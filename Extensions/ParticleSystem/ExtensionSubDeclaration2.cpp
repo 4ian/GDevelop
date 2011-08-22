@@ -34,6 +34,7 @@ freely, subject to the following restrictions:
  */
 void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 {
+    #if defined(GD_IDE_ONLY)
     DECLARE_OBJECT_ACTION("ParticleColor1",
                    _("Couleur initiale"),
                    _("Modifie la couleur initiale des particules."),
@@ -493,4 +494,5 @@ void Extension::ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos)
 
 
     DECLARE_END_OBJECT_CONDITION()
+    #endif
 }

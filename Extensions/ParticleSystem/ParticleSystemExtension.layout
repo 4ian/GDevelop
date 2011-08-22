@@ -2,19 +2,19 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
 	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2093" topLine="38" />
+		<Cursor1 position="2139" topLine="38" />
 	</File>
 	<File name="Extension.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1049" topLine="18" />
 	</File>
 	<File name="ExtensionSubDeclaration1.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="31807" topLine="602" />
+		<Cursor1 position="1288" topLine="11" />
 	</File>
 	<File name="ExtensionSubDeclaration2.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="24804" topLine="464" />
+		<Cursor1 position="1282" topLine="21" />
 	</File>
 	<File name="ExtensionSubDeclaration3.cpp" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="10380" topLine="218" />
+		<Cursor1 position="1295" topLine="19" />
 	</File>
 	<File name="ParticleEmitterInitialPositionPanel.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="6177" topLine="84" />
@@ -23,10 +23,10 @@
 		<Cursor1 position="1077" topLine="20" />
 	</File>
 	<File name="ParticleEmitterObject.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="26381" topLine="620" />
+		<Cursor1 position="1836" topLine="33" />
 	</File>
 	<File name="ParticleEmitterObject.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="14277" topLine="252" />
+		<Cursor1 position="1126" topLine="21" />
 	</File>
 	<File name="ParticleEmitterObjectEditor.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="73056" topLine="944" />
@@ -38,6 +38,6 @@
 		<Cursor1 position="72" topLine="3" />
 	</File>
 	<File name="ParticleSystemWrapper.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="72" topLine="3" />
+		<Cursor1 position="887" topLine="33" />
 	</File>
 </CodeBlocks_layout_file>

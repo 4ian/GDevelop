@@ -34,6 +34,7 @@ freely, subject to the following restrictions:
  */
 void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
 {
+    #if defined(GD_IDE_ONLY)
     DECLARE_OBJECT_ACTION("RecreateParticleSystem",
                    _("Recréer les particules"),
                    _("Efface et recréé les particules, pour prendre en compte par exemple les changements au niveau du paramétrage."),
@@ -406,4 +407,5 @@ void Extension::ExtensionSubDeclaration3(ExtensionObjectInfos & objInfos)
 
         instrInfo.cppCallingInformation.SetFunctionName("GetParticleAngle2").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
     DECLARE_END_OBJECT_EXPRESSION()
+    #endif
 }

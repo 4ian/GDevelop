@@ -344,8 +344,8 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					
+					
 					<Add directory="SPARK\include" />
 				</Compiler>
 				<Linker>
@@ -367,7 +367,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="../../ExtLibs/SFML/lib" />
 					<Add directory="SPARK\lib\gcc\static" />
 				</Linker>
 			</Target>
@@ -392,8 +392,8 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					
+					
 					<Add directory="SPARK\include" />
 				</Compiler>
 				<Linker>
@@ -416,7 +416,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="../../ExtLibs/SFML/lib" />
 					<Add directory="SPARK\lib\gcc\static" />
 				</Linker>
 			</Target>
@@ -440,8 +440,8 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					
+					
 					<Add directory="SPARK\include" />
 				</Compiler>
 				<Linker>
@@ -463,7 +463,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="../../ExtLibs/SFML/lib" />
 					<Add directory="SPARK\lib\gcc\static" />
 				</Linker>
 			</Target>
@@ -483,8 +483,8 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="\home\florian\Programmation\libs\boost_1_43_0" />
-					<Add directory="\home\florian\Programmation\libs\sfml\include" />
+					
+					
 					<Add directory="SPARK\include" />
 				</Compiler>
 				<Linker>
@@ -506,7 +506,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="\home\florian\Programmation\libs\sfml\lib" />
+					<Add directory="../../ExtLibs/SFML/lib" />
 					<Add directory="SPARK\lib\gcc\static" />
 				</Linker>
 			</Target>

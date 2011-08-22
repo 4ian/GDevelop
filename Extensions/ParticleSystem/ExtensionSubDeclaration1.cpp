@@ -35,6 +35,7 @@ freely, subject to the following restrictions:
  */
 void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
 {
+    #if defined(GD_IDE_ONLY)
     DECLARE_OBJECT_ACTION("EmitterForceMin",
                    _("Force minimale de l'émission"),
                    _("Modifie la force minimale d'émission des particules."),
@@ -631,4 +632,5 @@ void Extension::ExtensionSubDeclaration1(ExtensionObjectInfos & objInfos)
         instrInfo.cppCallingInformation.SetFunctionName("GetParticleGravityLength").SetManipulatedType("number").SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
     DECLARE_END_OBJECT_CONDITION()
+    #endif
 }

@@ -52,6 +52,7 @@ Extension::Extension()
                    &CreateParticleEmitterObject,
                    &DestroyParticleEmitterObject,
                    "ParticleEmitterObject");
+        #if defined(GD_IDE_ONLY)
 
         objInfos.SetIncludeFile("ParticleSystem/ParticleEmitterObject.h");
 
@@ -60,7 +61,10 @@ Extension::Extension()
         ExtensionSubDeclaration1(objInfos);
         ExtensionSubDeclaration3(objInfos);
 
+        #endif
+
     DECLARE_END_OBJECT()
+
 
     CompleteCompilationInformation();
 };

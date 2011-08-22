@@ -33,6 +33,7 @@ freely, subject to the following restrictions:
 #include "GDL/Position.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/RuntimeScene.h"
+#include "GDL/RotatedRectangle.h"
 #include "ParticleEmitterObject.h"
 #include "ParticleSystemWrapper.h"
 #include <SPK.h>
@@ -44,6 +45,11 @@ freely, subject to the following restrictions:
 #include "GDL/ResourcesMergingHelper.h"
 #include "GDL/MainEditorCommand.h"
 #include "ParticleEmitterObjectEditor.h"
+#endif
+
+#if defined(GD_IDE_ONLY)
+sf::Image ParticleEmitterObject::edittimeIconImage;
+sf::Sprite ParticleEmitterObject::edittimeIcon;
 #endif
 
 ParticleEmitterObject::ParticleEmitterObject(std::string name_) :
@@ -619,7 +625,7 @@ void ParticleEmitterObject::GetPropertyForDebugger(unsigned int propertyNb, stri
 {
     if ( !particleSystem.particleSystem ) return;
 
-    if      ( propertyNb == 0 ) {name = _T("Nombre de particules");      value = ToString(particleSystem.particleSystem->getNbParticles());}
+    if      ( propertyNb == 0 ) {name = _("Nombre de particules");      value = ToString(particleSystem.particleSystem->getNbParticles());}
 }
 
 bool ParticleEmitterObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -738,7 +744,7 @@ float ParticleEmitterObject::GetParticleGravityLength() const
 
 void ParticleEmitterObject::SetParticleColor1( const std::string & color )
 {
-    vector < string > colors = SpliterStringToVector <string> (color, ';');
+    vector < string > colors = SplitString <string> (color, ';');
 
     if ( colors.size() < 3 ) return; //Color is incorrect
 
@@ -748,7 +754,7 @@ void ParticleEmitterObject::SetParticleColor1( const std::string & color )
 }
 void ParticleEmitterObject::SetParticleColor2( const std::string & color )
 {
-    vector < string > colors = SpliterStringToVector <string> (color, ';');
+    vector < string > colors = SplitString <string> (color, ';');
 
     if ( colors.size() < 3 ) return; //Color is incorrect
 

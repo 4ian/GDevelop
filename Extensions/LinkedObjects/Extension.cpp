@@ -48,6 +48,8 @@ class Extension : public ExtensionBase
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
+            #if defined(GD_IDE_ONLY)
+
             DECLARE_ACTION("LinkObjects",
                            _("Lier deux objets"),
                            _("Lier deux objets ensemble, pour pouvoir retrouver l'un à partir de l'autre."),
@@ -173,17 +175,8 @@ class Extension : public ExtensionBase
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
             DECLARE_END_ACTION()
-            /*
-            DECLARE_STR_EXPRESSION("Encrypt", _("Crypter"), _("Crypter"), _("Cryptage"), "res/actions/scaleHeight.png", &ExpEncrypt)
-                instrInfo.AddParameter("string", _("Texte à crypter"), "", false);
-                instrInfo.AddParameter("string", _("Mot de passe ( 24 caractères )"), "", false);
-            DECLARE_END_STR_EXPRESSION()
 
-            DECLARE_STR_EXPRESSION("Decrypt", _("Decrypter"), _("Decrypter"), _("Cryptage"), "res/actions/scaleHeight.png", &ExpDecrypt)
-                instrInfo.AddParameter("string", _("Texte à décrypter"), "", false);
-                instrInfo.AddParameter("string", _("Mot de passe ( 24 caractères )"), "", false);
-            DECLARE_END_STR_EXPRESSION()
-            */
+            #endif
 
             CompleteCompilationInformation();
         };

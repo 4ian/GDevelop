@@ -25,7 +25,6 @@ freely, subject to the following restrictions:
 */
 
 #include "GDL/Instruction.h"
-#include "GDL/ObjectsConcerned.h"
 #include "GDL/RuntimeScene.h"
 #include "TimedEvent.h"
 #include <iostream>

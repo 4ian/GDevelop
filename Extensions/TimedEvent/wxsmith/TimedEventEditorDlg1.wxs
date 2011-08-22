@@ -72,9 +72,10 @@
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
-								<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="objectBt" member="yes">
-									<bitmap>res/objeticon.png</bitmap>
+								<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="expressionBt" member="yes">
+									<bitmap>res/expressionicon.png</bitmap>
 									<default>1</default>
+									<handler function="OnexpressionBtClick" entry="EVT_BUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>

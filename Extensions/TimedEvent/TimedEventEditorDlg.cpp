@@ -27,6 +27,7 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY)
 
 #include "TimedEventEditorDlg.h"
+#include "GDL/EditExpression.h"
 
 //(*InternalHeaders(TimedEventEditorDlg)
 #include <wx/bitmap.h>
@@ -96,9 +97,9 @@ scene(scene_)
 	FlexGridSizer4->AddGrowableCol(0);
 	timeoutEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer4->Add(timeoutEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	objectBt = new wxBitmapButton(this, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/objeticon.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
-	objectBt->SetDefault();
-	FlexGridSizer4->Add(objectBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	expressionBt = new wxBitmapButton(this, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/expressionicon.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
+	expressionBt->SetDefault();
+	FlexGridSizer4->Add(expressionBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -123,6 +124,7 @@ scene(scene_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
+	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TimedEventEditorDlg::OnexpressionBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TimedEventEditorDlg::OnokBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&TimedEventEditorDlg::OncancelBtClick);
 	//*)
@@ -149,4 +151,11 @@ void TimedEventEditorDlg::OncancelBtClick(wxCommandEvent& event)
 {
     EndModal(0);
 }
+
+void TimedEventEditorDlg::OnexpressionBtClick(wxCommandEvent& event)
+{
+    EditExpression dialog(this, string( timeoutEdit->GetValue().mb_str() ), game, scene);
+    if ( dialog.ShowModal() == 1 ) timeoutEdit->ChangeValue(dialog.expression);
+}
+
 #endif

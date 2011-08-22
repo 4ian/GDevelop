@@ -1,25 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="Extension.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="2164" topLine="73" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1956" topLine="30" />
 	</File>
-	<File name="TimedEvent.cpp" open="0" top="0" tabpos="4">
-		<Cursor position="12543" topLine="335" />
+	<File name="TimedEvent.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1497" topLine="27" />
 	</File>
-	<File name="TimedEvent.h" open="0" top="0" tabpos="2">
-		<Cursor position="2862" topLine="55" />
+	<File name="TimedEvent.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="4406" topLine="86" />
 	</File>
-	<File name="TimedEventActions.cpp" open="0" top="0" tabpos="3">
-		<Cursor position="1036" topLine="17" />
+	<File name="TimedEventEditorDlg.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2143" topLine="41" />
 	</File>
-	<File name="TimedEventActions.h" open="0" top="0" tabpos="5">
-		<Cursor position="1246" topLine="0" />
-	</File>
-	<File name="TimedEventEditorDlg.cpp" open="0" top="0" tabpos="1">
-		<Cursor position="7724" topLine="121" />
-	</File>
-	<File name="TimedEventEditorDlg.h" open="0" top="0" tabpos="3">
-		<Cursor position="2681" topLine="66" />
+	<File name="TimedEventEditorDlg.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1940" topLine="41" />
 	</File>
 </CodeBlocks_layout_file>

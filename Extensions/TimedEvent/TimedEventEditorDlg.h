@@ -52,13 +52,13 @@ class TimedEventEditorDlg: public wxDialog
 		virtual ~TimedEventEditorDlg();
 
 		//(*Declarations(TimedEventEditorDlg)
+		wxBitmapButton* expressionBt;
 		wxStaticText* StaticText2;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
 		wxButton* cancelBt;
 		wxStaticLine* StaticLine2;
-		wxBitmapButton* objectBt;
 		wxTextCtrl* nameEdit;
 		wxStaticLine* StaticLine1;
 		wxButton* okBt;
@@ -90,6 +90,7 @@ class TimedEventEditorDlg: public wxDialog
 		//(*Handlers(TimedEventEditorDlg)
 		void OnokBtClick(wxCommandEvent& event);
 		void OncancelBtClick(wxCommandEvent& event);
+		void OnexpressionBtClick(wxCommandEvent& event);
 		//*)
 
 		Game & game;

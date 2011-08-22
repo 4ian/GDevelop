@@ -24,22 +24,22 @@ freely, subject to the following restrictions:
 
 */
 
+#if defined(GD_IDE_ONLY)
+
 #ifndef TIMEDEVENT_H
 #define TIMEDEVENT_H
 #include "GDL/Event.h"
 #include <map>
 #include "GDL/ManualTimer.h"
 class RuntimeScene;
-class ObjectsConcerned;
 class Instruction;
-class Evaluateur;
 class TiXmlElement;
-
-#if defined(GD_IDE_ONLY)
+class EventsCodeGenerationContext;
+class EventsEditorItemsAreas;
+class EventsEditorSelection;
 class Scene;
 class MainEditorCommand;
 class wxWindow;
-#endif
 
 /**
  * Timed event
@@ -55,28 +55,7 @@ class GD_EXTENSION_API TimedEvent : public BaseEvent
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new TimedEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual void Execute( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
-
-        virtual void Preprocess(const Game & game, RuntimeScene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
-
-        /**
-         * Get time elapsed
-         */
-        float GetTime() const { return timer.GetTime();};
-
-        /**
-         * Change time elapsed
-         */
-        void SetTime(float newTime) { timer.SetTime(newTime);};
-
-        /**
-         * Reset time elapsed on the event
-         */
-        void Reset() {timer.Reset();};
-
-        static std::map < const Scene* , std::map < std::string, TimedEvent* > > timedEventsList; ///< Static map containing all functions, associated with their game, scene and name
-        void UnreferenceEvent();
-        void ReferenceEvent(Scene *);
+        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & callerContext);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -101,16 +80,13 @@ class GD_EXTENSION_API TimedEvent : public BaseEvent
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
         virtual vector < GDExpression* > GetAllExpressions();
 
-        #if defined(GD_IDE_ONLY)
         virtual void SaveToXml(TiXmlElement * eventElem) const;
-        #endif
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-#if defined(GD_IDE_ONLY)
         /**
          * Called by event editor to draw the event.
          */
-        virtual void Render(wxBufferedPaintDC & dc, int x, int y, unsigned int width) const;
+        virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 
         /**
          * Must return the height of the event when rendered
@@ -118,21 +94,15 @@ class GD_EXTENSION_API TimedEvent : public BaseEvent
         virtual unsigned int GetRenderedHeight(unsigned int width) const;
 
         /**
-         * Called when user click on the event
-         */
-        virtual void OnSingleClick(int x, int y, vector < boost::tuple< vector < BaseEventSPtr > *, unsigned int, vector < Instruction > *, unsigned int > > & eventsSelected,
-                                 bool & conditionsSelected, bool & instructionsSelected);
-
-        /**
          * Called when the user want to edit the event
          */
         virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
-#endif
+
+        static std::vector< TimedEvent* > codeGenerationCurrentParents;
+        std::vector< TimedEvent* > codeGenerationChildren;
 
     private:
         void Init(const TimedEvent & event);
-        bool ExecuteConditions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
-        void ExecuteActions( RuntimeScene & scene, ObjectsConcerned & objectsConcerned );
 
         string name;
         GDExpression timeout;
@@ -141,9 +111,9 @@ class GD_EXTENSION_API TimedEvent : public BaseEvent
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
 
-#if defined(GD_IDE_ONLY)
         bool nameSelected;
-#endif
 };
 
 #endif // TIMEDEVENT_H
+
+#endif

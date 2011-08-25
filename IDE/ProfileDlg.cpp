@@ -148,12 +148,12 @@ void ProfileDlg::UpdateGUI()
         return;
     }
 
-    eventsTimeTxt->SetLabel(_("Evenements : ")+ToString(lastEventsTime/1000.0f)+("ms")
+    eventsTimeTxt->SetLabel(_("Evenements : ")+ToString(static_cast<double>(lastEventsTime)/1000.0f)+("ms")
                             +_(" / Pourcentage de temps utilisé par les évenements : ")
                                      +ToString(static_cast<double>(lastEventsTime)/static_cast<double>((lastEventsTime+lastRenderingTime))*100.0f)
                                      +("%"));
 
-    totalTimeTxt->SetLabel(_("Temps de rendu total ( Affichage + Evenements )  : ")+ToString((lastRenderingTime+lastEventsTime)/1000.0f)+("ms"));
+    totalTimeTxt->SetLabel(_("Temps de rendu total ( Affichage + Evenements )  : ")+ToString(static_cast<double>((lastRenderingTime+lastEventsTime))/1000.0f)+("ms"));
 
     unsigned int currentObjectCount = sceneCanvas->edittimeRenderer.runtimeScene.objectsInstances.GetAllObjects().size();
     objectsCountTxt->SetLabel(_("Nombre d'objets : ")+ToString(currentObjectCount));
@@ -268,7 +268,7 @@ void ProfileDlg::ParseProfileEvents()
         boost::shared_ptr<BaseEvent> event = sceneCanvas->sceneEdited.profiler->profileEventsInformation[i].originalEvent.lock();
         if ( event != boost::shared_ptr<BaseEvent>())
         {
-            event->totalTimeDuringLastSession = sceneCanvas->sceneEdited.profiler->profileEventsInformation[i].GetTime();
+            event->totalTimeDuringLastSession = sceneCanvas->sceneEdited.profiler->profileEventsInformation[i].GetTime()/1000.0;
             event->percentDuringLastSession = static_cast<double>(event->totalTimeDuringLastSession)/static_cast<double>(totalEventsTime)*100.0f;
 
         }

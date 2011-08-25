@@ -192,11 +192,18 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
             wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg", wxFD_SAVE );
             FileDialog.ShowModal();
 
+            std::string path = ToString(FileDialog.GetPath());
+
+            #if defined(LINUX) //Extension seems not be added with wxGTK?
+            if ( FileDialog.GetFilterIndex() == 0 )
+                path += ".gdg";
+            #endif
+
             //A t on  un fichier à enregistrer ?
-            if ( FileDialog.GetPath() != "" )
+            if ( !path.empty() )
             {
                 //oui, donc on l'enregistre
-                games[i]->gameFile = FileDialog.GetPath();
+                games[i]->gameFile = path;
                 OpenSaveGame saveGame( *games[i] );
 
                 if ( !saveGame.SaveToFile(games[i]->gameFile) ) {wxLogError( "L'enregistrement a échoué." );}
@@ -238,14 +245,20 @@ void Game_Develop_EditorFrame::SaveAs()
     if ( !CurrentGameIsValid() ) return;
 
     //Affichage de la boite de dialogue
-    wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg", wxFD_SAVE );
+    wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg|All files|*.*", wxFD_SAVE );
     FileDialog.ShowModal();
 
+    std::string path = ToString(FileDialog.GetPath());
+    #if defined(LINUX) //Extension seems not be added with wxGTK?
+    if ( FileDialog.GetFilterIndex() == 0 )
+        path += ".gdg";
+    #endif
+
     //A t on  un fichier à enregistrer ?
-    if ( FileDialog.GetPath() != "" )
+    if ( !path.empty() )
     {
         //oui, donc on l'enregistre
-        GetCurrentGame()->gameFile = FileDialog.GetPath();
+        GetCurrentGame()->gameFile = path;
         OpenSaveGame saveGame( *GetCurrentGame() );
 
         if ( !saveGame.SaveToFile(GetCurrentGame()->gameFile) )

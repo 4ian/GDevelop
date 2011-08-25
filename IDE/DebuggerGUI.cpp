@@ -277,13 +277,13 @@ void DebuggerGUI::UpdateGUI()
         return;
 
     //General tab
-    generalList->SetItem(0, 1, ToString(1/scene.GetElapsedTime())+_(" i/s"));
-    generalList->SetItem(1, 1, ToString(scene.GetElapsedTime())+"s");
+    generalList->SetItem(0, 1, ToString(1000.0/scene.GetElapsedTime())+_(" i/s"));
+    generalList->SetItem(1, 1, ToString(static_cast<double>(scene.GetElapsedTime())/1000.0)+"s");
     generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
     generalList->SetItem(3, 1, ToString(scene.game->images.size()));
     generalList->SetItem(4, 1, ToString(scene.game->windowWidth)+"*"+ToString(scene.game->windowHeight));
-    generalList->SetItem(5, 1, ToString(scene.input->GetMouseX())+";"+ToString(scene.input->GetMouseY()));
-    generalList->SetItem(6, 1, ToString(scene.GetTimeFromStart())+"s");
+    generalList->SetItem(5, 1, ToString(sf::Mouse::GetPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::GetPosition(*scene.renderWindow).y));
+    generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000.0)+"s");
 
     const vector < Variable > sceneVariables = scene.variables.GetVariablesVector();
     const vector < Variable > gameVariables = scene.game->variables.GetVariablesVector();

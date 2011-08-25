@@ -599,7 +599,7 @@ void EditPropJeu::OnButton2Click(wxCommandEvent& event)
     }
     sf::RenderWindow App( sf::VideoMode( width, height, 32 ), "Chargement en cours...", style );
 
-    sf::Image image;
+    sf::Texture image;
     if ( imageCheck->GetValue() )
         image.LoadFromFile( static_cast<string>(imageEdit->GetValue()) );
 
@@ -622,7 +622,7 @@ void EditPropJeu::OnButton2Click(wxCommandEvent& event)
         App.Clear( sf::Color( 100, 100, 100 ) );
 
         // Process events
-        while ( App.GetEvent( Event ) )
+        while ( App.PollEvent( Event ) )
         {
             // Close window : exit
             if ( Event.Type == sf::Event::Closed || Event.Type == sf::Event::KeyPressed )

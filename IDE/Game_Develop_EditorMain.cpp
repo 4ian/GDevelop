@@ -360,10 +360,8 @@ buildToolsPnl(NULL)
     //Load wxAUI
     m_mgr.SetManagedWindow( this );
 
-    LoadSkin(&m_mgr);
+    LoadSkin(&m_mgr, editorsNotebook);
     LoadSkin(m_ribbon);
-
-    editorsNotebook->SetArtProvider(new GDAuiTabArt());
 
     //Create start page
     startPage = new StartHerePage(editorsNotebook, *this);
@@ -573,13 +571,14 @@ void Game_Develop_EditorFrame::LoadSkin(wxRibbonBar * bar)
     }
 }
 
-void Game_Develop_EditorFrame::LoadSkin(wxAuiManager * auiManager)
+void Game_Develop_EditorFrame::LoadSkin(wxAuiManager * auiManager, wxAuiNotebook * notebook)
 {
     wxConfigBase *pConfig = wxConfigBase::Get();
     wxString result;
 
     //DockArt skin
     wxAuiDefaultDockArt *dockArt = new wxAuiDefaultDockArt();
+    GDAuiTabArt * tabArt = new GDAuiTabArt();
     pConfig->Read( _T( "/Skin/Defined" ), &result );
     if ( result == "true" )
     {
@@ -625,6 +624,13 @@ void Game_Develop_EditorFrame::LoadSkin(wxAuiManager * auiManager)
         pConfig->Read( _T( "/Skin/ITextB" ), &b );
         dockArt->SetColour( 12, wxColour( r, v, b ) );
 
+        wxColor tabColor;
+        pConfig->Read( _T( "/Skin/TabColor" ), &tabColor );
+        tabArt->SetColour(tabColor);
+
+        wxColor activeTabColor;
+        pConfig->Read( _T( "/Skin/ActiveTabColor" ), &activeTabColor );
+        tabArt->SetActiveColour(activeTabColor);
     }
     else
     {
@@ -637,9 +643,12 @@ void Game_Develop_EditorFrame::LoadSkin(wxAuiManager * auiManager)
         dockArt->SetColour(11, wxColour(104,114,138));
         dockArt->SetColour(12, wxColour(104,114,138));
 
+        tabArt->SetColour(wxColour(220, 225, 232));
+        tabArt->SetActiveColour(wxColour(220, 225, 232));
     }
 
     auiManager->SetArtProvider(dockArt);
+    notebook->SetArtProvider(tabArt);
 }
 
 void Game_Develop_EditorFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& event)

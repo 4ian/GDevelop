@@ -97,9 +97,9 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
 	GridSizer1->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Couleur de fond"));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
-	FlexGridSizer4->AddGrowableCol(0);
+	FlexGridSizer4->AddGrowableCol(1);
 	FlexGridSizer4->AddGrowableRow(0);
-	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(24,23), wxSUNKEN_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	Panel1->SetBackgroundColour(wxColour(100,100,100));
 	FlexGridSizer4->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	ColorBt = new wxButton(this, ID_BUTTON1, _("Choisir la couleur"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
@@ -117,7 +117,7 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
 		_("Tri rapide ( rapide mais risque de \"clignotement\" )"),
 		_("Tri stable ( plus lent mais pas de \"clignotement\" )")
 	};
-	TriBox = new wxRadioBox(this, ID_RADIOBOX1, _("Méthode d\'affichage des objets"), wxDefaultPosition, wxSize(310,71), 2, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
+	TriBox = new wxRadioBox(this, ID_RADIOBOX1, _("Méthode d\'affichage des objets"), wxDefaultPosition, wxDefaultSize, 2, __wxRadioBoxChoices_1, 1, wxRA_HORIZONTAL, wxDefaultValidator, _T("ID_RADIOBOX1"));
 	FlexGridSizer5->Add(TriBox, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT3, _("Consultez l\'aide pour plus d\'informations sur les deux méthodes."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);

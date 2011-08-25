@@ -117,16 +117,16 @@ bool Game_Develop_EditorApp::OnInit()
     {wxCMD_LINE_PARAM,
     NULL,
     NULL,
-    wxT("Files to open"),
+    ("Files to open"),
     wxCMD_LINE_VAL_STRING,
     wxCMD_LINE_PARAM_MULTIPLE | wxCMD_LINE_PARAM_OPTIONAL
     },
 
-    {wxCMD_LINE_SWITCH, wxT("help"), NULL, wxT("Display help about launching Game Develop using command line") },
-    {wxCMD_LINE_SWITCH, wxT("version"), NULL, wxT("Display Game Develop version and quit"), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
-    {wxCMD_LINE_OPTION, wxT("lang"), NULL, wxT("Force loading a specific language ( Example : /lang=en_GB )"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
-    {wxCMD_LINE_SWITCH, wxT("allowMultipleInstances"), NULL, wxT("Allow to launch Game Develop even if it is already opened") },
-    {wxCMD_LINE_SWITCH, wxT("noCrashCheck"), NULL, wxT("Don't check if Game Develop crashed during last use.") },
+    {wxCMD_LINE_SWITCH, ("help"), NULL, ("Display help about launching Game Develop using command line") },
+    {wxCMD_LINE_SWITCH, ("version"), NULL, ("Display Game Develop version and quit"), wxCMD_LINE_VAL_NONE, wxCMD_LINE_OPTION_HELP },
+    {wxCMD_LINE_OPTION, ("lang"), NULL, ("Force loading a specific language ( Example : /lang=en_GB )"), wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
+    {wxCMD_LINE_SWITCH, ("allowMultipleInstances"), NULL, ("Allow to launch Game Develop even if it is already opened") },
+    {wxCMD_LINE_SWITCH, ("noCrashCheck"), NULL, ("Don't check if Game Develop crashed during last use.") },
 
     {wxCMD_LINE_NONE}
     };

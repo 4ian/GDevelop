@@ -11,7 +11,6 @@
 #include <iostream>
 #include <wx/dcbuffer.h>
 
-
 // the original wx functions live in dockart.cpp -- need to redefine them
 unsigned char gdAuiBlendColour(unsigned char fg, unsigned char bg, double alpha)
 {
@@ -207,26 +206,7 @@ GDAuiTabArt::GDAuiTabArt()
     m_fixed_tab_width = 100;
     m_tab_ctrl_height = 0;
 
-#if defined( __WXMAC__ ) && wxOSX_USE_COCOA_OR_CARBON
-    wxColor base_colour = wxColour( wxMacCreateCGColorFromHITheme(kThemeBrushToolbarBackground));
-#else
-    wxColor base_colour = wxSystemSettings::GetColour(wxSYS_COLOUR_3DFACE);
-#endif
-
-    // the base_colour is too pale to use as our base colour,
-    // so darken it a bit --
-    if ((255-base_colour.Red()) +
-        (255-base_colour.Green()) +
-        (255-base_colour.Blue()) < 60)
-    {
-        base_colour = gdAuiStepColour(base_colour, 92);
-    }
-
-    m_base_colour = base_colour;
-
-    //Game Develop use a light blue for base colour
-    m_base_colour = wxColour(220, 225, 232);
-    wxColor border_colour = gdAuiStepColour(base_colour, 75);
+    wxColor border_colour = gdAuiStepColour(m_base_colour, 75);
 
     m_border_pen = wxPen(border_colour);
     m_base_colour_pen = wxPen(m_base_colour);
@@ -247,6 +227,22 @@ GDAuiTabArt::GDAuiTabArt()
     m_flags = 0;
 }
 
+void GDAuiTabArt::SetColour(const wxColour& colour)
+{
+    m_base_colour = colour;
+
+    wxColor border_colour = gdAuiStepColour(m_base_colour, 75);
+
+    m_border_pen = wxPen(border_colour);
+    m_base_colour_pen = wxPen(m_base_colour);
+    m_base_colour_brush = wxBrush(m_base_colour);
+}
+
+void GDAuiTabArt::SetActiveColour(const wxColour& colour)
+{
+    m_active_colour = colour;
+}
+
 GDAuiTabArt::~GDAuiTabArt()
 {
 }
@@ -257,6 +253,8 @@ wxAuiTabArt* GDAuiTabArt::Clone()
     art->SetNormalFont(m_normal_font);
     art->SetSelectedFont(m_selected_font);
     art->SetMeasuringFont(m_measuring_font);
+    art->SetColour(m_base_colour);
+    art->SetActiveColour(m_active_colour);
 
     return art;
 }
@@ -471,8 +469,8 @@ void GDAuiTabArt::DrawTab(wxDC& dc,
 
         // draw base background color
         wxRect r(tab_x, tab_y, tab_width, tab_height);
-        dc.SetPen(m_base_colour_pen);
-        dc.SetBrush(m_base_colour_brush);
+        dc.SetPen(wxPen(m_active_colour));
+        dc.SetBrush(wxBrush(m_active_colour));
         dc.DrawRectangle(r.x+1, r.y+1, r.width-1, r.height-4);
 
         // this white helps fill out the gradient at the top of the tab
@@ -481,7 +479,7 @@ void GDAuiTabArt::DrawTab(wxDC& dc,
         dc.DrawRectangle(r.x+2, r.y+1, r.width-3, r.height-4);
 
         // these two points help the rounded corners appear more antialiased
-        dc.SetPen(m_base_colour_pen);
+        dc.SetPen(wxPen(m_active_colour));
         dc.DrawPoint(r.x+2, r.y+1);
         dc.DrawPoint(r.x+r.width-2, r.y+1);
 
@@ -494,7 +492,7 @@ void GDAuiTabArt::DrawTab(wxDC& dc,
 
         // draw gradient background
         wxColor top_color = *wxWHITE;
-        wxColor bottom_color = m_base_colour;
+        wxColor bottom_color = m_active_colour;
         dc.GradientFillLinear(r, bottom_color, top_color, wxSOUTH);
     }
     else

@@ -41,8 +41,8 @@ class EditorScene: public wxPanel
 
 		//(*Declarations(EditorScene)
 		wxScrollBar* scrollBar1;
-		wxScrollBar* scrollBar2;
 		EventsEditor* eventsEditor;
+		wxScrollBar* scrollBar2;
 		SceneCanvas* sceneCanvas;
 		wxPanel* scenePanel;
 		wxPanel* eventsPanel;

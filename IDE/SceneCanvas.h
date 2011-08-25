@@ -258,7 +258,7 @@ private :
     vector < vector < InitialPosition > > history; ///< History of changes
     vector < vector < InitialPosition > > redoHistory; ///< Histoy of changes so as to "redo"
 
-    static sf::Image reloadingIconImage;
+    static sf::Texture reloadingIconImage;
     static sf::Sprite reloadingIconSprite;
     static sf::Text reloadingText;
 };

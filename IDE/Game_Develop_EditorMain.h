@@ -96,7 +96,7 @@ class Game_Develop_EditorFrame: public wxFrame
         void Open(string FichierJeu);
 
         static void LoadSkin(wxRibbonBar * bar);
-        static void LoadSkin(wxAuiManager * auiManager);
+        static void LoadSkin(wxAuiManager * auiManager, wxAuiNotebook * notebook);
 
         /**
          * Get a pointer to notebook containing editors

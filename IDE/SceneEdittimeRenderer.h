@@ -46,6 +46,7 @@ class SceneEdittimeRenderer
         vector < float > yObjectsSelected;
         int xDecalement;
         int yDecalement;
+        ObjSPtr rightClickSelectedObject;
 
         //Rectangle de selection
         float xRectangleSelection;

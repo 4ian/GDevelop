@@ -464,7 +464,7 @@
 					<Add option="-lLLVMX86Disassembler" />
 					<Add option="-lLLVMCBackendInfo" />
 					<Add directory="bin\release" />
-					<Add directory="..\ExtLibs\SFML\lib" />
+					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>
 			</Target>
@@ -543,7 +543,7 @@
 					<Add option="-lLLVMX86Disassembler" />
 					<Add option="-lLLVMCBackendInfo" />
 					<Add directory="bin\debug" />
-					<Add directory="..\ExtLibs\SFML\lib" />
+					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>
 			</Target>

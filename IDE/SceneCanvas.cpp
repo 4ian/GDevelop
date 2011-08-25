@@ -92,7 +92,7 @@ const long SceneCanvas::ID_MENUITEM6 = wxNewId();
 const long SceneCanvas::ID_MENUITEM7 = wxNewId();
 
 
-sf::Image SceneCanvas::reloadingIconImage;
+sf::Texture SceneCanvas::reloadingIconImage;
 sf::Sprite SceneCanvas::reloadingIconSprite;
 sf::Text SceneCanvas::reloadingText;
 
@@ -109,7 +109,7 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
         scrollBar2(NULL)
 {
     reloadingIconImage.LoadFromFile("res/compile128.png");
-    reloadingIconSprite.SetImage(reloadingIconImage);
+    reloadingIconSprite.SetTexture(reloadingIconImage);
     reloadingText.SetColor(sf::Color(0,0,0,128));
     reloadingText.SetString(string(_("Compilation en cours...").mb_str()));
     reloadingText.SetCharacterSize(40);
@@ -678,7 +678,6 @@ void SceneCanvas::OnKey( wxKeyEvent& evt )
 
 void SceneCanvas::Reload()
 {
-    cout << "Reload: " << endl;
     ReloadFirstPart();
 }
 
@@ -720,10 +719,10 @@ void SceneCanvas::ReloadFirstPart()
 
 void SceneCanvas::ReloadSecondPart()
 {
+    cout << "ReloadSecondPart" << endl;
     if ( !edittimeRenderer.editing )
         EventsCodeCompiler::GetInstance()->DisableCompilation(sceneEdited);
 
-    cout << "ReloadSecondPart" << endl;
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !edittimeRenderer.editing && gameEdited.useExternalSourceFiles )
     {
@@ -770,7 +769,7 @@ void SceneCanvas::Refresh()
         {
             //Display a message when compiling
             sf::Event event;
-            while ( GetEvent( event ) )
+            while ( PollEvent( event ) )
                 ;
 
             Clear(sf::Color(255,255,255));
@@ -778,7 +777,7 @@ void SceneCanvas::Refresh()
             SaveGLStates();
             SetView(sf::View(sf::Vector2f(GetWidth()/2,GetHeight()/2), sf::Vector2f(GetWidth(),GetHeight())));
 
-            reloadingIconSprite.SetImage(reloadingIconImage);
+            reloadingIconSprite.SetTexture(reloadingIconImage);
             reloadingIconSprite.SetColor(sf::Color(255,255,255,128));
             reloadingIconSprite.SetPosition(GetWidth()/2-reloadingIconSprite.GetSize().x/2, GetHeight()/2-reloadingIconSprite.GetSize().y/2);
             reloadingText.SetPosition(GetWidth()/2-reloadingText.GetRect().Width/2, reloadingIconSprite.GetPosition().y+reloadingIconSprite.GetSize().y+10);
@@ -923,11 +922,11 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
 
     ObjSPtr object = edittimeRenderer.FindSmallestObject();
 
-    int mouseX = ConvertCoords(edittimeRenderer.runtimeScene.input->GetMouseX(), 0).x;
-    int mouseY = ConvertCoords(0, edittimeRenderer.runtimeScene.input->GetMouseY()).y;
+    int mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
+    int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
 
     //Suppress selection
-    if ( (!edittimeRenderer.runtimeScene.input->IsKeyDown(sf::Key::LShift) && !edittimeRenderer.runtimeScene.input->IsKeyDown(sf::Key::RShift)) && //Check that shift is not pressed
+    if ( (!sf::Keyboard::IsKeyPressed(sf::Keyboard::LShift) && !sf::Keyboard::IsKeyPressed(sf::Keyboard::RShift)) && //Check that shift is not pressed
         ( object == boost::shared_ptr<Object> () || //If no object is clicked
          find(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object) == edittimeRenderer.objectsSelected.end()) ) //Or an object which is not currently selected.
     {
@@ -1092,31 +1091,13 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
 void SceneCanvas::OnMotion( wxMouseEvent &event )
 {
     //Mille mercis Laurent.
-    int mouseXInScene = 0;
-    int mouseYInScene = 0;
-
-    wxString Xstr;
-    wxString Ystr;
+    int mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
+    int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
 
     if ( !edittimeRenderer.editing )
-    {
-        mouseXInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(edittimeRenderer.runtimeScene.input->GetMouseX(), 0, edittimeRenderer.runtimeScene.GetLayer("").GetCamera(0).GetSFMLView()).x);
-        mouseYInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(0, edittimeRenderer.runtimeScene.input->GetMouseY(), edittimeRenderer.runtimeScene.GetLayer("").GetCamera(0).GetSFMLView()).y);
-        Xstr =ToString( mouseXInScene );
-        Ystr =ToString( mouseYInScene );
-
-        wxLogStatus( wxString( _( "Position " ) ) + Xstr + wxString( _( ";" ) ) + Ystr + wxString( _( ". ( Calque de base, Caméra 0 )" ) ) );
-    }
+        wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". ( Calque de base, Caméra 0 )" ) ) );
     else
-    {
-        mouseXInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(edittimeRenderer.runtimeScene.input->GetMouseX(), 0).x);
-        mouseYInScene = static_cast<int>(sf::RenderWindow::ConvertCoords(0, edittimeRenderer.runtimeScene.input->GetMouseY()).y);
-
-        Xstr =ToString( mouseXInScene );
-        Ystr =ToString( mouseYInScene );
-
-        wxLogStatus( wxString( _( "Position " ) ) + Xstr + wxString( _( ";" ) ) + Ystr + wxString( _( ". SHIFT pour sélection multiple, clic droit pour plus d'options." ) ) );
-    }
+        wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". SHIFT pour sélection multiple, clic droit pour plus d'options." ) ) );
 
     //Le reste concerne juste le mode édition
     if ( edittimeRenderer.runtimeScene.running )
@@ -1124,14 +1105,14 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
 
     //Déplacement avec la souris
     if ( edittimeRenderer.isMoving )
-        edittimeRenderer.view.Move( edittimeRenderer.deplacementOX - mouseXInScene, edittimeRenderer.deplacementOY - mouseYInScene );
+        edittimeRenderer.view.Move( edittimeRenderer.deplacementOX - mouseX, edittimeRenderer.deplacementOY - mouseY );
 
     if ( edittimeRenderer.isResizingX )
     {
         for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
         {
             ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
-            object->SetWidth(mouseXInScene-edittimeRenderer.xObjectsSelected.at(i));
+            object->SetWidth(mouseX-edittimeRenderer.xObjectsSelected.at(i));
 
             int idPos = GetInitialPositionFromObject(object);
             if ( idPos != -1 )
@@ -1147,7 +1128,7 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
         for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
         {
             ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
-            object->SetHeight(mouseYInScene-edittimeRenderer.yObjectsSelected.at(i));
+            object->SetHeight(mouseY-edittimeRenderer.yObjectsSelected.at(i));
 
             int idPos = GetInitialPositionFromObject(object);
             if ( idPos != -1 )
@@ -1163,8 +1144,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
         for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
         {
             ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
-            float x = mouseXInScene-(object->GetDrawableX()+object->GetWidth()/2);
-            float y = mouseYInScene-(object->GetDrawableY()+object->GetHeight()/2);
+            float x = mouseX-(object->GetDrawableX()+object->GetWidth()/2);
+            float y = mouseY-(object->GetDrawableY()+object->GetHeight()/2);
             float newAngle = atan2(y,x)*180/3.14159;
 
             object->SetAngle(newAngle);
@@ -1187,8 +1168,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
             if ( idPos != -1 )
             {
                 //Déplacement effectué par la souris
-                int deltaX = mouseXInScene - edittimeRenderer.oldMouseX;
-                int deltaY = mouseYInScene - edittimeRenderer.oldMouseY;
+                int deltaX = mouseX - edittimeRenderer.oldMouseX;
+                int deltaY = mouseY - edittimeRenderer.oldMouseY;
 
                 //Anciennes et nouvelles coordonnées
                 int oldX = edittimeRenderer.xObjectsSelected[i];
@@ -1214,8 +1195,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
     }
     if ( edittimeRenderer.isSelecting )
     {
-        edittimeRenderer.xEndRectangleSelection = mouseXInScene;
-        edittimeRenderer.yEndRectangleSelection = mouseYInScene;
+        edittimeRenderer.xEndRectangleSelection = mouseX;
+        edittimeRenderer.yEndRectangleSelection = mouseY;
     }
 
 }
@@ -1225,7 +1206,10 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnLeftDClick( wxMouseEvent &event )
 {
-    AddObjetSelected(ConvertCoords(edittimeRenderer.runtimeScene.input->GetMouseX(), 0).x, ConvertCoords(0, edittimeRenderer.runtimeScene.input->GetMouseY()).y);
+    int mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
+    int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+
+    AddObjetSelected(mouseX, mouseY);
 }
 
 ////////////////////////////////////////////////////////////
@@ -1233,7 +1217,10 @@ void SceneCanvas::OnLeftDClick( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnAddObjetSelected( wxCommandEvent & event )
 {
-    AddObjetSelected(ConvertCoords(edittimeRenderer.runtimeScene.input->GetMouseX(), 0).x, ConvertCoords(0, edittimeRenderer.runtimeScene.input->GetMouseY()).y);
+    int mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
+    int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+
+    AddObjetSelected(mouseX, mouseY);
 }
 
 void SceneCanvas::AddObjetSelected(float x, float y)
@@ -1309,7 +1296,7 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
 
     //Suppress selection if
     if ( object == boost::shared_ptr<Object> () || /*Not clicked on an object*/
-        (( !edittimeRenderer.runtimeScene.input->IsKeyDown(sf::Key::LShift) && !edittimeRenderer.runtimeScene.input->IsKeyDown(sf::Key::RShift) ) && /*Clicked without using shift*/
+        (( !sf::Keyboard::IsKeyPressed(sf::Keyboard::LShift) && !sf::Keyboard::IsKeyPressed(sf::Keyboard::RShift) ) && /*Clicked without using shift*/
          find(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object) == edittimeRenderer.objectsSelected.end() ))
     {
         edittimeRenderer.objectsSelected.clear();
@@ -1325,6 +1312,7 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
         PopupMenu(&noObjectContextMenu);
         return;
     }
+    edittimeRenderer.rightClickSelectedObject = object;
 
     //Add the object to selection
     if ( find(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object) == edittimeRenderer.objectsSelected.end() )
@@ -1380,9 +1368,12 @@ void SceneCanvas::OnCopySelected(wxCommandEvent & event)
         int posId = GetInitialPositionFromObject(edittimeRenderer.objectsSelected[i]);
         if ( posId != -1 )
         {
+            int mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
+            int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+
             copiedPositions.push_back(sceneEdited.initialObjectsPositions.at(posId));
-            copiedPositions.back().x -= ConvertCoords(edittimeRenderer.runtimeScene.input->GetMouseX(), 0).x;
-            copiedPositions.back().y -= ConvertCoords(0, edittimeRenderer.runtimeScene.input->GetMouseY()).y;
+            copiedPositions.back().x -= mouseX;
+            copiedPositions.back().y -= mouseY;
         }
     }
 
@@ -1399,9 +1390,12 @@ void SceneCanvas::OnCutSelected(wxCommandEvent & event)
         if ( posId != -1 )
         {
             //Copy position
+            float mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
+            float mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+
             copiedPositions.push_back(sceneEdited.initialObjectsPositions.at(posId));
-            copiedPositions.back().x -= ConvertCoords(edittimeRenderer.runtimeScene.input->GetMouseX(), 0).x;
-            copiedPositions.back().y -= ConvertCoords(0, edittimeRenderer.runtimeScene.input->GetMouseY()).y;
+            copiedPositions.back().x -= mouseX;
+            copiedPositions.back().y -= mouseY;
 
             //Remove objects
             sceneEdited.initialObjectsPositions.erase(sceneEdited.initialObjectsPositions.begin() + posId);
@@ -1427,9 +1421,12 @@ void SceneCanvas::OnPasteSelected(wxCommandEvent & event)
 
     for (unsigned int i =0;i<pastedPositions.size();++i)
     {
+        float mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
+        float mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+
         sceneEdited.initialObjectsPositions.push_back(pastedPositions[i]);
-        sceneEdited.initialObjectsPositions.back().x += ConvertCoords(edittimeRenderer.runtimeScene.input->GetMouseX(), 0).x;
-        sceneEdited.initialObjectsPositions.back().y += ConvertCoords(0, edittimeRenderer.runtimeScene.input->GetMouseY()).y;
+        sceneEdited.initialObjectsPositions.back().x += mouseX;
+        sceneEdited.initialObjectsPositions.back().y += mouseY;
     }
 
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
@@ -1469,11 +1466,9 @@ void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
     if ( !edittimeRenderer.editing )
         return;
 
-    //Cherche l'objet sous la souris
-    ObjSPtr smallestObject = edittimeRenderer.FindSmallestObject();
-    if ( smallestObject == boost::shared_ptr<Object> ()) return;
+    if ( edittimeRenderer.rightClickSelectedObject == boost::shared_ptr<Object> ()) return;
 
-    int idPos = GetInitialPositionFromObject(smallestObject);
+    int idPos = GetInitialPositionFromObject(edittimeRenderer.rightClickSelectedObject);
     if ( idPos == -1 ) return;
 
     bool hadAPersonalizedSize = sceneEdited.initialObjectsPositions.at( idPos ).personalizedSize;
@@ -1484,18 +1479,18 @@ void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
     {
         sceneEdited.initialObjectsPositions.at( idPos ) = DialogPosition.position;
 
-        smallestObject->SetX( sceneEdited.initialObjectsPositions.at( idPos ).x );
-        smallestObject->SetY( sceneEdited.initialObjectsPositions.at( idPos ).y );
-        smallestObject->SetAngle( sceneEdited.initialObjectsPositions.at( idPos ).angle );
-        smallestObject->SetZOrder( sceneEdited.initialObjectsPositions.at( idPos ).zOrder );
-        smallestObject->SetLayer( sceneEdited.initialObjectsPositions.at( idPos ).layer );
+        edittimeRenderer.rightClickSelectedObject->SetX( sceneEdited.initialObjectsPositions.at( idPos ).x );
+        edittimeRenderer.rightClickSelectedObject->SetY( sceneEdited.initialObjectsPositions.at( idPos ).y );
+        edittimeRenderer.rightClickSelectedObject->SetAngle( sceneEdited.initialObjectsPositions.at( idPos ).angle );
+        edittimeRenderer.rightClickSelectedObject->SetZOrder( sceneEdited.initialObjectsPositions.at( idPos ).zOrder );
+        edittimeRenderer.rightClickSelectedObject->SetLayer( sceneEdited.initialObjectsPositions.at( idPos ).layer );
 
-        smallestObject->InitializeFromInitialPosition(sceneEdited.initialObjectsPositions.at( idPos ));
+        edittimeRenderer.rightClickSelectedObject->InitializeFromInitialPosition(sceneEdited.initialObjectsPositions.at( idPos ));
 
         if ( sceneEdited.initialObjectsPositions.at( idPos ).personalizedSize )
         {
-            smallestObject->SetWidth( sceneEdited.initialObjectsPositions.at( idPos ).width );
-            smallestObject->SetHeight( sceneEdited.initialObjectsPositions.at( idPos ).height );
+            edittimeRenderer.rightClickSelectedObject->SetWidth( sceneEdited.initialObjectsPositions.at( idPos ).width );
+            edittimeRenderer.rightClickSelectedObject->SetHeight( sceneEdited.initialObjectsPositions.at( idPos ).height );
         }
         else if ( hadAPersonalizedSize ) //For now, we reload the scene so as the object get back its initial size
         {
@@ -1555,9 +1550,11 @@ void SceneCanvas::OnMiddleDown( wxMouseEvent &event )
 
     if ( !edittimeRenderer.isMoving )
     {
+        sf::Vector2f mousePos = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y);
+
         edittimeRenderer.isMoving = true;
-        edittimeRenderer.deplacementOX = ConvertCoords(edittimeRenderer.runtimeScene.input->GetMouseX(), 0).x;
-        edittimeRenderer.deplacementOY = ConvertCoords(0, edittimeRenderer.runtimeScene.input->GetMouseY()).y;
+        edittimeRenderer.deplacementOX = mousePos.x;
+        edittimeRenderer.deplacementOY = mousePos.y;
         SetCursor( wxCursor( wxCURSOR_SIZING ) );
         return;
     }

@@ -7,6 +7,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include "GDL/CommonInstructions.h"
 #include <string>
 #include <SFML/System.hpp>
 
@@ -113,7 +114,7 @@ void GeneratePassword::OnCreerBtClick(wxCommandEvent& event)
     mdpEdit->ChangeValue("");
     for (unsigned int i = 0;i<static_cast<unsigned>(number);i++)
     {
-        int nb = sf::Randomizer::Random(0, 41);
+        int nb = Random(41);
         mdpEdit->ChangeValue(mdpEdit->GetValue()+carac.substr(nb,1));
     }
 }

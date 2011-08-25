@@ -80,7 +80,6 @@ mainEditorCommand(mainEditorCommand_)
 	sceneCanvas = new SceneCanvas(scenePanel, game, scene, mainEditorCommand, ID_CUSTOM1,wxPoint(0,0),wxSize(800,600), wxWANTS_CHARS | wxBORDER_SIMPLE);
 	eventsPanel = new wxPanel(notebook, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
 	eventsPanel->SetBackgroundColour(wxColour(255,255,255));
-	eventsPanel->SetToolTip(_("Editer les évènements de la scène."));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
 	FlexGridSizer3->AddGrowableRow(0);
@@ -142,7 +141,7 @@ mainEditorCommand(mainEditorCommand_)
             notebook->SetWindowStyleFlag(style);
         }
     }
-    Game_Develop_EditorFrame::LoadSkin(&m_mgr);
+    Game_Develop_EditorFrame::LoadSkin(&m_mgr, notebook);
 
     mainEditorCommand.GetRibbon()->SetActivePage(3);
     sceneCanvas->ConnectEvents();

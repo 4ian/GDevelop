@@ -527,7 +527,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
                 dc.DrawRectangle(x-61-2, y, 61,31);
 
                 std::ostringstream timeStr; timeStr.setf(ios::fixed,ios::floatfield); timeStr.precision(2);
-                timeStr << events[i]->totalTimeDuringLastSession/1000.0f;
+                timeStr << static_cast<double>(events[i]->totalTimeDuringLastSession)/1000.0f;
                 dc.DrawText(timeStr.str()+"ms", x-61, y+3);
 
                 std::ostringstream percentStr; percentStr.setf(ios::fixed,ios::floatfield); percentStr.precision(2);

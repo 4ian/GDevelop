@@ -86,7 +86,7 @@ Demarrage::Demarrage(wxWindow* parent)
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer4->AddGrowableRow(0);
-	StaticBitmap1 = new wxStaticBitmap(Panel4, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/gd-logo.png"))), wxPoint(-56,-64), wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
+	StaticBitmap1 = new wxStaticBitmap(Panel4, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/GD-logo.png"))), wxPoint(-56,-64), wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer4->Add(StaticBitmap1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	Panel4->SetSizer(FlexGridSizer4);
 	FlexGridSizer4->Fit(Panel4);

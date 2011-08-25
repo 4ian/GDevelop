@@ -33,6 +33,7 @@ class Preferences: public wxDialog
 		wxButton* OkBt;
 		wxButton* compilerToolchainBt;
 		wxStaticText* StaticText9;
+		wxStaticText* StaticText20;
 		wxPanel* backColorPnl;
 		wxPanel* Panel5;
 		wxCheckBox* hideLabelsCheck;
@@ -49,12 +50,15 @@ class Preferences: public wxDialog
 		wxChoice* sceneEventsTabPosition;
 		wxStaticText* StaticText14;
 		wxStaticText* StaticText6;
+		wxPanel* activeTabColorPnl;
 		wxPanel* borderColorPnl;
+		wxStaticText* StaticText19;
 		wxStaticText* StaticText8;
 		wxStaticText* StaticText11;
 		wxStaticText* StaticText18;
 		wxTextCtrl* autosaveTimeEdit;
 		wxPanel* Panel8;
+		wxPanel* tabColorPnl;
 		wxPanel* Panel1;
 		wxTextCtrl* conditionsColumnWidthEdit;
 		wxPanel* activeTextColorPnl;
@@ -83,6 +87,7 @@ class Preferences: public wxDialog
 		wxButton* AnnulerBt;
 		wxPanel* Panel2;
 		wxChoice* langChoice;
+		wxButton* radianceStyleBt;
 		wxTextCtrl* DossierTempCompEdit;
 		wxPanel* ribbonColor1Pnl;
 		wxPanel* ribbonColor2Pnl;
@@ -125,6 +130,7 @@ class Preferences: public wxDialog
 		static const long ID_PANEL16;
 		static const long ID_BUTTON6;
 		static const long ID_BUTTON7;
+		static const long ID_BUTTON10;
 		static const long ID_BUTTON8;
 		static const long ID_RADIOBOX1;
 		static const long ID_STATICTEXT1;
@@ -147,6 +153,10 @@ class Preferences: public wxDialog
 		static const long ID_PANEL12;
 		static const long ID_STATICTEXT12;
 		static const long ID_PANEL14;
+		static const long ID_STATICTEXT19;
+		static const long ID_PANEL19;
+		static const long ID_STATICTEXT20;
+		static const long ID_PANEL20;
 		static const long ID_PANEL8;
 		static const long ID_STATICTEXT17;
 		static const long ID_TEXTCTRL5;
@@ -194,10 +204,14 @@ class Preferences: public wxDialog
 		void OnobjectParamColorLeftUp(wxMouseEvent& event);
 		void OnautoParamColorLeftUp(wxMouseEvent& event);
 		void OnexpressionParamColorLeftUp(wxMouseEvent& event);
+		void OnradianceStyleBtClick(wxCommandEvent& event);
+		void OnactiveTabColorPnlLeftUp(wxMouseEvent& event);
+		void OntabColorPnlLeftUp(wxMouseEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();
 		void SetSkinAUI();
+		void SetSkinRadiance();
 
 		bool changesNeedRestart;
 

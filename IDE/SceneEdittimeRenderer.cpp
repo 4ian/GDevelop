@@ -110,7 +110,7 @@ void SceneEdittimeRenderer::RenderSceneEdittimeRenderer()
                                                     allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2-2
                                                     +20*sin(allObjects[id]->GetAngle()/180.f*3.14159) );
 
-                            centerToAngle.Rotate(-allObjects[id]->GetAngle());
+                            centerToAngle.Rotate(allObjects[id]->GetAngle());
                             centerToAngle.SetPosition(  allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
                                                         allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2);
 
@@ -158,18 +158,21 @@ void SceneEdittimeRenderer::RenderSceneEdittimeRenderer()
 
         if ( object != boost::shared_ptr<Object>() )
         {
+            float mouseX = runtimeScene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*runtimeScene.renderWindow).y).x;
+            float mouseY = runtimeScene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*runtimeScene.renderWindow).y).y;
+
             //Changing an initial object position is not dangerous,
             //as objects created from initial objects are always placed
             //to some coordinates just after their creations.
             if ( sceneEdited.grid && sceneEdited.snap )
             {
-                object->SetX( static_cast<int>(runtimeScene.renderWindow->ConvertCoords(runtimeScene.input->GetMouseX(), 0).x/sceneEdited.gridWidth)*sceneEdited.gridWidth );
-                object->SetY( static_cast<int>(runtimeScene.renderWindow->ConvertCoords(0, runtimeScene.input->GetMouseY()).y/sceneEdited.gridHeight)*sceneEdited.gridHeight );
+                object->SetX( static_cast<int>(mouseX/sceneEdited.gridWidth)*sceneEdited.gridWidth );
+                object->SetY( static_cast<int>(mouseY/sceneEdited.gridHeight)*sceneEdited.gridHeight );
             }
             else
             {
-                object->SetX( runtimeScene.renderWindow->ConvertCoords(runtimeScene.input->GetMouseX(), 0).x );
-                object->SetY( runtimeScene.renderWindow->ConvertCoords(0, runtimeScene.input->GetMouseY()).y );
+                object->SetX( mouseX );
+                object->SetY( mouseY );
             }
 
             object->DrawEdittime( *runtimeScene.renderWindow );
@@ -222,8 +225,8 @@ void SceneEdittimeRenderer::RenderGrid()
 ObjSPtr SceneEdittimeRenderer::FindSmallestObject()
 {
     ObjList potentialObjects;
-    int x = runtimeScene.renderWindow->ConvertCoords(runtimeScene.input->GetMouseX(), 0).x;
-    int y = runtimeScene.renderWindow->ConvertCoords(0, runtimeScene.input->GetMouseY()).y;
+    float x = runtimeScene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*runtimeScene.renderWindow).y).x;
+    float y = runtimeScene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*runtimeScene.renderWindow).y).y;
 
     ObjList allObjects = runtimeScene.objectsInstances.GetAllObjects();
 
@@ -236,29 +239,22 @@ ObjSPtr SceneEdittimeRenderer::FindSmallestObject()
                 runtimeScene.GetLayer(allObjects[id]->GetLayer()).GetVisibility())
         {
             potentialObjects.push_back( allObjects[id] );
+            std::cout << "potential:" << potentialObjects.back()->GetName() << std::endl;
         }
     }
     if ( potentialObjects.empty() ) return boost::shared_ptr<Object> (); //Aucun objet trouvé
 
     ObjSPtr smallest = potentialObjects[0]; //1er objet par défaut
-    if ( potentialObjects.size() > 1 )
+    for ( unsigned int j = 0;j < potentialObjects.size();j++ )
     {
-        int compare = 1;
-        for ( unsigned int j = 0;j < potentialObjects.size();j++ )
+        std::cout << "potential size:" << potentialObjects[j]->GetName() << ":" << potentialObjects[j]->GetWidth() * potentialObjects[j]->GetHeight() << std::endl;
+        if (( potentialObjects[j]->GetWidth() * potentialObjects[j]->GetHeight() ) < ( smallest->GetWidth() * smallest->GetHeight() ) )
         {
-            if (( potentialObjects[j]->GetWidth() * potentialObjects[j]->GetHeight() ) <
-                    ( potentialObjects[compare]->GetWidth() * potentialObjects[compare]->GetHeight() ) )
-            {
-                smallest = potentialObjects.at( j );
-
-                compare = j;
-            }
-            else
-            {
-                smallest = potentialObjects.at( compare );
-            }
+            smallest = potentialObjects[j];
+            std::cout << "smallest";
         }
     }
 
+    std::cout << "Returned smallest :" << smallest->GetName() << std::endl;
     return smallest;
 }

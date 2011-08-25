@@ -78,11 +78,13 @@ Point & Sprite::GetPoint(const string & name)
     return badPoint;
 }
 
-void Sprite::LoadImage(boost::shared_ptr<sf::Image> image_)
+void Sprite::LoadImage(boost::shared_ptr<sf::Texture> image_)
 {
     sfmlImage = image_;
-    sfmlSprite.SetImage(*sfmlImage, true);
+    sfmlSprite.SetTexture(*sfmlImage, true);
     hasItsOwnImage = false;
+
+    pixelPerfectCollisionMask = sfmlImage->CopyToImage();
 
     if ( automaticCentre )
         centre.SetXY(sfmlSprite.GetSubRect().Width/2, sfmlSprite.GetSubRect().Height/2);
@@ -100,10 +102,10 @@ bool Sprite::SetCentreAutomatic(bool enabled)
 
 void Sprite::MakeSpriteOwnsItsImage()
 {
-    if ( !hasItsOwnImage || sfmlImage == boost::shared_ptr<sf::Image>() )
+    if ( !hasItsOwnImage || sfmlImage == boost::shared_ptr<sf::Texture>() )
     {
-        sfmlImage = boost::shared_ptr<sf::Image>(new sf::Image(*sfmlImage)); //Copy the image.
-        sfmlSprite.SetImage(*sfmlImage);
+        sfmlImage = boost::shared_ptr<sf::Texture>(new sf::Texture(*sfmlImage)); //Copy the image.
+        sfmlSprite.SetTexture(*sfmlImage);
         hasItsOwnImage = true;
     }
 }

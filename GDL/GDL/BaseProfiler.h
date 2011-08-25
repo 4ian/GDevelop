@@ -13,6 +13,9 @@
 #include "GDL/profile.h"
 class BaseEvent;
 
+/**
+ * Used as a link between compiled events code and events.
+ */
 class ProfileLink
 {
 public:
@@ -48,13 +51,13 @@ class GD_API BaseProfiler
         btClock eventsClock; ///< Used to compute time used by events during the frame
         btClock renderingClock; ///< Used to compute time used by rendering during the frame
 
-        std::vector<ProfileLink> profileEventsInformation;
+        std::vector<ProfileLink> profileEventsInformation; ///< Used by events generated code
 
         void Update();
         void Reset();
 
     protected:
-        float stepTime; ///< Time between each UpdateGUI.
+        sf::Uint32 stepTime; ///< Time between each UpdateGUI.
 
         /**
          * Redefine this function so as to update GUI.

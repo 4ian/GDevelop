@@ -59,7 +59,7 @@ bool SpriteObject::LoadResources(const RuntimeScene & scene, const ImageManager 
             {
                 Sprite & sprite = GetAnimation( j ).GetDirectionToModify(k).GetSprite(l);
 
-                sprite.LoadImage(imageMgr.GetSFMLImage(sprite.GetImageName()));
+                sprite.LoadImage(imageMgr.GetSFMLTexture(sprite.GetImageName()));
             }
         }
     }
@@ -346,14 +346,16 @@ void SpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const s
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
-    boost::shared_ptr<sf::Image> dest = ptrToCurrentSprite->GetSFMLImage();
+    boost::shared_ptr<sf::Texture> dest = ptrToCurrentSprite->GetSFMLTexture();
 
     //Make sure the coordinates are correct.
     if ( xPosition < 0 || static_cast<unsigned>(xPosition) >= dest->GetWidth()) return;
     if ( yPosition < 0 || static_cast<unsigned>(yPosition) >= dest->GetWidth()) return;
 
-    dest->Copy(*scene.game->imageManager->GetSFMLImage(imageName),
-               xPosition, yPosition, sf::IntRect(0, 0, 0, 0), useTransparency);
+    //Update texture and pixel perfect collision mask
+    ptrToCurrentSprite->GetPixelPerfectCollisionMask().Copy(scene.game->imageManager->GetSFMLTexture(imageName)->CopyToImage(),
+                                                            xPosition, yPosition, sf::IntRect(0, 0, 0, 0), useTransparency);
+    dest->LoadFromImage(ptrToCurrentSprite->GetPixelPerfectCollisionMask());
 }
 
 void SpriteObject::MakeColorTransparent( const std::string & colorStr )
@@ -361,13 +363,15 @@ void SpriteObject::MakeColorTransparent( const std::string & colorStr )
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
-    boost::shared_ptr<sf::Image> dest = ptrToCurrentSprite->GetSFMLImage();
+    boost::shared_ptr<sf::Texture> dest = ptrToCurrentSprite->GetSFMLTexture();
 
     vector < string > colors = SplitString <string> (colorStr, ';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
-    dest->CreateMaskFromColor(  sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2])));
+    //Update texture and pixel perfect collision mask
+    ptrToCurrentSprite->GetPixelPerfectCollisionMask().CreateMaskFromColor(  sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2])));
+    dest->LoadFromImage(ptrToCurrentSprite->GetPixelPerfectCollisionMask());
 }
 
 void SpriteObject::SetColor(const std::string & colorStr)
@@ -429,7 +433,7 @@ void SpriteObject::UpdateCurrentSprite() const
 
             ptrToCurrentSprite->GetSFMLSprite().SetOrigin(   ptrToCurrentSprite->GetCentre().GetX(),
                                                     ptrToCurrentSprite->GetCentre().GetY() );
-            ptrToCurrentSprite->GetSFMLSprite().SetRotation( -currentAngle );
+            ptrToCurrentSprite->GetSFMLSprite().SetRotation( currentAngle );
         }
     }
 
@@ -699,8 +703,8 @@ bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
 {
     for (unsigned int cameraIndex = 0;cameraIndex < scene.GetLayer(layer).GetCamerasNumber();++cameraIndex)
     {
-        int mouseXInTheLayer = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).x;
-        int mouseYInTheLayer = scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).y;
+        int mouseXInTheLayer = scene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*scene.renderWindow).x, sf::Mouse::GetPosition(*scene.renderWindow).y, scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).x;
+        int mouseYInTheLayer = scene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*scene.renderWindow).x, sf::Mouse::GetPosition(*scene.renderWindow).y, scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).y;
 
         if  ( GetDrawableX() < mouseXInTheLayer &&
             ( GetDrawableX() + GetWidth() ) > mouseXInTheLayer &&
@@ -710,7 +714,7 @@ bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
             int ClicX = static_cast<int>( mouseXInTheLayer - GetDrawableX() );
             int ClicY = static_cast<int>( mouseYInTheLayer - GetDrawableY() );
 
-            return ( !accurate || GetCurrentSFMLSprite().GetPixel( ClicX , ClicY ).a != 0 );
+            return ( !accurate || GetCurrentSprite().GetPixelPerfectCollisionMask().GetPixel( ClicX , ClicY ).a != 0 );
         }
     }
 

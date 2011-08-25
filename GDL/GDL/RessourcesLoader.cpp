@@ -17,9 +17,9 @@ void RessourcesLoader::SetExeGD(const string & filename)
     ExeGD.Read(filename);
 }
 
-sf::Image * RessourcesLoader::LoadImage(const string & filename)
+sf::Texture * RessourcesLoader::LoadSFMLTexture(const string & filename)
 {
-    sf::Image * image = new sf::Image();
+    sf::Texture * image = new sf::Texture();
 
     if ( ExeGD.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
     {

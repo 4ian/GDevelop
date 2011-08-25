@@ -30,15 +30,15 @@ class GD_API ImageManager
         void LoadPermanentImages();
 
         boost::shared_ptr<OpenGLTextureWrapper> GetOpenGLTexture(std::string name) const;
-        boost::shared_ptr<sf::Image> GetSFMLImage(std::string name) const;
+        boost::shared_ptr<sf::Texture> GetSFMLTexture(std::string name) const;
         void ReloadImage(std::string name) const;
         bool HasImage(std::string name) const;
 
 
     private:
-        mutable map < string, boost::weak_ptr<sf::Image> > alreadyLoadedImages;
-        mutable map < string, boost::shared_ptr<sf::Image> > permanentlyLoadedImages;
-        mutable boost::shared_ptr<sf::Image> badImage;
+        mutable map < string, boost::weak_ptr<sf::Texture> > alreadyLoadedImages;
+        mutable map < string, boost::shared_ptr<sf::Texture> > permanentlyLoadedImages;
+        mutable boost::shared_ptr<sf::Texture> badTexture;
 
         mutable map < string, boost::weak_ptr<OpenGLTextureWrapper> > alreadyLoadedOpenGLTextures;
         mutable boost::shared_ptr<OpenGLTextureWrapper> badOpenGLTexture;
@@ -52,13 +52,14 @@ class GD_API ImageManager
 class GD_API OpenGLTextureWrapper
 {
     public :
-        OpenGLTextureWrapper(boost::shared_ptr<sf::Image> sfmlImage_);
+        OpenGLTextureWrapper(boost::shared_ptr<sf::Texture> sfmlTexture_);
         OpenGLTextureWrapper() : texture(0) {};
         ~OpenGLTextureWrapper() { glDeleteTextures(1, &texture); };
         inline GLuint GetOpenGLTexture() const { return texture; }
 
     private :
-        boost::shared_ptr<sf::Image> sfmlImage;
+        boost::shared_ptr<sf::Texture> sfmlTexture;
+        sf::Image sfmlImage;
         GLuint texture;
 };
 

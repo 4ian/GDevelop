@@ -12,7 +12,7 @@ bool GD_API TimerElapsedTime( RuntimeScene & scene, float time, std::string time
         //On cherche le nom du timer
         if ( scene.timers[i].GetName() == timerName )
         {
-            return ( scene.timers[i].GetTime() >= time );
+            return ( scene.timers[i].GetTime() >= time*1000.0 );
         }
 
     }
@@ -133,14 +133,14 @@ void GD_API SetTimeScale( RuntimeScene & scene, double value )
     scene.SetTimeScale(value);
 }
 
-double GD_API GetElapsedTime(RuntimeScene & scene)
+double GD_API GetElapsedTimeInSeconds(RuntimeScene & scene)
 {
-    return scene.GetElapsedTime();
+    return static_cast<double>(scene.GetElapsedTime())/1000.0;
 }
 
-double GD_API GetTimeFromStart(RuntimeScene & scene)
+double GD_API GetTimeFromStartInSeconds(RuntimeScene & scene)
 {
-    return scene.GetTimeFromStart();
+    return static_cast<double>(scene.GetTimeFromStart())/1000.0;
 }
 
 double GD_API GetTime( const RuntimeScene & scene, std::string parameter )

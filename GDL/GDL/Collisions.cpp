@@ -9,6 +9,7 @@
 #include <cmath>
 #include <SFML/Graphics.hpp>
 
+#include "GDL/Sprite.h"
 #include "GDL/SpriteObject.h"
 #include "GDL/Collisions.h"
 #include "GDL/Log.h"
@@ -20,7 +21,7 @@
 
 sf::Vector2f GD_API RotatePoint( const sf::Vector2f& Point, float Angle )
 {
-    Angle = Angle * RADIANS_PER_DEGREE;
+    Angle = -Angle * RADIANS_PER_DEGREE;
     sf::Vector2f RotatedPoint;
     RotatedPoint.x = Point.x * cos( Angle ) + Point.y * sin( Angle );
     RotatedPoint.y = -Point.x * sin( Angle ) + Point.y * cos( Angle );
@@ -95,7 +96,7 @@ sf::IntRect GetAABB( const sf::Sprite& Object )
 
 
 
-bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf::Uint8 AlphaLimit )
+bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf::Uint8 AlphaLimit, const sf::Image & Object1CollisionMask,  const sf::Image & Object2CollisionMask )
 {
     //Get AABBs of the two sprites
     sf::IntRect Object1AABB = GetAABB( Object1 );
@@ -138,10 +139,9 @@ bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf:
                         o1v.x < O1SubRectSize.x && o1v.y < O1SubRectSize.y &&
                         o2v.x < O2SubRectSize.x && o2v.y < O2SubRectSize.y )
                 {
-
                     //If both sprites have opaque pixels at the same point we've got a hit
-                    if (( Object1.GetPixel( static_cast<int>( o1v.x ), static_cast<int>( o1v.y ) ).a > AlphaLimit ) &&
-                            ( Object2.GetPixel( static_cast<int>( o2v.x ), static_cast<int>( o2v.y ) ).a > AlphaLimit ) )
+                    if (( Object1CollisionMask.GetPixel( static_cast<int>( o1v.x ), static_cast<int>( o1v.y ) ).a > AlphaLimit ) &&
+                        ( Object2CollisionMask.GetPixel( static_cast<int>( o2v.x ), static_cast<int>( o2v.y ) ).a > AlphaLimit ) )
                     {
                         return true;
                     }
@@ -158,5 +158,5 @@ bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf:
  */
 bool GD_API CheckCollision( const SpriteObject * const objet1, const SpriteObject * const objet2)
 {
-    return PixelPerfectTest( objet1->GetCurrentSFMLSprite(), objet2->GetCurrentSFMLSprite(), 1 );
+    return PixelPerfectTest( objet1->GetCurrentSFMLSprite(), objet2->GetCurrentSFMLSprite(), 1, objet1->GetCurrentSprite().GetPixelPerfectCollisionMask(), objet2->GetCurrentSprite().GetPixelPerfectCollisionMask()  );
 }

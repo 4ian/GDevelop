@@ -93,12 +93,12 @@ class GD_API Music
         /**
          * Change the current playing position of the music.
          */
-        void SetPlayingOffset(float timeOffset) { music.SetPlayingOffset(timeOffset); };
+        void SetPlayingOffset(unsigned int timeOffset) { music.SetPlayingOffset(timeOffset); };
 
         /**
-         * Change the current playing position of the music.
+         * Return the current playing position of the music, in milliseconds.
          */
-        float GetPlayingOffset() const { return music.GetPlayingOffset(); };
+        unsigned int GetPlayingOffset() const { return music.GetPlayingOffset(); };
 
         /**
          * Internal member functions to update music volume according to global volume.

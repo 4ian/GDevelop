@@ -43,12 +43,12 @@ class GD_API Sound : sf::NonCopyable
         /**
          * Change the current playing position of the sound.
          */
-        void SetPlayingOffset(float timeOffset) { sound.SetPlayingOffset(timeOffset); };
+        void SetPlayingOffset(unsigned int timeOffset) { sound.SetPlayingOffset(timeOffset); };
 
         /**
-         * Change the current playing position of the sound.
+         * Return the current playing position of the music, in milliseconds.
          */
-        float GetPlayingOffset() const { return sound.GetPlayingOffset(); };
+        unsigned int GetPlayingOffset() const { return sound.GetPlayingOffset(); };
 
         //Order is important :
         sf::SoundBuffer buffer;

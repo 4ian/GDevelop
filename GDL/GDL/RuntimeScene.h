@@ -48,7 +48,6 @@ public:
     RuntimeScene(const RuntimeScene & scene);
 
     sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display
-    const sf::Input *                       input; ///< Pointer to the SFML class used to get user input
     bool                                    inputKeyPressed;    ///< Supplementary input : True if any key was pressed
     int                                     inputWheelDelta;    ///< Supplementary input : Amount of mouse wheel moved
     std::string                             inputTextEntered;   ///< Supplementary input : Text entered using keyboard
@@ -63,7 +62,6 @@ public:
     vector < Text >                         textes; ///<Deprecated way of displaying a text
     vector < ManualTimer >                  timers; ///<List of the timer currently used.
     bool                                    running; ///< True if the scene is being played
-    float                                   pauseTime; ///<Time that has been spent during the frame but which must not be taken in account in elpased time.
     int                                     backgroundColorR; ///< Background color Red component
     int                                     backgroundColorG; ///< Background color Green component
     int                                     backgroundColorB; ///< Background color Blue component
@@ -125,12 +123,12 @@ public:
     inline float GetTimeScale() const { return timeScale; };
 
     /**
-     * Get elapsed time since last frame, in seconds.
+     * Get elapsed time since last frame, in milliseconds.
      */
     inline float GetElapsedTime() const { return realElapsedTime*timeScale; };
 
     /**
-     * Get time elapsed since beginning, in seconds.
+     * Get time elapsed since beginning, in milliseconds.
      */
     inline float GetTimeFromStart() const { return timeFromStart; };
 
@@ -138,6 +136,12 @@ public:
      * Return true if the scene was just rendered once.
      */
     inline bool IsFirstLoop() const { return firstLoop; };
+
+    /**
+     * Notify the scene that something ( Like an open file dialog ) stopped scene rendering for a certain amount of time.
+     * \param Pause duration, in milliseconds.
+     */
+    void NotifyPauseWasMade(unsigned int pauseTime_) { pauseTime += pauseTime_; }
 
     void ManageRenderTargetEvents();
     bool OrderObjectsByZOrder( ObjList & objList );
@@ -158,10 +162,11 @@ protected:
 
     bool firstLoop; ///<true if the scene was just rendered once.
     bool isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
-    float realElapsedTime; ///< Elpased time since last frame, in seconds, without taking time scale in account.
-    float elapsedTime; ///< Elpased time since last frame, in seconds
+    unsigned int realElapsedTime; ///< Elpased time since last frame, in milliseconds, without taking time scale in account.
+    unsigned int elapsedTime; ///< Elpased time since last frame, in milliseconds
     float timeScale; ///< Time scale
-    float timeFromStart; ///< Time in seconds elapsed from start
+    unsigned int timeFromStart; ///< Time in milliseconds elapsed from start
+    unsigned int pauseTime;
     int   specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
 
     static RuntimeLayer badLayer;

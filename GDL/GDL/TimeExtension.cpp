@@ -139,31 +139,31 @@ TimeExtension::TimeExtension()
     DECLARE_EXPRESSION("TimeDelta", _("Temps écoulé depuis la dernière image"), _("Temps écoulé depuis la dernière image"), _("Temps"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTime").SetIncludeFile("GDL/TimeTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/TimeTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
     DECLARE_EXPRESSION("TempsFrame", _("Temps écoulé depuis la dernière image"), _("Temps écoulé depuis la dernière image"), _("Temps"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTime").SetIncludeFile("GDL/TimeTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/TimeTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
     DECLARE_EXPRESSION("ElapsedTime", _("Temps écoulé depuis la dernière image"), _("Temps écoulé depuis la dernière image"), _("Temps"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTime").SetIncludeFile("GDL/TimeTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/TimeTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("TimeFromStart", _("Temps écoulé depuis le début de la scène"), _("Temps écoulé depuis le début de la scène"), _("Temps"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetTimeFromStart").SetIncludeFile("GDL/TimeTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDL/TimeTools.h");
     DECLARE_END_EXPRESSION()
     DECLARE_EXPRESSION("TempsDebut", _("Temps écoulé depuis le début de la scène"), _("Temps écoulé depuis le début de la scène"), _("Temps"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetTimeFromStart").SetIncludeFile("GDL/TimeTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDL/TimeTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
 
@@ -193,7 +193,7 @@ void TimeExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int pr
     if ( propertyNb < scene.timers.size() )
     {
         name = scene.timers[propertyNb].GetName();
-        value = ToString(scene.timers[propertyNb].GetTime())+"s";
+        value = ToString(static_cast<double>(scene.timers[propertyNb].GetTime())/1000.0)+"s";
 
         return;
     }
@@ -203,7 +203,7 @@ bool TimeExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb
 {
     if ( propertyNb < scene.timers.size() )
     {
-        scene.timers[propertyNb].SetTime(ToFloat(newValue));
+        scene.timers[propertyNb].SetTime(ToFloat(newValue)*1000.0);
 
         return true;
     }

@@ -38,14 +38,12 @@ RuntimeLayer RuntimeScene::badLayer;
 
 RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
 renderWindow(renderWindow_),
-input(&renderWindow->GetInput()),
 inputKeyPressed(false),
 game(game_),
 #if defined(GD_IDE_ONLY)
 debugger(NULL),
 #endif
 running(true),
-pauseTime(0),
 backgroundColorR(125),
 backgroundColorG(125),
 backgroundColorB(125),
@@ -55,6 +53,7 @@ realElapsedTime(0),
 elapsedTime(0),
 timeScale(1),
 timeFromStart(0),
+pauseTime(0),
 specialAction(-1)
 {
     renderWindow->ShowMouseCursor( true );
@@ -84,7 +83,6 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     renderWindow = scene.renderWindow;
     game = scene.game;
     soundManager = scene.soundManager;
-    input = scene.input;
     #if defined(GD_IDE_ONLY)
     debugger = scene.debugger;
     #endif
@@ -143,7 +141,6 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
     }
 
     renderWindow = newWindow;
-    input = &renderWindow->GetInput();
     renderWindow->SetTitle(title);
 
     glEnable(GL_DEPTH_TEST);
@@ -263,7 +260,7 @@ void RuntimeScene::ManageRenderTargetEvents()
     inputTextEntered.clear();
 
     sf::Event event;
-    while ( renderWindow->GetEvent( event ) )
+    while ( renderWindow->PollEvent( event ) )
     {
         // Close window : exit
         if ( event.Type == sf::Event::Closed )
@@ -373,7 +370,7 @@ void RuntimeScene::Render()
 
         //Internal profiler
         #ifndef RELEASE
-        if ( renderWindow->GetInput().IsKeyDown(sf::Key::F2))
+        if ( sf::Keyboard::IsKeyPressed(sf::Keyboard::F2))
             CProfileManager::Reset();
 
         renderWindow->SetView(sf::View(sf::FloatRect(0.0f,0.0f, game->windowWidth, game->windowHeight)));
@@ -429,8 +426,8 @@ bool RuntimeScene::UpdateTime()
     realElapsedTime -= pauseTime; //On enlève le temps de pause
 
     //On modifie ce temps écoulé si il est trop bas.
-    if ( game->minFPS != 0 && realElapsedTime > 1.f/static_cast<float>(game->minFPS) )
-        realElapsedTime = 1.f/static_cast<float>(game->minFPS); //On ralentit le jeu si les FPS sont trop bas.
+    if ( game->minFPS != 0 && realElapsedTime > 1000.f/static_cast<float>(game->minFPS) )
+        realElapsedTime = 1000.f/static_cast<float>(game->minFPS); //On ralentit le jeu si les FPS sont trop bas.
 
     elapsedTime = realElapsedTime*timeScale; //Le temps écoulé par le jeu est modifié suivant l'échelle du temps
 
@@ -485,10 +482,10 @@ void RuntimeScene::ManageObjectsAfterEvents()
     allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
     {
-        allObjects[id]->SetX( allObjects[id]->GetX() + ( allObjects[id]->TotalForceX() * GetElapsedTime() ));
-        allObjects[id]->SetY( allObjects[id]->GetY() + ( allObjects[id]->TotalForceY() * GetElapsedTime() ));
-        allObjects[id]->UpdateTime( GetElapsedTime() );
-        allObjects[id]->UpdateForce( GetElapsedTime() );
+        allObjects[id]->SetX( allObjects[id]->GetX() + ( allObjects[id]->TotalForceX() * static_cast<double>(GetElapsedTime())/1000.0f ));
+        allObjects[id]->SetY( allObjects[id]->GetY() + ( allObjects[id]->TotalForceY() * static_cast<double>(GetElapsedTime())/1000.0f ));
+        allObjects[id]->UpdateTime( static_cast<double>(GetElapsedTime())/1000.0f );
+        allObjects[id]->UpdateForce( static_cast<double>(GetElapsedTime())/1000.0f );
         allObjects[id]->DoAutomatismsPostEvents(*this);
     }
 }

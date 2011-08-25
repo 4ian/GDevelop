@@ -115,7 +115,7 @@ bool EventsExecutionEngine::LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffe
     std::cout << "JIT Compilation to machine code...\n";
     sf::Clock jitTimer;
     llvmExecutionEngine->getPointerToFunction(eventsEntryFunction);
-    std::cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()<<"s"<<std::endl;
+    std::cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()/1000.0f <<"s"<<std::endl;
 
     engineReady = true;
     return true;

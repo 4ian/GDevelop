@@ -23,7 +23,7 @@ class GD_API ManualTimer
 
         /**
          * Update the time of the timer
-         * @param Time to add in seconds
+         * @param Time to add in milliseconds
          */
         inline void UpdateTime(float time_) { if (!isPaused) time += time_; };
 
@@ -33,7 +33,7 @@ class GD_API ManualTimer
         inline void Reset() { time = 0; };
 
         /**
-         * Get the current time elapsed.
+         * Get the current time elapsed, in milliseconds.
          * @return Time elapsed
          */
         inline float GetTime() const { return time; };
@@ -59,7 +59,7 @@ class GD_API ManualTimer
     private:
 
         std::string name;
-        float time;
+        unsigned int time;
         bool isPaused;
 };
 

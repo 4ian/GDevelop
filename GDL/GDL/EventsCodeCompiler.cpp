@@ -91,7 +91,9 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     // (basically, exactly one input, and the operation mode is hard wired).
     llvm::SmallVector<const char *, 128> Args;
     Args.push_back("GDEditor.exe");
+    #if defined(WINDOWS)
     Args.push_back(!compilationForRuntime ? "-includeinclude/GDL/GDL/PrecompiledHeader.h" : "-includeinclude/GDL/GDL/PrecompiledHeaderRuntime.h");
+    #endif
     Args.push_back(eventsFile.c_str());
     Args.push_back("-fsyntax-only");
     Args.push_back("-w"); //No warning
@@ -133,7 +135,11 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     // We expect to get back exactly one command job, if we didn't something
     // failed. Extract that job from the compilation.
     const driver::JobList &Jobs = C->getJobs();
+    #if defined(WINDOWS) //We're currently using a (slighty) different version of llvm between windows and linux
     if (Jobs.size() != 1 || !isa<driver::Command>(Jobs.begin()))
+    #else
+    if (Jobs.size() != 1 || !isa<driver::Command>(*Jobs.begin()))
+    #endif
     {
         llvm::SmallString<256> Msg;
         llvm::raw_svector_ostream OS(Msg);
@@ -245,7 +251,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                 }
                 else
                 {
-                    cout << "Compilation duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
+                    cout << "Compilation duration: " << compilationTimer.GetElapsedTime()/1000.0f<<"s"<<endl;
 
                     if ( abort )
                     {
@@ -268,7 +274,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                             }
                             else
                             {
-                                cout << "Scene compilation successful. Total duration: " << compilationTimer.GetElapsedTime()<<"s"<<endl;
+                                cout << "Scene compilation successful. Total duration: " << compilationTimer.GetElapsedTime()/1000.0f<<"s"<<endl;
                                 task.scene->eventsModified = false;
                             }
                         }
@@ -442,12 +448,18 @@ void EventsCodeCompiler::NotifyASceneIsDestroyed(const Scene & scene)
 
 EventsCodeCompiler::EventsCodeCompiler()
 {
+    #if defined(WINDOWS)
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/include");
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++");
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
+    #elif defined(LINUX)
+    //On most distribution, clang is able to find itself standard headers paths.
     /*headersDirectories.insert("-Iinclude/Debian/");
     headersDirectories.insert("-Iinclude/Debian/c++/4.1.2/");
     headersDirectories.insert("-Iinclude/Debian/c++/4.1.2/i486-linux-gnu");*/
+    #elif defined(MAC)
+
+    #endif
 
     headersDirectories.insert("-Iinclude/llvm/tools/clang/lib/Headers");
     headersDirectories.insert("-Iinclude/GDL");

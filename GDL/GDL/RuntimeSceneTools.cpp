@@ -1,5 +1,6 @@
 #include "GDL/RuntimeSceneTools.h"
 #include "GDL/RuntimeScene.h"
+#include "GDL/CommonInstructions.h"
 
 bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
 {
@@ -61,10 +62,10 @@ void GD_API MoveObjects( RuntimeScene & scene )
 
     for (unsigned int id = 0;id < allObjects.size();++id)
     {
-        allObjects[id]->SetX( allObjects[id]->GetX() + allObjects[id]->TotalForceX() * scene.GetElapsedTime() );
-        allObjects[id]->SetY( allObjects[id]->GetY() + allObjects[id]->TotalForceY() * scene.GetElapsedTime() );
+        allObjects[id]->SetX( allObjects[id]->GetX() + allObjects[id]->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000.0f );
+        allObjects[id]->SetY( allObjects[id]->GetY() + allObjects[id]->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000.0f );
 
-        allObjects[id]->UpdateForce( scene.GetElapsedTime() );
+        allObjects[id]->UpdateForce( static_cast<double>(scene.GetElapsedTime())/1000.0f );
     }
 
     return;
@@ -158,7 +159,7 @@ bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::v
 
     if ( !allObjects.empty() )
     {
-        unsigned int id = sf::Randomizer::Random(0, allObjects.size()-1);
+        unsigned int id = Random(allObjects.size()-1);
         Object * theChosenOne = allObjects[id];
 
         for (std::map <std::string, std::vector<Object*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)

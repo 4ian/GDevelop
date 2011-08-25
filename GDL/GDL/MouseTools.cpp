@@ -3,22 +3,22 @@
 
 void GD_API CenterCursor( RuntimeScene & scene )
 {
-    scene.renderWindow->SetCursorPosition(scene.renderWindow->GetWidth()/2, scene.renderWindow->GetHeight()/2 );
+    sf::Mouse::SetPosition(sf::Vector2i(scene.renderWindow->GetWidth()/2, scene.renderWindow->GetHeight()/2), *scene.renderWindow );
 }
 
 void GD_API CenterCursorHorizontally( RuntimeScene & scene )
 {
-    scene.renderWindow->SetCursorPosition(scene.renderWindow->GetWidth()/2, scene.input->GetMouseY() );
+    sf::Mouse::SetPosition(sf::Vector2i(scene.renderWindow->GetWidth()/2, sf::Mouse::GetPosition(*scene.renderWindow).y ), *scene.renderWindow );
 }
 
 void GD_API CenterCursorVertically( RuntimeScene & scene )
 {
-    scene.renderWindow->SetCursorPosition(scene.input->GetMouseX(), scene.renderWindow->GetHeight()/2 );
+    sf::Mouse::SetPosition(sf::Vector2i(sf::Mouse::GetPosition(*scene.renderWindow).x, scene.renderWindow->GetHeight()/2), *scene.renderWindow );
 }
 
 void GD_API SetCursorPosition( RuntimeScene & scene, float newX, float newY )
 {
-    scene.renderWindow->SetCursorPosition( newX, newY );
+    sf::Mouse::SetPosition(sf::Vector2i(newX, newY), *scene.renderWindow );
 }
 
 void GD_API HideCursor( RuntimeScene & scene )
@@ -35,23 +35,23 @@ double GD_API GetCursorXPosition( RuntimeScene & scene, const std::string & laye
 {
     //Get view, and compute mouse position
     sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
-    return scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).x;
+    return scene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*scene.renderWindow).x, sf::Mouse::GetPosition(*scene.renderWindow).y, view).x;
 }
 
 double GD_API GetCursorYPosition( RuntimeScene & scene, const std::string & layer, unsigned int camera )
 {
     //Get view, and compute mouse position
     sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
-    return scene.renderWindow->ConvertCoords(scene.input->GetMouseX(), scene.input->GetMouseY(), view).y;
+    return scene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*scene.renderWindow).x, sf::Mouse::GetPosition(*scene.renderWindow).y, view).y;
 }
 
 bool GD_API MouseButtonPressed( RuntimeScene & scene, const std::string & key )
 {
-    if ( key == "Left" ) { return scene.input->IsMouseButtonDown( sf::Mouse::Left ); }
-    if ( key == "Right" ) { return scene.input->IsMouseButtonDown( sf::Mouse::Right ); }
-    if ( key == "Middle" ) { return scene.input->IsMouseButtonDown( sf::Mouse::Middle ); }
-    if ( key == "XButton1" ) { return scene.input->IsMouseButtonDown( sf::Mouse::XButton1 ); }
-    if ( key == "XButton2" ) { return scene.input->IsMouseButtonDown( sf::Mouse::XButton2 ); }
+    if ( key == "Left" ) { return sf::Mouse::IsButtonPressed( sf::Mouse::Left ); }
+    if ( key == "Right" ) { return sf::Mouse::IsButtonPressed( sf::Mouse::Right ); }
+    if ( key == "Middle" ) { return sf::Mouse::IsButtonPressed( sf::Mouse::Middle ); }
+    if ( key == "XButton1" ) { return sf::Mouse::IsButtonPressed( sf::Mouse::XButton1 ); }
+    if ( key == "XButton2" ) { return sf::Mouse::IsButtonPressed( sf::Mouse::XButton2 ); }
 
     return false;
 }

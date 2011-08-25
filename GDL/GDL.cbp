@@ -708,7 +708,7 @@
 					<Add option="-lLLVMARMInfo" />
 					<Add option="-lLLVMMBlazeAsmPrinter" />
 					<Add option="-lLLVMMBlazeInfo" />
-					<Add directory="..\ExtLibs\SFML\lib" />
+					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>
 			</Target>
@@ -823,7 +823,7 @@
 					<Add option="-lLLVMARMInfo" />
 					<Add option="-lLLVMMBlazeAsmPrinter" />
 					<Add option="-lLLVMMBlazeInfo" />
-					<Add directory="..\ExtLibs\SFML\lib" />
+					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>
 			</Target>
@@ -936,7 +936,7 @@
 					<Add option="-lLLVMARMInfo" />
 					<Add option="-lLLVMMBlazeAsmPrinter" />
 					<Add option="-lLLVMMBlazeInfo" />
-					<Add directory="..\ExtLibs\SFML\lib" />
+					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>
 			</Target>
@@ -1044,7 +1044,7 @@
 					<Add option="-lLLVMARMInfo" />
 					<Add option="-lLLVMMBlazeAsmPrinter" />
 					<Add option="-lLLVMMBlazeInfo" />
-					<Add directory="..\ExtLibs\SFML\lib" />
+					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>
 			</Target>
@@ -1083,7 +1083,7 @@
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
-					<Add directory="..\..\libs\sfml\lib" />
+					<Add directory="..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/release/libgdl.dylib" />
@@ -1123,7 +1123,7 @@
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
-					<Add directory="..\..\libs\sfml\lib" />
+					<Add directory="..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/debug/libgdl.dylib" />

@@ -6,9 +6,29 @@
 #include "GDL/CommonInstructions.h"
 #include <SFML/Graphics.hpp>
 
-double GD_API Random(unsigned int max)
+/**
+ * Private data to initialize randomizer global seed.
+ * Original code by Laurent Gomila.
+ */
+namespace
 {
-    return sf::Randomizer::Random(0, max);
+    // Initialize the generator's seed with the current system time
+    // in milliseconds, so that it is always different
+    unsigned int InitializeSeed()
+    {
+        unsigned int seed = static_cast<unsigned int>(std::time(NULL));
+        std::srand(seed);
+        return seed;
+    }
+
+    // Global variable storing the current seed
+    unsigned int globalSeed = InitializeSeed();
+}
+
+double GD_API Random(int end)
+{
+    int begin = 0;
+    return std::rand() % (end - begin + 1) + begin;
 }
 
 bool GD_API RelationTest(double rhs, float lhs, std::string relationalOperator)

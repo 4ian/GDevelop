@@ -33,12 +33,11 @@ wxPoint EventsRenderingHelper::DrawTextInArea(wxString text, wxDC & dc, wxRect r
     }
     point.x = rect.x; //We can now start from rect.x as space have been inserted.
 
-    unsigned int textSize = text.length()*fontCharacterWidth;
-    int cutCount = ceil(static_cast<double>(textSize)/static_cast<double>(rect.width));
-    int charactersInALine = static_cast<double>(rect.width)/static_cast<double>(textSize)*static_cast<double>(text.length());
+    int charactersInALine = floor(static_cast<double>(rect.width)/static_cast<double>(fontCharacterWidth));
+    if ( charactersInALine <= 0) charactersInALine = 1;
 
-    if ( cutCount == 0 ) cutCount = 1;
-    if ( charactersInALine == 0) charactersInALine = 1;
+    int cutCount = ceil(static_cast<double>(text.length())/static_cast<double>(charactersInALine));
+    if ( cutCount <= 0 ) cutCount = 1;
 
     size_t lastCutPosition = 0;
     wxString displayedText;
@@ -46,7 +45,7 @@ wxPoint EventsRenderingHelper::DrawTextInArea(wxString text, wxDC & dc, wxRect r
     {
         if (i != 0 ) point.y += 15;
 
-        displayedText = text.Mid(lastCutPosition, charactersInALine);
+        displayedText = text.substr(lastCutPosition, charactersInALine);
         dc.DrawText(displayedText, point);
 
         lastCutPosition += charactersInALine;
@@ -60,7 +59,11 @@ unsigned int EventsRenderingHelper::GetTextHeightInArea(wxString text, unsigned 
 {
     if ( text.empty() || widthAvailable == 0) return 0;
 
-    int cutCount = ceil(static_cast<double>(text.length()*fontCharacterWidth)/static_cast<double>(widthAvailable));
+    int charactersInALine = floor(static_cast<double>(widthAvailable)/static_cast<double>(fontCharacterWidth));
+    if ( charactersInALine <= 0) charactersInALine = 1;
+
+    int cutCount = ceil(static_cast<double>(text.length())/static_cast<double>(charactersInALine));
+    if ( cutCount <= 0 ) cutCount = 1;
 
     return cutCount*15;
 }

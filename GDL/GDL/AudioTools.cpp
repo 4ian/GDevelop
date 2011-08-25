@@ -8,6 +8,7 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/SoundManager.h"
 #include "GDL/RessourcesLoader.h"
+#undef PlaySound //Gniark!
 
 /**
  * Test if a music is played
@@ -70,22 +71,10 @@ bool GD_API SoundStopped( RuntimeScene & scene, unsigned int channel )
     return (SoundManager::GetInstance()->GetSoundOnChannel(channel)->GetStatus() == sf::Sound::Stopped);
 }
 
-void GD_API PlaySound( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch )
+void GD_API PlaySoundOnChannel( RuntimeScene & scene, const std::string & file, unsigned int channel, bool repeat, float volume, float pitch )
 {
     sf::Clock latency;
 
-    SoundManager * soundManager = SoundManager::GetInstance();
-    soundManager->sounds.push_back(boost::shared_ptr<Sound>(new Sound(file)));
-    soundManager->sounds.back()->sound.Play();
-    soundManager->sounds.back()->sound.SetLoop(repeat);
-    soundManager->sounds.back()->SetVolume(volume);
-    soundManager->sounds.back()->SetPitch(pitch);
-
-    scene.pauseTime += latency.GetElapsedTime();
-}
-
-void GD_API PlaySoundOnChannel( RuntimeScene & scene, const std::string & file, unsigned int channel, bool repeat, float volume, float pitch )
-{
     //Chargement
     SoundManager * soundManager = SoundManager::GetInstance();
 
@@ -97,6 +86,22 @@ void GD_API PlaySoundOnChannel( RuntimeScene & scene, const std::string & file, 
     soundManager->GetSoundOnChannel(channel)->sound.SetLoop(repeat);
     soundManager->GetSoundOnChannel(channel)->SetVolume(volume);
     soundManager->GetSoundOnChannel(channel)->SetPitch(pitch);
+
+    scene.NotifyPauseWasMade(latency.GetElapsedTime());
+}
+
+void GD_API PlaySound( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch )
+{
+    sf::Clock latency;
+
+    SoundManager * soundManager = SoundManager::GetInstance();
+    soundManager->sounds.push_back(boost::shared_ptr<Sound>(new Sound(file)));
+    soundManager->sounds.back()->sound.Play();
+    soundManager->sounds.back()->sound.SetLoop(repeat);
+    soundManager->sounds.back()->SetVolume(volume);
+    soundManager->sounds.back()->SetPitch(pitch);
+
+    scene.NotifyPauseWasMade(latency.GetElapsedTime());
 }
 
 void GD_API StopSoundOnChannel( RuntimeScene & scene, unsigned int channel )
@@ -241,26 +246,26 @@ void GD_API SetSoundPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int c
 {
     if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
 
-    SoundManager::GetInstance()->GetSoundOnChannel(channel)->SetPlayingOffset(playingOffset);
+    SoundManager::GetInstance()->GetSoundOnChannel(channel)->SetPlayingOffset(playingOffset*1000.0);
 }
 
 void GD_API SetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel, float playingOffset )
 {
     if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return;
 
-    SoundManager::GetInstance()->GetMusicOnChannel(channel)->SetPlayingOffset(playingOffset);
+    SoundManager::GetInstance()->GetMusicOnChannel(channel)->SetPlayingOffset(playingOffset*1000.0);
 }
 
 double GD_API GetSoundPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel)
 {
     if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return 0;
 
-    return SoundManager::GetInstance()->GetSoundOnChannel(channel)->GetPlayingOffset();
+    return static_cast<double>(SoundManager::GetInstance()->GetSoundOnChannel(channel)->GetPlayingOffset())/1000.0;
 }
 
 double GD_API GetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel)
 {
     if ( SoundManager::GetInstance()->GetMusicOnChannel(channel) == boost::shared_ptr<Music>() ) return 0;
 
-    return SoundManager::GetInstance()->GetMusicOnChannel(channel)->GetPlayingOffset();
+    return static_cast<double>(SoundManager::GetInstance()->GetMusicOnChannel(channel)->GetPlayingOffset())/1000.0;
 }

@@ -22,7 +22,7 @@ lastEventsTime(0),
 lastRenderingTime(0),
 totalSceneTime(0),
 totalEventsTime(0),
-stepTime(0.050f)
+stepTime(50)
 {
     //ctor
 }

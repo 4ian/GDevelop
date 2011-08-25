@@ -8,9 +8,9 @@
 #include <string>
 
 /**
- * Use sf::Randomizer to generate a random number between 0 and max
+ * Generate a random number between 0 and max
  */
-double GD_API Random(unsigned int max);
+double GD_API Random(int max);
 
 /**
  * \param Right hand side double

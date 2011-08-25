@@ -8,7 +8,7 @@
 
 void BaseDebugger::Update()
 {
-    if ( timeInterval.GetElapsedTime() > 0.200 )
+    if ( timeInterval.GetElapsedTime() > 200 ) //Update each 200 ms
     {
         UpdateGUI();
         timeInterval.Reset();

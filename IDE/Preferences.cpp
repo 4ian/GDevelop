@@ -1044,7 +1044,7 @@ void Preferences::SetSkinRadiance()
     tabColorPnl->SetBackgroundColour( wxColour(240, 240, 236) );
     tabColorPnl->Refresh();
 
-    activeTabColorPnl->SetBackgroundColour( wxColour(254, 199, 158) );
+    activeTabColorPnl->SetBackgroundColour( wxColour(255, 138, 102) );
     activeTabColorPnl->Refresh();
 }
 

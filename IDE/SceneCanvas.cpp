@@ -790,7 +790,19 @@ void SceneCanvas::Refresh()
             return;
         }
         else //Everything is finished, reloading is complete!
-            ReloadSecondPart();
+        {
+
+            //But be sure that no error occured.
+            if ( !edittimeRenderer.editing && !sceneEdited.compiledEventsExecutionEngine->Ready() )
+            {
+                wxLogError(_("La compilation des évènements a échouée, et la scène ne peut être testée. Veuillez rapporter ce problème au développeur de Game Develop, en joignant si possible les évènements responsables de ce message d'erreur."));
+                wxCommandEvent useless;
+                OnEditionBtClick(useless);
+            }
+            else
+                ReloadSecondPart();
+
+        }
     }
     else //We're displaying the scene
     {

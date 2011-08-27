@@ -25003,7 +25003,7 @@
 1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\fontdlg.h
 	"wx/dialog.h"
 
-1314033443 source:d:\florian\programmation\gamedevelop2\ide\compilation.cpp
+1314312251 source:d:\florian\programmation\gamedevelop2\ide\compilation.cpp
 	<wx/bitmap.h>
 	<wx/settings.h>
 	<wx/intl.h>
@@ -26008,7 +26008,7 @@
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
 
-1314189699 source:d:\florian\programmation\gamedevelop2\ide\editorscene.cpp
+1314362875 source:d:\florian\programmation\gamedevelop2\ide\editorscene.cpp
 	"EditorScene.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -26037,7 +26037,6 @@
 	"GDL/ChooseLayer.h"
 	"GDL/ChooseObject.h"
 	"GDL/HelpFileAccess.h"
-	"OldEventsEditor.h"
 	"EventsEditor.h"
 	"GridSetup.h"
 	"GDAuiTabArt.h"
@@ -26066,7 +26065,7 @@
 	"ErrorCompilation.h"
 	"nommgr.h"
 
-1312228108 source:d:\florian\programmation\gamedevelop2\ide\eventsrefactorer.cpp
+1314299562 source:d:\florian\programmation\gamedevelop2\ide\eventsrefactorer.cpp
 	"EventsRefactorer.h"
 	"GDL/Event.h"
 	"GDL/GDExpressionParser.h"
@@ -26196,7 +26195,7 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1314114937 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp
+1314362323 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp
 	<wx/msw/winundef.h>
 	<wx/image.h>
 	<wx/fileconf.h>
@@ -26822,7 +26821,7 @@
 	"GDL/Game.h"
 	"GDL/OpenSaveGame.h"
 
-1314191754 source:d:\florian\programmation\gamedevelop2\ide\preferences.cpp
+1314292534 source:d:\florian\programmation\gamedevelop2\ide\preferences.cpp
 	"Preferences.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -26866,7 +26865,7 @@
 	"Event.h"
 	"GDL/profile.h"
 
-1310217515 source:d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp
+1314366034 source:d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp
 	"ProjectManager.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -27416,7 +27415,7 @@
 	<wx/string.h>
 	<iostream>
 
-1314266010 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
+1314368584 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -27559,7 +27558,7 @@
 1311188810 source:d:\florian\programmation\gamedevelop2\ide\resource.rc
 	"version.h"
 
-1314266010 d:\florian\programmation\gamedevelop2\ide\version.h
+1314368584 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289489446 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -27954,7 +27953,7 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1313841848 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1314359864 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
@@ -28237,7 +28236,7 @@
 	<boost/shared_ptr.hpp>
 	<SFML/System.hpp>
 
-1313705315 d:\florian\programmation\gamedevelop2\gdl\gdl\eventsexecutionengine.h
+1314368407 d:\florian\programmation\gamedevelop2\gdl\gdl\eventsexecutionengine.h
 	<string>
 	<llvm/ADT/OwningPtr.h>
 	<llvm/LLVMContext.h>
@@ -28250,7 +28249,7 @@
 	"wx/defs.h"
 	"wx/object.h"
 
-1314215661 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
+1314291400 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
 	"EventsEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>

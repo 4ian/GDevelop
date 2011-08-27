@@ -473,7 +473,9 @@ void EventsEditor::OneventsPanelPaint(wxPaintEvent& event)
 
     scrollBar->SetRange(totalHeight);
     scrollBar->SetPageSize(eventsPanel->GetSize().y);
+    #if !defined(LINUX) //Linking error when using SetThumbSize on linux currently.
     scrollBar->SetThumbSize(eventsPanel->GetSize().y);
+    #endif
 }
 
 unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr< BaseEvent > > & events, int x, int y, boost::shared_ptr< BaseEvent > scrollTo  )

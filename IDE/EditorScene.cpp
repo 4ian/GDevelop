@@ -30,7 +30,6 @@
 #include "GDL/ChooseLayer.h"
 #include "GDL/ChooseObject.h"
 #include "GDL/HelpFileAccess.h"
-#include "OldEventsEditor.h"
 #include "EventsEditor.h"
 #include "GridSetup.h"
 #include "GDAuiTabArt.h"

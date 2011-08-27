@@ -40,7 +40,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
                 continue; //Skip code only parameter which are not included in function calls.
 
-            if ( i != 0 ) parametersStr += ", ";
+            if ( !parametersStr.empty() ) parametersStr += ",";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
         plainExpression += functionName+"("+parametersStr+")";
@@ -63,7 +63,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
                 continue; //Skip code only parameter which are not included in function calls.
 
-            if ( i != 0 ) parametersStr += ", ";
+            if ( !parametersStr.empty() ) parametersStr += ",";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
         plainExpression += functionName+"("+parametersStr+")";
@@ -79,7 +79,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
                 continue; //Skip code only parameter which are not included in function calls.
 
-            if ( i != 1 ) parametersStr += ", ";
+            if ( !parametersStr.empty() ) parametersStr += ",";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
         plainExpression += (instruction.parameters[0].GetPlainString() == oldName ? newName : instruction.parameters[0].GetPlainString())
@@ -96,7 +96,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
                 continue; //Skip code only parameter which are not included in function calls.
 
-            if ( i != 1 ) parametersStr += ", ";
+            if ( !parametersStr.empty() ) parametersStr += ",";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
         plainExpression += (instruction.parameters[0].GetPlainString() == oldName ? newName : instruction.parameters[0].GetPlainString())
@@ -113,7 +113,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
                 continue; //Skip code only parameter which are not included in function calls.
 
-            if ( i != 2 ) parametersStr += ", ";
+            if ( !parametersStr.empty() ) parametersStr += ",";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
         plainExpression += (instruction.parameters[0].GetPlainString() == oldName ? newName : instruction.parameters[0].GetPlainString())
@@ -130,7 +130,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
             if ( i < expressionInfo.parameters.size() && expressionInfo.parameters[i].codeOnly )
                 continue; //Skip code only parameter which are not included in function calls.
 
-            if ( i != 2 ) parametersStr += ", ";
+            if ( !parametersStr.empty() ) parametersStr += ",";
             parametersStr += instruction.parameters[i].GetPlainString();
         }
         plainExpression += (instruction.parameters[0].GetPlainString() == oldName ? newName : instruction.parameters[0].GetPlainString())

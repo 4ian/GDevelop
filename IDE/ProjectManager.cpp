@@ -1157,6 +1157,14 @@ void ProjectManager::CloseGame(Game * game)
         }
     }
 
+    //Ensure we're not destroying a scene with events being built
+    wxBusyInfo * waitDialog = EventsCodeCompiler::GetInstance()->EventsBeingCompiled() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de fermer le jeu...") : NULL;
+    while ( EventsCodeCompiler::GetInstance()->EventsBeingCompiled() )
+    {
+        wxYield();
+    }
+    if ( waitDialog ) delete waitDialog;
+
     for (unsigned int i = 0;i<mainEditor.games.size();++i)
     {
     	if ( mainEditor.games[i].get() == game)

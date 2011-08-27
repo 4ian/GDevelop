@@ -245,11 +245,14 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "Crash management ended" << endl;
 
     //Creating the console Manager
+    /* Deactivated, as the compilation thread can output messages at any time, resulting in the wxTextCtrl of console frame to be updated at any time
+       which is dangerous ( GUI must be only updated from main thread )
     #if defined(RELEASE) && defined(WINDOWS)
     ConsoleManager * consoleManager;
     consoleManager = ConsoleManager::GetInstance();
     cout << "ConsoleManager created" << endl;
     #endif
+    */
 
     //Splash screen
     wxBitmap bitmap;

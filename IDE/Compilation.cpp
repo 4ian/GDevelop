@@ -133,7 +133,7 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     	_("Simple ( dossier contenant jeu et ressources )"),
     	_("Fichier exécutable unique ( compressé )")
     };
-    TypeBox = new wxRadioBox(Panel5, ID_RADIOBOX1, _("Choisissez le type de compilation :"), wxPoint(16,32), wxDefaultSize, 2, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
+    TypeBox = new wxRadioBox(Panel5, ID_RADIOBOX1, _("Choisissez le type de compilation :"), wxPoint(16,32), wxDefaultSize, 2, __wxRadioBoxChoices_1, 1, wxRA_HORIZONTAL, wxDefaultValidator, _T("ID_RADIOBOX1"));
     FlexGridSizer7->Add(TypeBox, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Button4 = new wxButton(Panel5, ID_BUTTON8, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
     FlexGridSizer7->Add(Button4, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);

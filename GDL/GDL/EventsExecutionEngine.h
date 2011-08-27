@@ -40,6 +40,8 @@ public:
      */
     bool const Ready() { return engineReady; };
 
+    void SetNotReady() { engineReady = false; };
+
     /**
      * Initialize execution engine from bitCode stored in memory.
      */
@@ -50,7 +52,6 @@ public:
      */
     bool LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffer);
 
-    bool beingExecuted; ///< Runtime scene has to set this to true when the scene is being played, so as to prevent compiled events to be replaced during a preview, which would result in a crash.
     llvm::LLVMContext llvmContext;
     llvm::Function * eventsEntryFunction;
     llvm::Module * llvmModule;
@@ -69,6 +70,7 @@ public:
 
 private:
     bool engineReady;
+    std::string error;
 
     static bool llvmTargetsInitialized;
 };

@@ -223,6 +223,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
             Scene sceneCopy = *task.scene;
             boost::shared_ptr<EventsExecutionEngine> executionEngine = task.scene->compiledEventsExecutionEngine; //Execution engine that compilation will setup. Using a shared_ptr to ensure that execution engine is not destroyed during compilation
             cout << "Game and scene copy made, executionEngine shared_ptr ok." << endl;
+            executionEngine->SetNotReady();
 
             if ( abort || executionEngine == boost::shared_ptr<EventsExecutionEngine>() )
             {
@@ -236,7 +237,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                 EventsCodeGenerator::DeleteUselessEvents(sceneCopy.events);
                 std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.events);
                 std::ofstream myfile;
-                myfile.open ( string("Temporaries/"+ToString(executionEngine.get())+"events.cpp").c_str());
+                myfile.open ( string("Temporaries/"+ToString(executionEngine.get())+"events.cpp").c_str() );
                 myfile << eventsOutput;
                 myfile.close();
 
@@ -244,42 +245,47 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                 {
                     cout << "Compilation aborted." << endl;
                 }
-                else if ( !EventsCodeCompiler::GetInstance()->CompileEventsCppFileToBitCode("Temporaries/"+ToString(executionEngine.get())+"events.cpp", task.bitCodeFilename.empty() ? "Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc" : task.bitCodeFilename, task.compilationForRuntime ))
-                {
-                    cout << "Failed to compile Temporaries/"+ToString(executionEngine.get())+"events.cpp." << std::endl;
-                    cout << "Compilation aborted." << endl << char(7);
-                }
                 else
                 {
-                    cout << "Compilation duration: " << compilationTimer.GetElapsedTime()/1000.0f<<"s"<<endl;
-
-                    if ( abort )
+                    if ( !EventsCodeCompiler::GetInstance()->CompileEventsCppFileToBitCode("Temporaries/"+ToString(executionEngine.get())+"events.cpp", task.bitCodeFilename.empty() ? "Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc" : task.bitCodeFilename, task.compilationForRuntime ))
                     {
-                        cout << "Compilation aborted." << endl;
+                        cout << "Failed to compile Temporaries/"+ToString(executionEngine.get())+"events.cpp." << std::endl;
+                        cout << "Compilation aborted." << endl << char(7);
                     }
-                    else if ( !task.generateBitcodeFileOnly && !abort )
+                    else
                     {
-                        llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
-                        llvm::error_code err = llvm::MemoryBuffer::getFile("Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc", eventsBuffer);
-                        if ( err.value() != 0 )
+                        cout << "Compilation duration: " << compilationTimer.GetElapsedTime()/1000.0f<<"s"<<endl;
+
+                        if ( abort )
                         {
-                            std::cout << "Failed to load Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc: " << err.message() << std::endl;
-                            cout << "Compilation aborted." << endl << char(7);
+                            cout << "Compilation aborted." << endl;
                         }
-                        else
+                        else if ( !task.generateBitcodeFileOnly && !abort )
                         {
-                            if ( !executionEngine->LoadFromLLVMBitCode(eventsBuffer.get()) )
+                            llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
+                            llvm::error_code err = llvm::MemoryBuffer::getFile("Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc", eventsBuffer);
+                            if ( err.value() != 0 )
                             {
-                                cout << "Compilation aborted: Bitcode loading and compiling failed." << endl << char(7);
+                                std::cout << "Failed to load Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc: " << err.message() << std::endl;
+                                cout << "Compilation aborted." << endl << char(7);
                             }
                             else
                             {
-                                cout << "Scene compilation successful. Total duration: " << compilationTimer.GetElapsedTime()/1000.0f<<"s"<<endl;
-                                task.scene->eventsModified = false;
+                                if ( !executionEngine->LoadFromLLVMBitCode(eventsBuffer.get()) )
+                                {
+                                    cout << "Compilation aborted: Bitcode loading and compiling failed." << endl << char(7);
+                                }
+                                else
+                                {
+                                    cout << "Scene compilation successful. Total duration: " << compilationTimer.GetElapsedTime()/1000.0f<<"s"<<endl;
+                                    task.scene->eventsModified = false;
+                                }
                             }
+                            remove(std::string("Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc").c_str());
                         }
                     }
                 }
+                remove(std::string("Temporaries/"+ToString(executionEngine.get())+"events.cpp").c_str());
             }
         }
 

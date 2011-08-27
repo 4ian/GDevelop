@@ -39,13 +39,14 @@ void EventsExecutionEngine::EnsureLLVMTargetsInitialization()
 
 void EventsExecutionEngine::LoadDynamicLibraries()
 {
+    #if defined(WINDOWS) //Other system uses by default standard library as a shared library
     std::string error;
     llvm::sys::DynamicLibrary::LoadLibraryPermanently("libstdc++-6.dll", &error);
     if ( !error.empty() ) std::cout << error;
+    #endif
 }
 
 EventsExecutionEngine::EventsExecutionEngine() :
-    beingExecuted(false),
     engineReady(false)
 {
     llvmRuntimeContext = new RuntimeContext(NULL);

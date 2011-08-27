@@ -1005,7 +1005,7 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
 
         //On cherche l'ID de l'image à afficher
         std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), directionToDisplay.GetSprite(i).GetImageName()));
-        if ( image != game.images.end() )
+        if ( image != game.images.end() && wxFileExists((*image).file) )
         {
             wxBitmap bmp( (*image).file, wxBITMAP_TYPE_ANY);
             if ( bmp.GetWidth() != 48 || bmp.GetHeight() != 48 )
@@ -1080,7 +1080,7 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
     {
         const Sprite & sprite = object.GetAnimation( animation ).GetDirection( direction ).GetSprite(selectedImage);
         std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), sprite.GetImageName()));
-        if ( image != game.images.end() )
+        if ( image != game.images.end() && wxFileExists((*image).file))
         {
             //Chargement de l'image
             wxBitmap bmp( (*image).file, wxBITMAP_TYPE_ANY);

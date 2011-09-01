@@ -17,12 +17,13 @@ void MessageLoading( string message, float avancement )
 ImageManager::ImageManager() :
 game(NULL)
 {
-    badTexture = boost::shared_ptr<sf::Texture>(new sf::Texture());
-    badTexture->LoadFromMemory(GDpriv::InvalidImageData, sizeof(GDpriv::InvalidImageData));
-    badTexture->SetSmooth(false);
+    badTexture = boost::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper);
+    badTexture->texture.LoadFromMemory(GDpriv::InvalidImageData, sizeof(GDpriv::InvalidImageData));
+    badTexture->texture.SetSmooth(false);
+    badTexture->image = badTexture->texture.CopyToImage();
 }
 
-boost::shared_ptr<sf::Texture> ImageManager::GetSFMLTexture(std::string name) const
+boost::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(std::string name) const
 {
     if ( !game )
     {
@@ -41,11 +42,11 @@ boost::shared_ptr<sf::Texture> ImageManager::GetSFMLTexture(std::string name) co
     {
     	if ( game->images[i].nom == name )
     	{
-    	    boost::shared_ptr<sf::Texture> image = boost::shared_ptr<sf::Texture>(ressourcesLoader->LoadSFMLTexture( game->images[i].file ));
-    	    image->SetSmooth(game->images[i].smooth);
+    	    boost::shared_ptr<SFMLTextureWrapper> texture(new SFMLTextureWrapper(*ressourcesLoader->LoadSFMLTexture( game->images[i].file )));
+    	    texture->texture.SetSmooth(game->images[i].smooth);
 
-    	    alreadyLoadedImages[name] = image;
-            return image;
+    	    alreadyLoadedImages[name] = texture;
+            return texture;
     	}
     }
 
@@ -66,7 +67,7 @@ void ImageManager::ReloadImage(std::string name) const
     if ( alreadyLoadedImages.find(name) == alreadyLoadedImages.end() || alreadyLoadedImages.find(name)->second.expired() ) return;
 
     //Image still in memory, get it and update it.
-    boost::shared_ptr<sf::Texture> image = alreadyLoadedImages.find(name)->second.lock();
+    boost::shared_ptr<SFMLTextureWrapper> oldTexture = alreadyLoadedImages.find(name)->second.lock();
 
     for (unsigned int i = 0;i<game->images.size();++i)
     {
@@ -74,10 +75,9 @@ void ImageManager::ReloadImage(std::string name) const
     	{
             cout << "ImageManager: Reload " << name << endl;
 
-    	    boost::shared_ptr<sf::Texture> newImage = boost::shared_ptr<sf::Texture>(RessourcesLoader::GetInstance()->LoadSFMLTexture( game->images[i].file ));
-
-            *image = *newImage;
-    	    image->SetSmooth(game->images[i].smooth);
+            oldTexture->texture = *RessourcesLoader::GetInstance()->LoadSFMLTexture( game->images[i].file );
+    	    oldTexture->texture.SetSmooth(game->images[i].smooth);
+    	    oldTexture->image = oldTexture->texture.CopyToImage();
 
             return;
     	}
@@ -85,7 +85,7 @@ void ImageManager::ReloadImage(std::string name) const
 
     //Image not present anymore in image list.
     cout << "ImageManager: " << name << " is not available anymore." << endl;
-    *image = *badTexture;
+    *oldTexture = *badTexture;
 }
 
 boost::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(std::string name) const
@@ -136,7 +136,7 @@ void ImageManager::LoadPermanentImages()
 
     //Create a new list of permanently loaded images but do not delete now the old list
     //so as not to unload images that could be still present.
-    map < string, boost::shared_ptr<sf::Texture> > newPermanentlyLoadedImages;
+    map < string, boost::shared_ptr<SFMLTextureWrapper> > newPermanentlyLoadedImages;
     for (unsigned int i = 0;i<game->images.size();++i)
     {
     	if ( game->images[i].alwaysLoaded )
@@ -146,14 +146,19 @@ void ImageManager::LoadPermanentImages()
     permanentlyLoadedImages = newPermanentlyLoadedImages;
 }
 
-OpenGLTextureWrapper::OpenGLTextureWrapper(boost::shared_ptr<sf::Texture> sfmlTexture_)
+SFMLTextureWrapper::SFMLTextureWrapper(sf::Texture & texture_) :
+    texture(texture_),
+    image(texture.CopyToImage())
+{
+}
+
+OpenGLTextureWrapper::OpenGLTextureWrapper(boost::shared_ptr<SFMLTextureWrapper> sfmlTexture_)
 {
     sfmlTexture = sfmlTexture_;
-    sfmlImage = sfmlTexture->CopyToImage();
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, sfmlImage.GetWidth(), sfmlImage.GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, sfmlImage.GetPixelsPtr());
+    gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, sfmlTexture->image.GetWidth(), sfmlTexture->image.GetHeight(), GL_RGBA, GL_UNSIGNED_BYTE, sfmlTexture->image.GetPixelsPtr());
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 }

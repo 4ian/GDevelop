@@ -8,6 +8,7 @@
 #include <wx/sizer.h>
 #include <wx/menu.h>
 #include <wx/splitter.h>
+#include <wx/aui/aui.h>
 #include <wx/panel.h>
 //*)
 #include <wx/aui/aui.h>
@@ -32,9 +33,11 @@ class GD_API EditorImages: public wxPanel
 		string fileImageSelected;
 
 		//(*Declarations(EditorImages)
+		wxAuiManager* AuiManager1;
 		wxPanel* Core;
 		wxMenuItem* MenuItem8;
 		wxPanel* toolbarPanel;
+		wxAuiToolBar* toolbar;
 		wxMenuItem* MenuItem7;
 		wxMenu emptyMenu;
 		wxMenuItem* MenuItem5;
@@ -79,6 +82,7 @@ class GD_API EditorImages: public wxPanel
 	protected:
 
 		//(*Identifiers(EditorImages)
+		static const long ID_AUITOOLBAR1;
 		static const long ID_PANEL2;
 		static const long ID_TREECTRL1;
 		static const long ID_PANEL3;
@@ -164,8 +168,6 @@ class GD_API EditorImages: public wxPanel
 		bool useRibbon;
 
 		string renamedItemOldName;
-
-		wxToolBar * toolbar;
 
 		DECLARE_EVENT_TABLE()
 };

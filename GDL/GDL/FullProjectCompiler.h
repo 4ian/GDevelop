@@ -36,10 +36,12 @@ class GD_API FullProjectCompiler
         std::string GetTempDir();
         void SetForcedTempDir(const std::string & dir) { forcedTempDir = dir; };
 
-        void TargetWindows(bool enable = true) { windowsTarget = enable; };
+        //Cross compilation is not available
+        /*void TargetWindows(bool enable = true) { windowsTarget = enable; };
         void TargetLinux(bool enable = true) { linuxTarget = enable; };
-        void TargetMac(bool enable = true) { macTarget = enable; };
+        void TargetMac(bool enable = true) { macTarget = enable; };*/
         void CompressIfPossible(bool enable = true) { compressIfPossible = enable; };
+        void Optimize(bool enable = true) { optimize = enable; };
 
     private:
 
@@ -52,6 +54,7 @@ class GD_API FullProjectCompiler
         bool linuxTarget;
         bool macTarget;
         bool compressIfPossible;
+        bool optimize;
 };
 
 /**

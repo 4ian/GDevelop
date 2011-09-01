@@ -38,6 +38,7 @@
 #if defined(GD_IDE_ONLY)
 #include <wx/log.h>
 #include <wx/msgdlg.h>
+#include <wx/filename.h>
 #include "GDL/EventsCodeCompiler.h"
 #endif
 
@@ -90,6 +91,7 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
         return;
     }
 
+    std::vector<std::string> librariesLoaded;
     while (( lecture = readdir( rep ) ) )
     {
         string lec = lecture->d_name;
@@ -97,12 +99,22 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
         {
             //Charger l'extension
             LoadStaticExtensionInManager(directory+"/"+lec);
+            librariesLoaded.push_back(directory+"/"+lec);
 
             l++;
         }
     }
 
     closedir( rep );
+
+    #if defined(LINUX) || defined (MAC)
+    //Libraries are loaded using dlopen(.., ..|RTLD_LOCAL) meaning that their symbols are not available for other libraries
+    //nor for LLVM/Clang. We then reload set them as global to make thei symbols available for LLVM/Clang. We couldn't mark them
+    //as global when loading them as every extension use the sames "Create/DestroyGDExtension" symbols.
+    for (unsigned int i = 0;i<librariesLoaded.size();++i)
+        SetLibraryGlobal(librariesLoaded[i].c_str());
+    #endif
+
 	#elif defined(_MSC_VER)
 	WIN32_FIND_DATA f;
 	string dirPart = "/*.xgd";
@@ -135,7 +147,7 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
     //Log file in IDE only
     #if defined(GD_IDE_ONLY)
     {
-        wxFile errorDetectFile("ExtensionBeingLoaded.log", wxFile::write);
+        wxFile errorDetectFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log", wxFile::write);
         errorDetectFile.Write(fullpath);
     }
     #endif
@@ -224,7 +236,7 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
                 wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
                 #endif
                 #if defined(GD_IDE_ONLY)
-                wxRemoveFile("ExtensionBeingLoaded.log");
+                wxRemoveFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log");
                 #endif
                 #if defined(RELEASE)//Load extension despite errors in non release build
                 //signal(SIGSEGV, previousHandler);
@@ -237,7 +249,7 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
             GDpriv::LocaleManager::GetInstance()->AddCatalog(extension->GetName()); //In editor, load catalog associated with extension, if any.
             #endif
             #if defined(GD_IDE_ONLY)
-            wxRemoveFile("ExtensionBeingLoaded.log");
+            wxRemoveFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log");
             #endif
             //signal(SIGSEGV, previousHandler);
             return;

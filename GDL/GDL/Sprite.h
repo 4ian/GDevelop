@@ -10,6 +10,7 @@
 #include "GDL/Point.h"
 #include <string>
 #include "GDL/RotatedRectangle.h"
+class SFMLTextureWrapper;
 #undef LoadImage //prevent windows.h polluting everything
 
 /**
@@ -36,17 +37,17 @@ public:
     /**
      * Set a new image to the Sprite
      */
-    void LoadImage(boost::shared_ptr<sf::Texture> image);
+    void LoadImage(boost::shared_ptr<SFMLTextureWrapper> image);
 
     /**
      * Get SFML Image used by the sprite
      */
-    boost::shared_ptr<sf::Texture> GetSFMLTexture() { return sfmlImage; };
+    boost::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() { return sfmlImage; };
 
     /**
      * Get SFML Image used by the sprite
      */
-    const boost::shared_ptr<sf::Texture> GetSFMLTexture() const { return sfmlImage; };
+    const boost::shared_ptr<SFMLTextureWrapper> GetSFMLTexture() const { return sfmlImage; };
 
     /**
      * Change the name of the Sprite's image
@@ -78,16 +79,6 @@ public:
      * Un/Set use of the custom collision mask.
      */
     inline void SetCollisionMaskAutomatic(bool enabled) { automaticCollisionMask = enabled; };
-
-    /**
-     * Get the pixel perfect collision mask ( a sf::Image generated from the texture of the sprite )
-     */
-    const sf::Image & GetPixelPerfectCollisionMask() const { return pixelPerfectCollisionMask; };
-
-    /**
-     * Get the pixel perfect collision mask ( a sf::Image generated from the texture of the sprite )
-     */
-    sf::Image & GetPixelPerfectCollisionMask() { return pixelPerfectCollisionMask; };
 
     /**
      * Return all points without origin and center
@@ -163,13 +154,12 @@ public:
 private:
 
     sf::Sprite sfmlSprite; ///< Displayed SFML sprite
-    boost::shared_ptr<sf::Texture> sfmlImage; ///< Pointer to the image displayed by the sprite.
+    boost::shared_ptr<SFMLTextureWrapper> sfmlImage; ///< Pointer to the image displayed by the sprite.
     bool hasItsOwnImage; ///< True if sfmlImage is only owned by this Sprite.
     std::string image; ///< Name of the image to be loaded in Image Manager.
 
     bool automaticCollisionMask; ///< True to use the custom collision mask. Otherwise, a basic bounding box is returned by GetCollisionMask()
     std::vector<RotatedRectangle> customCollisionMask; ///< Custom collision mask
-    sf::Image pixelPerfectCollisionMask;
 
     std::vector < Point > points; ///< List of the points used by the sprite
     Point origine; ///< Origin point

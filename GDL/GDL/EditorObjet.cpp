@@ -11,6 +11,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/log.h>
+#include <wx/ribbon/toolbar.h>
 #include <wx/msgdlg.h>
 #include <string>
 #include <vector>
@@ -61,6 +62,7 @@ const long EditorObjet::ID_TOGGLEBUTTON2 = wxNewId();
 const long EditorObjet::ID_TOGGLEBUTTON3 = wxNewId();
 const long EditorObjet::ID_TOGGLEBUTTON4 = wxNewId();
 const long EditorObjet::ID_CHECKBOX2 = wxNewId();
+const long EditorObjet::ID_AUITOOLBAR1 = wxNewId();
 const long EditorObjet::ID_PANEL6 = wxNewId();
 const long EditorObjet::ID_STATICLINE3 = wxNewId();
 const long EditorObjet::ID_PANEL3 = wxNewId();
@@ -253,6 +255,11 @@ ySelectionOffset(0)
     FlexGridSizer13->AddGrowableCol(0);
     FlexGridSizer13->AddGrowableRow(0);
     toolbarPanel = new wxPanel(Core, ID_PANEL6, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL6"));
+    AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
+    toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxSize(139,35), wxAUI_TB_DEFAULT_STYLE);
+    toolbar->Realize();
+    AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).BestSize(wxSize(139,35)).Movable(false).Gripper(false));
+    AuiManager1->Update();
     FlexGridSizer13->Add(toolbarPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer7->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     StaticLine3 = new wxStaticLine(Core, ID_STATICLINE3, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE3"));
@@ -476,8 +483,8 @@ ySelectionOffset(0)
     Connect(idDelPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDelPointSelected);
     //*)
 
-    toolbar = new wxToolBar( toolbarPanel, -1, wxDefaultPosition, wxDefaultSize,
-                             wxTB_FLAT | wxTB_NODIVIDER | wxTB_HORIZONTAL );
+    /*toolbar = new wxToolbar( toolbarPanel, -1, wxDefaultPosition, wxDefaultSize,
+                             wxTB_FLAT | wxTB_NODIVIDER | wxTB_HORIZONTAL );*/
 
     toolbar->ClearTools();
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
@@ -498,14 +505,6 @@ ySelectionOffset(0)
     toolbar->EnableTool(idDelPoint, false);
     toolbar->EnableTool(ID_MENUITEM8, false);
     toolbar->EnableTool(ID_MENUITEM9, false);
-
-    toolbar->Realize();
-
-    //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
-#ifdef __WXGTK__
-    wxSize tbSize = toolbar->GetSize();
-    gtk_widget_set_usize( toolbar->m_widget, tbSize.GetWidth(), tbSize.GetHeight() );
-#endif
 
     NomObjetTxt->SetLabel( object.GetName() );
 
@@ -534,6 +533,7 @@ EditorObjet::~EditorObjet()
     //*)
 
     m_mgr.UnInit();
+	AuiManager1->UnInit();
 }
 
 ////////////////////////////////////////////////////////////

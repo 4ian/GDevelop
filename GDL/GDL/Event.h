@@ -14,7 +14,6 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include <boost/tuple/tuple.hpp>
 #include "GDL/Log.h"
 #include "GDL/Instruction.h"
 class Game;
@@ -47,6 +46,33 @@ class GD_API BaseEvent
 
         /**
          * Generate event's code.
+         * Implementation example :
+         * \code
+            std::string outputCode;
+
+            outputCode += EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
+
+            std::string ifPredicat;
+            for (unsigned int i = 0;i<conditions.size();++i)
+            {
+                if (i!=0) ifPredicat += " && ";
+                ifPredicat += "condition"+ToString(i)+"IsTrue";
+            }
+
+            if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
+            outputCode += "{\n";
+            outputCode += EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
+            if ( !events.empty() ) //Sub events
+            {
+                outputCode += "\n{\n";
+                outputCode += EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
+                outputCode += "}\n";
+            }
+
+            outputCode += "}\n";
+
+            return outputCode;
+         * \endcode
          */
         virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & context) {return "";};
 

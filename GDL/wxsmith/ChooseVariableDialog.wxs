@@ -57,6 +57,24 @@
 				<object class="wxPanel" name="ID_PANEL1" variable="toolbarPanel" member="yes">
 					<size>-1,26</size>
 					<handler function="OntoolbarPanelResize" entry="EVT_SIZE" />
+					<object class="wxAuiManager" variable="AuiManager1" member="yes">
+						<object class="AuiManagerItem">
+							<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes" />
+							<name>PaneName</name>
+							<standardpanetype>Toolbar</standardpanetype>
+							<caption>Pane caption</caption>
+							<captionvisible>0</captionvisible>
+							<minimizebutton>0</minimizebutton>
+							<maximizebutton>0</maximizebutton>
+							<pinbutton>0</pinbutton>
+							<layer>10</layer>
+							<dockfixed>0</dockfixed>
+							<dockabledirection></dockabledirection>
+							<resizable>0</resizable>
+							<destroyonclose>0</destroyonclose>
+							<firstadd>0</firstadd>
+						</object>
+					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>

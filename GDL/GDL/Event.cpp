@@ -13,6 +13,7 @@ BaseEvent::BaseEvent() :
 folded(false),
 eventHeightNeedUpdate(true),
 totalTimeDuringLastSession(0),
+percentDuringLastSession(0),
 disabled(false)
 {
 }

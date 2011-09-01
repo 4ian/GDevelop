@@ -114,7 +114,7 @@ MouseExtension::MouseExtension()
         instrInfo.AddParameter("expression", _("Position X"), "", false);
         instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
         instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "", true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("camera", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorXPosition").SetManipulatedType("number").SetIncludeFile("GDL/MouseTools.h");
 
@@ -132,7 +132,7 @@ MouseExtension::MouseExtension()
         instrInfo.AddParameter("expression", _("Position Y"), "", false);
         instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
         instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "", true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("camera", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Numéro de la caméra ( Caméra 0 si vide )"), "", true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCursorYPosition").SetManipulatedType("number").SetIncludeFile("GDL/MouseTools.h");
 

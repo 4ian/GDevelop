@@ -346,16 +346,15 @@ void SpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const s
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
-    boost::shared_ptr<sf::Texture> dest = ptrToCurrentSprite->GetSFMLTexture();
+    boost::shared_ptr<SFMLTextureWrapper> dest = ptrToCurrentSprite->GetSFMLTexture();
 
     //Make sure the coordinates are correct.
-    if ( xPosition < 0 || static_cast<unsigned>(xPosition) >= dest->GetWidth()) return;
-    if ( yPosition < 0 || static_cast<unsigned>(yPosition) >= dest->GetWidth()) return;
+    if ( xPosition < 0 || static_cast<unsigned>(xPosition) >= dest->texture.GetWidth()) return;
+    if ( yPosition < 0 || static_cast<unsigned>(yPosition) >= dest->texture.GetWidth()) return;
 
     //Update texture and pixel perfect collision mask
-    ptrToCurrentSprite->GetPixelPerfectCollisionMask().Copy(scene.game->imageManager->GetSFMLTexture(imageName)->CopyToImage(),
-                                                            xPosition, yPosition, sf::IntRect(0, 0, 0, 0), useTransparency);
-    dest->LoadFromImage(ptrToCurrentSprite->GetPixelPerfectCollisionMask());
+    dest->image.Copy(scene.game->imageManager->GetSFMLTexture(imageName)->image, xPosition, yPosition, sf::IntRect(0, 0, 0, 0), useTransparency);
+    dest->texture.LoadFromImage(dest->image);
 }
 
 void SpriteObject::MakeColorTransparent( const std::string & colorStr )
@@ -363,15 +362,15 @@ void SpriteObject::MakeColorTransparent( const std::string & colorStr )
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
     ptrToCurrentSprite->MakeSpriteOwnsItsImage(); //We want to modify only the image of the object, not all objects which have the same image.
-    boost::shared_ptr<sf::Texture> dest = ptrToCurrentSprite->GetSFMLTexture();
+    boost::shared_ptr<SFMLTextureWrapper> dest = ptrToCurrentSprite->GetSFMLTexture();
 
     vector < string > colors = SplitString <string> (colorStr, ';');
 
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
     //Update texture and pixel perfect collision mask
-    ptrToCurrentSprite->GetPixelPerfectCollisionMask().CreateMaskFromColor(  sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2])));
-    dest->LoadFromImage(ptrToCurrentSprite->GetPixelPerfectCollisionMask());
+    dest->image.CreateMaskFromColor(  sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2])));
+    dest->texture.LoadFromImage(dest->image);
 }
 
 void SpriteObject::SetColor(const std::string & colorStr)
@@ -714,7 +713,7 @@ bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
             int ClicX = static_cast<int>( mouseXInTheLayer - GetDrawableX() );
             int ClicY = static_cast<int>( mouseYInTheLayer - GetDrawableY() );
 
-            return ( !accurate || GetCurrentSprite().GetPixelPerfectCollisionMask().GetPixel( ClicX , ClicY ).a != 0 );
+            return ( !accurate || GetCurrentSprite().GetSFMLTexture()->image.GetPixel( ClicX , ClicY ).a != 0 );
         }
     }
 

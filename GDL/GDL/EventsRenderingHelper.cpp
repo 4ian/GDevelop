@@ -45,7 +45,19 @@ wxPoint EventsRenderingHelper::DrawTextInArea(wxString text, wxDC & dc, wxRect r
     {
         if (i != 0 ) point.y += 15;
 
+        #if defined(LINUX)
+        try
+        {
+        #endif
         displayedText = text.substr(lastCutPosition, charactersInALine);
+        #if defined(LINUX)
+        }
+        catch(...)
+        {
+            std::cout << "Error rendering:" << text << ";" << std::endl;
+        }
+        #endif
+
         dc.DrawText(displayedText, point);
 
         lastCutPosition += charactersInALine;

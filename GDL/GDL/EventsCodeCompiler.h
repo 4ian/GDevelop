@@ -64,17 +64,28 @@ public:
     void NotifyASceneIsDestroyed(const Scene & scene);
 
     /**
+     * Return the directory used as temporary directory for output files.
+     */
+    const std::string & GetWorkingDirectory() const { return workingDir; };
+
+    /**
+     * Set the directory used as temporary directory for output files.
+     */
+    void SetWorkingDirectory(std::string workingDir_);
+
+    /**
      * Describe to compiler what is needed
      */
     class Task
     {
     public:
-        Task(Game * game_, Scene* scene_) : game(game_), scene(scene_), compilationForRuntime(false), generateBitcodeFileOnly(false) {}
+        Task(Game * game_, Scene* scene_) : game(game_), scene(scene_), compilationForRuntime(false), optimize(false), generateBitcodeFileOnly(false) {}
 
         Game * game;
         Scene * scene;
 
         bool compilationForRuntime;
+        bool optimize;
         bool generateBitcodeFileOnly; ///< Please provide a bitcode filename if generateBitcodeFileOnly is set to true
         std::string bitCodeFilename; ///< Fill this string if generateBitcodeFileOnly is set to true
     };
@@ -130,7 +141,7 @@ private:
     /**
      * Compile C++ events file to bitcode file.
      */
-    bool CompileEventsCppFileToBitCode(std::string eventsFile, std::string bitCodeFile, bool compilationForRuntime);
+    bool CompileEventsCppFileToBitCode(std::string eventsFile, std::string bitCodeFile, bool compilationForRuntime, bool optimize);
 
     void AddPendingTask(const Task & task);
 
@@ -140,6 +151,8 @@ private:
 
     std::set<std::string> headersDirectories;
     sf::Mutex mutex;
+
+    std::string workingDir;
 
     EventsCodeCompiler();
     virtual ~EventsCodeCompiler();

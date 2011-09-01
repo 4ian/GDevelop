@@ -266,5 +266,32 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
     #endif*/
 
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-audio-2.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-graphics-2.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-network-2.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-window-2.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-system-2.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libsndfile-1.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "openal32.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "mingwm10.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libgcc_s_sjlj-1.dll"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "libstdc++-6.dll"));
+
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libFLAC.so.7"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libfreetype.so.6"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libopenal.so.0"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-audio.so.2"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-graphics.so.2"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-network.so.2"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-system.so.2"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-window.so.2"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsndfile.so.1"));
+
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-audio.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-graphics.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-network.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-system.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-window.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "sndfile"));
     #endif
 }

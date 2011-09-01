@@ -31,6 +31,7 @@
 #include "GDL/ExternalEvents.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/ExecutableIconChanger.h"
+#include "GDL/BaseProfiler.h"
 
 using namespace std;
 
@@ -39,6 +40,25 @@ namespace GDpriv
 
 void FullProjectCompiler::LaunchProjectCompilation()
 {
+    #if defined(WINDOWS)
+        windowsTarget = true;
+        linuxTarget = false;
+        macTarget = false;
+    #elif defined(LINUX)
+        windowsTarget = false;
+        linuxTarget = true;
+        macTarget = false;
+        compressIfPossible = false;
+    #elif defined(MAC)
+        windowsTarget = false;
+        linuxTarget = true;
+        macTarget = false;
+        compressIfPossible = false;
+    #else
+        #warning Unknown OS
+    #endif
+
+
     diagnosticManager.OnMessage(ToString(_("Lancement de la compilation du projet.")));
     if ( !windowsTarget && !linuxTarget && !macTarget)
     {
@@ -75,28 +95,46 @@ void FullProjectCompiler::LaunchProjectCompilation()
     if ( EventsCodeCompiler::GetInstance()->EventsBeingCompiled() )
     {
         diagnosticManager.OnMessage(ToString(_("Compilation en attente de la fin des tâches en cours...")));
+
+        wxStopWatch yieldClock;
         while (EventsCodeCompiler::GetInstance()->EventsBeingCompiled())
-            wxSafeYield();
+        {
+            if ( yieldClock.Time() > 50 )
+            {
+                wxSafeYield(NULL, true);
+                yieldClock.Start();
+            }
+        }
     }
 
     //Compile all scene events to bitcode
     for (unsigned int i = 0;i<gameToCompile.scenes.size();++i)
     {
+        if ( gameToCompile.scenes[i]->profiler ) gameToCompile.scenes[i]->profiler->profilingActivated = false;
+
         diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+gameToCompile.scenes[i]->GetName()+_(".")));
         EventsCodeCompiler::Task task(&gameToCompile, gameToCompile.scenes[i].get());
         task.compilationForRuntime = true;
         task.generateBitcodeFileOnly = true;
+        task.optimize = optimize;
         task.bitCodeFilename = tempDir+"/GDpriv"+gameToCompile.scenes[i]->GetName()+".ir";
         resourcesMergingHelper.GetNewFilename(task.bitCodeFilename); //Export bitcode file.
 
         EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(task);
 
+        wxStopWatch yieldClock;
         while (EventsCodeCompiler::GetInstance()->EventsBeingCompiled())
-            wxSafeYield(NULL, true);
+        {
+            if ( yieldClock.Time() > 50 )
+            {
+                wxSafeYield(NULL, true);
+                yieldClock.Start();
+            }
+        }
 
         if ( !wxFileExists(task.bitCodeFilename) )
         {
-            diagnosticManager.AddError(ToString(_("La compilation de la scène ")+gameToCompile.scenes[i]->GetName()+_(" a échouée : Rendez vous sur notre site pour nous rapporter cette erreur.\nSi vous pensez que l'erreur provient d'une extension, contactez le développeur de celle ci.")));
+            diagnosticManager.AddError(ToString(_("La compilation de la scène ")+gameToCompile.scenes[i]->GetName()+_(" a échouée : Rendez vous sur notre site pour nous rapporter cette erreur, en joignant le fichier suivant:\n"+EventsCodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt"+"\n\nSi vous pensez que l'erreur provient d'une extension, contactez le développeur de celle ci.")));
             diagnosticManager.OnCompilationFailed();
             return;
         }
@@ -109,7 +147,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     //Copie du jeu
     Game game = gameToCompile;
 
-    std::string winExecutableName = game.winExecutableFilename.empty() ? "Game.exe" : game.winExecutableFilename+".exe";
+    std::string winExecutableName = game.winExecutableFilename.empty() ? "GameWin.exe" : game.winExecutableFilename+".exe";
     std::string linuxExecutableName = game.linuxExecutableFilename.empty() ? "GameLinux" : game.linuxExecutableFilename;
     std::string macExecutableName = game.macExecutableFilename.empty() ? "GameMac" : game.macExecutableFilename;
 
@@ -260,7 +298,24 @@ void FullProjectCompiler::LaunchProjectCompilation()
             {
                 if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdw", tempDir + "/" + game.extensionsUsed[i]+".xgdw", true ) == false )
                     diagnosticManager.AddError(ToString(_( "Impossible de copier l'extension ")+game.extensionsUsed[i]+_(" pour Windows dans le répertoire de compilation.\n" )));
+            }
 
+            if ( linuxTarget )
+            {
+                if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdl", tempDir + "/"+game.extensionsUsed[i]+".xgdl", true ) == false )
+                    diagnosticManager.AddError(ToString(_( "Impossible de copier l'extension ")+game.extensionsUsed[i]+_(" pour Linux dans le répertoire de compilation.\n" )));
+            }
+
+            if ( macTarget )
+            {
+                if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdm", tempDir + "/"+game.extensionsUsed[i]+".xgdm", true ) == false )
+                    diagnosticManager.AddError(ToString(_( "Impossible de copier l'extension ")+game.extensionsUsed[i]+_(" pour Mac OS dans le répertoire de compilation.\n" )));
+            }
+        }
+        if ( extension != boost::shared_ptr<ExtensionBase>() )
+        {
+            if ( windowsTarget)
+            {
                 const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
                 for (unsigned int i = 0;i<supplementaryFiles.size();++i)
                 {
@@ -272,9 +327,6 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
             if ( linuxTarget )
             {
-                if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdl", tempDir + "/"+game.extensionsUsed[i]+".xgdl", true ) == false )
-                    diagnosticManager.AddError(ToString(_( "Impossible de copier l'extension ")+game.extensionsUsed[i]+_(" pour Linux dans le répertoire de compilation.\n" )));
-
                 const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
                 for (unsigned int i = 0;i<supplementaryFiles.size();++i)
                 {
@@ -286,9 +338,6 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
             if ( macTarget )
             {
-                if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdm", tempDir + "/"+game.extensionsUsed[i]+".xgdm", true ) == false )
-                    diagnosticManager.AddError(ToString(_( "Impossible de copier l'extension ")+game.extensionsUsed[i]+_(" pour Mac OS dans le répertoire de compilation.\n" )));
-
                 const std::vector < std::pair<std::string, std::string> > & supplementaryFiles = extension->GetSupplementaryRuntimeFiles();
                 for (unsigned int i = 0;i<supplementaryFiles.size();++i)
                 {
@@ -317,30 +366,6 @@ void FullProjectCompiler::LaunchProjectCompilation()
             if ( wxCopyFile( "Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )
                 diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable gdl.dll"+_(" dans le répertoire de compilation.\n" )));
 
-            if ( wxCopyFile( "sfml-audio-2.dll", tempDir + "/sfml-audio-2.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable sfml-audio-2.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "sfml-graphics-2.dll", tempDir + "/sfml-graphics-2.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable sfml-graphics-2.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "sfml-network-2.dll", tempDir + "/sfml-network-2.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable sfml-network-2.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "sfml-system-2.dll", tempDir + "/sfml-system-2.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable sfml-system-2.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "sfml-window-2.dll", tempDir + "/sfml-window-2.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable sfml-window-2.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "libsndfile-1.dll", tempDir + "/libsndfile-1.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de copier ")+"libsndfile-1.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "openal32.dll", tempDir + "/openal32.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de copier ")+"openal32.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "mingwm10.dll", tempDir + "/mingwm10.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de copier ")+"mingwm10.dll"+_(" dans le répertoire de compilation.\n" )));
-
         }
         //Fichiers pour linux
         if ( linuxTarget )
@@ -351,41 +376,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
             if ( wxCopyFile( "Runtime/PlayLinux", tempDir + "/" + linuxExecutableName, true ) == false )
                 diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"le script executable Linux"+_(" dans le répertoire de compilation.\n" )));
 
-            if ( wxCopyFile( "Runtime/libFLAC.so.7", tempDir + "/libFLAC.so.7", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libFLAC.so.7"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "Runtime/libfreetype.so.6", tempDir + "/libfreetype.so.6", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libfreetype.so.6"+_(" dans le répertoire de compilation.\n" )));
-
             if ( wxCopyFile( "Runtime/libgdl.so", tempDir + "/libgdl.so", true ) == false )
                 diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libgdl.so"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "Runtime/libopenal.so.0", tempDir + "/libopenal.so.0", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libopenal.so.0"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "Runtime/libsfml2-audio.so", tempDir + "/libsfml2-audio.so", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsfml2-audio.so"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "Runtime/libsfml2-graphics.so", tempDir + "/libsfml2-graphics.so", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsfml2-graphics.so"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "Runtime/libsfml2-network.so", tempDir + "/libsfml2-network.so", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsfml2-network.so"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "Runtime/libsfml2-system.so", tempDir + "/libsfml2-system.so", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsfml2-system.so"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "Runtime/libsfml2-system.so", tempDir + "/libsfml2-system.so", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsfml2-system.so"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "Runtime/libsfml2-window.so", tempDir + "/libsfml2-window.so", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsfml2-window.so"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "Runtime/libsndfile.so.1", tempDir + "/libsndfile.so.1", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsndfile.so.1"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "Runtime/libGLEW.so.1.3", tempDir + "/libGLEW.so.1.3", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libGLEW.so.1.3"+_(" dans le répertoire de compilation.\n" )));
         }
         if ( macTarget )
         {
@@ -394,24 +386,6 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
             if ( wxCopyFile( "MacRuntime/libgdl.dylib", tempDir + "/libgdl.dylib", true ) == false )
                 diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libgdl.dylib"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "MacRuntime/libsfml-audio.2.0.dylib", tempDir + "/libsfml-audio.2.0.dylib", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsfml-audio.2.0.dylib"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "MacRuntime/libsfml-graphics.2.0.dylib", tempDir + "/libsfml-graphics.2.0.dylib", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsfml-graphics.2.0.dylib"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "MacRuntime/libsfml-network.2.0.dylib", tempDir + "/libsfml-network.2.0.dylib", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsfml-network.2.0.dylib"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "MacRuntime/libsfml-system.2.0.dylib", tempDir + "/libsfml-system.2.0.dylib", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsfml-system.2.0.dylib"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "MacRuntime/libsfml-window.2.0.dylib", tempDir + "/libsfml-window.2.0.dylib", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"libsfml-window.2.0.dylib"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "MacRuntime/sndfile", tempDir + "/sndfile", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"sndfile"+_(" dans le répertoire de compilation.\n" )));
         }
 
         //Copie du tout dans le répertoire final
@@ -434,30 +408,6 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
             if ( wxCopyFile( "Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )
                 diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable gdl.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "sfml-audio-2.dll", tempDir + "/sfml-audio-2.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable sfml-audio-2.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "sfml-graphics-2.dll", tempDir + "/sfml-graphics-2.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable sfml-graphics-2.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "sfml-network-2.dll", tempDir + "/sfml-network-2.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable sfml-network-2.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "sfml-system-2.dll", tempDir + "/sfml-system-2.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable sfml-system-2.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "sfml-window-2.dll", tempDir + "/sfml-window-2.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable sfml-window-2.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "libsndfile-1.dll", tempDir + "/libsndfile-1.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de copier ")+"libsndfile-1.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "openal32.dll", tempDir + "/openal32.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de copier ")+"openal32.dll"+_(" dans le répertoire de compilation.\n" )));
-
-            if ( wxCopyFile( "mingwm10.dll", tempDir + "/mingwm10.dll", true ) == false )
-                diagnosticManager.AddError(ToString(_( "Impossible de copier ")+"mingwm10.dll"+_(" dans le répertoire de compilation.\n" )));
 
             //Compression en un seul fichier
             diagnosticManager.OnMessage( ToString( _("Exportation du jeu... ( Compression )") ) );
@@ -493,7 +443,7 @@ std::string FullProjectCompiler::GetTempDir()
     std::string tempDir = forcedTempDir;
     if ( tempDir.empty() ) //If the user has not forced a directory
     {
-        tempDir = wxFileName::GetHomeDir()+"/.Game Develop/";
+        tempDir = wxFileName::GetTempDir();
         if ( !wxFileName::IsDirWritable(tempDir) )
             tempDir = wxGetCwd();
 
@@ -504,7 +454,7 @@ std::string FullProjectCompiler::GetTempDir()
             wxMessageBox(_("Game Develop n'a pas réussi à trouver un répertoire temporaire pour la compilation.\nSi la compilation échoue, allez dans les préférences et choisissez un répertoire temporaire où vous avez les droits d'écriture."), _("La compilation risque d'échouer."), wxICON_EXCLAMATION);
     }
 
-    return tempDir + "/Compil";
+    return tempDir + "/GDDeploymentTemporaries";
 }
 
 void FullProjectCompiler::ClearDirectory(std::string directory)

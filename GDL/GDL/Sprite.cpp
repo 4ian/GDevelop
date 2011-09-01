@@ -1,5 +1,6 @@
 #include "GDL/Sprite.h"
 #include <SFML/Graphics.hpp>
+#include "GDL/ImageManager.h"
 #include <iostream>
 
 using namespace std;
@@ -78,13 +79,11 @@ Point & Sprite::GetPoint(const string & name)
     return badPoint;
 }
 
-void Sprite::LoadImage(boost::shared_ptr<sf::Texture> image_)
+void Sprite::LoadImage(boost::shared_ptr<SFMLTextureWrapper> image_)
 {
     sfmlImage = image_;
-    sfmlSprite.SetTexture(*sfmlImage, true);
+    sfmlSprite.SetTexture(sfmlImage->texture, true);
     hasItsOwnImage = false;
-
-    pixelPerfectCollisionMask = sfmlImage->CopyToImage();
 
     if ( automaticCentre )
         centre.SetXY(sfmlSprite.GetSubRect().Width/2, sfmlSprite.GetSubRect().Height/2);
@@ -102,10 +101,10 @@ bool Sprite::SetCentreAutomatic(bool enabled)
 
 void Sprite::MakeSpriteOwnsItsImage()
 {
-    if ( !hasItsOwnImage || sfmlImage == boost::shared_ptr<sf::Texture>() )
+    if ( !hasItsOwnImage || sfmlImage == boost::shared_ptr<SFMLTextureWrapper>() )
     {
-        sfmlImage = boost::shared_ptr<sf::Texture>(new sf::Texture(*sfmlImage)); //Copy the image.
-        sfmlSprite.SetTexture(*sfmlImage);
+        sfmlImage = boost::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper(sfmlImage->texture)); //Copy the texture.
+        sfmlSprite.SetTexture(sfmlImage->texture);
         hasItsOwnImage = true;
     }
 }

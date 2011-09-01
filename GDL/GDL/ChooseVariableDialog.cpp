@@ -26,6 +26,7 @@ const long ChooseVariableDialog::ID_STATICBITMAP1 = wxNewId();
 const long ChooseVariableDialog::ID_STATICTEXT6 = wxNewId();
 const long ChooseVariableDialog::ID_PANEL2 = wxNewId();
 const long ChooseVariableDialog::ID_STATICLINE1 = wxNewId();
+const long ChooseVariableDialog::ID_AUITOOLBAR1 = wxNewId();
 const long ChooseVariableDialog::ID_PANEL1 = wxNewId();
 const long ChooseVariableDialog::ID_LISTCTRL1 = wxNewId();
 const long ChooseVariableDialog::ID_STATICLINE2 = wxNewId();
@@ -49,6 +50,7 @@ END_EVENT_TABLE()
 ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, ListVariable & variables_) :
 variables(variables_)
 {
+    std::cout <<"Hello";
 	//(*Initialize(ChooseVariableDialog)
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer2;
@@ -78,6 +80,11 @@ variables(variables_)
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	toolbarPanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(-1,26), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+	AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
+	toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	toolbar->Realize();
+	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper(false));
+	AuiManager1->Update();
 	FlexGridSizer1->Add(toolbarPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	variablesList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxSize(374,149), wxLC_REPORT, wxDefaultValidator, _T("ID_LISTCTRL1"));
 	FlexGridSizer1->Add(variablesList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -116,9 +123,6 @@ variables(variables_)
 	variablesList->SetColumnWidth(0, 150);
 	variablesList->SetColumnWidth(1, 130);
 
-    toolbar = new wxToolBar( toolbarPanel, -1, wxDefaultPosition, wxDefaultSize,
-                                   wxTB_FLAT | wxTB_NODIVIDER );
-
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
     toolbar->AddTool( idAddVar, wxT( "Ajouter une variable" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter une variable") );
     toolbar->AddTool( idEditVar, wxT( "Editer la valeur initiale de la variable" ), wxBitmap( wxImage( "res/editicon.png" ) ), _("Editer la valeur initiale de la variable") );
@@ -131,12 +135,6 @@ variables(variables_)
     toolbar->AddTool( ID_Help, wxT( "Aide sur les variables initiales" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide sur les variables initiales") );
     toolbar->Realize();
 
-    //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
-#ifdef __WXGTK__
-    wxSize tbSize = toolbar->GetSize();
-    gtk_widget_set_usize( toolbar->m_widget, tbSize.GetWidth(), tbSize.GetHeight() );
-#endif
-
     Refresh();
 }
 
@@ -144,6 +142,8 @@ ChooseVariableDialog::~ChooseVariableDialog()
 {
 	//(*Destroy(ChooseVariableDialog)
 	//*)
+
+    AuiManager1->UnInit();
 }
 
 /**
@@ -151,7 +151,6 @@ ChooseVariableDialog::~ChooseVariableDialog()
  */
 void ChooseVariableDialog::OntoolbarPanelResize(wxSizeEvent& event)
 {
-    toolbar->SetSize(toolbarPanel->GetSize().x, -1);
 }
 
 /**

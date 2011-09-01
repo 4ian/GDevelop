@@ -42,6 +42,7 @@ namespace GDpriv
     void* GetSymbol(Handle library, const char* name) { return dlsym(library, name);}
     void CloseLibrary(Handle library) {dlclose(library);}
     std::string DynamicLibraryLastError() {return std::string(dlerror());}
+    Handle SetLibraryGlobal(const char* path) {return dlopen(path, RTLD_NOLOAD|RTLD_GLOBAL);}
 #else
     #warning System not supported for dynamic libraries loading
 #endif

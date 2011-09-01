@@ -46,6 +46,7 @@
 #endif
 
 //(*IdInit(EditorImages)
+const long EditorImages::ID_AUITOOLBAR1 = wxNewId();
 const long EditorImages::ID_PANEL2 = wxNewId();
 const long EditorImages::ID_TREECTRL1 = wxNewId();
 const long EditorImages::ID_PANEL3 = wxNewId();
@@ -126,6 +127,11 @@ toolbar(NULL)
     toolbarPanel = new wxPanel(Core, ID_PANEL2, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL2"));
     toolbarPanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
     if ( useRibbon ) toolbarPanel->SetSize(-1, 0);
+    AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
+    toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+    toolbar->Realize();
+    AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper(false));
+    AuiManager1->Update();
     FlexGridSizer1->Add(toolbarPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer4->Add(FlexGridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SplitterWindow1 = new wxSplitterWindow(Core, ID_SPLITTERWINDOW1, wxDefaultPosition, wxSize(239,271), wxSP_3D, _T("ID_SPLITTERWINDOW1"));
@@ -228,6 +234,7 @@ toolbar(NULL)
     {
         ConnectEvents();
         toolbarPanel->SetSize(GetSize().x, 0);
+        toolbarPanel->Show(false);
     }
 
     Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorImages::OnRefreshBtClick);
@@ -253,12 +260,7 @@ toolbar(NULL)
 void EditorImages::OnResize(wxSizeEvent& event)
 {
     if ( !useRibbon )
-    {
-        toolbarPanel->SetSize(event.GetSize().GetWidth(), toolbar->GetSize().GetHeight());
-        toolbar->SetSize(toolbarPanel->GetSize().x, -1);
-    }
-    else
-        toolbarPanel->SetSize(event.GetSize().GetWidth(), 0);
+        toolbarPanel->SetSize(event.GetSize().GetWidth(), toolbarPanel->GetSize().GetHeight());
 
     SplitterWindow1->Unsplit(BanqueImageList);
     SplitterWindow1->Unsplit(apercuPanel);
@@ -274,6 +276,8 @@ EditorImages::~EditorImages()
 {
     //(*Destroy(EditorImages)
     //*)
+
+    AuiManager1->UnInit();
 }
 
 void EditorImages::ConnectEvents()
@@ -305,10 +309,6 @@ void EditorImages::ConnectEvents()
 ////////////////////////////////////////////////////////////
 void EditorImages::CreateToolbar()
 {
-    //Barre d'outils
-    toolbar = new wxToolBar( toolbarPanel, -1, wxDefaultPosition, wxDefaultSize,
-                                    wxTB_FLAT /*| wxTB_NODIVIDER*/ );
-
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
     toolbar->AddTool( ID_BITMAPBUTTON1, wxT( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Rafraichir la liste d'images") );
     toolbar->AddSeparator();
@@ -323,12 +323,6 @@ void EditorImages::CreateToolbar()
     toolbar->AddSeparator();
     toolbar->AddTool( ID_BITMAPBUTTON3, wxT( "Aide de l'éditeur de la banque d'images" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur de la banque d'images") );
     toolbar->Realize();
-
-    //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
-#ifdef __WXGTK__
-    wxSize tbSize = toolbar->GetSize();
-    gtk_widget_set_usize( toolbar->m_widget, tbSize.GetWidth(), tbSize.GetHeight() );
-#endif
 }
 
 wxTreeItemId EditorImages::GetSelectedFolderItem()

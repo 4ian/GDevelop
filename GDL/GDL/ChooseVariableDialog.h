@@ -7,6 +7,7 @@
 #include <wx/listctrl.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/aui/aui.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
 #include <wx/statbmp.h>
@@ -32,8 +33,10 @@ class GD_API ChooseVariableDialog: public wxDialog
 		ListVariable variables;
 
 		//(*Declarations(ChooseVariableDialog)
+		wxAuiManager* AuiManager1;
 		wxButton* helpBt;
 		wxPanel* toolbarPanel;
+		wxAuiToolBar* toolbar;
 		wxStaticBitmap* StaticBitmap1;
 		wxListCtrl* variablesList;
 		wxButton* cancelBt;
@@ -51,6 +54,7 @@ class GD_API ChooseVariableDialog: public wxDialog
 		static const long ID_STATICTEXT6;
 		static const long ID_PANEL2;
 		static const long ID_STATICLINE1;
+		static const long ID_AUITOOLBAR1;
 		static const long ID_PANEL1;
 		static const long ID_LISTCTRL1;
 		static const long ID_STATICLINE2;
@@ -84,8 +88,6 @@ class GD_API ChooseVariableDialog: public wxDialog
 		void OnMoveUpVarSelected(wxCommandEvent& event);
 		void OnMoveDownVarSelected(wxCommandEvent& event);
 		void Refresh();
-
-        wxToolBar * toolbar;
 
 		DECLARE_EVENT_TABLE()
 };

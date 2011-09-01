@@ -8,11 +8,10 @@
 #include <string>
 #include <cmath>
 #include <SFML/Graphics.hpp>
-
+#include "GDL/ImageManager.h"
 #include "GDL/Sprite.h"
 #include "GDL/SpriteObject.h"
 #include "GDL/Collisions.h"
-#include "GDL/Log.h"
 
 #ifndef PI
 #define PI (3.14159265358979323846)
@@ -158,5 +157,5 @@ bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf:
  */
 bool GD_API CheckCollision( const SpriteObject * const objet1, const SpriteObject * const objet2)
 {
-    return PixelPerfectTest( objet1->GetCurrentSFMLSprite(), objet2->GetCurrentSFMLSprite(), 1, objet1->GetCurrentSprite().GetPixelPerfectCollisionMask(), objet2->GetCurrentSprite().GetPixelPerfectCollisionMask()  );
+    return PixelPerfectTest( objet1->GetCurrentSFMLSprite(), objet2->GetCurrentSFMLSprite(), 1, objet1->GetCurrentSprite().GetSFMLTexture()->image, objet2->GetCurrentSprite().GetSFMLTexture()->image  );
 }

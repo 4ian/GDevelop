@@ -56,7 +56,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetAnimation").SetAssociatedGetter("GetAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            instrInfo.cppCallingInformation.SetFunctionName("SetAnimation").SetAssociatedGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         DECLARE_END_OBJECT_ACTION()
 

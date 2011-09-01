@@ -11,6 +11,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <wx/filefn.h>
 
 //Long list of llvm and clang headers
 #include "clang/CodeGen/CodeGenAction.h"
@@ -75,15 +76,15 @@ using namespace clang::driver;
 EventsCodeCompiler *EventsCodeCompiler::_singleton = NULL;
 sf::Mutex EventsCodeCompiler::openSaveDialogMutex;
 
-bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, std::string bitCodeFile, bool compilationForRuntime)
+bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, std::string bitCodeFile, bool compilationForRuntime, bool optimize)
 {
     std::cout << "C++ events file to bitcode compilation started\n" << std::endl;
-    std::cout << "Creating Clang compiler job...\n" << std::endl;
 
+    //Diagnostic classes for driver
     TextDiagnosticPrinter *DiagClient = new TextDiagnosticPrinter(llvm::errs(), DiagnosticOptions());
-
     llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
     Diagnostic Diags(DiagID, DiagClient);
+
     Driver TheDriver("" /* "Clang executable path" */, llvm::sys::getHostTriple(), "a.out", /*IsProduction=*/false, /*CXXIsProduction=*/false,  Diags);
 
     // FIXME: This is a hack to try to force the driver to do something we can
@@ -92,7 +93,8 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     llvm::SmallVector<const char *, 128> Args;
     Args.push_back("GDEditor.exe");
     #if defined(WINDOWS)
-    Args.push_back(!compilationForRuntime ? "-includeinclude/GDL/GDL/PrecompiledHeader.h" : "-includeinclude/GDL/GDL/PrecompiledHeaderRuntime.h");
+    if ( !optimize ) //Don't use precompiled header when optimizing, as they are built without optimizations
+        Args.push_back(!compilationForRuntime ? "-includeinclude/GDL/GDL/PrecompiledHeader.h" : "-includeinclude/GDL/GDL/PrecompiledHeaderRuntime.h");
     #endif
     Args.push_back(eventsFile.c_str());
     Args.push_back("-fsyntax-only");
@@ -104,8 +106,7 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     if ( !compilationForRuntime )
         Args.push_back("-DGD_IDE_ONLY"); //Already set in PCH
 
-    //if ( compilationForRuntime )
-    //    Args.push_back("-O2"); //Already set in PCH
+    if ( optimize ) Args.push_back("-O1");
 
     //Already set in PCH :
     #if defined(WINDOWS)
@@ -178,7 +179,23 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     Clang.setInvocation(CI.take());
 
     // Create the compilers actual diagnostics engine.
-    Clang.createDiagnostics(int(CCArgs.size()),const_cast<char**>(CCArgs.data()));
+    //Clang.createDiagnostics(int(CCArgs.size()),const_cast<char**>(CCArgs.data()));
+
+    //Diagnostic for clang compiler
+    std::string compilationErrorFileErrors;
+    llvm::raw_fd_ostream errorFile(std::string(workingDir+"compilationErrors.txt").c_str(), compilationErrorFileErrors);
+    errorFile << "Please send this file to CompilGames@gmail.com, or include this content when reporting the problem to Game Develop's developer.\n";
+    errorFile << "Veuillez envoyer ce fichier à CompilGames@gmail.com, ou l'inclure lorsque vous rapportez ce problème au développeur de Game Develop.\n";
+    errorFile << "\n";
+    errorFile << "Clang output:\n";
+    if ( !compilationErrorFileErrors.empty() ) std::cout << "Unable to create compilation errors report file!\n";
+
+    TextDiagnosticPrinter * clangDiagClient = new TextDiagnosticPrinter(errorFile, DiagnosticOptions());
+
+    llvm::IntrusiveRefCntPtr<DiagnosticIDs> clangDiagID(new DiagnosticIDs());
+    Diagnostic * clangDiags = new Diagnostic(clangDiagID, clangDiagClient);
+
+    Clang.setDiagnostics(clangDiags);
     if (!Clang.hasDiagnostics())
         return false;
 
@@ -206,6 +223,7 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
 void EventsCodeCompiler::Worker::DoCompleteCompilation()
 {
     cout << "Compilation: Worker started compilation task(s)." << endl;
+    std::string outputDir = EventsCodeCompiler::GetInstance()->GetWorkingDirectory();
     bool compile = true;
 
     while ( compile )
@@ -223,7 +241,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
             Scene sceneCopy = *task.scene;
             boost::shared_ptr<EventsExecutionEngine> executionEngine = task.scene->compiledEventsExecutionEngine; //Execution engine that compilation will setup. Using a shared_ptr to ensure that execution engine is not destroyed during compilation
             cout << "Game and scene copy made, executionEngine shared_ptr ok." << endl;
-            executionEngine->SetNotReady();
+            if ( !task.generateBitcodeFileOnly ) executionEngine->SetNotReady();
 
             if ( abort || executionEngine == boost::shared_ptr<EventsExecutionEngine>() )
             {
@@ -237,7 +255,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                 EventsCodeGenerator::DeleteUselessEvents(sceneCopy.events);
                 std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.events);
                 std::ofstream myfile;
-                myfile.open ( string("Temporaries/"+ToString(executionEngine.get())+"events.cpp").c_str() );
+                myfile.open ( string(outputDir+ToString(executionEngine.get())+"events.cpp").c_str() );
                 myfile << eventsOutput;
                 myfile.close();
 
@@ -247,9 +265,9 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                 }
                 else
                 {
-                    if ( !EventsCodeCompiler::GetInstance()->CompileEventsCppFileToBitCode("Temporaries/"+ToString(executionEngine.get())+"events.cpp", task.bitCodeFilename.empty() ? "Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc" : task.bitCodeFilename, task.compilationForRuntime ))
+                    if ( !EventsCodeCompiler::GetInstance()->CompileEventsCppFileToBitCode(outputDir+ToString(executionEngine.get())+"events.cpp", task.bitCodeFilename.empty() ? outputDir+ToString(executionEngine.get())+"LLVMIR.bc" : task.bitCodeFilename, task.compilationForRuntime, task.optimize ))
                     {
-                        cout << "Failed to compile Temporaries/"+ToString(executionEngine.get())+"events.cpp." << std::endl;
+                        cout << "Failed to compile "+outputDir+ToString(executionEngine.get())+"events.cpp." << std::endl;
                         cout << "Compilation aborted." << endl << char(7);
                     }
                     else
@@ -263,10 +281,10 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                         else if ( !task.generateBitcodeFileOnly && !abort )
                         {
                             llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
-                            llvm::error_code err = llvm::MemoryBuffer::getFile("Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc", eventsBuffer);
+                            llvm::error_code err = llvm::MemoryBuffer::getFile(outputDir+ToString(executionEngine.get())+"LLVMIR.bc", eventsBuffer);
                             if ( err.value() != 0 )
                             {
-                                std::cout << "Failed to load Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc: " << err.message() << std::endl;
+                                std::cout << "Failed to load "+outputDir+ToString(executionEngine.get())+"LLVMIR.bc: " << err.message() << std::endl;
                                 cout << "Compilation aborted." << endl << char(7);
                             }
                             else
@@ -281,11 +299,11 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                                     task.scene->eventsModified = false;
                                 }
                             }
-                            remove(std::string("Temporaries/"+ToString(executionEngine.get())+"LLVMIR.bc").c_str());
+                            remove(std::string(outputDir+ToString(executionEngine.get())+"LLVMIR.bc").c_str());
                         }
                     }
                 }
-                remove(std::string("Temporaries/"+ToString(executionEngine.get())+"events.cpp").c_str());
+                remove(std::string(outputDir+ToString(executionEngine.get())+"events.cpp").c_str());
             }
         }
 
@@ -452,7 +470,18 @@ void EventsCodeCompiler::NotifyASceneIsDestroyed(const Scene & scene)
     }
 }
 
-EventsCodeCompiler::EventsCodeCompiler()
+void EventsCodeCompiler::SetWorkingDirectory(std::string workingDir_)
+{
+    workingDir = workingDir_;
+    if ( workingDir.empty() || (workingDir[workingDir.length()-1] != '/' && workingDir[workingDir.length()-1] != '\\' ) )
+        workingDir += "/";
+
+    if (!wxDirExists(workingDir.c_str()))
+        wxMkdir(workingDir);
+};
+
+EventsCodeCompiler::EventsCodeCompiler() :
+    workingDir("Temporaries/")
 {
     #if defined(WINDOWS)
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/include");

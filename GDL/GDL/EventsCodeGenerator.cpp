@@ -181,9 +181,7 @@ string GenerateCompoundOperatorCall(const InstructionInfos & instrInfos, vector<
     return callStartString+"("+argumentsStr+") "+operatorStr+" ("+rhs+")";
 }
 
-/**
- * Generate code for a condition. Result of condition is stored in conditionXIsTrue, with X = conditionIndexInList
- */
+
 std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const Scene & scene, Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context)
 {
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
@@ -1068,7 +1066,7 @@ void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & 
         #endif
     }
     #if defined(GD_IDE_ONLY)
-    if ( scene.profiler && scene.profiler->profilingActivated )
+    if ( !listEvent.empty() && scene.profiler && scene.profiler->profilingActivated )
     {
         //Define a new profile event
         boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);

@@ -26,8 +26,37 @@ class GD_API EventsCodeGenerator
     public:
         static std::string GenerateEventsCompleteCode(const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & events);
 
+        /**
+         * Generate code for executing an event list
+         *
+         * \param Game used
+         * \param Scene used
+         * \param Vector of events
+         * \param Context used for generation
+         * \return C++ code
+         */
         static std::string GenerateEventsListCode(const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
+
+        /**
+         * Generate code for executing a condition list
+         *
+         * \param Game used
+         * \param Scene used
+         * \param Vector of actions
+         * \param Context used for generation
+         * \return C++ code. Boolean containing conditions result are name conditionXIsTrue, with X = the number of the condition, starting from 0.
+         */
         static std::string GenerateConditionsListCode(const Game & game, const Scene & scene, std::vector < Instruction > & conditions, EventsCodeGenerationContext & context);
+
+        /**
+         * Generate code for executing an action list
+         *
+         * \param Game used
+         * \param Scene used
+         * \param Vector of actions
+         * \param Context used for generation
+         * \return C++ code
+         */
         static std::string GenerateActionsListCode(const Game & game, const Scene & scene, std::vector < Instruction > & actions, EventsCodeGenerationContext & context);
 
         /**
@@ -42,7 +71,27 @@ class GD_API EventsCodeGenerator
          */
         static std::vector<std::string> GenerateParametersCodes( const Game & game, const Scene & scene, std::vector < GDExpression > parameters, const std::vector < ParameterInfo > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
 
+        /**
+         * Generate code for a single condition
+         *
+         * \param Game used
+         * \param Scene used
+         * \param Instruction of the condition
+         * \param The name of the C++ boolean that will contains the condition result.
+         * \param Context used for generation
+         * \return C++ code
+         */
         static std::string GenerateConditionCode(const Game & game, const Scene & scene, Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context);
+
+        /**
+         * Generate code for a single action
+         *
+         * \param Game used
+         * \param Scene used
+         * \param Instruction of the action
+         * \param Context used for generation
+         * \return C++ code
+         */
         static std::string GenerateActionCode(const Game & game, const Scene & scene, Instruction & action, EventsCodeGenerationContext & context);
 
         static void DeleteUselessEvents(std::vector < BaseEventSPtr > & events);

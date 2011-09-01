@@ -10,6 +10,7 @@
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/tglbtn.h>
+#include <wx/aui/aui.h>
 #include <wx/statline.h>
 #include <wx/radiobut.h>
 #include <wx/panel.h>
@@ -19,6 +20,7 @@
 #include <wx/scrolbar.h>
 #include <wx/dialog.h>
 //*)
+#include <wx/ribbon/toolbar.h>
 #include <wx/toolbar.h>
 #include <wx/statbmp.h>
 #include <wx/aui/aui.h>
@@ -48,6 +50,7 @@ class EditorObjet: public wxDialog
 		int position;
 
 		//(*Declarations(EditorObjet)
+		wxAuiManager* AuiManager1;
 		wxPanel* Core;
 		wxButton* OkBt;
 		wxMenuItem* MenuItem31;
@@ -57,6 +60,7 @@ class EditorObjet: public wxDialog
 		wxMenu maskContextMenu;
 		wxCheckBox* NormalCheck;
 		wxPanel* toolbarPanel;
+		wxAuiToolBar* toolbar;
 		wxMenuItem* MenuItem26;
 		wxMenuItem* MenuItem7;
 		wxMenuItem* MenuItem25;
@@ -127,7 +131,7 @@ class EditorObjet: public wxDialog
 		wxButton* AideBt;
 		//*)
 		EditorImages * editorImagesPnl;
-		wxToolBar * toolbar;
+		//wxRibbonToolBar * toolbar;
 
 	protected:
 
@@ -150,6 +154,7 @@ class EditorObjet: public wxDialog
 		static const long ID_TOGGLEBUTTON3;
 		static const long ID_TOGGLEBUTTON4;
 		static const long ID_CHECKBOX2;
+		static const long ID_AUITOOLBAR1;
 		static const long ID_PANEL6;
 		static const long ID_STATICLINE3;
 		static const long ID_PANEL3;

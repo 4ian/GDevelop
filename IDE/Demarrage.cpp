@@ -107,7 +107,7 @@ Demarrage::Demarrage(wxWindow* parent)
 	wxFont StaticText6Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText6->SetFont(StaticText6Font);
 	FlexGridSizer5->Add(StaticText6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("Game Develop permet la création de jeux de façon simple et rapide, pour le développeur débutant ou confirmé."), wxDefaultPosition, wxSize(309,36), 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("Game Develop permet la création de jeux de façon simple et rapide, pour le développeur débutant ou confirmé."), wxDefaultPosition, wxSize(309,45), 0, _T("ID_STATICTEXT2"));
 	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -214,6 +214,9 @@ Demarrage::Demarrage(wxWindow* parent)
 	Connect(ID_HYPERLINKCTRL8,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&Demarrage::OnExempleBtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Demarrage::OnFermerBtClick);
 	//*)
+
+    if ( _("(-Insert the name of the second tutorial or a blank text-)") == "(-Insert the name of the second tutorial or a blank text-)" )
+        secondTutoLink->SetLabel("");
 }
 
 Demarrage::~Demarrage()
@@ -278,7 +281,7 @@ void Demarrage::OnFermerBtClick(wxCommandEvent& event)
 
 void Demarrage::OnTutorielBtClick(wxCommandEvent& event)
 {
-    wxString link = wxGetCwd() + "\\Tutorial\\"+_("Tutoriel.pdf");
+    wxString link = wxGetCwd() + "/Tutorial/"+_("Tutoriel.pdf");
     wxString mimetype = "application/pdf";
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {
@@ -329,7 +332,7 @@ void Demarrage::OnsecondTutoLinkClick(wxCommandEvent& event)
 {
     if ( _("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)") == "" ) return;
 
-    wxString link = wxGetCwd() + "\\Tutorial\\"+_("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)");
+    wxString link = wxGetCwd() + "/Tutorial/"+_("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)");
     wxString mimetype = "application/pdf";
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {

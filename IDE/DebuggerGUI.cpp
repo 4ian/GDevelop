@@ -27,6 +27,7 @@
 
 
 //(*IdInit(DebuggerGUI)
+const long DebuggerGUI::ID_AUITOOLBAR1 = wxNewId();
 const long DebuggerGUI::ID_PANEL3 = wxNewId();
 const long DebuggerGUI::ID_LISTCTRL2 = wxNewId();
 const long DebuggerGUI::ID_PANEL1 = wxNewId();
@@ -75,6 +76,11 @@ objectChanged(true)
 	FlexGridSizer6->AddGrowableCol(0);
 	FlexGridSizer6->AddGrowableRow(0);
 	toolbarPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL3"));
+	AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
+	toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	toolbar->Realize();
+	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper(false));
+	AuiManager1->Update();
 	FlexGridSizer6->Add(toolbarPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK1"));
@@ -127,8 +133,6 @@ objectChanged(true)
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&DebuggerGUI::OnobjectListItemActivated);
 	Connect(wxEVT_SIZE,(wxObjectEventFunction)&DebuggerGUI::OnResize);
 	//*)
-    toolbar = new wxToolBar( toolbarPanel, -1, wxDefaultPosition, wxDefaultSize,
-                                   wxTB_FLAT | wxTB_NODIVIDER );
 
     toolbar->ClearTools();
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
@@ -213,6 +217,8 @@ DebuggerGUI::~DebuggerGUI()
 {
 	//(*Destroy(DebuggerGUI)
 	//*)
+
+	AuiManager1->UnInit();
 }
 
 
@@ -221,7 +227,6 @@ DebuggerGUI::~DebuggerGUI()
 ////////////////////////////////////////////////////////////
 void DebuggerGUI::OntoolbarPanelResize(wxSizeEvent& event)
 {
-    toolbar->SetSize(toolbarPanel->GetSize().x, -1);
 }
 
 ////////////////////////////////////////////////////////////

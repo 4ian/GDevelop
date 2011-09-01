@@ -18,23 +18,12 @@ rem Game Develop C++ Implementation headers
 xcopy ..\..\GDL\*.h ..\Bin\Release\include\GDL\*.h /S /Y /D
 
 rem Boost (shared_ptr and dependencies) headers
-xcopy ..\..\ExtLibs\boost\boost\*.hpp ..\Bin\Release\include\boost\boost\*.hpp  /Y /S /D
-xcopy ..\..\ExtLibs\boost\boost\*.h ..\Bin\Release\include\boost\boost\*.h  /Y /S /D
+..\..\ExtLibs\boost\bcp.exe --boost=..\..\ExtLibs\boost\ version config shared_ptr weak_ptr enable_shared_from_this ..\bin\release\include\boost\
 
 rem SFML headers 
 xcopy ..\..\ExtLibs\SFML\include\*.h ..\Bin\Release\include\SFML\include\*.h /S /Y /D
 xcopy ..\..\ExtLibs\SFML\include\*.hpp ..\Bin\Release\include\SFML\include\*.hpp /S /Y /D
 xcopy ..\..\ExtLibs\SFML\include\*.inl ..\Bin\Release\include\SFML\include\*.inl /S /Y /D
-
-rem wxWidgets headers
-xcopy ..\..\ExtLibs\wxwidgets\include\*.h ..\Bin\Release\include\wxwidgets\include\*.h /S /Y /D
-xcopy ..\..\ExtLibs\wxwidgets\include\*.hpp ..\Bin\Release\include\wxwidgets\include\*.hpp /S /Y /D
-xcopy ..\..\ExtLibs\wxwidgets\include\*.inl ..\Bin\Release\include\wxwidgets\include\*.inl /S /Y /D
-
-rem wxWidgets headers
-xcopy ..\..\ExtLibs\wxwidgets\lib\*.h ..\Bin\Release\include\wxwidgets\lib\*.h /S /Y /D
-xcopy ..\..\ExtLibs\wxwidgets\lib\*.hpp ..\Bin\Release\include\wxwidgets\lib\*.hpp /S /Y /D
-xcopy ..\..\ExtLibs\wxwidgets\lib\*.inl ..\Bin\Release\include\wxwidgets\lib\*.inl /S /Y /D
 
 rem Extensions headers
 xcopy ..\..\Extensions\*.h ..\Bin\Release\Extensions\include\*.h /S /Y /D

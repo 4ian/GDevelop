@@ -5,6 +5,7 @@
 #include <wx/listctrl.h>
 #include <wx/sizer.h>
 #include <wx/menu.h>
+#include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/imaglist.h>
 //*)
@@ -22,6 +23,8 @@ class EditorLayers: public wxPanel
 		virtual ~EditorLayers();
 
 		//(*Declarations(EditorLayers)
+		wxAuiManager* AuiManager1;
+		wxAuiToolBar* toolbar;
 		wxMenuItem* MenuItem2;
 		wxMenuItem* MenuItem1;
 		wxListCtrl* layersList;
@@ -37,6 +40,7 @@ class EditorLayers: public wxPanel
 	protected:
 
 		//(*Identifiers(EditorLayers)
+		static const long ID_AUITOOLBAR1;
 		static const long ID_PANEL3;
 		static const long ID_LISTCTRL1;
 		static const long idMenuEdit;
@@ -90,7 +94,6 @@ class EditorLayers: public wxPanel
         string layerSelected;
 
 		void CreateToolbar();
-        wxToolBar * toolbar;
 
 		DECLARE_EVENT_TABLE()
 };

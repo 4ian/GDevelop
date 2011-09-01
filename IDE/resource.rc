@@ -1,6 +1,7 @@
 aaaa ICON "icon.ico"
 
 #include "version.h"
+#include "wx/msw/wx.rc"
 
 #ifndef DEBUG
 #define VER_DEBUG                   0

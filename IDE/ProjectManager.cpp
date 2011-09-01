@@ -29,10 +29,7 @@
 #include "InitialVariablesDialog.h"
 #include "EditPropScene.h"
 
-// archives Boost
 #include <fstream>
-#include <boost/archive/xml_oarchive.hpp>
-#include <boost/archive/xml_iarchive.hpp>
 
 
 using namespace GDpriv;

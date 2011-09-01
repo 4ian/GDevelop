@@ -46,6 +46,7 @@
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\ExtLibs\wxwidgets\include" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -205,6 +206,7 @@
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\include" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
@@ -298,6 +300,7 @@
 				</Compiler>
 				<ResourceCompiler>
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\include" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-lopenal32" />
@@ -988,6 +991,9 @@
 		</Unit>
 		<Unit filename="resource.rc">
 			<Option compilerVar="WINDRES" />
+			<Option target="Debug - Edittime" />
+			<Option target="Release - Edittime" />
+			<Option target="Development - Edittime" />
 		</Unit>
 		<Unit filename="wxSFMLCanvas.cpp">
 			<Option virtualFolder="wxSFML Canvas\" />

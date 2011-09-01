@@ -19,6 +19,7 @@
 #endif
 
 //(*IdInit(EditorLayers)
+const long EditorLayers::ID_AUITOOLBAR1 = wxNewId();
 const long EditorLayers::ID_PANEL3 = wxNewId();
 const long EditorLayers::ID_LISTCTRL1 = wxNewId();
 const long EditorLayers::idMenuEdit = wxNewId();
@@ -55,6 +56,11 @@ mainEditorCommand(mainEditorCommand_)
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(1);
 	toolBarPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxSize(120,25), wxTAB_TRAVERSAL, _T("ID_PANEL3"));
+	AuiManager1 = new wxAuiManager(toolBarPanel, wxAUI_MGR_DEFAULT);
+	toolbar = new wxAuiToolBar(toolBarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	toolbar->Realize();
+	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper(false));
+	AuiManager1->Update();
 	FlexGridSizer1->Add(toolBarPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	layersList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxSize(191,198), wxLC_REPORT, wxDefaultValidator, _T("ID_LISTCTRL1"));
 	FlexGridSizer1->Add(layersList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -114,9 +120,6 @@ mainEditorCommand(mainEditorCommand_)
 ////////////////////////////////////////////////////////////
 void EditorLayers::CreateToolbar()
 {
-    toolbar = new wxToolBar( toolBarPanel, -1, wxDefaultPosition, wxDefaultSize,
-                                   wxTB_FLAT | wxTB_NODIVIDER );
-
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
     toolbar->AddTool( ID_BITMAPBUTTON1, wxT( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Rafraichir la liste des calques") );
     toolbar->AddSeparator();
@@ -129,12 +132,6 @@ void EditorLayers::CreateToolbar()
     toolbar->AddSeparator();
     toolbar->AddTool( ID_BITMAPBUTTON3, wxT( "Aide de l'éditeur d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur d'objets") );
     toolbar->Realize();
-
-    //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
-#ifdef __WXGTK__
-    wxSize tbSize = toolbar->GetSize();
-    gtk_widget_set_usize( toolbar->m_widget, tbSize.GetWidth(), tbSize.GetHeight() );
-#endif
 }
 
 ////////////////////////////////////////////////////////////
@@ -149,6 +146,7 @@ EditorLayers::~EditorLayers()
 {
 	//(*Destroy(EditorLayers)
 	//*)
+	AuiManager1->UnInit();
 }
 
 void EditorLayers::OnRefresh(wxCommandEvent& event)

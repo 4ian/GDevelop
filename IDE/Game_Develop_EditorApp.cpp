@@ -60,6 +60,7 @@
 #include "GDL/ExtensionsLoader.h"
 #include "GDL/VersionWrapper.h"
 #include "GDL/LocaleManager.h"
+#include "GDL/EventsCodeCompiler.h"
 
 #include <fstream>
 #include <boost/shared_ptr.hpp>
@@ -236,7 +237,7 @@ bool Game_Develop_EditorApp::OnInit()
     //En vérifiant si un fichier existe toujours
     bool openRecupFiles = false;
     #if defined(RELEASE)
-    if ( !parser.Found( wxT("noCrashCheck") ) && wxFileExists("GameDevelopRunning.log") && !wxFileExists("ExtensionBeingLoaded.log") )
+    if ( !parser.Found( wxT("noCrashCheck") ) && wxFileExists(wxFileName::GetTempDir()+"/GameDevelopRunning.log") && !wxFileExists(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log") )
     {
         BugReport dialog(NULL);
         if ( dialog.ShowModal() == 1 ) openRecupFiles = true;
@@ -261,7 +262,7 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "Splash Screen created" << endl;
 
     //Création du fichier de détection des erreurs
-    wxFile errorDetectFile("GameDevelopRunning.log", wxFile::write);
+    wxFile errorDetectFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log", wxFile::write);
     errorDetectFile.Write(" ");
 
     //Les log
@@ -275,22 +276,30 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "Loading required dynamic libraries..." << endl;
     EventsExecutionEngine::LoadDynamicLibraries();
 
+    //Events compiler setup
+    cout << "Setting up events compiler..." << endl;
+    wxString eventsCompilerTempDir;
+    if ( Config->Read("/Dossier/EventsCompilerTempDir", &eventsCompilerTempDir) && !eventsCompilerTempDir.empty() )
+        EventsCodeCompiler::GetInstance()->SetWorkingDirectory(ToString(eventsCompilerTempDir));
+    else
+        EventsCodeCompiler::GetInstance()->SetWorkingDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
+
     //Load extensions
     cout << "Loading extensions" << endl;
     bool loadExtensions = true;
 
     #if defined(RELEASE)
-    if ( !parser.Found( wxT("noCrashCheck") ) && wxFileExists("ExtensionBeingLoaded.log") )
+    if ( !parser.Found( wxT("noCrashCheck") ) && wxFileExists(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log") )
     {
         int whattodo = 0;
         {
             wxTextFile extensionErrorDetectFile;
-            extensionErrorDetectFile.Open("ExtensionBeingLoaded.log");
+            extensionErrorDetectFile.Open(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log");
 
             ExtensionBugReportDlg dialog(NULL, extensionErrorDetectFile.GetFirstLine());
             whattodo = dialog.ShowModal();
         }
-        wxRemoveFile("ExtensionBeingLoaded.log");
+        wxRemoveFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log");
 
         if ( whattodo == 0 ) return false;
         else if ( whattodo == 1 ) loadExtensions = false;
@@ -317,7 +326,7 @@ bool Game_Develop_EditorApp::OnInit()
             Demarrage bienvenue( NULL );
             if ( bienvenue.ShowModal() == 1 )
             {
-                wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+                wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Examples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
                 open.ShowModal();
 
                 if ( !open.GetPath().empty() ) filesToOpen.push_back( string(open.GetPath().mb_str()) );
@@ -376,7 +385,7 @@ bool Game_Develop_EditorApp::OnInit()
         }
     }
 
-    wxLogWarning("Cette version de Game Develop n'est pas finalisée et n'est utilisable qu'à des fins de tests. Merci de ne pas la redistribuer et d'utiliser la version disponible sur notre site pour toute autre utilisation.");
+    //wxLogWarning("Cette version de Game Develop n'est pas finalisée et n'est utilisable qu'à des fins de tests. Merci de ne pas la redistribuer et d'utiliser la version disponible sur notre site pour toute autre utilisation.");
 
 #ifndef RELEASE
     TestResult tr;
@@ -406,7 +415,7 @@ int Game_Develop_EditorApp::OnExit()
     singleInstanceChecker = NULL;
     #endif
 
-    wxRemoveFile("GameDevelopRunning.log");
+    wxRemoveFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log");
 
     return 0;
 }

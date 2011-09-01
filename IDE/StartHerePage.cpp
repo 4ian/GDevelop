@@ -292,7 +292,7 @@ void StartHerePage::OnguideBtClick(wxCommandEvent& event)
 
 void StartHerePage::OntutoBtClick(wxCommandEvent& event)
 {
-    wxString link = wxGetCwd() + "\\Tutorial\\"+_("Tutoriel.pdf");
+    wxString link = wxGetCwd() + "/Tutorial/"+_("Tutoriel.pdf");
     wxString mimetype = "application/pdf";
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {
@@ -311,7 +311,7 @@ void StartHerePage::OnTutorial2BtClick(wxCommandEvent& event)
 {
     if ( _("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)") == "" ) return;
 
-    wxString link = wxGetCwd() + "\\Tutorial\\"+_("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)");
+    wxString link = wxGetCwd() + "/Tutorial/"+_("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)");
     wxString mimetype = "application/pdf";
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {
@@ -328,7 +328,7 @@ void StartHerePage::OnTutorial2BtClick(wxCommandEvent& event)
 
 void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)
 {
-    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Examples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
     open.ShowModal();
 
     if ( !open.GetPath().empty() ) mainEditor.Open(string(open.GetPath().mb_str()));

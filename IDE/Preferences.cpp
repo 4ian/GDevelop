@@ -53,6 +53,9 @@ const long Preferences::ID_BUTTON5 = wxNewId();
 const long Preferences::ID_STATICTEXT8 = wxNewId();
 const long Preferences::ID_TEXTCTRL4 = wxNewId();
 const long Preferences::ID_BUTTON4 = wxNewId();
+const long Preferences::ID_STATICTEXT21 = wxNewId();
+const long Preferences::ID_TEXTCTRL6 = wxNewId();
+const long Preferences::ID_BUTTON12 = wxNewId();
 const long Preferences::ID_PANEL7 = wxNewId();
 const long Preferences::ID_STATICTEXT15 = wxNewId();
 const long Preferences::ID_CHOICE1 = wxNewId();
@@ -60,6 +63,7 @@ const long Preferences::ID_PANEL16 = wxNewId();
 const long Preferences::ID_BUTTON6 = wxNewId();
 const long Preferences::ID_BUTTON7 = wxNewId();
 const long Preferences::ID_BUTTON10 = wxNewId();
+const long Preferences::ID_BUTTON13 = wxNewId();
 const long Preferences::ID_BUTTON8 = wxNewId();
 const long Preferences::ID_RADIOBOX1 = wxNewId();
 const long Preferences::ID_STATICTEXT1 = wxNewId();
@@ -158,6 +162,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer17;
     wxStaticBoxSizer* StaticBoxSizer5;
+    wxFlexGridSizer* FlexGridSizer31;
     wxFlexGridSizer* FlexGridSizer28;
     wxFlexGridSizer* FlexGridSizer26;
     wxFlexGridSizer* FlexGridSizer30;
@@ -193,7 +198,7 @@ changesNeedRestart(false)
     MAJCheck = new wxCheckBox(Panel2, ID_CHECKBOX4, _("Vérification des mises à jour"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
     MAJCheck->SetValue(false);
     StaticBoxSizer1->Add(MAJCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer14->Add(StaticBoxSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer14->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Autosauvegarde"));
     FlexGridSizer10 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer19 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -209,7 +214,7 @@ changesNeedRestart(false)
     StaticText14 = new wxStaticText(Panel2, ID_STATICTEXT14, _("Les fichiers seront sauvegardés en ajoutant .autosave.gdg à leur nom"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
     FlexGridSizer10->Add(StaticText14, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer4->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer14->Add(StaticBoxSizer4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer14->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel2->SetSizer(FlexGridSizer14);
     FlexGridSizer14->Fit(Panel2);
     FlexGridSizer14->SetSizeHints(Panel2);
@@ -237,23 +242,34 @@ changesNeedRestart(false)
     FlexGridSizer11->Add(BrowseEditionImage, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer5->Add(FlexGridSizer11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer15->Add(StaticBoxSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer6 = new wxStaticBoxSizer(wxHORIZONTAL, Panel3, _("Compilation"));
+    StaticBoxSizer6 = new wxStaticBoxSizer(wxVERTICAL, Panel3, _("Compilation"));
     FlexGridSizer13 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer13->AddGrowableCol(1);
-    StaticText8 = new wxStaticText(Panel3, ID_STATICTEXT8, _("Dossier temporaire de compilation :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+    StaticText8 = new wxStaticText(Panel3, ID_STATICTEXT8, _("Dossier temporaire de déploiement :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
     FlexGridSizer13->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     DossierTempCompEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
     DossierTempCompEdit->SetToolTip(_("Dossier servant à compiler un jeu.\nVous devez posséder les droits d\'écriture pour ce dossier.\nPar défaut, il s\'agit du dossier \"Compil\" dans le répertoire de Game Develop."));
     FlexGridSizer13->Add(DossierTempCompEdit, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
     BrowseDossierTempBt = new wxButton(Panel3, ID_BUTTON4, _("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
     FlexGridSizer13->Add(BrowseDossierTempBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer6->Add(FlexGridSizer13, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    StaticBoxSizer6->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer31 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer31->AddGrowableCol(1);
+    StaticText21 = new wxStaticText(Panel3, ID_STATICTEXT21, _("Dossier temporaire de compilation :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT21"));
+    FlexGridSizer31->Add(StaticText21, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    eventsCompilerTempDirEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL6, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
+    eventsCompilerTempDirEdit->SetToolTip(_("Dossier servant à compiler un jeu.\nVous devez posséder les droits d\'écriture pour ce dossier.\nPar défaut, il s\'agit du dossier \"Compil\" dans le répertoire de Game Develop."));
+    FlexGridSizer31->Add(eventsCompilerTempDirEdit, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
+    browseCompilationTempDir = new wxButton(Panel3, ID_BUTTON12, _("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
+    FlexGridSizer31->Add(browseCompilationTempDir, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer6->Add(FlexGridSizer31, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer15->Add(StaticBoxSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel3->SetSizer(FlexGridSizer15);
     FlexGridSizer15->Fit(Panel3);
     FlexGridSizer15->SetSizeHints(Panel3);
     Panel6 = new wxPanel(Listbook1, ID_PANEL16, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL16"));
     FlexGridSizer20 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer20->AddGrowableCol(0);
     StaticBoxSizer11 = new wxStaticBoxSizer(wxHORIZONTAL, Panel6, _("Editeur de scènes"));
     FlexGridSizer21 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticText15 = new wxStaticText(Panel6, ID_STATICTEXT15, _("Onglet \"Scène/Evenements\" :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT15"));
@@ -271,13 +287,15 @@ changesNeedRestart(false)
     FlexGridSizer16 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer16->AddGrowableCol(0);
     StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Apparence prédéfinie"));
-    FlexGridSizer2 = new wxFlexGridSizer(0, 4, 0, 0);
+    FlexGridSizer2 = new wxFlexGridSizer(0, 5, 0, 0);
     gdStyleBt = new wxButton(Panel4, ID_BUTTON6, _("Standard Game Develop"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
     FlexGridSizer2->Add(gdStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     officeStyleBt = new wxButton(Panel4, ID_BUTTON7, _("Microsoft Office"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
     FlexGridSizer2->Add(officeStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     radianceStyleBt = new wxButton(Panel4, ID_BUTTON10, _("Radiance"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
     FlexGridSizer2->Add(radianceStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    oxygenStyleBt = new wxButton(Panel4, ID_BUTTON13, _("Oxygen"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON13"));
+    FlexGridSizer2->Add(oxygenStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     auiStyleBt = new wxButton(Panel4, ID_BUTTON8, _("wxAUI"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
     FlexGridSizer2->Add(auiStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer2->Add(FlexGridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -289,7 +307,7 @@ changesNeedRestart(false)
     	_("Microsoft Office"),
     	_("wxAUI")
     };
-    ribbonStyleBox = new wxRadioBox(Panel4, ID_RADIOBOX1, _("Style du ruban"), wxDefaultPosition, wxDefaultSize, 2, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
+    ribbonStyleBox = new wxRadioBox(Panel4, ID_RADIOBOX1, _("Style du ruban"), wxDefaultPosition, wxDefaultSize, 2, __wxRadioBoxChoices_1, 1, wxRA_HORIZONTAL, wxDefaultValidator, _T("ID_RADIOBOX1"));
     FlexGridSizer3->Add(ribbonStyleBox, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer7 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Couleurs du ruban"));
     FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -304,17 +322,18 @@ changesNeedRestart(false)
     StaticBoxSizer7->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3->Add(StaticBoxSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer10 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Textes du ruban"));
-    FlexGridSizer22 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer22 = new wxFlexGridSizer(2, 1, 0, 0);
+    FlexGridSizer22->AddGrowableCol(0);
     hideLabelsCheck = new wxCheckBox(Panel4, ID_CHECKBOX2, _("Cacher les noms des boutons"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
     hideLabelsCheck->SetValue(false);
     FlexGridSizer22->Add(hideLabelsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_TOP, 5);
     hidePageTabsCheck = new wxCheckBox(Panel4, ID_CHECKBOX5, _("Cacher les onglets des pages"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
     hidePageTabsCheck->SetValue(false);
-    FlexGridSizer22->Add(hidePageTabsCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer22->Add(hidePageTabsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer10->Add(FlexGridSizer22, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3->Add(StaticBoxSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer16->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer18 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer18 = new wxFlexGridSizer(0, 2, 0, 0);
     StaticBoxSizer3 = new wxStaticBoxSizer(wxVERTICAL, Panel4, _("Couleur des panneaux"));
     FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticText4 = new wxStaticText(Panel4, ID_STATICTEXT4, _("Editeur actif :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
@@ -373,6 +392,7 @@ changesNeedRestart(false)
     FlexGridSizer16->SetSizeHints(Panel4);
     Panel8 = new wxPanel(Listbook1, ID_PANEL18, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL18"));
     FlexGridSizer27 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer27->AddGrowableCol(0);
     FlexGridSizer28 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticText17 = new wxStaticText(Panel8, ID_STATICTEXT17, _("Taille par défaut de la colonnes des conditions :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT17"));
     FlexGridSizer28->Add(StaticText17, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -380,12 +400,13 @@ changesNeedRestart(false)
     FlexGridSizer28->Add(conditionsColumnWidthEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticText18 = new wxStaticText(Panel8, ID_STATICTEXT18, _("pixels"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT18"));
     FlexGridSizer28->Add(StaticText18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer27->Add(FlexGridSizer28, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer27->Add(FlexGridSizer28, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
     hideContextPanelsLabels = new wxCheckBox(Panel8, ID_CHECKBOX6, _("Cacher les noms des boutons dans les panneaux contextuels"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
     hideContextPanelsLabels->SetValue(false);
     FlexGridSizer27->Add(hideContextPanelsLabels, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer15 = new wxStaticBoxSizer(wxHORIZONTAL, Panel8, _("Couleurs des paramètres"));
     FlexGridSizer29 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer29->AddGrowableCol(0);
     eventsEditorParametersProperties = new wxPropertyGrid(Panel8,ID_CUSTOM1,wxDefaultPosition,wxSize(342,168),0,_T("ID_CUSTOM1"));
     FlexGridSizer29->Add(eventsEditorParametersProperties, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer15->Add(FlexGridSizer29, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -450,9 +471,12 @@ changesNeedRestart(false)
     Connect(ID_CHOICE2,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&Preferences::OnlangChoiceSelect);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseEditionImageClick);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseDossierTempBtClick);
+    Connect(ID_TEXTCTRL6,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&Preferences::OneventsCompilerTempDirEditText);
+    Connect(ID_BUTTON12,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnbrowseCompilationTempDirClick);
     Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OngdStyleBtClick);
     Connect(ID_BUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnofficeStyleBtClick);
     Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnradianceStyleBtClick);
+    Connect(ID_BUTTON13,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnoxygenStyleBtClick);
     Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnauiStyleBtClick);
     ribbonColor1Pnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnribbonColor1PnlLeftUp,0,this);
     ribbonColor2Pnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnribbonColor2PnlLeftUp,0,this);
@@ -464,8 +488,8 @@ changesNeedRestart(false)
     InactifColor2Pnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnInactifColor2PnlRightUp,0,this);
     backColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnbackColorPnlLeftUp,0,this);
     borderColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnborderColorPnlLeftUp,0,this);
-    activeTextColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnbackColorPnlLeftUp,0,this);
-    inactiveTextColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnbackColorPnlLeftUp,0,this);
+    activeTextColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnactiveTextColorPnlLeftUp,0,this);
+    inactiveTextColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OninactiveTextColorPnlLeftUp,0,this);
     activeTabColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnactiveTabColorPnlLeftUp,0,this);
     tabColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OntabColorPnlLeftUp,0,this);
     Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OncompilerToolchainBtClick);
@@ -645,6 +669,9 @@ changesNeedRestart(false)
             EditeurImageEdit->ChangeValue( result );
         if ( pConfig->Read( _T( "/Dossier/Compilation" ), &result ) )
             DossierTempCompEdit->ChangeValue( result );
+        if ( pConfig->Read( _T( "/Dossier/EventsCompilerTempDir" ), &result ) )
+            eventsCompilerTempDirEdit->ChangeValue( result );
+
     }
 
     {
@@ -806,6 +833,8 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write( _T( "/EditeursExternes/Image" ), EditeurImageEdit->GetValue() );
     pConfig->Write( _T( "/Dossier/Compilation" ), DossierTempCompEdit->GetValue() );
+    pConfig->Write( _T( "/Dossier/EventsCompilerTempDir" ), eventsCompilerTempDirEdit->GetValue() );
+
 
     const wxLanguageInfo * language = wxLocale::FindLanguageInfo(langChoice->GetString(langChoice->GetSelection()));
     pConfig->Write( _T( "/Lang" ), language->CanonicalName );
@@ -1049,6 +1078,52 @@ void Preferences::SetSkinRadiance()
 }
 
 
+void Preferences::OnoxygenStyleBtClick(wxCommandEvent& event)
+{
+    SetSkinOxygen();
+}
+
+void Preferences::SetSkinOxygen()
+{
+    ribbonStyleBox->SetSelection(0);
+
+    ribbonColor1Pnl->SetBackgroundColour( wxColour(218, 218, 218) );
+    ribbonColor1Pnl->Refresh();
+
+    ribbonColor2Pnl->SetBackgroundColour( wxColour(117, 204, 255) );
+    ribbonColor2Pnl->Refresh();
+
+    ActifColorPnl->SetBackgroundColour( wxColour(117,204,255) );
+    ActifColorPnl->Refresh();
+
+    ActifColor2Pnl->SetBackgroundColour( wxColour(172,225,255) );
+    ActifColor2Pnl->Refresh();
+
+    InactifColorPnl->SetBackgroundColour( wxColour(247,246,246) );
+    InactifColorPnl->Refresh();
+
+    InactifColor2Pnl->SetBackgroundColour( wxColour(252,252,251) );
+    InactifColor2Pnl->Refresh();
+
+    borderColorPnl->SetBackgroundColour( wxColour(247,246,246) );
+    borderColorPnl->Refresh();
+
+    backColorPnl->SetBackgroundColour( wxColour(240,240,240) );
+    backColorPnl->Refresh();
+
+    activeTextColorPnl->SetBackgroundColour( wxColour(0,0,0) );
+    activeTextColorPnl->Refresh();
+
+    inactiveTextColorPnl->SetBackgroundColour( wxColour(120,120,120) );
+    inactiveTextColorPnl->Refresh();
+
+    tabColorPnl->SetBackgroundColour( wxColour(240, 240, 236) );
+    tabColorPnl->Refresh();
+
+    activeTabColorPnl->SetBackgroundColour( wxColour(172, 225, 255) );
+    activeTabColorPnl->Refresh();
+}
+
 void Preferences::OnActifColorPnlRightUp( wxMouseEvent& event )
 {
     wxColourData cData;
@@ -1109,12 +1184,23 @@ void Preferences::OnAideBtClick( wxCommandEvent& event )
 
 void Preferences::OnBrowseDossierTempBtClick( wxCommandEvent& event )
 {
-    wxDirDialog dialog( this, _( "Choisissez le répertoire temporaire pour la compilation" ), "");
+    wxDirDialog dialog( this, _( "Choisissez le répertoire temporaire pour le déploiement" ), "");
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
     {
         DossierTempCompEdit->ChangeValue(dialog.GetPath());
+    }
+}
+
+void Preferences::OnbrowseCompilationTempDirClick(wxCommandEvent& event)
+{
+    wxDirDialog dialog( this, _( "Choisissez le répertoire temporaire pour la compilation" ), "");
+    dialog.ShowModal();
+
+    if ( dialog.GetPath() != "" )
+    {
+        eventsCompilerTempDirEdit->ChangeValue(dialog.GetPath());
     }
 }
 
@@ -1227,5 +1313,37 @@ void Preferences::OntabColorPnlLeftUp(wxMouseEvent& event)
         cData = Dialog.GetColourData();
         tabColorPnl->SetBackgroundColour( cData.GetColour() );
         tabColorPnl->Refresh();
+    }
+}
+
+void Preferences::OneventsCompilerTempDirEditText(wxCommandEvent& event)
+{
+    changesNeedRestart = true;
+}
+
+
+void Preferences::OnactiveTextColorPnlLeftUp(wxMouseEvent& event)
+{
+    wxColourData cData;
+    cData.SetColour( activeTextColorPnl->GetBackgroundColour() );
+    wxColourDialog Dialog( this, &cData );
+    if ( Dialog.ShowModal() == wxID_OK )
+    {
+        cData = Dialog.GetColourData();
+        activeTextColorPnl->SetBackgroundColour( cData.GetColour() );
+        activeTextColorPnl->Refresh();
+    }
+}
+
+void Preferences::OninactiveTextColorPnlLeftUp(wxMouseEvent& event)
+{
+    wxColourData cData;
+    cData.SetColour( inactiveTextColorPnl->GetBackgroundColour() );
+    wxColourDialog Dialog( this, &cData );
+    if ( Dialog.ShowModal() == wxID_OK )
+    {
+        cData = Dialog.GetColourData();
+        inactiveTextColorPnl->SetBackgroundColour( cData.GetColour() );
+        inactiveTextColorPnl->Refresh();
     }
 }

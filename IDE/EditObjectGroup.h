@@ -6,6 +6,7 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/menu.h>
+#include <wx/aui/aui.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
 #include <wx/statbmp.h>
@@ -34,7 +35,9 @@ class EditObjectGroup: public wxDialog
 		ObjectGroup group;
 
 		//(*Declarations(EditObjectGroup)
+		wxAuiManager* AuiManager1;
 		wxButton* OkBt;
+		wxAuiToolBar* toolbar;
 		wxMenuItem* MenuItem2;
 		wxMenuItem* MenuItem1;
 		wxPanel* Panel1;
@@ -55,6 +58,7 @@ class EditObjectGroup: public wxDialog
 		static const long ID_STATICTEXT3;
 		static const long ID_PANEL1;
 		static const long ID_STATICLINE2;
+		static const long ID_AUITOOLBAR1;
 		static const long ID_PANEL2;
 		static const long ID_TREECTRL1;
 		static const long ID_STATICLINE1;
@@ -81,7 +85,6 @@ class EditObjectGroup: public wxDialog
 		void OnHelp(wxCommandEvent& event);
         void Refresh();
 
-        wxToolBar * toolbar;
         wxTreeItemId itemSelected;
 
 		Game & game;

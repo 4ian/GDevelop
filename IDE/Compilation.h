@@ -47,6 +47,7 @@ class Compilation: public wxDialog
 		wxStaticBitmap* StaticBitmap1;
 		wxCheckBox* MacCheck;
 		wxStaticBitmap* StaticBitmap4;
+		wxCheckBox* optimizationCheck;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
@@ -76,6 +77,7 @@ class Compilation: public wxDialog
 		static const long ID_STATICLINE1;
 		static const long ID_STATICTEXT4;
 		static const long ID_RADIOBOX1;
+		static const long ID_CHECKBOX4;
 		static const long ID_BUTTON8;
 		static const long ID_PANEL5;
 		static const long ID_STATICTEXT5;

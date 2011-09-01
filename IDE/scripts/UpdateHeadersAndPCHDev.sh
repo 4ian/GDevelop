@@ -11,19 +11,13 @@ echo -Copying files...
 rsync -r -u --include=*.h --include=*/ --exclude=* ../../GDL/  ../bin/dev/include/GDL/
 
 # Boost (shared_ptr and dependencies) headers
-rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*/ --exclude=* ../../ExtLibs/boost/boost/  ../bin/dev/include/boost/boost/
+rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*.inl --include=*/ --exclude=* ../../ExtLibs/boost/boost/  ../bin/dev/include/boost/boost/
 
 # SFML headers
-rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*/ --exclude=* ../../ExtLibs/SFML/include/  ../bin/dev/include/SFML/include/
-
-# wxWidgets headers
-rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*/ --exclude=* ../../ExtLibs/wxwidgets/include/  ../bin/dev/include/wxwidgets/include/
-
-# wxWidgets headers
-rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*/ --exclude=* ../../ExtLibs/wxwidgets/lib/  ../bin/dev/include/wxwidgets/lib/
+rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*.inl --include=*/ --exclude=* ../../ExtLibs/SFML/include/  ../bin/dev/include/SFML/include/
 
 # Extensions headers
-rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*/ --exclude=* ../../Extensions/  ../bin/dev/Extensions/include/
+rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*.inl --include=*/ --exclude=* ../../Extensions/  ../bin/dev/Extensions/include/
 
 # Extensions libs
 rsync -r -u --include=*.a --include=*/ --exclude=* ../../Extensions/  ../bin/dev/Extensions/include/

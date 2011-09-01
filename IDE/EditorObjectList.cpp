@@ -676,7 +676,8 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     if ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), newName)) != objects->end() )
     {
         wxLogWarning( _( "Impossible de renommer l'objet : un autre objet porte déjà ce nom." ) );
-        Refresh();
+
+        event.Veto();
         return;
     }
 
@@ -685,7 +686,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     {
         wxMessageBox(_("Le nom de l'objet contient des espaces, des caractères non autorisés ou représente un nom d'une expression. Utilisez uniquement des lettres, chiffres et underscores ( _ )."), _("Attention"), wxOK | wxICON_EXCLAMATION, this);
 
-        Refresh();
+        event.Veto();
         return;
     }
 

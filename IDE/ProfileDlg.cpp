@@ -9,6 +9,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
+#include "GDL/EventsCodeCompiler.h"
 #include "GDL/ProfileEvent.h"
 #include "SceneCanvas.h"
 #include <iostream>
@@ -268,12 +269,9 @@ void ProfileDlg::ParseProfileEvents()
         boost::shared_ptr<BaseEvent> event = sceneCanvas->sceneEdited.profiler->profileEventsInformation[i].originalEvent.lock();
         if ( event != boost::shared_ptr<BaseEvent>())
         {
-            event->totalTimeDuringLastSession = sceneCanvas->sceneEdited.profiler->profileEventsInformation[i].GetTime()/1000.0;
-            event->percentDuringLastSession = static_cast<double>(event->totalTimeDuringLastSession)/static_cast<double>(totalEventsTime)*100.0f;
-
+            event->totalTimeDuringLastSession = sceneCanvas->sceneEdited.profiler->profileEventsInformation[i].GetTime();
+            event->percentDuringLastSession = static_cast<double>(event->totalTimeDuringLastSession)/static_cast<double>(totalEventsTime)*100.0;
         }
-        else
-            cout << "Event null";
     }
 }
 
@@ -303,6 +301,11 @@ void ProfileDlg::OnStepTimeSelected(wxCommandEvent& event)
 void ProfileDlg::OnactivateCheckClick(wxCommandEvent& event)
 {
     profilingActivated = activateCheck->GetValue();
-    if ( sceneCanvas  )
+    if ( sceneCanvas )
+    {
+        sceneCanvas->sceneEdited.wasModified = true;
+        sceneCanvas->sceneEdited.eventsModified = true;
+        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&sceneCanvas->gameEdited, &sceneCanvas->sceneEdited));
         sceneCanvas->Reload();
+    }
 }

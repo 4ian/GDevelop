@@ -21,6 +21,7 @@
 #include <wx/notebook.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/bmpbuttn.h>
 //*)
@@ -42,7 +43,9 @@ class DebuggerGUI: public wxPanel, public BaseDebugger
 		virtual ~DebuggerGUI();
 
 		//(*Declarations(DebuggerGUI)
+		wxAuiManager* AuiManager1;
 		wxPanel* toolbarPanel;
+		wxAuiToolBar* toolbar;
 		wxListCtrl* generalList;
 		wxNotebook* Notebook1;
 		wxTreeCtrl* objectsTree;
@@ -53,13 +56,13 @@ class DebuggerGUI: public wxPanel, public BaseDebugger
 		wxListCtrl* objectList;
 		wxPanel* Panel2;
 		//*)
-		wxToolBar * toolbar;
 
 		void Pause();
 		void Play();
 	protected:
 
 		//(*Identifiers(DebuggerGUI)
+		static const long ID_AUITOOLBAR1;
 		static const long ID_PANEL3;
 		static const long ID_LISTCTRL2;
 		static const long ID_PANEL1;

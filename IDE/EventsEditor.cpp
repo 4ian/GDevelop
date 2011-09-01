@@ -455,11 +455,11 @@ void EventsEditor::OneventsPanelPaint(wxPaintEvent& event)
     //Clear selection areas
     itemsAreas.Clear();
 
-    unsigned int totalHeight = DrawEvents(dc, *events, leftMargin, -scrollBar->GetThumbPosition());
+    unsigned int totalHeight = DrawEvents(dc, *events, leftMargin + ( profilingActivated ? 23 : 0), -scrollBar->GetThumbPosition());
 
     wxString text;
     if ( events->empty() )
-        text = _("Ajoutez un premier évènement avec ruban.\nPassez ensuite la souris sur un évènement/action/condition pour obtenir plus d'options d'édition,\nou double cliquez pour éditer un élement.");
+        text = _("Ajoutez un premier évènement avec le ruban.\nPassez ensuite la souris sur un évènement/action/condition pour obtenir plus d'options d'édition,\nou double cliquez pour éditer un élement.");
     else
         text = _("Passez la souris sur un évènement/action/condition pour obtenir plus d'options d'édition,\nou double cliquez pour éditer un élement.");
     dc.SetTextForeground(wxColor(0,0,0));
@@ -481,7 +481,6 @@ void EventsEditor::OneventsPanelPaint(wxPaintEvent& event)
 unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr< BaseEvent > > & events, int x, int y, boost::shared_ptr< BaseEvent > scrollTo  )
 {
     int originalYPosition = y;
-    if (profilingActivated) x += 61;
 
     for (unsigned int i = 0;i<events.size();++i)
     {
@@ -521,20 +520,22 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
 
             if (profilingActivated && events[i]->IsExecutable())
             {
-                dc.DrawText(ToString(i+1), x-leftMargin+2-62, y);
+                dc.DrawText(ToString(i+1), x-leftMargin+2-42, y);
+                dc.SetFont(EventsRenderingHelper::GetInstance()->GetNiceFont().Smaller());
 
                 //Draw profile results
                 dc.SetPen(wxPen(wxColour(0,0,0)));
                 dc.SetBrush(wxColour(255.0f,255.0f*(1.0f-events[i]->percentDuringLastSession*0.05f),255.0f*(1.0f-events[i]->percentDuringLastSession*0.05f)));
-                dc.DrawRectangle(x-61-2, y, 61,31);
+                dc.DrawRectangle(x-41-2, y, 41,26);
 
                 std::ostringstream timeStr; timeStr.setf(ios::fixed,ios::floatfield); timeStr.precision(2);
                 timeStr << static_cast<double>(events[i]->totalTimeDuringLastSession)/1000.0f;
-                dc.DrawText(timeStr.str()+"ms", x-61, y+3);
+                dc.DrawText(timeStr.str()+"ms", x-41, y+1);
 
                 std::ostringstream percentStr; percentStr.setf(ios::fixed,ios::floatfield); percentStr.precision(2);
                 percentStr << events[i]->percentDuringLastSession;
-                dc.DrawText(percentStr.str()+"%", x-61, y+15);
+                dc.DrawText(percentStr.str()+"%", x-41, y+13);
+                dc.SetFont(EventsRenderingHelper::GetInstance()->GetFont());
             }
             else
                 dc.DrawText(ToString(i+1), x-leftMargin+2, y+3);
@@ -1115,8 +1116,8 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
 
             listHighlighted.instructionList->push_back(instruction);
             listHighlighted.event->eventHeightNeedUpdate = true;
-            ChangesMadeOnEvents();
             Refresh();
+            ChangesMadeOnEvents();
         }
     }
     else
@@ -1131,8 +1132,8 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
 
             listHighlighted.instructionList->push_back(instruction);
             listHighlighted.event->eventHeightNeedUpdate = true;
-            ChangesMadeOnEvents();
             Refresh();
+            ChangesMadeOnEvents();
         }
     }
 }
@@ -1315,7 +1316,7 @@ void EventsEditor::OnaddMoreBtClick(wxCommandEvent& event)
 void EventsEditor::ScrollToEvent(BaseEventSPtr eventToScrollTo)
 {
     wxClientDC dc(eventsPanel);
-    DrawEvents(dc, *events, leftMargin, 0, eventToScrollTo);
+    DrawEvents(dc, *events, leftMargin + ( profilingActivated ? 23 : 0), 0, eventToScrollTo);
     Refresh();
 }
 
@@ -1380,7 +1381,6 @@ void EventsEditor::OneventCutMenuSelected(wxCommandEvent& event)
 
 void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 {
-        cout << "allo";
     if ( selection.HasSelectedConditions() || (selection.GetHighlightedInstructionList().instructionList != NULL && selection.GetHighlightedInstructionList().isConditionList) )
     {
         if ( !Clipboard::GetInstance()->HasCondition() ) return;

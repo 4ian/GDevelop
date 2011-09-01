@@ -43,6 +43,7 @@ class Preferences: public wxDialog
 		wxButton* gdStyleBt;
 		wxButton* BrowseDossierTempBt;
 		wxTextCtrl* codeEditorEdit;
+		wxButton* oxygenStyleBt;
 		wxStaticText* StaticText13;
 		wxPanel* ActifColor2Pnl;
 		wxStaticText* StaticText2;
@@ -59,6 +60,7 @@ class Preferences: public wxDialog
 		wxTextCtrl* autosaveTimeEdit;
 		wxPanel* Panel8;
 		wxPanel* tabColorPnl;
+		wxTextCtrl* eventsCompilerTempDirEdit;
 		wxPanel* Panel1;
 		wxTextCtrl* conditionsColumnWidthEdit;
 		wxPanel* activeTextColorPnl;
@@ -70,6 +72,7 @@ class Preferences: public wxDialog
 		wxCheckBox* hidePageTabsCheck;
 		wxPanel* Panel6;
 		wxPanel* Panel3;
+		wxStaticText* StaticText21;
 		wxStaticLine* StaticLine2;
 		wxPanel* ActifColorPnl;
 		wxCheckBox* GuideCheck;
@@ -94,6 +97,7 @@ class Preferences: public wxDialog
 		wxStaticText* StaticText17;
 		wxStaticText* StaticText4;
 		wxButton* browseCodeEditorBt;
+		wxButton* browseCompilationTempDir;
 		wxButton* officeStyleBt;
 		wxStaticText* StaticText16;
 		wxStaticBitmap* StaticBitmap3;
@@ -124,6 +128,9 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT8;
 		static const long ID_TEXTCTRL4;
 		static const long ID_BUTTON4;
+		static const long ID_STATICTEXT21;
+		static const long ID_TEXTCTRL6;
+		static const long ID_BUTTON12;
 		static const long ID_PANEL7;
 		static const long ID_STATICTEXT15;
 		static const long ID_CHOICE1;
@@ -131,6 +138,7 @@ class Preferences: public wxDialog
 		static const long ID_BUTTON6;
 		static const long ID_BUTTON7;
 		static const long ID_BUTTON10;
+		static const long ID_BUTTON13;
 		static const long ID_BUTTON8;
 		static const long ID_RADIOBOX1;
 		static const long ID_STATICTEXT1;
@@ -207,11 +215,17 @@ class Preferences: public wxDialog
 		void OnradianceStyleBtClick(wxCommandEvent& event);
 		void OnactiveTabColorPnlLeftUp(wxMouseEvent& event);
 		void OntabColorPnlLeftUp(wxMouseEvent& event);
+		void OneventsCompilerTempDirEditText(wxCommandEvent& event);
+		void OnbrowseCompilationTempDirClick(wxCommandEvent& event);
+		void OnactiveTextColorPnlLeftUp(wxMouseEvent& event);
+		void OninactiveTextColorPnlLeftUp(wxMouseEvent& event);
+		void OnoxygenStyleBtClick(wxCommandEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();
 		void SetSkinAUI();
 		void SetSkinRadiance();
+		void SetSkinOxygen();
 
 		bool changesNeedRestart;
 

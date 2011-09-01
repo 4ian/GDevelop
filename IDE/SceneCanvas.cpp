@@ -795,7 +795,7 @@ void SceneCanvas::Refresh()
             //But be sure that no error occured.
             if ( !edittimeRenderer.editing && !sceneEdited.compiledEventsExecutionEngine->Ready() )
             {
-                wxLogError(_("La compilation des évènements a échouée, et la scène ne peut être testée. Veuillez rapporter ce problème au développeur de Game Develop, en joignant si possible les évènements responsables de ce message d'erreur."));
+                wxLogError(_("La compilation des évènements a échouée, et la scène ne peut être testée. Afin que le problème soit corrigé, veuillez le rapporter au développeur de Game Develop, en joignant le fichier suivant :\n")+EventsCodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt");
                 wxCommandEvent useless;
                 OnEditionBtClick(useless);
             }

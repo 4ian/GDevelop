@@ -31,6 +31,7 @@ const long EditObjectGroup::ID_STATICBITMAP3 = wxNewId();
 const long EditObjectGroup::ID_STATICTEXT3 = wxNewId();
 const long EditObjectGroup::ID_PANEL1 = wxNewId();
 const long EditObjectGroup::ID_STATICLINE2 = wxNewId();
+const long EditObjectGroup::ID_AUITOOLBAR1 = wxNewId();
 const long EditObjectGroup::ID_PANEL2 = wxNewId();
 const long EditObjectGroup::ID_TREECTRL1 = wxNewId();
 const long EditObjectGroup::ID_STATICLINE1 = wxNewId();
@@ -74,6 +75,11 @@ scene(scene_)
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer17->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel2 = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxSize(-1,26), wxTAB_TRAVERSAL, _T("ID_PANEL2"));
+	AuiManager1 = new wxAuiManager(Panel2, wxAUI_MGR_DEFAULT);
+	toolbar = new wxAuiToolBar(Panel2, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	toolbar->Realize();
+	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper(false));
+	AuiManager1->Update();
 	FlexGridSizer17->Add(Panel2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	ObjetsList = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxSize(286,181), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer17->Add(ObjetsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -109,9 +115,6 @@ scene(scene_)
 	//*)
 	Connect(ID_Help,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditObjectGroup::OnHelp);
 
-    toolbar = new wxToolBar( Panel2, -1, wxDefaultPosition, wxDefaultSize,
-                                   wxTB_FLAT | wxTB_NODIVIDER );
-
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
     toolbar->AddTool( idAddObjet, wxT( "Ajouter un objet" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un objet") );
     toolbar->AddTool( idDelObjet, wxT( "Supprimer l'objet selectionné" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer l'objet selectionné") );
@@ -119,11 +122,6 @@ scene(scene_)
     toolbar->AddTool( ID_Help, wxT( "Aide de l'éditeur de groupes d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur de groupes d'objets") );
     toolbar->Realize();
 
-    //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
-#ifdef __WXGTK__
-    wxSize tbSize = toolbar->GetSize();
-    gtk_widget_set_usize( toolbar->m_widget, tbSize.GetWidth(), tbSize.GetHeight() );
-#endif
 
     Refresh();
 }
@@ -132,6 +130,7 @@ EditObjectGroup::~EditObjectGroup()
 {
 	//(*Destroy(EditObjectGroup)
 	//*)
+	AuiManager1->UnInit();
 }
 
 void EditObjectGroup::OnHelp(wxCommandEvent& event)

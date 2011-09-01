@@ -531,8 +531,8 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
         != objectsGroups->end())
     {
         wxLogWarning( _( "Impossible de renommer le groupe : un autre groupe porte déjà ce nom." ) );
+
         event.Veto();
-        Refresh();
         return;
     }
     else

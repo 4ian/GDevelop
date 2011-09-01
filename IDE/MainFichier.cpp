@@ -77,7 +77,7 @@ void Game_Develop_EditorFrame::OnOpenExampleSelected(wxCommandEvent& event)
 {
     sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
 
-    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Exemples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Examples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
     open.ShowModal();
 
     if ( !open.GetPath().empty() ) Open(string(open.GetPath().mb_str()));
@@ -195,7 +195,7 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
             std::string path = ToString(FileDialog.GetPath());
 
             #if defined(LINUX) //Extension seems not be added with wxGTK?
-            if ( FileDialog.GetFilterIndex() == 0 )
+            if ( FileDialog.GetFilterIndex() == 0 && !path.empty() )
                 path += ".gdg";
             #endif
 
@@ -250,7 +250,7 @@ void Game_Develop_EditorFrame::SaveAs()
 
     std::string path = ToString(FileDialog.GetPath());
     #if defined(LINUX) //Extension seems not be added with wxGTK?
-    if ( FileDialog.GetFilterIndex() == 0 )
+    if ( FileDialog.GetFilterIndex() == 0 && !path.empty() )
         path += ".gdg";
     #endif
 

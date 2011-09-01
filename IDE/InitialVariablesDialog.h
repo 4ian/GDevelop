@@ -5,6 +5,7 @@
 #include <wx/listctrl.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/aui/aui.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
 #include <wx/statbmp.h>
@@ -28,8 +29,10 @@ class InitialVariablesDialog: public wxDialog
 		ListVariable variables;
 
 		//(*Declarations(InitialVariablesDialog)
+		wxAuiManager* AuiManager1;
 		wxButton* helpBt;
 		wxPanel* toolbarPanel;
+		wxAuiToolBar* toolbar;
 		wxStaticBitmap* StaticBitmap1;
 		wxListCtrl* variablesList;
 		wxButton* cancelBt;
@@ -47,6 +50,7 @@ class InitialVariablesDialog: public wxDialog
 		static const long ID_STATICTEXT6;
 		static const long ID_PANEL2;
 		static const long ID_STATICLINE1;
+		static const long ID_AUITOOLBAR1;
 		static const long ID_PANEL1;
 		static const long ID_LISTCTRL1;
 		static const long ID_STATICLINE2;
@@ -81,7 +85,6 @@ class InitialVariablesDialog: public wxDialog
 		void OnMoveDownVarSelected(wxCommandEvent& event);
 		void Refresh();
 
-        wxToolBar * toolbar;
         std::string selectedVariable;
 
 		DECLARE_EVENT_TABLE()

@@ -51,6 +51,7 @@ const long Compilation::ID_PANEL1 = wxNewId();
 const long Compilation::ID_STATICLINE1 = wxNewId();
 const long Compilation::ID_STATICTEXT4 = wxNewId();
 const long Compilation::ID_RADIOBOX1 = wxNewId();
+const long Compilation::ID_CHECKBOX4 = wxNewId();
 const long Compilation::ID_BUTTON8 = wxNewId();
 const long Compilation::ID_PANEL5 = wxNewId();
 const long Compilation::ID_STATICTEXT5 = wxNewId();
@@ -135,6 +136,9 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     };
     TypeBox = new wxRadioBox(Panel5, ID_RADIOBOX1, _("Choisissez le type de compilation :"), wxPoint(16,32), wxDefaultSize, 2, __wxRadioBoxChoices_1, 1, wxRA_HORIZONTAL, wxDefaultValidator, _T("ID_RADIOBOX1"));
     FlexGridSizer7->Add(TypeBox, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    optimizationCheck = new wxCheckBox(Panel5, ID_CHECKBOX4, _("Activer les optimisations ( ralentit la compilation )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
+    optimizationCheck->SetValue(false);
+    FlexGridSizer7->Add(optimizationCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Button4 = new wxButton(Panel5, ID_BUTTON8, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
     FlexGridSizer7->Add(Button4, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
     Panel5->SetSizer(FlexGridSizer7);
@@ -144,19 +148,19 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer5->AddGrowableCol(0);
     FlexGridSizer5->AddGrowableRow(2);
-    StaticText5 = new wxStaticText(Panel2, ID_STATICTEXT5, _("Game Develop permet de générer votre jeu pour Microsoft Windows\net pour GNU/Linux. Notez cependant que la compilation en mode\n\"Fichier executable unique\" n\'est pas disponible pour GNU/Linux."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+    StaticText5 = new wxStaticText(Panel2, ID_STATICTEXT5, _("Vous pouvez générer le projet pour d\'autres systèmes d\'exploitations\nen lançant Game Develop sur ceux ci."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
     FlexGridSizer5->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Choisissez le(s) système(s) cible(s)"));
+    StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Système cible"));
     FlexGridSizer8 = new wxFlexGridSizer(0, 2, 0, 0);
     StaticBitmap1 = new wxStaticBitmap(Panel2, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/win-logo.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
     FlexGridSizer8->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     WinCheck = new wxCheckBox(Panel2, ID_CHECKBOX1, _("Microsoft Windows"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
-    WinCheck->SetValue(true);
+    WinCheck->SetValue(false);
     FlexGridSizer8->Add(WinCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBitmap2 = new wxStaticBitmap(Panel2, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/linux-logo.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
     FlexGridSizer8->Add(StaticBitmap2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     LinuxCheck = new wxCheckBox(Panel2, ID_CHECKBOX2, _("GNU/Linux"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
-    LinuxCheck->SetValue(true);
+    LinuxCheck->SetValue(false);
     FlexGridSizer8->Add(LinuxCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBitmap4 = new wxStaticBitmap(Panel2, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/mac-logo.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP4"));
     FlexGridSizer8->Add(StaticBitmap4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -202,7 +206,7 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     Panel4->SetSizer(FlexGridSizer4);
     FlexGridSizer4->Fit(Panel4);
     FlexGridSizer4->SetSizeHints(Panel4);
-    Notebook1->AddPage(Panel5, _("Type de compilation"), false);
+    Notebook1->AddPage(Panel5, _("Options de compilation"), false);
     Notebook1->AddPage(Panel2, _("Système cible"), false);
     Notebook1->AddPage(Panel3, _("Lancement"), false);
     Notebook1->AddPage(Panel4, _("Finalisation"), false);
@@ -231,26 +235,22 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
 
     Panel4->Enable(false);
 
-    if ( gameToCompile.useExternalSourceFiles )
-    {
-        #if defined(WINDOWS)
-            LinuxCheck->SetValue(false);LinuxCheck->Enable(false);
-            MacCheck->SetValue(false);MacCheck->Enable(false);
-        #elif defined(LINUX)
-            WinCheck->SetValue(false);WinCheck->Enable(false);
-            MacCheck->SetValue(false);MacCheck->Enable(false);
-        #elif defined(MAC)
-            LinuxCheck->SetValue(false);LinuxCheck->Enable(false);
-            WinCheck->SetValue(false);WinCheck->Enable(false);
-        #else
-            #warning Unknown OS
-        #endif
-    }
-    if ( !wxDirExists("MacRuntime") )
-    {
-        MacCheck->Enable(false);
-        MacCheck->SetValue(false);
-    }
+    //Cross compilation is not available
+    #if defined(WINDOWS)
+        WinCheck->SetValue(true);WinCheck->Enable(false);
+        LinuxCheck->SetValue(false);LinuxCheck->Enable(false);
+        MacCheck->SetValue(false);MacCheck->Enable(false);
+    #elif defined(LINUX)
+        WinCheck->SetValue(false);WinCheck->Enable(false);
+        LinuxCheck->SetValue(true);LinuxCheck->Enable(false);
+        MacCheck->SetValue(false);MacCheck->Enable(false);
+    #elif defined(MAC)
+        LinuxCheck->SetValue(false);LinuxCheck->Enable(false);
+        WinCheck->SetValue(false);WinCheck->Enable(false);
+        MacCheck->SetValue(true);MacCheck->Enable(false);
+    #else
+        #warning Unknown OS
+    #endif
 }
 
 Compilation::~Compilation()
@@ -311,11 +311,15 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
     FullProjectCompilerDialogDiagnosticManager diagnosticManager(StaticText3, StaticText2, AvancementGauge, Panel4, Notebook1);
     GDpriv::FullProjectCompiler compilationManager(gameToCompile, diagnosticManager, ToString(dialog.GetPath()));
+
     compilationManager.SetForcedTempDir(ToString(tempDir));
-    compilationManager.TargetWindows(WinCheck->GetValue());
-    compilationManager.TargetLinux(LinuxCheck->GetValue());
-    compilationManager.TargetMac(MacCheck->GetValue());
     compilationManager.CompressIfPossible(TypeBox->GetSelection() == 1);
+    compilationManager.Optimize(optimizationCheck->GetValue());
+
+    //Cross compilation is not available
+    /*compilationManager.TargetWindows(WinCheck->GetValue());
+    compilationManager.TargetLinux(LinuxCheck->GetValue());
+    compilationManager.TargetMac(MacCheck->GetValue());*/
 
     compilationManager.LaunchProjectCompilation();
 
@@ -324,7 +328,13 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
 void Compilation::OnOuvrirBtClick( wxCommandEvent& event )
 {
+    #if defined(WINDOWS)
     wxExecute("explorer.exe \""+string(destinationDirectory.mb_str())+"\"");
+    #elif defined(LINUX)
+    system(string("xdg-open \""+string(destinationDirectory.mb_str())+"\"").c_str());
+    #elif defined(MAC)
+    system(string("open \""+string(destinationDirectory.mb_str())+"\"").c_str());
+    #endif
 }
 
 void Compilation::OnAideBtClick( wxCommandEvent& event )

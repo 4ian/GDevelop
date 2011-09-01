@@ -26136,7 +26136,7 @@
 	<string>
 	<windows.h>
 
-1312839629 source:d:\florian\programmation\gamedevelop2\ide\externaleventseditor.cpp
+1314873364 source:d:\florian\programmation\gamedevelop2\ide\externaleventseditor.cpp
 	"ExternalEventsEditor.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -26147,7 +26147,7 @@
 	"GDL/MainEditorCommand.h"
 	"EventsEditor.h"
 
-1312839616 d:\florian\programmation\gamedevelop2\ide\externaleventseditor.h
+1314873364 d:\florian\programmation\gamedevelop2\ide\externaleventseditor.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/panel.h>
@@ -26377,7 +26377,7 @@
 1304162683 d:\florian\programmation\gamedevelop2\gdl\gdl\localemanager.h
 	<wx/intl.h>
 
-1314191284 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp
+1314874600 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp
 	<wx/bitmap.h>
 	<wx/icon.h>
 	<wx/intl.h>
@@ -26420,6 +26420,7 @@
 	"ProjectManager.h"
 	"StartHerePage.h"
 	"BuildToolsPnl.h"
+	"ExternalEventsEditor.h"
 
 1264364136 d:\florian\programmation\gamedevelop2\ide\mystatusbar.h
 	<wx/app.h>
@@ -26827,7 +26828,7 @@
 	"GDL/Game.h"
 	"GDL/OpenSaveGame.h"
 
-1314813609 source:d:\florian\programmation\gamedevelop2\ide\preferences.cpp
+1314872512 source:d:\florian\programmation\gamedevelop2\ide\preferences.cpp
 	"Preferences.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -27564,7 +27565,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1314872537 d:\florian\programmation\gamedevelop2\ide\version.h
+1314874600 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289489446 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

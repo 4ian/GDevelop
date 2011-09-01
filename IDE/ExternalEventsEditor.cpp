@@ -71,6 +71,12 @@ ExternalEventsEditor::~ExternalEventsEditor()
 	//*)
 }
 
+void ExternalEventsEditor::ForceRefreshRibbonAndConnect()
+{
+    mainEditorCommand.GetRibbon()->SetActivePage(4);
+    eventsEditor->ConnectEvents();
+}
+
 /**
  * Change the scene used as parent for editing.
  */

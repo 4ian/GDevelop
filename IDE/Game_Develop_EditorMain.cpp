@@ -52,6 +52,7 @@
 #include "ProjectManager.h"
 #include "StartHerePage.h"
 #include "BuildToolsPnl.h"
+#include "ExternalEventsEditor.h"
 
 //(*IdInit(Game_Develop_EditorFrame)
 const long Game_Develop_EditorFrame::ID_PANEL3 = wxNewId();
@@ -519,10 +520,13 @@ void Game_Develop_EditorFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
     EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(event.GetSelection()));
     EditorImages * imagesEditorPtr = dynamic_cast<EditorImages*>(editorsNotebook->GetPage(event.GetSelection()));
     CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection()));
+    ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(editorsNotebook->GetPage(event.GetSelection()));
+
 
     if ( sceneEditorPtr != NULL ) sceneEditorPtr->ForceRefreshRibbonAndConnect();
     if ( imagesEditorPtr != NULL ) imagesEditorPtr->ForceRefreshRibbonAndConnect();
     if ( codeEditorPtr != NULL ) codeEditorPtr->ForceRefreshRibbonAndConnect();
+    if ( externalEventsEditorPtr != NULL ) externalEventsEditorPtr->ForceRefreshRibbonAndConnect();
 }
 
 void Game_Develop_EditorFrame::LoadSkin(wxRibbonBar * bar)

@@ -31,6 +31,11 @@ class ExternalEventsEditor: public wxPanel
 		ExternalEvents & events;
 		Game & game;
 
+        /**
+         * Can be called by parent so as to refresh ribbon for this editor.
+         */
+        void ForceRefreshRibbonAndConnect();
+
 	protected:
 
 		//(*Identifiers(ExternalEventsEditor)

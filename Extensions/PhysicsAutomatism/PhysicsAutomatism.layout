@@ -52,17 +52,17 @@
 	<File name="ContactListener.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="238" topLine="0" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2297" topLine="33" />
+	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2227" topLine="33" />
 	</File>
-	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1181" topLine="21" />
+	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2901" topLine="57" />
 	</File>
 	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1121" topLine="19" />
 	</File>
 	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="15182" topLine="217" />
+		<Cursor1 position="16402" topLine="252" />
 	</File>
 	<File name="PhysicsAutomatismEditor.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1008" topLine="3" />

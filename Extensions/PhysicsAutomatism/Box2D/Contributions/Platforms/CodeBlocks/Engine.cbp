@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\Library\libBox2D" prefix_auto="1" extension_auto="1" />
+				<Option output="..\..\Library\libBox2D" prefix_auto="1" extension_auto="0" />
 				<Option working_dir="" />
 				<Option object_output="obj\Debug" />
 				<Option type="2" />
@@ -18,7 +18,7 @@
 				</Compiler>
 			</Target>
 			<Target title="Release">
-				<Option output="..\..\Library\libBox2D" prefix_auto="1" extension_auto="1" />
+				<Option output="..\..\Library\libBox2D" prefix_auto="1" extension_auto="0" />
 				<Option working_dir="" />
 				<Option object_output="obj\Release" />
 				<Option type="2" />

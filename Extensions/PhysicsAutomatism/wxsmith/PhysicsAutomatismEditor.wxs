@@ -27,6 +27,7 @@
 										<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="rectCheck" member="yes">
 											<label>Rectangle</label>
 											<selected>1</selected>
+											<style>wxRB_GROUP</style>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>

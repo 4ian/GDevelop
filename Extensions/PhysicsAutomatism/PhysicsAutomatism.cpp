@@ -71,7 +71,7 @@ void PhysicsAutomatism::DoStepPreEvents(RuntimeScene & scene)
 
     if ( !runtimeScenesPhysicsDatas->stepped ) //Simulate the world, once at each frame
     {
-        runtimeScenesPhysicsDatas->world->Step(scene.GetElapsedTime(), 6, 10);
+        runtimeScenesPhysicsDatas->world->Step(static_cast<double>(scene.GetElapsedTime())/1000.0, 6, 10);
         runtimeScenesPhysicsDatas->world->ClearForces();
 
         runtimeScenesPhysicsDatas->stepped = true;
@@ -416,7 +416,7 @@ float PhysicsAutomatism::GetLinearVelocityY( RuntimeScene & scene )
 {
     if ( !body ) CreateBody(scene);
 
-    return body->GetLinearVelocity().y;
+    return -body->GetLinearVelocity().y;
 }
 double PhysicsAutomatism::GetAngularVelocity( const RuntimeScene & scene )
 {
@@ -440,12 +440,24 @@ double PhysicsAutomatism::GetAngularDamping( const RuntimeScene & scene)
 /**
  * Test if there is a contact with another object
  */
-bool PhysicsAutomatism::CollisionWith( const std::string & , std::vector<Object*> list, RuntimeScene & scene)
+bool PhysicsAutomatism::CollisionWith( const std::string & , std::map <std::string, std::vector<Object*> *> otherObjectsLists, RuntimeScene & scene)
 {
     if ( !body ) CreateBody(scene);
 
-	std::vector<Object*>::const_iterator obj_end = list.end();
-    for (std::vector<Object*>::iterator obj = list.begin(); obj != obj_end; ++obj )
+    //Getting a list of all objects which are tested
+    vector<Object*> objects;
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = otherObjectsLists.begin();it!=otherObjectsLists.end();++it)
+    {
+        if ( it->second != NULL )
+        {
+            objects.reserve(objects.size()+it->second->size());
+            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects));
+        }
+    }
+
+    //Test if an object of the list is in collision with our object.
+	std::vector<Object*>::const_iterator obj_end = objects.end();
+    for (std::vector<Object*>::iterator obj = objects.begin(); obj != obj_end; ++obj )
     {
         set<PhysicsAutomatism*>::const_iterator it = currentContacts.begin();
         set<PhysicsAutomatism*>::const_iterator end = currentContacts.end();

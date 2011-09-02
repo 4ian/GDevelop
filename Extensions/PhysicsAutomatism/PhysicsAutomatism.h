@@ -105,7 +105,7 @@ class GD_EXTENSION_API PhysicsAutomatism : public Automatism
         double GetLinearDamping( const RuntimeScene & scene);
         double GetAngularDamping( const RuntimeScene & scene);
 
-        bool CollisionWith( const std::string & , std::vector<Object*> list, RuntimeScene & scene);
+        bool CollisionWith( const std::string & , std::map <std::string, std::vector<Object*> *> otherObjectsLists, RuntimeScene & scene);
 
         static std::map < const Scene* , ScenePhysicsDatas > scenesPhysicsDatas; ///< Static map associating scene to datas
     private:

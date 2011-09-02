@@ -276,7 +276,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("layer", _("Mettre sur le calque ( calque de base si vide )"), "", false).SetDefaultValue("\"\"");
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetLayer").SetAssociatedGetter("GetLayer").SetManipulatedType("string");
+            instrInfo.cppCallingInformation.SetFunctionName("SetLayer");
 
         DECLARE_END_OBJECT_ACTION()
 

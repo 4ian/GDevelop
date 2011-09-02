@@ -746,11 +746,11 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
         }
         else if ( parametersInfo[pNb].type == "object" )
         {
-            argOutput = "\""+parameters[pNb].GetPlainString()+"\"";
+            argOutput = "\""+ConvertToCppString(parameters[pNb].GetPlainString())+"\"";
         }
         else if ( parametersInfo[pNb].type == "key" )
         {
-            argOutput = "\""+parameters[pNb].GetPlainString()+"\"";
+            argOutput = "\""+ConvertToCppString(parameters[pNb].GetPlainString())+"\"";
         }
         else if (parametersInfo[pNb].type == "objectvar" || parametersInfo[pNb].type == "scenevar" || parametersInfo[pNb].type == "globalvar" ||
                  parametersInfo[pNb].type == "password" || parametersInfo[pNb].type == "musicfile" || parametersInfo[pNb].type == "soundfile" ||
@@ -760,7 +760,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
         }
         else if ( parametersInfo[pNb].type == "mouse" )
         {
-            argOutput = "\""+parameters[pNb].GetPlainString()+"\"";
+            argOutput = "\""+ConvertToCppString(parameters[pNb].GetPlainString())+"\"";
         }
         else if ( parametersInfo[pNb].type == "yesorno" )
         {

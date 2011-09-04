@@ -43,8 +43,15 @@ class ResourcesMergingHelper;
 /**
  * \brief An object is something displayed on the scene.
  *
- * Games don't directly use this class, but derived classes
- * provided by extensions.
+ * Games don't directly use this class: Extensions can provide object by deriving from this class, and redefining functions:
+ * - Two important functions are Object::Draw and Object::DrawEdittime. They are called by scenes so as to render the object. These functions take in parameter a reference to the window where render the object.
+ * - Objects must be able to return their size, by redefining Object::GetWidth and Object::GetHeight
+ * - Objects must be able to return the position where they have precisely drawn ( for example, Sprite can draw image not exactly at the position of the object, if the origine point was moved ). They must also be able to return the position of their center. See Object::GetDrawableX, Object::GetDrawableY and Object::GetCenterX, Object::GetCenterY.
+ * - If objects need to load ressources ( for example textures at the loading ), redefine and implement Object::LoadResources and/or Object::LoadRuntimeResources ( See the Box3D Object extension sources so as to view an example ).
+ * - When objects are placed at the start of the scene, scenes call Object::InitializeFromInitialPosition, passing a InitialPosition object in parameter ( containing information like the position where place the object ). Note that common information were already changed ( Position, angle, layer... ). You just need to setup the object with the information related to your object.
+ * - Objects are loaded and saved ( to xml ) with Object::LoadFromXml and Object::SaveToXml, using TinyXml library ( See the source of the Text Object or the Box 3D Object so as to view how to implement these functions ) :
+ * - Objects can have also functions related to the edition: Object::GenerateThumbnail, Object::EditObject, Object::CreateInitialPositionPanel and Object::UpdateInitialPositionFromPanel
+ * - Finally, objects can expose debugging features: Object::GetPropertyForDebugger, Object::ChangeProperty and Object::GetNumberOfProperties
  */
 class GD_API Object : public boost::enable_shared_from_this<Object>
 {
@@ -348,7 +355,11 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         virtual bool DrawEdittime(sf::RenderWindow& main_window) {return true;};
 
         /**
-         * Called ( e.g. during compilation ) so as to inventory internal resources and update their filename
+         * Called ( e.g. during compilation ) so as to inventory internal resources and update their filename.
+         * Implementation example:
+         * \code
+         * myResourceFile = resourcesMergingHelper.GetNewFilename(myResourceFile);
+         * \endcode
          */
         virtual void PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper) {return;};
 
@@ -374,16 +385,28 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         /**
          * Called by the debugger so as to get a property value and name
+         * Implementation example:
+         * \code
+         * if      ( propertyNb == 0 ) {name = _("MyObjectProperty");      value = ToString(GetSomeProperty());}
+         * else if ( propertyNb == 1 ) {name = _("AnotherProperty");       value = GetAnotherPropety();}
+         * \endcode
          */
         virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
 
         /**
          * Called by the debugger so as to update a property
+         * \return true if property was changed, false if it not possible.
+         *
+         * Implementation example:
+         * \code
+         * if      ( propertyNb == 0 ) {return SetSomeProperty(ToFloat(newValue));}
+         * else if ( propertyNb == 1 ) {return false;} //Changing property is not allowed: returning false.
+         * \endcode
          */
         virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
 
         /**
-         * Must return the number of available properties for the debugger
+         * Must return the number of available properties for the debugger.
          */
         virtual unsigned int GetNumberOfProperties() const;
         #endif

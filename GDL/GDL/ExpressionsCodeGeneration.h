@@ -22,6 +22,7 @@ class EventsCodeGenerationContext;
 
 /**
  * \brief Used to generate C++ code from expressions.
+ *
  * Usage example :
  * \code
  *   std::string expressionOutputCppCode;

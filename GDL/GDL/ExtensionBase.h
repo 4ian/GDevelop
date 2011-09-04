@@ -521,14 +521,29 @@ class GD_API InstructionInfos
     bool canHaveSubInstructions;
     std::vector < ParameterInfo > parameters;
 
+    /**
+     * Notify that the instruction can have sub instructions.
+     */
     InstructionInfos & SetCanHaveSubInstructions()
     {
         canHaveSubInstructions = true;
         return *this;
     }
 
+    /**
+     * Add a parameter to the instruction ( condition or action ) information class.
+     * \param type One of the type handled by Game Develop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
+     * \param description Edittime only description for parameter
+     * \param optionalObjectType If type is "object", this parameter will describe which objects are allowed. If it is empty, all objects are allowed.
+     * \param parameterIsOptional true if the parameter must be optional, false otherwise.
+     */
     ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
 
+    /**
+     * Add a parameter not displayed in editor.
+     * \param type One of the type handled by Game Develop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
+     * \param supplementaryInformation Can be used if needed. For example, when type == "inlineCode", the content of supplementaryInformation is inserted in the generated C++ code.
+     */
     ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
     /**
@@ -540,18 +555,47 @@ class GD_API InstructionInfos
         enum AccessType {Reference, MutatorAndOrAccessor};
         CppCallingInformation() : accessType(Reference) {};
 
+        /**
+         * Set the C++ function name which will be used when generating the C++ code.
+         */
         CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
         {
             cppCallingName = cppCallingName_;
             return *this;
         }
 
+        /**
+         * Declare if the instruction ( condition or action ) being declared is manipulating something in a standard way.
+         */
         CppCallingInformation & SetManipulatedType(const std::string & type_)
         {
             type = type_;
             return *this;
         }
 
+        /**
+         * If InstructionInfos::CppCallingInformation::SetManipulatedType was called with "number" or "string", this function will tell the code generator
+         * the name of the getter function used to retrieve the data value.
+         *
+         * Usage example:
+         * \code
+         *  DECLARE_OBJECT_ACTION("String",
+         *                 _("Change the string"),
+         *                 _("Change the string of a text"),
+         *                 _("Do _PARAM2__PARAM1_ to the string of _PARAM0_"),
+         *                 _("Text"),
+         *                 "Extensions/text24.png",
+         *                 "Extensions/text.png");
+         *
+         *      instrInfo.AddParameter("object", _("Object"), "Text", false);
+         *      instrInfo.AddParameter("string", _("String"), "", false);
+         *      instrInfo.AddParameter("operator", _("Modification operator"), "", false);
+         *
+         *      instrInfo.cppCallingInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
+         *
+         *  DECLARE_END_OBJECT_ACTION()
+         * \endcode
+         */
         CppCallingInformation & SetAssociatedGetter(const std::string & getter)
         {
             optionalAssociatedInstruction = getter;
@@ -559,6 +603,9 @@ class GD_API InstructionInfos
             return *this;
         }
 
+        /**
+         * Set that the function is located in a specific include file
+         */
         CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
         {
             optionalIncludeFile = optionalIncludeFile_;
@@ -606,6 +653,9 @@ class GD_API ExpressionInfos
     ExpressionInfos(ExtensionBase & parentExtension);
     virtual ~ExpressionInfos() {};
 
+    /**
+     * When called, the expression will not be displayed in the editor
+     */
     ExpressionInfos & SetHidden();
 
     std::string fullname;
@@ -615,8 +665,14 @@ class GD_API ExpressionInfos
     wxBitmap smallicon;
     std::vector < ParameterInfo > parameters;
 
+    /**
+     * \see InstructionInfos::AddParameter
+     */
     ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
 
+    /**
+     * \see InstructionInfos::AddCodeOnlyParameter
+     */
     ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
     /**
@@ -625,12 +681,18 @@ class GD_API ExpressionInfos
     class CppCallingInformation
     {
     public:
+        /**
+         * Set the C++ function name which will be used when generating the C++ code.
+         */
         CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
         {
             cppCallingName = cppCallingName_;
             return *this;
         }
 
+        /**
+         * Set that the function is located in a specific include file
+         */
         CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
         {
             optionalIncludeFile = optionalIncludeFile_;
@@ -675,6 +737,9 @@ class GD_API StrExpressionInfos
     StrExpressionInfos(ExtensionBase & parentExtension);
     virtual ~StrExpressionInfos() {};
 
+    /**
+     * When called, the expression will not be displayed in the editor
+     */
     StrExpressionInfos & SetHidden();
 
     std::string fullname;
@@ -684,8 +749,14 @@ class GD_API StrExpressionInfos
     wxBitmap smallicon;
     std::vector < ParameterInfo > parameters;
 
+    /**
+     * \see InstructionInfos::AddParameter
+     */
     ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
 
+    /**
+     * \see InstructionInfos::AddCodeOnlyParameter
+     */
     ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
     /**
@@ -694,12 +765,18 @@ class GD_API StrExpressionInfos
     class CppCallingInformation
     {
     public:
+        /**
+         * Set the C++ function name which will be used when generating the C++ code.
+         */
         CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
         {
             cppCallingName = cppCallingName_;
             return *this;
         }
 
+        /**
+         * Set that the function is located in a specific include file
+         */
         CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
         {
             optionalIncludeFile = optionalIncludeFile_;
@@ -765,6 +842,9 @@ class GD_API AutomatismInfo
     virtual ~AutomatismInfo() {};
 
 #if defined(GD_IDE_ONLY)
+    /**
+     * Set that the automatism is located in a specific include file
+     */
     AutomatismInfo & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
 
     std::string fullname;
@@ -797,6 +877,9 @@ class GD_API ExtensionObjectInfos
     virtual ~ExtensionObjectInfos() {};
 
 #if defined(GD_IDE_ONLY)
+    /**
+     * Set that the object is located in a specific include file
+     */
     ExtensionObjectInfos & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
 
     std::string fullname;
@@ -967,12 +1050,14 @@ class GD_API ExtensionBase
     virtual bool HasDebuggingProperties() const { return false; };
 
     /**
-     * Called by the debugger so as to get a property value and name
+     * Called by the debugger so as to get a property value and name.
+     * \see Object::GetPropertyForDebugger
      */
     virtual void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const {};
 
     /**
      * Called by the debugger so as to update a property
+     * \see Object::ChangeProperty
      */
     virtual bool ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue) { return false; };
 

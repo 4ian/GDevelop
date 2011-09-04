@@ -41,12 +41,12 @@ class GD_API EventsRenderingHelper
          * Draw a text in dc at point, without taking more than widthAvailable.
          * \return X position of the last character and total height taken by the text
          */
-        wxPoint DrawTextInArea(wxString text, wxDC & dc, wxRect rect, wxPoint point);
+        wxPoint DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point);
 
         /**
          * \return Height taken by the text
          */
-        unsigned int GetTextHeightInArea(wxString text, unsigned int widthAvailable);
+        unsigned int GetTextHeightInArea(const std::string & text, unsigned int widthAvailable);
 
         int DrawInstruction(Instruction & instruction, const InstructionInfos & instructionInfos, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 

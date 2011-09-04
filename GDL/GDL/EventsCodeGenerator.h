@@ -68,6 +68,40 @@ class GD_API EventsCodeGenerator
          * \param parametersInfo Vector of information about parameters
          * \param context Context used for generation
          * \param supplementaryParametersTypes Optional vector of new parameters types ( vector of pair<std::string,std::string>("type", "valueToBeInserted") )
+         *
+         * Supported parameters type, and how they are used in C++ code:
+         *
+         * - object : Object name. (std::string)
+         * - expression : Mathematical expression. (double)
+         * - string : %Text expression. (std::string)
+         * - layer, color, file, joyaxis : Same as string
+         * - relationalOperator : Used to make a comparison between the function resturn value and value of the parameter preceding the relationOperator parameter. (std::string)
+         * - operator : Used to update a value using a setter and a getter. (std::string)
+         * - key, mouse, objectvar, scenevar, globalvar, password, musicfile, soundfile, police: (std::string)
+         * - trueorfalse, yesorno : (bool)
+         *
+         * <br><br>
+         * "Code only" parameters types:
+         * - currentScene: Reference to the current runtime scene ( RuntimeScene& )
+         * - inlineCode: supplementary information associated with the parameter is directly pasted in the C++ code without change.
+         * - mapOfObjectListsOfParameter : a std::map containing lists of objects which are specified by the object name in another parameter. (std::map <std::string, std::vector<Object*> *>) Example:
+         * \code
+        DECLARE_EXPRESSION("Count", _("Object count"), _("Count the number of picked objects"), _("Objects"), "res/conditions/nbObjet.png")
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
+
+            instrInfo.cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/ObjectTools.h");
+        DECLARE_END_EXPRESSION()
+         * \endcode
+         * - mapOfObjectListsOfParameterWithoutPickingThem : Same as mapOfObjectListsOfParameter but do not pick object if they are not already concerned.
+         * - ptrToObjectOfParameter : Return a pointer to object specified by the object name in another parameter ( Object * ). Example:
+         * \code
+        instrInfo.AddParameter("object", _("Objet"), "", false);
+        instrInfo.AddParameter("object", _("Target object"), "", false);
+        instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1"); //The called function will be called with this signature : Function(std::string, std::string, Object*)
+         * \endcode
+         * - mapOfAllObjectLists : Like mapOfObjectListsOfParameter, but the map contains every object lists which can be used in the scene. Use as few as possible.
+         * - listOfAlreadyPickedObjects : Vector of name of objects already concerned ( std::vector<std::string> & ). Use as few as possible.
          */
         static std::vector<std::string> GenerateParametersCodes( const Game & game, const Scene & scene, std::vector < GDExpression > parameters, const std::vector < ParameterInfo > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
 

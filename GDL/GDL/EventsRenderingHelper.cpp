@@ -20,7 +20,7 @@
 
 EventsRenderingHelper * EventsRenderingHelper::singleton = NULL;
 
-wxPoint EventsRenderingHelper::DrawTextInArea(wxString text, wxDC & dc, wxRect rect, wxPoint point)
+wxPoint EventsRenderingHelper::DrawTextInArea(std::string text, wxDC & dc, wxRect rect, wxPoint point)
 {
     if ( text.empty() || rect.width == 0) return point;
 
@@ -67,7 +67,7 @@ wxPoint EventsRenderingHelper::DrawTextInArea(wxString text, wxDC & dc, wxRect r
     return wxPoint(point.x+displayedText.length()*fontCharacterWidth, point.y);
 }
 
-unsigned int EventsRenderingHelper::GetTextHeightInArea(wxString text, unsigned int widthAvailable)
+unsigned int EventsRenderingHelper::GetTextHeightInArea(const std::string & text, unsigned int widthAvailable)
 {
     if ( text.empty() || widthAvailable == 0) return 0;
 

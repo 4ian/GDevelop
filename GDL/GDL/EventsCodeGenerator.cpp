@@ -680,6 +680,8 @@ string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Sce
     return outputCode;
 }
 
+/**
+ */
 vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, const Scene & scene, vector < GDExpression > parameters, const vector < ParameterInfo > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
 {
     vector<string> arguments;

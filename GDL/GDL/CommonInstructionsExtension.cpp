@@ -88,7 +88,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 //Declarations code
                 std::string declarationsCode;
-                for ( set<string>::iterator it = parentContext.objectsListsToBeDeclaredEmpty.begin() ; it != parentContext.objectsListsToBeDeclaredEmpty.end(); ++it )
+                for ( set<string>::iterator it = emptyListsNeeded.begin() ; it != emptyListsNeeded.end(); ++it )
                 {
                     //We need to duplicate the object lists : The "final" ones will be filled with objects by conditions,
                     //but they will have no incidence on further conditions, as conditions use "normal" ones.
@@ -104,7 +104,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 //When condition is finished, "final" objects lists become the "normal" ones.
                 code += "{\n";
-                for ( set<string>::iterator it = parentContext.objectsListsToBeDeclaredEmpty.begin() ; it != parentContext.objectsListsToBeDeclaredEmpty.end(); ++it )
+                for ( set<string>::iterator it = emptyListsNeeded.begin() ; it != emptyListsNeeded.end(); ++it )
                     code += ManObjListName(*it)+" = "+ManObjListName(*it)+"final;\n";
                 code += "}\n";
 

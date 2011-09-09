@@ -299,11 +299,11 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                                     task.scene->eventsModified = false;
                                 }
                             }
-                            remove(std::string(outputDir+ToString(executionEngine.get())+"LLVMIR.bc").c_str());
+                            if ( EventsCodeCompiler::GetInstance()->MustDeleteTemporaries() ) remove(std::string(outputDir+ToString(executionEngine.get())+"LLVMIR.bc").c_str());
                         }
                     }
                 }
-                remove(std::string(outputDir+ToString(executionEngine.get())+"events.cpp").c_str());
+                if ( EventsCodeCompiler::GetInstance()->MustDeleteTemporaries() ) remove(std::string(outputDir+ToString(executionEngine.get())+"events.cpp").c_str());
             }
         }
 
@@ -481,7 +481,8 @@ void EventsCodeCompiler::SetWorkingDirectory(std::string workingDir_)
 };
 
 EventsCodeCompiler::EventsCodeCompiler() :
-    workingDir("Temporaries/")
+    workingDir("Temporaries/"),
+    mustDeleteTemporaries(true)
 {
     #if defined(WINDOWS)
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/include");

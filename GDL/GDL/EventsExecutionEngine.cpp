@@ -57,12 +57,6 @@ EventsExecutionEngine::~EventsExecutionEngine()
     if ( llvmRuntimeContext != NULL ) delete llvmRuntimeContext;
 }
 
-void EventsExecutionEngine::Execute()
-{
-    const std::vector< llvm::GenericValue > args;
-    llvmExecutionEngine->runFunction(eventsEntryFunction, args);
-}
-
 bool EventsExecutionEngine::LoadFromLLVMBitCode(const char * src, unsigned int size)
 {
     llvm::StringRef input_data(src);
@@ -77,7 +71,7 @@ bool EventsExecutionEngine::LoadFromLLVMBitCode(const char * src, unsigned int s
 bool EventsExecutionEngine::LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffer)
 {
     std::string parseError;
-    llvmModule = ParseBitcodeFile(eventsBuffer, llvmContext, &parseError);
+    llvm::Module * llvmModule = ParseBitcodeFile(eventsBuffer, llvmContext, &parseError);
     std::cout << parseError;
 
     if (!llvmModule)
@@ -96,7 +90,7 @@ bool EventsExecutionEngine::LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffe
         return false;
     }
 
-    eventsEntryFunction = llvmModule->getFunction("main");
+    llvm::Function * eventsEntryFunction = llvmModule->getFunction("main");
     if (!eventsEntryFunction)
     {
         std::cout << "'main' function not found in module.\n";
@@ -115,7 +109,7 @@ bool EventsExecutionEngine::LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffe
 
     std::cout << "JIT Compilation to machine code...\n";
     sf::Clock jitTimer;
-    llvmExecutionEngine->getPointerToFunction(eventsEntryFunction);
+    compiledRawFunction = llvmExecutionEngine->getPointerToFunction(eventsEntryFunction);
     std::cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()/1000.0f <<"s"<<std::endl;
 
     engineReady = true;

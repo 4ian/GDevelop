@@ -33,7 +33,7 @@ public:
      * Execute compiled events.
      * Beware, there is no protection against calling Execute on an EventsExecutionEngine that is not initalized with bitcode
      */
-    void Execute();
+    void Execute() { ((void(*)())compiledRawFunction)(); };
 
     /**
      * Return true if loading from bitcode has been made successfully and if Execute can be called.
@@ -52,9 +52,8 @@ public:
      */
     bool LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffer);
 
+    void * compiledRawFunction; ///< Pointer to compiled events entry function.
     llvm::LLVMContext llvmContext;
-    llvm::Function * eventsEntryFunction;
-    llvm::Module * llvmModule;
     llvm::OwningPtr<llvm::ExecutionEngine> llvmExecutionEngine;
     RuntimeContext * llvmRuntimeContext; ///<Pointer is needed here.
 

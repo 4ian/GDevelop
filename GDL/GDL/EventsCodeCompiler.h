@@ -74,6 +74,16 @@ public:
     void SetWorkingDirectory(std::string workingDir_);
 
     /**
+     * Set if code compiler must delete temporaries files
+     */
+    void SetMustDeleteTemporaries(bool mustDeleteTemporaries_) { mustDeleteTemporaries = mustDeleteTemporaries_; };
+
+    /**
+     * Return true if code compiler must delete temporaries files
+     */
+    bool MustDeleteTemporaries() { return mustDeleteTemporaries; };
+
+    /**
      * Describe to compiler what is needed
      */
     class Task
@@ -153,6 +163,7 @@ private:
     sf::Mutex mutex;
 
     std::string workingDir;
+    bool mustDeleteTemporaries; ///< True if temporaries files must be deleted
 
     EventsCodeCompiler();
     virtual ~EventsCodeCompiler();

@@ -112,9 +112,9 @@ std::string GD_EXTENSION_API GetLastError()
     return ErrorManager::GetInstance()->GetLastError();
 }
 
-std::string GD_EXTENSION_API GetPublicAddress(float timeout)
+std::string GD_EXTENSION_API GetPublicAddress(float timeoutInSeconds)
 {
-    return sf::IpAddress::GetPublicAddress(timeout).ToString();
+    return sf::IpAddress::GetPublicAddress(timeoutInSeconds*1000).ToString();
 }
 
 std::string GD_EXTENSION_API GetLocalAddress()

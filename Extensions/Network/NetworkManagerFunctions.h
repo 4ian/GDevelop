@@ -44,7 +44,7 @@ void GD_EXTENSION_API ReceivePackets(  );
 std::string GD_EXTENSION_API GetReceivedDataString( const std::string & title);
 double GD_EXTENSION_API GetReceivedDataValue( const std::string & title );
 std::string GD_EXTENSION_API GetLastError();
-std::string GD_EXTENSION_API GetPublicAddress(float timeout);
+std::string GD_EXTENSION_API GetPublicAddress(float timeoutInSeconds);
 std::string GD_EXTENSION_API GetLocalAddress();
 
 }

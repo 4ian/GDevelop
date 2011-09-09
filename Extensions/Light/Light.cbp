@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\Runtime\bin\debug\Light.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\Light.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -38,7 +38,7 @@
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\Light.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\Extensions\Light.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -108,7 +108,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="..\..\Runtime\bin\release\Light.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\Light.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -139,7 +139,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\Light.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\Extensions\Light.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -208,7 +208,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development">
-				<Option output="..\..\Runtime\bin\dev\Light.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\dev\Light.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -239,7 +239,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
-				<Option output="..\..\IDE\bin\dev\Extensions\Light.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\dev\Extensions\Light.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -308,7 +308,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
-				<Option output="..\..\Runtime\bin\release\Light.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\Light.xgdl" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -342,11 +342,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\Light.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\Extensions\Light.xgdle" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -385,11 +385,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\Light.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\Extensions\Light.xgdle" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -426,11 +426,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
-				<Option output="..\..\Runtime\bin\debug\Light.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\Light.xgdl" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -464,11 +464,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
-				<Option output="..\..\Runtime\bin\release\Light.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\Light.xgdm" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -494,11 +494,11 @@
 					<Add option="-lsfml-system" />
 					<Add option="-framework OpenGL" />
 					<Add option="-dynamiclib" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="..\..\..\libs\sfml\lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/release/Light.xgdm" />
@@ -506,7 +506,7 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Mac - Debug">
-				<Option output="..\..\Runtime\bin\debug\Light.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\Light.xgdm" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -532,11 +532,11 @@
 					<Add option="-lsfml-system-d" />
 					<Add option="-framework OpenGL" />
 					<Add option="-dynamiclib" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="..\..\..\libs\sfml\lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/debug/Light.xgdm" />

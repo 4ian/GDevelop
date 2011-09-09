@@ -34,14 +34,15 @@ freely, subject to the following restrictions:
 namespace sf
 {
     class Sprite;
-    class Image;
+    class Texture;
     class Shader;
-    class RenderImage;
+    class RenderTexture;
 }
 class Evaluateur;
 class ImageManager;
 class RuntimeScene;
 class Object;
+class Scene;
 class ExpressionInstruction;
 class ObjectsConcerned;
 class ImageManager;
@@ -149,14 +150,14 @@ class GD_EXTENSION_API LightObject : public Object
         Light light; ///< Light object used to render light
 
         bool globalLight;
-        boost::shared_ptr<sf::RenderImage> globalLightImage;
+        boost::shared_ptr<sf::RenderTexture> globalLightImage;
         sf::Color globalLightColor;
 
         static sf::Shader commonBlurEffect;
         static bool commonBlurEffectLoaded;
 
         #if defined(GD_IDE_ONLY)
-        static sf::Image edittimeIconImage;
+        static sf::Texture edittimeIconImage;
         static sf::Sprite edittimeIcon;
         #endif
 };

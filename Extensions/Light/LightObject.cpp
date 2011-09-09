@@ -48,7 +48,7 @@ std::map<const Scene*, boost::weak_ptr<Light_Manager> >  LightObject::lightManag
 sf::Shader LightObject::commonBlurEffect;
 bool LightObject::commonBlurEffectLoaded = false;
 #if defined(GD_IDE_ONLY)
-sf::Image LightObject::edittimeIconImage;
+sf::Texture LightObject::edittimeIconImage;
 sf::Sprite LightObject::edittimeIcon;
 #endif
 
@@ -129,7 +129,7 @@ bool LightObject::LoadResources(const RuntimeScene & scene, const ImageManager &
     #if defined(GD_IDE_ONLY)
     edittimeIconImage.LoadFromFile("Extensions/lightIcon32.png");
     edittimeIconImage.SetSmooth(false);
-    edittimeIcon.SetImage(edittimeIconImage);
+    edittimeIcon.SetTexture(edittimeIconImage);
     #endif
 
     return true;
@@ -165,7 +165,7 @@ void LightObject::UpdateGlobalLightMembers()
     if ( globalLight )
     {
         //Create supplementary members for the global light
-        if ( !globalLightImage ) globalLightImage = boost::shared_ptr<sf::RenderImage>(new sf::RenderImage);
+        if ( !globalLightImage ) globalLightImage = boost::shared_ptr<sf::RenderTexture>(new sf::RenderTexture);
     }
     else
     {
@@ -193,7 +193,7 @@ bool LightObject::Draw( sf::RenderWindow& window )
 
     if ( !manager ) return false;
 
-    if ( updateClock.GetElapsedTime() >0.025 )
+    if ( updateClock.GetElapsedTime() > 25 ) //Update each 25 milliseconds
     {
         light.Generate(manager->walls);
         updateClock.Reset();
@@ -214,7 +214,7 @@ bool LightObject::Draw( sf::RenderWindow& window )
 
         //Display the intermediate image
         sf::Sprite sprite;
-        sprite.SetImage(globalLightImage->GetImage());
+        sprite.SetTexture(globalLightImage->GetTexture());
         sprite.SetBlendMode(sf::Blend::Multiply);
         commonBlurEffect.SetParameter("offset",0.005 * 1);
 

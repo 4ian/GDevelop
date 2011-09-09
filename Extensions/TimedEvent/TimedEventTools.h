@@ -34,7 +34,13 @@ namespace GDpriv
 namespace TimedEvents
 {
 
-float GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, std::string timedEventName);
+/**
+ * Update timed event and return its time, in seconds.
+ * \param Scene used
+ * \param Timed event nae
+ * \return Time elapsed, in milliseconds, of the timed event
+ */
+unsigned int GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, std::string timedEventName);
 void GD_EXTENSION_API Reset(RuntimeScene & scene, std::string timedEventName);
 
 }

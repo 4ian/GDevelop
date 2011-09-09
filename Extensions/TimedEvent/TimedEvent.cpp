@@ -73,7 +73,7 @@ std::string TimedEvent::GenerateEventCode(const Game & game, const Scene & scene
 
     std::string outputCode;
 
-    outputCode += "if ( GDpriv::TimedEvents::UpdateAndGetTimeOf(*runtimeContext->scene, \""+codeName+"\") > "+timeOutCode+")";
+    outputCode += "if ( GDpriv::TimedEvents::UpdateAndGetTimeOf(*runtimeContext->scene, \""+codeName+"\")/1000.0 > "+timeOutCode+")";
     outputCode += "{";
 
     outputCode += EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
@@ -100,7 +100,7 @@ std::string TimedEvent::GenerateEventCode(const Game & game, const Scene & scene
     outputCode += "}";
 
     //This event cannot be a parent of other TimedEvent anymore
-    if (codeGenerationCurrentParents.empty())
+    if (!codeGenerationCurrentParents.empty())
         codeGenerationCurrentParents.pop_back();
     else
         std::cout << "Error! CodeGenerationCurrentParents cannot be empty!";
@@ -251,7 +251,6 @@ void TimedEvent::Init(const TimedEvent & event)
 
     name = event.name;
     timeout = event.timeout;
-    timer = event.timer;
     conditions = event.conditions;
     actions = event.actions;
 }
@@ -260,8 +259,7 @@ void TimedEvent::Init(const TimedEvent & event)
  * Custom copy operator
  */
 TimedEvent::TimedEvent(const TimedEvent & event) :
-BaseEvent(event),
-timer("")
+BaseEvent(event)
 {
     Init(event);
 }

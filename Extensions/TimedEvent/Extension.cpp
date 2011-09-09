@@ -141,7 +141,7 @@ class Extension : public ExtensionBase
                 if ( propertyNb == i )
                 {
                     name = iter->first.empty() ? ToString(_("Sans nom")) : iter->first;
-                    value = ToString(iter->second.GetTime())+"s";
+                    value = ToString(static_cast<double>(iter->second.GetTime())/1000.0)+"s";
 
                     return;
                 }

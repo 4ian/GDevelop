@@ -106,7 +106,6 @@ class GD_EXTENSION_API TimedEvent : public BaseEvent
 
         string name;
         GDExpression timeout;
-        ManualTimer timer;
         vector < Instruction > conditions;
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;

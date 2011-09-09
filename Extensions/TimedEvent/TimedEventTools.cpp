@@ -33,7 +33,7 @@ namespace GDpriv
 namespace TimedEvents
 {
 
-float GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, std::string timedEventName)
+unsigned int GD_EXTENSION_API UpdateAndGetTimeOf(RuntimeScene & scene, std::string timedEventName)
 {
     TimedEventsManager & manager = TimedEventsManager::managers[&scene];
     manager.timedEvents[timedEventName].UpdateTime(scene.GetElapsedTime());

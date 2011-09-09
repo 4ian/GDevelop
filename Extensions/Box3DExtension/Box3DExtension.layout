@@ -8,10 +8,10 @@
 		<Cursor1 position="997" topLine="0" />
 	</File>
 	<File name="Box3DObject.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="16895" topLine="460" />
+		<Cursor1 position="13201" topLine="366" />
 	</File>
 	<File name="Box3DObject.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2218" topLine="34" />
+		<Cursor1 position="1071" topLine="15" />
 	</File>
 	<File name="Box3DObjectEditor.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="14938" topLine="214" />
@@ -19,7 +19,7 @@
 	<File name="Box3DObjectEditor.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="997" topLine="3" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="17158" topLine="326" />
+	<File name="Extension.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="16755" topLine="323" />
 	</File>
 </CodeBlocks_layout_file>

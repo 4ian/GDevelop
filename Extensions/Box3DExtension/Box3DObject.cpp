@@ -193,12 +193,12 @@ void Box3DObject::SaveToXml(TiXmlElement * object)
 
 bool Box3DObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
 {
-    frontTexture =  imageMgr.GetSFMLImage(frontTextureName);
-    topTexture =    imageMgr.GetSFMLImage(topTextureName);
-    bottomTexture = imageMgr.GetSFMLImage(bottomTextureName) ;
-    leftTexture =   imageMgr.GetSFMLImage(leftTextureName);
-    rightTexture =  imageMgr.GetSFMLImage(rightTextureName);
-    backTexture =   imageMgr.GetSFMLImage(backTextureName);
+    frontTexture =  imageMgr.GetSFMLTexture(frontTextureName);
+    topTexture =    imageMgr.GetSFMLTexture(topTextureName);
+    bottomTexture = imageMgr.GetSFMLTexture(bottomTextureName) ;
+    leftTexture =   imageMgr.GetSFMLTexture(leftTextureName);
+    rightTexture =  imageMgr.GetSFMLTexture(rightTextureName);
+    backTexture =   imageMgr.GetSFMLTexture(backTextureName);
 
     return true;
 }
@@ -255,7 +255,7 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    backTexture->Bind();
+    backTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0        , 0,            0);
         glTexCoord2f(0, 1); glVertex3f(0        , sizeHeight,   0);
@@ -263,7 +263,7 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            0);
     glEnd();
 
-    frontTexture->Bind();
+    frontTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0        , 0,            sizeDepth);
         glTexCoord2f(0, 1); glVertex3f(0        , sizeHeight,   sizeDepth);
@@ -271,7 +271,7 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            sizeDepth);
     glEnd();
 
-    leftTexture->Bind();
+    leftTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0,       0,              0);
         glTexCoord2f(0, 1); glVertex3f(0,       sizeHeight,     0);
@@ -279,7 +279,7 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
         glTexCoord2f(1, 0); glVertex3f(0,       0,              sizeDepth);
     glEnd();
 
-    rightTexture->Bind();
+    rightTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(sizeWidth, 0,            0);
         glTexCoord2f(0, 1); glVertex3f(sizeWidth, sizeHeight,   0);
@@ -287,7 +287,7 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            sizeDepth);
     glEnd();
 
-    bottomTexture->Bind();
+    bottomTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(0,           0,          sizeDepth);
         glTexCoord2f(0, 0); glVertex3f(0,           0,          0);
@@ -295,7 +295,7 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
         glTexCoord2f(1, 1); glVertex3f(sizeWidth,   0,          sizeDepth);
     glEnd();
 
-    topTexture->Bind();
+    topTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(0,           sizeHeight, sizeDepth);
         glTexCoord2f(0, 0); glVertex3f(0,           sizeHeight, 0);
@@ -341,7 +341,7 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
     glEnable(GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    backTexture->Bind();
+    backTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0        , 0,            0);
         glTexCoord2f(0, 1); glVertex3f(0        , sizeHeight,   0);
@@ -349,7 +349,7 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            0);
     glEnd();
 
-    frontTexture->Bind();
+    frontTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0        , 0,            sizeDepth);
         glTexCoord2f(0, 1); glVertex3f(0        , sizeHeight,   sizeDepth);
@@ -357,7 +357,7 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            sizeDepth);
     glEnd();
 
-    leftTexture->Bind();
+    leftTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(0,       0,              0);
         glTexCoord2f(0, 1); glVertex3f(0,       sizeHeight,     0);
@@ -365,7 +365,7 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
         glTexCoord2f(1, 0); glVertex3f(0,       0,              sizeDepth);
     glEnd();
 
-    rightTexture->Bind();
+    rightTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 0); glVertex3f(sizeWidth, 0,            0);
         glTexCoord2f(0, 1); glVertex3f(sizeWidth, sizeHeight,   0);
@@ -373,7 +373,7 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
         glTexCoord2f(1, 0); glVertex3f(sizeWidth, 0,            sizeDepth);
     glEnd();
 
-    bottomTexture->Bind();
+    bottomTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(0,           0,          sizeDepth);
         glTexCoord2f(0, 0); glVertex3f(0,           0,          0);
@@ -381,7 +381,7 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
         glTexCoord2f(1, 1); glVertex3f(sizeWidth,   0,          sizeDepth);
     glEnd();
 
-    topTexture->Bind();
+    topTexture->texture.Bind();
     glBegin(GL_QUADS);
         glTexCoord2f(0, 1); glVertex3f(0,           sizeHeight, sizeDepth);
         glTexCoord2f(0, 0); glVertex3f(0,           sizeHeight, 0);

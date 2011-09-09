@@ -28,10 +28,7 @@ freely, subject to the following restrictions:
 #define BOX3DOBJECT_H
 
 #include "GDL/Object.h"
-namespace sf
-{
-    class Image;
-}
+class SFMLTextureWrapper;
 class Evaluateur;
 class ImageManager;
 class RuntimeScene;
@@ -127,12 +124,12 @@ class GD_EXTENSION_API Box3DObject : public Object
         float pitch;
         float roll;
 
-        boost::shared_ptr<sf::Image> frontTexture;
-        boost::shared_ptr<sf::Image> topTexture;
-        boost::shared_ptr<sf::Image> bottomTexture;
-        boost::shared_ptr<sf::Image> leftTexture;
-        boost::shared_ptr<sf::Image> rightTexture;
-        boost::shared_ptr<sf::Image> backTexture;
+        boost::shared_ptr<SFMLTextureWrapper> frontTexture;
+        boost::shared_ptr<SFMLTextureWrapper> topTexture;
+        boost::shared_ptr<SFMLTextureWrapper> bottomTexture;
+        boost::shared_ptr<SFMLTextureWrapper> leftTexture;
+        boost::shared_ptr<SFMLTextureWrapper> rightTexture;
+        boost::shared_ptr<SFMLTextureWrapper> backTexture;
 };
 
 void DestroyBox3DObject(Object * object);

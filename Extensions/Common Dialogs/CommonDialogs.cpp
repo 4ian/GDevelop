@@ -74,7 +74,7 @@ void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const std::string & 
     msgBox.wait_until_closed();
     #endif
 
-    scene.pauseTime += timeSpent.GetElapsedTime(); //Don't take the time spent in this function in account.
+    scene.NotifyPauseWasMade(timeSpent.GetElapsedTime());//Don't take the time spent in this function in account.
 }
 
 /**
@@ -113,8 +113,7 @@ void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, const std::string & va
     dialog->wait_until_closed();
     #endif
 
-    //Don't take the time spent in this function in account.
-    scene.pauseTime += timeSpent.GetElapsedTime();
+    scene.NotifyPauseWasMade(timeSpent.GetElapsedTime());//Don't take the time spent in this function in account.
 
     //Update the variable
     scene.variables.ObtainVariable(variable) = result;
@@ -141,8 +140,7 @@ void GD_EXTENSION_API ShowYesNoMsgBox( RuntimeScene & scene, const std::string &
     dialog.wait_until_closed();
     #endif
 
-    //Don't take the time spent in this function in account.
-    scene.pauseTime += timeSpent.GetElapsedTime();
+    scene.NotifyPauseWasMade(timeSpent.GetElapsedTime());//Don't take the time spent in this function in account.
 
     //Update the variable
     scene.variables.ObtainVariable(variable) = result;
@@ -458,8 +456,7 @@ bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, const std::string & v
     dialog.wait_until_closed();
     #endif
 
-    //Don't take the time spent in this function in account.
-    scene.pauseTime += timeSpent.GetElapsedTime();
+    scene.NotifyPauseWasMade(timeSpent.GetElapsedTime());//Don't take the time spent in this function in account.
 
     //Update the variable
     scene.variables.ObtainVariable(variable) = result;

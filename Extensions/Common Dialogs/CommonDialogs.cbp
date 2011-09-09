@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\Runtime\bin\debug\CommonDialogs.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\CommonDialogs.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -39,7 +39,7 @@
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\CommonDialogs.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\Extensions\CommonDialogs.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -108,7 +108,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="..\..\Runtime\bin\release\CommonDialogs.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\CommonDialogs.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -140,7 +140,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\CommonDialogs.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\Extensions\CommonDialogs.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -209,7 +209,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development">
-				<Option output="..\..\Runtime\bin\dev\CommonDialogs.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\dev\CommonDialogs.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -241,7 +241,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
-				<Option output="..\..\IDE\bin\dev\Extensions\CommonDialogs.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\dev\Extensions\CommonDialogs.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -310,7 +310,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
-				<Option output="..\..\Runtime\bin\release\CommonDialogs.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\CommonDialogs.xgdl" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -348,11 +348,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\CommonDialogs.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\Extensions\CommonDialogs.xgdle" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -395,11 +395,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\CommonDialogs.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\Extensions\CommonDialogs.xgdle" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -440,11 +440,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
-				<Option output="..\..\Runtime\bin\debug\CommonDialogs.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\CommonDialogs.xgdl" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -482,11 +482,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
-				<Option output="..\..\Runtime\bin\release\CommonDialogs.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\CommonDialogs.xgdm" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -502,8 +502,8 @@
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="..\..\..\libs\boost_1_43_0" />
-					<Add directory="..\..\..\libs\sfml\include" />
+					<Add directory="../../ExtLibs/boost" />
+					<Add directory="../../ExtLibs/SFML/include" />
 					<Add directory="nwidgets" />
 					<Add directory="dlib-17.12" />
 				</Compiler>
@@ -517,11 +517,11 @@
 					<Add option="-framework OpenGL" />
 					<Add option="-lX11.6" />
 					<Add option="-dynamiclib" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="..\..\..\libs\sfml\lib" />
+					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
 					<Add directory="\usr\X11\lib" />
 				</Linker>
 				<ExtraCommands>
@@ -530,7 +530,7 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Mac - Debug">
-				<Option output="..\..\Runtime\bin\debug\CommonDialogs.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\CommonDialogs.xgdm" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -546,8 +546,8 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="..\..\..\libs\boost_1_43_0" />
-					<Add directory="..\..\..\libs\sfml\include" />
+					<Add directory="../../ExtLibs/boost" />
+					<Add directory="../../ExtLibs/SFML/include" />
 					<Add directory="nwidgets" />
 					<Add directory="dlib-17.12" />
 				</Compiler>
@@ -562,11 +562,11 @@
 					<Add option="-framework OpenGL" />
 					<Add option="-lX11.6" />
 					<Add option="-dynamiclib" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="..\..\..\libs\sfml\lib" />
+					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
 					<Add directory="\usr\X11\lib" />
 				</Linker>
 				<ExtraCommands>

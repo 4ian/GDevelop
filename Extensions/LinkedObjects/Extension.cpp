@@ -43,8 +43,8 @@ class Extension : public ExtensionBase
         Extension()
         {
             DECLARE_THE_EXTENSION("LinkedObjects",
-                                  _("Algorithme de chiffrement LinkedObjects"),
-                                  _("Extension permettant de chiffrer des fichiers avec l'algorithme LinkedObjects."),
+                                  _("Associations d'objets"),
+                                  _("Extension permettant d'associer virtuellement des objets entre eux et de les retrouver ensuite."),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 

@@ -2,7 +2,7 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
 	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2139" topLine="38" />
+		<Cursor1 position="2173" topLine="38" />
 	</File>
 	<File name="Extension.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1049" topLine="18" />
@@ -23,10 +23,10 @@
 		<Cursor1 position="1077" topLine="20" />
 	</File>
 	<File name="ParticleEmitterObject.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1836" topLine="33" />
+		<Cursor1 position="23940" topLine="511" />
 	</File>
-	<File name="ParticleEmitterObject.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1126" topLine="21" />
+	<File name="ParticleEmitterObject.h" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1145" topLine="4" />
 	</File>
 	<File name="ParticleEmitterObjectEditor.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="73056" topLine="944" />

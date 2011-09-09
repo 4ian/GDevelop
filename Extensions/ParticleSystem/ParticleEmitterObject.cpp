@@ -48,7 +48,7 @@ freely, subject to the following restrictions:
 #endif
 
 #if defined(GD_IDE_ONLY)
-sf::Image ParticleEmitterObject::edittimeIconImage;
+sf::Texture ParticleEmitterObject::edittimeIconImage;
 sf::Sprite ParticleEmitterObject::edittimeIcon;
 #endif
 
@@ -525,7 +525,7 @@ bool ParticleEmitterObject::LoadResources(const RuntimeScene & scene, const Imag
     #if defined(GD_IDE_ONLY)
     edittimeIconImage.LoadFromFile("Extensions/particleSystemSceneIcon.png");
     edittimeIconImage.SetSmooth(false);
-    edittimeIcon.SetImage(edittimeIconImage);
+    edittimeIcon.SetTexture(edittimeIconImage);
     #endif
 
     return true;

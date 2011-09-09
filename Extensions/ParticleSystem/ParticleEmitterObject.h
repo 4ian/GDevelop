@@ -31,7 +31,7 @@ freely, subject to the following restrictions:
 #include "ParticleSystemWrapper.h"
 namespace sf
 {
-    class Image;
+    class Texture;
     class Sprite;
 };
 class Evaluateur;
@@ -282,7 +282,7 @@ class GD_EXTENSION_API ParticleEmitterObject : public Object
         float angle;
 
         #if defined(GD_IDE_ONLY)
-        static sf::Image edittimeIconImage;
+        static sf::Texture edittimeIconImage;
         static sf::Sprite edittimeIcon;
         #endif
 };

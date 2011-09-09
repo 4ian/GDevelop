@@ -89,7 +89,7 @@ void AStarAutomatism::DoStepPreEvents(RuntimeScene & scene)
     }
 
     //  add to the current time along the path
-    timeOnSegment += scene.GetElapsedTime() * speed;
+    timeOnSegment += static_cast<double>(scene.GetElapsedTime())/1000.0 * speed;
 
     //  if I reached the end of this segment, move to a new segment
     if (timeOnSegment >= totalSegmentTime && currentSegment < path.size())

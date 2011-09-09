@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\Runtime\bin\debug\VideoObject.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\VideoObject.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -33,12 +33,12 @@
 					<Add option="-lsfml-system-d" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.a" />
 					<Add directory="..\..\Runtime\bin\debug" />
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\VideoObject.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\Extensions\VideoObject.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -102,14 +102,14 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.a" />
 					<Add directory="..\..\IDE\bin\debug" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="..\..\Runtime\bin\release\VideoObject.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\VideoObject.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -135,12 +135,12 @@
 					<Add option="-lsfml-system" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.a" />
 					<Add directory="..\..\Runtime\bin\release" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\VideoObject.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\Extensions\VideoObject.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -203,14 +203,14 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.a" />
 					<Add directory="..\..\IDE\bin\release" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
 			<Target title="Development">
-				<Option output="..\..\Runtime\bin\dev\VideoObject.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\dev\VideoObject.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -236,12 +236,12 @@
 					<Add option="-lsfml-system" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.a" />
 					<Add directory="..\..\Runtime\bin\dev" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
-				<Option output="..\..\IDE\bin\dev\Extensions\VideoObject.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\dev\Extensions\VideoObject.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
@@ -304,14 +304,14 @@
 					<Add option="-loleaut32" />
 					<Add library="opengl32" />
 					<Add library="glu32" />
-					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.dll.a" />
+					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.a" />
 					<Add directory="..\..\IDE\bin\dev" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
-				<Option output="..\..\Runtime\bin\release\VideoObject.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\VideoObject.xgdl" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -327,8 +327,6 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					
-					
 					<Add directory="libtheoraplayer\include" />
 				</Compiler>
 				<Linker>
@@ -351,11 +349,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\VideoObject.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\Extensions\VideoObject.xgdle" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -375,8 +373,6 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					
-					
 					<Add directory="libtheoraplayer\include" />
 				</Compiler>
 				<Linker>
@@ -400,11 +396,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\VideoObject.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\Extensions\VideoObject.xgdle" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -423,8 +419,6 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					
-					
 					<Add directory="libtheoraplayer\include" />
 				</Compiler>
 				<Linker>
@@ -447,11 +441,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
-				<Option output="..\..\Runtime\bin\debug\VideoObject.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\VideoObject.xgdl" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -467,8 +461,6 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					
-					
 					<Add directory="libtheoraplayer\include" />
 				</Compiler>
 				<Linker>
@@ -491,11 +483,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
-				<Option output="..\..\Runtime\bin\release\VideoObject.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\VideoObject.xgdm" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -511,8 +503,8 @@
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="..\..\..\libs\boost_1_43_0" />
-					<Add directory="..\..\..\libs\sfml\include" />
+					<Add directory="..\..\ExtLibs\boost" />
+					<Add directory="..\..\ExtLibs\SFML\include" />
 					<Add directory="libtheoraplayer\include" />
 				</Compiler>
 				<Linker>
@@ -527,11 +519,11 @@
 					<Add option="-lsfml-system" />
 					<Add option="-framework OpenGL" />
 					<Add option="-dynamiclib" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="..\..\..\libs\sfml\lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/release/VideoObject.xgdm" />
@@ -539,7 +531,7 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Mac - Debug">
-				<Option output="..\..\Runtime\bin\debug\VideoObject.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\VideoObject.xgdm" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -555,8 +547,8 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="..\..\..\libs\boost_1_43_0" />
-					<Add directory="..\..\..\libs\sfml\include" />
+					<Add directory="..\..\ExtLibs\boost" />
+					<Add directory="..\..\ExtLibs\SFML\include" />
 					<Add directory="libtheoraplayer\include" />
 				</Compiler>
 				<Linker>
@@ -571,11 +563,11 @@
 					<Add option="-lsfml-system-d" />
 					<Add option="-framework OpenGL" />
 					<Add option="-dynamiclib" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="..\..\..\libs\sfml\lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/debug/VideoObject.xgdm" />

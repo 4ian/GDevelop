@@ -29,7 +29,7 @@ freely, subject to the following restrictions:
 class TheoraVideoClip;
 namespace sf
 {
-    class Image;
+    class Texture;
     class Sprite;
 }
 #include <iostream>
@@ -74,7 +74,7 @@ class GD_EXTENSION_API VideoWrapper
         /**
          * Update current frame image and return it.
          */
-        const sf::Image & GetNextFrameImage();
+        const sf::Texture & GetNextFrameImage();
 
         /**
          * Update video clip time.
@@ -118,8 +118,8 @@ class GD_EXTENSION_API VideoWrapper
 
         void Init(const VideoWrapper & other);
 
-        sf::Sprite * renderSprite; ///<SFML Image to be displayed
-        sf::Image * currentFrameImage; ///<SFML Image to be displayed
+        sf::Sprite * renderSprite; ///<SFML sprite to be displayed
+        sf::Texture * currentFrameImage; ///<SFML Texture to be displayed using renderSprite
         TheoraVideoClip * clip; ///< Theora video clip.
         bool started;
         bool valid; ///< True if the clip is valid

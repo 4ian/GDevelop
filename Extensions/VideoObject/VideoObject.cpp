@@ -97,13 +97,13 @@ void VideoObject::ReloadVideo()
     video.Load(videoFile);
     video.SetLooping(looping);
     video.SetPause(paused);
-    video.GetRenderSprite().SetImage(video.GetNextFrameImage(), true);
+    video.GetRenderSprite().SetTexture(video.GetNextFrameImage(), true);
     video.GetRenderSprite().SetOrigin(video.GetRenderSprite().GetSize().x/2, video.GetRenderSprite().GetSize().y/2);
 }
 bool VideoObject::SetAngle(float newAngle)
 {
     angle = newAngle;
-    video.GetRenderSprite().SetRotation(-angle);
+    video.GetRenderSprite().SetRotation(angle);
     return true;
 };
 double VideoObject::GetTimePosition() const
@@ -158,7 +158,7 @@ bool VideoObject::Draw( sf::RenderWindow& window )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-	video.GetRenderSprite().SetImage(video.GetNextFrameImage(), true);
+	video.GetRenderSprite().SetTexture(video.GetNextFrameImage(), true);
     window.Draw( video.GetRenderSprite() );
 
     return true;
@@ -173,16 +173,22 @@ bool VideoObject::DrawEdittime(sf::RenderWindow& renderWindow)
     if ( !video.IsValid() )
     {
         static bool badImageLoaded = false;
-        static sf::Image badVideoIcon;
+        static sf::Texture badVideoIcon;
         if ( !badImageLoaded )
         {
             badVideoIcon.LoadFromFile("Extensions/badVideo.png");
             badImageLoaded = true;
         }
-        video.GetRenderSprite().SetImage(badVideoIcon, true);
+        video.GetRenderSprite().SetTexture(badVideoIcon, true);
     }
     else
-        video.GetRenderSprite().SetImage(video.GetNextFrameImage(), true);
+    {
+        sf::Shape rectangle = sf::Shape::Rectangle(0, 0, video.GetRenderSprite().GetSize().x, video.GetRenderSprite().GetSize().y, sf::Color(0,0,0));
+        rectangle.SetOrigin(video.GetRenderSprite().GetSize().x/2, video.GetRenderSprite().GetSize().y/2);
+        rectangle.SetPosition(GetX(), GetY());
+        rectangle.SetRotation(video.GetRenderSprite().GetRotation());
+        renderWindow.Draw(rectangle);
+    }
 
     renderWindow.Draw( video.GetRenderSprite() );
 

@@ -32,7 +32,7 @@ freely, subject to the following restrictions:
 
 VideoWrapper::VideoWrapper() :
 renderSprite(new sf::Sprite),
-currentFrameImage(new sf::Image),
+currentFrameImage(new sf::Texture),
 clip(NULL),
 started(false),
 valid(false)
@@ -54,7 +54,7 @@ void VideoWrapper::Init(const VideoWrapper & other)
         new TheoraVideoManager;
 
     if ( currentFrameImage ) delete currentFrameImage;
-    currentFrameImage = new sf::Image(*other.currentFrameImage);
+    currentFrameImage = new sf::Texture(*other.currentFrameImage);
 
     if ( renderSprite ) delete renderSprite;
     renderSprite = new sf::Sprite(*other.renderSprite);
@@ -85,7 +85,8 @@ bool VideoWrapper::Load(std::string filename)
     if ( clip )
     {
         clip->setAutoRestart(1);
-        currentFrameImage->Create(clip->getWidth(), clip->getHeight(), sf::Color(0,0,0));
+        currentFrameImage->Create(clip->getWidth(), clip->getHeight());
+
         valid = true;
     }
 
@@ -106,14 +107,14 @@ void VideoWrapper::UpdateTime(float time_increase)
 	TheoraVideoManager::getSingletonPtr()->update(time_increase);
 }
 
-const sf::Image & VideoWrapper::GetNextFrameImage()
+const sf::Texture & VideoWrapper::GetNextFrameImage()
 {
     if ( clip != NULL )
     {
         TheoraVideoFrame* f=clip->getNextFrame();
         if (f)
         {
-            currentFrameImage->LoadFromPixels(f->getWidth(), f->getHeight(), f->getBuffer());
+            currentFrameImage->Update((sf::Uint8*)f->getBuffer(), (unsigned int)f->getWidth(),  (unsigned int)f->getHeight(),0,0);
 
             clip->popFrame();
         }

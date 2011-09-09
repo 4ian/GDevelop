@@ -10164,7 +10164,7 @@
 
 1253308520 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\checkeddelete.h
 
-1313695503 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\videoobject.cpp
+1314398588 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\videoobject.cpp
 	<SFML/Graphics.hpp>
 	"GDL/Object.h"
 	"GDL/ImageManager.h"
@@ -10180,38 +10180,41 @@
 	"GDL/MainEditorCommand.h"
 	"VideoObjectEditor.h"
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics.hpp
+1314044652 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
 	<SFML/Graphics/Color.hpp>
 	<SFML/Graphics/Font.hpp>
 	<SFML/Graphics/Glyph.hpp>
 	<SFML/Graphics/Image.hpp>
 	<SFML/Graphics/Renderer.hpp>
-	<SFML/Graphics/RenderImage.hpp>
+	<SFML/Graphics/RenderTexture.hpp>
 	<SFML/Graphics/RenderWindow.hpp>
 	<SFML/Graphics/Shader.hpp>
 	<SFML/Graphics/Shape.hpp>
 	<SFML/Graphics/Sprite.hpp>
 	<SFML/Graphics/Text.hpp>
+	<SFML/Graphics/Texture.hpp>
 	<SFML/Graphics/View.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window.hpp
 	<SFML/System.hpp>
 	<SFML/Window/Context.hpp>
 	<SFML/Window/ContextSettings.hpp>
 	<SFML/Window/Event.hpp>
-	<SFML/Window/Input.hpp>
+	<SFML/Window/Joystick.hpp>
+	<SFML/Window/Keyboard.hpp>
+	<SFML/Window/Mouse.hpp>
 	<SFML/Window/VideoMode.hpp>
 	<SFML/Window/Window.hpp>
 	<SFML/Window/WindowStyle.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system.hpp
 	<SFML/Config.hpp>
 	<SFML/System/Clock.hpp>
 	<SFML/System/Err.hpp>
+	<SFML/System/InputStream.hpp>
 	<SFML/System/Lock.hpp>
 	<SFML/System/Mutex.hpp>
-	<SFML/System/Randomizer.hpp>
 	<SFML/System/Sleep.hpp>
 	<SFML/System/String.hpp>
 	<SFML/System/Thread.hpp>
@@ -10221,57 +10224,56 @@
 	<SFML/System/Vector2.hpp>
 	<SFML/System/Vector3.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\config.hpp
-	<climits>
+1314044652 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\config.hpp
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\clock.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\clock.hpp
 	<SFML/Config.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\err.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\err.hpp
 	<SFML/Config.hpp>
 	<ostream>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\lock.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\lock.hpp
 	<SFML/System/NonCopyable.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\noncopyable.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\noncopyable.hpp
 	<SFML/Config.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\mutex.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\mutex.hpp
 	<SFML/Config.hpp>
 	<SFML/System/NonCopyable.hpp>
 
 1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\randomizer.hpp
 	<SFML/Config.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\sleep.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\sleep.hpp
 	<SFML/Config.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\string.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\string.hpp
 	<SFML/Config.hpp>
 	<locale>
 	<string>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\thread.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\thread.hpp
 	<SFML/Config.hpp>
 	<SFML/System/NonCopyable.hpp>
 	<cstdlib>
 	<SFML/System/Thread.inl>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\thread.inl
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\thread.inl
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\threadlocal.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\threadlocal.hpp
 	<SFML/Config.hpp>
 	<SFML/System/NonCopyable.hpp>
 	<cstdlib>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\threadlocalptr.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\threadlocalptr.hpp
 	<SFML/System/ThreadLocal.hpp>
 	<SFML/System/ThreadLocalPtr.inl>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\threadlocalptr.inl
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\threadlocalptr.inl
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\utf.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\utf.hpp
 	<SFML/Config.hpp>
 	<algorithm>
 	<locale>
@@ -10279,71 +10281,75 @@
 	<cstdlib>
 	<SFML/System/Utf.inl>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\utf.inl
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\utf.inl
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\vector2.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\vector2.hpp
 	<SFML/System/Vector2.inl>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\vector2.inl
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\vector2.inl
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\vector3.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\vector3.hpp
 	<SFML/System/Vector3.inl>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\vector3.inl
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\vector3.inl
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\context.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\context.hpp
 	<SFML/Config.hpp>
 	<SFML/Window/GlResource.hpp>
+	<SFML/Window/ContextSettings.hpp>
 	<SFML/System/NonCopyable.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\glresource.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\glresource.hpp
 	<SFML/Config.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\contextsettings.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\contextsettings.hpp
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\event.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\event.hpp
 	<SFML/Config.hpp>
+	<SFML/Window/Joystick.hpp>
+	<SFML/Window/Keyboard.hpp>
+	<SFML/Window/Mouse.hpp>
 
 1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\input.hpp
 	<SFML/Config.hpp>
 	<SFML/System/NonCopyable.hpp>
 	<SFML/Window/Event.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\videomode.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\videomode.hpp
 	<SFML/Config.hpp>
 	<vector>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\window.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\window.hpp
 	<SFML/Window/ContextSettings.hpp>
-	<SFML/Window/Input.hpp>
 	<SFML/Window/VideoMode.hpp>
 	<SFML/Window/WindowHandle.hpp>
 	<SFML/Window/WindowStyle.hpp>
 	<SFML/Window/GlResource.hpp>
 	<SFML/System/Clock.hpp>
+	<SFML/System/Vector2.hpp>
 	<SFML/System/NonCopyable.hpp>
 	<string>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\windowhandle.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\windowhandle.hpp
 	<SFML/Config.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\windowstyle.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\windowstyle.hpp
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\color.hpp
+1314044652 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\color.hpp
 	<SFML/Config.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\font.hpp
+1314044652 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\font.hpp
 	<SFML/System/Resource.hpp>
 	<SFML/System/Vector2.hpp>
 	<SFML/System/String.hpp>
 	<SFML/Graphics/Glyph.hpp>
-	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/Texture.hpp>
 	<SFML/Graphics/Rect.hpp>
 	<map>
 	<string>
 	<vector>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\resource.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\resource.hpp
 	<SFML/System/Lock.hpp>
 	<SFML/System/Mutex.hpp>
 	<set>
@@ -10351,30 +10357,28 @@
 	<SFML/System/Resource.inl>
 	<SFML/System/ResourcePtr.inl>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\resource.inl
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\resource.inl
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\resourceptr.inl
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\resourceptr.inl
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\glyph.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\glyph.hpp
 	<SFML/Config.hpp>
 	<SFML/Graphics/Rect.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\rect.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\rect.hpp
 	<SFML/System/Vector2.hpp>
 	<algorithm>
 	<SFML/Graphics/Rect.inl>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\rect.inl
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\rect.inl
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\image.hpp
-	<SFML/System/Resource.hpp>
-	<SFML/Window/GlResource.hpp>
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\image.hpp
 	<SFML/Graphics/Color.hpp>
 	<SFML/Graphics/Rect.hpp>
 	<string>
 	<vector>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\renderer.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\renderer.hpp
 	<SFML/Config.hpp>
 	<SFML/System/NonCopyable.hpp>
 	<SFML/Window/GlResource.hpp>
@@ -10382,63 +10386,63 @@
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Graphics/Matrix3.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\drawable.hpp
+1314044652 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\drawable.hpp
 	<SFML/System/Vector2.hpp>
 	<SFML/Graphics/Color.hpp>
 	<SFML/Graphics/Matrix3.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\matrix3.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\matrix3.hpp
 	<SFML/Config.hpp>
 	<SFML/System/Vector2.hpp>
 	<SFML/Graphics/Rect.hpp>
 	<cmath>
 	<SFML/Graphics/Matrix3.inl>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\matrix3.inl
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\matrix3.inl
 
 1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\renderimage.hpp
 	<SFML/Graphics/Image.hpp>
 	<SFML/Graphics/RenderTarget.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\rendertarget.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\rendertarget.hpp
 	<SFML/System/NonCopyable.hpp>
 	<SFML/Graphics/Color.hpp>
 	<SFML/Graphics/Rect.hpp>
 	<SFML/Graphics/Renderer.hpp>
 	<SFML/Graphics/View.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\view.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\view.hpp
 	<SFML/Config.hpp>
 	<SFML/Graphics/Rect.hpp>
 	<SFML/Graphics/Matrix3.hpp>
 	<SFML/System/Vector2.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\renderwindow.hpp
-	<SFML/Graphics/Image.hpp>
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\renderwindow.hpp
 	<SFML/Graphics/RenderTarget.hpp>
+	<SFML/Graphics/Image.hpp>
 	<SFML/Window/Window.hpp>
 	<string>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\shader.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\shader.hpp
 	<SFML/Config.hpp>
-	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/Texture.hpp>
 	<SFML/Window/GlResource.hpp>
 	<SFML/System/Vector2.hpp>
 	<SFML/System/Vector3.hpp>
 	<map>
 	<string>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\shape.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\shape.hpp
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/System/Vector2.hpp>
 	<vector>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\sprite.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\sprite.hpp
 	<SFML/System/Resource.hpp>
 	<SFML/Graphics/Drawable.hpp>
 	<SFML/Graphics/Rect.hpp>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\text.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\text.hpp
 	<SFML/System/Resource.hpp>
 	<SFML/System/String.hpp>
 	<SFML/Graphics/Drawable.hpp>
@@ -10446,7 +10450,7 @@
 	<SFML/Graphics/Rect.hpp>
 	<string>
 
-1312670601 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
+1314969144 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
 	"GDL/Force.h"
 	<string>
 	<vector>
@@ -12206,14 +12210,13 @@
 
 1312668877 d:\florian\programmation\gamedevelop2\gdl\gdl\force.h
 
-1313855658 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
+1314815805 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
 	<boost/weak_ptr.hpp>
 	<iostream>
 	<vector>
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
-	<boost/tuple/tuple.hpp>
 	"GDL/Log.h"
 	"GDL/Instruction.h"
 
@@ -15673,7 +15676,7 @@
 	<string>
 	"GDL/Variable.h"
 
-1312668877 d:\florian\programmation\gamedevelop2\gdl\gdl\variable.h
+1314214439 d:\florian\programmation\gamedevelop2\gdl\gdl\variable.h
 	<string>
 
 1297523943 d:\florian\programmation\gamedevelop2\gdl\gdl\objecthelpers.h
@@ -15683,7 +15686,7 @@
 1309119157 d:\florian\programmation\gamedevelop2\gdl\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1307193655 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
+1314792591 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
 	"GDL/Game.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -15746,7 +15749,7 @@
 	<string>
 	<vector>
 
-1301751274 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\opengl.hpp
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\opengl.hpp
 	<SFML/Config.hpp>
 	<windows.h>
 	<GL/gl.h>
@@ -15782,7 +15785,7 @@
 	"GDL/Object.h"
 	"VideoWrapper.h"
 
-1312713691 d:\florian\programmation\gamedevelop2\extensions\videoobject\videowrapper.h
+1314051807 d:\florian\programmation\gamedevelop2\extensions\videoobject\videowrapper.h
 	<iostream>
 
 1284229476 d:\florian\programmation\gamedevelop2\extlibs\libtheoraplayer\trunk\include\theoraplayer.h
@@ -15958,7 +15961,7 @@
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\progdlg.h
 
-1312713691 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\videowrapper.cpp
+1314398154 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\videowrapper.cpp
 	"VideoWrapper.h"
 	<SFML/Graphics.hpp>
 	<TheoraPlayer.h>
@@ -15974,7 +15977,7 @@
 	"VideoObject.h"
 	<boost/version.hpp>
 
-1313695175 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
+1314972152 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
 	<wx/bitmap.h>
 	<wx/file.h>
 	<wx/wx.h>
@@ -15984,7 +15987,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1313841848 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1314979854 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299115781 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 
@@ -15993,4 +15996,139 @@
 1312714221 d:\florian\programmation\gamedevelop2\gdl\gdl\lightweightcommontools.h
 	<sstream>
 	<cmath>
+
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\inputstream.hpp
+	<SFML/Config.hpp>
+
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\joystick.hpp
+	<SFML/Config.hpp>
+
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\keyboard.hpp
+	<SFML/Config.hpp>
+
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\window\mouse.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Vector2.hpp>
+
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\texture.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/Window/GlResource.hpp>
+	<SFML/Graphics/Image.hpp>
+
+1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics\rendertexture.hpp
+	<SFML/Graphics/Texture.hpp>
+	<SFML/Graphics/RenderTarget.hpp>
+
+1284229477 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\libtheoraplayer\src\theoraasync.cpp
+	<stdio.h>
+	"TheoraAsync.h"
+	<windows.h>
+
+1284229476 d:\florian\programmation\gamedevelop2\extlibs\libtheoraplayer\trunk\include\theoraasync.h
+	<pthread.h>
+
+1284229477 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\libtheoraplayer\src\theoraaudiointerface.cpp
+	"TheoraAudioInterface.h"
+
+1284229476 d:\florian\programmation\gamedevelop2\extlibs\libtheoraplayer\trunk\include\theoraaudiointerface.h
+	"TheoraExport.h"
+
+1284229477 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\libtheoraplayer\src\theoradatasource.cpp
+	<stdio.h>
+	<memory.h>
+	"TheoraDataSource.h"
+	"TheoraException.h"
+
+1284229476 d:\florian\programmation\gamedevelop2\extlibs\libtheoraplayer\trunk\include\theoradatasource.h
+	<stdio.h>
+	<string>
+	"TheoraExport.h"
+
+1284229477 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\libtheoraplayer\src\theoraexception.cpp
+	"TheoraException.h"
+	"TheoraUtil.h"
+	"TheoraVideoManager.h"
+	<stdio.h>
+
+1284229476 d:\florian\programmation\gamedevelop2\extlibs\libtheoraplayer\trunk\include\theorautil.h
+	<string>
+	<vector>
+
+1284229477 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\libtheoraplayer\src\theoraframequeue.cpp
+	"TheoraFrameQueue.h"
+	"TheoraVideoFrame.h"
+	"TheoraUtil.h"
+
+1284229476 d:\florian\programmation\gamedevelop2\extlibs\libtheoraplayer\trunk\include\theoraframequeue.h
+	"TheoraAsync.h"
+	<list>
+
+1284229477 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\libtheoraplayer\src\theoratimer.cpp
+	"TheoraTimer.h"
+
+1284229476 d:\florian\programmation\gamedevelop2\extlibs\libtheoraplayer\trunk\include\theoratimer.h
+	"TheoraExport.h"
+
+1284229477 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\libtheoraplayer\src\theorautil.cpp
+	<stdio.h>
+	<algorithm>
+	<math.h>
+	<map>
+	"TheoraUtil.h"
+	"TheoraException.h"
+	<windows.h>
+
+1284229477 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\libtheoraplayer\src\theoravideoclip.cpp
+	<memory.h>
+	<ogg/ogg.h>
+	<vorbis/vorbisfile.h>
+	<theora/theoradec.h>
+	"TheoraVideoClip.h"
+	"TheoraVideoManager.h"
+	"TheoraVideoFrame.h"
+	"TheoraFrameQueue.h"
+	"TheoraAudioInterface.h"
+	"TheoraTimer.h"
+	"TheoraDataSource.h"
+	"TheoraUtil.h"
+	"TheoraException.h"
+
+1284229477 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\libtheoraplayer\src\theoravideoframe.cpp
+	<memory.h>
+	<theora/theoradec.h>
+	"TheoraVideoFrame.h"
+	"TheoraVideoClip.h"
+
+1284229477 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\libtheoraplayer\src\theoravideomanager.cpp
+	"TheoraVideoManager.h"
+	"TheoraWorkerThread.h"
+	"TheoraVideoClip.h"
+	"TheoraAudioInterface.h"
+	"TheoraUtil.h"
+	"TheoraDataSource.h"
+
+1284229476 d:\florian\programmation\gamedevelop2\extlibs\libtheoraplayer\trunk\include\theoraworkerthread.h
+	"TheoraAsync.h"
+
+1284229477 source:d:\florian\programmation\gamedevelop2\extensions\videoobject\libtheoraplayer\src\theoraworkerthread.cpp
+	"TheoraWorkerThread.h"
+	"TheoraVideoManager.h"
+	"TheoraVideoClip.h"
+	"TheoraUtil.h"
+
+1244090412 c:\libs\libogg-1.2.0\include\ogg\ogg.h
+	<stddef.h>
+	<ogg/os_types.h>
+
+1269022020 c:\libs\libogg-1.2.0\include\ogg\os_types.h
+	<stdint.h>
+	<sys/types.h>
+	<sys/types.h>
+	<sys/types.h>
+	<sys/types.h>
+	<inttypes.h>
+	<sys/types.h>
+	<ogg/config_types.h>
+
+1284230768 c:\libs\libogg-1.2.0\include\ogg\config_types.h
 

@@ -33,6 +33,7 @@ freely, subject to the following restrictions:
 #include "GDL/Position.h"
 #include "GDL/RotatedRectangle.h"
 #include "GDL/CommonTools.h"
+#include "GDL/XmlMacros.h"
 #include "TextObject.h"
 
 #if defined(GD_IDE_ONLY)
@@ -44,54 +45,55 @@ freely, subject to the following restrictions:
 
 TextObject::TextObject(std::string name_) :
 Object(name_),
-text("Text"),
 opacity( 255 ),
+smoothed(true),
 colorR( 255 ),
 colorG( 255 ),
 colorB( 255 ),
 angle(0)
 {
+    SetString("Text");
 }
 
-void TextObject::LoadFromXml(const TiXmlElement * object)
+void TextObject::LoadFromXml(const TiXmlElement * elem)
 {
-    if ( object->FirstChildElement( "String" ) == NULL ||
-         object->FirstChildElement( "String" )->Attribute("value") == NULL )
+    if ( elem->FirstChildElement( "String" ) == NULL ||
+         elem->FirstChildElement( "String" )->Attribute("value") == NULL )
     {
         cout << "Les informations concernant le texte d'un objet Text manquent.";
     }
     else
     {
-        SetString(object->FirstChildElement("String")->Attribute("value"));
+        SetString(elem->FirstChildElement("String")->Attribute("value"));
     }
 
-    if ( object->FirstChildElement( "Font" ) == NULL ||
-         object->FirstChildElement( "Font" )->Attribute("value") == NULL )
+    if ( elem->FirstChildElement( "Font" ) == NULL ||
+         elem->FirstChildElement( "Font" )->Attribute("value") == NULL )
     {
         cout << "Les informations concernant la police d'un objet Text manquent.";
     }
     else
     {
-        SetFont(object->FirstChildElement("Font")->Attribute("value"));
+        SetFont(elem->FirstChildElement("Font")->Attribute("value"));
     }
 
-    if ( object->FirstChildElement( "CharacterSize" ) == NULL ||
-         object->FirstChildElement( "CharacterSize" )->Attribute("value") == NULL )
+    if ( elem->FirstChildElement( "CharacterSize" ) == NULL ||
+         elem->FirstChildElement( "CharacterSize" )->Attribute("value") == NULL )
     {
         cout << "Les informations concernant la taille du texte d'un objet Text manquent.";
     }
     else
     {
         float size = 20;
-        object->FirstChildElement("CharacterSize")->QueryFloatAttribute("value", &size);
+        elem->FirstChildElement("CharacterSize")->QueryFloatAttribute("value", &size);
 
         SetCharacterSize(size);
     }
 
-    if ( object->FirstChildElement( "Color" ) == NULL ||
-         object->FirstChildElement( "Color" )->Attribute("r") == NULL ||
-         object->FirstChildElement( "Color" )->Attribute("g") == NULL ||
-         object->FirstChildElement( "Color" )->Attribute("b") == NULL )
+    if ( elem->FirstChildElement( "Color" ) == NULL ||
+         elem->FirstChildElement( "Color" )->Attribute("r") == NULL ||
+         elem->FirstChildElement( "Color" )->Attribute("g") == NULL ||
+         elem->FirstChildElement( "Color" )->Attribute("b") == NULL )
     {
         cout << "Les informations concernant la couleur du texte d'un objet Text manquent.";
     }
@@ -100,34 +102,39 @@ void TextObject::LoadFromXml(const TiXmlElement * object)
         int r = 255;
         int g = 255;
         int b = 255;
-        object->FirstChildElement("Color")->QueryIntAttribute("r", &r);
-        object->FirstChildElement("Color")->QueryIntAttribute("g", &g);
-        object->FirstChildElement("Color")->QueryIntAttribute("b", &b);
+        elem->FirstChildElement("Color")->QueryIntAttribute("r", &r);
+        elem->FirstChildElement("Color")->QueryIntAttribute("g", &g);
+        elem->FirstChildElement("Color")->QueryIntAttribute("b", &b);
 
         SetColor(r,g,b);
     }
+
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("smoothed", smoothed);
+    SetSmooth(smoothed);
 }
 
 #if defined(GD_IDE_ONLY)
-void TextObject::SaveToXml(TiXmlElement * object)
+void TextObject::SaveToXml(TiXmlElement * elem)
 {
     TiXmlElement * str = new TiXmlElement( "String" );
-    object->LinkEndChild( str );
+    elem->LinkEndChild( str );
     str->SetAttribute("value", GetString().c_str());
 
     TiXmlElement * font = new TiXmlElement( "Font" );
-    object->LinkEndChild( font );
+    elem->LinkEndChild( font );
     font->SetAttribute("value", GetFont().c_str());
 
     TiXmlElement * characterSize = new TiXmlElement( "CharacterSize" );
-    object->LinkEndChild( characterSize );
+    elem->LinkEndChild( characterSize );
     characterSize->SetAttribute("value", GetCharacterSize());
 
     TiXmlElement * color = new TiXmlElement( "Color" );
-    object->LinkEndChild( color );
+    elem->LinkEndChild( color );
     color->SetAttribute("r", GetColorR());
     color->SetAttribute("g", GetColorG());
     color->SetAttribute("b", GetColorB());
+
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("smoothed", smoothed);
 }
 #endif
 
@@ -204,6 +211,7 @@ void TextObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, 
     else if ( propertyNb == 2 ) {name = _("Taille de caractères");      value = ToString(GetCharacterSize());}
     else if ( propertyNb == 3 ) {name = _("Couleur");       value = ToString(GetColorR())+";"+ToString(GetColorG())+";"+ToString(GetColorB());}
     else if ( propertyNb == 4 ) {name = _("Opacité");       value = ToString(GetOpacity());}
+    else if ( propertyNb == 5 ) {name = _("Lissage");       value = smoothed ? _("Oui") : _("Non");}
 }
 
 bool TextObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -237,13 +245,14 @@ bool TextObject::ChangeProperty(unsigned int propertyNb, string newValue)
         SetColor(ToInt(r), ToInt(g), ToInt(b));
     }
     else if ( propertyNb == 4 ) { SetOpacity(ToFloat(newValue)); }
+    else if ( propertyNb == 5 ) { SetSmooth(!(newValue == _("Non"))); }
 
     return true;
 }
 
 unsigned int TextObject::GetNumberOfProperties() const
 {
-    return 5;
+    return 6;
 }
 #endif
 
@@ -365,6 +374,13 @@ void TextObject::SetFont(string fontName_)
     FontManager * fontManager = FontManager::GetInstance();
     text.SetFont(*fontManager->GetFont(fontName));
     text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2);
+}
+
+void TextObject::SetSmooth(bool smooth)
+{
+    smoothed = smooth;
+
+    const_cast<sf::Texture&>(text.GetFont().GetTexture(GetCharacterSize())).SetSmooth(smooth);
 }
 
 /**

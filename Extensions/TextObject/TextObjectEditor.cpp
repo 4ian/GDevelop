@@ -48,6 +48,7 @@ const long TextObjectEditor::ID_TEXTCTRL2 = wxNewId();
 const long TextObjectEditor::ID_BUTTON4 = wxNewId();
 const long TextObjectEditor::ID_STATICTEXT4 = wxNewId();
 const long TextObjectEditor::ID_SPINCTRL1 = wxNewId();
+const long TextObjectEditor::ID_CHECKBOX1 = wxNewId();
 const long TextObjectEditor::ID_STATICLINE1 = wxNewId();
 const long TextObjectEditor::ID_BUTTON1 = wxNewId();
 //*)
@@ -71,12 +72,14 @@ object(object_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Editer l\'objet texte"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Editer l\'objet texte"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer1->AddGrowableCol(0);
+	FlexGridSizer1->AddGrowableRow(0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Texte"));
-	textEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(238,135), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	StaticBoxSizer1->Add(textEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	textEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(332,173), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	StaticBoxSizer1->Add(textEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Autres propriétés"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer3->AddGrowableCol(1);
@@ -101,6 +104,10 @@ object(object_)
 	sizeEdit->SetValue(_T("0"));
 	FlexGridSizer5->Add(sizeEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer3->Add(5,5,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	smoothCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Lisser le texte"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	smoothCheck->SetValue(true);
+	FlexGridSizer3->Add(smoothCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
@@ -123,6 +130,7 @@ object(object_)
 	fontEdit->ChangeValue(object.GetFont());
 	sizeEdit->SetValue(object.GetCharacterSize());
 	colorBt->SetBackgroundColour(wxColour(object.GetColorR(), object.GetColorG(), object.GetColorB()));
+	smoothCheck->SetValue(object.IsSmoothed());
 }
 
 TextObjectEditor::~TextObjectEditor()
@@ -136,6 +144,9 @@ void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
     object.SetString(string(textEdit->GetValue().mb_str()));
     object.SetFont(string(fontEdit->GetValue().mb_str()));
+    object.SetCharacterSize(sizeEdit->GetValue());
+    object.SetSmooth(smoothCheck->GetValue());
+    object.SetColor(static_cast<int>(colorBt->GetBackgroundColour().Red()), static_cast<int>(colorBt->GetBackgroundColour().Green()), static_cast<int>(colorBt->GetBackgroundColour().Blue()));
 
     EndModal(1);
 }
@@ -144,10 +155,8 @@ void TextObjectEditor::OncolorBtClick(wxCommandEvent& event)
 {
     wxColour color = wxGetColourFromUser(this, colorBt->GetBackgroundColour());
     if ( color.IsOk() )
-    {
         colorBt->SetBackgroundColour(color);
-        object.SetColor(static_cast<int>(color.Red()), static_cast<int>(color.Green()), static_cast<int>(color.Blue()));
-    }
+
     return;
 }
 
@@ -164,6 +173,5 @@ void TextObjectEditor::OnfontBtClick(wxCommandEvent& event)
 
 void TextObjectEditor::OnSizeEditChange(wxSpinEvent& event)
 {
-    object.SetCharacterSize(sizeEdit->GetValue());
 }
 #endif

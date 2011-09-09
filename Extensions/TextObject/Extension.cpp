@@ -94,7 +94,7 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_CONDITION()
 
                 DECLARE_OBJECT_ACTION("Font",
-                               _("Changer la police"),
+                               _("Police de caractère"),
                                _("Modifie la police de caractère du texte."),
                                _("Changer la police de _PARAM0_ en _PARAM1_"),
                                _("Police"),
@@ -110,7 +110,7 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_ACTION("Size",
-                               _("Régler la taille du texte"),
+                               _("Taille"),
                                _("Modifie la taille du texte."),
                                _("Faire _PARAM2__PARAM1_ à la taille du texte de _PARAM0_"),
                                _("Taille"),
@@ -127,7 +127,7 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_CONDITION("Size",
-                               _("Taille du texte"),
+                               _("Taille"),
                                _("Teste la taille du texte."),
                                _("La taille du texte de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Taille"),
@@ -144,7 +144,7 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_CONDITION()
 
                 DECLARE_OBJECT_ACTION("ChangeColor",
-                               _("Changer la couleur d'un objet texte"),
+                               _("Couleur"),
                                _("Change la couleur du texte. Par défaut, la couleur est le blanc."),
                                _("Changer la couleur de _PARAM0_ en _PARAM1_"),
                                _("Effets"),
@@ -160,7 +160,7 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_ACTION("Opacity",
-                               _("Régler l'opacité d'un objet"),
+                               _("Opacité"),
                                _("Modifie la transparence d'un objet texte."),
                                _("Faire _PARAM2__PARAM1_ à l'opacité de _PARAM0_"),
                                _("Visibilité"),
@@ -177,7 +177,7 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_CONDITION("Opacity",
-                               _("Opacité d'un objet"),
+                               _("Opacité"),
                                _("Teste la valeur de l'opacité ( transparence ) d'un objet texte."),
                                _("L'opacité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Visibilité"),
@@ -195,8 +195,37 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_CONDITION()
 
 
+                DECLARE_OBJECT_ACTION("SetSmooth",
+                               _("Lissage"),
+                               _("Active ou désactive le lissage d'un texte."),
+                               _("Liser _PARAM0_ : _PARAM1_"),
+                               _("Visibilité"),
+                               "res/actions/opacity24.png",
+                               "res/actions/opacity.png");
+
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("yesorno", _("Lisser le texte"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetSmooth").SetIncludeFile("TextObject/TextObject.h");
+
+                DECLARE_END_OBJECT_ACTION()
+
+                DECLARE_OBJECT_CONDITION("Smoothed",
+                               _("Lissage"),
+                               _("Teste si un objet texte est lissé."),
+                               _("_PARAM0_ est lissé"),
+                               _("Visibilité"),
+                               "res/conditions/opacity24.png",
+                               "res/conditions/opacity.png");
+
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("IsSmoothed").SetIncludeFile("TextObject/TextObject.h");
+
+                DECLARE_END_OBJECT_CONDITION()
+
                 DECLARE_OBJECT_ACTION("Angle",
-                               _("Régler l'angle d'un objet texte"),
+                               _("Angle"),
                                _("Modifie l'angle d'un objet texte."),
                                _("Faire _PARAM2__PARAM1_ à l'angle de _PARAM0_"),
                                _("Rotation"),
@@ -213,7 +242,7 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_CONDITION("Angle",
-                               _("Angle d'un objet texte"),
+                               _("Angle"),
                                _("Teste la valeur de l'angle d'un objet texte."),
                                _("L'angle de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                                _("Rotation"),

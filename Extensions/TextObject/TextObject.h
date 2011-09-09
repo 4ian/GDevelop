@@ -92,7 +92,7 @@ class GD_EXTENSION_API TextObject : public Object
         virtual float GetCenterX() const;
         virtual float GetCenterY() const;
 
-        virtual bool SetAngle(float newAngle) { angle = newAngle; text.SetRotation(-angle); return true;};
+        virtual bool SetAngle(float newAngle) { angle = newAngle; text.SetRotation(angle); return true;};
         virtual float GetAngle() const {return angle;};
 
         inline void SetString(std::string str) { text.SetString(str); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
@@ -113,6 +113,9 @@ class GD_EXTENSION_API TextObject : public Object
         inline unsigned int GetColorB() const { return colorB; };
         void SetColor(const std::string & colorStr);
 
+        void SetSmooth(bool smooth);
+        bool IsSmoothed() const {return smoothed;};
+
         virtual std::vector<RotatedRectangle> GetHitBoxes() const;
     private:
 
@@ -122,6 +125,8 @@ class GD_EXTENSION_API TextObject : public Object
 
         //Opacity
         float opacity;
+
+        bool smoothed;
 
         //Color
         unsigned int colorR;

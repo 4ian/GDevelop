@@ -3,22 +3,25 @@
 	<object class="wxDialog" name="TextObjectEditor">
 		<title>Editer l&apos;objet texte</title>
 		<id_arg>0</id_arg>
+		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
+			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
 					<label>Texte</label>
 					<object class="sizeritem">
 						<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="textEdit" member="yes">
-							<size>238,135</size>
+							<size>332,173</size>
 							<style>wxTE_MULTILINE</style>
 						</object>
-						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
 						<option>1</option>
 					</object>
 				</object>
-				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
 				<option>1</option>
 			</object>
@@ -103,6 +106,21 @@
 									</object>
 								</object>
 								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+							<object class="spacer">
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+								<size>5,5</size>
+							</object>
+							<object class="sizeritem">
+								<object class="wxCheckBox" name="ID_CHECKBOX1" variable="smoothCheck" member="yes">
+									<label>Lisser le texte</label>
+									<checked>1</checked>
+								</object>
+								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
 								<option>1</option>
 							</object>
 						</object>

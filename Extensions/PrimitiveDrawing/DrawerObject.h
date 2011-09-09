@@ -33,7 +33,7 @@ freely, subject to the following restrictions:
 namespace sf
 {
     class Sprite;
-    class Image;
+    class Texture;
 }
 class ImageManager;
 class RuntimeScene;
@@ -154,7 +154,7 @@ class GD_EXTENSION_API DrawerObject : public Object
         bool absoluteCoordinates;
 
         #if defined(GD_IDE_ONLY)
-        static sf::Image edittimeIconImage;
+        static sf::Texture edittimeIconImage;
         static sf::Sprite edittimeIcon;
         #endif
 };

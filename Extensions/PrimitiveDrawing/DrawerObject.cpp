@@ -42,7 +42,7 @@ freely, subject to the following restrictions:
 #endif
 
 #if defined(GD_IDE_ONLY)
-sf::Image DrawerObject::edittimeIconImage;
+sf::Texture DrawerObject::edittimeIconImage;
 sf::Sprite DrawerObject::edittimeIcon;
 #endif
 
@@ -185,7 +185,7 @@ bool DrawerObject::LoadResources(const RuntimeScene & scene, const ImageManager 
 {
     #if defined(GD_IDE_ONLY)
     edittimeIconImage.LoadFromFile("Extensions/primitivedrawingicon.png");
-    edittimeIcon.SetImage(edittimeIconImage);
+    edittimeIcon.SetTexture(edittimeIconImage);
     #endif
 
     return true;
@@ -500,13 +500,14 @@ void GD_EXTENSION_API CopyImageOnAnother( const std::string & destName, const st
     if ( !scene.game->imageManager->HasImage(destName) ) return;
     if ( !scene.game->imageManager->HasImage(srcName) ) return;
 
-    boost::shared_ptr<sf::Image> dest = scene.game->imageManager->GetSFMLImage(destName);
+    boost::shared_ptr<SFMLTextureWrapper> dest = scene.game->imageManager->GetSFMLTexture(destName);
 
     //Make sure the coordinates are correct.
-    if ( destX < 0 || static_cast<unsigned>(destX) >= dest->GetWidth()) return;
-    if ( destY < 0 || static_cast<unsigned>(destY) >= dest->GetWidth()) return;
+    if ( destX < 0 || static_cast<unsigned>(destX) >= dest->texture.GetWidth()) return;
+    if ( destY < 0 || static_cast<unsigned>(destY) >= dest->texture.GetWidth()) return;
 
-    dest->Copy(*scene.game->imageManager->GetSFMLImage(srcName), destX, destY);
+    dest->image.Copy(scene.game->imageManager->GetSFMLTexture(srcName)->image, destX, destY);
+    dest->texture.LoadFromImage(dest->image);
 }
 
 }

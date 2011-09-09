@@ -160,8 +160,8 @@ void EditorScene::OnscenePanelResize(wxSizeEvent& event)
     //Manual resizing of scene's panel
     sceneCanvas->UpdateSize();
 
-    scrollBar1->SetSize(0, sceneCanvas->GetHeight(), sceneCanvas->GetWidth(), wxDefaultCoord);
-    scrollBar2->SetSize(sceneCanvas->GetWidth(), 0, wxDefaultCoord, sceneCanvas->GetHeight());
+    scrollBar1->SetSize(0, scenePanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight(), scenePanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), scrollBar1->GetSize().GetHeight());
+    scrollBar2->SetSize(scenePanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), 0, scrollBar2->GetSize().GetWidth(), scenePanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
 }
 
 EditorScene::~EditorScene()

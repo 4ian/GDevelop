@@ -63,6 +63,8 @@ mainEditorCommand(mainEditorCommand_)
 	Connect(ID_COMBOBOX1,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&ExternalEventsEditor::OnparentSceneComboBoxSelect);
 	//*)
 	Connect(ID_COMBOBOX1,wxEVT_COMMAND_COMBOBOX_DROPDOWN,(wxObjectEventFunction)&ExternalEventsEditor::OnparentSceneComboBoxDropDown);
+
+	eventsEditor->SetExternalEvents(&events);
 }
 
 ExternalEventsEditor::~ExternalEventsEditor()

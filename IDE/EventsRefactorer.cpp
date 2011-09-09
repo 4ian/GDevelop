@@ -5,6 +5,10 @@
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/StrExpressionInstruction.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/ExternalEvents.h"
+#include "GDL/Scene.h"
+#include "GDL/Game.h"
+#include "GDL/LinkEvent.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/weak_ptr.hpp>
 
@@ -722,4 +726,69 @@ bool EventsRefactorer::SearchStringInConditions(Game & game, Scene & scene, vect
     }
 
     return false;
+}
+
+void EventsRefactorer::NotifyChangesInEventsOfScene(Game & game, Scene & scene)
+{
+    scene.eventsModified = true; //Notify that events have changed in the scene
+
+    //Notify others scenes, which include the changed scene, that their events has changed
+    for (unsigned int i = 0;i<game.scenes.size();++i)
+    {
+        if ( game.scenes[i].get() == &scene ) continue;
+
+        std::vector< boost::shared_ptr<Scene> > linkedScenes;
+        std::vector< boost::shared_ptr<ExternalEvents> > notUsed;
+
+        GetScenesAndExternalEventsLinkedTo(game.scenes[i]->events, game, linkedScenes, notUsed);
+
+        if( find_if(linkedScenes.begin(), linkedScenes.end(), bind2nd(SceneHasName(), scene.GetName())) != linkedScenes.end() )
+            game.scenes[i]->eventsModified = true;
+    }
+}
+
+void EventsRefactorer::NotifyChangesInEventsOfExternalEvents(Game & game, ExternalEvents & externalEvents)
+{
+    //Notify scenes, which include the external events, that their events has changed
+    for (unsigned int i = 0;i<game.scenes.size();++i)
+    {
+        std::vector< boost::shared_ptr<Scene> > notUsed;
+        std::vector< boost::shared_ptr<ExternalEvents> > linkedExternalEvents;
+
+        GetScenesAndExternalEventsLinkedTo(game.scenes[i]->events, game, notUsed, linkedExternalEvents);
+
+        if( find_if(linkedExternalEvents.begin(), linkedExternalEvents.end(), bind2nd(ExternalEventsHasName(), externalEvents.GetName())) != linkedExternalEvents.end())
+            game.scenes[i]->eventsModified = true;
+    }
+}
+
+void EventsRefactorer::GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<BaseEvent> > & events, Game & game, std::vector< boost::shared_ptr<Scene> > & scenes, std::vector< boost::shared_ptr<ExternalEvents> > & externalEvents)
+{
+    for (unsigned int i = 0;i<events.size();++i)
+    {
+        boost::shared_ptr<LinkEvent> linkEvent = boost::dynamic_pointer_cast<LinkEvent>(events[i]);
+        if ( linkEvent != boost::shared_ptr<LinkEvent>() )
+        {
+             //We've got a link event, search now linked scene/external events
+            vector< boost::shared_ptr<Scene> >::iterator linkedScene =
+                find_if(game.scenes.begin(), game.scenes.end(), bind2nd(SceneHasName(), linkEvent->sceneLinked));
+
+            vector< boost::shared_ptr<ExternalEvents> >::iterator linkedExternalEvents =
+                find_if(game.externalEvents.begin(), game.externalEvents.end(), bind2nd(ExternalEventsHasName(), linkEvent->sceneLinked));
+
+            if ( linkedExternalEvents != game.externalEvents.end() )
+            {
+                externalEvents.push_back(*linkedExternalEvents);
+                GetScenesAndExternalEventsLinkedTo((*linkedExternalEvents)->events, game, scenes, externalEvents);
+            }
+            else if ( linkedScene != game.scenes.end() )
+            {
+                scenes.push_back(*linkedScene);
+                GetScenesAndExternalEventsLinkedTo((*linkedScene)->events, game, scenes, externalEvents);
+            }
+        }
+
+        if ( events[i]->CanHaveSubEvents() )
+            GetScenesAndExternalEventsLinkedTo(events[i]->GetSubEvents(), game, scenes, externalEvents);
+    }
 }

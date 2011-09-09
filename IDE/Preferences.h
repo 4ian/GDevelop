@@ -50,6 +50,7 @@ class Preferences: public wxDialog
 		wxPanel* Panel4;
 		wxChoice* sceneEventsTabPosition;
 		wxStaticText* StaticText14;
+		wxCheckBox* deleteTemporariesCheck;
 		wxStaticText* StaticText6;
 		wxPanel* activeTabColorPnl;
 		wxPanel* borderColorPnl;
@@ -131,6 +132,7 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT21;
 		static const long ID_TEXTCTRL6;
 		static const long ID_BUTTON12;
+		static const long ID_CHECKBOX7;
 		static const long ID_PANEL7;
 		static const long ID_STATICTEXT15;
 		static const long ID_CHOICE1;

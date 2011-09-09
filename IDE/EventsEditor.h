@@ -23,6 +23,7 @@
 #include "GDL/EventsEditorItemsAreas.h"
 #include "GDL/EventsEditorSelection.h"
 class SearchEvents;
+class ExternalEvents;
 class Game;
 class Scene;
 class BaseEvent;
@@ -95,6 +96,12 @@ class EventsEditor: public wxPanel
 
 		void SetAssociatedSceneCanvas(SceneCanvas * sceneCanvas_) { sceneCanvas = sceneCanvas_; };
 		SceneCanvas * GetAssociatedSceneCanvas() { return sceneCanvas; };
+
+		/**
+		 * Notify events editor that we're editing external events.
+		 * Do not change events in editor.
+		 */
+		void SetExternalEvents(ExternalEvents * externalEvents_) {externalEvents = externalEvents_; };
 
 	protected:
 
@@ -233,7 +240,10 @@ class EventsEditor: public wxPanel
 
 
 		Game & game;
-		Scene & scene;
+
+		Scene & scene; ///< Scene is required, even if it is a empty useless scene.
+        ExternalEvents * externalEvents; ///< Events editor can be used to edit external events
+
         vector < BaseEventSPtr > * events; ///< Events modified are not necessarily the events of the scene
 		MainEditorCommand & mainEditorCommand;
         SceneCanvas * sceneCanvas;

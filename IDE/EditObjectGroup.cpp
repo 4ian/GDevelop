@@ -60,8 +60,11 @@ scene(scene_)
 
 	Create(parent, wxID_ANY, _("Editer le groupe d\'objets"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer1->AddGrowableCol(0);
+	FlexGridSizer1->AddGrowableRow(0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17->AddGrowableCol(0);
+	FlexGridSizer17->AddGrowableRow(3);
 	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);

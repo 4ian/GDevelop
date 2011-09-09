@@ -8,6 +8,7 @@ class BaseEvent;
 class Game;
 class Scene;
 class Instruction;
+class ExternalEvents;
 typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
 
 /**
@@ -47,6 +48,9 @@ class EventsRefactorer
                                           bool matchCase,
                                           bool inConditions,
                                           bool inActions);
+
+		static void NotifyChangesInEventsOfScene(Game & game, Scene & scene);
+		static void NotifyChangesInEventsOfExternalEvents(Game & game, ExternalEvents & externalEvents);
 
     private:
         /**
@@ -95,6 +99,8 @@ class EventsRefactorer
 
         static bool SearchStringInActions(Game & game, Scene & scene, std::vector < Instruction > & actions, std::string search, bool matchCase);
         static bool SearchStringInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string search, bool matchCase);
+
+		static void GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<BaseEvent> > & events, Game & game, std::vector< boost::shared_ptr<Scene> > & scenes, std::vector< boost::shared_ptr<ExternalEvents> > & externalEvents);
 
         EventsRefactorer() {};
         virtual ~EventsRefactorer() {};

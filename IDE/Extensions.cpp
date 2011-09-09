@@ -150,6 +150,7 @@ game(game_)
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Extensions::OnFermerBtClick);
 	//*)
 
+    FlexGridSizer10->Show(false); //Cross compilation is not available and so the bitmaps are not relevant.
 
 	UpdateList();
 }

@@ -27,6 +27,8 @@
 #include "GDL/EventsCodeCompiler.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/HelpFileAccess.h"
+#include "GDL/ExternalEvents.h"
+#include "EventsRefactorer.h"
 #include "SceneCanvas.h"
 #include "ProfileDlg.h"
 #include "SearchEvents.h"
@@ -100,6 +102,7 @@ END_EVENT_TABLE()
 EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ ) :
     game(game_),
     scene(scene_),
+    externalEvents(NULL),
     events(events_),
     mainEditorCommand(mainEditorCommand_),
     conditionColumnWidth(350),
@@ -505,8 +508,12 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
                 dc.SetBrush(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
                 dc.DrawRectangle(0,y,eventsPanel->GetSize().x,height);
 
-                eventContextPanel->SetPosition(wxPoint(eventsPanel->GetSize().x-eventContextPanel->GetSize().x-10, y+height-1));
-                eventContextPanel->Show(true);
+                //Update context panel ( unless we're dragging something )
+                if ( !selection.IsDraggingEvent() && ! selection.IsDraggingInstruction())
+                {
+                    eventContextPanel->SetPosition(wxPoint(eventsPanel->GetSize().x-eventContextPanel->GetSize().x-10, y+height-1));
+                    eventContextPanel->Show(true);
+                }
 
                 if ( selection.IsDraggingEvent() )
                     drawDragTarget = true;//Draw drag target, but after
@@ -881,9 +888,14 @@ void EventsEditor::OneventsPanelMouseMove(wxMouseEvent& event)
         {
             selection.SetHighlighted(itemsAreas.GetInstructionListAt(event.GetX(), event.GetY()));
             wxRect area = itemsAreas.GetAreaOfInstructionListAt(event.GetX(), event.GetY());
-            if (!hideContextPanelsLabels) addInstrBt->SetLabel(itemsAreas.GetInstructionListAt(event.GetX(), event.GetY()).isConditionList ? _("Ajouter une condition") : _("Ajouter une action"));
-            listContextPanel->SetPosition(wxPoint(area.x, area.y+area.height-1));
-            showlistContextPanel = true;
+
+            //Update context panel ( unless we're dragging something )
+            if ( !selection.IsDraggingEvent() && ! selection.IsDraggingInstruction())
+            {
+                if (!hideContextPanelsLabels) addInstrBt->SetLabel(itemsAreas.GetInstructionListAt(event.GetX(), event.GetY()).isConditionList ? _("Ajouter une condition") : _("Ajouter une action"));
+                listContextPanel->SetPosition(wxPoint(area.x, area.y+area.height-1));
+                showlistContextPanel = true;
+            }
 
             if ( itemsAreas.IsOnInstruction(event.GetX(), event.GetY()) )
             {
@@ -1038,6 +1050,9 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory)
         redoHistory.clear();
         latestState = CloneVectorOfEvents(*events);
     }
+
+    EventsRefactorer::NotifyChangesInEventsOfScene(game, scene);
+    if ( externalEvents != NULL ) EventsRefactorer::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
 
     scene.wasModified = true;
     scene.eventsModified = true;
@@ -1603,6 +1618,7 @@ void EventsEditor::OntoggleActivationSelected(wxCommandEvent& event)
         if ( eventsSelected[i].event != boost::shared_ptr<BaseEvent>())
             eventsSelected[i].event->SetDisabled(!eventsSelected[i].event->IsDisabled());
     }
+    ChangesMadeOnEvents();
 }
 
 

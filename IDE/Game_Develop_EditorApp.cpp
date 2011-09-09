@@ -361,6 +361,12 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "Loading events editor configuration" << endl;
     TranslateAction::GetInstance()->LoadTypesFormattingFromConfig();
 
+    cout << "Loading events code compiler configuration" << endl;
+    bool deleteTemporaries;
+    if ( Config->Read( _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true) )
+        EventsCodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporaries);
+
+
     //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();
     mainEditor->Show();

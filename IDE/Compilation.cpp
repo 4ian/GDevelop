@@ -299,7 +299,10 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 {
     wxDirDialog dialog(this, _("Choisissez un dossier, vierge de préférence, où créer le jeu."));
     dialog.ShowModal();
-    if ( dialog.GetPath().empty() )
+
+    destinationDirectory = dialog.GetPath();
+
+    if ( destinationDirectory.empty() )
     {
         wxMessageBox(_("Vous devez choisir un répertoire où créer le jeu."), _("Compilation annulée"));
         return;
@@ -310,7 +313,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
     pConfig->Read( _T( "/Dossier/Compilation" ), &tempDir );
 
     FullProjectCompilerDialogDiagnosticManager diagnosticManager(StaticText3, StaticText2, AvancementGauge, Panel4, Notebook1);
-    GDpriv::FullProjectCompiler compilationManager(gameToCompile, diagnosticManager, ToString(dialog.GetPath()));
+    GDpriv::FullProjectCompiler compilationManager(gameToCompile, diagnosticManager, ToString(destinationDirectory));
 
     compilationManager.SetForcedTempDir(ToString(tempDir));
     compilationManager.CompressIfPossible(TypeBox->GetSelection() == 1);

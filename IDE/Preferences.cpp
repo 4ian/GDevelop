@@ -23,6 +23,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/LocaleManager.h"
 #include "GDL/TranslateAction.h"
+#include "GDL/EventsCodeCompiler.h"
 #include <wx/listctrl.h>
 #include "SetupCompilerToolchainDlg.h"
 
@@ -56,6 +57,7 @@ const long Preferences::ID_BUTTON4 = wxNewId();
 const long Preferences::ID_STATICTEXT21 = wxNewId();
 const long Preferences::ID_TEXTCTRL6 = wxNewId();
 const long Preferences::ID_BUTTON12 = wxNewId();
+const long Preferences::ID_CHECKBOX7 = wxNewId();
 const long Preferences::ID_PANEL7 = wxNewId();
 const long Preferences::ID_STATICTEXT15 = wxNewId();
 const long Preferences::ID_CHOICE1 = wxNewId();
@@ -263,6 +265,9 @@ changesNeedRestart(false)
     browseCompilationTempDir = new wxButton(Panel3, ID_BUTTON12, _("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
     FlexGridSizer31->Add(browseCompilationTempDir, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer6->Add(FlexGridSizer31, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    deleteTemporariesCheck = new wxCheckBox(Panel3, ID_CHECKBOX7, _("Supprimer les fichiers temporaires de compilation dès que possible"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
+    deleteTemporariesCheck->SetValue(true);
+    StaticBoxSizer6->Add(deleteTemporariesCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer15->Add(StaticBoxSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel3->SetSizer(FlexGridSizer15);
     FlexGridSizer15->Fit(Panel3);
@@ -672,6 +677,10 @@ changesNeedRestart(false)
         if ( pConfig->Read( _T( "/Dossier/EventsCompilerTempDir" ), &result ) )
             eventsCompilerTempDirEdit->ChangeValue( result );
 
+        bool deleteTemporaries;
+        if ( pConfig->Read( _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true) )
+            deleteTemporariesCheck->SetValue( deleteTemporaries );
+
     }
 
     {
@@ -834,7 +843,8 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     pConfig->Write( _T( "/EditeursExternes/Image" ), EditeurImageEdit->GetValue() );
     pConfig->Write( _T( "/Dossier/Compilation" ), DossierTempCompEdit->GetValue() );
     pConfig->Write( _T( "/Dossier/EventsCompilerTempDir" ), eventsCompilerTempDirEdit->GetValue() );
-
+    pConfig->Write( _T( "/Dossier/EventsCompilerDeleteTemp" ), deleteTemporariesCheck->GetValue());
+    EventsCodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporariesCheck->GetValue());
 
     const wxLanguageInfo * language = wxLocale::FindLanguageInfo(langChoice->GetString(langChoice->GetSelection()));
     pConfig->Write( _T( "/Lang" ), language->CanonicalName );
@@ -852,6 +862,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write("/Code/ExternalEditor", codeEditorEdit->GetValue());
     pConfig->Write("/Code/UseExternalEditor", externalCodeEditorCheck->GetValue());
+
 
     TranslateAction * eventsEditorConfig = TranslateAction::GetInstance();
     for (std::map<std::string, TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)

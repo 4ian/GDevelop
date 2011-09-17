@@ -97,12 +97,20 @@ bool SpriteObject::InitializeFromInitialPosition(const InitialPosition & positio
 /**
  * Render object at runtime
  */
-bool SpriteObject::Draw( sf::RenderWindow& window )
+bool SpriteObject::Draw( sf::RenderTarget & renderTarget )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    window.Draw( GetCurrentSFMLSprite() );
+    if ( !optionalShader )
+    {
+        renderTarget.Draw( GetCurrentSFMLSprite() );
+    }
+    else
+    {
+        renderTarget.Draw( GetCurrentSFMLSprite(), *optionalShader );
+    }
+
 
     return true;
 }
@@ -111,9 +119,17 @@ bool SpriteObject::Draw( sf::RenderWindow& window )
 /**
  * Render object at edittime
  */
-bool SpriteObject::DrawEdittime(sf::RenderWindow& renderWindow)
+bool SpriteObject::DrawEdittime( sf::RenderTarget & renderTarget )
 {
-    renderWindow.Draw( GetCurrentSFMLSprite() );
+
+    if ( !optionalShader )
+    {
+        renderTarget.Draw( GetCurrentSFMLSprite() );
+    }
+    else
+    {
+        renderTarget.Draw( GetCurrentSFMLSprite(), *optionalShader );
+    }
 
     return true;
 }

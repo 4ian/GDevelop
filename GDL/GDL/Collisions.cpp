@@ -133,10 +133,10 @@ bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf:
                 o1v = Object1.TransformToLocal( sf::Vector2f( i, j ) ); //Creating Objects each loop :(
                 o2v = Object2.TransformToLocal( sf::Vector2f( i, j ) );
 
-                //Hack to make sure pixels fall withint the Sprite's Image
+                //Hack to make sure pixels fall within the Sprite's Image
                 if ( o1v.x > 0 && o1v.y > 0 && o2v.x > 0 && o2v.y > 0 &&
-                        o1v.x < O1SubRectSize.x && o1v.y < O1SubRectSize.y &&
-                        o2v.x < O2SubRectSize.x && o2v.y < O2SubRectSize.y )
+                        o1v.x < Object1CollisionMask.GetWidth() && o1v.y < Object1CollisionMask.GetHeight() &&
+                        o2v.x < Object2CollisionMask.GetWidth() && o2v.y < Object2CollisionMask.GetHeight() )
                 {
                     //If both sprites have opaque pixels at the same point we've got a hit
                     if (( Object1CollisionMask.GetPixel( static_cast<int>( o1v.x ), static_cast<int>( o1v.y ) ).a > AlphaLimit ) &&

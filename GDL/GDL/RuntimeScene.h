@@ -115,22 +115,22 @@ public:
     /**
      * Change scene time scale.
      */
-    inline void SetTimeScale(float timeScale_) { timeScale = timeScale_; };
+    inline void SetTimeScale(double timeScale_) { timeScale = timeScale_; };
 
     /**
      * Return scene time scale.
      */
-    inline float GetTimeScale() const { return timeScale; };
+    inline double GetTimeScale() const { return timeScale; };
 
     /**
      * Get elapsed time since last frame, in milliseconds.
      */
-    inline float GetElapsedTime() const { return realElapsedTime*timeScale; };
+    inline unsigned int GetElapsedTime() const { return elapsedTime; };
 
     /**
      * Get time elapsed since beginning, in milliseconds.
      */
-    inline float GetTimeFromStart() const { return timeFromStart; };
+    inline unsigned int GetTimeFromStart() const { return timeFromStart; };
 
     /**
      * Return true if the scene was just rendered once.
@@ -164,7 +164,7 @@ protected:
     bool isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
     unsigned int realElapsedTime; ///< Elpased time since last frame, in milliseconds, without taking time scale in account.
     unsigned int elapsedTime; ///< Elpased time since last frame, in milliseconds
-    float timeScale; ///< Time scale
+    double timeScale; ///< Time scale
     unsigned int timeFromStart; ///< Time in milliseconds elapsed from start
     unsigned int pauseTime;
     int   specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene

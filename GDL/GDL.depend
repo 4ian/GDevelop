@@ -12914,7 +12914,7 @@
 	"GDL/Image.h"
 	"GDL/LoadingScreen.h"
 
-1314969144 d:\florian\programmation\gamedevelop2\gdl\\gdl\object.h
+1315582900 d:\florian\programmation\gamedevelop2\gdl\\gdl\object.h
 	"GDL/Force.h"
 	<string>
 	<vector>
@@ -13464,7 +13464,7 @@
 	<wx/help.h>
 	<wx/fs_zip.h>
 
-1314792460 source:d:\florian\programmation\gamedevelop2\gdl\gdl\collisions.cpp
+1316261745 source:d:\florian\programmation\gamedevelop2\gdl\gdl\collisions.cpp
 	<iostream>
 	<vector>
 	<string>
@@ -13475,7 +13475,7 @@
 	"GDL/SpriteObject.h"
 	"GDL/Collisions.h"
 
-1312672617 d:\florian\programmation\gamedevelop2\gdl\\gdl\spriteobject.h
+1315582106 d:\florian\programmation\gamedevelop2\gdl\\gdl\spriteobject.h
 	"GDL/Object.h"
 	"GDL/Animation.h"
 
@@ -13568,7 +13568,7 @@
 	<string>
 	<boost/shared_ptr.hpp>
 
-1314044205 d:\florian\programmation\gamedevelop2\gdl\\gdl\runtimescene.h
+1315663167 d:\florian\programmation\gamedevelop2\gdl\\gdl\runtimescene.h
 	"GDL/Scene.h"
 	<iostream>
 	<sstream>
@@ -13794,7 +13794,7 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1314044205 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
+1315663167 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
 	"GDL/Scene.h"
 	<iostream>
 	<sstream>
@@ -14598,7 +14598,7 @@
 	"GDL/ExtensionsManager.h"
 	"GDL/profile.h"
 
-1313840505 source:d:\florian\programmation\gamedevelop2\gdl\gdl\object.cpp
+1315760655 source:d:\florian\programmation\gamedevelop2\gdl\gdl\object.cpp
 	"GDL/Object.h"
 	<iostream>
 	<string>
@@ -14615,6 +14615,7 @@
 	"GDL/Automatism.h"
 	"GDL/RotatedRectangle.h"
 	<wx/panel.h>
+	<SFML/Graphics.hpp>
 
 1308407448 source:d:\florian\programmation\gamedevelop2\gdl\gdl\objectgroup.cpp
 	"GDL/ObjectGroup.h"
@@ -14828,7 +14829,7 @@
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1314215661 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
+1315663167 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
 	"GDL/RuntimeScene.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -14965,7 +14966,7 @@
 	<wx/panel.h>
 	<wx/combobox.h>
 
-1314792883 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
+1315760655 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
 	<SFML/Graphics.hpp>
 	"GDL/SpriteObject.h"
 	"GDL/Object.h"
@@ -15828,7 +15829,7 @@
 	<wx/filename.h>
 	"GDL/EventsCodeCompiler.h"
 
-1314979854 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1315760655 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1304162683 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -32162,7 +32163,7 @@
 	<set>
 	<boost/shared_ptr.hpp>
 
-1314980416 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerator.cpp
+1316204783 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerator.cpp
 	<utility>
 	"GDL/EventsCodeGenerator.h"
 	"GDL/ExtensionsManager.h"
@@ -32183,7 +32184,7 @@
 	<vector>
 	<utility>
 
-1315511470 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodecompiler.cpp
+1315580119 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodecompiler.cpp
 	"GDL/EventsCodeCompiler.h"
 	<SFML/System.hpp>
 	<iostream>
@@ -32689,7 +32690,7 @@
 
 1306597151 d:\florian\programmation\gamedevelop2\extlibs\llvm\build-tdmgcc45-debug\tools\clang\include\clang\basic\diagnosticdriverkinds.inc
 
-1314215661 source:d:\florian\programmation\gamedevelop2\gdl\gdl\timetools.cpp
+1315740816 source:d:\florian\programmation\gamedevelop2\gdl\gdl\timetools.cpp
 	"TimeTools.h"
 	"GDL/RuntimeScene.h"
 	"GDL/ManualTimer.h"

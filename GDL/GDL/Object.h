@@ -6,7 +6,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
-#include "GDL/Force.h" //This include file must be placed first. Could be removed if Force is removed a day.
+#include "GDL/Force.h" //This include file must be placed first. Could be removed if Force is removed one day.
 #include <string>
 #include <vector>
 #include <map>
@@ -17,7 +17,8 @@
 
 namespace sf
 {
-    class RenderWindow;
+    class RenderTarget;
+    class Shader;
 }
 
 class RotatedRectangle;
@@ -99,9 +100,11 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         virtual bool InitializeFromInitialPosition(const InitialPosition & position) {return true;}
 
         /**
-         * Draw the object
+         * Draw the object.
+         * \param renderTarget The SFML Rendertarget where object must be drawn.
+         * \param optionalShader Optional ( can be NULL ) pointer to a sf::Shader to use when rendering the object
          */
-        virtual bool Draw(sf::RenderWindow& main_window) {return true;};
+        virtual bool Draw(sf::RenderTarget & renderTarget) {return true;};
 
         /**
          * Load object from an xml element.
@@ -350,9 +353,11 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         #if defined(GD_IDE_ONLY)
         /**
-         * Draw the object at edittime ( on a scene editor )
+         * Draw the object at edittime ( on a scene editor typically )
+         * \param renderTarget The SFML Rendertarget where object must be drawn.
+         * \param optionalShader Optional ( can be NULL ) pointer to a sf::Shader to use when rendering the object
          */
-        virtual bool DrawEdittime(sf::RenderWindow& main_window) {return true;};
+        virtual bool DrawEdittime(sf::RenderTarget & renderTarget) {return true;};
 
         /**
          * Called ( e.g. during compilation ) so as to inventory internal resources and update their filename.
@@ -456,6 +461,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         bool hidden; ///<True to prevent the object from being rendered.
         std::string layer; ///<Name of the layer on which the object is.
         std::map<std::string, boost::shared_ptr<Automatism> > automatisms; ///<Contains all automatisms of the object.
+        boost::shared_ptr<sf::Shader> optionalShader; ///< Optional shader used by objects
 
         /**
          * Initialize object using another object. Used by copy-ctor and assign-op.

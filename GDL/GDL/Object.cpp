@@ -24,12 +24,16 @@
 
 using namespace std;
 
+//TEMP
+#include <SFML/Graphics.hpp>
+
 Object::Object(string name_) :
         name( name_ ),
         X( 0 ),
         Y( 0 ),
         zOrder( 0 ),
-        hidden( false )
+        hidden( false ),
+        optionalShader(new sf::Shader)
 {
     this->ClearForce();
 }
@@ -55,6 +59,9 @@ void Object::Init(const Object & object)
     zOrder = object.zOrder;
     hidden = object.hidden;
     layer = object.layer;
+
+    if ( object.optionalShader )
+        optionalShader = boost::shared_ptr<sf::Shader>(new sf::Shader(*object.optionalShader));
 
     automatisms.clear();
     for (std::map<std::string, boost::shared_ptr<Automatism> >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )

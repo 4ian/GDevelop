@@ -746,7 +746,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
 
             argOutput = "\""+argOutput+"\"";
         }
-        else if ( parametersInfo[pNb].type == "object" )
+        else if ( parametersInfo[pNb].type == "object" || parametersInfo[pNb].type == "automatism" )
         {
             argOutput = "\""+ConvertToCppString(parameters[pNb].GetPlainString())+"\"";
         }

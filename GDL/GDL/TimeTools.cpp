@@ -135,7 +135,7 @@ void GD_API SetTimeScale( RuntimeScene & scene, double value )
 
 double GD_API GetElapsedTimeInSeconds(RuntimeScene & scene)
 {
-    return static_cast<double>(scene.GetElapsedTime())/1000.0;
+    return scene.GetElapsedTime()/1000.0;
 }
 
 double GD_API GetTimeFromStartInSeconds(RuntimeScene & scene)

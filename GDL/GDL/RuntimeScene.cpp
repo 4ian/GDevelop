@@ -426,8 +426,8 @@ bool RuntimeScene::UpdateTime()
     realElapsedTime -= pauseTime; //On enlève le temps de pause
 
     //On modifie ce temps écoulé si il est trop bas.
-    if ( game->minFPS != 0 && realElapsedTime > 1000.f/static_cast<float>(game->minFPS) )
-        realElapsedTime = 1000.f/static_cast<float>(game->minFPS); //On ralentit le jeu si les FPS sont trop bas.
+    if ( game->minFPS != 0 && realElapsedTime > 1000.0/static_cast<double>(game->minFPS) )
+        realElapsedTime = 1000.0/static_cast<double>(game->minFPS); //On ralentit le jeu si les FPS sont trop bas.
 
     elapsedTime = realElapsedTime*timeScale; //Le temps écoulé par le jeu est modifié suivant l'échelle du temps
 

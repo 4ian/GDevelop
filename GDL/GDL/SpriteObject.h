@@ -43,10 +43,10 @@ class GD_API SpriteObject : public Object
         virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
-        virtual bool Draw(sf::RenderWindow& main_window);
+        virtual bool Draw(sf::RenderTarget & renderTarget);
 
         #if defined(GD_IDE_ONLY)
-        virtual bool DrawEdittime(sf::RenderWindow& main_window);
+        virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
 
         virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );

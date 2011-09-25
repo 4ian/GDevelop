@@ -1,10 +1,13 @@
 #include "GDL/RuntimeGame.h"
+#include "GDL/ShaderManager.h"
 
 RuntimeGame::RuntimeGame() :
 Game(),
-imageManager(boost::shared_ptr<ImageManager>(new ImageManager))
+imageManager(boost::shared_ptr<ImageManager>(new ImageManager)),
+shaderManager(boost::shared_ptr<ShaderManager>(new ShaderManager))
 {
     imageManager->SetGame(this);
+    shaderManager->SetGame(this);
 }
 
 RuntimeGame::RuntimeGame(const RuntimeGame & runtimeGame) :
@@ -28,4 +31,7 @@ void RuntimeGame::Init(const RuntimeGame & runtimeGame)
 {
     imageManager = boost::shared_ptr<ImageManager>(new ImageManager(*runtimeGame.imageManager));
     imageManager->SetGame(this);
+
+    shaderManager = boost::shared_ptr<ShaderManager>(new ShaderManager(*runtimeGame.shaderManager));
+    shaderManager->SetGame(this);
 }

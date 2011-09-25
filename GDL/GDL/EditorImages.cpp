@@ -97,9 +97,7 @@ END_EVENT_TABLE()
 
 EditorImages::EditorImages( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_, bool useRibbon_ ) :
 game(game_),
-#if defined(DESACTIVATED_FOR_WX290)
 filesWatcher(game),
-#endif
 mainEditorCommand(mainEditorCommand_),
 useRibbon(useRibbon_),
 toolbar(NULL)
@@ -684,11 +682,9 @@ void EditorImages::Refresh()
 
     BanqueImageList->Expand( allImagesItem );
 
-    #if defined(DESACTIVATED_FOR_WX290)
     filesWatcher.RemoveAll();
     for ( unsigned int i = 0;i < game.images.size();i++ )
         filesWatcher.Add(wxFileName(game.images[i].file).GetPath());
-    #endif
 }
 
 ////////////////////////////////////////////////////////////
@@ -821,6 +817,7 @@ void EditorImages::OnOpenPaintProgramClick(wxCommandEvent& event)
 void EditorImages::OnapercuPanelPaint(wxPaintEvent& event)
 {
     wxPaintDC dc( apercuPanel ); //Création obligatoire du wxBufferedPaintDC
+    wxLogNull noLog; //We take care of errors.
 
     wxSize size = apercuPanel->GetSize();
 

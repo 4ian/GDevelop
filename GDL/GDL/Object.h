@@ -107,6 +107,11 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         virtual bool Draw(sf::RenderTarget & renderTarget) {return true;};
 
         /**
+         * Redefine this function to return true if you're object can use shaders.
+         */
+        virtual bool SupportShaders() { return false; }
+
+        /**
          * Load object from an xml element.
          */
         virtual void LoadFromXml(const TiXmlElement * elemScene) {};

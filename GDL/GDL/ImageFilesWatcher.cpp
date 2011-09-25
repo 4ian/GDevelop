@@ -5,7 +5,6 @@
 
 #if defined(GD_IDE_ONLY)
 
-#if defined(DESACTIVATED_FOR_WX290)
 #include <iostream>
 #include <wx/fswatcher.h>
 #include "GDL/Game.h"
@@ -15,13 +14,13 @@ ImageFilesWatcher::ImageFilesWatcher(const Game & game_) :
     wxFileSystemWatcher(),
     game(game_)
 {
+    Connect(wxEVT_FSWATCHER, wxFileSystemWatcherEventHandler(ImageFilesWatcher::OnChange));
 }
 
-void ImageFilesWatcher::OnChange(int changeType, const wxFileName& path, const wxFileName& newPath)
+void ImageFilesWatcher::OnChange(wxFileSystemWatcherEvent& event)
 {
-    std::cout << "changed :" << path.GetFullName() << std::endl;
+    //Do nothing for now.
+    //std::cout << "changed :" << event.GetNewPath().GetPath() << std::endl;
 }
-
-#endif
 
 #endif

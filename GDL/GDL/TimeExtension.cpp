@@ -140,7 +140,6 @@ TimeExtension::TimeExtension()
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/TimeTools.h");
-        instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
     DECLARE_EXPRESSION("TempsFrame", _("Temps écoulé depuis la dernière image"), _("Temps écoulé depuis la dernière image"), _("Temps"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");

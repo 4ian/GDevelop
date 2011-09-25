@@ -153,8 +153,6 @@ bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfter
     if (!dragging) return false;
     dragging = false;
 
-    std::cout << "endDragSTART" << std::endl;
-
     if ( eventHighlighted.eventsList == NULL ) return false;
 
     //Be sure we do not try to drag inside an event selected
@@ -168,7 +166,6 @@ bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfter
 
         if ( (*it).event == eventHighlighted.event || ((*it).event->CanHaveSubEvents() && FindInEventsAndSubEvents((*it).event->GetSubEvents(), eventHighlighted.event)) )
         {
-            std::cout << "Cannot drag here" << std::endl;
             return false;
         }
     }
@@ -197,7 +194,6 @@ bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfter
         }
     }
 
-    std::cout << "endDragEND" << std::endl;
     ClearSelection();
 
     return true;
@@ -217,8 +213,6 @@ bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bo
 {
     if (!draggingInstruction) return false;
     draggingInstruction = false;
-
-    std::cout << "endDragSTART" << std::endl;
 
     //Find where to drag
     std::vector<Instruction> * list = NULL;
@@ -253,12 +247,10 @@ bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bo
 
             if ( (*it).instruction == instructionHighlighted.instruction || (FindInInstructionsAndSubInstructions((*it).instruction->GetSubInstructions(), instructionHighlighted.instruction)) )
             {
-                std::cout << "Cannot drag here" << std::endl;
                 return false;
             }
             if  (FindInInstructionsAndSubInstructions(instructionHighlighted.instruction->GetSubInstructions(), (*it).instruction) )
             {
-                std::cout << "Cannot drag here" << std::endl;
                 return false;
             }
         }
@@ -302,7 +294,6 @@ bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bo
         DeleteAllInstructionSelected();
     }
 
-    std::cout << "endDragEND" << std::endl;
     ClearSelection();
 
     return true;

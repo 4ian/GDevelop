@@ -98,7 +98,7 @@ std::string RessourcesLoader::LoadPlainText( const string & filename )
         {
             string ligne;
             while(getline(file, ligne))
-                text += ligne;
+                text += ligne+"\n";
 
             file.close();
         }

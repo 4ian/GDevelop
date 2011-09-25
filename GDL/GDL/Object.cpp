@@ -32,8 +32,7 @@ Object::Object(string name_) :
         X( 0 ),
         Y( 0 ),
         zOrder( 0 ),
-        hidden( false ),
-        optionalShader(new sf::Shader)
+        hidden( false )
 {
     this->ClearForce();
 }
@@ -61,7 +60,12 @@ void Object::Init(const Object & object)
     layer = object.layer;
 
     if ( object.optionalShader )
+    {
         optionalShader = boost::shared_ptr<sf::Shader>(new sf::Shader(*object.optionalShader));
+        optionalShader->SetCurrentTexture("texture");
+        optionalShader->SetParameter("offset", 0.1f);
+        optionalShader->SetParameter("mouse", 10,10);
+    }
 
     automatisms.clear();
     for (std::map<std::string, boost::shared_ptr<Automatism> >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )

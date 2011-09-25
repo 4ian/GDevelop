@@ -8,12 +8,14 @@
 #ifndef IMAGEFILESWATCHER_H
 #define IMAGEFILESWATCHER_H
 
-#if defined(DESACTIVATED_FOR_WX290)
+#ifdef __WXMSW__
+#include <wx/msw/winundef.h>
+#endif
 #include <wx/fswatcher.h>
 class Game;
 
 /**
- * Watch images file and notify the game to reload them when they are modified.
+ * Watch images files and notify the game if they are modified, so as to reload them when.
  */
 class GD_API ImageFilesWatcher : public wxFileSystemWatcher
 {
@@ -21,13 +23,11 @@ public:
     ImageFilesWatcher(const Game & game_);
 
 protected:
-    void OnChange(int changeType, const wxFileName& path, const wxFileName& newPath);
+    void OnChange(wxFileSystemWatcherEvent& event);
 
 private:
     const Game & game;
 };
-
-#endif
 
 #endif // IMAGEFILESWATCHER_H
 

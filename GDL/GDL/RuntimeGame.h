@@ -9,6 +9,7 @@
 #include <boost/shared_ptr.hpp>
 #include "GDL/Game.h"
 #include "GDL/ImageManager.h"
+class ShaderManager;
 
 /**
  * \brief Game class used at Runtime.
@@ -30,6 +31,7 @@ class GD_API RuntimeGame : public Game
         virtual ~RuntimeGame() {};
 
         boost::shared_ptr<ImageManager> imageManager; ///< Image manager is accessed thanks to a (smart) ptr as it can be shared across (Runtime) games
+        boost::shared_ptr<ShaderManager> shaderManager; ///< Shader manager is accessed thanks to a (smart) ptr as it can be shared across (Runtime) games
 
     private:
 

@@ -1453,6 +1453,8 @@
 		<Unit filename="GDL\Scene.h" />
 		<Unit filename="GDL\SceneExtension.cpp" />
 		<Unit filename="GDL\SceneExtension.h" />
+		<Unit filename="GDL\ShaderManager.cpp" />
+		<Unit filename="GDL\ShaderManager.h" />
 		<Unit filename="GDL\Sound.cpp" />
 		<Unit filename="GDL\Sound.h" />
 		<Unit filename="GDL\SoundManager.cpp" />

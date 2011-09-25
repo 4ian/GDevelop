@@ -160,9 +160,7 @@ class GD_API EditorImages: public wxPanel
 
         wxTreeItemId allImagesItem;
 
-#if defined(DESACTIVATED_FOR_WX290)
         ImageFilesWatcher filesWatcher;
-#endif
 
 		MainEditorCommand mainEditorCommand;
 		bool useRibbon;

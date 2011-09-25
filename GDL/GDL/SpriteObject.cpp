@@ -13,6 +13,7 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/Direction.h"
 #include "GDL/Sprite.h"
+#include "GDL/ShaderManager.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
@@ -64,6 +65,14 @@ bool SpriteObject::LoadResources(const RuntimeScene & scene, const ImageManager 
         }
     }
 
+    std::vector<std::string> shaders;
+//    shaders.push_back("blur.sfx");
+    shaders.push_back("fisheye.sfx");
+    optionalShader = scene.game->shaderManager->GetSFMLShader(shaders);
+    optionalShader->SetCurrentTexture("texture");
+    optionalShader->SetParameter("offset", 0.1f);
+    optionalShader->SetParameter("mouse", 10,10);
+
     return true;
 }
 
@@ -103,13 +112,9 @@ bool SpriteObject::Draw( sf::RenderTarget & renderTarget )
     if ( hidden ) return true;
 
     if ( !optionalShader )
-    {
         renderTarget.Draw( GetCurrentSFMLSprite() );
-    }
     else
-    {
         renderTarget.Draw( GetCurrentSFMLSprite(), *optionalShader );
-    }
 
 
     return true;
@@ -123,13 +128,9 @@ bool SpriteObject::DrawEdittime( sf::RenderTarget & renderTarget )
 {
 
     if ( !optionalShader )
-    {
         renderTarget.Draw( GetCurrentSFMLSprite() );
-    }
     else
-    {
         renderTarget.Draw( GetCurrentSFMLSprite(), *optionalShader );
-    }
 
     return true;
 }

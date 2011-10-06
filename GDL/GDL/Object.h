@@ -38,7 +38,7 @@ class Game;
 class Scene;
 class wxWindow;
 class MainEditorCommand;
-class ResourcesMergingHelper;
+class ArbitraryResourceWorker;
 #endif
 
 /**
@@ -365,13 +365,16 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         virtual bool DrawEdittime(sf::RenderTarget & renderTarget) {return true;};
 
         /**
-         * Called ( e.g. during compilation ) so as to inventory internal resources and update their filename.
+         * Called ( e.g. during compilation ) so as to inventory internal resources and sometimes update their filename.
          * Implementation example:
          * \code
-         * myResourceFile = resourcesMergingHelper.GetNewFilename(myResourceFile);
+         * worker.ExposeImage(myImage);
+         * worker.ExposeResource(myResourceFile);
          * \endcode
+         *
+         * \see ArbitraryResourceWorker
          */
-        virtual void PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper) {return;};
+        virtual void ExposeResources(ArbitraryResourceWorker & worker) {return;};
 
         /**
          * Generate thumbnail for editor

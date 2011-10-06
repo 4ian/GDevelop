@@ -40,6 +40,8 @@
 #include "GDL/PropImage.h"
 #include "GDL/BitmapGUIManager.h"
 #include "GDL/gdTreeItemStringData.h"
+#include "GDL/ImagesUsedInventorizer.h"
+
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
@@ -89,6 +91,7 @@ const long EditorImages::idRibbonPaintProgram= wxNewId();
 const long EditorImages::idRibbonSearch= wxNewId();
 const long EditorImages::idRibbonHelp= wxNewId();
 const long EditorImages::idRibbonRefresh = wxNewId();
+const long EditorImages::idRibbonDeleteUnused = wxNewId();
 
 BEGIN_EVENT_TABLE( EditorImages, wxPanel )
     //(*EventTable(EditorImages)
@@ -295,6 +298,7 @@ void EditorImages::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonSearch, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnChercherBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnAideBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnRefreshBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonDeleteUnused, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorImages::OnDeleteUnusedFiles, NULL, this);
 }
 
 /*void EditorImages::CreateRibbonPage(wxRibbonPage * page)
@@ -487,9 +491,7 @@ void EditorImages::OnDelImageBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorImages::OnModNameImageBtClick( wxCommandEvent& event )
 {
-    wxTreeItemId Item = m_itemSelected;
-    wxTreeItemId ItemNul = NULL;
-    if ( Item != ItemNul && BanqueImageList->GetChildrenCount( m_itemSelected ) == 0 )
+    if ( m_itemSelected.IsOk() && BanqueImageList->GetChildrenCount( m_itemSelected ) == 0 )
     {
         BanqueImageList->EditLabel( m_itemSelected );
     }
@@ -682,9 +684,46 @@ void EditorImages::Refresh()
 
     BanqueImageList->Expand( allImagesItem );
 
+
+    /*
+    //Not working for now
     filesWatcher.RemoveAll();
+    wxArrayString alreadyWatchedPaths;
+    filesWatcher.GetWatchedPaths(&alreadyWatchedPaths);
     for ( unsigned int i = 0;i < game.images.size();i++ )
-        filesWatcher.Add(wxFileName(game.images[i].file).GetPath());
+    {
+        bool alreadyWatched = false;
+        for (unsigned int j = 0;j<alreadyWatchedPaths.size();++j)
+        {
+            if ( alreadyWatchedPaths[j]==wxFileName(game.images[i].file).GetPath() )
+                alreadyWatched = true;
+        }
+
+        if ( !alreadyWatched )
+            filesWatcher.Add(wxFileName(game.images[i].file).GetPath());
+    }*/
+}
+
+void EditorImages::OnDeleteUnusedFiles( wxCommandEvent& event )
+{
+    //Add scenes resources
+    ImagesUsedInventorizer inventorizer;
+    for ( unsigned int i = 0;i < game.scenes.size();i++ )
+    {
+        for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j) //Add objects resources
+        	game.scenes[i]->initialObjects[j]->ExposeResources(inventorizer);
+    }
+    //Add global objects resources
+    for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
+        game.globalObjects[j]->ExposeResources(inventorizer);
+
+    std::set<std::string> & usedImages = inventorizer.GetAllUsedImages();
+    for ( unsigned int i = 0;i < game.images.size() ;i++ )
+    {
+        if ( usedImages.find(game.images[i].nom) == usedImages.end() )
+            std::cout << game.images[i].nom << " not more used.\n";
+    }
+
 }
 
 ////////////////////////////////////////////////////////////

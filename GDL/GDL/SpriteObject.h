@@ -48,6 +48,7 @@ class GD_API SpriteObject : public Object
         #if defined(GD_IDE_ONLY)
         virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+        virtual void ExposeResources(ArbitraryResourceWorker & worker);
 
         virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
         virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );

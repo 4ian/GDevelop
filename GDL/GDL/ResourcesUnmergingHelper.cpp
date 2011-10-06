@@ -9,16 +9,11 @@
 #include <wx/filename.h>
 #include <string>
 
-std::string ResourcesUnmergingHelper::GetNewFilename(std::string resourceFilename)
+void ResourcesUnmergingHelper::ExposeResource(std::string & resourceFilename)
 {
-    if ( resourceFilename.empty() ) return "";
+    if ( resourceFilename.empty() ) return;
 
-    if ( resourcesNewFilename.find(resourceFilename) != resourcesNewFilename.end() )
-        return resourcesNewFilename[resourceFilename];
-
-    //Currently, just strip the filename and add the resource, don't take care of resources with same filename.
-    resourcesNewFilename[resourceFilename] = newDirectory + "/" + resourceFilename;
-    return resourcesNewFilename[resourceFilename];
+    resourceFilename = newDirectory + "/" + resourceFilename;
 }
 
 #endif

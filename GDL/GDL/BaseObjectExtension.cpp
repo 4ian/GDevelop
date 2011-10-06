@@ -479,7 +479,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
-            instrInfo.AddParameter("text", _("Texte à tester"), "", false);
+            instrInfo.AddParameter("string", _("Texte à tester"), "", false);
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
 

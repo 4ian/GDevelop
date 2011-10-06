@@ -4,7 +4,7 @@
  */
 
 #include "GDL/AudioExtension.h"
-#include "GDL/ResourcesMergingHelper.h"
+#include "GDL/ArbitraryResourceWorker.h"
 #include "GDL/SoundManager.h"
 #include "GDL/Instruction.h"
 #include <iostream>
@@ -549,10 +549,14 @@ AudioExtension::AudioExtension()
 }
 
 #if defined(GD_IDE_ONLY)
-void AudioExtension::PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper)
+void AudioExtension::ExposeActionsResources(Instruction & action, ArbitraryResourceWorker & worker)
 {
     if ( action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" || action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal" )
-        action.SetParameter( 0, resourcesMergingHelper.GetNewFilename(action.GetParameter(0).GetPlainString()));
+    {
+        std::string parameter = action.GetParameter(0).GetPlainString();
+        worker.ExposeResource(parameter);
+        action.SetParameter(0, parameter);
+    }
 }
 
 void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const

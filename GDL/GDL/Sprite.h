@@ -60,6 +60,11 @@ public:
     inline const std::string & GetImageName() const { return image; }
 
     /**
+     * Get a reference to the name of the image
+     */
+    inline std::string & GetImageName() { return image; }
+
+    /**
      * Get the collision mask ( custom or automatically generated owing to IsCollisionMaskAutomatic() )
      */
     std::vector<RotatedRectangle> GetCollisionMask() const;

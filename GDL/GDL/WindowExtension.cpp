@@ -4,7 +4,7 @@
  */
 
 #include "GDL/WindowExtension.h"
-#include "GDL/ResourcesMergingHelper.h"
+#include "GDL/ArbitraryResourceWorker.h"
 #include "GDL/Instruction.h"
 
 WindowExtension::WindowExtension()
@@ -93,9 +93,13 @@ WindowExtension::WindowExtension()
 }
 
 #if defined(GD_IDE_ONLY)
-void WindowExtension::PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper)
+void WindowExtension::ExposeActionsResources(Instruction & action, ArbitraryResourceWorker & worker)
 {
     if ( action.GetType() == "EcrireTexte" && !action.GetParameterSafely( 6 ).GetPlainString().empty() )
-        action.SetParameter( 6, resourcesMergingHelper.GetNewFilename( action.GetParameterSafely( 6 ).GetPlainString() ) );
+    {
+        std::string parameter = action.GetParameter(6).GetPlainString();
+        worker.ExposeResource(parameter);
+        action.SetParameter(6, parameter);
+    }
 }
 #endif

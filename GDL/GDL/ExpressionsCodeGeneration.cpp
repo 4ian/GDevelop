@@ -201,7 +201,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         realObjects.push_back(context.currentObject);
     }
 
-    std::string output = "0";
+    std::string output = "\"\"";
     for (unsigned int i = 0;i<realObjects.size();++i)
     {
         context.ObjectNeeded(realObjects[i]);
@@ -337,7 +337,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         realObjects.push_back(context.currentObject);
     }
 
-    std::string output = "0";
+    std::string output = "\"\"";
     for (unsigned int i = 0;i<realObjects.size();++i)
     {
         context.ObjectNeeded(realObjects[i]);

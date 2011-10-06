@@ -118,7 +118,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         task.generateBitcodeFileOnly = true;
         task.optimize = optimize;
         task.bitCodeFilename = tempDir+"/GDpriv"+gameToCompile.scenes[i]->GetName()+".ir";
-        resourcesMergingHelper.GetNewFilename(task.bitCodeFilename); //Export bitcode file.
+        resourcesMergingHelper.ExposeResource(task.bitCodeFilename); //Export bitcode file.
 
         EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(task);
 
@@ -158,27 +158,27 @@ void FullProjectCompiler::LaunchProjectCompilation()
     for ( unsigned int i = 0;i < game.images.size() ;i++ )
     {
         diagnosticManager.OnMessage( ToString(_("Préparation des ressources...")), game.images[i].nom );
-        game.images[i].file = resourcesMergingHelper.GetNewFilename(game.images[i].file);
+        resourcesMergingHelper.ExposeResource(game.images[i].file);
     }
     if ( !game.loadingScreen.imageFichier.empty() )
-        game.loadingScreen.imageFichier = resourcesMergingHelper.GetNewFilename( game.loadingScreen.imageFichier );
+        resourcesMergingHelper.ExposeResource( game.loadingScreen.imageFichier );
 
     //Add scenes resources
     for ( unsigned int i = 0;i < game.scenes.size();i++ )
     {
         for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j) //Add objects resources
-        	game.scenes[i]->initialObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
+        	game.scenes[i]->initialObjects[j]->ExposeResources(resourcesMergingHelper);
 
-        InventoryEventsResources(game, game.scenes[i]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, resourcesMergingHelper);
     }
     //Add external events resources
     for ( unsigned int i = 0;i < game.externalEvents.size();i++ )
     {
-        InventoryEventsResources(game, game.externalEvents[i]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.externalEvents[i]->events, resourcesMergingHelper);
     }
     //Add global objects resources
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
-        game.globalObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
+        game.globalObjects[j]->ExposeResources(resourcesMergingHelper);
 
     //Now copy resources
     diagnosticManager.OnMessage( ToString( _("Copie des ressources...") ) );

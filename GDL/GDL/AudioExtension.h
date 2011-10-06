@@ -7,7 +7,7 @@
 #define AUDIOEXTENSION_H
 #include "GDL/ExtensionBase.h"
 class Instruction;
-class ResourcesMergingHelper;
+class ArbitraryResourceWorker;
 
 /**
  * \brief Internal builtin extension providing audio features.
@@ -19,7 +19,7 @@ class AudioExtension : public ExtensionBase
         virtual ~AudioExtension() {};
 
         #if defined(GD_IDE_ONLY)
-        virtual void PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper);
+        virtual void ExposeActionsResources(Instruction & action, ArbitraryResourceWorker & worker);
 
         bool HasDebuggingProperties() const { return true; };
         void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const;

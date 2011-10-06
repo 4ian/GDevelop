@@ -32,7 +32,7 @@ class ExpressionInstruction;
 class StrExpressionInstruction;
 class BaseEvent;
 class AutomatismsSharedDatas;
-class ResourcesMergingHelper;
+class ArbitraryResourceWorker;
 class EventsCodeGenerationContext;
 #undef CreateEvent
 
@@ -1036,13 +1036,17 @@ class GD_API ExtensionBase
 
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by conditions and update their filename
+     *
+     * \see ExtensionBase::ExposeActionsResources
      */
-    virtual void PrepareConditionsResourcesForMerging(Instruction & condition, ResourcesMergingHelper & resourcesMergingHelper) {};
+    virtual void ExposeConditionsResources(Instruction & condition, ArbitraryResourceWorker & worker) {};
 
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by actions and update their filename
+     *
+     * \see ArbitraryResourceWorker
      */
-    virtual void PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper) {};
+    virtual void ExposeActionsResources(Instruction & action, ArbitraryResourceWorker & worker) {};
 
     /**
      * Must return true if the extension has something to display in debugger.

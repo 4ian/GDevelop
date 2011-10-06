@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include <boost/shared_ptr.hpp>
+#include "GDL/ArbitraryResourceWorker.h"
 class Game;
 class BaseEvent;
 
@@ -19,24 +20,25 @@ class BaseEvent;
  * ResourcesMergingHelper is used ( mainly during compilation ) so
  * as to inventory resources and change their filenames
  */
-class GD_API ResourcesMergingHelper
+class GD_API ResourcesMergingHelper : public ArbitraryResourceWorker
 {
     public:
-        ResourcesMergingHelper() {};
+        ResourcesMergingHelper() : ArbitraryResourceWorker() {};
         virtual ~ResourcesMergingHelper() {};
 
-        virtual std::string GetNewFilename(std::string resourceFilename);
         std::map<std::string, std::string> & GetAllResourcesNewFilename() { return resourcesNewFilename; };
+
+        /**
+         * Resources merging helper collects all resources filenames and update these filenames.
+         */
+        virtual void ExposeResource(std::string & resource);
+
+        virtual void ExposeImage(std::string & imageName) {};
+        virtual void ExposeShader(std::string & shaderName) {};
 
     protected:
         std::map<std::string, std::string> resourcesNewFilename;
 };
-
-/**
- * Iterate over each event and call Prepare(Actions/Conditions)ResourcesForMerging for each
- * actions and conditions with the ResourcesMergingHelper passed as argument.
- */
-void GD_API InventoryEventsResources(const Game & game, std::vector < boost::shared_ptr<BaseEvent> > & events, ResourcesMergingHelper & resourcesMergingHelper);
 
 #endif // RESOURCESMERGINGHELPER_H
 #endif

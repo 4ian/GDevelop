@@ -14,6 +14,7 @@
 #include "GDL/Direction.h"
 #include "GDL/Sprite.h"
 #include "GDL/ShaderManager.h"
+#include "GDL/ArbitraryResourceWorker.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
@@ -101,6 +102,18 @@ bool SpriteObject::InitializeFromInitialPosition(const InitialPosition & positio
     SetAngle(position.angle);
 
     return true;
+}
+
+void SpriteObject::ExposeResources(ArbitraryResourceWorker & worker)
+{
+    for ( unsigned int j = 0; j < GetAnimationsNumber();j++ )
+    {
+        for ( unsigned int k = 0;k < GetAnimation( j ).GetDirectionsNumber();k++ )
+        {
+            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpritesNumber();l++ )
+                worker.ExposeImage(GetAnimation( j ).GetDirectionToModify(k).GetSprite(l).GetImageName());
+        }
+    }
 }
 
 /**

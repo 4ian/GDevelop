@@ -1215,6 +1215,8 @@
 		<Unit filename="GDL\AjoutPlusImage.h" />
 		<Unit filename="GDL\Animation.cpp" />
 		<Unit filename="GDL\Animation.h" />
+		<Unit filename="GDL\ArbitraryResourceWorker.cpp" />
+		<Unit filename="GDL\ArbitraryResourceWorker.h" />
 		<Unit filename="GDL\AudioExtension.cpp" />
 		<Unit filename="GDL\AudioExtension.h" />
 		<Unit filename="GDL\AudioTools.cpp" />
@@ -1354,6 +1356,8 @@
 		<Unit filename="GDL\ImageFilesWatcher.h" />
 		<Unit filename="GDL\ImageManager.cpp" />
 		<Unit filename="GDL\ImageManager.h" />
+		<Unit filename="GDL\ImagesUsedInventorizer.cpp" />
+		<Unit filename="GDL\ImagesUsedInventorizer.h" />
 		<Unit filename="GDL\Instruction.cpp" />
 		<Unit filename="GDL\Instruction.h" />
 		<Unit filename="GDL\InvalidImage.h" />
@@ -1425,6 +1429,10 @@
 		<Unit filename="GDL\PropImage.h" />
 		<Unit filename="GDL\RepeatEvent.cpp" />
 		<Unit filename="GDL\RepeatEvent.h" />
+		<Unit filename="GDL\ResourceWrapper.cpp" />
+		<Unit filename="GDL\ResourceWrapper.h" />
+		<Unit filename="GDL\ResourcesManager.cpp" />
+		<Unit filename="GDL\ResourcesManager.h" />
 		<Unit filename="GDL\ResourcesMergingHelper.cpp" />
 		<Unit filename="GDL\ResourcesMergingHelper.h" />
 		<Unit filename="GDL\ResourcesUnmergingHelper.cpp" />

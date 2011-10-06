@@ -1375,23 +1375,23 @@ void OpenSaveGame::RecreatePaths(string file)
 
     //Image du chargement
     if ( !game.loadingScreen.imageFichier.empty() )
-        game.loadingScreen.imageFichier = resourcesUnmergingHelper.GetNewFilename(game.loadingScreen.imageFichier);
+        resourcesUnmergingHelper.ExposeResource(game.loadingScreen.imageFichier);
 
 
     //Images : copie et enlève le répertoire des chemins
     for ( unsigned int i = 0;i < game.images.size() ;i++ )
-        game.images.at( i ).file = resourcesUnmergingHelper.GetNewFilename(game.images.at( i ).file);
+        resourcesUnmergingHelper.ExposeResource(game.images.at( i ).file);
 
     //Add scenes resources
     for ( unsigned int i = 0;i < game.scenes.size();i++ )
     {
         for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j) //Add objects resources
-        	game.scenes[i]->initialObjects[j]->PrepareResourcesForMerging(resourcesUnmergingHelper);
+        	game.scenes[i]->initialObjects[j]->ExposeResources(resourcesUnmergingHelper);
 
-        InventoryEventsResources(game, game.scenes[i]->events, resourcesUnmergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, resourcesUnmergingHelper);
     }
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
-        game.globalObjects[j]->PrepareResourcesForMerging(resourcesUnmergingHelper);
+        game.globalObjects[j]->ExposeResources(resourcesUnmergingHelper);
 #endif //GDE
 }
 

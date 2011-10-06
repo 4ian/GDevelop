@@ -78,6 +78,7 @@ class GD_API EditorImages: public wxPanel
 		static const long idRibbonSearch;
 		static const long idRibbonHelp;
 		static const long idRibbonRefresh;
+		static const long idRibbonDeleteUnused;
 
 	protected:
 
@@ -149,6 +150,7 @@ class GD_API EditorImages: public wxPanel
 		void OnremoveFolderOnlySelected(wxCommandEvent& event);
 		//*)
         void OnMoreOptions( wxCommandEvent& event );
+        void OnDeleteUnusedFiles( wxCommandEvent& event );
         void CreateToolbar();
         void ConnectEvents();
 

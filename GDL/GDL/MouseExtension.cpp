@@ -83,7 +83,7 @@ MouseExtension::MouseExtension()
         instrInfo.AddParameter("expression", _("Position X"), "", false);
         instrInfo.AddParameter("expression", _("Position Y"), "", false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("SetMousePosition").SetIncludeFile("GDL/MouseTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("SetCursorPosition").SetIncludeFile("GDL/MouseTools.h");
 
     DECLARE_END_ACTION()
 

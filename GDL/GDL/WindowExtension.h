@@ -7,6 +7,7 @@
 #define WINDOWEXTENSION_H
 
 #include "GDL/ExtensionBase.h"
+class ArbitraryResourceWorker;
 
 /**
  * \brief Internal built-in extension providing windows features.
@@ -18,7 +19,7 @@ class WindowExtension : public ExtensionBase
         virtual ~WindowExtension() {};
 
         #if defined(GD_IDE_ONLY)
-        virtual void PrepareActionsResourcesForMerging(Instruction & action, ResourcesMergingHelper & resourcesMergingHelper);
+        virtual void ExposeActionsResources(Instruction & action, ArbitraryResourceWorker & worker);
         #endif
 };
 

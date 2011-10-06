@@ -8,19 +8,25 @@
 #ifndef RESOURCESUNMERGINGHELPER_H
 #define RESOURCESUNMERGINGHELPER_H
 
-#include "GDL/ResourcesMergingHelper.h"
+#include "GDL/ArbitraryResourceWorker.h"
 #include <string>
 
 /**
  * Helper used to regenerate resources filename from a "portable" game
  */
-class GD_API ResourcesUnmergingHelper : public ResourcesMergingHelper
+class GD_API ResourcesUnmergingHelper : public ArbitraryResourceWorker
 {
     public:
-        ResourcesUnmergingHelper(std::string newDirectory_) : ResourcesMergingHelper(), newDirectory(newDirectory_) {};
+        ResourcesUnmergingHelper(std::string newDirectory_) : ArbitraryResourceWorker(), newDirectory(newDirectory_) {};
         virtual ~ResourcesUnmergingHelper() {};
 
-        virtual std::string GetNewFilename(std::string resourceFilename);
+        /**
+         * ResourcesUnmergingHelper modify each resouce path.
+         */
+        virtual void ExposeResource(std::string & resource);
+
+        virtual void ExposeImage(std::string & imageName) {};
+        virtual void ExposeShader(std::string & shaderName) {};
 
     private:
         std::string newDirectory;

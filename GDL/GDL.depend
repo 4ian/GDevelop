@@ -14045,7 +14045,7 @@
 
 1297529994 d:\florian\programmation\gamedevelop2\gdl\\gdl\treeitemstrexpressioninfodata.h
 
-1317760695 source:d:\florian\programmation\gamedevelop2\gdl\gdl\editorimages.cpp
+1317933694 source:d:\florian\programmation\gamedevelop2\gdl\gdl\editorimages.cpp
 	"GDL/EditorImages.h"
 	<wx/msw/winundef.h>
 	<wx/bitmap.h>
@@ -14053,6 +14053,7 @@
 	<wx/intl.h>
 	<wx/image.h>
 	<wx/string.h>
+	<wx/choicdlg.h>
 	<wx/toolbar.h>
 	<wx/config.h>
 	<wx/aui/aui.h>
@@ -32705,7 +32706,7 @@
 1314040294 d:\florian\programmation\gamedevelop2\gdl\gdl\timetools.h
 	<string>
 
-1313487987 source:d:\florian\programmation\gamedevelop2\gdl\gdl\expressionscodegeneration.cpp
+1317850249 source:d:\florian\programmation\gamedevelop2\gdl\gdl\expressionscodegeneration.cpp
 	"GDL/ExpressionsCodeGeneration.h"
 	"GDL/StrExpressionInstruction.h"
 	"GDL/ExpressionInstruction.h"

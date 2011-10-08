@@ -174,6 +174,8 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     OpenImages(hdl.FirstChildElement().FirstChildElement( "Images" ).FirstChildElement().Element(),
                hdl.FirstChildElement().FirstChildElement( "DossierImages" ).FirstChildElement().Element());
 
+    game.resourceManager.LoadFromXml(hdl.FirstChildElement().FirstChildElement( "Resources" ));
+
     //Global objects
     elem = hdl.FirstChildElement().FirstChildElement( "Objects" ).Element();
     if ( elem )
@@ -977,6 +979,11 @@ bool OpenSaveGame::SaveToFile(string file)
             imageDossier->SetAttribute( "nom", game.imagesFolders.at( i ).contenu.at(j).c_str() );
         }
     }
+
+    //Ressources
+    TiXmlElement * resources = new TiXmlElement( "Resources" );
+    root->LinkEndChild( resources );
+    game.resourceManager.SaveToXml(resources);
 
     //Global objects
     TiXmlElement * objects = new TiXmlElement( "Objects" );

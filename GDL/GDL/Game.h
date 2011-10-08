@@ -14,6 +14,7 @@
 #include "GDL/Dossier.h"
 #include "GDL/Image.h"
 #include "GDL/LoadingScreen.h"
+#include "GDL/ResourcesManager.h"
 class ExternalEvents;
 #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 namespace GDpriv
@@ -51,6 +52,7 @@ class GD_API Game
 
         std::vector < Image >    images; ///< List of images available for the game
         std::vector < Dossier >  imagesFolders; ///< Folder used to organize images
+        ResourcesManager resourceManager;
 
         std::vector < boost::shared_ptr<Scene> >             scenes; ///< List of all scenes
         std::vector < boost::shared_ptr<Object> >            globalObjects; ///< Global objects

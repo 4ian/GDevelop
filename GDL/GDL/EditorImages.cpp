@@ -17,6 +17,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <wx/choicdlg.h>
 #include <wx/toolbar.h>
 #include <wx/config.h>
 #include <wx/aui/aui.h>
@@ -706,24 +707,51 @@ void EditorImages::Refresh()
 
 void EditorImages::OnDeleteUnusedFiles( wxCommandEvent& event )
 {
-    //Add scenes resources
+    //Search in scenes resources
     ImagesUsedInventorizer inventorizer;
     for ( unsigned int i = 0;i < game.scenes.size();i++ )
     {
-        for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j) //Add objects resources
+        for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j)
         	game.scenes[i]->initialObjects[j]->ExposeResources(inventorizer);
     }
-    //Add global objects resources
-    for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
+    //Search in global objects resources
+    for (unsigned int j = 0;j<game.globalObjects.size();++j)
         game.globalObjects[j]->ExposeResources(inventorizer);
 
+    //Construct a wxArrayString with unused images
+    wxArrayString imagesNotUsed;
+    wxArrayInt initialSelection;
     std::set<std::string> & usedImages = inventorizer.GetAllUsedImages();
     for ( unsigned int i = 0;i < game.images.size() ;i++ )
     {
         if ( usedImages.find(game.images[i].nom) == usedImages.end() )
-            std::cout << game.images[i].nom << " not more used.\n";
+        {
+            imagesNotUsed.push_back(game.images[i].nom);
+            initialSelection.push_back(imagesNotUsed.size()-1);
+        }
     }
 
+    //Request the user to choose which images to remove.
+    wxMultiChoiceDialog dialog(this, _("Ces images ne semblent plus être utilisée dans le projet :\nCochez les images à supprimer."), _("Suppression d'images inutiles"), imagesNotUsed, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxOK | wxCANCEL);
+    dialog.SetSelections(initialSelection);
+    dialog.ShowModal();
+
+    //Remove selection
+    wxArrayInt selection = dialog.GetSelections();
+    for (unsigned int i = 0;i<selection.size();++i)
+    {
+        std::string imageName = ToString(imagesNotUsed[selection[i]]);
+
+        std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), imageName));
+        if ( image != game.images.end() )
+        {
+            game.imagesChanged.push_back((*image).nom);
+            game.images.erase( image );
+            Dossier::RemoveImage(&game.imagesFolders, imageName );
+        }
+
+        RemoveImageFromTree( BanqueImageList->GetRootItem(), imageName );
+    }
 }
 
 ////////////////////////////////////////////////////////////

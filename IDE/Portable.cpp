@@ -122,12 +122,12 @@ void Portable::OnButton1Click(wxCommandEvent& event)
 
     //Add loading image
     if ( !game.loadingScreen.imageFichier.empty() )
-        game.loadingScreen.imageFichier = resourcesMergingHelper.GetNewFilename(game.loadingScreen.imageFichier);
+        resourcesMergingHelper.ExposeResource(game.loadingScreen.imageFichier);
 
     //Add images
     for ( unsigned int i = 0;i < game.images.size() ;i++ )
     {
-        game.images.at( i ).file = resourcesMergingHelper.GetNewFilename(game.images.at( i ).file); //Pour chaque image
+        resourcesMergingHelper.ExposeResource(game.images.at( i ).file); //Pour chaque image
         AvancementGauge->SetValue(i/game.images.size()*33.0f);
     }
     wxSafeYield();
@@ -136,20 +136,20 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     for ( unsigned int s = 0;s < game.scenes.size();s++ )
     {
         for (unsigned int j = 0;j<game.scenes[s]->initialObjects.size();++j) //Add objects resources
-        	game.scenes[s]->initialObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
+        	game.scenes[s]->initialObjects[j]->ExposeResources(resourcesMergingHelper);
 
-        InventoryEventsResources(game, game.scenes[s]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.scenes[s]->events, resourcesMergingHelper);
         AvancementGauge->SetValue(s/game.scenes.size()*16.0f+33.0f);
     }
     //Add external events resources
     for ( unsigned int s = 0;s < game.externalEvents.size();s++ )
     {
-        InventoryEventsResources(game, game.externalEvents[s]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.externalEvents[s]->events, resourcesMergingHelper);
     }
     wxSafeYield();
     //Add global objects resources
     for (unsigned int j = 0;j<game.globalObjects.size();++j)
-        game.globalObjects[j]->PrepareResourcesForMerging(resourcesMergingHelper);
+        game.globalObjects[j]->ExposeResources(resourcesMergingHelper);
     wxSafeYield();
 
     //Copy resources

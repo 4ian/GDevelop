@@ -180,13 +180,13 @@ scene(scene_)
     FlexGridSizer3->Add(BoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     conditionSizer->Add(FlexGridSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
-    ConditionTextTxt = new wxStaticText(this, ID_STATICTEXT2, _("Choisissez une condition dans le menu de gauche"), wxDefaultPosition, wxSize(100,13), 0, _T("ID_STATICTEXT2"));
+    ConditionTextTxt = new wxStaticText(this, ID_STATICTEXT2, _("Choisissez une condition dans le menu de gauche"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     ConditionTextTxt->SetToolTip(_("Pour plus d\'informations sur la condition, consultez l\'aide."));
     BoxSizer3->Add(ConditionTextTxt, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     conditionSizer->Add(BoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
-    StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(400,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
-    BoxSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(480,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
+    BoxSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
     conditionSizer->Add(BoxSizer1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     GridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
     GridSizer1->AddGrowableCol(1);
@@ -611,7 +611,9 @@ void ChoixCondition::RefreshFromCondition()
     const InstructionInfos & instructionInfos =  GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(Type);
 
     NomConditionTxt->SetLabel( instructionInfos.fullname );
+    NomConditionTxt->Wrap( 450 );
     ConditionTextTxt->SetLabel( instructionInfos.description );
+    ConditionTextTxt->Wrap( 450 );
     if ( instructionInfos.icon.IsOk() ) ConditionImg->SetBitmap( instructionInfos.icon );
     else ConditionImg->SetBitmap(BitmapGUIManager::GetInstance()->unknown24);
 
@@ -718,7 +720,7 @@ void ChoixCondition::RefreshFromCondition()
     GlobalCheck->SetValue(!Loc);
     ContraireCheck->SetValue(Contraire);
 
-    Fit();
+    Layout();
 }
 
 
@@ -1065,4 +1067,9 @@ void ChoixCondition::OnObjetsListSelectionChanged(wxTreeEvent& event)
         selectedObject = globalObjectGroups->GetItemText( globalObjectGroups->GetFocusedItem() ).mb_str();
 
     RefreshObjectConditionsList();
+}
+
+void ChoixCondition::OnResize(wxSizeEvent& event)
+{
+    Layout();
 }

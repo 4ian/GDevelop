@@ -286,8 +286,8 @@ void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
         bar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Zoom initial") : "", wxBitmap("res/zoom24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonGrid, !hideLabels ? _("Grille") : "", wxBitmap("res/grid24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonGridSetup, !hideLabels ? _("Editer la grille") : "", wxBitmap("res/gridedit24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonWindowMask, !hideLabels ? _("Masque de la fenêtre de jeu") : "", wxBitmap("res/windowMask24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Liste des objets de la scène") : "", wxBitmap("res/ObjectsPositionsList24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonWindowMask, !hideLabels ? _("Masque de la fen. de jeu") : "", wxBitmap("res/windowMask24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Liste des objets") : "", wxBitmap("res/ObjectsPositionsList24.png", wxBITMAP_TYPE_ANY));
     }
     else
     {

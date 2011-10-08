@@ -313,6 +313,7 @@ buildToolsPnl(NULL)
             ribbonBar->AddButton(EditorImages::idRibbonDown, !hideLabels ? _("Déplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
             ribbonBar->AddButton(EditorImages::idRibbonSearch, !hideLabels ? _("Rechercher") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
             ribbonBar->AddButton(EditorImages::idRibbonRefresh, !hideLabels ? _("Rafraichir") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(EditorImages::idRibbonDeleteUnused, !hideLabels ? _("Supprimer les images superflues") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
         }
 
         {

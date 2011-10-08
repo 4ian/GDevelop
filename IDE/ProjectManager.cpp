@@ -275,8 +275,8 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Ajouter une scène") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Ajouter des évènements externes") : "", wxBitmap("res/eventsadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions") : "", wxBitmap("res/extension24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonEditScene, !hideLabels ? _("Editer la scène selectionnée") : "", wxBitmap("res/sceneedit24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonEditExternalEvents, !hideLabels ? _("Editer les évènements externes selectionnés") : "", wxBitmap("res/eventsedit24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonEditScene, !hideLabels ? _("Editer la scène") : "", wxBitmap("res/sceneedit24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonEditExternalEvents, !hideLabels ? _("Editer les év. externes") : "", wxBitmap("res/eventsedit24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -370,6 +370,8 @@ void ProjectManager::Refresh()
  */
 bool ProjectManager::GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemGameData *& data)
 {
+    if ( !selectedItem.IsOk() ) return false;
+
     data = dynamic_cast<gdTreeItemGameData*>(projectsTree->GetItemData(selectedItem));
     if ( data == NULL )
         return false;
@@ -572,7 +574,11 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
 {
     RuntimeGame * game;
     gdTreeItemGameData * data;
-    if ( !GetGameOfSelectedItem(game, data) ) return;
+    if ( !GetGameOfSelectedItem(game, data) )
+    {
+        wxLogWarning(_("Choisissez une scène à éditer dans le gestionnaire de projets."));
+        return;
+    }
 
     MainEditorCommand mainEditorCommand;
     mainEditorCommand.SetMainEditor(&mainEditor);
@@ -627,7 +633,11 @@ void ProjectManager::OneditScenePropMenuItemSelected(wxCommandEvent& event)
 {
     RuntimeGame * game;
     gdTreeItemGameData * data;
-    if ( !GetGameOfSelectedItem(game, data) ) return;
+    if ( !GetGameOfSelectedItem(game, data) )
+    {
+        wxLogWarning(_("Choisissez une scène à éditer dans le gestionnaire de projets."));
+        return;
+    }
 
     vector< boost::shared_ptr<Scene> >::const_iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
@@ -651,7 +661,11 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
 {
     RuntimeGame * game;
     gdTreeItemGameData * data;
-    if ( !GetGameOfSelectedItem(game, data) ) return;
+    if ( !GetGameOfSelectedItem(game, data) )
+    {
+        wxLogWarning(_("Choisissez une scène à éditer dans le gestionnaire de projets."));
+        return;
+    }
 
     MainEditorCommand mainEditorCommand;
     mainEditorCommand.SetMainEditor(&mainEditor);

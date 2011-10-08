@@ -266,9 +266,7 @@ bool Game_Develop_EditorApp::OnInit()
     errorDetectFile.Write(" ");
 
     //Les log
-    log = new wxLogGui(); // Affichage des messages d'erreurs
     GDLogBanner(); // Log sous forme de fichier détaillé
-    logChain = new wxLogChain( log );
 
     //LLVM stuff
     cout << "Initializing LLVM/Clang..." << endl;

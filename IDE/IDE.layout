@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Release - Edittime" />
+	<ActiveTarget name="Development - Edittime" />
 	<File name="AutomatismTypeChoice.cpp" open="0" top="0" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="5366" topLine="84" />
 	</File>
@@ -47,7 +47,7 @@
 		<Cursor1 position="1133" topLine="36" />
 	</File>
 	<File name="ChoixAction.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="43552" topLine="868" />
+		<Cursor1 position="30837" topLine="568" />
 	</File>
 	<File name="ChoixAction.h" open="0" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="2854" topLine="93" />
@@ -59,7 +59,7 @@
 		<Cursor1 position="6614" topLine="147" />
 	</File>
 	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="41898" topLine="796" />
+		<Cursor1 position="33466" topLine="446" />
 	</File>
 	<File name="ChoixCondition.h" open="0" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="140" topLine="0" />
@@ -82,8 +82,8 @@
 	<File name="CodeEditor.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1105" topLine="10" />
 	</File>
-	<File name="Compilation.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="18107" topLine="299" />
+	<File name="Compilation.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="18891" topLine="296" />
 	</File>
 	<File name="Compilation.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="2950" topLine="97" />
@@ -194,7 +194,7 @@
 		<Cursor1 position="2737" topLine="69" />
 	</File>
 	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="17806" topLine="65" />
+		<Cursor1 position="41500" topLine="915" />
 	</File>
 	<File name="EditorObjectList.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1434" topLine="35" />
@@ -206,12 +206,12 @@
 		<Cursor1 position="575" topLine="0" />
 	</File>
 	<File name="EditorObjetsGroups.cpp" open="0" top="0" tabpos="40" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="23871" topLine="527" />
+		<Cursor1 position="12650" topLine="201" />
 	</File>
 	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="2407" topLine="73" />
 	</File>
-	<File name="EditorScene.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="EditorScene.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="9257" topLine="144" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -220,8 +220,8 @@
 	<File name="ErrorCompilation.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="6171" topLine="158" />
 	</File>
-	<File name="EventsEditor.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="32575" topLine="494" />
+	<File name="EventsEditor.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="32023" topLine="494" />
 	</File>
 	<File name="EventsEditor.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="8918" topLine="230" />
@@ -238,7 +238,7 @@
 	<File name="ExtensionBugReportDlg.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="472" topLine="6" />
 	</File>
-	<File name="Extensions.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="Extensions.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="9383" topLine="129" />
 	</File>
 	<File name="Extensions.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
@@ -262,14 +262,14 @@
 	<File name="GDAuiTabArt.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="493" topLine="9" />
 	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="13233" topLine="354" />
+	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="9794" topLine="254" />
 	</File>
-	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="875" topLine="3" />
+	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="876" topLine="1" />
 	</File>
 	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="952" topLine="25" />
+		<Cursor1 position="21112" topLine="297" />
 	</File>
 	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="706" topLine="9" />
@@ -282,6 +282,9 @@
 	</File>
 	<File name="ImageEditor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="462" topLine="0" />
+	</File>
+	<File name="ImageEditor.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="256" topLine="0" />
 	</File>
 	<File name="ImportImage.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="4838" topLine="106" />
@@ -341,10 +344,10 @@
 		<Cursor1 position="319" topLine="0" />
 	</File>
 	<File name="Portable.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="7492" topLine="147" />
+		<Cursor1 position="7049" topLine="147" />
 	</File>
 	<File name="Preferences.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="61947" topLine="1066" />
+		<Cursor1 position="322" topLine="9" />
 	</File>
 	<File name="Preferences.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="6943" topLine="202" />
@@ -356,7 +359,7 @@
 		<Cursor1 position="2427" topLine="18" />
 	</File>
 	<File name="ProjectManager.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="36779" topLine="715" />
+		<Cursor1 position="40529" topLine="817" />
 	</File>
 	<File name="ProjectManager.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="984" topLine="23" />
@@ -367,14 +370,14 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="510" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="70711" topLine="1581" />
+	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="17774" topLine="272" />
 	</File>
-	<File name="SceneCanvas.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="10509" topLine="233" />
+	<File name="SceneCanvas.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3263" topLine="76" />
 	</File>
-	<File name="SceneEdittimeRenderer.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="11762" topLine="218" />
+	<File name="SceneEdittimeRenderer.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="12761" topLine="228" />
 	</File>
 	<File name="SceneEdittimeRenderer.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="613" topLine="7" />

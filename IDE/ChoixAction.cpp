@@ -168,8 +168,8 @@ scene(scene_)
 	BoxSizer3->Add(ActionTextTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer8->Add(BoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
-	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(400,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
-	BoxSizer1->Add(StaticLine1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(480,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
+	BoxSizer1->Add(StaticLine1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
 	BoxSizer8->Add(BoxSizer1, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	GridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	GridSizer1->AddGrowableCol(1);
@@ -582,7 +582,9 @@ void ChoixAction::RefreshFromAction()
 
     //Display action main properties
     NomActionTxt->SetLabel( instructionInfos.fullname );
+    NomActionTxt->Wrap( 450 );
     ActionTextTxt->SetLabel( instructionInfos.description );
+    ActionTextTxt->Wrap( 450 );
     if ( instructionInfos.icon.IsOk() ) ActionImg->SetBitmap( instructionInfos.icon );
     else ActionImg->SetBitmap(BitmapGUIManager::GetInstance()->unknown24);
 
@@ -689,7 +691,7 @@ void ChoixAction::RefreshFromAction()
     LocaliseCheck->SetValue(Loc);
     GlobalCheck->SetValue(!Loc);
 
-    Fit();
+    Layout();
 }
 
 ////////////////////////////////////////////////////////////

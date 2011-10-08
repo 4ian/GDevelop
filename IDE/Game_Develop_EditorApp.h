@@ -28,8 +28,6 @@ class Game_Develop_EditorApp : public wxApp
 
         Game_Develop_EditorFrame * mainEditor;
         wxSingleInstanceChecker * singleInstanceChecker;
-        wxLogGui *log;
-        wxLogChain *logChain;
 };
 
 #endif // GAME_DEVELOP_EDITORAPP_H

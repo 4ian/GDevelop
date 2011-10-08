@@ -135,6 +135,7 @@ class ChoixCondition: public wxDialog
 		void OnobjectsSearchCtrlText(wxCommandEvent& event);
 		void OnObjetsListSelectionChanged(wxTreeEvent& event);
 		void OnobjectConditionsTreeSelectionChanged(wxTreeEvent& event);
+		void OnResize(wxSizeEvent& event);
 		//*)
 		void RefreshAllLists();
 		void RefreshObjectsLists();

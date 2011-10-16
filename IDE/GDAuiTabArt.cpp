@@ -27,6 +27,8 @@ wxColor gdAuiStepColour(const wxColor& c, int ialpha)
     if (ialpha == 100)
         return c;
 
+    if (!c.IsOk()) return c;
+
     unsigned char r = c.Red(),
                   g = c.Green(),
                   b = c.Blue();

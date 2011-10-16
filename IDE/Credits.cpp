@@ -130,7 +130,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer6->AddGrowableCol(0);
 	FlexGridSizer6->AddGrowableRow(0);
-	HtmlWindow1 = new wxHtmlWindow(Panel3, ID_HTMLWINDOW1, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_AUTO, _T("ID_HTMLWINDOW1"));
+	HtmlWindow1 = new CustomHtmlWindow(Panel3, ID_HTMLWINDOW1, wxDefaultPosition, wxDefaultSize, wxHW_SCROLLBAR_AUTO, _T("ID_HTMLWINDOW1"));
 	HtmlWindow1->SetBorders(1);
 	FlexGridSizer6->Add(HtmlWindow1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel3->SetSizer(FlexGridSizer6);

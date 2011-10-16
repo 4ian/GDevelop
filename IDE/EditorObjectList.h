@@ -30,6 +30,7 @@ class EditorObjectList: public wxPanel
 
 		//(*Declarations(EditorObjectList)
 		wxMenuItem* renameAutomatism;
+		wxMenuItem* effectsMenuI;
 		wxMenuItem* addAutomatismItem;
 		wxPanel* toolbarPanel;
 		wxMenu* automatismsMenu;
@@ -66,6 +67,7 @@ class EditorObjectList: public wxPanel
 		static const long ID_MENUITEM5;
 		static const long ID_MENUITEM3;
 		static const long ID_MENUITEM1;
+		static const long idMenuEffects;
 		static const long idMenuModName;
 		static const long idMenuAddObj;
 		static const long idMenuDelObj;

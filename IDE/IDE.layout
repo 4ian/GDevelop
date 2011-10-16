@@ -133,6 +133,9 @@
 	<File name="Credits.cpp" open="0" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="15602" topLine="190" />
 	</File>
+	<File name="Credits.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="893" topLine="8" />
+	</File>
 	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="6811" topLine="45" />
 	</File>
@@ -263,16 +266,16 @@
 		<Cursor1 position="493" topLine="9" />
 	</File>
 	<File name="Game_Develop_EditorApp.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="9794" topLine="254" />
+		<Cursor1 position="9499" topLine="254" />
 	</File>
 	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="876" topLine="1" />
 	</File>
-	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="21112" topLine="297" />
+	<File name="Game_Develop_EditorMain.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="21525" topLine="317" />
 	</File>
-	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="706" topLine="9" />
+	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1193" topLine="36" />
 	</File>
 	<File name="GeneratePassword.cpp" open="0" top="0" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="5262" topLine="83" />
@@ -358,8 +361,8 @@
 	<File name="ProfileDlg.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="2427" topLine="18" />
 	</File>
-	<File name="ProjectManager.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="40529" topLine="817" />
+	<File name="ProjectManager.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="50427" topLine="1106" />
 	</File>
 	<File name="ProjectManager.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="984" topLine="23" />
@@ -370,8 +373,8 @@
 	<File name="RenderDialog.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="510" topLine="0" />
 	</File>
-	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="17774" topLine="272" />
+	<File name="SceneCanvas.cpp" open="1" top="1" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="46021" topLine="1016" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="3263" topLine="76" />

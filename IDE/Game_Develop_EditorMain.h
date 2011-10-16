@@ -34,7 +34,7 @@
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include "GDL/EditorImages.h"
+#include "GDL/ResourcesEditor.h"
 #include "GDL/Game.h"
 #include "GDL/CommonTools.h"
 #include "EditorScene.h"
@@ -51,7 +51,7 @@ using namespace std;
  */
 class Game_Develop_EditorFrame: public wxFrame
 {
-    friend class EditorImages;
+    friend class ResourcesEditor;
     public:
 
         /**

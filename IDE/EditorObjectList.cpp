@@ -60,6 +60,7 @@ const long EditorObjectList::ID_MENUITEM2 = wxNewId();
 const long EditorObjectList::ID_MENUITEM5 = wxNewId();
 const long EditorObjectList::ID_MENUITEM3 = wxNewId();
 const long EditorObjectList::ID_MENUITEM1 = wxNewId();
+const long EditorObjectList::idMenuEffects = wxNewId();
 const long EditorObjectList::idMenuModName = wxNewId();
 const long EditorObjectList::idMenuAddObj = wxNewId();
 const long EditorObjectList::idMenuDelObj = wxNewId();
@@ -121,7 +122,7 @@ mainEditorCommand(mainEditorCommand_)
 	editMenuI = new wxMenuItem((&ContextMenu), idMenuModObj, _("Modifier les propriétés de l\'objet"), wxEmptyString, wxITEM_NORMAL);
 	editMenuI->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
 	ContextMenu.Append(editMenuI);
-	editVarMenuI = new wxMenuItem((&ContextMenu), idMenuModVar, _("Modifier les variables initiales"), wxEmptyString, wxITEM_NORMAL);
+	editVarMenuI = new wxMenuItem((&ContextMenu), idMenuModVar, _("Variables initiales"), wxEmptyString, wxITEM_NORMAL);
 	editVarMenuI->SetBitmap(wxBitmap(wxImage(_T("res/var.png"))));
 	ContextMenu.Append(editVarMenuI);
 	automatismsMenu = new wxMenu();
@@ -135,7 +136,9 @@ mainEditorCommand(mainEditorCommand_)
 	deleteAutomatismItem = new wxMenuItem(automatismsMenu, ID_MENUITEM3, _("Supprimer un automatisme"), wxEmptyString, wxITEM_NORMAL);
 	deleteAutomatismItem->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	automatismsMenu->Append(deleteAutomatismItem);
-	ContextMenu.Append(ID_MENUITEM1, _("Modifier les automatismes"), automatismsMenu, wxEmptyString);
+	ContextMenu.Append(ID_MENUITEM1, _("Automatismes"), automatismsMenu, wxEmptyString);
+	effectsMenuI = new wxMenuItem((&ContextMenu), idMenuEffects, _("Effets"), wxEmptyString, wxITEM_NORMAL);
+	ContextMenu.Append(effectsMenuI);
 	editNameMenuI = new wxMenuItem((&ContextMenu), idMenuModName, _("Modifier le nom de l\'objet"), wxEmptyString, wxITEM_NORMAL);
 	editNameMenuI->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	ContextMenu.Append(editNameMenuI);
@@ -395,6 +398,8 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
             automatismsMenu->Insert(0, menuItem);
             Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnAutomatismSelected);
         }
+
+        ContextMenu.Enable(idMenuEffects, (*object)->SupportShaders());
 
 
         //Popup menu

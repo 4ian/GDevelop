@@ -125,10 +125,15 @@ void Portable::OnButton1Click(wxCommandEvent& event)
         resourcesMergingHelper.ExposeResource(game.loadingScreen.imageFichier);
 
     //Add images
-    for ( unsigned int i = 0;i < game.images.size() ;i++ )
+    for ( unsigned int i = 0;i < game.resourceManager.resources.size() ;i++ )
     {
-        resourcesMergingHelper.ExposeResource(game.images.at( i ).file); //Pour chaque image
-        AvancementGauge->SetValue(i/game.images.size()*33.0f);
+        if ( game.resourceManager.resources[i] == boost::shared_ptr<Resource>() )
+            continue;
+
+        if ( game.resourceManager.resources[i]->UseFile() )
+            resourcesMergingHelper.ExposeResource(game.resourceManager.resources[i]->GetFile());
+
+        AvancementGauge->SetValue(i/game.resourceManager.resources.size()*33.0f);
     }
     wxSafeYield();
 

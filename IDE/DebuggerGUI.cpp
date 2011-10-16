@@ -168,7 +168,7 @@ objectChanged(true)
     generalList->InsertItem(0, _("Images par secondes ( FPS )"));
     generalList->InsertItem(1, _("Temps depuis la dernière image"));
     generalList->InsertItem(2, _("Nombres d'objets"));
-    generalList->InsertItem(3, _("Nombres d'images"));
+    generalList->InsertItem(3, _("Nombres de ressources"));
     generalList->InsertItem(4, _("Taille de la fenêtre"));
     generalList->InsertItem(5, _("Position de la souris sur la fenêtre"));
     generalList->InsertItem(6, _("Temps depuis le début de la scène"));
@@ -285,7 +285,7 @@ void DebuggerGUI::UpdateGUI()
     generalList->SetItem(0, 1, ToString(1000.0/scene.GetElapsedTime())+_(" i/s"));
     generalList->SetItem(1, 1, ToString(static_cast<double>(scene.GetElapsedTime())/1000.0)+"s");
     generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
-    generalList->SetItem(3, 1, ToString(scene.game->images.size()));
+    //TODO //generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
     generalList->SetItem(4, 1, ToString(scene.game->windowWidth)+"*"+ToString(scene.game->windowHeight));
     generalList->SetItem(5, 1, ToString(sf::Mouse::GetPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::GetPosition(*scene.renderWindow).y));
     generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000.0)+"s");

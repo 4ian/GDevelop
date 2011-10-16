@@ -107,7 +107,7 @@ Demarrage::Demarrage(wxWindow* parent)
 	wxFont StaticText6Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText6->SetFont(StaticText6Font);
 	FlexGridSizer5->Add(StaticText6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("Game Develop permet la création de jeux de façon simple et rapide, pour le développeur débutant ou confirmé."), wxDefaultPosition, wxSize(309,45), 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("Game Develop permet la création de jeux de façon simple et rapide,\npour le développeur débutant ou confirmé."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);

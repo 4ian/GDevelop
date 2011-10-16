@@ -139,23 +139,25 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
 
     if ( ImageCheck->GetValue() )
     {
-        for(unsigned int i = 0;i<secondGame.images.size();i++)
+        for(unsigned int i = 0;i<secondGame.resourceManager.resources.size();i++)
         {
-            std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), secondGame.images.at(i).nom));
-            if ( image != game.images.end() )
+            if ( secondGame.resourceManager.resources[i] == boost::shared_ptr<Resource>() )
+                continue;
+
+            if ( game.resourceManager.HasResource(secondGame.resourceManager.resources[i]->name) )
             {
-                wxString depart = _("Une image nommé \"");
+                wxString depart = _("Une ressource nommé \"");
                 wxString fin = _("\" est déjà présente dans le jeu. Voulez vous la remplacer ?");
-                if (wxMessageBox(depart+secondGame.images.at(i).nom+fin, "Une image de ce nom existe déjà",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+secondGame.resourceManager.resources[i]->name+fin, "Une ressource de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
-                    game.images.erase(image);
-                    game.images.push_back(secondGame.images.at(i));
+                    game.resourceManager.RemoveResource(secondGame.resourceManager.resources[i]->name);
+                    game.resourceManager.resources.push_back(secondGame.resourceManager.resources[i]->Clone());
                 }
 
             }
             else
-                game.images.push_back(secondGame.images.at(i));
+                game.resourceManager.resources.push_back(secondGame.resourceManager.resources[i]->Clone());
         }
     }
     if ( ScenesCheck->GetValue() )

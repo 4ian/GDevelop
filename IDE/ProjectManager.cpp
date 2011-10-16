@@ -868,7 +868,7 @@ void ProjectManager::EditImagesOfGame(Game * game)
     //Verify if the image editor is not already opened
     for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
     {
-        EditorImages * imagesEditorPtr = dynamic_cast<EditorImages*>(mainEditor.GetEditorsNotebook()->GetPage(j));
+        ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
 
         if ( imagesEditorPtr != NULL && &imagesEditorPtr->game == game )
         {
@@ -887,7 +887,7 @@ void ProjectManager::EditImagesOfGame(Game * game)
             prefix = "["+game->name.substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
-    EditorImages * editorImages = new EditorImages(&mainEditor, *game, mainEditorCommand, true);
+    ResourcesEditor * editorImages = new ResourcesEditor(&mainEditor, *game, mainEditorCommand, true);
     mainEditor.GetEditorsNotebook()->AddPage(editorImages, prefix+_("Banque d'images"), true, wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY));
 }
 
@@ -1120,7 +1120,7 @@ void ProjectManager::CloseGame(Game * game)
     {
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
         ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-        EditorImages * imagesEditorPtr = dynamic_cast<EditorImages*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+        ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
         CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
         if ( sceneEditorPtr != NULL )

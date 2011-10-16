@@ -15,6 +15,25 @@
 #include <wx/html/htmlwin.h>
 //*)
 
+/**
+ * Internal class used to display an html window with links redirected to the default system browser.
+ */
+class CustomHtmlWindow: public wxHtmlWindow
+{
+public:
+	CustomHtmlWindow(wxWindow *parent, wxWindowID id = -1,
+		const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize,
+		long style = wxHW_SCROLLBAR_AUTO, const wxString& name = _T("htmlWindow"))
+    : wxHtmlWindow(parent, id, pos, size, style, name)
+    {
+    }
+
+	void OnLinkClicked(const wxHtmlLinkInfo& link)
+    {
+        wxLaunchDefaultBrowser(link.GetHref());
+    }
+};
+
 class Credits: public wxDialog
 {
 	public:
@@ -43,10 +62,10 @@ class Credits: public wxDialog
 		wxHyperlinkCtrl* florianRival;
 		wxPanel* Panel3;
 		wxStaticText* StaticText5;
-		wxHtmlWindow* HtmlWindow1;
 		wxBitmapButton* BitmapButton6;
 		wxBitmapButton* BitmapButton7;
 		wxBitmapButton* BitmapButton4;
+		CustomHtmlWindow* HtmlWindow1;
 		wxTextCtrl* TextCtrl1;
 		wxBitmapButton* BitmapButton3;
 		wxPanel* Panel2;

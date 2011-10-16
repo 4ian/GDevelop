@@ -39,7 +39,7 @@
 #include "Game_Develop_EditorMain.h"
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
-#include "GDL/EditorImages.h"
+#include "GDL/ResourcesEditor.h"
 #include "GDL/ChooseObject.h"
 #include "MyStatusBar.h"
 #include "EditorObjets.h"
@@ -305,36 +305,33 @@ buildToolsPnl(NULL)
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Banque d'images"));
         //
         {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Liste d'images"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Ajout de ressources"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(EditorImages::idRibbonAdd, !hideLabels ? _("Ajouter une image") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(EditorImages::idRibbonDel, !hideLabels ? _("Supprimer") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(EditorImages::idRibbonUp, !hideLabels ? _("Déplacer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(EditorImages::idRibbonDown, !hideLabels ? _("Déplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(EditorImages::idRibbonSearch, !hideLabels ? _("Rechercher") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(EditorImages::idRibbonRefresh, !hideLabels ? _("Rafraichir") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(EditorImages::idRibbonDeleteUnused, !hideLabels ? _("Supprimer les images superflues") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAdd, !hideLabels ? _("Ajouter une image") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAddDossier, !hideLabels ? _("Ajouter un dossier virtuel") : "", wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY));
+        }
+        {
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Gestion de la liste"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDel, !hideLabels ? _("Supprimer") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDeleteUnused, !hideLabels ? _("Supprimer les res. superflues") : "", wxBitmap("res/deleteunknown24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonUp, !hideLabels ? _("Déplacer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDown, !hideLabels ? _("Déplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Rafraichir la liste") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
         }
 
         {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Image sélectionnée"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Ressource sélectionnée"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(EditorImages::idRibbonMod, !hideLabels ? _("Nom") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(EditorImages::idRibbonModFile, !hideLabels ? _("Modifier le fichier") : "", wxBitmap("res/openicon24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(EditorImages::idRibbonModProp, !hideLabels ? _("Propriétés") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(EditorImages::idRibbonPaintProgram, !hideLabels ? _("Editer") : "", wxBitmap("res/paint24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonMod, !hideLabels ? _("Nom") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonModFile, !hideLabels ? _("Modifier le fichier") : "", wxBitmap("res/openicon24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonModProp, !hideLabels ? _("Propriétés") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonPaintProgram, !hideLabels ? _("Editer") : "", wxBitmap("res/paint24.png", wxBITMAP_TYPE_ANY));
         }
-
-        {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Dossiers"), wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-            wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(EditorImages::idRibbonAddDossier, !hideLabels ? _("Ajouter un dossier") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
-        }
-
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(EditorImages::idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
         }
     }
     {
@@ -519,7 +516,7 @@ void Game_Develop_EditorFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
 
     //Update ribbon for new selected editor
     EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(event.GetSelection()));
-    EditorImages * imagesEditorPtr = dynamic_cast<EditorImages*>(editorsNotebook->GetPage(event.GetSelection()));
+    ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(editorsNotebook->GetPage(event.GetSelection()));
     CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection()));
     ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(editorsNotebook->GetPage(event.GetSelection()));
 

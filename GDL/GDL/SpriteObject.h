@@ -54,6 +54,8 @@ class GD_API SpriteObject : public Object
         virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
         virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
+        virtual bool SupportShaders() { return true; }
+
         virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
         virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
         virtual unsigned int GetNumberOfProperties() const;

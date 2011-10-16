@@ -506,8 +506,6 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
     specialAction = scene;
 }
 
-RuntimeContext * tempRCpointer;
-
 ////////////////////////////////////////////////////////////
 /// Ouvre un jeu, et stocke dans les tableaux passés en paramétres.
 ////////////////////////////////////////////////////////////

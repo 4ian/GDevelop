@@ -171,10 +171,17 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         openLoadingScreen.OpenFromElement(elem->FirstChildElement( "Chargement" ));
     }
 
-    OpenImages(hdl.FirstChildElement().FirstChildElement( "Images" ).FirstChildElement().Element(),
-               hdl.FirstChildElement().FirstChildElement( "DossierImages" ).FirstChildElement().Element());
+    //Compatibility code
+    #if defined(GD_IDE_ONLY)
+    if ( major < 2 || (major == 2 && minor == 0 && build <= 10498) )
+    {
+        OpenImagesFromGD2010498(hdl.FirstChildElement().FirstChildElement( "Images" ).FirstChildElement().Element(),
+                   hdl.FirstChildElement().FirstChildElement( "DossierImages" ).FirstChildElement().Element());
+    }
+    #endif
+    //End of Compatibility code
 
-    game.resourceManager.LoadFromXml(hdl.FirstChildElement().FirstChildElement( "Resources" ));
+    game.resourceManager.LoadFromXml(hdl.FirstChildElement().FirstChildElement( "Resources" ).Element());
 
     //Global objects
     elem = hdl.FirstChildElement().FirstChildElement( "Objects" ).Element();
@@ -374,75 +381,8 @@ void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
     return;
 }
 
-void OpenSaveGame::OpenImages(const TiXmlElement * imagesElem, TiXmlElement * dossierElem)
-{
-    //Images
-    game.images.clear();
-    while ( imagesElem )
-    {
-        Image imageToAdd;
-
-        if ( imagesElem->Attribute( "nom" ) != NULL ) { imageToAdd.nom = imagesElem->Attribute( "nom" ); }
-        else { MSG( "Les informations concernant le nom de l'image manquent." ); }
-        if ( imagesElem->Attribute( "fichier" ) != NULL ) {imageToAdd.file = imagesElem->Attribute( "fichier" ); }
-        else { MSG( "Les informations concernant le fichier de l'image manquent." ); }
-
-        imageToAdd.smooth = true;
-        if ( imagesElem->Attribute( "lissage" ) != NULL && string(imagesElem->Attribute( "lissage" )) == "false")
-                imageToAdd.smooth = false;
-
-        imageToAdd.alwaysLoaded = false;
-        if ( imagesElem->Attribute( "alwaysLoaded" ) != NULL && string(imagesElem->Attribute( "alwaysLoaded" )) == "true")
-                imageToAdd.alwaysLoaded = true;
-
-        game.images.push_back(imageToAdd);
-        imagesElem = imagesElem->NextSiblingElement();
-    }
-
-    //Dossiers d'images
-    game.imagesFolders.clear();
-    while ( dossierElem )
-    {
-        Dossier dossierToAdd;
-
-        if ( dossierElem->Attribute( "nom" ) != NULL ) { dossierToAdd.nom =  dossierElem->Attribute( "nom" ); }
-        else { MSG( "Les informations concernant le nom d'un dossier d'images manquent." ); }
-
-        //On vérifie que le dossier n'existe pas plusieurs fois.
-        //Notamment pour purger les fichiers qui ont eu des dossiers dupliqués suite à un bug
-        //27/04/09
-        bool alreadyexist = false;
-        for (unsigned int i =0;i<game.imagesFolders.size();++i)
-        {
-        	if ( dossierToAdd.nom == game.imagesFolders.at(i).nom )
-                alreadyexist = true;
-        }
-
-        if ( !alreadyexist )
-        {
-            TiXmlElement *elemDossier = dossierElem;
-            if ( elemDossier->FirstChildElement( "Contenu" ) != NULL )
-            {
-                elemDossier = elemDossier->FirstChildElement( "Contenu" )->FirstChildElement();
-                while ( elemDossier )
-                {
-                    if ( elemDossier->Attribute( "nom" ) != NULL ) { dossierToAdd.contenu.push_back( elemDossier->Attribute( "nom" ) );}
-                    else { MSG( "Les informations concernant le nom d'une image d'un dossier manquent." ); }
-
-                    elemDossier = elemDossier->NextSiblingElement();
-                }
-            }
-
-            game.imagesFolders.push_back( dossierToAdd );
-        }
-
-        dossierElem = dossierElem->NextSiblingElement();
-    }
-}
-
 void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, TiXmlElement * elem)
 {
-    cout << "OpenObjects";
     TiXmlElement * elemScene = elem->FirstChildElement("Objet");
 
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
@@ -498,7 +438,6 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, T
 
 void OpenSaveGame::OpenGroupesObjets(vector < ObjectGroup > & list, TiXmlElement * elem)
 {
-    cout << "OpenGroupesObjets";
     TiXmlElement * elemScene = elem->FirstChildElement("Groupe");
 
     //Passage en revue des positions initiales
@@ -931,55 +870,6 @@ bool OpenSaveGame::SaveToFile(string file)
     OpenSaveLoadingScreen saveLoadingScreen(game.loadingScreen);
     saveLoadingScreen.SaveToElement(chargement);
 
-    //Les images
-    TiXmlElement * images = new TiXmlElement( "Images" );
-    root->LinkEndChild( images );
-    TiXmlElement * image;
-
-    if ( !game.images.empty() )
-    {
-        for ( unsigned int i = 0;i < game.images.size();i++ )
-        {
-            image = new TiXmlElement( "Image" );
-            images->LinkEndChild( image );
-            image->SetAttribute( "nom", game.images.at( i ).nom.c_str() );
-            image->SetAttribute( "fichier", game.images.at( i ).file.c_str() );
-
-            if ( !game.images.at( i ).smooth )
-                image->SetAttribute( "lissage", "false" );
-            else
-                image->SetAttribute( "lissage", "true" );
-
-            image->SetAttribute( "alwaysLoaded", "false" );
-            if ( game.images.at( i ).alwaysLoaded )
-                image->SetAttribute( "alwaysLoaded", "true" );
-
-        }
-    }
-
-    TiXmlElement * dossiers = new TiXmlElement( "DossierImages" );
-    root->LinkEndChild( dossiers );
-    TiXmlElement * dossier;
-
-    for ( unsigned int i = 0;i < game.imagesFolders.size();++i )
-    {
-
-        dossier = new TiXmlElement( "Dossier" );
-        dossiers->LinkEndChild( dossier );
-        dossier->SetAttribute( "nom", game.imagesFolders.at( i ).nom.c_str() );
-
-        TiXmlElement * contenu = new TiXmlElement( "Contenu" );
-        dossier->LinkEndChild( contenu );
-        TiXmlElement * imageDossier;
-
-        for ( unsigned int j = 0;j < game.imagesFolders.at( i ).contenu.size();j++ )
-        {
-            imageDossier = new TiXmlElement( "Image" );
-            contenu->LinkEndChild( imageDossier );
-            imageDossier->SetAttribute( "nom", game.imagesFolders.at( i ).contenu.at(j).c_str() );
-        }
-    }
-
     //Ressources
     TiXmlElement * resources = new TiXmlElement( "Resources" );
     root->LinkEndChild( resources );
@@ -1385,9 +1275,14 @@ void OpenSaveGame::RecreatePaths(string file)
         resourcesUnmergingHelper.ExposeResource(game.loadingScreen.imageFichier);
 
 
-    //Images : copie et enlève le répertoire des chemins
-    for ( unsigned int i = 0;i < game.images.size() ;i++ )
-        resourcesUnmergingHelper.ExposeResource(game.images.at( i ).file);
+    for ( unsigned int i = 0;i < game.resourceManager.resources.size() ;i++ )
+    {
+        if ( game.resourceManager.resources[i] == boost::shared_ptr<Resource>() )
+            continue;
+
+        if ( game.resourceManager.resources[i]->UseFile() )
+            resourcesUnmergingHelper.ExposeResource(game.resourceManager.resources[i]->GetFile());
+    }
 
     //Add scenes resources
     for ( unsigned int i = 0;i < game.scenes.size();i++ )
@@ -1403,6 +1298,73 @@ void OpenSaveGame::RecreatePaths(string file)
 }
 
 #if defined(GD_IDE_ONLY)
+void OpenSaveGame::OpenImagesFromGD2010498(const TiXmlElement * imagesElem, TiXmlElement * dossierElem)
+{
+    //Images
+    game.resourceManager.resources.clear();
+    while ( imagesElem )
+    {
+        boost::shared_ptr<ImageResource> image(new ImageResource);
+
+        if ( imagesElem->Attribute( "nom" ) != NULL ) { image->name = imagesElem->Attribute( "nom" ); }
+        else { MSG( "Les informations concernant le nom de l'image manquent." ); }
+        if ( imagesElem->Attribute( "fichier" ) != NULL ) {image->file = imagesElem->Attribute( "fichier" ); }
+        else { MSG( "Les informations concernant le fichier de l'image manquent." ); }
+
+        image->smooth = true;
+        if ( imagesElem->Attribute( "lissage" ) != NULL && string(imagesElem->Attribute( "lissage" )) == "false")
+                image->smooth = false;
+
+        image->alwaysLoaded = false;
+        if ( imagesElem->Attribute( "alwaysLoaded" ) != NULL && string(imagesElem->Attribute( "alwaysLoaded" )) == "true")
+                image->alwaysLoaded = true;
+
+        game.resourceManager.resources.push_back(image);
+        imagesElem = imagesElem->NextSiblingElement();
+    }
+
+    //Dossiers d'images
+    game.resourceManager.folders.clear();
+    while ( dossierElem )
+    {
+        ResourceFolder folder;
+
+        if ( dossierElem->Attribute( "nom" ) != NULL ) { folder.name =  dossierElem->Attribute( "nom" ); }
+        else { MSG( "Les informations concernant le nom d'un dossier d'images manquent." ); }
+
+        //On vérifie que le dossier n'existe pas plusieurs fois.
+        //Notamment pour purger les fichiers qui ont eu des dossiers dupliqués suite à un bug
+        //27/04/09
+        bool alreadyexist = false;
+        for (unsigned int i =0;i<game.resourceManager.folders.size();++i)
+        {
+        	if ( folder.name == game.resourceManager.folders[i].name )
+                alreadyexist = true;
+        }
+
+        if ( !alreadyexist )
+        {
+            TiXmlElement *elemDossier = dossierElem;
+            if ( elemDossier->FirstChildElement( "Contenu" ) != NULL )
+            {
+                elemDossier = elemDossier->FirstChildElement( "Contenu" )->FirstChildElement();
+                while ( elemDossier )
+                {
+                    if ( elemDossier->Attribute( "nom" ) != NULL ) { folder.AddResource(elemDossier->Attribute( "nom" ), game.resourceManager.resources); }
+                    else { MSG( "Les informations concernant le nom d'une image d'un dossier manquent." ); }
+
+                    elemDossier = elemDossier->NextSiblingElement();
+                }
+            }
+
+            game.resourceManager.folders.push_back( folder );
+        }
+
+        dossierElem = dossierElem->NextSiblingElement();
+    }
+}
+
+
 void OpenSaveGame::AdaptConditionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos)
 {
     vector < GDExpression > newParameters = instruction.GetParameters();

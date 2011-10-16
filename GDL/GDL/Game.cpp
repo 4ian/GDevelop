@@ -64,8 +64,7 @@ void Game::Init(const Game & game)
     loadingScreen = game.loadingScreen;
 
     //Resources
-    images = game.images;
-    imagesFolders = game.imagesFolders;
+    resourceManager = game.resourceManager;
 
     globalObjects.clear();
     for (unsigned int i =0;i<game.globalObjects.size();++i)

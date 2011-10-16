@@ -206,19 +206,21 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
         return false;
 
     std::cout << "Writing bitcode...\n";
-    sf::Lock lock(openSaveDialogMutex);
+    sf::Lock lock(openSaveDialogMutex); //On windows, GD is crashing if we write witcode while an open/save file dialog is displayed.
 
-    llvm::Module *Module = Act->takeModule();
+    llvm::OwningPtr<llvm::Module> module(Act->takeModule());
 
     std::string error;
     llvm::raw_fd_ostream file(bitCodeFile.c_str(), error, llvm::raw_fd_ostream::F_Binary);
-    llvm::WriteBitcodeToFile(Module, file);
+    llvm::WriteBitcodeToFile(module.get(), file);
     std::cout << error;
 
     std::cout << "Events C++ file to bitcode compilation ended.\n";
 
     return true;
 }
+
+EventsCodeCompiler::Worker::~Worker() {std::cout << "Compilation worker deleted." << std::endl;};
 
 void EventsCodeCompiler::Worker::DoCompleteCompilation()
 {
@@ -289,6 +291,7 @@ void EventsCodeCompiler::Worker::DoCompleteCompilation()
                             }
                             else
                             {
+
                                 if ( !executionEngine->LoadFromLLVMBitCode(eventsBuffer.get()) )
                                 {
                                     cout << "Compilation aborted: Bitcode loading and compiling failed." << endl << char(7);

@@ -40,8 +40,8 @@ BEGIN_EVENT_TABLE(PropImage,wxDialog)
 	EVT_SIZE    (PropImage::OnSize)
 END_EVENT_TABLE()
 
-PropImage::PropImage(wxWindow* parent, Image & pImage) :
-image(pImage)
+PropImage::PropImage(wxWindow* parent, ImageResource & image_) :
+image(image_)
 {
 	//(*Initialize(PropImage)
 	wxStaticBoxSizer* StaticBoxSizer2;
@@ -137,7 +137,7 @@ image(pImage)
 	//*)
 
     LissageCheck->SetValue(image.smooth);
-    NomEdit->ChangeValue(image.nom);
+    NomEdit->ChangeValue(image.name);
     FichierEdit->ChangeValue(image.file);
     alwaysLoadedCheck->SetValue(image.alwaysLoaded);
 }
@@ -152,7 +152,7 @@ PropImage::~PropImage()
 void PropImage::OnOkBtClick(wxCommandEvent& event)
 {
     image.smooth = LissageCheck->GetValue();
-    image.nom = NomEdit->GetValue();
+    image.name = NomEdit->GetValue();
     image.file = FichierEdit->GetValue();
     image.alwaysLoaded = alwaysLoadedCheck->GetValue();
 

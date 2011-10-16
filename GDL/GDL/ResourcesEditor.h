@@ -1,28 +1,32 @@
 #if defined(GD_IDE_ONLY)
 
-#ifndef EDITORIMAGES_H
-#define EDITORIMAGES_H
+#ifndef RESOURCESEDITOR_H
+#define RESOURCESEDITOR_H
 
-//(*Headers(EditorImages)
+//(*Headers(ResourcesEditor)
 #include <wx/treectrl.h>
 #include <wx/sizer.h>
 #include <wx/menu.h>
+#include <wx/textctrl.h>
 #include <wx/splitter.h>
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 //*)
+#include <wx/srchctrl.h>
 #include <wx/aui/aui.h>
+#include <boost/weak_ptr.hpp>
+#include "GDL/ResourcesManager.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/ImageManager.h"
 #include "GDL/MainEditorCommand.h"
 #include "GDL/ImageFilesWatcher.h"
 
-class GD_API EditorImages: public wxPanel
+class GD_API ResourcesEditor: public wxPanel
 {
 	public:
 
-		EditorImages(wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_, bool useRibbon_ = false );
-		virtual ~EditorImages();
+		ResourcesEditor(wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_, bool useRibbon_ = false );
+		virtual ~ResourcesEditor();
 
 		Game & game;
 
@@ -30,18 +34,20 @@ class GD_API EditorImages: public wxPanel
 
 		//Item sélectionné dans la liste
 		wxTreeItemId m_itemSelected;
-		string fileImageSelected;
+		boost::weak_ptr<Resource> resourceSelected;
 
-		//(*Declarations(EditorImages)
+		//(*Declarations(ResourcesEditor)
 		wxAuiManager* AuiManager1;
 		wxPanel* Core;
 		wxMenuItem* MenuItem8;
 		wxPanel* toolbarPanel;
 		wxAuiToolBar* toolbar;
 		wxMenuItem* MenuItem7;
+		wxSearchCtrl* searchCtrl;
 		wxMenu emptyMenu;
 		wxMenuItem* MenuItem5;
 		wxMenuItem* MenuItem2;
+		wxTreeCtrl* resourcesTree;
 		wxPanel* apercuPanel;
 		wxMenuItem* MenuItem4;
 		wxMenuItem* MenuItem14;
@@ -51,7 +57,7 @@ class GD_API EditorImages: public wxPanel
 		wxMenuItem* MenuItem10;
 		wxMenuItem* MenuItem12;
 		wxMenuItem* MenuItem6;
-		wxTreeCtrl* BanqueImageList;
+		wxPanel* treePanel;
 		wxSplitterWindow* SplitterWindow1;
 		wxMenuItem* MenuItem9;
 		wxMenu folderMenu;
@@ -82,10 +88,12 @@ class GD_API EditorImages: public wxPanel
 
 	protected:
 
-		//(*Identifiers(EditorImages)
+		//(*Identifiers(ResourcesEditor)
 		static const long ID_AUITOOLBAR1;
 		static const long ID_PANEL2;
 		static const long ID_TREECTRL1;
+		static const long ID_TEXTCTRL1;
+		static const long ID_PANEL4;
 		static const long ID_PANEL3;
 		static const long ID_SPLITTERWINDOW1;
 		static const long ID_PANEL1;
@@ -116,7 +124,7 @@ class GD_API EditorImages: public wxPanel
 
 	private:
 
-		//(*Handlers(EditorImages)
+		//(*Handlers(ResourcesEditor)
 		void OnHautImageBtClick(wxCommandEvent& event);
 		void OnDelImageBtClick(wxCommandEvent& event);
 		void OnModNameImageBtClick(wxCommandEvent& event);
@@ -148,6 +156,14 @@ class GD_API EditorImages: public wxPanel
 		void OnAddFolderSelected(wxCommandEvent& event);
 		void OnRemoveFolderSelected(wxCommandEvent& event);
 		void OnremoveFolderOnlySelected(wxCommandEvent& event);
+		void OnsearchCtrlText(wxCommandEvent& event);
+		void OnresourcesTreeBeginLabelEdit(wxTreeEvent& event);
+		void OnresourcesTreeEndLabelEdit(wxTreeEvent& event);
+		void OnresourcesTreeItemActivated(wxTreeEvent& event);
+		void OnresourcesTreeSelectionChanged(wxTreeEvent& event);
+		void OnresourcesTreeItemMenu(wxTreeEvent& event);
+		void OnresourcesTreeBeginDrag(wxTreeEvent& event);
+		void OnapercuPanelResize(wxSizeEvent& event);
 		//*)
         void OnMoreOptions( wxCommandEvent& event );
         void OnDeleteUnusedFiles( wxCommandEvent& event );

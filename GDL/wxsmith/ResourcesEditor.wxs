@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxPanel" name="EditorImages">
+	<object class="wxPanel" name="ResourcesEditor">
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 			<cols>1</cols>
@@ -21,8 +21,9 @@
 								<object class="sizeritem">
 									<object class="wxPanel" name="ID_PANEL2" variable="toolbarPanel" member="yes">
 										<size>-1,25</size>
-										<bg>wxSYS_COLOUR_WINDOW</bg>
-										<extra_code>if ( useRibbon ) toolbarPanel-&gt;SetSize(-1, 0);</extra_code>
+										<fg>wxSYS_COLOUR_HIGHLIGHT</fg>
+										<bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+										<extra_code>if ( useRibbon ) toolbarPanel-&gt;Hide();</extra_code>
 										<object class="wxAuiManager" variable="AuiManager1" member="yes">
 											<object class="AuiManagerItem">
 												<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes" />
@@ -55,20 +56,41 @@
 								<orientation>vertical</orientation>
 								<size>239,271</size>
 								<minsize>10,10</minsize>
-								<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="BanqueImageList" member="yes">
-									<size>200,170</size>
-									<tooltip>Clic droit sur une image pour accéder aux options</tooltip>
-									<style>wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE</style>
-									<handler function="OnBanqueImageListBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
-									<handler function="OnBanqueImageListEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
-									<handler function="OnBanqueImageListItemActivated1" entry="EVT_TREE_ITEM_ACTIVATED" />
-									<handler function="OnBanqueImageListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
-									<handler function="OnBanqueImageListItemMenu" entry="EVT_TREE_ITEM_MENU" />
+								<object class="wxPanel" name="ID_PANEL4" variable="treePanel" member="yes">
+									<pos>24,64</pos>
+									<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+										<cols>1</cols>
+										<growablecols>0</growablecols>
+										<growablerows>0</growablerows>
+										<object class="sizeritem">
+											<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="resourcesTree" member="yes">
+												<size>200,170</size>
+												<tooltip>Clic droit sur une image pour accéder aux options</tooltip>
+												<style>wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE</style>
+												<handler function="OnresourcesTreeBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
+												<handler function="OnresourcesTreeEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
+												<handler function="OnresourcesTreeItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
+												<handler function="OnresourcesTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+												<handler function="OnresourcesTreeItemMenu" entry="EVT_TREE_ITEM_MENU" />
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxTextCtrl" name="ID_TEXTCTRL1" subclass="wxSearchCtrl" variable="searchCtrl" member="yes">
+												<handler function="OnsearchCtrlText" entry="EVT_TEXT" />
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
 								</object>
 								<object class="wxPanel" name="ID_PANEL3" variable="apercuPanel" member="yes">
 									<size>200,120</size>
 									<style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
 									<handler function="OnapercuPanelPaint" entry="EVT_PAINT" />
+									<handler function="OnapercuPanelResize" entry="EVT_SIZE" />
 								</object>
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

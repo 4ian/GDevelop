@@ -117,8 +117,6 @@ void LinkEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainE
  */
 void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
-
     dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
     dc.SetPen( wxPen( wxColour( 0, 0, 0 ), 1) );
     wxRect rect(x+1, y, width, GetRenderedHeight(width)-2);

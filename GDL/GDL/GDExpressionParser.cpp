@@ -87,7 +87,7 @@ std::vector<GDExpression> CompleteParameters(const std::vector < ParameterInfo >
 bool GDExpressionParser::ValidSyntax(const std::string & str)
 {
     static const std::string numerics = "0123456789.e";
-    static const std::string operators = "+/*-";
+    static const std::string operators = "+/*-%";
 
     size_t parenthesisLevel = 0;
     std::string lastOperator;

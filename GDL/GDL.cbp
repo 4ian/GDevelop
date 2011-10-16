@@ -1290,8 +1290,6 @@
 		<Unit filename="GDL\EditRepeatEvent.h" />
 		<Unit filename="GDL\EditTextDialog.cpp" />
 		<Unit filename="GDL\EditTextDialog.h" />
-		<Unit filename="GDL\EditorImages.cpp" />
-		<Unit filename="GDL\EditorImages.h" />
 		<Unit filename="GDL\EditorObjet.cpp" />
 		<Unit filename="GDL\EditorObjet.h" />
 		<Unit filename="GDL\Event.cpp" />
@@ -1431,6 +1429,8 @@
 		<Unit filename="GDL\RepeatEvent.h" />
 		<Unit filename="GDL\ResourceWrapper.cpp" />
 		<Unit filename="GDL\ResourceWrapper.h" />
+		<Unit filename="GDL\ResourcesEditor.cpp" />
+		<Unit filename="GDL\ResourcesEditor.h" />
 		<Unit filename="GDL\ResourcesManager.cpp" />
 		<Unit filename="GDL\ResourcesManager.h" />
 		<Unit filename="GDL\ResourcesMergingHelper.cpp" />
@@ -1551,7 +1551,7 @@
 			</AutoVersioning>
 			<wxsmith version="1">
 				<resources>
-					<wxPanel wxs="wxsmith/EditorImages.wxs" src="GDL/EditorImages.cpp" hdr="GDL/EditorImages.h" fwddecl="0" i18n="1" name="EditorImages" language="CPP" />
+					<wxPanel wxs="wxsmith/ResourcesEditor.wxs" src="GDL/ResourcesEditor.cpp" hdr="GDL/ResourcesEditor.h" fwddecl="0" i18n="1" name="ResourcesEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseObject.wxs" src="GDL/ChooseObject.cpp" hdr="GDL/ChooseObject.h" fwddecl="0" i18n="1" name="ChooseObject" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseLayer.wxs" src="GDL/ChooseLayer.cpp" hdr="GDL/ChooseLayer.h" fwddecl="0" i18n="1" name="ChooseLayer" language="CPP" />
 					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDL/EditLink.cpp" hdr="GDL/EditLink.h" fwddecl="0" i18n="1" name="EditLink" language="CPP" />

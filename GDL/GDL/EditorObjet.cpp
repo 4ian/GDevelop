@@ -510,7 +510,7 @@ ySelectionOffset(0)
 
     m_mgr.SetManagedWindow( this );
 
-    editorImagesPnl = new EditorImages( this, game, mainEditorCommand );
+    editorImagesPnl = new ResourcesEditor( this, game, mainEditorCommand );
     editorImagesPnl->Refresh();
 
     m_mgr.AddPane( Core, wxAuiPaneInfo().Name( wxT( "Core" ) ).Center().CaptionVisible(false) );
@@ -1003,22 +1003,32 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
             dc.SetPen(wxPen(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT)));
         dc.DrawRectangle(wxRect(2+i*48+i*3-decalage,2,50,50));
 
-        //On cherche l'ID de l'image à afficher
-        std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), directionToDisplay.GetSprite(i).GetImageName()));
-        if ( image != game.images.end() && wxFileExists((*image).file) )
+        if ( game.resourceManager.HasResource(directionToDisplay.GetSprite(i).GetImageName()) )
         {
-            wxBitmap bmp( (*image).file, wxBITMAP_TYPE_ANY);
-            if ( bmp.GetWidth() != 48 || bmp.GetHeight() != 48 )
+            try
             {
-                wxImage bmpImage = bmp.ConvertToImage();
-                bmp = wxBitmap(bmpImage.Scale(48, 48));
-            }
+                ImageResource & image = dynamic_cast<ImageResource&>(game.resourceManager.GetResource(directionToDisplay.GetSprite(i).GetImageName()));
 
-            if ( bmp.IsOk() ) dc.DrawBitmap(bmp, 2+i*48+i*3+1-decalage, 3, true);
-        }
-        else
-        {
-            dc.DrawBitmap(wxBitmap( "res/error48.png", wxBITMAP_TYPE_ANY ), 2+i*48+i*3+1-decalage, 3);
+                if ( wxFileExists(image.file) )
+                {
+                    wxBitmap bmp( image.file, wxBITMAP_TYPE_ANY);
+                    if ( bmp.GetWidth() != 48 || bmp.GetHeight() != 48 )
+                    {
+                        wxImage bmpImage = bmp.ConvertToImage();
+                        bmp = wxBitmap(bmpImage.Scale(48, 48));
+                    }
+
+                    if ( bmp.IsOk() ) dc.DrawBitmap(bmp, 2+i*48+i*3+1-decalage, 3, true);
+                }
+                else
+                {
+                    dc.DrawBitmap(wxBitmap( "res/error48.png", wxBITMAP_TYPE_ANY ), 2+i*48+i*3+1-decalage, 3);
+                }
+            }
+            catch(...)
+            {
+                //Resource is probably not an image.
+            }
         }
     }
     if ( directionToDisplay.HasNoSprites() )
@@ -1079,46 +1089,54 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
     if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirection( direction ).GetSpritesNumber() )
     {
         const Sprite & sprite = object.GetAnimation( animation ).GetDirection( direction ).GetSprite(selectedImage);
-        std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), sprite.GetImageName()));
-        if ( image != game.images.end() && wxFileExists((*image).file))
+        try
         {
-            //Chargement de l'image
-            wxBitmap bmp( (*image).file, wxBITMAP_TYPE_ANY);
-            wxBitmap point( bitmapGUIManager->point );
+            ImageResource & image = dynamic_cast<ImageResource&>(game.resourceManager.GetResource(sprite.GetImageName()));
 
-            scrollWidth->SetScrollbar(scrollWidth->GetThumbPosition(),size.GetWidth(), bmp.GetWidth(),size.GetWidth());
-            scrollHeight->SetScrollbar(scrollHeight->GetThumbPosition(), size.GetHeight(), bmp.GetHeight(), size.GetHeight());
-
-            spritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
-            spritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;
-
-            if ( bmp.IsOk() )
-                dc.DrawBitmap(bmp, spritePosX, spritePosY, true /* use mask */); //Affichage de l'image
-
-            //Affichage du point
-            if ( placingPoint && sprite.HasPoint(selectedPoint))
+            if ( wxFileExists(image.file) )
             {
-                dc.DrawBitmap(point,
-                              sprite.GetPoint(selectedPoint).GetX() - point.GetWidth()/2 + ((size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2),
-                              sprite.GetPoint(selectedPoint).GetY() - point.GetHeight()/2 + ((size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2),
-                              true /* use mask */);
-            }
+                //Chargement de l'image
+                wxBitmap bmp( image.file, wxBITMAP_TYPE_ANY);
+                wxBitmap point( bitmapGUIManager->point );
 
-            //Display hit boxes
-            if ( editingMask )
-            {
-                //dc.SetLogicalFunction(wxINVERT);
-                std::vector<RotatedRectangle> boxes = sprite.GetCollisionMask();
-                for (unsigned int i = 0;i<boxes.size();++i)
+                scrollWidth->SetScrollbar(scrollWidth->GetThumbPosition(),size.GetWidth(), bmp.GetWidth(),size.GetWidth());
+                scrollHeight->SetScrollbar(scrollHeight->GetThumbPosition(), size.GetHeight(), bmp.GetHeight(), size.GetHeight());
+
+                spritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
+                spritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;
+
+                if ( bmp.IsOk() )
+                    dc.DrawBitmap(bmp, spritePosX, spritePosY, true /* use mask */); //Affichage de l'image
+
+                //Affichage du point
+                if ( placingPoint && sprite.HasPoint(selectedPoint))
                 {
-                    dc.SetBrush(wxBrush(wxColour(128,128,128), wxBRUSHSTYLE_FDIAGONAL_HATCH));
-                    if ( i == selectedBox ) dc.SetBrush(wxBrush(wxColour(255,255,255), wxBRUSHSTYLE_FDIAGONAL_HATCH));
-                    dc.DrawRectangle(spritePosX+boxes[i].center.x-boxes[i].halfSize.x,
-                                     spritePosY+boxes[i].center.y-boxes[i].halfSize.y,
-                                     boxes[i].halfSize.x*2,
-                                     boxes[i].halfSize.y*2);
+                    dc.DrawBitmap(point,
+                                  sprite.GetPoint(selectedPoint).GetX() - point.GetWidth()/2 + ((size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2),
+                                  sprite.GetPoint(selectedPoint).GetY() - point.GetHeight()/2 + ((size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2),
+                                  true /* use mask */);
+                }
+
+                //Display hit boxes
+                if ( editingMask )
+                {
+                    //dc.SetLogicalFunction(wxINVERT);
+                    std::vector<RotatedRectangle> boxes = sprite.GetCollisionMask();
+                    for (unsigned int i = 0;i<boxes.size();++i)
+                    {
+                        dc.SetBrush(wxBrush(wxColour(128,128,128), wxBRUSHSTYLE_FDIAGONAL_HATCH));
+                        if ( i == selectedBox ) dc.SetBrush(wxBrush(wxColour(255,255,255), wxBRUSHSTYLE_FDIAGONAL_HATCH));
+                        dc.DrawRectangle(spritePosX+boxes[i].center.x-boxes[i].halfSize.x,
+                                         spritePosY+boxes[i].center.y-boxes[i].halfSize.y,
+                                         boxes[i].halfSize.x*2,
+                                         boxes[i].halfSize.y*2);
+                    }
                 }
             }
+        }
+        catch(...)
+        {
+            //Resource is probably not an image.
         }
     }
 }
@@ -1232,14 +1250,14 @@ void EditorObjet::OnAddFromEndSelected(wxCommandEvent& event)
         return;
     }
 
-    if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->BanqueImageList->GetRootItem())
+    if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->resourcesTree->GetRootItem())
     {
         wxLogMessage(_("Choisissez une image dans la banque d'image."));
         return;
     }
 
     Sprite sprite;
-    sprite.SetImageName(string(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str()));
+    sprite.SetImageName(string(editorImagesPnl->resourcesTree->GetItemText(editorImagesPnl->m_itemSelected).mb_str()));
     object.GetAnimation( animation ).GetDirectionToModify( direction ).AddSprite(sprite);
 
     thumbsPanel->Refresh();
@@ -1256,14 +1274,14 @@ void EditorObjet::OnAddFromAfterSelected(wxCommandEvent& event)
         return;
     }
 
-    if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->BanqueImageList->GetRootItem())
+    if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->resourcesTree->GetRootItem())
     {
         wxLogMessage(_("Choisissez une image dans la banque d'image."));
         return;
     }
 
     Sprite sprite;
-    sprite.SetImageName(string(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str()));
+    sprite.SetImageName(string(editorImagesPnl->resourcesTree->GetItemText(editorImagesPnl->m_itemSelected).mb_str()));
 
     vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
 
@@ -1290,14 +1308,14 @@ void EditorObjet::OnAddFromBeforeSelected(wxCommandEvent& event)
         return;
     }
 
-    if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->BanqueImageList->GetRootItem())
+    if ( !editorImagesPnl->m_itemSelected.IsOk() || editorImagesPnl->m_itemSelected == editorImagesPnl->resourcesTree->GetRootItem())
     {
         wxLogMessage(_("Choisissez une image dans la banque d'image."));
         return;
     }
 
     Sprite sprite;
-    sprite.SetImageName(string(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected).mb_str()));
+    sprite.SetImageName(string(editorImagesPnl->resourcesTree->GetItemText(editorImagesPnl->m_itemSelected).mb_str()));
 
     vector < Sprite > & sprites = object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify();
 
@@ -1384,26 +1402,34 @@ void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
         movingBox = false;
     else if ( placingPoint )
     {
-        std::vector<Image>::iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), GetEditedSprite().GetImageName()));
-        if ( image == game.images.end() ) return;
+        if ( !game.resourceManager.HasResource(GetEditedSprite().GetImageName()) )
+            return;
 
-        //Tailles nécessaire pour placer le point
-        wxSize size = imagePanel->GetSize();
-        wxBitmap bmp( (*image).file, wxBITMAP_TYPE_ANY);
-
-        int SpritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
-        int SpritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;
-
-        MovePoint(GetEditedSprite(), selectedPoint, event.GetX() - SpritePosX, event.GetY() - SpritePosY);
-
-        //Repositionnement pour les autres sprites si besoin
-        if ( posEverywhereMenuItem->IsChecked() )
+        try
         {
-            for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesNumber();++i)
+            ImageResource & image = dynamic_cast<ImageResource&>(game.resourceManager.GetResource(GetEditedSprite().GetImageName()));
+
+            //Tailles nécessaire pour placer le point
+            wxSize size = imagePanel->GetSize();
+            wxBitmap bmp( image.file, wxBITMAP_TYPE_ANY);
+
+            int SpritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
+            int SpritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;
+
+            MovePoint(GetEditedSprite(), selectedPoint, event.GetX() - SpritePosX, event.GetY() - SpritePosY);
+
+            //Repositionnement pour les autres sprites si besoin
+            if ( posEverywhereMenuItem->IsChecked() )
             {
-                MovePoint(object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i),
-                          selectedPoint, event.GetX() - SpritePosX, event.GetY() - SpritePosY);
+                for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesNumber();++i)
+                {
+                    MovePoint(object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i),
+                              selectedPoint, event.GetX() - SpritePosX, event.GetY() - SpritePosY);
+                }
             }
+        }
+        catch(...)
+        {
         }
     }
 

@@ -155,10 +155,15 @@ void FullProjectCompiler::LaunchProjectCompilation()
     diagnosticManager.OnMessage( ToString( _("Préparation des ressources...") ));
 
     //Add images
-    for ( unsigned int i = 0;i < game.images.size() ;i++ )
+    for ( unsigned int i = 0;i < game.resourceManager.resources.size() ;i++ )
     {
-        diagnosticManager.OnMessage( ToString(_("Préparation des ressources...")), game.images[i].nom );
-        resourcesMergingHelper.ExposeResource(game.images[i].file);
+        if ( game.resourceManager.resources[i] == boost::shared_ptr<Resource>() )
+            continue;
+
+        diagnosticManager.OnMessage( ToString(_("Préparation des ressources...")), game.resourceManager.resources[i]->name );
+
+        if ( game.resourceManager.resources[i]->UseFile() )
+            resourcesMergingHelper.ExposeResource(game.resourceManager.resources[i]->GetFile());
     }
     if ( !game.loadingScreen.imageFichier.empty() )
         resourcesMergingHelper.ExposeResource( game.loadingScreen.imageFichier );

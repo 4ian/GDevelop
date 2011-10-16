@@ -48,7 +48,6 @@ private:
 
     void OpenDocument(TiXmlDocument & doc);
     void OpenGameInformations( const TiXmlElement * elem );
-    void OpenImages( const TiXmlElement * elem, TiXmlElement * dossierElem );
     void OpenObjects(vector < boost::shared_ptr<Object> > & objects, TiXmlElement * elem);
     void OpenPositions( vector < InitialPosition > & list, TiXmlElement * elem );
     void OpenGroupesObjets( vector < ObjectGroup > & list, TiXmlElement * elem );
@@ -57,6 +56,7 @@ private:
 
     #if defined(GD_IDE_ONLY)
     void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem );
+    void OpenImagesFromGD2010498( const TiXmlElement * elem, TiXmlElement * dossierElem );
 
     void SavePositions( const vector < InitialPosition > & list, TiXmlElement * positions );
     void SaveObjects( const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects );

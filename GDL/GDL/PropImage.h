@@ -18,13 +18,13 @@
 #include <wx/scrolbar.h>
 #include <wx/dialog.h>
 //*)
-#include "GDL/Image.h"
+#include "GDL/ResourcesManager.h"
 
 class GD_API PropImage: public wxDialog
 {
 	public:
 
-		PropImage(wxWindow* parent, Image & pImage);
+		PropImage(wxWindow* parent, ImageResource & image_);
 		virtual ~PropImage();
 
 		//(*Declarations(PropImage)
@@ -45,6 +45,8 @@ class GD_API PropImage: public wxDialog
 		wxCheckBox* alwaysLoadedCheck;
 		wxStaticText* StaticText4;
 		//*)
+
+		ImageResource & image;
 
 	protected:
 
@@ -79,8 +81,6 @@ class GD_API PropImage: public wxDialog
 		void OnBrowseBtClick(wxCommandEvent& event);
 		//*)
         void OnSize(wxSizeEvent& event);
-
-		Image & image;
 
 		DECLARE_EVENT_TABLE()
 };

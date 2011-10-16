@@ -66,13 +66,13 @@ bool SpriteObject::LoadResources(const RuntimeScene & scene, const ImageManager 
         }
     }
 
-    std::vector<std::string> shaders;
+    /*std::vector<std::string> shaders;
 //    shaders.push_back("blur.sfx");
     shaders.push_back("fisheye.sfx");
     optionalShader = scene.game->shaderManager->GetSFMLShader(shaders);
     optionalShader->SetCurrentTexture("texture");
     optionalShader->SetParameter("offset", 0.1f);
-    optionalShader->SetParameter("mouse", 10,10);
+    optionalShader->SetParameter("mouse", 10,10);*/
 
     return true;
 }
@@ -153,12 +153,11 @@ bool SpriteObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
     //Generate a thumbnail from the first animation
     if ( !HasNoAnimations() && !GetAnimation(0).HasNoDirections() && !GetAnimation(0).GetDirection(0).HasNoSprites() )
     {
-        std::vector<Image>::const_iterator image = std::find_if(game.images.begin(), game.images.end(), std::bind2nd(ImageHasName(), GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName()));
-        if ( image != game.images.end() )
-        {
-            if ( !wxFileExists((*image).file) ) return false;
+        std::string imageName = GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName();
 
-            thumbnail = wxBitmap( (*image).file, wxBITMAP_TYPE_ANY);
+        if ( game.resourceManager.HasResource(imageName) && wxFileExists(game.resourceManager.GetResource(imageName).GetFile()) )
+        {
+            thumbnail = wxBitmap( game.resourceManager.GetResource(imageName).GetFile(), wxBITMAP_TYPE_ANY);
 
             wxImage thumbImage = thumbnail.ConvertToImage();
             thumbnail = wxBitmap(thumbImage.Scale(24, 24));

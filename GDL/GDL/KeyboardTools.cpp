@@ -56,6 +56,20 @@ bool GD_API IsKeyPressed(RuntimeScene & scene, std::string key)
     if ( key == "LControl" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::LControl ); }
     if ( key == "LShift" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::LShift ); }
     if ( key == "LAlt" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::LAlt ); }
+    if ( key == "LSystem" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::LSystem ); }
+    if ( key == "RSystem" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::RSystem ); }
+    if ( key == "Menu" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Menu ); }
+    if ( key == "LBracket" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::LBracket ); }
+    if ( key == "RBracket" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::RBracket ); }
+    if ( key == "SemiColon" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::SemiColon ); }
+    if ( key == "Comma" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Comma ); }
+    if ( key == "Period" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Period ); }
+    if ( key == "Quote" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Quote ); }
+    if ( key == "Slash" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Slash ); }
+    if ( key == "BackSlash" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::BackSlash ); }
+    if ( key == "Tilde" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Tilde ); }
+    if ( key == "Equal" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Equal ); }
+    if ( key == "Dash" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Dash ); }
     if ( key == "Space" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Space ); }
     if ( key == "Return" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Return ); }
     if ( key == "Back" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Back ); }
@@ -105,7 +119,6 @@ bool GD_API IsKeyPressed(RuntimeScene & scene, std::string key)
     if ( key == "F15" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::F15 ); }
 
     if ( key == "Pause" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Pause ); }
-    //if ( key == "Count" ) { return sf::Keyboard::IsKeyPressed( sf::Keyboard::Count ); } //TODO
 
     return false;
 }

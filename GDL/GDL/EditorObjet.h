@@ -27,7 +27,7 @@
 #include "GDL/RuntimeGame.h"
 #include "GDL/SpriteObject.h"
 #include "GDL/MainEditorCommand.h"
-#include "GDL/EditorImages.h"
+#include "GDL/ResourcesEditor.h"
 
 #include <string>
 #include <vector>
@@ -130,7 +130,7 @@ class EditorObjet: public wxDialog
 		wxRadioButton* BoucleNonCheck;
 		wxButton* AideBt;
 		//*)
-		EditorImages * editorImagesPnl;
+		ResourcesEditor * editorImagesPnl;
 		//wxRibbonToolBar * toolbar;
 
 	protected:

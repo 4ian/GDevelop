@@ -131,7 +131,7 @@ private:
             thread(&EventsCodeCompiler::Worker::DoCompleteCompilation, this)
         {
         }
-        virtual ~Worker() {};
+        virtual ~Worker();
 
         void SetTask(Task task_) { task = task_; }
 

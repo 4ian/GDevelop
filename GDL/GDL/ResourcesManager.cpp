@@ -356,6 +356,7 @@ void ImageResource::LoadFromXml(const TiXmlElement * elem)
     alwaysLoaded = elem->Attribute("alwaysLoaded") ? (std::string(elem->Attribute("alwaysLoaded")) == "true" ) : false;
     smooth = elem->Attribute("smoothed") ? (std::string(elem->Attribute("smoothed")) != "false" ) : true;
     smooth = elem->Attribute("userAdded") ? (std::string(elem->Attribute("userAdded")) != "false" ) : true;
+    file = elem->Attribute("file") ? elem->Attribute("file") : "";
 }
 
 #if defined(GD_IDE_ONLY)
@@ -364,6 +365,7 @@ void ImageResource::SaveToXml(TiXmlElement * elem)
     elem->SetAttribute("alwaysLoaded", alwaysLoaded ? "true" : "false");
     elem->SetAttribute("smoothed", smooth ? "true" : "false");
     elem->SetAttribute("userAdded", userAdded ? "true" : "false");
+    elem->SetAttribute("file", file.c_str());
 }
 #endif
 

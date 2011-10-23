@@ -15838,7 +15838,7 @@
 	<wx/filename.h>
 	"GDL/EventsCodeCompiler.h"
 
-1319234554 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1319385853 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1304162683 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -32962,7 +32962,7 @@
 
 1312285753 d:\florian\programmation\gamedevelop2\gdl\\gdl\mathematicaltools.h
 
-1319302306 source:d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp
+1319385227 source:d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp
 	"FullProjectCompiler.h"
 	<fstream>
 	<iostream>
@@ -32981,6 +32981,7 @@
 	"GDL/Game.h"
 	"GDL/Scene.h"
 	"GDL/OpenSaveLoadingScreen.h"
+	"GDL/SceneNameMangler.h"
 	"GDL/AES.h"
 	"GDL/CommonTools.h"
 	"GDL/ResourcesMergingHelper.h"
@@ -33219,7 +33220,7 @@
 	"llvm/Config/config.h"
 	<sys/types.h>
 
-1313327331 d:\florian\programmation\gamedevelop2\gdl\\gdl\eventscodenamemangler.h
+1319384567 d:\florian\programmation\gamedevelop2\gdl\\gdl\eventscodenamemangler.h
 	<string>
 
 1313275292 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodenamemangler.cpp
@@ -33227,7 +33228,7 @@
 	"EventsCodeNameMangler.h"
 	<string>
 
-1313327331 d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodenamemangler.h
+1319384567 d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodenamemangler.h
 	<string>
 
 1313666728 source:d:\florian\programmation\gamedevelop2\gdl\gdl\profiletools.cpp
@@ -33287,7 +33288,7 @@
 	<boost/weak_ptr.hpp>
 	<SFML/Graphics.hpp>
 
-1318164848 source:d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.cpp
+1319389715 source:d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.cpp
 	"GDL/ResourcesManager.h"
 	"GDL/PropImage.h"
 	"GDL/CommonTools.h"
@@ -33399,4 +33400,15 @@
 	"GDL/gdTreeItemStringData.h"
 	"GDL/ImagesUsedInventorizer.h"
 	<gtk/gtk.h>
+
+1319390188 d:\florian\programmation\gamedevelop2\gdl\\gdl\scenenamemangler.h
+	<string>
+
+1319385853 source:d:\florian\programmation\gamedevelop2\gdl\gdl\scenenamemangler.cpp
+	"SceneNameMangler.h"
+	"GDL/CommonTools.h"
+	<string>
+
+1319390188 d:\florian\programmation\gamedevelop2\gdl\gdl\scenenamemangler.h
+	<string>
 

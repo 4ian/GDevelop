@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EVENTSCODENAMEMANGLER_H
 #define EVENTSCODENAMEMANGLER_H
 #include <string>
@@ -9,6 +14,9 @@ class GD_API EventsCodeNameMangler
 {
 public:
 
+    /**
+     * Get the mangled name from a name : All characters that are not 0-9, a-z, A-Z or _ are replaced by "_"+AsciiCodeOfTheCharacter.
+     */
     std::string GetMangledObjectsListName(const std::string & originalObjectName);
 
     static EventsCodeNameMangler *GetInstance()

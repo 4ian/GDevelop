@@ -23,6 +23,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/OpenSaveLoadingScreen.h"
+#include "GDL/SceneNameMangler.h"
 #include "GDL/AES.h"
 #include "GDL/CommonTools.h"
 #include "GDL/ResourcesMergingHelper.h"
@@ -117,7 +118,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         task.compilationForRuntime = true;
         task.generateBitcodeFileOnly = true;
         task.optimize = optimize;
-        task.bitCodeFilename = tempDir+"/GDpriv"+gameToCompile.scenes[i]->GetName()+".ir";
+        task.bitCodeFilename = tempDir+"/GDpriv"+SceneNameMangler::GetMangledSceneName(gameToCompile.scenes[i]->GetName())+".ir";
         EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(task);
 
         wxStopWatch yieldClock;

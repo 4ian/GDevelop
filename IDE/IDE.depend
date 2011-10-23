@@ -24559,7 +24559,7 @@
 	<SFML/Graphics.hpp>
 	"GDL/Sprite.h"
 
-1315663167 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
+1319232899 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
 	"GDL/Scene.h"
 	<iostream>
 	<sstream>
@@ -25584,7 +25584,7 @@
 	<string>
 	<vector>
 
-1308416274 source:d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp
+1318967627 source:d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp
 	"EditOptionsPosition.h"
 	<wx/settings.h>
 	<wx/font.h>
@@ -26193,7 +26193,7 @@
 	<string>
 	<vector>
 
-1314265138 source:d:\florian\programmation\gamedevelop2\ide\gdauitabart.cpp
+1318761986 source:d:\florian\programmation\gamedevelop2\ide\gdauitabart.cpp
 	"GDAuiTabArt.h"
 	<wx/aui/framemanager.h>
 	<wx/aui/dockart.h>
@@ -27573,7 +27573,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1318687566 d:\florian\programmation\gamedevelop2\ide\version.h
+1319309900 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289489446 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -27949,7 +27949,7 @@
 	<wx/wfstream.h>
 	<wx/txtstrm.h>
 
-1318163031 source:d:\florian\programmation\gamedevelop2\ide\credits.cpp
+1319234548 source:d:\florian\programmation\gamedevelop2\ide\credits.cpp
 	"Credits.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -27968,7 +27968,7 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1318113347 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1319234554 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 

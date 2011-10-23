@@ -110,7 +110,7 @@ scene(scene_)
 	FlexGridSizer3->AddGrowableCol(1);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT3, _("X :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	XEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(74,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	XEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	XEdit->SetToolTip(_("Coordonnée X de l\'objet sur la scène"));
 	FlexGridSizer3->Add(XEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT4, _("Y :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));

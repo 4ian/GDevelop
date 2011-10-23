@@ -1294,7 +1294,7 @@ void OpenSaveGame::RecreatePaths(string file)
     }
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
         game.globalObjects[j]->ExposeResources(resourcesUnmergingHelper);
-#endif //GDE
+#endif
 }
 
 #if defined(GD_IDE_ONLY)

@@ -104,18 +104,6 @@ bool SpriteObject::InitializeFromInitialPosition(const InitialPosition & positio
     return true;
 }
 
-void SpriteObject::ExposeResources(ArbitraryResourceWorker & worker)
-{
-    for ( unsigned int j = 0; j < GetAnimationsNumber();j++ )
-    {
-        for ( unsigned int k = 0;k < GetAnimation( j ).GetDirectionsNumber();k++ )
-        {
-            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpritesNumber();l++ )
-                worker.ExposeImage(GetAnimation( j ).GetDirectionToModify(k).GetSprite(l).GetImageName());
-        }
-    }
-}
-
 /**
  * Render object at runtime
  */
@@ -167,6 +155,18 @@ bool SpriteObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
     }
 
     return false;
+}
+
+void SpriteObject::ExposeResources(ArbitraryResourceWorker & worker)
+{
+    for ( unsigned int j = 0; j < GetAnimationsNumber();j++ )
+    {
+        for ( unsigned int k = 0;k < GetAnimation( j ).GetDirectionsNumber();k++ )
+        {
+            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpritesNumber();l++ )
+                worker.ExposeImage(GetAnimation( j ).GetDirectionToModify(k).GetSprite(l).GetImageName());
+        }
+    }
 }
 
 void SpriteObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand & mainEditorCommand )

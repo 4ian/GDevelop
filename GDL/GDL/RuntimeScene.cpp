@@ -38,7 +38,6 @@ RuntimeLayer RuntimeScene::badLayer;
 
 RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
 renderWindow(renderWindow_),
-inputKeyPressed(false),
 game(game_),
 #if defined(GD_IDE_ONLY)
 debugger(NULL),
@@ -107,6 +106,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     timeScale = scene.timeScale;
     timeFromStart = scene.timeFromStart;
     specialAction = scene.specialAction;
+    renderTargetEvents = scene.renderTargetEvents;
 
     automatismsSharedDatas.clear();
     for (std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> >::const_iterator it = scene.automatismsSharedDatas.begin();
@@ -256,12 +256,13 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
 ////////////////////////////////////////////////////////////
 void RuntimeScene::ManageRenderTargetEvents()
 {
-    inputWheelDelta = 0;
-    inputTextEntered.clear();
+    renderTargetEvents.clear();
 
     sf::Event event;
     while ( renderWindow->PollEvent( event ) )
     {
+        renderTargetEvents.push_back(event);
+
         // Close window : exit
         if ( event.Type == sf::Event::Closed )
         {
@@ -270,14 +271,6 @@ void RuntimeScene::ManageRenderTargetEvents()
             renderWindow->Close();
             #endif
         }
-        else if (event.Type == sf::Event::KeyPressed)
-            inputKeyPressed = true;
-        else if (event.Type == sf::Event::KeyReleased )
-            inputKeyPressed = false;
-        else if (event.Type == sf::Event::MouseWheelMoved )
-            inputWheelDelta = event.MouseWheel.Delta;
-        else if (event.Type == sf::Event::TextEntered )
-            inputTextEntered += event.Text.Unicode;
         else if (event.Type == sf::Event::Resized)
         {
             //Resetup OpenGL
@@ -397,7 +390,6 @@ RuntimeLayer & RuntimeScene::GetLayer(string name)
             return layers[i];
     }
 
-    cout << "Impossible de trouver le calque \""+name+"\".";
     return badLayer;
 }
 
@@ -412,7 +404,6 @@ const RuntimeLayer & RuntimeScene::GetLayer(string name) const
             return layers[i];
     }
 
-    cout << "Impossible de trouver le calque \""+name+"\".";
     return badLayer;
 }
 

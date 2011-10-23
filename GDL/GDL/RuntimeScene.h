@@ -48,9 +48,6 @@ public:
     RuntimeScene(const RuntimeScene & scene);
 
     sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display
-    bool                                    inputKeyPressed;    ///< Supplementary input : True if any key was pressed
-    int                                     inputWheelDelta;    ///< Supplementary input : Amount of mouse wheel moved
-    std::string                             inputTextEntered;   ///< Supplementary input : Text entered using keyboard
     RuntimeGame *                           game; ///< Pointer to the game the scene is linked to
     SoundManager *                          soundManager; ///< Pointer to the sound manager.
     #if defined(GD_IDE_ONLY)
@@ -144,6 +141,12 @@ public:
     void NotifyPauseWasMade(unsigned int pauseTime_) { pauseTime += pauseTime_; }
 
     void ManageRenderTargetEvents();
+
+    /**
+     * Get a read-only list of SFML events managed by the render target.
+     */
+    const std::vector<sf::Event> & GetRenderTargetEvents() const { return renderTargetEvents; }
+
     bool OrderObjectsByZOrder( ObjList & objList );
 
 protected:
@@ -168,6 +171,7 @@ protected:
     unsigned int timeFromStart; ///< Time in milliseconds elapsed from start
     unsigned int pauseTime;
     int   specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
+    std::vector<sf::Event> renderTargetEvents;
 
     static RuntimeLayer badLayer;
 };

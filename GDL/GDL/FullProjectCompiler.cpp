@@ -118,8 +118,6 @@ void FullProjectCompiler::LaunchProjectCompilation()
         task.generateBitcodeFileOnly = true;
         task.optimize = optimize;
         task.bitCodeFilename = tempDir+"/GDpriv"+gameToCompile.scenes[i]->GetName()+".ir";
-        resourcesMergingHelper.ExposeResource(task.bitCodeFilename); //Export bitcode file.
-
         EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(task);
 
         wxStopWatch yieldClock;
@@ -140,6 +138,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
         }
         else
             diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+gameToCompile.scenes[i]->GetName()+_(" effectuée avec succès.")));
+
+        resourcesMergingHelper.ExposeResource(task.bitCodeFilename); //Export bitcode file.
 
         diagnosticManager.OnPercentUpdate( static_cast<float>(i) / static_cast<float>(gameToCompile.scenes.size())*50.0 );
     }
@@ -414,16 +414,64 @@ void FullProjectCompiler::LaunchProjectCompilation()
             if ( wxCopyFile( "Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )
                 diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable gdl.dll"+_(" dans le répertoire de compilation.\n" )));
 
-            //Compression en un seul fichier
+            //Use 7zip to create a single archive
             diagnosticManager.OnMessage( ToString( _("Exportation du jeu... ( Compression )") ) );
-            wxRemoveFile( "MonJeu.exe" );
             wxArrayString arrStdOut, arrStdErr;
-            wxExecute( _T( "7za.exe a -sfx7zS.sfx \""+ tempDir +"/"+winExecutableName+"\" \"" + tempDir + "/*\"" ), arrStdOut, arrStdErr, wxEXEC_SYNC | wxEXEC_NOHIDE );
+            wxExecute( _T( "7za.exe a  \""+ tempDir +"/archive.7z\" \"" + tempDir + "/*\"" ), arrStdOut, arrStdErr, wxEXEC_SYNC  );
 
-            //Copie du fichier
-            if ( !wxCopyFile(tempDir +"/"+winExecutableName, outDir+"/"+winExecutableName) )
-                diagnosticManager.AddError(ToString(_( "Impossible de copier le fichier ")+winExecutableName+_(" depuis le répertoire de compilation vers le répertoire final.\n" )));
+            //Make the archive autoextractible
+            std::ofstream outFile;
+            outFile.open (std::string(outDir+"/"+winExecutableName).c_str(), std::ofstream::out | std::ofstream::binary);
+            {
+                std::ifstream file;
+                char buffer[1];
 
+                file.open ("7zS.sfx", std::ifstream::in | std::ifstream::binary);
+                if (file.is_open())
+                {
+                    file.seekg (0, std::ios::beg);
+                    while (file.read (buffer, 1))
+                        outFile.write (buffer, 1);
+
+                    file.close();
+                }
+                else
+                    diagnosticManager.AddError( ToString(_("Unable to open 7zS.sfx")) );
+            }
+            {
+                std::ifstream file;
+                char buffer[1];
+
+                file.open ("config.txt", std::ifstream::in | std::ifstream::binary);
+                if (file.is_open())
+                {
+                    file.seekg (0, std::ios::beg);
+                    while (file.read (buffer, 1))
+                        outFile.write (buffer, 1);
+
+                    file.close();
+                }
+                else
+                    diagnosticManager.AddError( ToString(_("Unable to open config.txt")) );
+            }
+            {
+                std::ifstream file;
+                char buffer[1];
+
+                file.open (std::string(tempDir +"/archive.7z").c_str(), std::ifstream::in | std::ifstream::binary);
+                if (file.is_open())
+                {
+                    file.seekg (0, std::ios::beg);
+                    while (file.read (buffer, 1))
+                        outFile.write (buffer, 1);
+
+                    file.close();
+                }
+                else
+                    diagnosticManager.AddError( ToString(_("Unable to open "))+std::string(tempDir +"/archive.7z") );
+            }
+
+            outFile.close();
         }
     }
 

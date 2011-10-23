@@ -329,14 +329,14 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
  *
  * Creating a new extension can be made by following these steps :<br>
  *
- * -Copy the directory of an extension and rename it :
+ * -Copy the directory of an extension and rename it:
  * \image html images/createnew1.png
  * -Rename then the sources files :
  * \image html images/createnew2.png
  * -Open the Code::Blocks project.<br>
- * -Delete the non existing source files from the Code::Blocks project :
+ * -Delete the non existing source files from the Code::Blocks project:
  * \image html images/createnew3.png
- * -Add then the recently renamed files ( Right click > Add files ) :
+ * -Add then the recently renamed files ( Right click > Add files ):
  * \image html images/createnew4.png
  * -Rename the title of the project ( Project > Properties ) and modify the name of the output files ( Project > Properties > Build targets > Output filenames for each build targets ).
  * \image html images/createnew5.png
@@ -344,8 +344,12 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
  * You can then start to modify the extension.<br>
  * If your extension is fairly simple, you can create it from the AES Extension. If your extension need an object, you can use for instance the Text Object Extension as a starting point.<br>
  * <br>
- * You can compile your extension with the appropriate buttons :
+ * You can compile your extension with the appropriate buttons:
  * \image html images/createnew7.png
+ *
+ * To make your extension usable with Game Develop, you have to:
+ * -Copy the generated file ( yourExtension.xgdw for example ) inside Game Develop "Extensions" folder.
+ * -Copy all needed include file inside a folder with the name of your extension located in GD "Extensions/include" subfolder.
  */
 
 /**

@@ -115,8 +115,20 @@ double GD_API GetGlobalVariableValue( const RuntimeScene & scene, const std::str
  */
 const std::string & GD_API GetGlobalVariableString( const RuntimeScene & scene, const std::string & variableName);
 
+/**
+ * Only used internally by GD events generated code.
+ */
 void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen);
+
+/**
+ * Only used internally by GD events generated code.
+ */
 void GD_API SetWindowSize(RuntimeScene & scene, int width, int height, bool useTheNewSizeForCameraDefaultSize);
+
+/**
+ * Only used internally by GD events generated code.
+ */
+void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName);
 
 /**
  * Only used internally by GD events generated code.

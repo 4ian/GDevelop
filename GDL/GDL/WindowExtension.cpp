@@ -68,6 +68,20 @@ WindowExtension::WindowExtension()
         instrInfo.cppCallingInformation.SetFunctionName("SetWindowSize").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
+    DECLARE_ACTION("SetWindowIcon",
+                   _("Changer l'icône de la fenêtre"),
+                   _("Cette action change l'icône de la fenêtre de jeu."),
+                   _("Utiliser _PARAM1_ en tant qu'icone pour la fenêtre de jeu."),
+                   _("Fenêtre de jeu"),
+                   "res/actions/window24.png",
+                   "res/actions/window.png");
+
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("string", _("Nom de l'image à utiliser en tant qu'icône"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetWindowIcon").SetIncludeFile("GDL/RuntimeSceneTools.h");
+
+    DECLARE_END_ACTION()
 
     DECLARE_EXPRESSION("SceneWindowWidth", "Largeur de la fenêtre de la scène", "Largeur de la fenêtre de la scène", "Ecran", "res/display16.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");

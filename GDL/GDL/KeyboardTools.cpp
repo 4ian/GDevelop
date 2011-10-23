@@ -125,5 +125,12 @@ bool GD_API IsKeyPressed(RuntimeScene & scene, std::string key)
 
 bool GD_API AnyKeyIsPressed( RuntimeScene & scene )
 {
-    return scene.inputKeyPressed;
+    const std::vector<sf::Event> & events = scene.GetRenderTargetEvents();
+    for (unsigned int i = 0;i<events.size();++i)
+    {
+        if (events[i].Type == sf::Event::KeyPressed)
+            return true;
+    }
+
+    return false;
 }

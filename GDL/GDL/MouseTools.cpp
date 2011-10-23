@@ -58,5 +58,12 @@ bool GD_API MouseButtonPressed( RuntimeScene & scene, const std::string & key )
 
 int GD_API GetMouseWheelDelta( RuntimeScene & scene )
 {
-    return scene.inputWheelDelta;
+    const std::vector<sf::Event> & events = scene.GetRenderTargetEvents();
+    for (unsigned int i = 0;i<events.size();++i)
+    {
+        if (events[i].Type == sf::Event::MouseWheelMoved )
+            return events[i].MouseWheel.Delta;
+    }
+
+    return 0;
 }

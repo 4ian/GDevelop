@@ -213,6 +213,16 @@ const std::string & GD_API GetGlobalVariableString( const RuntimeScene & scene, 
     return scene.game->variables.GetVariableString( variableName );
 }
 
+void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
+{
+    //Retrieve the image
+    boost::shared_ptr<SFMLTextureWrapper> image = scene.game->imageManager->GetSFMLTexture(imageName);
+    if ( image == boost::shared_ptr<SFMLTextureWrapper>() )
+        return;
+
+    scene.renderWindow->SetIcon(image->image.GetWidth(), image->image.GetHeight(), image->image.GetPixelsPtr());
+}
+
 void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeight, bool useTheNewSizeForCameraDefaultSize)
 {
     #if !defined(GD_IDE_ONLY)

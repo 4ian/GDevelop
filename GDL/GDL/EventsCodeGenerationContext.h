@@ -48,6 +48,11 @@ class GD_API EventsCodeGenerationContext
         void ObjectNotNeeded(std::string objectName) {objectsToBeDeclared.erase(objectName); objectsListsToBeDeclaredEmpty.erase(objectName);};
 
         /**
+         * Set an object to be already declared. Can be used by an event which declare itself the objects.
+         */
+        void ObjectAlreadyDeclared(std::string objectName) {objectsAlreadyDeclared.insert(objectName);}
+
+        /**
          * Request a map of all objects
          */
         void MapOfAllObjectsNeeded(const Game & game, const Scene & scene);

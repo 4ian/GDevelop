@@ -20,6 +20,7 @@
 #include "GDL/FontManager.h"
 #include "GDL/SoundManager.h"
 #include "GDL/OpenSaveLoadingScreen.h"
+#include "GDL/SceneNameMangler.h"
 #include "GDL/Game.h"
 #include "GDL/EventsExecutionEngine.h"
 #include "GDL/ExtensionsManager.h"
@@ -35,27 +36,31 @@
 
 using namespace std;
 
+std::string GetCurrentWorkingDirectory();
+
 int main( int argc, char *p_argv[] )
 {
     GDLogBanner();
 
-    // On définit le chemin d'execution du programme par rapport a la localisation de son executable
-    // Utile surtout sous linux
-#ifdef LINUX
-    string tmp;
+    //Get executable location
+    string executablePath;
     if ( *p_argv[0] != '/' )
     {
-        char buffer[1024];
-        tmp += ( getcwd( buffer, 1024 ) );
-        tmp += "/";
+        executablePath += GetCurrentWorkingDirectory();
+        executablePath += "/";
     }
-    tmp += p_argv[0];
-    tmp = tmp.substr( 0, tmp.find_last_of( "/" ) );
-    chdir( tmp.c_str() );
+    executablePath += p_argv[0];
+    executablePath = executablePath.substr( 0, executablePath.find_last_of( "/" ) );
+
+    // For linux, make the executable dir the current working directory
+#ifdef LINUX
+    chdir( executablePath.c_str() );
 #endif
 
+    //Check GDL version
     CompilationChecker::EnsureCorrectGDLVersion();
 
+    //Load extensions
     GDpriv::ExtensionsLoader * extensionsLoader = GDpriv::ExtensionsLoader::GetInstance();
     extensionsLoader->SetExtensionsDir("./");
     extensionsLoader->LoadAllStaticExtensionsAvailable();
@@ -64,29 +69,21 @@ int main( int argc, char *p_argv[] )
     GDpriv::DynamicExtensionsManager::GetInstance()->LoadDynamicExtension("dynext.dxgd");
     #endif
 
+    //Load game
     RessourcesLoader * exeGD = RessourcesLoader::GetInstance();
-    exeGD->SetExeGD( "gam.egd" );
-    string srcString = exeGD->LoadPlainText( "src" );
+    exeGD->SetExeGD( executablePath+"/gam.egd" );
 
-    //Le jeu
     RuntimeGame game;
-
-    //Open game
-#ifndef RELEASE
-
-    if ( srcString.empty() )
-    {
-        cout << endl << "Unable to initialize game." << endl;
-        return EXIT_FAILURE;
-    }
 
     OpenSaveGame openGame( game );
     {
+        cout << "Getting src file size..." << endl;
         int fsize = exeGD->GetBinaryFileSize( "src" );
 
         // round up (ignore pad for here)
         int size = (fsize+15)&(~15);
 
+        cout << "Getting src raw data..." << endl;
         char * ibuffer = exeGD->LoadBinaryFile( "src" );
         char * obuffer = new char[size];
 
@@ -101,12 +98,9 @@ int main( int argc, char *p_argv[] )
         string uncryptedSrc = obuffer;
         delete [] obuffer;
 
+        cout << "Loading game info..." << endl;
         openGame.OpenFromString(uncryptedSrc);
 	}
-
-#else
-
-#endif
 
     if ( game.scenes.empty() )
     {
@@ -121,11 +115,22 @@ int main( int argc, char *p_argv[] )
     EventsExecutionEngine::LoadDynamicLibraries();
 
     //Loading first scene bitcode
-    if ( !game.scenes[0]->compiledEventsExecutionEngine->LoadFromLLVMBitCode(exeGD->LoadBinaryFile( "GDpriv"+game.scenes[0]->GetName()+".ir" ), exeGD->GetBinaryFileSize( "GDpriv"+game.scenes[0]->GetName()+".ir" )) )
+    if ( !game.scenes[0]->compiledEventsExecutionEngine->LoadFromLLVMBitCode(exeGD->LoadBinaryFile( "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[0]->GetName())+".ir" ),
+                                                                             exeGD->GetBinaryFileSize( "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[0]->GetName())+".ir" )) )
     {
-        std::cout << "Unable to load bitcode from " << "GDpriv"+game.scenes[0]->GetName()+".ir" << std::endl;
+        std::cout << "Unable to load bitcode from " << "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[0]->GetName())+".ir" << std::endl;
         return EXIT_FAILURE;
     }
+
+    #if defined(WINDOWS)
+    //Handle special argument to change working directory
+    if ( argc >= 2 && std::string(p_argv[1]).size() > 5 && std::string(p_argv[1]).substr(0, 5) == "-cwd=" )
+    {
+        std::string newWorkingDir = std::string(p_argv[1]).substr(5, std::string::npos);
+        cout << "Changing working directory to " << newWorkingDir << endl;
+        chdir(newWorkingDir.c_str());
+    }
+    #endif
 
     //Initialize image manager and load always loaded images
     game.imageManager->SetGame( &game );
@@ -166,9 +171,10 @@ int main( int argc, char *p_argv[] )
             scenePlayed = newScenePlayed; //Clear the scene
 
             if ( !game.scenes[returnCode]->compiledEventsExecutionEngine->Ready() &&
-                 !game.scenes[returnCode]->compiledEventsExecutionEngine->LoadFromLLVMBitCode(exeGD->LoadBinaryFile( "GDpriv"+game.scenes[returnCode]->GetName()+".ir" ), exeGD->GetBinaryFileSize( "GDpriv"+game.scenes[returnCode]->GetName()+".ir" )) )
+                 !game.scenes[returnCode]->compiledEventsExecutionEngine->LoadFromLLVMBitCode(exeGD->LoadBinaryFile( "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[returnCode]->GetName())+".ir" ),
+                                                                                              exeGD->GetBinaryFileSize( "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[returnCode]->GetName())+".ir" )) )
             {
-                std::cout << "Unable to load bitcode from " << "GDpriv"+game.scenes[returnCode]->GetName()+".ir" << std::endl;
+                std::cout << "Unable to load bitcode from " << "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[returnCode]->GetName())+".ir" << std::endl;
                 return EXIT_FAILURE;
             }
 
@@ -183,4 +189,16 @@ int main( int argc, char *p_argv[] )
     fontManager->DestroySingleton();
 
     return EXIT_SUCCESS;
+}
+
+/**
+ * Retrieve current working directory
+ */
+std::string GetCurrentWorkingDirectory()
+{
+    char path[2048];
+    getcwd(path, 2048);
+
+    if ( path == NULL ) return "";
+    return path;
 }

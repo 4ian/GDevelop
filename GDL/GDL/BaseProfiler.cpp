@@ -6,11 +6,17 @@
 
 #include "BaseProfiler.h"
 
+/**
+ * Reset() only reset the profile clock, not the time registered.
+ */
 void ProfileLink::Reset()
 {
     profileClock.reset();
 }
 
+/**
+ * Add the time of the profile clock to the total time.
+ */
 void ProfileLink::Stop()
 {
     time += profileClock.getTimeMicroseconds();
@@ -42,5 +48,10 @@ void BaseProfiler::Reset()
     lastRenderingTime = 0;
     totalSceneTime = 0;
     totalEventsTime = 0;
+
+    for (unsigned int i = 0;i<profileEventsInformation.size();++i)
+    {
+        profileEventsInformation[i].time = 0;
+    }
 }
 #endif

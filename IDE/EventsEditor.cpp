@@ -105,6 +105,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
     externalEvents(NULL),
     events(events_),
     mainEditorCommand(mainEditorCommand_),
+    sceneCanvas(NULL),
     conditionColumnWidth(350),
     isResizingColumns(false),
     leftMargin(20),
@@ -1544,10 +1545,13 @@ void EventsEditor::OnSearchBtClick(wxCommandEvent& event)
 
 void EventsEditor::OnProfilingBtClick(wxCommandEvent& event)
 {
-    if ( !profilingActivated && sceneCanvas && sceneCanvas->GetOwnedProfileDialog() != boost::shared_ptr<ProfileDlg>() && !sceneCanvas->GetOwnedProfileDialog()->profilingActivated)
+    if (sceneCanvas && sceneCanvas->GetOwnedProfileDialog() != boost::shared_ptr<ProfileDlg>())
     {
-        wxLogMessage(_("Le suivi des performances n'est pas activé. Activez le suivi des évènements à l'aide de la fenêtre Performances lors de l'aperçu puis lancez un aperçu de la scène."));
-        return;
+        if ( !profilingActivated && !sceneCanvas->GetOwnedProfileDialog()->profilingActivated)
+        {
+            wxLogMessage(_("Le suivi des performances n'est pas activé. Activez le suivi des évènements à l'aide de la fenêtre Performances lors de l'aperçu puis lancez un aperçu de la scène."));
+            return;
+        }
     }
 
     profilingActivated = !profilingActivated;

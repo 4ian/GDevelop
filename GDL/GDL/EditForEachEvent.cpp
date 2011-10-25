@@ -114,7 +114,7 @@ void EditForEachEvent::OncancelBtClick(wxCommandEvent& event)
 
 void EditForEachEvent::OnobjectBtClick(wxCommandEvent& event)
 {
-    ChooseObject dialog(this, game, scene, true, string(objectEdit->GetValue().mb_str()));
+    ChooseObject dialog(this, game, scene, true);
     if ( dialog.ShowModal() == 1 )
         objectEdit->ChangeValue(dialog.objectChosen);
 

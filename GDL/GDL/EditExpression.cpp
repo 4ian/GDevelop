@@ -737,6 +737,7 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
             }
         }
 
+        if ( ExpressionEdit->GetText() == "0" ) ExpressionEdit->SetText("");
         ExpressionEdit->AddText(ReplaceSpacesByTildes(object)+"."+automatismStr+infos->GetName()+"("+parametersStr+")");
         return;
     }
@@ -760,6 +761,7 @@ void EditExpression::OnAddValBtClick(wxCommandEvent& event)
             if ( userCancelled ) return;
         }
 
+        if ( ExpressionEdit->GetText() == "0" ) ExpressionEdit->SetText("");
         ExpressionEdit->AddText(infos->GetName()+"("+parametersStr+")");
         return;
     }

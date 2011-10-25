@@ -56,10 +56,10 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     string conditionCode = EventsCodeGenerator::GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
 
                     conditionsCode += "{\n";
-                    conditionsCode += context.GenerateOptionalInstructionLevelDeclarationCode();
 
                     //Create new objects lists and generate condition
                     conditionsCode += context.GenerateObjectsDeclarationCode();
+                    conditionsCode += context.GenerateOptionalInstructionLevelDeclarationCode();
                     if ( !conditions[cId].GetType().empty() ) conditionsCode += conditionCode;
 
                     //If the condition is true : merge all objects picked in the final object lists.

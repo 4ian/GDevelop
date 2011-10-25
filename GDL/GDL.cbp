@@ -1461,6 +1461,8 @@
 		<Unit filename="GDL\Scene.h" />
 		<Unit filename="GDL\SceneExtension.cpp" />
 		<Unit filename="GDL\SceneExtension.h" />
+		<Unit filename="GDL\SceneNameMangler.cpp" />
+		<Unit filename="GDL\SceneNameMangler.h" />
 		<Unit filename="GDL\ShaderManager.cpp" />
 		<Unit filename="GDL\ShaderManager.h" />
 		<Unit filename="GDL\Sound.cpp" />
@@ -1570,7 +1572,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="2.0.10496" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="2.0.10535" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

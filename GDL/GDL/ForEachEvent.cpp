@@ -110,7 +110,7 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
             if ( i != 0 ) outputCode += "else ";
             outputCode += "if (forEachIndex < "+count+") {\n";
             outputCode += "    "+ManObjListName(realObjects[i])+".push_back(forEachObjects[forEachIndex]);\n";
-            if (context.MapOfAllObjectsIsNeeded()) "    forEachCurrentList = &"+ManObjListName(realObjects[i])+";\n";
+            if (context.MapOfAllObjectsIsNeeded()) outputCode += "    forEachCurrentList = &"+ManObjListName(realObjects[i])+";\n";
             outputCode += "}\n";
         }
     }
@@ -123,7 +123,7 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
     }
     else
     {
-        if ( context.MapOfAllObjectsIsNeeded() ) outputCode += "objectsListsMap[forEachObjects[forEachIndex]->GetName()] = &forEachCurrentList;\n";
+        if ( context.MapOfAllObjectsIsNeeded() ) outputCode += "objectsListsMap[forEachObjects[forEachIndex]->GetName()] = forEachCurrentList;\n";
     }
 
     outputCode += conditionsCode;

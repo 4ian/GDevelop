@@ -26,6 +26,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/EventsCodeCompiler.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/ExtensionBase.h"
 #include "GDL/HelpFileAccess.h"
 #include "GDL/ExternalEvents.h"
 #include "EventsRefactorer.h"

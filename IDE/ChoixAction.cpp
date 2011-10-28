@@ -30,6 +30,7 @@
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/ExtensionBase.h"
 #include "GDL/ChooseObject.h"
 #include "GDL/EditExpression.h"
 #include "GDL/EditTextDialog.h"

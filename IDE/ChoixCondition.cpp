@@ -33,6 +33,7 @@
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/ExtensionBase.h"
 #include "GDL/ChooseAutomatismDlg.h"
 #include "ChoixBouton.h"
 #include "ChoixClavier.h"

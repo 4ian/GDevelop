@@ -13,6 +13,7 @@
 
 #include "Extensions.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/ExtensionBase.h"
 #include "GDL/Game.h"
 
 using namespace std;

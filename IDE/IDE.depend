@@ -13841,7 +13841,7 @@
 	"wx/arrstr.h"
 	"wx/cmdargs.h"
 
-1297526733 source:d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp
+1319663278 source:d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp
 	"AutomatismTypeChoice.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -13852,6 +13852,7 @@
 	"GDL/Automatism.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/gdTreeItemStringData.h"
+	"GDL/ExtensionBase.h"
 	"Extensions.h"
 
 1280148329 d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.h
@@ -22351,11 +22352,11 @@
 	<boost/shared_ptr.hpp>
 	<string>
 
-1313670246 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsmanager.h
-	"GDL/ExtensionBase.h"
+1319663033 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsmanager.h
 	<string>
 	<iostream>
 	<vector>
+	<map>
 	<boost/shared_ptr.hpp>
 	<boost/bimap/bimap.hpp>
 
@@ -23087,7 +23088,7 @@
 	<string>
 	<vector>
 
-1317477836 source:d:\florian\programmation\gamedevelop2\ide\choixaction.cpp
+1319663300 source:d:\florian\programmation\gamedevelop2\ide\choixaction.cpp
 	"ChoixAction.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -23111,6 +23112,7 @@
 	"GDL/Scene.h"
 	"GDL/Game.h"
 	"GDL/ExtensionsManager.h"
+	"GDL/ExtensionBase.h"
 	"GDL/ChooseObject.h"
 	"GDL/EditExpression.h"
 	"GDL/EditTextDialog.h"
@@ -24759,7 +24761,7 @@
 	<vector>
 	<wx/msgdlg.h>
 
-1317477836 source:d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp
+1319663300 source:d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp
 	"CppUnitLite/TestHarness.h"
 	"ChoixCondition.h"
 	<wx/bitmap.h>
@@ -24786,6 +24788,7 @@
 	"GDL/Scene.h"
 	"GDL/Game.h"
 	"GDL/ExtensionsManager.h"
+	"GDL/ExtensionBase.h"
 	"GDL/ChooseAutomatismDlg.h"
 	"ChoixBouton.h"
 	"ChoixClavier.h"
@@ -25348,7 +25351,7 @@
 	"wx/stedit/stedit.h"
 	"wx/config.h"
 
-1318113537 source:d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp
+1319663371 source:d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp
 	"DebuggerGUI.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -25360,6 +25363,7 @@
 	"GDL/CommonTools.h"
 	<wx/msw/winundef.h>
 	"GDL/ExtensionsManager.h"
+	"GDL/ExtensionBase.h"
 	"GDL/ChooseObject.h"
 	"ConsoleManager.h"
 	"GDL/ChooseLayer.h"
@@ -25858,7 +25862,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1318365542 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
+1319663384 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -25883,6 +25887,7 @@
 	"GDL/Scene.h"
 	"GDL/Object.h"
 	"GDL/ExtensionsManager.h"
+	"GDL/ExtensionBase.h"
 	"GDL/CommonTools.h"
 	"Clipboard.h"
 	<algorithm>
@@ -27573,7 +27578,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1319568531 d:\florian\programmation\gamedevelop2\ide\version.h
+1319663422 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289489446 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -27968,7 +27973,7 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1319385853 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1319576650 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
@@ -28264,7 +28269,7 @@
 	"wx/defs.h"
 	"wx/object.h"
 
-1319568531 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
+1319663401 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
 	"EventsEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -28286,6 +28291,7 @@
 	"GDL/CommonTools.h"
 	"GDL/EventsCodeCompiler.h"
 	"GDL/ExtensionsManager.h"
+	"GDL/ExtensionBase.h"
 	"GDL/HelpFileAccess.h"
 	"GDL/ExternalEvents.h"
 	"EventsRefactorer.h"

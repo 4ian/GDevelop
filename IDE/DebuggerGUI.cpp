@@ -16,6 +16,7 @@
 #endif
 
 #include "GDL/ExtensionsManager.h"
+#include "GDL/ExtensionBase.h"
 #include "GDL/ChooseObject.h"
 #include "ConsoleManager.h"
 #include "GDL/ChooseLayer.h"

@@ -11,6 +11,7 @@
 #include "GDL/Automatism.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/gdTreeItemStringData.h"
+#include "GDL/ExtensionBase.h"
 #include "Extensions.h"
 
 //(*IdInit(AutomatismTypeChoice)

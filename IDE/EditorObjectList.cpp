@@ -27,6 +27,7 @@
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/ExtensionBase.h"
 #include "GDL/CommonTools.h"
 #include "Clipboard.h"
 #include <algorithm>

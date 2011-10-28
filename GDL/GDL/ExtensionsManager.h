@@ -5,14 +5,25 @@
 
 #ifndef EXTENSIONSMANAGER_H
 #define EXTENSIONSMANAGER_H
-#include "GDL/ExtensionBase.h"
 #include <string>
 #include <iostream>
 #include <vector>
+#include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/bimap/bimap.hpp>
 #undef CreateEvent //Thanks windows.h
 class Object;
+class Automatism;
+class ExtensionBase;
+class InstructionInfos;
+class ExpressionInfos;
+class StrExpressionInfos;
+class ExtensionObjectInfos;
+class AutomatismInfo;
+class AutomatismsSharedDatas;
+class BaseEvent;
+typedef void (*DestroyFunPtr)(Object*);
+typedef Object * (*CreateFunPtr)(std::string name);
 
 #if defined(GD_IDE_ONLY)
 class Game;
@@ -242,9 +253,9 @@ class GD_API ExtensionsManager
         ExtensionsManager();
         virtual ~ExtensionsManager() {};
 
-        vector < boost::shared_ptr<ExtensionBase> > extensionsLoaded;
-        map < std::string, CreateFunPtr >             creationFunctionTable;
-        map < std::string, DestroyFunPtr >            destroyFunctionTable;
+        std::vector < boost::shared_ptr<ExtensionBase> > extensionsLoaded;
+        std::map < std::string, CreateFunPtr >           creationFunctionTable;
+        std::map < std::string, DestroyFunPtr >          destroyFunctionTable;
 
         #if defined(GD_IDE_ONLY)
         static InstructionInfos badInstructionInfos;

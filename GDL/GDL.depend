@@ -13388,11 +13388,11 @@
 	<string>
 	<vector>
 
-1313670246 d:\florian\programmation\gamedevelop2\gdl\\gdl\extensionsmanager.h
-	"GDL/ExtensionBase.h"
+1319663033 d:\florian\programmation\gamedevelop2\gdl\\gdl\extensionsmanager.h
 	<string>
 	<iostream>
 	<vector>
+	<map>
 	<boost/shared_ptr.hpp>
 	<boost/bimap/bimap.hpp>
 
@@ -13929,7 +13929,8 @@
 	<string>
 	<vector>
 
-1294511660 d:\florian\programmation\gamedevelop2\gdl\\gdl\treeitemexpressioninfodata.h
+1319662806 d:\florian\programmation\gamedevelop2\gdl\\gdl\treeitemexpressioninfodata.h
+	"GDL/ExtensionBase.h"
 
 1305396638 d:\florian\programmation\gamedevelop2\gdl\\gdl\chooseautomatismdlg.h
 	<wx/sizer.h>
@@ -14216,14 +14217,17 @@
 
 1297523942 d:\florian\programmation\gamedevelop2\gdl\\gdl\conditions.h
 
-1315135346 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventsrenderinghelper.cpp
+1319663154 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventsrenderinghelper.cpp
 	"EventsRenderingHelper.h"
 	<utility>
 	<vector>
 	<string>
+	<wx/dcclient.h>
+	<wx/dcmemory.h>
 	<wx/renderer.h>
 	"GDL/Instruction.h"
 	"GDL/ExtensionsManager.h"
+	"GDL/ExtensionBase.h"
 	"GDL/TranslateAction.h"
 	"GDL/TranslateCondition.h"
 	"GDL/CommonTools.h"
@@ -14652,7 +14656,7 @@
 	"GDL/ObjectGroup.h"
 	"GDL/profile.h"
 
-1319293029 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
+1319663189 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
 	<wx/wx.h>
 	"GDL/Log.h"
 	<iostream>
@@ -14672,6 +14676,7 @@
 	"GDL/Instruction.h"
 	"GDL/Automatism.h"
 	"GDL/AutomatismsSharedDatas.h"
+	"GDL/ExtensionBase.h"
 	"GDL/VersionWrapper.h"
 	"GDL/ExtensionsLoader.h"
 	"GDL/Layer.h"
@@ -14836,7 +14841,7 @@
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1319284688 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
+1319663202 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
 	"GDL/RuntimeScene.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -14856,6 +14861,7 @@
 	"GDL/FontManager.h"
 	"GDL/AutomatismsSharedDatas.h"
 	"GDL/RuntimeContext.h"
+	"GDL/ExtensionBase.h"
 	"GDL/EventsExecutionEngine.h"
 	"GDL/ProfileEvent.h"
 	"GDL/BaseProfiler.h"
@@ -15838,7 +15844,7 @@
 	<wx/filename.h>
 	"GDL/EventsCodeCompiler.h"
 
-1319385853 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1319576650 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1304162683 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -32172,9 +32178,10 @@
 	<set>
 	<boost/shared_ptr.hpp>
 
-1316204783 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerator.cpp
+1319662955 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerator.cpp
 	<utility>
 	"GDL/EventsCodeGenerator.h"
+	"GDL/ExtensionBase.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/Scene.h"
 	"GDL/Game.h"

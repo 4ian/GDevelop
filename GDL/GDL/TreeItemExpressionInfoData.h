@@ -2,6 +2,7 @@
 
 #ifndef TREEITEMEXPRESSIONINFODATA_H
 #define TREEITEMEXPRESSIONINFODATA_H
+#include "GDL/ExtensionBase.h"
 
 /**
  * This class can be used by wxTreeCtrl, to attach

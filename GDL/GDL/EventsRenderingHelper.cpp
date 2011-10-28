@@ -8,9 +8,12 @@
 #include <utility>
 #include <vector>
 #include <string>
+#include <wx/dcclient.h>
+#include <wx/dcmemory.h>
 #include <wx/renderer.h>
 #include "GDL/Instruction.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/ExtensionBase.h"
 #include "GDL/TranslateAction.h"
 #include "GDL/TranslateCondition.h"
 #include "GDL/CommonTools.h"

@@ -22,6 +22,7 @@
 #include "GDL/FontManager.h"
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/RuntimeContext.h"
+#include "GDL/ExtensionBase.h"
 
 #include "GDL/EventsExecutionEngine.h"
 #if defined(GD_IDE_ONLY)

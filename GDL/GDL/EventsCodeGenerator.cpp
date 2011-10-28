@@ -7,6 +7,7 @@
 
 #include <utility>
 #include "GDL/EventsCodeGenerator.h"
+#include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"

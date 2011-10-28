@@ -38,6 +38,7 @@
 #include "GDL/Instruction.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"
+#include "GDL/ExtensionBase.h"
 #include "GDL/VersionWrapper.h"
 #include "GDL/ExtensionsLoader.h"
 #include "GDL/Layer.h"

@@ -36,14 +36,14 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
-#include "GDL/ResourcesMergingHelper.h"
+#include "GDL/ArbitraryResourceWorker.h"
 #include "GDL/MainEditorCommand.h"
 #include "TextEntryObjectEditor.h"
 #endif
 
 TextEntryObject::TextEntryObject(std::string name_) :
     Object(name_),
-    sceneTextEntered(NULL),
+    scene(NULL),
     activated(true)
 {
 }
@@ -58,9 +58,9 @@ void TextEntryObject::SaveToXml(TiXmlElement * object)
 }
 #endif
 
-bool TextEntryObject::LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr )
+bool TextEntryObject::LoadRuntimeResources(const RuntimeScene & scene_, const ImageManager & imageMgr )
 {
-    sceneTextEntered = &scene.inputTextEntered;
+    scene = &scene_;
 
     return true;
 }
@@ -73,7 +73,7 @@ bool TextEntryObject::InitializeFromInitialPosition(const InitialPosition & posi
 /**
  * Does not render anything
  */
-bool TextEntryObject::Draw( sf::RenderWindow& window )
+bool TextEntryObject::Draw( sf::RenderTarget& renderTarget )
 {
     return true;
 }
@@ -83,17 +83,22 @@ bool TextEntryObject::Draw( sf::RenderWindow& window )
  */
 void TextEntryObject::UpdateTime(float)
 {
-    if (!activated) return;
+    if (!activated || scene == NULL) return;
 
-    for (unsigned int i = 0;i<sceneTextEntered->size();++i)
+    std::string textEntered;
+
+    //Retrieve text entered
+    const std::vector<sf::Event> & events = scene->GetRenderTargetEvents();
+    for (unsigned int i = 0;i<events.size();++i)
     {
-        //Add character only if it is correct
-        if ((*sceneTextEntered)[i] > 30 && ((*sceneTextEntered)[i] < 127 || (*sceneTextEntered)[i] > 159))
+        if (events[i].Type == sf::Event::TextEntered )
         {
-            text += (*sceneTextEntered)[i];
-        }
-        else if ( (*sceneTextEntered)[i] == 8 ) //Backspace
+            //Skip some non displayable characters
+            if (events[i].Text.Unicode > 30 && (events[i].Text.Unicode < 127 || events[i].Text.Unicode > 159))
+                text += events[i].Text.Unicode;
+            else if (events[i].Text.Unicode == 8) //Backspace
             if ( !text.empty() ) text.erase(text.end()-1);
+        }
     }
 }
 
@@ -101,12 +106,12 @@ void TextEntryObject::UpdateTime(float)
 /**
  * Does not render anything
  */
-bool TextEntryObject::DrawEdittime(sf::RenderWindow& renderWindow)
+bool TextEntryObject::DrawEdittime( sf::RenderTarget& renderTarget )
 {
     return true;
 }
 
-void TextEntryObject::PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper)
+void TextEntryObject::ExposeResources(ArbitraryResourceWorker & worker)
 {
 }
 

@@ -6,6 +6,9 @@
 #include <wx/dialog.h>
 //*)
 
+/**
+ * \brief Window used to mimic a sf::RenderWindow.
+ */
 class RenderDialog: public wxDialog
 {
 	public:

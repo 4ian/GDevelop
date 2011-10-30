@@ -4,6 +4,7 @@
 #include <SFML/OpenGL.hpp>
 
 #include "GDL/RuntimeScene.h"
+#include "GDL/RuntimeGame.h"
 #include "GDL/Game.h"
 #include <vector>
 

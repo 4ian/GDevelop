@@ -20,6 +20,7 @@
 #include "GDL/ChooseObject.h"
 #include "ConsoleManager.h"
 #include "GDL/ChooseLayer.h"
+#include "GDL/RuntimeGame.h"
 #include <wx/textdlg.h>
 
 #ifdef ___WXMSW___

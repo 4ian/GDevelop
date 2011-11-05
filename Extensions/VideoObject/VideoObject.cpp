@@ -38,7 +38,7 @@ freely, subject to the following restrictions:
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
-#include "GDL/ResourcesMergingHelper.h"
+#include "GDL/ArbitraryResourceWorker.h"
 #include "GDL/MainEditorCommand.h"
 #include "VideoObjectEditor.h"
 #endif
@@ -153,13 +153,13 @@ bool VideoObject::InitializeFromInitialPosition(const InitialPosition & position
 /**
  * Render object at runtime
  */
-bool VideoObject::Draw( sf::RenderWindow& window )
+bool VideoObject::Draw( sf::RenderTarget& renderTarget )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
 	video.GetRenderSprite().SetTexture(video.GetNextFrameImage(), true);
-    window.Draw( video.GetRenderSprite() );
+    renderTarget.Draw( video.GetRenderSprite() );
 
     return true;
 }
@@ -168,7 +168,7 @@ bool VideoObject::Draw( sf::RenderWindow& window )
 /**
  * Render object at edittime
  */
-bool VideoObject::DrawEdittime(sf::RenderWindow& renderWindow)
+bool VideoObject::DrawEdittime(sf::RenderTarget& renderTarget)
 {
     if ( !video.IsValid() )
     {
@@ -187,17 +187,17 @@ bool VideoObject::DrawEdittime(sf::RenderWindow& renderWindow)
         rectangle.SetOrigin(video.GetRenderSprite().GetSize().x/2, video.GetRenderSprite().GetSize().y/2);
         rectangle.SetPosition(GetX(), GetY());
         rectangle.SetRotation(video.GetRenderSprite().GetRotation());
-        renderWindow.Draw(rectangle);
+        renderTarget.Draw(rectangle);
     }
 
-    renderWindow.Draw( video.GetRenderSprite() );
+    renderTarget.Draw( video.GetRenderSprite() );
 
     return true;
 }
 
-void VideoObject::PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper)
+void VideoObject::ExposeResources(ArbitraryResourceWorker & worker)
 {
-    videoFile = resourcesMergingHelper.GetNewFilename(videoFile);
+    worker.ExposeResource(videoFile);
 }
 
 bool VideoObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)

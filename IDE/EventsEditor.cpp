@@ -773,8 +773,8 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
                 item.instruction->SetInversion( dialog.Contraire );
 
                 item.event->eventHeightNeedUpdate = true;
-                ChangesMadeOnEvents();
                 Refresh();
+                ChangesMadeOnEvents();
             }
         }
         else
@@ -793,8 +793,8 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
                 item.instruction->SetLocal( dialog.Loc );
 
                 item.event->eventHeightNeedUpdate = true;
-                ChangesMadeOnEvents();
                 Refresh();
+                ChangesMadeOnEvents();
             }
         }
     }
@@ -817,8 +817,8 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
 
                 item.instructionList->push_back(instruction);
                 item.event->eventHeightNeedUpdate = true;
-                ChangesMadeOnEvents();
                 Refresh();
+                ChangesMadeOnEvents();
             }
         }
         else
@@ -833,8 +833,8 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
 
                 item.instructionList->push_back(instruction);
                 item.event->eventHeightNeedUpdate = true;
-                ChangesMadeOnEvents();
                 Refresh();
+                ChangesMadeOnEvents();
             }
         }
     }
@@ -1040,8 +1040,8 @@ void EventsEditor::DeleteSelection()
     }
 
     selection.ClearSelection();
-    ChangesMadeOnEvents();
     Refresh();
+    ChangesMadeOnEvents();
 }
 
 void EventsEditor::ChangesMadeOnEvents(bool updateHistory)
@@ -1176,9 +1176,8 @@ void EventsEditor::AddEvent(EventItem & previousEventItem)
         else if ( events != NULL )
             events->push_back( eventToAdd );
 
-
-        ChangesMadeOnEvents();
         Refresh();
+        ChangesMadeOnEvents();
     }
     else
         wxLogError(_("Impossible de créer un évènement standard"));
@@ -1229,8 +1228,8 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
         else if ( events != NULL)
             events->push_back( eventToAdd );
 
-        ChangesMadeOnEvents();
         Refresh();
+        ChangesMadeOnEvents();
     }
     else
         wxLogError(_("Impossible de créer un évènement commentaire."));
@@ -1249,8 +1248,8 @@ void EventsEditor::AddSubEvent(EventItem & parentEventItem)
         //Adding event
         parentEventItem.event->GetSubEvents().insert( parentEventItem.event->GetSubEvents().begin(), eventToAdd );
 
-        ChangesMadeOnEvents();
         Refresh();
+        ChangesMadeOnEvents();
     }
     else
         wxLogError(_("Impossible de créer un évènement standard"));
@@ -1300,8 +1299,8 @@ void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, EventItem & previ
     else if ( events != NULL)
         events->push_back( eventToAdd );
 
-    ChangesMadeOnEvents();
     Refresh();
+    ChangesMadeOnEvents();
 }
 
 void EventsEditor::OnAddCustomEventFromMenuSelected(wxCommandEvent& event)
@@ -1448,7 +1447,6 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
     }
     else if ( selection.HasSelectedEvents())
     {
-        cout << "lola";
         EventItem item = selection.GetAllSelectedEvents().back();
         if (item.eventsList == NULL) return;
 
@@ -1476,9 +1474,9 @@ void EventsEditor::OnundoMenuSelected(wxCommandEvent& event)
 
     latestState = CloneVectorOfEvents(*events);
 
-    ChangesMadeOnEvents(false);
     Refresh();
     UpdateRibbonBars();
+    ChangesMadeOnEvents(false);
 }
 
 void EventsEditor::OnredoMenuSelected(wxCommandEvent& event)
@@ -1491,9 +1489,9 @@ void EventsEditor::OnredoMenuSelected(wxCommandEvent& event)
 
     latestState = CloneVectorOfEvents(*events);
 
-    ChangesMadeOnEvents(false);
     Refresh();
     UpdateRibbonBars();
+    ChangesMadeOnEvents(false);
 }
 
 void EventsEditor::OnHelpBtClick(wxCommandEvent& event)
@@ -1588,8 +1586,8 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
             item.instruction->SetInversion( dialog.Contraire );
 
             item.event->eventHeightNeedUpdate = true;
-            ChangesMadeOnEvents();
             Refresh();
+            ChangesMadeOnEvents();
         }
     }
     else
@@ -1608,8 +1606,8 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
             item.instruction->SetLocal( dialog.Loc );
 
             item.event->eventHeightNeedUpdate = true;
-            ChangesMadeOnEvents();
             Refresh();
+            ChangesMadeOnEvents();
         }
     }
 }

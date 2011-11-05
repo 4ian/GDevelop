@@ -25863,7 +25863,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1319659784 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
+1320500480 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -25890,6 +25890,7 @@
 	"GDL/ExtensionsManager.h"
 	"GDL/ExtensionBase.h"
 	"GDL/CommonTools.h"
+	"GDL/EventsCodeCompiler.h"
 	"Clipboard.h"
 	<algorithm>
 	<numeric>
@@ -25996,7 +25997,7 @@
 	<wx/msw/winundef.h>
 	"EditorObjetsGroups.h"
 
-1316965801 source:d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp
+1320500234 source:d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp
 	"EditorObjetsGroups.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -26018,6 +26019,7 @@
 	"EditObjectGroup.h"
 	"Clipboard.h"
 	"GDL/HelpFileAccess.h"
+	"GDL/EventsCodeCompiler.h"
 	"EventsRefactorer.h"
 	<wx/msw/winundef.h>
 	<gtk/gtk.h>
@@ -27430,13 +27432,13 @@
 1264360534 source:d:\florian\programmation\gamedevelop2\ide\recentlist.cpp
 	"RecentList.h"
 
-1319815627 source:d:\florian\programmation\gamedevelop2\ide\renderdialog.cpp
+1320174002 source:d:\florian\programmation\gamedevelop2\ide\renderdialog.cpp
 	"RenderDialog.h"
 	<wx/intl.h>
 	<wx/string.h>
 	<iostream>
 
-1316965436 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
+1320520467 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -27581,7 +27583,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1319817887 d:\florian\programmation\gamedevelop2\ide\version.h
+1320524657 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -27976,7 +27978,7 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1319573050 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1320500064 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
@@ -28272,7 +28274,7 @@
 	"wx/defs.h"
 	"wx/object.h"
 
-1319659801 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
+1320524657 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
 	"EventsEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>

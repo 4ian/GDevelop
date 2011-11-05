@@ -37,8 +37,8 @@ RenderDialog::~RenderDialog()
 void RenderDialog::SetSizeOfRenderingZone(unsigned int width, unsigned int height)
 {
     renderCanvas->sf::RenderWindow::SetSize(width, height);
-    renderCanvas->wxWindowBase::SetSize(wxSize(width, height));
 
+    renderCanvas->wxWindowBase::SetSize(wxSize(width, height));
     SetClientSize(width, height);
 
     Update();

@@ -29,6 +29,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/CommonTools.h"
+#include "GDL/EventsCodeCompiler.h"
 #include "Clipboard.h"
 #include <algorithm>
 #include <numeric>
@@ -479,7 +480,8 @@ void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
     }
 
     (*object)->GetAutomatism(autoType)->EditAutomatism(this, game, scene, mainEditorCommand);
-    if ( scene ) scene->wasModified = true;
+    if ( scene )
+        scene->wasModified = true;
 }
 
 /**
@@ -578,7 +580,11 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
 
     objectsList->SetItemImage( itemAdded, thumbnailID );
 
-   if ( scene ) scene->wasModified = true;
+   if ( scene )
+   {
+        scene->wasModified = true;
+        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+   }
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
 }
 
@@ -638,7 +644,11 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
                     RemoveSharedDatasIfNecessary(automatisms[i]);
             }
 
-            if ( scene ) scene->wasModified = true;
+            if ( scene )
+            {
+                scene->wasModified = true;
+                EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+            }
         }
     }
 
@@ -718,6 +728,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         }
 
         scene->wasModified = true;
+        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
     }
     objectsList->SetItemText( event.GetItem(), event.GetLabel() );
     return;
@@ -827,7 +838,11 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
     }
 
     objectsList->Delete( item );
-    if ( scene ) scene->wasModified = true;
+    if ( scene )
+    {
+        scene->wasModified = true;
+        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+    }
 
     Clipboard::GetInstance()->SetObject(*object);
 
@@ -879,7 +894,11 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     for (unsigned int j = 0;j<automatisms.size();++j)
         CreateSharedDatasIfNecessary(object->GetAutomatism(automatisms[j]));
 
-    if ( scene ) scene->wasModified = true;
+    if ( scene )
+    {
+        scene->wasModified = true;
+        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+    }
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
 }
 
@@ -913,7 +932,11 @@ void EditorObjectList::OnMoveUpSelected(wxCommandEvent& event)
         objects->insert(objects->begin()+index-1, object);
 
         Refresh();
-        if ( scene ) scene->wasModified = true;
+        if ( scene )
+        {
+            scene->wasModified = true;
+            EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+        }
 
         //On la reselectionne
         wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
@@ -960,7 +983,11 @@ void EditorObjectList::OnMoveDownSelected(wxCommandEvent& event)
         objects->insert(objects->begin()+index+1, object);
 
         Refresh();
-        if ( scene ) scene->wasModified = true;
+        if ( scene )
+        {
+            scene->wasModified = true;
+            EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+        }
 
         //On la reselectionne
         wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
@@ -1058,7 +1085,11 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
         //Add shared datas to scene if necessary
         CreateSharedDatasIfNecessary(automatism);
 
-        if ( scene ) scene->wasModified = true;
+        if ( scene )
+        {
+            scene->wasModified = true;
+            EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+        }
     }
 }
 
@@ -1088,7 +1119,11 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
     //Remove shared datas if necessary
     RemoveSharedDatasIfNecessary(automatisms[selection]);
 
-    if ( scene ) scene->wasModified = true;
+    if ( scene )
+    {
+        scene->wasModified = true;
+        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+    }
 }
 
 /**
@@ -1126,7 +1161,11 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
     automatism->SetName(newName);
     CreateSharedDatasIfNecessary(automatism);
 
-    if ( scene ) scene->wasModified = true;
+    if ( scene )
+    {
+        scene->wasModified = true;
+        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+    }
 }
 
 

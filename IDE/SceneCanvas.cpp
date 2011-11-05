@@ -358,21 +358,22 @@ void SceneCanvas::UpdateSize()
     {
         //Scene takes all the space available in edition mode.
         Window::SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
-        wxWindowBase::SetSize(0,0, parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
-        edittimeRenderer.view.SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
+        wxWindowBase::SetPosition(wxPoint(0,0));
+        wxWindowBase::SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
+
+        edittimeRenderer.view.SetSize(GetClientSize().GetWidth(), GetClientSize().GetHeight());
     }
     else
     {
         //Scene has the size of the game's window size in preview mode.
         Window::SetSize(game.windowWidth, game.windowHeight);
-        wxWindowBase::SetSize(game.windowWidth, game.windowHeight);
+        wxWindowBase::SetClientSize(game.windowWidth, game.windowHeight);
 
         externalWindow->SetSizeOfRenderingZone(game.windowWidth, game.windowHeight);
 
         //Scene is centered in preview mode
-        wxWindowBase::SetSize((parentPanel->GetSize().GetWidth()-wxWindowBase::GetSize().GetX())/2,
-                              (parentPanel->GetSize().GetHeight()-wxWindowBase::GetSize().GetY())/2,
-                              game.windowWidth, game.windowHeight);
+        wxWindowBase::SetPosition(wxPoint((parentPanel->GetSize().GetWidth()-wxWindowBase::GetSize().GetX())/2,
+                              (parentPanel->GetSize().GetHeight()-wxWindowBase::GetSize().GetY())/2));
     }
 }
 
@@ -568,10 +569,11 @@ void SceneCanvas::OnPlayWindowBtClick( wxCommandEvent & event )
 
     externalWindow->Show(true);
     externalWindow->renderCanvas->SetFramerateLimit( game.maxFPS );
-    externalWindow->SetSize(GetWidth(), GetHeight());
+
+    externalWindow->SetSizeOfRenderingZone(game.windowWidth, game.windowHeight);
     edittimeRenderer.runtimeScene.ChangeRenderWindow(externalWindow->renderCanvas);
 
-    externalWindow->SetSize(GetWidth(), GetHeight());
+    externalWindow->SetSizeOfRenderingZone(game.windowWidth, game.windowHeight);
     edittimeRenderer.runtimeScene.ChangeRenderWindow(externalWindow->renderCanvas);
 
     if ( debugger ) debugger->Play();
@@ -835,9 +837,9 @@ void SceneCanvas::Refresh()
             }
             else if ( retourEvent != -1 )
             {
-                wxLogStatus( _( "Dans le jeu final, un changement de scène s'effectuera." ) );
+                if (retourEvent < gameEdited.scenes.size())
+                    wxLogStatus( _( "Dans le jeu final, un changement de scène s'effectuera vers la scène " ) + "\"" + gameEdited.scenes[retourEvent]->GetName() + "\"" );
             }
-
         }
         else if ( !edittimeRenderer.runtimeScene.running && !edittimeRenderer.editing ) //Runtime paused
             edittimeRenderer.runtimeScene.RenderWithoutStep();

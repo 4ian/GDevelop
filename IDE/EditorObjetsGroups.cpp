@@ -22,6 +22,7 @@
 #include "EditObjectGroup.h"
 #include "Clipboard.h"
 #include "GDL/HelpFileAccess.h"
+#include "GDL/EventsCodeCompiler.h"
 #include "EventsRefactorer.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -365,6 +366,7 @@ void EditorObjetsGroups::OnEditGroupSelected(wxCommandEvent& event)
             *i = dialog.group;
 
         scene.wasModified = true;
+        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, &scene));
         return;
     }
 }
@@ -395,6 +397,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     ObjetsGroupsList->AppendItem( rootId, name );
 
     scene.wasModified = true;
+    EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, &scene));
     wxLogStatus( _( "Le groupe a été correctement ajouté" ) );
 }
 
@@ -439,6 +442,7 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
             }
 
             scene.wasModified = true;
+            EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, &scene));
             ObjetsGroupsList->Delete( itemSelected );
         }
     }
@@ -548,6 +552,7 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
             EventsRefactorer::RenameObjectInEvents(game, scene, scene.events, ancienNom, newName);
 
             scene.wasModified = true;
+            EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, &scene));
             return;
         }
     }
@@ -613,6 +618,7 @@ void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
     objectsGroups->erase( i );
 
     scene.wasModified = true;
+    EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, &scene));
     ObjetsGroupsList->Delete( itemSelected );
 }
 
@@ -640,4 +646,5 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
     ObjetsGroupsList->AppendItem( rootId, groupPasted.GetName());
 
     scene.wasModified = true;
+    EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, &scene));
 }

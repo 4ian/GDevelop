@@ -48,7 +48,7 @@ freely, subject to the following restrictions:
 class Game;
 class ParticleEmitterObject;
 class MainEditorCommand;
-class EditorImages;
+class ResourcesEditor;
 
 class ParticleEmitterObjectEditor: public wxDialog
 {
@@ -192,7 +192,7 @@ class ParticleEmitterObjectEditor: public wxDialog
 		wxColourPickerCtrl* simpleColor2Bt;
 		wxTextCtrl* emitterForceMaxEdit;
 		//*)
-		EditorImages * editorImagesPnl;
+		ResourcesEditor * editorImagesPnl;
 
 	protected:
 

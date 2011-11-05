@@ -43,7 +43,7 @@ freely, subject to the following restrictions:
 #include "GDL/CommonTools.h"
 #include "ParticleEmitterObject.h"
 #include "GDL/MainEditorCommand.h"
-#include "GDL/EditorImages.h"
+#include "GDL/ResourcesEditor.h"
 
 //(*IdInit(ParticleEmitterObjectEditor)
 const long ParticleEmitterObjectEditor::ID_STATICTEXT7 = wxNewId();
@@ -938,7 +938,7 @@ object(object_)
 
 
     //Init the image bank editor
-    editorImagesPnl = new EditorImages( this, game, mainEditorCommand );
+    editorImagesPnl = new ResourcesEditor( this, game, mainEditorCommand );
     editorImagesPnl->Refresh();
 
 	//Init wxAuiManager with two pane : the editor and the image bank editor
@@ -1153,7 +1153,7 @@ void ParticleEmitterObjectEditor::OnimageChooseBtClick(wxCommandEvent& event)
         return;
     }
 
-    textureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    textureEdit->ChangeValue(editorImagesPnl->resourcesTree->GetItemText(editorImagesPnl->m_itemSelected));
 }
 
 void ParticleEmitterObjectEditor::OnimageBankBtClick(wxCommandEvent& event)

@@ -33,6 +33,7 @@ freely, subject to the following restrictions:
 #include "GDL/Position.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/RuntimeScene.h"
+#include "GDL/RuntimeGame.h"
 #include "GDL/RotatedRectangle.h"
 #include "ParticleEmitterObject.h"
 #include "ParticleSystemWrapper.h"
@@ -42,7 +43,7 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
-#include "GDL/ResourcesMergingHelper.h"
+#include "GDL/ArbitraryResourceWorker.h"
 #include "GDL/MainEditorCommand.h"
 #include "ParticleEmitterObjectEditor.h"
 #endif
@@ -552,27 +553,27 @@ bool ParticleEmitterObject::InitializeFromInitialPosition(const InitialPosition 
 /**
  * Render object at runtime
  */
-bool ParticleEmitterObject::Draw( sf::RenderWindow& window )
+bool ParticleEmitterObject::Draw( sf::RenderTarget& renderTarget )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    window.RestoreGLStates();
+    renderTarget.RestoreGLStates();
 
-    float xView =  window.GetView().GetCenter().x*0.25f;
-    float yView = -window.GetView().GetCenter().y*0.25f;
+    float xView =  renderTarget.GetView().GetCenter().x*0.25f;
+    float yView = -renderTarget.GetView().GetCenter().y*0.25f;
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glRotatef(window.GetView().GetRotation(), 0, 0, 1);
-    glTranslatef(-xView, -yView, -75.0f*(window.GetView().GetSize().y/600.0f));
+    glRotatef(renderTarget.GetView().GetRotation(), 0, 0, 1);
+    glTranslatef(-xView, -yView, -75.0f*(renderTarget.GetView().GetSize().y/600.0f));
 
 	SPK::GL::GLRenderer::saveGLStates();
 	particleSystem.particleSystem->render();
 	SPK::GL::GLRenderer::restoreGLStates();
 
-    window.SaveGLStates();
+    renderTarget.SaveGLStates();
 
     return true;
 }
@@ -587,16 +588,17 @@ void ParticleEmitterObject::OnPositionChanged()
 /**
  * Render object at edittime
  */
-bool ParticleEmitterObject::DrawEdittime(sf::RenderWindow& renderWindow)
+bool ParticleEmitterObject::DrawEdittime(sf::RenderTarget& renderTarget)
 {
     edittimeIcon.SetPosition(GetX(), GetY());
-    renderWindow.Draw(edittimeIcon);
+    renderTarget.Draw(edittimeIcon);
 
     return true;
 }
 
-void ParticleEmitterObject::PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper)
+void ParticleEmitterObject::ExposeResources(ArbitraryResourceWorker & worker)
 {
+    worker.ExposeImage(textureParticleName);
 }
 
 bool ParticleEmitterObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)

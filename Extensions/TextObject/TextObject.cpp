@@ -38,7 +38,7 @@ freely, subject to the following restrictions:
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
-#include "GDL/ResourcesMergingHelper.h"
+#include "GDL/ArbitraryResourceWorker.h"
 #include "GDL/MainEditorCommand.h"
 #include "TextObjectEditor.h"
 #endif
@@ -156,12 +156,12 @@ bool TextObject::InitializeFromInitialPosition(const InitialPosition & position)
 /**
  * Render object at runtime
  */
-bool TextObject::Draw( sf::RenderWindow& window )
+bool TextObject::Draw( sf::RenderTarget& renderTarget )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    window.Draw( text );
+    renderTarget.Draw( text );
 
     return true;
 }
@@ -170,16 +170,16 @@ bool TextObject::Draw( sf::RenderWindow& window )
 /**
  * Render object at edittime
  */
-bool TextObject::DrawEdittime(sf::RenderWindow& renderWindow)
+bool TextObject::DrawEdittime( sf::RenderTarget& renderTarget )
 {
-    renderWindow.Draw( text );
+    renderTarget.Draw( text );
 
     return true;
 }
 
-void TextObject::PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper)
+void TextObject::ExposeResources(ArbitraryResourceWorker & worker)
 {
-    fontName = resourcesMergingHelper.GetNewFilename(fontName);
+    worker.ExposeResource(fontName);
 }
 
 bool TextObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
@@ -367,12 +367,11 @@ void TextObject::SetOpacity(float val)
     text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
-void TextObject::SetFont(string fontName_)
+void TextObject::SetFont(const std::string & fontName_)
 {
     fontName = fontName_;
 
-    FontManager * fontManager = FontManager::GetInstance();
-    text.SetFont(*fontManager->GetFont(fontName));
+    text.SetFont(*FontManager::GetInstance()->GetFont(fontName_));
     text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2);
 }
 

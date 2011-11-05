@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 #define TEXTOBJECT_H
 
 #include "GDL/Object.h"
+#include "GDL/ResourceWrapper.h"
 #include <SFML/Graphics/Text.hpp>
 class ImageManager;
 class RuntimeScene;
@@ -56,11 +57,11 @@ class GD_EXTENSION_API TextObject : public Object
         virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
-        virtual bool Draw(sf::RenderWindow& main_window);
+        virtual bool Draw(sf::RenderTarget & renderTarget);
 
         #if defined(GD_IDE_ONLY)
-        virtual bool DrawEdittime(sf::RenderWindow& main_window);
-        virtual void PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper);
+        virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
+        virtual void ExposeResources(ArbitraryResourceWorker & worker);
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
 
         virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
@@ -95,14 +96,14 @@ class GD_EXTENSION_API TextObject : public Object
         virtual bool SetAngle(float newAngle) { angle = newAngle; text.SetRotation(angle); return true;};
         virtual float GetAngle() const {return angle;};
 
-        inline void SetString(std::string str) { text.SetString(str); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
+        inline void SetString(const std::string & str) { text.SetString(str); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
         inline std::string GetString() const {return text.GetString();};
 
         inline void SetCharacterSize(float size) { text.SetCharacterSize(size); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
         inline float GetCharacterSize() const { return text.GetCharacterSize(); };
 
-        void SetFont(std::string fontName_);
-        inline std::string GetFont() const {return fontName;};
+        void SetFont(const std::string & fontName_);
+        inline std::string GetFont() const {return fontName; };
 
         void SetOpacity(float val);
         inline float GetOpacity() const {return opacity;};

@@ -31,8 +31,7 @@ std::string RepeatEvent::GenerateEventCode(const Game & game, const Scene & scen
     std::string repeatCountCode;
     CallbacksForGeneratingExpressionCode callbacks(repeatCountCode, game, scene, parentContext);
     GDExpressionParser parser(repeatNumberExpression.GetPlainString());
-    parser.ParseMathExpression(game, scene, callbacks);
-    if (repeatCountCode.empty()) repeatCountCode = "0";
+    if (!parser.ParseMathExpression(game, scene, callbacks) || repeatCountCode.empty()) repeatCountCode = "0";
 
     //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
     EventsCodeGenerationContext context;

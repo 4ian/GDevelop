@@ -71,7 +71,6 @@ class GD_API Scene
         #if defined(GD_IDE_ONLY)
         bool wasModified;
         bool eventsModified;
-        bool eventsBeingCompiled;
 
         bool grid; ///< True if grid activated in editor -- Edittime only
         bool snap; ///< True if snap to grid activated in editor -- Edittime only

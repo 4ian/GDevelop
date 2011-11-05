@@ -65,8 +65,7 @@ std::string TimedEvent::GenerateEventCode(const Game & game, const Scene & scene
     std::string timeOutCode;
     CallbacksForGeneratingExpressionCode callbacks(timeOutCode, game, scene, context);
     GDExpressionParser parser(timeout.GetPlainString());
-    parser.ParseMathExpression(game, scene, callbacks);
-    if (timeOutCode.empty()) timeOutCode = "0";
+    if (parser.ParseMathExpression(game, scene, callbacks) || timeOutCode.empty()) timeOutCode = "0";
 
     //Prepare name
     std::string codeName = !name.empty() ? "GDNamedTimedEvent_"+name : "GDTimedEvent_"+ToString(this);
@@ -213,8 +212,14 @@ void TimedEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     //Draw actions and conditions
-    renderingHelper->DrawConditionsList(conditions, dc, x, y+functionTextHeight, renderingHelper->GetConditionsColumnWidth(), this, areas, selection);
-    renderingHelper->DrawActionsList(actions, dc, x+renderingHelper->GetConditionsColumnWidth(), y+functionTextHeight, width-renderingHelper->GetConditionsColumnWidth(), this, areas, selection);
+    renderingHelper->DrawConditionsList(conditions, dc,
+                                        x+border,
+                                        y+functionTextHeight+border,
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
+    renderingHelper->DrawActionsList(actions, dc,
+                                     x+renderingHelper->GetConditionsColumnWidth()+border,
+                                     y+functionTextHeight+border,
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
 }
 
 unsigned int TimedEvent::GetRenderedHeight(unsigned int width) const
@@ -222,13 +227,14 @@ unsigned int TimedEvent::GetRenderedHeight(unsigned int width) const
     if ( eventHeightNeedUpdate )
     {
         EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+        int border = renderingHelper->instructionsListBorder;
         const int functionTextHeight = 20;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth());
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth());
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
 
-        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + functionTextHeight);
+        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + functionTextHeight)+border*2;
         eventHeightNeedUpdate = false;
     }
 

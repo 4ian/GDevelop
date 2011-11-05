@@ -146,6 +146,10 @@ double GD_API trunc(double expression)
 {
     return ::trunc(expression);
 }
+double GD_API mod(double x, double y)
+{
+    return x - y * ::floor(x / y);
+}
 
 }
 }

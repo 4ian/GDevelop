@@ -7,7 +7,7 @@
 class RuntimeScene;
 class Object;
 
-bool GD_API SpriteTurnedToward( std::string, std::string, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float tolerance, bool conditionInverted );
-bool GD_API SpriteCollision( std::string, std::string, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, bool conditionInverted );
+bool GD_API SpriteTurnedToward( const std::string &, const std::string &, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float tolerance, bool conditionInverted );
+bool GD_API SpriteCollision( const std::string &, const std::string &, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, bool conditionInverted );
 
 #endif // SPRITETOOLS_H

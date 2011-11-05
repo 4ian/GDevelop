@@ -8,13 +8,14 @@
 
 #include <string>
 #include <vector>
-#include "GDL/Object.h"
+#include <boost/shared_ptr.hpp>
 #include "GDL/Scene.h"
 #include "GDL/ListVariable.h"
 #include "GDL/Dossier.h"
 #include "GDL/Image.h"
 #include "GDL/LoadingScreen.h"
 #include "GDL/ResourcesManager.h"
+class Object;
 class ExternalEvents;
 #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 namespace GDpriv

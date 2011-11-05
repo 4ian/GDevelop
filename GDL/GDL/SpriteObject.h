@@ -156,7 +156,7 @@ class GD_API SpriteObject : public Object
         bool IsFlippedY() const { return isFlippedY; };
 
         void TurnTowardPosition(float Xposition, float Yposition);
-        void TurnTowardObject( std::string, Object * object );
+        void TurnTowardObject( const std::string &, Object * object );
 
         /**
          * Only used internally by GD events generated code: Prefer using (Get/Set)Scale(X/Y).

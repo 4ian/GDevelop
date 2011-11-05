@@ -47,6 +47,7 @@ double GD_API sqrt(double expression);
 double GD_API tan(double expression);
 double GD_API tanh(double expression);
 double GD_API trunc(double expression);
+double GD_API mod(double x, double y);
 
 }
 }

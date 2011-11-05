@@ -186,7 +186,7 @@ public:
     /**
      * Load an xml element.
      */
-    virtual void LoadFromXml(const TiXmlElement * elem);
+    virtual void LoadFromXml(const TiXmlElement * elem, std::vector< boost::shared_ptr<Resource> > & alreadyExistingResources);
 
     #if defined(GD_IDE_ONLY)
     /**

@@ -54,23 +54,23 @@ ExtensionsManager::ExtensionsManager()
 {
     //Load all extensions
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new SpriteExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new CommonConversionsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new VariablesExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new MouseExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new KeyboardExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new JoystickExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new SceneExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new TimeExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new SpriteExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new MathematicalToolsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new CameraExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new KeyboardExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new AudioExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new FileExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new JoystickExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new NetworkExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new WindowExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new StringInstructionsExtension()));
+    AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
 
 #if defined(GD_IDE_ONLY)
     badInstructionInfos.fullname = _("Instruction inconnue");

@@ -8,8 +8,8 @@
 #include <string>
 class RuntimeScene;
 
-bool JoystickButtonDown( RuntimeScene & scene, unsigned int joystick, unsigned int button );
-double GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr );
-void JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr, const std::string & variable );
+bool GD_API JoystickButtonDown( RuntimeScene & scene, unsigned int joystick, unsigned int button );
+double GD_API GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr );
+void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr, const std::string & variable );
 
 #endif // JOYSTICKTOOLS_H

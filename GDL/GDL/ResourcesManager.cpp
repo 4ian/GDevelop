@@ -272,9 +272,21 @@ void ResourcesManager::CreateFolder(const std::string & name)
 /**
  * Load an xml element.
  */
-void ResourceFolder::LoadFromXml(const TiXmlElement * elem)
+void ResourceFolder::LoadFromXml(const TiXmlElement * elem, std::vector< boost::shared_ptr<Resource> > & alreadyExistingResources)
 {
-    //TODO
+    if (!elem) return;
+
+    name = elem->Attribute("name") ? elem->Attribute("name") : "";
+
+    const TiXmlElement * resourcesElem = elem->FirstChildElement("Resources");
+    const TiXmlElement * resourceElem = resourcesElem ? resourcesElem->FirstChildElement("Resource") : NULL;
+    while ( resourceElem )
+    {
+        std::string resName = resourceElem->Attribute("name") ? resourceElem->Attribute("name") : "";
+        AddResource(resName, alreadyExistingResources);
+
+        resourceElem = resourceElem->NextSiblingElement();
+    }
 }
 
 #if defined(GD_IDE_ONLY)
@@ -283,7 +295,21 @@ void ResourceFolder::LoadFromXml(const TiXmlElement * elem)
  */
 void ResourceFolder::SaveToXml(TiXmlElement * elem)
 {
-    //TODO
+    if (!elem) return;
+
+    elem->SetAttribute("name", name.c_str());
+
+    TiXmlElement * resourcesElem = new TiXmlElement( "Resources" );
+    elem->LinkEndChild(resourcesElem);
+    for (unsigned int i = 0;i<resources.size();++i)
+    {
+        if ( resources[i] == boost::shared_ptr<Resource>() ) break;
+
+        TiXmlElement * resourceElem = new TiXmlElement( "Resource" );
+        resourcesElem->LinkEndChild(resourceElem);
+
+        resourceElem->SetAttribute("name", resources[i]->name.c_str());
+    }
 }
 #endif
 
@@ -311,7 +337,7 @@ void ResourcesManager::LoadFromXml(const TiXmlElement * elem)
     while ( resourceFolderElem )
     {
         ResourceFolder folder;
-        folder.LoadFromXml(resourceFolderElem);
+        folder.LoadFromXml(resourceFolderElem, resources);
 
         folders.push_back(folder);
         resourceFolderElem = resourceFolderElem->NextSiblingElement();
@@ -338,15 +364,14 @@ void ResourcesManager::SaveToXml(TiXmlElement * elem)
         resources[i]->SaveToXml(resourceElem);
     }
 
-    const TiXmlElement * resourceFoldersElem = elem->FirstChildElement("ResourceFolders");
-    const TiXmlElement * resourceFolderElem  = resourceFoldersElem ? resourceFoldersElem->FirstChildElement() : NULL;
-    while ( resourceFolderElem )
+    TiXmlElement * resourceFoldersElem = new TiXmlElement( "ResourceFolders" );
+    elem->LinkEndChild(resourceFoldersElem);
+    for (unsigned int i = 0;i<folders.size();++i)
     {
-        ResourceFolder folder;
-        folder.LoadFromXml(resourceFolderElem);
+        TiXmlElement * folderElem = new TiXmlElement( "Folder" );
+        resourceFoldersElem->LinkEndChild(folderElem);
 
-        folders.push_back(folder);
-        resourceFolderElem = resourceFolderElem->NextSiblingElement();
+        folders[i].SaveToXml(folderElem);
     }
 }
 #endif

@@ -431,9 +431,9 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         void AddForceUsingPolarCoordinates( float angle, float length, float clearing );
         void AddForceTowardPosition( float positionX, float positionY, float length, float clearing );
         void AddForceToMoveAround( float positionX, float positionY, float angularVelocity, float distance, float clearing );
-        void AddForceTowardObject( std::string , float length, float clearing, Object * object );
-        void AddForceToMoveAroundObject( std::string , float velocity, float length, float clearing, Object * object );
-        void PutAroundObject( std::string , float length, float angleInDegrees, Object * object );
+        void AddForceTowardObject( const std::string &, float length, float clearing, Object * object );
+        void AddForceToMoveAroundObject( const std::string &, float velocity, float length, float clearing, Object * object );
+        void PutAroundObject( const std::string &, float length, float angleInDegrees, Object * object );
 
         void SetXY( float xValue, const char* xOperator, float yValue, const char* yOperator );
 

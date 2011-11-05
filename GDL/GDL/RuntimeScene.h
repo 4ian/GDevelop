@@ -13,7 +13,6 @@
 #include <string>
 #include <map>
 #include <boost/shared_ptr.hpp>
-#include "GDL/RuntimeGame.h"
 #include "GDL/Event.h"
 #include "GDL/CommonTools.h"
 #include "GDL/RuntimeLayer.h"
@@ -21,6 +20,7 @@
 #include "GDL/Layer.h"
 #include "GDL/ManualTimer.h"
 #include "GDL/ObjInstancesHolder.h"
+class RuntimeGame;
 class EventsExecutionEngine;
 class Object;
 class SoundManager;

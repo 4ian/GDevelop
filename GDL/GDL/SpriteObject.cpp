@@ -749,7 +749,7 @@ bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
     return false;
 }
 
-void SpriteObject::TurnTowardObject( std::string, Object * object )
+void SpriteObject::TurnTowardObject( const std::string &, Object * object )
 {
     if (object == NULL) return;
 

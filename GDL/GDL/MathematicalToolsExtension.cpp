@@ -14,6 +14,13 @@ MathematicalToolsExtension::MathematicalToolsExtension()
                           "Freeware")
     #if defined(GD_IDE_ONLY)
 
+    DECLARE_EXPRESSION("mod", _("Modulo"), _("x mod y"), _("Outils mathématiques"), "res/mathfunction.png")
+        instrInfo.AddParameter("expression", _("x ( dans x mod y )"), "", false);
+        instrInfo.AddParameter("expression", _("y ( dans x mod y )"), "", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::MathematicalTools::mod").SetIncludeFile("GDL/MathematicalTools.h");
+    DECLARE_END_EXPRESSION()
+
     DECLARE_EXPRESSION("min", _("Minimum de deux nombres"), _("Minimum de deux nombres"), _("Outils mathématiques"), "res/mathfunction.png")
         instrInfo.AddParameter("expression", _("Première expression"), "", false);
         instrInfo.AddParameter("expression", _("Deuxième expression"), "", false);

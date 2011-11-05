@@ -23,6 +23,7 @@
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/RuntimeContext.h"
 #include "GDL/ExtensionBase.h"
+#include "GDL/RuntimeGame.h"
 
 #include "GDL/EventsExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
@@ -616,7 +617,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     }
 
     if ( stopSoundsOnStartup ) SoundManager::GetInstance()->ClearAllSoundsAndMusics();
-
+    if ( renderWindow ) renderWindow->SetTitle(title);
 
     MessageLoading( "Loading finished", 100 );
 

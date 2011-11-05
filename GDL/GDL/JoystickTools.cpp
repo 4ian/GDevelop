@@ -7,12 +7,12 @@
 #include "GDL/RuntimeScene.h"
 #include <SFML/System.hpp>
 
-bool JoystickButtonDown( RuntimeScene & scene, unsigned int joystick, unsigned int button )
+bool GD_API JoystickButtonDown( RuntimeScene & scene, unsigned int joystick, unsigned int button )
 {
     return sf::Joystick::IsButtonPressed(joystick, button);
 }
 
-double GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr )
+double GD_API GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr )
 {
     sf::Joystick::Axis axis;
     if ( axisStr == "AxisX" ) axis = sf::Joystick::X;
@@ -29,7 +29,7 @@ double GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick, const 
     return sf::Joystick::GetAxisPosition(joystick, axis);
 }
 
-void JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr, const std::string & variable )
+void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr, const std::string & variable )
 {
     //Obtain axis and joystick
     sf::Joystick::Axis axis;

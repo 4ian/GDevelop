@@ -5,8 +5,14 @@
 
 #include "GDL/ObjInstancesHolder.h"
 #include "GDL/ExtensionsManager.h"
-
+#include "GDL/Object.h"
 #include "GDL/profile.h"
+
+void ObjInstancesHolder::AddObject(const ObjSPtr & object)
+{
+    objectsInstances[object->GetName()].push_back(object);
+    objectsRawPointersInstances[object->GetName()].push_back(object.get());
+}
 
 ObjInstancesHolder ObjInstancesHolder::CopyAndCloneAllObjects() const
 {

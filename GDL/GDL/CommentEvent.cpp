@@ -6,8 +6,8 @@
 
 #include <wx/dcmemory.h>
 #include "CommentEvent.h"
-#include "GDL/OpenSaveGame.h"
 #include "GDL/EventsRenderingHelper.h"
+#include "GDL/CommonTools.h"
 #include "GDL/tinyxml.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/EditComment.h"

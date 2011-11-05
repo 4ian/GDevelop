@@ -1,9 +1,14 @@
 #ifndef OBJINSTANCESHOLDER_H
 #define OBJINSTANCESHOLDER_H
 
-#include "GDL/Object.h"
 #include <string>
+#include <vector>
 #include <map>
+#include <boost/shared_ptr.hpp>
+class Object;
+
+typedef std::vector < boost::shared_ptr<Object> > ObjList;
+typedef boost::shared_ptr<Object> ObjSPtr;
 
 /**
  * \brief Hold lists of objects classified by the name of the objects.
@@ -17,11 +22,7 @@ public:
     /**
      * Add a new object to the lists
      */
-    inline void AddObject(const ObjSPtr & object)
-    {
-        objectsInstances[object->GetName()].push_back(object);
-        objectsRawPointersInstances[object->GetName()].push_back(object.get());
-    }
+    void AddObject(const ObjSPtr & object);
 
     /**
      * Get all objects with a specific name
@@ -112,7 +113,7 @@ public:
 protected:
 private:
 
-    std::map<std::string, ObjList> objectsInstances;
+    std::map<std::string, ObjList > objectsInstances;
     std::map<std::string, std::vector<Object*> > objectsRawPointersInstances;
 };
 

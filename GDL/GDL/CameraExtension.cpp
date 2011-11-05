@@ -35,8 +35,8 @@ CameraExtension::CameraExtension()
 
     DECLARE_CONDITION("CameraY",
                    _("Position Y de la caméra"),
-                   _("Modifie la position Y de la caméra indiquée."),
-                   _("Faire _PARAM2__PARAM1_ à la position Y de la caméra _PARAM4_ ( Calque : _PARAM3_ )"),
+                   _("Teste si la valeur de la position Y de la caméra\ncorrespond au test effectué."),
+                   _("La position Y de la caméra _PARAM4_ est _PARAM2_ à _PARAM1_ ( Calque : _PARAM3_ )"),
                    _("Calques et caméras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
@@ -71,8 +71,8 @@ CameraExtension::CameraExtension()
 
     DECLARE_ACTION("CameraY",
                    _("Position Y de la caméra"),
-                   _("Teste si la valeur de la position Y de la caméra\ncorrespond au test effectué."),
-                   _("La position Y de la caméra _PARAM4_ est _PARAM2_ à _PARAM1_ ( Calque : _PARAM3_ )"),
+                   _("Modifie la position Y de la caméra indiquée."),
+                   _("Faire _PARAM2__PARAM1_ à la position Y de la caméra _PARAM4_ ( Calque : _PARAM3_ )"),
                    _("Calques et caméras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-double GD_API PickedObjectsCount( string , std::map <std::string, std::vector<Object*> *> objectsLists )
+double GD_API PickedObjectsCount( const std::string &, std::map <std::string, std::vector<Object*> *> objectsLists )
 {
     vector<Object*> pickedObjects;
     std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists.begin();
@@ -21,8 +21,10 @@ double GD_API PickedObjectsCount( string , std::map <std::string, std::vector<Ob
     return pickedObjects.size();
 }
 
-bool GD_API HitBoxesCollision( string, string, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, bool conditionInverted )
+bool GD_API HitBoxesCollision( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, bool conditionInverted )
 {
+    const bool sameObjectLists = firstObjName == secondObjName;
+
     vector<Object*> objects1;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
@@ -35,13 +37,18 @@ bool GD_API HitBoxesCollision( string, string, std::map <std::string, std::vecto
     }
 
     vector<Object*> objects2;
-    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
+    if ( sameObjectLists )
+        objects2 = objects1;
+    else
     {
-        if ( it->second != NULL )
+        for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
         {
-            objects2.reserve(objects2.size()+it->second->size());
-            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
-            it->second->clear();
+            if ( it->second != NULL )
+            {
+                objects2.reserve(objects2.size()+it->second->size());
+                std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
+                it->second->clear();
+            }
         }
     }
 
@@ -51,7 +58,7 @@ bool GD_API HitBoxesCollision( string, string, std::map <std::string, std::vecto
 	for(unsigned int i = 0;i<objects1.size();++i)
     {
         bool AuMoinsUnObjet = false;
-        for(unsigned int j = 0;j<objects2.size();++j)
+        for(unsigned int j = (!sameObjectLists ? 0 : i+1);j<objects2.size();++j)
         {
             if ( objects1[i] != objects2[j] )
             {
@@ -97,8 +104,52 @@ bool GD_API HitBoxesCollision( string, string, std::map <std::string, std::vecto
     return isTrue;
 }
 
-float GD_API DistanceBetweenObjects( string, string, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float length, string relationalOperator, bool conditionInverted)
+namespace GDpriv
 {
+    bool GDinternalEqualToTest(float lhs, float rhs)
+    {
+        return lhs == rhs;
+    }
+    bool GDinternalInferiorOrEqualToTest(float lhs, float rhs)
+    {
+        return lhs <= rhs;
+    }
+    bool GDinternalInferiorToTest(float lhs, float rhs)
+    {
+        return lhs < rhs;
+    }
+    bool GDinternalSuperiorToTest(float lhs, float rhs)
+    {
+        return lhs > rhs;
+    }
+    bool GDinternalSuperiorOrEqualToTest(float lhs, float rhs)
+    {
+        return lhs >= rhs;
+    }
+    bool GDinternalDifferentFromTest(float lhs, float rhs)
+    {
+        return lhs != rhs;
+    }
+    bool GDinternalFalse(float , float )
+    {
+        return false;
+    }
+}
+
+float GD_API DistanceBetweenObjects( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float length, string relationalOperator, bool conditionInverted)
+{
+    length *= length;
+    const bool sameObjectLists = firstObjName == secondObjName;
+
+    bool (*relationFunction)(float, float) = &GDpriv::GDinternalFalse;
+
+    if ( relationalOperator == "=" ) relationFunction = &GDpriv::GDinternalEqualToTest;
+    else if ( relationalOperator == "<" ) relationFunction = &GDpriv::GDinternalInferiorToTest;
+    else if ( relationalOperator == ">" ) relationFunction = &GDpriv::GDinternalSuperiorToTest;
+    else if ( relationalOperator == "<=" ) relationFunction = &GDpriv::GDinternalInferiorOrEqualToTest;
+    else if ( relationalOperator == ">=" ) relationFunction = &GDpriv::GDinternalSuperiorOrEqualToTest;
+    else if ( relationalOperator == "!=" ) relationFunction = &GDpriv::GDinternalDifferentFromTest;
+
     vector<Object*> objects1;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
@@ -111,13 +162,18 @@ float GD_API DistanceBetweenObjects( string, string, std::map <std::string, std:
     }
 
     vector<Object*> objects2;
-    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
+    if ( sameObjectLists )
+        objects2 = objects1;
+    else
     {
-        if ( it->second != NULL )
+        for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
         {
-            objects2.reserve(objects2.size()+it->second->size());
-            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
-            it->second->clear();
+            if ( it->second != NULL )
+            {
+                objects2.reserve(objects2.size()+it->second->size());
+                std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
+                it->second->clear();
+            }
         }
     }
 
@@ -126,20 +182,14 @@ float GD_API DistanceBetweenObjects( string, string, std::map <std::string, std:
     //Test each object against each other objects
 	for(unsigned int i = 0;i<objects1.size();++i)
     {
-        for(unsigned int j = 0;j<objects2.size();++j)
+        for(unsigned int j = (!sameObjectLists ? 0 : i+1);j<objects2.size();++j)
         {
             if ( objects1[i] != objects2[j] )
             {
                 float X = objects1[i]->GetDrawableX()+objects1[i]->GetCenterX() - (objects2[j]->GetDrawableX()+objects2[j]->GetCenterX());
                 float Y = objects1[i]->GetDrawableY()+objects1[i]->GetCenterY() - (objects2[j]->GetDrawableY()+objects2[j]->GetCenterY());
 
-                if (( relationalOperator == "=" && sqrt(X*X+Y*Y) == length ) ||
-                        ( relationalOperator == "<" && sqrt(X*X+Y*Y) < length ) ||
-                        ( relationalOperator == ">" && sqrt(X*X+Y*Y) > length ) ||
-                        ( relationalOperator == "<=" && sqrt(X*X+Y*Y) <= length ) ||
-                        ( relationalOperator == ">=" && sqrt(X*X+Y*Y) >= length ) ||
-                        ( relationalOperator == "!=" && sqrt(X*X+Y*Y) != length )
-                   )
+                if ( relationFunction((X*X+Y*Y), length) )
                 {
                     if ( !conditionInverted )
                     {
@@ -170,8 +220,10 @@ float GD_API DistanceBetweenObjects( string, string, std::map <std::string, std:
     return isTrue;
 }
 
-bool GD_API MovesToward( string, string, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float tolerance, bool conditionInverted )
+bool GD_API MovesToward( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
+    const bool sameObjectLists = firstObjName == secondObjName;
+
     vector<Object*> objects1;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
@@ -184,13 +236,18 @@ bool GD_API MovesToward( string, string, std::map <std::string, std::vector<Obje
     }
 
     vector<Object*> objects2;
-    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
+    if ( sameObjectLists )
+        objects2 = objects1;
+    else
     {
-        if ( it->second != NULL )
+        for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
         {
-            objects2.reserve(objects2.size()+it->second->size());
-            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
-            it->second->clear();
+            if ( it->second != NULL )
+            {
+                objects2.reserve(objects2.size()+it->second->size());
+                std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
+                it->second->clear();
+            }
         }
     }
 
@@ -201,7 +258,7 @@ bool GD_API MovesToward( string, string, std::map <std::string, std::vector<Obje
     {
         if ( objects1[i]->TotalForceLength() != 0 )
         {
-            for(unsigned int j = 0;j<objects2.size();++j)
+            for(unsigned int j = (!sameObjectLists ? 0 : i+1);j<objects2.size();++j)
             {
                 if ( objects1[i] != objects2[j] )
                 {

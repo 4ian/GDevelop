@@ -502,7 +502,7 @@ void Object::SeparateObjectsWithForces( const string & , std::map <std::string, 
     }
 }
 
-void Object::AddForceTowardObject(string , float length, float clearing, Object * object )
+void Object::AddForceTowardObject(const std::string &, float length, float clearing, Object * object )
 {
     if ( object == NULL ) return;
 
@@ -516,7 +516,7 @@ void Object::AddForceTowardObject(string , float length, float clearing, Object 
     Forces.push_back( forceToAdd );
 }
 
-void Object::AddForceToMoveAroundObject( string , float velocity, float length, float clearing, Object * object )
+void Object::AddForceToMoveAroundObject( const std::string &, float velocity, float length, float clearing, Object * object )
 {
     if ( object == NULL ) return;
 
@@ -542,7 +542,7 @@ void Object::AddForceToMoveAroundObject( string , float velocity, float length, 
     Forces.push_back( forceToAdd );
 }
 
-void Object::PutAroundObject( string , float length, float angleInDegrees, Object * object )
+void Object::PutAroundObject( const std::string &, float length, float angleInDegrees, Object * object )
 {
     if ( object == NULL ) return;
 

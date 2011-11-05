@@ -549,7 +549,7 @@ SpriteExtension::SpriteExtension()
 
     //Declaration of all conditions available
 
-    /*DECLARE_OBJECT_CONDITION("EstTourne", //CONVERT TO OBJECT INSTRUCTION //TODO Par ici
+    DECLARE_CONDITION("EstTourne", //CONVERT TO OBJECT INSTRUCTION //TODO Par ici
                       _("Un objet est tourné vers un autre"),
                       _("Teste si un objet est tourné vers un autre"),
                       _("L'objet _PARAM0_ est tourné vers _PARAM1_"),
@@ -559,13 +559,15 @@ SpriteExtension::SpriteExtension()
 
         instrInfo.AddParameter("object", _("Nom de l'objet"), "Sprite", false);
         instrInfo.AddParameter("object", _("Nom du second objet"), "", false);
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
         instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
         instrInfo.AddParameter("expression", _("Angle de tolérance ( 0 : tolérance minimale )"), "",false);
         instrInfo.AddCodeOnlyParameter("conditionInverted", "");
 
-        instrInfo.cppCallingInformation.SetFunctionName("IsTurnedToward").SetIncludeFile("GDL/SpriteTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("SpriteTurnedToward").SetIncludeFile("GDL/SpriteTools.h");
 
-    DECLARE_END_OBJECT_CONDITION()*/
+    DECLARE_END_CONDITION()
+
     DECLARE_CONDITION("Collision",
                       _("Collision"),
                       _("La condition est vraie si il y a collision entre les deux objets donnés.\nLa collision est faite au pixel près.\nAttention ! Cette condition est couteuse pour l'ordinateur en terme de perfomance."),

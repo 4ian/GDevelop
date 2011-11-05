@@ -471,6 +471,15 @@ bool PhysicsAutomatism::CollisionWith( const std::string & , std::map <std::stri
     return false;
 }
 
+bool PhysicsAutomatism::IsStatic()
+{
+    return !dynamic;
+}
+
+bool PhysicsAutomatism::IsDynamic()
+{
+    return dynamic;
+}
 
 #if defined(GD_IDE_ONLY)
 void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const

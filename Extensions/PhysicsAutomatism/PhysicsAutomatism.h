@@ -80,6 +80,8 @@ class GD_EXTENSION_API PhysicsAutomatism : public Automatism
 
         void SetStatic(RuntimeScene & scene);
         void SetDynamic(RuntimeScene & scene);
+        bool IsStatic();
+        bool IsDynamic();
         void SetFixedRotation(RuntimeScene & scene);
         void SetFreeRotation(RuntimeScene & scene);
         void SetAsBullet(RuntimeScene & scene);

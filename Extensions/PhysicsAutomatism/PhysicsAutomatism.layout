@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development" />
+	<ActiveTarget name="Release - Edittime" />
 	<File name="Box2D\Box2D\Box2D\Box2D.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1565" topLine="30" />
 	</File>
@@ -29,7 +29,7 @@
 		<Cursor1 position="1786" topLine="49" />
 	</File>
 	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="17243" topLine="565" />
+		<Cursor1 position="3533" topLine="77" />
 	</File>
 	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="5231" topLine="182" />
@@ -41,7 +41,7 @@
 		<Cursor1 position="6345" topLine="251" />
 	</File>
 	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="0" topLine="132" />
+		<Cursor1 position="12952" topLine="306" />
 	</File>
 	<File name="Box2D\Box2D\Box2D\Dynamics\b2World.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="2957" topLine="92" />
@@ -53,13 +53,13 @@
 		<Cursor1 position="238" topLine="0" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2227" topLine="33" />
+		<Cursor1 position="4955" topLine="104" />
 	</File>
-	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2901" topLine="57" />
+	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="13973" topLine="426" />
 	</File>
 	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1121" topLine="19" />
+		<Cursor1 position="2341" topLine="67" />
 	</File>
 	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="16402" topLine="252" />

@@ -104,7 +104,6 @@ class Extension : public ExtensionBase
 
                         instrInfo.AddParameter("object", _("Objet"), "", false);
                         instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
-                        instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                         instrInfo.cppCallingInformation.SetFunctionName("IsDynamic").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 

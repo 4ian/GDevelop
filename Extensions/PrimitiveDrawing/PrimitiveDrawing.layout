@@ -2,10 +2,10 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="DrawerObject.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="15961" topLine="489" />
+		<Cursor1 position="1217" topLine="469" />
 	</File>
 	<File name="DrawerObject.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1148" topLine="9" />
+		<Cursor1 position="2034" topLine="47" />
 	</File>
 	<File name="DrawerObjectEditor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="7495" topLine="130" />

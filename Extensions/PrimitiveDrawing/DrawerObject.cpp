@@ -28,6 +28,7 @@ freely, subject to the following restrictions:
 #include <SFML/Graphics.hpp>
 #include "GDL/Object.h"
 #include "GDL/RuntimeScene.h"
+#include "GDL/RuntimeGame.h"
 #include "GDL/ImageManager.h"
 #include "GDL/RotatedRectangle.h"
 #include "GDL/tinyxml.h"
@@ -202,7 +203,7 @@ bool DrawerObject::InitializeFromInitialPosition(const InitialPosition & positio
 /**
  * Render object at runtime
  */
-bool DrawerObject::Draw( sf::RenderWindow& window )
+bool DrawerObject::Draw( sf::RenderTarget& renderTarget )
 {
     //Don't draw anything if hidden
     if ( hidden )
@@ -212,7 +213,7 @@ bool DrawerObject::Draw( sf::RenderWindow& window )
     }
 
     for (unsigned int i = 0;i<shapesToDraw.size();++i)
-    	window.Draw(shapesToDraw[i]);
+    	renderTarget.Draw(shapesToDraw[i]);
 
     shapesToDraw.clear();
 
@@ -223,10 +224,10 @@ bool DrawerObject::Draw( sf::RenderWindow& window )
 /**
  * Render object at edittime
  */
-bool DrawerObject::DrawEdittime(sf::RenderWindow& renderWindow)
+bool DrawerObject::DrawEdittime(sf::RenderTarget& renderTarget)
 {
     edittimeIcon.SetPosition(GetX(), GetY());
-    renderWindow.Draw(edittimeIcon);
+    renderTarget.Draw(edittimeIcon);
 
     return true;
 }

@@ -33,6 +33,7 @@ freely, subject to the following restrictions:
 #include "GDL/Position.h"
 #include "GDL/RotatedRectangle.h"
 #include "GDL/tinyxml.h"
+#include "GDL/ArbitraryResourceWorker.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/bitmap.h>
@@ -223,7 +224,7 @@ bool Box3DObject::InitializeFromInitialPosition(const InitialPosition & position
 /**
  * Render object at runtime
  */
-bool Box3DObject::Draw( sf::RenderWindow& window )
+bool Box3DObject::Draw( sf::RenderTarget& window )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
@@ -312,7 +313,7 @@ bool Box3DObject::Draw( sf::RenderWindow& window )
 /**
  * Render object at edittime
  */
-bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
+bool Box3DObject::DrawEdittime(sf::RenderTarget& window)
 {
     window.RestoreGLStates();
 
@@ -392,6 +393,16 @@ bool Box3DObject::DrawEdittime(sf::RenderWindow& window)
     window.SaveGLStates();
 
     return true;
+}
+
+void Box3DObject::ExposeResources(ArbitraryResourceWorker & worker)
+{
+    worker.ExposeImage(frontTextureName);
+    worker.ExposeImage(topTextureName);
+    worker.ExposeImage(bottomTextureName);
+    worker.ExposeImage(leftTextureName);
+    worker.ExposeImage(rightTextureName);
+    worker.ExposeImage(backTextureName);
 }
 
 bool Box3DObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)

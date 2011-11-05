@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 #include "GDL/Game.h"
 #include "GDL/CommonTools.h"
 #include "GDL/MainEditorCommand.h"
-#include "GDL/EditorImages.h"
+#include "GDL/ResourcesEditor.h"
 
 #include "Box3DObject.h"
 
@@ -207,13 +207,13 @@ object(object_)
 	depthEdit->ChangeValue(ToString(object.GetDepth()));
 
     //Init the image bank editor
-    editorImagesPnl = new EditorImages( this, game, mainEditorCommand );
-    editorImagesPnl->Refresh();
+    resourcesEditor = new ResourcesEditor( this, game, mainEditorCommand );
+    resourcesEditor->Refresh();
 
 	//Init wxAuiManager with two pane : the editor and the image bank editor
     m_mgr.SetManagedWindow( this );
     m_mgr.AddPane( Core, wxAuiPaneInfo().Name( wxT( "Core" ) ).Center().CaptionVisible(false) );
-    m_mgr.AddPane( editorImagesPnl, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _T( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(150, 100) );
+    m_mgr.AddPane( resourcesEditor, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _T( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(150, 100) );
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );
     m_mgr.Update();
@@ -257,69 +257,69 @@ void Box3DObjectEditor::OnokBtClick(wxCommandEvent& event)
 
 void Box3DObjectEditor::OnfrontAddFromBtClick(wxCommandEvent& event)
 {
-    if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
+    if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
         wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
-    frontTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    frontTextureEdit->ChangeValue(resourcesEditor->resourcesTree->GetItemText(resourcesEditor->m_itemSelected));
 }
 
 void Box3DObjectEditor::OntopAddFromBtClick(wxCommandEvent& event)
 {
-    if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
+    if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
         wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
-    topTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    topTextureEdit->ChangeValue(resourcesEditor->resourcesTree->GetItemText(resourcesEditor->m_itemSelected));
 }
 
 
 void Box3DObjectEditor::OnbottomAddFromBtClick(wxCommandEvent& event)
 {
-    if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
+    if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
         wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
-    bottomTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    bottomTextureEdit->ChangeValue(resourcesEditor->resourcesTree->GetItemText(resourcesEditor->m_itemSelected));
 }
 
 void Box3DObjectEditor::OnleftAddFromBtClick(wxCommandEvent& event)
 {
-    if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
+    if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
         wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
-    leftTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    leftTextureEdit->ChangeValue(resourcesEditor->resourcesTree->GetItemText(resourcesEditor->m_itemSelected));
 }
 
 void Box3DObjectEditor::OnrightAddFromBtClick(wxCommandEvent& event)
 {
-    if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
+    if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
         wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
-    rightTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    rightTextureEdit->ChangeValue(resourcesEditor->resourcesTree->GetItemText(resourcesEditor->m_itemSelected));
 }
 
 void Box3DObjectEditor::OnbackAddFromBtClick(wxCommandEvent& event)
 {
-    if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
+    if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
         wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
-    backTextureEdit->ChangeValue(editorImagesPnl->BanqueImageList->GetItemText(editorImagesPnl->m_itemSelected));
+    backTextureEdit->ChangeValue(resourcesEditor->resourcesTree->GetItemText(resourcesEditor->m_itemSelected));
 }
 
 /**
@@ -328,10 +328,10 @@ void Box3DObjectEditor::OnbackAddFromBtClick(wxCommandEvent& event)
 void Box3DObjectEditor::OnimageBankBtClick(wxCommandEvent& event)
 {
     //Update the window size
-    if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
+    if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
         SetSize(GetSize().GetWidth()+150, GetSize().GetHeight());
 
-    m_mgr.GetPane( editorImagesPnl ).Show();
+    m_mgr.GetPane( resourcesEditor ).Show();
     m_mgr.Update();
 }
 

@@ -58,11 +58,12 @@ class GD_EXTENSION_API Box3DObject : public Object
         virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
-        virtual bool Draw(sf::RenderWindow& main_window);
+        virtual bool Draw(sf::RenderTarget & renderTarget);
 
         #if defined(GD_IDE_ONLY)
-        virtual bool DrawEdittime(sf::RenderWindow& main_window);
+        virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+        virtual void ExposeResources(ArbitraryResourceWorker & worker);
 
         virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
         virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );

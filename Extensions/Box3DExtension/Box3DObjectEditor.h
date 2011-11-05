@@ -42,7 +42,7 @@ freely, subject to the following restrictions:
 class Game;
 class Box3DObject;
 class MainEditorCommand;
-class EditorImages;
+class ResourcesEditor;
 
 class Box3DObjectEditor: public wxDialog
 {
@@ -82,7 +82,7 @@ class Box3DObjectEditor: public wxDialog
 		wxBitmapButton* bottomAddFromBt;
 		wxTextCtrl* frontTextureEdit;
 		//*)
-		EditorImages * editorImagesPnl;
+		ResourcesEditor * resourcesEditor;
 
 	protected:
 

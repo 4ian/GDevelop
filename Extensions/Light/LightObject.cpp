@@ -39,7 +39,7 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
-#include "GDL/ResourcesMergingHelper.h"
+#include "GDL/ArbitraryResourceWorker.h"
 #include "GDL/MainEditorCommand.h"
 #include "LightObjectEditor.h"
 #endif
@@ -186,7 +186,7 @@ bool LightObject::InitializeFromInitialPosition(const InitialPosition & position
 /**
  * Render object at runtime
  */
-bool LightObject::Draw( sf::RenderWindow& window )
+bool LightObject::Draw( sf::RenderTarget& window )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
@@ -241,7 +241,7 @@ bool LightObject::Draw( sf::RenderWindow& window )
 /**
  * Render object at edittime
  */
-bool LightObject::DrawEdittime(sf::RenderWindow& renderWindow)
+bool LightObject::DrawEdittime(sf::RenderTarget& renderWindow)
 {
     edittimeIcon.SetPosition(GetX(), GetY());
     renderWindow.Draw(edittimeIcon);
@@ -249,7 +249,7 @@ bool LightObject::DrawEdittime(sf::RenderWindow& renderWindow)
     return true;
 }
 
-void LightObject::PrepareResourcesForMerging(ResourcesMergingHelper & resourcesMergingHelper)
+void LightObject::ExposeResources(ArbitraryResourceWorker & worker)
 {
 }
 

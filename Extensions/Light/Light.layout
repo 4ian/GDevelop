@@ -19,11 +19,11 @@
 	<File name="LightManager.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="124" topLine="0" />
 	</File>
-	<File name="LightObject.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="8177" topLine="200" />
+	<File name="LightObject.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="9001" topLine="235" />
 	</File>
 	<File name="LightObject.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1334" topLine="29" />
+		<Cursor1 position="2372" topLine="76" />
 	</File>
 	<File name="LightObjectEditor.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="7487" topLine="125" />

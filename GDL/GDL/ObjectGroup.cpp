@@ -27,6 +27,6 @@ void ObjectGroup::AddObject(string name)
 
 void ObjectGroup::RemoveObject(string name)
 {
-    std::remove(memberObjects.begin(), memberObjects.end(), name);
+    memberObjects.erase(std::remove(memberObjects.begin(), memberObjects.end(), name), memberObjects.end());
     return;
 }

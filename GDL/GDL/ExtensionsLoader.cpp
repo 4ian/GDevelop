@@ -34,6 +34,7 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/DynamicExtensionBase.h"
 #include "GDL/LocaleManager.h"
+#include "GDL/CommonTools.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/log.h>
@@ -182,6 +183,10 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
         }
         else
         {
+            #if defined(GD_IDE_ONLY)
+            GDpriv::LocaleManager::GetInstance()->AddCatalog(ToString(wxFileName(fullpath).GetName())); //In editor, load catalog associated with extension, if any.
+            #endif
+
             ExtensionBase * extensionPtr = create_extension();
             boost::shared_ptr<ExtensionBase> extension(extensionPtr, destroy_extension);
 
@@ -245,9 +250,6 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
             }
 
             extensionsManager->AddExtension(extension);
-            #if defined(GD_IDE_ONLY)
-            GDpriv::LocaleManager::GetInstance()->AddCatalog(extension->GetName()); //In editor, load catalog associated with extension, if any.
-            #endif
             #if defined(GD_IDE_ONLY)
             wxRemoveFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log");
             #endif

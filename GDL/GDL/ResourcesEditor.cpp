@@ -40,6 +40,7 @@
 #include "GDL/Game.h"
 #include "GDL/CommonTools.h"
 #include "GDL/PropImage.h"
+#include "GDL/ExternalEvents.h"
 #include "GDL/BitmapGUIManager.h"
 #include "GDL/gdTreeItemStringData.h"
 #include "GDL/ImagesUsedInventorizer.h"
@@ -741,10 +742,15 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
     {
         for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j)
         	game.scenes[i]->initialObjects[j]->ExposeResources(inventorizer);
+
+        LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, inventorizer);
     }
     //Search in global objects resources
     for (unsigned int j = 0;j<game.globalObjects.size();++j)
         game.globalObjects[j]->ExposeResources(inventorizer);
+    //Search in external events
+    for ( unsigned int i = 0;i < game.externalEvents.size();i++ )
+        LaunchResourceWorkerOnEvents(game, game.externalEvents[i]->events, inventorizer);
 
     //Construct a wxArrayString with unused images
     wxArrayString imagesNotUsed;

@@ -115,5 +115,11 @@ void WindowExtension::ExposeActionsResources(Instruction & action, ArbitraryReso
         worker.ExposeResource(parameter);
         action.SetParameter(6, parameter);
     }
+    if ( action.GetType() == "SetWindowIcon" && !action.GetParameterSafely( 1 ).GetPlainString().empty() )
+    {
+        std::string parameter = action.GetParameter(1).GetPlainString();
+        worker.ExposeImage(parameter);
+        action.SetParameter(1, parameter);
+    }
 }
 #endif

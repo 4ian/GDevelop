@@ -129,10 +129,6 @@ void GD_API DeleteGroupFromFile( const std::string & filename, const std::string
         return;
     groups.push_back("");
 
-    //Création si besoin est de la racine
-    if ( hdl.FirstChildElement(groups.at(0).c_str()).Element() == NULL )
-
-
     //A chaque fois, on vérifie si le groupe voulu existe
     for (unsigned int i =0;i<groups.size();i++)
     {

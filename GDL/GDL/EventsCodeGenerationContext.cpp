@@ -8,6 +8,7 @@
 #include "GDL/Scene.h"
 #include "GDL/EventsCodeNameMangler.h"
 #include "GDL/CommonTools.h"
+#include "GDL/EventsCodeGenerator.h"
 #include <set>
 
 using namespace std;
@@ -55,10 +56,10 @@ void EventsCodeGenerationContext::ObjectNeeded(std::string objectName)
 
         objectsListsDynamicallyDeclared.insert(objectName);
 
-        dynamicDeclaration += "if (find(objectsAlreadyDeclared.begin(), objectsAlreadyDeclared.end(), \""+objectName+"\") == objectsAlreadyDeclared.end()) ";
+        dynamicDeclaration += "if (find(objectsAlreadyDeclared.begin(), objectsAlreadyDeclared.end(), \""+EventsCodeGenerator::ConvertToCppString(objectName)+"\") == objectsAlreadyDeclared.end()) ";
         dynamicDeclaration += "{\n";
-        dynamicDeclaration += "    "+ManObjListName(objectName)+" = runtimeContext->GetObjectsRawPointers(\""+objectName+"\");\n";
-        dynamicDeclaration += "    objectsAlreadyDeclared.push_back(\""+objectName+"\");";
+        dynamicDeclaration += "    "+ManObjListName(objectName)+" = runtimeContext->GetObjectsRawPointers(\""+EventsCodeGenerator::ConvertToCppString(objectName)+"\");\n";
+        dynamicDeclaration += "    objectsAlreadyDeclared.push_back(\""+EventsCodeGenerator::ConvertToCppString(objectName)+"\");";
         dynamicDeclaration += "}\n";
     }
 
@@ -80,7 +81,7 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
             if ( objectsAlreadyDeclared.size() >= 3 ) declarationsCode += "objectsAlreadyDeclared.reserve("+ToString(objectsAlreadyDeclared.size())+");\n";
             for (std::set<string>::iterator it = objectsAlreadyDeclared.begin() ; it != objectsAlreadyDeclared.end(); ++it)
             {
-                declarationsCode+= "objectsAlreadyDeclared.push_back(\""+*it+"\");\n";
+                declarationsCode+= "objectsAlreadyDeclared.push_back(\""+EventsCodeGenerator::ConvertToCppString(*it)+"\");\n";
             }
         }
         else
@@ -91,10 +92,10 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
     {
         if ( objectsAlreadyDeclared.find(*it) == objectsAlreadyDeclared.end() && emptyObjectsListsAlreadyDeclared.find(*it) == emptyObjectsListsAlreadyDeclared.end() )
         {
-            declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+" = runtimeContext->GetObjectsRawPointers(\""+*it+"\");\n";
+            declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+" = runtimeContext->GetObjectsRawPointers(\""+EventsCodeGenerator::ConvertToCppString(*it)+"\");\n";
             objectsAlreadyDeclared.insert(*it);
 
-            if ( dynamicObjectsListsDeclaration) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n";
+            if ( dynamicObjectsListsDeclaration) declarationsCode += "objectsAlreadyDeclared.push_back(\""+EventsCodeGenerator::ConvertToCppString(*it)+"\");\n";
         }
         else
         {
@@ -103,7 +104,7 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
             declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+" = "+ManObjListName(*it)+"T;\n";
         }
 
-        if ( allObjectsMapNeeded ) declarationsCode += "objectsListsMap[\""+*it+"\"] = &"+ManObjListName(*it)+";\n";
+        if ( allObjectsMapNeeded ) declarationsCode += "objectsListsMap[\""+EventsCodeGenerator::ConvertToCppString(*it)+"\"] = &"+ManObjListName(*it)+";\n";
     }
     for ( set<string>::iterator it = objectsListsToBeDeclaredEmpty.begin() ; it != objectsListsToBeDeclaredEmpty.end(); ++it )
     {
@@ -125,7 +126,7 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
             //if ( dynamicObjectsListsDeclaration ) declarationsCode += "objectsAlreadyDeclared.push_back(\""+*it+"\");\n"; Let me commented please.
         }
 
-        if ( allObjectsMapNeeded ) declarationsCode += "objectsListsMap[\""+*it+"\"] = &"+ManObjListName(*it)+";\n";
+        if ( allObjectsMapNeeded ) declarationsCode += "objectsListsMap[\""+EventsCodeGenerator::ConvertToCppString(*it)+"\"] = &"+ManObjListName(*it)+";\n";
     }
 
     return declarationsCode;

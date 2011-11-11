@@ -836,7 +836,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 for (unsigned int i = 0;i<realObjects.size();++i)
                 {
                     context.EmptyObjectsListNeeded(realObjects[i]);
-                    argOutput += ".AddObjectListToMap(\""+realObjects[i]+"\", "+ManObjListName(realObjects[i])+")";
+                    argOutput += ".AddObjectListToMap(\""+ConvertToCppString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
                 }
                 argOutput += ".ReturnObjectListsMap()";
             }
@@ -863,7 +863,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 else
                     realObjects.push_back(parameters[i].GetPlainString());
 
-                if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() )
+                if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() && !context.currentObject.empty())
                 {
                     //If object currently used by instruction is available, use it directly.
                     argOutput += ManObjListName(context.currentObject)+"[i]";

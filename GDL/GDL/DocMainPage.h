@@ -80,9 +80,9 @@
  */
 
 /**
- *  \page GetFamiliarizedWithGDSDK Get familiarized with %Game Develop SDK
+ *  \page GetFamiliarizedWithGDSDK Get familiarized with Game Develop SDK
  *
- * Here are some explanations about SDK structure and some information about coding with Game Develop Library:
+ * Here are some explanations about SDK structure and some information about coding with %Game Develop Library:
  * - \subpage GetFamiliarizedWithGDL
  * - \subpage SDKDirectoriesStructure
  * - \subpage AboutExtensionCpp
@@ -327,6 +327,8 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
 /**
  * \page WritingANewExtension Writing an new extension
  *
+ * \section createNewExtension Create a new extension
+ *
  * Creating a new extension can be made by following these steps :<br>
  *
  * -Copy the directory of an extension and rename it:
@@ -347,9 +349,14 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
  * You can compile your extension with the appropriate buttons:
  * \image html images/createnew7.png
  *
+ * \section installExtension Use the extension with Game Develop
+ *
  * To make your extension usable with Game Develop, you have to:
- * -Copy the generated file ( yourExtension.xgdw for example ) inside Game Develop "Extensions" folder.
- * -Copy all needed include file inside a folder with the name of your extension located in GD "Extensions/include" subfolder.
+ * -Copy the generated file ( yourExtension.xgdw for example ) inside Game Develop "Extensions" folder. ( Extensions/yourExtension.xgdw )<br>
+ *  You can change the output directory in the Code::Blocks project to automatically create the extension file inside Game Develop "Extensions" folder.<br><br>
+ * -Copy all needed include file inside a folder with the name of your extension located in GD "Extensions/include" subfolder. ( Extensions/include/yourExtension/ )<br>
+ *  You can use a small script ( batch file on Windows ) to copy all the needed includes files to Game Develop "Extensions/include" subfolder.<br><br>
+ * -Translations catalog files must be put into Extensions/locale/<language>/yourExtension.mo ( Example : Extensions/locale/en_GB/yourExtension.mo )
  */
 
 /**

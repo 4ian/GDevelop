@@ -145,7 +145,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
 
         //Build string to access the object
         context.AddIncludeFile(objInfo.optionalIncludeFile);
-        if ( context.currentObject == realObjects[i] )
+        if ( context.currentObject == realObjects[i]  && !context.currentObject.empty())
         {
             if ( !castNeeded )
                 output = "("+ManObjListName(realObjects[i])+"[i]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
@@ -213,7 +213,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
 
         //Build string to access the object
         context.AddIncludeFile(objInfo.optionalIncludeFile);
-        if ( context.currentObject == realObjects[i] )
+        if ( context.currentObject == realObjects[i]  && !context.currentObject.empty())
         {
             if ( !castNeeded )
                 output = "("+ManObjListName(realObjects[i])+"[i]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
@@ -281,7 +281,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 
         //Build string to access the automatism
         context.AddIncludeFile(autoInfo.optionalIncludeFile);
-        if ( context.currentObject == realObjects[i] )
+        if ( context.currentObject == realObjects[i]  && !context.currentObject.empty() )
         {
             if ( !castNeeded )
                 output = "("+ManObjListName(realObjects[i])+"[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
@@ -349,7 +349,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 
         //Build string to access the automatism
         context.AddIncludeFile(autoInfo.optionalIncludeFile);
-        if ( context.currentObject == realObjects[i] )
+        if ( context.currentObject == realObjects[i] && !context.currentObject.empty() )
         {
             if ( !castNeeded )
                 output = "("+ManObjListName(realObjects[i])+"[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";

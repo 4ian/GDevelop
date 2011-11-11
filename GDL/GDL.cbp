@@ -779,7 +779,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
-				<Option platforms="Unix;" />
+				<Option platforms="Windows;Unix;" />
 				<Option output="..\IDE\bin\release\libgdl.so" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
@@ -851,50 +851,23 @@
 					<Add option="-lLLVMMC" />
 					<Add option="-lLLVMInstrumentation" />
 					<Add option="-lLLVMSupport" />
-					<Add option="-lLLVMAlphaCodeGen" />
-					<Add option="-lLLVMARMAsmParser" />
-					<Add option="-lLLVMARMDisassembler" />
 					<Add option="-lLLVMBlackfinCodeGen" />
 					<Add option="-lLLVMCBackend" />
-					<Add option="-lLLVMCellSPUCodeGen" />
 					<Add option="-lLLVMCppBackend" />
-					<Add option="-lLLVMMipsCodeGen" />
-					<Add option="-lLLVMMBlazeAsmParser" />
-					<Add option="-lLLVMMBlazeDisassembler" />
-					<Add option="-lLLVMMSP430CodeGen" />
 					<Add option="-lLLVMPowerPCCodeGen" />
-					<Add option="-lLLVMPTXCodeGen" />
-					<Add option="-lLLVMSparcCodeGen" />
-					<Add option="-lLLVMSystemZCodeGen" />
 					<Add option="-lLLVMX86AsmParser" />
 					<Add option="-lLLVMX86Disassembler" />
-					<Add option="-lLLVMXCoreCodeGen" />
-					<Add option="-lLLVMAlphaInfo" />
 					<Add option="-lLLVMARMCodeGen" />
-					<Add option="-lLLVMBlackfinInfo" />
 					<Add option="-lLLVMCBackendInfo" />
-					<Add option="-lLLVMCellSPUInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
-					<Add option="-lLLVMMipsInfo" />
-					<Add option="-lLLVMMBlazeCodeGen" />
-					<Add option="-lLLVMMSP430AsmPrinter" />
-					<Add option="-lLLVMMSP430Info" />
 					<Add option="-lLLVMPowerPCAsmPrinter" />
 					<Add option="-lLLVMPowerPCInfo" />
-					<Add option="-lLLVMPTXInfo" />
-					<Add option="-lLLVMSparcInfo" />
-					<Add option="-lLLVMSystemZInfo" />
-					<Add option="-lLLVMXCoreInfo" />
-					<Add option="-lLLVMARMAsmPrinter" />
-					<Add option="-lLLVMARMInfo" />
-					<Add option="-lLLVMMBlazeAsmPrinter" />
-					<Add option="-lLLVMMBlazeInfo" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
-				<Option platforms="Unix;" />
+				<Option platforms="Windows;Unix;" />
 				<Option output="..\IDE\bin\debug\libgdl.so" prefix_auto="0" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
@@ -964,44 +937,17 @@
 					<Add option="-lLLVMMC" />
 					<Add option="-lLLVMInstrumentation" />
 					<Add option="-lLLVMSupport" />
-					<Add option="-lLLVMAlphaCodeGen" />
-					<Add option="-lLLVMARMAsmParser" />
-					<Add option="-lLLVMARMDisassembler" />
 					<Add option="-lLLVMBlackfinCodeGen" />
 					<Add option="-lLLVMCBackend" />
-					<Add option="-lLLVMCellSPUCodeGen" />
 					<Add option="-lLLVMCppBackend" />
-					<Add option="-lLLVMMipsCodeGen" />
-					<Add option="-lLLVMMBlazeAsmParser" />
-					<Add option="-lLLVMMBlazeDisassembler" />
-					<Add option="-lLLVMMSP430CodeGen" />
 					<Add option="-lLLVMPowerPCCodeGen" />
-					<Add option="-lLLVMPTXCodeGen" />
-					<Add option="-lLLVMSparcCodeGen" />
-					<Add option="-lLLVMSystemZCodeGen" />
 					<Add option="-lLLVMX86AsmParser" />
 					<Add option="-lLLVMX86Disassembler" />
-					<Add option="-lLLVMXCoreCodeGen" />
-					<Add option="-lLLVMAlphaInfo" />
 					<Add option="-lLLVMARMCodeGen" />
-					<Add option="-lLLVMBlackfinInfo" />
 					<Add option="-lLLVMCBackendInfo" />
-					<Add option="-lLLVMCellSPUInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
-					<Add option="-lLLVMMipsInfo" />
-					<Add option="-lLLVMMBlazeCodeGen" />
-					<Add option="-lLLVMMSP430AsmPrinter" />
-					<Add option="-lLLVMMSP430Info" />
 					<Add option="-lLLVMPowerPCAsmPrinter" />
 					<Add option="-lLLVMPowerPCInfo" />
-					<Add option="-lLLVMPTXInfo" />
-					<Add option="-lLLVMSparcInfo" />
-					<Add option="-lLLVMSystemZInfo" />
-					<Add option="-lLLVMXCoreInfo" />
-					<Add option="-lLLVMARMAsmPrinter" />
-					<Add option="-lLLVMARMInfo" />
-					<Add option="-lLLVMMBlazeAsmPrinter" />
-					<Add option="-lLLVMMBlazeInfo" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>

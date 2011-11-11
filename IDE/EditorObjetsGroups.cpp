@@ -380,15 +380,15 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     ObjectGroup NewGroup;
     wxTreeItemId rootId = ObjetsGroupsList->GetRootItem();
 
-    wxString name =  _( "Nouveau groupe" );
-    int i = 0;
+    wxString name =  _( "Nouveau_groupe" );
+    int i = 1;
 
     //Tant qu'un objet avec le même nom existe, on ajoute un chiffre
     while ( std::find_if( objectsGroups->begin(), objectsGroups->end(), std::bind2nd(HasTheSameName(), name))
             != objectsGroups->end() )
     {
         ++i;
-        name =  _( "Nouveau groupe" )+" "+ ToString(i);
+        name =  _( "Nouveau_groupe" )+"_"+ ToString(i);
     }
     NewGroup.SetName( string(name.mb_str()) );
 

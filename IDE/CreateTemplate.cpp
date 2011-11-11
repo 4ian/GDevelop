@@ -83,7 +83,7 @@ events( events_ )
     Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
     FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-    StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/addtemplate.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP3"));
+    StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/addtemplate.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
     FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Vous pouvez créer un modèle d\'évènements à partir des \névènements de la scène actuelle. Un modèle d\'évènement\npermet de créer automatiquement et rapidement des évènements,\nen remplissant juste quelques paramètres."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
     FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -168,7 +168,7 @@ events( events_ )
     FlexGridSizer2->SetSizeHints(Panel3);
     Notebook1->AddPage(Panel2, _("Informations sur le modèle"), false);
     Notebook1->AddPage(Panel3, _("Paramètres"), false);
-    FlexGridSizer1->Add(Notebook1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
     FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -255,18 +255,25 @@ void CreateTemplate::OnCreateBtClick( wxCommandEvent& event )
 
     OpenSaveGame::SaveEvents(events, elemEvents);
 
-    wxFileDialog dialog( this, _( "Choisissez où enregistrer le modèle" ), "", "", "Modèle (*.mgd)|*.mgd", wxFD_SAVE );
-    dialog.ShowModal();
-
-    if ( dialog.GetPath() != "" )
+    if ( !doc.SaveFile( "/Template/" ) )
     {
-        string path = static_cast<string>( dialog.GetPath() );
+        wxLogError( _( "Impossible d'enregistrer le fichier dans le dossier Template de Game Develop : Vérifiez que Game Develop est lancé avec les autorisations nécessaires. Il va vous être proposer d'enregistrer le fichier dans un emplacement de votre choix." ) );
 
-        if ( !doc.SaveFile( path.c_str() ) )
+        wxFileDialog dialog( this, _( "Choisissez où enregistrer le modèle" ), "", "", "Modèle (*.mgd)|*.mgd", wxFD_SAVE );
+        dialog.ShowModal();
+
+        if ( dialog.GetPath() != "" )
         {
-            wxLogError( _( "Impossible d'enregistrer le fichier. Vérifiez que le disque comporte assez d'espace disque, qu'il n'est pas protégé en écriture, et que vous possèdez les autorisations nécessaires." ) );
-            return;
+            string path = static_cast<string>( dialog.GetPath() );
+
+            if ( !doc.SaveFile( path.c_str() ) )
+            {
+                wxLogError( _( "Impossible d'enregistrer le fichier. Vérifiez que le disque comporte assez d'espace disque, qu'il n'est pas protégé en écriture, et que vous possèdez les autorisations nécessaires." ) );
+                return;
+            }
         }
+
+        return;
     }
 
     wxLogMessage(_("Le modèle a été correctement créé."));

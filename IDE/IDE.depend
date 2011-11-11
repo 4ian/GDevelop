@@ -20761,7 +20761,7 @@
 1309119157 d:\florian\programmation\gamedevelop2\gdl\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1313665038 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
+1320525687 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
 	"GDL/Event.h"
 	<vector>
 	<map>
@@ -25312,7 +25312,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1303904414 source:d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp
+1321030768 source:d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp
 	"CreateTemplate.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -25997,7 +25997,7 @@
 	<wx/msw/winundef.h>
 	"EditorObjetsGroups.h"
 
-1320500234 source:d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp
+1321014726 source:d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp
 	"EditorObjetsGroups.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -27492,7 +27492,7 @@
 	"GDL/Game.h"
 	<vector>
 
-1312836101 source:d:\florian\programmation\gamedevelop2\ide\searchevents.cpp
+1321012078 source:d:\florian\programmation\gamedevelop2\ide\searchevents.cpp
 	"SearchEvents.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -27504,6 +27504,8 @@
 	"GDL/HelpFileAccess.h"
 	"EventsRefactorer.h"
 	"EventsEditor.h"
+	"GDL/EventsEditorSelection.h"
+	"GDL/EventsEditorItemsAreas.h"
 
 1300643353 source:d:\florian\programmation\gamedevelop2\ide\setupcompilertoolchaindlg.cpp
 	"SetupCompilerToolchainDlg.h"
@@ -27583,7 +27585,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1320524657 d:\florian\programmation\gamedevelop2\ide\version.h
+1321030769 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -28274,7 +28276,7 @@
 	"wx/defs.h"
 	"wx/object.h"
 
-1320524657 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
+1321023389 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
 	"EventsEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -28310,7 +28312,7 @@
 	"Clipboard.h"
 	<SFML/System.hpp>
 
-1314879089 d:\florian\programmation\gamedevelop2\ide\eventseditor.h
+1321012077 d:\florian\programmation\gamedevelop2\ide\eventseditor.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/menu.h>

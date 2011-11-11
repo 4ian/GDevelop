@@ -1503,7 +1503,11 @@ void EventsEditor::OnHelpBtClick(wxCommandEvent& event)
 void EventsEditor::OnCreateTemplateBtClick( wxCommandEvent& event )
 {
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
-    if ( eventsSelected.empty() ) return;
+    if ( eventsSelected.empty() )
+    {
+        wxLogMessage(_("Veuillez selectionner les évènements à utiliser pour créer le modèle, puis recliquez sur le bouton \"Créer\"."));
+        return;
+    }
 
     std::vector< boost::shared_ptr<BaseEvent> > eventsToUse;
     for (unsigned int i = 0;i<eventsSelected.size();++i)

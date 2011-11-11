@@ -12,6 +12,8 @@
 #include "GDL/HelpFileAccess.h"
 #include "EventsRefactorer.h"
 #include "EventsEditor.h"
+#include "GDL/EventsEditorSelection.h"
+#include "GDL/EventsEditorItemsAreas.h"
 
 using namespace std;
 
@@ -223,10 +225,12 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
     if ( !onlySelectedEventCheck->GetValue() && events == NULL ) return;
     if ( onlySelectedEventCheck->GetValue() )
     {
-        //if ( parent->GetLastSelectedEvent() == boost::shared_ptr<BaseEvent>() ) return;
-
-        //TODO
-        //eventsToInspect.push_back(parent->GetLastSelectedEvent()); //Use an intermediate vector for single events.
+        std::vector < EventItem > selectedEventsInfo = parent->GetSelection().GetAllSelectedEvents();
+        for (unsigned int i = 0;i<selectedEventsInfo.size();++i)
+        {
+            if ( selectedEventsInfo[i].event != boost::shared_ptr<BaseEvent>() )
+                eventsToInspect.push_back(selectedEventsInfo[i].event);
+        }
     }
 
     EventsRefactorer::ReplaceStringInEvents(game, scene,
@@ -237,7 +241,7 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
                                             replaceConditionsCheck->GetValue(),
                                             replaceActionsCheck->GetValue());
 
-    //parent->ChangesMadeOnEvents(); //TODO
+    parent->ChangesMadeOnEvents();
     parent->Refresh();
 }
 
@@ -276,7 +280,7 @@ void SearchEvents::OnnextBtClick(wxCommandEvent&)
     BaseEventSPtr event = searchResults[currentResult].lock();
     if ( event == boost::shared_ptr<BaseEvent>() ) return;
 
-    //parent->ScrollToEvent(event);//TODO
+    parent->ScrollToEvent(event);
 }
 
 void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
@@ -291,7 +295,7 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
     BaseEventSPtr event = searchResults[currentResult].lock();
     if ( event == boost::shared_ptr<BaseEvent>() ) return;
 
-    //parent->ScrollToEvent(event);//TODO
+    parent->ScrollToEvent(event);
 }
 
 void SearchEvents::OnhelpBtClick(wxCommandEvent& event)

@@ -84,12 +84,25 @@ class EventsEditor: public wxPanel
 		//*)
         SearchEvents * searchDialog;
 
+        /**
+         * Launch immediate refresh of events
+         */
 		void Refresh();
 
         /**
          * Scroll view to reach an event.
          */
         void ScrollToEvent(BaseEventSPtr event);
+
+		/**
+		 * Called when events are changed. Can be called from an external class such as SearchEvents dialog.
+		 */
+		void ChangesMadeOnEvents(bool updateHistory = true);
+
+		/**
+		 * Return a reference to the class used to manage selection.
+		 */
+		EventsEditorSelection & GetSelection() { return selection; };
 
 		static void CreateRibbonPage(wxRibbonPage * page);
 		void ConnectEvents();
@@ -224,7 +237,6 @@ class EventsEditor: public wxPanel
 
 		void RecomputeAllEventsWidth(std::vector < boost::shared_ptr<BaseEvent> > & eventsToRefresh);
 		void DeleteSelection();
-		void ChangesMadeOnEvents(bool updateHistory = true);
 
         void EndLiveEditing();
 

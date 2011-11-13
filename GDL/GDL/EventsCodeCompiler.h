@@ -136,6 +136,7 @@ private:
         void SetTask(Task task_) { task = task_; }
 
         void Launch() { thread.Launch(); }
+        void Terminate() { thread.Terminate(); }
         const Scene* GetScene() { return task.scene; }
 
         bool abort;

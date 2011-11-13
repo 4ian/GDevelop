@@ -80,24 +80,21 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
 {
     std::cout << "C++ events file to bitcode compilation started\n" << std::endl;
 
-    //Diagnostic classes for driver
-    TextDiagnosticPrinter *DiagClient = new TextDiagnosticPrinter(llvm::errs(), DiagnosticOptions());
-    llvm::IntrusiveRefCntPtr<DiagnosticIDs> DiagID(new DiagnosticIDs());
-    Diagnostic Diags(DiagID, DiagClient);
-
-    Driver TheDriver("" /* "Clang executable path" */, llvm::sys::getHostTriple(), "a.out", /*IsProduction=*/false, /*CXXIsProduction=*/false,  Diags);
-
-    // FIXME: This is a hack to try to force the driver to do something we can
-    // recognize. We need to extend the driver library to support this use model
-    // (basically, exactly one input, and the operation mode is hard wired).
+    //Defines compilation arguments for Clang.
     llvm::SmallVector<const char *, 128> Args;
-    Args.push_back("GDEditor.exe");
     #if defined(WINDOWS)
     if ( !optimize ) //Don't use precompiled header when optimizing, as they are built without optimizations
-        Args.push_back(!compilationForRuntime ? "-includeinclude/GDL/GDL/PrecompiledHeader.h" : "-includeinclude/GDL/GDL/PrecompiledHeaderRuntime.h");
+    {
+        Args.push_back("-include-pch");
+        Args.push_back(!compilationForRuntime ? "include/GDL/GDL/PrecompiledHeader.h.pch" : "-includeinclude/GDL/GDL/PrecompiledHeaderRuntime.h");
+    }
     #endif
     Args.push_back(eventsFile.c_str());
     Args.push_back("-fsyntax-only");
+    Args.push_back("-fcxx-exceptions");
+    Args.push_back("-fexceptions");
+    Args.push_back("-fgnu-runtime");
+    Args.push_back("-fdeprecated-macro");
     Args.push_back("-w"); //No warning
     //Headers
     for (std::set<std::string>::const_iterator header = headersDirectories.begin();header != headersDirectories.end();++header)
@@ -123,65 +120,28 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     //Already set in PCH :
     #if defined(RELEASE)
     Args.push_back("-DRELEASE");
+    Args.push_back("-DNDEBUG");
+    Args.push_back("-DBOOST_DISABLE_ASSERTS");
     #elif defined(DEV)
     Args.push_back("-DDEV");
+    Args.push_back("-DNDEBUG");
+    Args.push_back("-DBOOST_DISABLE_ASSERTS");
     #elif defined(DEBUG)
     Args.push_back("-DDEBUG");
     #endif
 
-    llvm::OwningPtr<Compilation> C(TheDriver.BuildCompilation(Args));
-    if (!C) return false;
-
-    // FIXME: This is copied from ASTUnit.cpp; simplify and eliminate.
-    // We expect to get back exactly one command job, if we didn't something
-    // failed. Extract that job from the compilation.
-    const driver::JobList &Jobs = C->getJobs();
-    #if defined(WINDOWS) //We're currently using a (slighty) different version of llvm between windows and linux
-    if (Jobs.size() != 1 || !isa<driver::Command>(Jobs.begin()))
-    #else
-    if (Jobs.size() != 1 || !isa<driver::Command>(*Jobs.begin()))
-    #endif
-    {
-        llvm::SmallString<256> Msg;
-        llvm::raw_svector_ostream OS(Msg);
-        C->PrintJob(OS, C->getJobs(), ";\n", true);
-        Diags.Report(diag::err_fe_expected_compiler_job) << OS.str();
-        return false;
-    }
-
-    const driver::Command *Cmd = cast<driver::Command>(*Jobs.begin());
-    if (llvm::StringRef(Cmd->getCreator().getName()) != "clang")
-    {
-        Diags.Report(diag::err_fe_expected_clang_command);
-        return false;
-    }
-
-    // Initialize a compiler invocation object from the clang (-cc1) arguments.
-    const driver::ArgStringList &CCArgs = Cmd->getArguments();
-    llvm::OwningPtr<CompilerInvocation> CI(new CompilerInvocation);
-    CompilerInvocation::CreateFromArgs(*CI,
-                                       const_cast<const char **>(CCArgs.data()),
-                                       const_cast<const char **>(CCArgs.data()) +
-                                       CCArgs.size(),
-                                       Diags);
-
-    if (false)
-    {
-        llvm::errs() << "clang invocation:\n";
-        C->PrintJob(llvm::errs(), C->getJobs(), "\n", true);
-        llvm::errs() << "\n";
-    }
-
+    //The clang compiler instance
     std::cout << "Creating compiler instance...\n";
-    // FIXME: This is copied from cc1_main.cpp; simplify and eliminate.
-    // Create a compiler instance to handle the actual work.
     CompilerInstance Clang;
-    Clang.setInvocation(CI.take());
 
-    // Create the compilers actual diagnostics engine.
-    //Clang.createDiagnostics(int(CCArgs.size()),const_cast<char**>(CCArgs.data()));
+    // Infer the builtin include path if unspecified.
+    if (Clang.getHeaderSearchOpts().UseBuiltinIncludes && Clang.getHeaderSearchOpts().ResourceDir.empty())
+    {
+        Clang.getHeaderSearchOpts().ResourceDir = wxGetCwd();
+        std::cout << "Set res dir to " << Clang.getHeaderSearchOpts().ResourceDir;
+    }
 
-    //Diagnostic for clang compiler
+    //Diagnostic classes
     std::string compilationErrorFileErrors;
     llvm::raw_fd_ostream errorFile(std::string(workingDir+"compilationErrors.txt").c_str(), compilationErrorFileErrors);
     errorFile << "Please send this file to CompilGames@gmail.com, or include this content when reporting the problem to Game Develop's developer.\n";
@@ -191,13 +151,17 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     if ( !compilationErrorFileErrors.empty() ) std::cout << "Unable to create compilation errors report file!\n";
 
     TextDiagnosticPrinter * clangDiagClient = new TextDiagnosticPrinter(errorFile, DiagnosticOptions());
-
     llvm::IntrusiveRefCntPtr<DiagnosticIDs> clangDiagID(new DiagnosticIDs());
     Diagnostic * clangDiags = new Diagnostic(clangDiagID, clangDiagClient);
 
+    CompilerInvocation::CreateFromArgs(Clang.getInvocation(), Args.begin(),  Args.end(), *clangDiags);
+
     Clang.setDiagnostics(clangDiags);
     if (!Clang.hasDiagnostics())
+    {
+        std::cout << "Unable to create clang diagnostic engine!" << std::endl;
         return false;
+    }
 
     std::cout << "Compiling...\n";
     // Create and execute the frontend to generate an LLVM bitcode module.

@@ -592,7 +592,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
         DECLARE_OBJECT_ACTION("Rebondir",
                        _("Ecarter un objet d'un autre"),
                        _("Ecarte un objet d'un autre, en utilisant les forces."),
-                       _("Ecarter _PARAM0_ de _PARAM2_ ( seul _PARAM0_ bougera )"),
+                       _("Ecarter _PARAM0_ de _PARAM1_ ( seul _PARAM0_ bougera )"),
                        _("Déplacement"),
                        "res/actions/ecarter24.png",
                        "res/actions/ecarter.png");

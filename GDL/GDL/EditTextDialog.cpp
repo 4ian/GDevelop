@@ -555,7 +555,7 @@ void EditTextDialog::OnAddPropBtClick(wxCommandEvent& event)
             }
             else
             {
-                if ( i != 1 ) parametersStr += ",";
+                if ( !parametersStr.empty() ) parametersStr += ",";
                 parametersStr += ShowParameterDialog(infos->GetStrExpressionInfos().parameters[i], cancelled, object);
                 if ( cancelled ) return;
             }
@@ -590,7 +590,7 @@ void EditTextDialog::OnAddFunctionBtClick(wxCommandEvent& event)
         string parametersStr;
         for (unsigned int i = 0;i<infos->GetStrExpressionInfos().parameters.size();++i)
         {
-            if ( i != 0 ) parametersStr += ",";
+            if ( !parametersStr.empty() ) parametersStr += ",";
             parametersStr += ShowParameterDialog(infos->GetStrExpressionInfos().parameters[i], cancelled);
             if ( cancelled ) return;
         }

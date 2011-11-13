@@ -1523,7 +1523,11 @@ void EventsEditor::OnCreateTemplateBtClick( wxCommandEvent& event )
 void EventsEditor::OnTemplateBtClick( wxCommandEvent& event )
 {
     std::vector< EventItem > eventsSelected = selection.GetAllSelectedEventsWithoutSubEvents();
-    if ( eventsSelected.empty() || eventsSelected[0].eventsList == NULL ) return;
+    if ( eventsSelected.empty() || eventsSelected[0].eventsList == NULL )
+    {
+        wxLogMessage("Selectionnez un évènement où insérer le modèle puis recliquez sur le bouton.");
+        return;
+    }
 
     ChoixTemplateEvent dialog( this );
     if ( dialog.ShowModal() != 1 ) return;

@@ -34,7 +34,6 @@ const long EditOptionsPosition::ID_STATICTEXT6 = wxNewId();
 const long EditOptionsPosition::ID_TEXTCTRL5 = wxNewId();
 const long EditOptionsPosition::ID_STATICTEXT11 = wxNewId();
 const long EditOptionsPosition::ID_CHOICE1 = wxNewId();
-const long EditOptionsPosition::ID_STATICTEXT12 = wxNewId();
 const long EditOptionsPosition::ID_STATICTEXT7 = wxNewId();
 const long EditOptionsPosition::ID_TEXTCTRL4 = wxNewId();
 const long EditOptionsPosition::ID_STATICTEXT8 = wxNewId();
@@ -152,10 +151,6 @@ scene(scene_)
 	layerChoice = new wxChoice(this, ID_CHOICE1, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
 	FlexGridSizer14->Add(layerChoice, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(FlexGridSizer14, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText9 = new wxStaticText(this, ID_STATICTEXT12, _("Mettez un nom de calque vide pour mettre l\'objet\nsur le calque de base."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT12"));
-	wxFont StaticText9Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
-	StaticText9->SetFont(StaticText9Font);
-	FlexGridSizer12->Add(StaticText9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer5->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer13->Add(StaticBoxSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Plan"));

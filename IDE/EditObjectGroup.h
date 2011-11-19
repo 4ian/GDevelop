@@ -90,6 +90,8 @@ class EditObjectGroup: public wxDialog
 		Game & game;
 		Scene & scene;
 
+		unsigned int modificationCount; ///< Track the number of modification. If the user made lots of modifications and wants to cancel, he will be warned.
+
 		DECLARE_EVENT_TABLE()
 };
 

@@ -28,7 +28,6 @@ class EditOptionsPosition: public wxDialog
 
 		//(*Declarations(EditOptionsPosition)
 		wxButton* OkBt;
-		wxStaticText* StaticText9;
 		wxTextCtrl* widthEdit;
 		wxTextCtrl* YEdit;
 		wxStaticText* StaticText2;
@@ -71,7 +70,6 @@ class EditOptionsPosition: public wxDialog
 		static const long ID_TEXTCTRL5;
 		static const long ID_STATICTEXT11;
 		static const long ID_CHOICE1;
-		static const long ID_STATICTEXT12;
 		static const long ID_STATICTEXT7;
 		static const long ID_TEXTCTRL4;
 		static const long ID_STATICTEXT8;

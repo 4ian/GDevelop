@@ -872,14 +872,14 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     //Add a new object of selected type to objects list
     ObjSPtr object = clipboard->GetObject()->Clone();
 
-    wxString name =  _( "Copie de " ) + object->GetName();
+    wxString name = object->GetName();
 
     //Add a number to the new name if necessary
     unsigned int i = 0;
     while ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ToString(name))) != objects->end() )
     {
         i++;
-        name =  _( "Copie de " ) + object->GetName()+ToString(i);
+        name =  _( "Copie_de_" ) + object->GetName()+"_"+ToString(i);
     }
 
     //Name the object

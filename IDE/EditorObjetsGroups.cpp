@@ -630,15 +630,13 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
 
     wxTreeItemId rootId = ObjetsGroupsList->GetRootItem();
 
-    groupPasted.SetName(string(_( "Copie de" )+" "+groupPasted.GetName()));
-
     //Tant qu'un objet avec le même nom existe, on ajoute un chiffre
-    unsigned int i = 1;
+    unsigned int i = 0;
     while ( std::find_if( objectsGroups->begin(), objectsGroups->end(), std::bind2nd(HasTheSameName(), groupPasted.GetName()))
             != objectsGroups->end() )
     {
         ++i;
-        groupPasted.SetName(string(_( "Copie de" )+" "+groupPasted.GetName()+" "+ToString(i)));
+        groupPasted.SetName(ToString(_( "Copie_de_" )+groupPasted.GetName()+"_"+ToString(i)));
     }
 
     //On l'ajoute

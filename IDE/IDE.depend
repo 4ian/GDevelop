@@ -23310,7 +23310,7 @@
 	<vector>
 	<string>
 
-1294508059 d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.h
+1321306271 d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.h
 	<wx/treectrl.h>
 	<wx/notebook.h>
 	<wx/sizer.h>
@@ -25552,7 +25552,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1314880934 source:d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp
+1321479675 source:d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp
 	"EditObjectGroup.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -25560,17 +25560,19 @@
 	<wx/image.h>
 	<wx/string.h>
 	<wx/log.h>
+	<wx/help.h>
+	<wx/msgdlg.h>
 	"GDL/Game.h"
 	"GDL/Scene.h"
 	"GDL/ObjectGroup.h"
 	"GDL/ChooseObject.h"
+	"GDL/CommonTools.h"
 	<wx/msw/winundef.h>
 	<string>
 	<vector>
-	<wx/help.h>
 	<gtk/gtk.h>
 
-1314636944 d:\florian\programmation\gamedevelop2\ide\editobjectgroup.h
+1321305821 d:\florian\programmation\gamedevelop2\ide\editobjectgroup.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -25589,7 +25591,7 @@
 	<string>
 	<vector>
 
-1318964027 source:d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp
+1321725693 source:d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp
 	"EditOptionsPosition.h"
 	<wx/settings.h>
 	<wx/font.h>
@@ -25605,7 +25607,7 @@
 	<sstream>
 	<string>
 
-1264861272 d:\florian\programmation\gamedevelop2\ide\editoptionsposition.h
+1321725693 d:\florian\programmation\gamedevelop2\ide\editoptionsposition.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -25863,7 +25865,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1320500480 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
+1321304460 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -25997,7 +25999,7 @@
 	<wx/msw/winundef.h>
 	"EditorObjetsGroups.h"
 
-1321014726 source:d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp
+1321304877 source:d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp
 	"EditorObjetsGroups.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -27585,7 +27587,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1321096227 d:\florian\programmation\gamedevelop2\ide\version.h
+1321479675 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -27982,7 +27984,7 @@
 
 1320500064 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
 1307986706 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\typeinfo.h
 	"wx/defs.h"
@@ -28876,7 +28878,7 @@
 1307986677 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wince\smartphone.rc
 	<aygshell.h>
 
-1308338463 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\msw\rcdefs.h
+1308334863 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\msw\rcdefs.h
 
 1313664438 d:\florian\programmation\gamedevelop2\gdl\gdl\linkevent.h
 	"Event.h"

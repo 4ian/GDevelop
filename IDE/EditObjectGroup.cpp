@@ -8,17 +8,18 @@
 #include <wx/string.h>
 //*)
 #include <wx/log.h>
+#include <wx/help.h>
+#include <wx/msgdlg.h>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/ObjectGroup.h"
 #include "GDL/ChooseObject.h"
+#include "GDL/CommonTools.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
 #include <string>
 #include <vector>
-#include <wx/help.h>
-
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
@@ -50,7 +51,8 @@ END_EVENT_TABLE()
 EditObjectGroup::EditObjectGroup(wxWindow* parent, Game & game_, Scene & scene_, const ObjectGroup & group_) :
 group(group_),
 game(game_),
-scene(scene_)
+scene(scene_),
+modificationCount(0)
 {
 	//(*Initialize(EditObjectGroup)
 	wxFlexGridSizer* FlexGridSizer2;
@@ -84,7 +86,7 @@ scene(scene_)
 	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().Gripper(false));
 	AuiManager1->Update();
 	FlexGridSizer17->Add(Panel2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	ObjetsList = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxSize(286,181), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+	ObjetsList = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxSize(286,181), wxTR_MULTIPLE|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer17->Add(ObjetsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer17->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -151,6 +153,13 @@ void EditObjectGroup::OnOkBtClick(wxCommandEvent& event)
 
 void EditObjectGroup::OnAnnulerBtClick(wxCommandEvent& event)
 {
+    if ( modificationCount > 7 )
+    {
+        wxMessageDialog msgDlg(this, _("Vous avez apporté ")+ToString(modificationCount)+_(" modifications. Êtes vous sûr d'annuler tous les changements ?"), _("Beaucoup de modifications ont été apportées."), wxYES_NO | wxICON_QUESTION);
+        if ( msgDlg.ShowModal() == wxID_NO )
+            return;
+    }
+
     EndModal(0);
 }
 
@@ -195,34 +204,40 @@ void EditObjectGroup::OnObjetsListItemRightClick(wxTreeEvent& event)
 
 void EditObjectGroup::OnAddObjetSelected(wxCommandEvent& event)
 {
-    ChooseObject dialog(this, game, scene, false);
+    ChooseObject dialog(this, game, scene, false /*No groups*/, "" /*All objects types*/, true /*Allow multiple selection*/ );
     if ( dialog.ShowModal() == 1 )
     {
-        string name = dialog.objectChosen;
-        if ( name == "" ) return;
-
-        //On l'ajoute si il n'est pas déjà dans le groupe
-        if ( !group.Find( name ) )
+        for (unsigned int i = 0;i<dialog.objectsChosen.size();++i)
         {
-            group.AddObject( name );
-            ObjetsList->AppendItem( ObjetsList->GetRootItem(), name );
-        } else { wxLogWarning(_("L'objet est déjà dans ce groupe."));}
+            //On l'ajoute si il n'est pas déjà dans le groupe
+            if ( !group.Find( dialog.objectsChosen[i] ) )
+            {
+                group.AddObject( dialog.objectsChosen[i] );
+                ObjetsList->AppendItem( ObjetsList->GetRootItem(), dialog.objectsChosen[i] );
+            } else { wxLogWarning(_("L'objet ")+dialog.objectsChosen[i]+_(" est déjà dans ce groupe."));}
+        }
+
+        modificationCount += dialog.objectsChosen.size();
     }
 }
 
 void EditObjectGroup::OnDelObjetSelected(wxCommandEvent& event)
 {
-    if ( ObjetsList->GetItemText( itemSelected ) != _( "Tous les objets du groupe" ) )
+    //Get selection and construct list of objects to remove.
+    wxArrayTreeItemIds selection;
+    unsigned int count = ObjetsList->GetSelections(selection);
+    std::vector <std::string> objectsToRemove;
+
+    for (unsigned int i = 0;i<count;++i)
+        objectsToRemove.push_back(ToString(ObjetsList->GetItemText( selection.Item(i) )));
+
+    for (unsigned int i = 0;i<objectsToRemove.size();++i)
     {
-        if ( group.Find( static_cast<string>(ObjetsList->GetItemText( itemSelected ))) )
-        {
-            group.RemoveObject(static_cast<string>(ObjetsList->GetItemText( itemSelected )));
-            ObjetsList->Delete( itemSelected );
-        }
-        return;
+        if ( group.Find( objectsToRemove[i] ) )
+            group.RemoveObject(objectsToRemove[i]);
     }
-    else
-    {
-        wxLogWarning( _( "Aucun objet sélectionnée" ) );
-    }
+
+    modificationCount += objectsToRemove.size();
+
+    Refresh();
 }

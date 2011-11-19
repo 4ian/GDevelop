@@ -2,6 +2,8 @@
  *  Game Develop
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY)
+
 
 #ifndef EVENTSCODEGENERATIONCONTEXT_H
 #define EVENTSCODEGENERATIONCONTEXT_H
@@ -122,3 +124,5 @@ class GD_API EventsCodeGenerationContext
 };
 
 #endif // EVENTSCODEGENERATIONCONTEXT_H
+
+#endif

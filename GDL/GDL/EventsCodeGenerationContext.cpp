@@ -3,6 +3,8 @@
  *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #include "EventsCodeGenerationContext.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
@@ -145,3 +147,5 @@ void EventsCodeGenerationContext::MapOfAllObjectsNeeded(const Game & game, const
         EmptyObjectsListNeeded(scene.initialObjects[i]->GetName());
     }
 }
+
+#endif

@@ -86,7 +86,7 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     if ( !optimize ) //Don't use precompiled header when optimizing, as they are built without optimizations
     {
         Args.push_back("-include-pch");
-        Args.push_back(!compilationForRuntime ? "include/GDL/GDL/PrecompiledHeader.h.pch" : "-includeinclude/GDL/GDL/PrecompiledHeaderRuntime.h");
+        Args.push_back(!compilationForRuntime ? "include/GDL/GDL/PrecompiledHeader.h.pch" : "include/GDL/GDL/PrecompiledHeaderRuntime.h.pch");
     }
     #endif
     Args.push_back(eventsFile.c_str());

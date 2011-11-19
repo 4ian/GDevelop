@@ -468,7 +468,6 @@ void OpenSaveGame::OpenGroupesObjets(vector < ObjectGroup > & list, TiXmlElement
 
 void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement * elem)
 {
-    cout << "OpenPositions";
     TiXmlElement * elemScene = elem->FirstChildElement();
 
     //Passage en revue des positions initiales

@@ -5,6 +5,7 @@
 
 #include <SFML/Graphics.hpp>
 #include "GDL/SpriteObject.h"
+#include "GDL/RuntimeGame.h"
 #include "GDL/Object.h"
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml.h"

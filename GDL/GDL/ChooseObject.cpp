@@ -19,7 +19,7 @@
 #include <wx/bitmap.h>
 #include <wx/imaglist.h>
 #include <wx/config.h>
-
+#include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ObjectGroup.h"
@@ -51,10 +51,11 @@ BEGIN_EVENT_TABLE(ChooseObject,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChooseObject::ChooseObject(wxWindow* parent, Game & game_, Scene & scene_, bool CanSelectGroup, string onlyObjectOfType_, const wxSize& size) :
+ChooseObject::ChooseObject(wxWindow* parent, Game & game_, Scene & scene_, bool canSelectGroup, std::string onlyObjectOfType_, bool allowMultipleSelection_, const wxSize& size) :
 game(game_),
 scene(scene_),
-onlyObjectOfType(onlyObjectOfType_)
+onlyObjectOfType(onlyObjectOfType_),
+allowMultipleSelection(allowMultipleSelection_)
 {
 	//(*Initialize(ChooseObject)
 	wxFlexGridSizer* FlexGridSizer2;
@@ -85,13 +86,13 @@ onlyObjectOfType(onlyObjectOfType_)
 	FlexGridSizer17->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(413,227), 0, _T("ID_NOTEBOOK1"));
-	ObjetsList = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
+	ObjetsList = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
 	ObjetsList->SetToolTip(_("Choisissez un objet dans la liste"));
-	GroupesList = new wxTreeCtrl(Notebook1, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
+	GroupesList = new wxTreeCtrl(Notebook1, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
 	GroupesList->SetToolTip(_("Choisissez un objet dans la liste"));
-	globalObjectsList = new wxTreeCtrl(Notebook1, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
+	globalObjectsList = new wxTreeCtrl(Notebook1, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
 	globalObjectsList->SetToolTip(_("Choisissez un objet dans la liste"));
-	globalObjectGroups = new wxTreeCtrl(Notebook1, ID_TREECTRL4, wxPoint(-71,-11), wxSize(281,190), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
+	globalObjectGroups = new wxTreeCtrl(Notebook1, ID_TREECTRL4, wxPoint(-71,-11), wxSize(281,190), wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
 	globalObjectGroups->SetToolTip(_("Choisissez un objet dans la liste"));
 	Notebook1->AddPage(ObjetsList, _("Objets"), false);
 	Notebook1->AddPage(GroupesList, _("Groupes d\'objets"), false);
@@ -158,15 +159,31 @@ onlyObjectOfType(onlyObjectOfType_)
 	Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ChooseObject::OnChoisirBtClick);
 	//*)
 
+    //Disable multiple selection if needed
+	if (!allowMultipleSelection)
+    {
+        ObjetsList->SetWindowStyleFlag(ObjetsList->GetWindowStyleFlag() & ~wxTR_MULTIPLE);
+        GroupesList->SetWindowStyleFlag(GroupesList->GetWindowStyleFlag() & ~wxTR_MULTIPLE);
+        globalObjectsList->SetWindowStyleFlag(globalObjectsList->GetWindowStyleFlag() & ~wxTR_MULTIPLE);
+        globalObjectGroups->SetWindowStyleFlag(globalObjectGroups->GetWindowStyleFlag() & ~wxTR_MULTIPLE);
+    }
+
+    //Assign icons
     imageList = new wxImageList( 16, 16 );
     imageList->Add(( wxBitmap( "res/objeticon.png", wxBITMAP_TYPE_ANY ) ) );
     imageList->Add(( wxBitmap( "res/groupeobjeticon.png", wxBITMAP_TYPE_ANY ) ) );
     Notebook1->AssignImageList(imageList);
-
     Notebook1->SetPageImage(0,0);
     Notebook1->SetPageImage(1,1);
     Notebook1->SetPageImage(2,0);
     Notebook1->SetPageImage(3,1);
+
+    //Remove pages if necessary
+    if (!canSelectGroup)
+    {
+        Notebook1->RemovePage(3);
+        Notebook1->RemovePage(1);
+    }
 
 	Refresh();
 }
@@ -190,22 +207,38 @@ void ChooseObject::OnChoisirBtClick(wxCommandEvent& event)
 {
     if ( Notebook1->GetSelection() == 0 && item.IsOk() && ObjetsList->GetRootItem() != item )
     {
-        objectChosen = ObjetsList->GetItemText( item ).mb_str();
+        //Get selection and construct list of objects selected
+        wxArrayTreeItemIds selectionIds; unsigned int count = ObjetsList->GetSelections(selectionIds);
+        for (unsigned int i = 0;i<count;++i) objectsChosen.push_back(ToString(ObjetsList->GetItemText( selectionIds.Item(i) )));
+
+        objectChosen = !objectsChosen.empty() ? objectsChosen[0] : "";
         EndModal(1);
     }
     else if ( GroupesList->IsEnabled() && itemGroups.IsOk() && Notebook1->GetSelection() == 1 && GroupesList->GetRootItem() != itemGroups )
     {
-        objectChosen = GroupesList->GetItemText( itemGroups ).mb_str();
+        //Get selection and construct list of objects selected
+        wxArrayTreeItemIds selectionIds; unsigned int count = GroupesList->GetSelections(selectionIds);
+        for (unsigned int i = 0;i<count;++i) objectsChosen.push_back(ToString(GroupesList->GetItemText( selectionIds.Item(i) )));
+
+        objectChosen = !objectsChosen.empty() ? objectsChosen[0] : "";
         EndModal(1);
     }
     else if ( Notebook1->GetSelection() == 2 && itemGlobal.IsOk() && globalObjectsList->GetRootItem() != itemGlobal )
     {
-        objectChosen = globalObjectsList->GetItemText( itemGlobal ).mb_str();
+        //Get selection and construct list of objects selected
+        wxArrayTreeItemIds selectionIds; unsigned int count = globalObjectsList->GetSelections(selectionIds);
+        for (unsigned int i = 0;i<count;++i) objectsChosen.push_back(ToString(globalObjectsList->GetItemText( selectionIds.Item(i) )));
+
+        objectChosen = !objectsChosen.empty() ? objectsChosen[0] : "";
         EndModal(1);
     }
     else if ( Notebook1->GetSelection() == 3 && itemGlobalGroups.IsOk() && globalObjectGroups->GetRootItem() != itemGlobalGroups )
     {
-        objectChosen = globalObjectGroups->GetItemText( itemGlobalGroups ).mb_str();
+        //Get selection and construct list of objects selected
+        wxArrayTreeItemIds selectionIds; unsigned int count = globalObjectGroups->GetSelections(selectionIds);
+        for (unsigned int i = 0;i<count;++i) objectsChosen.push_back(ToString(globalObjectGroups->GetItemText( selectionIds.Item(i) )));
+
+        objectChosen = !objectsChosen.empty() ? objectsChosen[0] : "";
         EndModal(1);
     }
 }

@@ -542,6 +542,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     oglFOV = scene.oglFOV;
     oglZNear = scene.oglZNear;
     oglZFar = scene.oglZFar;
+    stopSoundsOnStartup = scene.stopSoundsOnStartup;
 
     //Add global object groups
     copy(game->objectGroups.begin(), game->objectGroups.end(), back_inserter(objectGroups));
@@ -616,7 +617,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
         if ( extensions[i] != boost::shared_ptr<ExtensionBase>() ) extensions[i]->SceneLoaded(*this);
     }
 
-    if ( stopSoundsOnStartup ) SoundManager::GetInstance()->ClearAllSoundsAndMusics();
+    if ( stopSoundsOnStartup ) {SoundManager::GetInstance()->ClearAllSoundsAndMusics(); }
     if ( renderWindow ) renderWindow->SetTitle(title);
 
     MessageLoading( "Loading finished", 100 );

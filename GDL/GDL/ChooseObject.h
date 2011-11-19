@@ -30,7 +30,7 @@ class GD_API ChooseObject: public wxDialog
 {
 	public:
 
-		ChooseObject(wxWindow* parent, Game & game_, Scene & scene_, bool CanSelectGroup = true, string onlyObjectOfType_ = "", const wxSize& size=wxDefaultSize);
+		ChooseObject(wxWindow* parent, Game & game_, Scene & scene_, bool CanSelectGroup = true, string onlyObjectOfType_ = "", bool allowMultipleSelection_ = false, const wxSize& size=wxDefaultSize);
 		virtual ~ChooseObject();
 
 		//(*Declarations(ChooseObject)
@@ -60,6 +60,7 @@ class GD_API ChooseObject: public wxDialog
         Scene & scene;
 
 		string objectChosen;
+		std::vector <std::string> objectsChosen; ///< If dialog support multiple selection.
 
 		void Refresh();
 
@@ -115,6 +116,7 @@ class GD_API ChooseObject: public wxDialog
 
 		wxImageList * imageList;
 		string onlyObjectOfType;
+		bool allowMultipleSelection;
 
 		DECLARE_EVENT_TABLE()
 };

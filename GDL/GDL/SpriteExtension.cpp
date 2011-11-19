@@ -366,7 +366,7 @@ SpriteExtension::SpriteExtension()
 
         DECLARE_OBJECT_ACTION("ChangeColor",
                        _("Changer la couleur globale d'un objet"),
-                       _("Change la couleur globale de l'objet. Par défaut, la couleur est le blanc."),
+                       _("Change la couleur globale de l'objet. Par défaut, la couleur d'un Sprite est le blanc."),
                        _("Changer la couleur de _PARAM0_ en _PARAM1_"),
                        _("Effets"),
                        "res/actions/color24.png",
@@ -374,7 +374,6 @@ SpriteExtension::SpriteExtension()
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddParameter("color", _("Couleur"), "",false);
-
 
             instrInfo.cppCallingInformation.SetFunctionName("SetColor").SetIncludeFile("GDL/SpriteObject.h");
 

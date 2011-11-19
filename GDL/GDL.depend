@@ -13352,7 +13352,7 @@
 	<string>
 	<vector>
 
-1308407813 source:d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp
+1321307444 source:d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp
 	"GDL/ChooseObject.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -13364,12 +13364,13 @@
 	<wx/bitmap.h>
 	<wx/imaglist.h>
 	<wx/config.h>
+	"GDL/CommonTools.h"
 	"GDL/Scene.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/ObjectGroup.h"
 	"GDL/ObjectListDialogsHelper.h"
 
-1294508059 d:\florian\programmation\gamedevelop2\gdl\\gdl\chooseobject.h
+1321306271 d:\florian\programmation\gamedevelop2\gdl\\gdl\chooseobject.h
 	<wx/treectrl.h>
 	<wx/notebook.h>
 	<wx/sizer.h>
@@ -14656,7 +14657,7 @@
 	"GDL/ObjectGroup.h"
 	"GDL/profile.h"
 
-1319659589 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
+1321723116 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
 	<wx/wx.h>
 	"GDL/Log.h"
 	<iostream>
@@ -14841,7 +14842,7 @@
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1320179468 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
+1321733837 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
 	"GDL/RuntimeScene.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -14964,7 +14965,7 @@
 	"GDL/Object.h"
 	"GDL/Automatism.h"
 
-1320189032 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp
+1321219095 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp
 	"GDL/SpriteExtension.h"
 	"GDL/SpriteObject.h"
 
@@ -14980,9 +14981,10 @@
 	<wx/panel.h>
 	<wx/combobox.h>
 
-1319828704 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
+1321714166 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
 	<SFML/Graphics.hpp>
 	"GDL/SpriteObject.h"
+	"GDL/RuntimeGame.h"
 	"GDL/Object.h"
 	"GDL/ImageManager.h"
 	"GDL/tinyxml.h"
@@ -32160,9 +32162,9 @@
 	"wx/stream.h"
 	"wx/convauto.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
-1320791788 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerationcontext.cpp
+1321713992 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerationcontext.cpp
 	"EventsCodeGenerationContext.h"
 	"GDL/Game.h"
 	"GDL/Scene.h"
@@ -32171,17 +32173,17 @@
 	"GDL/EventsCodeGenerator.h"
 	<set>
 
-1319318212 d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerationcontext.h
+1321713992 d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerationcontext.h
 	<string>
 	<set>
 	<boost/shared_ptr.hpp>
 
-1319318212 d:\florian\programmation\gamedevelop2\gdl\\gdl\eventscodegenerationcontext.h
+1321713992 d:\florian\programmation\gamedevelop2\gdl\\gdl\eventscodegenerationcontext.h
 	<string>
 	<set>
 	<boost/shared_ptr.hpp>
 
-1321031361 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerator.cpp
+1321199069 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodegenerator.cpp
 	<utility>
 	"GDL/EventsCodeGenerator.h"
 	"GDL/ExtensionBase.h"
@@ -32203,7 +32205,7 @@
 	<vector>
 	<utility>
 
-1321198678 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodecompiler.cpp
+1321721392 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventscodecompiler.cpp
 	"GDL/EventsCodeCompiler.h"
 	<SFML/System.hpp>
 	<iostream>

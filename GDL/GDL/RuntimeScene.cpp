@@ -564,7 +564,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     for (unsigned int i = 0; i < game->globalObjects.size();++i)
         game->globalObjects[i]->LoadResources(*this, *game->imageManager);
 
-    //Create object instances which are originally positionned on scene
+    //Create object instances which are originally positioned on scene
     MessageLoading( "Adding objects to their initial position", 66 );
     for(unsigned int i = 0;i < scene.initialObjectsPositions.size();++i)
     {
@@ -601,7 +601,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
             std::cout << "Could not find and put object " << scene.initialObjectsPositions[i].objectName << std::endl;
     }
 
-    //Automatisms datas
+    //Automatisms data
     automatismsSharedDatas.clear();
     for(std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
         it != scene.automatismsInitialSharedDatas.end();
@@ -610,7 +610,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
         automatismsSharedDatas[it->first] = it->second->CreateRuntimeSharedDatas();
     }
 
-    //Extensions specific initalization
+    //Extensions specific initialization
     const vector < boost::shared_ptr<ExtensionBase> > extensions = GDpriv::ExtensionsManager::GetInstance()->GetExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
     {

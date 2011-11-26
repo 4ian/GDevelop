@@ -457,6 +457,9 @@ EventsCodeCompiler::EventsCodeCompiler() :
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
     #elif defined(LINUX)
     //On most distribution, clang is able to find itself standard headers paths.
+    //Except for some headers :
+    headersDirectories.insert("-I/usr/include/i386-linux-gnu/");
+
     /*headersDirectories.insert("-Iinclude/Debian/");
     headersDirectories.insert("-Iinclude/Debian/c++/4.1.2/");
     headersDirectories.insert("-Iinclude/Debian/c++/4.1.2/i486-linux-gnu");*/

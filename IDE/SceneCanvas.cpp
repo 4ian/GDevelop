@@ -357,7 +357,9 @@ void SceneCanvas::UpdateSize()
     if ( edittimeRenderer.editing )
     {
         //Scene takes all the space available in edition mode.
-        Window::SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
+
+        //This line is unnecessary and create a crash related to X in Linux.
+        //Window::SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
         wxWindowBase::SetPosition(wxPoint(0,0));
         wxWindowBase::SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
 
@@ -487,9 +489,9 @@ void SceneCanvas::OnOrigineBtClick(wxCommandEvent & event )
 }
 
 
-////////////////////////////////////////////////////////////
-/// Choisir un objet à ajouter
-////////////////////////////////////////////////////////////
+/**
+ * Choose an object to add
+ */
 void SceneCanvas::OnChoisirObjetBtClick( wxCommandEvent & event )
 {
     ChooseObject Dialog( this, game, edittimeRenderer.runtimeScene, false );

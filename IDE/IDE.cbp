@@ -175,6 +175,7 @@
 				<Option type="0" />
 				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
 				<Option host_application="bin\release\GDEditor.exe" />
+				<Option run_host_application_in_terminal="0" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O3" />

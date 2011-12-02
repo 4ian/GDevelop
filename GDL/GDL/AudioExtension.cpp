@@ -553,9 +553,9 @@ void AudioExtension::ExposeActionsResources(Instruction & action, ArbitraryResou
 {
     if ( action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" || action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal" )
     {
-        std::string parameter = action.GetParameter(0).GetPlainString();
+        std::string parameter = action.GetParameter(1).GetPlainString();
         worker.ExposeResource(parameter);
-        action.SetParameter(0, parameter);
+        action.SetParameter(1, parameter);
     }
 }
 

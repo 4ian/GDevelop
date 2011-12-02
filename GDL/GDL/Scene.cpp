@@ -11,9 +11,9 @@
 #include <iostream>
 
 Scene::Scene() :
-backgroundColorR(125),
-backgroundColorG(125),
-backgroundColorB(125),
+backgroundColorR(209),
+backgroundColorG(209),
+backgroundColorB(209),
 standardSortMethod(true),
 oglFOV(90.0f),
 oglZNear(1.0f),

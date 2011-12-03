@@ -111,7 +111,7 @@ Demarrage::Demarrage(wxWindow* parent)
 	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("Vous allez pouvoir régler quelques paramétrages et accéder aux conseils pour démarrer au mieux avec Game Develop.\n\nCliquez sur suivant pour continuer."), wxDefaultPosition, wxSize(305,75), 0, _T("ID_STATICTEXT5"));
+	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("Vous allez pouvoir régler quelques paramétrages et accéder aux\nconseils pour démarrer au mieux avec Game Develop.\n\nCliquez sur suivant pour continuer."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer5->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBitmap2 = new wxStaticBitmap(Panel1, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/presentation.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP2"));

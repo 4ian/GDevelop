@@ -690,11 +690,14 @@ void SceneCanvas::ReloadFirstPart()
     cout << "ReloadFirstPart: " << endl;
     isReloading = true;
 
+    SoundManager::GetInstance()->ClearAllSoundsAndMusics();
+    if ( gameEdited.imageManager ) gameEdited.imageManager->PreventImagesUnloading(); //Images are normally unloaded and loaded again when reloading the scene. We can prevent this to happen as it is time wasting.
+
+    //Reset game
     game = gameEdited;
     game.imageManager = gameEdited.imageManager; //Use same image manager.
 
-    SoundManager::GetInstance()->ClearAllSoundsAndMusics();
-
+    //Reset scene
     RuntimeScene newScene(this, &game);
     edittimeRenderer.runtimeScene = newScene;
     edittimeRenderer.runtimeScene.running = false;
@@ -751,6 +754,8 @@ void SceneCanvas::ReloadSecondPart()
 
     UpdateSize();
     UpdateScrollbars();
+
+    if ( gameEdited.imageManager ) gameEdited.imageManager->EnableImagesUnloading(); //We were preventing images unloading so as to be sure not to waste time unloading and reloading just after scenes images.
 
     isReloading = false;
 }

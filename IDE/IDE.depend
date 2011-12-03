@@ -24592,7 +24592,7 @@
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1314788991 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
+1322924408 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
 	"GDL/Game.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -25389,7 +25389,7 @@
 1297525936 d:\florian\programmation\gamedevelop2\gdl\gdl\basedebugger.h
 	<SFML/System.hpp>
 
-1318445239 source:d:\florian\programmation\gamedevelop2\ide\demarrage.cpp
+1322398978 source:d:\florian\programmation\gamedevelop2\ide\demarrage.cpp
 	"Demarrage.h"
 	"nommgr.h"
 	<wx/help.h>
@@ -25865,7 +25865,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1321304460 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
+1322402523 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -26782,7 +26782,7 @@
 	<wx/textfile.h>
 	"GDL/Game.h"
 
-1319659822 source:d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp
+1322397260 source:d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp
 	"ObjectTypeChoice.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -27440,7 +27440,7 @@
 	<wx/string.h>
 	<iostream>
 
-1320520467 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
+1322923997 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -27587,7 +27587,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1322333411 d:\florian\programmation\gamedevelop2\ide\version.h
+1322923998 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -27982,7 +27982,7 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1320500064 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1322860984 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 

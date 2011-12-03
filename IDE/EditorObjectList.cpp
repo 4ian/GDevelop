@@ -414,9 +414,9 @@ void EditorObjectList::OnobjectsListItemRightClick(wxTreeEvent& event)
     item = event.GetItem();
 }
 
-////////////////////////////////////////////////////////////
-/// La selection a changé.
-////////////////////////////////////////////////////////////
+/**
+ * Selection has changed
+ */
 void EditorObjectList::OnobjectsListSelectionChanged(wxTreeEvent& event)
 {
     wxFocusEvent unusedEvent;

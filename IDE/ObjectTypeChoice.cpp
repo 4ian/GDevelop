@@ -139,7 +139,11 @@ void ObjectTypeChoice::RefreshList()
 	    {
 	        if ( objectsTypes[j] != "" ) //Cannot use directly a base object
 	        {
-                imageList->Add(extensions[i]->GetObjectInfo(objectsTypes[j]).icon);
+                if ( extensions[i]->GetObjectInfo(objectsTypes[j]).icon.IsOk() )
+                    imageList->Add(extensions[i]->GetObjectInfo(objectsTypes[j]).icon);
+                else
+                    imageList->Add(wxBitmap(wxImage(_T("res/unknown32.png"))));
+
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(objectsTypes[j]);
 
                 wxListItem objectItem;

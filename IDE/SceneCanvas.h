@@ -132,10 +132,11 @@ public :
 
 private :
 
-    //Mise à jour
     virtual void OnUpdate();
     void Refresh();
     void UpdateContextMenu();
+    void CreateMenus();
+    void Undo();
 
     //Interaction
     virtual void OnLeftDown( wxMouseEvent &event );
@@ -154,6 +155,7 @@ private :
     void OnCopySelected(wxCommandEvent & event);
     void OnCutSelected(wxCommandEvent & event);
     void OnPasteSelected(wxCommandEvent & event);
+    void OnPasteSpecialSelected(wxCommandEvent & event);
     void OnRefreshBtClick( wxCommandEvent & event );
     void OnPreviewBtClick( wxCommandEvent & event );
     void OnEditionBtClick( wxCommandEvent & event );
@@ -170,20 +172,23 @@ private :
     void OnObjectsEditor( wxCommandEvent & event );
     void OnLayersEditor( wxCommandEvent & event );
     void OnUndoBtClick( wxCommandEvent & event );
+    void OnUndoMoreBtClick( wxRibbonButtonBarEvent & event );
     void OnRedoBtClick( wxCommandEvent & event );
     void OnWindowMaskBtClick( wxCommandEvent & event );
     void OnHelpBtClick( wxCommandEvent & event );
     void OnObjectsPositionList( wxCommandEvent & event );
     void OnProfilerBtClick( wxCommandEvent & event );
+    void Onzoom5Selected(wxCommandEvent& event);
     void Onzoom10Selected(wxCommandEvent& event);
     void Onzoom25Selected(wxCommandEvent& event);
     void Onzoom50Selected(wxCommandEvent& event);
     void Onzoom100Selected(wxCommandEvent& event);
     void Onzoom150Selected(wxCommandEvent& event);
     void Onzoom200Selected(wxCommandEvent& event);
-    void Onzoom300Selected(wxCommandEvent& event);
     void Onzoom500Selected(wxCommandEvent& event);
-    void Onzoom5Selected(wxCommandEvent& event);
+    void OnUndo10Selected(wxCommandEvent& event);
+    void OnUndo20Selected(wxCommandEvent& event);
+    void OnClearHistorySelected(wxCommandEvent& event);
     void OnFullScreenBtClick(wxCommandEvent& event);
 
     int GetObjectsSelectedHighestLayer();
@@ -197,6 +202,7 @@ private :
     static const long ID_COPYMENU;
     static const long ID_CUTMENU;
     static const long ID_PASTEMENU;
+    static const long ID_PASTESPECIALMENU;
     //Identifiers for changing mode
     static const long idRibbonEditMode;
     static const long idRibbonPreviewMode;
@@ -210,6 +216,9 @@ private :
     static const long idRibbonWindowMask;
     static const long idRibbonGridSetup;
     static const long idRibbonUndo;
+    static const long idUndo10;
+    static const long idUndo20;
+    static const long idClearHistory;
     static const long idRibbonRedo;
     static const long idRibbonObjectsPositionList;
     //Preview mode identifiers
@@ -236,6 +245,7 @@ private :
     wxMenu contextMenu;
     wxMenu noObjectContextMenu;
     wxMenu zoomMenu;
+    wxMenu undoMenu;
 
     void ReloadFirstPart();
     void ReloadSecondPart();
@@ -257,6 +267,7 @@ private :
 
     vector < vector < InitialPosition > > history; ///< History of changes
     vector < vector < InitialPosition > > redoHistory; ///< Histoy of changes so as to "redo"
+    vector < InitialPosition > latestState; ///< Necessary to keep track of what changed
 
     static sf::Texture reloadingIconImage;
     static sf::Sprite reloadingIconSprite;

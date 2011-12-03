@@ -43,6 +43,7 @@
 #include "DndTextSceneEditor.h"
 #include "InitialPositionBrowserDlg.h"
 #include "RenderDialog.h"
+#include "AdvancedPasteDlg.h"
 #include "EditorObjets.h"
 #include "EditorLayers.h"
 #include "DebuggerGUI.h"
@@ -57,6 +58,7 @@ const long SceneCanvas::ID_LAYERDOWNMENU = wxNewId();
 const long SceneCanvas::ID_COPYMENU = wxNewId();
 const long SceneCanvas::ID_CUTMENU = wxNewId();
 const long SceneCanvas::ID_PASTEMENU = wxNewId();
+const long SceneCanvas::ID_PASTESPECIALMENU = wxNewId();
 const long SceneCanvas::idRibbonEditMode = wxNewId();
 const long SceneCanvas::idRibbonPreviewMode = wxNewId();
 
@@ -90,6 +92,9 @@ const long SceneCanvas::ID_MENUITEM4 = wxNewId();
 const long SceneCanvas::ID_MENUITEM5 = wxNewId();
 const long SceneCanvas::ID_MENUITEM6 = wxNewId();
 const long SceneCanvas::ID_MENUITEM7 = wxNewId();
+const long SceneCanvas::idUndo10 = wxNewId();
+const long SceneCanvas::idUndo20 = wxNewId();
+const long SceneCanvas::idClearHistory = wxNewId();
 
 
 sf::Texture SceneCanvas::reloadingIconImage;
@@ -127,65 +132,11 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
     Connect(ID_COPYMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnCopySelected);
     Connect(ID_CUTMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnCutSelected);
     Connect(ID_PASTEMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnPasteSelected);
+    Connect(ID_PASTESPECIALMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnPasteSpecialSelected);
 
-    //Generate context menu
-    wxMenuItem * layerUpItem = new wxMenuItem((&contextMenu), ID_LAYERUPMENU, _("Passer le(s) objet(s) sur le calque supérieur"), wxEmptyString, wxITEM_NORMAL);
-    layerUpItem->SetBitmap(wxImage( "res/up.png" ) );
-    wxMenuItem * layerDownItem = new wxMenuItem((&contextMenu), ID_LAYERDOWNMENU, _("Passer le(s) objet(s) sur le calque inférieur"), wxEmptyString, wxITEM_NORMAL);
-    layerDownItem->SetBitmap(wxImage( "res/down.png" ) );
-    wxMenuItem * deleteItem = new wxMenuItem((&contextMenu), ID_DELOBJMENU, _("Supprimer la sélection\tDEL"), wxEmptyString, wxITEM_NORMAL);
-    deleteItem->SetBitmap(wxImage( "res/deleteicon.png" ) );
-    wxMenuItem * addItem = new wxMenuItem((&contextMenu), ID_ADDOBJMENU, _("Ajouter un objet\tINSER"), wxEmptyString, wxITEM_NORMAL);
-    addItem->SetBitmap(wxImage( "res/addobjet.png" ) );
+    CreateMenus();
 
-    contextMenu.Append(ID_PROPMENU, _("Propriétés"));
-    contextMenu.AppendSeparator();
-    contextMenu.Append(addItem);
-    contextMenu.Append(deleteItem);
-    contextMenu.AppendSeparator();
-    contextMenu.Append(layerUpItem);
-    contextMenu.Append(layerDownItem);
-    contextMenu.AppendSeparator();
-    {
-        wxMenuItem * copyItem = new wxMenuItem((&contextMenu), ID_COPYMENU, _("Copier"), wxEmptyString, wxITEM_NORMAL);
-        copyItem->SetBitmap(wxImage( "res/copyicon.png" ) );
-        contextMenu.Append(copyItem);
-        wxMenuItem * cutItem = new wxMenuItem((&contextMenu), ID_CUTMENU, _("Couper"), wxEmptyString, wxITEM_NORMAL);
-        cutItem->SetBitmap(wxImage( "res/cuticon.png" ) );
-        contextMenu.Append(cutItem);
-        wxMenuItem * pasteItem = new wxMenuItem((&contextMenu), ID_PASTEMENU, _("Coller"), wxEmptyString, wxITEM_NORMAL);
-        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
-        contextMenu.Append(pasteItem);
-    }
-
-    //Generate "no object" context menu
-    {
-        wxMenuItem * addItem = new wxMenuItem((&noObjectContextMenu), ID_ADDOBJMENU, _("Ajouter un objet\tINSER"), wxEmptyString, wxITEM_NORMAL);
-        addItem->SetBitmap(wxImage( "res/addobjet.png" ) );
-        noObjectContextMenu.Append(addItem);
-        noObjectContextMenu.AppendSeparator();
-        wxMenuItem * pasteItem = new wxMenuItem((&noObjectContextMenu), ID_PASTEMENU, _("Coller"), wxEmptyString, wxITEM_NORMAL);
-        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
-        noObjectContextMenu.Append(pasteItem);
-    }
-
-    //Generate zoom menu
-	wxMenuItem * zoom5 = new wxMenuItem((&zoomMenu), ID_MENUITEM8, _("5%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom5);
-	wxMenuItem * zoom10 = new wxMenuItem((&zoomMenu), ID_MENUITEM1, _("10%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom10);
-	wxMenuItem * zoom25 = new wxMenuItem((&zoomMenu), ID_MENUITEM2, _("25%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom25);
-	wxMenuItem * zoom50 = new wxMenuItem((&zoomMenu), ID_MENUITEM3, _("50%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom50);
-	wxMenuItem * zoom100 = new wxMenuItem((&zoomMenu), ID_MENUITEM4, _("100%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom100);
-	wxMenuItem * zoom150 = new wxMenuItem((&zoomMenu), ID_MENUITEM5, _("150%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom150);
-	wxMenuItem * zoom200 = new wxMenuItem((&zoomMenu), ID_MENUITEM6, _("200%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom200);
-	wxMenuItem * zoom500 = new wxMenuItem((&zoomMenu), ID_MENUITEM7, _("500%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom500);
+    latestState = sceneEdited.initialObjectsPositions;
 
     SetDropTarget(new DndTextSceneEditor(*this));
 
@@ -212,6 +163,7 @@ void SceneCanvas::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonGridSetup, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnGridSetupBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonWindowMask, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnWindowMaskBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnUndoBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnUndoMoreBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnRedoBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonObjectsPositionList,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnObjectsPositionList, NULL, this);
 
@@ -232,6 +184,9 @@ void SceneCanvas::ConnectEvents()
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom150Selected, NULL, this);
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom200Selected, NULL, this);
 	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom500Selected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idUndo10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnUndo10Selected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idUndo20,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnUndo20Selected, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idClearHistory,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnClearHistorySelected, NULL, this);
 }
 
 /**
@@ -280,7 +235,7 @@ void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
         bar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Editeur d'objets") : "", wxBitmap("res/objeticon24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Editeur de calques") : "", wxBitmap("res/layers24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonChooseObject, !hideLabels ? _("Choisir un objet") : "", wxBitmap("res/addobjet24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
+        bar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
         bar->AddButton(idRibbonOrigine, !hideLabels ? _("Revenir à l'origine") : "", wxBitmap("res/center24.png", wxBITMAP_TYPE_ANY));
         bar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Zoom initial") : "", wxBitmap("res/zoom24.png", wxBITMAP_TYPE_ANY));
@@ -501,13 +456,23 @@ void SceneCanvas::OnChoisirObjetBtClick( wxCommandEvent & event )
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Activer/Desactiver la grille
-////////////////////////////////////////////////////////////
+/**
+ * De/activate grid.
+ */
 void SceneCanvas::OnGridBtClick( wxCommandEvent & event )
 {
     sceneEdited.grid = !sceneEdited.grid;
 }
+
+/**
+ * Setup the grid.
+ */
+void SceneCanvas::OnGridSetupBtClick( wxCommandEvent & event )
+{
+    GridSetup dialog(this, sceneEdited.gridWidth, sceneEdited.gridHeight, sceneEdited.snap, sceneEdited.gridR, sceneEdited.gridG, sceneEdited.gridB);
+    dialog.ShowModal();
+}
+
 
 void SceneCanvas::OnWindowMaskBtClick( wxCommandEvent & event )
 {
@@ -516,35 +481,59 @@ void SceneCanvas::OnWindowMaskBtClick( wxCommandEvent & event )
 
 void SceneCanvas::OnUndoBtClick( wxCommandEvent & event )
 {
-    if ( history.size() < 2 )
-        return;
+    Undo();
+    Reload();
+}
+void SceneCanvas::Undo()
+{
+    if ( history.empty() ) return;
 
-    redoHistory.push_back(sceneEdited.initialObjectsPositions); //On pourra revenir à l'état actuel avec "Refaire"
-    sceneEdited.initialObjectsPositions = history.at( history.size() - 2 ); //-2 car le dernier élément est la liste d'évènement actuelle
+    redoHistory.push_back(sceneEdited.initialObjectsPositions); //We can go back to the current state using redo button.
+    sceneEdited.initialObjectsPositions = history.back();
     history.pop_back();
 
+    latestState = sceneEdited.initialObjectsPositions;
+}
+
+void SceneCanvas::OnUndo10Selected(wxCommandEvent& event)
+{
+    for (unsigned int i = 0;i<10;++i) Undo();
+
     Reload();
+}
+
+void SceneCanvas::OnUndo20Selected(wxCommandEvent& event)
+{
+    for (unsigned int i = 0;i<20;++i) Undo();
+
+    Reload();
+}
+
+void SceneCanvas::OnClearHistorySelected(wxCommandEvent& event)
+{
+    if (wxMessageBox("Etes-vous sûr de vouloir supprimer l'historique des modifications ?", "Êtes vous sûr ?",wxYES_NO ) != wxYES)
+        return;
+
+    history.clear();
+    redoHistory.clear();
 }
 
 void SceneCanvas::OnRedoBtClick( wxCommandEvent & event )
 {
-    if ( redoHistory.empty() )
-        return;
+    if ( redoHistory.empty() ) return;
 
-    history.push_back(redoHistory.back()); //Le dernier élément est la liste d'évènement actuellement éditée
+    history.push_back(sceneEdited.initialObjectsPositions);
     sceneEdited.initialObjectsPositions = redoHistory.back();
     redoHistory.pop_back();
+
+    latestState = sceneEdited.initialObjectsPositions;
 
     Reload();
 }
 
-////////////////////////////////////////////////////////////
-/// Activer/Desactiver la grille
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnGridSetupBtClick( wxCommandEvent & event )
+void SceneCanvas::OnUndoMoreBtClick(wxRibbonButtonBarEvent& evt)
 {
-    GridSetup dialog(this, sceneEdited.gridWidth, sceneEdited.gridHeight, sceneEdited.snap, sceneEdited.gridR, sceneEdited.gridG, sceneEdited.gridB);
-    dialog.ShowModal();
+    evt.PopupMenu(&undoMenu);
 }
 
 /**
@@ -845,7 +834,9 @@ void SceneCanvas::Refresh()
             else if ( retourEvent != -1 )
             {
                 if (retourEvent < gameEdited.scenes.size())
+                {
                     wxLogStatus( _( "Dans le jeu final, un changement de scène s'effectuera vers la scène " ) + "\"" + gameEdited.scenes[retourEvent]->GetName() + "\"" );
+                }
             }
         }
         else if ( !edittimeRenderer.runtimeScene.running && !edittimeRenderer.editing ) //Runtime paused
@@ -861,11 +852,15 @@ void SceneCanvas::OnUpdate()
     UpdateScrollbars();
 }
 
+/**
+ * Notify a change has been made : Update history.
+ */
 void SceneCanvas::ChangesMade()
 {
-    //Mise à jour de l'historique d'annulation
-    history.push_back(sceneEdited.initialObjectsPositions);
+    cout << "ChangesMade!" << std::endl;
+    history.push_back(latestState);
     redoHistory.clear();
+    latestState = sceneEdited.initialObjectsPositions;
 }
 
 ////////////////////////////////////////////////////////////
@@ -1041,6 +1036,8 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
     //position de départ est celle où ils sont.
     if ( edittimeRenderer.isMovingObject )
     {
+        bool changesMade = false;
+
         if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
         for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
         {
@@ -1048,13 +1045,20 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
             int IDInitialPosition = GetInitialPositionFromObject(object);
             if ( IDInitialPosition != -1)
             {
+                if (edittimeRenderer.xObjectsSelected[i] != sceneEdited.initialObjectsPositions.at( IDInitialPosition ).x ||
+                    edittimeRenderer.yObjectsSelected[i] != sceneEdited.initialObjectsPositions.at( IDInitialPosition ).y )
+                    changesMade = true;
+
                 edittimeRenderer.xObjectsSelected[i] = sceneEdited.initialObjectsPositions.at( IDInitialPosition ).x;
                 edittimeRenderer.yObjectsSelected[i] = sceneEdited.initialObjectsPositions.at( IDInitialPosition ).y;
 
                 if ( initialPositionsBrowser )
                     initialPositionsBrowser->SelectInitialPosition(IDInitialPosition);
             }
+
         }
+
+        if ( changesMade ) ChangesMade();
     }
 
     //Select object thanks to the selection area
@@ -1099,8 +1103,6 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
     edittimeRenderer.isMovingObject = false;
     edittimeRenderer.isRotatingObject = false;
     edittimeRenderer.isSelecting = false;
-
-    ChangesMade();
 }
 
 ////////////////////////////////////////////////////////////
@@ -1112,21 +1114,21 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
 void SceneCanvas::OnMotion( wxMouseEvent &event )
 {
     //Mille mercis Laurent.
-    int mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
-    int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+    float mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
+    float mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
 
     if ( !edittimeRenderer.editing )
         wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". ( Calque de base, Caméra 0 )" ) ) );
     else
         wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". SHIFT pour sélection multiple, clic droit pour plus d'options." ) ) );
 
-    //Le reste concerne juste le mode édition
+    //The rest is for edittime
     if ( edittimeRenderer.runtimeScene.running )
         return;
 
-    //Déplacement avec la souris
+    //Moving using middle click
     if ( edittimeRenderer.isMoving )
-        edittimeRenderer.view.Move( edittimeRenderer.deplacementOX - mouseX, edittimeRenderer.deplacementOY - mouseY );
+        edittimeRenderer.view.SetCenter( edittimeRenderer.viewStartPosition.x + edittimeRenderer.mouseStartPosition.x - sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, edittimeRenderer.viewStartPosition.y + edittimeRenderer.mouseStartPosition.y - sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y );
 
     if ( edittimeRenderer.isResizingX )
     {
@@ -1231,6 +1233,7 @@ void SceneCanvas::OnLeftDClick( wxMouseEvent &event )
     int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
 
     AddObjetSelected(mouseX, mouseY);
+    ChangesMade();
 }
 
 ////////////////////////////////////////////////////////////
@@ -1242,6 +1245,7 @@ void SceneCanvas::OnAddObjetSelected( wxCommandEvent & event )
     int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
 
     AddObjetSelected(mouseX, mouseY);
+    ChangesMade();
 }
 
 void SceneCanvas::AddObjetSelected(float x, float y)
@@ -1432,6 +1436,7 @@ void SceneCanvas::OnCutSelected(wxCommandEvent & event)
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
 
     Clipboard::GetInstance()->SetPositionsSelection(copiedPositions);
+    ChangesMade();
 }
 
 void SceneCanvas::OnPasteSelected(wxCommandEvent & event)
@@ -1451,6 +1456,48 @@ void SceneCanvas::OnPasteSelected(wxCommandEvent & event)
     }
 
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
+    ChangesMade();
+    Reload();
+}
+
+void SceneCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
+{
+    if ( !Clipboard::GetInstance()->HasPositionsSelection() ) return;
+    vector < InitialPosition > pastedPositions = Clipboard::GetInstance()->GetPositionsSelection();
+
+    float mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
+    float mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+
+    AdvancedPasteDlg dialog(this);
+    dialog.SetStartX(mouseX);
+    dialog.SetStartY(mouseY);
+
+
+    ObjSPtr object = GetObjectFromInitialPosition(pastedPositions.front());
+    if ( object != boost::shared_ptr<Object>() )
+    {
+        dialog.SetXGap(object->GetWidth());
+        dialog.SetYGap(object->GetHeight());
+    }
+
+    if ( dialog.ShowModal() != 1 ) return;
+
+    float angle = dialog.GetRotationIncrementation();
+    for (unsigned int i = 0;i<dialog.GetYCount();++i)
+    {
+        for (unsigned int j = 0;j<dialog.GetXCount();++j)
+        {
+            sceneEdited.initialObjectsPositions.push_back(pastedPositions.front());
+            sceneEdited.initialObjectsPositions.back().x = dialog.GetStartX()+dialog.GetXGap()*j;
+            sceneEdited.initialObjectsPositions.back().y = dialog.GetStartY()+dialog.GetYGap()*i;
+            sceneEdited.initialObjectsPositions.back().angle = pastedPositions.front().angle + angle;
+
+            angle += dialog.GetRotationIncrementation();
+        }
+    }
+
+    if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
+    ChangesMade();
     Reload();
 }
 
@@ -1571,12 +1618,11 @@ void SceneCanvas::OnMiddleDown( wxMouseEvent &event )
 
     if ( !edittimeRenderer.isMoving )
     {
-        sf::Vector2f mousePos = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y);
-
         edittimeRenderer.isMoving = true;
-        edittimeRenderer.deplacementOX = mousePos.x;
-        edittimeRenderer.deplacementOY = mousePos.y;
+        edittimeRenderer.mouseStartPosition = sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow);
+        edittimeRenderer.viewStartPosition = GetView().GetCenter();
         SetCursor( wxCursor( wxCURSOR_SIZING ) );
+
         return;
     }
     else
@@ -1658,9 +1704,9 @@ int SceneCanvas::GetObjectsSelectedLowestLayer()
     return lowestLayer;
 }
 
-////////////////////////////////////////////////////////////
-/// Renvoi l'ID d'une position initiale à partir d'un objet sur la scène
-////////////////////////////////////////////////////////////
+/**
+ * Tool function to get the initial position from an object.
+ */
 int SceneCanvas::GetInitialPositionFromObject(ObjSPtr object)
 {
     if ( object == boost::shared_ptr<Object> ()) return -1;
@@ -1678,6 +1724,9 @@ int SceneCanvas::GetInitialPositionFromObject(ObjSPtr object)
     return -1;
 }
 
+/**
+ * Tool function to get the object from an initial position.
+ */
 ObjSPtr SceneCanvas::GetObjectFromInitialPosition(const InitialPosition & initialPosition)
 {
     ObjList allObjects = edittimeRenderer.runtimeScene.objectsInstances.GetAllObjects();
@@ -1734,4 +1783,82 @@ void SceneCanvas::Onzoom200Selected(wxCommandEvent& event)
 void SceneCanvas::Onzoom500Selected(wxCommandEvent& event)
 {
     edittimeRenderer.view.SetSize(GetWidth()/5.f, GetHeight()/5.f);
+}
+
+void SceneCanvas::CreateMenus()
+{
+    //Generate context menu
+    wxMenuItem * layerUpItem = new wxMenuItem((&contextMenu), ID_LAYERUPMENU, _("Passer le(s) objet(s) sur le calque supérieur"), wxEmptyString, wxITEM_NORMAL);
+    layerUpItem->SetBitmap(wxImage( "res/up.png" ) );
+    wxMenuItem * layerDownItem = new wxMenuItem((&contextMenu), ID_LAYERDOWNMENU, _("Passer le(s) objet(s) sur le calque inférieur"), wxEmptyString, wxITEM_NORMAL);
+    layerDownItem->SetBitmap(wxImage( "res/down.png" ) );
+    wxMenuItem * deleteItem = new wxMenuItem((&contextMenu), ID_DELOBJMENU, _("Supprimer la sélection\tDEL"), wxEmptyString, wxITEM_NORMAL);
+    deleteItem->SetBitmap(wxImage( "res/deleteicon.png" ) );
+    wxMenuItem * addItem = new wxMenuItem((&contextMenu), ID_ADDOBJMENU, _("Ajouter un objet\tINSER"), wxEmptyString, wxITEM_NORMAL);
+    addItem->SetBitmap(wxImage( "res/addobjet.png" ) );
+
+    contextMenu.Append(ID_PROPMENU, _("Propriétés"));
+    contextMenu.AppendSeparator();
+    contextMenu.Append(addItem);
+    contextMenu.Append(deleteItem);
+    contextMenu.AppendSeparator();
+    contextMenu.Append(layerUpItem);
+    contextMenu.Append(layerDownItem);
+    contextMenu.AppendSeparator();
+    {
+        wxMenuItem * copyItem = new wxMenuItem((&contextMenu), ID_COPYMENU, _("Copier"), wxEmptyString, wxITEM_NORMAL);
+        copyItem->SetBitmap(wxImage( "res/copyicon.png" ) );
+        contextMenu.Append(copyItem);
+        wxMenuItem * cutItem = new wxMenuItem((&contextMenu), ID_CUTMENU, _("Couper"), wxEmptyString, wxITEM_NORMAL);
+        cutItem->SetBitmap(wxImage( "res/cuticon.png" ) );
+        contextMenu.Append(cutItem);
+        wxMenuItem * pasteItem = new wxMenuItem((&contextMenu), ID_PASTEMENU, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
+        contextMenu.Append(pasteItem);
+        wxMenuItem * pasteSpecialItem = new wxMenuItem((&contextMenu), ID_PASTESPECIALMENU, _("Collage spécial"), wxEmptyString, wxITEM_NORMAL);
+        contextMenu.Append(pasteSpecialItem);
+    }
+
+    //Generate "no object" context menu
+    {
+        wxMenuItem * addItem = new wxMenuItem((&noObjectContextMenu), ID_ADDOBJMENU, _("Ajouter un objet\tINSER"), wxEmptyString, wxITEM_NORMAL);
+        addItem->SetBitmap(wxImage( "res/addobjet.png" ) );
+        noObjectContextMenu.Append(addItem);
+        noObjectContextMenu.AppendSeparator();
+        wxMenuItem * pasteItem = new wxMenuItem((&noObjectContextMenu), ID_PASTEMENU, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
+        noObjectContextMenu.Append(pasteItem);
+        wxMenuItem * pasteSpecialItem = new wxMenuItem((&noObjectContextMenu), ID_PASTESPECIALMENU, _("Collage spécial"), wxEmptyString, wxITEM_NORMAL);
+        noObjectContextMenu.Append(pasteSpecialItem);
+    }
+
+    //Generate undo menu
+    {
+        wxMenuItem * undo10item = new wxMenuItem(&undoMenu, idUndo10, _("Annuler les 10 précédentes actions"), wxEmptyString, wxITEM_NORMAL);
+        undoMenu.Append(undo10item);
+        wxMenuItem * undo20item = new wxMenuItem(&undoMenu, idUndo20, _("Annuler les 20 précédentes actions"), wxEmptyString, wxITEM_NORMAL);
+        undoMenu.Append(undo20item);
+        undoMenu.AppendSeparator();
+        wxMenuItem * clearHistoryItem = new wxMenuItem(&undoMenu, idClearHistory, _("Supprimer l'historique des changements"), wxEmptyString, wxITEM_NORMAL);
+        clearHistoryItem->SetBitmap(wxImage( "res/history_clear16.png" ) );
+        undoMenu.Append(clearHistoryItem);
+    }
+
+    //Generate zoom menu
+	wxMenuItem * zoom5 = new wxMenuItem((&zoomMenu), ID_MENUITEM8, _("5%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom5);
+	wxMenuItem * zoom10 = new wxMenuItem((&zoomMenu), ID_MENUITEM1, _("10%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom10);
+	wxMenuItem * zoom25 = new wxMenuItem((&zoomMenu), ID_MENUITEM2, _("25%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom25);
+	wxMenuItem * zoom50 = new wxMenuItem((&zoomMenu), ID_MENUITEM3, _("50%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom50);
+	wxMenuItem * zoom100 = new wxMenuItem((&zoomMenu), ID_MENUITEM4, _("100%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom100);
+	wxMenuItem * zoom150 = new wxMenuItem((&zoomMenu), ID_MENUITEM5, _("150%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom150);
+	wxMenuItem * zoom200 = new wxMenuItem((&zoomMenu), ID_MENUITEM6, _("200%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom200);
+	wxMenuItem * zoom500 = new wxMenuItem((&zoomMenu), ID_MENUITEM7, _("500%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom500);
 }

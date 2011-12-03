@@ -24453,7 +24453,7 @@
 	"wx/stream.h"
 	"wx/convauto.h"
 
-1314039353 d:\florian\programmation\gamedevelop2\ide\scenecanvas.h
+1322940341 d:\florian\programmation\gamedevelop2\ide\scenecanvas.h
 	<SFML/Graphics.hpp>
 	<SFML/System.hpp>
 	"wxSFMLCanvas.hpp"
@@ -24745,7 +24745,7 @@
 	<string>
 	<vector>
 
-1314262336 d:\florian\programmation\gamedevelop2\ide\sceneedittimerenderer.h
+1322947362 d:\florian\programmation\gamedevelop2\ide\sceneedittimerenderer.h
 	"GDL/RuntimeScene.h"
 	"GDL/Game.h"
 	<SFML/Graphics.hpp>
@@ -27440,7 +27440,7 @@
 	<wx/string.h>
 	<iostream>
 
-1322923997 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
+1322946977 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -27479,13 +27479,14 @@
 	"DndTextSceneEditor.h"
 	"InitialPositionBrowserDlg.h"
 	"RenderDialog.h"
+	"AdvancedPasteDlg.h"
 	"EditorObjets.h"
 	"EditorLayers.h"
 	"DebuggerGUI.h"
 	"GridSetup.h"
 	"ProfileDlg.h"
 
-1319817887 source:d:\florian\programmation\gamedevelop2\ide\sceneedittimerenderer.cpp
+1322946313 source:d:\florian\programmation\gamedevelop2\ide\sceneedittimerenderer.cpp
 	"SceneEdittimeRenderer.h"
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
@@ -27587,7 +27588,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1322923998 d:\florian\programmation\gamedevelop2\ide\version.h
+1322947526 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -28911,4 +28912,19 @@
 	"GDL/ImageManager.h"
 	"GDL/MainEditorCommand.h"
 	"GDL/ImageFilesWatcher.h"
+
+1322943191 source:d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp
+	"AdvancedPasteDlg.h"
+	<wx/intl.h>
+	<wx/string.h>
+	"GDL/CommonTools.h"
+
+1322941497 d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/spinctrl.h>
+	<wx/statline.h>
+	<wx/button.h>
+	<wx/dialog.h>
 

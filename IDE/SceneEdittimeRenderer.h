@@ -61,8 +61,8 @@ class SceneEdittimeRenderer
         //Déplacement avec la souris ( clic molette )
         bool isMoving;
         bool isSelecting;
-        int deplacementOX;
-        int deplacementOY;
+        sf::Vector2i mouseStartPosition;
+        sf::Vector2f viewStartPosition;
 
         ObjSPtr FindSmallestObject();
 

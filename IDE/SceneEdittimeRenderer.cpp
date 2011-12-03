@@ -21,9 +21,7 @@ yRectangleSelection(0),
 xEndRectangleSelection(0),
 yEndRectangleSelection(0),
 isMoving( false ),
-isSelecting(false),
-deplacementOX( 0 ),
-deplacementOY( 0 )
+isSelecting(false)
 {
     //ctor
     runtimeScene.renderWindow->SetView(view);

@@ -13592,7 +13592,7 @@
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1314788991 d:\florian\programmation\gamedevelop2\gdl\\gdl\imagemanager.h
+1322924408 d:\florian\programmation\gamedevelop2\gdl\\gdl\imagemanager.h
 	"GDL/Game.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -14496,7 +14496,7 @@
 	"GDL/Game.h"
 	"GDL/ImageFilesWatcher.h"
 
-1318105349 source:d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.cpp
+1322924408 source:d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.cpp
 	"GDL/ImageManager.h"
 	"GDL/RessourcesLoader.h"
 	"GDL/InvalidImage.h"

@@ -50,7 +50,9 @@ boost::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(std::string n
                 texture->texture.SetSmooth(image->smooth);
 
                 alreadyLoadedImages[name] = texture;
+                #if defined(GD_IDE_ONLY)
                 if ( preventUnloading ) unloadingPreventer.push_back(texture); //If unload prevention is activated, add the image to the list dedicated to prevent images from being unloaded.
+                #endif
 
                 return texture;
             }
@@ -172,6 +174,7 @@ void ImageManager::LoadPermanentImages()
     permanentlyLoadedImages = newPermanentlyLoadedImages;
 }
 
+#if defined(GD_IDE_ONLY)
 void ImageManager::PreventImagesUnloading()
 {
     preventUnloading = true;
@@ -187,6 +190,7 @@ void ImageManager::EnableImagesUnloading()
     preventUnloading = false;
     unloadingPreventer.clear(); //Images which are not used anymore will thus be destroyed ( As no shared pointer will be pointing to them ).
 }
+#endif
 
 SFMLTextureWrapper::SFMLTextureWrapper(sf::Texture & texture_) :
     texture(texture_),

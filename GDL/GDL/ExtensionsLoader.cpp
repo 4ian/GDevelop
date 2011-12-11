@@ -79,7 +79,6 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
         suffix += "e";
     #endif
 
-    //External extensions
 	#if defined(__GNUC__) //For compilers with posix support
     struct dirent *lecture;
     DIR *rep;
@@ -98,8 +97,21 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
         string lec = lecture->d_name;
         if ( lec != "." && lec != ".." && lec.find(".xgd"+suffix, lec.length()-4-suffix.length()) != string::npos)
         {
-            //Charger l'extension
+            //Use a log file, in IDE only
+            #if defined(GD_IDE_ONLY)
+            {
+                wxFile errorDetectFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log", wxFile::write);
+                errorDetectFile.Write(directory+"/"+lec);
+            }
+            #endif
+
             LoadStaticExtensionInManager(directory+"/"+lec);
+
+            //Everything is ok : Delete the log file
+            #if defined(GD_IDE_ONLY)
+            wxRemoveFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log");
+            #endif
+
             librariesLoaded.push_back(directory+"/"+lec);
 
             l++;
@@ -125,33 +137,30 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
 	{
 		do
 		{
+            //Use a log file, in IDE only
+            #if defined(GD_IDE_ONLY)
+            {
+                wxFile errorDetectFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log", wxFile::write);
+                errorDetectFile.Write(f.cFileName);
+            }
+            #endif
+
 			LoadStaticExtensionInManager(f.cFileName);
+
+            //Everything is ok : Delete the log file
+            #if defined(GD_IDE_ONLY)
+            wxRemoveFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log");
+            #endif
+
 		} while(FindNextFile(h, &f));
 	}
 	#else
 		#warning Compiler not supported ( but might support one style of directory listing, update defines if necessary ) for dynamic libraries loading
 	#endif
 }
-/*
-void SignalHandler(int signal)
-{
-    printf("Crash when loading an extension.\n");
-}*/
 
 void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
 {
-    /*typedef void (*SignalHandlerPointer)(int);
-
-    SignalHandlerPointer previousHandler;
-    previousHandler = signal(SIGSEGV, SignalHandler);*/
-
-    //Log file in IDE only
-    #if defined(GD_IDE_ONLY)
-    {
-        wxFile errorDetectFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log", wxFile::write);
-        errorDetectFile.Write(fullpath);
-    }
-    #endif
 
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
     Handle extensionHdl = OpenLibrary(fullpath.c_str());
@@ -240,9 +249,6 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
                 wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" présente des erreurs :\n")) + error + string(_("\nL'extension n'a pas été chargée. Prenez contact avec le développeur pour plus d'informations." ));
                 wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
                 #endif
-                #if defined(GD_IDE_ONLY)
-                wxRemoveFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log");
-                #endif
                 #if defined(RELEASE)//Load extension despite errors in non release build
                 //signal(SIGSEGV, previousHandler);
                 return;
@@ -250,9 +256,6 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
             }
 
             extensionsManager->AddExtension(extension);
-            #if defined(GD_IDE_ONLY)
-            wxRemoveFile(wxFileName::GetTempDir()+"/ExtensionBeingLoaded.log");
-            #endif
             //signal(SIGSEGV, previousHandler);
             return;
         }

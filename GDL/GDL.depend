@@ -14496,7 +14496,7 @@
 	"GDL/Game.h"
 	"GDL/ImageFilesWatcher.h"
 
-1322924408 source:d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.cpp
+1322948803 source:d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.cpp
 	"GDL/ImageManager.h"
 	"GDL/RessourcesLoader.h"
 	"GDL/InvalidImage.h"
@@ -15812,7 +15812,7 @@
 	"GDL/tinyxml.h"
 	<windows.h>
 
-1321017705 source:d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp
+1323635020 source:d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp
 	"GDL/ExtensionsManager.h"
 	"GDL/ExtensionsLoader.h"
 	<stdio.h>

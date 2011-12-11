@@ -12,7 +12,7 @@
 				<Option output="..\Runtime\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -121,7 +121,7 @@
 				<Option output="..\IDE\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -234,7 +234,7 @@
 				<Option output="..\Runtime\bin\release\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -342,7 +342,7 @@
 				<Option output="..\IDE\bin\release\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -454,7 +454,7 @@
 				<Option output="..\Runtime\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -562,7 +562,7 @@
 				<Option output="..\IDE\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />

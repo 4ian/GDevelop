@@ -80,11 +80,9 @@ void MessageLoading( string message, float avancement )
 }
 
 
-////////////////////////////////////////////////////////////
-/// Démarrage
-///
-/// Démarrage du programme
-////////////////////////////////////////////////////////////
+/**
+ * Program entry point
+ */
 bool Game_Develop_EditorApp::OnInit()
 {
 #ifdef LINUX
@@ -100,9 +98,6 @@ bool Game_Develop_EditorApp::OnInit()
     chdir( tmp.c_str() );
 #endif
 #ifdef WINDOWS
-#if defined(NOT_FOR_WX290)
-    string exeDirectory = string(argv[0].mb_str()); //Make sure current working directory is executable directory.
-#endif
     string exeDirectory = argv[0]; //Make sure current working directory is executable directory.
     unsigned int backslashpos = exeDirectory.find_last_of( "\\" );
     if ( backslashpos > exeDirectory.length() ) backslashpos = 0;
@@ -147,6 +142,8 @@ bool Game_Develop_EditorApp::OnInit()
         return false;
     }
 
+    cout << "Game Develop initialization started:" << endl;
+
     std::vector<std::string> filesToOpen;
     for (unsigned int i = 0;i<parser.GetParamCount();++i)
     {
@@ -160,7 +157,7 @@ bool Game_Develop_EditorApp::OnInit()
 
     wxFileConfig *Config = new wxFileConfig( _T( "Game Develop" ), _T( "Compil Games" ), ConfigPath + "options.cfg" );
     wxConfigBase::Set( Config );
-    cout << "Config file setted" << endl;
+    cout << "* Config file set." << endl;
 
     //Set language
     {
@@ -193,11 +190,11 @@ bool Game_Develop_EditorApp::OnInit()
         GDpriv::LocaleManager::GetInstance()->SetLanguage(languageId);
 
     }
-    cout << "Language loaded" << endl;
+    cout << "* Language loaded" << endl;
 
     wxInitAllImageHandlers();
 
-    cout << "Image Handlers loaded" << endl;
+    cout << "* Image Handlers loaded" << endl;
 
     #ifdef RELEASE
     singleInstanceChecker = new wxSingleInstanceChecker;
@@ -212,7 +209,7 @@ bool Game_Develop_EditorApp::OnInit()
     }
     #endif
 
-    cout << "Single instance checked" << endl;
+    cout << "* Single instance checked" << endl;
     //Safety check for gdl.dll
     bool sameGDLdllAsDuringCompilation = CompilationChecker::EnsureCorrectGDLVersion();
     if ( !sameGDLdllAsDuringCompilation )
@@ -221,7 +218,7 @@ bool Game_Develop_EditorApp::OnInit()
                      "Si le problème persiste, assurez vous qu'il n'existe pas une nouvelle version de Game Develop sur le site officiel : http://www.compilgames.net\n"
                      "Si non, prenez contact avec l'auteur."));
     }
-    cout << "GDL checked" << endl;
+    cout << "* GDL checked" << endl;
 
     //Set help file
     {
@@ -231,7 +228,7 @@ bool Game_Develop_EditorApp::OnInit()
         else if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
             helpFileAccess->InitWithHelpFile("aide.chm");
     }
-    cout << "Help file setted" << endl;
+    cout << "* Help file set" << endl;
 
     //Test si le programme n'aurait pas planté la dernière fois
     //En vérifiant si un fichier existe toujours
@@ -243,7 +240,7 @@ bool Game_Develop_EditorApp::OnInit()
         if ( dialog.ShowModal() == 1 ) openRecupFiles = true;
     }
     #endif
-    cout << "Crash management ended" << endl;
+    cout << "* Crash management ended" << endl;
 
     //Creating the console Manager
     /* Deactivated, as the compilation thread can output messages at any time, resulting in the wxTextCtrl of console frame to be updated at any time
@@ -259,23 +256,24 @@ bool Game_Develop_EditorApp::OnInit()
     wxBitmap bitmap;
     bitmap.LoadFile( wxString("res/GD-Splashscreen.png"), wxBITMAP_TYPE_PNG );
     SplashScreen * splash = new SplashScreen(bitmap, 2, 0, -1, wxNO_BORDER | wxFRAME_SHAPED);
-    cout << "Splash Screen created" << endl;
+    cout << "* Splash Screen created" << endl;
 
     //Création du fichier de détection des erreurs
     wxFile errorDetectFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log", wxFile::write);
     errorDetectFile.Write(" ");
 
     //Les log
-    GDLogBanner(); // Log sous forme de fichier détaillé
+    cout << "* Displaying Game Develop version information :" << endl;
+    GDLogBanner();
 
     //LLVM stuff
-    cout << "Initializing LLVM/Clang..." << endl;
+    cout << "* Initializing LLVM/Clang..." << endl;
     EventsExecutionEngine::EnsureLLVMTargetsInitialization();
-    cout << "Loading required dynamic libraries..." << endl;
+    cout << "* Loading required dynamic libraries..." << endl;
     EventsExecutionEngine::LoadDynamicLibraries();
 
     //Events compiler setup
-    cout << "Setting up events compiler..." << endl;
+    cout << "* Setting up events compiler..." << endl;
     wxString eventsCompilerTempDir;
     if ( Config->Read("/Dossier/EventsCompilerTempDir", &eventsCompilerTempDir) && !eventsCompilerTempDir.empty() )
         EventsCodeCompiler::GetInstance()->SetWorkingDirectory(ToString(eventsCompilerTempDir));
@@ -283,7 +281,7 @@ bool Game_Develop_EditorApp::OnInit()
         EventsCodeCompiler::GetInstance()->SetWorkingDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
 
     //Load extensions
-    cout << "Loading extensions" << endl;
+    cout << "* Loading extensions:" << endl;
     bool loadExtensions = true;
 
     #if defined(RELEASE)
@@ -312,7 +310,7 @@ bool Game_Develop_EditorApp::OnInit()
     wxSetAssertHandler(NULL); //Don't want to have annoying assert dialogs in release
     #endif
 
-    cout << "Loading extensions : End" << endl;
+    cout << "* Extensions loading ended." << endl;
     wxFileSystem::AddHandler( new wxZipFSHandler );
 
     //Welcome window
@@ -334,7 +332,7 @@ bool Game_Develop_EditorApp::OnInit()
     }
 
     //Creating main window
-    cout << "Creating main window" << endl;
+    cout << "* Creating main window" << endl;
     mainEditor = new Game_Develop_EditorFrame( 0, filesToOpen.empty() && !openRecupFiles );
     SetTopWindow( mainEditor );
 
@@ -353,13 +351,13 @@ bool Game_Develop_EditorApp::OnInit()
         }
     }
 
-    cout << "Connecting shortcuts" << endl;
+    cout << "* Connecting shortcuts" << endl;
     Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(Game_Develop_EditorApp::OnKeyPressed));
 
-    cout << "Loading events editor configuration" << endl;
+    cout << "* Loading events editor configuration" << endl;
     TranslateAction::GetInstance()->LoadTypesFormattingFromConfig();
 
-    cout << "Loading events code compiler configuration" << endl;
+    cout << "* Loading events code compiler configuration" << endl;
     bool deleteTemporaries;
     if ( Config->Read( _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true) )
         EventsCodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporaries);
@@ -368,6 +366,7 @@ bool Game_Develop_EditorApp::OnInit()
     //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();
     mainEditor->Show();
+    cout << "* Initialization ended." << endl;
 
     //Checking for updates
     {
@@ -389,7 +388,7 @@ bool Game_Develop_EditorApp::OnInit()
         }
     }
 
-    //wxLogWarning("Cette version de Game Develop n'est pas finalisée et n'est utilisable qu'à des fins de tests. Merci de ne pas la redistribuer et d'utiliser la version disponible sur notre site pour toute autre utilisation.");
+    wxLogWarning("Cette version de Game Develop n'est pas finalisée et n'est utilisable qu'à des fins de tests. Merci de ne pas la redistribuer et d'utiliser la version disponible sur notre site pour toute autre utilisation.");
 
 #ifndef RELEASE
     TestResult tr;

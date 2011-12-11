@@ -26217,7 +26217,7 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1315856306 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp
+1323552273 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp
 	<wx/msw/winundef.h>
 	<wx/image.h>
 	<wx/fileconf.h>
@@ -27440,7 +27440,7 @@
 	<wx/string.h>
 	<iostream>
 
-1322946977 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
+1322947526 source:d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp
 	"SceneCanvas.h"
 	<string>
 	<iostream>
@@ -27588,7 +27588,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1322947526 d:\florian\programmation\gamedevelop2\ide\version.h
+1323552273 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

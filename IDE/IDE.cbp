@@ -13,7 +13,7 @@
 				<Option working_dir="bin\debug" />
 				<Option object_output="obj\debug" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option use_console_runner="0" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
@@ -173,7 +173,7 @@
 				<Option working_dir="bin\release" />
 				<Option object_output="obj\release" />
 				<Option type="0" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option host_application="bin\release\GDEditor.exe" />
 				<Option run_host_application_in_terminal="0" />
 				<Option projectLinkerOptionsRelation="2" />
@@ -269,7 +269,7 @@
 				<Option working_dir="bin\dev" />
 				<Option object_output="obj\dev" />
 				<Option type="1" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Compiler>
 					<Add option="-O3" />
@@ -561,6 +561,8 @@
 			<Add directory="CppUnitLite\" />
 			<Add directory="wxstedit\include" />
 		</Compiler>
+		<Unit filename="AdvancedPasteDlg.cpp" />
+		<Unit filename="AdvancedPasteDlg.h" />
 		<Unit filename="AutomatismTypeChoice.cpp" />
 		<Unit filename="AutomatismTypeChoice.h" />
 		<Unit filename="BugReport.cpp">
@@ -1110,6 +1112,7 @@
 					<wxDialog wxs="wxsmith/NewCppFileDlg.wxs" src="NewCppFileDlg.cpp" hdr="NewCppFileDlg.h" fwddecl="0" i18n="1" name="NewCppFileDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/ExtensionBugReportDlg.wxs" src="ExtensionBugReportDlg.cpp" hdr="ExtensionBugReportDlg.h" fwddecl="0" i18n="1" name="ExtensionBugReportDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/EventsEditor.wxs" src="EventsEditor.cpp" hdr="EventsEditor.h" fwddecl="0" i18n="1" name="EventsEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/AdvancedPasteDlg.wxs" src="AdvancedPasteDlg.cpp" hdr="AdvancedPasteDlg.h" fwddecl="0" i18n="1" name="AdvancedPasteDlg" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

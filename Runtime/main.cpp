@@ -22,6 +22,7 @@
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/SceneNameMangler.h"
 #include "GDL/Game.h"
+#include "GDL/RuntimeGame.h"
 #include "GDL/EventsExecutionEngine.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionsLoader.h"
@@ -43,14 +44,15 @@ int main( int argc, char *p_argv[] )
     GDLogBanner();
 
     //Get executable location
-    string executablePath;
+    string fullExecutablePath;
     if ( *p_argv[0] != '/' )
     {
-        executablePath += GetCurrentWorkingDirectory();
-        executablePath += "/";
+        fullExecutablePath += GetCurrentWorkingDirectory();
+        fullExecutablePath += "/";
     }
-    executablePath += p_argv[0];
-    executablePath = executablePath.substr( 0, executablePath.find_last_of( "/" ) );
+    fullExecutablePath += p_argv[0];
+    string executablePath = fullExecutablePath.substr( 0, fullExecutablePath.find_last_of( "/" ) );
+    string executableFilename = fullExecutablePath.find_last_of( "/" ) < fullExecutablePath.length() ? fullExecutablePath.substr( fullExecutablePath.find_last_of( "/" ), fullExecutablePath.length() ) : "";
 
     // For linux, make the executable dir the current working directory
 #ifdef LINUX
@@ -71,9 +73,39 @@ int main( int argc, char *p_argv[] )
 
     //Load game
     RessourcesLoader * exeGD = RessourcesLoader::GetInstance();
-    exeGD->SetExeGD( executablePath+"/gam.egd" );
+    if ( !exeGD->SetExeGD( executablePath+"/"+executableFilename.substr(0, executableFilename.length()-4)+".egd" ) && !exeGD->SetExeGD( executablePath+"/gam.egd" ) )
+    {
+        std::cout << "Failed to properly load executable." << std::endl;
+        return EXIT_FAILURE;
+    }
 
     RuntimeGame game;
+
+    //Display optional loading screen
+    OpenSaveLoadingScreen openLS(game.loadingScreen);
+    openLS.OpenFromString(exeGD->LoadPlainText( "loadingscreen" ));
+
+    unsigned long style = 0;
+    if ( game.loadingScreen.border ) style |= sf::Style::Titlebar;
+    sf::RenderWindow loadingApp( sf::VideoMode( game.loadingScreen.width, game.loadingScreen.height, 32 ), "Chargement en cours...", style );
+    loadingApp.Show(game.loadingScreen.afficher);
+    loadingApp.Clear( sf::Color( 100, 100, 100 ) );
+
+    boost::shared_ptr<sf::Texture> image = boost::shared_ptr<sf::Texture>(exeGD->LoadSFMLTexture( game.loadingScreen.imageFichier ));
+    if ( !game.loadingScreen.smooth ) image->SetSmooth(false);
+
+    sf::Sprite sprite( *image );
+    if ( game.loadingScreen.image )
+    {
+        loadingApp.Draw( sprite );
+    }
+    if ( game.loadingScreen.texte )
+    {
+        sf::Text Chargement( game.loadingScreen.texteChargement, *FontManager::GetInstance()->GetFont("") );
+        Chargement.SetPosition( game.loadingScreen.texteXPos, game.loadingScreen.texteYPos );
+        loadingApp.Draw( Chargement );
+    }
+    loadingApp.Display();
 
     OpenSaveGame openGame( game );
     {
@@ -135,6 +167,8 @@ int main( int argc, char *p_argv[] )
     //Initialize image manager and load always loaded images
     game.imageManager->SetGame( &game );
     game.imageManager->LoadPermanentImages();
+
+    loadingApp.Close();
 
     //Fenêtre de jeu
     sf::RenderWindow window;

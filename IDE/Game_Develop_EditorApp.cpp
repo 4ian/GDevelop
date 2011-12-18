@@ -388,7 +388,7 @@ bool Game_Develop_EditorApp::OnInit()
         }
     }
 
-    wxLogWarning("Cette version de Game Develop n'est pas finalisée et n'est utilisable qu'à des fins de tests. Merci de ne pas la redistribuer et d'utiliser la version disponible sur notre site pour toute autre utilisation.");
+    //wxLogWarning("Cette version de Game Develop n'est pas finalisée et n'est utilisable qu'à des fins de tests. Merci de ne pas la redistribuer et d'utiliser la version disponible sur notre site pour toute autre utilisation.");
 
 #ifndef RELEASE
     TestResult tr;

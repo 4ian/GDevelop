@@ -1256,7 +1256,7 @@ void SceneCanvas::AddObjetSelected(float x, float y)
 
     edittimeRenderer.isMovingObject = false;
 
-    if ( edittimeRenderer.objectToAdd.empty() ) { wxLogMessage( _( "Vous n'avez selectionné aucun objet à ajouter.\nSélectionnez en un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils." ) ); return;}
+    if ( edittimeRenderer.objectToAdd.empty() ) { wxLogMessage( _( "Glissez-déposez les objets depuis la liste des objets. Vous pouvez aussi en sélectionner un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils pour pouvoir ensuite l'ajouter par double clic." ) ); return;}
 
     std::vector<ObjSPtr>::iterator sceneObject = std::find_if(sceneEdited.initialObjects.begin(), sceneEdited.initialObjects.end(), std::bind2nd(ObjectHasName(), edittimeRenderer.objectToAdd));
     std::vector<ObjSPtr>::iterator globalObject = std::find_if(gameEdited.globalObjects.begin(), gameEdited.globalObjects.end(), std::bind2nd(ObjectHasName(), edittimeRenderer.objectToAdd));

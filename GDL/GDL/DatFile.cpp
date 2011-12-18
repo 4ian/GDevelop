@@ -110,11 +110,13 @@ bool DatFile::Create (std::vector<std::string> files, std::string directory, std
     return (true);
 }
 
-////////////////////////////////////////////////////////////
-/// Load the DatFile from a file
-////////////////////////////////////////////////////////////
-void DatFile::Read (std::string source)
+/**
+* Load the DatFile from a file. Return true on success
+*/
+bool DatFile::Read (std::string source)
 {
+    bool success = false;
+
     //The input file stream from which we want informations
     std::ifstream datfile;
     //A file entry in order to push it in the object's std::vector
@@ -140,9 +142,11 @@ void DatFile::Read (std::string source)
         }
         //Since all seems ok, we keep the DAT file name
         m_datfile = source;
+        success = true;
     }
     //Closing the DAT file
     datfile.close();
+    return success;
 }
 
 ////////////////////////////////////////////////////////////

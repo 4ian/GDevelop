@@ -59,6 +59,9 @@ void FullProjectCompiler::LaunchProjectCompilation()
         #warning Unknown OS
     #endif
 
+    std::string winExecutableName = gameToCompile.winExecutableFilename.empty() ? "GameWin.exe" : gameToCompile.winExecutableFilename+".exe";
+    std::string linuxExecutableName = gameToCompile.linuxExecutableFilename.empty() ? "GameLinux" : gameToCompile.linuxExecutableFilename;
+    std::string macExecutableName = gameToCompile.macExecutableFilename.empty() ? "GameMac" : gameToCompile.macExecutableFilename;
 
     diagnosticManager.OnMessage(ToString(_("Lancement de la compilation du projet.")));
     if ( !windowsTarget && !linuxTarget && !macTarget)
@@ -75,7 +78,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     wxString tempDir = GetTempDir();
     ClearDirectory(ToString(tempDir)); //Préparation du répertoire
 
-    //Make sure scene are not being previewed
+    //Make sure scenes are not being previewed
     bool stop = false;
     std::vector<Scene*> sceneWithCompilationPrevented = EventsCodeCompiler::GetInstance()->GetSceneWithCompilationDisallowed();
     for (unsigned int i = 0;i<gameToCompile.scenes.size();++i)
@@ -108,49 +111,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
         }
     }
 
-    //Compile all scene events to bitcode
-    for (unsigned int i = 0;i<gameToCompile.scenes.size();++i)
-    {
-        if ( gameToCompile.scenes[i]->profiler ) gameToCompile.scenes[i]->profiler->profilingActivated = false;
-
-        diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+gameToCompile.scenes[i]->GetName()+_(".")));
-        EventsCodeCompiler::Task task(&gameToCompile, gameToCompile.scenes[i].get());
-        task.compilationForRuntime = true;
-        task.generateBitcodeFileOnly = true;
-        task.optimize = optimize;
-        task.bitCodeFilename = tempDir+"/GDpriv"+SceneNameMangler::GetMangledSceneName(gameToCompile.scenes[i]->GetName())+".ir";
-        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(task);
-
-        wxStopWatch yieldClock;
-        while (EventsCodeCompiler::GetInstance()->EventsBeingCompiled())
-        {
-            if ( yieldClock.Time() > 50 )
-            {
-                wxSafeYield(NULL, true);
-                yieldClock.Start();
-            }
-        }
-
-        if ( !wxFileExists(task.bitCodeFilename) )
-        {
-            diagnosticManager.AddError(ToString(_("La compilation de la scène ")+gameToCompile.scenes[i]->GetName()+_(" a échouée : Rendez vous sur notre site pour nous rapporter cette erreur, en joignant le fichier suivant:\n"+EventsCodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt"+"\n\nSi vous pensez que l'erreur provient d'une extension, contactez le développeur de celle ci.")));
-            diagnosticManager.OnCompilationFailed();
-            return;
-        }
-        else
-            diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+gameToCompile.scenes[i]->GetName()+_(" effectuée avec succès.")));
-
-        resourcesMergingHelper.ExposeResource(task.bitCodeFilename); //Export bitcode file.
-
-        diagnosticManager.OnPercentUpdate( static_cast<float>(i) / static_cast<float>(gameToCompile.scenes.size())*50.0 );
-    }
-
-    //Copie du jeu
+    //Create a separate copy of the game in memory, as we're going to apply it some modifications ( i.e changing resources path )
     Game game = gameToCompile;
-
-    std::string winExecutableName = game.winExecutableFilename.empty() ? "GameWin.exe" : game.winExecutableFilename+".exe";
-    std::string linuxExecutableName = game.linuxExecutableFilename.empty() ? "GameLinux" : game.linuxExecutableFilename;
-    std::string macExecutableName = game.macExecutableFilename.empty() ? "GameMac" : game.macExecutableFilename;
 
     //Prepare resources to copy
     diagnosticManager.OnMessage( ToString( _("Préparation des ressources...") ));
@@ -185,6 +147,43 @@ void FullProjectCompiler::LaunchProjectCompilation()
     //Add global objects resources
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
         game.globalObjects[j]->ExposeResources(resourcesMergingHelper);
+
+    //Compile all scene events to bitcode
+    for (unsigned int i = 0;i<game.scenes.size();++i)
+    {
+        if ( game.scenes[i]->profiler ) game.scenes[i]->profiler->profilingActivated = false;
+
+        diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+game.scenes[i]->GetName()+_(".")));
+        EventsCodeCompiler::Task task(&game, game.scenes[i].get());
+        task.compilationForRuntime = true;
+        task.generateBitcodeFileOnly = true;
+        task.optimize = optimize;
+        task.bitCodeFilename = tempDir+"/GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[i]->GetName())+".ir";
+        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(task);
+
+        wxStopWatch yieldClock;
+        while (EventsCodeCompiler::GetInstance()->EventsBeingCompiled())
+        {
+            if ( yieldClock.Time() > 50 )
+            {
+                wxSafeYield(NULL, true);
+                yieldClock.Start();
+            }
+        }
+
+        if ( !wxFileExists(task.bitCodeFilename) )
+        {
+            diagnosticManager.AddError(ToString(_("La compilation de la scène ")+game.scenes[i]->GetName()+_(" a échouée : Rendez vous sur notre site pour nous rapporter cette erreur, en joignant le fichier suivant:\n"+EventsCodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt"+"\n\nSi vous pensez que l'erreur provient d'une extension, contactez le développeur de celle ci.")));
+            diagnosticManager.OnCompilationFailed();
+            return;
+        }
+        else
+            diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+game.scenes[i]->GetName()+_(" effectuée avec succès.")));
+
+        resourcesMergingHelper.ExposeResource(task.bitCodeFilename); //Export bitcode file.
+
+        diagnosticManager.OnPercentUpdate( static_cast<float>(i) / static_cast<float>(game.scenes.size())*50.0 );
+    }
 
     //Now copy resources
     diagnosticManager.OnMessage( ToString( _("Copie des ressources...") ) );

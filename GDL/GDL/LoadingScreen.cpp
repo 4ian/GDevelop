@@ -5,7 +5,7 @@
 using namespace std;
 
 LoadingScreen::LoadingScreen() :
-afficher(true),
+afficher(false),
 border(true),
 smooth(true),
 width(170),

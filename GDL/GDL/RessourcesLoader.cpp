@@ -12,9 +12,15 @@ using namespace std;
 
 RessourcesLoader * RessourcesLoader::_singleton = NULL;
 
-void RessourcesLoader::SetExeGD(const string & filename)
+bool RessourcesLoader::SetExeGD(const string & filename)
 {
-    ExeGD.Read(filename);
+    if ( ExeGD.Read(filename) )
+    {
+        std::cout << "Resource file set to " << filename << std::endl;
+        return true;
+    }
+
+    return false;
 }
 
 sf::Texture * RessourcesLoader::LoadSFMLTexture(const string & filename)
@@ -25,13 +31,13 @@ sf::Texture * RessourcesLoader::LoadSFMLTexture(const string & filename)
     {
         char* buffer = ExeGD.GetFile(filename);
         if (buffer==NULL)
-            cout << "Erreur lors de la récupération interne de l'image " << filename << endl;
+            cout << "Failed to get the file of a SFML texture from resource file: " << filename << endl;
 
         if (!image->LoadFromMemory(buffer, ExeGD.GetFileSize(filename)))
-            cout << "Erreur lors du chargement interne de l'image" << filename << endl;
+            cout << "Failed to load a SFML texture from resource file: " << filename << endl;
     }
     else if (!image->LoadFromFile(filename)) //Chargement depuis un fichier externe
-        cout << "Erreur lors du chargement externe de l'image " << filename << endl;
+        cout << "Failed to load a SFML texture: " << filename << endl;
 
     return image;
 }
@@ -44,17 +50,17 @@ sf::Font * RessourcesLoader::LoadFont(const string & filename)
     {
         char* buffer = ExeGD.GetFile(filename);
         if (buffer==NULL)
-            cout << "Erreur lors de la récupération interne de la police " << filename << endl;
+            cout << "Failed to get the file of a font from resource file:" << filename << endl;
 
         //TODO : Manage this
         char * fontBuffer = new char[ExeGD.GetFileSize(filename)];
         memcpy(fontBuffer, buffer, ExeGD.GetFileSize(filename));
 
         if (!font->LoadFromMemory(fontBuffer, ExeGD.GetFileSize(filename)))
-            cout << "Erreur lors du chargement interne de la police" << filename << endl;
+            cout << "Failed to load a font from resource file: " << filename << endl;
     }
     else if (!font->LoadFromFile(filename)) //Chargement depuis un fichier externe
-        cout << "Erreur lors du chargement externe de la police " << filename << endl;
+        cout << "Failed to load a font: " << filename << endl;
 
     return font;
 }
@@ -67,13 +73,13 @@ sf::SoundBuffer RessourcesLoader::LoadSoundBuffer( const string & filename )
     {
         char* buffer = ExeGD.GetFile(filename);
         if (buffer==NULL)
-            cout << "Erreur lors de la récupération interne du son " << filename << endl;
+            cout << "Failed to get the file of a sound buffer from resource file: " << filename << endl;
 
         if (!sbuffer.LoadFromMemory(buffer, ExeGD.GetFileSize(filename)))
-            cout << "Erreur lors du chargement interne du son " << filename << endl;
+            cout << "Failed to load a sound buffer from resource file: " << filename << endl;
     }
     else if (!sbuffer.LoadFromFile(filename)) //Chargement depuis un fichier externe
-        cout << "Erreur lors du chargement externe du son " << filename << endl;
+        cout << "Failed to load a sound buffer: " << filename << endl;
 
     return sbuffer;
 }
@@ -86,7 +92,7 @@ std::string RessourcesLoader::LoadPlainText( const string & filename )
     {
         char* buffer = ExeGD.GetFile(filename);
         if (buffer==NULL)
-            cout << "Erreur lors de la récupération interne du fichier " << filename << endl;
+            cout << "Failed to read a file from resource file: " << filename << endl;
 
         text = buffer;
     }
@@ -103,7 +109,7 @@ std::string RessourcesLoader::LoadPlainText( const string & filename )
             file.close();
         }
         else
-            cout << "Erreur lors de la lecture externe du fichier " << filename << endl;
+            cout << "Failed to read a file: " << filename << endl;
     }
 
     return text;
@@ -119,7 +125,7 @@ char* RessourcesLoader::LoadBinaryFile( const string & filename )
     {
         char* buffer = ExeGD.GetFile(filename);
         if (buffer==NULL)
-            cout << "Erreur lors de la récupération interne du fichier " << filename << endl;
+            cout << "Failed to read a binary file from resource file: " << filename << endl;
 
         return buffer;
     }
@@ -147,10 +153,10 @@ Music * RessourcesLoader::LoadMusic( const string & filename )
         music->SetBuffer(ExeGD.GetFile(filename), ExeGD.GetFileSize(filename));
 
         if (!music->OpenFromMemory(ExeGD.GetFileSize(filename)))
-            cout << "Erreur lors du chargement interne de la musique " << filename << endl;
+            cout << "Failed to load a music from resource file: " << filename << endl;
     }
     else if (!music->OpenFromFile(filename)) //Chargement depuis un fichier externe
-        cout << "Erreur lors du chargement externe de la musique " << filename << endl;
+        cout << "Failed to load a music: " << filename << endl;
 
     return music;
 }

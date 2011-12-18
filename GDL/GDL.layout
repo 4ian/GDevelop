@@ -37,8 +37,8 @@
 	<File name="GDL\ArbitraryResourceWorker.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="289" topLine="0" />
 	</File>
-	<File name="GDL\AudioExtension.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="28203" topLine="533" />
+	<File name="GDL\AudioExtension.cpp" open="1" top="1" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="28665" topLine="570" />
 	</File>
 	<File name="GDL\AudioExtension.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="224" topLine="0" />
@@ -311,7 +311,7 @@
 		<Cursor1 position="816" topLine="34" />
 	</File>
 	<File name="GDL\ExtensionsLoader.cpp" open="0" top="0" tabpos="28" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="8656" topLine="228" />
+		<Cursor1 position="4730" topLine="145" />
 	</File>
 	<File name="GDL\ExtensionsLoader.h" open="0" top="0" tabpos="24" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="214" topLine="0" />

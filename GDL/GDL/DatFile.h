@@ -1,3 +1,8 @@
+/**
+ * \file Adapted from the article http://www.sfml-dev.org/wiki/en/tutorials/formatdat
+ * which is itself inspired from archive.gamedev.net/archive/reference/programming/features/pak/index.html
+ */
+
 #ifndef DATFILE_H
 #define DATFILE_H
 
@@ -35,7 +40,7 @@ public :
     ~DatFile (void);
     bool Create (std::vector<std::string> files, std::string directory, std::string destination);
     bool ContainsFile(const std::string & filename);
-    void Read (std::string source);
+    bool Read (std::string source);
     char* GetFile (std::string filename);
     long int GetFileSize (std::string filename);
 };

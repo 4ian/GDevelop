@@ -54,9 +54,10 @@ public:
     int GetBinaryFileSize( const string & filename);
 
     /**
-     * Set the name of the Game Develop Executable to be open
+     * Set the name of the Game Develop Executable to be open.
+     * \return true if file was successfully opened.
      */
-    void SetExeGD( const string & filename );
+    bool SetExeGD( const string & filename );
 
     static RessourcesLoader *GetInstance()
     {

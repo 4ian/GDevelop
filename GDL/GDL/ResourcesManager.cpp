@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/ResourcesManager.h"
 #include "GDL/PropImage.h"
 #include "GDL/CommonTools.h"
@@ -212,7 +217,7 @@ boost::shared_ptr<Resource> ResourcesManager::CreateResource(const std::string &
     }
 
     std::cout << "Bad resource created ( type: " << kind << ")" << std::endl;
-    return boost::shared_ptr<Resource>(new ImageResource);
+    return boost::shared_ptr<Resource>(new Resource);
 }
 
 bool ResourcesManager::HasFolder(const std::string & name) const
@@ -380,7 +385,7 @@ void ImageResource::LoadFromXml(const TiXmlElement * elem)
 {
     alwaysLoaded = elem->Attribute("alwaysLoaded") ? (std::string(elem->Attribute("alwaysLoaded")) == "true" ) : false;
     smooth = elem->Attribute("smoothed") ? (std::string(elem->Attribute("smoothed")) != "false" ) : true;
-    smooth = elem->Attribute("userAdded") ? (std::string(elem->Attribute("userAdded")) != "false" ) : true;
+    userAdded = elem->Attribute("userAdded") ? (std::string(elem->Attribute("userAdded")) != "false" ) : true;
     file = elem->Attribute("file") ? elem->Attribute("file") : "";
 }
 

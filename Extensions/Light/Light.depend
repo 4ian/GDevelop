@@ -13607,7 +13607,7 @@
 
 1236012322 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\smart_ptr\detail\operator_bool.hpp
 
-1320500064 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1324229304 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1313272365 d:\florian\programmation\gamedevelop2\extensions\light\lightobstacleautomatism.h
 	"GDL/Automatism.h"
@@ -15970,7 +15970,7 @@
 	<string>
 	<vector>
 
-1314788991 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
+1322924408 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
 	"GDL/Game.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -16328,7 +16328,7 @@
 	"GDL/XmlMacros.h"
 	<iostream>
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
 1312710621 d:\florian\programmation\gamedevelop2\gdl\gdl\lightweightcommontools.h
 	<sstream>

@@ -15754,7 +15754,7 @@
 	<string>
 	<vector>
 
-1314788991 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
+1322924408 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
 	"GDL/Game.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -16087,7 +16087,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1320500064 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1324229304 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299112181 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 
@@ -16117,7 +16117,7 @@
 	<SFML/Graphics/Texture.hpp>
 	<SFML/Graphics/RenderTarget.hpp>
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
+1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
 1319925345 d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.h
 	<boost/shared_ptr.hpp>

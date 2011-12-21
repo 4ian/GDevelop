@@ -10,7 +10,7 @@
 				<Option output="..\..\Runtime\bin\debug\TextEntryObject.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -40,7 +40,7 @@
 				<Option output="..\..\IDE\bin\debug\Extensions\TextEntryObject.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -109,7 +109,7 @@
 				<Option output="..\..\Runtime\bin\release\TextEntryObject.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -139,7 +139,7 @@
 				<Option output="..\..\IDE\bin\release\Extensions\TextEntryObject.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -208,7 +208,7 @@
 				<Option output="..\..\Runtime\bin\dev\TextEntryObject.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -238,7 +238,7 @@
 				<Option output="..\..\IDE\bin\dev\Extensions\TextEntryObject.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -326,10 +326,10 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl" />
-					<Add option="-lsfml2-audio" />
-					<Add option="-lsfml2-graphics" />
-					<Add option="-lsfml2-window" />
-					<Add option="-lsfml2-system" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -371,10 +371,10 @@
 					<Add option="-s" />
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
-					<Add option="-lsfml2-audio" />
-					<Add option="-lsfml2-graphics" />
-					<Add option="-lsfml2-window" />
-					<Add option="-lsfml2-system" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -414,10 +414,10 @@
 				<Linker>
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
-					<Add option="-lsfml2-audio" />
-					<Add option="-lsfml2-graphics" />
-					<Add option="-lsfml2-window" />
-					<Add option="-lsfml2-system" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -454,10 +454,10 @@
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-lgdl" />
-					<Add option="-lsfml2-audio" />
-					<Add option="-lsfml2-graphics" />
-					<Add option="-lsfml2-window" />
-					<Add option="-lsfml2-system" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />

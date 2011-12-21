@@ -90,7 +90,7 @@ class GD_EXTENSION_API TextEntryObject : public Object
         virtual float GetCenterY() const;
 
         inline void SetString(std::string str) { text = str; };
-        inline std::string GetString() const { return text;};
+        const std::string & GetString() const;
 
         void Activate( bool activate = true ) { activated = activate; };
         bool IsActivated() const { return activated; };

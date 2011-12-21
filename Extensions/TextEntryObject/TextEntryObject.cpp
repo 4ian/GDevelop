@@ -25,6 +25,7 @@ freely, subject to the following restrictions:
 */
 
 #include <SFML/Graphics.hpp>
+#include <string>
 #include "GDL/Object.h"
 
 #include "GDL/ImageManager.h"
@@ -196,6 +197,12 @@ float TextEntryObject::GetCenterX() const
 {
     return 16;
 }
+
+const std::string & TextEntryObject::GetString() const
+{
+    return text;
+};
+
 
 /**
  * Y center is computed with text rectangle

@@ -47,8 +47,6 @@ class Extension : public ExtensionBase
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
-            #if defined(GD_IDE_ONLY)
-
             //Declaration of all objects available
             DECLARE_OBJECT("TextEntry",
                            _("Entrée de texte"),
@@ -57,6 +55,8 @@ class Extension : public ExtensionBase
                            &CreateTextEntryObject,
                            &DestroyTextEntryObject,
                            "TextEntryObject");
+
+            #if defined(GD_IDE_ONLY)
 
                 objInfos.SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
@@ -128,9 +128,9 @@ class Extension : public ExtensionBase
                     instrInfo.cppCallingInformation.SetFunctionName("GetString").SetIncludeFile("TextObject/TextObject.h");
                 DECLARE_END_OBJECT_STR_EXPRESSION()
 
+            #endif
             DECLARE_END_OBJECT()
 
-            #endif
 
             CompleteCompilationInformation();
         };

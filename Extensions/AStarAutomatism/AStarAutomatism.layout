@@ -2,7 +2,7 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
 	<File name="AStarAutomatism.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2846" topLine="75" />
+		<Cursor1 position="4133" topLine="112" />
 	</File>
 	<File name="AStarAutomatism.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="6567" topLine="165" />
@@ -14,7 +14,7 @@
 		<Cursor1 position="1874" topLine="39" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2319" topLine="40" />
+		<Cursor1 position="1806" topLine="37" />
 	</File>
 	<File name="MapSearchNode.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1184" topLine="30" />

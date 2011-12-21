@@ -43,7 +43,7 @@ class Extension : public ExtensionBase
         {
             DECLARE_THE_EXTENSION("AStarAutomatism",
                                   _("Automatisme de recherche de chemin ( Pathfinding A* )"),
-                                  _("Automatisme permettant de déplacer les objets en évitant les obstacles"),
+                                  _("Automatisme permettant de déplacer les objets en évitant les obstacles."),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 

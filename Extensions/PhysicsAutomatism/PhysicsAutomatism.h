@@ -31,8 +31,11 @@ freely, subject to the following restrictions:
 #include "GDL/Object.h"
 #include "ScenePhysicsDatas.h"
 #include <boost/weak_ptr.hpp>
+#include "SFML/Config.hpp"
+#include "SFML/System/Vector2.hpp"
 #include <iostream>
 #include <map>
+#include <vector>
 #include <set>
 class TiXmlElement;
 class RuntimeScene;
@@ -107,6 +110,27 @@ class GD_EXTENSION_API PhysicsAutomatism : public Automatism
         double GetLinearDamping( const RuntimeScene & scene);
         double GetAngularDamping( const RuntimeScene & scene);
 
+        void SetPolygonCoords(const std::vector<sf::Vector2f>&);
+        const std::vector<sf::Vector2f>& GetPolygonCoords() const;
+
+        /**
+        Return a string representing the coordinates vector.
+        \param vec the vector containing coordinates
+        \param coordsSep the separator between coordinates
+        \param composantSep the separator between the X and Y composant of a coordinate
+        \return a std::string representing the vector
+        */
+        static std::string GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec, char coordsSep = '\n', char composantSep = ';');
+
+        /**
+        Return a vector created with a string containing coordinates
+        \param str the string
+        \param coordsSep the separator between coordinates
+        \param composantSep the separator between the X and Y composant of a coordinate
+        \return a std::vector< sf::Vector2f >
+        */
+        static std::vector<sf::Vector2f> GetCoordsVectorFromString(const std::string &str, char coordsSep = '\n', char composantSep = ';');
+
         bool CollisionWith( const std::string & , std::map <std::string, std::vector<Object*> *> otherObjectsLists, RuntimeScene & scene);
 
         static std::map < const Scene* , ScenePhysicsDatas > scenesPhysicsDatas; ///< Static map associating scene to datas
@@ -116,7 +140,9 @@ class GD_EXTENSION_API PhysicsAutomatism : public Automatism
         virtual void DoStepPostEvents(RuntimeScene & scene);
         void CreateBody(const RuntimeScene & scene);
 
-        enum ShapeType {Box, Circle} shapeType;
+        enum ShapeType {Box, Circle, CustomPolygon} shapeType; ///< the kind of hitbox -> Box, Circle or CustomPolygon
+        std::vector<sf::Vector2f> polygonCoords; ///< The list of coordinates of the collision polygon
+
         bool dynamic; ///< Is the object static or dynamic
         bool fixedRotation; ///< Is the rotation fixed or not
         bool isBullet; ///< True if the object as to be considered as a bullet ( for better collision handling )

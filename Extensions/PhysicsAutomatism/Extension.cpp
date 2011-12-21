@@ -23,6 +23,10 @@ freely, subject to the following restrictions:
     distribution.
 
 */
+/** \author
+ * Contributors to the extension:
+ * Victor Levasseur ( Collisions using custom polygons )
+ */
 
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"

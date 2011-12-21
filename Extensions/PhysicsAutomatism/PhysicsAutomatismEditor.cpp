@@ -44,10 +44,14 @@ freely, subject to the following restrictions:
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 
+#include "CustomPolygonDialog.h"
+
 //(*IdInit(PhysicsAutomatismEditor)
 const long PhysicsAutomatismEditor::ID_STATICTEXT11 = wxNewId();
 const long PhysicsAutomatismEditor::ID_RADIOBUTTON1 = wxNewId();
 const long PhysicsAutomatismEditor::ID_RADIOBUTTON2 = wxNewId();
+const long PhysicsAutomatismEditor::ID_RADIOBUTTON3 = wxNewId();
+const long PhysicsAutomatismEditor::ID_BUTTON3 = wxNewId();
 const long PhysicsAutomatismEditor::ID_CHECKBOX1 = wxNewId();
 const long PhysicsAutomatismEditor::ID_CHECKBOX3 = wxNewId();
 const long PhysicsAutomatismEditor::ID_CHECKBOX2 = wxNewId();
@@ -98,6 +102,7 @@ mainEditorCommand(mainEditorCommand_)
 	wxFlexGridSizer* FlexGridSizer7;
 	wxFlexGridSizer* FlexGridSizer8;
 	wxBoxSizer* BoxSizer1;
+	wxFlexGridSizer* FlexGridSizer13;
 	wxFlexGridSizer* FlexGridSizer12;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
@@ -109,14 +114,21 @@ mainEditorCommand(mainEditorCommand_)
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Paramètres initiaux"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
-	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer5->AddGrowableCol(0);
 	StaticText11 = new wxStaticText(this, ID_STATICTEXT11, _("Forme du masque de collision :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
-	FlexGridSizer5->Add(StaticText11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer5->Add(StaticText11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer13 = new wxFlexGridSizer(0, 4, 0, 0);
 	rectCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("Rectangle"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
 	rectCheck->SetValue(true);
-	FlexGridSizer5->Add(rectCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer13->Add(rectCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	circleCheck = new wxRadioButton(this, ID_RADIOBUTTON2, _("Cercle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
-	FlexGridSizer5->Add(circleCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer13->Add(circleCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	polygonCheck = new wxRadioButton(this, ID_RADIOBUTTON3, _("Polygone personnalisé"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON3"));
+	FlexGridSizer13->Add(polygonCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	polygonBt = new wxButton(this, ID_BUTTON3, _("Définir la forme..."), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	FlexGridSizer13->Add(polygonBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer5->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
 	staticCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Objet statique"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
@@ -207,21 +219,22 @@ mainEditorCommand(mainEditorCommand_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
+	Connect(ID_RADIOBUTTON1,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&PhysicsAutomatismEditor::OnrectCheckSelect);
+	Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&PhysicsAutomatismEditor::OncircleCheckSelect);
+	Connect(ID_RADIOBUTTON3,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&PhysicsAutomatismEditor::OnpolygonCheckSelect);
+	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PhysicsAutomatismEditor::OnpolygonBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PhysicsAutomatismEditor::OnokBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PhysicsAutomatismEditor::OncancelBtClick);
 	//*)
 
     //Setup object datas
-	if ( automatism.shapeType == PhysicsAutomatism::Circle )
-	{
-	    rectCheck->SetValue(false);
-	    circleCheck->SetValue(true);
-	}
-	else
-	{
-	    rectCheck->SetValue(true);
-	    circleCheck->SetValue(false);
-	}
+    rectCheck->SetValue(automatism.shapeType == PhysicsAutomatism::Box);
+    circleCheck->SetValue(automatism.shapeType == PhysicsAutomatism::Circle);
+    polygonCheck->SetValue(automatism.shapeType == PhysicsAutomatism::CustomPolygon);
+    polygonBt->Enable(polygonCheck->GetValue());
+
+	coordsVector = automatism.GetPolygonCoords();
+
 	staticCheck->SetValue(!automatism.dynamic);
 	fixedRotationCheck->SetValue(automatism.fixedRotation);
 	massDensityEdit->SetValue(ToString(automatism.massDensity));
@@ -268,8 +281,12 @@ void PhysicsAutomatismEditor::OnokBtClick(wxCommandEvent& event)
 {
     if ( circleCheck->GetValue() )
         automatism.shapeType = PhysicsAutomatism::Circle;
-    else
+    else if( rectCheck->GetValue() )
         automatism.shapeType = PhysicsAutomatism::Box;
+    else
+        automatism.shapeType = PhysicsAutomatism::CustomPolygon;
+
+    automatism.SetPolygonCoords(coordsVector);
 
     automatism.dynamic = !staticCheck->GetValue();
     automatism.fixedRotation = fixedRotationCheck->GetValue();
@@ -287,4 +304,27 @@ void PhysicsAutomatismEditor::OnokBtClick(wxCommandEvent& event)
 
     EndModal(1);
 }
+
+void PhysicsAutomatismEditor::OnpolygonCheckSelect(wxCommandEvent& event)
+{
+    polygonBt->Enable(polygonCheck->GetValue());
+}
+
+void PhysicsAutomatismEditor::OncircleCheckSelect(wxCommandEvent& event)
+{
+    polygonBt->Enable(polygonCheck->GetValue());
+}
+
+void PhysicsAutomatismEditor::OnrectCheckSelect(wxCommandEvent& event)
+{
+    polygonBt->Enable(polygonCheck->GetValue());
+}
+
+void PhysicsAutomatismEditor::OnpolygonBtClick(wxCommandEvent& event)
+{
+    CustomPolygonDialog dialog(this, coordsVector);
+    dialog.ShowModal();
+    coordsVector = dialog.coordsVec;
+}
+
 #endif

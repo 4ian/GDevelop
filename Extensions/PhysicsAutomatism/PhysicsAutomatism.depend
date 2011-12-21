@@ -9197,84 +9197,84 @@
 1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
 	"GDL/btScalar.h"
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2circleshape.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2circleshape.cpp
 	<Box2D/Collision/Shapes/b2CircleShape.h>
 	<new>
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2circleshape.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2circleshape.h
 	<Box2D/Collision/Shapes/b2Shape.h>
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2shape.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2shape.h
 	<Box2D/Common/b2BlockAllocator.h>
 	<Box2D/Common/b2Math.h>
 	<Box2D/Collision/b2Collision.h>
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2blockallocator.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2blockallocator.h
 	<Box2D/Common/b2Settings.h>
 
-1304014800 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2settings.h
+1324460538 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2settings.h
 	<cassert>
 	<cmath>
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2math.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2math.h
 	<Box2D/Common/b2Settings.h>
 	<cmath>
 	<cfloat>
 	<cstddef>
 	<limits>
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collision.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collision.h
 	<Box2D/Common/b2Math.h>
 	<climits>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2polygonshape.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2polygonshape.cpp
 	<Box2D/Collision/Shapes/b2PolygonShape.h>
 	<new>
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2polygonshape.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2polygonshape.h
 	<Box2D/Collision/Shapes/b2Shape.h>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2broadphase.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2broadphase.cpp
 	<Box2D/Collision/b2BroadPhase.h>
 	<cstring>
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2broadphase.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2broadphase.h
 	<Box2D/Common/b2Settings.h>
 	<Box2D/Collision/b2Collision.h>
 	<Box2D/Collision/b2DynamicTree.h>
 	<algorithm>
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2dynamictree.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2dynamictree.h
 	<Box2D/Collision/b2Collision.h>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collidecircle.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collidecircle.cpp
 	<Box2D/Collision/b2Collision.h>
 	<Box2D/Collision/Shapes/b2CircleShape.h>
 	<Box2D/Collision/Shapes/b2PolygonShape.h>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collidepolygon.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collidepolygon.cpp
 	<Box2D/Collision/b2Collision.h>
 	<Box2D/Collision/Shapes/b2PolygonShape.h>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collision.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collision.cpp
 	<Box2D/Collision/b2Collision.h>
 	<Box2D/Collision/b2Distance.h>
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2distance.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2distance.h
 	<Box2D/Common/b2Math.h>
 	<climits>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2distance.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2distance.cpp
 	<Box2D/Collision/b2Distance.h>
 	<Box2D/Collision/Shapes/b2CircleShape.h>
 	<Box2D/Collision/Shapes/b2PolygonShape.h>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2dynamictree.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2dynamictree.cpp
 	<Box2D/Collision/b2DynamicTree.h>
 	<cstring>
 	<cfloat>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2timeofimpact.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2timeofimpact.cpp
 	<Box2D/Collision/b2Collision.h>
 	<Box2D/Collision/b2Distance.h>
 	<Box2D/Collision/b2TimeOfImpact.h>
@@ -9282,30 +9282,30 @@
 	<Box2D/Collision/Shapes/b2PolygonShape.h>
 	<cstdio>
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2timeofimpact.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2timeofimpact.h
 	<Box2D/Common/b2Math.h>
 	<Box2D/Collision/b2Distance.h>
 	<climits>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2blockallocator.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2blockallocator.cpp
 	<Box2D/Common/b2BlockAllocator.h>
 	<cstdlib>
 	<climits>
 	<cstring>
 	<memory>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2math.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2math.cpp
 	<Box2D/Common/b2Math.h>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2settings.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2settings.cpp
 	<Box2D/Common/b2Settings.h>
 	<cstdlib>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2stackallocator.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2stackallocator.cpp
 	<Box2D/Common/b2StackAllocator.h>
 	<Box2D/Common/b2Math.h>
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2stackallocator.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\common\b2stackallocator.h
 	<Box2D/Common/b2Settings.h>
 
 1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2circlecontact.cpp
@@ -9545,7 +9545,7 @@
 	<Box2D/Dynamics/Joints/b2Joint.h>
 	<Box2D/Common/b2StackAllocator.h>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2world.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2world.cpp
 	<Box2D/Dynamics/b2World.h>
 	<Box2D/Dynamics/b2Body.h>
 	<Box2D/Dynamics/b2Fixture.h>
@@ -9561,18 +9561,18 @@
 	<Box2D/Collision/b2TimeOfImpact.h>
 	<new>
 
-1279391003 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2worldcallbacks.cpp
+1279391002 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2worldcallbacks.cpp
 	<Box2D/Dynamics/b2WorldCallbacks.h>
 	<Box2D/Dynamics/b2Fixture.h>
 
-1282160533 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\contactlistener.cpp
+1282160532 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\contactlistener.cpp
 	"ContactListener.h"
 	"PhysicsAutomatism.h"
 
 1282161160 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\contactlistener.h
 	"Box2D/Box2D.h"
 
-1279391003 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\box2d.h
+1279391002 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\box2d\box2d\box2d\box2d.h
 	<Box2D/Common/b2Settings.h>
 	<Box2D/Collision/Shapes/b2CircleShape.h>
 	<Box2D/Collision/Shapes/b2PolygonShape.h>
@@ -9596,13 +9596,16 @@
 	<Box2D/Dynamics/Joints/b2RevoluteJoint.h>
 	<Box2D/Dynamics/Joints/b2WeldJoint.h>
 
-1315737216 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.h
+1324460256 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.h
 	"GDL/Automatism.h"
 	"GDL/Object.h"
 	"ScenePhysicsDatas.h"
 	<boost/weak_ptr.hpp>
+	"SFML/Config.hpp"
+	"SFML/System/Vector2.hpp"
 	<iostream>
 	<map>
+	<vector>
 	<set>
 
 1308398453 d:\florian\programmation\gamedevelop2\gdl\gdl\automatism.h
@@ -16416,7 +16419,7 @@
 1309119157 d:\florian\programmation\gamedevelop2\gdl\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1311278679 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\scenephysicsdatas.h
+1311278678 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\scenephysicsdatas.h
 	"GDL/AutomatismsSharedDatas.h"
 	"RuntimeScenePhysicsDatas.h"
 	<iostream>
@@ -16557,7 +16560,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1315737615 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\extension.cpp
+1315737614 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"PhysicsAutomatism.h"
@@ -16573,7 +16576,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1324229304 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1324230448 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299112181 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 
@@ -16620,7 +16623,7 @@
 
 1255632386 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\interprocess\detail\config_end.hpp
 
-1314629489 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp
+1324475850 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp
 	"PhysicsAutomatismEditor.h"
 	<wx/msw/winundef.h>
 	<wx/intl.h>
@@ -16632,8 +16635,9 @@
 	"GDL/MainEditorCommand.h"
 	"GDL/CommonTools.h"
 	"GDL/Scene.h"
+	"CustomPolygonDialog.h"
 
-1312716153 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.h
+1324387712 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.h
 	<wx/msw/winundef.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -16643,6 +16647,8 @@
 	<wx/radiobut.h>
 	<wx/button.h>
 	<wx/dialog.h>
+	<vector>
+	"SFML/System/Vector2.hpp"
 	<wx/msw/winundef.h>
 	<boost/shared_ptr.hpp>
 
@@ -16749,13 +16755,16 @@
 
 1297520343 d:\florian\programmation\gamedevelop2\gdl\gdl\xmlmacros.h
 
-1315737216 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.cpp
+1324460402 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.cpp
 	"PhysicsAutomatism.h"
 	"Box2D/Box2D.h"
+	"Triangulation/triangulate.h"
 	"GDL/RuntimeScene.h"
 	"GDL/tinyxml.h"
 	"GDL/XmlMacros.h"
 	"PhysicsAutomatismEditor.h"
+	"GDL/CommonTools.h"
+	<string>
 
 1312710621 d:\florian\programmation\gamedevelop2\gdl\gdl\lightweightcommontools.h
 	<sstream>
@@ -16789,4 +16798,5413 @@
 	<boost/shared_ptr.hpp>
 	<vector>
 	<string>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2circleshape.cpp
+	<Box2D/Collision/Shapes/b2CircleShape.h>
+	<new>
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2circleshape.h
+	<Box2D/Collision/Shapes/b2Shape.h>
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2shape.h
+	<Box2D/Common/b2BlockAllocator.h>
+	<Box2D/Common/b2Math.h>
+	<Box2D/Collision/b2Collision.h>
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\common\b2blockallocator.h
+	<Box2D/Common/b2Settings.h>
+
+1324395307 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\common\b2settings.h
+	<cassert>
+	<cmath>
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\common\b2math.h
+	<Box2D/Common/b2Settings.h>
+	<cmath>
+	<cfloat>
+	<cstddef>
+	<limits>
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collision.h
+	<Box2D/Common/b2Math.h>
+	<climits>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2polygonshape.cpp
+	<Box2D/Collision/Shapes/b2PolygonShape.h>
+	<new>
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\shapes\b2polygonshape.h
+	<Box2D/Collision/Shapes/b2Shape.h>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2broadphase.cpp
+	<Box2D/Collision/b2BroadPhase.h>
+	<cstring>
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2broadphase.h
+	<Box2D/Common/b2Settings.h>
+	<Box2D/Collision/b2Collision.h>
+	<Box2D/Collision/b2DynamicTree.h>
+	<algorithm>
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2dynamictree.h
+	<Box2D/Collision/b2Collision.h>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collidecircle.cpp
+	<Box2D/Collision/b2Collision.h>
+	<Box2D/Collision/Shapes/b2CircleShape.h>
+	<Box2D/Collision/Shapes/b2PolygonShape.h>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collidepolygon.cpp
+	<Box2D/Collision/b2Collision.h>
+	<Box2D/Collision/Shapes/b2PolygonShape.h>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2collision.cpp
+	<Box2D/Collision/b2Collision.h>
+	<Box2D/Collision/b2Distance.h>
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2distance.h
+	<Box2D/Common/b2Math.h>
+	<climits>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2distance.cpp
+	<Box2D/Collision/b2Distance.h>
+	<Box2D/Collision/Shapes/b2CircleShape.h>
+	<Box2D/Collision/Shapes/b2PolygonShape.h>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2dynamictree.cpp
+	<Box2D/Collision/b2DynamicTree.h>
+	<cstring>
+	<cfloat>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2timeofimpact.cpp
+	<Box2D/Collision/b2Collision.h>
+	<Box2D/Collision/b2Distance.h>
+	<Box2D/Collision/b2TimeOfImpact.h>
+	<Box2D/Collision/Shapes/b2CircleShape.h>
+	<Box2D/Collision/Shapes/b2PolygonShape.h>
+	<cstdio>
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\collision\b2timeofimpact.h
+	<Box2D/Common/b2Math.h>
+	<Box2D/Collision/b2Distance.h>
+	<climits>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\common\b2blockallocator.cpp
+	<Box2D/Common/b2BlockAllocator.h>
+	<cstdlib>
+	<climits>
+	<cstring>
+	<memory>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\common\b2math.cpp
+	<Box2D/Common/b2Math.h>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\common\b2settings.cpp
+	<Box2D/Common/b2Settings.h>
+	<cstdlib>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\common\b2stackallocator.cpp
+	<Box2D/Common/b2StackAllocator.h>
+	<Box2D/Common/b2Math.h>
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\common\b2stackallocator.h
+	<Box2D/Common/b2Settings.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2circlecontact.cpp
+	<Box2D/Dynamics/Contacts/b2CircleContact.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Dynamics/b2WorldCallbacks.h>
+	<Box2D/Common/b2BlockAllocator.h>
+	<Box2D/Collision/b2TimeOfImpact.h>
+	<new>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2circlecontact.h
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2contact.h
+	<Box2D/Common/b2Math.h>
+	<Box2D/Collision/b2Collision.h>
+	<Box2D/Collision/Shapes/b2Shape.h>
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+	<Box2D/Dynamics/b2Fixture.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2fixture.h
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Collision/b2Collision.h>
+	<Box2D/Collision/Shapes/b2Shape.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2body.h
+	<Box2D/Common/b2Math.h>
+	<Box2D/Collision/Shapes/b2Shape.h>
+	<memory>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2worldcallbacks.h
+	<Box2D/Common/b2Settings.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2contact.cpp
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+	<Box2D/Dynamics/Contacts/b2CircleContact.h>
+	<Box2D/Dynamics/Contacts/b2PolygonAndCircleContact.h>
+	<Box2D/Dynamics/Contacts/b2PolygonContact.h>
+	<Box2D/Dynamics/Contacts/b2ContactSolver.h>
+	<Box2D/Collision/b2Collision.h>
+	<Box2D/Collision/b2TimeOfImpact.h>
+	<Box2D/Collision/Shapes/b2Shape.h>
+	<Box2D/Common/b2BlockAllocator.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Dynamics/b2World.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2polygonandcirclecontact.h
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2polygoncontact.h
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2contactsolver.h
+	<Box2D/Common/b2Math.h>
+	<Box2D/Collision/b2Collision.h>
+	<Box2D/Dynamics/b2Island.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2island.h
+	<Box2D/Common/b2Math.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2TimeStep.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2timestep.h
+	<Box2D/Common/b2Settings.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2world.h
+	<Box2D/Common/b2Math.h>
+	<Box2D/Common/b2BlockAllocator.h>
+	<Box2D/Common/b2StackAllocator.h>
+	<Box2D/Dynamics/b2ContactManager.h>
+	<Box2D/Dynamics/b2WorldCallbacks.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2contactmanager.h
+	<Box2D/Collision/b2BroadPhase.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2contactsolver.cpp
+	<Box2D/Dynamics/Contacts/b2ContactSolver.h>
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Dynamics/b2World.h>
+	<Box2D/Common/b2StackAllocator.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2polygonandcirclecontact.cpp
+	<Box2D/Dynamics/Contacts/b2PolygonAndCircleContact.h>
+	<Box2D/Common/b2BlockAllocator.h>
+	<Box2D/Collision/b2TimeOfImpact.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Dynamics/b2WorldCallbacks.h>
+	<new>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2polygoncontact.cpp
+	<Box2D/Dynamics/Contacts/b2PolygonContact.h>
+	<Box2D/Common/b2BlockAllocator.h>
+	<Box2D/Collision/b2TimeOfImpact.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Dynamics/b2WorldCallbacks.h>
+	<new>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2toisolver.cpp
+	<Box2D/Dynamics/Contacts/b2TOISolver.h>
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Common/b2StackAllocator.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\contacts\b2toisolver.h
+	<Box2D/Common/b2Math.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2distancejoint.cpp
+	<Box2D/Dynamics/Joints/b2DistanceJoint.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2TimeStep.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2distancejoint.h
+	<Box2D/Dynamics/Joints/b2Joint.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2joint.h
+	<Box2D/Common/b2Math.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2frictionjoint.cpp
+	<Box2D/Dynamics/Joints/b2FrictionJoint.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2TimeStep.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2frictionjoint.h
+	<Box2D/Dynamics/Joints/b2Joint.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2gearjoint.cpp
+	<Box2D/Dynamics/Joints/b2GearJoint.h>
+	<Box2D/Dynamics/Joints/b2RevoluteJoint.h>
+	<Box2D/Dynamics/Joints/b2PrismaticJoint.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2TimeStep.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2gearjoint.h
+	<Box2D/Dynamics/Joints/b2Joint.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2revolutejoint.h
+	<Box2D/Dynamics/Joints/b2Joint.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2prismaticjoint.h
+	<Box2D/Dynamics/Joints/b2Joint.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2joint.cpp
+	<Box2D/Dynamics/Joints/b2Joint.h>
+	<Box2D/Dynamics/Joints/b2DistanceJoint.h>
+	<Box2D/Dynamics/Joints/b2LineJoint.h>
+	<Box2D/Dynamics/Joints/b2MouseJoint.h>
+	<Box2D/Dynamics/Joints/b2RevoluteJoint.h>
+	<Box2D/Dynamics/Joints/b2PrismaticJoint.h>
+	<Box2D/Dynamics/Joints/b2PulleyJoint.h>
+	<Box2D/Dynamics/Joints/b2GearJoint.h>
+	<Box2D/Dynamics/Joints/b2WeldJoint.h>
+	<Box2D/Dynamics/Joints/b2FrictionJoint.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2World.h>
+	<Box2D/Common/b2BlockAllocator.h>
+	<new>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2linejoint.h
+	<Box2D/Dynamics/Joints/b2Joint.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2mousejoint.h
+	<Box2D/Dynamics/Joints/b2Joint.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2pulleyjoint.h
+	<Box2D/Dynamics/Joints/b2Joint.h>
+
+1279391002 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2weldjoint.h
+	<Box2D/Dynamics/Joints/b2Joint.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2linejoint.cpp
+	<Box2D/Dynamics/Joints/b2LineJoint.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2TimeStep.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2mousejoint.cpp
+	<Box2D/Dynamics/Joints/b2MouseJoint.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2TimeStep.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2prismaticjoint.cpp
+	<Box2D/Dynamics/Joints/b2PrismaticJoint.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2TimeStep.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2pulleyjoint.cpp
+	<Box2D/Dynamics/Joints/b2PulleyJoint.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2TimeStep.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2revolutejoint.cpp
+	<Box2D/Dynamics/Joints/b2RevoluteJoint.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2TimeStep.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\joints\b2weldjoint.cpp
+	<Box2D/Dynamics/Joints/b2WeldJoint.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2TimeStep.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2body.cpp
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Dynamics/b2World.h>
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+	<Box2D/Dynamics/Joints/b2Joint.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2contactmanager.cpp
+	<Box2D/Dynamics/b2ContactManager.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Dynamics/b2WorldCallbacks.h>
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2fixture.cpp
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+	<Box2D/Collision/Shapes/b2CircleShape.h>
+	<Box2D/Collision/Shapes/b2PolygonShape.h>
+	<Box2D/Collision/b2BroadPhase.h>
+	<Box2D/Collision/b2Collision.h>
+	<Box2D/Common/b2BlockAllocator.h>
+
+1279391002 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2island.cpp
+	<Box2D/Dynamics/b2Island.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Dynamics/b2World.h>
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+	<Box2D/Dynamics/Contacts/b2ContactSolver.h>
+	<Box2D/Dynamics/Joints/b2Joint.h>
+	<Box2D/Common/b2StackAllocator.h>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2world.cpp
+	<Box2D/Dynamics/b2World.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Dynamics/b2Island.h>
+	<Box2D/Dynamics/Joints/b2PulleyJoint.h>
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+	<Box2D/Dynamics/Contacts/b2ContactSolver.h>
+	<Box2D/Dynamics/Contacts/b2TOISolver.h>
+	<Box2D/Collision/b2Collision.h>
+	<Box2D/Collision/b2BroadPhase.h>
+	<Box2D/Collision/Shapes/b2CircleShape.h>
+	<Box2D/Collision/Shapes/b2PolygonShape.h>
+	<Box2D/Collision/b2TimeOfImpact.h>
+	<new>
+
+1279391003 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\dynamics\b2worldcallbacks.cpp
+	<Box2D/Dynamics/b2WorldCallbacks.h>
+	<Box2D/Dynamics/b2Fixture.h>
+
+1282160533 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\contactlistener.cpp
+	"ContactListener.h"
+	"PhysicsAutomatism.h"
+
+1282161160 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\contactlistener.h
+	"Box2D/Box2D.h"
+
+1279391003 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\box2d\box2d\box2d\box2d.h
+	<Box2D/Common/b2Settings.h>
+	<Box2D/Collision/Shapes/b2CircleShape.h>
+	<Box2D/Collision/Shapes/b2PolygonShape.h>
+	<Box2D/Collision/b2BroadPhase.h>
+	<Box2D/Collision/b2Distance.h>
+	<Box2D/Collision/b2DynamicTree.h>
+	<Box2D/Collision/b2TimeOfImpact.h>
+	<Box2D/Dynamics/b2Body.h>
+	<Box2D/Dynamics/b2Fixture.h>
+	<Box2D/Dynamics/b2WorldCallbacks.h>
+	<Box2D/Dynamics/b2TimeStep.h>
+	<Box2D/Dynamics/b2World.h>
+	<Box2D/Dynamics/Contacts/b2Contact.h>
+	<Box2D/Dynamics/Joints/b2DistanceJoint.h>
+	<Box2D/Dynamics/Joints/b2FrictionJoint.h>
+	<Box2D/Dynamics/Joints/b2GearJoint.h>
+	<Box2D/Dynamics/Joints/b2LineJoint.h>
+	<Box2D/Dynamics/Joints/b2MouseJoint.h>
+	<Box2D/Dynamics/Joints/b2PrismaticJoint.h>
+	<Box2D/Dynamics/Joints/b2PulleyJoint.h>
+	<Box2D/Dynamics/Joints/b2RevoluteJoint.h>
+	<Box2D/Dynamics/Joints/b2WeldJoint.h>
+
+1324460256 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\physicsautomatism.h
+	"GDL/Automatism.h"
+	"GDL/Object.h"
+	"ScenePhysicsDatas.h"
+	<boost/weak_ptr.hpp>
+	"SFML/Config.hpp"
+	"SFML/System/Vector2.hpp"
+	<iostream>
+	<map>
+	<vector>
+	<set>
+
+1308398453 d:\développement\gd2\gdlsdk\gdl\gdl\automatism.h
+	<boost/shared_ptr.hpp>
+	<string>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\shared_ptr.hpp
+	<boost/smart_ptr/shared_ptr.hpp>
+
+1260812659 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\shared_ptr.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/shared_ptr_nmt.hpp>
+	<boost/config/no_tr1/memory.hpp>
+	<boost/assert.hpp>
+	<boost/checked_delete.hpp>
+	<boost/throw_exception.hpp>
+	<boost/smart_ptr/detail/shared_count.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/smart_ptr/detail/sp_convertible.hpp>
+	<boost/smart_ptr/detail/spinlock_pool.hpp>
+	<boost/memory_order.hpp>
+	<algorithm>
+	<functional>
+	<typeinfo>
+	<iosfwd>
+	<ostream>
+	<boost/smart_ptr/detail/operator_bool.hpp>
+
+1299112181 d:\développement\gd2\gdlsdk\extlibs\boost\boost\config.hpp
+	<boost/config/select_compiler_config.hpp>
+	<boost/config/select_stdlib_config.hpp>
+	<boost/config/select_platform_config.hpp>
+	<boost/config/suffix.hpp>
+
+1296302943 d:\développement\gd2\gdlsdk\extlibs\boost\boost\config\select_compiler_config.hpp
+
+1299503250 d:\développement\gd2\gdlsdk\extlibs\boost\boost\config\select_stdlib_config.hpp
+	<cstddef>
+	<boost/config/no_tr1/utility.hpp>
+
+1129736320 d:\développement\gd2\gdlsdk\extlibs\boost\boost\config\no_tr1\utility.hpp
+	<utility>
+
+1285921184 d:\développement\gd2\gdlsdk\extlibs\boost\boost\config\select_platform_config.hpp
+	<boost/config/posix_features.hpp>
+
+1129295786 d:\développement\gd2\gdlsdk\extlibs\boost\boost\config\posix_features.hpp
+	<unistd.h>
+
+1299503250 d:\développement\gd2\gdlsdk\extlibs\boost\boost\config\suffix.hpp
+	<limits.h>
+	<cstddef>
+	"boost/type.hpp"
+	"boost/non_type.hpp"
+	<typeinfo>
+
+1090798332 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type.hpp
+
+1084695475 d:\développement\gd2\gdlsdk\extlibs\boost\boost\non_type.hpp
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\shared_ptr_nmt.hpp
+	<boost/assert.hpp>
+	<boost/checked_delete.hpp>
+	<boost/throw_exception.hpp>
+	<boost/smart_ptr/detail/atomic_count.hpp>
+	<memory>
+	<algorithm>
+	<functional>
+	<new>
+
+1297786731 d:\développement\gd2\gdlsdk\extlibs\boost\boost\assert.hpp
+	<boost/current_function.hpp>
+	<assert.h>
+	<boost/current_function.hpp>
+	<cstdlib>
+	<iostream>
+	<boost/current_function.hpp>
+
+1196014039 d:\développement\gd2\gdlsdk\extlibs\boost\boost\current_function.hpp
+
+1092327187 d:\développement\gd2\gdlsdk\extlibs\boost\boost\checked_delete.hpp
+
+1291876819 d:\développement\gd2\gdlsdk\extlibs\boost\boost\throw_exception.hpp
+	<boost/exception/detail/attribute_noreturn.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/config.hpp>
+	<exception>
+	<boost/exception/exception.hpp>
+	<boost/current_function.hpp>
+
+1261002417 d:\développement\gd2\gdlsdk\extlibs\boost\boost\exception\detail\attribute_noreturn.hpp
+
+1274198038 d:\développement\gd2\gdlsdk\extlibs\boost\boost\detail\workaround.hpp
+	<boost/config.hpp>
+
+1299742455 d:\développement\gd2\gdlsdk\extlibs\boost\boost\exception\exception.hpp
+
+1240132670 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\atomic_count.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/sp_has_sync.hpp>
+	<boost/smart_ptr/detail/atomic_count_pthreads.hpp>
+	<boost/smart_ptr/detail/atomic_count_gcc_x86.hpp>
+	<boost/smart_ptr/detail/atomic_count_win32.hpp>
+	<boost/smart_ptr/detail/atomic_count_sync.hpp>
+	<boost/smart_ptr/detail/atomic_count_gcc.hpp>
+	<boost/smart_ptr/detail/atomic_count_pthreads.hpp>
+
+1259612452 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_has_sync.hpp
+
+1240132670 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\atomic_count_pthreads.hpp
+	<pthread.h>
+
+1240132670 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\atomic_count_gcc_x86.hpp
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\atomic_count_win32.hpp
+	<boost/detail/interlocked.hpp>
+
+1259613511 d:\développement\gd2\gdlsdk\extlibs\boost\boost\detail\interlocked.hpp
+	<boost/config.hpp>
+	<windows.h>
+
+1240132670 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\atomic_count_sync.hpp
+	<ia64intrin.h>
+
+1240132670 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\atomic_count_gcc.hpp
+	<ext/atomicity.h>
+	<bits/atomicity.h>
+
+1129736320 d:\développement\gd2\gdlsdk\extlibs\boost\boost\config\no_tr1\memory.hpp
+	<memory>
+
+1249770075 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\shared_count.hpp
+	<boost/config.hpp>
+	<boost/checked_delete.hpp>
+	<boost/throw_exception.hpp>
+	<boost/smart_ptr/bad_weak_ptr.hpp>
+	<boost/smart_ptr/detail/sp_counted_base.hpp>
+	<boost/smart_ptr/detail/sp_counted_impl.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/config/no_tr1/memory.hpp>
+	<functional>
+	<new>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\bad_weak_ptr.hpp
+	<exception>
+
+1238159446 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/sp_has_sync.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_nt.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_spin.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_pt.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_nt.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_gcc_x86.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_gcc_ia64.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_acc_ia64.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_cw_ppc.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_gcc_ppc.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_gcc_mips.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_sync.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_gcc_sparc.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_w32.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_nt.hpp>
+	<boost/smart_ptr/detail/sp_counted_base_spin.hpp>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_nt.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1287955494 d:\développement\gd2\gdlsdk\extlibs\boost\boost\detail\sp_typeinfo.hpp
+	<boost/config.hpp>
+	<boost/current_function.hpp>
+	<functional>
+	<typeinfo>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_spin.hpp
+	<boost/detail/sp_typeinfo.hpp>
+	<boost/smart_ptr/detail/spinlock_pool.hpp>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\spinlock_pool.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/spinlock.hpp>
+	<cstddef>
+
+1236012148 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\spinlock.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/sp_has_sync.hpp>
+	<boost/smart_ptr/detail/spinlock_gcc_arm.hpp>
+	<boost/smart_ptr/detail/spinlock_sync.hpp>
+	<boost/smart_ptr/detail/spinlock_w32.hpp>
+	<boost/smart_ptr/detail/spinlock_pt.hpp>
+	<boost/smart_ptr/detail/spinlock_nt.hpp>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\spinlock_gcc_arm.hpp
+	<boost/smart_ptr/detail/yield_k.hpp>
+
+1278792425 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\yield_k.hpp
+	<boost/config.hpp>
+	<windows.h>
+	<sched.h>
+	<time.h>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\spinlock_sync.hpp
+	<boost/smart_ptr/detail/yield_k.hpp>
+	<ia64intrin.h>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\spinlock_w32.hpp
+	<boost/detail/interlocked.hpp>
+	<boost/smart_ptr/detail/yield_k.hpp>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\spinlock_pt.hpp
+	<pthread.h>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\spinlock_nt.hpp
+	<boost/assert.hpp>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_pt.hpp
+	<boost/detail/sp_typeinfo.hpp>
+	<pthread.h>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_gcc_x86.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_gcc_ia64.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_acc_ia64.hpp
+	<boost/detail/sp_typeinfo.hpp>
+	<machine/sys/inline.h>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_cw_ppc.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_gcc_ppc.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1238159446 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_gcc_mips.hpp
+	<boost/detail/sp_typeinfo.hpp>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_sync.hpp
+	<boost/detail/sp_typeinfo.hpp>
+	<limits.h>
+	<ia64intrin.h>
+
+1259612234 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_gcc_sparc.hpp
+	<boost/detail/sp_typeinfo.hpp>
+	<inttypes.h>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_base_w32.hpp
+	<boost/detail/interlocked.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/detail/sp_typeinfo.hpp>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_counted_impl.hpp
+	<boost/config.hpp>
+	<boost/checked_delete.hpp>
+	<boost/smart_ptr/detail/sp_counted_base.hpp>
+	<boost/smart_ptr/detail/quick_allocator.hpp>
+	<memory>
+	<cstddef>
+
+1260812659 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\quick_allocator.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/lightweight_mutex.hpp>
+	<boost/type_traits/type_with_alignment.hpp>
+	<boost/type_traits/alignment_of.hpp>
+	<new>
+	<cstddef>
+
+1236011851 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\lightweight_mutex.hpp
+	<boost/config.hpp>
+	<boost/smart_ptr/detail/lwm_nop.hpp>
+	<boost/smart_ptr/detail/lwm_pthreads.hpp>
+	<boost/smart_ptr/detail/lwm_win32_cs.hpp>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\lwm_nop.hpp
+
+1259612701 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\lwm_pthreads.hpp
+	<boost/assert.hpp>
+	<pthread.h>
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\lwm_win32_cs.hpp
+	<windows.h>
+
+1278581278 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\type_with_alignment.hpp
+	<boost/mpl/if.hpp>
+	<boost/preprocessor/list/for_each_i.hpp>
+	<boost/preprocessor/tuple/to_list.hpp>
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/list/transform.hpp>
+	<boost/preprocessor/list/append.hpp>
+	<boost/type_traits/alignment_of.hpp>
+	<boost/type_traits/is_pod.hpp>
+	<boost/static_assert.hpp>
+	<boost/config.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<cstddef>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\if.hpp
+	<boost/mpl/aux_/value_wknd.hpp>
+	<boost/mpl/aux_/static_cast.hpp>
+	<boost/mpl/aux_/na_spec.hpp>
+	<boost/mpl/aux_/lambda_support.hpp>
+	<boost/mpl/aux_/config/integral.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\value_wknd.hpp
+	<boost/mpl/aux_/static_cast.hpp>
+	<boost/mpl/aux_/config/integral.hpp>
+	<boost/mpl/aux_/config/eti.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+	<boost/mpl/int.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\static_cast.hpp
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\workaround.hpp
+	<boost/detail/workaround.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\integral.hpp
+	<boost/mpl/aux_/config/msvc.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\msvc.hpp
+	<boost/config.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\eti.hpp
+	<boost/mpl/aux_/config/msvc.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\int.hpp
+	<boost/mpl/int_fwd.hpp>
+	<boost/mpl/aux_/integral_wrapper.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\int_fwd.hpp
+	<boost/mpl/aux_/adl_barrier.hpp>
+	<boost/mpl/aux_/nttp_decl.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\adl_barrier.hpp
+	<boost/mpl/aux_/config/adl.hpp>
+	<boost/mpl/aux_/config/gcc.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\adl.hpp
+	<boost/mpl/aux_/config/msvc.hpp>
+	<boost/mpl/aux_/config/intel.hpp>
+	<boost/mpl/aux_/config/gcc.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\intel.hpp
+	<boost/config.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\gcc.hpp
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\nttp_decl.hpp
+	<boost/mpl/aux_/config/nttp.hpp>
+	<boost/preprocessor/cat.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\nttp.hpp
+	<boost/mpl/aux_/config/msvc.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\cat.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1173263823 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\config\config.hpp
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\integral_wrapper.hpp
+	<boost/mpl/integral_c_tag.hpp>
+	<boost/mpl/aux_/static_cast.hpp>
+	<boost/mpl/aux_/nttp_decl.hpp>
+	<boost/mpl/aux_/config/static_constant.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+	<boost/preprocessor/cat.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\integral_c_tag.hpp
+	<boost/mpl/aux_/adl_barrier.hpp>
+	<boost/mpl/aux_/config/static_constant.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\static_constant.hpp
+	<boost/config.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\na_spec.hpp
+	<boost/mpl/lambda_fwd.hpp>
+	<boost/mpl/int.hpp>
+	<boost/mpl/bool.hpp>
+	<boost/mpl/aux_/na.hpp>
+	<boost/mpl/aux_/arity.hpp>
+	<boost/mpl/aux_/template_arity_fwd.hpp>
+	<boost/mpl/aux_/preprocessor/params.hpp>
+	<boost/mpl/aux_/preprocessor/enum.hpp>
+	<boost/mpl/aux_/preprocessor/def_params_tail.hpp>
+	<boost/mpl/aux_/lambda_arity_param.hpp>
+	<boost/mpl/aux_/config/dtp.hpp>
+	<boost/mpl/aux_/config/eti.hpp>
+	<boost/mpl/aux_/nttp_decl.hpp>
+	<boost/mpl/aux_/config/ttp.hpp>
+	<boost/mpl/aux_/config/lambda.hpp>
+	<boost/mpl/aux_/config/overload_resolution.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\lambda_fwd.hpp
+	<boost/mpl/void_fwd.hpp>
+	<boost/mpl/aux_/na.hpp>
+	<boost/mpl/aux_/config/lambda.hpp>
+	<boost/mpl/int.hpp>
+	<boost/mpl/aux_/lambda_arity_param.hpp>
+	<boost/mpl/aux_/template_arity_fwd.hpp>
+	<boost/mpl/bool.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\void_fwd.hpp
+	<boost/mpl/aux_/adl_barrier.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\na.hpp
+	<boost/mpl/bool.hpp>
+	<boost/mpl/aux_/na_fwd.hpp>
+	<boost/mpl/aux_/config/msvc.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\bool.hpp
+	<boost/mpl/bool_fwd.hpp>
+	<boost/mpl/integral_c_tag.hpp>
+	<boost/mpl/aux_/config/static_constant.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\bool_fwd.hpp
+	<boost/mpl/aux_/adl_barrier.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\na_fwd.hpp
+	<boost/mpl/aux_/adl_barrier.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\ctps.hpp
+	<boost/mpl/aux_/config/workaround.hpp>
+	<boost/config.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\lambda.hpp
+	<boost/mpl/aux_/config/ttp.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\ttp.hpp
+	<boost/mpl/aux_/config/msvc.hpp>
+	<boost/mpl/aux_/config/gcc.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\lambda_arity_param.hpp
+	<boost/mpl/aux_/config/ttp.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\template_arity_fwd.hpp
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\arity.hpp
+	<boost/mpl/aux_/config/dtp.hpp>
+	<boost/mpl/aux_/nttp_decl.hpp>
+	<boost/mpl/aux_/config/static_constant.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\dtp.hpp
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\preprocessor\params.hpp
+	<boost/mpl/aux_/config/preprocessor.hpp>
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/comma_if.hpp>
+	<boost/preprocessor/repeat.hpp>
+	<boost/preprocessor/inc.hpp>
+	<boost/preprocessor/cat.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\preprocessor.hpp
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\comma_if.hpp
+	<boost/preprocessor/punctuation/comma_if.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\punctuation\comma_if.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/control/if.hpp>
+	<boost/preprocessor/facilities/empty.hpp>
+	<boost/preprocessor/punctuation/comma.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\control\if.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/control/iif.hpp>
+	<boost/preprocessor/logical/bool.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\control\iif.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\logical\bool.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\facilities\empty.hpp
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\punctuation\comma.hpp
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\repeat.hpp
+	<boost/preprocessor/repetition/repeat.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\repetition\repeat.hpp
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/debug/error.hpp>
+	<boost/preprocessor/detail/auto_rec.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\debug\error.hpp
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/config/config.hpp>
+
+1091341466 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\detail\auto_rec.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/detail/dmc/auto_rec.hpp>
+	<boost/preprocessor/control/iif.hpp>
+
+1091341466 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\detail\dmc\auto_rec.hpp
+	<boost/preprocessor/control/iif.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\tuple\eat.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\inc.hpp
+	<boost/preprocessor/arithmetic/inc.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\arithmetic\inc.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\preprocessor\enum.hpp
+	<boost/mpl/aux_/config/preprocessor.hpp>
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/comma_if.hpp>
+	<boost/preprocessor/repeat.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\preprocessor\def_params_tail.hpp
+	<boost/mpl/limits/arity.hpp>
+	<boost/mpl/aux_/config/dtp.hpp>
+	<boost/mpl/aux_/config/preprocessor.hpp>
+	<boost/preprocessor/comma_if.hpp>
+	<boost/preprocessor/logical/and.hpp>
+	<boost/preprocessor/identity.hpp>
+	<boost/preprocessor/empty.hpp>
+	<boost/mpl/aux_/preprocessor/filter_params.hpp>
+	<boost/mpl/aux_/preprocessor/sub.hpp>
+	<boost/preprocessor/arithmetic/add.hpp>
+	<boost/preprocessor/arithmetic/sub.hpp>
+	<boost/preprocessor/inc.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+	<boost/preprocessor/repeat.hpp>
+	<boost/preprocessor/cat.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\limits\arity.hpp
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\logical\and.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/logical/bool.hpp>
+	<boost/preprocessor/logical/bitand.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\logical\bitand.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\identity.hpp
+	<boost/preprocessor/facilities/identity.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\facilities\identity.hpp
+	<boost/preprocessor/facilities/empty.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\empty.hpp
+	<boost/preprocessor/facilities/empty.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\preprocessor\filter_params.hpp
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\preprocessor\sub.hpp
+	<boost/mpl/aux_/config/preprocessor.hpp>
+	<boost/mpl/aux_/preprocessor/tuple.hpp>
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/arithmetic/sub.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\preprocessor\tuple.hpp
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\arithmetic\sub.hpp
+	<boost/preprocessor/arithmetic/dec.hpp>
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/control/while.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\arithmetic\dec.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\control\while.hpp
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/debug/error.hpp>
+	<boost/preprocessor/detail/auto_rec.hpp>
+	<boost/preprocessor/list/fold_left.hpp>
+	<boost/preprocessor/list/fold_right.hpp>
+	<boost/preprocessor/logical/bitand.hpp>
+	<boost/preprocessor/control/detail/edg/while.hpp>
+	<boost/preprocessor/control/detail/msvc/while.hpp>
+	<boost/preprocessor/control/detail/dmc/while.hpp>
+	<boost/preprocessor/control/detail/while.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\fold_left.hpp
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/control/while.hpp>
+	<boost/preprocessor/debug/error.hpp>
+	<boost/preprocessor/detail/auto_rec.hpp>
+	<boost/preprocessor/list/detail/edg/fold_left.hpp>
+	<boost/preprocessor/list/detail/dmc/fold_left.hpp>
+	<boost/preprocessor/list/detail/fold_left.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\detail\edg\fold_left.hpp
+	<boost/preprocessor/control/expr_iif.hpp>
+	<boost/preprocessor/control/iif.hpp>
+	<boost/preprocessor/list/adt.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\control\expr_iif.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\adt.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/detail/is_binary.hpp>
+	<boost/preprocessor/logical/compl.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\detail\is_binary.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/detail/check.hpp>
+
+1196014039 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\detail\check.hpp
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/config/config.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\logical\compl.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\detail\dmc\fold_left.hpp
+	<boost/preprocessor/control/expr_iif.hpp>
+	<boost/preprocessor/control/iif.hpp>
+	<boost/preprocessor/list/adt.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\tuple\elem.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\detail\fold_left.hpp
+	<boost/preprocessor/control/expr_iif.hpp>
+	<boost/preprocessor/control/iif.hpp>
+	<boost/preprocessor/list/adt.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\fold_right.hpp
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/control/while.hpp>
+	<boost/preprocessor/debug/error.hpp>
+	<boost/preprocessor/detail/auto_rec.hpp>
+	<boost/preprocessor/list/detail/edg/fold_right.hpp>
+	<boost/preprocessor/list/detail/fold_right.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\detail\edg\fold_right.hpp
+	<boost/preprocessor/control/iif.hpp>
+	<boost/preprocessor/list/adt.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\detail\fold_right.hpp
+	<boost/preprocessor/list/fold_left.hpp>
+	<boost/preprocessor/list/reverse.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\reverse.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/list/fold_left.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\control\detail\edg\while.hpp
+	<boost/preprocessor/control/if.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\control\detail\msvc\while.hpp
+	<boost/preprocessor/control/if.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\control\detail\dmc\while.hpp
+	<boost/preprocessor/control/iif.hpp>
+	<boost/preprocessor/logical/bool.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\control\detail\while.hpp
+	<boost/preprocessor/control/iif.hpp>
+	<boost/preprocessor/logical/bool.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\arithmetic\add.hpp
+	<boost/preprocessor/arithmetic/dec.hpp>
+	<boost/preprocessor/arithmetic/inc.hpp>
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/control/while.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\overload_resolution.hpp
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\lambda_support.hpp
+	<boost/mpl/aux_/config/lambda.hpp>
+	<boost/mpl/int_fwd.hpp>
+	<boost/mpl/aux_/yes_no.hpp>
+	<boost/mpl/aux_/na_fwd.hpp>
+	<boost/mpl/aux_/preprocessor/params.hpp>
+	<boost/mpl/aux_/preprocessor/enum.hpp>
+	<boost/mpl/aux_/config/msvc.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+	<boost/preprocessor/tuple/to_list.hpp>
+	<boost/preprocessor/list/for_each_i.hpp>
+	<boost/preprocessor/inc.hpp>
+	<boost/preprocessor/cat.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\yes_no.hpp
+	<boost/mpl/aux_/nttp_decl.hpp>
+	<boost/mpl/aux_/config/arrays.hpp>
+	<boost/mpl/aux_/config/msvc.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\aux_\config\arrays.hpp
+	<boost/mpl/aux_/config/msvc.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\tuple\to_list.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\for_each_i.hpp
+	<boost/preprocessor/arithmetic/inc.hpp>
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/list/adt.hpp>
+	<boost/preprocessor/repetition/for.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+	<boost/preprocessor/tuple/rem.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\repetition\for.hpp
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/debug/error.hpp>
+	<boost/preprocessor/detail/auto_rec.hpp>
+	<boost/preprocessor/repetition/detail/edg/for.hpp>
+	<boost/preprocessor/repetition/detail/msvc/for.hpp>
+	<boost/preprocessor/repetition/detail/dmc/for.hpp>
+	<boost/preprocessor/repetition/detail/for.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\repetition\detail\edg\for.hpp
+	<boost/preprocessor/control/if.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\repetition\detail\msvc\for.hpp
+	<boost/preprocessor/control/if.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\repetition\detail\dmc\for.hpp
+	<boost/preprocessor/control/expr_iif.hpp>
+	<boost/preprocessor/control/iif.hpp>
+	<boost/preprocessor/logical/bool.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\repetition\detail\for.hpp
+	<boost/preprocessor/control/expr_iif.hpp>
+	<boost/preprocessor/control/iif.hpp>
+	<boost/preprocessor/logical/bool.hpp>
+	<boost/preprocessor/tuple/eat.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\tuple\rem.hpp
+	<boost/preprocessor/config/config.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\transform.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/list/fold_right.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+	<boost/preprocessor/tuple/rem.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\list\append.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/list/fold_right.hpp>
+
+1242844880 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\alignment_of.hpp
+	<boost/config.hpp>
+	<cstddef>
+	<boost/type_traits/intrinsics.hpp>
+	<boost/type_traits/detail/size_t_trait_def.hpp>
+	<boost/type_traits/detail/size_t_trait_undef.hpp>
+
+1286358013 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\intrinsics.hpp
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/is_same.hpp>
+	<algorithm>
+	<type_traits.h>
+	<msl_utility>
+	<boost/type_traits/is_same.hpp>
+	<boost/type_traits/is_same.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/is_volatile.hpp>
+	<boost/type_traits/is_same.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/is_volatile.hpp>
+	<boost/type_traits/is_same.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/is_volatile.hpp>
+	<boost/type_traits/is_void.hpp>
+
+1224059369 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\config.hpp
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+
+1278581278 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_same.hpp
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/detail/ice_and.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1070458451 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\yes_no_type.hpp
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\ice_and.hpp
+	<boost/config.hpp>
+
+1278253503 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_reference.hpp
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/is_lvalue_reference.hpp>
+	<boost/type_traits/is_rvalue_reference.hpp>
+	<boost/type_traits/ice.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1278253503 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_lvalue_reference.hpp
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/detail/wrap.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1070458451 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\wrap.hpp
+
+1152699022 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\bool_trait_def.hpp
+	<boost/type_traits/detail/template_arity_spec.hpp>
+	<boost/type_traits/integral_constant.hpp>
+	<boost/mpl/bool.hpp>
+	<boost/mpl/aux_/lambda_support.hpp>
+	<boost/config.hpp>
+
+1094136097 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\template_arity_spec.hpp
+	<boost/mpl/int.hpp>
+	<boost/mpl/aux_/template_arity_fwd.hpp>
+	<boost/mpl/aux_/preprocessor/params.hpp>
+	<boost/mpl/aux_/config/lambda.hpp>
+	<boost/mpl/aux_/config/overload_resolution.hpp>
+
+1206222355 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\integral_constant.hpp
+	<boost/config.hpp>
+	<boost/mpl/bool.hpp>
+	<boost/mpl/integral_c.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\integral_c.hpp
+	<boost/mpl/integral_c_fwd.hpp>
+	<boost/mpl/aux_/config/ctps.hpp>
+	<boost/mpl/aux_/config/static_constant.hpp>
+	<boost/mpl/aux_/config/workaround.hpp>
+	<boost/mpl/aux_/integral_wrapper.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\integral_c_fwd.hpp
+	<boost/mpl/aux_/config/workaround.hpp>
+	<boost/mpl/aux_/adl_barrier.hpp>
+
+1094136097 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\bool_trait_undef.hpp
+
+1278253503 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_rvalue_reference.hpp
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\ice.hpp
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/detail/ice_or.hpp>
+	<boost/type_traits/detail/ice_and.hpp>
+	<boost/type_traits/detail/ice_not.hpp>
+	<boost/type_traits/detail/ice_eq.hpp>
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\ice_or.hpp
+	<boost/config.hpp>
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\ice_not.hpp
+	<boost/config.hpp>
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\ice_eq.hpp
+	<boost/config.hpp>
+
+1294337682 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_volatile.hpp
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/type_traits/detail/cv_traits_impl.hpp>
+	<boost/type_traits/remove_bounds.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/is_array.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/detail/false_result.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\cv_traits_impl.hpp
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+
+1224059369 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\remove_bounds.hpp
+	<boost/config.hpp>
+	<cstddef>
+	<boost/detail/workaround.hpp>
+	<boost/type_traits/msvc/remove_bounds.hpp>
+	<boost/type_traits/detail/type_trait_def.hpp>
+	<boost/type_traits/detail/type_trait_undef.hpp>
+
+1278581278 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\msvc\remove_bounds.hpp
+	<boost/type_traits/msvc/typeof.hpp>
+	<boost/type_traits/is_array.hpp>
+
+1196014039 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\msvc\typeof.hpp
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+
+1224059369 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_array.hpp
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/detail/wrap.hpp>
+	<cstddef>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1094136097 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\type_trait_def.hpp
+	<boost/type_traits/detail/template_arity_spec.hpp>
+	<boost/mpl/aux_/lambda_support.hpp>
+
+1094136097 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\type_trait_undef.hpp
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\false_result.hpp
+	<boost/config.hpp>
+
+1224059369 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_void.hpp
+	<boost/config.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1124983648 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\size_t_trait_def.hpp
+	<boost/type_traits/detail/template_arity_spec.hpp>
+	<boost/type_traits/integral_constant.hpp>
+	<boost/mpl/aux_/lambda_support.hpp>
+	<boost/mpl/size_t.hpp>
+	<cstddef>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\size_t.hpp
+	<boost/mpl/size_t_fwd.hpp>
+	<boost/mpl/aux_/integral_wrapper.hpp>
+
+1223702342 d:\développement\gd2\gdlsdk\extlibs\boost\boost\mpl\size_t_fwd.hpp
+	<boost/mpl/aux_/adl_barrier.hpp>
+	<boost/config.hpp>
+	<cstddef>
+
+1094136097 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\size_t_trait_undef.hpp
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_pod.hpp
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/is_void.hpp>
+	<boost/type_traits/is_scalar.hpp>
+	<boost/type_traits/detail/ice_or.hpp>
+	<boost/type_traits/intrinsics.hpp>
+	<cstddef>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_scalar.hpp
+	<boost/type_traits/is_arithmetic.hpp>
+	<boost/type_traits/is_enum.hpp>
+	<boost/type_traits/is_pointer.hpp>
+	<boost/type_traits/is_member_pointer.hpp>
+	<boost/type_traits/detail/ice_or.hpp>
+	<boost/config.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1224059369 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_arithmetic.hpp
+	<boost/type_traits/is_integral.hpp>
+	<boost/type_traits/is_float.hpp>
+	<boost/type_traits/detail/ice_or.hpp>
+	<boost/config.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1224059369 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_integral.hpp
+	<boost/config.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_float.hpp
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1215767679 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_enum.hpp
+	<boost/type_traits/intrinsics.hpp>
+	<boost/type_traits/add_reference.hpp>
+	<boost/type_traits/is_arithmetic.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/is_convertible.hpp>
+	<boost/type_traits/is_array.hpp>
+	<boost/type_traits/is_function.hpp>
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/is_class.hpp>
+	<boost/type_traits/is_union.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1278253503 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\add_reference.hpp
+	<boost/type_traits/is_reference.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/config.hpp>
+	<boost/type_traits/detail/type_trait_def.hpp>
+	<boost/type_traits/detail/type_trait_undef.hpp>
+
+1278581278 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_convertible.hpp
+	<boost/type_traits/intrinsics.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/is_array.hpp>
+	<boost/type_traits/add_reference.hpp>
+	<boost/type_traits/ice.hpp>
+	<boost/type_traits/is_arithmetic.hpp>
+	<boost/type_traits/is_void.hpp>
+	<boost/type_traits/is_abstract.hpp>
+	<boost/type_traits/is_function.hpp>
+	<boost/type_traits/remove_reference.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1255101362 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_abstract.hpp
+	<boost/type_traits/intrinsics.hpp>
+	<boost/static_assert.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/is_class.hpp>
+	<boost/type_traits/detail/ice_and.hpp>
+	<boost/type_traits/is_polymorphic.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1299112181 d:\développement\gd2\gdlsdk\extlibs\boost\boost\static_assert.hpp
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+
+1231335886 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_class.hpp
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/intrinsics.hpp>
+	<boost/type_traits/is_union.hpp>
+	<boost/type_traits/detail/ice_and.hpp>
+	<boost/type_traits/detail/ice_not.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/is_scalar.hpp>
+	<boost/type_traits/is_array.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/is_void.hpp>
+	<boost/type_traits/is_function.hpp>
+	<boost/type_traits/remove_cv.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_union.hpp
+	<boost/type_traits/remove_cv.hpp>
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/intrinsics.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1294337682 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\remove_cv.hpp
+	<boost/type_traits/broken_compiler_spec.hpp>
+	<boost/type_traits/detail/cv_traits_impl.hpp>
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+	<cstddef>
+	<boost/type_traits/msvc/remove_cv.hpp>
+	<boost/type_traits/detail/type_trait_def.hpp>
+	<boost/type_traits/detail/type_trait_undef.hpp>
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\broken_compiler_spec.hpp
+	<boost/mpl/aux_/lambda_support.hpp>
+	<boost/config.hpp>
+	<boost/type_traits/detail/type_trait_undef.hpp>
+
+1278581278 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\msvc\remove_cv.hpp
+	<boost/type_traits/msvc/typeof.hpp>
+	<boost/type_traits/is_volatile.hpp>
+	<boost/type_traits/is_const.hpp>
+	<boost/type_traits/is_pointer.hpp>
+	<boost/type_traits/is_array.hpp>
+
+1294337682 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_const.hpp
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/type_traits/detail/cv_traits_impl.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/remove_bounds.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/is_array.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/detail/false_result.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1224059369 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_pointer.hpp
+	<boost/type_traits/is_member_pointer.hpp>
+	<boost/type_traits/detail/ice_and.hpp>
+	<boost/type_traits/detail/ice_not.hpp>
+	<boost/type_traits/config.hpp>
+	<boost/type_traits/remove_cv.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/is_array.hpp>
+	<boost/type_traits/detail/is_function_ptr_tester.hpp>
+	<boost/type_traits/detail/false_result.hpp>
+	<boost/type_traits/detail/ice_or.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1255101362 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_member_pointer.hpp
+	<boost/type_traits/config.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/type_traits/is_member_function_pointer.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/is_array.hpp>
+	<boost/type_traits/detail/is_mem_fun_pointer_tester.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/detail/false_result.hpp>
+	<boost/type_traits/detail/ice_or.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1255101362 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_member_function_pointer.hpp
+	<boost/type_traits/config.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/type_traits/detail/is_mem_fun_pointer_impl.hpp>
+	<boost/type_traits/remove_cv.hpp>
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/is_array.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/detail/false_result.hpp>
+	<boost/type_traits/detail/ice_or.hpp>
+	<boost/type_traits/detail/is_mem_fun_pointer_tester.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\is_mem_fun_pointer_impl.hpp
+	<boost/config.hpp>
+	<boost/preprocessor/iterate.hpp>
+	<boost/preprocessor/enum_params.hpp>
+	<boost/preprocessor/comma_if.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\iterate.hpp
+	<boost/preprocessor/iteration/iterate.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\iteration\iterate.hpp
+	<boost/preprocessor/arithmetic/dec.hpp>
+	<boost/preprocessor/arithmetic/inc.hpp>
+	<boost/preprocessor/array/elem.hpp>
+	<boost/preprocessor/array/size.hpp>
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/slot/slot.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\array\elem.hpp
+	<boost/preprocessor/array/data.hpp>
+	<boost/preprocessor/array/size.hpp>
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\array\data.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\array\size.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/tuple/elem.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\slot\slot.hpp
+	<boost/preprocessor/cat.hpp>
+	<boost/preprocessor/slot/detail/def.hpp>
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\slot\detail\def.hpp
+
+1090896214 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\enum_params.hpp
+	<boost/preprocessor/repetition/enum_params.hpp>
+
+1095087089 d:\développement\gd2\gdlsdk\extlibs\boost\boost\preprocessor\repetition\enum_params.hpp
+	<boost/preprocessor/config/config.hpp>
+	<boost/preprocessor/punctuation/comma_if.hpp>
+	<boost/preprocessor/repetition/repeat.hpp>
+
+1144236156 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\is_mem_fun_pointer_tester.hpp
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/config.hpp>
+	<boost/preprocessor/iterate.hpp>
+	<boost/preprocessor/enum_params.hpp>
+	<boost/preprocessor/comma_if.hpp>
+
+1144236156 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\is_function_ptr_tester.hpp
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/config.hpp>
+	<boost/preprocessor/iterate.hpp>
+	<boost/preprocessor/enum_params.hpp>
+	<boost/preprocessor/comma_if.hpp>
+
+1278253503 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_function.hpp
+	<boost/type_traits/is_reference.hpp>
+	<boost/type_traits/detail/false_result.hpp>
+	<boost/config.hpp>
+	<boost/type_traits/detail/is_function_ptr_helper.hpp>
+	<boost/type_traits/detail/is_function_ptr_tester.hpp>
+	<boost/type_traits/detail/yes_no_type.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1128691598 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\detail\is_function_ptr_helper.hpp
+	<boost/type_traits/config.hpp>
+	<boost/preprocessor/iterate.hpp>
+	<boost/preprocessor/enum_params.hpp>
+	<boost/preprocessor/comma_if.hpp>
+
+1215767679 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\is_polymorphic.hpp
+	<boost/type_traits/intrinsics.hpp>
+	<boost/type_traits/is_class.hpp>
+	<boost/type_traits/remove_cv.hpp>
+	<boost/type_traits/detail/bool_trait_def.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/type_traits/detail/bool_trait_undef.hpp>
+
+1294337682 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\remove_reference.hpp
+	<boost/type_traits/broken_compiler_spec.hpp>
+	<boost/config.hpp>
+	<boost/detail/workaround.hpp>
+	<boost/type_traits/msvc/remove_reference.hpp>
+	<boost/type_traits/detail/type_trait_def.hpp>
+	<boost/type_traits/detail/type_trait_undef.hpp>
+
+1278581278 d:\développement\gd2\gdlsdk\extlibs\boost\boost\type_traits\msvc\remove_reference.hpp
+	<boost/type_traits/msvc/typeof.hpp>
+	<boost/type_traits/is_reference.hpp>
+
+1274891641 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\sp_convertible.hpp
+	<boost/config.hpp>
+
+1259862637 d:\développement\gd2\gdlsdk\extlibs\boost\boost\memory_order.hpp
+
+1236012322 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\detail\operator_bool.hpp
+
+1319828704 d:\développement\gd2\gdlsdk\gdl\gdl\object.h
+	"GDL/Force.h"
+	<string>
+	<vector>
+	<map>
+	<boost/shared_ptr.hpp>
+	<boost/enable_shared_from_this.hpp>
+	"GDL/ListVariable.h"
+	"GDL/ObjectHelpers.h"
+
+1312665277 d:\développement\gd2\gdlsdk\gdl\gdl\force.h
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\enable_shared_from_this.hpp
+	<boost/smart_ptr/enable_shared_from_this.hpp>
+
+1236294377 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\enable_shared_from_this.hpp
+	<boost/smart_ptr/weak_ptr.hpp>
+	<boost/smart_ptr/shared_ptr.hpp>
+	<boost/assert.hpp>
+	<boost/config.hpp>
+
+1260812659 d:\développement\gd2\gdlsdk\extlibs\boost\boost\smart_ptr\weak_ptr.hpp
+	<memory>
+	<boost/smart_ptr/detail/shared_count.hpp>
+	<boost/smart_ptr/shared_ptr.hpp>
+
+1297527793 d:\développement\gd2\gdlsdk\gdl\gdl\listvariable.h
+	<vector>
+	<string>
+	"GDL/Variable.h"
+
+1314210839 d:\développement\gd2\gdlsdk\gdl\gdl\variable.h
+	<string>
+
+1297520343 d:\développement\gd2\gdlsdk\gdl\gdl\objecthelpers.h
+	<boost/shared_ptr.hpp>
+	<vector>
+
+1311278679 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\scenephysicsdatas.h
+	"GDL/AutomatismsSharedDatas.h"
+	"RuntimeScenePhysicsDatas.h"
+	<iostream>
+
+1308398453 d:\développement\gd2\gdlsdk\gdl\gdl\automatismsshareddatas.h
+	"GDL/AutomatismsRuntimeSharedDatas.h"
+	<boost/shared_ptr.hpp>
+	<string>
+
+1297520341 d:\développement\gd2\gdlsdk\gdl\gdl\automatismsruntimeshareddatas.h
+	<boost/shared_ptr.hpp>
+
+1311278742 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\runtimescenephysicsdatas.h
+	<iostream>
+	"GDL/AutomatismsRuntimeSharedDatas.h"
+
+1236010936 d:\développement\gd2\gdlsdk\extlibs\boost\boost\weak_ptr.hpp
+	<boost/smart_ptr/weak_ptr.hpp>
+
+1324388622 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\physicsautomatismeditor.cpp
+	"PhysicsAutomatismEditor.h"
+	<wx/msw/winundef.h>
+	<wx/intl.h>
+	<wx/string.h>
+	<wx/log.h>
+	<wx/msw/winundef.h>
+	"GDL/Game.h"
+	"PhysicsAutomatism.h"
+	"GDL/MainEditorCommand.h"
+	"GDL/CommonTools.h"
+	"GDL/Scene.h"
+	"CustomPolygonDialog.h"
+
+1324387712 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\physicsautomatismeditor.h
+	<wx/msw/winundef.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/checkbox.h>
+	<wx/statline.h>
+	<wx/radiobut.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<vector>
+	"SFML/System/Vector2.hpp"
+	<wx/msw/winundef.h>
+	<boost/shared_ptr.hpp>
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\winundef.h
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\sizer.h
+	"wx/defs.h"
+	"wx/window.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\defs.h
+	"wx/platform.h"
+	"wx/version.h"
+	"wx/dlimpexp.h"
+	<stddef.h>
+	"wx/debug.h"
+	<sys/types.h>
+	<sys/types.h>
+	"wx/windowid.h"
+	<unistd.h>
+	"wx/msw/winundef.h"
+	"wx/features.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\platform.h
+	<stddef.h>
+	<unistd.h>
+	<TargetConditionals.h>
+	<AvailabilityMacros.h>
+	"wx/osx/config_xcode.h"
+	"wx/setup.h"
+	"wx/setup_gccxml.h"
+	"wx/msw/wince/libraries.h"
+	"wx/msw/libraries.h"
+	"wx/msw/gccpriv.h"
+	<TargetConditionals.h>
+	<AvailabilityMacros.h>
+	"wx/chkconf.h"
+	"wx/palmos/missing.h"
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\config_xcode.h
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
+
+1253304918 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\setup_gccxml.h
+
+1253304861 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\wince\libraries.h
+
+1253304862 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\libraries.h
+
+1253304862 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\gccpriv.h
+	<_mingw.h>
+	<w32api.h>
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\chkconf.h
+	"wx/palmos/chkconf.h"
+	"wx/msw/wince/chkconf.h"
+	"wx/msw/chkconf.h"
+	"wx/gtk/chkconf.h"
+	"wx/cocoa/chkconf.h"
+	"wx/osx/chkconf.h"
+	"wx/os2/chkconf.h"
+	"wx/mgl/chkconf.h"
+	"wx/dfb/chkconf.h"
+	"wx/motif/chkconf.h"
+	"wx/x11/chkconf.h"
+	"wx/unix/chkconf.h"
+	"wx/univ/chkconf.h"
+
+1307986672 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\chkconf.h
+
+1253304861 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\wince\chkconf.h
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\chkconf.h
+
+1253304893 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\chkconf.h
+
+1307986703 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\chkconf.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\chkconf.h
+	"wx/osx/iphone/chkconf.h"
+	"wx/osx/carbon/chkconf.h"
+	"wx/osx/cocoa/chkconf.h"
+
+1307986688 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\iphone\chkconf.h
+
+1253304886 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\carbon\chkconf.h
+
+1307986689 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\cocoa\chkconf.h
+
+1253304873 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\chkconf.h
+
+1253304882 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mgl\chkconf.h
+
+1253304856 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\chkconf.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\chkconf.h
+
+1253304867 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\chkconf.h
+
+1307986665 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\unix\chkconf.h
+
+1307986664 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\chkconf.h
+
+1307986672 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\missing.h
+	<stdarg.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<PalmTypes.h>
+	<MemoryMgr.h>
+	<StringMgr.h>
+	<UIResources.h>
+	<ErrorMgr.h>
+	<DataMgr.h>
+	<wchar.h>
+	<unistd.h>
+	<time.h>
+	<StatusBar.h>
+	<Loader.h>
+	<PalmTypesCompatibility.h>
+	<PenInputMgr.h>
+	"sections.h"
+	"pfall.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\version.h
+	"wx/cpp.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cpp.h
+
+1253304923 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dlimpexp.h
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\debug.h
+	<assert.h>
+	<limits.h>
+	"wx/chartype.h"
+	"wx/cpp.h"
+	"wx/dlimpexp.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\chartype.h
+	"wx/platform.h"
+	<sys/types.h>
+	<wchar.h>
+	<wcstr.h>
+	<stdlib.h>
+	<widec.h>
+	<ctype.h>
+	<stddef.h>
+	<stddef.h>
+	<string.h>
+	<ctype.h>
+	<tchar.h>
+	<ctype.h>
+
+1253304921 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\windowid.h
+
+1253304913 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\features.h
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\window.h
+	"wx/event.h"
+	"wx/list.h"
+	"wx/cursor.h"
+	"wx/font.h"
+	"wx/colour.h"
+	"wx/region.h"
+	"wx/utils.h"
+	"wx/intl.h"
+	"wx/validate.h"
+	"wx/palette.h"
+	"wx/accel.h"
+	"wx/access.h"
+	"wx/palmos/window.h"
+	"wx/msw/window.h"
+	"wx/motif/window.h"
+	"wx/gtk/window.h"
+	"wx/gtk1/window.h"
+	"wx/x11/window.h"
+	"wx/mgl/window.h"
+	"wx/dfb/window.h"
+	"wx/osx/window.h"
+	"wx/cocoa/window.h"
+	"wx/os2/window.h"
+	"wx/univ/window.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\event.h
+	"wx/defs.h"
+	"wx/cpp.h"
+	"wx/object.h"
+	"wx/clntdata.h"
+	"wx/gdicmn.h"
+	"wx/cursor.h"
+	"wx/mousestate.h"
+	"wx/dynarray.h"
+	"wx/thread.h"
+	"wx/tracker.h"
+	"wx/typeinfo.h"
+	"wx/any.h"
+	"wx/meta/convertible.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\object.h
+	"wx/memory.h"
+	"wx/xti.h"
+	"wx/rtti.h"
+	"wx/xti2.h"
+	"wx/msw/msvcrt.h"
+
+1253304918 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\memory.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/msgout.h"
+	<stddef.h>
+
+1320388289 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\string.h
+	"wx/defs.h"
+	<ctype.h>
+	<stdio.h>
+	<string.h>
+	<stdarg.h>
+	<limits.h>
+	<string.h>
+	<stdio.h>
+	<stdarg.h>
+	<limits.h>
+	<stdlib.h>
+	<strings.h>
+	"wx/wxcrtbase.h"
+	"wx/strvararg.h"
+	"wx/buffer.h"
+	"wx/strconv.h"
+	"wx/stringimpl.h"
+	"wx/stringops.h"
+	"wx/unichar.h"
+	"wx/tls.h"
+	"wx/iosfwrap.h"
+	"wx/crt.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\wxcrtbase.h
+	"wx/chartype.h"
+	<stdio.h>
+	<string.h>
+	<ctype.h>
+	<wchar.h>
+	<wctype.h>
+	<time.h>
+	<io.h>
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\strvararg.h
+	"wx/platform.h"
+	"wx/cpp.h"
+	"wx/chartype.h"
+	"wx/strconv.h"
+	"wx/buffer.h"
+	"wx/unichar.h"
+	<type_traits>
+	<type_traits>
+	<tr1/type_traits>
+	"wx/stringimpl.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\strconv.h
+	"wx/defs.h"
+	"wx/chartype.h"
+	"wx/buffer.h"
+	"typeinfo.h"
+	<stdlib.h>
+	"wx/fontenc.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\buffer.h
+	"wx/chartype.h"
+	"wx/wxcrtbase.h"
+	<stdlib.h>
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\typeinfo.h
+	"wx/defs.h"
+	<typeinfo>
+	<string.h>
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\fontenc.h
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\unichar.h
+	"wx/defs.h"
+	"wx/chartype.h"
+	"wx/stringimpl.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\stringimpl.h
+	"wx/defs.h"
+	"wx/chartype.h"
+	"wx/wxcrtbase.h"
+	<stdlib.h>
+	"wx/beforestd.h"
+	<string>
+	"wx/afterstd.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\beforestd.h
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\afterstd.h
+	"wx/msw/winundef.h"
+
+1253304924 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\stringops.h
+	"wx/chartype.h"
+	"wx/stringimpl.h"
+	"wx/unichar.h"
+	"wx/buffer.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\tls.h
+	"wx/defs.h"
+	"wx/msw/tls.h"
+	"wx/os2/tls.h"
+	"wx/unix/tls.h"
+	<stdlib.h>
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\tls.h
+	"wx/msw/wrapwin.h"
+	"wx/thread.h"
+	"wx/vector.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\wrapwin.h
+	"wx/platform.h"
+	<winsock2.h>
+	<windows.h>
+	"wx/msw/winundef.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\thread.h
+	"wx/defs.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\vector.h
+	"wx/defs.h"
+	<vector>
+	<algorithm>
+	"wx/utils.h"
+	"wx/scopeguard.h"
+	"wx/meta/movable.h"
+	"wx/meta/if.h"
+	"wx/beforestd.h"
+	<new>
+	"wx/afterstd.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\utils.h
+	"wx/object.h"
+	"wx/list.h"
+	"wx/filefn.h"
+	"wx/hashmap.h"
+	"wx/versioninfo.h"
+	"wx/meta/implicitconversion.h"
+	"wx/gdicmn.h"
+	"wx/mousestate.h"
+	"wx/longlong.h"
+	"wx/platinfo.h"
+	<direct.h>
+	<dirent.h>
+	<unistd.h>
+	<stdio.h>
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\list.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/beforestd.h"
+	<algorithm>
+	<iterator>
+	<list>
+	"wx/afterstd.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\filefn.h
+	"wx/list.h"
+	"wx/arrstr.h"
+	"wx/msw/wince/time.h"
+	"wx/msw/private.h"
+	<time.h>
+	<sys/types.h>
+	<sys/stat.h>
+	<sys/types.h>
+	<utime.h>
+	<sys/stat.h>
+	<unistd.h>
+	<stat.h>
+	<unistd.h>
+	<unix.h>
+	<process.h>
+	"wx/os2/private.h"
+	<direct.h>
+	<io.h>
+	<unistd.h>
+	<unistd.h>
+	<dirent.h>
+	<direct.h>
+	<dos.h>
+	<io.h>
+	<direct.h>
+	<dos.h>
+	<io.h>
+	<io.h>
+	<unistd.h>
+	<dir.h>
+	<fcntl.h>
+	<sys/types.h>
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\arrstr.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/dynarray.h"
+	"wx/beforestd.h"
+	<iterator>
+	"wx/afterstd.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dynarray.h
+	"wx/defs.h"
+	"wx/beforestd.h"
+	<vector>
+	<algorithm>
+	"wx/afterstd.h"
+
+1253304861 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\wince\time.h
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\private.h
+	"wx/msw/wrapwin.h"
+	"wx/msw/microwin.h"
+	"wx/log.h"
+	"wx/window.h"
+	"wx/gdicmn.h"
+	"wx/colour.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\microwin.h
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\log.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/strvararg.h"
+	"wx/arrstr.h"
+	<time.h>
+	"wx/dynarray.h"
+	"wx/hashmap.h"
+	"wx/thread.h"
+	"wx/iosfwrap.h"
+	"wx/generic/logg.h"
+	"wx/cocoa/log.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\hashmap.h
+	"wx/string.h"
+	"wx/wxcrt.h"
+	<unordered_map>
+	<tr1/unordered_map>
+	<ext/hash_map>
+	<hash_map>
+	<stddef.h>
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\wxcrt.h
+	"wx/wxcrtbase.h"
+	"wx/string.h"
+	<string.h>
+
+1253304926 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\iosfwrap.h
+	<iostream.h>
+	<iosfwd>
+	"wx/msw/winundef.h"
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\logg.h
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\log.h
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gdicmn.h
+	"wx/defs.h"
+	"wx/list.h"
+	"wx/string.h"
+	"wx/fontenc.h"
+	"wx/hashmap.h"
+	"wx/math.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\math.h
+	"wx/defs.h"
+	<math.h>
+	<float.h>
+	<ieeefp.h>
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\colour.h
+	"wx/defs.h"
+	"wx/gdiobj.h"
+	"wx/variant.h"
+	"wx/generic/colour.h"
+	"wx/msw/colour.h"
+	"wx/motif/colour.h"
+	"wx/gtk/colour.h"
+	"wx/gtk1/colour.h"
+	"wx/generic/colour.h"
+	"wx/generic/colour.h"
+	"wx/x11/colour.h"
+	"wx/osx/colour.h"
+	"wx/cocoa/colour.h"
+	"wx/os2/colour.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gdiobj.h
+	"wx/object.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\variant.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/arrstr.h"
+	"wx/list.h"
+	"wx/cpp.h"
+	"wx/longlong.h"
+	"wx/datetime.h"
+	"wx/iosfwrap.h"
+	"wx/any.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\longlong.h
+	"wx/defs.h"
+	"wx/string.h"
+	<limits.h>
+	"wx/iosfwrap.h"
+	<limits>
+	"wx/strvararg.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\datetime.h
+	"wx/defs.h"
+	"wx/msw/wince/time.h"
+	<time.h>
+	<limits.h>
+	"wx/longlong.h"
+	"wx/anystr.h"
+	"wx/dynarray.h"
+
+1253304923 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\anystr.h
+	"wx/string.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\any.h
+	"wx/defs.h"
+	<new>
+	"wx/string.h"
+	"wx/meta/if.h"
+	"wx/typeinfo.h"
+	"wx/list.h"
+	"wx/datetime.h"
+	"wx/variant.h"
+
+1253304841 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\meta\if.h
+	"wx/defs.h"
+
+1253304906 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\colour.h
+	"wx/object.h"
+
+1253304863 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\colour.h
+	"wx/object.h"
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\colour.h
+	"wx/object.h"
+	"wx/string.h"
+
+1253304894 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\colour.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\colour.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/gdiobj.h"
+	"wx/palette.h"
+
+1253304920 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palette.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/gdiobj.h"
+	"wx/palmos/palette.h"
+	"wx/msw/palette.h"
+	"wx/x11/palette.h"
+	"wx/generic/paletteg.h"
+	"wx/mgl/palette.h"
+	"wx/osx/palette.h"
+	"wx/os2/palette.h"
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\palette.h
+	"wx/gdiobj.h"
+
+1253304862 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\palette.h
+	"wx/gdiobj.h"
+
+1253304867 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\palette.h
+	"wx/list.h"
+
+1253304905 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\paletteg.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+
+1253304882 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mgl\palette.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\palette.h
+	"wx/gdiobj.h"
+
+1253304873 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\palette.h
+	"wx/gdiobj.h"
+	"wx/os2/private.h"
+
+1253304876 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\private.h
+	<os2.h>
+	<os2def.h>
+	<X11/Xmd.h>
+	<Xm/VendorSP.h>
+	<types.h>
+	<tcpustd.h>
+	<sys/time.h>
+	"wx/dlimpexp.h"
+	"wx/fontenc.h"
+	"wx/thread.h"
+
+1253304867 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\colour.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/gdiobj.h"
+	"wx/palette.h"
+
+1253304887 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\colour.h
+	"wx/osx/core/colour.h"
+
+1307986690 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\core\colour.h
+	"wx/object.h"
+	"wx/string.h"
+	"wx/osx/core/cfref.h"
+
+1307986690 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\core\cfref.h
+	<unistd.h>
+	<AvailabilityMacros.h>
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\colour.h
+	"wx/object.h"
+	"wx/string.h"
+
+1253304874 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\colour.h
+	"wx/object.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\versioninfo.h
+	"wx/string.h"
+
+1307986666 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\meta\implicitconversion.h
+	"wx/defs.h"
+	"wx/meta/if.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mousestate.h
+	"wx/gdicmn.h"
+	"wx/kbdstate.h"
+
+1253304924 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\kbdstate.h
+	"wx/defs.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\platinfo.h
+	"wx/string.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\scopeguard.h
+	"wx/defs.h"
+	"wx/except.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\except.h
+	"wx/defs.h"
+
+1307986666 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\meta\movable.h
+	"wx/meta/pod.h"
+	"wx/string.h"
+
+1307986666 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\meta\pod.h
+	"wx/defs.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\tls.h
+	"wx/os2/private.h"
+	"wx/thread.h"
+	"wx/vector.h"
+
+1307986665 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\unix\tls.h
+	<pthread.h>
+
+1253304920 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\crt.h
+	"wx/defs.h"
+	"wx/chartype.h"
+	"wx/wxcrt.h"
+	"wx/wxcrtvararg.h"
+
+1253304920 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\wxcrtvararg.h
+	"wx/wxcrt.h"
+	"wx/strvararg.h"
+	"wx/string.h"
+	<stdarg.h>
+
+1253304922 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msgout.h
+	"wx/defs.h"
+	"wx/chartype.h"
+	"wx/strvararg.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\xti.h
+	"wx/defs.h"
+	"wx/xtitypes.h"
+	"wx/xtihandler.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\xtitypes.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/hashmap.h"
+	"wx/arrstr.h"
+	"wx/flags.h"
+	"wx/intl.h"
+	"wx/log.h"
+	<typeinfo>
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\flags.h
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\intl.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/translation.h"
+	"wx/fontenc.h"
+	"wx/language.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\translation.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/buffer.h"
+	"wx/language.h"
+	"wx/hashmap.h"
+	"wx/strconv.h"
+	"wx/scopedptr.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\language.h
+	"wx/defs.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\scopedptr.h
+	"wx/defs.h"
+	"wx/checkeddelete.h"
+
+1253304920 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\checkeddelete.h
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\xtihandler.h
+	"wx/defs.h"
+	"wx/xti.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\rtti.h
+	"wx/memory.h"
+	"wx/flags.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\xti2.h
+	"wx/xtiprop.h"
+	"wx/xtictor.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\xtiprop.h
+	"wx/defs.h"
+	"wx/xti.h"
+	"wx/any.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\xtictor.h
+	"wx/defs.h"
+	"wx/xti.h"
+
+1253304864 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\msvcrt.h
+	<stdlib.h>
+	<crtdbg.h>
+
+1253304920 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\clntdata.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/hashmap.h"
+
+1253304915 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cursor.h
+	"wx/defs.h"
+	"wx/palmos/cursor.h"
+	"wx/msw/cursor.h"
+	"wx/motif/cursor.h"
+	"wx/gtk/cursor.h"
+	"wx/gtk1/cursor.h"
+	"wx/x11/cursor.h"
+	"wx/mgl/cursor.h"
+	"wx/dfb/cursor.h"
+	"wx/osx/cursor.h"
+	"wx/cocoa/cursor.h"
+	"wx/os2/cursor.h"
+	"wx/utils.h"
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\cursor.h
+	"wx/palmos/gdiimage.h"
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\gdiimage.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+	"wx/list.h"
+
+1253304863 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\cursor.h
+	"wx/msw/gdiimage.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\gdiimage.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+	"wx/list.h"
+
+1253304844 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\cursor.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\cursor.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\cursor.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+	"wx/image.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\image.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/gdicmn.h"
+	"wx/hashmap.h"
+	"wx/arrstr.h"
+	"wx/stream.h"
+	"wx/variant.h"
+	"wx/imagbmp.h"
+	"wx/imagpng.h"
+	"wx/imaggif.h"
+	"wx/imagpcx.h"
+	"wx/imagjpeg.h"
+	"wx/imagtga.h"
+	"wx/imagtiff.h"
+	"wx/imagpnm.h"
+	"wx/imagxpm.h"
+	"wx/imagiff.h"
+
+1253304927 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\stream.h
+	"wx/defs.h"
+	<stdio.h>
+	"wx/object.h"
+	"wx/string.h"
+	"wx/filefn.h"
+
+1253304918 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\imagbmp.h
+	"wx/image.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\imagpng.h
+	"wx/defs.h"
+	"wx/image.h"
+	"wx/versioninfo.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\imaggif.h
+	"wx/image.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\imagpcx.h
+	"wx/image.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\imagjpeg.h
+	"wx/defs.h"
+	"wx/image.h"
+	"wx/versioninfo.h"
+
+1253304924 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\imagtga.h
+	"wx/image.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\imagtiff.h
+	"wx/defs.h"
+	"wx/image.h"
+	"wx/versioninfo.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\imagpnm.h
+	"wx/image.h"
+
+1253304913 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\imagxpm.h
+	"wx/image.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\imagiff.h
+	"wx/image.h"
+
+1253304867 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\cursor.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+	"wx/colour.h"
+
+1307986687 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mgl\cursor.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+
+1253304857 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\cursor.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\cursor.h
+	"wx/bitmap.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\bitmap.h
+	"wx/string.h"
+	"wx/gdicmn.h"
+	"wx/colour.h"
+	"wx/image.h"
+	"wx/variant.h"
+	"wx/palmos/bitmap.h"
+	"wx/msw/bitmap.h"
+	"wx/x11/bitmap.h"
+	"wx/gtk/bitmap.h"
+	"wx/gtk1/bitmap.h"
+	"wx/x11/bitmap.h"
+	"wx/mgl/bitmap.h"
+	"wx/dfb/bitmap.h"
+	"wx/osx/bitmap.h"
+	"wx/cocoa/bitmap.h"
+	"wx/os2/bitmap.h"
+	"wx/generic/mask.h"
+
+1307986672 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\bitmap.h
+	"wx/palmos/gdiimage.h"
+	"wx/gdicmn.h"
+	"wx/palette.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\bitmap.h
+	"wx/msw/gdiimage.h"
+	"wx/palette.h"
+
+1307986679 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\bitmap.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/palette.h"
+	"wx/gdiobj.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\bitmap.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\bitmap.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/palette.h"
+	"wx/gdiobj.h"
+
+1307986687 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mgl\bitmap.h
+
+1253304856 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\bitmap.h
+	"wx/dfb/dfbptr.h"
+
+1253304857 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\dfbptr.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\bitmap.h
+	"wx/palette.h"
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\bitmap.h
+	"wx/palette.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\bitmap.h
+	"wx/os2/private.h"
+	"wx/os2/gdiimage.h"
+	"wx/gdicmn.h"
+	"wx/palette.h"
+
+1253304873 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\gdiimage.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+	"wx/list.h"
+
+1253304905 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\mask.h
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\cursor.h
+	"wx/bitmap.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\cursor.h
+	"wx/bitmap.h"
+
+1253304924 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\tracker.h
+	"wx/defs.h"
+
+1253304841 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\meta\convertible.h
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\font.h
+	"wx/defs.h"
+	"wx/fontenc.h"
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+	"wx/palmos/font.h"
+	"wx/msw/font.h"
+	"wx/motif/font.h"
+	"wx/gtk/font.h"
+	"wx/gtk1/font.h"
+	"wx/x11/font.h"
+	"wx/mgl/font.h"
+	"wx/dfb/font.h"
+	"wx/osx/font.h"
+	"wx/cocoa/font.h"
+	"wx/os2/font.h"
+
+1307986672 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\font.h
+	"wx/gdicmn.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\font.h
+	"wx/gdicmn.h"
+
+1307986666 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\font.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\font.h
+
+1307986668 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\font.h
+	"wx/hash.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\hash.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/object.h"
+
+1307986679 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\font.h
+
+1307986686 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mgl\font.h
+	"wx/hash.h"
+
+1307986673 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\font.h
+	"wx/dfb/dfbptr.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\font.h
+
+1307986703 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\font.h
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\font.h
+	"wx/gdiobj.h"
+	"wx/os2/private.h"
+
+1253304916 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\region.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+	"wx/palmos/region.h"
+	"wx/msw/region.h"
+	"wx/gtk/region.h"
+	"wx/gtk1/region.h"
+	"wx/x11/region.h"
+	"wx/mgl/region.h"
+	"wx/dfb/region.h"
+	"wx/osx/region.h"
+	"wx/cocoa/region.h"
+	"wx/os2/region.h"
+
+1253304854 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\region.h
+
+1253304863 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\region.h
+
+1253304895 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\region.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\region.h
+	"wx/list.h"
+
+1253304867 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\region.h
+	"wx/list.h"
+
+1253304882 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mgl\region.h
+	"wx/list.h"
+
+1253304857 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\region.h
+
+1253304888 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\region.h
+	"wx/osx/carbon/region.h"
+	"wx/generic/region.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\carbon\region.h
+	"wx/list.h"
+
+1253304906 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\region.h
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\region.h
+	"wx/generic/region.h"
+
+1253304876 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\region.h
+	"wx/list.h"
+	"wx/os2/private.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\validate.h
+	"wx/defs.h"
+	"wx/event.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\accel.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/generic/accel.h"
+	"wx/msw/accel.h"
+	"wx/motif/accel.h"
+	"wx/gtk/accel.h"
+	"wx/gtk1/accel.h"
+	"wx/osx/accel.h"
+	"wx/generic/accel.h"
+	"wx/os2/accel.h"
+
+1253304906 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\accel.h
+
+1253304863 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\accel.h
+
+1307986666 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\accel.h
+	"wx/object.h"
+	"wx/string.h"
+	"wx/event.h"
+
+1253304895 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\accel.h
+	"wx/generic/accel.h"
+
+1253304846 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\accel.h
+	"wx/generic/accel.h"
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\accel.h
+	"wx/string.h"
+	"wx/event.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\accel.h
+	"wx/object.h"
+
+1253304914 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\access.h
+	"wx/defs.h"
+	"wx/variant.h"
+	"wx/msw/ole/access.h"
+
+1307986676 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\ole\access.h
+
+1253304854 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\window.h
+	"wx/hash.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\window.h
+	"wx/settings.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\settings.h
+	"wx/colour.h"
+	"wx/font.h"
+
+1307986667 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\window.h
+	"wx/region.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\window.h
+	"wx/dynarray.h"
+
+1307986668 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\window.h
+
+1307986679 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\window.h
+	"wx/region.h"
+
+1307986686 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mgl\window.h
+	"wx/font.h"
+
+1307986673 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\window.h
+	"wx/dfb/dfbptr.h"
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\window.h
+	"wx/brush.h"
+	"wx/dc.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\brush.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+	"wx/palmos/brush.h"
+	"wx/msw/brush.h"
+	"wx/x11/brush.h"
+	"wx/gtk/brush.h"
+	"wx/gtk1/brush.h"
+	"wx/mgl/brush.h"
+	"wx/dfb/brush.h"
+	"wx/osx/brush.h"
+	"wx/cocoa/brush.h"
+	"wx/os2/brush.h"
+
+1253304854 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\brush.h
+	"wx/gdicmn.h"
+	"wx/gdiobj.h"
+	"wx/bitmap.h"
+
+1253304865 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\brush.h
+
+1253304867 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\brush.h
+	"wx/gdiobj.h"
+
+1253304895 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\brush.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\brush.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/gdiobj.h"
+	"wx/bitmap.h"
+
+1253304882 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mgl\brush.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/gdiobj.h"
+	"wx/bitmap.h"
+
+1253304857 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\brush.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/gdiobj.h"
+	"wx/bitmap.h"
+
+1253304888 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\brush.h
+	"wx/gdicmn.h"
+	"wx/gdiobj.h"
+	"wx/bitmap.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\brush.h
+	"wx/gdicmn.h"
+	"wx/gdiobj.h"
+	"wx/bitmap.h"
+
+1253304876 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\brush.h
+	"wx/bitmap.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dc.h
+	"wx/object.h"
+	"wx/intl.h"
+	"wx/cursor.h"
+	"wx/font.h"
+	"wx/colour.h"
+	"wx/bitmap.h"
+	"wx/brush.h"
+	"wx/pen.h"
+	"wx/palette.h"
+	"wx/dynarray.h"
+	"wx/math.h"
+	"wx/image.h"
+	"wx/region.h"
+	"wx/affinematrix2d.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\pen.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+	"wx/palmos/pen.h"
+	"wx/msw/pen.h"
+	"wx/x11/pen.h"
+	"wx/gtk/pen.h"
+	"wx/gtk1/pen.h"
+	"wx/mgl/pen.h"
+	"wx/dfb/pen.h"
+	"wx/osx/pen.h"
+	"wx/cocoa/pen.h"
+	"wx/os2/pen.h"
+
+1253304854 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\pen.h
+	"wx/gdiobj.h"
+	"wx/bitmap.h"
+	"wx/colour.h"
+
+1253304865 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\pen.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+
+1253304868 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\pen.h
+	"wx/gdicmn.h"
+	"wx/gdiobj.h"
+
+1253304895 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\pen.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\pen.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+
+1253304882 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mgl\pen.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+
+1253304857 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\pen.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/string.h"
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+
+1253304889 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\pen.h
+	"wx/gdiobj.h"
+	"wx/colour.h"
+	"wx/bitmap.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\pen.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+
+1253304878 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\pen.h
+	"wx/gdiobj.h"
+	"wx/bitmap.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\affinematrix2d.h
+	"wx/affinematrix2dbase.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\affinematrix2dbase.h
+	"wx/defs.h"
+	"wx/geometry.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\geometry.h
+	"wx/defs.h"
+	"wx/utils.h"
+	"wx/gdicmn.h"
+	"wx/math.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\window.h
+	"wx/cocoa/NSView.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\nsview.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\objcassociate.h
+
+1253304877 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\window.h
+	<os2.h>
+	"wx/hash.h"
+
+1307986664 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\window.h
+	"wx/bitmap.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\stattext.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/stattext.h"
+	"wx/msw/stattext.h"
+	"wx/motif/stattext.h"
+	"wx/gtk/stattext.h"
+	"wx/gtk1/stattext.h"
+	"wx/osx/stattext.h"
+	"wx/cocoa/stattext.h"
+	"wx/os2/stattext.h"
+	"wx/palmos/stattext.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\control.h
+	"wx/defs.h"
+	"wx/window.h"
+	"wx/univ/control.h"
+	"wx/palmos/control.h"
+	"wx/msw/control.h"
+	"wx/motif/control.h"
+	"wx/gtk/control.h"
+	"wx/gtk1/control.h"
+	"wx/osx/control.h"
+	"wx/cocoa/control.h"
+	"wx/os2/control.h"
+
+1253304838 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\control.h
+	"wx/univ/inphand.h"
+	"wx/univ/inpcons.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\inphand.h
+	"wx/univ/inpcons.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\inpcons.h
+	"wx/object.h"
+	"wx/event.h"
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\control.h
+	"wx/dynarray.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\control.h
+	"wx/dynarray.h"
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\control.h
+	"wx/window.h"
+	"wx/list.h"
+	"wx/validate.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\control.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\control.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/list.h"
+	"wx/window.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\control.h
+
+1253304909 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\control.h
+	"wx/cocoa/NSControl.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\nscontrol.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1253304873 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\control.h
+	"wx/dynarray.h"
+
+1307986664 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\stattext.h
+	"wx/generic/stattextg.h"
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\stattextg.h
+	"wx/stattext.h"
+
+1253304862 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\stattext.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\stattext.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\stattext.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\stattext.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\stattext.h
+
+1253304909 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\stattext.h
+	"wx/cocoa/NSTextField.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\nstextfield.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\stattext.h
+	"wx/control.h"
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\stattext.h
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\textctrl.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/textentry.h"
+	"wx/dynarray.h"
+	"wx/gdicmn.h"
+	"wx/ioswrap.h"
+	"wx/x11/textctrl.h"
+	"wx/univ/textctrl.h"
+	"wx/msw/wince/textctrlce.h"
+	"wx/msw/textctrl.h"
+	"wx/motif/textctrl.h"
+	"wx/gtk/textctrl.h"
+	"wx/gtk1/textctrl.h"
+	"wx/osx/textctrl.h"
+	"wx/cocoa/textctrl.h"
+	"wx/os2/textctrl.h"
+	"wx/palmos/textctrl.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\textentry.h
+	"wx/gdicmn.h"
+	"wx/gtk/textentry.h"
+	"wx/osx/textentry.h"
+	"wx/msw/textentry.h"
+	"wx/motif/textentry.h"
+	"wx/os2/textentry.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\textentry.h
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\textentry.h
+	"wx/control.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\textentry.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\textentry.h
+
+1253304877 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\textentry.h
+
+1253304924 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\ioswrap.h
+	"wx/beforestd.h"
+	<iostream.h>
+	<iostream>
+	"wx/afterstd.h"
+	"wx/msw/winundef.h"
+
+1253304867 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\textctrl.h
+	"wx/univ/textctrl.h"
+	"wx/scrolwin.h"
+	"wx/arrstr.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\textctrl.h
+	"wx/scrolwin.h"
+	"wx/univ/inphand.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\scrolwin.h
+	"wx/panel.h"
+	"wx/gtk/scrolwin.h"
+	"wx/gtk1/scrolwin.h"
+	"wx/generic/scrolwin.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\panel.h
+	"wx/window.h"
+	"wx/containr.h"
+	"wx/univ/panel.h"
+	"wx/msw/panel.h"
+	"wx/generic/panelg.h"
+
+1253304915 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\containr.h
+	"wx/defs.h"
+
+1307986664 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\panel.h
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\panel.h
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\panelg.h
+	"wx/bitmap.h"
+
+1253304893 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\scrolwin.h
+
+1253304846 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\scrolwin.h
+
+1253304905 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\scrolwin.h
+
+1307986677 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\wince\textctrlce.h
+	"wx/dynarray.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\textctrl.h
+
+1253304844 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\textctrl.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\textctrl.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\textctrl.h
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\textctrl.h
+	"wx/control.h"
+	"wx/textctrl.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\textctrl.h
+	"wx/cocoa/NSTextField.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\textctrl.h
+
+1253304854 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\textctrl.h
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\checkbox.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/checkbox.h"
+	"wx/msw/checkbox.h"
+	"wx/motif/checkbox.h"
+	"wx/gtk/checkbox.h"
+	"wx/gtk1/checkbox.h"
+	"wx/osx/checkbox.h"
+	"wx/cocoa/checkbox.h"
+	"wx/os2/checkbox.h"
+	"wx/palmos/checkbox.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\checkbox.h
+	"wx/button.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\button.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+	"wx/control.h"
+	"wx/univ/button.h"
+	"wx/msw/button.h"
+	"wx/motif/button.h"
+	"wx/gtk/button.h"
+	"wx/gtk1/button.h"
+	"wx/osx/button.h"
+	"wx/cocoa/button.h"
+	"wx/os2/button.h"
+	"wx/palmos/button.h"
+
+1253304838 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\button.h
+	"wx/bitmap.h"
+
+1307986677 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\button.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\button.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\button.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\button.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/list.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\button.h
+	"wx/control.h"
+	"wx/gdicmn.h"
+
+1253304909 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\button.h
+	"wx/cocoa/NSButton.h"
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\nsbutton.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+	"wx/cocoa/ObjcRef.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\objcref.h
+	"wx/osx/core/cfref.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\button.h
+	"wx/control.h"
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\button.h
+
+1253304862 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\checkbox.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\checkbox.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\checkbox.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\checkbox.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\checkbox.h
+
+1253304909 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\checkbox.h
+	"wx/cocoa/NSButton.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\checkbox.h
+	"wx/control.h"
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\checkbox.h
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\statline.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/statline.h"
+	"wx/msw/statline.h"
+	"wx/gtk/statline.h"
+	"wx/gtk1/statline.h"
+	"wx/os2/statline.h"
+	"wx/osx/statline.h"
+	"wx/cocoa/statline.h"
+	"wx/generic/statline.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\statline.h
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\statline.h
+
+1253304895 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\statline.h
+	"wx/defs.h"
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\statline.h
+	"wx/defs.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\statline.h
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\statline.h
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\statline.h
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\statline.h
+
+1253304916 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\radiobut.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/radiobut.h"
+	"wx/msw/radiobut.h"
+	"wx/motif/radiobut.h"
+	"wx/gtk/radiobut.h"
+	"wx/gtk1/radiobut.h"
+	"wx/osx/radiobut.h"
+	"wx/cocoa/radiobut.h"
+	"wx/os2/radiobut.h"
+	"wx/palmos/radiobut.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\radiobut.h
+	"wx/checkbox.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\radiobut.h
+
+1253304844 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\radiobut.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\radiobut.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\radiobut.h
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\radiobut.h
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\radiobut.h
+	"wx/cocoa/NSButton.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\radiobut.h
+	"wx/control.h"
+
+1253304854 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\radiobut.h
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dialog.h
+	"wx/defs.h"
+	"wx/toplevel.h"
+	"wx/univ/dialog.h"
+	"wx/palmos/dialog.h"
+	"wx/msw/dialog.h"
+	"wx/motif/dialog.h"
+	"wx/gtk/dialog.h"
+	"wx/gtk1/dialog.h"
+	"wx/osx/dialog.h"
+	"wx/cocoa/dialog.h"
+	"wx/os2/dialog.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\toplevel.h
+	"wx/nonownedwnd.h"
+	"wx/iconbndl.h"
+	"wx/containr.h"
+	"wx/weakref.h"
+	"wx/palmos/toplevel.h"
+	"wx/msw/toplevel.h"
+	"wx/gtk/toplevel.h"
+	"wx/gtk1/toplevel.h"
+	"wx/x11/toplevel.h"
+	"wx/mgl/toplevel.h"
+	"wx/dfb/toplevel.h"
+	"wx/osx/toplevel.h"
+	"wx/cocoa/toplevel.h"
+	"wx/os2/toplevel.h"
+	"wx/motif/toplevel.h"
+	"wx/univ/toplevel.h"
+
+1253304915 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\nonownedwnd.h
+	"wx/dfb/nonownedwnd.h"
+	"wx/osx/nonownedwnd.h"
+	"wx/window.h"
+
+1307986673 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\nonownedwnd.h
+	"wx/window.h"
+	"wx/dfb/dfbptr.h"
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\nonownedwnd.h
+	"wx/window.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\iconbndl.h
+	"wx/gdiobj.h"
+	"wx/gdicmn.h"
+	"wx/icon.h"
+	"wx/dynarray.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\icon.h
+	"wx/iconloc.h"
+	"wx/generic/icon.h"
+	"wx/msw/icon.h"
+	"wx/motif/icon.h"
+	"wx/generic/icon.h"
+	"wx/generic/icon.h"
+	"wx/generic/icon.h"
+	"wx/generic/icon.h"
+	"wx/generic/icon.h"
+	"wx/osx/icon.h"
+	"wx/generic/icon.h"
+	"wx/cocoa/icon.h"
+	"wx/os2/icon.h"
+	"wx/variant.h"
+
+1253304922 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\iconloc.h
+	"wx/string.h"
+
+1253304906 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\icon.h
+	"wx/bitmap.h"
+
+1253304863 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\icon.h
+	"wx/msw/gdiimage.h"
+
+1253304844 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\icon.h
+	"wx/bitmap.h"
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\icon.h
+	"wx/bitmap.h"
+
+1307986703 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\icon.h
+	"wx/gdicmn.h"
+	"wx/gdiobj.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\icon.h
+	"wx/bitmap.h"
+	"wx/os2/gdiimage.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\weakref.h
+	"wx/tracker.h"
+	"wx/meta/convertible.h"
+	"wx/meta/int2type.h"
+
+1253304841 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\meta\int2type.h
+
+1253304854 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\toplevel.h
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\toplevel.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\toplevel.h
+
+1253304846 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\toplevel.h
+
+1253304866 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\toplevel.h
+
+1253304882 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mgl\toplevel.h
+
+1253304856 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\toplevel.h
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\toplevel.h
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\toplevel.h
+	"wx/hashmap.h"
+	"wx/cocoa/NSWindow.h"
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\nswindow.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1253304875 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\toplevel.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\toplevel.h
+
+1307986664 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\toplevel.h
+	"wx/univ/inpcons.h"
+	"wx/univ/inphand.h"
+	"wx/icon.h"
+
+1307986664 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\dialog.h
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\dialog.h
+	"wx/panel.h"
+
+1307986677 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\dialog.h
+	"wx/panel.h"
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\dialog.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\dialog.h
+
+1253304846 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\dialog.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\dialog.h
+	"wx/panel.h"
+
+1253304909 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\dialog.h
+	"wx/defs.h"
+	"wx/panel.h"
+	"wx/cocoa/NSPanel.h"
+
+1253304909 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\nspanel.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1253304873 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\dialog.h
+	"wx/panel.h"
+
+1319824888 d:\développement\gd2\gdlsdk\gdl\gdl\game.h
+	<string>
+	<vector>
+	<boost/shared_ptr.hpp>
+	"GDL/Scene.h"
+	"GDL/ListVariable.h"
+	"GDL/Dossier.h"
+	"GDL/Image.h"
+	"GDL/LoadingScreen.h"
+	"GDL/ResourcesManager.h"
+
+1320525687 d:\développement\gd2\gdlsdk\gdl\gdl\scene.h
+	"GDL/Event.h"
+	<vector>
+	<map>
+	<string>
+	<boost/shared_ptr.hpp>
+	"GDL/Object.h"
+	"GDL/ObjectGroup.h"
+	"GDL/Position.h"
+	"GDL/Layer.h"
+
+1314812205 d:\développement\gd2\gdlsdk\gdl\gdl\event.h
+	<boost/weak_ptr.hpp>
+	<iostream>
+	<vector>
+	<string>
+	<vector>
+	<boost/shared_ptr.hpp>
+	"GDL/Log.h"
+	"GDL/Instruction.h"
+
+1313668931 d:\développement\gd2\gdlsdk\gdl\gdl\log.h
+	<string>
+	<vector>
+
+1312823469 d:\développement\gd2\gdlsdk\gdl\gdl\instruction.h
+	<string>
+	<vector>
+	<iostream>
+	"GDL/GDExpression.h"
+
+1308405099 d:\développement\gd2\gdlsdk\gdl\gdl\gdexpression.h
+	<string>
+	<vector>
+
+1308405409 d:\développement\gd2\gdlsdk\gdl\gdl\objectgroup.h
+	<vector>
+	<string>
+	<set>
+	<utility>
+
+1297540952 d:\développement\gd2\gdlsdk\gdl\gdl\position.h
+	<string>
+	<map>
+
+1297524574 d:\développement\gd2\gdlsdk\gdl\gdl\layer.h
+	<string>
+	<vector>
+	<SFML/Graphics.hpp>
+	"GDL/Camera.h"
+
+1314041052 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics.hpp
+	<SFML/Window.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Font.hpp>
+	<SFML/Graphics/Glyph.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/Graphics/Renderer.hpp>
+	<SFML/Graphics/RenderTexture.hpp>
+	<SFML/Graphics/RenderWindow.hpp>
+	<SFML/Graphics/Shader.hpp>
+	<SFML/Graphics/Shape.hpp>
+	<SFML/Graphics/Sprite.hpp>
+	<SFML/Graphics/Text.hpp>
+	<SFML/Graphics/Texture.hpp>
+	<SFML/Graphics/View.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window.hpp
+	<SFML/System.hpp>
+	<SFML/Window/Context.hpp>
+	<SFML/Window/ContextSettings.hpp>
+	<SFML/Window/Event.hpp>
+	<SFML/Window/Joystick.hpp>
+	<SFML/Window/Keyboard.hpp>
+	<SFML/Window/Mouse.hpp>
+	<SFML/Window/VideoMode.hpp>
+	<SFML/Window/Window.hpp>
+	<SFML/Window/WindowStyle.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/System/Err.hpp>
+	<SFML/System/InputStream.hpp>
+	<SFML/System/Lock.hpp>
+	<SFML/System/Mutex.hpp>
+	<SFML/System/Sleep.hpp>
+	<SFML/System/String.hpp>
+	<SFML/System/Thread.hpp>
+	<SFML/System/ThreadLocal.hpp>
+	<SFML/System/ThreadLocalPtr.hpp>
+	<SFML/System/Utf.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/Vector3.hpp>
+
+1314041052 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\config.hpp
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\clock.hpp
+	<SFML/Config.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\err.hpp
+	<SFML/Config.hpp>
+	<ostream>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\inputstream.hpp
+	<SFML/Config.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\lock.hpp
+	<SFML/System/NonCopyable.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\noncopyable.hpp
+	<SFML/Config.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\mutex.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\sleep.hpp
+	<SFML/Config.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\string.hpp
+	<SFML/Config.hpp>
+	<locale>
+	<string>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\thread.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+	<SFML/System/Thread.inl>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\thread.inl
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\threadlocal.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<cstdlib>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\threadlocalptr.hpp
+	<SFML/System/ThreadLocal.hpp>
+	<SFML/System/ThreadLocalPtr.inl>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\threadlocalptr.inl
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\utf.hpp
+	<SFML/Config.hpp>
+	<algorithm>
+	<locale>
+	<string>
+	<cstdlib>
+	<SFML/System/Utf.inl>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\utf.inl
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\vector2.hpp
+	<SFML/System/Vector2.inl>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\vector2.inl
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\vector3.hpp
+	<SFML/System/Vector3.inl>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\vector3.inl
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window\context.hpp
+	<SFML/Config.hpp>
+	<SFML/Window/GlResource.hpp>
+	<SFML/Window/ContextSettings.hpp>
+	<SFML/System/NonCopyable.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window\glresource.hpp
+	<SFML/Config.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window\contextsettings.hpp
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window\event.hpp
+	<SFML/Config.hpp>
+	<SFML/Window/Joystick.hpp>
+	<SFML/Window/Keyboard.hpp>
+	<SFML/Window/Mouse.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window\joystick.hpp
+	<SFML/Config.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window\keyboard.hpp
+	<SFML/Config.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window\mouse.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Vector2.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window\videomode.hpp
+	<SFML/Config.hpp>
+	<vector>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window\window.hpp
+	<SFML/Window/ContextSettings.hpp>
+	<SFML/Window/VideoMode.hpp>
+	<SFML/Window/WindowHandle.hpp>
+	<SFML/Window/WindowStyle.hpp>
+	<SFML/Window/GlResource.hpp>
+	<SFML/System/Clock.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<string>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window\windowhandle.hpp
+	<SFML/Config.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\window\windowstyle.hpp
+
+1314041052 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\color.hpp
+	<SFML/Config.hpp>
+
+1314041052 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\font.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/String.hpp>
+	<SFML/Graphics/Glyph.hpp>
+	<SFML/Graphics/Texture.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<map>
+	<string>
+	<vector>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\resource.hpp
+	<SFML/System/Lock.hpp>
+	<SFML/System/Mutex.hpp>
+	<set>
+	<cstddef>
+	<SFML/System/Resource.inl>
+	<SFML/System/ResourcePtr.inl>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\resource.inl
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\system\resourceptr.inl
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\glyph.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Rect.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\rect.hpp
+	<SFML/System/Vector2.hpp>
+	<algorithm>
+	<SFML/Graphics/Rect.inl>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\rect.inl
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\texture.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/Window/GlResource.hpp>
+	<SFML/Graphics/Image.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\image.hpp
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<string>
+	<vector>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\renderer.hpp
+	<SFML/Config.hpp>
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Window/GlResource.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+
+1314041052 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\drawable.hpp
+	<SFML/System/Vector2.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\matrix3.hpp
+	<SFML/Config.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<cmath>
+	<SFML/Graphics/Matrix3.inl>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\matrix3.inl
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\rendertexture.hpp
+	<SFML/Graphics/Texture.hpp>
+	<SFML/Graphics/RenderTarget.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\rendertarget.hpp
+	<SFML/System/NonCopyable.hpp>
+	<SFML/Graphics/Color.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<SFML/Graphics/Renderer.hpp>
+	<SFML/Graphics/View.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\view.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<SFML/Graphics/Matrix3.hpp>
+	<SFML/System/Vector2.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\renderwindow.hpp
+	<SFML/Graphics/RenderTarget.hpp>
+	<SFML/Graphics/Image.hpp>
+	<SFML/Window/Window.hpp>
+	<string>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\shader.hpp
+	<SFML/Config.hpp>
+	<SFML/Graphics/Texture.hpp>
+	<SFML/Window/GlResource.hpp>
+	<SFML/System/Vector2.hpp>
+	<SFML/System/Vector3.hpp>
+	<map>
+	<string>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\shape.hpp
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/System/Vector2.hpp>
+	<vector>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\sprite.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Rect.hpp>
+
+1314041053 d:\développement\gd2\gdlsdk\extlibs\sfml\include\sfml\graphics\text.hpp
+	<SFML/System/Resource.hpp>
+	<SFML/System/String.hpp>
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Font.hpp>
+	<SFML/Graphics/Rect.hpp>
+	<string>
+
+1297525936 d:\développement\gd2\gdlsdk\gdl\gdl\camera.h
+	<SFML/System.hpp>
+	<SFML/Graphics.hpp>
+
+1297520342 d:\développement\gd2\gdlsdk\gdl\gdl\dossier.h
+	<string>
+	<vector>
+
+1308410764 d:\développement\gd2\gdlsdk\gdl\gdl\image.h
+	<string>
+	<vector>
+
+1297524574 d:\développement\gd2\gdlsdk\gdl\gdl\loadingscreen.h
+	<string>
+	<vector>
+
+1319925345 d:\développement\gd2\gdlsdk\gdl\gdl\resourcesmanager.h
+	<boost/shared_ptr.hpp>
+	<vector>
+	<string>
+
+1297527793 d:\développement\gd2\gdlsdk\gdl\gdl\maineditorcommand.h
+	<wx/ribbon/bar.h>
+	<wx/ribbon/buttonbar.h>
+	<wx/toplevel.h>
+	<iostream>
+	<algorithm>
+	<vector>
+
+1307986686 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\ribbon\bar.h
+	"wx/defs.h"
+	"wx/ribbon/control.h"
+	"wx/ribbon/page.h"
+
+1307986686 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\ribbon\control.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/dynarray.h"
+
+1307986686 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\ribbon\page.h
+	"wx/defs.h"
+	"wx/ribbon/control.h"
+	"wx/ribbon/panel.h"
+	"wx/bitmap.h"
+
+1307986686 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\ribbon\panel.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+	"wx/ribbon/control.h"
+
+1307986686 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\ribbon\buttonbar.h
+	"wx/defs.h"
+	"wx/ribbon/art.h"
+	"wx/ribbon/control.h"
+	"wx/dynarray.h"
+
+1307986686 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\ribbon\art.h
+	"wx/defs.h"
+	"wx/brush.h"
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/pen.h"
+	"wx/bitmap.h"
+
+1313669014 d:\développement\gd2\gdlsdk\gdl\gdl\commontools.h
+	<string>
+	<sstream>
+	<iostream>
+	<vector>
+	<cmath>
+	"GDL/LightweightCommonTools.h"
+
+1312710621 d:\développement\gd2\gdlsdk\gdl\gdl\lightweightcommontools.h
+	<sstream>
+	<cmath>
+
+1311278742 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\runtimescenephysicsdatas.cpp
+	"RuntimeScenePhysicsDatas.h"
+	"ScenePhysicsDatas.h"
+	"ContactListener.h"
+	"Box2D/Box2D.h"
+	<iostream>
+
+1294508060 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\scenephysicsdatas.cpp
+	"ScenePhysicsDatas.h"
+	"GDL/tinyxml.h"
+	"GDL/XmlMacros.h"
+	<iostream>
+
+1303904068 d:\développement\gd2\gdlsdk\gdl\gdl\tinyxml.h
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<string>
+	<iostream>
+	<sstream>
+	"GDL/tinystr.h"
+
+1303904068 d:\développement\gd2\gdlsdk\gdl\gdl\tinystr.h
+	<assert.h>
+	<string.h>
+
+1297520343 d:\développement\gd2\gdlsdk\gdl\gdl\xmlmacros.h
+
+1315737615 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\extension.cpp
+	"GDL/ExtensionBase.h"
+	"GDL/Version.h"
+	"PhysicsAutomatism.h"
+	<boost/version.hpp>
+
+1317476824 d:\développement\gd2\gdlsdk\gdl\gdl\extensionbase.h
+	<wx/bitmap.h>
+	<wx/file.h>
+	<wx/wx.h>
+	<wx/msw/winundef.h>
+	<string>
+	<vector>
+	<map>
+	<boost/shared_ptr.hpp>
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\file.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/filefn.h"
+	"wx/strconv.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\wx.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/dynarray.h"
+	"wx/list.h"
+	"wx/hash.h"
+	"wx/string.h"
+	"wx/hashmap.h"
+	"wx/arrstr.h"
+	"wx/intl.h"
+	"wx/log.h"
+	"wx/event.h"
+	"wx/app.h"
+	"wx/utils.h"
+	"wx/stream.h"
+	"wx/memory.h"
+	"wx/math.h"
+	"wx/stopwatch.h"
+	"wx/timer.h"
+	"wx/module.h"
+	"wx/wxcrt.h"
+	"wx/wxcrtvararg.h"
+	"wx/window.h"
+	"wx/containr.h"
+	"wx/panel.h"
+	"wx/toplevel.h"
+	"wx/frame.h"
+	"wx/gdicmn.h"
+	"wx/gdiobj.h"
+	"wx/region.h"
+	"wx/bitmap.h"
+	"wx/image.h"
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/dc.h"
+	"wx/dcclient.h"
+	"wx/dcmemory.h"
+	"wx/dcprint.h"
+	"wx/dcscreen.h"
+	"wx/button.h"
+	"wx/menuitem.h"
+	"wx/menu.h"
+	"wx/pen.h"
+	"wx/brush.h"
+	"wx/palette.h"
+	"wx/icon.h"
+	"wx/cursor.h"
+	"wx/dialog.h"
+	"wx/settings.h"
+	"wx/msgdlg.h"
+	"wx/dataobj.h"
+	"wx/control.h"
+	"wx/ctrlsub.h"
+	"wx/bmpbuttn.h"
+	"wx/checkbox.h"
+	"wx/checklst.h"
+	"wx/choice.h"
+	"wx/scrolbar.h"
+	"wx/stattext.h"
+	"wx/statbmp.h"
+	"wx/statbox.h"
+	"wx/listbox.h"
+	"wx/radiobox.h"
+	"wx/radiobut.h"
+	"wx/textctrl.h"
+	"wx/slider.h"
+	"wx/gauge.h"
+	"wx/scrolwin.h"
+	"wx/dirdlg.h"
+	"wx/toolbar.h"
+	"wx/combobox.h"
+	"wx/layout.h"
+	"wx/sizer.h"
+	"wx/statusbr.h"
+	"wx/choicdlg.h"
+	"wx/textdlg.h"
+	"wx/filedlg.h"
+	"wx/mdi.h"
+	"wx/validate.h"
+	"wx/valtext.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\app.h
+	"wx/event.h"
+	"wx/build.h"
+	"wx/cmdargs.h"
+	"wx/init.h"
+	"wx/intl.h"
+	"wx/log.h"
+	"wx/unix/app.h"
+	"wx/palmos/app.h"
+	"wx/msw/app.h"
+	"wx/motif/app.h"
+	"wx/mgl/app.h"
+	"wx/dfb/app.h"
+	"wx/gtk/app.h"
+	"wx/gtk1/app.h"
+	"wx/x11/app.h"
+	"wx/osx/app.h"
+	"wx/cocoa/app.h"
+	"wx/os2/app.h"
+	"wx/univ/theme.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\build.h
+	"wx/version.h"
+
+1253304924 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cmdargs.h
+	"wx/arrstr.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\init.h
+	"wx/defs.h"
+	"wx/chartype.h"
+
+1253304841 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\unix\app.h
+	<signal.h>
+
+1307986672 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\app.h
+	"wx/event.h"
+	"wx/icon.h"
+
+1307986677 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\app.h
+	"wx/event.h"
+	"wx/icon.h"
+	"wx/msw/wrapwin.h"
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\app.h
+	"wx/event.h"
+	"wx/hashmap.h"
+
+1253304882 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mgl\app.h
+	"wx/frame.h"
+	"wx/icon.h"
+	"wx/vidmode.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\frame.h
+	"wx/toplevel.h"
+	"wx/statusbr.h"
+	"wx/univ/frame.h"
+	"wx/palmos/frame.h"
+	"wx/msw/frame.h"
+	"wx/gtk/frame.h"
+	"wx/gtk1/frame.h"
+	"wx/motif/frame.h"
+	"wx/osx/frame.h"
+	"wx/cocoa/frame.h"
+	"wx/os2/frame.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\statusbr.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/list.h"
+	"wx/dynarray.h"
+	"wx/univ/statusbr.h"
+	"wx/palmos/statusbr.h"
+	"wx/msw/statusbar.h"
+	"wx/generic/statusbr.h"
+	"wx/osx/statusbr.h"
+	"wx/generic/statusbr.h"
+
+1307986664 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\statusbr.h
+	"wx/univ/inpcons.h"
+	"wx/arrstr.h"
+
+1253304854 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\statusbr.h
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\statusbar.h
+	"wx/vector.h"
+	"wx/tooltip.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\tooltip.h
+	"wx/defs.h"
+	"wx/msw/tooltip.h"
+	"wx/gtk/tooltip.h"
+	"wx/gtk1/tooltip.h"
+	"wx/osx/tooltip.h"
+	"wx/cocoa/tooltip.h"
+	"wx/os2/tooltip.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\tooltip.h
+	"wx/object.h"
+	"wx/gdicmn.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\tooltip.h
+	"wx/string.h"
+	"wx/object.h"
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\tooltip.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/object.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\tooltip.h
+	"wx/string.h"
+	"wx/event.h"
+
+1307986703 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\tooltip.h
+	"wx/object.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\tooltip.h
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\statusbr.h
+	"wx/defs.h"
+	"wx/pen.h"
+	"wx/arrstr.h"
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\statusbr.h
+
+1253304838 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\frame.h
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\frame.h
+
+1253304865 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\frame.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\frame.h
+
+1253304846 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\frame.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\frame.h
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\frame.h
+	"wx/toolbar.h"
+	"wx/accel.h"
+	"wx/icon.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\toolbar.h
+	"wx/defs.h"
+	"wx/tbarbase.h"
+	"wx/univ/toolbar.h"
+	"wx/palmos/toolbar.h"
+	"wx/msw/toolbar.h"
+	"wx/msw/wince/tbarwce.h"
+	"wx/motif/toolbar.h"
+	"wx/gtk/toolbar.h"
+	"wx/gtk1/toolbar.h"
+	"wx/osx/toolbar.h"
+	"wx/cocoa/toolbar.h"
+	"wx/os2/toolbar.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\tbarbase.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+	"wx/list.h"
+	"wx/control.h"
+
+1253304838 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\toolbar.h
+	"wx/button.h"
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\toolbar.h
+	"wx/dynarray.h"
+
+1307986677 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\toolbar.h
+	"wx/dynarray.h"
+	"wx/imaglist.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\imaglist.h
+	"wx/defs.h"
+	"wx/generic/imaglist.h"
+	"wx/msw/imaglist.h"
+	"wx/osx/imaglist.h"
+	"wx/palmos/imaglist.h"
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\imaglist.h
+	"wx/list.h"
+
+1253304862 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\imaglist.h
+	"wx/bitmap.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\imaglist.h
+	"wx/defs.h"
+	"wx/list.h"
+	"wx/icon.h"
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\imaglist.h
+	"wx/bitmap.h"
+
+1253304861 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\wince\tbarwce.h
+	"wx/dynarray.h"
+	"wx/msw/toolbar.h"
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\toolbar.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\toolbar.h
+
+1307986668 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\toolbar.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\toolbar.h
+	"wx/tbarbase.h"
+	"wx/dynarray.h"
+
+1253304909 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\toolbar.h
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\toolbar.h
+	"wx/timer.h"
+	"wx/tbarbase.h"
+
+1253304927 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\timer.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/longlong.h"
+	"wx/event.h"
+	"wx/stopwatch.h"
+	"wx/utils.h"
+
+1253304917 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\stopwatch.h
+	"wx/defs.h"
+	"wx/longlong.h"
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\frame.h
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\frame.h
+	"wx/os2/wxrsc.h"
+
+1253304875 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\wxrsc.h
+
+1253304917 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\vidmode.h
+
+1253304857 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dfb\app.h
+	"wx/dfb/dfbptr.h"
+	"wx/vidmode.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\app.h
+
+1307986668 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\app.h
+	"wx/frame.h"
+	"wx/icon.h"
+	"wx/strconv.h"
+
+1253304867 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\app.h
+	"wx/gdicmn.h"
+	"wx/event.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\app.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/gdicmn.h"
+	"wx/event.h"
+
+1307986703 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\app.h
+	"wx/osx/core/cfref.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\app.h
+	<types.h>
+	<sys/ioctl.h>
+	<sys/select.h>
+	<sys/time.h>
+	<sys/types.h>
+	<unistd.h>
+	<utils.h>
+	<types.h>
+	"wx/event.h"
+	"wx/icon.h"
+
+1253304838 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\theme.h
+	"wx/string.h"
+
+1253304915 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\module.h
+	"wx/object.h"
+	"wx/list.h"
+	"wx/arrstr.h"
+	"wx/dynarray.h"
+
+1253304921 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dcclient.h
+	"wx/dc.h"
+
+1253304920 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dcmemory.h
+	"wx/dc.h"
+	"wx/bitmap.h"
+
+1253304927 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dcprint.h
+	"wx/defs.h"
+	"wx/dc.h"
+
+1253304921 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dcscreen.h
+	"wx/defs.h"
+	"wx/dc.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\menuitem.h
+	"wx/defs.h"
+	"wx/object.h"
+	"wx/univ/menuitem.h"
+	"wx/palmos/menuitem.h"
+	"wx/msw/menuitem.h"
+	"wx/motif/menuitem.h"
+	"wx/gtk/menuitem.h"
+	"wx/gtk1/menuitem.h"
+	"wx/osx/menuitem.h"
+	"wx/cocoa/menuitem.h"
+	"wx/os2/menuitem.h"
+
+1253304838 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\menuitem.h
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\menuitem.h
+	"wx/ownerdrw.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\ownerdrw.h
+	"wx/defs.h"
+	"wx/font.h"
+	"wx/colour.h"
+	"wx/msw/ownerdrw.h"
+	"wx/os2/ownerdrw.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\ownerdrw.h
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\ownerdrw.h
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\menuitem.h
+	"wx/ownerdrw.h"
+	"wx/bitmap.h"
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\menuitem.h
+	"wx/bitmap.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\menuitem.h
+	"wx/bitmap.h"
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\menuitem.h
+	"wx/bitmap.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\menuitem.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+
+1253304909 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\menuitem.h
+	"wx/hashmap.h"
+	"wx/bitmap.h"
+	"wx/cocoa/ObjcRef.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\menuitem.h
+	"wx/defs.h"
+	"wx/os2/private.h"
+	"wx/ownerdrw.h"
+	"wx/bitmap.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\menu.h
+	"wx/defs.h"
+	"wx/list.h"
+	"wx/window.h"
+	"wx/menuitem.h"
+	"wx/univ/menu.h"
+	"wx/palmos/menu.h"
+	"wx/msw/menu.h"
+	"wx/motif/menu.h"
+	"wx/gtk/menu.h"
+	"wx/gtk1/menu.h"
+	"wx/osx/menu.h"
+	"wx/cocoa/menu.h"
+	"wx/os2/menu.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\menu.h
+	"wx/accel.h"
+	"wx/dynarray.h"
+
+1307986672 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\menu.h
+	"wx/accel.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\menu.h
+	"wx/accel.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\menu.h
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/arrstr.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\menu.h
+
+1307986668 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\menu.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\menu.h
+	"wx/arrstr.h"
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\menu.h
+	"wx/cocoa/NSMenu.h"
+	"wx/accel.h"
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\nsmenu.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\menu.h
+	"wx/accel.h"
+	"wx/list.h"
+	"wx/dynarray.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msgdlg.h
+	"wx/defs.h"
+	"wx/dialog.h"
+	"wx/stockitem.h"
+	"wx/generic/msgdlgg.h"
+	"wx/cocoa/msgdlg.h"
+	"wx/palmos/msgdlg.h"
+	"wx/msw/msgdlg.h"
+	"wx/motif/msgdlg.h"
+	"wx/gtk/msgdlg.h"
+	"wx/osx/msgdlg.h"
+	"wx/os2/msgdlg.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\stockitem.h
+	"wx/defs.h"
+	"wx/chartype.h"
+	"wx/string.h"
+	"wx/accel.h"
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\msgdlgg.h
+
+1307986703 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\msgdlg.h
+	"wx/msgdlg.h"
+	"wx/generic/msgdlgg.h"
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\msgdlg.h
+
+1307986677 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\msgdlg.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\msgdlg.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\msgdlg.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\msgdlg.h
+
+1253304873 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\msgdlg.h
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dataobj.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/bitmap.h"
+	"wx/list.h"
+	"wx/arrstr.h"
+	"wx/msw/ole/dataform.h"
+	"wx/motif/dataform.h"
+	"wx/gtk/dataform.h"
+	"wx/gtk1/dataform.h"
+	"wx/x11/dataform.h"
+	"wx/osx/dataform.h"
+	"wx/cocoa/dataform.h"
+	"wx/os2/dataform.h"
+	"wx/msw/ole/dataobj.h"
+	"wx/motif/dataobj.h"
+	"wx/x11/dataobj.h"
+	"wx/gtk/dataobj.h"
+	"wx/gtk1/dataobj.h"
+	"wx/osx/dataobj.h"
+	"wx/cocoa/dataobj.h"
+	"wx/os2/dataobj.h"
+	"wx/msw/ole/dataobj2.h"
+	"wx/gtk/dataobj2.h"
+	"wx/gtk1/dataobj2.h"
+	"wx/x11/dataobj2.h"
+	"wx/motif/dataobj2.h"
+	"wx/osx/dataobj2.h"
+	"wx/cocoa/dataobj2.h"
+	"wx/os2/dataobj2.h"
+
+1307986676 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\ole\dataform.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\dataform.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\dataform.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\dataform.h
+
+1307986679 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\dataform.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\dataform.h
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\dataform.h
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\dataform.h
+
+1307986676 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\ole\dataobj.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\dataobj.h
+
+1307986679 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\dataobj.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\dataobj.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\dataobj.h
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\dataobj.h
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\dataobj.h
+
+1253304877 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\dataobj.h
+
+1253304859 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\ole\dataobj2.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\dataobj2.h
+
+1253304848 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\dataobj2.h
+
+1307986679 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\x11\dataobj2.h
+
+1253304844 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\dataobj2.h
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\dataobj2.h
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\dataobj2.h
+
+1253304875 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\dataobj2.h
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\ctrlsub.h
+	"wx/defs.h"
+	"wx/arrstr.h"
+	"wx/control.h"
+	"wx/msw/ctrlsub.h"
+	"wx/motif/ctrlsub.h"
+
+1253304865 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\ctrlsub.h
+
+1253304844 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\ctrlsub.h
+	"wx/dynarray.h"
+	"wx/generic/ctrlsub.h"
+
+1253304906 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\ctrlsub.h
+	"wx/dynarray.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\bmpbuttn.h
+	"wx/defs.h"
+	"wx/button.h"
+	"wx/univ/bmpbuttn.h"
+	"wx/msw/bmpbuttn.h"
+	"wx/motif/bmpbuttn.h"
+	"wx/gtk/bmpbuttn.h"
+	"wx/gtk1/bmpbuttn.h"
+	"wx/osx/bmpbuttn.h"
+	"wx/cocoa/bmpbuttn.h"
+	"wx/os2/bmpbuttn.h"
+	"wx/palmos/bmpbuttn.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\bmpbuttn.h
+
+1253304864 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\bmpbuttn.h
+	"wx/button.h"
+	"wx/bitmap.h"
+	"wx/brush.h"
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\bmpbuttn.h
+	"wx/motif/bmpmotif.h"
+
+1253304844 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\bmpmotif.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+
+1253304894 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\bmpbuttn.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\bmpbuttn.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\bmpbuttn.h
+	"wx/button.h"
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\bmpbuttn.h
+	"wx/cocoa/NSButton.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\bmpbuttn.h
+	"wx/button.h"
+	"wx/dcclient.h"
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\bmpbuttn.h
+	"wx/button.h"
+	"wx/bitmap.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\checklst.h
+	"wx/defs.h"
+	"wx/listbox.h"
+	"wx/univ/checklst.h"
+	"wx/msw/wince/checklst.h"
+	"wx/msw/checklst.h"
+	"wx/motif/checklst.h"
+	"wx/gtk/checklst.h"
+	"wx/gtk1/checklst.h"
+	"wx/osx/checklst.h"
+	"wx/cocoa/checklst.h"
+	"wx/os2/checklst.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\listbox.h
+	"wx/defs.h"
+	"wx/ctrlsub.h"
+	"wx/univ/listbox.h"
+	"wx/msw/listbox.h"
+	"wx/motif/listbox.h"
+	"wx/gtk/listbox.h"
+	"wx/gtk1/listbox.h"
+	"wx/osx/listbox.h"
+	"wx/os2/listbox.h"
+	"wx/cocoa/listbox.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\listbox.h
+	"wx/scrolwin.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\listbox.h
+	"wx/dynarray.h"
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\listbox.h
+	"wx/ctrlsub.h"
+	"wx/clntdata.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\listbox.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\listbox.h
+	"wx/list.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\listbox.h
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253304873 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\listbox.h
+	"wx/dynarray.h"
+
+1253304909 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\listbox.h
+	"wx/cocoa/NSTableView.h"
+	"wx/dynarray.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\nstableview.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\checklst.h
+
+1253304861 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\wince\checklst.h
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\checklst.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\checklst.h
+	"wx/listbox.h"
+
+1253304894 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\checklst.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\checklst.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\checklst.h
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\checklst.h
+
+1253304874 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\checklst.h
+	<stddef.h>
+	"wx/defs.h"
+
+1253304925 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\choice.h
+	"wx/defs.h"
+	"wx/ctrlsub.h"
+	"wx/univ/choice.h"
+	"wx/msw/wince/choicece.h"
+	"wx/msw/choice.h"
+	"wx/motif/choice.h"
+	"wx/gtk/choice.h"
+	"wx/gtk1/choice.h"
+	"wx/osx/choice.h"
+	"wx/cocoa/choice.h"
+	"wx/os2/choice.h"
+	"wx/palmos/choice.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\choice.h
+	"wx/combobox.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\combobox.h
+	"wx/defs.h"
+	"wx/ctrlsub.h"
+	"wx/textentry.h"
+	"wx/univ/combobox.h"
+	"wx/msw/combobox.h"
+	"wx/motif/combobox.h"
+	"wx/gtk/combobox.h"
+	"wx/gtk1/combobox.h"
+	"wx/osx/combobox.h"
+	"wx/cocoa/combobox.h"
+	"wx/os2/combobox.h"
+
+1307986664 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\combobox.h
+	"wx/combo.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\combo.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/renderer.h"
+	"wx/bitmap.h"
+	"wx/textentry.h"
+	"wx/msw/combo.h"
+	"wx/generic/combo.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\renderer.h
+	"wx/gdicmn.h"
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/bitmap.h"
+	"wx/string.h"
+
+1307986677 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\combo.h
+	"wx/timer.h"
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\combo.h
+	"wx/dcbuffer.h"
+
+1253304925 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dcbuffer.h
+	"wx/dcmemory.h"
+	"wx/dcclient.h"
+	"wx/window.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\combobox.h
+	"wx/choice.h"
+	"wx/textentry.h"
+
+1253304844 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\combobox.h
+	"wx/choice.h"
+	"wx/textentry.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\combobox.h
+	"wx/choice.h"
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\combobox.h
+	"wx/defs.h"
+	"wx/object.h"
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\combobox.h
+	"wx/containr.h"
+	"wx/choice.h"
+	"wx/textctrl.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\combobox.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+	"wx/textctrl.h"
+	"wx/dynarray.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\combobox.h
+	"wx/choice.h"
+	"wx/textentry.h"
+
+1307986677 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\wince\choicece.h
+	"wx/defs.h"
+	"wx/dynarray.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\choice.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\choice.h
+	"wx/clntdata.h"
+	"wx/dynarray.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\choice.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\choice.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\choice.h
+	"wx/control.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\choice.h
+	"wx/cocoa/NSMenu.h"
+
+1253304874 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\choice.h
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\choice.h
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\scrolbar.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/scrolbar.h"
+	"wx/msw/scrolbar.h"
+	"wx/motif/scrolbar.h"
+	"wx/gtk/scrolbar.h"
+	"wx/gtk1/scrolbar.h"
+	"wx/osx/scrolbar.h"
+	"wx/cocoa/scrolbar.h"
+	"wx/os2/scrolbar.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\scrolbar.h
+	"wx/univ/scrarrow.h"
+	"wx/renderer.h"
+
+1253304838 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\scrarrow.h
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\scrolbar.h
+
+1307986667 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\scrolbar.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\scrolbar.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\scrolbar.h
+	"wx/defs.h"
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\scrolbar.h
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\scrolbar.h
+	"wx/cocoa/NSScroller.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\nsscroller.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+	"wx/cocoa/ObjcRef.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\scrolbar.h
+	"wx/scrolbar.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\statbmp.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/bitmap.h"
+	"wx/icon.h"
+	"wx/univ/statbmp.h"
+	"wx/msw/statbmp.h"
+	"wx/motif/statbmp.h"
+	"wx/gtk/statbmp.h"
+	"wx/gtk1/statbmp.h"
+	"wx/osx/statbmp.h"
+	"wx/cocoa/statbmp.h"
+	"wx/os2/statbmp.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\statbmp.h
+	"wx/bitmap.h"
+
+1253304865 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\statbmp.h
+	"wx/control.h"
+	"wx/icon.h"
+	"wx/bitmap.h"
+
+1253304844 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\statbmp.h
+	"wx/motif/bmpmotif.h"
+	"wx/icon.h"
+
+1253304895 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\statbmp.h
+	"wx/icon.h"
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\statbmp.h
+	"wx/icon.h"
+
+1253304888 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\statbmp.h
+	"wx/osx/carbon/statbmp.h"
+	"wx/generic/statbmpg.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\carbon\statbmp.h
+	"wx/icon.h"
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\statbmpg.h
+	"wx/statbmp.h"
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\statbmp.h
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\statbmp.h
+	"wx/control.h"
+	"wx/icon.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\statbox.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/statbox.h"
+	"wx/msw/statbox.h"
+	"wx/motif/statbox.h"
+	"wx/gtk/statbox.h"
+	"wx/gtk1/statbox.h"
+	"wx/osx/statbox.h"
+	"wx/cocoa/statbox.h"
+	"wx/os2/statbox.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\statbox.h
+
+1253304865 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\statbox.h
+
+1253304844 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\statbox.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\statbox.h
+
+1307986668 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\statbox.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\statbox.h
+	"wx/control.h"
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\statbox.h
+	"wx/cocoa/NSBox.h"
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\nsbox.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\statbox.h
+	"wx/control.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\radiobox.h
+	"wx/defs.h"
+	"wx/ctrlsub.h"
+	"wx/dynarray.h"
+	"wx/univ/radiobox.h"
+	"wx/msw/radiobox.h"
+	"wx/motif/radiobox.h"
+	"wx/gtk/radiobox.h"
+	"wx/gtk1/radiobox.h"
+	"wx/osx/radiobox.h"
+	"wx/cocoa/radiobox.h"
+	"wx/os2/radiobox.h"
+	"wx/palmos/radiobox.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\radiobox.h
+	"wx/statbox.h"
+	"wx/dynarray.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\radiobox.h
+	"wx/statbox.h"
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\radiobox.h
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\radiobox.h
+	"wx/bitmap.h"
+	"wx/list.h"
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\radiobox.h
+	"wx/bitmap.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\radiobox.h
+
+1307986703 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\radiobox.h
+
+1253304875 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\radiobox.h
+
+1253304853 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\radiobox.h
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\slider.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/slider.h"
+	"wx/msw/slider.h"
+	"wx/motif/slider.h"
+	"wx/gtk/slider.h"
+	"wx/gtk1/slider.h"
+	"wx/osx/slider.h"
+	"wx/cocoa/slider.h"
+	"wx/os2/slider.h"
+	"wx/palmos/slider.h"
+
+1307986664 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\slider.h
+	"wx/univ/scrthumb.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\scrthumb.h
+	"wx/timer.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\slider.h
+
+1253304844 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\slider.h
+	"wx/control.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\slider.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\slider.h
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\slider.h
+	"wx/control.h"
+	"wx/slider.h"
+	"wx/stattext.h"
+
+1307986703 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\slider.h
+	"wx/cocoa/NSSlider.h"
+
+1307986703 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\nsslider.h
+	"wx/hashmap.h"
+	"wx/cocoa/ObjcAssociate.h"
+	"wx/cocoa/ObjcRef.h"
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\slider.h
+	"wx/control.h"
+
+1307986672 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\palmos\slider.h
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gauge.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/univ/gauge.h"
+	"wx/msw/gauge.h"
+	"wx/motif/gauge.h"
+	"wx/gtk/gauge.h"
+	"wx/gtk1/gauge.h"
+	"wx/osx/gauge.h"
+	"wx/cocoa/gauge.h"
+	"wx/os2/gauge.h"
+
+1253304839 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\univ\gauge.h
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\gauge.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\gauge.h
+
+1253304894 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\gauge.h
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\gauge.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\gauge.h
+	"wx/control.h"
+
+1253304909 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\gauge.h
+
+1253304873 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\gauge.h
+
+1253304917 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\dirdlg.h
+	"wx/dialog.h"
+	"wx/generic/dirdlgg.h"
+	"wx/generic/dirdlgg.h"
+	"wx/generic/dirdlgg.h"
+	"wx/msw/dirdlg.h"
+	"wx/gtk/dirdlg.h"
+	"wx/generic/dirdlgg.h"
+	"wx/osx/dirdlg.h"
+	"wx/cocoa/dirdlg.h"
+	"wx/generic/dirdlgg.h"
+
+1253304906 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\dirdlgg.h
+	"wx/dialog.h"
+
+1253304864 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\dirdlg.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\dirdlg.h
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\dirdlg.h
+
+1253304909 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\dirdlg.h
+
+1253304915 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\layout.h
+	"wx/object.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\choicdlg.h
+	"wx/generic/choicdgg.h"
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\choicdgg.h
+	"wx/dynarray.h"
+	"wx/dialog.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\textdlg.h
+	"wx/generic/textdlgg.h"
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\textdlgg.h
+	"wx/defs.h"
+	"wx/dialog.h"
+	"wx/valtext.h"
+	"wx/textctrl.h"
+
+1307986704 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\valtext.h
+	"wx/defs.h"
+	"wx/validate.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\filedlg.h
+	"wx/defs.h"
+	"wx/dialog.h"
+	"wx/arrstr.h"
+	"wx/generic/filedlgg.h"
+	"wx/msw/filedlg.h"
+	"wx/motif/filedlg.h"
+	"wx/gtk/filedlg.h"
+	"wx/gtk1/filedlg.h"
+	"wx/osx/filedlg.h"
+	"wx/cocoa/filedlg.h"
+	"wx/os2/filedlg.h"
+	"wx/generic/filedlgg.h"
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\filedlgg.h
+	"wx/listctrl.h"
+	"wx/datetime.h"
+	"wx/filefn.h"
+	"wx/artprov.h"
+	"wx/filedlg.h"
+	"wx/generic/filectrlg.h"
+
+1253304924 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\listctrl.h
+	"wx/defs.h"
+	"wx/listbase.h"
+	"wx/msw/listctrl.h"
+	"wx/osx/listctrl.h"
+	"wx/generic/listctrl.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\listbase.h
+	"wx/colour.h"
+	"wx/font.h"
+	"wx/gdicmn.h"
+	"wx/event.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\listctrl.h
+	"wx/textctrl.h"
+	"wx/dynarray.h"
+	"wx/vector.h"
+
+1307986691 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\listctrl.h
+	"wx/defs.h"
+	"wx/generic/listctrl.h"
+
+1307986701 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\listctrl.h
+	"wx/scrolwin.h"
+	"wx/textctrl.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\artprov.h
+	"wx/string.h"
+	"wx/bitmap.h"
+	"wx/icon.h"
+	"wx/iconbndl.h"
+
+1253304906 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\filectrlg.h
+	"wx/panel.h"
+	"wx/listctrl.h"
+	"wx/filectrl.h"
+	"wx/filename.h"
+
+1307986706 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\filectrl.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/event.h"
+	"wx/gtk/filectrl.h"
+	"wx/generic/filectrlg.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\filectrl.h
+	"wx/control.h"
+	"wx/filectrl.h"
+
+1307986705 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\filename.h
+	"wx/arrstr.h"
+	"wx/filefn.h"
+	"wx/datetime.h"
+	"wx/intl.h"
+	"wx/longlong.h"
+	"wx/file.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\filedlg.h
+
+1253304843 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\motif\filedlg.h
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\filedlg.h
+	"wx/gtk/filectrl.h"
+
+1253304847 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\filedlg.h
+	"wx/generic/filedlgg.h"
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\filedlg.h
+
+1253304911 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\filedlg.h
+
+1307986684 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\os2\filedlg.h
+
+1253304927 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\mdi.h
+	"wx/defs.h"
+	"wx/frame.h"
+	"wx/menu.h"
+	"wx/generic/mdig.h"
+	"wx/msw/mdi.h"
+	"wx/gtk/mdi.h"
+	"wx/gtk1/mdi.h"
+	"wx/osx/mdi.h"
+	"wx/cocoa/mdi.h"
+
+1253304906 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\generic\mdig.h
+	"wx/panel.h"
+
+1307986678 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\msw\mdi.h
+	"wx/frame.h"
+
+1307986696 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk\mdi.h
+	"wx/frame.h"
+
+1253304846 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\gtk1\mdi.h
+	"wx/frame.h"
+
+1307986692 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\osx\mdi.h
+
+1253304910 d:\développement\gd2\gdlsdk\extlibs\wxwidgets\include\wx\cocoa\mdi.h
+	"wx/frame.h"
+
+1324230448 d:\développement\gd2\gdlsdk\gdl\gdl\version.h
+
+1299112181 d:\développement\gd2\gdlsdk\extlibs\boost\boost\version.hpp
+
+1324460403 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\physicsautomatism.cpp
+	"PhysicsAutomatism.h"
+	"Box2D/Box2D.h"
+	"Triangulation/triangulate.h"
+	"GDL/RuntimeScene.h"
+	"GDL/tinyxml.h"
+	"GDL/XmlMacros.h"
+	"PhysicsAutomatismEditor.h"
+	"GDL/CommonTools.h"
+	<string>
+
+1319816389 d:\développement\gd2\gdlsdk\gdl\gdl\runtimescene.h
+	"GDL/Scene.h"
+	<iostream>
+	<sstream>
+	<vector>
+	<string>
+	<map>
+	<boost/shared_ptr.hpp>
+	"GDL/Event.h"
+	"GDL/CommonTools.h"
+	"GDL/RuntimeLayer.h"
+	"GDL/Text.h"
+	"GDL/Layer.h"
+	"GDL/ManualTimer.h"
+	"GDL/ObjInstancesHolder.h"
+
+1297539407 d:\développement\gd2\gdlsdk\gdl\gdl\runtimelayer.h
+	<SFML/Graphics.hpp>
+	"GDL/Layer.h"
+	"GDL/RuntimeCamera.h"
+
+1268854766 d:\développement\gd2\gdlsdk\gdl\gdl\runtimecamera.h
+	"GDL/Camera.h"
+
+1297522571 d:\développement\gd2\gdlsdk\gdl\gdl\text.h
+	<SFML/Graphics.hpp>
+	<string>
+
+1314037442 d:\développement\gd2\gdlsdk\gdl\gdl\manualtimer.h
+	<string>
+
+1319825566 d:\développement\gd2\gdlsdk\gdl\gdl\objinstancesholder.h
+	<string>
+	<vector>
+	<map>
+	<boost/shared_ptr.hpp>
+
+1324411591 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\custompolygondialog.cpp
+	"CustomPolygonDialog.h"
+	"PhysicsAutomatism.h"
+	<wx/intl.h>
+	<wx/string.h>
+	"GDL/CommonTools.h"
+	<string>
+
+1324460491 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\custompolygondialog.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	"SFML/System/Vector2.hpp"
+	<vector>
+
+1324396550 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\triangulation\triangulate.cpp
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	"triangulate.h"
+
+1324396423 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\triangulation\triangulate.h
+	"SFML/Config.hpp"
+	"SFML/System/Vector2.hpp"
+	<vector>
+
+1324410447 d:\développement\gd2\gdlsdk\extensions\physicsautomatism\polygoneditorwidget.h
+	<wx/scrolwin.h>
+
+1324411703 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\polygoneditorwidget.cpp
+	"PolygonEditorWidget.h"
+
+1324478974 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.cpp
+	"CustomPolygonDialog.h"
+	"PhysicsAutomatism.h"
+	<wx/font.h>
+	<wx/intl.h>
+	<wx/string.h>
+	<wx/dcbuffer.h>
+	"GDL/CommonTools.h"
+	"GDL/BitmapGUIManager.h"
+	<string>
+
+1324478922 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/panel.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	"SFML/System/Vector2.hpp"
+	<vector>
+
+1297523268 d:\florian\programmation\gamedevelop2\gdl\gdl\bitmapguimanager.h
+	<wx/bitmap.h>
+	<string>
+
+1324396422 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\triangulation\triangulate.h
+	"SFML/Config.hpp"
+	"SFML/System/Vector2.hpp"
+	<vector>
+
+1324396550 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\triangulation\triangulate.cpp
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	"triangulate.h"
 

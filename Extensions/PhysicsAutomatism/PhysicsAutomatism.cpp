@@ -26,10 +26,14 @@ freely, subject to the following restrictions:
 
 #include "PhysicsAutomatism.h"
 #include "Box2D/Box2D.h"
+#include "Triangulation/triangulate.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/tinyxml.h"
 #include "GDL/XmlMacros.h"
 #include "PhysicsAutomatismEditor.h"
+#include "GDL/CommonTools.h"
+#include <string>
+
 #undef GetObject
 
 PhysicsAutomatism::PhysicsAutomatism(std::string automatismTypeName) :
@@ -149,6 +153,40 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
 
         body->CreateFixture(&fixtureDef);
     }
+    else if( shapeType == CustomPolygon && polygonCoords.size() > 2)
+    {
+        //Make a polygon triangulation to make possible to use a concave polygon and more than 8 edged polygons
+        std::vector<sf::Vector2f> resultOfTriangulation;
+
+        Triangulate::Process(polygonCoords, resultOfTriangulation);
+
+        //Iterate over all triangles
+        for(unsigned int i = 0; i < resultOfTriangulation.size() / 3; i++)
+        {
+            b2FixtureDef fixtureDef;
+            b2PolygonShape dynamicBox;
+
+            //Create vertices
+            b2Vec2 vertices[3];
+
+            unsigned int b = 0;
+            for(int a = 2; a >= 0; a--) //Box2D use another direction for vertices
+            {
+                vertices[b].Set((resultOfTriangulation.at(i*3 + a).x - object->GetWidth()/2)                             * runtimeScenesPhysicsDatas->GetInvScaleX(),
+                                (((object->GetHeight() - (resultOfTriangulation.at(i*3 + a).y)) - object->GetHeight()/2) * runtimeScenesPhysicsDatas->GetInvScaleY()));
+                b++;
+            }
+
+            dynamicBox.Set(vertices, 3);
+
+            fixtureDef.shape = &dynamicBox;
+            fixtureDef.density = massDensity;
+            fixtureDef.friction = averageFriction;
+            fixtureDef.restitution = averageRestitution;
+
+            body->CreateFixture(&fixtureDef);
+        }
+    }
     else
     {
         b2FixtureDef fixtureDef;
@@ -172,7 +210,7 @@ void PhysicsAutomatism::OnDeActivate()
     if ( runtimeScenesPhysicsDatas && body )
     {
         runtimeScenesPhysicsDatas->world->DestroyBody(body);
-        body = NULL; //Of course.
+        body = NULL; //Of course: body can ( and will ) be reused: Make sure we nullify the pointer as the body was destroyed.
     }
 }
 
@@ -481,6 +519,16 @@ bool PhysicsAutomatism::IsDynamic()
     return dynamic;
 }
 
+void PhysicsAutomatism::SetPolygonCoords(const std::vector<sf::Vector2f> &vec)
+{
+    polygonCoords = vec;
+}
+
+const std::vector<sf::Vector2f>& PhysicsAutomatism::GetPolygonCoords() const
+{
+    return polygonCoords;
+}
+
 #if defined(GD_IDE_ONLY)
 void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const
 {
@@ -493,8 +541,12 @@ void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("angularDamping", angularDamping);
     if ( shapeType == Circle)
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "Circle")
+    else if( shapeType == CustomPolygon )
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "CustomPolygon")
     else
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "Box")
+
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("coordsList", PhysicsAutomatism::GetStringFromCoordsVector(GetPolygonCoords(), '/', ';').c_str());
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("averageRestitution", averageRestitution);
 }
 #endif
@@ -508,11 +560,56 @@ void PhysicsAutomatism::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("averageFriction", averageFriction);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("linearDamping", linearDamping);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("angularDamping", angularDamping);
+
     std::string shape;
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("shapeType", shape);
     if ( shape == "Circle" )
         shapeType = Circle;
+    else if (shape == "CustomPolygon")
+        shapeType = CustomPolygon;
     else
         shapeType = Box;
+
+    std::string coordsStr;
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("coordsList", coordsStr);
+    SetPolygonCoords(PhysicsAutomatism::GetCoordsVectorFromString(coordsStr, '/', ';'));
+
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("averageRestitution", averageRestitution);
+}
+
+
+std::string PhysicsAutomatism::GetStringFromCoordsVector(const std::vector<sf::Vector2f> &vec, char coordsSep, char composantSep)
+{
+    std::string coordsStr;
+
+	int a = 0;
+	for (a = 0; a < vec.size(); a++)
+	{
+	    coordsStr += ToString<float>(vec.at(a).x) + composantSep + ToString<float>(vec.at(a).y);
+	    if(a != vec.size() - 1)
+            coordsStr += coordsSep;
+	}
+
+	return coordsStr;
+}
+
+std::vector<sf::Vector2f> PhysicsAutomatism::GetCoordsVectorFromString(const std::string &str, char coordsSep, char composantSep)
+{
+    std::vector<sf::Vector2f> coordsVec;
+
+    std::vector<std::string> coordsDecomposed = SplitString<std::string>(str, coordsSep);
+
+    int a = 0;
+    for(a = 0; a < coordsDecomposed.size(); a++)
+    {
+        std::vector<std::string> coordXY = SplitString<std::string>(coordsDecomposed.at(a), composantSep);
+
+        if(coordXY.size() != 2)
+            continue;
+
+        sf::Vector2f newCoord(ToFloat<std::string>(coordXY.at(0)), ToFloat<std::string>(coordXY.at(1)));
+        coordsVec.push_back(newCoord);
+    }
+
+    return coordsVec;
 }

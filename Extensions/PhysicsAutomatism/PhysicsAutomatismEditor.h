@@ -41,6 +41,10 @@ freely, subject to the following restrictions:
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
+
+#include <vector>
+#include "SFML/System/Vector2.hpp"
+
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -79,6 +83,7 @@ class PhysicsAutomatismEditor: public wxDialog
 		wxStaticText* StaticText7;
 		wxTextCtrl* angularDampingEdit;
 		wxTextCtrl* gravityYEdit;
+		wxRadioButton* polygonCheck;
 		wxStaticLine* StaticLine1;
 		wxTextCtrl* massDensityEdit;
 		wxRadioButton* rectCheck;
@@ -87,6 +92,7 @@ class PhysicsAutomatismEditor: public wxDialog
 		wxStaticText* StaticText4;
 		wxRadioButton* circleCheck;
 		wxButton* okBt;
+		wxButton* polygonBt;
 		wxCheckBox* staticCheck;
 		//*)
 
@@ -98,6 +104,8 @@ class PhysicsAutomatismEditor: public wxDialog
 		static const long ID_STATICTEXT11;
 		static const long ID_RADIOBUTTON1;
 		static const long ID_RADIOBUTTON2;
+		static const long ID_RADIOBUTTON3;
+		static const long ID_BUTTON3;
 		static const long ID_CHECKBOX1;
 		static const long ID_CHECKBOX3;
 		static const long ID_CHECKBOX2;
@@ -131,12 +139,18 @@ class PhysicsAutomatismEditor: public wxDialog
 		//(*Handlers(PhysicsAutomatismEditor)
 		void OncancelBtClick(wxCommandEvent& event);
 		void OnokBtClick(wxCommandEvent& event);
+		void OnpolygonCheckSelect(wxCommandEvent& event);
+		void OncircleCheckSelect(wxCommandEvent& event);
+		void OnrectCheckSelect(wxCommandEvent& event);
+		void OnpolygonBtClick(wxCommandEvent& event);
 		//*)
 
 		Game & game;
         Scene * scene;
         boost::shared_ptr<ScenePhysicsDatas> sharedDatas;
 		MainEditorCommand & mainEditorCommand;
+
+		std::vector<sf::Vector2f> coordsVector;
 
 		DECLARE_EVENT_TABLE()
 };

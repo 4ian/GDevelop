@@ -4,7 +4,7 @@
 	<Project>
 		<Option title="PhysicsAutomatism" />
 		<Option pch_mode="2" />
-		<Option compiler="gcc" />
+		<Option compiler="mingw_452" />
 		<Build>
 			<Target title="Debug">
 				<Option output="..\..\Runtime\bin\debug\PhysicsAutomatism.xgdw" prefix_auto="1" extension_auto="0" />
@@ -208,7 +208,7 @@
 				<Option output="..\..\Runtime\bin\dev\PhysicsAutomatism.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
-				<Option compiler="gcc" />
+				<Option compiler="mingw_452" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -320,8 +320,6 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -340,7 +338,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
@@ -364,8 +362,6 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -385,7 +381,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
@@ -408,8 +404,6 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
@@ -428,7 +422,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
@@ -448,8 +442,6 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -468,7 +460,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
@@ -488,8 +480,8 @@
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="../../ExtLibs/boost" />
-					<Add directory="../../ExtLibs/SFML/include" />
+					<Add directory="..\..\ExtLibs\boost" />
+					<Add directory="..\..\ExtLibs\SFML\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -500,11 +492,11 @@
 					<Add option="-lsfml-system" />
 					<Add option="-framework OpenGL" />
 					<Add option="-dynamiclib" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/release/PhysicsAutomatism.xgdm" />
@@ -528,8 +520,8 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="../../ExtLibs/boost" />
-					<Add directory="../../ExtLibs/SFML/include" />
+					<Add directory="..\..\ExtLibs\boost" />
+					<Add directory="..\..\ExtLibs\SFML\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -541,11 +533,11 @@
 					<Add option="-lsfml-system-d" />
 					<Add option="-framework OpenGL" />
 					<Add option="-dynamiclib" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/debug/PhysicsAutomatism.xgdm" />
@@ -636,6 +628,8 @@
 		<Unit filename="Box2D\Box2D\Box2D\Dynamics\b2WorldCallbacks.h" />
 		<Unit filename="ContactListener.cpp" />
 		<Unit filename="ContactListener.h" />
+		<Unit filename="CustomPolygonDialog.cpp" />
+		<Unit filename="CustomPolygonDialog.h" />
 		<Unit filename="Extension.cpp" />
 		<Unit filename="PhysicsAutomatism.cpp" />
 		<Unit filename="PhysicsAutomatism.h" />
@@ -645,6 +639,8 @@
 		<Unit filename="RuntimeScenePhysicsDatas.h" />
 		<Unit filename="ScenePhysicsDatas.cpp" />
 		<Unit filename="ScenePhysicsDatas.h" />
+		<Unit filename="Triangulation\triangulate.cpp" />
+		<Unit filename="Triangulation\triangulate.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
@@ -654,6 +650,7 @@
 				<gui name="wxWidgets" src="" main="" init_handlers="necessary" language="CPP" />
 				<resources>
 					<wxDialog wxs="wxsmith/PhysicsAutomatismEditor.wxs" src="PhysicsAutomatismEditor.cpp" hdr="PhysicsAutomatismEditor.h" fwddecl="0" i18n="1" name="PhysicsAutomatismEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/CustomPolygonDialog.wxs" src="CustomPolygonDialog.cpp" hdr="CustomPolygonDialog.h" fwddecl="0" i18n="1" name="CustomPolygonDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

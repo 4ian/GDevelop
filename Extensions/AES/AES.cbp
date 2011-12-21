@@ -7,10 +7,10 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\Runtime\bin\debug\AES.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\AES.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -37,10 +37,10 @@
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\AES.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\Extensions\AES.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-Wall" />
@@ -106,10 +106,10 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="..\..\Runtime\bin\release\AES.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\AES.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -136,10 +136,10 @@
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\AES.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\Extensions\AES.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -205,10 +205,10 @@
 				</Linker>
 			</Target>
 			<Target title="Development">
-				<Option output="..\..\Runtime\bin\dev\AES.xgdw" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\dev\AES.xgdw" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -235,10 +235,10 @@
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
-				<Option output="..\..\IDE\bin\dev\Extensions\AES.xgdwe" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\dev\Extensions\AES.xgdwe" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
-				<Option compiler="gnu_gcc_compiler__tdmgcc452" />
+				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
 				<Compiler>
 					<Add option="-O2" />
@@ -304,7 +304,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
-				<Option output="..\..\Runtime\bin\release\AES.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\AES.xgdl" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -320,16 +320,14 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl" />
-					<Add option="-lsfml2-audio" />
-					<Add option="-lsfml2-graphics" />
-					<Add option="-lsfml2-window" />
-					<Add option="-lsfml2-system" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -340,11 +338,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\AES.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\Extensions\AES.xgdle" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -364,17 +362,15 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
-					<Add option="-lsfml2-audio" />
-					<Add option="-lsfml2-graphics" />
-					<Add option="-lsfml2-window" />
-					<Add option="-lsfml2-system" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -385,11 +381,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\AES.xgdle" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\Extensions\AES.xgdle" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -408,16 +404,14 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
-					<Add option="-lsfml2-audio" />
-					<Add option="-lsfml2-graphics" />
-					<Add option="-lsfml2-window" />
-					<Add option="-lsfml2-system" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -428,11 +422,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
-				<Option output="..\..\Runtime\bin\debug\AES.xgdl" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\AES.xgdl" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -448,16 +442,14 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-lgdl" />
-					<Add option="-lsfml2-audio" />
-					<Add option="-lsfml2-graphics" />
-					<Add option="-lsfml2-window" />
-					<Add option="-lsfml2-system" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
 					<Add option="-lsndfile" />
 					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
@@ -468,11 +460,11 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
-				<Option output="..\..\Runtime\bin\release\AES.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\AES.xgdm" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -488,8 +480,8 @@
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="..\..\..\libs\boost_1_43_0" />
-					<Add directory="..\..\..\libs\sfml\include" />
+					<Add directory="..\..\ExtLibs\boost" />
+					<Add directory="..\..\ExtLibs\SFML\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -500,11 +492,11 @@
 					<Add option="-lsfml-system" />
 					<Add option="-framework OpenGL" />
 					<Add option="-dynamiclib" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="..\..\..\libs\sfml\lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/release/AES.xgdm" />
@@ -512,7 +504,7 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Mac - Debug">
-				<Option output="..\..\Runtime\bin\debug\AES.xgdm" prefix_auto="0" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\AES.xgdm" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -528,8 +520,8 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="..\..\..\libs\boost_1_43_0" />
-					<Add directory="..\..\..\libs\sfml\include" />
+					<Add directory="..\..\ExtLibs\boost" />
+					<Add directory="..\..\ExtLibs\SFML\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -541,11 +533,11 @@
 					<Add option="-lsfml-system-d" />
 					<Add option="-framework OpenGL" />
 					<Add option="-dynamiclib" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="..\..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="..\..\..\libs\sfml\lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/debug/AES.xgdm" />

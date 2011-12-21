@@ -83,14 +83,6 @@ std::string FunctionEvent::GenerateEventCode(const Game & game, const Scene & sc
     else
         functionCode += "\nvoid GDEventsGeneratedFunction"+name+ToString(this)+"(RuntimeContext * runtimeContext, std::map <std::string, std::vector<Object*> *> & , std::vector <std::string> &)\n{\n";
 
-    if ( useCallerContext ) //If we use the caller context, all objects are declared.
-    {
-        for (unsigned int i = 0;i<game.globalObjects.size();++i)
-            context.ObjectAlreadyDeclared(game.globalObjects[i]->GetName());
-        for (unsigned int i = 0;i<scene.initialObjects.size();++i)
-            context.ObjectAlreadyDeclared(scene.initialObjects[i]->GetName());
-    }
-
     //Generating function body code
     std::string conditionsCode = EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
     std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
@@ -205,7 +197,7 @@ void FunctionEvent::LoadFromXml(const TiXmlElement * elem)
         OpenSaveGame::OpenEvents(events, elem->FirstChildElement( "Events" ));
 
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("useCallerContext", useCallerContext);
-    if ( elem->FirstChildElement( "useCallerContext" ) == NULL ) useCallerContext = true;
+    if ( elem->Attribute( "useCallerContext" ) == NULL ) useCallerContext = true;
 }
 
 

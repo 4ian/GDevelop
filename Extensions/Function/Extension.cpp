@@ -58,7 +58,7 @@ class Extension : public ExtensionBase
             DECLARE_ACTION("LaunchFunction",
                            _("Lancer une fonction"),
                            _("Lance une fonction"),
-                           _("Lancer _PARAM0_ (_PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"),
+                           _("Lancer _PARAM0_ (_PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"),
                            _("Fonctions"),
                            "res/actions/function24.png",
                            "res/actions/function.png");
@@ -204,8 +204,7 @@ class Extension : public ExtensionBase
                     std::string expression;
                     CallbacksForGeneratingExpressionCode callbacks(expression, game, scene, context);
                     GDExpressionParser parser(instruction.parameters[0].GetPlainString());
-                    parser.ParseMathExpression(game, scene, callbacks);
-                    if (expression.empty()) expression = "0";
+                    if (!parser.ParseMathExpression(game, scene, callbacks) || expression.empty()) expression = "0";
 
                     std::string code;
 

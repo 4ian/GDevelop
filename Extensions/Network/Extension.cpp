@@ -46,7 +46,7 @@ class Extension : public ExtensionBase
         {
             DECLARE_THE_EXTENSION("Network",
                                   _("Fonctionnalités réseau"),
-                                  _("Extension permettant de communiquer entre plusieurs jeux"),
+                                  _("Extension permettant de communiquer entre plusieurs jeux."),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 

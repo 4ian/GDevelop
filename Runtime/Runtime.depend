@@ -6130,10 +6130,11 @@
 	"GDL/DynamicExtensionBase.h"
 	"GDL/DynamicLibrariesTools.h"
 
-1313753913 d:\florian\programmation\gamedevelop2\gdl\gdl\dynamicextensionbase.h
+1324491676 d:\florian\programmation\gamedevelop2\gdl\gdl\dynamicextensionbase.h
 	<map>
 	<string>
 	"GDL/Event.h"
+	<boost/shared_ptr.hpp>
 
 1272195179 d:\florian\programmation\gamedevelop2\runtime\compilationchecker.h
 
@@ -6145,7 +6146,7 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1322860984 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1324491676 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1297526378 d:\florian\programmation\gamedevelop2\gdl\gdl\versionwrapper.h
 	<string>

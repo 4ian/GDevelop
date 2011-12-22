@@ -2,6 +2,7 @@
 echo.
 echo Tool for updating include directory for Debug target.
 echo Optional parameters : noPCH to skip headers precompilation.
+echo Optional parameters : onlyPCH to do only headers precompilation.
 if "%1"=="onlyPCH" GOTO PCH
 echo.
 
@@ -9,8 +10,8 @@ echo -Copying files...
 rem del ..\Bin\Debug\include\*.* /S /Q
 
 rem Standard library headers
-xcopy C:\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\*.h ..\Bin\Debug\include\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\*.h /S  /Y /D
-xcopy C:\TDM-GCC-4.5.2\include\*.* ..\Bin\Debug\include\TDM-GCC-4.5.2\include\*.* /S  /Y /D
+xcopy C:\MinGW\lib\gcc\mingw32\4.5.2\include\*.* ..\Bin\Debug\include\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\*.* /S  /Y /D
+xcopy C:\MinGW\include\*.* ..\Bin\Debug\include\TDM-GCC-4.5.2\include\*.* /S  /Y /D
 xcopy ..\..\ExtLibs\llvm\tools\clang\lib\Headers\*.h ..\Bin\Debug\include\llvm\tools\clang\lib\Headers\*.h /S  /Y /D
 
 rem Game Develop C++ Implementation headers

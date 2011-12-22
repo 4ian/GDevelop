@@ -23310,7 +23310,7 @@
 	<vector>
 	<string>
 
-1321306271 d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.h
+1324560653 d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.h
 	<wx/treectrl.h>
 	<wx/notebook.h>
 	<wx/sizer.h>
@@ -25389,7 +25389,7 @@
 1297525936 d:\florian\programmation\gamedevelop2\gdl\gdl\basedebugger.h
 	<SFML/System.hpp>
 
-1322398978 source:d:\florian\programmation\gamedevelop2\ide\demarrage.cpp
+1324423750 source:d:\florian\programmation\gamedevelop2\ide\demarrage.cpp
 	"Demarrage.h"
 	"nommgr.h"
 	<wx/help.h>
@@ -26383,12 +26383,12 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1272046313 d:\florian\programmation\gamedevelop2\ide\compilationchecker.h
+1324504752 d:\florian\programmation\gamedevelop2\ide\compilationchecker.h
 
 1309706027 d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.h
 	"GDL/ExtensionBase.h"
 
-1297526378 d:\florian\programmation\gamedevelop2\gdl\gdl\versionwrapper.h
+1324504752 d:\florian\programmation\gamedevelop2\gdl\gdl\versionwrapper.h
 	<string>
 
 1304159083 d:\florian\programmation\gamedevelop2\gdl\gdl\localemanager.h
@@ -26660,10 +26660,11 @@
 	"GDL/DynamicExtensionBase.h"
 	"GDL/DynamicLibrariesTools.h"
 
-1313753913 d:\florian\programmation\gamedevelop2\gdl\gdl\dynamicextensionbase.h
+1324491676 d:\florian\programmation\gamedevelop2\gdl\gdl\dynamicextensionbase.h
 	<map>
 	<string>
 	"GDL/Event.h"
+	<boost/shared_ptr.hpp>
 
 1264360534 d:\florian\programmation\gamedevelop2\ide\portable.h
 	<wx/sizer.h>
@@ -27588,7 +27589,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1324218805 d:\florian\programmation\gamedevelop2\ide\version.h
+1324558396 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -27964,7 +27965,7 @@
 	<wx/wfstream.h>
 	<wx/txtstrm.h>
 
-1319230948 source:d:\florian\programmation\gamedevelop2\ide\credits.cpp
+1324486852 source:d:\florian\programmation\gamedevelop2\ide\credits.cpp
 	"Credits.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -27977,13 +27978,13 @@
 	<vector>
 	<iostream>
 
-1312669475 source:d:\florian\programmation\gamedevelop2\ide\compilationchecker.cpp
+1324558396 source:d:\florian\programmation\gamedevelop2\ide\compilationchecker.cpp
 	"CompilationChecker.h"
 	"GDL/Version.h"
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1322860984 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1324491676 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 

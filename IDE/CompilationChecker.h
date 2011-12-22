@@ -2,7 +2,7 @@
 #define COMPILATIONCHECKER_H
 
 /**
- * Class used to ensure that the IDE is compiled and runned with the same version of GDL
+ * \brief Internal class used to ensure that the IDE is compiled and run with the same version of GDL
  */
 class CompilationChecker
 {

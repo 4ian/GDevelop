@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-10-25 22:46+0200\n"
+"POT-Creation-Date: 2011-12-18 16:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,46 +16,131 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:46
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseautomatismdlg.cpp:43
-msgid "Choisir un automatisme"
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:53
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1818
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1831
+msgid "Collage spécial"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:54
-msgid ""
-"Choisissez le type de l'automatisme à ajouter.\n"
-"Les automatismes permettent d'ajouter à un\n"
-"objet un comportement prédéfini."
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:61
+msgid "Collage"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:64
-msgid "Informations sur l'automatisme"
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:64
+msgid "Commencer le collage en :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:72
-msgid "Pas d'informations sur l'automatisme"
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:69
+#: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:110
+#: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:120
+#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:255
+#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:273
+#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:247
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1121
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1123
+#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:177
+msgid ";"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:81
-msgid "Plus d'automatismes"
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:74
+msgid "Nombre de copies de l'objet :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:83
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:81
+msgid "en largeur ( X )"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:89
+msgid "en hauteur ( Y )"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:95
+#: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:143
+#: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:145
+#: d:\florian\programmation\gamedevelop2\ide\extensionbugreportdlg.cpp:82
+#: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:283
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:105
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:164
+#: d:\florian\programmation\gamedevelop2\ide\wxstedit\src\stedlgs_wdr.cpp:475
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:405
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:419
+#: d:\florian\programmation\gamedevelop2\extensions\pathautomatism\extension.cpp:67
+#: d:\florian\programmation\gamedevelop2\extensions\pathautomatism\extension.cpp:83
+#: d:\florian\programmation\gamedevelop2\extensions\pathautomatism\extension.cpp:99
+#: d:\florian\programmation\gamedevelop2\extensions\pathautomatism\extension.cpp:113
+msgid "Options"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:97
+msgid "Espacer chaque objet de :"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:100
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:104
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:112
+#: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:107
+#: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:112
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:162
+#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:253
+#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:257
+#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:270
+#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:275
+#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:231
+#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:245
+#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:249
+#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:260
+#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:264
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:234
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteinitialpositionpanel.cpp:49
+#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:150
+#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:175
+#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:179
+#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:187
+#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:191
+#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryinitialpositionpanel.cpp:47
+#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryinitialpositionpanel.cpp:55
+#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryinitialpositionpanel.cpp:63
+#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryinitialpositionpanel.cpp:74
+#: d:\florian\programmation\gamedevelop2\extensions\textobject\textinitialpositionpanel.cpp:47
+#: d:\florian\programmation\gamedevelop2\extensions\textobject\textinitialpositionpanel.cpp:55
+#: d:\florian\programmation\gamedevelop2\extensions\textobject\textinitialpositionpanel.cpp:63
+#: d:\florian\programmation\gamedevelop2\extensions\textobject\textinitialpositionpanel.cpp:74
+msgid "0"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:102
+msgid "pixels en largeur"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:106
+msgid "pixels en hauteur"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:109
+msgid "Appliquer progressivement à chaque objet créé :"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:114
+msgid "° de rotation"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:122
+#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:84
 #: d:\florian\programmation\gamedevelop2\ide\choicefile.cpp:55
 #: d:\florian\programmation\gamedevelop2\ide\choicejoyaxis.cpp:63
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:208
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:209
 #: d:\florian\programmation\gamedevelop2\ide\choixbouton.cpp:55
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:236
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:237
 #: d:\florian\programmation\gamedevelop2\ide\credits.cpp:181
 #: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:138
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:92
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:192
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:94
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:187
 #: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:387
 #: d:\florian\programmation\gamedevelop2\ide\editpropscene.cpp:288
 #: d:\florian\programmation\gamedevelop2\ide\generatepassword.cpp:83
 #: d:\florian\programmation\gamedevelop2\ide\gridsetup.cpp:78
 #: d:\florian\programmation\gamedevelop2\ide\initialvariablesdialog.cpp:90
-#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:89
+#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:90
 #: d:\florian\programmation\gamedevelop2\ide\preferences.cpp:465
 #: d:\florian\programmation\gamedevelop2\ide\setupcompilertoolchaindlg.cpp:228
 #: d:\florian\programmation\gamedevelop2\ide\signemodification.cpp:35
@@ -79,36 +164,37 @@ msgstr ""
 msgid "Ok"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:85
+#: d:\florian\programmation\gamedevelop2\ide\advancedpastedlg.cpp:124
+#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:86
 #: d:\florian\programmation\gamedevelop2\ide\choicefile.cpp:57
 #: d:\florian\programmation\gamedevelop2\ide\choicejoyaxis.cpp:65
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:210
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:211
 #: d:\florian\programmation\gamedevelop2\ide\choixbouton.cpp:57
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:238
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:239
 #: d:\florian\programmation\gamedevelop2\ide\choixtemplateevent.cpp:157
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:71
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:133
 #: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:140
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:94
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:194
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:96
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:189
 #: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:389
 #: d:\florian\programmation\gamedevelop2\ide\editpropscene.cpp:292
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:202
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:367
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:203
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:368
 #: d:\florian\programmation\gamedevelop2\ide\generatepassword.cpp:85
 #: d:\florian\programmation\gamedevelop2\ide\gridsetup.cpp:80
 #: d:\florian\programmation\gamedevelop2\ide\initialvariablesdialog.cpp:92
 #: d:\florian\programmation\gamedevelop2\ide\newcppfiledlg.cpp:123
 #: d:\florian\programmation\gamedevelop2\ide\objectsonbadlayerbox.cpp:64
-#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:91
+#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:92
 #: d:\florian\programmation\gamedevelop2\ide\preferences.cpp:467
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:283
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:238
 #: d:\florian\programmation\gamedevelop2\ide\setupcompilertoolchaindlg.cpp:230
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\advancedtextentrydlg.cpp:50
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\ajoutplusimage.cpp:68
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseautomatismdlg.cpp:69
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\chooselayer.cpp:65
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:109
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:110
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\choosevariabledialog.cpp:97
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editcomment.cpp:59
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editdynamicextensioncallerevent.cpp:86
@@ -122,6 +208,30 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\extensions\timedevent\timedeventeditordlg.cpp:120
 #: d:\florian\programmation\gamedevelop2\extensions\videoobject\videoobjecteditor.cpp:110
 msgid "Annuler"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:47
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseautomatismdlg.cpp:43
+msgid "Choisir un automatisme"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:55
+msgid ""
+"Choisissez le type de l'automatisme à ajouter.\n"
+"Les automatismes permettent d'ajouter à un\n"
+"objet un comportement prédéfini."
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:65
+msgid "Informations sur l'automatisme"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:73
+msgid "Pas d'informations sur l'automatisme"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\automatismtypechoice.cpp:82
+msgid "Plus d'automatismes"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\bugreport.cpp:70
@@ -151,7 +261,7 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp:110
 #: d:\florian\programmation\gamedevelop2\ide\demarrage.cpp:227
 #: d:\florian\programmation\gamedevelop2\ide\demarrage.cpp:271
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:126
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:128
 msgid "Suivant"
 msgstr ""
 
@@ -384,35 +494,35 @@ msgstr ""
 msgid "Axe"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:108
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:109
 msgid "Editer l'action"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:121
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:143
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:158
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:122
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:144
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:159
 msgid "Choisissez une action à paramétrer."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:127
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:129
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:131
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:133
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:142
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:144
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:146
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:148
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:89
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:91
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:93
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:95
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:128
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:130
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:132
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:134
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:143
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:145
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:147
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:149
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:90
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:92
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:94
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:96
 msgid "Choisissez un objet dans la liste"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:134
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:149
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:123
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:185
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:135
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:150
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:125
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:187
 #: d:\florian\programmation\gamedevelop2\ide\editorobjets.cpp:68
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:346
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:225
@@ -425,104 +535,104 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension2.cpp:154
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension2.cpp:171
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension2.cpp:202
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:96
-msgid "Objets"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:135
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:150
-#: d:\florian\programmation\gamedevelop2\ide\editorobjets.cpp:69
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:97
-msgid "Groupes d'objets"
+msgid "Objets"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:136
 #: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:151
-#: d:\florian\programmation\gamedevelop2\ide\editorobjets.cpp:73
-#: d:\florian\programmation\gamedevelop2\ide\fusion.cpp:87
+#: d:\florian\programmation\gamedevelop2\ide\editorobjets.cpp:69
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:98
-msgid "Objets globaux"
+msgid "Groupes d'objets"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:137
 #: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:152
-#: d:\florian\programmation\gamedevelop2\ide\editorobjets.cpp:74
+#: d:\florian\programmation\gamedevelop2\ide\editorobjets.cpp:73
+#: d:\florian\programmation\gamedevelop2\ide\fusion.cpp:87
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:99
+msgid "Objets globaux"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:138
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:153
+#: d:\florian\programmation\gamedevelop2\ide\editorobjets.cpp:74
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:100
 msgid "Groupes globaux"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:148
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:270
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:423
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:149
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:271
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:424
 msgid "Toutes les actions"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:149
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:164
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:150
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:165
 msgid "Par objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:159
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:160
 msgid "Aucune action choisie"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:166
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:167
 msgid "Choisissez une action dans le menu de gauche"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:167
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:184
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:168
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:185
 msgid "Pour plus d'informations sur la condition, consultez l'aide."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:180
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:195
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:181
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:196
 msgid "Sélection des objets"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:182
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:199
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:183
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:200
 msgid "Par défaut"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:184
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:185
 msgid "Ne seront pris en compte que les objets concernés par les autres conditions et actions de l'évènement."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:186
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:203
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:187
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:204
 msgid "Forcer en global"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:187
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:188
 msgid "Tous les objets de la scène seront concernés par cette action."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:201
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:202
 msgid "Plus d'actions"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:203
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:231
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:204
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:232
 msgid "Ranger par objets"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:212
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:240
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:213
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:241
 #: d:\florian\programmation\gamedevelop2\ide\choixtemplateevent.cpp:159
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:148
 #: d:\florian\programmation\gamedevelop2\ide\compilation.cpp:218
 #: d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp:180
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:196
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:264
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:191
 #: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:266
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:191
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:193
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:268
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:192
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:194
 #: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:391
 #: d:\florian\programmation\gamedevelop2\ide\editpropscene.cpp:296
 #: d:\florian\programmation\gamedevelop2\ide\errorcompilation.cpp:160
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:394
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:396
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:395
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:397
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:289
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:332
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:334
@@ -530,10 +640,10 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\ide\preferences.cpp:469
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:282
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:284
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:257
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:259
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:133
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:189
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:212
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:214
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:135
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:191
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\choosevariabledialog.cpp:99
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editcomment.cpp:61
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editdynamicextensioncallerevent.cpp:88
@@ -544,13 +654,13 @@ msgstr ""
 msgid "Aide"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:294
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:446
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:324
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:477
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:438
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:531
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:664
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:295
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:447
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:325
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:478
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:440
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:534
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:675
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editexpression.cpp:502
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editexpression.cpp:537
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\edittextdialog.cpp:196
@@ -558,10 +668,10 @@ msgstr ""
 msgid "Tous les objets"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:303
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:453
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:334
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:484
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:304
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:454
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:335
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:485
 #: d:\florian\programmation\gamedevelop2\ide\initialpositionbrowserdlg.cpp:39
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:37
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:54
@@ -653,21 +763,21 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:338
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:359
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:375
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:391
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:407
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:423
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:455
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:465
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:475
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:485
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:494
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:502
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:509
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:515
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:522
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:528
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:534
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:540
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:390
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:406
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:422
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:454
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:464
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:474
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:484
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:493
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:501
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:508
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:514
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:521
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:527
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:533
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:539
 #: d:\florian\programmation\gamedevelop2\extensions\astarautomatism\extension.cpp:71
 #: d:\florian\programmation\gamedevelop2\extensions\astarautomatism\extension.cpp:89
 #: d:\florian\programmation\gamedevelop2\extensions\astarautomatism\extension.cpp:106
@@ -938,10 +1048,10 @@ msgstr ""
 msgid "Objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:342
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:500
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:373
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:531
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:343
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:501
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:374
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:532
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:515
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:530
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editexpression.cpp:538
@@ -1020,46 +1130,46 @@ msgstr ""
 msgid "Automatisme"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:599
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:628
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:600
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:629
 msgid "Paramètre :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:651
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:680
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:652
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:681
 msgid " :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:763
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:764
 #: d:\florian\programmation\gamedevelop2\extensions\textobject\textobjecteditor.cpp:165
 msgid "Choisissez une police de caractère ( fichiers ttf, ttc )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:775
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:776
 msgid "Choisissez une musique ( fichiers ogg )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:787
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:788
 msgid "Choisissez un son ( fichiers wav )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:828
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:860
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:829
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:861
 msgid "oui"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:832
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:862
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:833
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:863
 msgid "non"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:946
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:943
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:947
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:944
 msgid "Trop peu de paramètres. Ceci peut être dû à un bug de Game Develop."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:986
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:983
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:987
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:984
 #, c-format
 msgid ""
 "Erreur dans le paramètre n°%i : %s\n"
@@ -1067,8 +1177,8 @@ msgid ""
 "Êtes vous sûr de vouloir valider ce paramètre ?"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:986
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:983
+#: d:\florian\programmation\gamedevelop2\ide\choixaction.cpp:987
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:984
 msgid "Un paramètre contient une ou plusieurs erreurs."
 msgstr ""
 
@@ -1156,72 +1266,72 @@ msgid ""
 "Shift gauche : non"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:123
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:124
 msgid "Editer la condition"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:136
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:137
 msgid "Choisissez une condition à paramétrer."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:163
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:299
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:454
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:164
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:300
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:455
 msgid "Toutes les conditions"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:176
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:177
 msgid "Aucune condition choisie"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:183
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:184
 msgid "Choisissez une condition dans le menu de gauche"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:201
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:202
 msgid "Ne seront pris en compte que les objets concernés par les autres conditions de l'évènement."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:204
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:205
 msgid "Tous les objets de la scène seront concernés par cette condition."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:209
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:210
 msgid "Inversion"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:213
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:214
 msgid "Inverser la condition"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:215
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:216
 msgid "Cochez pour que la condition vérifie l'inverse de ce qu'elle devrait faire."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:229
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:230
 msgid "Plus de conditions"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:851
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:852
 msgid "Choisissez Vrai ou Faux pour remplir le paramètre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:851
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:852
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\translatecondition.cpp:91
 msgid "Vrai ou Faux"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:853
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:854
 #: d:\florian\programmation\gamedevelop2\ide\trueorfalse.cpp:44
 msgid "Vrai"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:855
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:856
 #: d:\florian\programmation\gamedevelop2\ide\trueorfalse.cpp:46
 msgid "Faux"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:1042
+#: d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp:1043
 msgid ""
 "Attention. Cette option n'est présente que par compatibilité avec les anciennes versions de Game Develop.\n"
 "Elle ne doit plus être utilisée dans les nouveaux jeux et pourrait être enlevée dans les prochaines versions."
@@ -1278,7 +1388,7 @@ msgid "Description paramètre 8"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\choixtemplateevent.cpp:155
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:380
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:381
 msgid "Insérer"
 msgstr ""
 
@@ -1288,7 +1398,7 @@ msgid "Tous les modèles"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\choixtemplateevent.cpp:268
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:80
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:81
 msgid "Erreur lors du chargement : "
 msgstr ""
 
@@ -1302,40 +1412,40 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:61
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:126
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:259
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:103
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:373
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:261
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:104
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:374
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:165
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:150
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1809
 msgid "Copier"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:64
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:127
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:260
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:106
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:374
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:262
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:107
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:375
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:168
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:153
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1812
 msgid "Couper"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:67
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:128
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:261
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:109
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:375
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:263
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:110
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:376
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:171
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:156
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:167
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1815
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1828
 msgid "Coller"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:74
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:134
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:204
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:368
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:284
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:205
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:369
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:239
 msgid "Refaire"
 msgstr ""
 
@@ -1346,46 +1456,30 @@ msgid "Enregistrer"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:124
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:257
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:371
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:259
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:372
 msgid "Presse papiers"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:131
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:365
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:366
 msgid "Annulation"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:137
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:389
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:390
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:278
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:252
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:207
 msgid "Outils"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:139
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:386
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:387
 msgid "Chercher / Remplacer"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:140
 msgid "Aller à..."
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:143
-#: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:145
-#: d:\florian\programmation\gamedevelop2\ide\extensionbugreportdlg.cpp:82
-#: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:283
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:103
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:162
-#: d:\florian\programmation\gamedevelop2\ide\wxstedit\src\stedlgs_wdr.cpp:475
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:405
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:419
-#: d:\florian\programmation\gamedevelop2\extensions\pathautomatism\extension.cpp:67
-#: d:\florian\programmation\gamedevelop2\extensions\pathautomatism\extension.cpp:83
-#: d:\florian\programmation\gamedevelop2\extensions\pathautomatism\extension.cpp:99
-#: d:\florian\programmation\gamedevelop2\extensions\pathautomatism\extension.cpp:113
-msgid "Options"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\codeeditor.cpp:150
@@ -1526,7 +1620,7 @@ msgid "Compilation annulée"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\consoleframe.cpp:32
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:148
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:150
 msgid "Console Game Develop"
 msgstr ""
 
@@ -1584,20 +1678,24 @@ msgid "Paramètres"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp:176
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:381
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:382
 #: d:\florian\programmation\gamedevelop2\ide\generatepassword.cpp:72
 msgid "Créer"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp:258
+#: d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp:260
+msgid "Impossible d'enregistrer le fichier dans le dossier Template de Game Develop : Vérifiez que Game Develop est lancé avec les autorisations nécessaires. Il va vous être proposer d'enregistrer le fichier dans un emplacement de votre choix."
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp:262
 msgid "Choisissez où enregistrer le modèle"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp:267
+#: d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp:271
 msgid "Impossible d'enregistrer le fichier. Vérifiez que le disque comporte assez d'espace disque, qu'il n'est pas protégé en écriture, et que vous possèdez les autorisations nécessaires."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp:272
+#: d:\florian\programmation\gamedevelop2\ide\createtemplate.cpp:279
 msgid "Le modèle a été correctement créé."
 msgstr ""
 
@@ -1747,112 +1845,112 @@ msgstr ""
 msgid "http://www.boost.org/"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:82
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:84
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:84
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:86
 #: d:\florian\programmation\gamedevelop2\ide\editorlayers.cpp:62
 #: d:\florian\programmation\gamedevelop2\ide\initialvariablesdialog.cpp:81
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\choosevariabledialog.cpp:86
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:261
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:140
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:141
 msgid "Pane caption"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:108
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:110
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:182
 msgid "Objet :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:113
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:115
 msgid "Supprimer cet objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:122
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:501
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:124
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:503
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:259
 #: d:\florian\programmation\gamedevelop2\ide\preferences.cpp:453
 #: d:\florian\programmation\gamedevelop2\ide\preferences.cpp:521
 msgid "Général"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:139
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:141
 msgid "Jouer la scène"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:140
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:142
 msgid "Mettre en pause la scène"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:142
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:144
 msgid "Avancer d'une étape"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:144
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:99
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:122
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:146
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:169
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:243
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:298
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:146
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:101
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:124
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:148
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:171
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:245
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:300
 msgid "Ajouter un objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:145
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:147
 msgid "Ajouter une variable de la scène"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:146
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:148
 msgid "Ajouter une variable globale"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:168
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:170
 msgid "Images par secondes ( FPS )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:169
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:171
 msgid "Temps depuis la dernière image"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:170
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:172
 msgid "Nombres d'objets"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:171
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:173
 msgid "Nombres de ressources"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:172
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:174
 msgid "Taille de la fenêtre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:173
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:175
 msgid "Position de la souris sur la fenêtre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:174
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:176
 msgid "Temps depuis le début de la scène"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:176
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:178
 msgid "Variables de la scène"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:285
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:287
 msgid " i/s"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:317
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:319
 msgid "Variables globales"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:361
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:363
 msgid "objets"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:515
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:517
 msgid "Spécifique"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:529
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:531
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:287
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:305
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:458
@@ -1877,74 +1975,74 @@ msgstr ""
 msgid "Variables"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:574
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:589
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:605
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:627
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:636
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:663
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:576
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:591
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:607
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:629
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:638
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:665
 msgid "Entrez la nouvelle valeur"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:574
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:589
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:627
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:636
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:663
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:576
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:591
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:629
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:638
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:665
 msgid "Edition d'une valeur"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:578
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:593
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:667
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:580
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:595
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:669
 msgid ""
 "Impossible de modifier la valeur.\n"
 "La valeur entrée peut être incorrecte, ou la propriété en lecture seule."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:605
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:607
 msgid "Edition d'une variable"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:702
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:721
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:704
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:723
 msgid "Entrez le nom de la nouvelle variable"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:702
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:711
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:704
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:713
 msgid "Ajout d'une variable de la scène"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:707
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:726
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:709
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:728
 msgid "Une variable avec ce nom existe déjà"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:711
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:730
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:713
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:732
 msgid "Entrez la valeur de la variable"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:721
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:730
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:723
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:732
 msgid "Ajout d'une variable globale"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:753
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:755
 msgid "Impossible de créer l'objet."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:757
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:759
 msgid "Entrez la position X de l'objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:757
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:758
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:759
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:760
 msgid "Ajout d'un objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:758
+#: d:\florian\programmation\gamedevelop2\ide\debuggergui.cpp:760
 msgid "Entrez la position Y de l'objet"
 msgstr ""
 
@@ -1964,7 +2062,8 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\demarrage.cpp:201
 msgid ""
-"Vous allez pouvoir régler quelques paramétrages et accéder aux conseils pour démarrer au mieux avec Game Develop.\n"
+"Vous allez pouvoir régler quelques paramétrages et accéder aux\n"
+"conseils pour démarrer au mieux avec Game Develop.\n"
 "\n"
 "Cliquez sur suivant pour continuer."
 msgstr ""
@@ -2150,15 +2249,15 @@ msgid "Caméra n°"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:79
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:244
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:112
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:180
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:198
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:246
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:113
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:181
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:199
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:316
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:161
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:183
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:394
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:202
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:203
 msgid "Supprimer"
 msgstr ""
 
@@ -2187,47 +2286,6 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:105
 msgid "De"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:107
-#: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:112
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:167
-#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:253
-#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:257
-#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:270
-#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:275
-#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:231
-#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:245
-#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:249
-#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:260
-#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:264
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:234
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteinitialpositionpanel.cpp:49
-#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:150
-#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:175
-#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:179
-#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:187
-#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:191
-#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryinitialpositionpanel.cpp:47
-#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryinitialpositionpanel.cpp:55
-#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryinitialpositionpanel.cpp:63
-#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryinitialpositionpanel.cpp:74
-#: d:\florian\programmation\gamedevelop2\extensions\textobject\textinitialpositionpanel.cpp:47
-#: d:\florian\programmation\gamedevelop2\extensions\textobject\textinitialpositionpanel.cpp:55
-#: d:\florian\programmation\gamedevelop2\extensions\textobject\textinitialpositionpanel.cpp:63
-#: d:\florian\programmation\gamedevelop2\extensions\textobject\textinitialpositionpanel.cpp:74
-msgid "0"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:110
-#: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:120
-#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:255
-#: d:\florian\programmation\gamedevelop2\ide\editpropjeu.cpp:273
-#: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:247
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1110
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1112
-#: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp:177
-msgid ";"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\editlayer.cpp:115
@@ -2260,59 +2318,70 @@ msgstr ""
 msgid "Impossible d'enlever l'unique camera du calque."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:61
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:63
 msgid "Editer le groupe d'objets"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:73
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:75
 msgid ""
 "Les groupes d'objets permettent d'utiliser le nom\n"
 "du groupe pour se référer à tous les objets qu'il\n"
 "contient."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:102
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:104
 msgid "Supprimer l'objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:123
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:299
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:125
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:301
 msgid "Supprimer l'objet selectionné"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:125
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:146
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:127
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:147
 msgid "Aide de l'éditeur de groupes d'objets"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:160
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:215
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:158
+msgid "Vous avez apporté "
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:158
+msgid " modifications. Êtes vous sûr d'annuler tous les changements ?"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:158
+msgid "Beaucoup de modifications ont été apportées."
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:169
 msgid "Tous les objets du groupe"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:209
-msgid "L'objet est déjà dans ce groupe."
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:217
+msgid "L'objet "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:226
-msgid "Aucun objet sélectionnée"
+#: d:\florian\programmation\gamedevelop2\ide\editobjectgroup.cpp:217
+msgid " est déjà dans ce groupe."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:79
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:78
 msgid "Editer les options avancées d'un objet sur la scène"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:89
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:88
 msgid "Objet concerné :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:91
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:90
 #: d:\florian\programmation\gamedevelop2\ide\editorjeu.cpp:55
 #: d:\florian\programmation\gamedevelop2\ide\editpropscene.cpp:134
 msgid "Sans Nom"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:108
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:107
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:33
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:50
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:67
@@ -2327,33 +2396,33 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:722
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension2.cpp:117
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\object.cpp:216
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:463
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:473
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:483
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:492
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:462
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:472
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:482
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:491
 #: d:\florian\programmation\gamedevelop2\extensions\box3dobject\extension.cpp:171
 #: d:\florian\programmation\gamedevelop2\extensions\box3dobject\extension.cpp:189
 #: d:\florian\programmation\gamedevelop2\extensions\box3dobject\extension.cpp:317
 msgid "Position"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:111
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:110
 msgid "X :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:114
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:113
 msgid "Coordonnée X de l'objet sur la scène"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:116
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:115
 msgid "Y :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:119
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:118
 msgid "Coordonnée Y de l'objet sur la scène."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:123
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:122
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:675
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:681
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:688
@@ -2364,8 +2433,8 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:183
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:266
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:283
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:533
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:539
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:532
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:538
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\windowextension.cpp:32
 #: d:\florian\programmation\gamedevelop2\extensions\box3dobject\extension.cpp:65
 #: d:\florian\programmation\gamedevelop2\extensions\box3dobject\extension.cpp:82
@@ -2381,21 +2450,21 @@ msgstr ""
 msgid "Taille"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:127
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:126
 msgid "Taille personnalisée"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:132
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:131
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\propimage.cpp:91
 msgid "Largeur :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:137
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:136
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\propimage.cpp:95
 msgid "Hauteur :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:145
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:144
 #: d:\florian\programmation\gamedevelop2\ide\editorlayers.cpp:110
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:369
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:374
@@ -2420,17 +2489,11 @@ msgstr ""
 msgid "Calque"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:150
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:149
 msgid "Calque de l'objet :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:155
-msgid ""
-"Mettez un nom de calque vide pour mettre l'objet\n"
-"sur le calque de base."
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:161
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:156
 #: d:\florian\programmation\gamedevelop2\ide\initialpositionbrowserdlg.cpp:43
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:256
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:353
@@ -2439,28 +2502,28 @@ msgstr ""
 msgid "Plan"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:165
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:160
 msgid "Plan n° :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:168
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:163
 msgid "Plan initial de l'objet sur la scène."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:171
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:166
 msgid ""
 "0 par défaut. Plus le plan est grand,\n"
 "plus l'objet sera au dessus des autres."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:227
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:234
-#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:316
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:222
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:229
+#: d:\florian\programmation\gamedevelop2\ide\editoptionsposition.cpp:311
 #: d:\florian\programmation\gamedevelop2\ide\editorlayers.cpp:178
 #: d:\florian\programmation\gamedevelop2\ide\objectsonbadlayerbox.cpp:79
 #: d:\florian\programmation\gamedevelop2\ide\objectsonbadlayerbox.cpp:102
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:900
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:912
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:904
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:916
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\chooselayer.cpp:80
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\chooselayer.cpp:96
 msgid "Calque de base"
@@ -2568,13 +2631,13 @@ msgid "Déplacer le calque au dessous"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\editorlayers.cpp:131
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:301
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:347
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:303
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:348
 msgid "Plus d'options d'édition ( clic droit sur la liste )"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\editorlayers.cpp:133
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:305
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:307
 msgid "Aide de l'éditeur d'objets"
 msgstr ""
 
@@ -2595,238 +2658,238 @@ msgstr ""
 msgid "Impossible de trouver le calque à déplacer !"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:122
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:300
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:124
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:302
 msgid "Modifier les propriétés de l'objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:125
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:127
 msgid "Variables initiales"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:130
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:132
 msgid "Ajouter un automatisme"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:133
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:135
 msgid "Renommer un automatisme"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:136
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:138
 msgid "Supprimer un automatisme"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:139
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:141
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:510
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:525
 msgid "Automatismes"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:140
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:142
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:317
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:334
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:355
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:371
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:387
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:403
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:419
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:386
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:402
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:418
 #: d:\florian\programmation\gamedevelop2\extensions\textobject\extension.cpp:150
 #: d:\florian\programmation\gamedevelop2\extensions\videoobject\extension.cpp:218
 msgid "Effets"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:142
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:144
 msgid "Modifier le nom de l'objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:149
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:151
 msgid "Supprimer l'objet\tDel"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:153
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:155
 msgid "Déplacer vers le haut\tCtrl-Up"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:156
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:158
 msgid "Déplacer vers le bas\tCtrl-Down"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:160
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:182
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:162
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:183
 msgid "Copier\tCtrl-C"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:163
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:185
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:165
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:186
 msgid "Couper\tCtrl-X"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:166
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:173
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:188
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:168
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:175
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:189
 msgid "Coller\tCtrl-V"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:176
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:178
 msgid "Supprimer les objets\tDEL"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:176
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:178
 msgid "Supprimer tous les objets selectionnés"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:241
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:243
 msgid "Liste d'objets"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:245
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:181
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:247
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:182
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:318
 #: d:\florian\programmation\gamedevelop2\ide\initialvariablesdialog.cpp:128
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\choosevariabledialog.cpp:132
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:213
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:214
 msgid "Déplacer vers le haut"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:246
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:182
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:248
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:183
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:319
 #: d:\florian\programmation\gamedevelop2\ide\initialvariablesdialog.cpp:129
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\choosevariabledialog.cpp:133
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:189
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:216
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:190
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:217
 msgid "Déplacer vers le bas"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:247
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:90
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:249
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:92
 msgid "Rechercher"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:248
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:294
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:250
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:249
 msgid "Rafraichir"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:251
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:185
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:253
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:186
 msgid "Objet sélectionné"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:253
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:248
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:255
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:203
 msgid "Edition"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:254
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:188
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:256
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:189
 msgid "Editer le nom"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:296
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:138
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:342
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:298
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:139
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:343
 msgid "Rafraichir la liste d'images"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:303
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:305
 msgid "Rechercher un objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:537
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:540
 msgid "Aucun objet sélectionné"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:550
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:557
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:553
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:560
 msgid "Nouvel_objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:581
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:882
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:588
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:902
 msgid "L'objet a été correctement ajouté"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:593
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:600
 msgid "Supprimer également toutes les références à l'objet dans les groupes et les évènements ( Soit les actions et conditions utilisant l'objet ) ?"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:594
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:601
 #, c-format
 msgid "Supprimer également toutes les références aux %i objets dans les groupes et les évènements ( Soit les actions et conditions utilisant l'objet ) ?"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:595
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:413
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:602
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:416
 msgid "Confirmation de la suppression"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:683
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:694
 msgid "Impossible de renommer l'objet : un autre objet porte déjà ce nom."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:692
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:703
 msgid "Le nom de l'objet contient des espaces, des caractères non autorisés ou représente un nom d'une expression. Utilisez uniquement des lettres, chiffres et underscores ( _ )."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:692
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:703
 msgid "Attention"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:768
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:780
 msgid "Entrez l'objet à rechercher"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:768
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:780
 msgid "Chercher un objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:806
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:818
 msgid "Impossible de trouver l'objet à copier"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:824
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:836
 msgid "Impossible de trouver l'objet à couper"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:852
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:868
 msgid "Pas d'objet à coller."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:859
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:866
-msgid "Copie de "
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:882
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:639
+msgid "Copie_de_"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:903
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:950
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:923
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:974
 msgid "L'objet à déplacer n'a pas été trouvé."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1011
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1032
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1070
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1039
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1060
 #: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1102
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1138
 msgid "L'objet à éditer n'a pas été trouvé."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1044
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1072
 msgid "Impossible de créer l'automatisme."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1082
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1114
 msgid "Choisissez l'automatisme à supprimer"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1082
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1114
 msgid "Choisir l'automatisme à supprimer"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1114
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1150
 msgid "Choisissez l'automatisme à renommer"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1114
+#: d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp:1150
 msgid "Choisir l'automatisme à renommer"
 msgstr ""
 
@@ -2846,93 +2909,84 @@ msgstr ""
 msgid "Global à tout le jeu"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:83
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:187
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:84
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:188
 msgid "Editer le groupe"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:92
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:93
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:113
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:142
 msgid "Modifier le nom"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:96
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:140
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:179
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:97
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:141
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:180
 msgid "Ajouter un groupe"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:99
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:100
 msgid "Supprimer le groupe"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:141
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:142
 msgid "Supprimer le groupe selectionné"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:142
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:143
 msgid "Modifier le groupe"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:143
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:144
 msgid "Déplacer le groupe vers le haut"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:144
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:145
 msgid "Déplacer le groupe vers le bas"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:177
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:178
 msgid "Liste de groupes"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:215
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:216
 msgid "Tous les groupes d'objets de la scène"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:381
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:389
-msgid "Nouveau groupe"
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:383
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:391
+msgid "Nouveau_groupe"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:398
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:401
 msgid "Le groupe a été correctement ajouté"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:411
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:414
 msgid "Supprimer également toutes les références au groupe dans les évènements ( Soit les actions et conditions utilisant le groupe ) ?"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:412
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:415
 #, c-format
 msgid "Supprimer également toutes les références aux %i groupes dans les évènements ( Soit les actions et conditions utilisant les groupes ) ?"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:419
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:564
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:422
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:569
 msgid "Aucun groupe sélectionné"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:484
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:488
 msgid "Contenu du groupe \""
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:533
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:537
 msgid "Impossible de renommer le groupe : un autre groupe porte déjà ce nom."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:561
+#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:566
 msgid "Tous les groupes de de la scène"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:627
-#: d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp:635
-#: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:1032
-#: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:1036
-#: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:1510
-#: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:1514
-msgid "Copie de"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\editorscene.cpp:91
@@ -2946,17 +3000,17 @@ msgid "Editeur de scène"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\editorscene.cpp:125
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:280
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:235
 msgid "Editeur d'objets"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\editorscene.cpp:126
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:281
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:236
 msgid "Editeur de calques"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\editorscene.cpp:127
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:298
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:253
 msgid "Debugger"
 msgstr ""
 
@@ -2965,7 +3019,7 @@ msgid "Positions initiales des objets"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\editorscene.cpp:129
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:299
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:254
 msgid "Performances"
 msgstr ""
 
@@ -3064,7 +3118,7 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:155
 #: d:\florian\programmation\gamedevelop2\ide\importimage.cpp:188
 #: d:\florian\programmation\gamedevelop2\ide\renderdialog.cpp:22
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:249
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:204
 msgid "Aperçu"
 msgstr ""
 
@@ -3289,25 +3343,25 @@ msgstr ""
 msgid "Si vous n'arrivez pas à résoudre le problème, n'hésitez pas à nous contacter"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:146
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:148
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:354
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:147
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:149
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:355
 msgid "Ajouter un évènement"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:151
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:152
 msgid "Ajouter un sous évènement"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:153
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:154
 msgid "Un sous évènement"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:156
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:157
 msgid "Ajouter un autre type d'évènement"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:158
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:159
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\advancedextension.cpp:22
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\sceneextension.cpp:42
 #: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\extension.cpp:221
@@ -3316,78 +3370,78 @@ msgstr ""
 msgid "Autre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:165
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:167
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:896
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:166
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:168
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:897
 msgid "Ajouter une condition"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:176
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:177
 msgid "Supprimer\tDEL"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:179
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:180
 msgid "Dés/activer"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:192
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:193
 msgid "Annuler\tCtrl-Z"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:195
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:196
 msgid "Refaire\tCtrl-Y"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:352
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:353
 msgid "Insertion"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:355
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:356
 msgid "Ajouter un sous-évènement"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:356
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:357
 msgid "Ajouter un commentaire"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:357
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:358
 msgid "Ajouter..."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:360
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:361
 msgid "Suppression"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:362
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:363
 msgid "Supprimer la sélection"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:378
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:379
 msgid "Modèles"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:384
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:385
 msgid "Recherche"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:391
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:392
 msgid "Afficher les performances"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:466
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:467
 msgid ""
 "Ajoutez un premier évènement avec le ruban.\n"
 "Passez ensuite la souris sur un évènement/action/condition pour obtenir plus d'options d'édition,\n"
 "ou double cliquez pour éditer un élement."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:468
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:469
 msgid ""
 "Passez la souris sur un évènement/action/condition pour obtenir plus d'options d'édition,\n"
 "ou double cliquez pour éditer un élement."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:896
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:897
 msgid "Ajouter une action"
 msgstr ""
 
@@ -3400,7 +3454,11 @@ msgstr ""
 msgid "Impossible de créer un évènement commentaire."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:1552
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:1508
+msgid "Veuillez selectionner les évènements à utiliser pour créer le modèle, puis recliquez sur le bouton \"Créer\"."
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp:1559
 msgid "Le suivi des performances n'est pas activé. Activez le suivi des évènements à l'aide de la fenêtre Performances lors de l'aperçu puis lancez un aperçu de la scène."
 msgstr ""
 
@@ -3605,18 +3663,18 @@ msgstr ""
 msgid " )."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp:206
+#: d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp:203
 msgid "Une autre instance de Game Develop est actuellement ouverte. Glissez-déposez dessus un fichier pour l'ouvrir."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp:220
+#: d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp:217
 msgid ""
 "La version du fichier GDL.dll ( ou GDL.so ) semble être incorrecte. Veuillez réinstaller Game Develop afin que le programme fonctionne correctement.\n"
 "Si le problème persiste, assurez vous qu'il n'existe pas une nouvelle version de Game Develop sur le site officiel : http://www.compilgames.net\n"
 "Si non, prenez contact avec l'auteur."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp:327
+#: d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp:325
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:152
 #: d:\florian\programmation\gamedevelop2\ide\mainfichier.cpp:80
 #: d:\florian\programmation\gamedevelop2\ide\startherepage.cpp:331
@@ -3748,10 +3806,10 @@ msgid "Ajout de ressources"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:310
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:177
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:192
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:206
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:344
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:178
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:193
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:207
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:345
 msgid "Ajouter une image"
 msgstr ""
 
@@ -3786,7 +3844,7 @@ msgid "Modifier le fichier"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\game_develop_editormain.cpp:328
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:141
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1800
 msgid "Propriétés"
 msgstr ""
 
@@ -3999,7 +4057,7 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\choixdossier.cpp:73
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseautomatismdlg.cpp:67
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\chooselayer.cpp:63
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:107
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:108
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\choosevariabledialog.cpp:95
 msgid "Choisir"
 msgstr ""
@@ -4086,12 +4144,12 @@ msgid "L'espacement vertical est invalide ( doit être supérieur ou égal à 0 
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\initialpositionbrowserdlg.cpp:40
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:69
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:76
 msgid "X"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\initialpositionbrowserdlg.cpp:41
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:68
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:75
 msgid "Y"
 msgstr ""
 
@@ -4213,7 +4271,7 @@ msgid "Veuillez patienter pendant la compilation des sources C++..."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\mainfichier.cpp:345
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:86
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:89
 msgid "La scène "
 msgstr ""
 
@@ -4323,7 +4381,7 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\messageplus.cpp:72
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:317
-#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryobject.cpp:149
+#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryobject.cpp:144
 #: d:\florian\programmation\gamedevelop2\extensions\textobject\textobject.cpp:214
 #: d:\florian\programmation\gamedevelop2\extensions\videoobject\videoobject.cpp:228
 #: d:\florian\programmation\gamedevelop2\extensions\videoobject\videoobject.cpp:230
@@ -4333,8 +4391,8 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\ide\messageplus.cpp:74
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\commoninstructionsextension.cpp:153
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:320
-#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryobject.cpp:149
-#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryobject.cpp:155
+#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryobject.cpp:144
+#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryobject.cpp:150
 #: d:\florian\programmation\gamedevelop2\extensions\textobject\textobject.cpp:214
 #: d:\florian\programmation\gamedevelop2\extensions\textobject\textobject.cpp:248
 #: d:\florian\programmation\gamedevelop2\extensions\videoobject\videoobject.cpp:228
@@ -4547,11 +4605,11 @@ msgstr ""
 msgid "sur le calque :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:50
+#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:51
 msgid "Choisir un type d'objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:60
+#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:61
 msgid ""
 "Choisissez le type d'objet à ajouter.\n"
 "Le type de l'objet détermine la façon dont\n"
@@ -4559,15 +4617,15 @@ msgid ""
 "interagir avec..."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:70
+#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:71
 msgid "Informations sur l'objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:78
+#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:79
 msgid "Pas d'informations sur l'objet."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:87
+#: d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp:88
 msgid "Plus d'objets"
 msgstr ""
 
@@ -5040,7 +5098,7 @@ msgid "Ajouter des évènements externes"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:154
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:199
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:200
 msgid "Renommer"
 msgstr ""
 
@@ -5140,6 +5198,13 @@ msgstr ""
 msgid "Erreur"
 msgstr ""
 
+#: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:1032
+#: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:1036
+#: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:1510
+#: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:1514
+msgid "Copie de"
+msgstr ""
+
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:1195
 #: d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp:1212
 msgid ""
@@ -5166,200 +5231,210 @@ msgstr ""
 msgid "Fichier introuvable"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:114
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:119
 msgid "Compilation en cours..."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:132
-msgid "Passer le(s) objet(s) sur le calque supérieur"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:134
-msgid "Passer le(s) objet(s) sur le calque inférieur"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:136
-msgid "Supprimer la sélection\tDEL"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:138
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:163
-msgid "Ajouter un objet\tINSER"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:173
-msgid "5%"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:175
-msgid "10%"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:177
-msgid "25%"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:179
-msgid "50%"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:181
-msgid "100%"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:183
-msgid "150%"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:185
-msgid "200%"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:187
-msgid "500%"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:246
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:201
 msgid "Mode"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:282
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:65
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:237
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:66
 msgid "Choisir un objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:285
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:240
 msgid "Revenir à l'origine"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:286
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:241
 msgid "Zoom initial"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:287
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:242
 msgid "Grille"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:288
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:243
 msgid "Editer la grille"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:289
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:244
 msgid "Masque de la fen. de jeu"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:290
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:245
 msgid "Liste des objets"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:295
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:250
 msgid "Jouer"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:296
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:251
 msgid "Jouer dans une fenêtre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:297
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:252
 msgid "Pause"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:300
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:255
 msgid "Afficher l'éditeur en plein écran"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:712
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:708
 msgid "Game Develop est entrain de compiler les sources C++ et ne pourra lancer un aperçu qu'une fois ce processus terminé."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:798
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:796
 msgid "La compilation des évènements a échouée, et la scène ne peut être testée. Afin que le problème soit corrigé, veuillez le rapporter au développeur de Game Develop, en joignant le fichier suivant :\n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:834
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:832
 msgid "Dans le jeu final, le jeu se terminera."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:838
-msgid "Dans le jeu final, un changement de scène s'effectuera."
+msgid "Dans le jeu final, un changement de scène s'effectuera vers la scène "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:902
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:915
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:906
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:919
 msgid "Passer le(s) objet(s) sur le calque \""
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1110
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1112
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1121
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1123
 msgid "Position "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1110
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1121
 msgid ". ( Calque de base, Caméra 0 )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1112
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1123
 msgid ". SHIFT pour sélection multiple, clic droit pour plus d'options."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1246
-msgid ""
-"Vous n'avez selectionné aucun objet à ajouter.\n"
-"Sélectionnez en un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils."
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1259
+msgid "Glissez-déposez les objets depuis la liste des objets. Vous pouvez aussi en sélectionner un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils pour pouvoir ensuite l'ajouter par double clic."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1260
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1273
 msgid "L'objet à ajouter n'existe pas ou plus dans la liste des objets."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:79
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1791
+msgid "Passer le(s) objet(s) sur le calque supérieur"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1793
+msgid "Passer le(s) objet(s) sur le calque inférieur"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1795
+msgid "Supprimer la sélection\tDEL"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1797
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1824
+msgid "Ajouter un objet\tINSER"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1837
+msgid "Annuler les 10 précédentes actions"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1839
+msgid "Annuler les 20 précédentes actions"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1842
+msgid "Supprimer l'historique des changements"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1848
+msgid "5%"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1850
+msgid "10%"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1852
+msgid "25%"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1854
+msgid "50%"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1856
+msgid "100%"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1858
+msgid "150%"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1860
+msgid "200%"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\scenecanvas.cpp:1862
+msgid "500%"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:81
 msgid "Chercher dans les évènements"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:105
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:164
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:107
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:166
 msgid "Prendre en compte la casse"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:110
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:169
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:112
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:171
 msgid "Où"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:112
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:175
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:114
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:177
 msgid "Les conditions"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:115
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:178
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:117
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:180
 msgid "Les actions"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:124
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:195
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:126
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:197
 msgid "Chercher"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:129
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:131
 msgid "Précédent"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:146
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:187
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:196
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:148
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:189
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:198
 msgid "Remplacer"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:154
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:156
 msgid "par"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:171
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:173
 msgid "Seulement l'évènement selectionné"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:254
+#: d:\florian\programmation\gamedevelop2\ide\searchevents.cpp:258
 #, c-format
 msgid "%i résultats."
 msgstr ""
@@ -9896,8 +9971,7 @@ msgid "Ecarte un objet d'un autre, en utilisant les forces."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:595
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:611
-msgid "Ecarter _PARAM0_ de _PARAM2_ ( seul _PARAM0_ bougera )"
+msgid "Ecarter _PARAM0_ de _PARAM1_ ( seul _PARAM0_ bougera )"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:601
@@ -9907,6 +9981,10 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:610
 msgid "Ecarte un objet d'un autre sans utiliser les forces."
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:611
+msgid "Ecarter _PARAM0_ de _PARAM2_ ( seul _PARAM0_ bougera )"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension.cpp:624
@@ -10051,7 +10129,7 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension2.cpp:103
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension2.cpp:122
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:578
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:579
 #: d:\florian\programmation\gamedevelop2\extensions\linkedobjects\extension.cpp:65
 #: d:\florian\programmation\gamedevelop2\extensions\linkedobjects\extension.cpp:83
 msgid "Objet 2"
@@ -10079,8 +10157,8 @@ msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension2.cpp:185
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\baseobjectextension2.cpp:188
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:570
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:573
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:571
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:574
 #: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\extension.cpp:447
 #: d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\extension.cpp:450
 msgid "Collision"
@@ -10177,11 +10255,13 @@ msgid "Position Y de la caméra"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\cameraextension.cpp:38
-msgid "Modifie la position Y de la caméra indiquée."
+msgid ""
+"Teste si la valeur de la position Y de la caméra\n"
+"correspond au test effectué."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\cameraextension.cpp:39
-msgid "Faire _PARAM2__PARAM1_ à la position Y de la caméra _PARAM4_ ( Calque : _PARAM3_ )"
+msgid "La position Y de la caméra _PARAM4_ est _PARAM2_ à _PARAM1_ ( Calque : _PARAM3_ )"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\cameraextension.cpp:56
@@ -10193,13 +10273,11 @@ msgid "Faire _PARAM2__PARAM1_ à la position X de la caméra _PARAM4_ ( Calque :
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\cameraextension.cpp:74
-msgid ""
-"Teste si la valeur de la position Y de la caméra\n"
-"correspond au test effectué."
+msgid "Modifie la position Y de la caméra indiquée."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\cameraextension.cpp:75
-msgid "La position Y de la caméra _PARAM4_ est _PARAM2_ à _PARAM1_ ( Calque : _PARAM3_ )"
+msgid "Faire _PARAM2__PARAM1_ à la position Y de la caméra _PARAM4_ ( Calque : _PARAM3_ )"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\cameraextension.cpp:91
@@ -10531,13 +10609,13 @@ msgid "Choisissez un dossier, ou ajoutez en un avec le clic droit."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\choixdossier.cpp:71
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:703
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:704
 msgid "Toutes les images"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\choixdossier.cpp:77
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:196
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:210
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:197
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:211
 msgid "Ajouter un dossier"
 msgstr ""
 
@@ -10587,29 +10665,29 @@ msgid ""
 "utilisez l'éditeur des calques de la scène."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:79
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:80
 msgid ""
 "Choisissez un des objets de la scène. Pour ajouter ou\n"
 " modifier des objets, utilisez l'éditeur des objets."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:111
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:112
 msgid "Aucun"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:115
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:116
 msgid "Choisir cet objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:124
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:125
 msgid "Pour ajouter des objets, utilisez l'éditeur d'objets"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:126
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:127
 msgid "Choisir ce groupe"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:135
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\chooseobject.cpp:136
 msgid "Pour ajouter des groupes, utilisez l'éditeur de groupes d'objets"
 msgstr ""
 
@@ -10719,7 +10797,7 @@ msgid "Tant que"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\commoninstructionsextension.cpp:241
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\repeatevent.cpp:161
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\repeatevent.cpp:160
 msgid "Répéter"
 msgstr ""
 
@@ -10934,7 +11012,7 @@ msgid "cos"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editexpression.cpp:182
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:98
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:105
 msgid "Cosinus"
 msgstr ""
 
@@ -10943,7 +11021,7 @@ msgid "sin"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editexpression.cpp:185
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:197
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:204
 msgid "Sinus"
 msgstr ""
 
@@ -10952,7 +11030,7 @@ msgid "tan"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editexpression.cpp:188
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:215
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:222
 msgid "Tangente"
 msgstr ""
 
@@ -10969,7 +11047,7 @@ msgid "cosh"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editexpression.cpp:198
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:104
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:111
 msgid "Cosinus hyperbolique"
 msgstr ""
 
@@ -10978,7 +11056,7 @@ msgid "sinh"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editexpression.cpp:203
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:203
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:210
 msgid "Sinus hyperbolique"
 msgstr ""
 
@@ -10987,7 +11065,7 @@ msgid "tanh"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editexpression.cpp:208
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:221
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:228
 msgid "Tangente hyperbolique"
 msgstr ""
 
@@ -11183,10 +11261,10 @@ msgid "Sans nom"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:198
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:514
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:521
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:513
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:520
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteinitialpositionpanel.cpp:33
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:204
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:205
 msgid "Animation"
 msgstr ""
 
@@ -11214,11 +11292,12 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:67
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:131
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:217
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:435
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:501
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:508
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:434
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:500
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:507
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:555
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteinitialpositionpanel.cpp:43
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:205
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:206
 msgid "Direction"
 msgstr ""
 
@@ -11326,7 +11405,7 @@ msgid "Ajouter l'image selectionnée dans la banque d'image"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:372
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:180
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:181
 msgid "Supprimer l'image"
 msgstr ""
 
@@ -11403,7 +11482,7 @@ msgid "Ajouter une image à la fin depuis la banque d'image"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\editorobjet.cpp:492
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:345
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:346
 msgid "Supprimer l'image selectionnée"
 msgstr ""
 
@@ -11585,21 +11664,21 @@ msgid ""
 "Des actions/conditions du jeu ne s'executeront pas correctement."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\eventsrenderinghelper.cpp:162
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\eventsrenderinghelper.cpp:165
 msgid "Pas de conditions"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\eventsrenderinghelper.cpp:260
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\eventsrenderinghelper.cpp:263
 msgid "Pas d'actions"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:164
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:179
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:235
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:174
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:189
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:249
 msgid "L'extension "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:164
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:174
 msgid ""
 " n'a pas pû être chargée.\n"
 "Prenez contact avec le développeur pour plus d'informations.\n"
@@ -11607,23 +11686,23 @@ msgid ""
 "Erreur détaillée :\n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:165
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:180
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:236
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:175
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:190
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:250
 msgid "Extension non compatible"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:179
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:189
 msgid ""
 " n'a pas pû être chargée.\n"
 "Prenez contact avec le développeur pour plus d'informations."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:235
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:249
 msgid " présente des erreurs :\n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:235
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.cpp:249
 msgid ""
 "\n"
 "L'extension n'a pas été chargée. Prenez contact avec le développeur pour plus d'informations."
@@ -11747,36 +11826,36 @@ msgid "Ecrire _PARAM2_ dans _PARAM1_ du fichier _PARAM0_"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\fileextension.cpp:80
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:32
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:38
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:44
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:50
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:56
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:62
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:75
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:81
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:87
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:93
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:99
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:105
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:111
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:117
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:123
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:129
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:135
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:141
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:147
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:153
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:39
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:45
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:51
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:57
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:63
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:69
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:82
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:88
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:94
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:100
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:106
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:112
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:118
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:124
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:130
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:136
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:142
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:148
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:154
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:160
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:166
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:186
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:192
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:198
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:204
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:210
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:216
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:222
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:228
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:167
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:173
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:193
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:199
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:205
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:211
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:217
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:223
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:229
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:235
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\translateaction.cpp:182
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\translatecondition.cpp:73
 msgid "Expression"
@@ -11896,187 +11975,187 @@ msgstr ""
 msgid ", répéter :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:63
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:66
 msgid "Lancement de la compilation du projet."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:66
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:69
 msgid "Pas de système cible défini."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:86
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:89
 msgid "ne peut être compilée : Veuillez arrêter tout aperçu de celle ci avant de lancer la compilation.\n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:98
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:101
 msgid "Compilation en attente de la fin des tâches en cours..."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:116
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:141
-msgid "Compilation de la scène "
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:116
-msgid "."
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:136
-msgid "La compilation de la scène "
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:136
-msgid " a échouée : Rendez vous sur notre site pour nous rapporter cette erreur, en joignant le fichier suivant:\n"
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:141
-msgid " effectuée avec succès."
-msgstr ""
-
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:156
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:164
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:118
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:126
 msgid "Préparation des ressources..."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:190
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:156
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:181
+msgid "Compilation de la scène "
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:156
+msgid "."
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:176
+msgid "La compilation de la scène "
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:176
+msgid " a échouée : Rendez vous sur notre site pour nous rapporter cette erreur, en joignant le fichier suivant:\n"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:181
+msgid " effectuée avec succès."
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:189
 msgid "Copie des ressources..."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:196
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:330
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:341
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:352
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:195
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:329
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:340
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:351
 msgid "Impossible de copier "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:196
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:370
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:373
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:380
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:383
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:386
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:391
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:394
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:413
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:416
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:195
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:369
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:372
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:379
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:382
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:385
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:390
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:393
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:412
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:415
 msgid " dans le répertoire de compilation.\n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:204
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:210
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:252
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:203
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:209
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:251
 msgid "Compilation du jeu..."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:204
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:203
 msgid "Etape 1 sur 3"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:210
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:209
 msgid "Etape 2 sur 3"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:252
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:251
 msgid "Etape 3 sur 3"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:281
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:523
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:280
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:522
 msgid "Impossible de supprimer le fichier "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:281
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:280
 msgid " situé dans le répertoire de compilation.\n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:289
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:288
 msgid "Exportation du jeu..."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:306
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:312
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:318
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:305
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:311
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:317
 msgid "Impossible de copier l'extension "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:306
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:330
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:305
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:329
 msgid " pour Windows dans le répertoire de compilation.\n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:312
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:341
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:311
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:340
 msgid " pour Linux dans le répertoire de compilation.\n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:318
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:352
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:317
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:351
 msgid " pour Mac OS dans le répertoire de compilation.\n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:360
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:359
 msgid "Impossible de copier les sources C++ compilées ( dynext.dxgd ) dans le répertoire de compilation.\n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:370
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:373
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:380
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:383
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:386
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:391
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:394
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:413
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:416
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:369
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:372
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:379
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:382
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:385
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:390
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:393
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:412
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:415
 msgid "Impossible de créer "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:403
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:402
 msgid "Impossible de copier le fichier "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:419
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:418
 msgid "Exportation du jeu... ( Compression )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:440
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:439
 msgid "Unable to open 7zS.sfx"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:456
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:455
 msgid "Unable to open config.txt"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:472
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:471
 msgid "Unable to open "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:485
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:484
 msgid "Compilation terminée"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:508
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:507
 msgid ""
 "Game Develop n'a pas réussi à trouver un répertoire temporaire pour la compilation.\n"
 "Si la compilation échoue, allez dans les préférences et choisissez un répertoire temporaire où vous avez les droits d'écriture."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:508
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:507
 msgid "La compilation risque d'échouer."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:517
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:516
 msgid "Impossible de créer le répertoire : "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:532
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:531
 msgid "La compilation a échoué avec ces erreurs :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:538
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:537
 msgid "La compilation a terminé sans erreurs."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:551
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\fullprojectcompiler.cpp:550
 msgid "Avancement : "
 msgstr ""
 
@@ -12332,38 +12411,39 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:17
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:24
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:31
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:37
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:43
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:49
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:55
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:61
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:67
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:38
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:44
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:50
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:56
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:62
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:68
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:74
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:80
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:86
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:92
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:98
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:104
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:110
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:116
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:122
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:128
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:134
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:140
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:146
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:152
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:81
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:87
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:93
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:99
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:105
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:111
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:117
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:123
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:129
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:135
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:141
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:147
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:153
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:159
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:165
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:171
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:166
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:172
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:178
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:185
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:191
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:197
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:203
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:209
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:215
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:221
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:227
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:192
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:198
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:204
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:210
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:216
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:222
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:228
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:234
 msgid "Outils mathématiques"
 msgstr ""
 
@@ -12372,234 +12452,250 @@ msgid "Extension proposant des outils mathématiques, integrée en standard"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:17
-msgid "Minimum de deux nombres"
+msgid "Modulo"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:17
+msgid "x mod y"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:18
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:25
-msgid "Première expression"
+msgid "x ( dans x mod y )"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:19
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:26
-msgid "Deuxième expression"
+msgid "y ( dans x mod y )"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:24
+msgid "Minimum de deux nombres"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:25
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:32
+msgid "Première expression"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:26
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:33
+msgid "Deuxième expression"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:31
 msgid "Maximum de deux nombres"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:31
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:38
 msgid "Valeur absolue"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:31
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:38
 msgid "Valeur absolue d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:37
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:44
 msgid "Arccosinus"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:37
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:44
 msgid "Arccosinus d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:43
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:50
 msgid "Arccosinus hyperbolique"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:43
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:50
 msgid "Arccosinus hyperbolique d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:49
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:55
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:56
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:62
 msgid "Arcsinus"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:49
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:55
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:56
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:62
 msgid "Arcsinus d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:61
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:68
 msgid "Arctangente"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:61
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:68
 msgid "Arctangente d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:67
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:74
 msgid "Arctangente à deux arguments"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:67
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:74
 msgid "Arctangente à deux arguments ( atan2 )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:74
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:81
 msgid "Arctangente hyperbolique"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:80
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:87
 msgid "Racine cubique"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:86
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:93
 msgid "Partie entière par excès"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:86
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:93
 msgid "Partie entière par excès ( ceil )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:92
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:99
 msgid "Partie entière par défaut"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:92
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:99
 msgid "Partie entière par défaut ( floor )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:98
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:105
 msgid "Cosinus d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:104
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:111
 msgid "Cosinus hyperbolique d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:110
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:117
 msgid "Cotangente"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:110
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:117
 msgid "Cotangente d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:116
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:123
 msgid "cosécante "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:116
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:123
 msgid "Cosécante d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:122
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:128
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:134
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:129
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:135
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:141
 msgid "Arrondi"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:122
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:128
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:134
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:129
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:135
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:141
 msgid "Arrondi d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:140
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:147
 msgid "Exponentiel"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:140
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:147
 msgid "Exponentiel d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:146
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:152
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:153
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:159
 msgid "Logarithme"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:146
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:152
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:153
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:159
 msgid "Logarithme ( Base e ) d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:159
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:166
 msgid "Logarithme en base 2"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:159
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:166
 msgid "Logarithme ( Base 2 ) d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:165
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:172
 msgid "Logarithme en base 10"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:165
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:172
 msgid "Logarithme ( Base 10 ) d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:171
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:178
 msgid "Racine n-ième"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:171
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:178
 msgid "Racine n-ième d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:172
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:179
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:186
 msgid "Nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:173
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:180
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:187
 msgid "N"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:178
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:185
 msgid "Puissance"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:178
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:185
 msgid "Elever un nombre à la puissance n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:185
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:192
 msgid "Sécante"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:185
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:192
 msgid "Sécante d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:191
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:198
 msgid "Signe d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:191
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:198
 msgid "Renvoie le signe d'un nombre (sous la forme 1, -1 ou 0 )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:197
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:204
 msgid "Sinus d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:203
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:210
 msgid "Sinus hyperbolique d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:209
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:216
 msgid "Racine d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:215
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:222
 msgid "Tangente d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:221
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:228
 msgid "Tangente hyperbolique d'un nombre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:227
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:234
 msgid "Troncature"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:227
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\mathematicaltoolsextension.cpp:234
 msgid "Troncature d'un nombre"
 msgstr ""
 
@@ -12634,7 +12730,7 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mouseextension.cpp:173
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mouseextension.cpp:181
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\mouseextension.cpp:190
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:451
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:450
 msgid "Souris"
 msgstr ""
 
@@ -12869,39 +12965,39 @@ msgstr ""
 msgid "Error during loading: "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:80
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:83
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:81
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:84
 msgid ""
 "\n"
 "Vérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:136
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:137
 msgid ""
 "La version de l'éditeur utilisé pour créer ce jeu semble être une nouvelle version.\n"
 "Le jeu peut donc ne pas s'ouvrir, ou des données peuvent manquer.\n"
 "Vous devriez vérifier si une nouvelle version de Game Develop est disponible."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:142
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:143
 msgid ""
 "La version de l'éditeur utilisé pour créer ce jeu semble être supérieure.\n"
 "Le jeu peut donc ne pas s'ouvrir, ou des données peuvent manquer.\n"
 "Vous devriez vérifier si une nouvelle version de Game Develop est disponible."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:156
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:157
 msgid ""
 "Le jeu ouvert a été enregistré avec une ancienne version de Game Develop.\n"
 "Il se peut que le jeu ne soit pas correctement ouvert.\n"
 "Veuillez ouvrir le jeu et l'enregistrer avec la version 1.5.10151 avant de le réouvrir avec cette version de Game Develop."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:309
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:310
 msgid "Attention, si vous enregistrez votre jeu avec cette version de Game Develop, vous ne pourrez plus le réouvrir avec une version précédente."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:366
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp:367
 msgid "Aucune information sur la portabilité du jeu"
 msgstr ""
 
@@ -12910,8 +13006,8 @@ msgid "Impossible d'enregistrer le fichier. Vérifiez que le disque comporte ass
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\propimage.cpp:58
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:167
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:346
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:168
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:347
 msgid "Modifier les propriétés de l'image"
 msgstr ""
 
@@ -12953,153 +13049,153 @@ msgid "Choisissez l'image"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\propimage.cpp:238
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:378
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.cpp:47
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:379
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.cpp:52
 msgid "Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\repeatevent.cpp:161
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\repeatevent.cpp:160
 msgid "fois :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:152
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:153
 msgid "Clic droit sur une image pour accéder aux options"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:170
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:171
 msgid "Modifier le nom de l'image"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:173
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:174
 msgid "Modifier le fichier de l'image"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:183
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:184
 msgid "Supprimer seulement du dossier"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:186
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:187
 msgid "Déplacer vers le haut\tCtrl-P"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:186
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:187
 msgid "Déplacer l'image vers le haut dans la liste"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:189
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:190
 msgid "Déplacer l'image vers le bas dans la liste"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:349
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:350
 msgid "Ouvrir l'image avec un éditeur"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:350
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:351
 msgid "Naviguer dans les dossiers"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:351
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:352
 msgid "Rechercher une image"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:353
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:354
 msgid "Aide de l'éditeur de la banque d'images"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:378
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:379
 msgid "Choisissez une ou plusieurs images à ajouter"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:382
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:383
 msgid "Ajout des images"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:403
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:404
 msgid "Ajout de l'image "
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:429
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:430
 msgid "Des images portant le même nom sont déjà présentes, et n'ont pas été ajoutées à la liste de toutes les images :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:431
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:432
 msgid "L'image a été correctement ajoutée à la banque d'image"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:453
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:506
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:521
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:454
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:507
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:522
 msgid "Aucune image sélectionnée"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:627
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:628
 msgid "Impossible de renommer le dossier : un autre dossier porte déjà ce nom."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:641
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:642
 msgid "Impossible de renommer l'image : une autre image porte déjà ce nom."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:767
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:773
 msgid ""
 "Ces images ne semblent plus être utilisée dans le projet :\n"
 "Cochez les images à supprimer."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:767
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:773
 msgid "Suppression d'images inutiles"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:792
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:798
 msgid "L'image à modifier n'a pas été trouvée."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:824
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:830
 msgid "La ressource est introuvable."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:857
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:863
 msgid "Choisissez le programme pour éditer ce type de ressource"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:857
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:863
 msgid "Programmes (*.exe)|*.exe"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:884
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:890
 msgid ""
 "Choisissez une ressource dans\n"
 "la liste de gauche pour l'afficher.\n"
 "\n"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:885
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:891
 msgid ""
 "Vous pouvez ajouter et\n"
 "modifier les ressources avec le ruban."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:885
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:891
 msgid ""
 "Vous pouvez ajouter et\n"
 "modifier les ressources avec la barre d'outils"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:936
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:1029
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:942
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:1035
 msgid "L'image à déplacer n'a pas été trouvée."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:1111
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:1115
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:1117
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourceseditor.cpp:1121
 msgid "Nouveau dossier"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.cpp:47
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.cpp:52
 msgid "Choisissez le fichier de l'image"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.cpp:60
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.cpp:65
 msgid "Fichier de l'image"
 msgstr ""
 
@@ -13276,9 +13372,9 @@ msgstr ""
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:200
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:234
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:251
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:514
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:521
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:527
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:513
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:520
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:526
 msgid "Animations et images"
 msgstr ""
 
@@ -13346,7 +13442,7 @@ msgid "Tourner _PARAM0_ vers _PARAM1_;_PARAM2_"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:135
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:439
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:438
 msgid "Objet à tourner"
 msgstr ""
 
@@ -13419,7 +13515,7 @@ msgid "Numéro de la direction à tester"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:231
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:527
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:526
 msgid "Numéro de l'image de l'objet"
 msgstr ""
 
@@ -13546,7 +13642,7 @@ msgid "Changer la couleur globale d'un objet"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:369
-msgid "Change la couleur globale de l'objet. Par défaut, la couleur est le blanc."
+msgid "Change la couleur globale de l'objet. Par défaut, la couleur d'un Sprite est le blanc."
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:370
@@ -13556,142 +13652,166 @@ msgstr ""
 msgid "Changer la couleur de _PARAM0_ en _PARAM1_"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:384
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:383
 msgid "Changer le mode d'affichage"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:385
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:384
 msgid ""
 "Change le numéro de mode d'affichage d'un objet.\n"
 "Le mode d'affichage par défaut est 0 ( Alpha )."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:386
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:385
 msgid "Changer le numéro de mode d'affichage de _PARAM0_ en _PARAM1_"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:392
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:391
 msgid "Mode ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:400
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:399
 msgid "Inverser l'affichage horizontalement"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:401
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:400
 msgid "Inverse l'affichage de l'objet horizontalement"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:402
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:401
 msgid "Inverser l'affichage de _PARAM0_ horizontalement : _PARAM1_"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:408
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:424
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:407
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:423
 msgid "Activer l'inversion"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:416
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:415
 msgid "Inverser l'affichage verticalement"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:417
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:416
 msgid "Inverse l'affichage de l'objet verticalement"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:418
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:417
 msgid "Inverser l'affichage de _PARAM0_ verticalement : _PARAM1_"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:432
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:431
 msgid "Tourner un objet vers un autre"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:433
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:432
 msgid ""
 "Tourne un objet vers un autre.\n"
 "( Si la direction est normale, l'objet prendra la direction la plus appropriée.\n"
 "Si c'est une rotation automatique, il sera tourné vers l'objet. )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:434
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:433
 msgid "Tourner _PARAM0_ vers _PARAM1_"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:440
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:439
 msgid "Objet vers lequel se tourner"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:448
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:447
 msgid "Le curseur est sur un objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:449
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:448
 msgid "Teste si le curseur survole un objet. Le test est précis par défaut ( vérifie que le curseur n'est pas sur une zone transparente )."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:450
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:449
 msgid "Le curseur est sur _PARAM0_"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:457
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:456
 msgid "Test précis ? ( oui par défaut )"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:463
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:483
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:462
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:482
 msgid "Position X d'un point"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:466
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:476
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:486
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:495
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:465
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:475
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:485
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:494
 msgid "Nom du point"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:473
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:492
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:472
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:491
 msgid "Position Y d'un point"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:501
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:508
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:500
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:507
 msgid "Direction de l'objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:514
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:521
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:513
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:520
 msgid "Animation de l'objet"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:527
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:206
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:526
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:207
 #: d:\florian\programmation\gamedevelop2\extensions\particlesystem\extensionsubdeclaration3.cpp:194
 #: d:\florian\programmation\gamedevelop2\extensions\particlesystem\extensionsubdeclaration3.cpp:210
 msgid "Image"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:533
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:532
 msgid "Echelle de la taille en largeur"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:539
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:538
 msgid "Echelle de la taille en hauteur"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:571
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:552
+msgid "Un objet est tourné vers un autre"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:553
+msgid "Teste si un objet est tourné vers un autre"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:554
+msgid "L'objet _PARAM0_ est tourné vers _PARAM1_"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:559
+msgid "Nom de l'objet"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:560
+msgid "Nom du second objet"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:563
+msgid "Angle de tolérance ( 0 : tolérance minimale )"
+msgstr ""
+
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:572
 msgid ""
 "La condition est vraie si il y a collision entre les deux objets donnés.\n"
 "La collision est faite au pixel près.\n"
 "Attention ! Cette condition est couteuse pour l'ordinateur en terme de perfomance."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:572
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:573
 msgid "_PARAM0_ est en collision avec _PARAM1_"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:577
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteextension.cpp:578
 #: d:\florian\programmation\gamedevelop2\extensions\linkedobjects\extension.cpp:64
 #: d:\florian\programmation\gamedevelop2\extensions\linkedobjects\extension.cpp:82
 msgid "Objet 1"
@@ -13717,7 +13837,7 @@ msgstr ""
 msgid "Angle initial"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:207
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:208
 #: d:\florian\programmation\gamedevelop2\extensions\textobject\extension.cpp:163
 #: d:\florian\programmation\gamedevelop2\extensions\textobject\extension.cpp:180
 #: d:\florian\programmation\gamedevelop2\extensions\textobject\extension.cpp:261
@@ -13727,15 +13847,15 @@ msgstr ""
 msgid "Opacité"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:208
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:209
 msgid "Méthode d'affichage"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:212
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:213
 msgid "Echelle X de la taille"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:213
+#: d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp:214
 msgid "Echelle Y de la taille"
 msgstr ""
 
@@ -16428,7 +16548,7 @@ msgid "Particules"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\extensions\particlesystem\extensionsubdeclaration3.cpp:233
-#: d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleemitterobject.cpp:629
+#: d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleemitterobject.cpp:630
 msgid "Nombre de particules"
 msgstr ""
 
@@ -17117,30 +17237,30 @@ msgstr ""
 msgid "en Y"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\drawerobject.cpp:258
+#: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\drawerobject.cpp:259
 #: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\extension.cpp:121
 #: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\extension.cpp:129
 msgid "Couleur de remplissage"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\drawerobject.cpp:259
+#: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\drawerobject.cpp:260
 #: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\extension.cpp:187
 #: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\extension.cpp:205
 msgid "Opacité du remplissage"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\drawerobject.cpp:260
+#: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\drawerobject.cpp:261
 #: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\extension.cpp:153
 #: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\extension.cpp:170
 msgid "Taille du contour"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\drawerobject.cpp:261
+#: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\drawerobject.cpp:262
 #: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\extension.cpp:137
 msgid "Couleur du contour"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\drawerobject.cpp:262
+#: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\drawerobject.cpp:263
 #: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\extension.cpp:222
 #: d:\florian\programmation\gamedevelop2\extensions\primitivedrawing\extension.cpp:239
 msgid "Opacité du contour"
@@ -17346,17 +17466,17 @@ msgstr ""
 msgid "Extension permettant d'utiliser un objet captant le texte entré au clavier."
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\extension.cpp:54
+#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\extension.cpp:52
 msgid "Entrée de texte"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\extension.cpp:55
+#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\extension.cpp:53
 msgid "Objet captant le texte entré au clavier"
 msgstr ""
 
 #: d:\florian\programmation\gamedevelop2\extensions\textentryobject\extension.cpp:64
 #: d:\florian\programmation\gamedevelop2\extensions\textentryobject\extension.cpp:80
-#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryobject.cpp:148
+#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryobject.cpp:143
 msgid "Texte en mémoire"
 msgstr ""
 
@@ -17427,7 +17547,7 @@ msgstr ""
 msgid "Hauteur initiale :"
 msgstr ""
 
-#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryobject.cpp:149
+#: d:\florian\programmation\gamedevelop2\extensions\textentryobject\textentryobject.cpp:144
 msgid "Activé ?"
 msgstr ""
 

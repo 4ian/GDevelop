@@ -23,5 +23,17 @@ bool CompilationChecker::EnsureCorrectGDLVersion()
         return false;
     }
 
+    if ( !GDLVersionWrapper::CompiledForEdittime() )
+    {
+        char beep = 7;
+        std::cout << std::endl;
+        std::cout << "-- ERROR ! --" << beep << std::endl;
+        std::cout << "GDL build mismatch:" << std::endl;
+        std::cout << "IDE is using GDL without edittime support!" << std::endl;
+        std::cout << "---------------" << std::endl;
+
+        return false;
+    }
+
     return true;
 }

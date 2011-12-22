@@ -178,7 +178,7 @@ Demarrage::Demarrage(wxWindow* parent)
 	FlexGridSizer13->Add(HyperlinkCtrl8, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap12 = new wxStaticBitmap(Panel3, ID_STATICBITMAP12, wxBitmap(wxImage(_T("res/wikiicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP12"));
 	FlexGridSizer13->Add(StaticBitmap12, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl9 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL9, _("Accéder au wiki ( Base d\'articles et de connaissance )"), _("http://www.forum.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL9"));
+	HyperlinkCtrl9 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL9, _("Accéder au wiki ( Base d\'articles et de connaissance )"), _("http://www.wiki.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL9"));
 	FlexGridSizer13->Add(HyperlinkCtrl9, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap13 = new wxStaticBitmap(Panel3, ID_STATICBITMAP13, wxBitmap(wxImage(_T("res/community.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP13"));
 	FlexGridSizer13->Add(StaticBitmap13, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

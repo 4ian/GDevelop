@@ -10,8 +10,8 @@ echo -Copying files...
 rem del ..\Bin\Release\include\*.* /S /Q
 
 rem Standard library headers
-xcopy C:\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\*.* ..\Bin\Release\include\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\*.* /S  /Y /D
-xcopy C:\TDM-GCC-4.5.2\include\*.* ..\Bin\Release\include\TDM-GCC-4.5.2\include\*.* /S  /Y /D
+xcopy C:\MinGW\lib\gcc\mingw32\4.5.2\include\*.* ..\Bin\Release\include\TDM-GCC-4.5.2\lib\gcc\mingw32\4.5.2\include\*.* /S  /Y /D
+xcopy C:\MinGW\include\*.* ..\Bin\Release\include\TDM-GCC-4.5.2\include\*.* /S  /Y /D
 xcopy ..\..\ExtLibs\llvm\tools\clang\lib\Headers\*.h ..\Bin\Release\include\llvm\tools\clang\lib\Headers\*.h /S  /Y /D
 
 rem Game Develop C++ Implementation headers

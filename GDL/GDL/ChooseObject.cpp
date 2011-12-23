@@ -51,11 +51,12 @@ BEGIN_EVENT_TABLE(ChooseObject,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChooseObject::ChooseObject(wxWindow* parent, Game & game_, Scene & scene_, bool canSelectGroup, std::string onlyObjectOfType_, bool allowMultipleSelection_, const wxSize& size) :
+ChooseObject::ChooseObject(wxWindow* parent, Game & game_, Scene & scene_, bool canSelectGroup_, std::string onlyObjectOfType_, bool allowMultipleSelection_, const wxSize& size) :
 game(game_),
 scene(scene_),
 onlyObjectOfType(onlyObjectOfType_),
-allowMultipleSelection(allowMultipleSelection_)
+allowMultipleSelection(allowMultipleSelection_),
+canSelectGroup(canSelectGroup_)
 {
 	//(*Initialize(ChooseObject)
 	wxFlexGridSizer* FlexGridSizer2;
@@ -205,7 +206,12 @@ void ChooseObject::Refresh()
 
 void ChooseObject::OnChoisirBtClick(wxCommandEvent& event)
 {
-    if ( Notebook1->GetSelection() == 0 && item.IsOk() && ObjetsList->GetRootItem() != item )
+    int objectsListNotebookId = 0;
+    int objectGroupsListNotebookId = canSelectGroup ? 1 : -1;
+    int globalObjectsListNotebookId = canSelectGroup ? 2 : 1;
+    int globalObjectGroupsListNotebookId = canSelectGroup ? 3 : -1;
+
+    if ( Notebook1->GetSelection() == objectsListNotebookId && item.IsOk() && ObjetsList->GetRootItem() != item )
     {
         //Get selection and construct list of objects selected
         wxArrayTreeItemIds selectionIds; unsigned int count = ObjetsList->GetSelections(selectionIds);
@@ -214,7 +220,7 @@ void ChooseObject::OnChoisirBtClick(wxCommandEvent& event)
         objectChosen = !objectsChosen.empty() ? objectsChosen[0] : "";
         EndModal(1);
     }
-    else if ( GroupesList->IsEnabled() && itemGroups.IsOk() && Notebook1->GetSelection() == 1 && GroupesList->GetRootItem() != itemGroups )
+    else if (  Notebook1->GetSelection() == objectGroupsListNotebookId &&  GroupesList->IsEnabled() && itemGroups.IsOk() && GroupesList->GetRootItem() != itemGroups )
     {
         //Get selection and construct list of objects selected
         wxArrayTreeItemIds selectionIds; unsigned int count = GroupesList->GetSelections(selectionIds);
@@ -223,7 +229,7 @@ void ChooseObject::OnChoisirBtClick(wxCommandEvent& event)
         objectChosen = !objectsChosen.empty() ? objectsChosen[0] : "";
         EndModal(1);
     }
-    else if ( Notebook1->GetSelection() == 2 && itemGlobal.IsOk() && globalObjectsList->GetRootItem() != itemGlobal )
+    else if ( Notebook1->GetSelection() == globalObjectsListNotebookId && itemGlobal.IsOk() && globalObjectsList->GetRootItem() != itemGlobal )
     {
         //Get selection and construct list of objects selected
         wxArrayTreeItemIds selectionIds; unsigned int count = globalObjectsList->GetSelections(selectionIds);
@@ -232,7 +238,7 @@ void ChooseObject::OnChoisirBtClick(wxCommandEvent& event)
         objectChosen = !objectsChosen.empty() ? objectsChosen[0] : "";
         EndModal(1);
     }
-    else if ( Notebook1->GetSelection() == 3 && itemGlobalGroups.IsOk() && globalObjectGroups->GetRootItem() != itemGlobalGroups )
+    else if ( Notebook1->GetSelection() == globalObjectGroupsListNotebookId && itemGlobalGroups.IsOk() && globalObjectGroups->GetRootItem() != itemGlobalGroups )
     {
         //Get selection and construct list of objects selected
         wxArrayTreeItemIds selectionIds; unsigned int count = globalObjectGroups->GetSelections(selectionIds);

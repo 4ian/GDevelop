@@ -42,3 +42,11 @@ std::string GDLVersionWrapper::Status()
 {
     return AutoVersion::STATUS;
 }
+bool GDLVersionWrapper::CompiledForEdittime()
+{
+#if defined(GD_IDE_ONLY)
+    return true;
+#else
+    return false;
+#endif
+}

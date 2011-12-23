@@ -45,6 +45,11 @@ class GD_API GDLVersionWrapper
         static std::string Status();
 
         /**
+         * Return true if GDL is compiled with edittime support.
+         */
+        static bool CompiledForEdittime();
+
+        /**
          * Get Year of the release
          */
         static std::string Year();

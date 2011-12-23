@@ -6,6 +6,7 @@
 #include <map>
 #include <string>
 #include "GDL/Event.h"
+#include <boost/shared_ptr.hpp>
 
 /**
  * \brief Internal base class for C++ dynamic extensions,

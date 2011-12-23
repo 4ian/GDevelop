@@ -80,8 +80,8 @@ CameraExtension::CameraExtension()
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddParameter("expression", _("Valeur"), "",false);
         instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",false).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("SetCameraY").SetManipulatedType("number").SetAssociatedGetter("GetCameraY").SetIncludeFile("GDL/RuntimeSceneCameraTools.h");
 

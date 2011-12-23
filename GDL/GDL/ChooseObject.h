@@ -117,6 +117,7 @@ class GD_API ChooseObject: public wxDialog
 		wxImageList * imageList;
 		string onlyObjectOfType;
 		bool allowMultipleSelection;
+		bool canSelectGroup;
 
 		DECLARE_EVENT_TABLE()
 };

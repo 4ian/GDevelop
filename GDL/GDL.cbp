@@ -1466,7 +1466,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="2.0.10538" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="2.0.10541" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

@@ -170,7 +170,7 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
         return false;
 
     std::cout << "Writing bitcode...\n";
-    sf::Lock lock(openSaveDialogMutex); //On windows, GD is crashing if we write witcode while an open/save file dialog is displayed.
+    sf::Lock lock(openSaveDialogMutex); //On windows, GD is crashing if we write bitcode while an open/save file dialog is displayed.
 
     llvm::OwningPtr<llvm::Module> module(Act->takeModule());
 

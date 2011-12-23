@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxPanel" name="DebuggerGUI">
+		<id_arg>0</id_arg>
+		<handler function="OnResize" entry="EVT_SIZE" />
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<growablecols>0</growablecols>
+			<growablerows>1</growablerows>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+					<cols>3</cols>
+					<growablecols>0</growablecols>
+					<growablerows>0</growablerows>
+					<object class="sizeritem">
+						<object class="wxPanel" name="ID_PANEL3" variable="toolbarPanel" member="yes">
+							<size>-1,25</size>
+							<handler function="OntoolbarPanelResize" entry="EVT_SIZE" />
+							<object class="wxAuiManager" variable="AuiManager1" member="yes">
+								<object class="AuiManagerItem">
+									<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes" />
+									<name>PaneName</name>
+									<standardpanetype>Toolbar</standardpanetype>
+									<caption>Pane caption</caption>
+									<captionvisible>0</captionvisible>
+									<minimizebutton>0</minimizebutton>
+									<maximizebutton>0</maximizebutton>
+									<pinbutton>0</pinbutton>
+									<layer>10</layer>
+									<dockfixed>0</dockfixed>
+									<dockabledirection></dockabledirection>
+									<resizable>0</resizable>
+									<destroyonclose>0</destroyonclose>
+									<firstadd>0</firstadd>
+								</object>
+							</object>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
+					<object class="notebookpage">
+						<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+							<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+								<cols>3</cols>
+								<growablecols>0</growablecols>
+								<growablerows>0</growablerows>
+								<object class="sizeritem">
+									<object class="wxListCtrl" name="ID_LISTCTRL2" variable="generalList" member="yes">
+										<size>249,203</size>
+										<style>wxLC_REPORT</style>
+										<handler function="OngeneralListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<label>Général</label>
+					</object>
+					<object class="notebookpage">
+						<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
+							<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+								<cols>3</cols>
+								<growablecols>1</growablecols>
+								<growablerows>0</growablerows>
+								<object class="sizeritem">
+									<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="objectsTree" member="yes">
+										<size>138,203</size>
+										<handler function="OnobjectsTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>2</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
+										<cols>1</cols>
+										<growablecols>0</growablecols>
+										<growablerows>1</growablerows>
+										<object class="sizeritem">
+											<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+												<cols>3</cols>
+												<growablecols>2</growablecols>
+												<growablerows>0</growablerows>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+														<label>Objet :</label>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT2" variable="objectName" member="yes">
+														<label></label>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="deleteBt" member="yes">
+														<bitmap>res/deleteicon.png</bitmap>
+														<tooltip>Supprimer cet objet</tooltip>
+														<handler function="OndeleteBtClick" entry="EVT_BUTTON" />
+													</object>
+													<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>2</border>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxListCtrl" name="ID_LISTCTRL1" variable="objectList" member="yes">
+												<size>249,203</size>
+												<style>wxLC_REPORT|wxLC_EDIT_LABELS</style>
+												<handler function="OnobjectListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
+											</object>
+											<flag>wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>2</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<label>Objets</label>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+	</object>
+</wxsmith>

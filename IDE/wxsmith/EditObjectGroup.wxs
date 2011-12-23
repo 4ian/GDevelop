@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="EditObjectGroup">
+		<title>Editer le groupe d&apos;objets</title>
+		<id_arg>0</id_arg>
+		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>3</cols>
+			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
+					<cols>1</cols>
+					<growablecols>0</growablecols>
+					<growablerows>3</growablerows>
+					<object class="sizeritem">
+						<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+							<size>420,54</size>
+							<bg>wxSYS_COLOUR_WINDOW</bg>
+							<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+								<cols>3</cols>
+								<object class="sizeritem">
+									<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
+										<bitmap>res/groupeobjet48.png</bitmap>
+										<style>wxNO_BORDER</style>
+									</object>
+									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+										<label>Les groupes d&apos;objets permettent d&apos;utiliser le nom&#x0A;du groupe pour se référer à tous les objets qu&apos;il&#x0A;contient.</label>
+										<style>wxALIGN_CENTRE</style>
+									</object>
+									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticLine" name="ID_STATICLINE2" variable="StaticLine2" member="yes">
+							<size>10,-1</size>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
+							<size>-1,26</size>
+							<handler function="OnPanel2Resize" entry="EVT_SIZE" />
+							<object class="wxAuiManager" variable="AuiManager1" member="yes">
+								<object class="AuiManagerItem">
+									<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes" />
+									<name>PaneName</name>
+									<standardpanetype>Toolbar</standardpanetype>
+									<caption>Pane caption</caption>
+									<captionvisible>0</captionvisible>
+									<minimizebutton>0</minimizebutton>
+									<maximizebutton>0</maximizebutton>
+									<pinbutton>0</pinbutton>
+									<layer>10</layer>
+									<dockfixed>0</dockfixed>
+									<dockabledirection></dockabledirection>
+									<resizable>0</resizable>
+									<destroyonclose>0</destroyonclose>
+									<firstadd>0</firstadd>
+								</object>
+							</object>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="ObjetsList" member="yes">
+							<size>286,181</size>
+							<style>wxTR_MULTIPLE|wxTR_DEFAULT_STYLE</style>
+							<handler function="OnObjetsListBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
+							<handler function="OnObjetsListEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
+							<handler function="OnObjetsListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
+							<handler function="OnObjetsListItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
+							<handler function="OnObjetsListItemActivated" entry="EVT_TREE_SEL_CHANGED" />
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
+							<size>10,-1</size>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+							<cols>3</cols>
+							<object class="sizeritem">
+								<object class="wxButton" name="ID_BUTTON1" variable="OkBt" member="yes">
+									<label>Ok</label>
+									<handler function="OnOkBtClick" entry="EVT_BUTTON" />
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxButton" name="ID_BUTTON2" variable="AnnulerBt" member="yes">
+									<label>Annuler</label>
+									<handler function="OnAnnulerBtClick" entry="EVT_BUTTON" />
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+		<object class="wxMenu" variable="ContextMenu" member="yes">
+			<object class="wxMenuItem" name="idAddObjet" variable="MenuItem1" member="yes">
+				<label>Ajouter un objet</label>
+				<bitmap>res/addicon.png</bitmap>
+				<handler function="OnAddObjetSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idDelObjet" variable="MenuItem2" member="yes">
+				<label>Supprimer l&apos;objet</label>
+				<bitmap>res/deleteicon.png</bitmap>
+				<handler function="OnDelObjetSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+	</object>
+</wxsmith>

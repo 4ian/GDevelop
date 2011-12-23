@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="RenderDialog">
+		<title>Aperçu</title>
+		<id_arg>0</id_arg>
+		<object class="Custom" name="ID_CUSTOM1" subclass="wxSFMLCanvas" variable="renderCanvas" member="yes">
+			<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),$(STYLE));</creating_code>
+			<include_file>wxSFMLCanvas.hpp</include_file>
+			<local_include>1</local_include>
+			<style>wxWANTS__CHARS | wxNO__BORDER</style>
+			<size>800,600</size>
+		</object>
+	</object>
+</wxsmith>

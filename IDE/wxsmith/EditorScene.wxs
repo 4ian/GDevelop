@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxPanel" name="EditorScene">
+		<bg>wxSYS_COLOUR_WINDOW</bg>
+		<id_arg>0</id_arg>
+		<style>0</style>
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
+			<object class="sizeritem">
+				<object class="wxAuiNotebook" name="ID_AUINOTEBOOK1" variable="notebook" member="yes">
+					<extra_code>notebook-&gt;SetArtProvider(new GDAuiTabArt);</extra_code>
+					<style>wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_BOTTOM|wxNO_BORDER</style>
+					<handler function="OnnotebookPageChanged" entry="EVT_AUINOTEBOOK_PAGE_CHANGED" />
+					<object class="AuiNotebookPage">
+						<object class="wxPanel" name="ID_PANEL5" variable="scenePanel" member="yes">
+							<bg>#FFFFFF</bg>
+							<style>wxNO_BORDER|wxTAB_TRAVERSAL</style>
+							<handler function="OnscenePanelResize" entry="EVT_SIZE" />
+							<object class="wxScrollBar" name="ID_SCROLLBAR2" variable="scrollBar2" member="yes">
+								<value>2500</value>
+								<thumbsize>10</thumbsize>
+								<range>5000</range>
+								<pagesize>10</pagesize>
+								<style>wxSB_VERTICAL</style>
+								<handler function="OnScrollBar2Scroll" entry="EVT_COMMAND_SCROLL" />
+								<handler function="OnScrollBar2Scroll" entry="EVT_COMMAND_SCROLL_THUMBTRACK" />
+								<handler function="OnScrollBar2Scroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
+							</object>
+							<object class="wxScrollBar" name="ID_SCROLLBAR1" variable="scrollBar1" member="yes">
+								<value>2500</value>
+								<thumbsize>10</thumbsize>
+								<range>5000</range>
+								<pagesize>10</pagesize>
+								<style>wxSB_HORIZONTAL</style>
+								<handler function="OnScrollBar1Scroll" entry="EVT_COMMAND_SCROLL" />
+								<handler function="OnScrollBar1Scroll" entry="EVT_COMMAND_SCROLL_THUMBTRACK" />
+								<handler function="OnScrollBar1Scroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
+							</object>
+							<object class="Custom" name="ID_CUSTOM1" subclass="SceneCanvas" variable="sceneCanvas" member="yes">
+								<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, mainEditorCommand, ID__CUSTOM1,$(POS),$(SIZE), $(STYLE));</creating_code>
+								<style>wxWANTS__CHARS | wxBORDER__SIMPLE</style>
+								<pos>0,0</pos>
+								<size>800,600</size>
+								<focused>1</focused>
+								<handler function="OnsceneCanvasSetFocus" entry="EVT_SET_FOCUS" />
+							</object>
+						</object>
+						<label>Scène</label>
+						<icon>res/sceneeditor.png</icon>
+					</object>
+					<object class="AuiNotebookPage">
+						<object class="wxPanel" name="ID_PANEL6" variable="eventsPanel" member="yes">
+							<bg>#FFFFFF</bg>
+							<style>wxNO_BORDER|wxTAB_TRAVERSAL</style>
+							<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+								<cols>1</cols>
+								<growablecols>0</growablecols>
+								<growablerows>0</growablerows>
+								<object class="sizeritem">
+									<object class="Custom" name="ID_CUSTOM2" subclass="EventsEditor" variable="eventsEditor" member="yes">
+										<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, &amp;scene.events, mainEditorCommand);</creating_code>
+										<style></style>
+										<size>456,317</size>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<label>Evènements</label>
+						<icon>res/events16.png</icon>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+	</object>
+</wxsmith>

@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="Demarrage">
+		<title>Premier démarrage de Game Develop</title>
+		<centered>1</centered>
+		<size>662,325</size>
+		<id_arg>0</id_arg>
+		<style>wxCAPTION|wxSYSTEM_MENU</style>
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<object class="sizeritem">
+				<object class="wxPanel" name="ID_PANEL4" variable="Panel4" member="yes">
+					<bg>#433454</bg>
+					<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
+						<cols>3</cols>
+						<growablecols>0</growablecols>
+						<growablerows>0</growablerows>
+						<object class="sizeritem">
+							<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="StaticBitmap1" member="yes">
+								<bitmap>res/GD-logo.png</bitmap>
+								<pos>-56,-64</pos>
+								<style>wxNO_BORDER</style>
+							</object>
+							<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+							<option>1</option>
+						</object>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
+					<size>10,-1</size>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
+					<object class="notebookpage">
+						<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+							<pos>32,47</pos>
+							<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+								<cols>1</cols>
+								<growablecols>0</growablecols>
+								<growablerows>0</growablerows>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
+										<cols>3</cols>
+										<growablecols>0</growablecols>
+										<growablerows>0</growablerows>
+										<object class="sizeritem">
+											<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+												<cols>1</cols>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
+														<label>Cet écran s&apos;affiche au premier démarrage</label>
+														<font>
+															<weight>bold</weight>
+														</font>
+													</object>
+													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+														<label>Game Develop permet la création de jeux de façon simple et rapide,&#x0A;pour le développeur débutant ou confirmé.</label>
+														<font />
+													</object>
+													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
+														<label>Vous allez pouvoir régler quelques paramétrages et accéder aux&#x0A;conseils pour démarrer au mieux avec Game Develop.&#x0A;&#x0A;Cliquez sur suivant pour continuer.</label>
+													</object>
+													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap2" member="yes">
+												<bitmap>res/presentation.png</bitmap>
+												<style>0</style>
+											</object>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_TOP</flag>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+										<cols>3</cols>
+										<growablecols>0</growablecols>
+										<growablerows>0</growablerows>
+										<object class="sizeritem">
+											<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+												<label>Game Develop est un freeware.  Si vous l&apos;avez payé autrement que par un don&#x0A;à l&apos;auteur, nous vous recommandons d&apos;obtenir un remboursement.</label>
+												<font>
+													<style>italic</style>
+												</font>
+											</object>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON6" variable="Button1" member="yes">
+												<label>Suivant</label>
+												<handler function="OnButton1Click" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_BOTTOM</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<label>Bienvenue</label>
+					</object>
+					<object class="notebookpage">
+						<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
+							<pos>93,-1</pos>
+							<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
+								<cols>1</cols>
+								<growablecols>0</growablecols>
+								<growablerows>0</growablerows>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer9" member="no">
+										<cols>2</cols>
+										<growablecols>1</growablecols>
+										<object class="sizeritem">
+											<object class="wxFlexGridSizer" variable="FlexGridSizer10" member="no">
+												<cols>1</cols>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+														<label>Game Develop vérifie par défaut au démarrage si de nouvelles mises à jour sont&#x0A;disponibles. Si vous possédez un pare feu, il est possible que celui ci  vous demande&#x0A;si le logiciel peut accéder à internet. Dans ce cas, répondez par l&apos;affirmative.</label>
+													</object>
+													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxCheckBox" name="ID_CHECKBOX1" variable="majCheck" member="yes">
+														<label>Vérifier les mises à jour au démarrage</label>
+														<checked>1</checked>
+													</object>
+													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
+												<bitmap>res/maj.png</bitmap>
+												<style>0</style>
+											</object>
+											<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON7" variable="Button2" member="yes">
+										<label>Suivant</label>
+										<handler function="OnButton2Click" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<label>Paramétrage</label>
+					</object>
+					<object class="notebookpage">
+						<object class="wxPanel" name="ID_PANEL3" variable="Panel3" member="yes">
+							<pos>140,-3</pos>
+							<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+								<cols>1</cols>
+								<growablecols>0</growablecols>
+								<growablerows>2</growablerows>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer11" member="no">
+										<cols>2</cols>
+										<object class="sizeritem">
+											<object class="wxStaticBitmap" name="ID_STATICBITMAP4" variable="StaticBitmap4" member="yes">
+												<bitmap>res/modesimpleicon.png</bitmap>
+												<style>wxNO_BORDER</style>
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="HyperlinkCtrl1" member="yes">
+												<label>Pour commencer, lisez le guide de démarrage qui explique les principaux concepts.</label>
+												<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
+												<handler function="OnGuideBtClick" entry="EVT_HYPERLINK" />
+											</object>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+										<label>Vous pouvez ensuite :</label>
+									</object>
+									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer13" member="no">
+										<cols>2</cols>
+										<object class="sizeritem">
+											<object class="wxStaticBitmap" name="ID_STATICBITMAP5" variable="StaticBitmap5" member="yes">
+												<bitmap>res/tutoicon.png</bitmap>
+												<style>wxNO_BORDER</style>
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxFlexGridSizer" variable="FlexGridSizer12" member="no">
+												<cols>3</cols>
+												<object class="sizeritem">
+													<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL2" variable="HyperlinkCtrl2" member="yes">
+														<label>Lire le tutoriel</label>
+														<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
+														<handler function="OnTutorielBtClick" entry="EVT_HYPERLINK" />
+													</object>
+													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL17" variable="secondTutoLink" member="yes">
+														<label>(-Insert the name of the second tutorial or a blank text-)</label>
+														<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
+														<handler function="OnsecondTutoLinkClick" entry="EVT_HYPERLINK" />
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxStaticBitmap" name="ID_STATICBITMAP11" variable="StaticBitmap11" member="yes">
+												<bitmap>res/openicon.png</bitmap>
+												<style>wxNO_BORDER</style>
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL8" variable="HyperlinkCtrl8" member="yes">
+												<label>Ouvrir les exemples</label>
+												<style>wxHL_ALIGN_LEFT|wxNO_BORDER</style>
+												<handler function="OnExempleBtClick" entry="EVT_HYPERLINK" />
+											</object>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxStaticBitmap" name="ID_STATICBITMAP12" variable="StaticBitmap12" member="yes">
+												<bitmap>res/wikiicon.png</bitmap>
+												<style>wxNO_BORDER</style>
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL9" variable="HyperlinkCtrl9" member="yes">
+												<label>Accéder au wiki ( Base d&apos;articles et de connaissance )</label>
+												<url>http://www.wiki.compilgames.net</url>
+												<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
+											</object>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxStaticBitmap" name="ID_STATICBITMAP13" variable="StaticBitmap13" member="yes">
+												<bitmap>res/community.png</bitmap>
+												<style>wxNO_BORDER</style>
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL10" variable="HyperlinkCtrl10" member="yes">
+												<label>Accéder au forum</label>
+												<url>http://www.forum.compilgames.net</url>
+												<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
+											</object>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer14" member="no">
+										<cols>3</cols>
+										<growablecols>1</growablecols>
+										<growablerows>0</growablerows>
+										<object class="sizeritem">
+											<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
+												<label>Vous pouvez aussi accéder à ces liens depuis la page qui s&apos;affiche&#x0A;au démarrage de Game Develop.</label>
+												<font>
+													<style>italic</style>
+												</font>
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON4" variable="FermerBt" member="yes">
+												<label>Fermer</label>
+												<handler function="OnFermerBtClick" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<label>Débuter avec Game Develop</label>
+					</object>
+				</object>
+				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<border>5</border>
+				<option>1</option>
+			</object>
+		</object>
+	</object>
+</wxsmith>

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxPanel" name="EditorObjetsGroups">
+		<id_arg>0</id_arg>
+		<handler function="OnSetFocus" entry="EVT_SET_FOCUS" />
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<growablecols>0</growablecols>
+			<growablerows>1</growablerows>
+			<object class="sizeritem">
+				<object class="wxPanel" name="ID_PANEL4" variable="Panel3" member="yes">
+					<size>-1,0</size>
+					<handler function="OnPanel3Resize" entry="EVT_SIZE" />
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="ObjetsGroupsList" member="yes">
+					<pos>-72,-72</pos>
+					<size>179,170</size>
+					<style>wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE</style>
+					<handler function="OnObjetsGroupsListBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
+					<handler function="OnObjetsGroupsListEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
+					<handler function="OnObjetsGroupsListItemDoubleClicked" entry="EVT_TREE_ITEM_ACTIVATED" />
+					<handler function="OnTreeCtrl1ItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
+					<handler function="OnObjetsGroupsListItemActivated" entry="EVT_TREE_SEL_CHANGED" />
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+		<object class="wxMenu" variable="ContextMenu" member="yes">
+			<object class="wxMenuItem" name="IdGroupEdit" variable="editMenuItem" member="no">
+				<label>Editer le groupe</label>
+				<bitmap>res/editpropicon.png</bitmap>
+				<extra_code>#ifdef ____WXMSW____&#x0A;    ContextMenu.Remove(editMenuItem);&#x0A;    wxFont boldFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE__NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING__DEFAULT);&#x0A;    editMenuItem-&gt;SetFont(boldFont);&#x0A;    ContextMenu.Append(editMenuItem);&#x0A;#endif</extra_code>
+				<handler function="OnEditGroupSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idModName" variable="MenuItem4" member="yes">
+				<label>Modifier le nom</label>
+				<bitmap>res/editnom.png</bitmap>
+				<handler function="OnModNameSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="idAddGroup" variable="MenuItem2" member="yes">
+				<label>Ajouter un groupe</label>
+				<bitmap>res/addicon.png</bitmap>
+				<handler function="OnAddGroupSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idDelGroup" variable="MenuItem3" member="yes">
+				<label>Supprimer le groupe</label>
+				<bitmap>res/deleteicon.png</bitmap>
+				<handler function="OnDelGroupSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem1" member="yes">
+				<label>Copier</label>
+				<bitmap>res/copyicon.png</bitmap>
+				<handler function="OnCopyGroupSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem5" member="yes">
+				<label>Couper</label>
+				<bitmap>res/cuticon.png</bitmap>
+				<handler function="OnCutGroupSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem6" member="yes">
+				<label>Coller</label>
+				<bitmap>res/pasteicon.png</bitmap>
+				<handler function="OnPasteGroupSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+		<object class="wxMenu" variable="multipleContextMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItem7" member="yes">
+				<label>Supprimer</label>
+				<handler function="OnDelGroupSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+	</object>
+</wxsmith>

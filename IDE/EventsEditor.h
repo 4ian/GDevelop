@@ -160,6 +160,9 @@ class EventsEditor: public wxPanel
 		static const long idRibbonHelp;
 		static const long idSearchReplace;
 		static const long idRibbonProfiling;
+		static const long idRibbonFoldAll;
+		static const long idRibbonUnFoldAll;
+
         static wxRibbonButtonBar * insertRibbonBar;
         static wxRibbonButtonBar * deleteRibbonBar;
         static wxRibbonButtonBar * clipboardRibbonBar;
@@ -229,6 +232,8 @@ class EventsEditor: public wxPanel
         void OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt);
         void OnRibbonAddSubEventSelected(wxRibbonButtonBarEvent& evt);
         void OnRibbonAddCustomEventFromMenu(wxRibbonButtonBarEvent& evt);
+        void OnRibbonFoldAll(wxRibbonButtonBarEvent& evt);
+        void OnRibbonUnFoldAll(wxRibbonButtonBarEvent& evt);
         void HandleSelectionAfterClick(int x, int y, bool allowLiveEditingParameters = true);
 
         void AddEvent(EventItem & previousEventItem);
@@ -250,6 +255,10 @@ class EventsEditor: public wxPanel
          */
         unsigned int DrawEvents(wxDC & dc, std::vector < boost::shared_ptr< BaseEvent > > & events, int x, int y, boost::shared_ptr< BaseEvent > scrollTo = boost::shared_ptr< BaseEvent >() );
 
+        /**
+         * Tool function.
+         */
+        void FoldEventListAndSubEvents(std::vector<boost::shared_ptr<BaseEvent> > & list, bool fold);
 
 		Game & game;
 

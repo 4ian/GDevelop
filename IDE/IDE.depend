@@ -27589,7 +27589,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1324558396 d:\florian\programmation\gamedevelop2\ide\version.h
+1324601769 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -28280,7 +28280,7 @@
 	"wx/defs.h"
 	"wx/object.h"
 
-1321096227 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
+1324601769 source:d:\florian\programmation\gamedevelop2\ide\eventseditor.cpp
 	"EventsEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -28316,7 +28316,7 @@
 	"Clipboard.h"
 	<SFML/System.hpp>
 
-1321012077 d:\florian\programmation\gamedevelop2\ide\eventseditor.h
+1324601733 d:\florian\programmation\gamedevelop2\ide\eventseditor.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/menu.h>

@@ -85,6 +85,8 @@ const long EventsEditor::idRibbonCreateTemplate = wxNewId();
 const long EventsEditor::idRibbonHelp = wxNewId();
 const long EventsEditor::idRibbonProfiling = wxNewId();
 const long EventsEditor::idSearchReplace = wxNewId();
+const long EventsEditor::idRibbonFoldAll = wxNewId();
+const long EventsEditor::idRibbonUnFoldAll = wxNewId();
 
 vector < std::pair<long, std::string> > EventsEditor::idForEventTypesMenu;
 
@@ -387,6 +389,12 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idSearchReplace, !hideLabels ? _("Chercher / Remplacer") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
     }
     {
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Affichage"), wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
+        ribbonBar->AddButton(idRibbonFoldAll, !hideLabels ? _("Tout replier") : "", wxBitmap("res/foldAll24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Tout déplier") : "", wxBitmap("res/unFoldAll24.png", wxBITMAP_TYPE_ANY));
+    }
+    {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Outils"), wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonProfiling, !hideLabels ? _("Afficher les performances") : "", wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY));
@@ -415,6 +423,8 @@ void EventsEditor::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idSearchReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnSearchBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonProfiling, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnProfilingBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnHelpBtClick, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonFoldAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonFoldAll, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonUnFoldAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonUnFoldAll, NULL, this);
 }
 void InternalEventsEditorRefreshCallbacks::Refresh()
 {
@@ -1341,6 +1351,26 @@ void EventsEditor::OndeleteMenuSelected(wxCommandEvent& event)
     DeleteSelection();
 }
 
+void EventsEditor::OnRibbonFoldAll(wxRibbonButtonBarEvent& evt)
+{
+    FoldEventListAndSubEvents(*events, true);
+    Refresh();
+}
+
+void EventsEditor::OnRibbonUnFoldAll(wxRibbonButtonBarEvent& evt)
+{
+    FoldEventListAndSubEvents(*events, false);
+    Refresh();
+}
+
+void EventsEditor::FoldEventListAndSubEvents(std::vector<boost::shared_ptr<BaseEvent> > & list, bool fold)
+{
+    for (unsigned int i = 0;i<list.size();++i)
+    {
+        list[i]->folded = fold;
+        if ( list[i]->CanHaveSubEvents() )  FoldEventListAndSubEvents(list[i]->GetSubEvents(), fold);
+    }
+}
 
 void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
 {

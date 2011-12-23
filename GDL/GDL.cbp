@@ -683,9 +683,6 @@
 					<Add option="-fno-stack-protector" />
 					<Add option="-finput-charset=iso-8859-1" />
 					<Add option="-m32" />
-					<Add option="`wx-config --cppflags`" />
-					<Add option="`pkg-config gtk+-2.0 --cflags`" />
-					<Add option="-DGD_IDE_ONLY" />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -695,12 +692,9 @@
 					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="..\ExtLibs\llvm\build\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
-					<Add directory="..\ExtLibs\llvm\build\tools\clang\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
-					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />

@@ -580,6 +580,7 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
         }
 
         if ( elemScene->Attribute( "disabled" ) != NULL ) { if ( string(elemScene->Attribute( "disabled" )) == "true" ) event->SetDisabled(); }
+        if ( elemScene->Attribute( "folded" ) != NULL ) { event->folded = ( string(elemScene->Attribute( "folded" )) == "true" ); }
 
         list.push_back( event );
 
@@ -1103,6 +1104,7 @@ void OpenSaveGame::SaveEvents(const vector < BaseEventSPtr > & list, TiXmlElemen
 
         event = new TiXmlElement( "Event" );
         event->SetAttribute( "disabled", list[j]->IsDisabled() ? "true" : "false" );
+        event->SetAttribute( "folded", list[j]->folded ? "true" : "false" );
         events->LinkEndChild( event );
 
         TiXmlElement * type = new TiXmlElement( "Type" );

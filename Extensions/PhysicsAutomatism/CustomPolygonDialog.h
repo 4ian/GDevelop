@@ -1,4 +1,4 @@
-/** \author
+/**
 
 Game Develop - Physic Automatism Extension
 Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
@@ -22,7 +22,7 @@ freely, subject to the following restrictions:
     3. This notice may not be removed or altered from any source
     distribution.
 */
-/** \author
+/**
  * This file was originally written by Victor Levasseur.
  */
 

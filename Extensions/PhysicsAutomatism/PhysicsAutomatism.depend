@@ -9565,7 +9565,7 @@
 	<Box2D/Dynamics/b2WorldCallbacks.h>
 	<Box2D/Dynamics/b2Fixture.h>
 
-1282160532 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\contactlistener.cpp
+1324660031 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\contactlistener.cpp
 	"ContactListener.h"
 	"PhysicsAutomatism.h"
 
@@ -16560,7 +16560,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1315737614 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\extension.cpp
+1324486704 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"PhysicsAutomatism.h"
@@ -16576,7 +16576,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1324230448 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1324491676 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299112181 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 
@@ -16755,7 +16755,7 @@
 
 1297520343 d:\florian\programmation\gamedevelop2\gdl\gdl\xmlmacros.h
 
-1324460402 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.cpp
+1324482920 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.cpp
 	"PhysicsAutomatism.h"
 	"Box2D/Box2D.h"
 	"Triangulation/triangulate.h"
@@ -22171,7 +22171,7 @@
 1324411703 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\polygoneditorwidget.cpp
 	"PolygonEditorWidget.h"
 
-1324478974 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.cpp
+1324493949 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.cpp
 	"CustomPolygonDialog.h"
 	"PhysicsAutomatism.h"
 	<wx/font.h>
@@ -22182,7 +22182,7 @@
 	"GDL/BitmapGUIManager.h"
 	<string>
 
-1324478922 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.h
+1324486704 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>

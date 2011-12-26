@@ -1,4 +1,4 @@
-/** \author
+/**
 
 Game Develop - Physic Automatism Extension
 Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
@@ -23,7 +23,7 @@ freely, subject to the following restrictions:
     distribution.
 
 */
-/** \author
+/**
  * Contributors to the extension:
  * Victor Levasseur ( Collisions using custom polygons )
  */

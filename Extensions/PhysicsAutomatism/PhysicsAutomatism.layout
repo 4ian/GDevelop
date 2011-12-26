@@ -47,36 +47,48 @@
 		<Cursor1 position="2957" topLine="92" />
 	</File>
 	<File name="ContactListener.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="639" topLine="0" />
+		<Cursor1 position="579" topLine="0" />
 	</File>
-	<File name="ContactListener.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="238" topLine="0" />
+	<File name="ContactListener.h" open="1" top="1" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="255" topLine="0" />
+	</File>
+	<File name="CustomPolygonDialog.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="8059" topLine="143" />
+	</File>
+	<File name="CustomPolygonDialog.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="980" topLine="0" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4955" topLine="104" />
+		<Cursor1 position="2080" topLine="45" />
 	</File>
 	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="13973" topLine="426" />
+		<Cursor1 position="3102" topLine="68" />
 	</File>
 	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2341" topLine="67" />
+		<Cursor1 position="6217" topLine="0" />
 	</File>
 	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="16402" topLine="252" />
+		<Cursor1 position="640" topLine="0" />
 	</File>
 	<File name="PhysicsAutomatismEditor.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1008" topLine="3" />
+		<Cursor1 position="982" topLine="0" />
 	</File>
 	<File name="RuntimeScenePhysicsDatas.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="74" topLine="3" />
+		<Cursor1 position="296" topLine="21" />
 	</File>
 	<File name="RuntimeScenePhysicsDatas.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1072" topLine="3" />
+		<Cursor1 position="974" topLine="0" />
 	</File>
 	<File name="ScenePhysicsDatas.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1117" topLine="3" />
 	</File>
 	<File name="ScenePhysicsDatas.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1011" topLine="6" />
+		<Cursor1 position="1645" topLine="30" />
+	</File>
+	<File name="Triangulation\triangulate.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2897" topLine="108" />
+	</File>
+	<File name="Triangulation\triangulate.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="905" topLine="23" />
 	</File>
 </CodeBlocks_layout_file>

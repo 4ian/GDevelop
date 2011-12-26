@@ -1,4 +1,4 @@
-/** \author
+/**
 
 Game Develop - Physic Automatism Extension
 Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
@@ -22,7 +22,7 @@ freely, subject to the following restrictions:
     3. This notice may not be removed or altered from any source
     distribution.
 */
-/** \author
+/**
  * This file was originally written by Victor Levasseur.
  */
 
@@ -165,7 +165,7 @@ void CustomPolygonDialog::OnpreviewPnlPaint(wxPaintEvent& event)
     //Draw polygon
     dc.SetBrush(wxBrush(wxColor(50, 57, 122), wxFDIAGONAL_HATCH));
     dc.SetPen(wxPen(wxColor(50, 57, 122)));
-    dc.DrawPolygon(points.size(), const_cast<wxPoint *>(&points[0])); //Quite ugly
+    dc.DrawPolygon(points.size(), &points[0]);
 
     //Draw origin
     wxBitmap point(BitmapGUIManager::GetInstance()->point);
@@ -181,8 +181,6 @@ void CustomPolygonDialog::OnTextCtrl1Text(wxCommandEvent& event)
     previewPnl->Update(); //Immediately
 }
 
-#endif
-
 void CustomPolygonDialog::OnpreviewPnlMouseMove(wxMouseEvent& event)
 {
     wxSize panelSize = previewPnl->GetSize();
@@ -191,3 +189,6 @@ void CustomPolygonDialog::OnpreviewPnlMouseMove(wxMouseEvent& event)
                            +";"
                            +ToString(event.GetPosition().y-(panelSize.GetHeight()/2)));
 }
+
+
+#endif

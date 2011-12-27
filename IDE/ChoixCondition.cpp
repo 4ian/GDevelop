@@ -51,6 +51,10 @@
 #include <wx/help.h>
 #include <boost/algorithm/string.hpp>
 
+#ifdef __WXMSW__
+#include <wx/msw/uxtheme.h>
+#endif
+
 using namespace std;
 
 //(*IdInit(ChoixCondition)
@@ -261,8 +265,18 @@ scene(scene_)
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnCancelBtClick);
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnAideBtClick);
     //*)
-    moreBt->SetBitmap(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
 
+    #if defined(__WXMSW__) //Offer nice look to list
+    wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
+    if(theme) theme->SetWindowTheme((HWND) ConditionsTree->GetHWND(), L"EXPLORER", NULL);
+    if(theme) theme->SetWindowTheme((HWND) ObjetsList->GetHWND(), L"EXPLORER", NULL);
+    if(theme) theme->SetWindowTheme((HWND) GroupesList->GetHWND(), L"EXPLORER", NULL);
+    if(theme) theme->SetWindowTheme((HWND) globalObjectsList->GetHWND(), L"EXPLORER", NULL);
+    if(theme) theme->SetWindowTheme((HWND) globalObjectGroups->GetHWND(), L"EXPLORER", NULL);
+    if(theme) theme->SetWindowTheme((HWND) objectConditionsTree->GetHWND(), L"EXPLORER", NULL);
+    #endif
+
+    moreBt->SetBitmap(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
     imageList = new wxImageList( 16, 16 );
     imageList->Add(( wxBitmap( "res/conditions/unecond.png", wxBITMAP_TYPE_ANY ) ) );
     ConditionsTree->AssignImageList( imageList );

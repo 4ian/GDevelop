@@ -26,12 +26,12 @@ xcopy ..\..\ExtLibs\SFML\include\*.hpp ..\Bin\Dev\include\SFML\include\*.hpp /S 
 xcopy ..\..\ExtLibs\SFML\include\*.inl ..\Bin\Dev\include\SFML\include\*.inl /S /Y /D
 
 rem Extensions headers
-xcopy ..\..\Extensions\*.h ..\Bin\Dev\Extensions\include\*.h /S /Y /D
-xcopy ..\..\Extensions\*.hpp ..\Bin\Dev\Extensions\include\*.hpp /S /Y /D
-xcopy ..\..\Extensions\*.inl ..\Bin\Dev\Extensions\include\*.inl /S /Y /D
+xcopy ..\..\Extensions\*.h ..\Bin\Dev\Extensions\include\*.h /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+xcopy ..\..\Extensions\*.hpp ..\Bin\Dev\Extensions\include\*.hpp /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+xcopy ..\..\Extensions\*.inl ..\Bin\Dev\Extensions\include\*.inl /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
 
 rem Extensions libs
-xcopy ..\..\Extensions\*.a ..\Bin\Dev\Extensions\Lib\*.a /S /Y /D
+xcopy ..\..\Extensions\*.a ..\Bin\Dev\Extensions\Lib\*.a /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
 
 echo.
 echo -End of copy

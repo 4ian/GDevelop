@@ -34,7 +34,6 @@
 			<object class="wxMenuItem" name="IdGroupEdit" variable="editMenuItem" member="no">
 				<label>Editer le groupe</label>
 				<bitmap>res/editpropicon.png</bitmap>
-				<extra_code>#ifdef ____WXMSW____&#x0A;    ContextMenu.Remove(editMenuItem);&#x0A;    wxFont boldFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE__NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING__DEFAULT);&#x0A;    editMenuItem-&gt;SetFont(boldFont);&#x0A;    ContextMenu.Append(editMenuItem);&#x0A;#endif</extra_code>
 				<handler function="OnEditGroupSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idModName" variable="MenuItem4" member="yes">

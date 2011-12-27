@@ -10,7 +10,7 @@
 				<object class="wxListCtrl" name="ID_LISTCTRL1" variable="initialPositionsList" member="yes">
 					<size>206,167</size>
 					<style>wxLC_REPORT</style>
-					<handler function="OninitialPositionsListItemActivated" entry="EVT_LIST_ITEM_FOCUSED" />
+					<handler function="OninitialPositionsListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>

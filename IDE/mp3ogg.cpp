@@ -14,11 +14,7 @@
 #include <string>
 #include <vector>
 #include <wx/filename.h>
-
-#ifdef DEBUG
-
-#endif
-
+#include "GDL/CommonTools.h"
 #include "mp3ogg.h"
 using namespace std;
 
@@ -51,7 +47,7 @@ mp3ogg::mp3ogg(wxWindow* parent)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
-	
+
 	Create(parent, wxID_ANY, _("Convertir Mp3 vers OGG Vorbis"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -95,7 +91,7 @@ mp3ogg::mp3ogg(wxWindow* parent)
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
-	
+
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&mp3ogg::OnEncoderBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&mp3ogg::OnEncoderWAVBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&mp3ogg::OnFermerBtClick);
@@ -132,19 +128,19 @@ void mp3ogg::OnEncoderBtClick(wxCommandEvent& event)
     wxFileDialog dialog(this, _("Choisissez le fichier MP3 à encoder en OGG Vorbis"), "", "", "Fichier audio MP3 ( *.mp3)|*.mp3");
     dialog.ShowModal();
 
-    string rep = static_cast<string> ( dialog.GetPath() );
-    if ( rep == "" ) return;
+    string originalFile = ToString( dialog.GetPath() );
+    if ( originalFile == "" ) return;
 
-    wxExecute("lame \""+rep+"\" --decode", wxEXEC_SYNC);
-    wxExecute("oggenc \""+rep+".wav\"", wxEXEC_SYNC);
+    wxExecute("lame \""+originalFile+"\" \""+originalFile+".wav\" --decode", wxEXEC_SYNC);
+    wxExecute("oggenc \""+originalFile+".wav\"", wxEXEC_SYNC);
 
     //Suppression du wav intermédiaire
-    wxRemoveFile(rep+".wav");
+    wxRemoveFile(originalFile+".wav");
 
     //Renommage du file.mp3.ogg en file.ogg
-    wxFileName filename(rep);
+    wxFileName filename(originalFile);
     filename.SetExt("ogg");
-    wxRenameFile(rep+".ogg", filename.GetFullPath());
+    wxRenameFile(originalFile+".ogg", filename.GetFullPath());
 
     wxLogMessage(_("L'encodage est terminé. Le fichier OGG se trouve dans le même répertoire que le fichier MP3."));
 

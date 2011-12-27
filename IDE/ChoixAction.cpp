@@ -47,6 +47,9 @@
 #include "GDL/ExpressionsCorrectnessTesting.h"
 #include <boost/algorithm/string.hpp>
 
+#ifdef __WXMSW__
+#include <wx/msw/uxtheme.h>
+#endif
 
 //(*IdInit(ChoixAction)
 const long ChoixAction::ID_TREECTRL1 = wxNewId();
@@ -233,6 +236,16 @@ scene(scene_)
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixAction::OnAideBtClick);
 	//*)
     moreBt->SetBitmap(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
+
+    #if defined(__WXMSW__) //Offer nice look to list
+    wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
+    if(theme) theme->SetWindowTheme((HWND) ActionsTree->GetHWND(), L"EXPLORER", NULL);
+    if(theme) theme->SetWindowTheme((HWND) ObjetsList->GetHWND(), L"EXPLORER", NULL);
+    if(theme) theme->SetWindowTheme((HWND) GroupesList->GetHWND(), L"EXPLORER", NULL);
+    if(theme) theme->SetWindowTheme((HWND) globalObjectsList->GetHWND(), L"EXPLORER", NULL);
+    if(theme) theme->SetWindowTheme((HWND) globalObjectGroups->GetHWND(), L"EXPLORER", NULL);
+    if(theme) theme->SetWindowTheme((HWND) objectActionsTree->GetHWND(), L"EXPLORER", NULL);
+    #endif
 
     searchCtrl->SetFocus();
 

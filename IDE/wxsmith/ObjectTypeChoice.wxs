@@ -18,6 +18,7 @@
 						<object class="sizeritem">
 							<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap2" member="yes">
 								<bitmap>res/objeticon64.png</bitmap>
+								<style>wxNO_BORDER</style>
 							</object>
 							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>
@@ -70,7 +71,6 @@
 										<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="iconBmp" member="yes">
 											<bitmap>res/unknown32.png</bitmap>
 											<size>32,32</size>
-											<style>wxSIMPLE_BORDER</style>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>

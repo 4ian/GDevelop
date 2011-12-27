@@ -33,7 +33,7 @@ sceneCanvas(sceneCanvas_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
-	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_FOCUSED,(wxObjectEventFunction)&InitialPositionBrowserDlg::OninitialPositionsListItemActivated);
+	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&InitialPositionBrowserDlg::OninitialPositionsListItemActivated);
 	//*)
 
 	initialPositionsList->InsertColumn(0, _("Objet"));

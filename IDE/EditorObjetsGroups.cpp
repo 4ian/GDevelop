@@ -24,8 +24,10 @@
 #include "GDL/HelpFileAccess.h"
 #include "GDL/EventsCodeCompiler.h"
 #include "EventsRefactorer.h"
+
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
+#include <wx/msw/uxtheme.h>
 #endif
 
 #ifdef __WXGTK__
@@ -84,12 +86,6 @@ mainEditorCommand(mainEditorCommand_)
 	editMenuItem = new wxMenuItem((&ContextMenu), IdGroupEdit, _("Editer le groupe"), wxEmptyString, wxITEM_NORMAL);
 	editMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editpropicon.png"))));
 	ContextMenu.Append(editMenuItem);
-	#ifdef __WXMSW__
-	    ContextMenu.Remove(editMenuItem);
-	    wxFont boldFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
-	    editMenuItem->SetFont(boldFont);
-	    ContextMenu.Append(editMenuItem);
-	#endif
 	MenuItem4 = new wxMenuItem((&ContextMenu), idModName, _("Modifier le nom"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	ContextMenu.Append(MenuItem4);
@@ -131,6 +127,11 @@ mainEditorCommand(mainEditorCommand_)
 	Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjetsGroups::OnDelGroupSelected);
 	Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorObjetsGroups::OnSetFocus);
 	//*)
+
+    #if defined(__WXMSW__) //Offer nice look to wxTreeCtrl
+    wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
+    if(theme) theme->SetWindowTheme((HWND) ObjetsGroupsList->GetHWND(), L"EXPLORER", NULL);
+    #endif
 
     toolbar = new wxToolBar( Panel3, -1, wxDefaultPosition, wxDefaultSize,
                                    wxTB_FLAT | wxTB_NODIVIDER );

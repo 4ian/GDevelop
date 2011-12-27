@@ -151,7 +151,11 @@ bool Game_Develop_EditorApp::OnInit()
     }
 
     //Load configuration
+    #if defined(LINUX)
+    wxString ConfigPath = wxFileName::GetHomeDir() + "/.config/Game Develop/";
+    #else
     wxString ConfigPath = wxFileName::GetHomeDir() + "/.Game Develop/";
+    #endif
     if ( !wxDirExists( ConfigPath ) )
         wxMkdir( ConfigPath );
 
@@ -344,9 +348,9 @@ bool Game_Develop_EditorApp::OnInit()
     if ( openRecupFiles )
     {
         unsigned int i = 0;
-        while( wxFileExists("gameDump"+ToString(i)+".gdg") )
+        while( wxFileExists(wxFileName::GetTempDir()+"/GDGamesDump/"+"gameDump"+ToString(i)+".gdg") )
         {
-            mainEditor->Open("gameDump"+ToString(i)+".gdg");
+            mainEditor->Open(ToString(wxFileName::GetTempDir()+"/GDGamesDump/"+"gameDump"+ToString(i)+".gdg"));
             ++i;
         }
     }

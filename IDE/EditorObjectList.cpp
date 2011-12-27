@@ -47,6 +47,7 @@
 
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
+#include <wx/msw/uxtheme.h>
 #endif
 
 #ifdef __WXGTK__
@@ -208,6 +209,11 @@ mainEditorCommand(mainEditorCommand_)
 	Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OndelObjMenuISelected);
 	Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorObjectList::OnSetFocus);
 	//*)
+
+    #if defined(__WXMSW__) //Offer nice look to wxTreeCtrl
+    wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
+    if(theme) theme->SetWindowTheme((HWND) objectsList->GetHWND(), L"EXPLORER", NULL);
+    #endif
 
     CreateToolbar();
 

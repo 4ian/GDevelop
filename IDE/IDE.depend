@@ -23005,7 +23005,7 @@
 	<wx/thread.h>
 	"GDL/SourceFileBuilder.h"
 
-1300399150 d:\florian\programmation\gamedevelop2\gdl\gdl\sourcefilebuilder.h
+1324920970 d:\florian\programmation\gamedevelop2\gdl\gdl\sourcefilebuilder.h
 	<wx/process.h>
 	<vector>
 	<string>
@@ -25865,7 +25865,7 @@
 	<wx/dialog.h>
 	"GDL/Layer.h"
 
-1322402523 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
+1325006860 source:d:\florian\programmation\gamedevelop2\ide\editorobjectlist.cpp
 	"EditorObjectList.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -25908,6 +25908,7 @@
 	"AutomatismTypeChoice.h"
 	"EventsRefactorer.h"
 	<wx/msw/winundef.h>
+	<wx/msw/uxtheme.h>
 	<gtk/gtk.h>
 
 1285008194 d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.h
@@ -25999,7 +26000,7 @@
 	<wx/msw/winundef.h>
 	"EditorObjetsGroups.h"
 
-1321304877 source:d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp
+1325007095 source:d:\florian\programmation\gamedevelop2\ide\editorobjetsgroups.cpp
 	"EditorObjetsGroups.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -26024,6 +26025,7 @@
 	"GDL/EventsCodeCompiler.h"
 	"EventsRefactorer.h"
 	<wx/msw/winundef.h>
+	<wx/msw/uxtheme.h>
 	<gtk/gtk.h>
 
 1315041481 source:d:\florian\programmation\gamedevelop2\ide\editorscene.cpp
@@ -26217,7 +26219,7 @@
 	<iostream>
 	<wx/dcbuffer.h>
 
-1324217569 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp
+1324920295 source:d:\florian\programmation\gamedevelop2\ide\game_develop_editorapp.cpp
 	<wx/msw/winundef.h>
 	<wx/image.h>
 	<wx/fileconf.h>
@@ -26352,7 +26354,8 @@
 	<string>
 	<vector>
 
-1292277359 d:\florian\programmation\gamedevelop2\ide\checkmaj.h
+1324920438 d:\florian\programmation\gamedevelop2\ide\checkmaj.h
+	<string>
 
 1292276995 d:\florian\programmation\gamedevelop2\ide\maj.h
 	<wx/sizer.h>
@@ -26551,7 +26554,7 @@
 1253304906 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\animate.h
 	"wx/bitmap.h"
 
-1301940842 source:d:\florian\programmation\gamedevelop2\ide\initialpositionbrowserdlg.cpp
+1324927525 source:d:\florian\programmation\gamedevelop2\ide\initialpositionbrowserdlg.cpp
 	"InitialPositionBrowserDlg.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -26783,7 +26786,7 @@
 	<wx/textfile.h>
 	"GDL/Game.h"
 
-1322397260 source:d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp
+1325007498 source:d:\florian\programmation\gamedevelop2\ide\objecttypechoice.cpp
 	"ObjectTypeChoice.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -26793,10 +26796,11 @@
 	<string>
 	<vector>
 	"GDL/gdTreeItemStringData.h"
-	"Extensions.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/ExtensionBase.h"
 	"GDL/Game.h"
+	"Extensions.h"
+	<wx/msw/uxtheme.h>
 
 1264360536 source:d:\florian\programmation\gamedevelop2\ide\objectsonbadlayerbox.cpp
 	"ObjectsOnBadLayerBox.h"
@@ -26893,7 +26897,7 @@
 	"Event.h"
 	"GDL/profile.h"
 
-1318081968 source:d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp
+1325006958 source:d:\florian\programmation\gamedevelop2\ide\projectmanager.cpp
 	"ProjectManager.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -26921,6 +26925,7 @@
 	"InitialVariablesDialog.h"
 	"EditPropScene.h"
 	<fstream>
+	<wx/msw/uxtheme.h>
 
 1266530852 d:\florian\programmation\gamedevelop2\ide\gdtreeitemgamedata.h
 	<string>
@@ -27571,7 +27576,7 @@
 
 1266530360 source:d:\florian\programmation\gamedevelop2\ide\gdtreeitemgamedata.cpp
 
-1264360532 source:d:\florian\programmation\gamedevelop2\ide\mp3ogg.cpp
+1324821247 source:d:\florian\programmation\gamedevelop2\ide\mp3ogg.cpp
 	"nommgr.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -27583,13 +27588,14 @@
 	<string>
 	<vector>
 	<wx/filename.h>
+	"GDL/CommonTools.h"
 	"mp3ogg.h"
 
 1314613573 source:d:\florian\programmation\gamedevelop2\ide\resource.rc
 	"version.h"
 	"wx/msw/wx.rc"
 
-1324601769 d:\florian\programmation\gamedevelop2\ide\version.h
+1325008666 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"
@@ -27873,14 +27879,15 @@
 
 1307986706 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\arrimpl.cpp
 
-1303904414 source:d:\florian\programmation\gamedevelop2\ide\checkmaj.cpp
-	"nommgr.h"
+1324920412 source:d:\florian\programmation\gamedevelop2\ide\checkmaj.cpp
+	"CheckMAJ.h"
 	<wx/log.h>
 	<wx/wx.h>
 	"wx/msgdlg.h"
 	<wx/protocol/http.h>
 	<wx/url.h>
 	<wx/wfstream.h>
+	<wx/filename.h>
 	<string>
 	<vector>
 	<iostream>
@@ -27888,8 +27895,6 @@
 	"SFML/Network.hpp"
 	"GDL/tinyxml.h"
 	"GDL/VersionWrapper.h"
-	"CheckMAJ.h"
-	"MAJ.h"
 
 1314041053 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\network.hpp
 	<SFML/System.hpp>
@@ -27965,7 +27970,7 @@
 	<wx/wfstream.h>
 	<wx/txtstrm.h>
 
-1324486852 source:d:\florian\programmation\gamedevelop2\ide\credits.cpp
+1324660847 source:d:\florian\programmation\gamedevelop2\ide\credits.cpp
 	"Credits.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -27984,7 +27989,7 @@
 	"GDL/VersionWrapper.h"
 	"GDL/CommonTools.h"
 
-1324491676 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1324995634 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
@@ -28928,4 +28933,21 @@
 	<wx/statline.h>
 	<wx/button.h>
 	<wx/dialog.h>
+
+1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\uxtheme.h
+	"wx/defs.h"
+	"wx/msw/private.h"
+	"wx/msw/uxthemep.h"
+	"wx/dynlib.h"
+
+1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\uxthemep.h
+	"wx/msw/wrapcctl.h"
+
+1307986706 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dynlib.h
+	"wx/defs.h"
+	"wx/string.h"
+	"wx/dynarray.h"
+	<dlfcn.h>
+	<dl.h>
+	<CodeFragments.h>
 

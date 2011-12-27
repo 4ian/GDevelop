@@ -10,11 +10,14 @@
 #include <string>
 #include <vector>
 #include "GDL/gdTreeItemStringData.h"
-
-#include "Extensions.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/Game.h"
+#include "Extensions.h"
+
+#ifdef __WXMSW__
+#include <wx/msw/uxtheme.h>
+#endif
 
 using namespace std;
 
@@ -56,7 +59,7 @@ game(game_)
 	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	Panel1->SetBackgroundColour(wxColour(255,255,255));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticBitmap2 = new wxStaticBitmap(Panel1, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/objeticon64.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP2"));
+	StaticBitmap2 = new wxStaticBitmap(Panel1, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/objeticon64.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer4->Add(StaticBitmap2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Choisissez le type d\'objet à ajouter.\nLe type de l\'objet détermine la façon dont\nil est affiché, ce qu\'il fait, comment peut on\ninteragir avec..."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer4->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -104,6 +107,11 @@ game(game_)
 	//*)
 
     moreObjectsBt->SetBitmap(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
+
+    #if defined(__WXMSW__) //Offer nice look to list
+    wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
+    if(theme) theme->SetWindowTheme((HWND) objectsList->GetHWND(), L"EXPLORER", NULL);
+    #endif
 
     RefreshList();
 }

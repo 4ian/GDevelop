@@ -26,12 +26,15 @@ xcopy ..\..\ExtLibs\SFML\include\*.hpp ..\Bin\Release\include\SFML\include\*.hpp
 xcopy ..\..\ExtLibs\SFML\include\*.inl ..\Bin\Release\include\SFML\include\*.inl /S /Y /D
 
 rem Extensions headers
-xcopy ..\..\Extensions\*.h ..\Bin\Release\Extensions\include\*.h /S /Y /D
-xcopy ..\..\Extensions\*.hpp ..\Bin\Release\Extensions\include\*.hpp /S /Y /D
-xcopy ..\..\Extensions\*.inl ..\Bin\Release\Extensions\include\*.inl /S /Y /D
+xcopy ..\..\Extensions\*.h ..\Bin\Release\Extensions\include\*.h /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+xcopy ..\..\Extensions\*.hpp ..\Bin\Release\Extensions\include\*.hpp /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+xcopy ..\..\Extensions\*.inl ..\Bin\Release\Extensions\include\*.inl /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+
+rem Special case : Widgets extension
+xcopy ..\..\Extensions\Widgets-Extension\src\*.h ..\Bin\Release\Extensions\include\Widgets\*.h /S /Y /D
 
 rem Extensions libs
-xcopy ..\..\Extensions\*.a ..\Bin\Release\Extensions\Lib\*.a /S /Y /D
+xcopy ..\..\Extensions\*.a ..\Bin\Release\Extensions\Lib\*.a /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
 
 echo.
 echo -End of copy

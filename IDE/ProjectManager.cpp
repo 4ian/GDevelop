@@ -20,7 +20,6 @@
 #include "GDL/CommentEvent.h"
 #include "GDL/SourceFile.h"
 #include "GDL/EventsCodeCompiler.h"
-
 #include "CodeEditor.h"
 #include "NewCppFileDlg.h"
 #include "Extensions.h"
@@ -31,6 +30,9 @@
 
 #include <fstream>
 
+#ifdef __WXMSW__
+#include <wx/msw/uxtheme.h>
+#endif
 
 using namespace GDpriv;
 
@@ -235,6 +237,11 @@ mainEditor(mainEditor_)
     imageList->Add(wxBitmap("res/events16.png", wxBITMAP_TYPE_ANY));
     imageList->Add(wxBitmap("res/source_cpp16.png", wxBITMAP_TYPE_ANY));
     projectsTree->SetImageList(imageList);
+
+    #if defined(__WXMSW__) //Offer nice look to wxTreeCtrl
+    wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
+    if(theme) theme->SetWindowTheme((HWND) projectsTree->GetHWND(), L"EXPLORER", NULL);
+    #endif
 
     Refresh();
 }

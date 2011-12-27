@@ -1,5 +1,11 @@
+/** \file
+ *  Game Develop
+ *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef CHECKMAJ_H
 #define CHECKMAJ_H
+#include <string>
 
 /**
  * Class to check and retrieve information

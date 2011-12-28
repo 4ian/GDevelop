@@ -1,0 +1,370 @@
+#if defined(GD_IDE_ONLY)
+
+#include "EventsEditorItemsAreas.h"
+#include <wx/gdicmn.h>
+#include <map>
+#include "GDL/Event.h"
+
+bool EventsEditorItemsAreas::IsOnEvent(int x, int y)
+{
+    for (unsigned int i = 0;i<eventsAreas.size();++i)
+    {
+        if ( eventsAreas[i].first.Contains(x,y) )
+            return true;
+    }
+
+    return false;
+}
+
+EventItem EventsEditorItemsAreas::GetEventAt(int x, int y)
+{
+    for (unsigned int i = 0;i<eventsAreas.size();++i)
+    {
+        if ( eventsAreas[i].first.Contains(x,y) )
+            return eventsAreas[i].second;
+    }
+
+    std::cout << "WARNING, RETURNING DUMMY EVENT";
+
+    EventItem dummy;
+    return dummy;
+}
+wxRect EventsEditorItemsAreas::GetAreaOfEventAt(int x, int y)
+{
+    for (unsigned int i = 0;i<eventsAreas.size();++i)
+    {
+        if ( eventsAreas[i].first.Contains(x,y) )
+            return eventsAreas[i].first;
+    }
+
+    std::cout << "WARNING, RETURNING DUMMY EVENT rect";
+
+    wxRect dummy;
+    return dummy;
+}
+
+bool EventsEditorItemsAreas::IsOnInstruction(int x, int y)
+{
+    for (unsigned int i = 0;i<instructionsAreas.size();++i)
+    {
+        if ( instructionsAreas[i].first.Contains(x,y) )
+            return true;
+    }
+
+    return false;
+}
+
+InstructionItem EventsEditorItemsAreas::GetInstructionAt(int x, int y)
+{
+    for (unsigned int i = 0;i<instructionsAreas.size();++i)
+    {
+        if ( instructionsAreas[i].first.Contains(x,y) )
+            return instructionsAreas[i].second;
+    }
+
+    std::cout << "WARNING, RETURNING DUMMY Instruction";
+
+    InstructionItem dummy;
+    return dummy;
+}
+
+wxRect EventsEditorItemsAreas::GetAreaOfInstructionAt(int x, int y)
+{
+    for (unsigned int i = 0;i<instructionsAreas.size();++i)
+    {
+        if ( instructionsAreas[i].first.Contains(x,y) )
+            return instructionsAreas[i].first;
+    }
+
+    std::cout << "WARNING, RETURNING DUMMY Instruction area";
+
+    wxRect dummy;
+    return dummy;
+}
+
+bool EventsEditorItemsAreas::IsOnInstructionList(int x, int y)
+{
+    for (unsigned int i = 0;i<instructionListsAreas.size();++i)
+    {
+        if ( instructionListsAreas[i].first.Contains(x,y) )
+            return true;
+    }
+
+    return false;
+}
+
+InstructionListItem EventsEditorItemsAreas::GetInstructionListAt(int x, int y)
+{
+    wxRect rect;
+    InstructionListItem instructionList;
+    for (unsigned int i = 0;i<instructionListsAreas.size();++i)
+    {
+        if ( instructionListsAreas[i].first.Contains(x,y) )
+        {
+            if ( (instructionListsAreas[i].first.width*instructionListsAreas[i].first.height < rect.width*rect.height) || rect.width == 0 )
+            {
+                rect = instructionListsAreas[i].first;
+                instructionList = instructionListsAreas[i].second;
+            }
+        }
+    }
+
+    if ( rect.width == 0)
+        std::cout << "WARNING, RETURNING DUMMY InstructionListItem";
+
+    return instructionList;
+}
+
+wxRect EventsEditorItemsAreas::GetAreaOfInstructionListAt(int x, int y)
+{
+    wxRect rect;
+    for (unsigned int i = 0;i<instructionListsAreas.size();++i)
+    {
+        if ( instructionListsAreas[i].first.Contains(x,y) )
+        {
+            if ( (instructionListsAreas[i].first.width*instructionListsAreas[i].first.height < rect.width*rect.height) || rect.width == 0 )
+                rect = instructionListsAreas[i].first;
+        }
+    }
+
+    if ( rect.width == 0)
+        std::cout << "WARNING, RETURNING DUMMY InstructionListItem Rect";
+
+    return rect;
+}
+
+bool EventsEditorItemsAreas::IsOnParameter(int x, int y)
+{
+    for (unsigned int i = 0;i<parametersAreas.size();++i)
+    {
+        if ( parametersAreas[i].first.Contains(x,y) )
+            return true;
+    }
+
+    return false;
+}
+
+ParameterItem EventsEditorItemsAreas::GetParameterAt(int x, int y)
+{
+    for (unsigned int i = 0;i<parametersAreas.size();++i)
+    {
+        if ( parametersAreas[i].first.Contains(x,y) )
+            return parametersAreas[i].second;
+    }
+
+    std::cout << "WARNING, RETURNING DUMMY Parameter";
+
+    ParameterItem dummy;
+    return dummy;
+}
+
+wxRect EventsEditorItemsAreas::GetAreaOfParameterAt(int x, int y)
+{
+    for (unsigned int i = 0;i<parametersAreas.size();++i)
+    {
+        if ( parametersAreas[i].first.Contains(x,y) )
+            return parametersAreas[i].first;
+    }
+
+    std::cout << "WARNING, RETURNING DUMMY Parameter Rect";
+
+    wxRect dummy;
+    return dummy;
+}
+
+bool EventsEditorItemsAreas::IsOnFoldingItem(int x, int y)
+{
+    for (unsigned int i = 0;i<foldingAreas.size();++i)
+    {
+        if ( foldingAreas[i].first.Contains(x,y) )
+            return true;
+    }
+
+    return false;
+}
+
+FoldingItem EventsEditorItemsAreas::GetFoldingItemAt(int x, int y)
+{
+    for (unsigned int i = 0;i<foldingAreas.size();++i)
+    {
+        if ( foldingAreas[i].first.Contains(x,y) )
+            return foldingAreas[i].second;
+    }
+
+    std::cout << "WARNING, RETURNING DUMMY FoldingItem";
+
+    FoldingItem dummy;
+    return dummy;
+}
+
+void EventsEditorItemsAreas::Clear()
+{
+    eventsAreas.clear();
+    instructionsAreas.clear();
+    instructionListsAreas.clear();
+    parametersAreas.clear();
+    foldingAreas.clear();
+}
+
+void EventsEditorItemsAreas::AddInstructionArea(wxRect area, InstructionItem & instruction)
+{
+    instructionsAreas.push_back(std::make_pair(area, instruction));
+}
+
+void EventsEditorItemsAreas::AddParameterArea(wxRect area, ParameterItem & parameter)
+{
+    parametersAreas.push_back(std::make_pair(area, parameter));
+}
+
+void EventsEditorItemsAreas::AddEventArea(wxRect area, EventItem & event)
+{
+    eventsAreas.push_back(std::make_pair(area, event));
+}
+
+void EventsEditorItemsAreas::AddFoldingItem(wxRect area, FoldingItem & item)
+{
+    foldingAreas.push_back(std::make_pair(area, item));
+}
+
+void EventsEditorItemsAreas::AddInstructionListArea(wxRect area, InstructionListItem & item)
+{
+    instructionListsAreas.push_back(std::make_pair(area, item));
+}
+
+//EventItem stuff :
+bool EventItem::operator==(const EventItem & other) const
+{
+    return (event == other.event && eventsList == other.eventsList && positionInList == other.positionInList);
+}
+size_t hash_value(const EventItem & a)
+{
+    std::size_t seed = 0;
+    boost::hash_combine(seed, a.event.get());
+    boost::hash_combine(seed, a.eventsList);
+    boost::hash_combine(seed, a.positionInList);
+    return seed;
+}
+
+EventItem::EventItem(boost::shared_ptr<BaseEvent> event_, std::vector<boost::shared_ptr<BaseEvent> > * eventsList_, unsigned int positionInList_ ) :
+    event(event_),
+    eventsList(eventsList_),
+    positionInList(positionInList_)
+{
+
+}
+
+EventItem::EventItem() :
+    eventsList(NULL),
+    positionInList(0)
+{
+
+}
+
+//InstructionItem stuff :
+bool InstructionItem::operator==(const InstructionItem & other) const
+{
+    return (instruction == other.instruction && isCondition == other.isCondition && instructionList == other.instructionList && positionInList == other.positionInList && event == other.event);
+}
+size_t hash_value(const InstructionItem & a)
+{
+    std::size_t seed = 0;
+    boost::hash_combine(seed, a.instruction);
+    boost::hash_combine(seed, a.instructionList);
+    boost::hash_combine(seed, a.positionInList);
+    boost::hash_combine(seed, a.event);
+    boost::hash_combine(seed, a.isCondition);
+    return seed;
+}
+
+InstructionItem::InstructionItem(Instruction * instruction_, bool isCondition_, std::vector<Instruction>* instructionList_, unsigned int positionInList_, BaseEvent * event_ ) :
+    instruction(instruction_),
+    isCondition(isCondition_),
+    instructionList(instructionList_),
+    positionInList(positionInList_),
+    event(event_)
+{
+}
+
+InstructionItem::InstructionItem() :
+    instruction(NULL),
+    isCondition(true),
+    instructionList(NULL),
+    positionInList(0),
+    event(NULL)
+{
+}
+
+//InstructionListItem stuff :
+bool InstructionListItem::operator==(const InstructionListItem & other) const
+{
+    return (isConditionList == other.isConditionList && instructionList == other.instructionList && event == other.event);
+}
+size_t hash_value(const InstructionListItem & a)
+{
+    std::size_t seed = 0;
+    boost::hash_combine(seed, a.instructionList);
+    boost::hash_combine(seed, a.event);
+    boost::hash_combine(seed, a.isConditionList);
+    return seed;
+}
+
+InstructionListItem::InstructionListItem(bool isCondition_, std::vector<Instruction>* instructionList_, BaseEvent * event_ ) :
+    isConditionList(isCondition_),
+    instructionList(instructionList_),
+    event(event_)
+{
+}
+
+InstructionListItem::InstructionListItem() :
+    isConditionList(true),
+    instructionList(NULL),
+    event(NULL)
+{
+}
+//ParameterItem stuff :
+bool ParameterItem::operator==(const ParameterItem & other) const
+{
+    return (parameter == other.parameter && event == other.event);
+}
+size_t hash_value(const ParameterItem & a)
+{
+    std::size_t seed = 0;
+    boost::hash_combine(seed, a.parameter);
+    boost::hash_combine(seed, a.event);
+    return seed;
+}
+
+ParameterItem::ParameterItem(GDExpression * parameter_, BaseEvent * event_) :
+    parameter(parameter_),
+    event(event_)
+{
+}
+
+ParameterItem::ParameterItem() :
+    parameter(NULL),
+    event(NULL)
+{
+}
+
+//FoldingItem stuff :
+bool FoldingItem::operator==(const FoldingItem & other) const
+{
+    return (event == other.event);
+}
+size_t hash_value(const FoldingItem & a)
+{
+    std::size_t seed = 0;
+    boost::hash_combine(seed, a.event);
+    return seed;
+}
+
+FoldingItem::FoldingItem(BaseEvent * event_) :
+    event(event_)
+{
+}
+
+FoldingItem::FoldingItem() :
+    event(NULL)
+{
+}
+#endif

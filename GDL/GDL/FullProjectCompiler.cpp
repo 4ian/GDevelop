@@ -408,7 +408,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     {
         if ( windowsTarget )
         {
-            if ( wxCopyFile( "Runtime/PlayWin.exe", tempDir + "/setup.exe", true ) == false )
+            if ( wxCopyFile( "Runtime/PlayWin.exe", tempDir + "/internalstart.exe", true ) == false )
                 diagnosticManager.AddError(ToString(_( "Impossible de créer ")+"l'executable Windows"+_(" dans le répertoire de compilation.\n" )));
 
             if ( wxCopyFile( "Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )

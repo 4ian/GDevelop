@@ -133,6 +133,16 @@ void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName);
 /**
  * Only used internally by GD events generated code.
  */
+void GD_API SetWindowTitle(RuntimeScene & scene, const std::string & newName);
+
+/**
+ * Only used internally by GD events generated code.
+ */
+const std::string & GD_API GetWindowTitle(RuntimeScene & scene);
+
+/**
+ * Only used internally by GD events generated code.
+ */
 unsigned int GD_API GetSceneWindowWidth(RuntimeScene & scene);
 
 /**

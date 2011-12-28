@@ -687,6 +687,7 @@
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />

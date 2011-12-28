@@ -134,7 +134,7 @@ class BuildProcess : public wxProcess
 {
 public:
     BuildProcess(SourceFileBuilder *parent) :
-        wxProcess(NULL),
+        wxProcess(0),
         m_parent(parent)
     {
         std::cout << "BuildProcess created" << std::endl;

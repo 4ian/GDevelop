@@ -42,6 +42,7 @@ fullscreen(false)
     extensionsUsed.push_back("BuiltinCommonInstructions");
     extensionsUsed.push_back("BuiltinCommonConversions");
     extensionsUsed.push_back("BuiltinStringInstructions");
+    extensionsUsed.push_back("BuiltinMathematicalTools");
 }
 
 

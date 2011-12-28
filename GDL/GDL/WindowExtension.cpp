@@ -83,6 +83,21 @@ WindowExtension::WindowExtension()
 
     DECLARE_END_ACTION()
 
+    DECLARE_ACTION("SetWindowTitle",
+                   _("Changer le titre de la fenêtre"),
+                   _("Cette action change le titre de la fenêtre de jeu."),
+                   _("Changer le titre de la fenêtre en _PARAM1_"),
+                   _("Fenêtre de jeu"),
+                   "res/actions/window24.png",
+                   "res/actions/window.png");
+
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("string", _("Nouveau titre"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("SetWindowTitle").SetIncludeFile("GDL/RuntimeSceneTools.h");
+
+    DECLARE_END_ACTION()
+
     DECLARE_EXPRESSION("SceneWindowWidth", "Largeur de la fenêtre de la scène", "Largeur de la fenêtre de la scène", "Ecran", "res/display16.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
@@ -103,6 +118,11 @@ WindowExtension::WindowExtension()
     DECLARE_EXPRESSION("ColorDepth", "Profondeur de couleur de la résolution actuelle", "Profondeur de couleur de la résolution actuelle", "Ecran", "res/display16.png")
         instrInfo.cppCallingInformation.SetFunctionName("GetColorDepth").SetIncludeFile("GDL/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
+    DECLARE_STR_EXPRESSION("WindowTitle", "Titre de la fenêtre", "Titre de la fenêtre", "Ecran", "res/display16.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetWindowTitle").SetIncludeFile("GDL/RuntimeSceneTools.h");
+    DECLARE_END_STR_EXPRESSION()
     #endif
 }
 

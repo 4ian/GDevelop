@@ -197,8 +197,6 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
             #endif
 
             ExtensionBase * extensionPtr = create_extension();
-            boost::shared_ptr<ExtensionBase> extension(extensionPtr, destroy_extension);
-
             string error;
 
             //Perform safety check about the compilation
@@ -227,13 +225,13 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
                 error += "Not the same SFML version.\n";
 
             else if ( extensionPtr->compilationInfo.boostVersion != BOOST_VERSION )
-                error += "Not the same Boost version.";
+                error += "Not the same Boost version.\n(Extension is using "+ToString(extensionPtr->compilationInfo.boostVersion)+", Game Develop is using "+ToString(BOOST_VERSION)+")\n";
 
             else if ( extensionPtr->compilationInfo.gdlVersion != RC_FILEVERSION_STRING)
-                error += "Not the same GDL version.\n";
+                error += "Not the same GDL version.\n(Extension is using "+extensionPtr->compilationInfo.gdlVersion+", Game Develop is using "+RC_FILEVERSION_STRING+")\n";
 
             else if ( extensionPtr->compilationInfo.sizeOfpInt != sizeof(int*))
-                error += "Not the same architecture.\n";
+                error += "Not the same architecture.\n(Extension sizeof(int*) is "+ToString(extensionPtr->compilationInfo.sizeOfpInt)+", Game Develop sizeof(int*) is "+ToString(sizeof(int*))+")\n";
 
             if ( !error.empty() )
             {
@@ -243,20 +241,24 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
                 cout << "---------------" << endl;
 
                 #if defined(RELEASE)//Load extension despite errors in non release build
+
+                //Destroy the extension class THEN unload the library from memory
+                destroy_extension(extensionPtr);
                 CloseLibrary(extensionHdl);
                 #endif
+
                 #if defined(GD_IDE_ONLY) && defined(RELEASE) //Show errors in IDE only
                 wxString userMsg = string(_("L'extension "))+ fullpath + string(_(" présente des erreurs :\n")) + error + string(_("\nL'extension n'a pas été chargée. Prenez contact avec le développeur pour plus d'informations." ));
                 wxMessageBox(userMsg, _("Extension non compatible"), wxOK | wxICON_EXCLAMATION);
                 #endif
+
                 #if defined(RELEASE)//Load extension despite errors in non release build
-                //signal(SIGSEGV, previousHandler);
                 return;
                 #endif
             }
 
+            boost::shared_ptr<ExtensionBase> extension(extensionPtr, destroy_extension);
             extensionsManager->AddExtension(extension);
-            //signal(SIGSEGV, previousHandler);
             return;
         }
     }

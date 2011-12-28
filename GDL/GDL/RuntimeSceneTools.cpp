@@ -224,6 +224,17 @@ void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
     scene.renderWindow->SetIcon(image->image.GetWidth(), image->image.GetHeight(), image->image.GetPixelsPtr());
 }
 
+void GD_API SetWindowTitle(RuntimeScene & scene, const std::string & newName)
+{
+    scene.title = newName;
+    if (scene.renderWindow != NULL) scene.renderWindow->SetTitle(scene.title);
+}
+
+const std::string & GD_API GetWindowTitle(RuntimeScene & scene)
+{
+    return scene.title;
+}
+
 void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeight, bool useTheNewSizeForCameraDefaultSize)
 {
     #if !defined(GD_IDE_ONLY)

@@ -23088,7 +23088,7 @@
 	<string>
 	<vector>
 
-1319659700 source:d:\florian\programmation\gamedevelop2\ide\choixaction.cpp
+1325008666 source:d:\florian\programmation\gamedevelop2\ide\choixaction.cpp
 	"ChoixAction.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -23128,6 +23128,7 @@
 	"GDL/ObjectListDialogsHelper.h"
 	"GDL/ExpressionsCorrectnessTesting.h"
 	<boost/algorithm/string.hpp>
+	<wx/msw/uxtheme.h>
 
 1300628570 d:\florian\programmation\gamedevelop2\ide\choixaction.h
 	<wx/treectrl.h>
@@ -24761,7 +24762,7 @@
 	<vector>
 	<wx/msgdlg.h>
 
-1319659700 source:d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp
+1325008666 source:d:\florian\programmation\gamedevelop2\ide\choixcondition.cpp
 	"CppUnitLite/TestHarness.h"
 	"ChoixCondition.h"
 	<wx/bitmap.h>
@@ -24804,6 +24805,7 @@
 	"SigneTest.h"
 	<wx/help.h>
 	<boost/algorithm/string.hpp>
+	<wx/msw/uxtheme.h>
 
 1264364134 d:\florian\programmation\gamedevelop2\ide\debugmem.h
 	<list>
@@ -26126,7 +26128,7 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1314982850 source:d:\florian\programmation\gamedevelop2\ide\extensions.cpp
+1325020210 source:d:\florian\programmation\gamedevelop2\ide\extensions.cpp
 	"Extensions.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -26145,6 +26147,7 @@
 	"GDL/ExtensionsManager.h"
 	"GDL/ExtensionsLoader.h"
 	"GDL/gdTreeItemStringData.h"
+	<wx/msw/uxtheme.h>
 
 1302441884 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsloader.h
 	<string>
@@ -27544,7 +27547,7 @@
 	<wx/dcscreen.h>
 	"SplashScreen.h"
 
-1314717471 source:d:\florian\programmation\gamedevelop2\ide\startherepage.cpp
+1325019694 source:d:\florian\programmation\gamedevelop2\ide\startherepage.cpp
 	"StartHerePage.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -27595,7 +27598,7 @@
 	"version.h"
 	"wx/msw/wx.rc"
 
-1325008666 d:\florian\programmation\gamedevelop2\ide\version.h
+1325020220 d:\florian\programmation\gamedevelop2\ide\version.h
 
 1289485846 source:d:\florian\programmation\gamedevelop2\ide\wxsfmlcanvas.cpp
 	"wxSFMLCanvas.hpp"

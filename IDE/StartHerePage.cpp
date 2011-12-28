@@ -93,7 +93,7 @@ mainEditor(mainEditor_)
 	GridSizer2 = new wxGridSizer(0, 2, 0, 0);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Pour commencer, utilisez le gestionnaire de projet, à gauche\npar défaut, pour ajouter une scène ( clic droit sur \"Scènes\" )\net pour modifier les images ( double clic sur \"Images\" )."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-	FlexGridSizer4->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Si vous débutez ou avez besoin d\'aide :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer4->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -115,7 +115,7 @@ mainEditor(mainEditor_)
 	FlexGridSizer7->Add(openExamplesLink, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap5 = new wxStaticBitmap(this, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/wikiicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
 	FlexGridSizer7->Add(StaticBitmap5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl3 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL3, _("Accéder au wiki ( Base d\'articles et de connaissance )"), _("http://www.forum.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL3"));
+	HyperlinkCtrl3 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL3, _("Accéder au wiki ( Base d\'articles et de connaissance )"), _("http://www.wiki.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL3"));
 	FlexGridSizer7->Add(HyperlinkCtrl3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap6 = new wxStaticBitmap(this, ID_STATICBITMAP6, wxBitmap(wxImage(_T("res/community.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP6"));
 	FlexGridSizer7->Add(StaticBitmap6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);

@@ -87,7 +87,7 @@
 								<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
 									<label>Pour commencer, utilisez le gestionnaire de projet, à gauche&#x0A;par défaut, pour ajouter une scène ( clic droit sur &quot;Scènes&quot; )&#x0A;et pour modifier les images ( double clic sur &quot;Images&quot; ).</label>
 								</object>
-								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
 								<option>1</option>
 							</object>
@@ -188,7 +188,7 @@
 									<object class="sizeritem">
 										<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL3" variable="HyperlinkCtrl3" member="yes">
 											<label>Accéder au wiki ( Base d&apos;articles et de connaissance )</label>
-											<url>http://www.forum.compilgames.net</url>
+											<url>http://www.wiki.compilgames.net</url>
 											<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 										</object>
 										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>

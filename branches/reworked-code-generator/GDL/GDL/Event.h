@@ -22,11 +22,10 @@ class wxWindow;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
 class Scene;
-class ObjectsConcerned;
 class Instruction;
-class Evaluateur;
 class TiXmlElement;
 class Game;
+class EventsCodeGenerator;
 class EventsCodeGenerationContext;
 class wxDC;
 
@@ -50,7 +49,7 @@ class GD_API BaseEvent
          * \code
             std::string outputCode;
 
-            outputCode += EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
+            outputCode += codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
 
             std::string ifPredicat;
             for (unsigned int i = 0;i<conditions.size();++i)
@@ -61,11 +60,11 @@ class GD_API BaseEvent
 
             if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
             outputCode += "{\n";
-            outputCode += EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
+            outputCode += codeGenerator.GenerateActionsListCode(game, scene, actions, context);
             if ( !events.empty() ) //Sub events
             {
                 outputCode += "\n{\n";
-                outputCode += EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
+                outputCode += codeGenerator.GenerateEventsListCode(game, scene, events, context);
                 outputCode += "}\n";
             }
 
@@ -74,7 +73,7 @@ class GD_API BaseEvent
             return outputCode;
          * \endcode
          */
-        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & context) {return "";};
+        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context) {return "";};
 
         /**
          * Derived class have to redefine this function, so as to return true, if they are executable.

@@ -26,7 +26,7 @@ objectsToPickSelected(false)
 {
 }
 
-std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & parentContext)
+std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
     std::string outputCode;
 
@@ -44,22 +44,19 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
     if ( realObjects.empty() ) return "";
 
     for (unsigned int i = 0;i<realObjects.size();++i)
-        parentContext.ObjectNeeded(realObjects[i]);
+        parentContext.ObjectsListNeeded(realObjects[i]);
 
     //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
     EventsCodeGenerationContext context;
     context.InheritsFrom(parentContext);
 
     //Prepare conditions/actions codes
-    std::string conditionsCode = EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
-    std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
+    std::string conditionsCode = codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
+    std::string actionsCode = codeGenerator.GenerateActionsListCode(game, scene, actions, context);
     std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
     //Prepare object declaration and sub events
-    std::string subevents = EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
-
-    for (unsigned int i = 0;i<realObjects.size();++i)
-        context.ObjectNotNeeded(realObjects[i]); //We take care of declaring this object
+    std::string subevents = codeGenerator.GenerateEventsListCode(game, scene, events, context);
 
     std::string objectDeclaration = context.GenerateObjectsDeclarationCode()+"\n";
 
@@ -96,8 +93,6 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
         for (unsigned int j = 0;j<realObjects.size();++j)
             outputCode += "std::vector<Object*> "+ManObjListName(realObjects[j])+";\n";
 
-        if (context.MapOfAllObjectsIsNeeded()) outputCode += "std::vector<Object*> * forEachCurrentList = NULL;";
-
         for (unsigned int i = 0;i<realObjects.size();++i) //Pick then only one object
         {
             std::string count;
@@ -110,21 +105,12 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
             if ( i != 0 ) outputCode += "else ";
             outputCode += "if (forEachIndex < "+count+") {\n";
             outputCode += "    "+ManObjListName(realObjects[i])+".push_back(forEachObjects[forEachIndex]);\n";
-            if (context.MapOfAllObjectsIsNeeded()) outputCode += "    forEachCurrentList = &"+ManObjListName(realObjects[i])+";\n";
             outputCode += "}\n";
         }
     }
 
+    outputCode += "{"; //This scope is used as the for loop modified the objects list.
     outputCode += objectDeclaration;
-
-    if ( realObjects.size() == 1 )
-    {
-        if ( context.MapOfAllObjectsIsNeeded() ) outputCode += "objectsListsMap[\""+realObjects[0]+"\"] = &"+ManObjListName(realObjects[0])+";\n";
-    }
-    else
-    {
-        if ( context.MapOfAllObjectsIsNeeded() ) outputCode += "objectsListsMap[forEachObjects[forEachIndex]->GetName()] = forEachCurrentList;\n";
-    }
 
     outputCode += conditionsCode;
     outputCode += "if (" +ifPredicat+ ")\n";
@@ -137,6 +123,8 @@ std::string ForEachEvent::GenerateEventCode(const Game & game, const Scene & sce
         outputCode += "} //Subevents end.\n";
     }
     outputCode += "}\n";
+
+    outputCode += "}";
 
     outputCode += "}\n"; //End of for loop
 

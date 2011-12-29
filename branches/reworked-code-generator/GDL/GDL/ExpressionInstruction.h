@@ -12,7 +12,6 @@
 class GDExpression;
 class ExpressionInstruction;
 class Object;
-class ObjectsConcerned;
 class RuntimeScene;
 class Automatism;
 

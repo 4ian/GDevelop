@@ -23,13 +23,13 @@ repeatNumberExpressionSelected(false)
 {
 }
 
-std::string RepeatEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & parentContext)
+std::string RepeatEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
     std::string outputCode;
 
     //Prepare expression containing how many times event must be repeated
     std::string repeatCountCode;
-    CallbacksForGeneratingExpressionCode callbacks(repeatCountCode, game, scene, parentContext);
+    CallbacksForGeneratingExpressionCode callbacks(repeatCountCode, game, scene, codeGenerator, parentContext);
     GDExpressionParser parser(repeatNumberExpression.GetPlainString());
     if (!parser.ParseMathExpression(game, scene, callbacks) || repeatCountCode.empty()) repeatCountCode = "0";
 
@@ -38,12 +38,12 @@ std::string RepeatEvent::GenerateEventCode(const Game & game, const Scene & scen
     context.InheritsFrom(parentContext);
 
     //Prepare conditions/actions codes
-    std::string conditionsCode = EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
-    std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
+    std::string conditionsCode = codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
+    std::string actionsCode = codeGenerator.GenerateActionsListCode(game, scene, actions, context);
     std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
     //Prepare object declaration and sub events
-    std::string subevents = EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
+    std::string subevents = codeGenerator.GenerateEventsListCode(game, scene, events, context);
     std::string objectDeclaration = context.GenerateObjectsDeclarationCode()+"\n";
 
     //Write final code

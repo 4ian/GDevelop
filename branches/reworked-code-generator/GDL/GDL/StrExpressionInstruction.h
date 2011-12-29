@@ -10,14 +10,6 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 class GDExpression;
-class ExpressionInstruction;
-class Object;
-class Automatism;
-class ObjectsConcerned;
-class RuntimeScene;
-
-typedef std::vector < boost::shared_ptr<Object> > ObjList;
-typedef boost::shared_ptr<Object> ObjSPtr;
 
 /**
  * \brief Instruction ( function or object function ) of a string expression.

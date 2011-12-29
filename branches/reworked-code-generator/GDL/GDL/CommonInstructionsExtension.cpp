@@ -39,12 +39,13 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
                 //Conditions code
                 std::string conditionsCode;
                 std::vector<Instruction> & conditions = instruction.GetSubInstructions();
 
+                //"OR" condition must declare objects list, but without picking the objects from the scene. Lists are either empty or come from a parent event.
                 set<string> emptyListsNeeded;
                 for (unsigned int cId =0;cId < conditions.size();++cId)
                 {
@@ -53,20 +54,21 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     EventsCodeGenerationContext context;
                     context.InheritsFrom(parentContext);
 
-                    string conditionCode = EventsCodeGenerator::GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
+                    string conditionCode = codeGenerator.GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
 
                     conditionsCode += "{\n";
 
                     //Create new objects lists and generate condition
                     conditionsCode += context.GenerateObjectsDeclarationCode();
-                    conditionsCode += context.GenerateOptionalInstructionLevelDeclarationCode();
                     if ( !conditions[cId].GetType().empty() ) conditionsCode += conditionCode;
 
                     //If the condition is true : merge all objects picked in the final object lists.
                     conditionsCode += "if( condition"+ToString(cId)+"IsTrue ) {\n";
                     conditionsCode += "    conditionTrue = true;\n";
-                    for ( set<string>::iterator it = context.objectsToBeDeclared.begin() ; it != context.objectsToBeDeclared.end(); ++it )
+                    std::set<std::string> objectsListsToBeDeclared = context.GetObjectsToBeDeclared();
+                    for ( set<string>::iterator it = objectsListsToBeDeclared.begin() ; it != objectsListsToBeDeclared.end(); ++it )
                     {
+                        emptyListsNeeded.insert(*it);
                         conditionsCode += "    for(unsigned int i = 0;i<"+ManObjListName(*it)+".size();++i)\n";
                         conditionsCode += "    {\n";
                         conditionsCode += "        if ( find("+ManObjListName(*it)+"final.begin(), "+ManObjListName(*it)+"final.end(), "+ManObjListName(*it)+"[i]) == "+ManObjListName(*it)+"final.end())\n";
@@ -76,23 +78,18 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     conditionsCode += "}\n";
 
                     conditionsCode += "}\n";
-
-                    //"OR" condition must declare objects list, but without getting the objects from the scene. Lists are either empty or come from a parent event.
-                    for ( set<string>::iterator it = context.objectsToBeDeclared.begin() ; it != context.objectsToBeDeclared.end(); ++it )
-                        emptyListsNeeded.insert(*it);
                 }
 
-                //"OR" condition must declare objects list, but without getting the objects from the scene. Lists are either empty or come from a parent event.
-                for ( set<string>::iterator it = emptyListsNeeded.begin() ; it != emptyListsNeeded.end(); ++it )
-                    parentContext.EmptyObjectsListNeeded(*it);
+                std::string declarationsCode;
 
                 //Declarations code
-                std::string declarationsCode;
                 for ( set<string>::iterator it = emptyListsNeeded.begin() ; it != emptyListsNeeded.end(); ++it )
                 {
+                    //"OR" condition must declare objects list, but without getting the objects from the scene. Lists are either empty or come from a parent event.
+                    parentContext.EmptyObjectsListNeeded(*it);
                     //We need to duplicate the object lists : The "final" ones will be filled with objects by conditions,
                     //but they will have no incidence on further conditions, as conditions use "normal" ones.
-                    declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+"final = "+ManObjListName(*it)+";\n";
+                    declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+"final;\n";
                 }
                 for (unsigned int i = 0;i<conditions.size();++i)
                     declarationsCode += "bool condition"+ToString(i)+"IsTrue = false;\n";
@@ -127,11 +124,11 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
                 string outputCode;
 
-                outputCode += EventsCodeGenerator::GenerateConditionsListCode(game, scene, instruction.GetSubInstructions(), parentContext);
+                outputCode += codeGenerator.GenerateConditionsListCode(game, scene, instruction.GetSubInstructions(), parentContext);
 
                 std::string ifPredicat = "true";
                 for (unsigned int i = 0;i<instruction.GetSubInstructions().size();++i)
@@ -159,7 +156,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
                 std::vector<Instruction> & conditions = instruction.GetSubInstructions();
                 string outputCode;
@@ -169,7 +166,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 for (unsigned int cId =0;cId < conditions.size();++cId)
                 {
-                    string conditionCode = EventsCodeGenerator::GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", parentContext);
+                    string conditionCode = codeGenerator.GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", parentContext);
 
                     if ( !conditions[cId].GetType().empty() )
                     {
@@ -180,7 +177,6 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                             if (i == cId-1) outputCode += ") ";
                         }
 
-                        outputCode += parentContext.GenerateOptionalInstructionLevelDeclarationCode();
                         outputCode += "{\n"+conditionCode+"}\n";
                     }
                 }

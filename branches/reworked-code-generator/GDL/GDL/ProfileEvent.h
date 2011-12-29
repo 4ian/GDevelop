@@ -12,11 +12,6 @@
 #include <wx/html/htmprint.h>
 #include "Event.h"
 #include "GDL/profile.h"
-class RuntimeScene;
-class ObjectsConcerned;
-class Instruction;
-class Evaluateur;
-class TiXmlElement;
 
 /**
  * \brief Event used internally by Game Develop to profile events.
@@ -34,7 +29,7 @@ class GD_API ProfileEvent : public BaseEvent
         void SetPreviousProfileEvent( boost::shared_ptr<ProfileEvent> previousProfileEvent_ ) { previousProfileEvent = previousProfileEvent_; }
 
         virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & context);
+        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         unsigned int index;
 

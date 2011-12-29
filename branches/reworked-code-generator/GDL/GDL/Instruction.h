@@ -8,11 +8,6 @@
 #include <string>
 #include <vector>
 #include <iostream>
-class RuntimeScene;
-class Evaluateur;
-class ObjectsConcerned;
-class Object;
-class Automatism;
 #include "GDL/GDExpression.h"
 
 using namespace std;

@@ -17,7 +17,7 @@
 #include "GDL/EventsEditorItemsAreas.h"
 #include "GDL/EventsEditorSelection.h"
 
-std::string WhileEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & parentContext)
+std::string WhileEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
     std::string outputCode;
 
@@ -26,10 +26,10 @@ std::string WhileEvent::GenerateEventCode(const Game & game, const Scene & scene
     context.InheritsFrom(parentContext);
 
     //Prepare codes
-    std::string whileConditionsStr = EventsCodeGenerator::GenerateConditionsListCode(game, scene, whileConditions, parentContext);
+    std::string whileConditionsStr = codeGenerator.GenerateConditionsListCode(game, scene, whileConditions, context);
     std::string whileIfPredicat = "true"; for (unsigned int i = 0;i<whileConditions.size();++i) whileIfPredicat += " && condition"+ToString(i)+"IsTrue";
-    std::string conditionsCode = EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
-    std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
+    std::string conditionsCode = codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
+    std::string actionsCode = codeGenerator.GenerateActionsListCode(game, scene, actions, context);
     std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
     //Write final code
@@ -45,7 +45,7 @@ std::string WhileEvent::GenerateEventCode(const Game & game, const Scene & scene
     outputCode += "{\n";
     outputCode += actionsCode;
     outputCode += "\n{ //Subevents: \n";
-    outputCode += EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
+    outputCode += codeGenerator.GenerateEventsListCode(game, scene, events, context);
     outputCode += "} //Subevents end.\n";
     outputCode += "}\n";
     outputCode += "} else stopDoWhile = true; \n";

@@ -26,7 +26,6 @@ class RuntimeScene;
 class Object;
 class ExpressionInstruction;
 class StrExpressionInstruction;
-class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
 class TiXmlElement;

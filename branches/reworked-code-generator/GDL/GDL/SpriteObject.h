@@ -9,12 +9,10 @@
 #include "GDL/Object.h"
 #include "GDL/Animation.h"
 class Sprite;
-class Evaluateur;
 class ImageManager;
 class RuntimeScene;
 class Object;
 class ExpressionInstruction;
-class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
 namespace sf

@@ -1,4 +1,8 @@
 #include "GDL/BaseObjectExtension.h"
+#include "GDL/EventsCodeGenerator.h"
+#include "GDL/EventsCodeGenerationContext.h"
+#include "GDL/EventsCodeNameMangler.h"
+#include "GDL/ExpressionsCodeGeneration.h"
 
 void BaseObjectExtension::DeclareExtensionSecondPart()
 {
@@ -12,7 +16,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/create.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPickingThem", "3");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPicking", "3");
         instrInfo.AddCodeOnlyParameter("inlineCode", "0"); //Useless parameter
         instrInfo.AddParameter("object", _("Objet à créer"), "", false);
         instrInfo.AddParameter("expression", _("Position X"), "", false);
@@ -26,20 +30,20 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     DECLARE_ACTION("CreateByName",
                    _("Créer un objet de partir son nom"),
                    _("Créer un objet à la position spécifiée"),
-                   _("Créer l'objet ayant le nom _PARAM3_ à la position _PARAM4_;_PARAM5_"),
+                   _("Parmi les objets _PARAM2_, créer l'objet ayant le nom _PARAM3_ à la position _PARAM4_;_PARAM5_"),
                    _("Objets"),
                    "res/actions/create24.png",
                    "res/actions/create.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
-        instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
+        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPicking", "2");
+        instrInfo.AddParameter("object", _("Groupe contenant les objets qui peuvent être créés par l'action"), "", false);
         instrInfo.AddParameter("string", _("Texte représentant le nom de l'objet à créer"), "", false);
         instrInfo.AddParameter("expression", _("Position X"), "", false);
         instrInfo.AddParameter("expression", _("Position Y"), "", false);
         instrInfo.AddParameter("layer", _("Calque ( calque de base si vide )"), "", true).SetDefaultValue("\"\"");
 
-        instrInfo.cppCallingInformation.SetFunctionName("CreateObjectOnScene").SetIncludeFile("GDL/RuntimeSceneTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("CreateObjectFromGroupOnScene").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 

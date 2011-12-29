@@ -883,20 +883,6 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 cout << "Error: Could not get objects for a parameter" << endl;
             }
         }
-        //Code only parameter type
-        else if ( parametersInfo[pNb].type == "mapOfAllObjectLists" )
-        {
-            //context.MapOfAllObjectsNeeded(game, scene);
-            argOutput += "objectsListsMap";
-        }
-        else if ( parametersInfo[pNb].type == "listOfAlreadyPickedObjects" )
-        {
-            //context.NeedObjectListsDynamicDeclaration();
-            argOutput += "objectsAlreadyDeclared";
-        }
-        else if ( parametersInfo[pNb].type == "objectDeleted" )
-        {
-        }
         else
         {
             //Try supplementary types if provided

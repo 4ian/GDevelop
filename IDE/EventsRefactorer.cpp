@@ -732,7 +732,7 @@ void EventsRefactorer::NotifyChangesInEventsOfScene(Game & game, Scene & scene)
 {
     scene.eventsModified = true; //Notify that events have changed in the scene
 
-    //Notify others scenes, which include the changed scene, that their events has changed
+    //Notify others scenes, which include the changed scene ( even indirectly ), that their events has changed
     for (unsigned int i = 0;i<game.scenes.size();++i)
     {
         if ( game.scenes[i].get() == &scene ) continue;
@@ -749,7 +749,7 @@ void EventsRefactorer::NotifyChangesInEventsOfScene(Game & game, Scene & scene)
 
 void EventsRefactorer::NotifyChangesInEventsOfExternalEvents(Game & game, ExternalEvents & externalEvents)
 {
-    //Notify scenes, which include the external events, that their events has changed
+    //Notify scenes, which include the external events ( even indirectly ), that their events has changed
     for (unsigned int i = 0;i<game.scenes.size();++i)
     {
         std::vector< boost::shared_ptr<Scene> > notUsed;
@@ -769,7 +769,7 @@ void EventsRefactorer::GetScenesAndExternalEventsLinkedTo(const std::vector< boo
         boost::shared_ptr<LinkEvent> linkEvent = boost::dynamic_pointer_cast<LinkEvent>(events[i]);
         if ( linkEvent != boost::shared_ptr<LinkEvent>() )
         {
-             //We've got a link event, search now linked scene/external events
+            //We've got a link event, search now linked scene/external events
             vector< boost::shared_ptr<Scene> >::iterator linkedScene =
                 find_if(game.scenes.begin(), game.scenes.end(), bind2nd(SceneHasName(), linkEvent->sceneLinked));
 
@@ -778,13 +778,21 @@ void EventsRefactorer::GetScenesAndExternalEventsLinkedTo(const std::vector< boo
 
             if ( linkedExternalEvents != game.externalEvents.end() )
             {
-                externalEvents.push_back(*linkedExternalEvents);
-                GetScenesAndExternalEventsLinkedTo((*linkedExternalEvents)->events, game, scenes, externalEvents);
+                //Protect against circular references
+                if ( find(externalEvents.begin(), externalEvents.end(), *linkedExternalEvents) == externalEvents.end() )
+                {
+                    externalEvents.push_back(*linkedExternalEvents);
+                    GetScenesAndExternalEventsLinkedTo((*linkedExternalEvents)->events, game, scenes, externalEvents);
+                }
             }
             else if ( linkedScene != game.scenes.end() )
             {
-                scenes.push_back(*linkedScene);
-                GetScenesAndExternalEventsLinkedTo((*linkedScene)->events, game, scenes, externalEvents);
+                //Protect against circular references
+                if ( find(scenes.begin(), scenes.end(), *linkedScene) == scenes.end() )
+                {
+                    scenes.push_back(*linkedScene);
+                    GetScenesAndExternalEventsLinkedTo((*linkedScene)->events, game, scenes, externalEvents);
+                }
             }
         }
 

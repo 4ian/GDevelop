@@ -168,7 +168,7 @@ class EventsEditor: public wxPanel
         static wxRibbonButtonBar * clipboardRibbonBar;
         static wxRibbonButtonBar * templateRibbonBar;
         static wxRibbonButtonBar * undoRibbonBar;
-		static vector < std::pair<long, std::string> > idForEventTypesMenu;
+		vector < std::pair<long, std::string> > idForEventTypesMenu;
 
 	private:
 

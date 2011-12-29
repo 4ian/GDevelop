@@ -88,8 +88,6 @@ const long EventsEditor::idSearchReplace = wxNewId();
 const long EventsEditor::idRibbonFoldAll = wxNewId();
 const long EventsEditor::idRibbonUnFoldAll = wxNewId();
 
-vector < std::pair<long, std::string> > EventsEditor::idForEventTypesMenu;
-
 wxRibbonButtonBar * EventsEditor::insertRibbonBar = NULL;
 wxRibbonButtonBar * EventsEditor::deleteRibbonBar = NULL;
 wxRibbonButtonBar * EventsEditor::clipboardRibbonBar = NULL;
@@ -280,7 +278,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
-    //Insert extension objects actions
+    //Insert extension specific events types
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled

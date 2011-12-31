@@ -6,6 +6,7 @@
 //*)
 #include <wx/textctrl.h>
 #include <wx/log.h>
+#include <wx/ribbon/bar.h>
 #include "GDL/ExternalEvents.h"
 #include "GDL/Game.h"
 #include "GDL/MainEditorCommand.h"

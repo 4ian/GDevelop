@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef GAME_DEVELOP_EDITORMAIN_H
@@ -12,6 +12,7 @@
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/frame.h>
+#include <wx/infobar.h>
 #include <wx/timer.h>
 //*)
 #include "wx/aui/aui.h"
@@ -103,6 +104,11 @@ class Game_Develop_EditorFrame: public wxFrame
          */
         inline const wxAuiNotebook * GetEditorsNotebook() const { return editorsNotebook; };
         inline wxAuiNotebook * GetEditorsNotebook() { return editorsNotebook; };
+
+        /**
+         * Get a lightweight interface to this class.
+         */
+        MainEditorCommand & GetMainEditorCommand() { return mainEditorCommand; };
 
         /**
          * Get a pointer to the ribbon
@@ -235,6 +241,7 @@ class Game_Develop_EditorFrame: public wxFrame
 
         //(*Identifiers(Game_Develop_EditorFrame)
         static const long ID_PANEL3;
+        static const long ID_CUSTOM1;
         static const long ID_AUINOTEBOOK1;
         static const long ID_PANEL1;
         static const long ID_MENUITEM1;
@@ -276,6 +283,7 @@ class Game_Develop_EditorFrame: public wxFrame
         wxMenuItem* MenuItem10;
         wxMenu decomposerContextMenu;
         wxPanel* ribbonPanel;
+        wxInfoBar* infoBar;
         wxMenuItem* MenuItem43;
         wxMenu saveContextMenu;
         //*)
@@ -284,6 +292,7 @@ class Game_Develop_EditorFrame: public wxFrame
         wxRibbonButtonBar * ribbonSceneEditorButtonBar; ///Pointer to the ribbon bar which can be changed by scene editors
         BuildToolsPnl * buildToolsPnl;
         std::vector<SceneCanvas*> scenesLockingShortcuts;
+        MainEditorCommand mainEditorCommand;
 
         StartHerePage * startPage;
         ProjectManager * projectManager;

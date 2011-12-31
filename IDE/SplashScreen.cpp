@@ -1,14 +1,6 @@
-#ifdef DEBUG
-#include "nommgr.h"
-#endif
-
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
 #include <wx/dcscreen.h>
-
-#ifdef DEBUG
-
-#endif
 
 #include "SplashScreen.h"
 namespace

@@ -13,6 +13,8 @@
 #include <iostream>
 #include <sstream>
 #include <wx/scrolbar.h>
+#include <wx/ribbon/bar.h>
+#include <wx/ribbon/buttonbar.h>
 
 #include "GDL/Object.h"
 #include "GDL/Collisions.h"

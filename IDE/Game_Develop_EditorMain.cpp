@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 //(*InternalHeaders(Game_Develop_EditorFrame)
@@ -56,6 +56,7 @@
 
 //(*IdInit(Game_Develop_EditorFrame)
 const long Game_Develop_EditorFrame::ID_PANEL3 = wxNewId();
+const long Game_Develop_EditorFrame::ID_CUSTOM1 = wxNewId();
 const long Game_Develop_EditorFrame::ID_AUINOTEBOOK1 = wxNewId();
 const long Game_Develop_EditorFrame::ID_PANEL1 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM1 = wxNewId();
@@ -97,13 +98,16 @@ END_EVENT_TABLE()
 
 
 /**
- * Constructor : Create window
+ * Constructor of the main frame.
  */
 Game_Develop_EditorFrame::Game_Develop_EditorFrame( wxWindow* parent, bool createEmptyProject) :
 gameCurrentlyEdited(0),
 m_ribbon(NULL),
 ribbonSceneEditorButtonBar(NULL),
-buildToolsPnl(NULL)
+buildToolsPnl(NULL),
+mainEditorCommand(NULL, NULL, this, NULL, NULL, NULL, &scenesLockingShortcuts),
+startPage(NULL),
+projectManager(NULL)
 {
 
     //(*Initialize(Game_Develop_EditorFrame)
@@ -142,7 +146,9 @@ buildToolsPnl(NULL)
     Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(629,484), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer2->AddGrowableCol(0);
-    FlexGridSizer2->AddGrowableRow(0);
+    FlexGridSizer2->AddGrowableRow(1);
+    infoBar = new wxInfoBar(Panel1,ID_CUSTOM1);
+    FlexGridSizer2->Add(infoBar, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     editorsNotebook = new wxAuiNotebook(Panel1, ID_AUINOTEBOOK1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_TOP|wxNO_BORDER);
     FlexGridSizer2->Add(editorsNotebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     Panel1->SetSizer(FlexGridSizer2);
@@ -240,7 +246,7 @@ buildToolsPnl(NULL)
 
     //Create status bar
     MyStatusBar * myStatusBar = new MyStatusBar(this);
-    myStatusBar->SetStatusText( "2008-2011 Compil Games", 1 );
+    myStatusBar->SetStatusText( "2008-2012 Compil Games", 1 );
     SetStatusBar(myStatusBar);
 
     //Ribbon setup
@@ -394,6 +400,10 @@ buildToolsPnl(NULL)
     m_mgr.Update();
     UpdateNotebook();
     m_ribbon->Realize();
+
+    infoBar->SetShowHideEffects(wxSHOW_EFFECT_SLIDE_TO_BOTTOM, wxSHOW_EFFECT_BLEND);
+
+    mainEditorCommand = MainEditorCommand(m_ribbon, ribbonSceneEditorButtonBar, this, buildToolsPnl, &m_mgr, infoBar, &scenesLockingShortcuts);
 
     SetSize(900,740);
     Center();

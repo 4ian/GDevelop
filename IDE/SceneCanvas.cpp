@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "SceneCanvas.h"
@@ -13,6 +13,7 @@
 #include <wx/cursor.h>
 #include <wx/log.h>
 #include <wx/scrolbar.h>
+#include <wx/infobar.h>
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -49,6 +50,7 @@
 #include "DebuggerGUI.h"
 #include "GridSetup.h"
 #include "ProfileDlg.h"
+#include <wx/infobar.h>
 
 const long SceneCanvas::ID_ADDOBJMENU = wxNewId();
 const long SceneCanvas::ID_DELOBJMENU = wxNewId();
@@ -695,7 +697,12 @@ void SceneCanvas::ReloadFirstPart()
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
     //Useful when opening a scene for the first time for example.
     if ( sceneEdited.eventsModified && !EventsCodeCompiler::GetInstance()->SceneEventsBeingCompiled(sceneEdited) )
+    {
         EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&gameEdited, &sceneEdited));
+
+        if ( !edittimeRenderer.editing )
+            mainEditorCommand.GetInfoBar()->ShowMessage(_("Les modifications apportées aux évènements seront prises en compte lors du retour au mode édition."));
+    }
 
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !edittimeRenderer.editing && gameEdited.useExternalSourceFiles )
@@ -705,7 +712,7 @@ void SceneCanvas::ReloadFirstPart()
 
         if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->LaunchGameSourceFilesBuild(gameEdited) )
         {
-            wxLogWarning(_("Game Develop est entrain de compiler les sources C++ et ne pourra lancer un aperçu qu'une fois ce processus terminé."));
+            mainEditorCommand.GetInfoBar()->ShowMessage(_("Game Develop est entrain de compiler les sources C++ et ne pourra lancer un aperçu qu'une fois ce processus terminé."));
         }
     }
     #endif
@@ -728,7 +735,7 @@ void SceneCanvas::ReloadSecondPart()
 
         if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->LastBuildSuccessed() )
         {
-            mainEditorCommand.GetPaneManager()->GetPane(mainEditorCommand.GetBuildToolsPanel()).Show(true);
+            mainEditorCommand.GetPaneManager().GetPane(mainEditorCommand.GetBuildToolsPanel()).Show(true);
             mainEditorCommand.GetBuildToolsPanel()->notebook->SetSelection(1);
             mainEditorCommand.GetBuildToolsPanel()->buildMessagesPnl->OpenFileContainingFirstError();
             mainEditorCommand.GetMainEditor()->RequestUserAttention();

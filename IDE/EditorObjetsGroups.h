@@ -7,6 +7,7 @@
 #include <wx/menu.h>
 #include <wx/panel.h>
 //*)
+#include <wx/ribbon/page.h>
 #include <wx/toolbar.h>
 #include <string>
 #include <vector>

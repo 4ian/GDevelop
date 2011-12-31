@@ -678,7 +678,7 @@ vector < boost::weak_ptr<BaseEvent> > EventsRefactorer::SearchInEvents(Game & ga
 
         if ( events[i]->CanHaveSubEvents() )
         {
-            vector < boost::weak_ptr<BaseEvent> > subResults = SearchInEvents(game, scene, events[i]->GetSubEvents(), search, matchCase, inConditions, inActions);;
+            vector < boost::weak_ptr<BaseEvent> > subResults = SearchInEvents(game, scene, events[i]->GetSubEvents(), search, matchCase, inConditions, inActions);
             std::copy(subResults.begin(), subResults.end(), std::back_inserter(results));
         }
     }

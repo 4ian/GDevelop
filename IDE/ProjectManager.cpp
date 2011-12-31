@@ -538,10 +538,6 @@ void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t li
     }
     //Launch an internal code editor else
 
-    MainEditorCommand mainEditorCommand;
-    mainEditorCommand.SetMainEditor(&mainEditor);
-    mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
-
     //Having a game associated with the editor is optional
     Game * associatedGame = NULL;
     if ( game )
@@ -566,7 +562,7 @@ void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t li
         }
     }
 
-    CodeEditor * editorScene = new CodeEditor(mainEditor.GetEditorsNotebook(), filename, associatedGame, mainEditorCommand);
+    CodeEditor * editorScene = new CodeEditor(mainEditor.GetEditorsNotebook(), filename, associatedGame, mainEditor.GetMainEditorCommand());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, wxFileName(filename).GetFullName(), true, wxBitmap("res/source_cpp16.png", wxBITMAP_TYPE_ANY)) )
     {
         wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
@@ -586,14 +582,6 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
         wxLogWarning(_("Choisissez une scène à éditer dans le gestionnaire de projets."));
         return;
     }
-
-    MainEditorCommand mainEditorCommand;
-    mainEditorCommand.SetMainEditor(&mainEditor);
-    mainEditorCommand.SetRibbonSceneEditorButtonBar(mainEditor.GetRibbonSceneEditorButtonBar()); //Need link to the scene editor wxRibbonButtonBar
-    mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
-    mainEditorCommand.SetBuildToolsPanel(mainEditor.GetBuildToolsPanel());
-    mainEditorCommand.SetPaneManager(mainEditor.GetAUIPaneManger());
-    mainEditorCommand.SetScenesLockingShortcutsList(mainEditor.GetScenesLockingShortcutsList());
 
     vector< boost::shared_ptr<Scene> >::const_iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
@@ -626,7 +614,7 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
             prefix = "["+game->name.substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
-    EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), *game, *(*scene), mainEditorCommand);
+    EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), *game, *(*scene), mainEditor.GetMainEditorCommand());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+data->GetSecondString(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY)) )
     {
         wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
@@ -673,11 +661,6 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
         wxLogWarning(_("Choisissez une scène à éditer dans le gestionnaire de projets."));
         return;
     }
-
-    MainEditorCommand mainEditorCommand;
-    mainEditorCommand.SetMainEditor(&mainEditor);
-    mainEditorCommand.SetRibbonSceneEditorButtonBar(mainEditor.GetRibbonSceneEditorButtonBar()); //Need link to the scene editor wxRibbonButtonBar
-    mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
 
     vector< boost::shared_ptr<Scene> >::const_iterator scene =
         find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
@@ -868,10 +851,6 @@ void ProjectManager::OnRibbonEditImagesSelected(wxRibbonButtonBarEvent& event)
  */
 void ProjectManager::EditImagesOfGame(Game * game)
 {
-    MainEditorCommand mainEditorCommand;
-    mainEditorCommand.SetMainEditor(&mainEditor);
-    mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
-
     //Verify if the image editor is not already opened
     for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
     {
@@ -894,7 +873,7 @@ void ProjectManager::EditImagesOfGame(Game * game)
             prefix = "["+game->name.substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
-    ResourcesEditor * editorImages = new ResourcesEditor(&mainEditor, *game, mainEditorCommand, true);
+    ResourcesEditor * editorImages = new ResourcesEditor(&mainEditor, *game, mainEditor.GetMainEditorCommand(), true);
     mainEditor.GetEditorsNotebook()->AddPage(editorImages, prefix+_("Banque d'images"), true, wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY));
 }
 
@@ -1248,11 +1227,6 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    MainEditorCommand mainEditorCommand;
-    mainEditorCommand.SetMainEditor(&mainEditor);
-    mainEditorCommand.SetRibbonSceneEditorButtonBar(mainEditor.GetRibbonSceneEditorButtonBar()); //Need link to the scene editor wxRibbonButtonBar
-    mainEditorCommand.SetRibbon(mainEditor.GetRibbon());
-
     vector< boost::shared_ptr<ExternalEvents> >::const_iterator events =
         find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), data->GetSecondString()));
 
@@ -1284,7 +1258,7 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
             prefix = "["+game->name.substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
-    ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, *(*events), mainEditorCommand);
+    ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, *(*events), mainEditor.GetMainEditorCommand());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, wxBitmap("res/events16.png", wxBITMAP_TYPE_ANY)) )
     {
         wxLogError(_("Impossible d'ajouter le nouvel onglet !"));

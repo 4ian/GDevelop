@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef EVENTSEDITOR_H
@@ -16,6 +16,8 @@
 #include <wx/statbmp.h>
 #include <wx/scrolbar.h>
 //*)
+#include <wx/ribbon/page.h>
+#include <wx/ribbon/buttonbar.h>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "GDL/MainEditorCommand.h"

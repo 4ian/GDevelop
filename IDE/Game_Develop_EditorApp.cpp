@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 //This file was created 2008-03-01

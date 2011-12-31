@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #if defined(GD_IDE_ONLY)
@@ -9,9 +9,7 @@
 #define FOREACHEVENT_H
 #include "Event.h"
 class RuntimeScene;
-class ObjectsConcerned;
 class Instruction;
-class Evaluateur;
 class TiXmlElement;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
@@ -33,7 +31,7 @@ class ForEachEvent : public BaseEvent
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new ForEachEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & context);
+        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};

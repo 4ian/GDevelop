@@ -10,6 +10,7 @@
 //*)
 #include "GDL/ForEachEvent.h"
 #include "GDL/ChooseObject.h"
+#include "GDL/CommonTools.h"
 class Game;
 class Scene;
 
@@ -103,7 +104,7 @@ EditForEachEvent::~EditForEachEvent()
 
 void EditForEachEvent::OnokBtClick(wxCommandEvent& event)
 {
-    eventEdited.SetObjectToPick(string(objectEdit->GetValue().mb_str()));
+    eventEdited.SetObjectToPick(ToString(objectEdit->GetValue()));
     EndModal(1);
 }
 

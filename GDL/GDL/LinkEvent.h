@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #if defined(GD_IDE_ONLY)
@@ -21,7 +21,7 @@ class wxWindow;
 class LinkEvent : public BaseEvent
 {
     public:
-        LinkEvent(): BaseEvent(), start(0), end(0) {};
+        LinkEvent(): BaseEvent(), start(std::string::npos), end(std::string::npos) {};
         virtual ~LinkEvent() {};
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new LinkEvent(*this));}
 

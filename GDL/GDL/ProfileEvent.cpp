@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #if defined(GD_IDE_ONLY)
@@ -10,6 +10,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 #include "GDL/EventsCodeGenerationContext.h"
+#include "GDL/EventsCodeGenerator.h"
 #include "GDL/BaseProfiler.h"
 #include <iostream>
 
@@ -23,9 +24,9 @@ ProfileEvent::~ProfileEvent()
 {
 }
 
-std::string ProfileEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & context)
+std::string ProfileEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
-    context.AddIncludeFile("GDL/ProfileTools.h");
+    codeGenerator.AddIncludeFile("GDL/ProfileTools.h");
 
     ProfileLink profileLink;
     profileLink.originalEvent = originalEvent;

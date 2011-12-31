@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #if defined(GD_IDE_ONLY)
@@ -31,10 +31,9 @@ using namespace std;
  * \param Information about the instruction
  * \param Arguments, in their C++ form.
  * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Get
- * \param Generation context. Used for example to report error.
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string GenerateRelationalOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, EventsCodeGenerationContext & context, unsigned int startFromArgument = 0)
+string EventsCodeGenerator::GenerateRelationalOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
 {
     unsigned int relationalOperatorIndex = 0;
     for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
@@ -44,7 +43,7 @@ string GenerateRelationalOperatorCall(const InstructionInfos & instrInfos, vecto
     }
     if ( relationalOperatorIndex == 0 )
     {
-        context.errorOccured = true;
+        ReportError();
         return "";
     }
 
@@ -74,10 +73,9 @@ string GenerateRelationalOperatorCall(const InstructionInfos & instrInfos, vecto
  * \param Arguments, in their C++ form.
  * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Set
  * \param String to be placed at the start of the call of the getter ( the "getter" function to be called typically ). Example : MyObject->Get
- * \param Generation context. Used for example to report error.
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string GenerateOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, const string & getterStartString, EventsCodeGenerationContext & context, unsigned int startFromArgument = 0)
+string EventsCodeGenerator::GenerateOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, const string & getterStartString, unsigned int startFromArgument)
 {
     unsigned int operatorIndex = 0;
     for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
@@ -88,7 +86,7 @@ string GenerateOperatorCall(const InstructionInfos & instrInfos, vector<string> 
 
     if ( operatorIndex == 0 )
     {
-        context.errorOccured = true;
+        ReportError();
         return "";
     }
 
@@ -139,10 +137,9 @@ string GenerateOperatorCall(const InstructionInfos & instrInfos, vector<string> 
  * \param Information about the instruction
  * \param Arguments, in their C++ form.
  * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Set
- * \param Generation context. Used for example to report error.
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string GenerateCompoundOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, EventsCodeGenerationContext & context, unsigned int startFromArgument = 0)
+string EventsCodeGenerator::GenerateCompoundOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
 {
     unsigned int operatorIndex = 0;
     for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
@@ -153,7 +150,7 @@ string GenerateCompoundOperatorCall(const InstructionInfos & instrInfos, vector<
 
     if ( operatorIndex == 0 )
     {
-        context.errorOccured = true;
+        ReportError();
         return "";
     }
 
@@ -192,12 +189,12 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
     InstructionInfos instrInfos = extensionsManager->GetConditionInfos(condition.GetType());
 
     if ( !instrInfos.cppCallingInformation.optionalIncludeFile.empty() )
-        context.AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
+        AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
 
     if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>() )
     {
         conditionCode += "{\nbool & conditionTrue = "+returnBoolean+";\n";
-        conditionCode += instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, condition, context);
+        conditionCode += instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, condition, *this, context);
         conditionCode += "}\n";
 
         return conditionCode;
@@ -242,7 +239,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
         string predicat;
         if ( instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string")
         {
-            predicat = GenerateRelationalOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName, context);
+            predicat = GenerateRelationalOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName);
         }
         else
         {
@@ -289,15 +286,15 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
         {
             std::string realObjectName = realObjects[i];
 
-            context.currentObject = realObjectName;
-            context.ObjectNeeded(realObjectName);
+            context.SetCurrentObject(realObjectName);
+            context.ObjectsListNeeded(realObjectName);
 
             //Prepare arguments
             vector<string> arguments = EventsCodeGenerator::GenerateParametersCodes(game, scene, condition.GetParameters(), instrInfos.parameters, context);
 
             //Add a static_cast if necessary
             const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
-            context.AddIncludeFile(objInfo.optionalIncludeFile);
+            AddIncludeFile(objInfo.optionalIncludeFile);
             string objectFunctionCallNamePart =
             ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ?
                 "static_cast<"+objInfo.cppClassName+"*>("+ManObjListName(realObjectName)+"[i])->"+instrInfos.cppCallingInformation.cppCallingName
@@ -307,7 +304,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             string predicat;
             if ( (instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string") )
             {
-                predicat = GenerateRelationalOperatorCall(instrInfos, arguments, objectFunctionCallNamePart, context, 1);
+                predicat = GenerateRelationalOperatorCall(instrInfos, arguments, objectFunctionCallNamePart, 1);
             }
             else
             {
@@ -335,7 +332,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             conditionCode += "        "+ManObjListName(realObjectName)+".erase("+ManObjListName(realObjectName)+".begin()+i);\n";
             conditionCode += "    }\n";
             conditionCode += "}\n";
-            context.currentObject = "";
+            context.SetNoCurrentObject();
         }
     }
 
@@ -358,15 +355,15 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
         {
             std::string realObjectName = realObjects[i];
 
-            context.currentObject = realObjectName;
-            context.ObjectNeeded(realObjectName);
+            context.SetCurrentObject(realObjectName);
+            context.ObjectsListNeeded(realObjectName);
 
             //Prepare arguments
             vector<string> arguments = GenerateParametersCodes(game, scene, condition.GetParameters(), instrInfos.parameters, context);
 
             //Add a static_cast if necessary
             const AutomatismInfo & autoInfo = extensionsManager->GetAutomatismInfo(automatismType);
-            context.AddIncludeFile(autoInfo.optionalIncludeFile);
+            AddIncludeFile(autoInfo.optionalIncludeFile);
             string objectFunctionCallNamePart =
             ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
                 "static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(realObjectName)+"[i]->GetAutomatismRawPointer(\""+condition.GetParameter(1).GetPlainString()+"\"))->"+instrInfos.cppCallingInformation.cppCallingName
@@ -376,7 +373,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             string predicat;
             if ( (instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string") )
             {
-                predicat = GenerateRelationalOperatorCall(instrInfos, arguments, objectFunctionCallNamePart, context, 2);
+                predicat = GenerateRelationalOperatorCall(instrInfos, arguments, objectFunctionCallNamePart, 2);
             }
             else
             {
@@ -414,7 +411,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
                 conditionCode += "}";
             }
 
-            context.currentObject = "";
+            context.SetNoCurrentObject();
         }
     }
 
@@ -444,7 +441,6 @@ string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const 
                 if (i == cId-1) outputCode += ") ";
             }
             outputCode += "{\n";
-            outputCode += context.GenerateOptionalInstructionLevelDeclarationCode();
             outputCode += conditionCode;
             outputCode += "}\n";
         }
@@ -465,11 +461,11 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
     InstructionInfos instrInfos = extensionsManager->GetActionInfos(action.GetType());
 
     if ( !instrInfos.cppCallingInformation.optionalIncludeFile.empty() )
-        context.AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
+        AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
 
     if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>() )
     {
-        return instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, action, context);
+        return instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, action, *this, context);
     }
 
     //Be sure there is no lack of parameter.
@@ -508,9 +504,9 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
         if ( instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string" )
         {
             if ( instrInfos.cppCallingInformation.accessType == InstructionInfos::CppCallingInformation::MutatorAndOrAccessor )
-                call = GenerateOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName, instrInfos.cppCallingInformation.optionalAssociatedInstruction, context);
+                call = GenerateOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName, instrInfos.cppCallingInformation.optionalAssociatedInstruction);
             else
-                call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName, context);
+                call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName);
         }
         else
         {
@@ -547,14 +543,14 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
         {
             std::string realObjectName = realObjects[i];
 
-            context.currentObject = realObjectName;
-            context.ObjectNeeded(realObjectName);
+            context.SetCurrentObject(realObjectName);
+            context.ObjectsListNeeded(realObjectName);
 
             vector<string> arguments = GenerateParametersCodes(game, scene, action.GetParameters(), instrInfos.parameters, context);
 
             //Add a static_cast if necessary
             const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
-            context.AddIncludeFile(objInfo.optionalIncludeFile);
+            AddIncludeFile(objInfo.optionalIncludeFile);
             string objectPart = ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ? "static_cast<"+objInfo.cppClassName+"*>("+ManObjListName(realObjectName)+"[i])->" : ManObjListName(realObjectName)+"[i]->" ;
 
             //Create call
@@ -562,9 +558,9 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             if ( instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string")
             {
                 if ( instrInfos.cppCallingInformation.accessType == InstructionInfos::CppCallingInformation::MutatorAndOrAccessor )
-                    call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, objectPart+instrInfos.cppCallingInformation.optionalAssociatedInstruction, context,1);
+                    call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, objectPart+instrInfos.cppCallingInformation.optionalAssociatedInstruction,1);
                 else
-                    call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, context,1);
+                    call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName,1);
             }
             else
             {
@@ -583,7 +579,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             actionCode += "    "+call+";\n";
             actionCode += "}\n";
 
-            context.currentObject = "";
+            context.SetNoCurrentObject();
         }
     }
 
@@ -606,14 +602,14 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
         {
             std::string realObjectName = realObjects[i];
 
-            context.currentObject = realObjectName;
-            context.ObjectNeeded(realObjectName);
+            context.SetCurrentObject(realObjectName);
+            context.ObjectsListNeeded(realObjectName);
 
             vector<string> arguments = GenerateParametersCodes(game, scene, action.GetParameters(), instrInfos.parameters, context);
 
             //Add a static_cast if necessary
             const AutomatismInfo & autoInfo = extensionsManager->GetAutomatismInfo(automatismType);
-            context.AddIncludeFile(autoInfo.optionalIncludeFile);
+            AddIncludeFile(autoInfo.optionalIncludeFile);
             string objectPart =
             ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
                 "static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(realObjectName)+"[i]->GetAutomatismRawPointer(\""+action.GetParameter(1).GetPlainString()+"\"))->"
@@ -624,9 +620,9 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             if ( (instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string") )
             {
                 if ( instrInfos.cppCallingInformation.accessType == InstructionInfos::CppCallingInformation::MutatorAndOrAccessor )
-                    call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, objectPart+instrInfos.cppCallingInformation.optionalAssociatedInstruction, context,2);
+                    call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, objectPart+instrInfos.cppCallingInformation.optionalAssociatedInstruction,2);
                 else
-                    call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, context,2);
+                    call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName,2);
             }
             else
             {
@@ -655,7 +651,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
                 actionCode += "}\n";
             }
 
-            context.currentObject = "";
+            context.SetNoCurrentObject();
         }
     }
 
@@ -672,7 +668,6 @@ string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Sce
     {
         string actionCode = GenerateActionCode(game, scene, actions[aId], context);
 
-        outputCode += context.GenerateOptionalInstructionLevelDeclarationCode();
         outputCode += "{\n";
         if ( !actions[aId].GetType().empty() ) outputCode += actionCode;
         outputCode += "}\n";
@@ -699,7 +694,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
 
         if ( parametersInfo[pNb].type == "expression" || parametersInfo[pNb].type == "camera" )
         {
-            CallbacksForGeneratingExpressionCode callbacks(argOutput, game, scene, context);
+            CallbacksForGeneratingExpressionCode callbacks(argOutput, game, scene, *this, context);
 
             GDExpressionParser parser(parameters[pNb].GetPlainString());
             if ( !parser.ParseMathExpression(game, scene, callbacks) )
@@ -713,7 +708,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
         }
         else if ( parametersInfo[pNb].type == "string" || parametersInfo[pNb].type == "layer" || parametersInfo[pNb].type == "color" || parametersInfo[pNb].type == "file" || parametersInfo[pNb].type == "joyaxis" )
         {
-            CallbacksForGeneratingExpressionCode callbacks(argOutput, game, scene, context);
+            CallbacksForGeneratingExpressionCode callbacks(argOutput, game, scene, *this, context);
 
             GDExpressionParser parser(parameters[pNb].GetPlainString());
             if ( !parser.ParseTextExpression(game, scene, callbacks) )
@@ -803,7 +798,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 argOutput += "runtimeContext->ClearObjectListsMap()";
                 for (unsigned int i = 0;i<realObjects.size();++i)
                 {
-                    context.ObjectNeeded(realObjects[i]);
+                    context.ObjectsListNeeded(realObjects[i]);
                     argOutput += ".AddObjectListToMap(\""+realObjects[i]+"\", "+ManObjListName(realObjects[i])+")";
                 }
                 argOutput += ".ReturnObjectListsMap()";
@@ -811,12 +806,12 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
             else
             {
                 argOutput += "runtimeContext->ClearObjectListsMap().ReturnObjectListsMap()";
-                context.errorOccured = true;
+                ReportError();
                 cout << "Error: Could not get objects for a parameter" << endl;
             }
         }
         //Code only parameter type
-        else if ( parametersInfo[pNb].type == "mapOfObjectListsOfParameterWithoutPickingThem" )
+        else if ( parametersInfo[pNb].type == "mapOfObjectListsOfParameterWithoutPicking" )
         {
             unsigned int i = ToInt(parametersInfo[pNb].supplementaryInformation);
             if ( i < parameters.size() )
@@ -836,17 +831,18 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 for (unsigned int i = 0;i<realObjects.size();++i)
                 {
                     context.EmptyObjectsListNeeded(realObjects[i]);
-                    argOutput += ".AddObjectListToMap(\""+ConvertToCppString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
+                    argOutput += ".AddObjectListToMap(\""+realObjects[i]+"\", "+ManObjListName(realObjects[i])+")";
                 }
                 argOutput += ".ReturnObjectListsMap()";
             }
             else
             {
                 argOutput += "runtimeContext->ClearObjectListsMap().ReturnObjectListsMap()";
-                context.errorOccured = true;
+                ReportError();
                 cout << "Error: Could not get objects for a parameter" << endl;
             }
         }
+        //Code only parameter type
         else if ( parametersInfo[pNb].type == "ptrToObjectOfParameter")
         {
             unsigned int i = ToInt(parametersInfo[pNb].supplementaryInformation);
@@ -863,16 +859,16 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 else
                     realObjects.push_back(parameters[i].GetPlainString());
 
-                if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() && !context.currentObject.empty())
+                if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() && !context.GetCurrentObject().empty())
                 {
                     //If object currently used by instruction is available, use it directly.
-                    argOutput += ManObjListName(context.currentObject)+"[i]";
+                    argOutput += ManObjListName(context.GetCurrentObject())+"[i]";
                 }
                 else
                 {
                     for (unsigned int i = 0;i<realObjects.size();++i)
                     {
-                        context.ObjectNeeded(realObjects[i]);
+                        context.ObjectsListNeeded(realObjects[i]);
                         argOutput += "(!"+ManObjListName(realObjects[i])+".empty() ? "+ManObjListName(realObjects[i])+"[0] : ";
                     }
                     argOutput += "NULL";
@@ -883,23 +879,9 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
             else
             {
                 argOutput += "NULL";
-                context.errorOccured = true;
+                ReportError();
                 cout << "Error: Could not get objects for a parameter" << endl;
             }
-        }
-        //Code only parameter type
-        else if ( parametersInfo[pNb].type == "mapOfAllObjectLists" )
-        {
-            context.MapOfAllObjectsNeeded(game, scene);
-            argOutput += "objectsListsMap";
-        }
-        else if ( parametersInfo[pNb].type == "listOfAlreadyPickedObjects" )
-        {
-            context.NeedObjectListsDynamicDeclaration();
-            argOutput += "objectsAlreadyDeclared";
-        }
-        else if ( parametersInfo[pNb].type == "objectDeleted" )
-        {
         }
         else
         {
@@ -936,13 +918,12 @@ string EventsCodeGenerator::GenerateEventsListCode(const Game & game, const Scen
 
     for ( unsigned int eId = 0; eId < events.size();++eId )
     {
-        //Each event has its own context : Objects picked in an event are totally differents than the one picked in another.
+        //Each event has its own context : Objects picked in an event are totally different than the one picked in another.
         EventsCodeGenerationContext context;
         context.InheritsFrom(parentContext); //Events in the same "level" share the same context as their parent.
 
-        string eventCoreCode = events[eId]->GenerateEventCode(game, scene, context);
+        string eventCoreCode = events[eId]->GenerateEventCode(game, scene, *this, context);
         string declarationsCode = context.GenerateObjectsDeclarationCode();
-        declarationsCode += context.GenerateOptionalInstructionLevelDeclarationCode();;
 
         output += "\n{\n" + declarationsCode + "\n" + eventCoreCode + "\n}\n";
     }
@@ -956,31 +937,28 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(const Game & game, const 
 
     //Prepare the global context ( Used to get needed header files )
     EventsCodeGenerationContext context;
-    context.includeFiles = boost::shared_ptr< set<string> >(new set<string>);
-    context.customCodeInMain = boost::shared_ptr< string >(new string);
-    context.customCodeOutsideMain = boost::shared_ptr< string >(new string);
-    context.customGlobalDeclaration = boost::shared_ptr< set<string> >(new set<string>);
+    EventsCodeGenerator codeGenerator;
 
     //Generate whole events code
-    string wholeEventsCode = EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
+    string wholeEventsCode = codeGenerator.GenerateEventsListCode(game, scene, events, context);
 
     //Generate default code around events
-    for ( set<string>::iterator include = context.includeFiles->begin() ; include != context.includeFiles->end(); ++include )
+    for ( set<string>::iterator include = codeGenerator.GetIncludeFiles().begin() ; include != codeGenerator.GetIncludeFiles().end(); ++include )
         output += "#include \""+*include+"\"\n";
 
     output +=
     "#include <vector>\n#include <map>\n#include <string>\n#include <stdio.h>\n#include <SFML/System/Clock.hpp>\n#include <SFML/System/Vector2.hpp>\n#include <SFML/Graphics/Color.hpp>\n#include \"GDL/RuntimeContext.h\"\n#include \"GDL/Object.h\"\n#include \"GDL/AudioTools.h\"\n#include \"GDL/CommonInstructions.h\"\n#include \"GDL/LightweightCommonTools.h\"\n#include \"GDL/FileTools.h\"\n#include \"GDL/KeyboardTools.h\"\n#include \"GDL/MouseTools.h\"\n#include \"GDL/NetworkTools.h\"\n#include \"GDL/ObjectTools.h\"\n#include \"GDL/RuntimeSceneCameraTools.h\"\n#include \"GDL/RuntimeSceneTools.h\"\n#include \"GDL/SpriteObject.h\"\n#include \"GDL/SpriteTools.h\"\n#include \"GDL/TimeTools.h\"\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
 
-    for ( set<string>::iterator declaration = context.customGlobalDeclaration->begin() ; declaration != context.customGlobalDeclaration->end(); ++declaration )
+    for ( set<string>::iterator declaration = codeGenerator.GetCustomGlobalDeclaration().begin() ; declaration != codeGenerator.GetCustomGlobalDeclaration().end(); ++declaration )
         output += *declaration+"\n";
 
     output +=
-    *context.customCodeOutsideMain+
+    codeGenerator.GetCustomCodeOutsideMain()+
     "\n"
     "int main()\n"
     "{\n"
 	"RuntimeContext * runtimeContext = static_cast< RuntimeContext *> (pointerToRuntimeContext);"
-	+*context.customCodeInMain
+	+codeGenerator.GetCustomCodeInMain()
     +wholeEventsCode+
     "return 0;\n"
     "}\n";
@@ -1079,6 +1057,11 @@ void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & 
         listEvent.push_back(profileEvent);
     }
     #endif
+}
+
+void EventsCodeGenerator::ReportError()
+{
+    errorOccurred = true;
 }
 
 #endif

@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 #if defined(GD_IDE_ONLY)
 
@@ -20,10 +20,11 @@
 
 using namespace std;
 
-CallbacksForGeneratingExpressionCode::CallbacksForGeneratingExpressionCode(string & plainExpression_, const Game & game_, const Scene & scene_, EventsCodeGenerationContext & context_) :
+CallbacksForGeneratingExpressionCode::CallbacksForGeneratingExpressionCode(string & plainExpression_, const Game & game_, const Scene & scene_, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context_) :
     plainExpression(plainExpression_),
     game(game_),
     scene(scene_),
+    codeGenerator(codeGenerator_),
     context(context_)
 {
 
@@ -47,14 +48,14 @@ void CallbacksForGeneratingExpressionCode::OnNumber(string text)
 
 void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
 {
-    context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
+    codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
 
     //Launch custom code generator if needed
     if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<ExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, codeGenerator, context); return; }
 
 
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
+    vector<string> parameters = codeGenerator.GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
 
     string parametersStr;
     for (unsigned int i = 0;i<parameters.size();++i)
@@ -68,24 +69,24 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
 
 void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
 {
-    context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
+    codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
 
     //Launch custom code generator if needed
     if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<StrExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, codeGenerator, context); return; }
 
     //TODO : A bit of hack here..
     //Special case : Function without name is a litteral string.
     if ( functionName.empty() )
     {
         if ( instruction.parameters.empty() ) return;
-        plainExpression += "std::string(\""+EventsCodeGenerator::ConvertToCppString(instruction.parameters[0].GetPlainString())+"\")";
+        plainExpression += "std::string(\""+codeGenerator.ConvertToCppString(instruction.parameters[0].GetPlainString())+"\")";
 
         return;
     }
 
     //Prepare parameters
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
+    vector<string> parameters = codeGenerator.GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
     for (unsigned int i = 0;i<parameters.size();++i)
     {
@@ -98,15 +99,15 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
 
 void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
 {
-    context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
+    codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( instruction.parameters.empty() ) return;
 
     //Launch custom code generator if needed
     if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<ExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, codeGenerator, context); return; }
 
     //Prepare parameters
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
+    vector<string> parameters = codeGenerator.GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
     for (unsigned int i = 1;i<parameters.size();++i)
     {
@@ -127,16 +128,16 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         realObjects.push_back(instruction.parameters[0].GetPlainString());
 
     //If current object is present, use it and only it.
-    if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() )
+    if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() )
     {
         realObjects.clear();
-        realObjects.push_back(context.currentObject);
+        realObjects.push_back(context.GetCurrentObject());
     }
 
     std::string output = "0";
     for (unsigned int i = 0;i<realObjects.size();++i)
     {
-        context.ObjectNeeded(realObjects[i]);
+        context.ObjectsListNeeded(realObjects[i]);
 
         //Cast the object if needed
         string objectType = GetTypeOfObject(game, scene, realObjects[i]);
@@ -144,8 +145,8 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         bool castNeeded = !objInfo.cppClassName.empty();
 
         //Build string to access the object
-        context.AddIncludeFile(objInfo.optionalIncludeFile);
-        if ( context.currentObject == realObjects[i]  && !context.currentObject.empty())
+        codeGenerator.AddIncludeFile(objInfo.optionalIncludeFile);
+        if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty())
         {
             if ( !castNeeded )
                 output = "("+ManObjListName(realObjects[i])+"[i]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
@@ -166,15 +167,15 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
 
 void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
 {
-    context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
+    codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( instruction.parameters.empty() ) return;
 
     //Launch custom code generator if needed
     if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<StrExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, codeGenerator, context); return; }
 
     //Prepare parameters
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
+    vector<string> parameters = codeGenerator.GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
     for (unsigned int i = 1;i<parameters.size();++i)
     {
@@ -195,16 +196,16 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         realObjects.push_back(instruction.parameters[0].GetPlainString());
 
     //If current object is present, use it and only it.
-    if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() )
+    if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() )
     {
         realObjects.clear();
-        realObjects.push_back(context.currentObject);
+        realObjects.push_back(context.GetCurrentObject());
     }
 
     std::string output = "\"\"";
     for (unsigned int i = 0;i<realObjects.size();++i)
     {
-        context.ObjectNeeded(realObjects[i]);
+        context.ObjectsListNeeded(realObjects[i]);
 
         //Cast the object if needed
         string objectType = GetTypeOfObject(game, scene, realObjects[i]);
@@ -212,8 +213,8 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         bool castNeeded = !objInfo.cppClassName.empty();
 
         //Build string to access the object
-        context.AddIncludeFile(objInfo.optionalIncludeFile);
-        if ( context.currentObject == realObjects[i]  && !context.currentObject.empty())
+        codeGenerator.AddIncludeFile(objInfo.optionalIncludeFile);
+        if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty())
         {
             if ( !castNeeded )
                 output = "("+ManObjListName(realObjects[i])+"[i]->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
@@ -234,15 +235,15 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
 
 void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo)
 {
-    context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
+    codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( instruction.parameters.size() < 2 ) return;
 
     //Launch custom code generator if needed
     if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<ExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, codeGenerator, context); return; }
 
     //Prepare parameters
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
+    vector<string> parameters = codeGenerator.GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
     for (unsigned int i = 2;i<parameters.size();++i)
     {
@@ -263,16 +264,16 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         realObjects.push_back(instruction.parameters[0].GetPlainString());
 
     //If current object is present, use it and only it.
-    if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() )
+    if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() )
     {
         realObjects.clear();
-        realObjects.push_back(context.currentObject);
+        realObjects.push_back(context.GetCurrentObject());
     }
 
     std::string output = "0";
     for (unsigned int i = 0;i<realObjects.size();++i)
     {
-        context.ObjectNeeded(realObjects[i]);
+        context.ObjectsListNeeded(realObjects[i]);
 
         //Cast the object if needed
         string automatismType = GetTypeOfAutomatism(game, scene, instruction.parameters[1].GetPlainString());
@@ -280,8 +281,8 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         bool castNeeded = !autoInfo.cppClassName.empty();
 
         //Build string to access the automatism
-        context.AddIncludeFile(autoInfo.optionalIncludeFile);
-        if ( context.currentObject == realObjects[i]  && !context.currentObject.empty() )
+        codeGenerator.AddIncludeFile(autoInfo.optionalIncludeFile);
+        if ( context.GetCurrentObject() == realObjects[i]  && !context.GetCurrentObject().empty() )
         {
             if ( !castNeeded )
                 output = "("+ManObjListName(realObjects[i])+"[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
@@ -302,15 +303,15 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 
 void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo)
 {
-    context.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
+    codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( instruction.parameters.size() < 2 ) return;
 
     //Launch custom code generator if needed
     if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<StrExpressionInfos::CppCallingInformation::CustomCodeGenerator>() )
-    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, context); return; }
+    { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, instruction, codeGenerator, context); return; }
 
     //Prepare parameters
-    vector<string> parameters = EventsCodeGenerator::GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
+    vector<string> parameters = codeGenerator.GenerateParametersCodes(game, scene, instruction.parameters, expressionInfo.parameters, context);
     string parametersStr;
     for (unsigned int i = 2;i<parameters.size();++i)
     {
@@ -331,16 +332,16 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         realObjects.push_back(instruction.parameters[0].GetPlainString());
 
     //If current object is present, use it and only it.
-    if ( find(realObjects.begin(), realObjects.end(), context.currentObject) != realObjects.end() )
+    if ( find(realObjects.begin(), realObjects.end(), context.GetCurrentObject()) != realObjects.end() )
     {
         realObjects.clear();
-        realObjects.push_back(context.currentObject);
+        realObjects.push_back(context.GetCurrentObject());
     }
 
     std::string output = "\"\"";
     for (unsigned int i = 0;i<realObjects.size();++i)
     {
-        context.ObjectNeeded(realObjects[i]);
+        context.ObjectsListNeeded(realObjects[i]);
 
         //Cast the object if needed
         string automatismType = GetTypeOfAutomatism(game, scene, instruction.parameters[1].GetPlainString());
@@ -348,8 +349,8 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         bool castNeeded = !autoInfo.cppClassName.empty();
 
         //Build string to access the automatism
-        context.AddIncludeFile(autoInfo.optionalIncludeFile);
-        if ( context.currentObject == realObjects[i] && !context.currentObject.empty() )
+        codeGenerator.AddIncludeFile(autoInfo.optionalIncludeFile);
+        if ( context.GetCurrentObject() == realObjects[i] && !context.GetCurrentObject().empty() )
         {
             if ( !castNeeded )
                 output = "("+ManObjListName(realObjects[i])+"[i]->GetAutomatismRawPointer(\""+instruction.parameters[1].GetPlainString()+"\")->"+expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+"))";
@@ -372,7 +373,7 @@ bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const Game & game
 {
     string newExpression;
 
-    CallbacksForGeneratingExpressionCode callbacks(newExpression, game, scene, context);
+    CallbacksForGeneratingExpressionCode callbacks(newExpression, game, scene, codeGenerator, context);
 
     GDExpressionParser parser(expression.GetPlainString());
     if ( !parser.ParseMathExpression(game, scene, callbacks) )
@@ -391,7 +392,7 @@ bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(const Game & game
 {
     string newExpression;
 
-    CallbacksForGeneratingExpressionCode callbacks(newExpression, game, scene, context);
+    CallbacksForGeneratingExpressionCode callbacks(newExpression, game, scene, codeGenerator, context);
 
     GDExpressionParser parser(expression.GetPlainString());
     if ( !parser.ParseTextExpression(game, scene, callbacks) )

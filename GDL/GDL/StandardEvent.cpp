@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #if defined(GD_IDE_ONLY)
@@ -20,11 +20,11 @@ BaseEvent()
 {
 }
 
-std::string StandardEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & context)
+std::string StandardEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
 {
     std::string outputCode;
 
-    outputCode += EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
+    outputCode += codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
 
     std::string ifPredicat;
     for (unsigned int i = 0;i<conditions.size();++i)
@@ -35,11 +35,11 @@ std::string StandardEvent::GenerateEventCode(const Game & game, const Scene & sc
 
     if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
     outputCode += "{\n";
-    outputCode += EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
+    outputCode += codeGenerator.GenerateActionsListCode(game, scene, actions, context);
     if ( !events.empty() ) //Sub events
     {
         outputCode += "\n{\n";
-        outputCode += EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
+        outputCode += codeGenerator.GenerateEventsListCode(game, scene, events, context);
         outputCode += "}\n";
     }
 

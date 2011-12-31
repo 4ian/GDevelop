@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #if defined(GD_IDE_ONLY)
@@ -10,6 +10,7 @@
 #include "GDL/OpenSaveGame.h"
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/CommonTools.h"
+#include "GDL/EmptyEvent.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/tinyxml.h"
 #include "RuntimeScene.h"
@@ -64,7 +65,11 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
     if ( eventsLinkedIter != game.externalEvents.end() ) eventsToInclude = &(*eventsLinkedIter)->events;
     else if ( sceneLinkedIter != game.scenes.end() ) eventsToInclude = &(*sceneLinkedIter)->events;
 
-    if ( eventsToInclude == NULL ) return;
+    if ( eventsToInclude == NULL )
+    {
+        std::cout << "Unable to get events from a link" << std::endl;
+        return;
+    }
 
     unsigned int firstEvent = start;
     unsigned int lastEvent = end;
@@ -80,8 +85,7 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
         lastEvent--;
     }
 
-
-    //On teste la validité de l'insertion
+    //Check bounds
     if ( firstEvent >= eventsToInclude->size() )
     {
         std::cout << "Unable to get events from a link ( Invalid start )" << std::endl;
@@ -98,12 +102,21 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
         return;
     }
 
-    for ( unsigned int insertion = 0;insertion <= static_cast<unsigned>(lastEvent-firstEvent);insertion++ ) //Insertion des évènements du lien
+    //Insert an empty event to replace the link event ( we'll delete the link event at the end )
+    //( If we just erase the link event without adding a blank event to replace it,
+    //the first event inserted by the link will not be preprocessed ( and it can be annoying if it require preprocessing, such as another link event ). )
+    eventList.insert(eventList.begin() + indexOfTheEventInThisList, boost::shared_ptr<BaseEvent>(new EmptyEvent));
+
+    //Insert linked events
+    for ( unsigned int insertion = 0;insertion <= static_cast<unsigned>(lastEvent-firstEvent);insertion++ )
     {
-        //Profiling can be enabled in editor.
-        eventList.insert( eventList.begin() + indexOfTheEventInThisList + insertion, CloneRememberingOriginalEvent(eventsToInclude->at( firstEvent+insertion )));
+        //Profiling can be enabled in editor, so we use CloneRememberingOriginalEvent.
+        eventList.insert( eventList.begin() + indexOfTheEventInThisList + 1 + insertion, /*Start inserted at indexOfTheEventInThisList+1 ( after the empty event ) */
+                         CloneRememberingOriginalEvent(eventsToInclude->at( firstEvent+insertion )));
     }
-    eventList.erase( eventList.begin() + indexOfTheEventInThisList + static_cast<unsigned>(lastEvent-firstEvent)+1 ); //Suppression du lien
+
+    //Delete the link event ( which is now at the end of the list of events we've just inserted )
+    eventList.erase( eventList.begin() + indexOfTheEventInThisList + 1 + static_cast<unsigned>(lastEvent-firstEvent)+1 );
 }
 
 void LinkEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)

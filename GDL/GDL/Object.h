@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef OBJECT_H
@@ -26,7 +26,6 @@ class RuntimeScene;
 class Object;
 class ExpressionInstruction;
 class StrExpressionInstruction;
-class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
 class TiXmlElement;

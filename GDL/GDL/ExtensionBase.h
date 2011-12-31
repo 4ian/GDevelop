@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef EXTENSIONBASE_H
@@ -34,6 +34,7 @@ class BaseEvent;
 class AutomatismsSharedDatas;
 class ArbitraryResourceWorker;
 class EventsCodeGenerationContext;
+class EventsCodeGenerator;
 #undef CreateEvent
 
 //Declare typedefs for objects creations/destructions functions
@@ -617,7 +618,7 @@ class GD_API InstructionInfos
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context) {return "";};
         };
 
         CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
@@ -704,7 +705,7 @@ class GD_API ExpressionInfos
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const ExpressionInstruction & instruction, EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, const ExpressionInstruction & instruction, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context) {return "";};
         };
 
         CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
@@ -788,7 +789,7 @@ class GD_API StrExpressionInfos
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const StrExpressionInstruction & instruction, EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, const StrExpressionInstruction & instruction, EventsCodeGenerator & codeGenerator_ ,EventsCodeGenerationContext & context) {return "";};
         };
 
         CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)

@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "GDL/VariablesExtension.h"
@@ -108,7 +108,7 @@ VariablesExtension::VariablesExtension()
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddParameter("globalvar", _("Nom de la variable"), "", false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GlobalVariableDefined").SetManipulatedType("string").SetIncludeFile("GDL/RuntimeSceneTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GlobalVariableDefined").SetIncludeFile("GDL/RuntimeSceneTools.h");
 
     DECLARE_END_CONDITION()
 

@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef STREXPRESSIONINSTRUCTION_H
@@ -10,14 +10,6 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 class GDExpression;
-class ExpressionInstruction;
-class Object;
-class Automatism;
-class ObjectsConcerned;
-class RuntimeScene;
-
-typedef std::vector < boost::shared_ptr<Object> > ObjList;
-typedef boost::shared_ptr<Object> ObjSPtr;
 
 /**
  * \brief Instruction ( function or object function ) of a string expression.

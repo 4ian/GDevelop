@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #if defined(GD_IDE_ONLY)
@@ -19,6 +19,7 @@ class GDExpression;
 class Game;
 class Scene;
 class EventsCodeGenerationContext;
+class EventsCodeGenerator;
 
 /**
  * \brief Used to generate C++ code from expressions.
@@ -27,7 +28,7 @@ class EventsCodeGenerationContext;
  * \code
  *   std::string expressionOutputCppCode;
  *
- *   CallbacksForGeneratingExpressionCode callbacks(expressionOutputCppCode, game, scene, context);
+ *   CallbacksForGeneratingExpressionCode callbacks(expressionOutputCppCode, game, scene, codeGenerator, context);
  *   GDExpressionParser parser(theOriginalGameDevelopExpression);
  *   parser.ParseTextExpression(game, scene, callbacks);
  *
@@ -37,9 +38,8 @@ class EventsCodeGenerationContext;
  */
 class GD_API CallbacksForGeneratingExpressionCode : public ParserCallbacks
 {
-    public:
-
-    CallbacksForGeneratingExpressionCode(std::string & output, const Game & game_, const Scene & scene_, EventsCodeGenerationContext & context_);
+public:
+    CallbacksForGeneratingExpressionCode(std::string & output, const Game & game_, const Scene & scene_, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context_);
     virtual ~CallbacksForGeneratingExpressionCode() {};
 
     void OnConstantToken(std::string text);
@@ -54,12 +54,12 @@ class GD_API CallbacksForGeneratingExpressionCode : public ParserCallbacks
     bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression);
     bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression);
 
-
-    private :
-        std::string & plainExpression;
-        const Game & game;
-        const Scene & scene;
-        EventsCodeGenerationContext & context;
+private :
+    std::string & plainExpression;
+    const Game & game;
+    const Scene & scene;
+    EventsCodeGenerator & codeGenerator;
+    EventsCodeGenerationContext & context;
 };
 
 

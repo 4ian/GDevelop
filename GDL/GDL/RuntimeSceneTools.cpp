@@ -72,36 +72,7 @@ void GD_API MoveObjects( RuntimeScene & scene )
     return;
 }
 
-void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> mapOfAllObjectLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
-{
-    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
-    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->globalObjects.begin(), scene.game->globalObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
-
-    ObjSPtr newObject = boost::shared_ptr<Object> ();
-
-    if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
-        newObject = (*sceneObject)->Clone();
-    else if ( globalObject != scene.game->globalObjects.end() ) //Then the global object list
-        newObject = (*globalObject)->Clone();
-    else
-        return;
-
-    //Ajout à la liste d'objet et configuration de sa position
-    newObject->SetX( positionX );
-    newObject->SetY( positionY );
-    newObject->LoadRuntimeResources(scene, *scene.game->imageManager);
-
-    newObject->SetLayer( layer );
-
-    if ( find(alreadyDeclaredObjects.begin(), alreadyDeclaredObjects.end(), objectWanted) == alreadyDeclaredObjects.end() )
-        alreadyDeclaredObjects.push_back(objectWanted);
-
-    //Add object to scene and let it be concerned by futures actions
-    scene.objectsInstances.AddObject(newObject);
-    if ( mapOfAllObjectLists[objectWanted] != NULL && find(mapOfAllObjectLists[objectWanted]->begin(), mapOfAllObjectLists[objectWanted]->end(), newObject.get()) == mapOfAllObjectLists[objectWanted]->end() )
-        mapOfAllObjectLists[objectWanted]->push_back( newObject.get() );
-}
-void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> mapOfAllObjectLists, int useless, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
+void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int useless, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
 {
     std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
     std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->globalObjects.begin(), scene.game->globalObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
@@ -124,10 +95,16 @@ void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std
 
     //Add object to scene and let it be concerned by futures actions
     scene.objectsInstances.AddObject(newObject);
-    if ( mapOfAllObjectLists[objectWanted] != NULL && find(mapOfAllObjectLists[objectWanted]->begin(), mapOfAllObjectLists[objectWanted]->end(), newObject.get()) == mapOfAllObjectLists[objectWanted]->end() )
-        mapOfAllObjectLists[objectWanted]->push_back( newObject.get() );
+    if ( pickedObjectLists[objectWanted] != NULL && find(pickedObjectLists[objectWanted]->begin(), pickedObjectLists[objectWanted]->end(), newObject.get()) == pickedObjectLists[objectWanted]->end() )
+        pickedObjectLists[objectWanted]->push_back( newObject.get() );
 }
 
+void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string &, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
+{
+    if ( pickedObjectLists[objectWanted] == NULL ) return; //Bail out if the object is not present in the specified group
+
+    CreateObjectOnScene(scene, pickedObjectLists, 0, objectWanted, positionX, positionY, layer);
+}
 
 bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int, const std::string &)
 {

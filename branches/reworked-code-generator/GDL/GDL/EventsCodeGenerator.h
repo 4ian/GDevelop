@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2011 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #if defined(GD_IDE_ONLY)
@@ -108,8 +108,6 @@ public:
     instrInfo.AddParameter("object", _("Target object"), "", false);
     instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1"); //The called function will be called with this signature : Function(std::string, std::string, Object*)
      * \endcode
-     * - mapOfAllObjectLists : Like mapOfObjectListsOfParameter, but the map contains every object lists which can be used in the scene. Use as few as possible.
-     * - listOfAlreadyPickedObjects : Vector of name of objects already concerned ( std::vector<std::string> & ). Use as few as possible.
      */
     std::vector<std::string> GenerateParametersCodes( const Game & game, const Scene & scene, std::vector < GDExpression > parameters, const std::vector < ParameterInfo > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
 

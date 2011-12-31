@@ -2,12 +2,12 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="238" topLine="0" />
+		<Cursor1 position="973" topLine="0" />
 	</File>
 	<File name="CompilationChecker.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="125" topLine="0" />
+		<Cursor1 position="258" topLine="0" />
 	</File>
-	<File name="main.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1478" topLine="49" />
+	<File name="main.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="42" topLine="2" />
 	</File>
 </CodeBlocks_layout_file>

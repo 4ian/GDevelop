@@ -64,23 +64,19 @@ void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
 {
     sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
 
-    //Affichage de la boite de dialogue
     wxFileDialog openFileDialog( this, _( "Choisissez le jeu à ouvrir" ), "", "", "*\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
 
-    //A t on  un fichier à ouvrir ?
-    if (openFileDialog.ShowModal() == wxID_CANCEL)
-        return;
-
-    Open( string(openFileDialog.GetPath().mb_str()) );
+    if (openFileDialog.ShowModal() != wxID_CANCEL && !openFileDialog.GetPath().empty() )
+        Open( ToString(openFileDialog.GetPath()) );
 }
 void Game_Develop_EditorFrame::OnOpenExampleSelected(wxCommandEvent& event)
 {
     sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
 
     wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Examples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
-    open.ShowModal();
 
-    if ( !open.GetPath().empty() ) Open(string(open.GetPath().mb_str()));
+    if ( open.ShowModal() != wxID_CANCEL && !open.GetPath().empty() )
+        Open(ToString(open.GetPath()));
 }
 /**
  * Adapter for the ribbon

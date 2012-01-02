@@ -55,7 +55,6 @@
 #include "ExternalEventsEditor.h"
 
 //(*IdInit(Game_Develop_EditorFrame)
-const long Game_Develop_EditorFrame::ID_PANEL3 = wxNewId();
 const long Game_Develop_EditorFrame::ID_CUSTOM1 = wxNewId();
 const long Game_Develop_EditorFrame::ID_AUINOTEBOOK1 = wxNewId();
 const long Game_Develop_EditorFrame::ID_PANEL1 = wxNewId();
@@ -111,15 +110,14 @@ projectManager(NULL)
 {
 
     //(*Initialize(Game_Develop_EditorFrame)
+    wxBoxSizer* ribbonSizer;
     wxMenuItem* MenuItem1;
     wxMenuItem* MenuItem11;
     wxFlexGridSizer* FlexGridSizer2;
     wxMenuItem* MenuItem42;
-    wxFlexGridSizer* FlexGridSizer8;
     wxMenuItem* MenuItem41;
     wxFlexGridSizer* FlexGridSizer1;
     wxMenuItem* MenuItem45;
-    wxFlexGridSizer* ribbonSizer;
 
     Create(parent, wxID_ANY, _("Game Develop - Nouveau jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(850,700));
@@ -131,18 +129,8 @@ projectManager(NULL)
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer1->AddGrowableCol(0);
     FlexGridSizer1->AddGrowableRow(1);
-    FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
-    FlexGridSizer8->AddGrowableCol(0);
-    FlexGridSizer8->AddGrowableRow(0);
-    ribbonPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-    ribbonSizer = new wxFlexGridSizer(0, 1, 0, 0);
-    ribbonSizer->AddGrowableCol(0);
-    ribbonSizer->AddGrowableRow(0);
-    ribbonPanel->SetSizer(ribbonSizer);
-    ribbonSizer->Fit(ribbonPanel);
-    ribbonSizer->SetSizeHints(ribbonPanel);
-    FlexGridSizer8->Add(ribbonPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer1->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    ribbonSizer = new wxBoxSizer(wxVERTICAL);
+    FlexGridSizer1->Add(ribbonSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(629,484), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer2->AddGrowableCol(0);
@@ -257,7 +245,8 @@ projectManager(NULL)
     {
         ribbonStyle &= ~wxRIBBON_BAR_SHOW_PAGE_LABELS;
     }
-    m_ribbon = new wxRibbonBar(ribbonPanel, wxID_ANY, wxDefaultPosition, wxSize(-1, 75), ribbonStyle);
+    m_ribbon = new wxRibbonBar(this, wxID_ANY);
+    m_ribbon->SetWindowStyle(ribbonStyle);
     bool hideLabels = false;
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
     {
@@ -360,6 +349,8 @@ projectManager(NULL)
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Code"));
         CodeEditor::CreateRibbonPage(ribbonEditorPage);
     }
+    m_ribbon->Realize();
+    unsigned int ribbonHeight = m_ribbon->GetSize().GetHeight();
     ribbonSizer->Add(m_ribbon, 0, wxEXPAND);
 
     //Load wxAUI
@@ -376,11 +367,13 @@ projectManager(NULL)
     projectManager = new ProjectManager(this, *this);
     projectManager->ConnectEvents();
 
+    //Create build tools panel
     buildToolsPnl = new BuildToolsPnl(this, projectManager);
 
+    //Setup panes and load user configuration
     m_mgr.AddPane( projectManager, wxAuiPaneInfo().Name( wxT( "PM" ) ).Caption( _( "Gestionnaire de projets" ) ).Left().MaximizeButton( true ).MinimizeButton( false ).MinSize(170,100) );
     m_mgr.AddPane( Panel1, wxAuiPaneInfo().Name( wxT( "EP" ) ).Caption( _( "Editeur principal" ) ).Center().CaptionVisible(false).CloseButton( false ).MaximizeButton( true ).MinimizeButton( false ) );
-    m_mgr.AddPane( ribbonPanel, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ruban" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).Resizable(false) );
+    m_mgr.AddPane( m_ribbon, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ruban" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).Resizable(false) );
     m_mgr.AddPane( buildToolsPnl, wxAuiPaneInfo().Name( wxT( "CT" ) ).Caption( _( "Outils de compilations" ) ).Bottom().MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(120,130));
 
     wxString result;
@@ -388,18 +381,18 @@ projectManager(NULL)
     if ( result != "" )
         m_mgr.LoadPerspective( result , true );
 
-    #if defined(WINDOWS)
-    m_mgr.GetPane(ribbonPanel).MinSize(1, 110);
-    #else
-    m_mgr.GetPane(ribbonPanel).MinSize(1, 120);
-    #endif
+    //Ensure that names are corrected ( Useful in particular to ensure that these name are in the selected language ).
+    m_mgr.GetPane(projectManager).Caption(_( "Gestionnaire de projets" ));
+    m_mgr.GetPane(buildToolsPnl).Caption(_( "Outils de compilations" ));
+
+    //Change ribbon pane height.
+    m_mgr.GetPane(m_ribbon).MinSize(1, m_ribbon->GetBestSize().GetHeight());
 
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );
 
     m_mgr.Update();
     UpdateNotebook();
-    m_ribbon->Realize();
 
     infoBar->SetShowHideEffects(wxSHOW_EFFECT_SLIDE_TO_BOTTOM, wxSHOW_EFFECT_BLEND);
 

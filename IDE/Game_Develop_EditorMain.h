@@ -240,7 +240,6 @@ class Game_Develop_EditorFrame: public wxFrame
     private:
 
         //(*Identifiers(Game_Develop_EditorFrame)
-        static const long ID_PANEL3;
         static const long ID_CUSTOM1;
         static const long ID_AUINOTEBOOK1;
         static const long ID_PANEL1;
@@ -282,7 +281,6 @@ class Game_Develop_EditorFrame: public wxFrame
         wxMenu openContextMenu;
         wxMenuItem* MenuItem10;
         wxMenu decomposerContextMenu;
-        wxPanel* ribbonPanel;
         wxInfoBar* infoBar;
         wxMenuItem* MenuItem43;
         wxMenu saveContextMenu;

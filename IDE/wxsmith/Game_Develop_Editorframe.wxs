@@ -18,10 +18,8 @@
 					<growablerows>0</growablerows>
 					<object class="sizeritem">
 						<object class="wxPanel" name="ID_PANEL3" variable="ribbonPanel" member="yes">
-							<object class="wxFlexGridSizer" variable="ribbonSizer" member="no">
-								<cols>1</cols>
-								<growablecols>0</growablecols>
-								<growablerows>0</growablerows>
+							<object class="wxBoxSizer" variable="ribbonSizer" member="no">
+								<orient>wxVERTICAL</orient>
 							</object>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

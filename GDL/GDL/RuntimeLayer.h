@@ -89,4 +89,11 @@ class GD_API RuntimeLayer
         static RuntimeCamera badCamera;
 };
 
+/**
+ * \brief Functor testing RuntimeLayer name
+ */
+struct RuntimeLayerHasName : public std::binary_function<RuntimeLayer, std::string, bool> {
+    bool operator()(const RuntimeLayer & layer, const std::string & name) const { return layer.GetName() == name; }
+};
+
 #endif // RUNTIMELAYER_H

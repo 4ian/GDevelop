@@ -568,7 +568,7 @@ SpriteExtension::SpriteExtension()
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("Collision",
-                      _("Collision"),
+                      _("Collision ( Pixel perfect )"),
                       _("La condition est vraie si il y a collision entre les deux objets donnés.\nLa collision est faite au pixel près.\nAttention ! Cette condition est couteuse pour l'ordinateur en terme de perfomance."),
                       _("_PARAM0_ est en collision avec _PARAM1_"),
                       _("Collision"),

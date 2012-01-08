@@ -1009,6 +1009,7 @@ class GD_API ExtensionBase
     inline std::string GetLicense() const { return license; }
     inline std::string GetFullName() const { return fullname; }
     const std::vector < std::pair<std::string, std::string> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
+    const std::vector < std::string > & GetSupplementaryIncludeDirectories() const { return supplementaryIncludeDirectories; };
 
 
     const std::map<std::string, InstructionInfos > & GetAllActions() const;
@@ -1093,6 +1094,7 @@ class GD_API ExtensionBase
     std::string author; ///<Author displayed to users at edittime
     std::string license;  ///<License name displayed to users at edittime
     std::vector < std::pair<std::string, std::string> > supplementaryRuntimeFiles; ///<Supplementary runtime files to copy on compilation
+    std::vector < std::string > supplementaryIncludeDirectories; ///<Supplementary include directories to use on events compilation
 
     std::map<std::string, InstructionInfos > conditionsInfos;
     std::map<std::string, InstructionInfos > actionsInfos;

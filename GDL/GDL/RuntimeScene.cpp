@@ -45,9 +45,6 @@ game(game_),
 debugger(NULL),
 #endif
 running(true),
-backgroundColorR(125),
-backgroundColorG(125),
-backgroundColorB(125),
 firstLoop(true),
 isFullScreen(false),
 realElapsedTime(0),
@@ -83,7 +80,6 @@ void RuntimeScene::Init(const RuntimeScene & scene)
 {
     renderWindow = scene.renderWindow;
     game = scene.game;
-    soundManager = scene.soundManager;
     #if defined(GD_IDE_ONLY)
     debugger = scene.debugger;
     #endif
@@ -95,9 +91,6 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     textes = scene.textes;
     timers = scene.timers;
     pauseTime = scene.pauseTime;
-    backgroundColorR = scene.backgroundColorR;
-    backgroundColorG = scene.backgroundColorG;
-    backgroundColorB = scene.backgroundColorB;
 
     compiledEventsExecutionEngine = scene.compiledEventsExecutionEngine;
 
@@ -189,10 +182,6 @@ void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, in
 }
 #endif
 
-////////////////////////////////////////////////////////////
-/// Avancer l'état de la scène et la dessiner
-/// Appelé habituellement à chaque tour de boucle de jeu
-////////////////////////////////////////////////////////////
 int RuntimeScene::RenderAndStep(unsigned int nbStep)
 {
     BT_PROFILE("RenderAndStep");
@@ -253,9 +242,6 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
     return specialAction;
 }
 
-////////////////////////////////////////////////////////////
-/// Gestion des évènements basiques de la fenêtre
-////////////////////////////////////////////////////////////
 void RuntimeScene::ManageRenderTargetEvents()
 {
     renderTargetEvents.clear();
@@ -290,9 +276,7 @@ void RuntimeScene::ManageRenderTargetEvents()
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Affichage simple
-////////////////////////////////////////////////////////////
+
 void RuntimeScene::RenderWithoutStep()
 {
     ManageRenderTargetEvents();
@@ -305,9 +289,6 @@ void RuntimeScene::RenderWithoutStep()
     #endif
 }
 
-////////////////////////////////////////////////////////////
-/// Affichage dans une sf::RenderWindow
-////////////////////////////////////////////////////////////
 void RuntimeScene::Render()
 {
     renderWindow->Clear( sf::Color( backgroundColorR, backgroundColorG, backgroundColorB ) );
@@ -381,40 +362,27 @@ void RuntimeScene::Render()
     renderWindow->Display();
 }
 
-////////////////////////////////////////////////////////////
-/// Renvoie le calque avec le nom indiqué
-////////////////////////////////////////////////////////////
-RuntimeLayer & RuntimeScene::GetLayer(string name)
+RuntimeLayer & RuntimeScene::GetLayer(const string & name)
 {
-    for (unsigned int i = 0;i<layers.size();++i)
-    {
-    	if( layers[i].GetName() == name )
-            return layers[i];
-    }
+    std::vector<RuntimeLayer>::iterator layer = std::find_if(layers.begin(), layers.end(), std::bind2nd(RuntimeLayerHasName(), name));
+
+    if ( layer != layers.end() ) return *layer;
 
     return badLayer;
 }
 
-////////////////////////////////////////////////////////////
-/// Renvoie le calque avec le nom indiqué
-////////////////////////////////////////////////////////////
-const RuntimeLayer & RuntimeScene::GetLayer(string name) const
+const RuntimeLayer & RuntimeScene::GetLayer(const string & name) const
 {
-    for (unsigned int i = 0;i<layers.size();++i)
-    {
-    	if( layers[i].GetName() == name )
-            return layers[i];
-    }
+    std::vector<RuntimeLayer>::const_iterator layer = std::find_if(layers.begin(), layers.end(), std::bind2nd(RuntimeLayerHasName(), name));
+
+    if ( layer != layers.end() ) return *layer;
 
     return badLayer;
 }
 
-////////////////////////////////////////////////////////////
-/// Met à jour le temps
-////////////////////////////////////////////////////////////
 bool RuntimeScene::UpdateTime()
 {
-    //Temps écoulé depuis la dernière frame
+    //Update time elapsed since last frame
     realElapsedTime = renderWindow->GetFrameTime();
     realElapsedTime -= pauseTime; //On enlève le temps de pause
 
@@ -532,7 +500,6 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
     compiledEventsExecutionEngine = scene.compiledEventsExecutionEngine;
     compiledEventsExecutionEngine->llvmRuntimeContext->scene = this;
-
 
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;

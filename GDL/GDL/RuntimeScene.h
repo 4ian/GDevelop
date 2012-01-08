@@ -49,20 +49,35 @@ public:
 
     sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display
     RuntimeGame *                           game; ///< Pointer to the game the scene is linked to
-    SoundManager *                          soundManager; ///< Pointer to the sound manager.
     #if defined(GD_IDE_ONLY)
     BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
     #endif
     ObjInstancesHolder                      objectsInstances; ///< Contains all of the objects on the scene
     ListVariable                            variables; ///<List of the scene variables
-    vector < RuntimeLayer >                 layers; ///<List of the layers
-    vector < Text >                         textes; ///<Deprecated way of displaying a text
-    vector < ManualTimer >                  timers; ///<List of the timer currently used.
+    std::vector < ManualTimer >             timers; ///<List of the timer currently used.
     bool                                    running; ///< True if the scene is being played
-    int                                     backgroundColorR; ///< Background color Red component
-    int                                     backgroundColorG; ///< Background color Green component
-    int                                     backgroundColorB; ///< Background color Blue component
-    std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas. Note the use of flat_map for better performance.
+
+    /**
+     * Get the list of all layers of the scene
+     */
+    const std::vector < RuntimeLayer > & GetAllLayers() const { return layers; }
+
+    /**
+     * Get the list of all layers of the scene
+     */
+    std::vector < RuntimeLayer > & GetAllLayers() { return layers; }
+
+    /**
+     * Add a text to be displayed on the scene
+     * \deprecated
+     */
+    void DisplayText(Text & text) { textes.push_back(text); };
+
+    /**
+     * Get the AutomatismsRuntimeSharedData associated with automatism.
+     * Be careful, no check is made to ensure that the shared data exist.
+     */
+    const boost::shared_ptr<AutomatismsRuntimeSharedDatas> & GetAutomatismSharedDatas(const std::string & automatismName) const { return automatismsSharedDatas.find(automatismName)->second; }
 
     /**
      * Set up the Runtime Scene using a Scene
@@ -102,12 +117,12 @@ public:
     /**
      * Return the layer with the name passed in argument
      */
-    const RuntimeLayer & GetLayer(string name) const;
+    const RuntimeLayer & GetLayer(const string & name) const;
 
     /**
      * Return the layer with the name passed in argument
      */
-    RuntimeLayer & GetLayer(string name);
+    RuntimeLayer & GetLayer(const string & name);
 
     /**
      * Change scene time scale.
@@ -147,11 +162,12 @@ public:
      */
     const std::vector<sf::Event> & GetRenderTargetEvents() const { return renderTargetEvents; }
 
+    /**
+     * Order an object list according to object's Z coordinate.
+     */
     bool OrderObjectsByZOrder( ObjList & objList );
 
 protected:
-
-    void Init(const RuntimeScene & scene);
 
     /**
      * Render a frame in the window
@@ -161,8 +177,6 @@ protected:
     void ManageObjectsAfterEvents();
     bool UpdateTime();
 
-    bool DisplayLegacyTexts(string layer = "");
-
     bool firstLoop; ///<true if the scene was just rendered once.
     bool isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
     unsigned int realElapsedTime; ///< Elpased time since last frame, in milliseconds, without taking time scale in account.
@@ -171,7 +185,16 @@ protected:
     unsigned int timeFromStart; ///< Time in milliseconds elapsed from start
     unsigned int pauseTime;
     int   specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
+
+    std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
+    std::vector < RuntimeLayer > layers; ///<List of the layers
+
+    vector < Text > textes; ///<Deprecated way of displaying a text
+    bool DisplayLegacyTexts(string layer = "");
+
     std::vector<sf::Event> renderTargetEvents;
+
+    void Init(const RuntimeScene & scene);
 
     static RuntimeLayer badLayer;
 };

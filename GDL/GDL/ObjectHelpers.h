@@ -12,7 +12,6 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 class Object;
-class Object;
 
 /**
  * An object list is a vector containing (smart) pointers to objects.

@@ -301,7 +301,7 @@ void GD_API DisplayLegacyTextOnScene( RuntimeScene & scene, const std::string & 
     texte.fontName = fontName;
     texte.layer = layer;
 
-    scene.textes.push_back(texte);
+    scene.DisplayText(texte);
 
     return;
 }

@@ -28,6 +28,7 @@
 #include "GDL/WindowExtension.h"
 #include "GDL/StringInstructionsExtension.h"
 #include "GDL/Object.h"
+#include "GDL/EventsCodeCompiler.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/Game.h"
@@ -99,6 +100,10 @@ bool ExtensionsManager::AddExtension(boost::shared_ptr<ExtensionBase> extension)
         creationFunctionTable[objectsTypes[i]] = extension->GetObjectCreationFunctionPtr(objectsTypes[i]);
         destroyFunctionTable[objectsTypes[i]] = extension->GetDestroyObjectFunction(objectsTypes[i]);
     }
+
+    //Add include directories
+    for (unsigned int i = 0;i<extension->GetSupplementaryIncludeDirectories().size();++i)
+        EventsCodeCompiler::GetInstance()->AddHeaderDirectory(extension->GetSupplementaryIncludeDirectories()[i]);
 
     extensionsLoaded.push_back(extension);
     return true;

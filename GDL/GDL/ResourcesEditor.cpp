@@ -21,6 +21,7 @@
 #include <wx/choicdlg.h>
 #include <wx/toolbar.h>
 #include <wx/config.h>
+#include <wx/msgdlg.h>
 #include <wx/aui/aui.h>
 #include <wx/log.h>
 #include <wx/filedlg.h>
@@ -489,6 +490,33 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
     if ( itemData && itemData->GetString() == "Image" )
     {
         std::string imageName = ToString(resourcesTree->GetItemText( m_itemSelected ));
+
+        //Warn the user if the resource is still in use
+        //TODO : Activate this when multiple selection is implemented.
+        /*{
+            //Search in scenes resources
+            ImagesUsedInventorizer inventorizer;
+            for ( unsigned int i = 0;i < game.scenes.size();i++ )
+            {
+                for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j)
+                    game.scenes[i]->initialObjects[j]->ExposeResources(inventorizer);
+
+                LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, inventorizer);
+            }
+            //Search in global objects resources
+            for (unsigned int j = 0;j<game.globalObjects.size();++j)
+                game.globalObjects[j]->ExposeResources(inventorizer);
+            //Search in external events
+            for ( unsigned int i = 0;i < game.externalEvents.size();i++ )
+                LaunchResourceWorkerOnEvents(game, game.externalEvents[i]->events, inventorizer);
+
+            std::set<std::string> & usedImages = inventorizer.GetAllUsedImages();
+            if ( usedImages.find(imageName) != usedImages.end() )
+            {
+                if ( wxMessageBox(_("Certains élements du projet utilisent cette ressource.\nÊtes vous sûr de vouloir la supprimer ?"), _("Ressource utilisée"), wxYES_NO | wxICON_QUESTION, this) == wxNO )
+                    return;
+            }
+        }*/
 
         game.resourceManager.RemoveResource(imageName),
         game.imagesChanged.push_back(imageName);
@@ -1107,7 +1135,7 @@ void ResourcesEditor::ForceRefreshRibbonAndConnect()
 {
     if ( useRibbon )
     {
-        mainEditorCommand.GetRibbon()->SetActivePage(2);
+        mainEditorCommand.GetRibbon()->SetActivePage(1);
         ConnectEvents();
     }
 }

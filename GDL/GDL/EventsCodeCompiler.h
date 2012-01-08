@@ -54,7 +54,7 @@ public:
     /**
      * A directory where headers can be found
      */
-    void AddHeaderDirectory(std::string dir) { headersDirectories.insert(dir); }
+    void AddHeaderDirectory(std::string dir) { headersDirectories.insert("-I"+dir); }
 
     /**
      * Return a set containing pointers to scene with events which cannot be compiled for now

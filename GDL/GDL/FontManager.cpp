@@ -1,35 +1,31 @@
 #include "GDL/FontManager.h"
 #include "GDL/RessourcesLoader.h"
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include <string>
 #include <vector>
 
 using namespace std;
 
-
 FontManager *FontManager::_singleton = NULL;
 
-FontManager::FontManager()
+FontManager::~FontManager()
 {
-    //ctor
+    UnloadAllFonts();
 }
 
-FontManager::~FontManager()
+void FontManager::UnloadAllFonts()
 {
     //Need to explicit delete fonts
     for ( map<string, sf::Font*>::iterator it=fonts.begin() ; it != fonts.end(); ++it )
         delete (*it).second;
+
+    fonts.clear();
 }
 
-
-////////////////////////////////////////////////////////////
-/// Renvoie la police souhaitée, après l'avoir chargée si besoin
-////////////////////////////////////////////////////////////
-const sf::Font * FontManager::GetFont(string fontName)
+const sf::Font * FontManager::GetFont(const string & fontName)
 {
-    //Use default font
-    if (fontName == "")
+    //Use default font if no font is specified
+    if (fontName.empty())
     {
         static sf::Font defaultFont;
         static bool loaded = false;
@@ -57,4 +53,13 @@ const sf::Font * FontManager::GetFont(string fontName)
     fonts[fontName] = ressourcesLoader->LoadFont(fontName);
 
     return fonts[fontName];
+}
+
+void FontManager::DestroySingleton()
+{
+    if ( NULL != _singleton )
+    {
+        delete _singleton;
+        _singleton = NULL;
+    }
 }

@@ -9,8 +9,6 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 /**
  * \brief FontManager loads and manages SFML fonts.
  */
@@ -25,8 +23,16 @@ public:
      * sfmlText.SetFont(*fontManager->GetFont(fontName));
      * \endcode
      */
-    const sf::Font * GetFont(string fontName);
+    const sf::Font * GetFont(const std::string & fontName);
 
+    /**
+     * Unload all fonts from memory
+     */
+    void UnloadAllFonts();
+
+    /**
+     * Return a pointer to the global singleton class
+     */
     static FontManager *GetInstance()
     {
         if ( NULL == _singleton )
@@ -37,20 +43,16 @@ public:
         return ( static_cast<FontManager*>( _singleton ) );
     }
 
-    static void DestroySingleton()
-    {
-        if ( NULL != _singleton )
-        {
-            delete _singleton;
-            _singleton = NULL;
-        }
-    }
+    /**
+     * Destroy the global singleton class.
+     */
+    static void DestroySingleton();
 
 private:
 
-    map < std::string, sf::Font* >   fonts;
+    std::map < std::string, sf::Font* > fonts;
 
-    FontManager();
+    FontManager() {};
     virtual ~FontManager();
 
     static FontManager *_singleton;

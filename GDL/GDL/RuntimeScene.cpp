@@ -29,7 +29,7 @@
 #if defined(GD_IDE_ONLY)
 #include "GDL/ProfileEvent.h"
 #include "GDL/BaseProfiler.h"
-#include "GDL/BaseDebugger.h"
+#include "GDL/IDE/BaseDebugger.h"
 #include "GDL/ProfileTools.h"
 #endif
 

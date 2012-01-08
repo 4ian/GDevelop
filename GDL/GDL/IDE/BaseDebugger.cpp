@@ -4,7 +4,7 @@
  */
 
 #if defined(GD_IDE_ONLY)
-#include "GDL/BaseDebugger.h"
+#include "GDL/IDE/BaseDebugger.h"
 
 void BaseDebugger::Update()
 {

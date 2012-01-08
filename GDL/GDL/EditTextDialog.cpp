@@ -23,8 +23,8 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/gdTreeItemStringData.h"
 #include "GDL/TreeItemStrExpressionInfoData.h"
-#include "GDL/ChooseAutomatismDlg.h"
-#include "GDL/AdvancedTextEntryDlg.h"
+#include "GDL/IDE/ChooseAutomatismDlg.h"
+#include "GDL/IDE/AdvancedTextEntryDlg.h"
 #include "GDL/HelpFileAccess.h"
 #include "GDL/ExpressionsCorrectnessTesting.h"
 

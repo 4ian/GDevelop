@@ -14,7 +14,7 @@
 #include <iostream>
 #include <set>
 #include <boost/shared_ptr.hpp>
-#include "GDL/ArbitraryResourceWorker.h"
+#include "GDL/IDE/ArbitraryResourceWorker.h"
 
 /**
  * \brief Class used to track all images used in a game.

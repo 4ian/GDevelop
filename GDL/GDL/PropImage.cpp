@@ -12,7 +12,7 @@
 //*)
 #include <wx/dcbuffer.h>
 #include <wx/filedlg.h>
-#include "GDL/BitmapGUIManager.h"
+#include "GDL/IDE/BitmapGUIManager.h"
 #include "GDL/CommonTools.h"
 
 //(*IdInit(PropImage)

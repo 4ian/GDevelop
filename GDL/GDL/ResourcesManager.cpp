@@ -14,7 +14,7 @@
 #include <wx/log.h>
 #include <wx/dcclient.h>
 #include <wx/file.h>
-#include "GDL/BitmapGUIManager.h"
+#include "GDL/IDE/BitmapGUIManager.h"
 #endif
 
 std::string Resource::badStr;

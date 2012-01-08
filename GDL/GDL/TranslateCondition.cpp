@@ -14,7 +14,7 @@
 #include <wx/bitmap.h>
 #include "GDL/tinyxml.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/BitmapGUIManager.h"
+#include "GDL/IDE/BitmapGUIManager.h"
 #include "GDL/TranslateCondition.h"
 #include "GDL/TranslateAction.h"
 #include "GDL/CommonTools.h"

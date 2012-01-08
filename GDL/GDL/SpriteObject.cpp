@@ -15,7 +15,7 @@
 #include "GDL/Direction.h"
 #include "GDL/Sprite.h"
 #include "GDL/ShaderManager.h"
-#include "GDL/ArbitraryResourceWorker.h"
+#include "GDL/IDE/ArbitraryResourceWorker.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>

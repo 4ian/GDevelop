@@ -29,8 +29,8 @@
 #include "GDL/ChooseObject.h"
 #include "GDL/ChooseLayer.h"
 #include "GDL/ChooseVariableDialog.h"
-#include "GDL/ChooseAutomatismDlg.h"
-#include "GDL/AdvancedTextEntryDlg.h"
+#include "GDL/IDE/ChooseAutomatismDlg.h"
+#include "GDL/IDE/AdvancedTextEntryDlg.h"
 #include "GDL/HelpFileAccess.h"
 
 #include <string>

@@ -42,7 +42,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/PropImage.h"
 #include "GDL/ExternalEvents.h"
-#include "GDL/BitmapGUIManager.h"
+#include "GDL/IDE/BitmapGUIManager.h"
 #include "GDL/gdTreeItemStringData.h"
 #include "GDL/ImagesUsedInventorizer.h"
 

@@ -8,7 +8,7 @@
 #ifndef RESOURCESUNMERGINGHELPER_H
 #define RESOURCESUNMERGINGHELPER_H
 
-#include "GDL/ArbitraryResourceWorker.h"
+#include "GDL/IDE/ArbitraryResourceWorker.h"
 #include <string>
 
 /**

@@ -143,9 +143,6 @@ class Game_Develop_EditorFrame: public wxFrame
         //(*Handlers(Game_Develop_EditorFrame)
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
-        void OnButton4Click(wxCommandEvent& event);
-        void OnButton1Click(wxCommandEvent& event);
-        void OnUnusedVarLeftDown(wxMouseEvent& event);
         void OnClose(wxCloseEvent& event);
         void OnSaveMenuSelected(wxCommandEvent& event);
         void OnMenuNewSelected(wxCommandEvent& event);
@@ -157,59 +154,29 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnMenuEventsEditorSelected(wxCommandEvent& event);
         void OnMenuAideSelected(wxCommandEvent& event);
         void OnSceneTreeItemMenu(wxTreeEvent& event);
-        void OnShowTBSelected(wxCommandEvent& event);
-        void OnShowTBEditorsSelected(wxCommandEvent& event);
-        void OnShowTBSceneSelected(wxCommandEvent& event);
         void OnRefreshBtClick(wxCommandEvent& event);
         void OnStartBtClick(wxCommandEvent& event);
         void OnStopBtClick(wxCommandEvent& event);
         void OnPauseBtClick(wxCommandEvent& event);
         void OnEditionBtClick(wxCommandEvent& event);
         void OnApercuBtClick(wxCommandEvent& event);
-        void OnClicGBoxSelect(wxCommandEvent& event);
-        void OnClicDBoxSelect(wxCommandEvent& event);
-        void OnButton1Click1(wxCommandEvent& event);
-        void OnZoomBtClick(wxCommandEvent& event);
-        void OnH2BtClick(wxCommandEvent& event);
-        void OnH1BtClick(wxCommandEvent& event);
-        void OnY0BtClick(wxCommandEvent& event);
-        void OnB1BtClick(wxCommandEvent& event);
-        void OnB2BtClick(wxCommandEvent& event);
-        void OnG2BtClick(wxCommandEvent& event);
-        void OnG1BtClick(wxCommandEvent& event);
-        void OnX0BtClick(wxCommandEvent& event);
-        void OnD1BtClick(wxCommandEvent& event);
-        void OnD2BtClick(wxCommandEvent& event);
         void OnAddObjCheckClick(wxCommandEvent& event);
         void OnDeplacerGCheckClick(wxCommandEvent& event);
         void OnDelObjetCheckClick(wxCommandEvent& event);
         void OnDeplacerDCheckClick(wxCommandEvent& event);
         void OnMenuPrefSelected(wxCommandEvent& event);
-        void OnMenuSaveWSSelected(wxCommandEvent& event);
         void OnRefreshAnalyseBtClick(wxCommandEvent& event);
         void OnMenuCompilationSelected(wxCommandEvent& event);
         void OnMenuPortableSelected(wxCommandEvent& event);
-        void OnWSDefautSelected(wxCommandEvent& event);
-        void OnWSDetacheSelected(wxCommandEvent& event);
-        void OnMenuItem27Selected(wxCommandEvent& event);
-        void OnWSSimpleSelected1(wxCommandEvent& event);
-        void OnWSChronoSelected(wxCommandEvent& event);
-        void OnScrollBar1Scroll(wxScrollEvent& event);
-        void OnScrollBar2ScrollChanged(wxScrollEvent& event);
         void OnMenuItem23Selected(wxCommandEvent& event);
-        void OnGoOrigineBtClick(wxCommandEvent& event);
-        void OnGridBtClick(wxCommandEvent& event);
         void OnMenuForumSelected(wxCommandEvent& event);
         void OnMenuSiteSelected(wxCommandEvent& event);
-        void OnShowToolBarCGSelected(wxCommandEvent& event);
-        void OnShowToolBarAideSelected(wxCommandEvent& event);
         void OnMenuFusionSelected(wxCommandEvent& event);
         void OnMenuItem36Selected(wxCommandEvent& event);
         void OnMenuTutoSelected(wxCommandEvent& event);
         void OnDecomposeGIFSelected(wxCommandEvent& event);
         void OnDecomposeRPGSelected(wxCommandEvent& event);
         void OnMenuWikiSelected(wxCommandEvent& event);
-        void OnParaPanelPaint(wxPaintEvent& event);
         void OnSceneTreeItemActivated(wxTreeEvent& event);
         void OnextensionsEditBtClick(wxCommandEvent& event);
         void OnDecomposeSSSelected(wxCommandEvent& event);
@@ -220,6 +187,9 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnOpenExampleSelected(wxCommandEvent& event);
         void OnautoSaveTimerTrigger(wxTimerEvent& event);
         void OnKeyDown(wxKeyEvent& event);
+        void OnMenuSaveAllSelected(wxCommandEvent& event);
+        void OnCloseCurrentProjectSelected(wxCommandEvent& event);
+        void OnResize(wxSizeEvent& event);
         //*)
         void OnRibbonNewClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonOpenClicked(wxRibbonButtonBarEvent& evt);
@@ -231,11 +201,18 @@ class Game_Develop_EditorFrame: public wxFrame
         void OnRibbonDecomposerDropDownClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonCppToolsClicked(wxRibbonButtonBarEvent& evt);
+        void OnRibbonFileBtClick(wxMouseEvent& event);
+        void OnRibbonFileBtLeave(wxMouseEvent& event);
+        void OnRibbonFileBtEnter(wxMouseEvent& event);
+        void OnRibbonHelpBtClick(wxMouseEvent& event);
+        void OnRibbonHelpBtLeave(wxMouseEvent& event);
+        void OnRibbonHelpBtEnter(wxMouseEvent& event);
         void SaveAs();
         void OnRecentClicked(wxCommandEvent& event );
         void UpdateNotebook();
         void MakeImagesEditorRibbon();
         void PrepareAutosave();
+        void RealizeRibbonCustomButtons();
 
     private:
 
@@ -251,6 +228,24 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long ID_MENUITEM5;
         static const long ID_MENUITEM6;
         static const long ID_TIMER1;
+        static const long ID_MENUITEM7;
+        static const long ID_MENUITEM9;
+        static const long ID_MENUITEM10;
+        static const long ID_MENUITEM11;
+        static const long ID_MENUITEM12;
+        static const long ID_MENUITEM18;
+        static const long ID_MENUITEM13;
+        static const long ID_MENUITEM16;
+        static const long ID_MENUITEM15;
+        static const long ID_MENUITEM19;
+        static const long ID_MENUITEM17;
+        static const long ID_MENUITEM14;
+        static const long ID_MENUITEM20;
+        static const long ID_MENUITEM23;
+        static const long ID_MENUITEM22;
+        static const long ID_MENUITEM25;
+        static const long ID_MENUITEM24;
+        static const long ID_MENUITEM21;
         //*)
         static const long IDM_RECENTS;
         static const long idRibbonNew;
@@ -260,9 +255,6 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long idRibbonSaveAs;
         static const long idRibbonPortable;
         static const long idRibbonCompil;
-        static const long idRibbonProjectsManager;
-        static const long idRibbonImporter;
-        static const long idRibbonEncoder;
         static const long idRibbonOptions;
         static const long idRibbonHelp;
         static const long idRibbonTuto;
@@ -271,22 +263,44 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long idRibbonUpdate;
         static const long idRibbonWebSite;
         static const long idRibbonCredits;
-        static const long idRibbonStartPage;
-        static const long idRibbonCppTools;
+        static const long idRibbonFileBt;
+        static const long idRibbonHelpBt;
 
         //(*Declarations(Game_Develop_EditorFrame)
+        wxMenuItem* MenuItem8;
+        wxMenuItem* MenuItem7;
+        wxMenuItem* MenuItem5;
+        wxMenuItem* MenuItem2;
         wxTimer autoSaveTimer;
+        wxMenuItem* MenuItem4;
+        wxMenuItem* MenuItem14;
+        wxMenuItem* MenuItem15;
         wxPanel* Panel1;
+        wxMenuItem* MenuItem17;
         wxAuiNotebook* editorsNotebook;
+        wxMenuItem* MenuItem13;
         wxMenu openContextMenu;
         wxMenuItem* MenuItem10;
         wxMenu decomposerContextMenu;
+        wxMenuItem* MenuItem12;
+        wxMenuItem* MenuItem3;
+        wxMenuItem* MenuItem20;
+        wxMenuItem* MenuItem6;
         wxInfoBar* infoBar;
+        wxMenu helpMenu;
+        wxMenuItem* MenuItem21;
+        wxMenuItem* MenuItem16;
         wxMenuItem* MenuItem43;
+        wxMenuItem* MenuItem9;
+        wxMenuItem* MenuItem18;
         wxMenu saveContextMenu;
+        wxMenuItem* MenuItem19;
+        wxMenu fileMenu;
         //*)
         wxAuiManager m_mgr;
         wxRibbonBar * m_ribbon; ///< Pointer to the ribbon
+        wxStaticBitmap * ribbonFileBt; ///< Pointer to the ribbon file custom button
+        wxStaticBitmap * ribbonHelpBt; ///< Pointer to the ribbon file custom button
         wxRibbonButtonBar * ribbonSceneEditorButtonBar; ///Pointer to the ribbon bar which can be changed by scene editors
         BuildToolsPnl * buildToolsPnl;
         std::vector<SceneCanvas*> scenesLockingShortcuts;
@@ -296,6 +310,11 @@ class Game_Develop_EditorFrame: public wxFrame
         ProjectManager * projectManager;
 
         RecentList m_recentlist; ///<Inventory and manage recent files
+
+        wxBitmap ribbonFileNormalBitmap;
+        wxBitmap ribbonFileHoveredBitmap;
+        wxBitmap ribbonHelpNormalBitmap;
+        wxBitmap ribbonHelpHoveredBitmap;
 
         DECLARE_EVENT_TABLE()
 };

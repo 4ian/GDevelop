@@ -79,6 +79,11 @@ const long ProjectManager::idRibbonEditImages = wxNewId();
 const long ProjectManager::idRibbonEditScene = wxNewId();
 const long ProjectManager::idRibbonAddExternalEvents = wxNewId();
 const long ProjectManager::idRibbonEditExternalEvents = wxNewId();
+const long ProjectManager::idRibbonStartPage = wxNewId();
+const long ProjectManager::idRibbonCppTools = wxNewId();
+const long ProjectManager::idRibbonImporter = wxNewId();
+const long ProjectManager::idRibbonEncoder = wxNewId();
+const long ProjectManager::idRibbonProjectsManager = wxNewId();
 
 BEGIN_EVENT_TABLE(ProjectManager,wxPanel)
 	//(*EventTable(ProjectManager)
@@ -286,6 +291,19 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonEditExternalEvents, !hideLabels ? _("Editer les év. externes") : "", wxBitmap("res/eventsedit24.png", wxBITMAP_TYPE_ANY));
     }
     {
+        wxRibbonPanel *affichagePanel = new wxRibbonPanel(page, wxID_ANY, _("Affichage"), wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonButtonBar *affichage_bar = new wxRibbonButtonBar(affichagePanel, wxID_ANY);
+        affichage_bar->AddButton(idRibbonProjectsManager, !hideLabels ? _("Projets") : "", wxBitmap("res/projectManager24.png", wxBITMAP_TYPE_ANY));
+        affichage_bar->AddButton(idRibbonStartPage, !hideLabels ? _("Page de démarrage") : "", wxBitmap("res/startPage24.png", wxBITMAP_TYPE_ANY));
+        affichage_bar->AddButton(idRibbonCppTools, !hideLabels ? _("Outils C++") : "", wxBitmap("res/source_cpp24.png", wxBITMAP_TYPE_ANY));
+
+        wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Outils"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonButtonBar *tools_bar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
+        tools_bar->AddButton(idRibbonEncoder, !hideLabels ? _("Convertisseur") : "", wxBitmap("res/musicicon24.png", wxBITMAP_TYPE_ANY));
+        tools_bar->AddDropdownButton(idRibbonImporter, !hideLabels ? _("Convertisseur d'images ") : "", wxBitmap("res/strip24.png", wxBITMAP_TYPE_ANY));
+
+    }
+    {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(wxID_ANY, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
@@ -309,6 +327,11 @@ void ProjectManager::ConnectEvents()
     mainEditor.Connect( idRibbonAddExternalEvents, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonAddExternalEventsSelected, NULL, this );
     mainEditor.Connect( idRibbonEditScene, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditSceneSelected, NULL, this );
     mainEditor.Connect( idRibbonEditExternalEvents, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditExternalEventsSelected, NULL, this );
+    mainEditor.Connect( idRibbonStartPage, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonStartPageClicked, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonCppTools, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonCppToolsClicked, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonProjectsManager, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnProjectsManagerClicked, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonEncoder, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuItem23Selected, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonImporter, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonDecomposerDropDownClicked, NULL, &mainEditor );
 }
 
 void ProjectManager::Refresh()
@@ -1206,7 +1229,7 @@ void ProjectManager::OncloseGameBtSelected(wxCommandEvent& event)
 void ProjectManager::OnprojectsTreeSelectionChanged(wxTreeEvent& event)
 {
     selectedItem = event.GetItem();
-    mainEditor.GetRibbon()->SetActivePage(1);
+    mainEditor.GetRibbon()->SetActivePage(static_cast<size_t>(0));
 }
 
 /**

@@ -16,6 +16,7 @@ void Game_Develop_EditorFrame::OnMenuPrefSelected( wxCommandEvent& event )
     PrepareAutosave();
 
     UpdateNotebook();
+    RealizeRibbonCustomButtons();
     m_ribbon->Realize();
     m_mgr.Update();
 }

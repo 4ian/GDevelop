@@ -30,6 +30,7 @@ class Preferences: public wxDialog
 		wxStaticText* StaticText10;
 		wxRadioButton* externalCodeEditorCheck;
 		wxPanel* InactifColorPnl;
+		wxStaticText* StaticText22;
 		wxButton* OkBt;
 		wxButton* compilerToolchainBt;
 		wxStaticText* StaticText9;
@@ -83,6 +84,7 @@ class Preferences: public wxDialog
 		wxStaticText* StaticText5;
 		wxStaticText* StaticText7;
 		wxPanel* Panel7;
+		wxPanel* fileBtColorPnl;
 		wxCheckBox* autosaveActivatedCheck;
 		wxStaticLine* StaticLine1;
 		wxButton* BrowseEditionImage;
@@ -149,6 +151,8 @@ class Preferences: public wxDialog
 		static const long ID_PANEL10;
 		static const long ID_CHECKBOX2;
 		static const long ID_CHECKBOX5;
+		static const long ID_STATICTEXT22;
+		static const long ID_PANEL21;
 		static const long ID_STATICTEXT4;
 		static const long ID_PANEL3;
 		static const long ID_PANEL4;
@@ -222,6 +226,7 @@ class Preferences: public wxDialog
 		void OnactiveTextColorPnlLeftUp(wxMouseEvent& event);
 		void OninactiveTextColorPnlLeftUp(wxMouseEvent& event);
 		void OnoxygenStyleBtClick(wxCommandEvent& event);
+		void OnfileBtColorPnlLeftUp(wxMouseEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();

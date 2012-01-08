@@ -142,7 +142,7 @@ mainEditorCommand(mainEditorCommand_)
     }
     Game_Develop_EditorFrame::LoadSkin(&m_mgr, notebook);
 
-    mainEditorCommand.GetRibbon()->SetActivePage(3);
+    mainEditorCommand.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();
 
     wxString perspective;
@@ -204,12 +204,12 @@ void EditorScene::ForceRefreshRibbonAndConnect()
     if ( notebook->GetPageText(notebook->GetSelection()) == _("Scène") )
     {
         sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->edittimeRenderer.editing);
-        mainEditorCommand.GetRibbon()->SetActivePage(3);
+        mainEditorCommand.GetRibbon()->SetActivePage(2);
         sceneCanvas->ConnectEvents();
     }
     else if ( notebook->GetPageText(notebook->GetSelection()) == _("Evènements") )
     {
-        mainEditorCommand.GetRibbon()->SetActivePage(4);
+        mainEditorCommand.GetRibbon()->SetActivePage(3);
         eventsEditor->ConnectEvents();
     }
 }
@@ -225,6 +225,6 @@ void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)
 void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
     sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->edittimeRenderer.editing);
-    mainEditorCommand.GetRibbon()->SetActivePage(3);
+    mainEditorCommand.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();
 }

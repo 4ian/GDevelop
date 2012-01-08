@@ -1029,7 +1029,7 @@ void EditorObjectList::OnobjectsListBeginDrag(wxTreeEvent& event)
  */
 void EditorObjectList::OnSetFocus(wxFocusEvent& event)
 {
-    mainEditorCommand.GetRibbon()->SetActivePage(5);
+    mainEditorCommand.GetRibbon()->SetActivePage(4);
     ConnectEvents();
 }
 

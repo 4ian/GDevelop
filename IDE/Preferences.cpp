@@ -74,6 +74,8 @@ const long Preferences::ID_STATICTEXT2 = wxNewId();
 const long Preferences::ID_PANEL10 = wxNewId();
 const long Preferences::ID_CHECKBOX2 = wxNewId();
 const long Preferences::ID_CHECKBOX5 = wxNewId();
+const long Preferences::ID_STATICTEXT22 = wxNewId();
+const long Preferences::ID_PANEL21 = wxNewId();
 const long Preferences::ID_STATICTEXT4 = wxNewId();
 const long Preferences::ID_PANEL3 = wxNewId();
 const long Preferences::ID_PANEL4 = wxNewId();
@@ -135,6 +137,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer10;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer27;
+    wxStaticBoxSizer* StaticBoxSizer16;
     wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer25;
     wxFlexGridSizer* FlexGridSizer22;
@@ -164,6 +167,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer17;
     wxStaticBoxSizer* StaticBoxSizer5;
+    wxFlexGridSizer* FlexGridSizer32;
     wxFlexGridSizer* FlexGridSizer31;
     wxFlexGridSizer* FlexGridSizer28;
     wxFlexGridSizer* FlexGridSizer26;
@@ -305,7 +309,7 @@ changesNeedRestart(false)
     FlexGridSizer2->Add(auiStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer2->Add(FlexGridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer16->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer3 = new wxFlexGridSizer(0, 4, 0, 0);
     FlexGridSizer3->AddGrowableCol(2);
     wxString __wxRadioBoxChoices_1[2] =
     {
@@ -337,8 +341,16 @@ changesNeedRestart(false)
     FlexGridSizer22->Add(hidePageTabsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer10->Add(FlexGridSizer22, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3->Add(StaticBoxSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer16 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Bouton \"Fichier\""));
+    FlexGridSizer32 = new wxFlexGridSizer(0, 3, 0, 0);
+    StaticText22 = new wxStaticText(Panel4, ID_STATICTEXT22, _("Couleur"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT22"));
+    FlexGridSizer32->Add(StaticText22, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    fileBtColorPnl = new wxPanel(Panel4, ID_PANEL21, wxDefaultPosition, wxSize(39,16), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL21"));
+    FlexGridSizer32->Add(fileBtColorPnl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer16->Add(FlexGridSizer32, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer3->Add(StaticBoxSizer16, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer16->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer18 = new wxFlexGridSizer(0, 2, 0, 0);
+    FlexGridSizer18 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBoxSizer3 = new wxStaticBoxSizer(wxVERTICAL, Panel4, _("Couleur des panneaux"));
     FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticText4 = new wxStaticText(Panel4, ID_STATICTEXT4, _("Editeur actif :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
@@ -487,6 +499,7 @@ changesNeedRestart(false)
     ribbonColor2Pnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnribbonColor2PnlLeftUp,0,this);
     Connect(ID_CHECKBOX2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&Preferences::OnhideLabelsCheckClick);
     Connect(ID_CHECKBOX5,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&Preferences::OnhideLabelsCheckClick);
+    fileBtColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnfileBtColorPnlLeftUp,0,this);
     ActifColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnActifColorPnlRightUp,0,this);
     ActifColor2Pnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnActifColor2PnlRightUp,0,this);
     InactifColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnInactifColorPnlRightUp,0,this);
@@ -661,6 +674,11 @@ changesNeedRestart(false)
             pConfig->Read( _T( "/Skin/ActiveTabColor" ), &activeTabColor );
             activeTabColorPnl->SetBackgroundColour( activeTabColor );
             activeTabColorPnl->Refresh();
+
+            wxColor fileBtColor;
+            pConfig->Read( _T( "/Skin/FileButtonColor" ), &fileBtColor );
+            fileBtColorPnl->SetBackgroundColour( fileBtColor );
+            fileBtColorPnl->Refresh();
         }
         else
             SetSkinDefault();
@@ -836,6 +854,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write( _T( "/Skin/TabColor"), tabColorPnl->GetBackgroundColour() );
     pConfig->Write( _T( "/Skin/ActiveTabColor"), activeTabColorPnl->GetBackgroundColour() );
+    pConfig->Write( _T( "/Skin/FileButtonColor"), fileBtColorPnl->GetBackgroundColour() );
 
     pConfig->Write( _T( "/Skin/HideLabels"), hideLabelsCheck->GetValue() );
     pConfig->Write( _T( "/Skin/HidePageTabs"), hidePageTabsCheck->GetValue() );
@@ -944,6 +963,9 @@ void Preferences::SetSkinDefault()
 
     activeTabColorPnl->SetBackgroundColour( wxColour(220, 225, 232) );
     activeTabColorPnl->Refresh();
+
+    fileBtColorPnl->SetBackgroundColour( wxColour(200, 200, 255) );
+    fileBtColorPnl->Refresh();
 }
 
 /**
@@ -992,6 +1014,9 @@ void Preferences::SetSkinOffice()
 
     activeTabColorPnl->SetBackgroundColour( wxColour(220, 225, 232) );
     activeTabColorPnl->Refresh();
+
+    fileBtColorPnl->SetBackgroundColour( wxColour(200, 200, 255) );
+    fileBtColorPnl->Refresh();
 }
 
 /**
@@ -1041,6 +1066,9 @@ void Preferences::SetSkinAUI()
 
     activeTabColorPnl->SetBackgroundColour( wxColour(220, 220, 220) );
     activeTabColorPnl->Refresh();
+
+    fileBtColorPnl->SetBackgroundColour( wxColour(220, 220, 255) );
+    fileBtColorPnl->Refresh();
 }
 void Preferences::OnradianceStyleBtClick(wxCommandEvent& event)
 {
@@ -1086,6 +1114,9 @@ void Preferences::SetSkinRadiance()
 
     activeTabColorPnl->SetBackgroundColour( wxColour(255, 138, 102) );
     activeTabColorPnl->Refresh();
+
+    fileBtColorPnl->SetBackgroundColour( wxColour(255, 103, 89) );
+    fileBtColorPnl->Refresh();
 }
 
 
@@ -1133,6 +1164,9 @@ void Preferences::SetSkinOxygen()
 
     activeTabColorPnl->SetBackgroundColour( wxColour(172, 225, 255) );
     activeTabColorPnl->Refresh();
+
+    fileBtColorPnl->SetBackgroundColour( wxColour(168, 247, 255) );
+    fileBtColorPnl->Refresh();
 }
 
 void Preferences::OnActifColorPnlRightUp( wxMouseEvent& event )
@@ -1356,5 +1390,18 @@ void Preferences::OninactiveTextColorPnlLeftUp(wxMouseEvent& event)
         cData = Dialog.GetColourData();
         inactiveTextColorPnl->SetBackgroundColour( cData.GetColour() );
         inactiveTextColorPnl->Refresh();
+    }
+}
+
+void Preferences::OnfileBtColorPnlLeftUp(wxMouseEvent& event)
+{
+    wxColourData cData;
+    cData.SetColour( fileBtColorPnl->GetBackgroundColour() );
+    wxColourDialog Dialog( this, &cData );
+    if ( Dialog.ShowModal() == wxID_OK )
+    {
+        cData = Dialog.GetColourData();
+        fileBtColorPnl->SetBackgroundColour( cData.GetColour() );
+        fileBtColorPnl->Refresh();
     }
 }

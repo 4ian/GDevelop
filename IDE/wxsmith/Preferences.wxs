@@ -418,7 +418,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
-										<cols>3</cols>
+										<cols>4</cols>
 										<growablecols>2</growablecols>
 										<object class="sizeritem">
 											<object class="wxRadioBox" name="ID_RADIOBOX1" variable="ribbonStyleBox" member="yes">
@@ -520,13 +520,46 @@
 											<border>5</border>
 											<option>1</option>
 										</object>
+										<object class="sizeritem">
+											<object class="wxStaticBoxSizer" variable="StaticBoxSizer16" member="no">
+												<label>Bouton &quot;Fichier&quot;</label>
+												<object class="sizeritem">
+													<object class="wxFlexGridSizer" variable="FlexGridSizer32" member="no">
+														<cols>3</cols>
+														<object class="sizeritem">
+															<object class="wxStaticText" name="ID_STATICTEXT22" variable="StaticText22" member="yes">
+																<label>Couleur</label>
+															</object>
+															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+														<object class="sizeritem">
+															<object class="wxPanel" name="ID_PANEL21" variable="fileBtColorPnl" member="yes">
+																<size>39,16</size>
+																<style>wxRAISED_BORDER|wxTAB_TRAVERSAL</style>
+																<handler function="OnfileBtColorPnlLeftUp" entry="EVT_LEFT_UP" />
+															</object>
+															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+													</object>
+													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
 									<object class="wxFlexGridSizer" variable="FlexGridSizer18" member="no">
-										<cols>2</cols>
+										<cols>3</cols>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer3" member="no">
 												<label>Couleur des panneaux</label>

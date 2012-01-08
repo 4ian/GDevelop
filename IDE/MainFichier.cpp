@@ -12,6 +12,7 @@
 #include "GDL/Game.h"
 #include "GDL/DynamicExtensionsManager.h"
 #include "GDL/CompilerMessagesParser.h"
+#include "GDL/CommonTools.h"
 #include "BuildMessagesPnl.h"
 
 #include "Game_Develop_EditorMain.h"
@@ -24,12 +25,18 @@
 #include "ProjectManager.h"
 #include "StartHerePage.h"
 
-////////////////////////////////////////////////////////////
-/// Fermeture avec le menu quitter
-////////////////////////////////////////////////////////////
+/**
+ * Request close
+ */
 void Game_Develop_EditorFrame::OnQuit( wxCommandEvent& event )
 {
     Close();
+}
+
+void Game_Develop_EditorFrame::OnCloseCurrentProjectSelected(wxCommandEvent& event)
+{
+    wxRibbonButtonBarEvent uselessEvent;
+    if ( projectManager ) projectManager->OnRibbonCloseSelected(uselessEvent);
 }
 
 ////////////////////////////////////////////////////////////
@@ -57,9 +64,9 @@ void Game_Develop_EditorFrame::OnRibbonNewClicked(wxRibbonButtonBarEvent& evt)
     OnMenuNewSelected(uselessEvent);
 }
 
-////////////////////////////////////////////////////////////
-/// Ouvrir un jeu
-////////////////////////////////////////////////////////////
+/**
+ * Open a file
+ */
 void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
 {
     sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
@@ -69,6 +76,10 @@ void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
     if (openFileDialog.ShowModal() != wxID_CANCEL && !openFileDialog.GetPath().empty() )
         Open( ToString(openFileDialog.GetPath()) );
 }
+
+/**
+ * Open an example file
+ */
 void Game_Develop_EditorFrame::OnOpenExampleSelected(wxCommandEvent& event)
 {
     sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
@@ -222,6 +233,11 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
 
     wxLogStatus(_("Enregistrements des fichiers terminés."));
 }
+void Game_Develop_EditorFrame::OnMenuSaveAllSelected(wxCommandEvent& event)
+{
+    wxRibbonButtonBarEvent uselessEvent;
+    OnRibbonSaveAllClicked(uselessEvent);
+}
 
 ////////////////////////////////////////////////////////////
 /// Enregistrer sous
@@ -363,50 +379,48 @@ void Game_Develop_EditorFrame::OnMenuPortableSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::OnRecentClicked( wxCommandEvent& event )
 {
-    wxString Last;
+    wxString last;
 
     switch ( event.GetId() )
     {
     case wxID_FILE1:
-        Last = m_recentlist.GetEntry( 0 );
+        last = m_recentlist.GetEntry( 0 );
         break;
     case wxID_FILE2:
-        Last = m_recentlist.GetEntry( 1 );
+        last = m_recentlist.GetEntry( 1 );
         break;
     case wxID_FILE3:
-        Last = m_recentlist.GetEntry( 2 );
+        last = m_recentlist.GetEntry( 2 );
         break;
     case wxID_FILE4:
-        Last = m_recentlist.GetEntry( 3 );
+        last = m_recentlist.GetEntry( 3 );
         break;
     case wxID_FILE5:
-        Last = m_recentlist.GetEntry( 4 );
+        last = m_recentlist.GetEntry( 4 );
         break;
     case wxID_FILE6:
-        Last = m_recentlist.GetEntry( 5 );
+        last = m_recentlist.GetEntry( 5 );
         break;
     case wxID_FILE7:
-        Last = m_recentlist.GetEntry( 6 );
+        last = m_recentlist.GetEntry( 6 );
         break;
     case wxID_FILE8:
-        Last = m_recentlist.GetEntry( 7 );
+        last = m_recentlist.GetEntry( 7 );
         break;
     case wxID_FILE9:
-        Last = m_recentlist.GetEntry( 8 );
+        last = m_recentlist.GetEntry( 8 );
         break;
 
     default:
         break;
     }
 
-    Open( static_cast<string>( Last ) );
-
+    Open( ToString(last) );
 }
 
-
-////////////////////////////////////////////////////////////
-/// Ouvrir la fenêtre de fusion de jeux
-////////////////////////////////////////////////////////////
+/**
+ * Open import file dialog
+ */
 void Game_Develop_EditorFrame::OnMenuFusionSelected(wxCommandEvent& event)
 {
     if ( !CurrentGameIsValid() ) return;

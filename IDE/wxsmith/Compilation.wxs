@@ -3,7 +3,7 @@
 	<object class="wxDialog" name="Compilation">
 		<title>Compilation du jeu</title>
 		<centered>1</centered>
-		<extra_code>wxIcon FrameIcon;&#x0A;FrameIcon.CopyFromBitmap(wxBitmap(wxImage(__T(&quot;res/compil.png&quot;))));&#x0A;SetIcon(FrameIcon);</extra_code>
+		<extra_code>wxIcon FrameIcon;&#x0A;FrameIcon.CopyFromBitmap(wxBitmap(wxImage(__T(&quot;res/compilationicon.png&quot;))));&#x0A;SetIcon(FrameIcon);</extra_code>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>

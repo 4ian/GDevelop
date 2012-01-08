@@ -53,9 +53,9 @@ void SceneEdittimeRenderer::RenderSceneEdittimeRenderer()
 
     std::vector < sf::Shape > GUIelements;
 
-    for (unsigned int layerIndex =0;layerIndex<runtimeScene.layers.size();++layerIndex)
+    for (unsigned int layerIndex =0;layerIndex<runtimeScene.GetAllLayers().size();++layerIndex)
     {
-        if ( runtimeScene.layers.at(layerIndex).GetVisibility() )
+        if ( runtimeScene.GetAllLayers()[layerIndex].GetVisibility() )
         {
             //Prepare OpenGL rendering
             runtimeScene.renderWindow->RestoreGLStates();
@@ -71,7 +71,7 @@ void SceneEdittimeRenderer::RenderSceneEdittimeRenderer()
             //Render all objects
             for (unsigned int id = 0;id < allObjects.size();++id)
             {
-                if ( allObjects[id]->GetLayer() == runtimeScene.layers.at(layerIndex).GetName())
+                if ( allObjects[id]->GetLayer() == runtimeScene.GetAllLayers()[layerIndex].GetName())
                 {
                     allObjects[id]->DrawEdittime(*runtimeScene.renderWindow);
 

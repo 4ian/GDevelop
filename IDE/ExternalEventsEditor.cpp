@@ -76,7 +76,7 @@ ExternalEventsEditor::~ExternalEventsEditor()
 
 void ExternalEventsEditor::ForceRefreshRibbonAndConnect()
 {
-    mainEditorCommand.GetRibbon()->SetActivePage(4);
+    mainEditorCommand.GetRibbon()->SetActivePage(3);
     eventsEditor->ConnectEvents();
 }
 

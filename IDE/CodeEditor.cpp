@@ -264,7 +264,7 @@ void CodeEditor::OnResize(wxSizeEvent& event)
 
 void CodeEditor::ForceRefreshRibbonAndConnect()
 {
-    mainEditorCommand.GetRibbon()->SetActivePage(7);
+    mainEditorCommand.GetRibbon()->SetActivePage(6);
     ConnectEvents();
 }
 

@@ -102,7 +102,7 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
 
     Create(parent, wxID_ANY, _("Compilation du jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
     wxIcon FrameIcon;
-    FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/compil.png"))));
+    FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/compilationicon.png"))));
     SetIcon(FrameIcon);
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer1->AddGrowableCol(0);

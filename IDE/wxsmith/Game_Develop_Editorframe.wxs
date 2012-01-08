@@ -7,24 +7,14 @@
 		<size>850,700</size>
 		<id_arg>0</id_arg>
 		<handler function="OnClose" entry="EVT_CLOSE" />
+		<handler function="OnResize" entry="EVT_SIZE" />
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<growablecols>0</growablecols>
 			<growablerows>1</growablerows>
 			<object class="sizeritem">
-				<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
-					<cols>3</cols>
-					<growablecols>0</growablecols>
-					<growablerows>0</growablerows>
-					<object class="sizeritem">
-						<object class="wxPanel" name="ID_PANEL3" variable="ribbonPanel" member="yes">
-							<object class="wxBoxSizer" variable="ribbonSizer" member="no">
-								<orient>wxVERTICAL</orient>
-							</object>
-						</object>
-						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-						<option>1</option>
-					</object>
+				<object class="wxBoxSizer" variable="ribbonSizer" member="no">
+					<orient>wxVERTICAL</orient>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
@@ -104,6 +94,108 @@
 		<object class="wxTimer" name="ID_TIMER1" variable="autoSaveTimer" member="yes">
 			<interval>180000</interval>
 			<handler function="OnautoSaveTimerTrigger" entry="EVT_TIMER" />
+		</object>
+		<object class="wxMenu" variable="fileMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem2" member="yes">
+				<label>Nouveau</label>
+				<accel>Ctrl+N</accel>
+				<bitmap>res/newicon.png</bitmap>
+				<handler function="OnMenuNewSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM9" variable="MenuItem3" member="yes">
+				<label>Ouvrir</label>
+				<accel>Ctrl+O</accel>
+				<bitmap>res/openicon.png</bitmap>
+				<handler function="OnMenuOpenSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem4" member="yes">
+				<label>Ouvrir un jeu d&apos;exemple</label>
+				<handler function="OnOpenExampleSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem5" member="yes">
+				<label>Importer un jeu</label>
+				<bitmap>res/addicon.png</bitmap>
+				<handler function="OnMenuFusionSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM12" variable="MenuItem6" member="yes">
+				<label>Enregistrer</label>
+				<accel>Ctrl+S</accel>
+				<bitmap>res/saveicon.png</bitmap>
+				<handler function="OnMenuSaveSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM18" variable="MenuItem14" member="yes">
+				<label>Enregistrer en mode portable</label>
+				<handler function="OnMenuPortableSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM13" variable="MenuItem7" member="yes">
+				<label>Enregistrer sous...</label>
+				<bitmap>res/saveasicon.png</bitmap>
+				<handler function="OnMenuSaveAsSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM16" variable="MenuItem12" member="yes">
+				<label>Enregistrer tous les projets ouverts</label>
+				<accel>Ctrl+Shift+S</accel>
+				<bitmap>res/save_all16.png</bitmap>
+				<handler function="OnMenuSaveAllSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM15" variable="MenuItem9" member="yes">
+				<label>Compiler le projet en exécutable</label>
+				<bitmap>res/compilationicon.png</bitmap>
+				<handler function="OnMenuCompilationSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM19" variable="MenuItem15" member="yes">
+				<label>Fermer le projet</label>
+				<handler function="OnCloseCurrentProjectSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM17" variable="MenuItem13" member="yes">
+				<label>Préférences</label>
+				<bitmap>res/preficon.png</bitmap>
+				<handler function="OnMenuPrefSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM14" variable="MenuItem8" member="yes">
+				<label>Quitter</label>
+				<handler function="OnQuit" entry="EVT_MENU" />
+			</object>
+		</object>
+		<object class="wxMenu" variable="helpMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM20" variable="MenuItem16" member="yes">
+				<label>Aide</label>
+				<bitmap>res/helpicon.png</bitmap>
+				<handler function="OnMenuAideSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM23" variable="MenuItem19" member="yes">
+				<label>Tutoriel</label>
+				<bitmap>res/tutoicon.png</bitmap>
+				<handler function="OnMenuTutoSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM22" variable="MenuItem18" member="yes">
+				<label>Wiki</label>
+				<bitmap>res/wikiicon.png</bitmap>
+				<handler function="OnMenuWikiSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM25" variable="MenuItem21" member="yes">
+				<label>Vérifier les mises à jour</label>
+				<bitmap>res/update16.png</bitmap>
+				<handler function="OnMenuItem36Selected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM24" variable="MenuItem20" member="yes">
+				<label>Site officiel</label>
+				<bitmap>res/siteicon.png</bitmap>
+				<handler function="OnMenuSiteSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM21" variable="MenuItem17" member="yes">
+				<label>A propos...</label>
+				<bitmap>res/icon16.png</bitmap>
+				<handler function="OnAbout" entry="EVT_MENU" />
+			</object>
 		</object>
 	</object>
 </wxsmith>

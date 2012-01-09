@@ -32,7 +32,7 @@
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/Game.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #endif
 
 

@@ -4,6 +4,6 @@
  */
 
 #include "GDL/StrExpressionInstruction.h"
-#include "GDL/GDExpression.h"
+#include "GDL/IDE/GDExpression.h"
 
 //TODO : Remove this class

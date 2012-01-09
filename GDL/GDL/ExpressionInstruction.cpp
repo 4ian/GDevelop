@@ -1,4 +1,4 @@
 #include "GDL/ExpressionInstruction.h"
-#include "GDL/GDExpression.h"
+#include "GDL/IDE/GDExpression.h"
 
 #warning remove me !

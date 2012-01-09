@@ -9,7 +9,7 @@
 #include <wx/string.h>
 //*)
 #include "GDL/ForEachEvent.h"
-#include "GDL/ChooseObject.h"
+#include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/CommonTools.h"
 class Game;
 class Scene;

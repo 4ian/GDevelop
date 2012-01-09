@@ -6,7 +6,7 @@
 #include "GDL/AudioExtension.h"
 #include "GDL/IDE/ArbitraryResourceWorker.h"
 #include "GDL/SoundManager.h"
-#include "GDL/Instruction.h"
+#include "GDL/IDE/Instruction.h"
 #include <iostream>
 
 AudioExtension::AudioExtension()

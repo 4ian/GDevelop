@@ -7,7 +7,7 @@
 #include "GDExpressionParser.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
-#include "GDL/GDExpression.h"
+#include "GDL/IDE/GDExpression.h"
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/StrExpressionInstruction.h"
 #include "GDL/ExtensionBase.h"

@@ -12,7 +12,7 @@
 #include <vector>
 #include <map>
 #include "GDL/TextFormatting.h"
-#include "GDL/Instruction.h"
+#include "GDL/IDE/Instruction.h"
 #include <string>
 #include <wx/bitmap.h>
 class InstructionInfos;

@@ -15,7 +15,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "GDL/Log.h"
-#include "GDL/Instruction.h"
+#include "GDL/IDE/Instruction.h"
 class Game;
 class MainEditorCommand;
 class wxWindow;

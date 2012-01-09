@@ -13,9 +13,9 @@
 #include <wx/stc/stc.h>
 #include "GDL/EditExpression.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/ChooseObject.h"
-#include "GDL/ChooseLayer.h"
-#include "GDL/ChooseVariableDialog.h"
+#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDL/IDE/Dialogs/ChooseLayer.h"
+#include "GDL/IDE/Dialogs/ChooseVariableDialog.h"
 #include <wx/textdlg.h>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
@@ -23,7 +23,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/gdTreeItemStringData.h"
 #include "GDL/TreeItemStrExpressionInfoData.h"
-#include "GDL/IDE/ChooseAutomatismDlg.h"
+#include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
 #include "GDL/IDE/AdvancedTextEntryDlg.h"
 #include "GDL/HelpFileAccess.h"
 #include "GDL/ExpressionsCorrectnessTesting.h"

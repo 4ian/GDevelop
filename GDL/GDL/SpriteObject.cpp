@@ -20,8 +20,8 @@
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
-#include "GDL/MainEditorCommand.h"
-#include "GDL/EditorObjet.h"
+#include "GDL/IDE/MainEditorCommand.h"
+#include "GDL/IDE/Dialogs/SpriteObjectEditor.h"
 #include "GDL/SpriteInitialPositionPanel.h"
 #endif
 

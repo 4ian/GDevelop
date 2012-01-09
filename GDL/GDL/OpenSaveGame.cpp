@@ -35,7 +35,7 @@
 #include "GDL/Animation.h"
 #include "GDL/Position.h"
 #include "GDL/Event.h"
-#include "GDL/Instruction.h"
+#include "GDL/IDE/Instruction.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/ExtensionBase.h"

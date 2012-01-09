@@ -26,8 +26,8 @@
 #include <wx/aui/aui.h>
 #include "GDL/RuntimeGame.h"
 #include "GDL/SpriteObject.h"
-#include "GDL/MainEditorCommand.h"
-#include "GDL/ResourcesEditor.h"
+#include "GDL/IDE/MainEditorCommand.h"
+#include "GDL/IDE/Dialogs/ResourcesEditor.h"
 
 #include <string>
 #include <vector>

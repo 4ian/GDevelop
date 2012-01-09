@@ -4,7 +4,7 @@
  */
 
 #if defined(GD_IDE_ONLY)
-#include "LocaleManager.h"
+#include "GDL/IDE/LocaleManager.h"
 #include <wx/log.h>
 
 namespace GDpriv

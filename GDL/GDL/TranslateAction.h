@@ -11,7 +11,7 @@
 #include <map>
 #include <utility>
 #include <wx/bitmap.h>
-#include "GDL/Instruction.h"
+#include "GDL/IDE/Instruction.h"
 #include "GDL/TextFormatting.h"
 class InstructionInfos;
 

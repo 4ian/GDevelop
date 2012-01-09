@@ -2,13 +2,14 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY)
 
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
 #include <string>
 #include <vector>
 #include <iostream>
-#include "GDL/GDExpression.h"
+#include "GDL/IDE/GDExpression.h"
 
 using namespace std;
 
@@ -123,11 +124,9 @@ class GD_API Instruction
          */
         inline void SetSubInstructions(const vector < Instruction > & subInstructions_) { subInstructions = subInstructions_; };
 
-        #if defined(GD_IDE_ONLY)
         mutable bool renderedHeightNeedUpdate;
         mutable unsigned int renderedHeight; ///<Height of the instruction rendered in an event editor
         mutable bool selected; ///<True if selected in an event editor
-        #endif
 
     private:
         string type;
@@ -139,5 +138,7 @@ class GD_API Instruction
 
         static GDExpression badExpression;
 };
+
+#endif
 
 #endif // INSTRUCTION_H

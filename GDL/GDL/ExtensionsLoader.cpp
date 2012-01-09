@@ -33,7 +33,7 @@
 #include "GDL/Version.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/DynamicExtensionBase.h"
-#include "GDL/LocaleManager.h"
+#include "GDL/IDE/LocaleManager.h"
 #include "GDL/CommonTools.h"
 
 #if defined(GD_IDE_ONLY)

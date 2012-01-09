@@ -1,6 +1,6 @@
 #if defined(GD_IDE_ONLY)
 
-#include "GDL/EditorObjet.h"
+#include "GDL/IDE/Dialogs/SpriteObjectEditor.h"
 
 //(*InternalHeaders(EditorObjet)
 #include <wx/bitmap.h>
@@ -33,7 +33,7 @@
 #include "GDL/Direction.h"
 #include "GDL/Sprite.h"
 #include "GDL/CommonTools.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/IDE/AjoutPlusImage.h"
 #include "GDL/IDE/BitmapGUIManager.h"
 

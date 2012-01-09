@@ -5,7 +5,7 @@
 
 #if defined(GD_IDE_ONLY)
 
-#include "GDL/ResourcesEditor.h"
+#include "GDL/IDE/Dialogs/ResourcesEditor.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -44,7 +44,7 @@
 #include "GDL/ExternalEvents.h"
 #include "GDL/IDE/BitmapGUIManager.h"
 #include "GDL/gdTreeItemStringData.h"
-#include "GDL/ImagesUsedInventorizer.h"
+#include "GDL/IDE/ImagesUsedInventorizer.h"
 
 
 #ifdef __WXGTK__

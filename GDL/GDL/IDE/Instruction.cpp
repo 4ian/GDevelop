@@ -1,20 +1,20 @@
-#include "GDL/Instruction.h"
+#if defined(GD_IDE_ONLY)
+
+#include "GDL/IDE/Instruction.h"
+#include "GDL/IDE/IDE/GDExpression.h"
 #include <string>
 #include <iostream>
 #include <vector>
 #include <assert.h>
-#include "GDL/GDExpression.h"
 
 using namespace std;
 
 GDExpression Instruction::badExpression("");
 
 Instruction::Instruction(string type_) :
-#if defined(GD_IDE_ONLY)
 renderedHeightNeedUpdate(true),
 renderedHeight(0),
 selected(false),
-#endif
 type(type_),
 isLocal(true),
 inverted(false)
@@ -24,11 +24,9 @@ inverted(false)
 }
 
 Instruction::Instruction(string type_, const vector <GDExpression> & parameters_, bool isLocal_, bool inverted_) :
-#if defined(GD_IDE_ONLY)
 renderedHeightNeedUpdate(true),
 renderedHeight(0),
 selected(false),
-#endif
 type(type_),
 isLocal(isLocal_),
 inverted(inverted_),
@@ -51,3 +49,5 @@ void Instruction::SetParameter(unsigned int nb, const GDExpression & val)
     }
     parameters[nb] = val;
 }
+
+#endif

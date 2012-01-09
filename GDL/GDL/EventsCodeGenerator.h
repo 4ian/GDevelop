@@ -98,7 +98,7 @@ public:
         instrInfo.AddParameter("object", _("Objet"), "", false);
         instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/ObjectTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
     DECLARE_END_EXPRESSION()
      * \endcode
      * - mapOfObjectListsOfParameterWithoutPicking : Same as mapOfObjectListsOfParameter but do not pick object if they are not already concerned.

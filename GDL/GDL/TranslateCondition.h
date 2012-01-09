@@ -11,7 +11,7 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "GDL/TextFormatting.h"
+#include "GDL/IDE/TextFormatting.h"
 #include "GDL/IDE/Instruction.h"
 #include <string>
 #include <wx/bitmap.h>

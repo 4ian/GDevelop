@@ -15,7 +15,7 @@
 #include <wx/log.h>
 #include "GDL/ListVariable.h"
 #include "GDL/Variable.h"
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>

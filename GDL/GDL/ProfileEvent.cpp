@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY)
 
 #include "ProfileEvent.h"
-#include "GDL/ProfileTools.h"
+#include "GDL/BuiltinExtensions/ProfileTools.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 #include "GDL/EventsCodeGenerationContext.h"
@@ -26,7 +26,7 @@ ProfileEvent::~ProfileEvent()
 
 std::string ProfileEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
-    codeGenerator.AddIncludeFile("GDL/ProfileTools.h");
+    codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/ProfileTools.h");
 
     ProfileLink profileLink;
     profileLink.originalEvent = originalEvent;

@@ -12,7 +12,7 @@
 #include "GDL/StrExpressionInstruction.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/CommonInstructions.h"
+#include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDL/CommonTools.h"
 
 std::string GDExpressionParser::parserSeparators = " ,+-*/%.<>=&|;()#^![]{}";

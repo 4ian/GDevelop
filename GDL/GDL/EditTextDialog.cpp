@@ -21,11 +21,11 @@
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/gdTreeItemStringData.h"
-#include "GDL/TreeItemStrExpressionInfoData.h"
+#include "GDL/IDE/gdTreeItemStringData.h"
+#include "GDL/IDE/TreeItemStrExpressionInfoData.h"
 #include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
 #include "GDL/IDE/AdvancedTextEntryDlg.h"
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/ExpressionsCorrectnessTesting.h"
 
 //(*IdInit(EditTextDialog)

@@ -26,7 +26,7 @@
 #include "GDL/SceneNameMangler.h"
 #include "GDL/AES.h"
 #include "GDL/CommonTools.h"
-#include "GDL/ResourcesMergingHelper.h"
+#include "GDL/IDE/ResourcesMergingHelper.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"

@@ -7,7 +7,7 @@
 //*)
 #include <wx/colordlg.h>
 #include "GDL/Event.h"
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 
 //(*IdInit(EditComment)
 const long EditComment::ID_BUTTON1 = wxNewId();

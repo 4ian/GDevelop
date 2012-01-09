@@ -36,14 +36,14 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 
 #include "GDL/Game.h"
 #include "GDL/CommonTools.h"
-#include "GDL/PropImage.h"
+#include "GDL/IDE/Dialogs/PropImage.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/IDE/BitmapGUIManager.h"
-#include "GDL/gdTreeItemStringData.h"
+#include "GDL/IDE/gdTreeItemStringData.h"
 #include "GDL/IDE/ImagesUsedInventorizer.h"
 
 

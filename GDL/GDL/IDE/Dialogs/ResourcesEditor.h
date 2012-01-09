@@ -19,7 +19,7 @@
 #include "GDL/RuntimeGame.h"
 #include "GDL/ImageManager.h"
 #include "GDL/IDE/MainEditorCommand.h"
-#include "GDL/ImageFilesWatcher.h"
+#include "GDL/IDE/ImageFilesWatcher.h"
 
 class GD_API ResourcesEditor: public wxPanel
 {

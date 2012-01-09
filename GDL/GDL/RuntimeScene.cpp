@@ -30,7 +30,7 @@
 #include "GDL/ProfileEvent.h"
 #include "GDL/BaseProfiler.h"
 #include "GDL/IDE/BaseDebugger.h"
-#include "GDL/ProfileTools.h"
+#include "GDL/BuiltinExtensions/ProfileTools.h"
 #endif
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message

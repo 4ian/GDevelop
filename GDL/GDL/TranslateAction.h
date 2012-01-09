@@ -12,7 +12,7 @@
 #include <utility>
 #include <wx/bitmap.h>
 #include "GDL/IDE/Instruction.h"
-#include "GDL/TextFormatting.h"
+#include "GDL/IDE/TextFormatting.h"
 class InstructionInfos;
 
 /**

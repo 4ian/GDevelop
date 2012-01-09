@@ -4,7 +4,7 @@
  */
 
 #include "GDL/OpenSaveLoadingScreen.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include <string>
 #include <iostream>
 

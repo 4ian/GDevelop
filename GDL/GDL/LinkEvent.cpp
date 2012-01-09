@@ -12,7 +12,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/EmptyEvent.h"
 #include "GDL/ExternalEvents.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "RuntimeScene.h"
 #include "Game.h"
 #include "Event.h"

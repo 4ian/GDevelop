@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY)
 
 #include "StandardEvent.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/CommonTools.h"
 #include "GDL/EventsCodeGenerator.h"

@@ -6,7 +6,7 @@
 #include "GDL/ResourcesManager.h"
 #include "GDL/IDE/Dialogs/PropImage.h"
 #include "GDL/CommonTools.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include <iostream>
 #if defined(GD_IDE_ONLY)
 #include <wx/filedlg.h>

@@ -5,7 +5,7 @@
 
 #if defined(GD_IDE_ONLY)
 
-#include "FullProjectCompiler.h"
+#include "IDE/FullProjectCompiler.h"
 #include <fstream>
 #include <iostream>
 #include <wx/filefn.h>

@@ -9,7 +9,7 @@
 #include <iostream>
 #include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/ExpressionsCodeGeneration.h"
 #include "GDL/EventsCodeNameMangler.h"

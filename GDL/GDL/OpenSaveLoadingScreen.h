@@ -7,7 +7,7 @@
 #define OPENSAVELOADINGSCREEN_H
 #include <string>
 #include "GDL/LoadingScreen.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 
 using namespace std;
 

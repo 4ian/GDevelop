@@ -6,7 +6,7 @@
 #ifndef XMLFILESHELPER_H
 #define XMLFILESHELPER_H
 
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include <map>

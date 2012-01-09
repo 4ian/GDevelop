@@ -26,7 +26,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "GDL/OpenSaveGame.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/IDE/ResourcesUnmergingHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"

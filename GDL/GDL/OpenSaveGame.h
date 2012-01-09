@@ -8,7 +8,7 @@
 
 #include "GDL/Game.h"
 #include <string>
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/CommonTools.h"
 class Instruction;
 class InstructionInfos;

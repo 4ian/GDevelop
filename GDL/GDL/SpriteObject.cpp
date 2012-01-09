@@ -8,7 +8,7 @@
 #include "GDL/RuntimeGame.h"
 #include "GDL/Object.h"
 #include "GDL/ImageManager.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/Position.h"
 #include "GDL/CommonTools.h"
 #include "GDL/RuntimeScene.h"

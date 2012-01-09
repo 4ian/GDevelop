@@ -8,7 +8,7 @@
 #include "CommentEvent.h"
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/CommonTools.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/EditComment.h"
 #include "GDL/EventsEditorItemsAreas.h"

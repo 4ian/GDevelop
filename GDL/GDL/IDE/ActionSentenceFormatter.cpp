@@ -14,8 +14,8 @@
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/BitmapGUIManager.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/TranslateAction.h"
-#include "GDL/tinyxml.h"
+#include "GDL/IDE/ActionSentenceFormatter.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include <wx/bitmap.h>
 #include <iostream>
 #include <map>

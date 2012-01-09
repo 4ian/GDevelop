@@ -12,11 +12,11 @@
 #include <wx/log.h>
 #include <wx/wx.h>
 #include <wx/bitmap.h>
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/IDE/BitmapGUIManager.h"
-#include "GDL/TranslateCondition.h"
-#include "GDL/TranslateAction.h"
+#include "GDL/IDE/ConditionSentenceFormatter.h"
+#include "GDL/IDE/ActionSentenceFormatter.h"
 #include "GDL/CommonTools.h"
 
 using namespace std;

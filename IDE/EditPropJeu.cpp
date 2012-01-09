@@ -24,7 +24,7 @@
 #include <SFML/Graphics.hpp>
 #include <wx/filedlg.h>
 #include <wx/config.h>
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/FontManager.h"
 #include "GDL/SourceFile.h"
 #include "SetupCompilerToolchainDlg.h"

@@ -17,7 +17,7 @@
 #include "GDL/ObjectGroup.h"
 #include "GDL/Object.h"
 #include "GDL/Game.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif

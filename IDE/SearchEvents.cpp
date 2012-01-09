@@ -9,7 +9,7 @@
 #include "GDL/Event.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 #include "EventsRefactorer.h"
 #include "EventsEditor.h"
 #include "GDL/EventsEditorSelection.h"

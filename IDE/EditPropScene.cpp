@@ -15,7 +15,7 @@
 #include <wx/cmndata.h>
 #include <wx/help.h>
 #include <wx/config.h>
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
 
 #include "GDL/Scene.h"

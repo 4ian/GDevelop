@@ -23,7 +23,7 @@
 #include "GDL/Game.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeGame.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #include "SceneEdittimeRenderer.h"
 class RenderDialog;
 class EditorObjets;

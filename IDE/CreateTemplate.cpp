@@ -10,7 +10,7 @@
 //*)
 #include <wx/log.h>
 #include <wx/filedlg.h>
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/tinyxml.h"
 #include <string>
 #include <vector>

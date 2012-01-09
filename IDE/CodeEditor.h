@@ -12,7 +12,7 @@
 #include <wx/ribbon/toolbar.h>
 #include <string>
 #include <vector>
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 class Game;
 class Scene;
 

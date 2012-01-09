@@ -34,13 +34,13 @@
 #include <algorithm>
 #include <numeric>
 #include "EditorObjetsGroups.h"
-#include "GDL/BitmapGUIManager.h"
+#include "GDL/IDE/BitmapGUIManager.h"
 #include "GDL/Automatism.h"
 #include "GDL/CommonTools.h"
 #include "DndTextObjectsEditor.h"
 #include "ObjectTypeChoice.h"
 #include "InitialVariablesDialog.h"
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/AutomatismsSharedDatas.h"
 #include "AutomatismTypeChoice.h"
 #include "EventsRefactorer.h"

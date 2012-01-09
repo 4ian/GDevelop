@@ -20,7 +20,7 @@
 #include "GDL/VersionWrapper.h"
 #include "CheckMAJ.h"
 #include "GDL/tinyxml.h"
-#include "GDL/LocaleManager.h"
+#include "GDL/IDE/LocaleManager.h"
 
 //(*IdInit(MAJ)
 const long MAJ::ID_STATICBITMAP3 = wxNewId();

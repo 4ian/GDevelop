@@ -12,7 +12,7 @@
 #include <wx/toolbar.h>
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 class SceneCanvas;
 
 class EditorLayers: public wxPanel

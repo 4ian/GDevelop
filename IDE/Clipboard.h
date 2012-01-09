@@ -4,7 +4,7 @@
 #include "GDL/Object.h"
 #include "GDL/Event.h"
 #include "GDL/Scene.h"
-#include "GDL/Instruction.h"
+#include "GDL/IDE/Instruction.h"
 #include "GDL/ExternalEvents.h"
 
 //Undefining an annoying macro changing GetObject in GetObjectA

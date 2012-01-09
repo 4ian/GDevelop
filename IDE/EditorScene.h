@@ -17,7 +17,7 @@
 
 #include "GDL/Game.h"
 class RuntimeGame;
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif

@@ -13,7 +13,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/ObjectGroup.h"
-#include "GDL/ChooseObject.h"
+#include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/CommonTools.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>

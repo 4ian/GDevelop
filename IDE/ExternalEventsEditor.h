@@ -11,7 +11,7 @@ class Game;
 class ExternalEvents;
 class EventsEditor;
 #include "GDL/Scene.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 
 class ExternalEventsEditor: public wxPanel
 {

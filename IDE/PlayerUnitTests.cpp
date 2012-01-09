@@ -8,7 +8,7 @@
 #include "GDL/Object.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/GDExpression.h"
+#include "GDL/IDE/GDExpression.h"
 
 #ifdef ___WXMSW___
 #include "windows.h"

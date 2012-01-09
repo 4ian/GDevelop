@@ -29,7 +29,7 @@
 
 #include "GDL/RuntimeScene.h"
 #include "GDL/Game.h"
-#include "GDL/BaseDebugger.h"
+#include "GDL/IDE/BaseDebugger.h"
 
 #ifdef ___WXMSW___
 #include <wx/msw/winundef.h>

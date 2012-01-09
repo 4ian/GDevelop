@@ -12,7 +12,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 #include <sstream>
 #include <string>
 

@@ -20,7 +20,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/Event.h"
 #include "GDL/EventsEditorItemsAreas.h"
 #include "GDL/EventsEditorSelection.h"

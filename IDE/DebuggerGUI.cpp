@@ -17,9 +17,9 @@
 
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/ChooseObject.h"
+#include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "ConsoleManager.h"
-#include "GDL/ChooseLayer.h"
+#include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDL/RuntimeGame.h"
 #include <wx/textdlg.h>
 

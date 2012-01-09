@@ -35,7 +35,7 @@
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include "GDL/ResourcesEditor.h"
+#include "GDL/IDE/Dialogs/ResourcesEditor.h"
 #include "GDL/Game.h"
 #include "GDL/CommonTools.h"
 #include "EditorScene.h"

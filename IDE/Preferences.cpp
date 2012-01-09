@@ -19,9 +19,9 @@
 #include <wx/help.h>
 #include <wx/dirdlg.h>
 #include <wx/log.h>
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
-#include "GDL/LocaleManager.h"
+#include "GDL/IDE/LocaleManager.h"
 #include "GDL/TranslateAction.h"
 #include "GDL/EventsCodeCompiler.h"
 #include <wx/listctrl.h>

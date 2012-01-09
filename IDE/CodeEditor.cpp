@@ -15,7 +15,7 @@
 #include <wx/config.h>
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #include <wx/fontdlg.h>
 
 //(*IdInit(CodeEditor)

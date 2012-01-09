@@ -8,7 +8,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/config.h>
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 #include <wx/mimetype.h> // mimetype support
 #include "Game_Develop_EditorMain.h"
 

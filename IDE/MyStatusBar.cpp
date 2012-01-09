@@ -36,7 +36,7 @@
 #include <wx/bmpbuttn.h>
 #include <wx/dcmemory.h>
 #include "MyStatusBar.h"
-#include "GDL/BitmapGUIManager.h"
+#include "GDL/IDE/BitmapGUIManager.h"
 #include <wx/config.h>
 
 #include <wx/datetime.h>

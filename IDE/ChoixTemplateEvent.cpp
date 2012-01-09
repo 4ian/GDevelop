@@ -18,7 +18,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "TemplateEvents.h"
-#include "GDL/HelpFileAccess.h"
+#include "GDL/IDE/HelpFileAccess.h"
 
 #define MSG(x) wxLogWarning(_(x));
 

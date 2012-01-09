@@ -2,7 +2,7 @@
 #include "Clipboard.h"
 #include "GDL/Object.h"
 #include "GDL/Event.h"
-#include "GDL/Instruction.h"
+#include "GDL/IDE/Instruction.h"
 #include "GDL/ExtensionsManager.h"
 
 //Une macro a été définie quelque part ( windows.h ),

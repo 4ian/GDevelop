@@ -19,7 +19,7 @@
 #include "GDL/Object.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 
 class EditorObjectList: public wxPanel
 {

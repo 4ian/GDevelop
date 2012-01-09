@@ -22,7 +22,7 @@
 //*)
 #include <wx/srchctrl.h>
 #include <wx/bmpbuttn.h>
-#include "GDL/GDExpression.h"
+#include "GDL/IDE/GDExpression.h"
 class Scene;
 class Game;
 

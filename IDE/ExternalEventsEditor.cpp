@@ -9,7 +9,7 @@
 #include <wx/ribbon/bar.h>
 #include "GDL/ExternalEvents.h"
 #include "GDL/Game.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #include "EventsEditor.h"
 
 //(*IdInit(ExternalEventsEditor)

@@ -3,7 +3,7 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "BuiltinExtensions/AudioTools.h"
+#include "AudioTools.h"
 #include <string>
 #include "GDL/RuntimeScene.h"
 #include "GDL/SoundManager.h"

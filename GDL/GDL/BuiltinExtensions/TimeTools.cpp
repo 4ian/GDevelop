@@ -1,8 +1,8 @@
-#include "BuiltinExtensions/TimeTools.h"
+#include "TimeTools.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ManualTimer.h"
 
-bool GD_API TimerElapsedTime( RuntimeScene & scene, float time, std::string timerName )
+bool GD_API TimerElapsedTime( RuntimeScene & scene, float time, const std::string & timerName )
 {
     if ( timerName.empty() ) return false;
 
@@ -20,7 +20,22 @@ bool GD_API TimerElapsedTime( RuntimeScene & scene, float time, std::string time
     return true;
 }
 
-bool GD_API TimerPaused( RuntimeScene & scene, std::string timerName )
+double GD_API GetTimerElapsedTimeInSeconds( RuntimeScene & scene, const std::string & timerName )
+{
+    if ( timerName.empty() ) return 0;
+
+    for ( unsigned int i = 0;i < scene.timers.size();i++ )
+    {
+        if ( scene.timers[i].GetName() == timerName )
+        {
+            return ( scene.timers[i].GetTime()/1000.0 );
+        }
+    }
+
+    return 0;
+}
+
+bool GD_API TimerPaused( RuntimeScene & scene, const std::string & timerName )
 {
     if ( timerName.empty() ) return false;
 
@@ -43,7 +58,7 @@ double GD_API GetTimeScale( RuntimeScene & scene )
     return scene.GetTimeScale();
 }
 
-void GD_API ResetTimer( RuntimeScene & scene, std::string timerName )
+void GD_API ResetTimer( RuntimeScene & scene, const std::string & timerName )
 {
     if ( timerName.empty() ) return;
 
@@ -65,7 +80,7 @@ void GD_API ResetTimer( RuntimeScene & scene, std::string timerName )
     return;
 }
 
-void GD_API PauseTimer( RuntimeScene & scene, std::string timerName )
+void GD_API PauseTimer( RuntimeScene & scene, const std::string & timerName )
 {
     if ( timerName.empty() ) return;
 
@@ -88,7 +103,7 @@ void GD_API PauseTimer( RuntimeScene & scene, std::string timerName )
     return;
 }
 
-void GD_API UnPauseTimer( RuntimeScene & scene, std::string timerName )
+void GD_API UnPauseTimer( RuntimeScene & scene, const std::string & timerName )
 {
     if ( timerName.empty() ) return;
 
@@ -114,7 +129,7 @@ void GD_API UnPauseTimer( RuntimeScene & scene, std::string timerName )
 /**
  * Remove a timer from memory
  */
-void GD_API RemoveTimer( RuntimeScene & scene, std::string timerName )
+void GD_API RemoveTimer( RuntimeScene & scene, const std::string & timerName )
 {
     if ( timerName.empty() ) return;
 
@@ -143,7 +158,7 @@ double GD_API GetTimeFromStartInSeconds(RuntimeScene & scene)
     return static_cast<double>(scene.GetTimeFromStart())/1000.0;
 }
 
-double GD_API GetTime( const RuntimeScene & scene, std::string parameter )
+double GD_API GetTime( const RuntimeScene & scene, const std::string & parameter )
 {
     time_t rawtime = time(0);
     struct tm * timeinfo = localtime ( &rawtime );

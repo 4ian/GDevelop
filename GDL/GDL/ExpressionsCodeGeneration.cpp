@@ -7,7 +7,7 @@
 #include "GDL/ExpressionsCodeGeneration.h"
 #include "GDL/StrExpressionInstruction.h"
 #include "GDL/ExpressionInstruction.h"
-#include "GDL/GDExpressionParser.h"
+#include "GDL/IDE/GDExpressionParser.h"
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/Scene.h"

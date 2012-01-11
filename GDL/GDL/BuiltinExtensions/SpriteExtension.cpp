@@ -439,7 +439,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("object", _("Objet vers lequel se tourner"), "", false);
             instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
 
-            instrInfo.cppCallingInformation.SetFunctionName("TurnTowardObject").SetIncludeFile("GDL/SpriteTools.h");
+            instrInfo.cppCallingInformation.SetFunctionName("TurnTowardObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
         DECLARE_END_OBJECT_ACTION()
 
@@ -455,7 +455,7 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddCodeOnlyParameter("currentScene", "");
             instrInfo.AddParameter("yesorno", _("Test précis ? ( oui par défaut )"), "", true).SetDefaultValue("yes");
 
-            instrInfo.cppCallingInformation.SetFunctionName("CursorOnObject").SetIncludeFile("GDL/SpriteTools.h");
+            instrInfo.cppCallingInformation.SetFunctionName("CursorOnObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
         DECLARE_END_OBJECT_CONDITION()
 
@@ -563,7 +563,7 @@ SpriteExtension::SpriteExtension()
         instrInfo.AddParameter("expression", _("Angle de tolérance ( 0 : tolérance minimale )"), "",false);
         instrInfo.AddCodeOnlyParameter("conditionInverted", "");
 
-        instrInfo.cppCallingInformation.SetFunctionName("SpriteTurnedToward").SetIncludeFile("GDL/SpriteTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("SpriteTurnedToward").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
     DECLARE_END_CONDITION()
 
@@ -581,7 +581,7 @@ SpriteExtension::SpriteExtension()
         instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
         instrInfo.AddCodeOnlyParameter("conditionInverted", "");
 
-        instrInfo.cppCallingInformation.SetFunctionName("SpriteCollision").SetIncludeFile("GDL/SpriteTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("SpriteCollision").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
     DECLARE_END_CONDITION()
 

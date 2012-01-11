@@ -28,7 +28,7 @@
 #include "GDL/EventsExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
 #include "GDL/ProfileEvent.h"
-#include "GDL/BaseProfiler.h"
+#include "GDL/IDE/BaseProfiler.h"
 #include "GDL/IDE/BaseDebugger.h"
 #include "GDL/BuiltinExtensions/ProfileTools.h"
 #endif

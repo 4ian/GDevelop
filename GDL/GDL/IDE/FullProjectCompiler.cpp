@@ -5,7 +5,7 @@
 
 #if defined(GD_IDE_ONLY)
 
-#include "IDE/FullProjectCompiler.h"
+#include "FullProjectCompiler.h"
 #include <fstream>
 #include <iostream>
 #include <wx/filefn.h>
@@ -32,7 +32,7 @@
 #include "GDL/ExternalEvents.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/ExecutableIconChanger.h"
-#include "GDL/BaseProfiler.h"
+#include "GDL/IDE/BaseProfiler.h"
 
 using namespace std;
 

@@ -1,6 +1,6 @@
 /** \file EventsCodePrecompiledHeader.h
     \brief Internal file. Used by GD events generated code to speed up compilation.
-	
+
 	To generate precompiled headers from this file, use scripts in GameDevelop folder/IDE/scripts
 */
 
@@ -24,5 +24,5 @@
 #include "GDL/BuiltinExtensions/RuntimeSceneCameraTools.h"
 #include "GDL/BuiltinExtensions/RuntimeSceneTools.h"
 #include "GDL/SpriteObject.h"
-#include "GDL/SpriteTools.h"
+#include "GDL/BuiltinExtensions/SpriteTools.h"
 #include "GDL/BuiltinExtensions/TimeTools.h"

@@ -11,7 +11,7 @@
 #include "GDL/Scene.h"
 #include "GDL/EventsCodeGenerationContext.h"
 #include "GDL/EventsCodeGenerator.h"
-#include "GDL/BaseProfiler.h"
+#include "GDL/IDE/BaseProfiler.h"
 #include <iostream>
 
 ProfileEvent::ProfileEvent() :

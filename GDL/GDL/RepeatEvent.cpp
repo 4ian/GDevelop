@@ -12,9 +12,9 @@
 #include "GDL/ExpressionsCodeGeneration.h"
 #include "GDL/EventsCodeGenerationContext.h"
 #include "GDL/EventsRenderingHelper.h"
-#include "GDL/EditRepeatEvent.h"
-#include "GDL/EventsEditorItemsAreas.h"
-#include "GDL/EventsEditorSelection.h"
+#include "GDL/IDE/Dialogs/EditRepeatEvent.h"
+#include "GDL/IDE/EventsEditorItemsAreas.h"
+#include "GDL/IDE/EventsEditorSelection.h"
 
 RepeatEvent::RepeatEvent() :
 BaseEvent(),

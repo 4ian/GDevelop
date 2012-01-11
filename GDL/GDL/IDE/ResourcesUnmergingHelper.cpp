@@ -5,7 +5,7 @@
 
 #if defined(GD_IDE_ONLY)
 
-#include "IDE/ResourcesUnmergingHelper.h"
+#include "ResourcesUnmergingHelper.h"
 #include <wx/filename.h>
 #include <string>
 

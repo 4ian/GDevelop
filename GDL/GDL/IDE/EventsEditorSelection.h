@@ -11,7 +11,7 @@
 #include <boost/weak_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_set.hpp>
-#include "GDL/EventsEditorItemsAreas.h"
+#include "GDL/IDE/EventsEditorItemsAreas.h"
 class BaseEvent;
 namespace GDpriv
 {

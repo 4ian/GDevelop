@@ -5,8 +5,8 @@
 
 #if defined(GD_IDE_ONLY)
 
-#include "IDE/ResourcesMergingHelper.h"
-#include "Game.h"
+#include "ResourcesMergingHelper.h"
+#include "GDL/Game.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
 #include <wx/filename.h>

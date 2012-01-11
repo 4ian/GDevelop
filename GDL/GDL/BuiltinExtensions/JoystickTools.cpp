@@ -3,7 +3,7 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "BuiltinExtensions/JoystickTools.h"
+#include "JoystickTools.h"
 #include "GDL/RuntimeScene.h"
 #include <SFML/System.hpp>
 

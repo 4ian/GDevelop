@@ -10,7 +10,7 @@
 
 #include <vector>
 #include <string>
-#include "GDL/GDExpressionParser.h"
+#include "GDL/IDE/GDExpressionParser.h"
 class ExpressionInstruction;
 class ExpressionInfos;
 class StrExpressionInstruction;

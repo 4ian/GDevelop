@@ -1,5 +1,5 @@
 #if defined(GD_IDE_ONLY)
-#include "GDL/ChooseLayer.h"
+#include "ChooseLayer.h"
 
 //(*InternalHeaders(ChooseLayer)
 #include <wx/bitmap.h>

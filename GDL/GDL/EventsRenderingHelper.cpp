@@ -17,8 +17,8 @@
 #include "GDL/IDE/ActionSentenceFormatter.h"
 #include "GDL/IDE/ConditionSentenceFormatter.h"
 #include "GDL/CommonTools.h"
-#include "GDL/EventsEditorItemsAreas.h"
-#include "GDL/EventsEditorSelection.h"
+#include "GDL/IDE/EventsEditorItemsAreas.h"
+#include "GDL/IDE/EventsEditorSelection.h"
 #include "GDL/Event.h"
 
 EventsRenderingHelper * EventsRenderingHelper::singleton = NULL;

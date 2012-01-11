@@ -5,8 +5,8 @@
 
 #if defined(GD_IDE_ONLY)
 
-#include "GDL/EventsEditorSelection.h"
-#include "GDL/EventsEditorItemsAreas.h"
+#include "GDL/IDE/EventsEditorSelection.h"
+#include "GDL/IDE/EventsEditorItemsAreas.h"
 #include "GDL/Event.h"
 #include <iostream>
 #include <map>

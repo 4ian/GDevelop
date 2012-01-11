@@ -5,10 +5,10 @@
 
 #if defined(GD_IDE_ONLY)
 
-#include "BuiltinExtensions/ProfileTools.h"
+#include "ProfileTools.h"
 #include "GDL/ProfileEvent.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/BaseProfiler.h"
+#include "GDL/IDE/BaseProfiler.h"
 #include <iostream>
 
 void GD_API StartProfileTimer(RuntimeScene & scene, unsigned int id)

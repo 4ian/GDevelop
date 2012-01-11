@@ -17,7 +17,7 @@
 #include "Game.h"
 #include "Event.h"
 #include <iostream>
-#include "GDL/EditLink.h"
+#include "GDL/IDE/Dialogs/EditLink.h"
 
 using namespace std;
 

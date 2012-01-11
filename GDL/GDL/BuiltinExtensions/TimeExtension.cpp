@@ -153,6 +153,13 @@ TimeExtension::TimeExtension()
         instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("TimerElapsedTime", _("Temps d'un chronomètre"), _("Temps écoulé d'un chronomètre"), _("Temps"), "res/actions/time.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("string", _("Nom du chronomètre"), "", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetTimerElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        instrInfo.SetHidden();
+    DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("TimeFromStart", _("Temps écoulé depuis le début de la scène"), _("Temps écoulé depuis le début de la scène"), _("Temps"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");

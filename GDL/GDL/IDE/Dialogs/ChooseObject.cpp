@@ -5,7 +5,7 @@
 
 #if defined(GD_IDE_ONLY)
 
-#include "GDL/ChooseObject.h"
+#include "GDL/IDE/Dialogs/ChooseObject.h"
 
 //(*InternalHeaders(ChooseObject)
 #include <wx/bitmap.h>
@@ -23,7 +23,7 @@
 #include "GDL/Scene.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ObjectGroup.h"
-#include "GDL/ObjectListDialogsHelper.h"
+#include "GDL/IDE/Dialogs/ObjectListDialogsHelper.h"
 
 //(*IdInit(ChooseObject)
 const long ChooseObject::ID_STATICBITMAP3 = wxNewId();

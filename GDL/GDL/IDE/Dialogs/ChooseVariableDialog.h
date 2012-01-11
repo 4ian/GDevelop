@@ -16,7 +16,7 @@
 //*)
 #include <wx/toolbar.h>
 #include <string>
-#include "GDL/ListVariable.h"
+#include "GDL/VariableList.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif

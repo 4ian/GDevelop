@@ -15,9 +15,9 @@
 #include "GDL/EventsCodeNameMangler.h"
 #include "GDL/EventsCodeGenerationContext.h"
 #include "GDL/EventsRenderingHelper.h"
-#include "GDL/EditForEachEvent.h"
-#include "GDL/EventsEditorItemsAreas.h"
-#include "GDL/EventsEditorSelection.h"
+#include "GDL/IDE/Dialogs/EditForEachEvent.h"
+#include "GDL/IDE/EventsEditorItemsAreas.h"
+#include "GDL/IDE/EventsEditorSelection.h"
 
 ForEachEvent::ForEachEvent() :
 BaseEvent(),

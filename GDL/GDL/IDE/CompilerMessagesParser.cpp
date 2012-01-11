@@ -6,7 +6,7 @@
 #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 #if defined(GD_IDE_ONLY)
 
-#include "IDE/CompilerMessagesParser.h"
+#include "CompilerMessagesParser.h"
 #include "GDL/CommonTools.h"
 #include <iostream>
 

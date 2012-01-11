@@ -3,7 +3,7 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "BuiltinExtensions/FileTools.h"
+#include "FileTools.h"
 #include <boost/shared_ptr.hpp>
 #include <string>
 #include "GDL/RuntimeScene.h"

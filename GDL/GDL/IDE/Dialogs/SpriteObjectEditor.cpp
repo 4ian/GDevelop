@@ -34,8 +34,8 @@
 #include "GDL/Sprite.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/MainEditorCommand.h"
-#include "GDL/IDE/AjoutPlusImage.h"
-#include "GDL/IDE/BitmapGUIManager.h"
+#include "GDL/IDE/Dialogs/AjoutPlusImage.h"
+#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>

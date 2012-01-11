@@ -1,7 +1,7 @@
 #if defined(GD_IDE_ONLY)
 
 #include "GDL/IDE/Instruction.h"
-#include "GDL/IDE/IDE/GDExpression.h"
+#include "GDL/IDE/GDExpression.h"
 #include <string>
 #include <iostream>
 #include <vector>

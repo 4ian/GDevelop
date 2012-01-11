@@ -4,7 +4,7 @@
  */
 
 #if defined(GD_IDE_ONLY)
-#include "GDL/AjoutPlusImage.h"
+#include "GDL/IDE/Dialogs/AjoutPlusImage.h"
 
 //(*InternalHeaders(AjoutPlusImage)
 #include <wx/bitmap.h>

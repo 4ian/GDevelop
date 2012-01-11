@@ -1,8 +1,8 @@
 #if defined(GD_IDE_ONLY)
 
 #include "AdvancedTextEntryDlg.h"
-#include "GDL/EditExpression.h"
-#include "GDL/EditTextDialog.h"
+#include "GDL/IDE/Dialogs/EditExpression.h"
+#include "GDL/IDE/Dialogs/EditTextDialog.h"
 
 //(*InternalHeaders(AdvancedTextEntryDlg)
 #include <wx/intl.h>

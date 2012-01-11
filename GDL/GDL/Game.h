@@ -10,8 +10,7 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "GDL/Scene.h"
-#include "GDL/ListVariable.h"
-#include "GDL/Image.h"
+#include "GDL/VariableList.h"
 #include "GDL/LoadingScreen.h"
 #include "GDL/ResourcesManager.h"
 class Object;

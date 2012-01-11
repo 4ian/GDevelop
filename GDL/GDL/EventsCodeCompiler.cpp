@@ -66,7 +66,7 @@
 #include "GDL/Event.h"
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/EventsExecutionEngine.h"
-#include "GDL/BaseProfiler.h"
+#include "GDL/IDE/BaseProfiler.h"
 #include "GDL/CommonTools.h"
 
 using namespace std;

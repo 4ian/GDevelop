@@ -3,7 +3,7 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "BuiltinExtensions/MathematicalToolsExtension.h"
+#include "MathematicalToolsExtension.h"
 
 MathematicalToolsExtension::MathematicalToolsExtension()
 {

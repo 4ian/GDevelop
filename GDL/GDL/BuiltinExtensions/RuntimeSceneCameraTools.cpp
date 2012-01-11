@@ -3,7 +3,7 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "BuiltinExtensions/RuntimeSceneCameraTools.h"
+#include "RuntimeSceneCameraTools.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeCamera.h"
 

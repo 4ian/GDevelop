@@ -10,9 +10,9 @@
 #include "GDL/CommonTools.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/XmlMacros.h"
-#include "GDL/EditComment.h"
-#include "GDL/EventsEditorItemsAreas.h"
-#include "GDL/EventsEditorSelection.h"
+#include "GDL/IDE/Dialogs/EditComment.h"
+#include "GDL/IDE/EventsEditorItemsAreas.h"
+#include "GDL/IDE/EventsEditorSelection.h"
 
 void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
 {

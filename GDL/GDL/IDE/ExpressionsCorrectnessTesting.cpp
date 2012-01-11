@@ -5,8 +5,8 @@
 
 #if defined(GD_IDE_ONLY)
 
-#include "GDL/ExpressionsCorrectnessTesting.h"
-#include "GDL/GDExpressionParser.h"
+#include "GDL/IDE/ExpressionsCorrectnessTesting.h"
+#include "GDL/IDE/GDExpressionParser.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"

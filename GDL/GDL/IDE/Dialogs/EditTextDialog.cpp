@@ -24,9 +24,9 @@
 #include "GDL/IDE/gdTreeItemStringData.h"
 #include "GDL/IDE/TreeItemStrExpressionInfoData.h"
 #include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
-#include "GDL/IDE/AdvancedTextEntryDlg.h"
+#include "GDL/IDE/Dialogs/AdvancedTextEntryDlg.h"
 #include "GDL/IDE/HelpFileAccess.h"
-#include "GDL/ExpressionsCorrectnessTesting.h"
+#include "GDL/IDE/ExpressionsCorrectnessTesting.h"
 
 //(*IdInit(EditTextDialog)
 const long EditTextDialog::ID_CUSTOM1 = wxNewId();

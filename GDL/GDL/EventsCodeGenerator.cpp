@@ -13,13 +13,13 @@
 #include "GDL/Game.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDL/CommonTools.h"
-#include "GDL/GDExpressionParser.h"
+#include "GDL/IDE/GDExpressionParser.h"
 #include "GDL/EventsCodeNameMangler.h"
 #include "GDL/EventsCodeGenerationContext.h"
 #include "GDL/ExpressionsCodeGeneration.h"
 
 #include "GDL/ProfileEvent.h"
-#include "GDL/BaseProfiler.h"
+#include "GDL/IDE/BaseProfiler.h"
 
 using namespace std;
 
@@ -947,7 +947,7 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(const Game & game, const 
         output += "#include \""+*include+"\"\n";
 
     output +=
-    "#include <vector>\n#include <map>\n#include <string>\n#include <stdio.h>\n#include <SFML/System/Clock.hpp>\n#include <SFML/System/Vector2.hpp>\n#include <SFML/Graphics/Color.hpp>\n#include \"GDL/RuntimeContext.h\"\n#include \"GDL/Object.h\"\n#include \"GDL/BuiltinExtensions/AudioTools.h\"\n#include \"GDL/BuiltinExtensions/CommonInstructionsTools.h\"\n#include \"GDL/LightweightCommonTools.h\"\n#include \"GDL/BuiltinExtensions/FileTools.h\"\n#include \"GDL/BuiltinExtensions/KeyboardTools.h\"\n#include \"GDL/BuiltinExtensions/MouseTools.h\"\n#include \"GDL/BuiltinExtensions/NetworkTools.h\"\n#include \"GDL/BuiltinExtensions/ObjectTools.h\"\n#include \"GDL/BuiltinExtensions/RuntimeSceneCameraTools.h\"\n#include \"GDL/BuiltinExtensions/RuntimeSceneTools.h\"\n#include \"GDL/SpriteObject.h\"\n#include \"GDL/SpriteTools.h\"\n#include \"GDL/BuiltinExtensions/TimeTools.h\"\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
+    "#include <vector>\n#include <map>\n#include <string>\n#include <stdio.h>\n#include <SFML/System/Clock.hpp>\n#include <SFML/System/Vector2.hpp>\n#include <SFML/Graphics/Color.hpp>\n#include \"GDL/RuntimeContext.h\"\n#include \"GDL/Object.h\"\n#include \"GDL/BuiltinExtensions/AudioTools.h\"\n#include \"GDL/BuiltinExtensions/CommonInstructionsTools.h\"\n#include \"GDL/LightweightCommonTools.h\"\n#include \"GDL/BuiltinExtensions/FileTools.h\"\n#include \"GDL/BuiltinExtensions/KeyboardTools.h\"\n#include \"GDL/BuiltinExtensions/MouseTools.h\"\n#include \"GDL/BuiltinExtensions/NetworkTools.h\"\n#include \"GDL/BuiltinExtensions/ObjectTools.h\"\n#include \"GDL/BuiltinExtensions/RuntimeSceneCameraTools.h\"\n#include \"GDL/BuiltinExtensions/RuntimeSceneTools.h\"\n#include \"GDL/SpriteObject.h\"\n#include \"GDL/BuiltinExtensions/SpriteTools.h\"\n#include \"GDL/BuiltinExtensions/TimeTools.h\"\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
 
     for ( set<string>::iterator declaration = codeGenerator.GetCustomGlobalDeclaration().begin() ; declaration != codeGenerator.GetCustomGlobalDeclaration().end(); ++declaration )
         output += *declaration+"\n";

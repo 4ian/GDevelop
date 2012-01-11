@@ -24,13 +24,12 @@
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/TreeItemExpressionInfoData.h"
-#include "GDL/ExpressionsCorrectnessTesting.h"
-
+#include "GDL/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDL/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
-#include "GDL/IDE/AdvancedTextEntryDlg.h"
+#include "GDL/IDE/Dialogs/AdvancedTextEntryDlg.h"
 #include "GDL/IDE/HelpFileAccess.h"
 
 #include <string>

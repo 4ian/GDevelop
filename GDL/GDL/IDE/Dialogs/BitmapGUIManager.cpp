@@ -5,6 +5,7 @@
 
 #if defined(GD_IDE_ONLY)
 
+#include "BitmapGUIManager.h"
 #include <wx/bitmap.h>
 #include <wx/wx.h>
 #include <wx/gdicmn.h>
@@ -13,7 +14,6 @@
 #include <iostream>
 #include <string>
 
-#include "GDL/BitmapGUIManager.h"
 
 using namespace std;
 

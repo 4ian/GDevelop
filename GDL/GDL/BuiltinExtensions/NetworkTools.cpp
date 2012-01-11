@@ -7,7 +7,7 @@
 #include <fstream>
 #include <SFML/Network.hpp>
 #include "GDL/RuntimeScene.h"
-#include "md5.h"
+#include "GDL/md5.h"
 
 /**
  * Send data to a php web page.

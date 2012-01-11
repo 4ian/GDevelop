@@ -12,8 +12,8 @@
 #include "GDL/EventsCodeGenerator.h"
 #include "GDL/EventsCodeGenerationContext.h"
 #include "EventsRenderingHelper.h"
-#include "GDL/EventsEditorItemsAreas.h"
-#include "GDL/EventsEditorSelection.h"
+#include "GDL/IDE/EventsEditorItemsAreas.h"
+#include "GDL/IDE/EventsEditorSelection.h"
 
 StandardEvent::StandardEvent() :
 BaseEvent()

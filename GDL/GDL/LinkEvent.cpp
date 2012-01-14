@@ -119,9 +119,9 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
     eventList.erase( eventList.begin() + indexOfTheEventInThisList + 1 + static_cast<unsigned>(lastEvent-firstEvent)+1 );
 }
 
-void LinkEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+void LinkEvent::EditEvent(wxWindow* parent_, Game & game, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
-    EditLink dialog(parent_, *this);
+    EditLink dialog(parent_, *this, game);
     dialog.ShowModal();
 }
 

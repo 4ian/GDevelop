@@ -1101,7 +1101,6 @@
 		<Unit filename="GDL\AutomatismsRuntimeSharedDatas.h" />
 		<Unit filename="GDL\AutomatismsSharedDatas.cpp" />
 		<Unit filename="GDL\AutomatismsSharedDatas.h" />
-		<Unit filename="GDL\BuiltinCppImplementation.h" />
 		<Unit filename="GDL\BuiltinExtensions\AdvancedExtension.cpp" />
 		<Unit filename="GDL\BuiltinExtensions\AdvancedExtension.h" />
 		<Unit filename="GDL\BuiltinExtensions\AudioExtension.cpp" />
@@ -1155,6 +1154,8 @@
 		<Unit filename="GDL\BuiltinExtensions\SceneExtension.h" />
 		<Unit filename="GDL\BuiltinExtensions\SpriteExtension.cpp" />
 		<Unit filename="GDL\BuiltinExtensions\SpriteExtension.h" />
+		<Unit filename="GDL\BuiltinExtensions\SpriteTools.cpp" />
+		<Unit filename="GDL\BuiltinExtensions\SpriteTools.h" />
 		<Unit filename="GDL\BuiltinExtensions\StringInstructionsExtension.cpp" />
 		<Unit filename="GDL\BuiltinExtensions\StringInstructionsExtension.h" />
 		<Unit filename="GDL\BuiltinExtensions\StringTools.cpp" />
@@ -1186,40 +1187,23 @@
 		<Unit filename="GDL\DynamicExtensionsManager.h" />
 		<Unit filename="GDL\DynamicLibrariesTools.cpp" />
 		<Unit filename="GDL\DynamicLibrariesTools.h" />
-		<Unit filename="GDL\EditComment.cpp" />
-		<Unit filename="GDL\EditComment.h" />
-		<Unit filename="GDL\EditDynamicExtensionCallerEvent.h" />
-		<Unit filename="GDL\EditExpression.cpp" />
-		<Unit filename="GDL\EditExpression.h" />
-		<Unit filename="GDL\EditForEachEvent.cpp" />
-		<Unit filename="GDL\EditForEachEvent.h" />
-		<Unit filename="GDL\EditLink.cpp" />
-		<Unit filename="GDL\EditLink.h" />
-		<Unit filename="GDL\EditRepeatEvent.cpp" />
-		<Unit filename="GDL\EditRepeatEvent.h" />
-		<Unit filename="GDL\EditTextDialog.cpp" />
-		<Unit filename="GDL\EditTextDialog.h" />
 		<Unit filename="GDL\EmptyEvent.cpp" />
 		<Unit filename="GDL\EmptyEvent.h" />
 		<Unit filename="GDL\Event.cpp" />
 		<Unit filename="GDL\Event.h" />
-		<Unit filename="GDL\EventsCodeCompiler.cpp" />
-		<Unit filename="GDL\EventsCodeCompiler.h" />
-		<Unit filename="GDL\EventsCodeGenerationContext.cpp" />
-		<Unit filename="GDL\EventsCodeGenerationContext.h" />
-		<Unit filename="GDL\EventsCodeGenerator.cpp" />
-		<Unit filename="GDL\EventsCodeGenerator.h" />
-		<Unit filename="GDL\EventsCodeNameMangler.cpp" />
-		<Unit filename="GDL\EventsCodeNameMangler.h" />
-		<Unit filename="GDL\EventsCodePrecompiledHeader.h" />
-		<Unit filename="GDL\EventsEditorItemsAreas.cpp" />
-		<Unit filename="GDL\EventsEditorItemsAreas.h" />
-		<Unit filename="GDL\EventsEditorSelection.cpp" />
-		<Unit filename="GDL\EventsEditorSelection.h" />
 		<Unit filename="GDL\EventsExecutionEngine.cpp" />
 		<Unit filename="GDL\EventsExecutionEngine.h" />
 		<Unit filename="GDL\EventsRenderingHelper.cpp" />
 		<Unit filename="GDL\EventsRenderingHelper.h" />
+		<Unit filename="GDL\Events\EventsCodeCompiler.cpp" />
+		<Unit filename="GDL\Events\EventsCodeCompiler.h" />
+		<Unit filename="GDL\Events\EventsCodeGenerationContext.cpp" />
+		<Unit filename="GDL\Events\EventsCodeGenerationContext.h" />
+		<Unit filename="GDL\Events\EventsCodeGenerator.cpp" />
+		<Unit filename="GDL\Events\EventsCodeGenerator.h" />
+		<Unit filename="GDL\Events\EventsCodeNameMangler.cpp" />
+		<Unit filename="GDL\Events\EventsCodeNameMangler.h" />
+		<Unit filename="GDL\Events\EventsCodePrecompiledHeader.h" />
 		<Unit filename="GDL\ExecutableIconChanger.cpp" />
 		<Unit filename="GDL\ExecutableIconChanger.h" />
 		<Unit filename="GDL\ExpressionInstruction.cpp" />
@@ -1270,6 +1254,18 @@
 		<Unit filename="GDL\IDE\Dialogs\ChooseObject.h" />
 		<Unit filename="GDL\IDE\Dialogs\ChooseVariableDialog.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\ChooseVariableDialog.h" />
+		<Unit filename="GDL\IDE\Dialogs\EditComment.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\EditComment.h" />
+		<Unit filename="GDL\IDE\Dialogs\EditExpression.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\EditExpression.h" />
+		<Unit filename="GDL\IDE\Dialogs\EditForEachEvent.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\EditForEachEvent.h" />
+		<Unit filename="GDL\IDE\Dialogs\EditLink.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\EditLink.h" />
+		<Unit filename="GDL\IDE\Dialogs\EditRepeatEvent.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\EditRepeatEvent.h" />
+		<Unit filename="GDL\IDE\Dialogs\EditTextDialog.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\EditTextDialog.h" />
 		<Unit filename="GDL\IDE\Dialogs\ObjectListDialogsHelper.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\ObjectListDialogsHelper.h" />
 		<Unit filename="GDL\IDE\Dialogs\PropImage.cpp" />
@@ -1278,6 +1274,10 @@
 		<Unit filename="GDL\IDE\Dialogs\ResourcesEditor.h" />
 		<Unit filename="GDL\IDE\Dialogs\SpriteObjectEditor.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\SpriteObjectEditor.h" />
+		<Unit filename="GDL\IDE\EventsEditorItemsAreas.cpp" />
+		<Unit filename="GDL\IDE\EventsEditorItemsAreas.h" />
+		<Unit filename="GDL\IDE\EventsEditorSelection.cpp" />
+		<Unit filename="GDL\IDE\EventsEditorSelection.h" />
 		<Unit filename="GDL\IDE\ExpressionsCorrectnessTesting.cpp" />
 		<Unit filename="GDL\IDE\ExpressionsCorrectnessTesting.h" />
 		<Unit filename="GDL\IDE\FullProjectCompiler.cpp" />
@@ -1383,8 +1383,6 @@
 		<Unit filename="GDL\SpriteInitialPositionPanel.h" />
 		<Unit filename="GDL\SpriteObject.cpp" />
 		<Unit filename="GDL\SpriteObject.h" />
-		<Unit filename="GDL\SpriteTools.cpp" />
-		<Unit filename="GDL\SpriteTools.h" />
 		<Unit filename="GDL\StandardEvent.cpp" />
 		<Unit filename="GDL\StandardEvent.h" />
 		<Unit filename="GDL\StrExpressionInstruction.cpp" />
@@ -1409,8 +1407,6 @@
 		<Unit filename="GDL\md5.h" />
 		<Unit filename="GDL\profile.cpp" />
 		<Unit filename="GDL\profile.h" />
-		<Unit filename="GDL\singleton.cpp" />
-		<Unit filename="GDL\singleton.h" />
 		<Unit filename="GDL\tinyxml\tinystr.cpp" />
 		<Unit filename="GDL\tinyxml\tinystr.h" />
 		<Unit filename="GDL\tinyxml\tinyxml.cpp" />
@@ -1430,21 +1426,21 @@
 			</AutoVersioning>
 			<wxsmith version="1">
 				<resources>
-					<wxPanel wxs="wxsmith/ResourcesEditor.wxs" src="GDL/ResourcesEditor.cpp" hdr="GDL/ResourcesEditor.h" fwddecl="0" i18n="1" name="ResourcesEditor" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseObject.wxs" src="GDL/ChooseObject.cpp" hdr="GDL/ChooseObject.h" fwddecl="0" i18n="1" name="ChooseObject" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseLayer.wxs" src="GDL/ChooseLayer.cpp" hdr="GDL/ChooseLayer.h" fwddecl="0" i18n="1" name="ChooseLayer" language="CPP" />
-					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDL/EditLink.cpp" hdr="GDL/EditLink.h" fwddecl="0" i18n="1" name="EditLink" language="CPP" />
-					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDL/EditComment.cpp" hdr="GDL/EditComment.h" fwddecl="0" i18n="1" name="EditComment" language="CPP" />
-					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDL/EditForEachEvent.cpp" hdr="GDL/EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
-					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDL/EditRepeatEvent.cpp" hdr="GDL/EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
-					<wxDialog wxs="wxsmith/EditExpression.wxs" src="GDL/EditExpression.cpp" hdr="GDL/EditExpression.h" fwddecl="0" i18n="1" name="EditExpression" language="CPP" />
-					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="GDL/EditorObjet.cpp" hdr="GDL/EditorObjet.h" fwddecl="0" i18n="1" name="EditorObjet" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDL/ChooseVariableDialog.cpp" hdr="GDL/ChooseVariableDialog.h" fwddecl="0" i18n="1" name="ChooseVariableDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/EditTextDialog.wxs" src="GDL/EditTextDialog.cpp" hdr="GDL/EditTextDialog.h" fwddecl="0" i18n="1" name="EditTextDialog" language="CPP" />
-					<wxDialog wxs="wxsmith/ChooseAutomatismDlg.wxs" src="GDL/ChooseAutomatismDlg.cpp" hdr="GDL/ChooseAutomatismDlg.h" fwddecl="0" i18n="1" name="ChooseAutomatismDlg" language="CPP" />
-					<wxDialog wxs="wxsmith/PropImage.wxs" src="GDL/PropImage.cpp" hdr="GDL/PropImage.h" fwddecl="0" i18n="1" name="PropImage" language="CPP" />
-					<wxDialog wxs="wxsmith/EditDynamicExtensionCallerEvent.wxs" src="GDL/EditDynamicExtensionCallerEvent.cpp" hdr="GDL/EditDynamicExtensionCallerEvent.h" fwddecl="0" i18n="1" name="EditDynamicExtensionCallerEvent" language="CPP" />
-					<wxDialog wxs="wxsmith/AdvancedTextEntryDlg.wxs" src="GDL/AdvancedTextEntryDlg.cpp" hdr="GDL/AdvancedTextEntryDlg.h" fwddecl="0" i18n="1" name="AdvancedTextEntryDlg" language="CPP" />
+					<wxPanel wxs="wxsmith/ResourcesEditor.wxs" src="GDL/IDE/Dialogs/ResourcesEditor.cpp" hdr="GDL/IDE/Dialogs/ResourcesEditor.h" fwddecl="0" i18n="1" name="ResourcesEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseObject.wxs" src="GDL/IDE/Dialogs/ChooseObject.cpp" hdr="GDL/IDE/Dialogs/ChooseObject.h" fwddecl="0" i18n="1" name="ChooseObject" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseLayer.wxs" src="GDL/IDE/Dialogs/ChooseLayer.cpp" hdr="GDL/IDE/Dialogs/ChooseLayer.h" fwddecl="0" i18n="1" name="ChooseLayer" language="CPP" />
+					<wxDialog wxs="wxsmith/EditLink.wxs" src="GDL/IDE/Dialogs/EditLink.cpp" hdr="GDL/IDE/Dialogs/EditLink.h" fwddecl="0" i18n="1" name="EditLink" language="CPP" />
+					<wxDialog wxs="wxsmith/EditComment.wxs" src="GDL/IDE/Dialogs/EditComment.cpp" hdr="GDL/IDE/Dialogs/EditComment.h" fwddecl="0" i18n="1" name="EditComment" language="CPP" />
+					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDL/IDE/Dialogs/EditForEachEvent.cpp" hdr="GDL/IDE/Dialogs/EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDL/IDE/Dialogs/EditRepeatEvent.cpp" hdr="GDL/IDE/Dialogs/EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/EditExpression.wxs" src="GDL/IDE/Dialogs/EditExpression.cpp" hdr="GDL/IDE/Dialogs/EditExpression.h" fwddecl="0" i18n="1" name="EditExpression" language="CPP" />
+					<wxDialog wxs="wxsmith/SpriteObjectEditor.wxs" src="GDL/IDE/Dialogs/SpriteObjectEditor.cpp" hdr="GDL/IDE/Dialogs/SpriteObjectEditor.h" fwddecl="0" i18n="1" name="SpriteObjectEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDL/IDE/Dialogs/ChooseVariableDialog.cpp" hdr="GDL/IDE/Dialogs/ChooseVariableDialog.h" fwddecl="0" i18n="1" name="ChooseVariableDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditTextDialog.wxs" src="GDL/IDE/Dialogs/EditTextDialog.cpp" hdr="GDL/IDE/Dialogs/EditTextDialog.h" fwddecl="0" i18n="1" name="EditTextDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseAutomatismDlg.wxs" src="GDL/IDE/Dialogs/ChooseAutomatismDlg.cpp" hdr="GDL/IDE/Dialogs/ChooseAutomatismDlg.h" fwddecl="0" i18n="1" name="ChooseAutomatismDlg" language="CPP" />
+					<wxDialog wxs="wxsmith/PropImage.wxs" src="GDL/IDE/Dialogs/PropImage.cpp" hdr="GDL/IDE/Dialogs/PropImage.h" fwddecl="0" i18n="1" name="PropImage" language="CPP" />
+					<wxDialog wxs="wxsmith/EditDynamicExtensionCallerEvent.wxs" src="GDL/IDE/Dialogs/EditDynamicExtensionCallerEvent.cpp" hdr="GDL/IDE/Dialogs/EditDynamicExtensionCallerEvent.h" fwddecl="0" i18n="1" name="EditDynamicExtensionCallerEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/AdvancedTextEntryDlg.wxs" src="GDL/IDE/Dialogs/AdvancedTextEntryDlg.cpp" hdr="GDL/IDE/Dialogs/AdvancedTextEntryDlg.h" fwddecl="0" i18n="1" name="AdvancedTextEntryDlg" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

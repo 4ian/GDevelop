@@ -8,9 +8,9 @@
 #include "EventsCodeGenerationContext.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "GDL/EventsCodeNameMangler.h"
+#include "GDL/Events/EventsCodeNameMangler.h"
 #include "GDL/CommonTools.h"
-#include "GDL/EventsCodeGenerator.h"
+#include "GDL/Events/EventsCodeGenerator.h"
 #include <set>
 
 void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext & parent)

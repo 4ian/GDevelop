@@ -6,7 +6,7 @@
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/EventsExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 #endif
 #include <iostream>
 

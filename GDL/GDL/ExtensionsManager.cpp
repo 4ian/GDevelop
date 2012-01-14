@@ -28,7 +28,7 @@
 #include "GDL/BuiltinExtensions/WindowExtension.h"
 #include "GDL/BuiltinExtensions/StringInstructionsExtension.h"
 #include "GDL/Object.h"
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/Game.h"

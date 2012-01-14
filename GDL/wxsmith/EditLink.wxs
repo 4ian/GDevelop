@@ -26,7 +26,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-										<label>Un lien permet d&apos;insérer les évènements d&apos;une autre &#x0A;scène à celle ci.</label>
+										<label>Un lien permet d&apos;insérer les évènements d&apos;une autre &#x0A;scène ou des évènements externes à celle ci.</label>
 										<size>253,30</size>
 										<style>wxALIGN_CENTRE</style>
 									</object>
@@ -52,20 +52,18 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
-					<cols>2</cols>
-					<growablecols>1</growablecols>
+					<cols>1</cols>
+					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-							<label>Lien vers la scène :</label>
+							<label>Lien vers la scène/évènements externes :</label>
 						</object>
-						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
 						<option>1</option>
 					</object>
 					<object class="sizeritem">
-						<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="NomSceneEdit" member="yes">
-							<tooltip>Nom de la scène liée</tooltip>
-						</object>
+						<object class="wxComboBox" name="ID_COMBOBOX1" variable="linkedNameEdit" member="yes" />
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
 						<option>1</option>

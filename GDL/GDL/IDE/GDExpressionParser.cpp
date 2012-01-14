@@ -17,7 +17,7 @@
 
 std::string GDExpressionParser::parserSeparators = " ,+-*/%.<>=&|;()#^![]{}";
 
-size_t GetMinimalParametersNumber(const std::vector < ParameterInfo > & parametersInfos)
+size_t GDExpressionParser::GetMinimalParametersNumber(const std::vector < ParameterInfo > & parametersInfos)
 {
     size_t nb = 0;
     for (unsigned int i = 0;i<parametersInfos.size();++i)
@@ -28,7 +28,7 @@ size_t GetMinimalParametersNumber(const std::vector < ParameterInfo > & paramete
     return nb;
 }
 
-size_t GetMaximalParametersNumber(const std::vector < ParameterInfo > & parametersInfos)
+size_t GDExpressionParser::GetMaximalParametersNumber(const std::vector < ParameterInfo > & parametersInfos)
 {
     size_t nb = 0;
     for (unsigned int i = 0;i<parametersInfos.size();++i)
@@ -502,7 +502,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                         firstErrorStr = _("Nombre de paramètre incorrect.");
                         firstErrorStr += " ";
                         firstErrorStr += _("Attendu ( au maximum ) :");
-                        firstErrorStr += ToString(instructionInfos.parameters.size());
+                        firstErrorStr += ToString(GetMaximalParametersNumber(instructionInfos.parameters));
                         #endif
                         return false;
                     }

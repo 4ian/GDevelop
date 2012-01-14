@@ -82,6 +82,8 @@ void GDEmptyFunctionDoingNothing();
 /**
  * Called by llvm JIT when an unknown function is needed: As it should not happen, this function will warn the user about the error
  * and will return a pointer to a blank function to prevent crash.
+ *
+ * \see GDEmptyFunctionDoingNothing
  */
 void* UseSubstituteForUnknownFunctions(const std::string& name);
 

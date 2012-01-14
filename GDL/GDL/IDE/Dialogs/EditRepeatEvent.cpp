@@ -9,7 +9,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include "GDL/EditExpression.h"
+#include "GDL/IDE/Dialogs/EditExpression.h"
 #include "GDL/RepeatEvent.h"
 
 //(*IdInit(EditRepeatEvent)

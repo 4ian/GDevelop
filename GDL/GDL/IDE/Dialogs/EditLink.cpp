@@ -11,6 +11,8 @@
 //*)
 #include <sstream>
 #include "GDL/CommonTools.h"
+#include "GDL/Game.h"
+#include "GDL/ExternalEvents.h"
 #include <wx/help.h>
 
 //(*IdInit(EditLink)
@@ -19,7 +21,7 @@ const long EditLink::ID_STATICTEXT3 = wxNewId();
 const long EditLink::ID_PANEL1 = wxNewId();
 const long EditLink::ID_STATICLINE2 = wxNewId();
 const long EditLink::ID_STATICTEXT1 = wxNewId();
-const long EditLink::ID_TEXTCTRL1 = wxNewId();
+const long EditLink::ID_COMBOBOX1 = wxNewId();
 const long EditLink::ID_RADIOBUTTON1 = wxNewId();
 const long EditLink::ID_RADIOBUTTON2 = wxNewId();
 const long EditLink::ID_TEXTCTRL2 = wxNewId();
@@ -38,8 +40,9 @@ BEGIN_EVENT_TABLE(EditLink,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditLink::EditLink(wxWindow* parent, LinkEvent & pEvent) :
-eventToEdit(pEvent)
+EditLink::EditLink(wxWindow* parent, LinkEvent & event, const Game & game_) :
+editedEvent(event),
+game(game_)
 {
 	//(*Initialize(EditLink)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -60,7 +63,7 @@ eventToEdit(pEvent)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/link48.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Un lien permet d\'insérer les évènements d\'une autre \nscène à celle ci."), wxDefaultPosition, wxSize(253,30), wxALIGN_CENTRE, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Un lien permet d\'insérer les évènements d\'une autre \nscène ou des évènements externes à celle ci."), wxDefaultPosition, wxSize(253,30), wxALIGN_CENTRE, _T("ID_STATICTEXT3"));
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
@@ -68,13 +71,12 @@ eventToEdit(pEvent)
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer17->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
-	FlexGridSizer3->AddGrowableCol(1);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Lien vers la scène :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-	FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	NomSceneEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	NomSceneEdit->SetToolTip(_("Nom de la scène liée"));
-	FlexGridSizer3->Add(NomSceneEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer3->AddGrowableCol(0);
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Lien vers la scène/évènements externes :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	linkedNameEdit = new wxComboBox(this, ID_COMBOBOX1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_COMBOBOX1"));
+	FlexGridSizer3->Add(linkedNameEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Inclure"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -124,13 +126,19 @@ eventToEdit(pEvent)
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditLink::OnAideBtClick);
 	//*)
 
-	NomSceneEdit->ChangeValue(eventToEdit.sceneLinked);
-	if ( eventToEdit.start != -1 && eventToEdit.end != -1 )
+	linkedNameEdit->ChangeValue(editedEvent.sceneLinked);
+	if ( editedEvent.start != -1 && editedEvent.end != -1 )
 	{
 	    OnlyEventsCheck->SetValue(true);
-	    StartEdit->ChangeValue(ToString(eventToEdit.start));
-	    EndEdit->ChangeValue(ToString(eventToEdit.end));
+	    StartEdit->ChangeValue(ToString(editedEvent.start));
+	    EndEdit->ChangeValue(ToString(editedEvent.end));
 	}
+
+	for (unsigned int i = 0;i<game.externalEvents.size();++i)
+        linkedNameEdit->Append(game.externalEvents[i]->GetName());
+
+    for (unsigned int i = 0;i<game.scenes.size();++i)
+    	linkedNameEdit->Append(game.scenes[i]->GetName());
 }
 
 EditLink::~EditLink()
@@ -147,47 +155,33 @@ void EditLink::OnAideBtClick(wxCommandEvent& event)
     help->DisplaySection(150);
 }
 
-////////////////////////////////////////////////////////////
-/// Clic sur annuler, ferme sans modifier l'évènement
-////////////////////////////////////////////////////////////
+/**
+ * Cancel changes
+ */
 void EditLink::OnAnnulerBtClick(wxCommandEvent& event)
 {
     EndModal(0);
 }
 
-////////////////////////////////////////////////////////////
-/// Clic sur ok, modifie l'évènement et ferme la fenêtre
-////////////////////////////////////////////////////////////
+/**
+ * Apply changes
+ */
 void EditLink::OnOkBtClick(wxCommandEvent& event)
 {
-    eventToEdit.sceneLinked = static_cast<string>(NomSceneEdit->GetValue());
+    editedEvent.sceneLinked = ToString(linkedNameEdit->GetValue());
     if ( AllEventsCheck->GetValue() == true )
     {
-        eventToEdit.start = -1;
-        eventToEdit.end = -1;
+        editedEvent.start = -1;
+        editedEvent.end = -1;
     }
     else
     {
-        {
-            stringstream ss;
-            ss << StartEdit->GetValue();
-            ss >> eventToEdit.start;
-        }
-        {
-            stringstream ss;
-            ss << EndEdit->GetValue();
-            ss >> eventToEdit.end;
-        }
+        editedEvent.start = ToInt(ToString(StartEdit->GetValue()));
+        editedEvent.end = ToInt(ToString(EndEdit->GetValue()));
     }
     EndModal(1);
 }
 
-
-////////////////////////////////////////////////////////////
-/// Modification de texte
-///
-/// Coche automatiquement la case "Seulement les évènements..."
-////////////////////////////////////////////////////////////
 void EditLink::OnStartEditText(wxCommandEvent& event)
 {
     OnlyEventsCheck->SetValue(true);

@@ -59,6 +59,16 @@ class GD_API GDExpressionParser
          */
         bool PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks &, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression);
 
+        /**
+         * Return the minimal number of parameters which can be used when calling an expression ( i.e. ParametersCount-OptionalParameters-CodeOnlyParameters )
+         */
+        size_t GetMinimalParametersNumber(const std::vector < ParameterInfo > & parametersInfos);
+
+        /**
+         * Return the maximal number of parameters which can be used when calling an expression ( i.e. ParametersCount-CodeOnlyParameters )
+         */
+        size_t GetMaximalParametersNumber(const std::vector < ParameterInfo > & parametersInfos);
+
         bool ValidSyntax(const std::string & str);
 
         std::string expressionPlainString;

@@ -9,8 +9,8 @@
 #include "GDL/BuiltinExtensions/ProfileTools.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
-#include "GDL/EventsCodeGenerationContext.h"
-#include "GDL/EventsCodeGenerator.h"
+#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/IDE/BaseProfiler.h"
 #include <iostream>
 

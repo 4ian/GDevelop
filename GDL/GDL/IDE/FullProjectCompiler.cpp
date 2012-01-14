@@ -18,7 +18,7 @@
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 #include <wx/filename.h>
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 #include "GDL/DatFile.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"

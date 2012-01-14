@@ -5,7 +5,7 @@
 
 #if defined(GD_IDE_ONLY)
 
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 
 #include <SFML/System.hpp>
 #include <iostream>
@@ -64,7 +64,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/Event.h"
-#include "GDL/EventsCodeGenerator.h"
+#include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/EventsExecutionEngine.h"
 #include "GDL/IDE/BaseProfiler.h"
 #include "GDL/CommonTools.h"
@@ -86,7 +86,7 @@ bool EventsCodeCompiler::CompileEventsCppFileToBitCode(std::string eventsFile, s
     if ( !optimize ) //Don't use precompiled header when optimizing, as they are built without optimizations
     {
         Args.push_back("-include-pch");
-        Args.push_back(!compilationForRuntime ? "include/GDL/GDL/PrecompiledHeader.h.pch" : "include/GDL/GDL/PrecompiledHeaderRuntime.h.pch");
+        Args.push_back(!compilationForRuntime ? "include/GDL/GDL/Events/PrecompiledHeader.h.pch" : "include/GDL/GDL/Events/PrecompiledHeaderRuntime.h.pch");
     }
     #endif
     Args.push_back(eventsFile.c_str());

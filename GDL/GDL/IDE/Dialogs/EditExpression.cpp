@@ -5,7 +5,7 @@
 
 #if defined(GD_IDE_ONLY)
 
-#include "GDL/EditExpression.h"
+#include "EditExpression.h"
 
 //(*InternalHeaders(EditExpression)
 #include <wx/bitmap.h>

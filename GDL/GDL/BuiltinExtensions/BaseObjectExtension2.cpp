@@ -1,7 +1,7 @@
 #include "GDL/BuiltinExtensions/BaseObjectExtension.h"
-#include "GDL/EventsCodeGenerator.h"
-#include "GDL/EventsCodeGenerationContext.h"
-#include "GDL/EventsCodeNameMangler.h"
+#include "GDL/Events/EventsCodeGenerator.h"
+#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDL/Events/EventsCodeNameMangler.h"
 #include "GDL/ExpressionsCodeGeneration.h"
 
 void BaseObjectExtension::DeclareExtensionSecondPart()

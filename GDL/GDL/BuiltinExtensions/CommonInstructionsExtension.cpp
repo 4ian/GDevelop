@@ -13,10 +13,9 @@
 #include "GDL/LinkEvent.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Event.h"
-#include "GDL/DynamicExtensionCallerEvent.h"
-#include "GDL/EventsCodeGenerator.h"
-#include "GDL/EventsCodeGenerationContext.h"
-#include "GDL/EventsCodeNameMangler.h"
+#include "GDL/Events/EventsCodeGenerator.h"
+#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDL/Events/EventsCodeNameMangler.h"
 
 #include "GDL/ExtensionBase.h"
 

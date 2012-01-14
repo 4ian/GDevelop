@@ -4,15 +4,15 @@
  */
 
 #if defined(GD_IDE_ONLY)
-#include "GDL/EditTextDialog.h"
+#include "EditTextDialog.h"
 
 //(*InternalHeaders(EditTextDialog)
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
 #include <wx/stc/stc.h>
-#include "GDL/EditExpression.h"
 #include "GDL/ExtensionBase.h"
+#include "GDL/IDE/Dialogs/EditExpression.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDL/IDE/Dialogs/ChooseVariableDialog.h"

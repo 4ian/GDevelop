@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY)
 
 #include <utility>
-#include "GDL/EventsCodeGenerator.h"
+#include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Scene.h"
@@ -14,8 +14,8 @@
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/GDExpressionParser.h"
-#include "GDL/EventsCodeNameMangler.h"
-#include "GDL/EventsCodeGenerationContext.h"
+#include "GDL/Events/EventsCodeNameMangler.h"
+#include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/ExpressionsCodeGeneration.h"
 
 #include "GDL/ProfileEvent.h"

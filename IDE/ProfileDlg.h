@@ -16,7 +16,7 @@
 #include <vector>
 #include <deque>
 #include "GDL/Event.h"
-#include "GDL/BaseProfiler.h"
+#include "GDL/IDE/BaseProfiler.h"
 class SceneCanvas;
 
 class ProfileDlg: public wxPanel, public BaseProfiler

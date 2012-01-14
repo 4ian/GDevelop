@@ -11,7 +11,7 @@
 #include <wx/image.h>
 #include <wx/textdlg.h>
 #include <wx/log.h>
-#include "GDL/ListVariable.h"
+#include "GDL/VariableList.h"
 #include "GDL/IDE/HelpFileAccess.h"
 
 #ifdef __WXGTK__

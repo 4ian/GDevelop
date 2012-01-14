@@ -6,12 +6,12 @@
 #include <wx/progdlg.h>
 #include <boost/shared_ptr.hpp>
 #include <SFML/System.hpp>
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Game.h"
 #include "GDL/DynamicExtensionsManager.h"
-#include "GDL/CompilerMessagesParser.h"
+#include "GDL/IDE/CompilerMessagesParser.h"
 #include "GDL/CommonTools.h"
 #include "BuildMessagesPnl.h"
 

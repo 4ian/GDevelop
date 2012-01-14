@@ -23,11 +23,11 @@
 #include <wx/config.h>
 #include <wx/log.h>
 #include <wx/msgdlg.h>
-#include "GDL/gdTreeItemStringData.h"
+#include "GDL/IDE/gdTreeItemStringData.h"
 #include "GDL/IDE/HelpFileAccess.h"
-#include "GDL/TranslateCondition.h"
-#include "GDL/EditExpression.h"
-#include "GDL/EditTextDialog.h"
+#include "GDL/IDE/ConditionSentenceFormatter.h"
+#include "GDL/IDE/Dialogs/EditExpression.h"
+#include "GDL/IDE/Dialogs/EditTextDialog.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
@@ -37,14 +37,14 @@
 #include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
 #include "ChoixBouton.h"
 #include "ChoixClavier.h"
-#include "GDL/IDE/BitmapGUIManager.h"
+#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
 #include "TrueOrFalse.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "ChoiceJoyAxis.h"
 #include "ChoiceFile.h"
 #include "GDL/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDL/ObjectListDialogsHelper.h"
-#include "GDL/ExpressionsCorrectnessTesting.h"
+#include "GDL/IDE/Dialogs/ObjectListDialogsHelper.h"
+#include "GDL/IDE/ExpressionsCorrectnessTesting.h"
 #include "Extensions.h"
 #include "SigneTest.h"
 

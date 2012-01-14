@@ -9,7 +9,7 @@
 #include <wx/dirdlg.h>
 #include <wx/config.h>
 #include <wx/msgdlg.h>
-#include "GDL/CompilerToolchainPathManager.h"
+#include "GDL/IDE/CompilerToolchainPathManager.h"
 
 using namespace GDpriv;
 

@@ -28,7 +28,7 @@
 #include <algorithm>
 #include <numeric>
 #include "EditorObjetsGroups.h"
-#include "GDL/IDE/BitmapGUIManager.h"
+#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>

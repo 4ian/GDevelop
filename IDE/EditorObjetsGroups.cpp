@@ -22,7 +22,7 @@
 #include "EditObjectGroup.h"
 #include "Clipboard.h"
 #include "GDL/IDE/HelpFileAccess.h"
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 #include "EventsRefactorer.h"
 
 #ifdef __WXMSW__

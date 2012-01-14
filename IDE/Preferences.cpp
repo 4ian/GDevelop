@@ -22,8 +22,8 @@
 #include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/LocaleManager.h"
-#include "GDL/TranslateAction.h"
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/IDE/ActionSentenceFormatter.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 #include <wx/listctrl.h>
 #include "SetupCompilerToolchainDlg.h"
 

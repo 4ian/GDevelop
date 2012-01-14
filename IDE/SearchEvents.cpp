@@ -12,8 +12,8 @@
 #include "GDL/IDE/HelpFileAccess.h"
 #include "EventsRefactorer.h"
 #include "EventsEditor.h"
-#include "GDL/EventsEditorSelection.h"
-#include "GDL/EventsEditorItemsAreas.h"
+#include "GDL/IDE/EventsEditorSelection.h"
+#include "GDL/IDE/EventsEditorItemsAreas.h"
 
 using namespace std;
 

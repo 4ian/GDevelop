@@ -14,7 +14,7 @@
 #include <wx/gauge.h>
 //*)
 #include <wx/thread.h>
-#include "GDL/SourceFileBuilder.h"
+#include "GDL/IDE/SourceFileBuilder.h"
 class Game;
 class SceneCanvas;
 

@@ -54,13 +54,12 @@
 #include "GDL/SoundManager.h"
 #include "GDL/FontManager.h"
 #include "GDL/IDE/HelpFileAccess.h"
-#include "GDL/TranslateAction.h"
+#include "GDL/IDE/ActionSentenceFormatter.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/SpriteExtension.h"
 #include "GDL/ExtensionsLoader.h"
 #include "GDL/VersionWrapper.h"
 #include "GDL/IDE/LocaleManager.h"
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 
 #include <fstream>
 #include <boost/shared_ptr.hpp>

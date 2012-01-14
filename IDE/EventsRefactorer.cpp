@@ -1,6 +1,6 @@
 #include "EventsRefactorer.h"
 #include "GDL/Event.h"
-#include "GDL/GDExpressionParser.h"
+#include "GDL/IDE/GDExpressionParser.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/StrExpressionInstruction.h"

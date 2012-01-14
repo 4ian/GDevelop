@@ -11,7 +11,7 @@
 #include <wx/log.h>
 #include <wx/filedlg.h>
 #include "GDL/IDE/HelpFileAccess.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include <string>
 #include <vector>
 

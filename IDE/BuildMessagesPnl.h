@@ -14,7 +14,7 @@
 class Game;
 class ProjectManager;
 #include <vector>
-#include "GDL/CompilerMessagesParser.h"
+#include "GDL/IDE/CompilerMessagesParser.h"
 
 class BuildMessagesPnl: public wxPanel
 {

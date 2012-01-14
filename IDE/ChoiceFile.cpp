@@ -9,7 +9,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "GDL/EditTextDialog.h"
+#include "GDL/IDE/Dialogs/EditTextDialog.h"
 class Game;
 class Scene;
 

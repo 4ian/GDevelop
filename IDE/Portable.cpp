@@ -13,7 +13,7 @@
 #include <vector>
 #include <wx/dirdlg.h>
 #include <wx/log.h>
-#include "GDL/ResourcesMergingHelper.h"
+#include "GDL/IDE/ResourcesMergingHelper.h"
 #include "GDL/ExternalEvents.h"
 #include "Portable.h"
 #include "GDL/Game.h"

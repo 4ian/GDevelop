@@ -13,7 +13,7 @@
 #include <vector>
 class Game;
 class Scene;
-#include "GDL/EditTextDialog.h"
+#include "GDL/IDE/Dialogs/EditTextDialog.h"
 
 using namespace std;
 

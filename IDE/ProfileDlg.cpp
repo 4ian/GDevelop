@@ -9,7 +9,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 #include "GDL/ProfileEvent.h"
 #include "SceneCanvas.h"
 #include <iostream>

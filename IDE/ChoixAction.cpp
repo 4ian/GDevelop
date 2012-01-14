@@ -22,20 +22,20 @@
 #include <wx/help.h>
 #include <wx/msgdlg.h>
 #include <wx/config.h>
-#include "GDL/gdTreeItemStringData.h"
+#include "GDL/IDE/gdTreeItemStringData.h"
 #include "Extensions.h"
 #include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
-#include "GDL/TranslateAction.h"
+#include "GDL/IDE/ActionSentenceFormatter.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
-#include "GDL/EditExpression.h"
-#include "GDL/EditTextDialog.h"
+#include "GDL/IDE/Dialogs/EditExpression.h"
+#include "GDL/IDE/Dialogs/EditTextDialog.h"
 #include "ChoixClavier.h"
-#include "GDL/IDE/BitmapGUIManager.h"
+#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
 #include "SigneModification.h"
 #include "GeneratePassword.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
@@ -43,8 +43,8 @@
 #include "ChoiceFile.h"
 #include "GDL/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
-#include "GDL/ObjectListDialogsHelper.h"
-#include "GDL/ExpressionsCorrectnessTesting.h"
+#include "GDL/IDE/Dialogs/ObjectListDialogsHelper.h"
+#include "GDL/IDE/ExpressionsCorrectnessTesting.h"
 #include <boost/algorithm/string.hpp>
 
 #ifdef __WXMSW__

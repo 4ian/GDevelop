@@ -34,13 +34,13 @@
 #include "GDL/DatFile.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/OpenSaveGame.h"
-#include "GDL/ResourcesMergingHelper.h"
+#include "GDL/IDE/ResourcesMergingHelper.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/ExternalEvents.h"
 #include "Compilation.h"
 #include "ErrorCompilation.h"
-#include "GDL/FullProjectCompiler.h"
+#include "GDL/IDE/FullProjectCompiler.h"
 
 using namespace std;
 

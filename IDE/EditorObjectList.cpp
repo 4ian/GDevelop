@@ -29,12 +29,12 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/CommonTools.h"
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 #include "Clipboard.h"
 #include <algorithm>
 #include <numeric>
 #include "EditorObjetsGroups.h"
-#include "GDL/IDE/BitmapGUIManager.h"
+#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
 #include "GDL/Automatism.h"
 #include "GDL/CommonTools.h"
 #include "DndTextObjectsEditor.h"

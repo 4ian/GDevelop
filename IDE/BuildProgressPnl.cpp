@@ -13,7 +13,7 @@
 #include <wx/txtstrm.h>
 #include "GDL/Game.h"
 #include "SceneCanvas.h"
-#include "GDL/SourceFileBuilder.h"
+#include "GDL/IDE/SourceFileBuilder.h"
 
 //(*IdInit(BuildProgressPnl)
 const long BuildProgressPnl::ID_BUTTON1 = wxNewId();

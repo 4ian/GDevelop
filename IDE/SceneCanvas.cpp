@@ -31,9 +31,9 @@
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/DynamicExtensionsManager.h"
-#include "GDL/SourceFileBuilder.h"
-#include "GDL/CompilerMessagesParser.h"
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/IDE/SourceFileBuilder.h"
+#include "GDL/IDE/CompilerMessagesParser.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 #include "GDL/EventsExecutionEngine.h"
 #include "GDL/SoundManager.h"
 #include "BuildMessagesPnl.h"
@@ -1009,6 +1009,24 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
     }
     else //Add object to selection
     {
+        //Clone the object using Ctrl
+        if (!edittimeRenderer.isMovingObject && (sf::Keyboard::IsKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::IsKeyPressed(sf::Keyboard::RControl) ))
+        {
+            edittimeRenderer.objectsSelected.erase(remove(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object), edittimeRenderer.objectsSelected.end());
+
+            //Clone the object and its initial position
+            int idPos = GetInitialPositionFromObject(object);
+            if (idPos != -1)
+            {
+                object = object->Clone();
+                edittimeRenderer.runtimeScene.objectsInstances.AddObject(object);
+                sceneEdited.initialObjectsPositions.push_back(sceneEdited.initialObjectsPositions[idPos]);
+
+                if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
+            }
+        }
+
+        //Adding the object to selection if needed
         if ( find(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object) == edittimeRenderer.objectsSelected.end() )
         {
             edittimeRenderer.objectsSelected.push_back(object);
@@ -1147,9 +1165,9 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
             int idPos = GetInitialPositionFromObject(object);
             if ( idPos != -1 )
             {
-                sceneEdited.initialObjectsPositions.at( idPos ).personalizedSize = true;
-                sceneEdited.initialObjectsPositions.at( idPos ).width = object->GetWidth();
-                sceneEdited.initialObjectsPositions.at( idPos ).height = object->GetHeight();
+                sceneEdited.initialObjectsPositions[idPos].personalizedSize = true;
+                sceneEdited.initialObjectsPositions[idPos].width = object->GetWidth();
+                sceneEdited.initialObjectsPositions[idPos].height = object->GetHeight();
             }
         }
     }
@@ -1163,9 +1181,9 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
             int idPos = GetInitialPositionFromObject(object);
             if ( idPos != -1 )
             {
-                sceneEdited.initialObjectsPositions.at( idPos ).personalizedSize = true;
-                sceneEdited.initialObjectsPositions.at( idPos ).height = object->GetHeight();
-                sceneEdited.initialObjectsPositions.at( idPos ).width = object->GetWidth();
+                sceneEdited.initialObjectsPositions[idPos].personalizedSize = true;
+                sceneEdited.initialObjectsPositions[idPos].height = object->GetHeight();
+                sceneEdited.initialObjectsPositions[idPos].width = object->GetWidth();
             }
         }
     }
@@ -1183,7 +1201,7 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
             int idPos = GetInitialPositionFromObject(object);
             if ( idPos != -1 )
             {
-                sceneEdited.initialObjectsPositions.at( idPos ).angle = newAngle;
+                sceneEdited.initialObjectsPositions[idPos].angle = newAngle;
             }
         }
     }
@@ -1214,8 +1232,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
                 }
 
                 //Modification de l'emplacement initial
-                sceneEdited.initialObjectsPositions.at( idPos ).x = newX;
-                sceneEdited.initialObjectsPositions.at( idPos ).y = newY;
+                sceneEdited.initialObjectsPositions[idPos].x = newX;
+                sceneEdited.initialObjectsPositions[idPos].y = newY;
 
                 //On bouge aussi l'objet actuellement affiché
                 object->SetX( newX );

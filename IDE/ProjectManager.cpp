@@ -19,7 +19,7 @@
 #include "GDL/StandardEvent.h"
 #include "GDL/CommentEvent.h"
 #include "GDL/SourceFile.h"
-#include "GDL/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompiler.h"
 #include "CodeEditor.h"
 #include "NewCppFileDlg.h"
 #include "Extensions.h"

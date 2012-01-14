@@ -12,7 +12,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "TemplateEvents.h"
 
 class ChoixTemplateEvent: public wxDialog

@@ -22,8 +22,8 @@
 #include <boost/shared_ptr.hpp>
 #include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/Event.h"
-#include "GDL/EventsEditorItemsAreas.h"
-#include "GDL/EventsEditorSelection.h"
+#include "GDL/IDE/EventsEditorItemsAreas.h"
+#include "GDL/IDE/EventsEditorSelection.h"
 class SearchEvents;
 class ExternalEvents;
 class Game;

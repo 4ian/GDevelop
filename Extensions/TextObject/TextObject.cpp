@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Text Object Extension
-Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@ freely, subject to the following restrictions:
 #include "GDL/Object.h"
 
 #include "GDL/ImageManager.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
 #include "GDL/RotatedRectangle.h"
@@ -38,8 +38,8 @@ freely, subject to the following restrictions:
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
-#include "GDL/ArbitraryResourceWorker.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/ArbitraryResourceWorker.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #include "TextObjectEditor.h"
 #endif
 

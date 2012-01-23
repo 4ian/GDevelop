@@ -25,12 +25,12 @@ class GD_API RuntimeLayer
         /**
          * Get layer name
          */
-        inline std::string GetName() const { return associatedLayer.GetName(); };
+        inline const std::string & GetName() const { return associatedLayer.GetName(); };
 
         /**
          * Change layer name
          */
-        inline void SetName(std::string name_) { associatedLayer.SetName(name_); };
+        inline void SetName(const std::string & name_) { associatedLayer.SetName(name_); };
 
         /**
          *Get layer visibility

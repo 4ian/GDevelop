@@ -349,14 +349,14 @@ void Object::AddForceToMoveAround( float positionX, float positionY, float angul
     Forces.push_back( forceToAdd );
 }
 
-void Object::Duplicate(RuntimeScene & scene, std::vector<Object*> & concernedObjects)
+void Object::Duplicate(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists)
 {
     ObjSPtr newObject = Clone();
 
     scene.objectsInstances.AddObject(newObject);
 
-    if ( std::find(concernedObjects.begin(), concernedObjects.end(), newObject.get()) == concernedObjects.end() )
-        concernedObjects.push_back(newObject.get()); //Object is concerned for future actions
+    if ( pickedObjectLists[name] != NULL && find(pickedObjectLists[name]->begin(), pickedObjectLists[name]->end(), newObject.get()) == pickedObjectLists[name]->end() )
+        pickedObjectLists[name]->push_back( newObject.get() );
 }
 
 bool Object::IsStopped()

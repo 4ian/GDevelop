@@ -35,7 +35,7 @@ public:
     /**
      * Mark the object has being the object being handled by the instruction
      */
-    void SetCurrentObject(std::string objectName) { currentObject = objectName; };
+    void SetCurrentObject(const std::string & objectName) { currentObject = objectName; };
 
     /**
      * Set that no particular object is being handled by an instruction
@@ -51,13 +51,13 @@ public:
      * Call this when an instruction in the event need an object list.
      * The list will be filled with objects from the scene if it is the first time it is requested.
      */
-    void ObjectsListNeeded(std::string objectName);
+    void ObjectsListNeeded(const std::string & objectName);
 
     /**
      * Call this when an instruction in the event need an object list.
      * No object will be picked from the scene.
      */
-    void EmptyObjectsListNeeded(std::string objectName);
+    void EmptyObjectsListNeeded(const std::string & objectName);
 
     /**
      * Generate code for getting needed object lists from scene.
@@ -68,7 +68,7 @@ public:
     /**
      * Return true if an object list has already been declared ( or is going to be declared ).
      */
-    bool ObjectAlreadyDeclared(std::string objectName) { return (alreadyDeclaredObjectsLists.find(objectName) != alreadyDeclaredObjectsLists.end() || objectsListsToBeDeclared.find(objectName) != objectsListsToBeDeclared.end() || emptyObjectsListsToBeDeclared.find(objectName) != emptyObjectsListsToBeDeclared.end()); };
+    bool ObjectAlreadyDeclared(const std::string & objectName) { return (alreadyDeclaredObjectsLists.find(objectName) != alreadyDeclaredObjectsLists.end() || objectsListsToBeDeclared.find(objectName) != objectsListsToBeDeclared.end() || emptyObjectsListsToBeDeclared.find(objectName) != emptyObjectsListsToBeDeclared.end()); };
 
     /**
      * Return the objects lists which will be declared by the current context

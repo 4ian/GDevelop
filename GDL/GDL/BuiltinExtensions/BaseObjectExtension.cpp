@@ -243,7 +243,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddCodeOnlyParameter("currentScene", "");
-            instrInfo.AddCodeOnlyParameter("listsOfObjectsOfParameter", "0");
+            instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
 
             instrInfo.cppCallingInformation.SetFunctionName("Duplicate");
 

@@ -23,12 +23,12 @@ void EventsCodeGenerationContext::InheritsFrom(const EventsCodeGenerationContext
         alreadyDeclaredObjectsLists.insert(*it);
 }
 
-void EventsCodeGenerationContext::ObjectsListNeeded(std::string objectName)
+void EventsCodeGenerationContext::ObjectsListNeeded(const std::string & objectName)
 {
     if ( emptyObjectsListsToBeDeclared.find(objectName) == emptyObjectsListsToBeDeclared.end() )
         objectsListsToBeDeclared.insert(objectName);
 }
-void EventsCodeGenerationContext::EmptyObjectsListNeeded(std::string objectName)
+void EventsCodeGenerationContext::EmptyObjectsListNeeded(const std::string & objectName)
 {
     if ( objectsListsToBeDeclared.find(objectName) == objectsListsToBeDeclared.end() )
         emptyObjectsListsToBeDeclared.insert(objectName);

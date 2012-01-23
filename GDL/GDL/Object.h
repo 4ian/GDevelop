@@ -436,7 +436,7 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         void SetXY( float xValue, const char* xOperator, float yValue, const char* yOperator );
 
-        void Duplicate( RuntimeScene & scene, std::vector<Object*>& );
+        void Duplicate( RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists );
         void ActivateAutomatism( const std::string & automatismName, bool activate = true );
         bool AutomatismActivated( const std::string & automatismName );
 

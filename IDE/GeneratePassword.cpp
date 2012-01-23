@@ -7,7 +7,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include "GDL/CommonInstructions.h"
+#include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include <string>
 #include <SFML/System.hpp>
 

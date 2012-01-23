@@ -8,6 +8,7 @@
 #include <wx/checklst.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -35,10 +36,12 @@ class Extensions: public wxDialog
 		wxCheckListBox* ExtensionsList;
 		wxStaticText* StaticText2;
 		wxButton* FermerBt;
+		wxStaticText* StaticText6;
 		wxTextCtrl* infoEdit;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxStaticText* StaticText5;
 		wxStaticLine* StaticLine1;
 		wxStaticText* licenseTxt;
@@ -65,6 +68,8 @@ class Extensions: public wxDialog
 		static const long ID_STATICBITMAP2;
 		static const long ID_STATICBITMAP4;
 		static const long ID_STATICBITMAP1;
+		static const long ID_STATICTEXT8;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_STATICTEXT2;
 		static const long ID_BUTTON3;
 		//*)

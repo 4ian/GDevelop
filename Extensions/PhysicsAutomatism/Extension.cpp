@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -534,6 +534,94 @@ class Extension : public ExtensionBase
                         instrInfo.cppCallingInformation.SetFunctionName("SetGravity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetPolygonScaleX",
+                                   _("Changer l'échelle en X du polygone de collision"),
+                                   _("Change l'échelle en X du polygone de collision. Taper une échelle supérieure à 1 pour agrandir le polygone, inférieure à 1 pour le réduire."),
+                                   _("Changer l'échelle en X du polygone de collision de _PARAM0_ en _PARAM2_"),
+                                   _("Polygone de collision"),
+                                   "res/physics24.png",
+                                   "res/physics16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Echelle"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("SetPolygonScaleY",
+                                   _("Changer l'échelle en Y du polygone de collision"),
+                                   _("Change l'échelle en Y du polygone de collision. Taper une échelle supérieure à 1 pour agrandir le polygone, inférieure à 1 pour le réduire."),
+                                   _("Changer l'échelle en Y du polygone de collision de _PARAM0_ en _PARAM2_"),
+                                   _("Polygone de collision"),
+                                   "res/physics24.png",
+                                   "res/physics16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Echelle"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("SetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_CONDITION("GetPolygonScaleX",
+                                   _("Echelle en X du polygone de collision"),
+                                   _("Teste la valeur de l'échelle en X du polygone de collision."),
+                                   _("L'échelle en X du polygone de collision de _PARAM0_ est _PARAM3__PARAM2_"),
+                                   _("Polygone de collision"),
+                                   "res/physics24.png",
+                                   "res/physics16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe de la comparaison"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetPolygonScaleX").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_CONDITION("GetPolygonScaleY",
+                                   _("Echelle en Y du polygone de collision"),
+                                   _("Teste la valeur de l'échelle en Y du polygone de collision."),
+                                   _("L'échelle en Y du polygone de collision de _PARAM0_ est _PARAM3__PARAM2_"),
+                                   _("Polygone de collision"),
+                                   "res/physics24.png",
+                                   "res/physics16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe de la comparaison"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetPolygonScaleY").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_EXPRESSION("PolygonScaleX", _("Echelle en X du polygone de collision"), _("Echelle en X du polygone de collision"), _("Polygone de collision"), "res/physics16.png")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetPolygonScaleX").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
+
+                    DECLARE_AUTOMATISM_EXPRESSION("PolygonScaleY", _("Echelle en Y du polygone de collision"), _("Echelle en Y du polygone de collision"), _("Polygone de collision"), "res/physics16.png")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
 
                     DECLARE_AUTOMATISM_EXPRESSION("LinearVelocityX", _("Vitesse linéaire en X"), _("Vitesse linéaire en X"), _("Déplacement"), "res/physics16.png")
                         instrInfo.AddParameter("object", _("Objet"), "", false);

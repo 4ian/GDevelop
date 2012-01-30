@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@ freely, subject to the following restrictions:
 #include "Box2D/Box2D.h"
 #include "Triangulation/triangulate.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/XmlMacros.h"
 #include "PhysicsAutomatismEditor.h"
 #include "GDL/CommonTools.h"
@@ -49,6 +49,12 @@ linearDamping(0.1),
 angularDamping(0.1),
 body(NULL)
 {
+    polygonHeight = 200;
+    polygonWidth = 200;
+    automaticResizing = false;
+    polygonPositioning = OnCenter;
+    polygonScaleX = 1;
+    polygonScaleY = 1;
 }
 
 PhysicsAutomatism::~PhysicsAutomatism()
@@ -123,7 +129,7 @@ void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
 void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
 {
     if ( runtimeScenesPhysicsDatas == boost::shared_ptr<RuntimeScenePhysicsDatas>() )
-        runtimeScenesPhysicsDatas = boost::static_pointer_cast<RuntimeScenePhysicsDatas>(scene.automatismsSharedDatas.find(name)->second);
+        runtimeScenesPhysicsDatas = boost::static_pointer_cast<RuntimeScenePhysicsDatas>(scene.GetAutomatismSharedDatas(name));
 
     //Create body from object
     b2BodyDef bodyDef;
@@ -172,8 +178,22 @@ void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
             unsigned int b = 0;
             for(int a = 2; a >= 0; a--) //Box2D use another direction for vertices
             {
-                vertices[b].Set((resultOfTriangulation.at(i*3 + a).x - object->GetWidth()/2)                             * runtimeScenesPhysicsDatas->GetInvScaleX(),
-                                (((object->GetHeight() - (resultOfTriangulation.at(i*3 + a).y)) - object->GetHeight()/2) * runtimeScenesPhysicsDatas->GetInvScaleY()));
+                if(polygonPositioning == OnOrigin)
+                {
+                    vertices[b].Set((resultOfTriangulation.at(i*3 + a).x * GetPolygonScaleX() - object->GetWidth()/2 - (object->GetDrawableX() - object->GetX()))                                                * runtimeScenesPhysicsDatas->GetInvScaleX(),
+                                    (((object->GetHeight() - (resultOfTriangulation.at(i*3 + a).y * GetPolygonScaleY())) - object->GetHeight()/2  + (object->GetDrawableY() - object->GetY()))                   * runtimeScenesPhysicsDatas->GetInvScaleY()));
+                }
+                /*else if(polygonPositioning == OnTopLeftCorner)
+                {
+                    vertices[b].Set((resultOfTriangulation.at(i*3 + a).x * GetPolygonScaleX() - object->GetWidth()/2 )                                              * runtimeScenesPhysicsDatas->GetInvScaleX(),
+                                    (((object->GetHeight() - (resultOfTriangulation.at(i*3 + a).y * GetPolygonScaleY())) - object->GetHeight()/2)                   * runtimeScenesPhysicsDatas->GetInvScaleY()));
+                }*/
+                else if(polygonPositioning == OnCenter)
+                {
+                    vertices[b].Set((resultOfTriangulation.at(i*3 + a).x * GetPolygonScaleX())                                                                       * runtimeScenesPhysicsDatas->GetInvScaleX(),
+                                    (((object->GetHeight() - (resultOfTriangulation.at(i*3 + a).y * GetPolygonScaleY())) - object->GetHeight())                      * runtimeScenesPhysicsDatas->GetInvScaleY()));
+                }
+
                 b++;
             }
 
@@ -529,6 +549,48 @@ const std::vector<sf::Vector2f>& PhysicsAutomatism::GetPolygonCoords() const
     return polygonCoords;
 }
 
+bool PhysicsAutomatism::HasAutomaticResizing() const
+{
+    return automaticResizing;
+}
+
+void PhysicsAutomatism::SetAutomaticResizing(bool b)
+{
+    automaticResizing = b;
+}
+
+float PhysicsAutomatism::GetPolygonScaleX() const
+{
+    if(automaticResizing)
+        return object->GetWidth() / polygonWidth;
+    else
+        return polygonScaleX;
+}
+
+void PhysicsAutomatism::SetPolygonScaleX(float scX, RuntimeScene &scene)
+{
+    polygonScaleX = scX;
+
+    runtimeScenesPhysicsDatas->world->DestroyBody(body);
+    CreateBody(scene);
+}
+
+float PhysicsAutomatism::GetPolygonScaleY() const
+{
+    if(automaticResizing)
+        return object->GetHeight() / polygonHeight;
+    else
+        return polygonScaleY;
+}
+
+void PhysicsAutomatism::SetPolygonScaleY(float scY, RuntimeScene &scene)
+{
+    polygonScaleY = scY;
+
+    runtimeScenesPhysicsDatas->world->DestroyBody(body);
+    CreateBody(scene);
+}
+
 #if defined(GD_IDE_ONLY)
 void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const
 {
@@ -545,6 +607,17 @@ void PhysicsAutomatism::SaveToXml(TiXmlElement * elem) const
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "CustomPolygon")
     else
         GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("shapeType", "Box")
+
+    if ( polygonPositioning == OnOrigin )
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("positioning", "OnOrigin")
+    /*else if ( polygonPositioning == OnTopLeftCorner )
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("positioning", "OnTopLeftCorner")*/
+    else
+        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("positioning", "OnCenter")
+
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("autoResizing", automaticResizing);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("polygonWidth", polygonWidth);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("polygonHeight", polygonHeight);
 
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("coordsList", PhysicsAutomatism::GetStringFromCoordsVector(GetPolygonCoords(), '/', ';').c_str());
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_FLOAT("averageRestitution", averageRestitution);
@@ -570,6 +643,20 @@ void PhysicsAutomatism::LoadFromXml(const TiXmlElement * elem)
     else
         shapeType = Box;
 
+    std::string posi = "OnOrigin";
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("positioning", posi);
+    if(posi == "OnOrigin")
+        polygonPositioning = OnOrigin;
+    /*else if (posi == "OnTopLeftCorner")
+        polygonPositioning = OnTopLeftCorner;*/
+    else
+        polygonPositioning = OnCenter;
+
+    automaticResizing = false;
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("autoResizing", automaticResizing);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("polygonWidth", polygonWidth);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("polygonHeight", polygonHeight);
+
     std::string coordsStr;
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("coordsList", coordsStr);
     SetPolygonCoords(PhysicsAutomatism::GetCoordsVectorFromString(coordsStr, '/', ';'));
@@ -582,8 +669,7 @@ std::string PhysicsAutomatism::GetStringFromCoordsVector(const std::vector<sf::V
 {
     std::string coordsStr;
 
-	int a = 0;
-	for (a = 0; a < vec.size(); a++)
+	for (unsigned int a = 0; a < vec.size(); a++)
 	{
 	    coordsStr += ToString<float>(vec.at(a).x) + composantSep + ToString<float>(vec.at(a).y);
 	    if(a != vec.size() - 1)
@@ -599,8 +685,7 @@ std::vector<sf::Vector2f> PhysicsAutomatism::GetCoordsVectorFromString(const std
 
     std::vector<std::string> coordsDecomposed = SplitString<std::string>(str, coordsSep);
 
-    int a = 0;
-    for(a = 0; a < coordsDecomposed.size(); a++)
+    for(unsigned int a = 0; a < coordsDecomposed.size(); a++)
     {
         std::vector<std::string> coordXY = SplitString<std::string>(coordsDecomposed.at(a), composantSep);
 

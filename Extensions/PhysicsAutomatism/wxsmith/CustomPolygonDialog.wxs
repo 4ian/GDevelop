@@ -4,6 +4,7 @@
 		<title>Coordonnées du polygone de collision</title>
 		<size>256,279</size>
 		<id_arg>0</id_arg>
+		<handler function="OnClose" entry="EVT_CLOSE" />
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<growablecols>0</growablecols>
@@ -14,9 +15,8 @@
 					<object class="sizeritem">
 						<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
 							<cols>1</cols>
-							<rows>3</rows>
+							<rows>5</rows>
 							<growablecols>0</growablecols>
-							<growablerows>1</growablerows>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
 									<label>Entrez les coordonnées du polygone de collision :&#x0A;( Chaque ligne doit contenir un point sous la forme x;y )</label>
@@ -26,9 +26,11 @@
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
-								<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
-									<style>wxTE_MULTILINE</style>
-									<handler function="OnTextCtrl1Text" entry="EVT_TEXT" />
+								<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="pointsEdit" member="yes">
+									<size>321,120</size>
+									<maxsize>-1,120</maxsize>
+									<style>wxTE_MULTILINE|wxVSCROLL</style>
+									<handler function="OnpointsEditText" entry="EVT_TEXT" />
 								</object>
 								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
@@ -45,15 +47,194 @@
 								<border>5</border>
 								<option>1</option>
 							</object>
+							<object class="sizeritem">
+								<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
+									<label>Positionnement</label>
+									<object class="sizeritem">
+										<object class="wxGridSizer" variable="GridSizer1" member="no">
+											<cols>1</cols>
+											<rows>3</rows>
+											<object class="sizeritem">
+												<object class="wxRadioButton" name="ID_RADIOBUTTON3" variable="OnCenterRadioBt" member="yes">
+													<label>Positionner par rapport au centre</label>
+													<selected>1</selected>
+													<handler function="OnRadioButton1Select" entry="EVT_RADIOBUTTON" />
+												</object>
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="OnOriginRadioBt" member="yes">
+													<label>Positionner par rapport à l&apos;origine</label>
+													<handler function="OnRadioButton1Select" entry="EVT_RADIOBUTTON" />
+												</object>
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxStaticBoxSizer" variable="StaticBoxSizer3" member="no">
+									<label>Redimensionnement</label>
+									<object class="sizeritem">
+										<object class="wxFlexGridSizer" variable="FlexGridSizer9" member="no">
+											<cols>1</cols>
+											<growablecols>0</growablecols>
+											<object class="sizeritem">
+												<object class="wxCheckBox" name="ID_CHECKBOX1" variable="autoResizingCheckBox" member="yes">
+													<label>Etirer automatiquement en fonction de la taille de l&apos;objet</label>
+													<handler function="OnautoResizingCheckBoxClick" entry="EVT_CHECKBOX" />
+												</object>
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText3" member="yes">
+													<label>Pour que le polygone s&apos;étire en fonction de la taille de l&apos;objet, il faut définir le rectangle correspondant à la taille initiale de l&apos;objet.</label>
+													<size>291,47</size>
+													<enabled>0</enabled>
+													<font>
+														<style>italic</style>
+													</font>
+													<style>wxST_NO_AUTORESIZE</style>
+												</object>
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxFlexGridSizer" variable="FlexGridSizer10" member="no">
+													<cols>4</cols>
+													<object class="sizeritem">
+														<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText4" member="yes">
+															<label>Largeur:</label>
+															<enabled>0</enabled>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="polygonWidthTextCtrl" member="yes">
+															<value>200</value>
+															<size>87,21</size>
+															<enabled>0</enabled>
+															<handler function="OnpolygonHeightTextCtrlTextEnter" entry="EVT_TEXT" />
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText5" member="yes">
+															<label>Hauteur:</label>
+															<enabled>0</enabled>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="polygonHeightTextCtrl" member="yes">
+															<value>200</value>
+															<size>88,21</size>
+															<enabled>0</enabled>
+															<handler function="OnpolygonHeightTextCtrlTextEnter" entry="EVT_TEXT" />
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+										</object>
+										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<option>1</option>
 					</object>
 					<object class="sizeritem">
 						<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
-							<cols>3</cols>
+							<cols>1</cols>
+							<rows>2</rows>
 							<growablecols>0</growablecols>
 							<growablerows>0</growablerows>
+							<object class="sizeritem">
+								<object class="wxStaticBoxSizer" variable="StaticBoxSizer4" member="no">
+									<label>Outils</label>
+									<object class="sizeritem">
+										<object class="wxFlexGridSizer" variable="FlexGridSizer11" member="no">
+											<cols>4</cols>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON2" variable="Button1" member="yes">
+													<label>Décaler...</label>
+													<tooltip>Décaler la forme</tooltip>
+													<handler function="OnButton1Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>2</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON3" variable="Button2" member="yes">
+													<label>Agrandir...</label>
+													<tooltip>Agrandir la forme</tooltip>
+													<handler function="OnButton2Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>2</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON4" variable="Button3" member="yes">
+													<label>Rotation...</label>
+													<tooltip>Tourner le polygone par rapport à un point</tooltip>
+													<handler function="OnButton3Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>2</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxButton" name="ID_BUTTON5" variable="Button4" member="yes">
+													<label>Arrondir...</label>
+													<tooltip>Arrondir les coordonnées</tooltip>
+													<handler function="OnButton4Click" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>2</border>
+												<option>1</option>
+											</object>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
 							<object class="sizeritem">
 								<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
 									<label>Aperçu du polygone de collision :</label>
@@ -63,27 +244,63 @@
 											<growablecols>0</growablecols>
 											<growablerows>0</growablerows>
 											<object class="sizeritem">
-												<object class="wxPanel" name="ID_PANEL1" variable="previewPnl" member="yes">
-													<size>440,348</size>
-													<style>wxSIMPLE_BORDER|wxTAB_TRAVERSAL</style>
-													<handler function="OnpreviewPnlPaint" entry="EVT_PAINT" />
-													<handler function="OnpreviewPnlMouseMove" entry="EVT_MOTION" />
+												<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
+													<cols>2</cols>
+													<rows>2</rows>
+													<growablecols>0</growablecols>
+													<object class="sizeritem">
+														<object class="wxPanel" name="ID_PANEL1" variable="previewPnl" member="yes">
+															<size>440,348</size>
+															<style>wxSIMPLE_BORDER|wxTAB_TRAVERSAL</style>
+															<handler function="OnpreviewPnlPaint" entry="EVT_PAINT" />
+															<handler function="OnpreviewPnlMouseMove" entry="EVT_MOTION" />
+														</object>
+														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxScrollBar" name="ID_SCROLLBAR1" variable="previewPnlVerticalScroll" member="yes">
+															<value>600</value>
+															<thumbsize>500</thumbsize>
+															<range>2000</range>
+															<pagesize>500</pagesize>
+															<style>wxSB_VERTICAL</style>
+															<handler function="OnpreviewScrollChanged" entry="EVT_COMMAND_SCROLL_CHANGED" />
+														</object>
+														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxScrollBar" name="ID_SCROLLBAR2" variable="previewPnlHorizontalScroll" member="yes">
+															<value>600</value>
+															<thumbsize>500</thumbsize>
+															<range>2000</range>
+															<pagesize>500</pagesize>
+															<style>wxSB_HORIZONTAL</style>
+															<handler function="OnpreviewScrollChanged" entry="EVT_COMMAND_SCROLL_CHANGED" />
+														</object>
+														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
 												</object>
-												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-												<border>5</border>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 												<option>1</option>
 											</object>
 											<object class="sizeritem">
 												<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
-													<cols>3</cols>
+													<cols>2</cols>
 													<object class="sizeritem">
-														<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+														<object class="wxStaticText" name="ID_STATICTEXT4" variable="pointLabelTxt" member="yes">
 															<label>Le point indique l&apos;origine de l&apos;objet.</label>
+															<size>277,13</size>
 															<font>
 																<style>italic</style>
 															</font>
 														</object>
-														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 														<border>5</border>
 														<option>1</option>
 													</object>
@@ -126,6 +343,15 @@
 						<object class="wxButton" name="ID_BUTTON1" variable="okBt" member="yes">
 							<label>Ok</label>
 							<handler function="OnokBtClick" entry="EVT_BUTTON" />
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxButton" name="ID_BUTTON6" variable="cancelBt" member="yes">
+							<label>Annuler</label>
+							<handler function="OncancelBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>

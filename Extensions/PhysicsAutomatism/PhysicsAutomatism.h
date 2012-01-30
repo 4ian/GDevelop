@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -50,6 +50,8 @@ class GD_EXTENSION_API PhysicsAutomatism : public Automatism
         PhysicsAutomatism(std::string automatismTypeName);
         virtual ~PhysicsAutomatism();
         virtual boost::shared_ptr<Automatism> Clone() { return boost::shared_ptr<Automatism>(new PhysicsAutomatism(*this));}
+
+        enum Positioning {OnOrigin = 0, OnCenter = 2};
 
         #if defined(GD_IDE_ONLY)
         /**
@@ -113,6 +115,15 @@ class GD_EXTENSION_API PhysicsAutomatism : public Automatism
         void SetPolygonCoords(const std::vector<sf::Vector2f>&);
         const std::vector<sf::Vector2f>& GetPolygonCoords() const;
 
+        bool HasAutomaticResizing() const;
+        void SetAutomaticResizing(bool);
+
+        float GetPolygonScaleX() const;
+        void SetPolygonScaleX(float, RuntimeScene&);
+
+        float GetPolygonScaleY() const;
+        void SetPolygonScaleY(float, RuntimeScene&);
+
         /**
         Return a string representing the coordinates vector.
         \param vec the vector containing coordinates
@@ -141,7 +152,15 @@ class GD_EXTENSION_API PhysicsAutomatism : public Automatism
         void CreateBody(const RuntimeScene & scene);
 
         enum ShapeType {Box, Circle, CustomPolygon} shapeType; ///< the kind of hitbox -> Box, Circle or CustomPolygon
+        Positioning polygonPositioning;
         std::vector<sf::Vector2f> polygonCoords; ///< The list of coordinates of the collision polygon
+
+        bool automaticResizing;
+        float polygonWidth; ///< ONLY for automatic resizing, used to define a scale with automatic resizing
+        float polygonHeight; ///< ONLY for automatic resizing, used to define a scale with automatic resizing
+
+        float polygonScaleX; ///< ONLY for non-automatic resizing -> Use GetPolygonScaleX() instead to be sure to get a correct value
+        float polygonScaleY; ///< ONLY for non-automatic resizing -> Use GetPolygonScaleY() instead to be sure to get a correct value
 
         bool dynamic; ///< Is the object static or dynamic
         bool fixedRotation; ///< Is the rotation fixed or not

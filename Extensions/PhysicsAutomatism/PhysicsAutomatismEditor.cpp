@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -40,7 +40,7 @@ freely, subject to the following restrictions:
 #endif
 #include "GDL/Game.h"
 #include "PhysicsAutomatism.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 
@@ -234,6 +234,11 @@ mainEditorCommand(mainEditorCommand_)
     polygonBt->Enable(polygonCheck->GetValue());
 
 	coordsVector = automatism.GetPolygonCoords();
+	positioning = automatism.polygonPositioning;
+
+	polygonHeight = automatism.polygonHeight;
+	polygonWidth = automatism.polygonWidth;
+	automaticResizing = automatism.HasAutomaticResizing();
 
 	staticCheck->SetValue(!automatism.dynamic);
 	fixedRotationCheck->SetValue(automatism.fixedRotation);
@@ -296,6 +301,10 @@ void PhysicsAutomatismEditor::OnokBtClick(wxCommandEvent& event)
     automatism.averageRestitution = ToFloat(string(restitutionEdit->GetValue().mb_str()));
     automatism.linearDamping = ToFloat(string(linearDampingEdit->GetValue().mb_str()));
     automatism.angularDamping = ToFloat(string(angularDampingEdit->GetValue().mb_str()));
+    automatism.polygonPositioning = static_cast<PhysicsAutomatism::Positioning>(positioning);
+    automatism.polygonWidth = polygonWidth;
+    automatism.polygonHeight = polygonHeight;
+    automatism.SetAutomaticResizing(automaticResizing);
 
     sharedDatas->gravityX = ToFloat(string(gravityXEdit->GetValue().mb_str()));
     sharedDatas->gravityY = ToFloat(string(gravityYEdit->GetValue().mb_str()));
@@ -322,9 +331,13 @@ void PhysicsAutomatismEditor::OnrectCheckSelect(wxCommandEvent& event)
 
 void PhysicsAutomatismEditor::OnpolygonBtClick(wxCommandEvent& event)
 {
-    CustomPolygonDialog dialog(this, coordsVector);
+    CustomPolygonDialog dialog(this, coordsVector, positioning, sf::Vector2f(polygonWidth, polygonHeight), automaticResizing);
     dialog.ShowModal();
     coordsVector = dialog.coordsVec;
+    positioning = dialog.positioning;
+    polygonHeight = dialog.polygonHeight;
+    polygonWidth = dialog.polygonWidth;
+    automaticResizing = dialog.automaticResizing;
 }
 
 #endif

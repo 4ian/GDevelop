@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Physic Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -151,6 +151,11 @@ class PhysicsAutomatismEditor: public wxDialog
 		MainEditorCommand & mainEditorCommand;
 
 		std::vector<sf::Vector2f> coordsVector;
+		unsigned int positioning;
+
+		float polygonWidth;
+		float polygonHeight;
+		bool automaticResizing;
 
 		DECLARE_EVENT_TABLE()
 };

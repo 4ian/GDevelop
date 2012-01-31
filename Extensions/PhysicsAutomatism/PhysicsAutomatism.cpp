@@ -81,9 +81,7 @@ void PhysicsAutomatism::DoStepPreEvents(RuntimeScene & scene)
 
     if ( !runtimeScenesPhysicsDatas->stepped ) //Simulate the world, once at each frame
     {
-        runtimeScenesPhysicsDatas->world->Step(static_cast<double>(scene.GetElapsedTime())/1000.0, 6, 10);
-        runtimeScenesPhysicsDatas->world->ClearForces();
-
+        runtimeScenesPhysicsDatas->StepWorld(static_cast<float>(scene.GetElapsedTime())/1000.0, 6, 10);
         runtimeScenesPhysicsDatas->stepped = true;
     }
 

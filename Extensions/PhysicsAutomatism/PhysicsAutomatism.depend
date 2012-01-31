@@ -9596,7 +9596,7 @@
 	<Box2D/Dynamics/Joints/b2RevoluteJoint.h>
 	<Box2D/Dynamics/Joints/b2WeldJoint.h>
 
-1325278124 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.h
+1328044838 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.h
 	"GDL/Automatism.h"
 	"GDL/Object.h"
 	"ScenePhysicsDatas.h"
@@ -16418,7 +16418,7 @@
 1309119157 d:\florian\programmation\gamedevelop2\gdl\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1325278124 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\scenephysicsdatas.h
+1328044838 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\scenephysicsdatas.h
 	"GDL/AutomatismsSharedDatas.h"
 	"RuntimeScenePhysicsDatas.h"
 	<iostream>
@@ -16431,7 +16431,7 @@
 1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsruntimeshareddatas.h
 	<boost/shared_ptr.hpp>
 
-1325278124 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\runtimescenephysicsdatas.h
+1328045730 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\runtimescenephysicsdatas.h
 	<iostream>
 	"GDL/AutomatismsRuntimeSharedDatas.h"
 
@@ -16557,7 +16557,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1325278124 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\extension.cpp
+1328045248 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"PhysicsAutomatism.h"
@@ -16620,7 +16620,7 @@
 
 1255632386 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\interprocess\detail\config_end.hpp
 
-1326058492 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp
+1328045582 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp
 	"PhysicsAutomatismEditor.h"
 	<wx/msw/winundef.h>
 	<wx/intl.h>
@@ -16634,7 +16634,7 @@
 	"GDL/Scene.h"
 	"CustomPolygonDialog.h"
 
-1325278124 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.h
+1328044838 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.h
 	<wx/msw/winundef.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -16720,7 +16720,7 @@
 	"wx/pen.h"
 	"wx/bitmap.h"
 
-1325278124 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\runtimescenephysicsdatas.cpp
+1328045730 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\runtimescenephysicsdatas.cpp
 	"RuntimeScenePhysicsDatas.h"
 	"ScenePhysicsDatas.h"
 	"ContactListener.h"
@@ -16750,7 +16750,7 @@
 
 1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\xmlmacros.h
 
-1326232805 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.cpp
+1328045508 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.cpp
 	"PhysicsAutomatism.h"
 	"Box2D/Box2D.h"
 	"Triangulation/triangulate.h"
@@ -22177,7 +22177,7 @@
 1324411703 source:d:\développement\gd2\gdlsdk\extensions\physicsautomatism\polygoneditorwidget.cpp
 	"PolygonEditorWidget.h"
 
-1326145252 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.cpp
+1328045270 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.cpp
 	"CustomPolygonDialog.h"
 	"PhysicsAutomatism.h"
 	<wx/font.h>
@@ -22192,7 +22192,7 @@
 	<string>
 	<cmath>
 
-1325278124 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.h
+1328044838 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>

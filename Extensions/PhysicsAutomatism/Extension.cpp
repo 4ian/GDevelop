@@ -25,7 +25,7 @@ freely, subject to the following restrictions:
 */
 /**
  * Contributors to the extension:
- * Victor Levasseur ( Collisions using custom polygons )
+ * Victor Levasseur ( Collisions using custom polygons, fixed time step fix )
  */
 
 #include "GDL/ExtensionBase.h"

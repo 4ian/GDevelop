@@ -42,6 +42,11 @@ class RuntimeScene;
 class b2Body;
 class PhysicsAutomatismEditor;
 
+namespace sf
+{
+    class Clock;
+}
+
 class GD_EXTENSION_API PhysicsAutomatism : public Automatism
 {
     friend class PhysicsAutomatismEditor;
@@ -176,6 +181,8 @@ class GD_EXTENSION_API PhysicsAutomatism : public Automatism
         float objectOldAngle;
         float objectOldWidth;
         float objectOldHeight;
+
+        sf::Clock *stepClock;
 
         b2Body * body; ///< Box2D body, representing the object in the Box2D world
         boost::shared_ptr<RuntimeScenePhysicsDatas> runtimeScenesPhysicsDatas;

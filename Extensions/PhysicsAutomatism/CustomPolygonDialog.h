@@ -56,7 +56,6 @@ class CustomPolygonDialog: public wxDialog
 
 		//(*Declarations(CustomPolygonDialog)
 		wxButton* Button4;
-		wxTextCtrl* pointsEdit;
 		wxStaticText* StaticText2;
 		wxRadioButton* OnOriginRadioBt;
 		wxButton* Button1;
@@ -66,12 +65,12 @@ class CustomPolygonDialog: public wxDialog
 		wxStaticText* StaticText1;
 		wxTextCtrl* polygonWidthTextCtrl;
 		wxStaticText* StaticText3;
-		wxButton* cancelBt;
 		wxButton* Button2;
 		wxButton* Button3;
 		wxStaticText* StaticText5;
 		wxStaticText* cursorPosTxt;
 		wxScrollBar* previewPnlVerticalScroll;
+		wxTextCtrl* TextCtrl1;
 		wxRadioButton* OnCenterRadioBt;
 		wxScrollBar* previewPnlHorizontalScroll;
 		wxPanel* previewPnl;
@@ -85,6 +84,7 @@ class CustomPolygonDialog: public wxDialog
         bool automaticResizing;
 		float polygonWidth;
 		float polygonHeight;
+
 
 		int horizontalPreviewPos;
 		int verticalPreviewPos;
@@ -113,7 +113,6 @@ class CustomPolygonDialog: public wxDialog
 		static const long ID_STATICTEXT4;
 		static const long ID_STATICTEXT3;
 		static const long ID_BUTTON1;
-		static const long ID_BUTTON6;
 		//*)
 
 	private:
@@ -133,15 +132,7 @@ class CustomPolygonDialog: public wxDialog
 		void OnButton2Click(wxCommandEvent& event);
 		void OnButton3Click(wxCommandEvent& event);
 		void OnButton4Click(wxCommandEvent& event);
-		void OncancelBtClick(wxCommandEvent& event);
-		void OnpointsEditText(wxCommandEvent& event);
 		//*)
-
-		/**
-		 * De/activate controls related to the initial size of the object according
-		 * to user choice.
-		 */
-		void UpdateObjectInitialSizeRelatedControls();
 
 		DECLARE_EVENT_TABLE()
 };

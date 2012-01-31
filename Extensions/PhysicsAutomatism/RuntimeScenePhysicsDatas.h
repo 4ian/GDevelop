@@ -69,11 +69,22 @@ class RuntimeScenePhysicsDatas : public AutomatismsRuntimeSharedDatas
          */
         inline float GetInvScaleY() const { return invScaleY; }
 
+        /**
+         * Call world->Step(), ensuring that the timeStep passed to Step() is fixed.
+         * This method is to be called once a frame ( by PhysicsAutomatism ).
+         */
+        void StepWorld(float dt, int v, int p);
+
     private:
         float scaleX;
         float scaleY;
         float invScaleX;
         float invScaleY;
+
+        float fixedTimeStep; ///< Time step between to call to world->Step(...). Box2D need a fixed time step to ensure reliable simulation.
+        unsigned int maxSteps; ///< Maximum steps per frames, to prevent slow down (a slow down will force the computer to make more steps which will force it to make even more steps...)
+
+        float totalTime;
 };
 
 #endif // RUNTIMESCENEPHYSICSDATAS_H

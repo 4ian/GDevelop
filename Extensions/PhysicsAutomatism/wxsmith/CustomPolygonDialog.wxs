@@ -26,11 +26,11 @@
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
-								<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
+								<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="pointsEdit" member="yes">
 									<size>321,120</size>
 									<maxsize>-1,120</maxsize>
 									<style>wxTE_MULTILINE|wxVSCROLL</style>
-									<handler function="OnTextCtrl1Text" entry="EVT_TEXT" />
+									<handler function="OnpointsEditText" entry="EVT_TEXT" />
 								</object>
 								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
@@ -343,6 +343,15 @@
 						<object class="wxButton" name="ID_BUTTON1" variable="okBt" member="yes">
 							<label>Ok</label>
 							<handler function="OnokBtClick" entry="EVT_BUTTON" />
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxButton" name="ID_BUTTON6" variable="cancelBt" member="yes">
+							<label>Annuler</label>
+							<handler function="OncancelBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>

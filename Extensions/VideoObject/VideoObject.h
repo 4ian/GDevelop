@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Video Object Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -33,7 +33,6 @@ class ImageManager;
 class RuntimeScene;
 class Object;
 class ExpressionInstruction;
-class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
 #if defined(GD_IDE_ONLY)

@@ -548,7 +548,7 @@ SpriteExtension::SpriteExtension()
 
     //Declaration of all conditions available
 
-    DECLARE_CONDITION("EstTourne", //CONVERT TO OBJECT INSTRUCTION //TODO Par ici
+    DECLARE_CONDITION("EstTourne",
                       _("Un objet est tourné vers un autre"),
                       _("Teste si un objet est tourné vers un autre"),
                       _("L'objet _PARAM0_ est tourné vers _PARAM1_"),

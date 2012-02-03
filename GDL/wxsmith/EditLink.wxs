@@ -83,6 +83,7 @@
 								<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="AllEventsCheck" member="yes">
 									<label>Tous les évènements de la scène</label>
 									<selected>1</selected>
+									<style>wxRB_GROUP</style>
 								</object>
 								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>

@@ -25,12 +25,12 @@ class GD_API Layer
         /**
          * Change layer name
          */
-        inline void SetName(string name_) { name = name_; }
+        inline void SetName(const string & name_) { name = name_; }
 
         /**
          * Get layer name
          */
-        inline string GetName() const { return name; }
+        inline const string & GetName() const { return name; }
 
         /**
          * Change if layer is displayed or not

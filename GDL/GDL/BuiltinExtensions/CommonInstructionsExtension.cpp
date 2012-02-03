@@ -10,6 +10,7 @@
 #include "GDL/ForEachEvent.h"
 #include "GDL/WhileEvent.h"
 #include "GDL/RepeatEvent.h"
+#include "GDL/CppCodeEvent.h"
 #include "GDL/LinkEvent.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Event.h"
@@ -249,17 +250,15 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                   ForEachEvent)
 
     DECLARE_END_EVENT()
-    /*
-    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-    DECLARE_EVENT("DynamicExtensionCaller",
+
+    DECLARE_EVENT("CppCode",
                   _("Code C++"),
                   "Execute du code C++",
                   "",
                   "res/source_cpp16.png",
-                  DynamicExtensionCallerEvent)
+                  CppCodeEvent)
 
     DECLARE_END_EVENT()
-    #endif*/
 
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-audio-2.dll"));
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-graphics-2.dll"));

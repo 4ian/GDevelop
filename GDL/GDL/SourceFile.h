@@ -58,6 +58,16 @@ public:
      */
     void SaveToXml(TiXmlElement * elem);
 
+    /**
+     * Set if the file is hidden from the user point of view and is only managed by Game Develop
+     */
+    void SetGDManaged(bool gdManaged_) { gdManaged = gdManaged_; };
+
+    /**
+     * Return true if the file is hidden from the user point of view and is only managed by Game Develop
+     */
+    bool IsGDManaged() const { return gdManaged; };
+
     enum sourceFileLanguage
     {
         CPlusPlus
@@ -68,6 +78,7 @@ private:
     std::string filename; ///< Filename
     time_t lastBuildTimeStamp; ///< Time of the last build
     sourceFileLanguage language; ///< Source file language
+    bool gdManaged; ///< True if the source file is hidden from the user point of view and is managed only by Game Develop.
 };
 
 //"Tool" Functions

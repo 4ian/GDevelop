@@ -14,7 +14,8 @@ namespace GDpriv
 
 SourceFile::SourceFile() :
     lastBuildTimeStamp(0),
-    language(CPlusPlus)
+    language(CPlusPlus),
+    gdManaged(false)
 {
     //ctor
 }

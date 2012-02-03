@@ -1176,6 +1176,8 @@
 		<Unit filename="GDL\CommentEvent.h" />
 		<Unit filename="GDL\CommonTools.cpp" />
 		<Unit filename="GDL\CommonTools.h" />
+		<Unit filename="GDL\CppCodeEvent.cpp" />
+		<Unit filename="GDL\CppCodeEvent.h" />
 		<Unit filename="GDL\DatFile.cpp" />
 		<Unit filename="GDL\DatFile.h" />
 		<Unit filename="GDL\Direction.cpp" />
@@ -1445,7 +1447,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="2.0.10541" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="2.1.10568" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

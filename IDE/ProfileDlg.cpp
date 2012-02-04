@@ -9,7 +9,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "GDL/Events/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompilationHelper.h"
 #include "GDL/ProfileEvent.h"
 #include "SceneCanvas.h"
 #include <iostream>
@@ -305,7 +305,7 @@ void ProfileDlg::OnactivateCheckClick(wxCommandEvent& event)
     {
         sceneCanvas->sceneEdited.wasModified = true;
         sceneCanvas->sceneEdited.eventsModified = true;
-        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&sceneCanvas->gameEdited, &sceneCanvas->sceneEdited));
+        EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(sceneCanvas->gameEdited, sceneCanvas->sceneEdited);
         sceneCanvas->Reload();
     }
 }

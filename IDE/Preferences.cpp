@@ -23,7 +23,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/LocaleManager.h"
 #include "GDL/IDE/ActionSentenceFormatter.h"
-#include "GDL/Events/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompilationHelper.h"
 #include <wx/listctrl.h>
 #include "SetupCompilerToolchainDlg.h"
 
@@ -863,7 +863,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     pConfig->Write( _T( "/Dossier/Compilation" ), DossierTempCompEdit->GetValue() );
     pConfig->Write( _T( "/Dossier/EventsCompilerTempDir" ), eventsCompilerTempDirEdit->GetValue() );
     pConfig->Write( _T( "/Dossier/EventsCompilerDeleteTemp" ), deleteTemporariesCheck->GetValue());
-    EventsCodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporariesCheck->GetValue());
+    CodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporariesCheck->GetValue());
 
     const wxLanguageInfo * language = wxLocale::FindLanguageInfo(langChoice->GetString(langChoice->GetSelection()));
     pConfig->Write( _T( "/Lang" ), language->CanonicalName );

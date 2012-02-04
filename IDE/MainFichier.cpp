@@ -6,12 +6,12 @@
 #include <wx/progdlg.h>
 #include <boost/shared_ptr.hpp>
 #include <SFML/System.hpp>
-#include "GDL/Events/EventsCodeCompiler.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Game.h"
 #include "GDL/DynamicExtensionsManager.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
+#include "GDL/IDE/CodeCompiler.h"
 #include "GDL/CommonTools.h"
 #include "BuildMessagesPnl.h"
 
@@ -69,7 +69,7 @@ void Game_Develop_EditorFrame::OnRibbonNewClicked(wxRibbonButtonBarEvent& evt)
  */
 void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
 {
-    sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
+    sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
     wxFileDialog openFileDialog( this, _( "Choisissez le jeu à ouvrir" ), "", "", "*\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
 
@@ -82,7 +82,7 @@ void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
  */
 void Game_Develop_EditorFrame::OnOpenExampleSelected(wxCommandEvent& event)
 {
-    sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
+    sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
     wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Examples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
 
@@ -108,7 +108,7 @@ void Game_Develop_EditorFrame::OnRibbonOpenDropDownClicked(wxRibbonButtonBarEven
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::Open( string file )
 {
-    sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
+    sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
     boost::shared_ptr<RuntimeGame> newGame(new RuntimeGame);
 
@@ -194,7 +194,7 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
     {
         if ( games[i]->gameFile.empty() )
         {
-            sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
+            sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
             wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg", wxFD_SAVE );
             FileDialog.ShowModal();
@@ -252,7 +252,7 @@ void Game_Develop_EditorFrame::OnMenuSaveAsSelected( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void Game_Develop_EditorFrame::SaveAs()
 {
-    sf::Lock lock(EventsCodeCompiler::openSaveDialogMutex);
+    sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
     if ( !CurrentGameIsValid() ) return;
 
@@ -345,17 +345,6 @@ void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event 
                 RequestUserAttention();
                 return;
             }
-        }
-    }
-
-    //Be sure that we are able to compile all scenes of game.
-    std::vector<Scene*> sceneWithCompilationPrevented = EventsCodeCompiler::GetInstance()->GetSceneWithCompilationDisallowed();
-    for (unsigned int i = 0;i<GetCurrentGame()->scenes.size();++i)
-    {
-        if ( find(sceneWithCompilationPrevented.begin(), sceneWithCompilationPrevented.end(), GetCurrentGame()->scenes[i].get()) != sceneWithCompilationPrevented.end() )
-        {
-            wxLogMessage(_("La scène ")+GetCurrentGame()->scenes[i]->title+_(" ne peut être compilée : Fermez l'aperçu de celle ci avant de continuer."));
-            return;
         }
     }
 

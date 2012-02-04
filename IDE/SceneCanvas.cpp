@@ -33,7 +33,7 @@
 #include "GDL/DynamicExtensionsManager.h"
 #include "GDL/IDE/SourceFileBuilder.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
-#include "GDL/Events/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompilationHelper.h"
 #include "GDL/EventsExecutionEngine.h"
 #include "GDL/SoundManager.h"
 #include "BuildMessagesPnl.h"
@@ -369,7 +369,7 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 {
     if ( edittimeRenderer.editing ) return;
 
-    EventsCodeCompiler::GetInstance()->EnableCompilation(sceneEdited);
+    CodeCompiler::GetInstance()->EnableTaskRelatedTo(sceneEdited);
 
     edittimeRenderer.editing = true;
     edittimeRenderer.runtimeScene.running = false;
@@ -696,9 +696,9 @@ void SceneCanvas::ReloadFirstPart()
 
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
     //Useful when opening a scene for the first time for example.
-    if ( sceneEdited.eventsModified && !EventsCodeCompiler::GetInstance()->SceneEventsBeingCompiled(sceneEdited) )
+    if ( sceneEdited.eventsModified && !CodeCompiler::GetInstance()->HasTaskRelatedTo(sceneEdited) )
     {
-        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&gameEdited, &sceneEdited));
+        EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(gameEdited, sceneEdited);
 
         if ( !edittimeRenderer.editing )
             mainEditorCommand.GetInfoBar()->ShowMessage(_("Les modifications apportées aux évènements seront prises en compte lors du retour au mode édition."));
@@ -724,7 +724,7 @@ void SceneCanvas::ReloadSecondPart()
 {
     cout << "ReloadSecondPart" << endl;
     if ( !edittimeRenderer.editing )
-        EventsCodeCompiler::GetInstance()->DisableCompilation(sceneEdited);
+        CodeCompiler::GetInstance()->DisableTaskRelatedTo(sceneEdited);
 
     #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( !edittimeRenderer.editing && gameEdited.useExternalSourceFiles )
@@ -767,7 +767,7 @@ void SceneCanvas::Refresh()
             if ( mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->IsBuilding() )
                 wait = true;
         }
-        if ( !edittimeRenderer.editing && EventsCodeCompiler::GetInstance()->EventsBeingCompiled()) //Ensure some events are not being compiled.
+        if ( !edittimeRenderer.editing && CodeCompiler::GetInstance()->CompilationInProcess()) //Ensure some events are not being compiled.
             wait =true;
 
         if ( wait ) //We're still waiting for something to finish
@@ -800,7 +800,7 @@ void SceneCanvas::Refresh()
             //But be sure that no error occured.
             if ( !edittimeRenderer.editing && !sceneEdited.compiledEventsExecutionEngine->Ready() )
             {
-                wxLogError(_("La compilation des évènements a échouée, et la scène ne peut être testée. Afin que le problème soit corrigé, veuillez le rapporter au développeur de Game Develop, en joignant le fichier suivant :\n")+EventsCodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt");
+                wxLogError(_("La compilation des évènements a échouée, et la scène ne peut être testée. Afin que le problème soit corrigé, veuillez le rapporter au développeur de Game Develop, en joignant le fichier suivant :\n")+CodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt");
                 wxCommandEvent useless;
                 OnEditionBtClick(useless);
             }

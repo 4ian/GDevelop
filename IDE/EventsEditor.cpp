@@ -24,7 +24,7 @@
 #include "GDL/IDE/EventsEditorSelection.h"
 #include "GDL/EventsRenderingHelper.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Events/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompilationHelper.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/IDE/HelpFileAccess.h"
@@ -1066,7 +1066,7 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory)
 
     scene.wasModified = true;
     scene.eventsModified = true;
-    EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, &scene));
+    EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, scene);
 }
 
 /**

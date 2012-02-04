@@ -59,7 +59,7 @@
 #include "GDL/ExtensionsLoader.h"
 #include "GDL/VersionWrapper.h"
 #include "GDL/IDE/LocaleManager.h"
-#include "GDL/Events/EventsCodeCompiler.h"
+#include "GDL/IDE/CodeCompiler.h"
 
 #include <fstream>
 #include <boost/shared_ptr.hpp>
@@ -279,9 +279,9 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "* Setting up events compiler..." << endl;
     wxString eventsCompilerTempDir;
     if ( Config->Read("/Dossier/EventsCompilerTempDir", &eventsCompilerTempDir) && !eventsCompilerTempDir.empty() )
-        EventsCodeCompiler::GetInstance()->SetWorkingDirectory(ToString(eventsCompilerTempDir));
+        CodeCompiler::GetInstance()->SetWorkingDirectory(ToString(eventsCompilerTempDir));
     else
-        EventsCodeCompiler::GetInstance()->SetWorkingDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
+        CodeCompiler::GetInstance()->SetWorkingDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
 
     //Load extensions
     cout << "* Loading extensions:" << endl;
@@ -363,7 +363,7 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "* Loading events code compiler configuration" << endl;
     bool deleteTemporaries;
     if ( Config->Read( _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true) )
-        EventsCodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporaries);
+        CodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporaries);
 
 
     //Fin du splash screen, affichage de la fenêtre

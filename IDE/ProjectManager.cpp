@@ -19,7 +19,7 @@
 #include "GDL/StandardEvent.h"
 #include "GDL/CommentEvent.h"
 #include "GDL/SourceFile.h"
-#include "GDL/Events/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompilationHelper.h"
 #include "CodeEditor.h"
 #include "NewCppFileDlg.h"
 #include "Extensions.h"
@@ -936,8 +936,8 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = EventsCodeCompiler::GetInstance()->EventsBeingCompiled() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de supprimer la scène...") : NULL;
-    while ( EventsCodeCompiler::GetInstance()->EventsBeingCompiled() )
+    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de supprimer la scène...") : NULL;
+    while ( CodeCompiler::GetInstance()->CompilationInProcess() )
     {
         wxYield();
     }
@@ -1007,8 +1007,8 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = EventsCodeCompiler::GetInstance()->EventsBeingCompiled() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements\ndoit être menée à terme avant de continuer...") : NULL;
-    while (EventsCodeCompiler::GetInstance()->EventsBeingCompiled())
+    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements\ndoit être menée à terme avant de continuer...") : NULL;
+    while (CodeCompiler::GetInstance()->CompilationInProcess())
     {
         wxYield();
     }
@@ -1178,8 +1178,8 @@ void ProjectManager::CloseGame(Game * game)
     }
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = EventsCodeCompiler::GetInstance()->EventsBeingCompiled() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de fermer le jeu...") : NULL;
-    while ( EventsCodeCompiler::GetInstance()->EventsBeingCompiled() )
+    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de fermer le jeu...") : NULL;
+    while ( CodeCompiler::GetInstance()->CompilationInProcess() )
     {
         wxYield();
     }

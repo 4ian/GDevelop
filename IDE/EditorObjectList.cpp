@@ -29,7 +29,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Events/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompilationHelper.h"
 #include "Clipboard.h"
 #include <algorithm>
 #include <numeric>
@@ -589,7 +589,7 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
    if ( scene )
    {
         scene->wasModified = true;
-        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+        EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, *scene);
    }
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
 }
@@ -653,7 +653,7 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
             if ( scene )
             {
                 scene->wasModified = true;
-                EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+                EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, *scene);
             }
         }
     }
@@ -734,7 +734,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         }
 
         scene->wasModified = true;
-        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+        EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, *scene);
     }
     objectsList->SetItemText( event.GetItem(), event.GetLabel() );
     return;
@@ -847,7 +847,7 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
     if ( scene )
     {
         scene->wasModified = true;
-        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+        EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, *scene);
     }
 
     Clipboard::GetInstance()->SetObject(*object);
@@ -903,7 +903,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     if ( scene )
     {
         scene->wasModified = true;
-        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+        EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, *scene);
     }
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
 }
@@ -941,7 +941,7 @@ void EditorObjectList::OnMoveUpSelected(wxCommandEvent& event)
         if ( scene )
         {
             scene->wasModified = true;
-            EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+            EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, *scene);
         }
 
         //On la reselectionne
@@ -992,7 +992,7 @@ void EditorObjectList::OnMoveDownSelected(wxCommandEvent& event)
         if ( scene )
         {
             scene->wasModified = true;
-            EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+            EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, *scene);
         }
 
         //On la reselectionne
@@ -1094,7 +1094,7 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
         if ( scene )
         {
             scene->wasModified = true;
-            EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+            EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, *scene);
         }
     }
 }
@@ -1128,7 +1128,7 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
     if ( scene )
     {
         scene->wasModified = true;
-        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+        EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, *scene);
     }
 }
 
@@ -1170,7 +1170,7 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
     if ( scene )
     {
         scene->wasModified = true;
-        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(EventsCodeCompiler::Task(&game, scene));
+        EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, *scene);
     }
 }
 

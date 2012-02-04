@@ -18,7 +18,8 @@
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 #include <wx/filename.h>
-#include "GDL/Events/EventsCodeCompiler.h"
+#include "GDL/IDE/CodeCompiler.h"
+#include "GDL/Events/EventsCodeCompilationHelper.h"
 #include "GDL/DatFile.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
@@ -78,30 +79,13 @@ void FullProjectCompiler::LaunchProjectCompilation()
     wxString tempDir = GetTempDir();
     ClearDirectory(ToString(tempDir)); //Préparation du répertoire
 
-    //Make sure scenes are not being previewed
-    bool stop = false;
-    std::vector<Scene*> sceneWithCompilationPrevented = EventsCodeCompiler::GetInstance()->GetSceneWithCompilationDisallowed();
-    for (unsigned int i = 0;i<gameToCompile.scenes.size();++i)
-    {
-        if ( find(sceneWithCompilationPrevented.begin(), sceneWithCompilationPrevented.end(), gameToCompile.scenes[i].get()) != sceneWithCompilationPrevented.end() )
-        {
-            stop = true;
-            diagnosticManager.AddError(ToString(_("La scène ")+gameToCompile.scenes[i]->GetName()+_("ne peut être compilée : Veuillez arrêter tout aperçu de celle ci avant de lancer la compilation.\n")));
-        }
-    }
-    if ( stop )
-    {
-        diagnosticManager.OnCompilationFailed();
-        return;
-    }
-
     //Wait current compilations to end
-    if ( EventsCodeCompiler::GetInstance()->EventsBeingCompiled() )
+    if ( CodeCompiler::GetInstance()->CompilationInProcess() )
     {
         diagnosticManager.OnMessage(ToString(_("Compilation en attente de la fin des tâches en cours...")));
 
         wxStopWatch yieldClock;
-        while (EventsCodeCompiler::GetInstance()->EventsBeingCompiled())
+        while (CodeCompiler::GetInstance()->CompilationInProcess())
         {
             if ( yieldClock.Time() > 50 )
             {
@@ -154,15 +138,19 @@ void FullProjectCompiler::LaunchProjectCompilation()
         if ( game.scenes[i]->profiler ) game.scenes[i]->profiler->profilingActivated = false;
 
         diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+game.scenes[i]->GetName()+_(".")));
-        EventsCodeCompiler::Task task(&game, game.scenes[i].get());
+        CodeCompilerTask task;
         task.compilationForRuntime = true;
-        task.generateBitcodeFileOnly = true;
         task.optimize = optimize;
-        task.bitCodeFilename = tempDir+"/GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[i]->GetName())+".ir";
-        EventsCodeCompiler::GetInstance()->EventsCompilationNeeded(task);
+        task.eventsGeneratedCode = true;
+        task.inputFile = string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(game.scenes[i].get())+"events.cpp");
+        task.outputFile = tempDir+"/GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[i]->GetName())+".ir";
+        task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPreWork(&game, game.scenes[i].get(), boost::shared_ptr<EventsExecutionEngine>()));
+        task.scene = game.scenes[i].get();
+
+        CodeCompiler::GetInstance()->AddTask(task);
 
         wxStopWatch yieldClock;
-        while (EventsCodeCompiler::GetInstance()->EventsBeingCompiled())
+        while (CodeCompiler::GetInstance()->CompilationInProcess())
         {
             if ( yieldClock.Time() > 50 )
             {
@@ -171,16 +159,16 @@ void FullProjectCompiler::LaunchProjectCompilation()
             }
         }
 
-        if ( !wxFileExists(task.bitCodeFilename) )
+        if ( !wxFileExists(task.outputFile) )
         {
-            diagnosticManager.AddError(ToString(_("La compilation de la scène ")+game.scenes[i]->GetName()+_(" a échouée : Rendez vous sur notre site pour nous rapporter cette erreur, en joignant le fichier suivant:\n"+EventsCodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt"+"\n\nSi vous pensez que l'erreur provient d'une extension, contactez le développeur de celle ci.")));
+            diagnosticManager.AddError(ToString(_("La compilation de la scène ")+game.scenes[i]->GetName()+_(" a échouée : Rendez vous sur notre site pour nous rapporter cette erreur, en joignant le fichier suivant:\n"+CodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt"+"\n\nSi vous pensez que l'erreur provient d'une extension, contactez le développeur de celle ci.")));
             diagnosticManager.OnCompilationFailed();
             return;
         }
         else
             diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+game.scenes[i]->GetName()+_(" effectuée avec succès.")));
 
-        resourcesMergingHelper.ExposeResource(task.bitCodeFilename); //Export bitcode file.
+        resourcesMergingHelper.ExposeResource(task.outputFile); //Export bitcode file.
 
         diagnosticManager.OnPercentUpdate( static_cast<float>(i) / static_cast<float>(game.scenes.size())*50.0 );
     }

@@ -28,7 +28,7 @@
 #include "GDL/BuiltinExtensions/WindowExtension.h"
 #include "GDL/BuiltinExtensions/StringInstructionsExtension.h"
 #include "GDL/Object.h"
-#include "GDL/Events/EventsCodeCompiler.h"
+#include "GDL/IDE/CodeCompiler.h"
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/Game.h"
@@ -103,7 +103,7 @@ bool ExtensionsManager::AddExtension(boost::shared_ptr<ExtensionBase> extension)
 
     //Add include directories
     for (unsigned int i = 0;i<extension->GetSupplementaryIncludeDirectories().size();++i)
-        EventsCodeCompiler::GetInstance()->AddHeaderDirectory(extension->GetSupplementaryIncludeDirectories()[i]);
+        CodeCompiler::GetInstance()->AddHeaderDirectory(extension->GetSupplementaryIncludeDirectories()[i]);
 
     extensionsLoaded.push_back(extension);
     return true;

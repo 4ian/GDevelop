@@ -20,8 +20,11 @@ class RuntimeContext;
 
 /**
  * \brief Manage all llvm related stuff to launch compiled events.
- * RuntimeScene uses this class to launch events.
- * This class is setup by EventsCodeCompiler.
+ * RuntimeScene uses this class to launch compiled events.
+ * Set up this class by loading bitcode compiled by CodeCompiler.
+ *
+ * \see EventsCodeCompilationHelper
+ * \see CodeCompiler
  */
 class GD_API EventsExecutionEngine
 {

@@ -40,7 +40,7 @@
 #include <wx/log.h>
 #include <wx/msgdlg.h>
 #include <wx/filename.h>
-#include "GDL/Events/EventsCodeCompiler.h"
+#include "GDL/IDE/CodeCompiler.h"
 #endif
 
 typedef ExtensionBase* (*createExtension)();

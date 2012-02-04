@@ -6,7 +6,7 @@
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/EventsExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
-#include "GDL/Events/EventsCodeCompiler.h"
+#include "GDL/Events/EventsCodeCompilationHelper.h"
 #endif
 #include <iostream>
 
@@ -45,7 +45,9 @@ windowMask(false)
 Scene::~Scene()
 {
     #if defined(GD_IDE_ONLY) //Make sure a compilation is not being run on this scene.
-    EventsCodeCompiler::GetInstance()->NotifyASceneIsDestroyed(*this);
+    CodeCompiler::GetInstance()->RemovePendingTasksRelatedTo(*this);
+    while ( CodeCompiler::GetInstance()->HasTaskRelatedTo(*this) )
+        ;
     #endif
 }
 

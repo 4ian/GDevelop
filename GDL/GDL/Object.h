@@ -283,6 +283,12 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         inline const std::string & GetLayer() const { return layer; }
 
         /**
+         * Return true if object's layer is layer_.
+         */
+        inline bool IsOnLayer(const std::string & layer_) const { return layer == layer_; }
+
+
+        /**
          * Get object hit box(es)
          */
         virtual std::vector<RotatedRectangle> GetHitBoxes() const;

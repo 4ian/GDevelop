@@ -372,8 +372,9 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("layer", _("Calque"), "", false);
+            instrInfo.AddParameter("relationalOperator", _("Calque"), "", false);
 
-            instrInfo.cppCallingInformation.SetFunctionName("GetLayer").SetManipulatedType("string");
+            instrInfo.cppCallingInformation.SetFunctionName("IsOnLayer");
 
         DECLARE_END_OBJECT_CONDITION()
 

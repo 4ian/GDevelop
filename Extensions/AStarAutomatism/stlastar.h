@@ -25,7 +25,7 @@ given where due.
 
 /**
  * Adapted for Game Develop - A Star Automatism Extension
- * Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+ * Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 class RuntimeSceneAStarDatas;
 

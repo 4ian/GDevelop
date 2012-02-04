@@ -1,7 +1,7 @@
 /**
 
 Game Develop - A Star Automatism Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@ freely, subject to the following restrictions:
 #include "AStarAutomatismEditor.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Scene.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/XmlMacros.h"
 #include "MapSearchNode.h"
 
@@ -84,7 +84,7 @@ void AStarAutomatism::DoStepPreEvents(RuntimeScene & scene)
 {
     if ( runtimeScenesAStarDatas == boost::shared_ptr<RuntimeSceneAStarDatas>() )
     {
-        runtimeScenesAStarDatas = boost::static_pointer_cast<RuntimeSceneAStarDatas>(scene.automatismsSharedDatas.find(name)->second);
+        runtimeScenesAStarDatas = boost::static_pointer_cast<RuntimeSceneAStarDatas>(scene.GetAutomatismSharedDatas(name));
         runtimeScenesAStarDatas->objects.push_back(shared_from_this());
     }
 
@@ -115,7 +115,7 @@ void AStarAutomatism::ComputePath(RuntimeScene & scene)
 {
     if ( runtimeScenesAStarDatas == boost::shared_ptr<RuntimeSceneAStarDatas>() )
     {
-        runtimeScenesAStarDatas = boost::static_pointer_cast<RuntimeSceneAStarDatas>(scene.automatismsSharedDatas.find(name)->second);
+        runtimeScenesAStarDatas = boost::static_pointer_cast<RuntimeSceneAStarDatas>(scene.GetAutomatismSharedDatas(name));
         runtimeScenesAStarDatas->objects.push_back(shared_from_this());
     }
 

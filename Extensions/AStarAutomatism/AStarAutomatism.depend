@@ -8815,7 +8815,7 @@
 1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
 	"GDL/btScalar.h"
 
-1312670010 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\astarautomatismeditor.cpp
+1326058491 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\astarautomatismeditor.cpp
 	"AStarAutomatismEditor.h"
 	<wx/font.h>
 	<wx/intl.h>
@@ -8823,11 +8823,11 @@
 	<wx/log.h>
 	"GDL/Game.h"
 	"AStarAutomatism.h"
-	"GDL/MainEditorCommand.h"
+	"GDL/IDE/MainEditorCommand.h"
 	"GDL/CommonTools.h"
 	"GDL/Scene.h"
 
-1301511952 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\astarautomatismeditor.h
+1325278123 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\astarautomatismeditor.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -11852,25 +11852,23 @@
 
 1236012322 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\smart_ptr\detail\operator_bool.hpp
 
-1319824888 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
+1326144572 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
 	"GDL/Scene.h"
-	"GDL/ListVariable.h"
-	"GDL/Dossier.h"
-	"GDL/Image.h"
+	"GDL/VariableList.h"
 	"GDL/LoadingScreen.h"
 	"GDL/ResourcesManager.h"
 
-1319828704 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
+1328304139 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
 	"GDL/Force.h"
 	<string>
 	<vector>
 	<map>
 	<boost/shared_ptr.hpp>
 	<boost/enable_shared_from_this.hpp>
-	"GDL/ListVariable.h"
+	"GDL/VariableList.h"
 	"GDL/ObjectHelpers.h"
 
 1307986706 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\wx.h
@@ -13177,9 +13175,9 @@
 1253304910 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\mdi.h
 	"wx/frame.h"
 
-1312665277 d:\florian\programmation\gamedevelop2\gdl\gdl\force.h
+1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\force.h
 
-1314812205 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
+1326058787 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
 	<boost/weak_ptr.hpp>
 	<iostream>
 	<vector>
@@ -13187,7 +13185,7 @@
 	<vector>
 	<boost/shared_ptr.hpp>
 	"GDL/Log.h"
-	"GDL/Instruction.h"
+	"GDL/IDE/Instruction.h"
 
 1236010936 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\weak_ptr.hpp
 	<boost/smart_ptr/weak_ptr.hpp>
@@ -15377,19 +15375,18 @@
 	<boost/type_traits/remove_volatile.hpp>
 	<boost/type_traits/remove_cv.hpp>
 
-1313668931 d:\florian\programmation\gamedevelop2\gdl\gdl\log.h
+1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\log.h
 	<string>
 	<vector>
 
-1312823469 d:\florian\programmation\gamedevelop2\gdl\gdl\instruction.h
+1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\instruction.h
 	<string>
 	<vector>
 	<iostream>
 	"GDL/GDExpression.h"
 
-1308405099 d:\florian\programmation\gamedevelop2\gdl\gdl\gdexpression.h
+1326055346 d:\florian\programmation\gamedevelop2\gdl\gdl\gdexpression.h
 	<string>
-	<vector>
 
 1314041053 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system.hpp
 	<SFML/Config.hpp>
@@ -15670,22 +15667,22 @@
 	<boost/assert.hpp>
 	<boost/config.hpp>
 
-1297527793 d:\florian\programmation\gamedevelop2\gdl\gdl\listvariable.h
+1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\listvariable.h
 	<vector>
 	<string>
 	"GDL/Variable.h"
 
-1314210839 d:\florian\programmation\gamedevelop2\gdl\gdl\variable.h
+1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\variable.h
 	<string>
 
-1297520343 d:\florian\programmation\gamedevelop2\gdl\gdl\objecthelpers.h
+1326056681 d:\florian\programmation\gamedevelop2\gdl\gdl\objecthelpers.h
 	<boost/shared_ptr.hpp>
 	<vector>
 
 1309119157 d:\florian\programmation\gamedevelop2\gdl\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1320525687 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
+1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
 	"GDL/Event.h"
 	<vector>
 	<map>
@@ -15696,39 +15693,39 @@
 	"GDL/Position.h"
 	"GDL/Layer.h"
 
-1308405409 d:\florian\programmation\gamedevelop2\gdl\gdl\objectgroup.h
+1325335071 d:\florian\programmation\gamedevelop2\gdl\gdl\objectgroup.h
 	<vector>
 	<string>
 	<set>
 	<utility>
 
-1297540952 d:\florian\programmation\gamedevelop2\gdl\gdl\position.h
+1325335071 d:\florian\programmation\gamedevelop2\gdl\gdl\position.h
 	<string>
 	<map>
 
-1297524574 d:\florian\programmation\gamedevelop2\gdl\gdl\layer.h
+1327355525 d:\florian\programmation\gamedevelop2\gdl\gdl\layer.h
 	<string>
 	<vector>
 	<SFML/Graphics.hpp>
 	"GDL/Camera.h"
 
-1297525936 d:\florian\programmation\gamedevelop2\gdl\gdl\camera.h
+1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\camera.h
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 
-1297520342 d:\florian\programmation\gamedevelop2\gdl\gdl\dossier.h
+1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\dossier.h
 	<string>
 	<vector>
 
-1308410764 d:\florian\programmation\gamedevelop2\gdl\gdl\image.h
+1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\image.h
 	<string>
 	<vector>
 
-1297524574 d:\florian\programmation\gamedevelop2\gdl\gdl\loadingscreen.h
+1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\loadingscreen.h
 	<string>
 	<vector>
 
-1313272365 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\astarautomatism.h
+1325278123 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\astarautomatism.h
 	"GDL/Automatism.h"
 	"GDL/Object.h"
 	"SceneAStarDatas.h"
@@ -15738,30 +15735,30 @@
 	<map>
 	<set>
 
-1308398453 d:\florian\programmation\gamedevelop2\gdl\gdl\automatism.h
+1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\automatism.h
 	<boost/shared_ptr.hpp>
 	<string>
 
-1313272735 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\sceneastardatas.h
+1325278123 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\sceneastardatas.h
 	"GDL/AutomatismsSharedDatas.h"
 	"RuntimeSceneAStarDatas.h"
 	<iostream>
 
-1308398453 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsshareddatas.h
+1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsshareddatas.h
 	"GDL/AutomatismsRuntimeSharedDatas.h"
 	<boost/shared_ptr.hpp>
 	<string>
 
-1297520341 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsruntimeshareddatas.h
+1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsruntimeshareddatas.h
 	<boost/shared_ptr.hpp>
 
-1313272554 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\runtimesceneastardatas.h
+1325278123 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\runtimesceneastardatas.h
 	<iostream>
 	<boost/weak_ptr.hpp>
 	<vector>
 	"GDL/AutomatismsRuntimeSharedDatas.h"
 
-1319816389 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
+1326056511 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
 	"GDL/Scene.h"
 	<iostream>
 	<sstream>
@@ -15802,7 +15799,7 @@
 	<OpenGL/gl.h>
 	<OpenGL/glu.h>
 
-1313669014 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
+1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
 	<string>
 	<sstream>
 	<iostream>
@@ -15810,7 +15807,7 @@
 	<cmath>
 	"GDL/LightweightCommonTools.h"
 
-1297539407 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimelayer.h
+1327256763 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimelayer.h
 	<SFML/Graphics.hpp>
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
@@ -15818,7 +15815,7 @@
 1268854766 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimecamera.h
 	"GDL/Camera.h"
 
-1297522571 d:\florian\programmation\gamedevelop2\gdl\gdl\text.h
+1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\text.h
 	<SFML/Graphics.hpp>
 	<string>
 
@@ -15831,13 +15828,11 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1297527793 d:\florian\programmation\gamedevelop2\gdl\gdl\maineditorcommand.h
-	<wx/ribbon/bar.h>
-	<wx/ribbon/buttonbar.h>
-	<wx/toplevel.h>
+1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\maineditorcommand.h
 	<iostream>
 	<algorithm>
 	<vector>
+	<wx/infobar.h>
 
 1307986686 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\ribbon\bar.h
 	"wx/defs.h"
@@ -15874,16 +15869,16 @@
 	"wx/pen.h"
 	"wx/bitmap.h"
 
-1301684650 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\mapsearchnode.cpp
+1325278123 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\mapsearchnode.cpp
 	"MapSearchNode.h"
 	<cmath>
 	"RuntimeSceneAStarDatas.h"
 	"AStarAutomatism.h"
 
-1301684650 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\mapsearchnode.h
+1325278123 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\mapsearchnode.h
 	"stlastar.h"
 
-1301177673 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\stlastar.h
+1325278123 d:\florian\programmation\gamedevelop2\extensions\astarautomatism\stlastar.h
 	<iostream>
 	<stdio.h>
 	<assert.h>
@@ -15896,14 +15891,14 @@
 	<string.h>
 	<stdio.h>
 
-1301425435 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\runtimesceneastardatas.cpp
+1325278123 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\runtimesceneastardatas.cpp
 	"RuntimeSceneAStarDatas.h"
 	"SceneAStarDatas.h"
 	<iostream>
 
-1301425435 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\sceneastardatas.cpp
+1326232805 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\sceneastardatas.cpp
 	"SceneAStarDatas.h"
-	"GDL/tinyxml.h"
+	"GDL/tinyxml/tinyxml.h"
 	"GDL/XmlMacros.h"
 	<iostream>
 
@@ -15922,15 +15917,15 @@
 	<assert.h>
 	<string.h>
 
-1297520343 d:\florian\programmation\gamedevelop2\gdl\gdl\xmlmacros.h
+1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\xmlmacros.h
 
-1319223228 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\extension.cpp
+1325278123 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"AStarAutomatism.h"
 	<boost/version.hpp>
 
-1317476824 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
+1325353122 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
 	<wx/bitmap.h>
 	<wx/file.h>
 	<wx/wx.h>
@@ -15940,16 +15935,16 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1324229304 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1327613415 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299112181 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 
-1314212180 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\astarautomatism.cpp
+1326232805 source:d:\florian\programmation\gamedevelop2\extensions\astarautomatism\astarautomatism.cpp
 	"AStarAutomatism.h"
 	"AStarAutomatismEditor.h"
 	"GDL/RuntimeScene.h"
 	"GDL/Scene.h"
-	"GDL/tinyxml.h"
+	"GDL/tinyxml/tinyxml.h"
 	"GDL/XmlMacros.h"
 	"MapSearchNode.h"
 
@@ -15981,8 +15976,54 @@
 	<SFML/Graphics/Texture.hpp>
 	<SFML/Graphics/RenderTarget.hpp>
 
-1319925345 d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.h
+1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.h
 	<boost/shared_ptr.hpp>
 	<vector>
 	<string>
+
+1307986704 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\infobar.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/gtk/infobar.h"
+	"wx/generic/infobar.h"
+
+1307986696 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\infobar.h
+	"wx/generic/infobar.h"
+
+1307986701 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\infobar.h
+
+1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\variablelist.h
+	<vector>
+	<string>
+	"GDL/Variable.h"
+
+1326058974 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\instruction.h
+	<string>
+	<vector>
+	<iostream>
+	"GDL/IDE/GDExpression.h"
+
+1326055346 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\gdexpression.h
+	<string>
+
+1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\maineditorcommand.h
+	<iostream>
+	<algorithm>
+	<vector>
+	<wx/infobar.h>
+
+1326141663 d:\florian\programmation\gamedevelop2\gdl\gdl\tinyxml\tinyxml.h
+	<ctype.h>
+	<stdio.h>
+	<stdlib.h>
+	<string.h>
+	<assert.h>
+	<string>
+	<iostream>
+	<sstream>
+	"GDL/tinyxml/tinystr.h"
+
+1303904068 d:\florian\programmation\gamedevelop2\gdl\gdl\tinyxml\tinystr.h
+	<assert.h>
+	<string.h>
 

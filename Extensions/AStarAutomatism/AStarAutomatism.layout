@@ -2,39 +2,39 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
 	<File name="AStarAutomatism.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4133" topLine="112" />
+		<Cursor1 position="88" topLine="3" />
 	</File>
 	<File name="AStarAutomatism.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="6567" topLine="165" />
+		<Cursor1 position="640" topLine="6" />
 	</File>
 	<File name="AStarAutomatismEditor.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="10939" topLine="137" />
+		<Cursor1 position="88" topLine="3" />
 	</File>
 	<File name="AStarAutomatismEditor.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1874" topLine="39" />
+		<Cursor1 position="88" topLine="3" />
 	</File>
 	<File name="Extension.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1806" topLine="37" />
+		<Cursor1 position="88" topLine="3" />
 	</File>
 	<File name="MapSearchNode.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1184" topLine="30" />
+		<Cursor1 position="88" topLine="3" />
 	</File>
 	<File name="MapSearchNode.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2129" topLine="39" />
+		<Cursor1 position="88" topLine="3" />
 	</File>
 	<File name="RuntimeSceneAStarDatas.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1314" topLine="8" />
+		<Cursor1 position="88" topLine="3" />
 	</File>
 	<File name="RuntimeSceneAStarDatas.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1974" topLine="24" />
+		<Cursor1 position="88" topLine="3" />
 	</File>
 	<File name="SceneAStarDatas.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="0" topLine="0" />
+		<Cursor1 position="88" topLine="3" />
 	</File>
 	<File name="SceneAStarDatas.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2126" topLine="28" />
+		<Cursor1 position="88" topLine="3" />
 	</File>
 	<File name="stlastar.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1727" topLine="38" />
+		<Cursor1 position="1096" topLine="27" />
 	</File>
 </CodeBlocks_layout_file>

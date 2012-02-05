@@ -34835,7 +34835,7 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1327760936 source:d:\florian\programmation\gamedevelop2\gdl\gdl\cppcodeevent.cpp
+1328453702 source:d:\florian\programmation\gamedevelop2\gdl\gdl\cppcodeevent.cpp
 	"CppCodeEvent.h"
 	<iostream>
 	"GDL/RuntimeScene.h"
@@ -34919,14 +34919,15 @@
 	<SFML/System.hpp>
 	"GDL/IDE/CodeCompiler.h"
 
-1328395673 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\codecompiler.h
+1328460487 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\codecompiler.h
 	<string>
 	<vector>
 	<set>
 	<SFML/System.hpp>
 	<boost/shared_ptr.hpp>
+	<wx/event.h>
 
-1328396155 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\codecompiler.cpp
+1328462504 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\codecompiler.cpp
 	"CodeCompiler.h"
 	<SFML/System.hpp>
 	<iostream>
@@ -34982,12 +34983,13 @@
 	"llvm/Bitcode/ReaderWriter.h"
 	"clang/Basic/FileManager.h"
 
-1328395673 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\codecompiler.h
+1328460487 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\codecompiler.h
 	<string>
 	<vector>
 	<set>
 	<SFML/System.hpp>
 	<boost/shared_ptr.hpp>
+	<wx/event.h>
 
 1328394584 d:\florian\programmation\gamedevelop2\gdl\\gdl\events\eventscodecompilationhelper.h
 	<map>

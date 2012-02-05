@@ -61,6 +61,7 @@ using namespace clang::driver;
 
 CodeCompiler *CodeCompiler::_singleton = NULL;
 sf::Mutex CodeCompiler::openSaveDialogMutex;
+const wxEventType CodeCompiler::refreshEventType = wxNewEventType();
 
 void CodeCompiler::ProcessTasks()
 {
@@ -91,12 +92,14 @@ void CodeCompiler::ProcessTasks()
                     std::cout << "No more task to be processed ( But "+ToString(pendingTasks.size())+" disabled task(s) waiting for being enabled )." << std::endl;
 
                 threadLaunched = false;
+                NotifyControls();
                 return;
             }
 
         }
 
         std::cout << "Processing task..." << std::endl;
+        NotifyControls();
 
         if ( currentTask.preWork != boost::shared_ptr<CodeCompilerExtraWork>() )
         {
@@ -220,6 +223,16 @@ void CodeCompiler::ProcessTasks()
         }
 
         std::cout << "Task ended." << std::endl;
+        NotifyControls();
+    }
+}
+
+void CodeCompiler::NotifyControls()
+{
+    wxCommandEvent refreshEvent( refreshEventType );
+    for (std::set<wxEvtHandler*>::iterator it = notifiedControls.begin();it != notifiedControls.end();++it)
+    {
+        if ( (*it) != NULL) wxPostEvent((*it), refreshEvent);
     }
 }
 
@@ -251,7 +264,7 @@ std::vector < CodeCompilerTask > CodeCompiler::GetCurrentTasks() const
     sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
     std::vector < CodeCompilerTask > allTasks = pendingTasks;
-    allTasks.insert(allTasks.begin(), currentTask);
+    if (threadLaunched) allTasks.insert(allTasks.begin(), currentTask);
 
     return allTasks;
 }
@@ -323,7 +336,7 @@ bool CodeCompiler::CompilationInProcess() const
 {
     sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
-    return (threadLaunched || !pendingTasks.empty());
+    return (threadLaunched);
 }
 
 void CodeCompiler::SetWorkingDirectory(std::string workingDir_)

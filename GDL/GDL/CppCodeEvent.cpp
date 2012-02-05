@@ -39,11 +39,13 @@ std::string CppCodeEvent::GenerateEventCode(const Game & game, const Scene & sce
 void CppCodeEvent::SaveToXml(TiXmlElement * elem) const
 {
     //GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("IncludeFile", includeFile);//TODO
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("FunctionToCall", functionToCall);
 }
 
 void CppCodeEvent::LoadFromXml(const TiXmlElement * elem)
 {
     //GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("IncludeFile", includeFile);//TODO
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("FunctionToCall", functionToCall);
 }
 
 

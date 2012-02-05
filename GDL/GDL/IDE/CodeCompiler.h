@@ -12,6 +12,7 @@
 #include <set>
 #include <SFML/System.hpp>
 #include <boost/shared_ptr.hpp>
+#include <wx/event.h>
 class CodeCompilerExtraWork;
 class Scene;
 
@@ -34,8 +35,8 @@ public:
     bool eventsGeneratedCode; ///< If set to true, the compiler will be set up with common options for events compilation.
     Scene * scene; ///< Optional pointer to a scene to specify that the task work is related to this scene.
 
-    boost::shared_ptr<CodeCompilerExtraWork> postWork;
-    boost::shared_ptr<CodeCompilerExtraWork> preWork;
+    boost::shared_ptr<CodeCompilerExtraWork> postWork; ///< Post work that will be launched when the compilation of the task is over
+    boost::shared_ptr<CodeCompilerExtraWork> preWork;  ///< Pre work that will be launched before the compilation of the task is launched
 
     std::string userFriendlyName; ///< Task name displayed to the user
 
@@ -68,6 +69,9 @@ public:
 /**
  * \brief C++ Code compiler
  * This class uses a thread to launch Clang compiler according to the task added using AddTask.
+ * Specific functions are available for preventing the compiler to start a new task involving a specific scene.
+ *
+ * \see CodeCompilerTask
  */
 class GD_API CodeCompiler
 {
@@ -79,11 +83,6 @@ public:
      * won't be added to this pending task list.
      */
     void AddTask(CodeCompilerTask task);
-
-    /**
-     * Return a list of tasks containing the current task and tasks waiting to be processed
-     */
-    std::vector < CodeCompilerTask > GetCurrentTasks() const;
 
     /**
      * Return true if a task involving scene is being processed or will be processed.
@@ -114,14 +113,14 @@ public:
     bool CompilationInProcess() const;
 
     /**
+     * Return a list of tasks containing the current task and tasks waiting to be processed
+     */
+    std::vector < CodeCompilerTask > GetCurrentTasks() const;
+
+    /**
      * Add a directory where headers can be found
      */
     void AddHeaderDirectory(const std::string & dir) { headersDirectories.insert(std::string("-I"+dir)); };
-
-    /**
-     * Set the directory used as temporary directory for output files.
-     */
-    void SetWorkingDirectory(std::string workingDir_);
 
     /**
      * Set if code compiler must delete temporaries files
@@ -134,35 +133,60 @@ public:
     bool MustDeleteTemporaries() { return mustDeleteTemporaries; };
 
     /**
+     * Set the directory used as temporary directory for output files.
+     */
+    void SetWorkingDirectory(std::string workingDir_);
+
+    /**
      * Return the directory used as temporary directory for output files.
      */
     const std::string & GetWorkingDirectory() const { return workingDir; };
+
+    /**
+     * Add a (wxWidgets) control to the list of objects notified when progress has been made
+     */
+    void AddNotifiedControl(wxEvtHandler * control) { notifiedControls.insert(control); };
+
+    /**
+     * Remove a (wxWidgets) control from the list of objects notified when progress has been made
+     */
+    void RemoveNotifiedControl(wxEvtHandler * control) { notifiedControls.erase(control); };
 
     static CodeCompiler * GetInstance();
     static void DestroySingleton();
 
     static sf::Mutex openSaveDialogMutex; ///< wxWidgets Open/Save dialog seems to cause crash when writing bitcode at the same time.
+    static const wxEventType refreshEventType; ///< Used to notify associated gui that they need to update.
 
 private:
-
-
-    bool threadLaunched; ///< Set to true when the thread is working, and to false when the pending task list has been exhausted.
-    CodeCompilerTask currentTask;
-    sf::Thread currentTaskThread;
-
-    std::vector < CodeCompilerTask > pendingTasks; ///< Compilation task waiting to be launched.
-    mutable sf::Mutex pendingTasksMutex; ///< A mutex is used to b sure that pending tasks are not modified by the thread and another method at the same time.
-
-    std::vector < Scene* > compilationDisallowed; ///< List of scenes which disallow their events to be compiled. (However, if a compilation is being made, it will not be stopped)
 
     /**
      * Execute the current tasks until pending task list is empty. Do not call this method directly: It is only to be used by currentTaskThread.
      */
     void ProcessTasks();
 
-    std::string workingDir;
-    std::set < std::string > headersDirectories;
-    bool mustDeleteTemporaries;
+    /**
+     * Post an event to notifiedControls to notify them that progress has been made.
+     */
+    void NotifyControls();
+
+    //Current tasks
+    bool threadLaunched; ///< Set to true when the thread is working, and to false when the pending task list has been exhausted.
+    CodeCompilerTask currentTask; ///< When a task is being done, it is removed from pendingTasks and stored here.
+    sf::Thread currentTaskThread; ///< The thread used to process tasks
+
+    //Pending task management
+    std::vector < CodeCompilerTask > pendingTasks; ///< Compilation task waiting to be launched.
+    mutable sf::Mutex pendingTasksMutex; ///< A mutex is used to b sure that pending tasks are not modified by the thread and another method at the same time.
+    std::vector < Scene* > compilationDisallowed; ///< List of scenes which disallow their events to be compiled. (However, if a compilation is being made, it will not be stopped)
+
+    //Global compiler configuration
+    std::string workingDir; ///< The directory where temporary files are created
+    std::set < std::string > headersDirectories; ///< List of headers that should be used for every compilation task
+    bool mustDeleteTemporaries; ///< True if temporary must be deleted
+
+    //Gui related
+    std::set<wxEvtHandler*> notifiedControls;
 
     CodeCompiler();
     virtual ~CodeCompiler();

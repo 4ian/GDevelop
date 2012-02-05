@@ -1197,8 +1197,8 @@
 		<Unit filename="GDL\EventsExecutionEngine.h" />
 		<Unit filename="GDL\EventsRenderingHelper.cpp" />
 		<Unit filename="GDL\EventsRenderingHelper.h" />
-		<Unit filename="GDL\Events\EventsCodeCompiler.cpp" />
-		<Unit filename="GDL\Events\EventsCodeCompiler.h" />
+		<Unit filename="GDL\Events\EventsCodeCompilationHelper.cpp" />
+		<Unit filename="GDL\Events\EventsCodeCompilationHelper.h" />
 		<Unit filename="GDL\Events\EventsCodeGenerationContext.cpp" />
 		<Unit filename="GDL\Events\EventsCodeGenerationContext.h" />
 		<Unit filename="GDL\Events\EventsCodeGenerator.cpp" />
@@ -1236,6 +1236,8 @@
 		<Unit filename="GDL\IDE\BaseDebugger.h" />
 		<Unit filename="GDL\IDE\BaseProfiler.cpp" />
 		<Unit filename="GDL\IDE\BaseProfiler.h" />
+		<Unit filename="GDL\IDE\CodeCompiler.cpp" />
+		<Unit filename="GDL\IDE\CodeCompiler.h" />
 		<Unit filename="GDL\IDE\CompilerMessagesParser.cpp" />
 		<Unit filename="GDL\IDE\CompilerMessagesParser.h" />
 		<Unit filename="GDL\IDE\CompilerToolchainPathManager.cpp" />
@@ -1258,6 +1260,8 @@
 		<Unit filename="GDL\IDE\Dialogs\ChooseVariableDialog.h" />
 		<Unit filename="GDL\IDE\Dialogs\EditComment.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\EditComment.h" />
+		<Unit filename="GDL\IDE\Dialogs\EditCppCodeEvent.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\EditCppCodeEvent.h" />
 		<Unit filename="GDL\IDE\Dialogs\EditExpression.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\EditExpression.h" />
 		<Unit filename="GDL\IDE\Dialogs\EditForEachEvent.cpp" />
@@ -1415,6 +1419,7 @@
 		<Unit filename="GDL\tinyxml\tinyxml.h" />
 		<Unit filename="GDL\tinyxml\tinyxmlerror.cpp" />
 		<Unit filename="GDL\tinyxml\tinyxmlparser.cpp" />
+		<Unit filename="wxsmith\EditCppCodeEvent.wxs" />
 		<Extensions>
 			<code_completion />
 			<envvars />
@@ -1443,6 +1448,7 @@
 					<wxDialog wxs="wxsmith/PropImage.wxs" src="GDL/IDE/Dialogs/PropImage.cpp" hdr="GDL/IDE/Dialogs/PropImage.h" fwddecl="0" i18n="1" name="PropImage" language="CPP" />
 					<wxDialog wxs="wxsmith/EditDynamicExtensionCallerEvent.wxs" src="GDL/IDE/Dialogs/EditDynamicExtensionCallerEvent.cpp" hdr="GDL/IDE/Dialogs/EditDynamicExtensionCallerEvent.h" fwddecl="0" i18n="1" name="EditDynamicExtensionCallerEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/AdvancedTextEntryDlg.wxs" src="GDL/IDE/Dialogs/AdvancedTextEntryDlg.cpp" hdr="GDL/IDE/Dialogs/AdvancedTextEntryDlg.h" fwddecl="0" i18n="1" name="AdvancedTextEntryDlg" language="CPP" />
+					<wxDialog wxs="wxsmith/EditCppCodeEvent.wxs" src="GDL\IDE\Dialogs\EditCppCodeEvent.cpp" hdr="GDL\IDE\Dialogs\EditCppCodeEvent.h" fwddecl="0" i18n="1" name="EditCppCodeEvent" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

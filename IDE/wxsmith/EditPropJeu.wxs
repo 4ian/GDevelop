@@ -714,15 +714,6 @@
 									<border>5</border>
 									<option>1</option>
 								</object>
-								<object class="sizeritem">
-									<object class="wxButton" name="ID_BUTTON8" variable="compilerToolchainBt" member="yes">
-										<label>Paramétrer Game Develop pour la compilation des sources C++</label>
-										<handler function="OncompilerToolchainBtClick" entry="EVT_BUTTON" />
-									</object>
-									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
 							</object>
 						</object>
 						<label>Sources C++</label>

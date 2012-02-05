@@ -10,6 +10,14 @@ class ProjectManager;
 class BuildProgressPnl;
 class BuildMessagesPnl;
 
+/**
+ * \brief Designed to handheld all GUI related to code compilation.
+ * Automatically create its child and associate it if necessary with the needed classes ( CodeCompiler )
+ *
+ * \see CodeCompiler
+ * \see BuildProgressPnl
+ * \see BuildMessagesPnl
+ */
 class BuildToolsPnl: public wxPanel
 {
 	public:

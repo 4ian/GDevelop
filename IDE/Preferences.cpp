@@ -25,7 +25,6 @@
 #include "GDL/IDE/ActionSentenceFormatter.h"
 #include "GDL/Events/EventsCodeCompilationHelper.h"
 #include <wx/listctrl.h>
-#include "SetupCompilerToolchainDlg.h"
 
 #include <string>
 #include <vector>
@@ -101,8 +100,6 @@ const long Preferences::ID_STATICTEXT18 = wxNewId();
 const long Preferences::ID_CHECKBOX6 = wxNewId();
 const long Preferences::ID_CUSTOM1 = wxNewId();
 const long Preferences::ID_PANEL18 = wxNewId();
-const long Preferences::ID_STATICTEXT16 = wxNewId();
-const long Preferences::ID_BUTTON9 = wxNewId();
 const long Preferences::ID_RADIOBUTTON2 = wxNewId();
 const long Preferences::ID_RADIOBUTTON1 = wxNewId();
 const long Preferences::ID_TEXTCTRL2 = wxNewId();
@@ -127,9 +124,7 @@ changesNeedRestart(false)
     wxStaticBoxSizer* StaticBoxSizer2;
     wxFlexGridSizer* FlexGridSizer4;
     wxFlexGridSizer* FlexGridSizer16;
-    wxFlexGridSizer* FlexGridSizer24;
     wxFlexGridSizer* FlexGridSizer19;
-    wxStaticBoxSizer* StaticBoxSizer12;
     wxFlexGridSizer* FlexGridSizer23;
     wxStaticBoxSizer* StaticBoxSizer15;
     wxStaticBoxSizer* StaticBoxSizer14;
@@ -434,15 +429,6 @@ changesNeedRestart(false)
     Panel7 = new wxPanel(Listbook1, ID_PANEL17, wxDefaultPosition, wxSize(463,247), wxTAB_TRAVERSAL, _T("ID_PANEL17"));
     FlexGridSizer23 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer23->AddGrowableCol(0);
-    StaticBoxSizer12 = new wxStaticBoxSizer(wxHORIZONTAL, Panel7, _("Paramétrage de la compilation"));
-    FlexGridSizer24 = new wxFlexGridSizer(0, 1, 0, 0);
-    FlexGridSizer24->AddGrowableCol(0);
-    StaticText16 = new wxStaticText(Panel7, ID_STATICTEXT16, _("Afin de compiler les sources C++ qui peuvent être utilisé\npar les jeux, Game Develop a besoin d\'accéder à des fichiers\nsupplémentaires."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT16"));
-    FlexGridSizer24->Add(StaticText16, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    compilerToolchainBt = new wxButton(Panel7, ID_BUTTON9, _("Ouvrir le paramétrage de la compilation des sources C++"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON9"));
-    FlexGridSizer24->Add(compilerToolchainBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer12->Add(FlexGridSizer24, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    FlexGridSizer23->Add(StaticBoxSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer13 = new wxStaticBoxSizer(wxHORIZONTAL, Panel7, _("Edition des sources"));
     FlexGridSizer25 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer25->AddGrowableCol(0);
@@ -510,7 +496,6 @@ changesNeedRestart(false)
     inactiveTextColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OninactiveTextColorPnlLeftUp,0,this);
     activeTabColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnactiveTabColorPnlLeftUp,0,this);
     tabColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OntabColorPnlLeftUp,0,this);
-    Connect(ID_BUTTON9,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OncompilerToolchainBtClick);
     Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnbrowseCodeEditorBtClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnOkBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnAnnulerBtClick);
@@ -1318,12 +1303,6 @@ void Preferences::OnhideLabelsCheckClick(wxCommandEvent& event)
 void Preferences::OnlangChoiceSelect(wxCommandEvent& event)
 {
     changesNeedRestart = true;
-}
-
-void Preferences::OncompilerToolchainBtClick(wxCommandEvent& event)
-{
-    SetupCompilerToolchainDlg dialog(this);
-    dialog.ShowModal();
 }
 
 void Preferences::OnbrowseCodeEditorBtClick(wxCommandEvent& event)

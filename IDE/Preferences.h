@@ -32,7 +32,6 @@ class Preferences: public wxDialog
 		wxPanel* InactifColorPnl;
 		wxStaticText* StaticText22;
 		wxButton* OkBt;
-		wxButton* compilerToolchainBt;
 		wxStaticText* StaticText9;
 		wxStaticText* StaticText20;
 		wxPanel* backColorPnl;
@@ -102,7 +101,6 @@ class Preferences: public wxDialog
 		wxButton* browseCodeEditorBt;
 		wxButton* browseCompilationTempDir;
 		wxButton* officeStyleBt;
-		wxStaticText* StaticText16;
 		wxStaticBitmap* StaticBitmap3;
 		wxRadioButton* internalCodeEditorCheck;
 		wxButton* AideBt;
@@ -178,8 +176,6 @@ class Preferences: public wxDialog
 		static const long ID_CHECKBOX6;
 		static const long ID_CUSTOM1;
 		static const long ID_PANEL18;
-		static const long ID_STATICTEXT16;
-		static const long ID_BUTTON9;
 		static const long ID_RADIOBUTTON2;
 		static const long ID_RADIOBUTTON1;
 		static const long ID_TEXTCTRL2;

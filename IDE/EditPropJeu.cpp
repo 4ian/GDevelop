@@ -27,7 +27,6 @@
 #include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/FontManager.h"
 #include "GDL/SourceFile.h"
-#include "SetupCompilerToolchainDlg.h"
 #include "NewCppFileDlg.h"
 
 #include "GDL/Game.h"
@@ -95,7 +94,6 @@ const long EditPropJeu::ID_CHECKBOX9 = wxNewId();
 const long EditPropJeu::ID_STATICTEXT18 = wxNewId();
 const long EditPropJeu::ID_BUTTON7 = wxNewId();
 const long EditPropJeu::ID_STATICTEXT19 = wxNewId();
-const long EditPropJeu::ID_BUTTON8 = wxNewId();
 const long EditPropJeu::ID_PANEL5 = wxNewId();
 const long EditPropJeu::ID_NOTEBOOK1 = wxNewId();
 const long EditPropJeu::ID_STATICLINE3 = wxNewId();
@@ -367,8 +365,6 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     FlexGridSizer29->Add(Button1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticText19 = new wxStaticText(Panel5, ID_STATICTEXT19, _("Game Develop nécessite des fichiers supplémentaires afin de pouvoir\ncompiler des sources C++ pour les jeux."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT19"));
     FlexGridSizer29->Add(StaticText19, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    compilerToolchainBt = new wxButton(Panel5, ID_BUTTON8, _("Paramétrer Game Develop pour la compilation des sources C++"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
-    FlexGridSizer29->Add(compilerToolchainBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel5->SetSizer(FlexGridSizer29);
     FlexGridSizer29->Fit(Panel5);
     FlexGridSizer29->SetSizeHints(Panel5);
@@ -402,7 +398,6 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     Connect(ID_TEXTCTRL14,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditPropJeu::OnwinIconEditText);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnbrowseIconClick);
     Connect(ID_CHECKBOX9,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnuseExternalSourcesCheckClick);
-    Connect(ID_BUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OncompilerToolchainBtClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnOkBtClick);
     Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OncancelBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnAideBtClick);
@@ -676,12 +671,6 @@ void EditPropJeu::OnbrowseIconClick(wxCommandEvent& event)
     fileDialog.ShowModal();
 
     if ( !fileDialog.GetPath().empty() ) winIconEdit->SetValue(fileDialog.GetPath());
-}
-
-void EditPropJeu::OncompilerToolchainBtClick(wxCommandEvent& event)
-{
-    SetupCompilerToolchainDlg dialog(this);
-    dialog.ShowModal();
 }
 
 void EditPropJeu::OnuseExternalSourcesCheckClick(wxCommandEvent& event)

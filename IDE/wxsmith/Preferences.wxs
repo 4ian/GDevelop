@@ -877,39 +877,6 @@
 								<cols>1</cols>
 								<growablecols>0</growablecols>
 								<object class="sizeritem">
-									<object class="wxStaticBoxSizer" variable="StaticBoxSizer12" member="no">
-										<label>Paramétrage de la compilation</label>
-										<object class="sizeritem">
-											<object class="wxFlexGridSizer" variable="FlexGridSizer24" member="no">
-												<cols>1</cols>
-												<growablecols>0</growablecols>
-												<object class="sizeritem">
-													<object class="wxStaticText" name="ID_STATICTEXT16" variable="StaticText16" member="yes">
-														<label>Afin de compiler les sources C++ qui peuvent être utilisé&#x0A;par les jeux, Game Develop a besoin d&apos;accéder à des fichiers&#x0A;supplémentaires.</label>
-													</object>
-													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
-												<object class="sizeritem">
-													<object class="wxButton" name="ID_BUTTON9" variable="compilerToolchainBt" member="yes">
-														<label>Ouvrir le paramétrage de la compilation des sources C++</label>
-														<handler function="OncompilerToolchainBtClick" entry="EVT_BUTTON" />
-													</object>
-													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-													<border>5</border>
-													<option>1</option>
-												</object>
-											</object>
-											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-											<option>1</option>
-										</object>
-									</object>
-									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer13" member="no">
 										<label>Edition des sources</label>
 										<object class="sizeritem">

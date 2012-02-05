@@ -27,7 +27,6 @@ class EditPropJeu: public wxDialog
 		wxStaticText* StaticText10;
 		wxCheckBox* useExternalSourcesCheck;
 		wxButton* OkBt;
-		wxButton* compilerToolchainBt;
 		wxStaticText* StaticText9;
 		wxStaticBitmap* StaticBitmap2;
 		wxTextCtrl* texteYPosEdit;
@@ -157,7 +156,6 @@ class EditPropJeu: public wxDialog
 		static const long ID_STATICTEXT18;
 		static const long ID_BUTTON7;
 		static const long ID_STATICTEXT19;
-		static const long ID_BUTTON8;
 		static const long ID_PANEL5;
 		static const long ID_NOTEBOOK1;
 		static const long ID_STATICLINE3;

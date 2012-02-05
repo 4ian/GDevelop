@@ -944,8 +944,6 @@
 		<Unit filename="SearchEvents.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
 		</Unit>
-		<Unit filename="SetupCompilerToolchainDlg.cpp" />
-		<Unit filename="SetupCompilerToolchainDlg.h" />
 		<Unit filename="SigneModification.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
 		</Unit>
@@ -1108,7 +1106,6 @@
 					<wxPanel wxs="wxsmith/BuildMessagesPnl.wxs" src="BuildMessagesPnl.cpp" hdr="BuildMessagesPnl.h" fwddecl="0" i18n="1" name="BuildMessagesPnl" language="CPP" />
 					<wxPanel wxs="wxsmith/BuildProgressPnl.wxs" src="BuildProgressPnl.cpp" hdr="BuildProgressPnl.h" fwddecl="0" i18n="1" name="BuildProgressPnl" language="CPP" />
 					<wxPanel wxs="wxsmith/BuildToolsPnl.wxs" src="BuildToolsPnl.cpp" hdr="BuildToolsPnl.h" fwddecl="0" i18n="1" name="BuildToolsPnl" language="CPP" />
-					<wxDialog wxs="wxsmith/SetupCompilerToolchainDlg.wxs" src="SetupCompilerToolchainDlg.cpp" hdr="SetupCompilerToolchainDlg.h" fwddecl="0" i18n="1" name="SetupCompilerToolchainDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/NewCppFileDlg.wxs" src="NewCppFileDlg.cpp" hdr="NewCppFileDlg.h" fwddecl="0" i18n="1" name="NewCppFileDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/ExtensionBugReportDlg.wxs" src="ExtensionBugReportDlg.cpp" hdr="ExtensionBugReportDlg.h" fwddecl="0" i18n="1" name="ExtensionBugReportDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/EventsEditor.wxs" src="EventsEditor.cpp" hdr="EventsEditor.h" fwddecl="0" i18n="1" name="EventsEditor" language="CPP" />

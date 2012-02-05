@@ -7,6 +7,7 @@
 #include "ProjectManager.h"
 #include "BuildProgressPnl.h"
 #include "BuildMessagesPnl.h"
+#include "GDL/IDE/CodeCompiler.h"
 
 //(*IdInit(BuildToolsPnl)
 const long BuildToolsPnl::ID_NOTEBOOK1 = wxNewId();
@@ -38,6 +39,8 @@ BuildToolsPnl::BuildToolsPnl(wxWindow* parent, ProjectManager * projectManager)
 
     notebook->AddPage(buildProgressPnl, _("Compilation"));
     notebook->AddPage(buildMessagesPnl, _("Messages de compilation"));
+
+    CodeCompiler::GetInstance()->AddNotifiedControl(buildProgressPnl);
 }
 
 BuildToolsPnl::~BuildToolsPnl()
@@ -45,4 +48,3 @@ BuildToolsPnl::~BuildToolsPnl()
 	//(*Destroy(BuildToolsPnl)
 	//*)
 }
-

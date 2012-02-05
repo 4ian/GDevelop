@@ -104,6 +104,7 @@ scene(scene_)
 	FlexGridSizer6->AddGrowableCol(0);
 	FlexGridSizer6->AddGrowableRow(1);
 	FlexGridSizer13 = new wxFlexGridSizer(0, 2, 0, 0);
+	FlexGridSizer13->AddGrowableCol(0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Position"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer3->AddGrowableCol(1);
@@ -169,7 +170,7 @@ scene(scene_)
 	FlexGridSizer7->Add(StaticText7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer3->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer13->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer6->Add(FlexGridSizer13, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer6->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer15 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer15->AddGrowableCol(0);
 	FlexGridSizer15->AddGrowableRow(0);

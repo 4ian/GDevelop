@@ -8,24 +8,6 @@
 			<growablecols>0</growablecols>
 			<growablerows>1</growablerows>
 			<object class="sizeritem">
-				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
-					<cols>3</cols>
-					<growablecols>1</growablecols>
-					<growablerows>0</growablerows>
-					<object class="sizeritem">
-						<object class="wxButton" name="ID_BUTTON1" variable="stopCompilerBt" member="yes">
-							<label>Arrêter la compilation des sources</label>
-							<handler function="OnstopCompilerBtClick" entry="EVT_BUTTON" />
-						</object>
-						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-						<border>5</border>
-						<option>1</option>
-					</object>
-				</object>
-				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<option>1</option>
-			</object>
-			<object class="sizeritem">
 				<object class="wxStaticText" name="ID_STATICTEXT1" variable="statusTxt" member="yes">
 					<label></label>
 				</object>

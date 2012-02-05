@@ -31,7 +31,6 @@
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/DynamicExtensionsManager.h"
-#include "GDL/IDE/SourceFileBuilder.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
 #include "GDL/Events/EventsCodeCompilationHelper.h"
 #include "GDL/EventsExecutionEngine.h"
@@ -678,7 +677,7 @@ void SceneCanvas::Reload()
 
 void SceneCanvas::ReloadFirstPart()
 {
-    cout << "ReloadFirstPart: " << endl;
+    cout << "Scene canvas reloading... ( Step 1/2 )" << endl;
     isReloading = true;
 
     SoundManager::GetInstance()->ClearAllSoundsAndMusics();
@@ -704,46 +703,14 @@ void SceneCanvas::ReloadFirstPart()
             mainEditorCommand.GetInfoBar()->ShowMessage(_("Les modifications apportées aux évènements seront prises en compte lors du retour au mode édition."));
     }
 
-    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-    if ( !edittimeRenderer.editing && gameEdited.useExternalSourceFiles )
-    {
-        GDpriv::DynamicExtensionsManager::GetInstance()->UnloadAllDynamicExtensions();
-        mainEditorCommand.GetBuildToolsPanel()->notebook->SetSelection(0);
-
-        if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->LaunchGameSourceFilesBuild(gameEdited) )
-        {
-            mainEditorCommand.GetInfoBar()->ShowMessage(_("Game Develop est entrain de compiler les sources C++ et ne pourra lancer un aperçu qu'une fois ce processus terminé."));
-        }
-    }
-    #endif
-
     return; //Reload second par will be called by Refresh when appropriate
 }
 
 void SceneCanvas::ReloadSecondPart()
 {
-    cout << "ReloadSecondPart" << endl;
+    cout << "Scene canvas reloading... ( Step 2/2 )" << endl;
     if ( !edittimeRenderer.editing )
         CodeCompiler::GetInstance()->DisableTaskRelatedTo(sceneEdited);
-
-    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-    if ( !edittimeRenderer.editing && gameEdited.useExternalSourceFiles )
-    {
-        GDpriv::CompilerMessagesParser errorsParser;
-        errorsParser.ParseOutput(mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->sourceFileBuilder.GetErrors());
-        mainEditorCommand.GetBuildToolsPanel()->buildMessagesPnl->RefreshWith(&gameEdited, errorsParser.parsedErrors);
-
-        if ( !mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->LastBuildSuccessed() )
-        {
-            mainEditorCommand.GetPaneManager().GetPane(mainEditorCommand.GetBuildToolsPanel()).Show(true);
-            mainEditorCommand.GetBuildToolsPanel()->notebook->SetSelection(1);
-            mainEditorCommand.GetBuildToolsPanel()->buildMessagesPnl->OpenFileContainingFirstError();
-            mainEditorCommand.GetMainEditor()->RequestUserAttention();
-        }
-
-        GDpriv::DynamicExtensionsManager::GetInstance()->LoadDynamicExtension("dynext.dxgde");
-    }
-    #endif
 
     edittimeRenderer.runtimeScene.LoadFromScene( sceneEdited );
     sceneEdited.wasModified = false;
@@ -762,11 +729,6 @@ void SceneCanvas::Refresh()
     if ( isReloading )
     {
         bool wait = false;
-        if (gameEdited.useExternalSourceFiles) //Ensure we're not compiling C++ external sources
-        {
-            if ( mainEditorCommand.GetBuildToolsPanel()->buildProgressPnl->IsBuilding() )
-                wait = true;
-        }
         if ( !edittimeRenderer.editing && CodeCompiler::GetInstance()->CompilationInProcess()) //Ensure some events are not being compiled.
             wait =true;
 
@@ -864,7 +826,6 @@ void SceneCanvas::OnUpdate()
  */
 void SceneCanvas::ChangesMade()
 {
-    cout << "ChangesMade!" << std::endl;
     history.push_back(latestState);
     redoHistory.clear();
     latestState = sceneEdited.initialObjectsPositions;

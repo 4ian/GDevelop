@@ -296,58 +296,6 @@ void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event 
 {
     if ( !CurrentGameIsValid() ) return;
 
-    //Compile now source if there are not up to date ( and if game use C++ features ).
-    if ( GetCurrentGame()->useExternalSourceFiles )
-    {
-        if ( !GetBuildToolsPanel()->buildProgressPnl->ChangeGameWithoutBuilding(*GetCurrentGame()) )
-        {
-            wxLogWarning(_("Game Develop est entrain de compiler les sources C++ et ne pourra compiler le jeu qu'une fois ce processus terminé."));
-            return;
-        }
-
-        if ( true )
-        {
-            GDpriv::SourceFileBuilder builder(GetBuildToolsPanel()->buildProgressPnl->progressGauge, GetBuildToolsPanel()->buildProgressPnl->statusTxt, true);
-            builder.SetFiles(GetCurrentGame()->externalSourceFiles);
-            builder.SetExtensionsUsed(GetCurrentGame()->extensionsUsed);
-
-            GDpriv::DynamicExtensionsManager::GetInstance()->UnloadAllDynamicExtensions();
-            GetBuildToolsPanel()->notebook->SetSelection(0);
-
-            //Be sure another build process is not running, and then launch build.
-            if ( GetBuildToolsPanel()->buildProgressPnl->IsBuilding() || !builder.LaunchSourceFilesBuild() )
-            {
-                wxLogWarning(_("Game Develop est entrain de compiler les sources C++ et ne pourra compiler le jeu qu'une fois ce processus terminé."));
-                return;
-            }
-
-            //Wait build to finish.
-            wxProgressDialog progress(_("Compilation"),_("Veuillez patienter pendant la compilation des sources C++..."),100, NULL, wxPD_CAN_ABORT | wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_ELAPSED_TIME);
-            while ( builder.IsBuilding() )
-            {
-                if ( !progress.Update(GetBuildToolsPanel()->buildProgressPnl->progressGauge->GetValue()) ) //Enable the user to stop compilation
-                {
-                    builder.AbordBuild();
-                    return;
-                }
-            }
-
-            GDpriv::CompilerMessagesParser errorsParser;
-            errorsParser.ParseOutput(builder.GetErrors());
-            GetBuildToolsPanel()->buildMessagesPnl->RefreshWith(&*GetCurrentGame(), errorsParser.parsedErrors);
-
-            //Build failed, stop here and show errors
-            if ( !builder.LastBuildSuccessed() )
-            {
-                m_mgr.GetPane(GetBuildToolsPanel()).Show(true);
-                GetBuildToolsPanel()->notebook->SetSelection(1);
-                GetBuildToolsPanel()->buildMessagesPnl->OpenFileContainingFirstError();
-                RequestUserAttention();
-                return;
-            }
-        }
-    }
-
     Compilation Dialog( this, *GetCurrentGame() );
     Dialog.ShowModal();
 }

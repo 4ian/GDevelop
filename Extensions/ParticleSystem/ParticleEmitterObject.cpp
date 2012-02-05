@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Particle System Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -28,7 +28,7 @@ freely, subject to the following restrictions:
 #include <SFML/OpenGL.hpp>
 #include "GDL/Object.h"
 #include "GDL/ImageManager.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
 #include "GDL/XmlMacros.h"
@@ -43,8 +43,8 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
-#include "GDL/ArbitraryResourceWorker.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/ArbitraryResourceWorker.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #include "ParticleEmitterObjectEditor.h"
 #endif
 
@@ -105,8 +105,7 @@ hasSomeParticles(true),
 opacity( 255 ),
 colorR( 255 ),
 colorG( 255 ),
-colorB( 255 ),
-angle(0)
+colorB( 255 )
 {
 }
 
@@ -685,6 +684,7 @@ void ParticleEmitterObject::SetFriction(float newValue)
 }
 void ParticleEmitterObject::SetEmitterXDirection(float newValue)
 {
+    std::cout <<"SetXDirectionTO" << emitterXDirection;
     emitterXDirection = newValue;
     if ( particleSystem.emitter ) particleSystem.emitter->setDirection(SPK::Vector3D(emitterXDirection, -emitterYDirection, emitterZDirection));
 }
@@ -743,6 +743,18 @@ float ParticleEmitterObject::GetParticleGravityLength() const
     return sqrt(GetParticleGravityY()*GetParticleGravityY()+GetParticleGravityX()*GetParticleGravityX());
 }
 
+bool ParticleEmitterObject::SetAngle(float newAngleInDegrees)
+{
+    SetEmitterXDirection(cos(newAngleInDegrees/180.0f*3.14159f));
+    SetEmitterYDirection(sin(newAngleInDegrees/180.0f*3.14159f));
+
+    return true;
+}
+
+float ParticleEmitterObject::GetAngle() const
+{
+    return atan2f(GetEmitterYDirection(), GetEmitterXDirection())*180.0f/3.14159f;
+}
 
 void ParticleEmitterObject::SetParticleColor1( const std::string & color )
 {

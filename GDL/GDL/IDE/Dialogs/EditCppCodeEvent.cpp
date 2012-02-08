@@ -1,3 +1,4 @@
+#if defined(GD_IDE_ONLY)
 #include "EditCppCodeEvent.h"
 
 //(*InternalHeaders(EditCppCodeEvent)
@@ -150,3 +151,4 @@ void EditCppCodeEvent::OncancelBtClick(wxCommandEvent& event)
 {
     EndModal(0);
 }
+#endif

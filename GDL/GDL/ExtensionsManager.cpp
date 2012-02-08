@@ -101,9 +101,11 @@ bool ExtensionsManager::AddExtension(boost::shared_ptr<ExtensionBase> extension)
         destroyFunctionTable[objectsTypes[i]] = extension->GetDestroyObjectFunction(objectsTypes[i]);
     }
 
+    #if defined(GD_IDE_ONLY)
     //Add include directories
     for (unsigned int i = 0;i<extension->GetSupplementaryIncludeDirectories().size();++i)
         CodeCompiler::GetInstance()->AddHeaderDirectory(extension->GetSupplementaryIncludeDirectories()[i]);
+    #endif
 
     extensionsLoaded.push_back(extension);
     return true;

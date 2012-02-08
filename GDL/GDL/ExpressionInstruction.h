@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY)
 #ifndef EXPRESSIONINSTRUCTION_H
 #define EXPRESSIONINSTRUCTION_H
 
@@ -10,7 +10,6 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 class GDExpression;
-class ExpressionInstruction;
 class Object;
 class RuntimeScene;
 class Automatism;
@@ -34,3 +33,4 @@ class GD_API ExpressionInstruction
 };
 
 #endif // EXPRESSIONINSTRUCTION_H
+#endif

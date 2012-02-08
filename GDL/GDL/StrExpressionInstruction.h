@@ -2,7 +2,7 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY)
 #ifndef STREXPRESSIONINSTRUCTION_H
 #define STREXPRESSIONINSTRUCTION_H
 
@@ -25,3 +25,4 @@ class GD_API StrExpressionInstruction
 };
 
 #endif // STREXPRESSIONINSTRUCTION_H
+#endif

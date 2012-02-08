@@ -8,8 +8,7 @@
 
 #include <string>
 #include <map>
-
-using namespace std;
+#include "GDL/VariableList.h"
 
 /**
  * \brief Represents an object on a scene at startup.
@@ -19,21 +18,22 @@ using namespace std;
  */
 class GD_API InitialPosition
 {
-    public:
-        InitialPosition();
-        virtual ~InitialPosition() {};
+public:
+    InitialPosition();
+    virtual ~InitialPosition() {};
 
-        string objectName; ///< Object name
-        float x; ///< Object initial X position
-        float y; ///< Object initial Y position
-        float angle; ///< Object initial angle
-        int zOrder; ///< Object initial Z order
-        string layer; ///< Object initial layer
-        bool personalizedSize; ///< True if object has a custom size
-        float width;  ///< Object custom width
-        float height; ///< Object custom height
-        map < string, float > floatInfos; ///< More data which can be used by the object
-        map < string, string > stringInfos; ///< More data which can be used by the object
+    std::string objectName; ///< Object name
+    float x; ///< Object initial X position
+    float y; ///< Object initial Y position
+    float angle; ///< Object initial angle
+    int zOrder; ///< Object initial Z order
+    std::string layer; ///< Object initial layer
+    bool personalizedSize; ///< True if object has a custom size
+    float width;  ///< Object custom width
+    float height; ///< Object custom height
+    std::map < std::string, float > floatInfos; ///< More data which can be used by the object
+    std::map < std::string, std::string > stringInfos; ///< More data which can be used by the object
+    ListVariable initialVariables;
 };
 
 #endif // POSITION_H

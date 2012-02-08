@@ -1,3 +1,5 @@
+#if defined(GD_IDE_ONLY)
+
 #include "CodeCompiler.h"
 #include <SFML/System.hpp>
 #include <iostream>
@@ -403,3 +405,4 @@ void CodeCompiler::DestroySingleton()
         _singleton = NULL;
     }
 }
+#endif

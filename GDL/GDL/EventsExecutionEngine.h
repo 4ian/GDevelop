@@ -34,7 +34,7 @@ public:
 
     /**
      * Execute compiled events.
-     * Beware, there is no protection against calling Execute on an EventsExecutionEngine that is not initalized with bitcode
+     * Beware, there is no protection against calling Execute on an EventsExecutionEngine that is not initialized with bitcode
      */
     void Execute() { ((void(*)())compiledRawFunction)(); };
 

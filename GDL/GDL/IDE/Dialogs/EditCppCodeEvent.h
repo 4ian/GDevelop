@@ -1,3 +1,5 @@
+#if defined(GD_IDE_ONLY)
+
 #ifndef EDITCPPCODEEVENT_H
 #define EDITCPPCODEEVENT_H
 
@@ -66,4 +68,5 @@ class EditCppCodeEvent: public wxDialog
 		DECLARE_EVENT_TABLE()
 };
 
+#endif
 #endif

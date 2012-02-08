@@ -560,6 +560,13 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
                 newObject->SetHeight(scene.initialObjectsPositions[i].height);
             }
 
+            //Substitute initial variables specific to that object instance.
+            const std::vector<Variable> & instanceSpecificVariables = scene.initialObjectsPositions[i].initialVariables.GetVariablesVector();
+            for (unsigned int j = 0;j<instanceSpecificVariables.size();++j)
+            {
+                newObject->variablesObjet.ObtainVariable(instanceSpecificVariables[j].GetName()) = instanceSpecificVariables[j];
+            }
+
             newObject->LoadRuntimeResources(*this, *game->imageManager);
 
             objectsInstances.AddObject(newObject);

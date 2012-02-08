@@ -466,65 +466,65 @@ void OpenSaveGame::OpenGroupesObjets(vector < ObjectGroup > & list, TiXmlElement
     }
 }
 
-void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement * elem)
+void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement * rootElem)
 {
-    TiXmlElement * elemScene = elem->FirstChildElement();
+    TiXmlElement * elem = rootElem->FirstChildElement();
 
     //Passage en revue des positions initiales
-    while ( elemScene )
+    while ( elem )
     {
         InitialPosition newPosition;
 
-        if ( elemScene->Attribute( "x" ) != NULL ) { elemScene->QueryFloatAttribute( "x", &newPosition.x );}
+        if ( elem->Attribute( "x" ) != NULL ) { elem->QueryFloatAttribute( "x", &newPosition.x );}
         else { MSG( "Les informations concernant la position X d'un objet manquent." ); }
 
-        if ( elemScene->Attribute( "y" ) != NULL ) { elemScene->QueryFloatAttribute( "y", &newPosition.y );}
+        if ( elem->Attribute( "y" ) != NULL ) { elem->QueryFloatAttribute( "y", &newPosition.y );}
         else { MSG( "Les informations concernant la position Y d'un objet manquent." ); }
 
         //Compatibility with Game Develop 1.2 and inferior
-        if ( elemScene->Attribute( "direction" ) != NULL )
+        if ( elem->Attribute( "direction" ) != NULL )
         {
             int direction;
-            elemScene->QueryIntAttribute( "direction", &direction );
+            elem->QueryIntAttribute( "direction", &direction );
             newPosition.floatInfos["direction"] = direction;
         }
 
         //Compatibility with Game Develop 1.2 and inferior
-        if ( elemScene->Attribute( "animation" ) != NULL )
+        if ( elem->Attribute( "animation" ) != NULL )
         {
             int animation;
-            elemScene->QueryIntAttribute( "animation", &animation );
+            elem->QueryIntAttribute( "animation", &animation );
             newPosition.floatInfos["animation"] = animation;
         }
 
-        if ( elemScene->Attribute( "angle" ) != NULL ) { elemScene->QueryFloatAttribute( "angle", &newPosition.angle );}
+        if ( elem->Attribute( "angle" ) != NULL ) { elem->QueryFloatAttribute( "angle", &newPosition.angle );}
 
         //Compatibility with Game Develop 1.2.8522 and inferior
         newPosition.personalizedSize = false;
-        if ( elemScene->Attribute( "personalizedSize" ) != NULL )
+        if ( elem->Attribute( "personalizedSize" ) != NULL )
         {
-            string personalizedSize = elemScene->Attribute( "personalizedSize" );
+            string personalizedSize = elem->Attribute( "personalizedSize" );
             if ( personalizedSize == "true")
                 newPosition.personalizedSize = true;
         }
 
         //Compatibility with Game Develop 1.2.8522 and inferior
-        if ( elemScene->Attribute( "width" ) != NULL )
-            elemScene->QueryFloatAttribute( "width", &newPosition.width );
+        if ( elem->Attribute( "width" ) != NULL )
+            elem->QueryFloatAttribute( "width", &newPosition.width );
 
         //Compatibility with Game Develop 1.2.8522 and inferior
-        if ( elemScene->Attribute( "height" ) != NULL )
-            elemScene->QueryFloatAttribute( "height", &newPosition.height );
+        if ( elem->Attribute( "height" ) != NULL )
+            elem->QueryFloatAttribute( "height", &newPosition.height );
 
-        if ( elemScene->Attribute( "plan" ) != NULL ) { elemScene->QueryIntAttribute( "plan", &newPosition.zOrder );}
+        if ( elem->Attribute( "plan" ) != NULL ) { elem->QueryIntAttribute( "plan", &newPosition.zOrder );}
         else { MSG( "Les informations concernant le plan d'un objet manquent." ); }
 
-        if ( elemScene->Attribute( "layer" ) != NULL ) { newPosition.layer = elemScene->Attribute( "layer" ); }
+        if ( elem->Attribute( "layer" ) != NULL ) { newPosition.layer = elem->Attribute( "layer" ); }
 
-        if ( elemScene->Attribute( "nom" ) != NULL ) { newPosition.objectName = elemScene->Attribute( "nom" );}
+        if ( elem->Attribute( "nom" ) != NULL ) { newPosition.objectName = elem->Attribute( "nom" );}
         else { MSG( "Les informations concernant le nom d'un objet manquent." ); }
 
-        TiXmlElement * floatInfos = elemScene->FirstChildElement( "floatInfos" );
+        TiXmlElement * floatInfos = elem->FirstChildElement( "floatInfos" );
         if ( floatInfos ) floatInfos = floatInfos->FirstChildElement("Info");
         while ( floatInfos )
         {
@@ -538,7 +538,7 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement
             floatInfos = floatInfos->NextSiblingElement();
         }
 
-        TiXmlElement * stringInfos = elemScene->FirstChildElement( "stringInfos" );
+        TiXmlElement * stringInfos = elem->FirstChildElement( "stringInfos" );
         if ( stringInfos ) stringInfos = stringInfos->FirstChildElement("Info");
         while ( stringInfos )
         {
@@ -548,9 +548,11 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement
             stringInfos = stringInfos->NextSiblingElement();
         }
 
+        OpenVariablesList(newPosition.initialVariables, elem->FirstChildElement( "InitialVariables" ));
+
         list.push_back( newPosition );
 
-        elemScene = elemScene->NextSiblingElement();
+        elem = elem->NextSiblingElement();
     }
 }
 
@@ -772,9 +774,10 @@ void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents
 void OpenSaveGame::OpenVariablesList(ListVariable & list, const TiXmlElement * elem)
 {
     list.Clear();
+
+    if ( elem == NULL ) return;
     const TiXmlElement * elemScene = elem->FirstChildElement();
 
-    //Passage en revue des évènements
     while ( elemScene )
     {
         string name = elemScene->Attribute( "Name" ) != NULL ? elemScene->Attribute( "Name" ) : "";
@@ -1053,23 +1056,23 @@ void OpenSaveGame::SaveGroupesObjets(const vector < ObjectGroup > & list, TiXmlE
 
 void OpenSaveGame::SavePositions(const vector < InitialPosition > & list, TiXmlElement * positions)
 {
-    for ( unsigned int j = 0;j < list.size();j++ )
+    for (unsigned int j = 0;j < list.size();++j)
     {
         TiXmlElement * objet = new TiXmlElement( "Objet" );
         positions->LinkEndChild( objet );
-        objet->SetAttribute( "nom", list.at( j ).objectName.c_str() );
-        objet->SetDoubleAttribute( "x", list.at( j ).x );
-        objet->SetDoubleAttribute( "y", list.at( j ).y );
-        objet->SetAttribute( "plan", list.at( j ).zOrder );
-        objet->SetAttribute( "layer", list.at( j ).layer.c_str() );
-        objet->SetDoubleAttribute( "angle", list.at( j ).angle );
+        objet->SetAttribute( "nom", list[j].objectName.c_str() );
+        objet->SetDoubleAttribute( "x", list[j].x );
+        objet->SetDoubleAttribute( "y", list[j].y );
+        objet->SetAttribute( "plan", list[j].zOrder );
+        objet->SetAttribute( "layer", list[j].layer.c_str() );
+        objet->SetDoubleAttribute( "angle", list[j].angle );
 
         objet->SetAttribute( "personalizedSize", "false" );
-        if ( list.at( j ).personalizedSize )
+        if ( list[j].personalizedSize )
             objet->SetAttribute( "personalizedSize", "true" );
 
-        objet->SetDoubleAttribute( "width", list.at( j ).width );
-        objet->SetDoubleAttribute( "height", list.at( j ).height );
+        objet->SetDoubleAttribute( "width", list[j].width );
+        objet->SetDoubleAttribute( "height", list[j].height );
 
         TiXmlElement * floatInfos = new TiXmlElement( "floatInfos" );
         objet->LinkEndChild( floatInfos );
@@ -1092,6 +1095,10 @@ void OpenSaveGame::SavePositions(const vector < InitialPosition > & list, TiXmlE
             info->SetAttribute( "name", stringInfo->first.c_str());
             info->SetAttribute( "value", stringInfo->second.c_str());
         }
+
+        TiXmlElement * initialVariables = new TiXmlElement( "InitialVariables" );
+        objet->LinkEndChild( initialVariables );
+        SaveVariablesList(list[j].initialVariables, initialVariables);
     }
 }
 
@@ -1231,6 +1238,8 @@ void OpenSaveGame::SaveLayers(const vector < Layer > & list, TiXmlElement * laye
 
 void OpenSaveGame::SaveVariablesList(const ListVariable & list, TiXmlElement * elem)
 {
+    if ( elem == NULL ) return;
+
     vector<Variable> variables = list.GetVariablesVector();
     for ( unsigned int j = 0;j < variables.size();j++ )
     {

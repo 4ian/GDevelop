@@ -4,10 +4,7 @@
  */
 
 #include "GDL/Position.h"
-
 #include <string>
-
-using namespace std;
 
 InitialPosition::InitialPosition() :
 objectName(""),

@@ -69,6 +69,8 @@ const long Game_Develop_EditorFrame::ID_MENUITEM6 = wxNewId();
 const long Game_Develop_EditorFrame::ID_TIMER1 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM7 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM9 = wxNewId();
+const long Game_Develop_EditorFrame::toBeDeletedMenuItem = wxNewId();
+const long Game_Develop_EditorFrame::ID_MENUITEM26 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM10 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM11 = wxNewId();
 const long Game_Develop_EditorFrame::ID_MENUITEM12 = wxNewId();
@@ -166,8 +168,6 @@ projectManager(NULL)
     MenuItem45 = new wxMenuItem((&openContextMenu), ID_MENUITEM8, _("Importer un jeu"), wxEmptyString, wxITEM_NORMAL);
     MenuItem45->SetBitmap(wxBitmap(wxImage(_T("res/fusionicon.png"))));
     openContextMenu.Append(MenuItem45);
-    wxMenu * contextMenuRecents =new wxMenu;
-     openContextMenu.Append(IDM_RECENTS,_("Récemment ouvert"), contextMenuRecents);
     MenuItem10 = new wxMenuItem((&saveContextMenu), ID_MENUITEM2, _("Enregistrer sous..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/saveasicon.png"))));
     saveContextMenu.Append(MenuItem10);
@@ -192,6 +192,10 @@ projectManager(NULL)
     MenuItem3 = new wxMenuItem((&fileMenu), ID_MENUITEM9, _("Ouvrir\tCtrl+O"), wxEmptyString, wxITEM_NORMAL);
     MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/openicon.png"))));
     fileMenu.Append(MenuItem3);
+    menuRecentFiles = new wxMenu();
+    MenuItem23 = new wxMenuItem(menuRecentFiles, toBeDeletedMenuItem, _("useless"), wxEmptyString, wxITEM_NORMAL);
+    menuRecentFiles->Append(MenuItem23);
+    fileMenu.Append(ID_MENUITEM26, _("Fichiers récemments ouverts"), menuRecentFiles, wxEmptyString);
     MenuItem4 = new wxMenuItem((&fileMenu), ID_MENUITEM10, _("Ouvrir un jeu d\'exemple"), wxEmptyString, wxITEM_NORMAL);
     fileMenu.Append(MenuItem4);
     MenuItem5 = new wxMenuItem((&fileMenu), ID_MENUITEM11, _("Importer un jeu"), wxEmptyString, wxITEM_NORMAL);
@@ -223,6 +227,7 @@ projectManager(NULL)
     fileMenu.AppendSeparator();
     MenuItem8 = new wxMenuItem((&fileMenu), ID_MENUITEM14, _("Quitter"), wxEmptyString, wxITEM_NORMAL);
     fileMenu.Append(MenuItem8);
+    menuRecentFiles->Delete(toBeDeletedMenuItem);
     MenuItem16 = new wxMenuItem((&helpMenu), ID_MENUITEM20, _("Aide"), wxEmptyString, wxITEM_NORMAL);
     MenuItem16->SetBitmap(wxBitmap(wxImage(_T("res/helpicon.png"))));
     helpMenu.Append(MenuItem16);
@@ -315,7 +320,7 @@ projectManager(NULL)
 
     //Prepare recent list
     m_recentlist.SetMaxEntries( 9 );
-    m_recentlist.SetAssociatedMenu( contextMenuRecents );
+    m_recentlist.SetAssociatedMenu( menuRecentFiles );
     for ( int i = 0;i < 9;i++ )
     {
         wxString result;

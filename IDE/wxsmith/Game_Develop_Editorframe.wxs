@@ -51,7 +51,6 @@
 			</object>
 		</object>
 		<object class="wxMenu" variable="openContextMenu" member="yes">
-			<extra_code>wxMenu * contextMenuRecents =new wxMenu;&#x0A; openContextMenu.Append(IDM__RECENTS,__(&quot;Récemment ouvert&quot;), contextMenuRecents);</extra_code>
 			<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem1" member="no">
 				<label>Ouvrir un exemple</label>
 				<handler function="OnOpenExampleSelected" entry="EVT_MENU" />
@@ -96,6 +95,7 @@
 			<handler function="OnautoSaveTimerTrigger" entry="EVT_TIMER" />
 		</object>
 		<object class="wxMenu" variable="fileMenu" member="yes">
+			<extra_code>menuRecentFiles-&gt;Delete(toBeDeletedMenuItem);</extra_code>
 			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem2" member="yes">
 				<label>Nouveau</label>
 				<accel>Ctrl+N</accel>
@@ -108,6 +108,12 @@
 				<accel>Ctrl+O</accel>
 				<bitmap>res/openicon.png</bitmap>
 				<handler function="OnMenuOpenSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenu" name="ID_MENUITEM26" variable="menuRecentFiles" member="yes">
+				<label>Fichiers récemments ouverts</label>
+				<object class="wxMenuItem" name="toBeDeletedMenuItem" variable="MenuItem23" member="yes">
+					<label>useless</label>
+				</object>
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem4" member="yes">
 				<label>Ouvrir un jeu d&apos;exemple</label>

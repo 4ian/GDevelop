@@ -13,6 +13,7 @@
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/HelpFileAccess.h"
+#include "InitialVariablesDialog.h"
 #include <sstream>
 #include <string>
 
@@ -37,6 +38,8 @@ const long EditOptionsPosition::ID_CHOICE1 = wxNewId();
 const long EditOptionsPosition::ID_STATICTEXT7 = wxNewId();
 const long EditOptionsPosition::ID_TEXTCTRL4 = wxNewId();
 const long EditOptionsPosition::ID_STATICTEXT8 = wxNewId();
+const long EditOptionsPosition::ID_BUTTON4 = wxNewId();
+const long EditOptionsPosition::ID_STATICTEXT9 = wxNewId();
 const long EditOptionsPosition::ID_PANEL2 = wxNewId();
 const long EditOptionsPosition::ID_STATICLINE2 = wxNewId();
 const long EditOptionsPosition::ID_BUTTON1 = wxNewId();
@@ -51,12 +54,15 @@ END_EVENT_TABLE()
 
 EditOptionsPosition::EditOptionsPosition(wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position_) :
 position(position_),
+initialVariables(position.initialVariables),
 game(game_),
 scene(scene_)
 {
 	//(*Initialize(EditOptionsPosition)
 	wxStaticBoxSizer* StaticBoxSizer2;
 	wxFlexGridSizer* FlexGridSizer4;
+	wxFlexGridSizer* FlexGridSizer16;
+	wxStaticBoxSizer* StaticBoxSizer4;
 	wxFlexGridSizer* FlexGridSizer10;
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
@@ -73,6 +79,7 @@ scene(scene_)
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
+	wxFlexGridSizer* FlexGridSizer11;
 	wxStaticBoxSizer* StaticBoxSizer5;
 
 	Create(parent, wxID_ANY, _("Editer les options avancées d\'un objet sur la scène"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
@@ -171,6 +178,20 @@ scene(scene_)
 	StaticBoxSizer3->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer13->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer11->AddGrowableCol(0);
+	FlexGridSizer11->AddGrowableRow(0);
+	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Variables initiales spécifiques à cette instance de l\'objet"));
+	FlexGridSizer16 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer16->AddGrowableCol(1);
+	FlexGridSizer16->AddGrowableRow(0);
+	editInitialVariables = new wxButton(this, ID_BUTTON4, _("Modifier"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	FlexGridSizer16->Add(editInitialVariables, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	variablesStatusTxt = new wxStaticText(this, ID_STATICTEXT9, _("Aucune variable spécifique à cette instance de définie."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+	FlexGridSizer16->Add(variablesStatusTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer4->Add(FlexGridSizer16, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer11->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer6->Add(FlexGridSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer15 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer15->AddGrowableCol(0);
 	FlexGridSizer15->AddGrowableRow(0);
@@ -198,6 +219,7 @@ scene(scene_)
 	Center();
 
 	Connect(ID_CHECKBOX1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnsizeCheckClick);
+	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OneditInitialVariablesClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnOkBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnAnnulerBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnAideBtClick);
@@ -230,6 +252,8 @@ scene(scene_)
         layerChoice->SetStringSelection(_("Calque de base"));
 
     zOrderEdit->ChangeValue(ToString(position.zOrder) );
+
+    UpdateInitialVariablesStatus();
 
     //Create the object-specific panel, if it has one.
     wxPanel * returnedPanel = NULL;
@@ -312,10 +336,10 @@ void EditOptionsPosition::OnOkBtClick(wxCommandEvent& event)
     if ( layerChoice->GetStringSelection() == _("Calque de base"))
         position.layer = "";
 
+    position.initialVariables = initialVariables;
+
     std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), position.objectName));
     std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), position.objectName));
-
-    ObjSPtr object = boost::shared_ptr<Object> ();
 
     if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
         (*sceneObject)->UpdateInitialPositionFromPanel(customPanel, position);
@@ -348,4 +372,22 @@ void EditOptionsPosition::OnsizeCheckClick(wxCommandEvent& event)
         widthEdit->Enable(false);
         heightEdit->Enable(false);
     }
+}
+
+void EditOptionsPosition::OneditInitialVariablesClick(wxCommandEvent& event)
+{
+    InitialVariablesDialog dialog(this, initialVariables);
+    if ( dialog.ShowModal() == 1 )
+    {
+        initialVariables = dialog.variables;
+        UpdateInitialVariablesStatus();
+    }
+}
+
+void EditOptionsPosition::UpdateInitialVariablesStatus()
+{
+    if ( initialVariables.GetVariablesVector().empty() )
+        variablesStatusTxt->SetLabel(_("Aucune variable spécifique à cette instance de définie."));
+    else
+        variablesStatusTxt->SetLabel(ToString(initialVariables.GetVariablesVector().size())+_(" variable(s) spécifiques à cette instance sont définie(s)."));
 }

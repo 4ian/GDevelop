@@ -13,7 +13,8 @@
 #include <wx/dialog.h>
 //*)
 #include "GDL/Position.h"
-#include "GDL/Object.h"
+#include "GDL/Position.h"
+#include "GDL/VariableList.h"
 class Game;
 class Scene;
 
@@ -30,6 +31,7 @@ class EditOptionsPosition: public wxDialog
 		wxButton* OkBt;
 		wxTextCtrl* widthEdit;
 		wxTextCtrl* YEdit;
+		wxStaticText* variablesStatusTxt;
 		wxStaticText* StaticText2;
 		wxCheckBox* sizeCheck;
 		wxChoice* layerChoice;
@@ -46,6 +48,7 @@ class EditOptionsPosition: public wxDialog
 		wxStaticText* StaticText7;
 		wxStaticLine* StaticLine1;
 		wxButton* AnnulerBt;
+		wxButton* editInitialVariables;
 		wxTextCtrl* zOrderEdit;
 		wxStaticText* StaticText4;
 		wxStaticText* objectNameTxt;
@@ -73,6 +76,8 @@ class EditOptionsPosition: public wxDialog
 		static const long ID_STATICTEXT7;
 		static const long ID_TEXTCTRL4;
 		static const long ID_STATICTEXT8;
+		static const long ID_BUTTON4;
+		static const long ID_STATICTEXT9;
 		static const long ID_PANEL2;
 		static const long ID_STATICLINE2;
 		static const long ID_BUTTON1;
@@ -88,8 +93,12 @@ class EditOptionsPosition: public wxDialog
 		void OnAideBtClick(wxCommandEvent& event);
 		void OnAnimationComboText(wxCommandEvent& event);
 		void OnsizeCheckClick(wxCommandEvent& event);
+		void OneditInitialVariablesClick(wxCommandEvent& event);
 		//*)
 		void RefreshDirecType(int anim);
+		void UpdateInitialVariablesStatus();
+
+		ListVariable initialVariables;
 
 		const Game & game;
 		const Scene & scene;

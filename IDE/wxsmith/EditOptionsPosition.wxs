@@ -271,6 +271,49 @@
 								<option>1</option>
 							</object>
 							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer11" member="no">
+									<cols>3</cols>
+									<growablecols>0</growablecols>
+									<growablerows>0</growablerows>
+									<object class="sizeritem">
+										<object class="wxStaticBoxSizer" variable="StaticBoxSizer4" member="no">
+											<label>Variables initiales spécifiques à cette instance de l&apos;objet</label>
+											<object class="sizeritem">
+												<object class="wxFlexGridSizer" variable="FlexGridSizer16" member="no">
+													<cols>3</cols>
+													<growablecols>1</growablecols>
+													<growablerows>0</growablerows>
+													<object class="sizeritem">
+														<object class="wxButton" name="ID_BUTTON4" variable="editInitialVariables" member="yes">
+															<label>Modifier</label>
+															<handler function="OneditInitialVariablesClick" entry="EVT_BUTTON" />
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxStaticText" name="ID_STATICTEXT9" variable="variablesStatusTxt" member="yes">
+															<label>Aucune variable spécifique à cette instance de définie.</label>
+														</object>
+														<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<option>1</option>
+											</object>
+										</object>
+										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
 								<object class="wxFlexGridSizer" variable="FlexGridSizer15" member="no">
 									<cols>1</cols>
 									<growablecols>0</growablecols>

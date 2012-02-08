@@ -586,11 +586,14 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
 
     objectsList->SetItemImage( itemAdded, thumbnailID );
 
-   if ( scene )
-   {
+    objectsList->EditLabel(itemAdded);
+
+    if ( scene )
+    {
         scene->wasModified = true;
         EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, *scene);
-   }
+    }
+
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
 }
 

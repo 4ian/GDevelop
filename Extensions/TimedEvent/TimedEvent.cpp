@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Timed Event Extension
-Copyright (c) 2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -29,13 +29,13 @@ freely, subject to the following restrictions:
 #include "GDL/OpenSaveGame.h"
 #include "TimedEvent.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/tinyxml.h"
-#include "GDL/EventsCodeGenerator.h"
-#include "GDL/EventsCodeGenerationContext.h"
+#include "GDL/tinyxml/tinyxml.h"
+#include "GDL/Events/EventsCodeGenerator.h"
+#include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/ExpressionsCodeGeneration.h"
 #include "GDL/EventsRenderingHelper.h"
-#include "GDL/EventsEditorItemsAreas.h"
-#include "GDL/EventsEditorSelection.h"
+#include "GDL/IDE/EventsEditorItemsAreas.h"
+#include "GDL/IDE/EventsEditorSelection.h"
 #include "TimedEventEditorDlg.h"
 
 std::vector< TimedEvent* > TimedEvent::codeGenerationCurrentParents;
@@ -49,9 +49,9 @@ TimedEvent::~TimedEvent()
 {
 }
 
-std::string TimedEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & context)
+std::string TimedEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
 {
-    context.AddIncludeFile("TimedEvent/TimedEventTools.h");
+    codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
 
     //Notify parent timed event that they have a child
     for (unsigned int i = 0;i<codeGenerationCurrentParents.size();++i)
@@ -63,9 +63,9 @@ std::string TimedEvent::GenerateEventCode(const Game & game, const Scene & scene
 
     //Prepare code for computing timeout
     std::string timeOutCode;
-    CallbacksForGeneratingExpressionCode callbacks(timeOutCode, game, scene, context);
+    CallbacksForGeneratingExpressionCode callbacks(timeOutCode, game, scene, codeGenerator, context);
     GDExpressionParser parser(timeout.GetPlainString());
-    if (parser.ParseMathExpression(game, scene, callbacks) || timeOutCode.empty()) timeOutCode = "0";
+    if (!parser.ParseMathExpression(game, scene, callbacks) || timeOutCode.empty()) timeOutCode = "0";
 
     //Prepare name
     std::string codeName = !name.empty() ? "GDNamedTimedEvent_"+name : "GDTimedEvent_"+ToString(this);
@@ -75,7 +75,7 @@ std::string TimedEvent::GenerateEventCode(const Game & game, const Scene & scene
     outputCode += "if ( GDpriv::TimedEvents::UpdateAndGetTimeOf(*runtimeContext->scene, \""+codeName+"\")/1000.0 > "+timeOutCode+")";
     outputCode += "{";
 
-    outputCode += EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
+    outputCode += codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
 
     std::string ifPredicat;
     for (unsigned int i = 0;i<conditions.size();++i)
@@ -86,11 +86,11 @@ std::string TimedEvent::GenerateEventCode(const Game & game, const Scene & scene
 
     if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
     outputCode += "{\n";
-    outputCode += EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
+    outputCode += codeGenerator.GenerateActionsListCode(game, scene, actions, context);
     if ( !events.empty() ) //Sub events
     {
         outputCode += "\n{\n";
-        outputCode += EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
+        outputCode += codeGenerator.GenerateEventsListCode(game, scene, events, context);
         outputCode += "}\n";
     }
 

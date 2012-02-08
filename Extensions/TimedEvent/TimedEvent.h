@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Timed Event Extension
-Copyright (c) 2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -55,7 +55,7 @@ class GD_EXTENSION_API TimedEvent : public BaseEvent
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new TimedEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & callerContext);
+        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};

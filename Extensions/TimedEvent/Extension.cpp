@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Timed Event Extension
-Copyright (c) 2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -30,8 +30,9 @@ freely, subject to the following restrictions:
 #include "TimedEvent.h"
 #include "TimedEventsManager.h"
 #include "GDL/CommonTools.h"
+#include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/EventsCodeGenerationContext.h"
+#include "GDL/Events/EventsCodeGenerationContext.h"
 
 /**
  * This class declare information about the extension.
@@ -89,9 +90,9 @@ class Extension : public ExtensionBase
 
             class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
             {
-                virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & context)
+                virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
                 {
-                    context.AddIncludeFile("TimedEvent/TimedEventTools.h");
+                    codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
 
                     for (unsigned int i = 0;TimedEvent::codeGenerationCurrentParents.size();++i)
                     {

@@ -10,12 +10,12 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/ExpressionsCodeGeneration.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDL/IDE/ExpressionsCodeGeneration.h"
 #include "GDL/IDE/EventsRenderingHelper.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/EventsEditorItemsAreas.h"
 #include "GDL/IDE/EventsEditorSelection.h"
+#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDL/ExtensionsManager.h"
 
 std::string WhileEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {

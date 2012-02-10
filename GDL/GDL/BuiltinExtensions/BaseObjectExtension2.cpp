@@ -2,7 +2,7 @@
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/Events/EventsCodeNameMangler.h"
-#include "GDL/ExpressionsCodeGeneration.h"
+#include "GDL/IDE/ExpressionsCodeGeneration.h"
 
 void BaseObjectExtension::DeclareExtensionSecondPart()
 {

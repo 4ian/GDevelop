@@ -16,7 +16,7 @@
 #include "GDL/IDE/GDExpressionParser.h"
 #include "GDL/Events/EventsCodeNameMangler.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/IDE/ExpressionsCodeGeneration.h"
+#include "GDL/Events/ExpressionsCodeGeneration.h"
 
 #include "GDL/ProfileEvent.h"
 #include "GDL/IDE/BaseProfiler.h"

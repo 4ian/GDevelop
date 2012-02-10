@@ -11,7 +11,7 @@
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/IDE/ExpressionsCodeGeneration.h"
+#include "GDL/Events/ExpressionsCodeGeneration.h"
 #include "GDL/Events/EventsCodeNameMangler.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/IDE/EventsRenderingHelper.h"

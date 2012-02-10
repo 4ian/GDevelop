@@ -10,7 +10,7 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/IDE/ExpressionsCodeGeneration.h"
+#include "GDL/Events/ExpressionsCodeGeneration.h"
 #include "GDL/IDE/EventsRenderingHelper.h"
 #include "GDL/IDE/EventsEditorItemsAreas.h"
 #include "GDL/IDE/EventsEditorSelection.h"

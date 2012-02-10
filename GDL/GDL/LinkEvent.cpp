@@ -8,7 +8,7 @@
 #include <wx/dcmemory.h>
 #include "GDL/LinkEvent.h"
 #include "GDL/OpenSaveGame.h"
-#include "GDL/EventsRenderingHelper.h"
+#include "GDL/IDE/EventsRenderingHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/EmptyEvent.h"
 #include "GDL/ExternalEvents.h"

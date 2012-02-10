@@ -6,7 +6,7 @@
 
 #include <wx/dcmemory.h>
 #include "CommentEvent.h"
-#include "GDL/EventsRenderingHelper.h"
+#include "GDL/IDE/EventsRenderingHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/XmlMacros.h"

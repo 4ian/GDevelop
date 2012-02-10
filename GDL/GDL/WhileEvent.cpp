@@ -12,7 +12,7 @@
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/ExpressionsCodeGeneration.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/EventsRenderingHelper.h"
+#include "GDL/IDE/EventsRenderingHelper.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/EventsEditorItemsAreas.h"
 #include "GDL/IDE/EventsEditorSelection.h"

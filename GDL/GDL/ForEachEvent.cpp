@@ -14,7 +14,7 @@
 #include "GDL/ExpressionsCodeGeneration.h"
 #include "GDL/Events/EventsCodeNameMangler.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/EventsRenderingHelper.h"
+#include "GDL/IDE/EventsRenderingHelper.h"
 #include "GDL/IDE/Dialogs/EditForEachEvent.h"
 #include "GDL/IDE/EventsEditorItemsAreas.h"
 #include "GDL/IDE/EventsEditorSelection.h"

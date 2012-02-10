@@ -20,7 +20,7 @@
 #include "GDL/Scene.h"
 #include "GDL/Event.h"
 #include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/EventsExecutionEngine.h"
+#include "GDL/CodeExecutionEngine.h"
 #include "GDL/IDE/BaseProfiler.h"
 #include "GDL/CommonTools.h"
 
@@ -36,7 +36,7 @@ bool EventsCodeCompilerPreWork::Execute()
 
     Game gameCopy = *game;
     Scene sceneCopy = *scene;
-    if ( executionEngine != boost::shared_ptr<EventsExecutionEngine>() ) executionEngine->SetNotReady();
+    if ( executionEngine != boost::shared_ptr<CodeExecutionEngine>() ) executionEngine->SetNotReady();
     cout << "Game and scene copy made" << endl;
 
     cout << "Generating C++ code...\n";
@@ -61,9 +61,9 @@ bool EventsCodeCompilerPostWork::Execute()
         std::cout << "WARNING: Cannot execute post task: No valid associated scene." << std::endl;
         return false;
     }
-    if ( executionEngine == boost::shared_ptr<EventsExecutionEngine>() )
+    if ( executionEngine == boost::shared_ptr<CodeExecutionEngine>() )
     {
-        std::cout << "WARNING: Cannot execute post task: No valid EventsExecutionEngine." << std::endl;
+        std::cout << "WARNING: Cannot execute post task: No valid CodeExecutionEngine." << std::endl;
         return false;
     }
 
@@ -94,8 +94,8 @@ void GD_API EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(Game &
     task.inputFile = string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(&scene)+"events.cpp");
     task.outputFile = string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(&scene)+"LLVMIR.bc");
     task.scene = &scene;
-    task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPreWork(&game, &scene, scene.compiledEventsExecutionEngine));
-    task.postWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPostWork(&game, &scene, scene.compiledEventsExecutionEngine));
+    task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPreWork(&game, &scene, scene.codeExecutionEngine));
+    task.postWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPostWork(&game, &scene, scene.codeExecutionEngine));
     task.userFriendlyName = "Compilation of events of scene "+scene.GetName();
 
     CodeCompiler::GetInstance()->AddTask(task);

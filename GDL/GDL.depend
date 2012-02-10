@@ -12984,7 +12984,7 @@
 1325335072 d:\florian\programmation\gamedevelop2\gdl\\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1325335073 d:\florian\programmation\gamedevelop2\gdl\\gdl\scene.h
+1328891436 d:\florian\programmation\gamedevelop2\gdl\\gdl\scene.h
 	"GDL/Event.h"
 	<vector>
 	<map>
@@ -13573,7 +13573,7 @@
 	<string>
 	<boost/shared_ptr.hpp>
 
-1326056511 d:\florian\programmation\gamedevelop2\gdl\\gdl\runtimescene.h
+1328891147 d:\florian\programmation\gamedevelop2\gdl\\gdl\runtimescene.h
 	"GDL/Scene.h"
 	<iostream>
 	<sstream>
@@ -13801,7 +13801,7 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1326056511 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
+1328891147 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
 	"GDL/Scene.h"
 	<iostream>
 	<sstream>
@@ -14833,7 +14833,7 @@
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1328736673 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
+1328891147 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
 	"GDL/RuntimeScene.h"
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
@@ -14855,7 +14855,7 @@
 	"GDL/RuntimeContext.h"
 	"GDL/ExtensionBase.h"
 	"GDL/RuntimeGame.h"
-	"GDL/EventsExecutionEngine.h"
+	"GDL/CodeExecutionEngine.h"
 	"GDL/ProfileEvent.h"
 	"GDL/IDE/BaseProfiler.h"
 	"GDL/IDE/BaseDebugger.h"
@@ -15839,7 +15839,7 @@
 	<wx/filename.h>
 	"GDL/IDE/CodeCompiler.h"
 
-1328394584 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1328893179 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -32890,25 +32890,7 @@
 1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\audiotools.h
 	<string>
 
-1325335071 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventsexecutionengine.cpp
-	<iostream>
-	"EventsExecutionEngine.h"
-	<llvm/ExecutionEngine/GenericValue.h>
-	<llvm/ExecutionEngine/ExecutionEngine.h>
-	<llvm/ExecutionEngine/JIT.h>
-	<llvm/Support/DynamicLibrary.h>
-	<llvm/Config/config.h>
-	<llvm/Module.h>
-	<llvm/Target/TargetRegistry.h>
-	<llvm/Target/TargetSelect.h>
-	<llvm/Bitcode/ReaderWriter.h>
-	<llvm/Support/MemoryBuffer.h>
-	<llvm/Support/TypeBuilder.h>
-	<llvm/Support/system_error.h>
-	<SFML/System.hpp>
-	"GDL/RuntimeContext.h"
-	<wx/intl.h>
-	<wx/log.h>
+1328891147 source:d:\florian\programmation\gamedevelop2\gdl\gdl\eventsexecutionengine.cpp
 
 1328564927 d:\florian\programmation\gamedevelop2\gdl\gdl\eventsexecutionengine.h
 	<string>
@@ -34261,7 +34243,7 @@
 	"GDL/Scene.h"
 	"GDL/Game.h"
 
-1328393587 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\fullprojectcompiler.cpp
+1328891147 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\fullprojectcompiler.cpp
 	"FullProjectCompiler.h"
 	<fstream>
 	<iostream>
@@ -34892,7 +34874,7 @@
 1327701325 d:\florian\programmation\gamedevelop2\gdl\\gdl\cppcodeevent.h
 	"Event.h"
 
-1328394584 source:d:\florian\programmation\gamedevelop2\gdl\gdl\events\eventscodecompilationhelper.cpp
+1328891147 source:d:\florian\programmation\gamedevelop2\gdl\gdl\events\eventscodecompilationhelper.cpp
 	"EventsCodeCompilationHelper.h"
 	<SFML/System.hpp>
 	<iostream>
@@ -34906,11 +34888,11 @@
 	"GDL/Scene.h"
 	"GDL/Event.h"
 	"GDL/Events/EventsCodeGenerator.h"
-	"GDL/EventsExecutionEngine.h"
+	"GDL/CodeExecutionEngine.h"
 	"GDL/IDE/BaseProfiler.h"
 	"GDL/CommonTools.h"
 
-1328394584 d:\florian\programmation\gamedevelop2\gdl\gdl\events\eventscodecompilationhelper.h
+1328891147 d:\florian\programmation\gamedevelop2\gdl\gdl\events\eventscodecompilationhelper.h
 	<map>
 	<string>
 	<iostream>
@@ -34992,7 +34974,7 @@
 	<boost/shared_ptr.hpp>
 	<wx/event.h>
 
-1328394584 d:\florian\programmation\gamedevelop2\gdl\\gdl\events\eventscodecompilationhelper.h
+1328891147 d:\florian\programmation\gamedevelop2\gdl\\gdl\events\eventscodecompilationhelper.h
 	<map>
 	<string>
 	<iostream>
@@ -35001,4 +34983,34 @@
 	<boost/shared_ptr.hpp>
 	<SFML/System.hpp>
 	"GDL/IDE/CodeCompiler.h"
+
+1328891147 source:d:\florian\programmation\gamedevelop2\gdl\gdl\codeexecutionengine.cpp
+	<iostream>
+	"CodeExecutionEngine.h"
+	<llvm/ExecutionEngine/GenericValue.h>
+	<llvm/ExecutionEngine/ExecutionEngine.h>
+	<llvm/ExecutionEngine/JIT.h>
+	<llvm/Support/DynamicLibrary.h>
+	<llvm/Config/config.h>
+	<llvm/Module.h>
+	<llvm/Target/TargetRegistry.h>
+	<llvm/Target/TargetSelect.h>
+	<llvm/Bitcode/ReaderWriter.h>
+	<llvm/Support/MemoryBuffer.h>
+	<llvm/Support/TypeBuilder.h>
+	<llvm/Support/system_error.h>
+	<SFML/System.hpp>
+	"GDL/RuntimeContext.h"
+	<wx/intl.h>
+	<wx/log.h>
+
+1328891147 d:\florian\programmation\gamedevelop2\gdl\gdl\codeexecutionengine.h
+	<string>
+	<llvm/ADT/OwningPtr.h>
+	<llvm/LLVMContext.h>
+
+1328891147 d:\florian\programmation\gamedevelop2\gdl\\gdl\codeexecutionengine.h
+	<string>
+	<llvm/ADT/OwningPtr.h>
+	<llvm/LLVMContext.h>
 

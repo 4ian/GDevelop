@@ -32,7 +32,7 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/OpenSaveGame.h"
-#include "GDL/ExecutableIconChanger.h"
+#include "GDL/IDE/ExecutableIconChanger.h"
 #include "GDL/IDE/BaseProfiler.h"
 
 using namespace std;
@@ -144,7 +144,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         task.eventsGeneratedCode = true;
         task.inputFile = string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(game.scenes[i].get())+"events.cpp");
         task.outputFile = tempDir+"/GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[i]->GetName())+".ir";
-        task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPreWork(&game, game.scenes[i].get(), boost::shared_ptr<EventsExecutionEngine>()));
+        task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPreWork(&game, game.scenes[i].get(), boost::shared_ptr<CodeExecutionEngine>()));
         task.scene = game.scenes[i].get();
 
         CodeCompiler::GetInstance()->AddTask(task);

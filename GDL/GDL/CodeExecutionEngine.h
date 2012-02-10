@@ -3,8 +3,9 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#ifndef EVENTSEXECUTIONENGINE_H
-#define EVENTSEXECUTIONENGINE_H
+#ifndef CODEEXECUTIONENGINE_H
+#define CODEEXECUTIONENGINE_H
+
 
 #include <string>
 #include <llvm/ADT/OwningPtr.h>
@@ -26,15 +27,15 @@ class RuntimeContext;
  * \see EventsCodeCompilationHelper
  * \see CodeCompiler
  */
-class GD_API EventsExecutionEngine
+class GD_API CodeExecutionEngine
 {
 public:
-    EventsExecutionEngine();
-    virtual ~EventsExecutionEngine();
+    CodeExecutionEngine();
+    virtual ~CodeExecutionEngine();
 
     /**
      * Execute compiled events.
-     * Beware, there is no protection against calling Execute on an EventsExecutionEngine that is not initialized with bitcode
+     * Beware, there is no protection against calling Execute on an CodeExecutionEngine that is not initialized with bitcode
      */
     void Execute() { ((void(*)())compiledRawFunction)(); };
 
@@ -90,4 +91,5 @@ void GDEmptyFunctionDoingNothing();
  */
 void* UseSubstituteForUnknownFunctions(const std::string& name);
 
-#endif // EVENTSEXECUTIONENGINE_H
+
+#endif // CODEEXECUTIONENGINE_H

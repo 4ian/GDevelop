@@ -4,7 +4,7 @@
 #include "GDL/Position.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"
-#include "GDL/EventsExecutionEngine.h"
+#include "GDL/CodeExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
 #include "GDL/Events/EventsCodeCompilationHelper.h"
 #endif
@@ -22,7 +22,7 @@ stopSoundsOnStartup(true),
 #if defined(GD_IDE_ONLY)
 profiler(NULL),
 #endif
-compiledEventsExecutionEngine(boost::shared_ptr<EventsExecutionEngine>(new EventsExecutionEngine))
+codeExecutionEngine(boost::shared_ptr<CodeExecutionEngine>(new CodeExecutionEngine))
 #if defined(GD_IDE_ONLY)
 ,wasModified(false),
 eventsModified(true),
@@ -71,7 +71,7 @@ void Scene::Init(const Scene & scene)
     events = CloneVectorOfEvents(scene.events);
     #endif
 
-    compiledEventsExecutionEngine = boost::shared_ptr<EventsExecutionEngine>(new EventsExecutionEngine);
+    codeExecutionEngine = boost::shared_ptr<CodeExecutionEngine>(new CodeExecutionEngine);
 
     initialObjects.clear();
     for (unsigned int i =0;i<scene.initialObjects.size();++i)

@@ -15,7 +15,7 @@
 #include <boost/shared_ptr.hpp>
 #include <SFML/System.hpp>
 #include "GDL/IDE/CodeCompiler.h"
-class EventsExecutionEngine;
+class CodeExecutionEngine;
 class Scene;
 class Game;
 
@@ -31,9 +31,9 @@ public:
 
     Game * game;
     Scene * scene;
-    boost::shared_ptr<EventsExecutionEngine> executionEngine; ///< The execution engine where the compiled code must be loaded
+    boost::shared_ptr<CodeExecutionEngine> executionEngine; ///< The execution engine where the compiled code must be loaded
 
-    EventsCodeCompilerPostWork(Game * game_, Scene * scene_, boost::shared_ptr<EventsExecutionEngine> executionEngine_) : game(game_), scene(scene_), executionEngine(executionEngine_) {};
+    EventsCodeCompilerPostWork(Game * game_, Scene * scene_, boost::shared_ptr<CodeExecutionEngine> executionEngine_) : game(game_), scene(scene_), executionEngine(executionEngine_) {};
     virtual ~EventsCodeCompilerPostWork() {};
 };
 
@@ -49,9 +49,9 @@ public:
 
     Game * game;
     Scene * scene;
-    boost::shared_ptr<EventsExecutionEngine> executionEngine; ///< The execution engine where the compiled code must be loaded. Can be NULL.
+    boost::shared_ptr<CodeExecutionEngine> executionEngine; ///< The execution engine where the compiled code must be loaded. Can be NULL.
 
-    EventsCodeCompilerPreWork(Game * game_, Scene * scene_, boost::shared_ptr<EventsExecutionEngine> executionEngine_) : game(game_), scene(scene_), executionEngine(executionEngine_) {};
+    EventsCodeCompilerPreWork(Game * game_, Scene * scene_, boost::shared_ptr<CodeExecutionEngine> executionEngine_) : game(game_), scene(scene_), executionEngine(executionEngine_) {};
     virtual ~EventsCodeCompilerPreWork() {};
 };
 

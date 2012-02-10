@@ -25,7 +25,7 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/RuntimeGame.h"
 
-#include "GDL/EventsExecutionEngine.h"
+#include "GDL/CodeExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
 #include "GDL/ProfileEvent.h"
 #include "GDL/IDE/BaseProfiler.h"
@@ -92,7 +92,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     timers = scene.timers;
     pauseTime = scene.pauseTime;
 
-    compiledEventsExecutionEngine = scene.compiledEventsExecutionEngine;
+    codeExecutionEngine = scene.codeExecutionEngine;
 
     firstLoop = scene.firstLoop;
     isFullScreen = scene.isFullScreen;
@@ -203,7 +203,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
 
         {
             BT_PROFILE("Events");
-            compiledEventsExecutionEngine->Execute();
+            codeExecutionEngine->Execute();
         }
 
         #if defined(GD_IDE_ONLY)
@@ -498,8 +498,8 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     events = CloneVectorOfEvents(scene.events);
     #endif
 
-    compiledEventsExecutionEngine = scene.compiledEventsExecutionEngine;
-    compiledEventsExecutionEngine->llvmRuntimeContext->scene = this;
+    codeExecutionEngine = scene.codeExecutionEngine;
+    codeExecutionEngine->llvmRuntimeContext->scene = this;
 
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;

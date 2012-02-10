@@ -4,7 +4,7 @@
  */
 
 #include <iostream>
-#include "EventsExecutionEngine.h"
+#include "CodeExecutionEngine.h"
 #include <llvm/ExecutionEngine/GenericValue.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
 #include <llvm/ExecutionEngine/JIT.h>
@@ -26,9 +26,9 @@
 #include <wx/log.h>
 #endif
 
-bool EventsExecutionEngine::llvmTargetsInitialized = false;
+bool CodeExecutionEngine::llvmTargetsInitialized = false;
 
-void EventsExecutionEngine::EnsureLLVMTargetsInitialization()
+void CodeExecutionEngine::EnsureLLVMTargetsInitialization()
 {
     if ( !llvmTargetsInitialized )
     {
@@ -37,7 +37,7 @@ void EventsExecutionEngine::EnsureLLVMTargetsInitialization()
     }
 }
 
-void EventsExecutionEngine::LoadDynamicLibraries()
+void CodeExecutionEngine::LoadDynamicLibraries()
 {
     #if defined(WINDOWS) //Other system uses by default standard library as a shared library
     std::string error;
@@ -46,18 +46,18 @@ void EventsExecutionEngine::LoadDynamicLibraries()
     #endif
 }
 
-EventsExecutionEngine::EventsExecutionEngine() :
+CodeExecutionEngine::CodeExecutionEngine() :
     engineReady(false)
 {
     llvmRuntimeContext = new RuntimeContext(NULL);
 }
 
-EventsExecutionEngine::~EventsExecutionEngine()
+CodeExecutionEngine::~CodeExecutionEngine()
 {
     if ( llvmRuntimeContext != NULL ) delete llvmRuntimeContext;
 }
 
-bool EventsExecutionEngine::LoadFromLLVMBitCode(const char * src, unsigned int size)
+bool CodeExecutionEngine::LoadFromLLVMBitCode(const char * src, unsigned int size)
 {
     llvm::StringRef input_data(src);
     llvm::StringRef buffer_name("src");
@@ -68,7 +68,7 @@ bool EventsExecutionEngine::LoadFromLLVMBitCode(const char * src, unsigned int s
     return LoadFromLLVMBitCode(eventsBuffer.get());
 }
 
-bool EventsExecutionEngine::LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffer)
+bool CodeExecutionEngine::LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffer)
 {
     std::string parseError;
     llvm::Module * llvmModule = ParseBitcodeFile(eventsBuffer, llvmContext, &parseError);

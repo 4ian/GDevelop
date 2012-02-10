@@ -17,7 +17,7 @@ class Game;
 #include "GDL/ObjectGroup.h"
 #include "GDL/Position.h"
 #include "GDL/Layer.h"
-class EventsExecutionEngine;
+class CodeExecutionEngine;
 class AutomatismsSharedDatas;
 class BaseProfiler;
 
@@ -66,7 +66,7 @@ class GD_API Scene
         vector < Layer >                        initialLayers; ///< Initial layers
         ListVariable                            variables; ///< Variables list
         std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
-        boost::shared_ptr<EventsExecutionEngine> compiledEventsExecutionEngine;
+        boost::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
 
         #if defined(GD_IDE_ONLY)
         bool wasModified;

@@ -21,7 +21,7 @@
 #include "GDL/ManualTimer.h"
 #include "GDL/ObjInstancesHolder.h"
 class RuntimeGame;
-class EventsExecutionEngine;
+class CodeExecutionEngine;
 class Object;
 class SoundManager;
 class AutomatismsRuntimeSharedDatas;

@@ -33,7 +33,7 @@
 #include <SFML/System.hpp>
 #include "CppUnitLite/TestHarness.h"
 
-#include "GDL/EventsExecutionEngine.h"
+#include "GDL/CodeExecutionEngine.h"
 #include <llvm/Support/DynamicLibrary.h>
 
 #include "Game_Develop_EditorMain.h"
@@ -271,9 +271,9 @@ bool Game_Develop_EditorApp::OnInit()
 
     //LLVM stuff
     cout << "* Initializing LLVM/Clang..." << endl;
-    EventsExecutionEngine::EnsureLLVMTargetsInitialization();
+    CodeExecutionEngine::EnsureLLVMTargetsInitialization();
     cout << "* Loading required dynamic libraries..." << endl;
-    EventsExecutionEngine::LoadDynamicLibraries();
+    CodeExecutionEngine::LoadDynamicLibraries();
 
     //Events compiler setup
     cout << "* Setting up events compiler..." << endl;

@@ -22,7 +22,7 @@
 #include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/IDE/EventsEditorItemsAreas.h"
 #include "GDL/IDE/EventsEditorSelection.h"
-#include "GDL/EventsRenderingHelper.h"
+#include "GDL/IDE/EventsRenderingHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Events/EventsCodeCompilationHelper.h"
 #include "GDL/ExtensionsManager.h"

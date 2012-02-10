@@ -33,7 +33,7 @@
 #include "GDL/DynamicExtensionsManager.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
 #include "GDL/Events/EventsCodeCompilationHelper.h"
-#include "GDL/EventsExecutionEngine.h"
+#include "GDL/CodeExecutionEngine.h"
 #include "GDL/SoundManager.h"
 #include "BuildMessagesPnl.h"
 #include "BuildProgressPnl.h"
@@ -760,7 +760,7 @@ void SceneCanvas::Refresh()
         {
 
             //But be sure that no error occured.
-            if ( !edittimeRenderer.editing && !sceneEdited.compiledEventsExecutionEngine->Ready() )
+            if ( !edittimeRenderer.editing && !sceneEdited.codeExecutionEngine->Ready() )
             {
                 wxLogError(_("La compilation des évènements a échouée, et la scène ne peut être testée. Afin que le problème soit corrigé, veuillez le rapporter au développeur de Game Develop, en joignant le fichier suivant :\n")+CodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt");
                 wxCommandEvent useless;

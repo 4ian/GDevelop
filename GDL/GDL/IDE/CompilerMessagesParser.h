@@ -1,5 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 
-#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 #if defined(GD_IDE_ONLY)
 
 #ifndef COMPILERERRORSPARSER_H
@@ -16,10 +19,11 @@ namespace GDpriv
 class GD_API CompilerMessage
 {
 public:
-    CompilerMessage() : line(std::string::npos) {};
+    CompilerMessage() : line(std::string::npos), column(std::string::npos) {};
 
     std::string file;
     size_t line;
+    size_t column;
     std::string message;
     enum MessageType
     {
@@ -37,9 +41,9 @@ class GD_API CompilerMessagesParser
         CompilerMessagesParser() {};
         virtual ~CompilerMessagesParser() {};
 
-        void ParseOutput(std::vector<std::string> output);
+        void ParseOutput(std::string output);
 
-        std::vector < CompilerMessage > parsedErrors;
+        std::vector < CompilerMessage > parsedMessages;
 
     private:
 };
@@ -48,5 +52,4 @@ class GD_API CompilerMessagesParser
 
 #endif // COMPILERERRORSPARSER_H
 
-#endif
 #endif

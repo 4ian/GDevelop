@@ -3,7 +3,6 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 #if defined(GD_IDE_ONLY)
 #include "GDL/SourceFile.h"
 #include "GDL/tinyxml/tinyxml.h"
@@ -36,6 +35,9 @@ void SourceFile::LoadFromXml(const TiXmlElement * elem)
     int ilastBuildTimeStamp = lastBuildTimeStamp;
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("lastBuildTimeStamp", ilastBuildTimeStamp);
     lastBuildTimeStamp = ilastBuildTimeStamp;
+
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("gdManaged", gdManaged);
+    if ( elem->Attribute("gdManaged") == NULL ) gdManaged = false;
 }
 
 /**
@@ -45,9 +47,9 @@ void SourceFile::SaveToXml(TiXmlElement * elem)
 {
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("filename", filename);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("lastBuildTimeStamp", lastBuildTimeStamp);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("gdManaged", gdManaged);
 }
 
 }
 
-#endif
 #endif

@@ -1,14 +1,20 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef ImageManager_H
 #define ImageManager_H
 
-#include "GDL/Game.h" //This include file must be placed first
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
-#include <boost/shared_ptr.hpp>
 #include <iostream>
 #include <vector>
 #include <string>
+#include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
+#include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
+class Game;
 class OpenGLTextureWrapper;
 class SFMLTextureWrapper;
 #undef LoadImage //thx windows.h

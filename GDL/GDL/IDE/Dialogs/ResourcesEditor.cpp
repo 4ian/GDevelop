@@ -39,6 +39,8 @@
 #include "GDL/IDE/HelpFileAccess.h"
 
 #include "GDL/Game.h"
+#include "GDL/Scene.h"
+#include "GDL/Object.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/Dialogs/PropImage.h"
 #include "GDL/ExternalEvents.h"
@@ -106,10 +108,10 @@ END_EVENT_TABLE()
 
 ResourcesEditor::ResourcesEditor( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_, bool useRibbon_ ) :
 game(game_),
+toolbar(NULL),
 filesWatcher(game),
 mainEditorCommand(mainEditorCommand_),
-useRibbon(useRibbon_),
-toolbar(NULL)
+useRibbon(useRibbon_)
 {
     //(*Initialize(ResourcesEditor)
     wxFlexGridSizer* FlexGridSizer4;

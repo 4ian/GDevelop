@@ -252,7 +252,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("CppCode",
-                  _("Code C++"),
+                  _("Code C++ ( Expérimental )"),
                   "Execute du code C++",
                   "",
                   "res/source_cpp16.png",

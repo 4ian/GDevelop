@@ -18,6 +18,7 @@
 								<object class="sizeritem">
 									<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
 										<bitmap>res/repeat.png</bitmap>
+										<style>0</style>
 									</object>
 									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>

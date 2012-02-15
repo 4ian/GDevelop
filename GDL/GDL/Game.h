@@ -9,13 +9,14 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include "GDL/Scene.h"
 #include "GDL/VariableList.h"
 #include "GDL/LoadingScreen.h"
 #include "GDL/ResourcesManager.h"
+class ObjectGroup;
 class Object;
+class Scene;
 class ExternalEvents;
-#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
+#if defined(GD_IDE_ONLY)
 namespace GDpriv
 {
 class SourceFile;
@@ -31,7 +32,7 @@ class GD_API Game
     public:
         Game();
         Game(const Game&);
-        virtual ~Game() {};
+        virtual ~Game();
 
         Game& operator=(const Game & rhs);
 
@@ -69,11 +70,9 @@ class GD_API Game
         std::string macExecutableFilename;  ///< Mac executable name
         #endif
 
-        #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-        bool useExternalSourceFiles; ///< True if game used external source files, and thus dynamic extensions.
+        bool useExternalSourceFiles; ///< True if game used external source files.
         #if defined(GD_IDE_ONLY)
         std::vector < boost::shared_ptr<GDpriv::SourceFile> >        externalSourceFiles; ///< List of C++ source files used.
-        #endif
         #endif
 
     private:

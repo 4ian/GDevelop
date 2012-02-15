@@ -3,7 +3,6 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 #if defined(GD_IDE_ONLY)
 
 #ifndef SOURCEFILE_H
@@ -94,5 +93,4 @@ struct ExternalSourceFileHasName : public std::binary_function<boost::shared_ptr
 
 #endif // SOURCEFILE_H
 
-#endif
 #endif

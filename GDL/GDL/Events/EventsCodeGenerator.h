@@ -27,11 +27,11 @@ class GD_API EventsCodeGenerator
 {
 public:
 
-    static std::string GenerateEventsCompleteCode(const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & events);
+    static std::string GenerateEventsCompleteCode(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events, bool compilationForRuntime = false);
     static void DeleteUselessEvents(std::vector < BaseEventSPtr > & events);
     static void PreprocessEventList( const Game & game, const Scene & scene, vector < BaseEventSPtr > & listEvent );
 
-    EventsCodeGenerator() {};
+    EventsCodeGenerator() : errorOccurred(false), compilationForRuntime(false) {};
     virtual ~EventsCodeGenerator() {};
 
     /**
@@ -43,7 +43,7 @@ public:
      * \param context Context used for generation
      * \return C++ code
      */
-    std::string GenerateEventsListCode(const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
+    std::string GenerateEventsListCode(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
 
     /**
      * Generate code for executing a condition list
@@ -179,6 +179,16 @@ public:
     const std::set<std::string> & GetCustomGlobalDeclaration() const { return customGlobalDeclaration; }
 
     /**
+     * Return true if code generation is made for runtime only.
+     */
+    bool GenerateCodeForRuntime() { return compilationForRuntime; }
+
+    /**
+     * Set if the code generated is meant to be used for runtime only and not in the IDE.
+     */
+    void SetGenerateCodeForRuntime(bool compilationForRuntime_) { compilationForRuntime = compilationForRuntime_; }
+
+    /**
      * Report that an error occurred during code generation ( Event code won't be generated )
      */
     void ReportError();
@@ -195,6 +205,7 @@ private:
     std::string GenerateCompoundOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument = 0);
 
     bool errorOccurred;
+    bool compilationForRuntime;
 
     std::set<std::string> includeFiles; ///< List of headers files used by instructions. A (shared) pointer is used so as context created from another one can share the same list.
     std::string customCodeOutsideMain; ///< Custom code inserted before events ( and not in events function )

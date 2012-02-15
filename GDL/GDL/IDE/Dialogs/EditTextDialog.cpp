@@ -19,6 +19,7 @@
 #include <wx/textdlg.h>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
+#include "GDL/Object.h"
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/gdTreeItemStringData.h"

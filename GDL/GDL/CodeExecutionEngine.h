@@ -6,7 +6,7 @@
 #ifndef CODEEXECUTIONENGINE_H
 #define CODEEXECUTIONENGINE_H
 
-
+#include <vector>
 #include <string>
 #include <llvm/ADT/OwningPtr.h>
 #include <llvm/LLVMContext.h>
@@ -24,7 +24,7 @@ class RuntimeContext;
  * RuntimeScene uses this class to launch compiled events.
  * Set up this class by loading bitcode compiled by CodeCompiler.
  *
- * \see EventsCodeCompilationHelper
+ * \see CodeCompilationHelpers
  * \see CodeCompiler
  */
 class GD_API CodeExecutionEngine
@@ -47,14 +47,20 @@ public:
     void SetNotReady() { engineReady = false; };
 
     /**
-     * Initialize execution engine from bitCode stored in memory.
+     * Initialize execution engine from bitcode stored in memory.
+     * Buffers passed as parameter are internally copied.
+     *
+     * \param data vector containing std::pair : The first member is the raw memory buffer, and the second member is the size of the buffer.
      */
-    bool LoadFromLLVMBitCode(const char * src, unsigned int size);
+    bool LoadFromLLVMBitCode(std::vector< std::pair<const char * /*src*/, unsigned int /*size*/> > data);
 
     /**
-     * Initialize execution engine from bitCode loaded in memory.
+     * Initialize execution engine from bitcode loaded in llvm::MemoryBuffer.
+     * The first bitcode buffer will be used to generate the main llvm module, and the other will be linked to the first one.
+     *
+     * \param bitcodeBuffers vector containing one or more pointers to memory buffers containing bitcode. These buffers won't be modified or freed by the function.
      */
-    bool LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffer);
+    bool LoadFromLLVMBitCode(std::vector<llvm::MemoryBuffer *> bitcodeBuffers);
 
     void * compiledRawFunction; ///< Pointer to compiled events entry function.
     llvm::LLVMContext llvmContext;

@@ -54,10 +54,12 @@ void CommentEvent::LoadFromXml(const TiXmlElement * eventElem)
     if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "textB" ) != NULL ) { eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "textB", &textB );}
 }
 
-void CommentEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+BaseEvent::EditEventReturnType CommentEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     EditComment dialog(parent_, *this);
-    dialog.ShowModal();
+    if ( dialog.ShowModal() == 0) return Cancelled;
+
+    return ChangesMadeButNoNeedForEventsRecompilation;
 }
 
 /**

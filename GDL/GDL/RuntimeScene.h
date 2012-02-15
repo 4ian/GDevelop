@@ -13,7 +13,6 @@
 #include <string>
 #include <map>
 #include <boost/shared_ptr.hpp>
-#include "GDL/Event.h"
 #include "GDL/CommonTools.h"
 #include "GDL/RuntimeLayer.h"
 #include "GDL/Text.h"

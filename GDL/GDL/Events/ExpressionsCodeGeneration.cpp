@@ -4,7 +4,7 @@
  */
 #if defined(GD_IDE_ONLY)
 
-#include "GDL/ExpressionsCodeGeneration.h"
+#include "ExpressionsCodeGeneration.h"
 #include "GDL/StrExpressionInstruction.h"
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/IDE/GDExpressionParser.h"

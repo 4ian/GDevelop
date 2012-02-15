@@ -12,9 +12,9 @@ using namespace std;
 
 RessourcesLoader * RessourcesLoader::_singleton = NULL;
 
-bool RessourcesLoader::SetExeGD(const string & filename)
+bool RessourcesLoader::SetResourceFile(const string & filename)
 {
-    if ( ExeGD.Read(filename) )
+    if ( resFile.Read(filename) )
     {
         std::cout << "Resource file set to " << filename << std::endl;
         return true;
@@ -27,13 +27,13 @@ sf::Texture * RessourcesLoader::LoadSFMLTexture(const string & filename)
 {
     sf::Texture * image = new sf::Texture();
 
-    if ( ExeGD.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
+    if ( resFile.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
     {
-        char* buffer = ExeGD.GetFile(filename);
+        char* buffer = resFile.GetFile(filename);
         if (buffer==NULL)
             cout << "Failed to get the file of a SFML texture from resource file: " << filename << endl;
 
-        if (!image->LoadFromMemory(buffer, ExeGD.GetFileSize(filename)))
+        if (!image->LoadFromMemory(buffer, resFile.GetFileSize(filename)))
             cout << "Failed to load a SFML texture from resource file: " << filename << endl;
     }
     else if (!image->LoadFromFile(filename)) //Chargement depuis un fichier externe
@@ -46,17 +46,17 @@ sf::Font * RessourcesLoader::LoadFont(const string & filename)
 {
     sf::Font * font = new sf::Font();
 
-    if ( ExeGD.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
+    if ( resFile.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
     {
-        char* buffer = ExeGD.GetFile(filename);
+        char* buffer = resFile.GetFile(filename);
         if (buffer==NULL)
             cout << "Failed to get the file of a font from resource file:" << filename << endl;
 
         //TODO : Manage this
-        char * fontBuffer = new char[ExeGD.GetFileSize(filename)];
-        memcpy(fontBuffer, buffer, ExeGD.GetFileSize(filename));
+        char * fontBuffer = new char[resFile.GetFileSize(filename)];
+        memcpy(fontBuffer, buffer, resFile.GetFileSize(filename));
 
-        if (!font->LoadFromMemory(fontBuffer, ExeGD.GetFileSize(filename)))
+        if (!font->LoadFromMemory(fontBuffer, resFile.GetFileSize(filename)))
             cout << "Failed to load a font from resource file: " << filename << endl;
     }
     else if (!font->LoadFromFile(filename)) //Chargement depuis un fichier externe
@@ -69,13 +69,13 @@ sf::SoundBuffer RessourcesLoader::LoadSoundBuffer( const string & filename )
 {
     sf::SoundBuffer sbuffer;
 
-    if ( ExeGD.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
+    if ( resFile.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
     {
-        char* buffer = ExeGD.GetFile(filename);
+        char* buffer = resFile.GetFile(filename);
         if (buffer==NULL)
             cout << "Failed to get the file of a sound buffer from resource file: " << filename << endl;
 
-        if (!sbuffer.LoadFromMemory(buffer, ExeGD.GetFileSize(filename)))
+        if (!sbuffer.LoadFromMemory(buffer, resFile.GetFileSize(filename)))
             cout << "Failed to load a sound buffer from resource file: " << filename << endl;
     }
     else if (!sbuffer.LoadFromFile(filename)) //Chargement depuis un fichier externe
@@ -88,9 +88,9 @@ std::string RessourcesLoader::LoadPlainText( const string & filename )
 {
     std::string text;
 
-    if ( ExeGD.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
+    if ( resFile.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
     {
-        char* buffer = ExeGD.GetFile(filename);
+        char* buffer = resFile.GetFile(filename);
         if (buffer==NULL)
             cout << "Failed to read a file from resource file: " << filename << endl;
 
@@ -121,9 +121,9 @@ std::string RessourcesLoader::LoadPlainText( const string & filename )
  */
 char* RessourcesLoader::LoadBinaryFile( const string & filename )
 {
-    if ( ExeGD.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
+    if ( resFile.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
     {
-        char* buffer = ExeGD.GetFile(filename);
+        char* buffer = resFile.GetFile(filename);
         if (buffer==NULL)
             cout << "Failed to read a binary file from resource file: " << filename << endl;
 
@@ -135,24 +135,29 @@ char* RessourcesLoader::LoadBinaryFile( const string & filename )
     return NULL;
 }
 
-int RessourcesLoader::GetBinaryFileSize( const string & filename)
+long int RessourcesLoader::GetBinaryFileSize( const string & filename)
 {
-    if ( ExeGD.ContainsFile(filename))
-        return ExeGD.GetFileSize(filename);
+    if ( resFile.ContainsFile(filename))
+        return resFile.GetFileSize(filename);
 
     cout << "Internal file " << filename << " not found for GetFileSize.";
     return 0;
+}
+
+bool RessourcesLoader::HasFile(const std::string & filename)
+{
+    return resFile.ContainsFile(filename);
 }
 
 Music * RessourcesLoader::LoadMusic( const string & filename )
 {
     Music * music = new Music;
 
-    if ( ExeGD.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
+    if ( resFile.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
     {
-        music->SetBuffer(ExeGD.GetFile(filename), ExeGD.GetFileSize(filename));
+        music->SetBuffer(resFile.GetFile(filename), resFile.GetFileSize(filename));
 
-        if (!music->OpenFromMemory(ExeGD.GetFileSize(filename)))
+        if (!music->OpenFromMemory(resFile.GetFileSize(filename)))
             cout << "Failed to load a music from resource file: " << filename << endl;
     }
     else if (!music->OpenFromFile(filename)) //Chargement depuis un fichier externe

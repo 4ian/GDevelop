@@ -6,20 +6,20 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "GDL/Event.h" //This include must be placed first
 #include <vector>
 #include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
-
-class Game;
-#include "GDL/Object.h"
 #include "GDL/ObjectGroup.h"
 #include "GDL/Position.h"
 #include "GDL/Layer.h"
+class Object;
+class Game;
 class CodeExecutionEngine;
 class AutomatismsSharedDatas;
 class BaseProfiler;
+class BaseEvent;
+typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
 
 /**
  * \brief Represents a scene.
@@ -66,6 +66,8 @@ class GD_API Scene
         vector < Layer >                        initialLayers; ///< Initial layers
         ListVariable                            variables; ///< Variables list
         std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
+
+        mutable std::vector<std::string>        externalSourcesDependList; ///< List of source files the scene code depends on.
         boost::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
 
         #if defined(GD_IDE_ONLY)

@@ -4,7 +4,7 @@
 
 using namespace std;
 /**
- * \brief Manual timer updated using UpdateTime member function.
+ * \brief Manual timer updated using ManualTimer::UpdateTime member function.
  *
  *  A manual timer is a timer which is updated manually by calling UpdateTime.
  */
@@ -13,8 +13,15 @@ class GD_API ManualTimer
     public:
 
         ManualTimer();
+
+        /**
+         * Constructor
+         * \param name_ The name of the timer
+         */
         ManualTimer(std::string name_);
+
         virtual ~ManualTimer();
+
         /**
          * Get the name of the timer
          * @return Timer's name
@@ -23,7 +30,7 @@ class GD_API ManualTimer
 
         /**
          * Update the time of the timer
-         * @param Time to add in milliseconds
+         * @param time_ Time to add in milliseconds
          */
         inline void UpdateTime(float time_) { if (!isPaused) time += time_; };
 
@@ -39,7 +46,9 @@ class GD_API ManualTimer
         inline float GetTime() const { return time; };
 
         /**
-         * Change the time
+         * Change the timer's value.
+         *
+         * \param newTime The timer's new value
          */
         inline void SetTime(float newTime) { time = newTime; };
 
@@ -51,16 +60,16 @@ class GD_API ManualTimer
 
         /**
          * Set the paused state of the timer.
-         * @param The new state ( true = paused )
+         * @param newState The new state ( true = paused )
          */
         inline void SetPaused(bool newState = true) { isPaused = newState; };
 
     protected:
     private:
 
-        std::string name;
-        unsigned int time;
-        bool isPaused;
+        std::string name; ///< The name of the timer
+        unsigned int time; ///< Time elapsed in milliseconds
+        bool isPaused; ///< True if timer is paused
 };
 
 #endif // MANUALTIMER_H

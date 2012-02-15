@@ -23,7 +23,7 @@ repeatNumberExpressionSelected(false)
 {
 }
 
-std::string RepeatEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+std::string RepeatEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
     std::string outputCode;
 
@@ -193,10 +193,12 @@ unsigned int RepeatEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-void RepeatEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+BaseEvent::EditEventReturnType RepeatEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     EditRepeatEvent dialog(parent_, *this, game_, scene_);
-    dialog.ShowModal();
+    if ( dialog.ShowModal() == 0 ) return Cancelled;
+
+    return ChangesMade;
 }
 
 /**

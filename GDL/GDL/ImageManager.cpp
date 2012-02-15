@@ -5,6 +5,7 @@
 
 #include "GDL/ImageManager.h"
 #include "GDL/RessourcesLoader.h"
+#include "GDL/Game.h"
 #include "GDL/InvalidImage.h"
 
 #undef LoadImage //thx windows.h

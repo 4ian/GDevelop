@@ -3,15 +3,16 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "GDL/RuntimeScene.h" // must be placed first, thx wx
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
 #include <sstream>
 #include <fstream>
 #include <iomanip>
+#include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
+#include "GDL/RuntimeScene.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
+#include "GDL/Object.h"
 #include "GDL/ImageManager.h"
 #include "GDL/SoundManager.h"
 #include "GDL/ExtensionsManager.h"

@@ -912,7 +912,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
 /**
  * Generate events list code.
  */
-string EventsCodeGenerator::GenerateEventsListCode(const Game & game, const Scene & scene, vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & parentContext)
+string EventsCodeGenerator::GenerateEventsListCode(Game & game, Scene & scene, vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & parentContext)
 {
     string output;
 
@@ -931,13 +931,14 @@ string EventsCodeGenerator::GenerateEventsListCode(const Game & game, const Scen
     return output;
 }
 
-string EventsCodeGenerator::GenerateEventsCompleteCode(const Game & game, const Scene & scene, vector < BaseEventSPtr > & events)
+string EventsCodeGenerator::GenerateEventsCompleteCode(Game & game, Scene & scene, vector < BaseEventSPtr > & events, bool compilationForRuntime)
 {
     string output;
 
     //Prepare the global context ( Used to get needed header files )
     EventsCodeGenerationContext context;
     EventsCodeGenerator codeGenerator;
+    codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
 
     //Generate whole events code
     string wholeEventsCode = codeGenerator.GenerateEventsListCode(game, scene, events, context);

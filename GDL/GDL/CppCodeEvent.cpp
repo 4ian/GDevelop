@@ -7,6 +7,9 @@
 
 #include "CppCodeEvent.h"
 #include <iostream>
+#include <fstream>
+#include <wx/filename.h>
+#include <wx/dcmemory.h>
 #include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml/tinyxml.h"
@@ -18,36 +21,88 @@
 #include "GDL/IDE/Dialogs/EditCppCodeEvent.h"
 #include "GDL/IDE/EventsEditorItemsAreas.h"
 #include "GDL/IDE/EventsEditorSelection.h"
+#include "GDL/IDE/CodeCompiler.h"
+#include "GDL/SourceFile.h"
 #include "GDL/XmlMacros.h"
 
-CppCodeEvent::CppCodeEvent() :
-BaseEvent()
+std::string CppCodeEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
-}
+    //Write real source file
+    wxFileName outputFile(associatedGDManagedSourceFile);
+    outputFile.MakeAbsolute(wxFileName::FileName(game.gameFile).GetPath());
 
-std::string CppCodeEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
-{
-    //codeGenerator.AddIncludeFile(includeFile);
+    std::ofstream file;
+    file.open( ToString(outputFile.GetFullPath()).c_str() );
+    file << GenerateAssociatedFileCode();
+    file.close();
+
+    //Notify the scene it depends on the compilation of a source file
+    if ( std::find(scene.externalSourcesDependList.begin(), scene.externalSourcesDependList.end(), associatedGDManagedSourceFile)  == scene.externalSourcesDependList.end())
+        scene.externalSourcesDependList.push_back(associatedGDManagedSourceFile);
+
+    //And even on the compilation of some others source files.
+    for (unsigned int i = 0;i<dependencies.size();++i)
+    {
+        if ( std::find(scene.externalSourcesDependList.begin(), scene.externalSourcesDependList.end(), dependencies[i])  == scene.externalSourcesDependList.end())
+            scene.externalSourcesDependList.push_back(dependencies[i]);
+    }
+
+    //Generate the code to call the associated source file
+    std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") + ((passSceneAsParameter && passObjectListAsParameter) ? ", ":"") + (passObjectListAsParameter ? "std::vector<Object*> objectsList" :"") + ");";
+    codeGenerator.AddGlobalDeclaration(functionPrototype+"\n");
 
     std::string outputCode;
+    outputCode += "{";
 
-    outputCode += ""+functionToCall+"\n";
+    //Prepare objects list if needed
+    if ( passObjectListAsParameter )
+    {
+        vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectToPassAsParameter));
+        vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectToPassAsParameter));
 
+        std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
+        if ( globalGroup != game.objectGroups.end() )
+            realObjects = (*globalGroup).GetAllObjectsNames();
+        else if ( sceneGroup != scene.objectGroups.end() )
+            realObjects = (*sceneGroup).GetAllObjectsNames();
+        else
+            realObjects.push_back(objectToPassAsParameter);
+
+        if ( realObjects.empty() ) return "";
+
+        outputCode += "std::vector<Object*> functionObjects;";
+        for (unsigned int i = 0;i<realObjects.size();++i)
+        {
+            parentContext.ObjectsListNeeded(realObjects[i]);
+            outputCode += "functionObjects.insert("+ string(i == 0 ? "functionObjects.begin()" : "functionObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
+        }
+    }
+
+    std::string functionCall = functionToCall+"("+ (passSceneAsParameter ? "*runtimeContext->scene" :"") +((passSceneAsParameter && passObjectListAsParameter) ? ", ":"")+(passObjectListAsParameter ? "functionObjects" :"") + ");";
+    outputCode += ""+functionCall+"\n";
+
+    outputCode += "}";
     return outputCode;
 }
 
-void CppCodeEvent::SaveToXml(TiXmlElement * elem) const
+std::string CppCodeEvent::GenerateAssociatedFileCode()
 {
-    //GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("IncludeFile", includeFile);//TODO
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("FunctionToCall", functionToCall);
-}
+    std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") +((passSceneAsParameter && passObjectListAsParameter) ? ", ":"")+ (passObjectListAsParameter ? "std::vector<Object*> objectsList" :"") + ")";
+    std::string output;
+    output += "#include <cstdio>\n";
+    output += "#include <vector>\n";
+    output += "#include <string>\n";
+    if (passSceneAsParameter ) output += "#include \"GDL/RuntimeScene.h\"\n";
+    if (passObjectListAsParameter ) output += "#include \"GDL/Object.h\"\n";
+    for (unsigned int i = 0;i<includeFiles.size();++i) output += "#include "+includeFiles[i]+"\n";
 
-void CppCodeEvent::LoadFromXml(const TiXmlElement * elem)
-{
-    //GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("IncludeFile", includeFile);//TODO
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("FunctionToCall", functionToCall);
-}
+    output += functionPrototype+"\n";
+    output += "{\n";
+    output += inlineCode;
+    output += "}\n";
 
+    return output;
+}
 
 /**
  * Render the event in the bitmap
@@ -59,13 +114,23 @@ void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
     const int titleTextHeight = 20;
 
     //Draw header rectangle
-    wxRect headerRect(x, y, width, titleTextHeight);
+    wxRect headerRect(x, y, width, GetRenderedHeight(width));
     renderingHelper->DrawNiceRectangle(dc, headerRect);
 
     //Header
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
-    dc.DrawText( _("Code C++ :"), x + 4, y + 3 );
+    dc.DrawText( (displayedName.empty() ? _("Code C++") : _("Code C++ : ")) + displayedName, x + 4, y + 3 );
+
+    if ( codeDisplayedInEditor )
+    {
+        dc.SetFont( renderingHelper->GetFont() );
+        dc.SetBrush(renderingHelper->GetActionsRectangleFillBrush());
+        dc.SetPen(renderingHelper->GetActionsRectangleOutlinePen());
+
+        dc.DrawRectangle(wxRect(x + 4, y + 3 + titleTextHeight + 2, width-8, GetRenderedHeight(width)-(3 + titleTextHeight + 5)));
+        dc.DrawLabel( inlineCode, wxNullBitmap, wxRect(x + 4, y + 3 + titleTextHeight + 4, width-2, GetRenderedHeight(width)));
+    }
 }
 
 unsigned int CppCodeEvent::GetRenderedHeight(unsigned int width) const
@@ -73,25 +138,106 @@ unsigned int CppCodeEvent::GetRenderedHeight(unsigned int width) const
     if ( eventHeightNeedUpdate )
     {
         EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
-        int border = renderingHelper->instructionsListBorder;
-        const int titleTextHeight = 20;
+        renderedHeight = 20;
 
-        //Get maximum height needed
-        /*int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border);
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
-
-        renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + titleTextHeight)+border*2;
-        eventHeightNeedUpdate = false;*/
+        if ( codeDisplayedInEditor )
+        {
+            wxMemoryDC fakeDC;
+            fakeDC.SetFont(renderingHelper->GetFont());
+            renderedHeight += fakeDC.GetMultiLineTextExtent(inlineCode).GetHeight();
+            renderedHeight += 15; //Borders
+        }
+        eventHeightNeedUpdate = false;
     }
 
-    return 20;
+    return renderedHeight;
 }
 
-void CppCodeEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+BaseEvent::EditEventReturnType CppCodeEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     EditCppCodeEvent dialog(parent_, *this, game_, scene_);
-    dialog.ShowModal();
+    int returned = dialog.ShowModal();
+
+    if ( returned == 0 ) return Cancelled;
+    else if (returned == 2) return ChangesMadeButNoNeedForEventsRecompilation;
+
+    return ChangesMade;
 }
+
+void CppCodeEvent::SaveToXml(TiXmlElement * elem) const
+{
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("FunctionToCall", functionToCall);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("InlineCode", inlineCode);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("AssociatedGDManagedSourceFile", associatedGDManagedSourceFile);
+
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("PassSceneAsParameter", passSceneAsParameter);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("PassObjectListAsParameter", passObjectListAsParameter);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("ObjectToPassAsParameter", objectToPassAsParameter);
+
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("CodeDisplayedInEditor", codeDisplayedInEditor);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("DisplayedName", displayedName);
+
+    TiXmlElement * includesElem = new TiXmlElement( "Includes" );
+    elem->LinkEndChild( includesElem );
+    for ( unsigned int i = 0;i < includeFiles.size();++i)
+    {
+        TiXmlElement * includeElem = new TiXmlElement( "Include" );
+        includesElem->LinkEndChild( includeElem );
+
+        includeElem->SetAttribute("value", includeFiles[i].c_str());
+    }
+
+    TiXmlElement * dependenciesElem = new TiXmlElement( "Dependencies" );
+    elem->LinkEndChild( dependenciesElem );
+    for ( unsigned int i = 0;i < dependencies.size();++i)
+    {
+        TiXmlElement * dependencyElem = new TiXmlElement( "Dependency" );
+        dependenciesElem->LinkEndChild( dependencyElem );
+
+        dependencyElem->SetAttribute("sourceFile", dependencies[i].c_str());
+    }
+}
+
+void CppCodeEvent::LoadFromXml(const TiXmlElement * elem)
+{
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("FunctionToCall", functionToCall);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("InlineCode", inlineCode);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("AssociatedGDManagedSourceFile", associatedGDManagedSourceFile);
+
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("PassSceneAsParameter", passSceneAsParameter);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("PassObjectListAsParameter", passObjectListAsParameter);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("ObjectToPassAsParameter", objectToPassAsParameter);
+
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("CodeDisplayedInEditor", codeDisplayedInEditor);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("DisplayedName", displayedName);
+
+    includeFiles.clear();
+    const TiXmlElement * includesElem = elem->FirstChildElement( "Includes" );
+    if ( includesElem != NULL)
+    {
+        const TiXmlElement * includeElem = includesElem->FirstChildElement();
+        while(includeElem)
+        {
+            includeFiles.push_back(includeElem->Attribute("value") != NULL ? includeElem->Attribute("value") : "");
+
+            includeElem = includeElem->NextSiblingElement();
+        }
+    }
+
+    dependencies.clear();
+    const TiXmlElement * dependenciesElem = elem->FirstChildElement( "Dependencies" );
+    if ( dependenciesElem != NULL)
+    {
+        const TiXmlElement * dependencyElem = dependenciesElem->FirstChildElement();
+        while(dependencyElem)
+        {
+            dependencies.push_back(dependencyElem->Attribute("sourceFile") != NULL ? dependencyElem->Attribute("sourceFile") : "");
+
+            dependencyElem = dependencyElem->NextSiblingElement();
+        }
+    }
+}
+
 
 /**
  * Initialize from another CppCodeEvent.
@@ -100,8 +246,17 @@ void CppCodeEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, Ma
 void CppCodeEvent::Init(const CppCodeEvent & event)
 {
     includeFiles = event.includeFiles;
+    dependencies = event.dependencies;
     functionToCall = event.functionToCall;
+    inlineCode = event.inlineCode;
     associatedGDManagedSourceFile = event.associatedGDManagedSourceFile;
+
+    passSceneAsParameter = event.passSceneAsParameter;
+    passObjectListAsParameter = event.passObjectListAsParameter;
+    objectToPassAsParameter = event.objectToPassAsParameter;
+
+    codeDisplayedInEditor = event.codeDisplayedInEditor;
+    displayedName = event.displayedName;
 }
 
 /**
@@ -125,6 +280,17 @@ CppCodeEvent& CppCodeEvent::operator=(const CppCodeEvent & event)
     }
 
     return *this;
+}
+
+CppCodeEvent::CppCodeEvent() :
+BaseEvent(),
+inlineCode("scene.backgroundColorR = 100;\nscene.backgroundColorG = 100;\nscene.backgroundColorB = 240;\n"),
+passSceneAsParameter(true),
+passObjectListAsParameter(false),
+codeDisplayedInEditor(false)
+{
+    includeFiles.push_back("<iostream>");
+    includeFiles.push_back("\"GDL/CommonTools.h\"");
 }
 
 #endif

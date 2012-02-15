@@ -44,7 +44,7 @@ class LinkEvent : public BaseEvent
          */
         virtual unsigned int GetRenderedHeight(unsigned int width) const;
 
-        virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
+        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
 };
 
 #endif // LINKCOMMENT_H

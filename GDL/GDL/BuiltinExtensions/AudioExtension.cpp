@@ -6,6 +6,7 @@
 #include "GDL/BuiltinExtensions/AudioExtension.h"
 #include "GDL/IDE/ArbitraryResourceWorker.h"
 #include "GDL/SoundManager.h"
+#include "GDL/CommonTools.h"
 #include "GDL/IDE/Instruction.h"
 #include <iostream>
 
@@ -545,6 +546,11 @@ AudioExtension::AudioExtension()
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicPitchOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
     DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("GlobalVolume", _("Volume global"), _("Valeur du volume global"), _("Volume sonore"), "res/conditions/volume.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVolume").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+    DECLARE_END_EXPRESSION()
     #endif
 }
 
@@ -561,42 +567,138 @@ void AudioExtension::ExposeActionsResources(Instruction & action, ArbitraryResou
 
 void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const
 {
-    if ( propertyNb < SoundManager::GetInstance()->sounds.size() )
+    if ( propertyNb == 0 )
     {
-        sf::Sound::Status soundStatus = SoundManager::GetInstance()->sounds[propertyNb]->GetStatus();
-
-        if ( soundStatus == sf::Sound::Playing)
-            name = _("Son joué :");
-        else if ( soundStatus == sf::Sound::Stopped)
-            name = _("Son stoppé :");
-        else if ( soundStatus == sf::Sound::Paused)
-            name = _("Son en pause :");
-
-        value = SoundManager::GetInstance()->sounds[propertyNb]->file;
+        name = _("Volume global :");
+        value = ToString(SoundManager::GetInstance()->GetGlobalVolume());
     }
-    if ( propertyNb-SoundManager::GetInstance()->sounds.size() < SoundManager::GetInstance()->musics.size() )
+    else if ( propertyNb < 1+SoundManager::GetInstance()->sounds.size()*3 )
     {
-        sf::Sound::Status soundStatus = SoundManager::GetInstance()->musics[propertyNb-SoundManager::GetInstance()->sounds.size()]->GetStatus();
+        unsigned int soundNb = ((propertyNb-1)-(propertyNb-1)%3)/3;
+        if (soundNb >= SoundManager::GetInstance()->sounds.size()) return;
 
-        if ( soundStatus == sf::Sound::Playing)
-            name = _("Musique jouée :");
-        else if ( soundStatus == sf::Sound::Stopped)
-            name = _("Musique stoppée :");
-        else if ( soundStatus == sf::Sound::Paused)
-            name = _("Musique en pause :");
+        if ( propertyNb % 3 == 1)
+        {
+            sf::Sound::Status soundStatus = SoundManager::GetInstance()->sounds[soundNb]->GetStatus();
 
-        value = SoundManager::GetInstance()->musics[propertyNb-SoundManager::GetInstance()->sounds.size()]->file;
+            if ( soundStatus == sf::Sound::Playing)
+                name = _("Son joué :");
+            else if ( soundStatus == sf::Sound::Stopped)
+                name = _("Son stoppé :");
+            else if ( soundStatus == sf::Sound::Paused)
+                name = _("Son en pause :");
+
+            value = SoundManager::GetInstance()->sounds[soundNb]->file;
+        }
+        else if ( propertyNb % 3 == 2)
+        {
+            name = _(" -Volume/Pitch :");
+            value = ToString(SoundManager::GetInstance()->sounds[soundNb]->GetVolume())
+                    +"/"+ToString(SoundManager::GetInstance()->sounds[soundNb]->GetPitch());
+        }
+        else
+        {
+            name = _(" -Avancement (secondes) :");
+            value = ToString(SoundManager::GetInstance()->sounds[soundNb]->GetPlayingOffset());
+        }
+
+    }
+    else if ( propertyNb < 1+SoundManager::GetInstance()->sounds.size()*3+SoundManager::GetInstance()->musics.size()*3 )
+    {
+        unsigned int musicNb = ((propertyNb-1-SoundManager::GetInstance()->sounds.size()*3)-(propertyNb-1-SoundManager::GetInstance()->sounds.size()*3)%3)/3;
+        if (musicNb >= SoundManager::GetInstance()->musics.size()) return;
+
+        if ( propertyNb % 3 == 1)
+        {
+            sf::Sound::Status soundStatus = SoundManager::GetInstance()->musics[musicNb]->GetStatus();
+
+            if ( soundStatus == sf::Sound::Playing)
+                name = _("Musique jouée :");
+            else if ( soundStatus == sf::Sound::Stopped)
+                name = _("Musique stoppée :");
+            else if ( soundStatus == sf::Sound::Paused)
+                name = _("Musique en pause :");
+
+            value = SoundManager::GetInstance()->musics[musicNb]->file;
+        }
+        else if ( propertyNb % 3 == 2)
+        {
+            name = _(" -Volume/Pitch :");
+            value = ToString(SoundManager::GetInstance()->musics[musicNb]->GetVolume())
+                    +"/"+ToString(SoundManager::GetInstance()->musics[musicNb]->GetPitch());
+        }
+        else
+        {
+            name = _(" -Avancement (secondes) :");
+            value = ToString(SoundManager::GetInstance()->musics[musicNb]->GetPlayingOffset());
+        }
     }
 }
 
 bool AudioExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb, std::string newValue)
 {
+    if ( propertyNb == 0 )
+    {
+        SoundManager::GetInstance()->SetGlobalVolume(ToFloat(newValue));
+        return true;
+    }
+    else if ( propertyNb < 1+SoundManager::GetInstance()->sounds.size()*3 )
+    {
+        unsigned int soundNb = ((propertyNb-1)-(propertyNb-1)%3)/3;
+        if (soundNb >= SoundManager::GetInstance()->sounds.size()) return false;
+
+        if ( propertyNb % 3 == 1)
+        {
+            return false;
+        }
+        else if ( propertyNb % 3 == 2)
+        {
+            std::vector<string> values = SplitString<string>(newValue, '/');
+            if ( values.size() < 2 ) return false;
+
+            SoundManager::GetInstance()->sounds[soundNb]->SetVolume(ToFloat(values[0]));
+            SoundManager::GetInstance()->sounds[soundNb]->SetPitch(ToFloat(values[1]));
+            return true;
+        }
+        else
+        {
+            SoundManager::GetInstance()->sounds[soundNb]->SetPlayingOffset(ToFloat(newValue));
+            return true;
+        }
+
+    }
+    else if ( propertyNb < 1+SoundManager::GetInstance()->sounds.size()*3+SoundManager::GetInstance()->musics.size()*3 )
+    {
+        unsigned int musicNb = ((propertyNb-1-SoundManager::GetInstance()->sounds.size()*3)-(propertyNb-1-SoundManager::GetInstance()->sounds.size()*3)%3)/3;
+        if (musicNb >= SoundManager::GetInstance()->musics.size()) return false;
+
+        if ( propertyNb % 3 == 1)
+        {
+            return false;
+        }
+        else if ( propertyNb % 3 == 2)
+        {
+            std::vector<string> values = SplitString<string>(newValue, '/');
+            if ( values.size() < 2 ) return false;
+
+            SoundManager::GetInstance()->musics[musicNb]->SetVolume(ToFloat(values[0]));
+            SoundManager::GetInstance()->musics[musicNb]->SetPitch(ToFloat(values[1]));
+            return true;
+        }
+        else
+        {
+            SoundManager::GetInstance()->musics[musicNb]->SetPlayingOffset(ToFloat(newValue));
+            return true;
+        }
+    }
+
+
     return false;
 }
 
 unsigned int AudioExtension::GetNumberOfProperties(RuntimeScene & scene) const
 {
-    return SoundManager::GetInstance()->musics.size()+SoundManager::GetInstance()->sounds.size();
+    return 1+SoundManager::GetInstance()->musics.size()*3+SoundManager::GetInstance()->sounds.size()*3;
 }
 
 #endif

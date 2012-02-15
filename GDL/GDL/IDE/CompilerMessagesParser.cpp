@@ -3,7 +3,6 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
 #if defined(GD_IDE_ONLY)
 
 #include "CompilerMessagesParser.h"
@@ -13,21 +12,20 @@
 namespace GDpriv
 {
 
-void CompilerMessagesParser::ParseOutput(std::vector<std::string> output)
+void CompilerMessagesParser::ParseOutput(std::string rawOutput)
 {
-    parsedErrors.clear();
+    parsedMessages.clear();
+    std::vector<std::string> output = SplitString<std::string>(rawOutput, '\n');
 
     for (unsigned int i = 0;i<output.size();++i)
     {
         CompilerMessage newMessage;
 
-        //std::cout <<  output[i] << std::endl;
-
+        //Parse file
         size_t fileEndPos = output[i].find_first_of(':', 2);
         if ( fileEndPos != std::string::npos ) newMessage.file = output[i].substr(0, fileEndPos);
 
-        //std::cout << "d:"<< output[i][fileEndPos+1] << endl;
-
+        //Get line
         size_t lineEndPos = std::string::npos;
         if ( output[i].length()>fileEndPos && isdigit(output[i][fileEndPos+1]) )
         {
@@ -35,19 +33,26 @@ void CompilerMessagesParser::ParseOutput(std::vector<std::string> output)
             if ( lineEndPos != std::string::npos ) newMessage.line = ToInt(output[i].substr(fileEndPos+1, lineEndPos));
         }
 
+        //Get column
+        size_t colEndPos = std::string::npos;
+        if ( output[i].length()>lineEndPos && isdigit(output[i][lineEndPos+1]) )
+        {
+            colEndPos = output[i].find_first_of(':', lineEndPos+1);
+            if ( colEndPos != std::string::npos ) newMessage.column = ToInt(output[i].substr(lineEndPos+1, colEndPos));
+        }
+
         if ( fileEndPos < output[i].length() )
-            newMessage.message = output[i].substr(lineEndPos != std::string::npos ? lineEndPos+1 : fileEndPos, output[i].length());
+            newMessage.message = output[i].substr(colEndPos != std::string::npos ? colEndPos+1 : fileEndPos, output[i].length());
         else
             newMessage.message = output[i];
 
         if ( output[i].find("error") < output[i].length() ) newMessage.messageType = CompilerMessage::error;
         else newMessage.messageType = CompilerMessage::simple;
 
-        parsedErrors.push_back(newMessage);
+        parsedMessages.push_back(newMessage);
     }
 }
 
 }
 
-#endif
 #endif

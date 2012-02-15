@@ -7,7 +7,7 @@
     #include <wx/wx.h>
     #define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
     #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
-    #define ToString(x)ToString(x) // Méthode de conversion int vers string
+    #include "GDL/IDE/Dialogs/ProjectUpdateDlg.h"
 #else
     #include "GDL/Log.h"
     #include <iostream>
@@ -97,6 +97,14 @@ bool OpenSaveGame::OpenFromFile(string file)
         RecreatePaths(file);
     game.portable = false;
 
+    #if defined(GD_IDE_ONLY)
+    if (!updateText.empty())
+    {
+        ProjectUpdateDlg updateDialog(NULL, updateText);
+        updateDialog.ShowModal();
+    }
+    #endif
+
     return true;
 }
 
@@ -181,6 +189,19 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     }
     #endif
     //End of Compatibility code
+
+    //Compatibility code
+    #if defined(GD_IDE_ONLY)
+    if ( major < 2 || (major == 2 && minor <= 0) )
+    {
+        updateText += _("L'action \"Créer un objet de partir son nom\" nécessite dorénavant que vous indiquiez un groupe d'objet parmi lequel les objets sont susceptibles d'être créés.\nPar exemple, les objets que vous crééez à partir de cette fonction peuvent prendre comme nom Objet1, Objet2 ou Objet3, créez un groupe avec ces 3 objets et passez le en paramètre à l'action.\n\n");
+        updateText += _("Les fonctions ont subi un changement au niveau de leur paramétrage. Vous devenez dorénavant indiquer les objets susceptibles passés en paramètre à la fonction, si vous en utilisez. De même que ci dessus, créez un groupe d'objet qui contient les objets devant être passés en argument à la fonction si vous en avez besoin.\n\n");
+        updateText += _("Enfin, si vous utilisez l'extension Association d'objets, les actions/conditions nécessitent dorénavant de toujours indiquer le nom des objets associés à prendre en compte : Vérifiez que vos évènements liés à cette extension sont toujours valides.\n\n");
+        updateText += _("Merci de votre compréhension.\n");
+    }
+    #endif
+    //End of Compatibility code
+
 
     game.resourceManager.LoadFromXml(hdl.FirstChildElement().FirstChildElement( "Resources" ).Element());
 
@@ -277,6 +298,19 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
             }
         }
 
+        newScene->externalSourcesDependList.clear();
+        const TiXmlElement * dependenciesElem = elem->FirstChildElement( "Dependencies" );
+        if ( dependenciesElem != NULL)
+        {
+            const TiXmlElement * dependencyElem = dependenciesElem->FirstChildElement();
+            while(dependencyElem)
+            {
+                newScene->externalSourcesDependList.push_back(dependencyElem->Attribute("sourceFile") != NULL ? dependencyElem->Attribute("sourceFile") : "");
+
+                dependencyElem = dependencyElem->NextSiblingElement();
+            }
+        }
+
         game.scenes.push_back( newScene );
 
         elem = elem->NextSiblingElement();
@@ -288,7 +322,6 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     if ( elem )
         OpenExternalEvents(game.externalEvents, elem);
 
-    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     elem = hdl.FirstChildElement().FirstChildElement( "ExternalSourceFiles" ).Element();
     if ( elem )
     {
@@ -302,7 +335,6 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
             sourceFileElem = sourceFileElem->NextSiblingElement();
         }
     }
-    #endif
     #endif
 
     if ( notBackwardCompatible )
@@ -371,12 +403,10 @@ void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("macExecutableFilename", game.macExecutableFilename);
-    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     if ( elem->Attribute( "useExternalSourceFiles" )  != NULL )
     {
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("useExternalSourceFiles", game.useExternalSourceFiles);
     }
-    #endif
     #endif
 
     return;
@@ -954,6 +984,16 @@ bool OpenSaveGame::SaveToFile(string file)
                 autoSharedDatas->SetAttribute("Type", it->second->GetTypeName().c_str());
                 autoSharedDatas->SetAttribute("Name", it->second->GetName().c_str());
                 it->second->SaveToXml(autoSharedDatas);
+            }
+
+            TiXmlElement * dependenciesElem = new TiXmlElement( "Dependencies" );
+            scene->LinkEndChild( dependenciesElem );
+            for ( unsigned int j = 0;j < game.scenes[i]->externalSourcesDependList.size();++j)
+            {
+                TiXmlElement * dependencyElem = new TiXmlElement( "Dependency" );
+                dependenciesElem->LinkEndChild( dependencyElem );
+
+                dependencyElem->SetAttribute("sourceFile", game.scenes[i]->externalSourcesDependList[j].c_str());
             }
 
             if ( !game.scenes[i]->initialObjectsPositions.empty() )

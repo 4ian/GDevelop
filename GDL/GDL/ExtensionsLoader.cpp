@@ -32,7 +32,6 @@
 #include "GDL/Game.h"
 #include "GDL/Version.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/DynamicExtensionBase.h"
 #include "GDL/IDE/LocaleManager.h"
 #include "GDL/CommonTools.h"
 

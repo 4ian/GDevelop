@@ -2,11 +2,13 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Game.h"
 #include "GDL/Position.h"
+#include "GDL/Event.h"
+#include "GDL/Object.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/CodeExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
-#include "GDL/Events/EventsCodeCompilationHelper.h"
+#include "GDL/Events/CodeCompilationHelpers.h"
 #endif
 #include <iostream>
 
@@ -71,6 +73,7 @@ void Scene::Init(const Scene & scene)
     events = CloneVectorOfEvents(scene.events);
     #endif
 
+    externalSourcesDependList = scene.externalSourcesDependList;
     codeExecutionEngine = boost::shared_ptr<CodeExecutionEngine>(new CodeExecutionEngine);
 
     initialObjects.clear();

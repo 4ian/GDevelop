@@ -12,6 +12,7 @@
 #include <sstream>
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
+#include "GDL/Scene.h"
 #include "GDL/ExternalEvents.h"
 #include <wx/help.h>
 

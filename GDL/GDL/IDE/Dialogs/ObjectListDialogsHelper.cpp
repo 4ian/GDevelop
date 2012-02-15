@@ -9,6 +9,7 @@
 #include <wx/treectrl.h>
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
+#include "GDL/Object.h"
 #include "GDL/ExtensionsManager.h"
 #include <boost/algorithm/string.hpp>
 

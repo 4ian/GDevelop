@@ -17,7 +17,7 @@
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/ExtensionsManager.h"
 
-std::string WhileEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+std::string WhileEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
     std::string outputCode;
 
@@ -186,8 +186,9 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-void WhileEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
+    return ChangesMade;
 }
 
 /**

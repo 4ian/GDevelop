@@ -100,16 +100,32 @@ void CodeCompiler::ProcessTasks()
 
         }
 
-        std::cout << "Processing task..." << std::endl;
+        std::cout << "Processing task " << currentTask.userFriendlyName << "..." << std::endl;
+        lastTaskFailed = false;
         NotifyControls();
+        bool skip = false; ///Set to true if the preworker of the task asked to relaunch the task later.
 
         if ( currentTask.preWork != boost::shared_ptr<CodeCompilerExtraWork>() )
         {
-            std::cout << "Launching pre work" << std::endl;
+            std::cout << "Launching pre work..." << std::endl;
             currentTask.preWork->Execute();
+
+            if ( currentTask.preWork->requestRelaunchCompilationLater )
+            {
+                std::cout << "Preworker asked to launch the task later" << std::endl;
+                sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
+                pendingTasks.push_back(currentTask);
+                pendingTasks.back().preWork->requestRelaunchCompilationLater = false;
+
+                skip = true;
+            }
         }
 
+        bool compilationSucceeded = false; //Some post worker want to be informed of the compilation success/fail.
+        if (!skip)
         {
+            lastTaskMessages.clear();
+
             //Define compilation arguments for Clang.
             llvm::SmallVector<const char *, 128> args;
 
@@ -136,6 +152,13 @@ void CodeCompiler::ProcessTasks()
             //Headers
             for (std::set<std::string>::const_iterator header = headersDirectories.begin();header != headersDirectories.end();++header)
                 args.push_back((*header).c_str());
+
+            //Additional headers
+            std::vector<std::string> additionalHeadersArgs;
+            for (unsigned int i = 0;i<currentTask.additionalHeaderDirectories.size();++i)
+                additionalHeadersArgs.push_back("-I"+currentTask.additionalHeaderDirectories[i]);
+            for (unsigned int i = 0;i<additionalHeadersArgs.size();++i)
+                args.push_back(additionalHeadersArgs[i].c_str());
 
             if ( !currentTask.compilationForRuntime ) args.push_back("-DGD_IDE_ONLY"); //Already set in PCH
             if ( currentTask.optimize ) args.push_back("-O1");
@@ -179,10 +202,6 @@ void CodeCompiler::ProcessTasks()
             //Diagnostic classes
             std::string compilationErrorFileErrors;
             llvm::raw_fd_ostream errorFile(std::string(workingDir+"compilationErrors.txt").c_str(), compilationErrorFileErrors);
-            errorFile << "Please send this file to CompilGames@gmail.com, or include this content when reporting the problem to Game Develop's developer.\n";
-            errorFile << "Veuillez envoyer ce fichier à CompilGames@gmail.com, ou l'inclure lorsque vous rapportez ce problème au développeur de Game Develop.\n";
-            errorFile << "\n";
-            errorFile << "Clang output:\n";
             if ( !compilationErrorFileErrors.empty() ) std::cout << "Unable to create compilation errors report file!\n";
 
             TextDiagnosticPrinter * clangDiagClient = new TextDiagnosticPrinter(errorFile, DiagnosticOptions());
@@ -203,25 +222,45 @@ void CodeCompiler::ProcessTasks()
             llvm::OwningPtr<CodeGenAction> Act(new EmitLLVMOnlyAction());
             if (!Clang.ExecuteAction(*Act))
             {
-                std::cout << "Fatal error during compilation";
-                return;
+                std::cout << "Compilation failed.\n";
+                lastTaskFailed = true;
+            }
+            else
+            {
+                std::cout << "Compilation succeeded. Writing bitcode to file...\n";
+                sf::Lock lock(openSaveDialogMutex); //On windows, GD is crashing if we write bitcode while an open/save file dialog is displayed.
+
+                llvm::OwningPtr<llvm::Module> module(Act->takeModule());
+
+                std::string error;
+                llvm::raw_fd_ostream file(currentTask.outputFile.c_str(), error, llvm::raw_fd_ostream::F_Binary);
+                llvm::WriteBitcodeToFile(module.get(), file);
+                std::cout << error;
+
+                compilationSucceeded = true;
             }
 
-            std::cout << "Writing bitcode...\n";
-            sf::Lock lock(openSaveDialogMutex); //On windows, GD is crashing if we write bitcode while an open/save file dialog is displayed.
-
-            llvm::OwningPtr<llvm::Module> module(Act->takeModule());
-
-            std::string error;
-            llvm::raw_fd_ostream file(currentTask.outputFile.c_str(), error, llvm::raw_fd_ostream::F_Binary);
-            llvm::WriteBitcodeToFile(module.get(), file);
-            std::cout << error;
+            //Compilation ended, loading diagnostics
+            {
+                std::ifstream t(std::string(workingDir+"compilationErrors.txt").c_str());
+                lastTaskMessages.assign(std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>()));
+            }
         }
 
-        if ( currentTask.postWork != boost::shared_ptr<CodeCompilerExtraWork>() )
+        if (!skip && currentTask.postWork != boost::shared_ptr<CodeCompilerExtraWork>() )
         {
             std::cout << "Launching post task" << std::endl;
+            currentTask.postWork->compilationSucceeded = compilationSucceeded;
             currentTask.postWork->Execute();
+
+            if ( currentTask.postWork->requestRelaunchCompilationLater )
+            {
+                std::cout << "Postworker asked to launch again the task later" << std::endl;
+
+                sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
+                pendingTasks.push_back(currentTask);
+                pendingTasks.back().postWork->requestRelaunchCompilationLater = false;
+            }
         }
 
         std::cout << "Task ended." << std::endl;
@@ -250,12 +289,12 @@ void CodeCompiler::AddTask(CodeCompilerTask task)
         }
 
         pendingTasks.push_back(task);
-        std::cout << "New task added.";
+        std::cout << "New task added (" << task.userFriendlyName << ")" << std::endl;
     }
 
     if ( !threadLaunched )
     {
-        std::cout << "Launching compilation thread...";
+        std::cout << "Launching compilation thread..." << std::endl;
         threadLaunched = true;
         currentTaskThread.Launch();
     }
@@ -353,7 +392,8 @@ void CodeCompiler::SetWorkingDirectory(std::string workingDir_)
 
 CodeCompiler::CodeCompiler() :
     threadLaunched(false),
-    currentTaskThread(&CodeCompiler::ProcessTasks, this)
+    currentTaskThread(&CodeCompiler::ProcessTasks, this),
+    lastTaskFailed(false)
 {
     #if defined(WINDOWS)
     headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/include");
@@ -378,7 +418,8 @@ CodeCompiler::CodeCompiler() :
     headersDirectories.insert("-IExtensions/include");
 }
 
-CodeCompilerExtraWork::CodeCompilerExtraWork()
+CodeCompilerExtraWork::CodeCompilerExtraWork() :
+    requestRelaunchCompilationLater(false)
 {
 }
 CodeCompilerExtraWork::~CodeCompilerExtraWork()

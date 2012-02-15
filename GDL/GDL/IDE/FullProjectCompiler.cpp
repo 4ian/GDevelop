@@ -19,19 +19,20 @@
 #include <wx/msgdlg.h>
 #include <wx/filename.h>
 #include "GDL/IDE/CodeCompiler.h"
-#include "GDL/Events/EventsCodeCompilationHelper.h"
+#include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/DatFile.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
+#include "GDL/Object.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/SceneNameMangler.h"
 #include "GDL/AES.h"
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/ResourcesMergingHelper.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/OpenSaveGame.h"
+#include "GDL/IDE/ResourcesMergingHelper.h"
 #include "GDL/IDE/ExecutableIconChanger.h"
 #include "GDL/IDE/BaseProfiler.h"
 
@@ -144,7 +145,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         task.eventsGeneratedCode = true;
         task.inputFile = string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(game.scenes[i].get())+"events.cpp");
         task.outputFile = tempDir+"/GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[i]->GetName())+".ir";
-        task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPreWork(&game, game.scenes[i].get(), boost::shared_ptr<CodeExecutionEngine>()));
+        task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, game.scenes[i].get(), resourcesMergingHelper));
         task.scene = game.scenes[i].get();
 
         CodeCompiler::GetInstance()->AddTask(task);

@@ -38,6 +38,8 @@ public:
     boost::shared_ptr<CodeCompilerExtraWork> postWork; ///< Post work that will be launched when the compilation of the task is over
     boost::shared_ptr<CodeCompilerExtraWork> preWork;  ///< Pre work that will be launched before the compilation of the task is launched
 
+    std::vector<std::string> additionalHeaderDirectories; ///< Extra directories used when searching for includes.
+
     std::string userFriendlyName; ///< Task name displayed to the user
 
     /**
@@ -61,6 +63,9 @@ public:
      * Override this method with the extra work to do. Must return true if successful.
      */
     virtual bool Execute() {return true;};
+
+    bool requestRelaunchCompilationLater; ///< If the task set this bool to true, the task will be skipped and relaunched later.
+    bool compilationSucceeded; ///< Set to true by the CodeCompiler if the compilation associated to the task was a success. Only applicable for post work.
 
     CodeCompilerExtraWork();
     virtual ~CodeCompilerExtraWork();
@@ -123,6 +128,26 @@ public:
     void AddHeaderDirectory(const std::string & dir) { headersDirectories.insert(std::string("-I"+dir)); };
 
     /**
+     * Add a (wxWidgets) control to the list of objects notified when progress has been made
+     */
+    void AddNotifiedControl(wxEvtHandler * control) { notifiedControls.insert(control); };
+
+    /**
+     * Remove a (wxWidgets) control from the list of objects notified when progress has been made
+     */
+    void RemoveNotifiedControl(wxEvtHandler * control) { notifiedControls.erase(control); };
+
+    /**
+     * Return true if the latest task has failed.
+     */
+    bool LastTaskFailed() { return lastTaskFailed; };
+
+    /**
+     * Get the output of the compiler for the last task.
+     */
+    const std::string & GetLastTaskMessages() { return lastTaskMessages; };
+
+    /**
      * Set if code compiler must delete temporaries files
      */
     void SetMustDeleteTemporaries(bool mustDeleteTemporaries_) { mustDeleteTemporaries = mustDeleteTemporaries_; };
@@ -141,16 +166,6 @@ public:
      * Return the directory used as temporary directory for output files.
      */
     const std::string & GetWorkingDirectory() const { return workingDir; };
-
-    /**
-     * Add a (wxWidgets) control to the list of objects notified when progress has been made
-     */
-    void AddNotifiedControl(wxEvtHandler * control) { notifiedControls.insert(control); };
-
-    /**
-     * Remove a (wxWidgets) control from the list of objects notified when progress has been made
-     */
-    void RemoveNotifiedControl(wxEvtHandler * control) { notifiedControls.erase(control); };
 
     static CodeCompiler * GetInstance();
     static void DestroySingleton();
@@ -186,7 +201,9 @@ private:
     bool mustDeleteTemporaries; ///< True if temporary must be deleted
 
     //Gui related
-    std::set<wxEvtHandler*> notifiedControls;
+    std::set<wxEvtHandler*> notifiedControls; ///< List of wxWidgets controls to be notified when some progress has been made.
+    std::string lastTaskMessages;  ///< String containing the messages emitted by the compiler for the latest task.
+    bool lastTaskFailed; ///< Set to true when a task fail.
 
     CodeCompiler();
     virtual ~CodeCompiler();

@@ -12,6 +12,10 @@
 #include "GDL/CommonTools.h"
 class Instruction;
 class InstructionInfos;
+class InitialPosition;
+class Layer;
+class BaseEvent;
+typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
 
 using namespace std;
 
@@ -69,6 +73,7 @@ private:
     static void AdaptActionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos);
 
     bool updateEventsFromGD1x;
+    std::string updateText;
     #endif
 };
 

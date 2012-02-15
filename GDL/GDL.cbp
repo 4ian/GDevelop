@@ -25,7 +25,6 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
@@ -62,6 +61,7 @@
 					<Add option="-lLLVMX86Utils" />
 					<Add option="-lLLVMScalarOpts" />
 					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMLinker" />
 					<Add option="-lLLVMTransformUtils" />
 					<Add option="-lLLVMipa" />
 					<Add option="-lLLVMAnalysis" />
@@ -71,44 +71,11 @@
 					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
 					<Add option="-lLLVMInstrumentation" />
 					<Add option="-lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
-					<Add option="-lLLVMAlphaCodeGen" />
-					<Add option="-lLLVMARMAsmParser" />
-					<Add option="-lLLVMARMDisassembler" />
-					<Add option="-lLLVMBlackfinCodeGen" />
 					<Add option="-lLLVMCBackend" />
-					<Add option="-lLLVMCellSPUCodeGen" />
 					<Add option="-lLLVMCppBackend" />
-					<Add option="-lLLVMMipsCodeGen" />
-					<Add option="-lLLVMMBlazeAsmParser" />
-					<Add option="-lLLVMMBlazeDisassembler" />
-					<Add option="-lLLVMMSP430CodeGen" />
-					<Add option="-lLLVMPowerPCCodeGen" />
-					<Add option="-lLLVMPTXCodeGen" />
-					<Add option="-lLLVMSparcCodeGen" />
-					<Add option="-lLLVMSystemZCodeGen" />
 					<Add option="-lLLVMX86AsmParser" />
 					<Add option="-lLLVMX86Disassembler" />
-					<Add option="-lLLVMXCoreCodeGen" />
-					<Add option="-lLLVMAlphaInfo" />
-					<Add option="-lLLVMARMCodeGen" />
-					<Add option="-lLLVMBlackfinInfo" />
 					<Add option="-lLLVMCBackendInfo" />
-					<Add option="-lLLVMCellSPUInfo" />
-					<Add option="-lLLVMCppBackendInfo" />
-					<Add option="-lLLVMMipsInfo" />
-					<Add option="-lLLVMMBlazeCodeGen" />
-					<Add option="-lLLVMMSP430AsmPrinter" />
-					<Add option="-lLLVMMSP430Info" />
-					<Add option="-lLLVMPowerPCAsmPrinter" />
-					<Add option="-lLLVMPowerPCInfo" />
-					<Add option="-lLLVMPTXInfo" />
-					<Add option="-lLLVMSparcInfo" />
-					<Add option="-lLLVMSystemZInfo" />
-					<Add option="-lLLVMXCoreInfo" />
-					<Add option="-lLLVMARMAsmPrinter" />
-					<Add option="-lLLVMARMInfo" />
-					<Add option="-lLLVMMBlazeAsmPrinter" />
-					<Add option="-lLLVMMBlazeInfo" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
@@ -211,6 +178,7 @@
 					<Add option="-lLLVMAnalysis" />
 					<Add option="-lLLVMTarget" />
 					<Add option="-lLLVMCore" />
+					<Add option="-lLLVMLinker" />
 					<Add option="-lLLVMMC" />
 					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
 					<Add option="-lLLVMInstrumentation" />
@@ -247,7 +215,6 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
@@ -283,6 +250,7 @@
 					<Add option="-lLLVMX86Utils" />
 					<Add option="-lLLVMScalarOpts" />
 					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMLinker" />
 					<Add option="-lLLVMTransformUtils" />
 					<Add option="-lLLVMipa" />
 					<Add option="-lLLVMAnalysis" />
@@ -292,44 +260,11 @@
 					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
 					<Add option="-lLLVMInstrumentation" />
 					<Add option="-lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
-					<Add option="-lLLVMAlphaCodeGen" />
-					<Add option="-lLLVMARMAsmParser" />
-					<Add option="-lLLVMARMDisassembler" />
-					<Add option="-lLLVMBlackfinCodeGen" />
 					<Add option="-lLLVMCBackend" />
-					<Add option="-lLLVMCellSPUCodeGen" />
 					<Add option="-lLLVMCppBackend" />
-					<Add option="-lLLVMMipsCodeGen" />
-					<Add option="-lLLVMMBlazeAsmParser" />
-					<Add option="-lLLVMMBlazeDisassembler" />
-					<Add option="-lLLVMMSP430CodeGen" />
-					<Add option="-lLLVMPowerPCCodeGen" />
-					<Add option="-lLLVMPTXCodeGen" />
-					<Add option="-lLLVMSparcCodeGen" />
-					<Add option="-lLLVMSystemZCodeGen" />
 					<Add option="-lLLVMX86AsmParser" />
 					<Add option="-lLLVMX86Disassembler" />
-					<Add option="-lLLVMXCoreCodeGen" />
-					<Add option="-lLLVMAlphaInfo" />
-					<Add option="-lLLVMARMCodeGen" />
-					<Add option="-lLLVMBlackfinInfo" />
 					<Add option="-lLLVMCBackendInfo" />
-					<Add option="-lLLVMCellSPUInfo" />
-					<Add option="-lLLVMCppBackendInfo" />
-					<Add option="-lLLVMMipsInfo" />
-					<Add option="-lLLVMMBlazeCodeGen" />
-					<Add option="-lLLVMMSP430AsmPrinter" />
-					<Add option="-lLLVMMSP430Info" />
-					<Add option="-lLLVMPowerPCAsmPrinter" />
-					<Add option="-lLLVMPowerPCInfo" />
-					<Add option="-lLLVMPTXInfo" />
-					<Add option="-lLLVMSparcInfo" />
-					<Add option="-lLLVMSystemZInfo" />
-					<Add option="-lLLVMXCoreInfo" />
-					<Add option="-lLLVMARMAsmPrinter" />
-					<Add option="-lLLVMARMInfo" />
-					<Add option="-lLLVMMBlazeAsmPrinter" />
-					<Add option="-lLLVMMBlazeInfo" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
@@ -431,6 +366,7 @@
 					<Add option="-lLLVMAnalysis" />
 					<Add option="-lLLVMTarget" />
 					<Add option="-lLLVMCore" />
+					<Add option="-lLLVMLinker" />
 					<Add option="-lLLVMMC" />
 					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
 					<Add option="-lLLVMInstrumentation" />
@@ -467,7 +403,6 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
 				</Compiler>
@@ -503,6 +438,7 @@
 					<Add option="-lLLVMX86Utils" />
 					<Add option="-lLLVMScalarOpts" />
 					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMLinker" />
 					<Add option="-lLLVMTransformUtils" />
 					<Add option="-lLLVMipa" />
 					<Add option="-lLLVMAnalysis" />
@@ -512,44 +448,11 @@
 					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
 					<Add option="-lLLVMInstrumentation" />
 					<Add option="-lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
-					<Add option="-lLLVMAlphaCodeGen" />
-					<Add option="-lLLVMARMAsmParser" />
-					<Add option="-lLLVMARMDisassembler" />
-					<Add option="-lLLVMBlackfinCodeGen" />
 					<Add option="-lLLVMCBackend" />
-					<Add option="-lLLVMCellSPUCodeGen" />
 					<Add option="-lLLVMCppBackend" />
-					<Add option="-lLLVMMipsCodeGen" />
-					<Add option="-lLLVMMBlazeAsmParser" />
-					<Add option="-lLLVMMBlazeDisassembler" />
-					<Add option="-lLLVMMSP430CodeGen" />
-					<Add option="-lLLVMPowerPCCodeGen" />
-					<Add option="-lLLVMPTXCodeGen" />
-					<Add option="-lLLVMSparcCodeGen" />
-					<Add option="-lLLVMSystemZCodeGen" />
 					<Add option="-lLLVMX86AsmParser" />
 					<Add option="-lLLVMX86Disassembler" />
-					<Add option="-lLLVMXCoreCodeGen" />
-					<Add option="-lLLVMAlphaInfo" />
-					<Add option="-lLLVMARMCodeGen" />
-					<Add option="-lLLVMBlackfinInfo" />
 					<Add option="-lLLVMCBackendInfo" />
-					<Add option="-lLLVMCellSPUInfo" />
-					<Add option="-lLLVMCppBackendInfo" />
-					<Add option="-lLLVMMipsInfo" />
-					<Add option="-lLLVMMBlazeCodeGen" />
-					<Add option="-lLLVMMSP430AsmPrinter" />
-					<Add option="-lLLVMMSP430Info" />
-					<Add option="-lLLVMPowerPCAsmPrinter" />
-					<Add option="-lLLVMPowerPCInfo" />
-					<Add option="-lLLVMPTXInfo" />
-					<Add option="-lLLVMSparcInfo" />
-					<Add option="-lLLVMSystemZInfo" />
-					<Add option="-lLLVMXCoreInfo" />
-					<Add option="-lLLVMARMAsmPrinter" />
-					<Add option="-lLLVMARMInfo" />
-					<Add option="-lLLVMMBlazeAsmPrinter" />
-					<Add option="-lLLVMMBlazeInfo" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
@@ -650,6 +553,7 @@
 					<Add option="-lLLVMAnalysis" />
 					<Add option="-lLLVMTarget" />
 					<Add option="-lLLVMCore" />
+					<Add option="-lLLVMLinker" />
 					<Add option="-lLLVMMC" />
 					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
 					<Add option="-lLLVMInstrumentation" />
@@ -729,6 +633,7 @@
 					<Add option="-lLLVMX86Utils" />
 					<Add option="-lLLVMScalarOpts" />
 					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMLinker" />
 					<Add option="-lLLVMTransformUtils" />
 					<Add option="-lLLVMipa" />
 					<Add option="-lLLVMAnalysis" />
@@ -816,6 +721,7 @@
 					<Add option="-lLLVMX86Utils" />
 					<Add option="-lLLVMScalarOpts" />
 					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMLinker" />
 					<Add option="-lLLVMTransformUtils" />
 					<Add option="-lLLVMipa" />
 					<Add option="-lLLVMAnalysis" />
@@ -901,6 +807,7 @@
 					<Add option="-lLLVMX86Utils" />
 					<Add option="-lLLVMScalarOpts" />
 					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMLinker" />
 					<Add option="-lLLVMTransformUtils" />
 					<Add option="-lLLVMipa" />
 					<Add option="-lLLVMAnalysis" />
@@ -981,6 +888,7 @@
 					<Add option="-lLLVMX86Utils" />
 					<Add option="-lLLVMScalarOpts" />
 					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMLinker" />
 					<Add option="-lLLVMTransformUtils" />
 					<Add option="-lLLVMipa" />
 					<Add option="-lLLVMAnalysis" />
@@ -1170,6 +1078,8 @@
 		<Unit filename="GDL\BuiltinExtensions\WindowExtension.h" />
 		<Unit filename="GDL\Camera.cpp" />
 		<Unit filename="GDL\Camera.h" />
+		<Unit filename="GDL\CodeExecutionEngine.cpp" />
+		<Unit filename="GDL\CodeExecutionEngine.h" />
 		<Unit filename="GDL\Collisions.cpp" />
 		<Unit filename="GDL\Collisions.h" />
 		<Unit filename="GDL\CommentEvent.cpp" />
@@ -1183,22 +1093,14 @@
 		<Unit filename="GDL\Direction.cpp" />
 		<Unit filename="GDL\Direction.h" />
 		<Unit filename="GDL\DocMainPage.h" />
-		<Unit filename="GDL\DynamicExtensionBase.cpp" />
-		<Unit filename="GDL\DynamicExtensionBase.h" />
-		<Unit filename="GDL\DynamicExtensionsManager.cpp" />
-		<Unit filename="GDL\DynamicExtensionsManager.h" />
 		<Unit filename="GDL\DynamicLibrariesTools.cpp" />
 		<Unit filename="GDL\DynamicLibrariesTools.h" />
 		<Unit filename="GDL\EmptyEvent.cpp" />
 		<Unit filename="GDL\EmptyEvent.h" />
 		<Unit filename="GDL\Event.cpp" />
 		<Unit filename="GDL\Event.h" />
-		<Unit filename="GDL\EventsExecutionEngine.cpp" />
-		<Unit filename="GDL\EventsExecutionEngine.h" />
-		<Unit filename="GDL\EventsRenderingHelper.cpp" />
-		<Unit filename="GDL\EventsRenderingHelper.h" />
-		<Unit filename="GDL\Events\EventsCodeCompilationHelper.cpp" />
-		<Unit filename="GDL\Events\EventsCodeCompilationHelper.h" />
+		<Unit filename="GDL\Events\CodeCompilationHelpers.cpp" />
+		<Unit filename="GDL\Events\CodeCompilationHelpers.h" />
 		<Unit filename="GDL\Events\EventsCodeGenerationContext.cpp" />
 		<Unit filename="GDL\Events\EventsCodeGenerationContext.h" />
 		<Unit filename="GDL\Events\EventsCodeGenerator.cpp" />
@@ -1206,12 +1108,10 @@
 		<Unit filename="GDL\Events\EventsCodeNameMangler.cpp" />
 		<Unit filename="GDL\Events\EventsCodeNameMangler.h" />
 		<Unit filename="GDL\Events\EventsCodePrecompiledHeader.h" />
-		<Unit filename="GDL\ExecutableIconChanger.cpp" />
-		<Unit filename="GDL\ExecutableIconChanger.h" />
+		<Unit filename="GDL\Events\ExpressionsCodeGeneration.cpp" />
+		<Unit filename="GDL\Events\ExpressionsCodeGeneration.h" />
 		<Unit filename="GDL\ExpressionInstruction.cpp" />
 		<Unit filename="GDL\ExpressionInstruction.h" />
-		<Unit filename="GDL\ExpressionsCodeGeneration.cpp" />
-		<Unit filename="GDL\ExpressionsCodeGeneration.h" />
 		<Unit filename="GDL\ExtensionBase.cpp" />
 		<Unit filename="GDL\ExtensionBase.h" />
 		<Unit filename="GDL\ExtensionsLoader.cpp" />
@@ -1240,8 +1140,6 @@
 		<Unit filename="GDL\IDE\CodeCompiler.h" />
 		<Unit filename="GDL\IDE\CompilerMessagesParser.cpp" />
 		<Unit filename="GDL\IDE\CompilerMessagesParser.h" />
-		<Unit filename="GDL\IDE\CompilerToolchainPathManager.cpp" />
-		<Unit filename="GDL\IDE\CompilerToolchainPathManager.h" />
 		<Unit filename="GDL\IDE\ConditionSentenceFormatter.cpp" />
 		<Unit filename="GDL\IDE\ConditionSentenceFormatter.h" />
 		<Unit filename="GDL\IDE\Dialogs\AdvancedTextEntryDlg.cpp" />
@@ -1274,6 +1172,8 @@
 		<Unit filename="GDL\IDE\Dialogs\EditTextDialog.h" />
 		<Unit filename="GDL\IDE\Dialogs\ObjectListDialogsHelper.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\ObjectListDialogsHelper.h" />
+		<Unit filename="GDL\IDE\Dialogs\ProjectUpdateDlg.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\ProjectUpdateDlg.h" />
 		<Unit filename="GDL\IDE\Dialogs\PropImage.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\PropImage.h" />
 		<Unit filename="GDL\IDE\Dialogs\ResourcesEditor.cpp" />
@@ -1284,6 +1184,10 @@
 		<Unit filename="GDL\IDE\EventsEditorItemsAreas.h" />
 		<Unit filename="GDL\IDE\EventsEditorSelection.cpp" />
 		<Unit filename="GDL\IDE\EventsEditorSelection.h" />
+		<Unit filename="GDL\IDE\EventsRenderingHelper.cpp" />
+		<Unit filename="GDL\IDE\EventsRenderingHelper.h" />
+		<Unit filename="GDL\IDE\ExecutableIconChanger.cpp" />
+		<Unit filename="GDL\IDE\ExecutableIconChanger.h" />
 		<Unit filename="GDL\IDE\ExpressionsCorrectnessTesting.cpp" />
 		<Unit filename="GDL\IDE\ExpressionsCorrectnessTesting.h" />
 		<Unit filename="GDL\IDE\FullProjectCompiler.cpp" />
@@ -1308,8 +1212,6 @@
 		<Unit filename="GDL\IDE\ResourcesMergingHelper.h" />
 		<Unit filename="GDL\IDE\ResourcesUnmergingHelper.cpp" />
 		<Unit filename="GDL\IDE\ResourcesUnmergingHelper.h" />
-		<Unit filename="GDL\IDE\SourceFileBuilder.cpp" />
-		<Unit filename="GDL\IDE\SourceFileBuilder.h" />
 		<Unit filename="GDL\IDE\TextFormatting.cpp" />
 		<Unit filename="GDL\IDE\TextFormatting.h" />
 		<Unit filename="GDL\IDE\TreeItemExpressionInfoData.h" />
@@ -1419,7 +1321,7 @@
 		<Unit filename="GDL\tinyxml\tinyxml.h" />
 		<Unit filename="GDL\tinyxml\tinyxmlerror.cpp" />
 		<Unit filename="GDL\tinyxml\tinyxmlparser.cpp" />
-		<Unit filename="wxsmith\EditCppCodeEvent.wxs" />
+		<Unit filename="wxsmith\ProjectUpdateDlg.wxs" />
 		<Extensions>
 			<code_completion />
 			<envvars />
@@ -1449,11 +1351,12 @@
 					<wxDialog wxs="wxsmith/EditDynamicExtensionCallerEvent.wxs" src="GDL/IDE/Dialogs/EditDynamicExtensionCallerEvent.cpp" hdr="GDL/IDE/Dialogs/EditDynamicExtensionCallerEvent.h" fwddecl="0" i18n="1" name="EditDynamicExtensionCallerEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/AdvancedTextEntryDlg.wxs" src="GDL/IDE/Dialogs/AdvancedTextEntryDlg.cpp" hdr="GDL/IDE/Dialogs/AdvancedTextEntryDlg.h" fwddecl="0" i18n="1" name="AdvancedTextEntryDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/EditCppCodeEvent.wxs" src="GDL\IDE\Dialogs\EditCppCodeEvent.cpp" hdr="GDL\IDE\Dialogs\EditCppCodeEvent.h" fwddecl="0" i18n="1" name="EditCppCodeEvent" language="CPP" />
+					<wxDialog wxs="wxsmith/ProjectUpdateDlg.wxs" src="GDL\IDE\Dialogs\ProjectUpdateDlg.cpp" hdr="GDL\IDE\Dialogs\ProjectUpdateDlg.h" fwddecl="0" i18n="1" name="ProjectUpdateDlg" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="2.1.10568" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="2.1.10676" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

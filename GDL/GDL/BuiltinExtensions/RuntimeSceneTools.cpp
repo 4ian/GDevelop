@@ -1,6 +1,7 @@
 #include "GDL/BuiltinExtensions/RuntimeSceneTools.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
+#include "GDL/Object.h"
 #include "GDL/RuntimeGame.h"
 
 bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )

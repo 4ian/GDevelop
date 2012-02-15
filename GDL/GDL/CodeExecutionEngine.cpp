@@ -18,6 +18,7 @@
 #include <llvm/Support/TypeBuilder.h>
 #undef _ //llvm/Support/system_error.h does not support wxWidgets "_" macro
 #include <llvm/Support/system_error.h>
+#include <llvm/Linker.h>
 #include <SFML/System.hpp>
 #include "GDL/RuntimeContext.h"
 
@@ -57,48 +58,65 @@ CodeExecutionEngine::~CodeExecutionEngine()
     if ( llvmRuntimeContext != NULL ) delete llvmRuntimeContext;
 }
 
-bool CodeExecutionEngine::LoadFromLLVMBitCode(const char * src, unsigned int size)
+bool CodeExecutionEngine::LoadFromLLVMBitCode(std::vector< std::pair<const char * /*src*/, unsigned int /*size*/> > data)
 {
-    llvm::StringRef input_data(src);
-    llvm::StringRef buffer_name("src");
-    llvm::OwningPtr<llvm::MemoryBuffer> eventsBuffer;
-    eventsBuffer.reset(llvm::MemoryBuffer::getNewMemBuffer(size, "src"));
-    memcpy((char*)eventsBuffer->getBufferStart(), src, size);
+    std::vector < llvm::MemoryBuffer* > codeBuffers;
+    for (unsigned int i = 0;i<data.size();++i)
+    {
+        llvm::StringRef input_data(data[i].first);
+        llvm::StringRef buffer_name("src");
+        llvm::MemoryBuffer * codeBuffer;
+        codeBuffer = llvm::MemoryBuffer::getNewMemBuffer(data[i].second, "src");
+        memcpy((char*)codeBuffer->getBufferStart(), data[i].first, data[i].second);
 
-    return LoadFromLLVMBitCode(eventsBuffer.get());
+        codeBuffers.push_back(codeBuffer);
+    }
+
+    bool result = LoadFromLLVMBitCode(codeBuffers);
+    for (unsigned int i = 0;i<codeBuffers.size();++i) delete codeBuffers[i];
+
+    return result;
 }
 
-bool CodeExecutionEngine::LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffer)
+bool CodeExecutionEngine::LoadFromLLVMBitCode(std::vector<llvm::MemoryBuffer *> bitcodeBuffers)
 {
+    if ( bitcodeBuffers.empty() )
+    {
+        std::cout << "No bitcode to load." << std::endl;
+        return false;
+    }
+
+    //Load the first module
     std::string parseError;
-    llvm::Module * llvmModule = ParseBitcodeFile(eventsBuffer, llvmContext, &parseError);
+    llvm::Module * llvmMainModule = ParseBitcodeFile(bitcodeBuffers[0], llvmContext, &parseError);
     std::cout << parseError;
 
-    if (!llvmModule)
+    if (!llvmMainModule)
     {
-        std::cout << "Module creation failed\n";
+        std::cout << "Unable to create main module from bitcode.\n";
         return false;
     }
 
     engineReady = false;
 
+    //Create the execution engine, used to generate the machine code.
     std::string error;
-    llvmExecutionEngine.reset( llvm::ExecutionEngine::createJIT(llvmModule, &error, 0, llvm::CodeGenOpt::None)); //No optimisation during machine code generation
+    llvmExecutionEngine.reset( llvm::ExecutionEngine::createJIT(llvmMainModule, &error, 0, llvm::CodeGenOpt::None)); //No optimisation during machine code generation
     if (!llvmExecutionEngine)
     {
-        std::cout << "unable to make execution engine: " << error << "\n";
+        std::cout << "Unable to make execution engine: " << error << "\n";
         return false;
     }
 
-    llvm::Function * eventsEntryFunction = llvmModule->getFunction("main");
+    llvm::Function * eventsEntryFunction = llvmMainModule->getFunction("main");
     if (!eventsEntryFunction)
     {
-        std::cout << "'main' function not found in module.\n";
+        std::cout << "'main' function not found in the main module.\n";
         return false;
     }
 
     std::cout << "Mapping objects of execution engine...\n";
-    llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(llvmModule->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(llvmModule->getContext())));
+    llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(llvmMainModule->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(llvmMainModule->getContext())));
     llvmExecutionEngine->addGlobalMapping(globalValue, &llvmRuntimeContext);
 
     // Using this, warnAboutUnknownFunctions is called if we need to generate code for an unknown function.
@@ -107,10 +125,33 @@ bool CodeExecutionEngine::LoadFromLLVMBitCode(llvm::MemoryBuffer * eventsBuffer)
     // will warn the user about this problem.
     llvmExecutionEngine->InstallLazyFunctionCreator(UseSubstituteForUnknownFunctions);
 
+    //Load all supplementary bitcode files to modules and add them to the main module
+    if ( bitcodeBuffers.size() > 1 ) std::cout << "Loading modules from secondary bitcode buffers..." << std::endl;
+    for (unsigned int i = 1;i<bitcodeBuffers.size();++i)
+    {
+        std::string parseError;
+        llvm::Module * llvmModule = ParseBitcodeFile(bitcodeBuffers[i], llvmContext, &parseError);
+        std::cout << parseError;
+
+        if ( llvmModule == NULL)
+        {
+            std::cout << "WARNING: A (secondary) bitcode buffer could not be loaded to a module." << std::endl;
+            continue;
+        }
+
+        std::string linkError;
+        if ( llvm::Linker::LinkModules(llvmMainModule, llvmModule, &linkError) /*LinkModules return true if an error occurred. */)
+        {
+            std::cout << "WARNING: A (secondary) bitcode module could not be linked to the main module: " << linkError << std::endl;
+            continue;
+        }
+    }
+
     std::cout << "JIT Compilation to machine code...\n";
     sf::Clock jitTimer;
     compiledRawFunction = llvmExecutionEngine->getPointerToFunction(eventsEntryFunction);
     std::cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()/1000.0f <<"s"<<std::endl;
+
 
     engineReady = true;
     return true;

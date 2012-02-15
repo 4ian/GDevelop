@@ -11,7 +11,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
-#include "EventsRenderingHelper.h"
+#include "GDL/IDE/EventsRenderingHelper.h"
 #include "GDL/IDE/EventsEditorItemsAreas.h"
 #include "GDL/IDE/EventsEditorSelection.h"
 
@@ -20,7 +20,7 @@ BaseEvent()
 {
 }
 
-std::string StandardEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+std::string StandardEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
 {
     std::string outputCode;
 

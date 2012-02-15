@@ -1,7 +1,14 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "GDL/Game.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/SourceFile.h"
+#include "GDL/Scene.h"
+#include "GDL/Object.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
@@ -19,10 +26,8 @@ maxFPS(60),
 minFPS(10),
 verticalSync(false),
 portable(false),
-fullscreen(false)
-#if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-,useExternalSourceFiles(false)
-#endif
+fullscreen(false),
+useExternalSourceFiles(false)
 {
     //Game use builtin extensions by default
     extensionsUsed.push_back("BuiltinObject");
@@ -45,6 +50,9 @@ fullscreen(false)
     extensionsUsed.push_back("BuiltinMathematicalTools");
 }
 
+Game::~Game()
+{
+}
 
 void Game::Init(const Game & game)
 {
@@ -81,14 +89,12 @@ void Game::Init(const Game & game)
     	externalEvents.push_back( boost::shared_ptr<ExternalEvents>(new ExternalEvents(*game.externalEvents[i])) );
     #endif
 
-    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
     useExternalSourceFiles = game.useExternalSourceFiles;
 
     #if defined(GD_IDE_ONLY)
     externalSourceFiles.clear();
     for (unsigned int i =0;i<game.externalSourceFiles.size();++i)
     	externalSourceFiles.push_back( boost::shared_ptr<GDpriv::SourceFile>(new GDpriv::SourceFile(*game.externalSourceFiles[i])) );
-    #endif
     #endif
 
     variables = game.variables;

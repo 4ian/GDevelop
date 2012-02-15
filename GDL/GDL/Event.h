@@ -73,7 +73,7 @@ class GD_API BaseEvent
             return outputCode;
          * \endcode
          */
-        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context) {return "";};
+        virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context) {return "";};
 
         /**
          * Derived class have to redefine this function, so as to return true, if they are executable.
@@ -153,9 +153,20 @@ class GD_API BaseEvent
         virtual unsigned int GetRenderedHeight(unsigned int width) const {return 0;};
 
         /**
+         * Used by EditEvent to describe what sort of changes have been made to the event
+         * \see BaseEvent::EditEvent
+         */
+        enum EditEventReturnType
+        {
+            ChangesMade,
+            Cancelled,
+            ChangesMadeButNoNeedForEventsRecompilation
+        };
+
+        /**
          * Called when the user want to edit the event
          */
-        virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_) {};
+        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_) { return ChangesMade; };
 
         bool            folded; ///< Here as it must be saved. Used by events editor
         mutable bool    eventHeightNeedUpdate; ///<Automatically set to true/false by the events editor
@@ -163,6 +174,7 @@ class GD_API BaseEvent
         boost::weak_ptr<BaseEvent> originalEvent; ///< Pointer only used for profiling events, so as to remember the original event from which it has been copied.
         unsigned long int totalTimeDuringLastSession; ///< Total time used by the event during the last run. Used for profiling.
         float percentDuringLastSession; ///< Total time used by the event during the last run. Used for profiling.
+
 
     protected:
         mutable unsigned int    renderedHeight;

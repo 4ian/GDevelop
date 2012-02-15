@@ -13,9 +13,8 @@
 #include "GDL/EmptyEvent.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/tinyxml/tinyxml.h"
-#include "RuntimeScene.h"
-#include "Game.h"
-#include "Event.h"
+#include "GDL/RuntimeScene.h"
+#include "GDL/Game.h"
 #include <iostream>
 #include "GDL/IDE/Dialogs/EditLink.h"
 
@@ -119,10 +118,12 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
     eventList.erase( eventList.begin() + indexOfTheEventInThisList + 1 + static_cast<unsigned>(lastEvent-firstEvent)+1 );
 }
 
-void LinkEvent::EditEvent(wxWindow* parent_, Game & game, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game & game, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     EditLink dialog(parent_, *this, game);
-    dialog.ShowModal();
+    if ( dialog.ShowModal() == 0 ) return Cancelled;
+
+    return ChangesMade;
 }
 
 /**

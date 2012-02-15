@@ -1,7 +1,7 @@
 /**
 
 Game Develop - LinkedObjects Extension
-Copyright (c) 2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -42,32 +42,7 @@ namespace LinkedObjects
 
 std::map < RuntimeScene* , ObjectsLinksManager > ObjectsLinksManager::managers;
 
-bool GD_EXTENSION_API PickAllObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> mapOfAllObjectLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string &, Object * object)
-{
-    //Get a list of all objects linked
-    std::vector<Object*> linkedObjects = ObjectsLinksManager::managers[&scene].GetAllRawPointersToObjectsLinkedWith(object->Shared_ptrFromObject());
-
-    //Then pick all of these objects
-    for (unsigned int j = 0;j<linkedObjects.size();++j)
-    {
-        const std::string & linkedObjectName = linkedObjects[j]->GetName();
-
-        //Add linked object to appropriate picked object list
-        if ( mapOfAllObjectLists.find(linkedObjectName) != mapOfAllObjectLists.end() )
-        {
-            if ( find(mapOfAllObjectLists[linkedObjectName]->begin(), mapOfAllObjectLists[linkedObjectName]->end(), linkedObjects[j]) == mapOfAllObjectLists[linkedObjectName]->end() )
-                mapOfAllObjectLists[linkedObjectName]->push_back(linkedObjects[j]);
-        }
-
-        //Add linked object to already concerned objects
-        if ( find(alreadyDeclaredObjects.begin(), alreadyDeclaredObjects.end(), linkedObjectName) == alreadyDeclaredObjects.end() )
-            alreadyDeclaredObjects.push_back(linkedObjectName);
-    }
-
-    return !linkedObjects.empty();
-}
-
-bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectsLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string &, Object * object, std::string linkedName)
+bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectsLists, int useless, const std::string &, Object * object, std::string linkedName)
 {
     //Get a list of all objects with the desired name linked to our object
     std::vector<Object*> linkedObjects = ObjectsLinksManager::managers[&scene].GetRawPointersToObjectsLinkedWith(object->Shared_ptrFromObject(), linkedName);
@@ -85,9 +60,6 @@ bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::s
         }
 
     }
-    //Add linked object to already concerned objects
-    if ( find(alreadyDeclaredObjects.begin(), alreadyDeclaredObjects.end(), linkedName) == alreadyDeclaredObjects.end() )
-        alreadyDeclaredObjects.push_back(linkedName);
 
     return !linkedObjects.empty();
 }

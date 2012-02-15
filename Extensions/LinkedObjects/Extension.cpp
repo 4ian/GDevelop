@@ -1,7 +1,7 @@
 /**
 
 Game Develop - LinkedObjects Extension
-Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -102,24 +102,6 @@ class Extension : public ExtensionBase
 
             DECLARE_END_ACTION()
 
-            DECLARE_CONDITION("PickAllObjectsLinkedTo",
-                           _("Prendre en compte tous les objets liés"),
-                           _("Prends en compte tous les objets liés à un objet pour les prochaines conditions et actions.\nLa condition renvoie faux si aucun objet n'a été pris en compte."),
-                           _("Prendre en compte tous les objets liés à _PARAM3_"),
-                           _("Associations d'objets"),
-                           "Extensions/LinkedObjectsicon24.png",
-                           "Extensions/LinkedObjectsicon16.png");
-
-                instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
-                instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
-                instrInfo.AddParameter("object", _("Objet"), "", false);
-                instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "3");
-
-                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::LinkedObjects::PickAllObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
-
-            DECLARE_END_CONDITION()
-
             DECLARE_CONDITION("PickObjectsLinkedTo",
                            _("Prendre en compte des objets liés"),
                            _("Prends en compte des objets liés à un objet pour les prochaines conditions et actions.\nLa condition renvoie faux si aucun objet n'a été pris en compte."),
@@ -129,8 +111,8 @@ class Extension : public ExtensionBase
                            "Extensions/LinkedObjectsicon16.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
-                instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
+                instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPicking", "5");
+                instrInfo.AddCodeOnlyParameter("inlineCode", "0"); //For backward compatibility
                 instrInfo.AddParameter("object", _("Objet"), "", false);
                 instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "3");
                 instrInfo.AddParameter("object", _("Objets liés à prendre en compte"), "", false);
@@ -138,24 +120,6 @@ class Extension : public ExtensionBase
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
             DECLARE_END_CONDITION()
-
-            DECLARE_ACTION("PickAllObjectsLinkedTo",
-                           _("Prendre en compte tous les objets liés"),
-                           _("Prends en compte tous les objets liés à un objet pour les prochaines actions."),
-                           _("Prendre en compte tous les objets liés à _PARAM3_"),
-                           _("Associations d'objets"),
-                           "Extensions/LinkedObjectsicon24.png",
-                           "Extensions/LinkedObjectsicon16.png");
-
-                instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
-                instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
-                instrInfo.AddParameter("object", _("Objet"), "", false);
-                instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "3");
-
-                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::LinkedObjects::PickAllObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
-
-            DECLARE_END_ACTION()
 
             DECLARE_ACTION("PickObjectsLinkedTo",
                            _("Prendre en compte des objets liés"),
@@ -166,8 +130,8 @@ class Extension : public ExtensionBase
                            "Extensions/LinkedObjectsicon16.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
-                instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
+                instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPicking", "5");
+                instrInfo.AddCodeOnlyParameter("inlineCode", "0"); //For backward compatibility
                 instrInfo.AddParameter("object", _("Objet"), "", false);
                 instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "3");
                 instrInfo.AddParameter("object", _("Objets liés à prendre en compte"), "", false);

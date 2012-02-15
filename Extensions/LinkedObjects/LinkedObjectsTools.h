@@ -1,7 +1,7 @@
 /**
 
 Game Develop - LinkedObjects Extension
-Copyright (c) 2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2011-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -41,8 +41,7 @@ namespace LinkedObjects
 void GD_EXTENSION_API LinkObjects(RuntimeScene & scene, Object * a, Object * b, const std::string & ,const std::string & );
 void GD_EXTENSION_API RemoveLinkBetween(RuntimeScene & scene, Object * a, Object * b, const std::string & ,const std::string & );
 void GD_EXTENSION_API RemoveAllLinksOf(RuntimeScene & scene, Object * object);
-bool GD_EXTENSION_API PickAllObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> mapOfAllObjectLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string &, Object * object);
-bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectsLists, std::vector<std::string> & alreadyDeclaredObjects, const std::string &, Object * object, std::string linkedName);
+bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectsLists, int useless, const std::string &, Object * object, std::string linkedName);
 
 }
 

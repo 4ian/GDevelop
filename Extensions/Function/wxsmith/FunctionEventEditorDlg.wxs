@@ -83,13 +83,65 @@
 					<cols>1</cols>
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
-						<object class="wxRadioBox" name="ID_RADIOBOX1" variable="callerContextChoice" member="yes">
-							<label>Lors de l&apos;appel à la fonction</label>
-							<content>
-								<item>Utiliser les objets concernés du contexte qui appelle la fonction</item>
-								<item>Oublier les objets déjà concernés.</item>
-							</content>
-							<default>-1</default>
+						<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
+							<label>Arguments</label>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
+									<cols>1</cols>
+									<growablecols>0</growablecols>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+											<label>(Optionnel) Passer les objets du groupe suivant à la fonction :</label>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
+											<cols>3</cols>
+											<growablecols>0</growablecols>
+											<object class="sizeritem">
+												<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="objectEdit" member="yes" />
+												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="objectBt" member="yes">
+													<bitmap>res/objeticon.png</bitmap>
+													<default>1</default>
+													<handler function="OnobjectBtClick" entry="EVT_BUTTON" />
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+										</object>
+										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
+											<label>Les objets de ce groupe qui sont concernés par les précédentes&#x0A;actions/conditions seront passés à la fonction lors de son appel&#x0A;par une action, et seront directement concernés par les actions&#x0A;et conditions qui leur font référence.</label>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+											<label>Les autres arguments peuvent être passés sous forme&#x0A;de texte lors de l&apos;appel à la fonction. ( Et récupérés dans&#x0A;la fonction avec Function::GetParameter(x) ).</label>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>

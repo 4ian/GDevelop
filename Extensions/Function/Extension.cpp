@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Function Extension
-Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,11 +27,15 @@ freely, subject to the following restrictions:
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
 #include "GDL/StrExpressionInstruction.h"
-#include "GDL/EventsCodeGenerationContext.h"
-#include "GDL/ExpressionsCodeGeneration.h"
-#include "GDL/EventsCodeGenerator.h"
-#include "GDL/GDExpressionParser.h"
-#include "GDL/Instruction.h"
+#include "GDL/IDE/GDExpressionParser.h"
+#include "GDL/Events/ExpressionsCodeGeneration.h"
+#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDL/Events/EventsCodeGenerator.h"
+#include "GDL/Events/EventsCodeNameMangler.h"
+#include "GDL/Game.h"
+#include "GDL/Scene.h"
+#include "GDL/CommonTools.h"
+#include "GDL/IDE/Instruction.h"
 #include "FunctionEvent.h"
 #include <boost/version.hpp>
 
@@ -71,24 +75,52 @@ class Extension : public ExtensionBase
                 instrInfo.AddParameter("string", _("Paramètre 5"), "", true);
                 instrInfo.AddParameter("string", _("Paramètre 6"), "", true);
                 instrInfo.AddParameter("string", _("Paramètre 7"), "", true);
-                instrInfo.AddCodeOnlyParameter("mapOfAllObjectLists", "");
-                instrInfo.AddCodeOnlyParameter("listOfAlreadyPickedObjects", "");
 
             class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
             {
-                virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & context)
+                virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
                 {
-                    context.AddGlobalDeclaration(FunctionEvent::globalDeclaration);
+                    codeGenerator.AddGlobalDeclaration(FunctionEvent::globalDeclaration);
                     std::string functionName = instruction.GetParameterSafely(0).GetPlainString();
 
+                    boost::shared_ptr<FunctionEvent> functionEvent = FunctionEvent::SearchForFunctionInEvents(scene.events, functionName);
+                    if ( functionEvent == boost::shared_ptr<FunctionEvent>() )
+                    {
+                        std::cout << "Function \""+functionName+"\" not found!" << std::endl;
+                        return "//Function \""+functionName+"\" not found.\n";
+                    }
+
                     std::string code;
+
+                    //Generate code for objects passed as arguments
+                    std::string objectsAsArgumentCode;
+                    {
+                        vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), functionEvent->GetObjectsPassedAsArgument()));
+                        vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), functionEvent->GetObjectsPassedAsArgument()));
+
+                        std::vector<std::string> realObjects;
+                        if ( globalGroup != game.objectGroups.end() )
+                            realObjects = (*globalGroup).GetAllObjectsNames();
+                        else if ( sceneGroup != scene.objectGroups.end() )
+                            realObjects = (*sceneGroup).GetAllObjectsNames();
+                        else
+                            realObjects.push_back(functionEvent->GetObjectsPassedAsArgument());
+
+                        objectsAsArgumentCode += "runtimeContext->ClearObjectListsMap()";
+                        for (unsigned int i = 0;i<realObjects.size();++i)
+                        {
+                            context.EmptyObjectsListNeeded(realObjects[i]);
+                            objectsAsArgumentCode += ".AddObjectListToMap(\""+realObjects[i]+"\", "+ManObjListName(realObjects[i])+")";
+                        }
+                        objectsAsArgumentCode += ".ReturnObjectListsMap()";
+                    }
 
                     //Generate code for evaluating parameters
                     code += "std::vector<std::string> functionParameters;\n";
                     for (unsigned int i = 1;i<8;++i)
                     {
                         std::string parameterCode;
-                        CallbacksForGeneratingExpressionCode callbacks(parameterCode, game, scene, context);
+                        CallbacksForGeneratingExpressionCode callbacks(parameterCode, game, scene, codeGenerator, context);
                         GDExpressionParser parser(instruction.GetParameterSafely(i).GetPlainString());
                         parser.ParseTextExpression(game, scene, callbacks);
                         if (parameterCode.empty()) parameterCode = "\"\"";
@@ -98,10 +130,7 @@ class Extension : public ExtensionBase
                     code += "std::vector<std::string> * oldFunctionParameters = currentFunctionParameters;\n";
                     code += "currentFunctionParameters = &functionParameters;\n";
 
-                    context.MapOfAllObjectsNeeded(game, scene);
-                    context.NeedObjectListsDynamicDeclaration();
-
-                    code += "if(functionEventsMap->find(\""+functionName+"\") != functionEventsMap->end()) (*functionEventsMap)[\""+functionName+"\"](runtimeContext, objectsListsMap, objectsAlreadyDeclared);\n";
+                    code += FunctionEvent::MangleFunctionName(*functionEvent)+"(runtimeContext, "+objectsAsArgumentCode+");\n";
                     code += "currentFunctionParameters = oldFunctionParameters;\n";
 
                     return code;
@@ -110,69 +139,6 @@ class Extension : public ExtensionBase
 
             InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
             instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
-
-            DECLARE_END_ACTION()
-
-            DECLARE_ACTION("LaunchFunctionFromExpression",
-                           _("Lancer une fonction grâce à une expression"),
-                           _("Lance une fonction en retrouvant son nom depuis l'expression."),
-                           _("Lancer la fonction correspondant à _PARAM0_ (_PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"),
-                           _("Fonctions"),
-                           "res/actions/function24.png",
-                           "res/actions/function.png");
-
-                instrInfo.AddParameter("string", _("Expression donnant le nom de la fonction"), "", false);
-                instrInfo.AddParameter("string", _("Paramètre 1"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 2"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 3"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 4"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 5"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 6"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 7"), "", true);
-
-            class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
-            {
-                virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerationContext & context)
-                {
-                    context.AddGlobalDeclaration(FunctionEvent::globalDeclaration);
-
-                    //Generate code for evaluating function name
-                    std::string functionNameCode;
-                    CallbacksForGeneratingExpressionCode callbacks(functionNameCode, game, scene, context);
-                    GDExpressionParser parser(instruction.GetParameterSafely(0).GetPlainString());
-                    parser.ParseTextExpression(game, scene, callbacks);
-                    if (functionNameCode.empty()) functionNameCode = "\"\"";
-
-                    std::string code;
-
-                    //Generate code for evaluating parameters
-                    code += "std::vector<std::string> functionParameters;\n";
-                    for (unsigned int i = 1;i<8;++i)
-                    {
-                        std::string parameterCode;
-                        CallbacksForGeneratingExpressionCode callbacks(parameterCode, game, scene, context);
-                        GDExpressionParser parser(instruction.GetParameterSafely(i).GetPlainString());
-                        parser.ParseTextExpression(game, scene, callbacks);
-                        if (parameterCode.empty()) parameterCode = "\"\"";
-
-                        code += "functionParameters.push_back("+parameterCode+");\n";
-                    }
-
-                    code += "std::vector<std::string> * oldFunctionParameters = currentFunctionParameters;\n";
-                    code += "currentFunctionParameters = &functionParameters;\n";
-
-                    context.MapOfAllObjectsNeeded(game, scene);
-                    context.NeedObjectListsDynamicDeclaration();
-                    code += "if(functionEventsMap->find("+functionNameCode+") != functionEventsMap->end()) (*functionEventsMap)["+functionNameCode+"](runtimeContext, objectsListsMap, objectsAlreadyDeclared);";
-                    code += "currentFunctionParameters = oldFunctionParameters;\n";
-
-                    return code;
-                };
-            };
-
-            InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
-
 
             DECLARE_END_ACTION()
 
@@ -195,14 +161,14 @@ class Extension : public ExtensionBase
 
             class CodeGenerator : public StrExpressionInfos::CppCallingInformation::CustomCodeGenerator
             {
-                virtual std::string GenerateCode(const Game & game, const Scene & scene, const StrExpressionInstruction & instruction, EventsCodeGenerationContext & context)
+                virtual std::string GenerateCode(const Game & game, const Scene & scene, const StrExpressionInstruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
                 {
-                    context.AddGlobalDeclaration(FunctionEvent::globalDeclaration);
-                    context.AddIncludeFile("Function/FunctionTools.h");
+                    codeGenerator.AddGlobalDeclaration(FunctionEvent::globalDeclaration);
+                    codeGenerator.AddIncludeFile("Function/FunctionTools.h");
 
                     //Generate code for evaluating index
                     std::string expression;
-                    CallbacksForGeneratingExpressionCode callbacks(expression, game, scene, context);
+                    CallbacksForGeneratingExpressionCode callbacks(expression, game, scene, codeGenerator, context);
                     GDExpressionParser parser(instruction.parameters[0].GetPlainString());
                     if (!parser.ParseMathExpression(game, scene, callbacks) || expression.empty()) expression = "0";
 

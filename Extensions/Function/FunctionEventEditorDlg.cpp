@@ -10,6 +10,7 @@
 #include <wx/string.h>
 //*)
 #include "GDL/CommonTools.h"
+#include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "FunctionEvent.h"
 
 //(*IdInit(FunctionEventEditorDlg)
@@ -19,7 +20,11 @@ const long FunctionEventEditorDlg::ID_PANEL1 = wxNewId();
 const long FunctionEventEditorDlg::ID_STATICLINE2 = wxNewId();
 const long FunctionEventEditorDlg::ID_STATICTEXT2 = wxNewId();
 const long FunctionEventEditorDlg::ID_TEXTCTRL2 = wxNewId();
-const long FunctionEventEditorDlg::ID_RADIOBOX1 = wxNewId();
+const long FunctionEventEditorDlg::ID_STATICTEXT1 = wxNewId();
+const long FunctionEventEditorDlg::ID_TEXTCTRL1 = wxNewId();
+const long FunctionEventEditorDlg::ID_BITMAPBUTTON1 = wxNewId();
+const long FunctionEventEditorDlg::ID_STATICTEXT5 = wxNewId();
+const long FunctionEventEditorDlg::ID_STATICTEXT4 = wxNewId();
 const long FunctionEventEditorDlg::ID_STATICLINE1 = wxNewId();
 const long FunctionEventEditorDlg::ID_BUTTON1 = wxNewId();
 const long FunctionEventEditorDlg::ID_BUTTON2 = wxNewId();
@@ -36,11 +41,14 @@ game(game_),
 scene(scene_)
 {
 	//(*Initialize(FunctionEventEditorDlg)
+	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
+	wxFlexGridSizer* FlexGridSizer8;
 	wxFlexGridSizer* FlexGridSizer6;
+	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
@@ -73,13 +81,25 @@ scene(scene_)
 	FlexGridSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
-	wxString __wxRadioBoxChoices_1[2] =
-	{
-		_("Utiliser les objets concernés du contexte qui appelle la fonction"),
-		_("Oublier les objets déjà concernés.")
-	};
-	callerContextChoice = new wxRadioBox(this, ID_RADIOBOX1, _("Lors de l\'appel à la fonction"), wxDefaultPosition, wxDefaultSize, 2, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
-	FlexGridSizer2->Add(callerContextChoice, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Arguments"));
+	FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer8->AddGrowableCol(0);
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("(Optionnel) Passer les objets du groupe suivant à la fonction :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	FlexGridSizer8->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer4->AddGrowableCol(0);
+	objectEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	FlexGridSizer4->Add(objectEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	objectBt = new wxBitmapButton(this, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/objeticon.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
+	objectBt->SetDefault();
+	FlexGridSizer4->Add(objectBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer8->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Les objets de ce groupe qui sont concernés par les précédentes\nactions/conditions seront passés à la fonction lors de son appel\npar une action, et seront directement concernés par les actions\net conditions qui leur font référence."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	FlexGridSizer8->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Les autres arguments peuvent être passés sous forme\nde texte lors de l\'appel à la fonction. ( Et récupérés dans\nla fonction avec Function::GetParameter(x) )."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	FlexGridSizer8->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer1->Add(FlexGridSizer8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -93,11 +113,12 @@ scene(scene_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
+	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&FunctionEventEditorDlg::OnobjectBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&FunctionEventEditorDlg::OnokBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&FunctionEventEditorDlg::OncancelBtClick);
 	//*)
 
-	callerContextChoice->SetSelection(eventEdited.UseCallerContext() ? 0 : 1);
+	objectEdit->SetValue(eventEdited.GetObjectsPassedAsArgument());
 	nameEdit->SetValue(eventEdited.GetName());
 }
 
@@ -109,7 +130,7 @@ FunctionEventEditorDlg::~FunctionEventEditorDlg()
 
 void FunctionEventEditorDlg::OnokBtClick(wxCommandEvent& event)
 {
-    eventEdited.SetUseCallerContext(callerContextChoice->GetSelection() == 0);
+    eventEdited.SetObjectsPassedAsArgument(ToString(objectEdit->GetValue()));
     eventEdited.SetName(ToString(nameEdit->GetValue()));
 
     EndModal(1);
@@ -119,5 +140,15 @@ void FunctionEventEditorDlg::OncancelBtClick(wxCommandEvent& event)
 {
     EndModal(0);
 }
+
+void FunctionEventEditorDlg::OnobjectBtClick(wxCommandEvent& event)
+{
+    ChooseObject dialog(this, game, scene, true);
+    if ( dialog.ShowModal() == 1 )
+        objectEdit->ChangeValue(dialog.objectChosen);
+
+    return;
+}
+
 
 #endif

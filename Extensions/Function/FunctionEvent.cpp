@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Function Extension
-Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -30,82 +30,68 @@ freely, subject to the following restrictions:
 #include "FunctionEvent.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/CommonTools.h"
-#include "GDL/EventsCodeGenerationContext.h"
-#include "GDL/EventsCodeGenerator.h"
-#include "GDL/EventsCodeNameMangler.h"
+#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDL/Events/EventsCodeGenerator.h"
+#include "GDL/Events/EventsCodeNameMangler.h"
 #include "GDL/XmlMacros.h"
-#include "GDL/tinyxml.h"
-#include "GDL/EventsRenderingHelper.h"
-#include "GDL/EventsEditorItemsAreas.h"
-#include "GDL/EventsEditorSelection.h"
+#include "GDL/tinyxml/tinyxml.h"
+#include "GDL/IDE/EventsRenderingHelper.h"
+#include "GDL/IDE/EventsEditorItemsAreas.h"
+#include "GDL/IDE/EventsEditorSelection.h"
 #include "FunctionEventEditorDlg.h"
 #include <wx/textdlg.h>
 
 FunctionEvent::FunctionEvent() :
 BaseEvent(),
 name("MyFunction"),
-useCallerContext(false)
-,nameSelected(false)
+nameSelected(false)
 {
 }
 
 //Functions need some additionals "tools"
-const std::string FunctionEvent::globalDeclaration = "typedef void (*GDEventsFunctionsType)(RuntimeContext *, std::map <std::string, std::vector<Object*> *> &, std::vector <std::string> &);\n"
-                                                     "std::map <std::string, GDEventsFunctionsType> * functionEventsMap;\n"
-                                                     "std::vector<std::string> * currentFunctionParameters;\n";
+const std::string FunctionEvent::globalDeclaration = "std::vector<std::string> * currentFunctionParameters;\n";
 
-std::string FunctionEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & callerContext)
+std::string FunctionEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & /* The function has nothing to do with the current context */ )
 {
-    //Declaring the maps containing pointers to functions. We can't use a global object directly ( The execution engine does not initialize static/global objects ), so we use a pointer.
-    callerContext.AddGlobalDeclaration(globalDeclaration);
+    //Declaring the pointer to the function parameters
+    codeGenerator.AddGlobalDeclaration(globalDeclaration);
 
     //Declaring function prototype.
-    callerContext.AddGlobalDeclaration("void GDEventsGeneratedFunction"+name+ToString(this)+"(RuntimeContext *, std::map <std::string, std::vector<Object*> *> & , std::vector <std::string> &);\n");
+    codeGenerator.AddGlobalDeclaration("void "+MangleFunctionName(*this)+"(RuntimeContext *, std::map <std::string, std::vector<Object*> *>);\n");
 
-    //We take care of initializing ourselves the map and the pointer to current function parameters
-    callerContext.AddCustomCodeInMain("if ( functionEventsMap == NULL ) functionEventsMap = new std::map <std::string, GDEventsFunctionsType>;\ncurrentFunctionParameters = NULL;");
-
-    //Registering the function.
-    callerContext.AddCustomCodeInMain("(*functionEventsMap)[\""+name+"\"] = GDEventsGeneratedFunction"+name+ToString(this)+";");
-
-    //Generating function code :
+    //Generating function code:
     std::string functionCode;
-    EventsCodeGenerationContext context;
-    context.includeFiles = callerContext.includeFiles;
+    functionCode += "\nvoid "+MangleFunctionName(*this)+"(RuntimeContext * runtimeContext, std::map <std::string, std::vector<Object*> *> objectsListsMap)\n{\n";
 
-
-    //Function declaration
-    if ( useCallerContext )
+    EventsCodeGenerationContext callerContext;
     {
-        context.NeedObjectListsDynamicDeclaration();
-        functionCode += "\nvoid GDEventsGeneratedFunction"+name+ToString(this)+"(RuntimeContext * runtimeContext, std::map <std::string, std::vector<Object*> *> & objectsListsMap, std::vector <std::string> & objectsAlreadyDeclared)\n{\n";
+        vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), GetObjectsPassedAsArgument()));
+        vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), GetObjectsPassedAsArgument()));
+
+        std::vector<std::string> realObjects;
+        if ( globalGroup != game.objectGroups.end() )
+            realObjects = (*globalGroup).GetAllObjectsNames();
+        else if ( sceneGroup != scene.objectGroups.end() )
+            realObjects = (*sceneGroup).GetAllObjectsNames();
+        else
+            realObjects.push_back(GetObjectsPassedAsArgument());
+
+        for (unsigned int i = 0;i<realObjects.size();++i)
+        {
+            callerContext.EmptyObjectsListNeeded(realObjects[i]);
+            functionCode += "std::vector<Object*> "+ManObjListName(realObjects[i]) + ";\n";
+            functionCode += "if ( objectsListsMap[\""+realObjects[i]+"\"] != NULL ) "+ManObjListName(realObjects[i])+" = *objectsListsMap[\""+realObjects[i]+"\"];\n";
+        }
     }
-    else
-        functionCode += "\nvoid GDEventsGeneratedFunction"+name+ToString(this)+"(RuntimeContext * runtimeContext, std::map <std::string, std::vector<Object*> *> & , std::vector <std::string> &)\n{\n";
+    functionCode += "{";
+
+    EventsCodeGenerationContext context;
+    context.InheritsFrom(callerContext);
 
     //Generating function body code
-    std::string conditionsCode = EventsCodeGenerator::GenerateConditionsListCode(game, scene, conditions, context);
-    std::string actionsCode = EventsCodeGenerator::GenerateActionsListCode(game, scene, actions, context);
-    std::string subeventsCode = EventsCodeGenerator::GenerateEventsListCode(game, scene, events, context);
-
-    //Object declaration :
-    if ( useCallerContext ) //Using functions parameters to initalize objects list if we use caller context
-    {
-        for (unsigned int i = 0;i<game.globalObjects.size();++i)
-        {
-            functionCode += "std::vector<Object*> "+ManObjListName(game.globalObjects[i]->GetName()) + ";\n";
-            functionCode += "if ( objectsListsMap[\""+game.globalObjects[i]->GetName()+"\"] != NULL ) "+ManObjListName(game.globalObjects[i]->GetName())+" = *objectsListsMap[\""+game.globalObjects[i]->GetName()+"\"];\n";
-            functionCode += "objectsListsMap[\""+game.globalObjects[i]->GetName()+"\"] = &"+ManObjListName(game.globalObjects[i]->GetName())+";\n";
-        }
-        for (unsigned int i = 0;i<scene.initialObjects.size();++i)
-        {
-            functionCode += "std::vector<Object*> "+ManObjListName(scene.initialObjects[i]->GetName()) + ";\n";
-            functionCode += "if ( objectsListsMap[\""+scene.initialObjects[i]->GetName()+"\"] != NULL ) "+ManObjListName(scene.initialObjects[i]->GetName())+" = *objectsListsMap[\""+scene.initialObjects[i]->GetName()+"\"];\n";
-            functionCode += "objectsListsMap[\""+scene.initialObjects[i]->GetName()+"\"] = &"+ManObjListName(scene.initialObjects[i]->GetName())+";\n";
-        }
-    }
-    else //Or make standard declaration if we do not use the caller context
-        functionCode += context.GenerateObjectsDeclarationCode();
+    std::string conditionsCode = codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
+    std::string actionsCode = codeGenerator.GenerateActionsListCode(game, scene, actions, context);
+    std::string subeventsCode = codeGenerator.GenerateEventsListCode(game, scene, events, context);
 
     std::string ifPredicat = "true";
     for (unsigned int i = 0;i<conditions.size();++i)
@@ -123,9 +109,9 @@ std::string FunctionEvent::GenerateEventCode(const Game & game, const Scene & sc
     }
     functionCode += "}\n";
 
-
-    functionCode += "}\n";
-    callerContext.AddCustomCodeOutsideMain(functionCode);
+    functionCode += "}\n"; //Context end
+    functionCode += "}\n"; //Function end
+    codeGenerator.AddCustomCodeOutsideMain(functionCode);
 
     return "";
 }
@@ -172,7 +158,7 @@ void FunctionEvent::SaveToXml(TiXmlElement * elem) const
         OpenSaveGame::SaveEvents(events, subeventsElem);
     }
 
-    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("useCallerContext", useCallerContext);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("objectsPassedAsArgument", objectsPassedAsArgument);
 }
 
 void FunctionEvent::LoadFromXml(const TiXmlElement * elem)
@@ -196,16 +182,7 @@ void FunctionEvent::LoadFromXml(const TiXmlElement * elem)
     if ( elem->FirstChildElement( "Events" ) != NULL )
         OpenSaveGame::OpenEvents(events, elem->FirstChildElement( "Events" ));
 
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("useCallerContext", useCallerContext);
-    if ( elem->Attribute( "useCallerContext" ) == NULL ) useCallerContext = true;
-}
-
-
-/**
- * Unregister function when object is destroyed
- */
-FunctionEvent::~FunctionEvent()
-{
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("objectsPassedAsArgument", objectsPassedAsArgument);
 }
 
 /**
@@ -224,7 +201,9 @@ void FunctionEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEd
     //Name
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
-    dc.DrawText( _("Fonction") + " " + name, x + 4, y + 3 );
+    wxString caption = _("Fonction") + " " + name;
+    if ( !objectsPassedAsArgument.empty() ) caption += " "+_("( Objets passés en paramètre : ")+objectsPassedAsArgument+_(")");
+    dc.DrawText( caption, x + 4, y + 3 );
 
     //Draw conditions rectangle
     wxRect rect(x, y+functionTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-functionTextHeight);
@@ -260,10 +239,12 @@ unsigned int FunctionEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-void FunctionEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+BaseEvent::EditEventReturnType FunctionEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     FunctionEventEditorDlg dialog(parent_, *this, game_, scene_);
-    dialog.ShowModal();
+    if ( dialog.ShowModal() == 0 ) return Cancelled;
+
+    return ChangesMade;
 }
 
 /**
@@ -273,8 +254,8 @@ void FunctionEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, M
 void FunctionEvent::Init(const FunctionEvent & event)
 {
     events = CloneVectorOfEvents(event.events);
-    useCallerContext = event.useCallerContext;
     name = event.name;
+    objectsPassedAsArgument = event.objectsPassedAsArgument;
     conditions = event.conditions;
     actions = event.actions;
 }
@@ -300,6 +281,46 @@ FunctionEvent& FunctionEvent::operator=(const FunctionEvent & event)
     }
 
     return *this;
+}
+
+boost::shared_ptr<FunctionEvent> FunctionEvent::SearchForFunctionInEvents(const std::vector < boost::shared_ptr<BaseEvent> > & events, const std::string & functionName)
+{
+    for (unsigned int i = 0;i<events.size();++i)
+    {
+        boost::shared_ptr<FunctionEvent> functionEvent = boost::dynamic_pointer_cast<FunctionEvent>(events[i]);
+        if ( functionEvent != boost::shared_ptr<FunctionEvent>() )
+        {
+            if ( functionEvent->GetName() == functionName )
+                return functionEvent;
+        }
+
+        if ( events[i]->CanHaveSubEvents() )
+        {
+            boost::shared_ptr<FunctionEvent> result = SearchForFunctionInEvents(events[i]->GetSubEvents(), functionName);
+            if ( result != boost::shared_ptr<FunctionEvent>() ) return result;
+        }
+    }
+
+    return boost::shared_ptr<FunctionEvent>();
+}
+
+std::vector< boost::shared_ptr<FunctionEvent> > FunctionEvent::GetAllFunctionsInEvents(const std::vector < boost::shared_ptr<BaseEvent> > & events)
+{
+    std::vector< boost::shared_ptr<FunctionEvent> > results;
+
+    for (unsigned int i = 0;i<events.size();++i)
+    {
+        boost::shared_ptr<FunctionEvent> functionEvent = boost::dynamic_pointer_cast<FunctionEvent>(events[i]);
+        if ( functionEvent != boost::shared_ptr<FunctionEvent>() ) results.push_back(functionEvent);
+
+        if ( events[i]->CanHaveSubEvents() )
+        {
+            std::vector< boost::shared_ptr<FunctionEvent> >  subResults = GetAllFunctionsInEvents(events[i]->GetSubEvents());
+            std::copy(subResults.begin(), subResults.end(), std::back_inserter(results));
+        }
+    }
+
+    return results;
 }
 
 #endif

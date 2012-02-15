@@ -6,10 +6,10 @@
 //(*Headers(FunctionEventEditorDlg)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
-#include <wx/radiobox.h>
 #include <wx/textctrl.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
+#include <wx/bmpbuttn.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -25,13 +25,17 @@ class FunctionEventEditorDlg: public wxDialog
 
 		//(*Declarations(FunctionEventEditorDlg)
 		wxStaticText* StaticText2;
-		wxRadioBox* callerContextChoice;
 		wxPanel* Panel1;
+		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
 		wxButton* cancelBt;
 		wxStaticLine* StaticLine2;
+		wxBitmapButton* objectBt;
 		wxTextCtrl* nameEdit;
+		wxStaticText* StaticText5;
 		wxStaticLine* StaticLine1;
+		wxTextCtrl* objectEdit;
+		wxStaticText* StaticText4;
 		wxButton* okBt;
 		wxStaticBitmap* StaticBitmap3;
 		//*)
@@ -47,7 +51,11 @@ class FunctionEventEditorDlg: public wxDialog
 		static const long ID_STATICLINE2;
 		static const long ID_STATICTEXT2;
 		static const long ID_TEXTCTRL2;
-		static const long ID_RADIOBOX1;
+		static const long ID_STATICTEXT1;
+		static const long ID_TEXTCTRL1;
+		static const long ID_BITMAPBUTTON1;
+		static const long ID_STATICTEXT5;
+		static const long ID_STATICTEXT4;
 		static const long ID_STATICLINE1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
@@ -58,6 +66,7 @@ class FunctionEventEditorDlg: public wxDialog
 		//(*Handlers(FunctionEventEditorDlg)
 		void OncancelBtClick(wxCommandEvent& event);
 		void OnokBtClick(wxCommandEvent& event);
+		void OnobjectBtClick(wxCommandEvent& event);
 		//*)
 
 		Game & game;

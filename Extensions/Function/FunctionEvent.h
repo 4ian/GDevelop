@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Function Extension
-Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -29,10 +29,9 @@ freely, subject to the following restrictions:
 #ifndef FUNCTIONEVENT_H
 #define FUNCTIONEVENT_H
 #include "GDL/Event.h"
+#include "GDL/CommonTools.h"
 class RuntimeScene;
-class ObjectsConcerned;
 class Instruction;
-class Evaluateur;
 class TiXmlElement;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
@@ -49,13 +48,13 @@ class GD_EXTENSION_API FunctionEvent : public BaseEvent
     public:
         FunctionEvent();
         FunctionEvent(const FunctionEvent & event);
-        virtual ~FunctionEvent();
+        virtual ~FunctionEvent() {};
 
         FunctionEvent& operator=(const FunctionEvent & event);
         virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new FunctionEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerationContext & callerContext);
+        virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & callerContext);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -73,8 +72,8 @@ class GD_EXTENSION_API FunctionEvent : public BaseEvent
         string GetName() const { return name; };
         void SetName(string name_) { name = name_; };
 
-        bool UseCallerContext() const { return useCallerContext; };
-        void SetUseCallerContext(bool useCallerContext_) { useCallerContext = useCallerContext_; };
+        const std::string & GetObjectsPassedAsArgument() const { return objectsPassedAsArgument; };
+        void SetObjectsPassedAsArgument(const std::string & objects) { objectsPassedAsArgument = objects; };
 
         virtual vector < vector<Instruction>* > GetAllConditionsVectors();
         virtual vector < vector<Instruction>* > GetAllActionsVectors();
@@ -95,21 +94,37 @@ class GD_EXTENSION_API FunctionEvent : public BaseEvent
         /**
          * Called when the user want to edit the event
          */
-        virtual void EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
+        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
+
+        /**
+         * Tool function to generate an unique C++ name for a function.
+         */
+        static std::string MangleFunctionName(FunctionEvent & functionEvent) { return "GDFunction"+functionEvent.GetName()+ToString(&functionEvent); };
+
+        /**
+         * Tool function to search for a function event in an event list.
+         */
+        static boost::shared_ptr<FunctionEvent> SearchForFunctionInEvents(const std::vector < boost::shared_ptr<BaseEvent> > & events, const std::string & functionName);
+
+        /**
+         * Tool function to list function events in an event list.
+         */
+        static std::vector< boost::shared_ptr<FunctionEvent> > GetAllFunctionsInEvents(const std::vector < boost::shared_ptr<BaseEvent> > & events);
 
         static const std::string globalDeclaration;
 
     private:
         void Init(const FunctionEvent & event);
 
-        string name;
+        std::string name;
+        std::string objectsPassedAsArgument;
         vector < Instruction > conditions;
         vector < Instruction > actions;
         vector < BaseEventSPtr > events;
-        bool useCallerContext;
 
         bool nameSelected;
 };
+
 
 #endif // FUNCTIONEVENT_H
 

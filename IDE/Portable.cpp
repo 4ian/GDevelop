@@ -1,6 +1,7 @@
-#ifdef DEBUG
-#include "nommgr.h"
-#endif
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 
 //(*InternalHeaders(Portable)
 #include <wx/bitmap.h>
@@ -15,13 +16,11 @@
 #include <wx/log.h>
 #include "GDL/IDE/ResourcesMergingHelper.h"
 #include "GDL/ExternalEvents.h"
-#include "Portable.h"
 #include "GDL/Game.h"
+#include "GDL/Object.h"
+#include "GDL/Scene.h"
 #include "GDL/OpenSaveGame.h"
-
-#ifdef DEBUG
-
-#endif
+#include "Portable.h"
 
 using namespace std;
 

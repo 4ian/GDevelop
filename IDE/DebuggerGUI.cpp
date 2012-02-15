@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "DebuggerGUI.h"
 
 //(*InternalHeaders(DebuggerGUI)
@@ -9,23 +14,15 @@
 #include <wx/toolbar.h>
 #include <wx/image.h>
 #include <boost/weak_ptr.hpp>
+#include <wx/textdlg.h>
 #include "GDL/CommonTools.h"
-
-#ifdef ___WXMSW___
-#include <wx/msw/winundef.h>
-#endif
-
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
-#include "ConsoleManager.h"
-#include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDL/RuntimeGame.h"
-#include <wx/textdlg.h>
-
-#ifdef ___WXMSW___
-#include <wx/msw/winundef.h>
-#endif
+#include "GDL/Object.h"
+#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDL/IDE/Dialogs/ChooseLayer.h"
+#include "ConsoleManager.h"
 
 
 //(*IdInit(DebuggerGUI)

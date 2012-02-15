@@ -24,7 +24,7 @@
 #include "GDL/IDE/EventsEditorSelection.h"
 #include "GDL/IDE/EventsRenderingHelper.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Events/EventsCodeCompilationHelper.h"
+#include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/IDE/HelpFileAccess.h"
@@ -853,10 +853,14 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
 
         if ( evt == boost::shared_ptr<BaseEvent>() ) return;
 
-        evt->EditEvent(this, game, scene, mainEditorCommand);
-        evt->eventHeightNeedUpdate = true;
+        BaseEvent::EditEventReturnType returned = evt->EditEvent(this, game, scene, mainEditorCommand);
 
-        ChangesMadeOnEvents();
+        if (returned != BaseEvent::Cancelled)
+        {
+            evt->eventHeightNeedUpdate = true;
+            ChangesMadeOnEvents(true /*update history*/, returned==BaseEvent::ChangesMadeButNoNeedForEventsRecompilation /*Don't recompile events if it is not necessary*/);
+        }
+
     }
 }
 
@@ -1052,7 +1056,7 @@ void EventsEditor::DeleteSelection()
     ChangesMadeOnEvents();
 }
 
-void EventsEditor::ChangesMadeOnEvents(bool updateHistory)
+void EventsEditor::ChangesMadeOnEvents(bool updateHistory, bool noNeedForSceneRecompilation)
 {
     if ( updateHistory )
     {
@@ -1061,12 +1065,15 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory)
         latestState = CloneVectorOfEvents(*events);
     }
 
-    EventsRefactorer::NotifyChangesInEventsOfScene(game, scene);
-    if ( externalEvents != NULL ) EventsRefactorer::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
+    if ( !noNeedForSceneRecompilation )
+    {
+        EventsRefactorer::NotifyChangesInEventsOfScene(game, scene);
+        if ( externalEvents != NULL ) EventsRefactorer::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
 
-    scene.wasModified = true;
-    scene.eventsModified = true;
-    EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, scene);
+        scene.wasModified = true;
+        scene.eventsModified = true;
+        CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+    }
 }
 
 /**
@@ -1171,6 +1178,7 @@ void EventsEditor::AddEvent(EventItem & previousEventItem)
     BaseEventSPtr eventToAdd = GDpriv::ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Standard");
     if ( eventToAdd != boost::shared_ptr<BaseEvent>() )
     {
+        //Edit the event
         eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
 
         //Adding event
@@ -1223,7 +1231,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
     BaseEventSPtr eventToAdd = GDpriv::ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Comment");
     if ( eventToAdd != boost::shared_ptr<BaseEvent>() )
     {
-        eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
+        if ( eventToAdd->EditEvent(this, game, scene, mainEditorCommand) == BaseEvent::Cancelled ) return;
 
         //Adding event
         if ( previousEventItem.eventsList != NULL )
@@ -1294,7 +1302,7 @@ void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, EventItem & previ
     //Create event
     if ( !GDpriv::ExtensionsManager::GetInstance()->HasEventType(eventType) ) return;
     BaseEventSPtr eventToAdd = GDpriv::ExtensionsManager::GetInstance()->CreateEvent(eventType);
-    eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
+    if ( eventToAdd->EditEvent(this, game, scene, mainEditorCommand) == BaseEvent::Cancelled ) return;
 
     //Adding event
     if ( previousEventItem.eventsList != NULL )

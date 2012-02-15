@@ -1,5 +1,0 @@
-<?xml version="1.0" encoding="ISO-8859-1" ?>
-<News>
-	<Version Major="1" Minor="2" Build="8522" Revision="42867"/>
-	<Info Info="La version 1.2.8522 est disponible.&#x0A;&#x0A;-Correction des actions pour modifier le texte d'une variable globale et de la scène&#x0A;-Correction de l'insertion de la valeur d'une variable de la scène dans l'éditeur d'expression&#x0A;-Correction de l'action pour modifier le texte d'une variable d'un objet&#x0A;-Correction de la catégorie de la condition Souris sur objet&#x0A;-Correction de la condition Un groupe existe&#x0A;-Correction de l'expression de temps&#x0A;-Correction du non-affichage de l'image de chargement" Lien="http://www.compilgames.net/gddown.php?file=gd.exe"/>
-</News>

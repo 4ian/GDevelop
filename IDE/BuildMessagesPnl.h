@@ -23,7 +23,6 @@ class BuildMessagesPnl: public wxPanel
 		BuildMessagesPnl(wxWindow* parent, ProjectManager * projectManager);
 		virtual ~BuildMessagesPnl();
 
-		void RefreshWith(Game * game, std::vector < GDpriv::CompilerMessage > messages);
 		void OpenFileContainingFirstError();
 
         ProjectManager * projectManager; ///< Used to open files.
@@ -45,6 +44,18 @@ class BuildMessagesPnl: public wxPanel
 		void OnmessagesListItemActivated(wxListEvent& event);
 		void OnResize(wxSizeEvent& event);
 		//*)
+
+        /**
+         * Clear and add messages.
+         * \param game Game from which the messages have been emitted
+         * \param messages Messages to be displayed
+         */
+		void RefreshWith(Game * game, std::vector < GDpriv::CompilerMessage > messages);
+
+		/**
+		 * Called thanks to an event of type CodeCompiler::refreshEventType sent ( typically ) by CodeCompiler.
+		 */
+		void OnMustRefresh(wxCommandEvent&);
 
 		DECLARE_EVENT_TABLE()
 };

@@ -891,8 +891,6 @@
 		<Unit filename="MyStatusBar.h">
 			<Option virtualFolder="LIB MyStatusBar\" />
 		</Unit>
-		<Unit filename="NewCppFileDlg.cpp" />
-		<Unit filename="NewCppFileDlg.h" />
 		<Unit filename="ObjectTypeChoice.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur objets\" />
 		</Unit>
@@ -1106,7 +1104,6 @@
 					<wxPanel wxs="wxsmith/BuildMessagesPnl.wxs" src="BuildMessagesPnl.cpp" hdr="BuildMessagesPnl.h" fwddecl="0" i18n="1" name="BuildMessagesPnl" language="CPP" />
 					<wxPanel wxs="wxsmith/BuildProgressPnl.wxs" src="BuildProgressPnl.cpp" hdr="BuildProgressPnl.h" fwddecl="0" i18n="1" name="BuildProgressPnl" language="CPP" />
 					<wxPanel wxs="wxsmith/BuildToolsPnl.wxs" src="BuildToolsPnl.cpp" hdr="BuildToolsPnl.h" fwddecl="0" i18n="1" name="BuildToolsPnl" language="CPP" />
-					<wxDialog wxs="wxsmith/NewCppFileDlg.wxs" src="NewCppFileDlg.cpp" hdr="NewCppFileDlg.h" fwddecl="0" i18n="1" name="NewCppFileDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/ExtensionBugReportDlg.wxs" src="ExtensionBugReportDlg.cpp" hdr="ExtensionBugReportDlg.h" fwddecl="0" i18n="1" name="ExtensionBugReportDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/EventsEditor.wxs" src="EventsEditor.cpp" hdr="EventsEditor.h" fwddecl="0" i18n="1" name="EventsEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/AdvancedPasteDlg.wxs" src="AdvancedPasteDlg.cpp" hdr="AdvancedPasteDlg.h" fwddecl="0" i18n="1" name="AdvancedPasteDlg" language="CPP" />

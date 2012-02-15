@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef CREATETEMPLATE_H
 #define CREATETEMPLATE_H
 
@@ -13,6 +18,7 @@
 #include <wx/dialog.h>
 //*)
 #include "GDL/Game.h"
+#include "GDL/Event.h"
 #include <string>
 #include <vector>
 

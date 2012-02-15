@@ -22,7 +22,7 @@
 #include "EditObjectGroup.h"
 #include "Clipboard.h"
 #include "GDL/IDE/HelpFileAccess.h"
-#include "GDL/Events/EventsCodeCompilationHelper.h"
+#include "GDL/Events/CodeCompilationHelpers.h"
 #include "EventsRefactorer.h"
 
 #ifdef __WXMSW__
@@ -367,7 +367,7 @@ void EditorObjetsGroups::OnEditGroupSelected(wxCommandEvent& event)
             *i = dialog.group;
 
         scene.wasModified = true;
-        EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, scene);
+        CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
         return;
     }
 }
@@ -398,7 +398,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     ObjetsGroupsList->AppendItem( rootId, name );
 
     scene.wasModified = true;
-    EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, scene);
+    CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
     wxLogStatus( _( "Le groupe a été correctement ajouté" ) );
 }
 
@@ -443,7 +443,7 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
             }
 
             scene.wasModified = true;
-            EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, scene);
+            CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
             ObjetsGroupsList->Delete( itemSelected );
         }
     }
@@ -553,7 +553,7 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
             EventsRefactorer::RenameObjectInEvents(game, scene, scene.events, ancienNom, newName);
 
             scene.wasModified = true;
-            EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, scene);
+            CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
             return;
         }
     }
@@ -619,7 +619,7 @@ void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
     objectsGroups->erase( i );
 
     scene.wasModified = true;
-    EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, scene);
+    CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
     ObjetsGroupsList->Delete( itemSelected );
 }
 
@@ -645,5 +645,5 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
     ObjetsGroupsList->AppendItem( rootId, groupPasted.GetName());
 
     scene.wasModified = true;
-    EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(game, scene);
+    CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
 }

@@ -23,7 +23,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/LocaleManager.h"
 #include "GDL/IDE/ActionSentenceFormatter.h"
-#include "GDL/Events/EventsCodeCompilationHelper.h"
+#include "GDL/Events/CodeCompilationHelpers.h"
 #include <wx/listctrl.h>
 
 #include <string>

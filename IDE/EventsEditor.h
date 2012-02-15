@@ -98,8 +98,11 @@ class EventsEditor: public wxPanel
 
 		/**
 		 * Called when events are changed. Can be called from an external class such as SearchEvents dialog.
+		 *
+         * \param updateHistory true if history must be updated
+         * \param noNeedForSceneRecompilation set this to false if the changes does not imply that a scene events compilation must be made ( For example, when a comment is edited. )
 		 */
-		void ChangesMadeOnEvents(bool updateHistory = true);
+		void ChangesMadeOnEvents(bool updateHistory = true, bool noNeedForSceneRecompilation = false);
 
 		/**
 		 * Return a reference to the class used to manage selection.

@@ -12,6 +12,7 @@
 #include <wx/ribbon/toolbar.h>
 #include <wx/imaglist.h>
 #include <wx/busyinfo.h>
+#include <fstream>
 #include "Clipboard.h"
 #include "Game_Develop_EditorMain.h"
 #include "gdTreeItemGameData.h"
@@ -19,9 +20,8 @@
 #include "GDL/StandardEvent.h"
 #include "GDL/CommentEvent.h"
 #include "GDL/SourceFile.h"
-#include "GDL/Events/EventsCodeCompilationHelper.h"
+#include "GDL/Events/CodeCompilationHelpers.h"
 #include "CodeEditor.h"
-#include "NewCppFileDlg.h"
 #include "Extensions.h"
 #include "ExternalEventsEditor.h"
 #include "EditPropJeu.h"
@@ -371,20 +371,19 @@ void ProjectManager::Refresh()
             projectsTree->AppendItem(eventsItem, mainEditor.games[i]->externalEvents[j]->GetName(), 4 ,4, eventsItemData);
         }
 
-        #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
         if ( mainEditor.games[i]->useExternalSourceFiles )
         {
             gdTreeItemGameData * sourceFilesItemData = new gdTreeItemGameData("SourceFiles", "", mainEditor.games[i].get());
             wxTreeItemId sourceFilesItem = projectsTree->AppendItem(projectItem, _("Fichiers sources C++"), 5 ,5, sourceFilesItemData);
             for (unsigned int j = 0;j<mainEditor.games[i]->externalSourceFiles.size();++j)
             {
+                if ( mainEditor.games[i]->externalSourceFiles[j]->IsGDManaged() )
+                    continue;
+
                 gdTreeItemGameData * sourceFileItem = new gdTreeItemGameData("SourceFile", mainEditor.games[i]->externalSourceFiles[j]->GetFileName(), mainEditor.games[i].get());
-                wxFileName relativeFileName = wxFileName(mainEditor.games[i]->externalSourceFiles[j]->GetFileName());
-                relativeFileName.MakeRelativeTo(wxFileName(mainEditor.games[i]->gameFile).GetPath());
-                projectsTree->AppendItem(sourceFilesItem, relativeFileName.GetFullPath(), 5 ,5, sourceFileItem);
+                projectsTree->AppendItem(sourceFilesItem, mainEditor.games[i]->externalSourceFiles[j]->GetFileName(), 5 ,5, sourceFileItem);
             }
         }
-        #endif
 
         //Extensions
         gdTreeItemGameData * extensionsItemData = new gdTreeItemGameData("Extensions", "", mainEditor.games[i].get());
@@ -537,7 +536,10 @@ void ProjectManager::OnEditSourceFileSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    EditSourceFile(game, data->GetSecondString());
+    wxFileName filename(data->GetSecondString());
+    filename.MakeAbsolute(wxFileName::FileName(game->gameFile).GetPath());
+
+    EditSourceFile(game, ToString(filename.GetFullPath()));
 }
 
 void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t line)
@@ -1536,21 +1538,27 @@ void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    NewCppFileDlg dialog(this, *game);
+    wxFileDialog dialog( this, _( "Choisissez un nom de fichier" ), "", "", "Source C++ (*.cpp)|*.cpp|Header C++ (*.h)|*.h", wxFD_SAVE|wxFD_OVERWRITE_PROMPT );
+    if ( dialog.ShowModal() == wxID_CANCEL )
+        return;
 
-    if ( dialog.ShowModal() == 1 )
-    {
-        for (unsigned int i = 0;i<dialog.createdFiles.size();++i)
-        {
-            boost::shared_ptr<SourceFile> sourceFile(new SourceFile);
-            sourceFile->SetFileName(dialog.createdFiles[i]);
+    //Creating an empty file
+    std::ofstream file;
+    file.open ( ToString(dialog.GetPath()).c_str() );
+    file << "\n";
+    file.close();
 
-            vector< boost::shared_ptr<SourceFile> >::iterator alreadyExistingSourceFile =
-                find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), dialog.createdFiles[i]));
+    //Adding it to the game source files.
+    boost::shared_ptr<SourceFile> sourceFile(new SourceFile);
 
-            if ( alreadyExistingSourceFile == game->externalSourceFiles.end() )
-                game->externalSourceFiles.push_back(sourceFile);
-        }
-        Refresh();
-    }
+    wxFileName filename(dialog.GetPath()); //Files are added with their paths relative to the project directory
+    filename.MakeRelativeTo(wxFileName::FileName(game->gameFile).GetPath());
+    sourceFile->SetFileName(ToString(filename.GetFullPath()));
+
+    vector< boost::shared_ptr<SourceFile> >::iterator alreadyExistingSourceFile =
+        find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), ToString(filename.GetFullPath())));
+
+    if ( alreadyExistingSourceFile == game->externalSourceFiles.end() )
+        game->externalSourceFiles.push_back(sourceFile);
+    Refresh();
 }

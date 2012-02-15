@@ -9,7 +9,6 @@
 #include "GDL/OpenSaveGame.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Game.h"
-#include "GDL/DynamicExtensionsManager.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
 #include "GDL/IDE/CodeCompiler.h"
 #include "GDL/CommonTools.h"

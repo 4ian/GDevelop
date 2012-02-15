@@ -11,6 +11,8 @@
 //*)
 #include "GDL/Game.h"
 #include "GDL/CommonTools.h"
+#include "GDL/IDE/CodeCompiler.h"
+#include "GDL/IDE/CompilerMessagesParser.h"
 #include "ProjectManager.h"
 
 using namespace GDpriv;
@@ -22,6 +24,7 @@ const long BuildMessagesPnl::ID_LISTCTRL1 = wxNewId();
 BEGIN_EVENT_TABLE(BuildMessagesPnl,wxPanel)
     //(*EventTable(BuildMessagesPnl)
     //*)
+	EVT_COMMAND(wxID_ANY, CodeCompiler::refreshEventType, BuildMessagesPnl::OnMustRefresh)
 END_EVENT_TABLE()
 
 BuildMessagesPnl::BuildMessagesPnl(wxWindow* parent, ProjectManager * projectManager_) :
@@ -47,13 +50,22 @@ BuildMessagesPnl::BuildMessagesPnl(wxWindow* parent, ProjectManager * projectMan
 
     messagesList->InsertColumn(0, _("Fichier"));
     messagesList->InsertColumn(1, _("Ligne"));
-    messagesList->InsertColumn(2, _("Message"));
+    messagesList->InsertColumn(2, _("Colonne"));
+    messagesList->InsertColumn(3, _("Message"));
 }
 
 BuildMessagesPnl::~BuildMessagesPnl()
 {
     //(*Destroy(BuildMessagesPnl)
     //*)
+}
+
+void BuildMessagesPnl::OnMustRefresh(wxCommandEvent&)
+{
+    CompilerMessagesParser parser;
+    parser.ParseOutput(CodeCompiler::GetInstance()->GetLastTaskMessages());
+
+    RefreshWith(NULL, parser.parsedMessages);
 }
 
 void BuildMessagesPnl::RefreshWith(Game * game, std::vector < CompilerMessage > messages)
@@ -65,7 +77,8 @@ void BuildMessagesPnl::RefreshWith(Game * game, std::vector < CompilerMessage > 
     {
         messagesList->InsertItem(i, messages[i].file);
         messagesList->SetItem(i, 1, messages[i].line != std::string::npos ? ToString(messages[i].line) : "");
-        messagesList->SetItem(i, 2, messages[i].message);
+        messagesList->SetItem(i, 2, messages[i].column != std::string::npos ? ToString(messages[i].column) : "");
+        messagesList->SetItem(i, 3, messages[i].message);
 
         if ( messages[i].messageType == CompilerMessage::error)
             messagesList->SetItemTextColour(i, *wxRED);
@@ -85,7 +98,7 @@ void BuildMessagesPnl::OpenFileContainingFirstError()
 
     messagesList->GetItem( row_info );
     size_t line = row_info.m_text.empty() ? std::string::npos : ToInt(string(row_info.m_text.mb_str()));
-    std::string file = string(messagesList->GetItemText(0).mb_str());
+    std::string file = ToString(messagesList->GetItemText(0));
 
     if ( projectManager && wxFileExists(file) ) projectManager->EditSourceFile(gameAssociatedWithErrors, file, line);
 }
@@ -108,5 +121,7 @@ void BuildMessagesPnl::OnmessagesListItemActivated(wxListEvent& event)
 void BuildMessagesPnl::OnResize(wxSizeEvent& event)
 {
     messagesList->SetSize(event.GetSize());
-    messagesList->SetColumnWidth(2, messagesList->GetSize().GetWidth()-messagesList->GetColumnWidth(0)-messagesList->GetColumnWidth(1));
+    messagesList->SetColumnWidth(1, 40);
+    messagesList->SetColumnWidth(2, 35);
+    messagesList->SetColumnWidth(3, messagesList->GetSize().GetWidth()-messagesList->GetColumnWidth(0)-messagesList->GetColumnWidth(1)-messagesList->GetColumnWidth(2));
 }

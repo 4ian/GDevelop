@@ -41,6 +41,7 @@ BuildToolsPnl::BuildToolsPnl(wxWindow* parent, ProjectManager * projectManager)
     notebook->AddPage(buildMessagesPnl, _("Messages de compilation"));
 
     CodeCompiler::GetInstance()->AddNotifiedControl(buildProgressPnl);
+    CodeCompiler::GetInstance()->AddNotifiedControl(buildMessagesPnl);
 }
 
 BuildToolsPnl::~BuildToolsPnl()

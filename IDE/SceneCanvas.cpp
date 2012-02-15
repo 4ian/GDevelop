@@ -30,9 +30,8 @@
 #include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
-#include "GDL/DynamicExtensionsManager.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
-#include "GDL/Events/EventsCodeCompilationHelper.h"
+#include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/CodeExecutionEngine.h"
 #include "GDL/SoundManager.h"
 #include "BuildMessagesPnl.h"
@@ -697,7 +696,7 @@ void SceneCanvas::ReloadFirstPart()
     //Useful when opening a scene for the first time for example.
     if ( sceneEdited.eventsModified && !CodeCompiler::GetInstance()->HasTaskRelatedTo(sceneEdited) )
     {
-        EventsCodeCompilationHelper::CreateSceneEventsCompilationTask(gameEdited, sceneEdited);
+        CodeCompilationHelpers::CreateSceneEventsCompilationTask(gameEdited, sceneEdited);
 
         if ( !edittimeRenderer.editing )
             mainEditorCommand.GetInfoBar()->ShowMessage(_("Les modifications apportées aux évènements seront prises en compte lors du retour au mode édition."));

@@ -20,6 +20,8 @@
 
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
+#include "GDL/Object.h"
+#include "GDL/Scene.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/ExternalEvents.h"
 

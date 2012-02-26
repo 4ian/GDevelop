@@ -93,6 +93,7 @@ std::string FunctionEvent::GenerateEventCode(Game & game, Scene & scene, EventsC
     std::string actionsCode = codeGenerator.GenerateActionsListCode(game, scene, actions, context);
     std::string subeventsCode = codeGenerator.GenerateEventsListCode(game, scene, events, context);
 
+    functionCode += context.GenerateObjectsDeclarationCode();
     std::string ifPredicat = "true";
     for (unsigned int i = 0;i<conditions.size();++i)
         ifPredicat += " && condition"+ToString(i)+"IsTrue";

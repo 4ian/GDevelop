@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Box 3D Extension
-Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -32,14 +32,14 @@ freely, subject to the following restrictions:
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
 #include "GDL/RotatedRectangle.h"
-#include "GDL/tinyxml.h"
-#include "GDL/ArbitraryResourceWorker.h"
+#include "GDL/tinyxml/tinyxml.h"
+#include "GDL/IDE/ArbitraryResourceWorker.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/bitmap.h>
 #include <wx/panel.h>
 #include "GDL/CommonTools.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 #include "Box3DObjectEditor.h"
 #include "Box3DInitialPositionPanel.h"
 #endif

@@ -32,8 +32,8 @@ freely, subject to the following restrictions:
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/ExpressionsCodeGeneration.h"
-#include "GDL/EventsRenderingHelper.h"
+#include "GDL/Events/ExpressionsCodeGeneration.h"
+#include "GDL/IDE/EventsRenderingHelper.h"
 #include "GDL/IDE/EventsEditorItemsAreas.h"
 #include "GDL/IDE/EventsEditorSelection.h"
 #include "TimedEventEditorDlg.h"
@@ -49,7 +49,7 @@ TimedEvent::~TimedEvent()
 {
 }
 
-std::string TimedEvent::GenerateEventCode(const Game & game, const Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+std::string TimedEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
 {
     codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
 
@@ -68,7 +68,7 @@ std::string TimedEvent::GenerateEventCode(const Game & game, const Scene & scene
     if (!parser.ParseMathExpression(game, scene, callbacks) || timeOutCode.empty()) timeOutCode = "0";
 
     //Prepare name
-    std::string codeName = !name.empty() ? "GDNamedTimedEvent_"+name : "GDTimedEvent_"+ToString(this);
+    std::string codeName = !name.empty() ? "GDNamedTimedEvent_"+EventsCodeGenerator::ConvertToCppString(name) : "GDTimedEvent_"+ToString(this);
 
     std::string outputCode;
 
@@ -241,10 +241,12 @@ unsigned int TimedEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-void TimedEvent::EditEvent(wxWindow* parent, Game & game, Scene & scene, MainEditorCommand & mainEditorCommand)
+BaseEvent::EditEventReturnType TimedEvent::EditEvent(wxWindow* parent, Game & game, Scene & scene, MainEditorCommand & mainEditorCommand)
 {
     TimedEventEditorDlg dialog(parent, *this, game, scene);
-    dialog.ShowModal();
+    if ( dialog.ShowModal() == 0 ) return Cancelled;
+
+    return ChangesMade;
 }
 
 /**

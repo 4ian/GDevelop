@@ -74,7 +74,20 @@ class Extension : public ExtensionBase
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
                 instrInfo.AddParameter("", _("Nom"), "", false);
 
-                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::TimedEvents::Reset").SetIncludeFile("TimedEvent/TimedEventTools.h");
+            class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
+            {
+                virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+                {
+                    codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
+
+                    std::string codeName = "GDNamedTimedEvent_"+EventsCodeGenerator::ConvertToCppString(instruction.GetParameterSafely(0).GetPlainString());
+                    return "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
+
+                    return "";
+                };
+            };
+            InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
             DECLARE_END_ACTION()
 
@@ -94,20 +107,26 @@ class Extension : public ExtensionBase
                 {
                     codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
 
-                    for (unsigned int i = 0;TimedEvent::codeGenerationCurrentParents.size();++i)
+                    for (unsigned int i = 0;i<TimedEvent::codeGenerationCurrentParents.size();++i)
                     {
+                        if ( TimedEvent::codeGenerationCurrentParents[i] == NULL )
+                        {
+                            std::cout << "WARNING : NULL timed event in codeGenerationCurrentParents";
+                            continue;
+                        }
+
                         if (TimedEvent::codeGenerationCurrentParents[i]->GetName() == instruction.GetParameterSafely(0).GetPlainString())
                         {
                             TimedEvent & timedEvent = *TimedEvent::codeGenerationCurrentParents[i];
 
                             std::string code;
                             {
-                                std::string codeName = !timedEvent.GetName().empty() ? "GDNamedTimedEvent_"+timedEvent.GetName() : "GDTimedEvent_"+ToString(&timedEvent);
+                                std::string codeName = !timedEvent.GetName().empty() ? "GDNamedTimedEvent_"+EventsCodeGenerator::ConvertToCppString(timedEvent.GetName()) : "GDTimedEvent_"+ToString(&timedEvent);
                                 code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
                             }
                             for (unsigned int j = 0;j<timedEvent.codeGenerationChildren.size();++j)
                             {
-                                std::string codeName = !timedEvent.codeGenerationChildren[j]->GetName().empty() ? "GDNamedTimedEvent_"+timedEvent.codeGenerationChildren[j]->GetName() : "GDTimedEvent_"+ToString(timedEvent.codeGenerationChildren[j]);
+                                std::string codeName = !timedEvent.codeGenerationChildren[j]->GetName().empty() ? "GDNamedTimedEvent_"+EventsCodeGenerator::ConvertToCppString(timedEvent.codeGenerationChildren[j]->GetName()) : "GDTimedEvent_"+ToString(timedEvent.codeGenerationChildren[j]);
                                 code += "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
                             }
                             return code;
@@ -141,7 +160,13 @@ class Extension : public ExtensionBase
             {
                 if ( propertyNb == i )
                 {
-                    name = iter->first.empty() ? ToString(_("Sans nom")) : iter->first;
+                    name = iter->first;
+                    //Unmangle name
+                    if ( name.find("GDNamedTimedEvent_") == 0 && name.length() > 18 )
+                        name = name.substr(18, name.length());
+                    else
+                        name = _("Sans nom");
+
                     value = ToString(static_cast<double>(iter->second.GetTime())/1000.0)+"s";
 
                     return;

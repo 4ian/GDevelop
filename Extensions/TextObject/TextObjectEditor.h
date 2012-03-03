@@ -35,6 +35,7 @@ freely, subject to the following restrictions:
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/spinctrl.h>
+#include <wx/tglbtn.h>
 #include <wx/statline.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -50,24 +51,34 @@ class TextObjectEditor: public wxDialog
 		TextObjectEditor( wxWindow* parent, Game & game_, TextObject & object_, MainEditorCommand & mainEditorCommand_ );
 		virtual ~TextObjectEditor();
 
+		void AdaptFontColor(wxButton *button);
+
 		//(*Declarations(TextObjectEditor)
 		wxSpinCtrl* sizeEdit;
 		wxStaticText* StaticText2;
 		wxTextCtrl* textEdit;
 		wxStaticText* StaticText1;
+		wxToggleButton* underlineToggleButton;
+		wxStaticText* StaticText3;
 		wxButton* fontBt;
 		wxButton* colorBt;
 		wxStaticLine* StaticLine1;
+		wxToggleButton* boldToggleButton;
 		wxCheckBox* smoothCheck;
 		wxTextCtrl* fontEdit;
 		wxStaticText* StaticText4;
 		wxButton* okBt;
+		wxToggleButton* italicToggleButton;
 		//*)
 
 	protected:
 
 		//(*Identifiers(TextObjectEditor)
 		static const long ID_TEXTCTRL1;
+		static const long ID_STATICTEXT3;
+		static const long ID_TOGGLEBUTTON1;
+		static const long ID_TOGGLEBUTTON2;
+		static const long ID_TOGGLEBUTTON3;
 		static const long ID_STATICTEXT1;
 		static const long ID_BUTTON3;
 		static const long ID_STATICTEXT2;

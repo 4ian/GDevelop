@@ -37,7 +37,6 @@ freely, subject to the following restrictions:
 #include "TextObject.h"
 
 #if defined(GD_IDE_ONLY)
-#include <wx/wx.h>
 #include "GDL/IDE/ArbitraryResourceWorker.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "TextObjectEditor.h"
@@ -109,6 +108,19 @@ void TextObject::LoadFromXml(const TiXmlElement * elem)
         SetColor(r,g,b);
     }
 
+    if ( elem->FirstChildElement( "Style" ) == NULL ||
+         elem->FirstChildElement( "Style" )->Attribute("value") == NULL )
+    {
+        cout << "Les informations concernant le style du texte manquent.";
+    }
+    else
+    {
+        int style = 0;
+        elem->FirstChildElement("Style")->QueryIntAttribute("value", &style);
+
+        SetFontStyle(style);
+    }
+
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("smoothed", smoothed);
     SetSmooth(smoothed);
 }
@@ -133,6 +145,10 @@ void TextObject::SaveToXml(TiXmlElement * elem)
     color->SetAttribute("r", GetColorR());
     color->SetAttribute("g", GetColorG());
     color->SetAttribute("b", GetColorB());
+
+    TiXmlElement * style = new TiXmlElement( "Style" );
+    style->SetAttribute("value", GetFontStyle());
+    elem->LinkEndChild( style );
 
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("smoothed", smoothed);
 }
@@ -373,6 +389,57 @@ void TextObject::SetFont(const std::string & fontName_)
 
     text.SetFont(*FontManager::GetInstance()->GetFont(fontName_));
     text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2);
+}
+
+void TextObject::SetFontStyle(int style)
+{
+    text.SetStyle(style);
+}
+
+int TextObject::GetFontStyle()
+{
+    return text.GetStyle();
+}
+
+bool TextObject::HasFontStyle(sf::Text::Style style)
+{
+    return (text.GetStyle() & style) != 0;
+}
+
+bool TextObject::IsBold()
+{
+    return HasFontStyle(sf::Text::Bold);
+}
+
+void TextObject::SetBold(bool bold)
+{
+    SetFontStyle((bold ? sf::Text::Bold : 0) |
+                 (IsItalic() ? sf::Text::Italic : 0) |
+                 (IsUnderlined() ? sf::Text::Underlined : 0) );
+}
+
+bool TextObject::IsItalic()
+{
+    return HasFontStyle(sf::Text::Italic);
+}
+
+void TextObject::SetItalic(bool italic)
+{
+    SetFontStyle((IsBold() ? sf::Text::Bold : 0) |
+                 (italic ? sf::Text::Italic : 0) |
+                 (IsUnderlined() ? sf::Text::Underlined : 0) );
+}
+
+bool TextObject::IsUnderlined()
+{
+    return HasFontStyle(sf::Text::Underlined);
+}
+
+void TextObject::SetUnderlined(bool underlined)
+{
+    SetFontStyle((IsBold() ? sf::Text::Bold : 0) |
+                 (IsItalic() ? sf::Text::Italic : 0) |
+                 (underlined ? sf::Text::Underlined : 0) );
 }
 
 void TextObject::SetSmooth(bool smooth)

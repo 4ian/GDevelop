@@ -23,6 +23,10 @@ freely, subject to the following restrictions:
     distribution.
 
 */
+/**
+ * Contributors to the extension:
+ * Victor Levasseur ( Bold/Italic/Underlined styles )
+ */
 
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
@@ -221,6 +225,93 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("object", _("Objet"), "Text", false);
 
                     instrInfo.cppCallingInformation.SetFunctionName("IsSmoothed").SetIncludeFile("TextObject/TextObject.h");
+
+                DECLARE_END_OBJECT_CONDITION()
+
+                DECLARE_OBJECT_ACTION("SetBold",
+                               _("Gras"),
+                               _("Met ou non le texte en gras."),
+                               _("Mettre en gras _PARAM0_ : _PARAM1_"),
+                               _("Style"),
+                               "res/actions/bold.png",
+                               "res/actions/bold16.png");
+
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("yesorno", _("Mettre en gras"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetBold").SetIncludeFile("TextObject/TextObject.h");
+
+                DECLARE_END_OBJECT_ACTION()
+
+                DECLARE_OBJECT_CONDITION("IsBold",
+                               _("Gras"),
+                               _("Teste si un objet texte est en gras."),
+                               _("_PARAM0_ est en gras"),
+                               _("Style"),
+                               "res/conditions/bold.png",
+                               "res/conditions/bold16.png");
+
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("IsBold").SetIncludeFile("TextObject/TextObject.h");
+
+                DECLARE_END_OBJECT_CONDITION()
+
+                DECLARE_OBJECT_ACTION("SetItalic",
+                               _("Italique"),
+                               _("Met ou non le texte en italique."),
+                               _("Mettre en italique _PARAM0_ : _PARAM1_"),
+                               _("Style"),
+                               "res/actions/italic.png",
+                               "res/actions/italic16.png");
+
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("yesorno", _("Mettre en italique"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetItalic").SetIncludeFile("TextObject/TextObject.h");
+
+                DECLARE_END_OBJECT_ACTION()
+
+                DECLARE_OBJECT_CONDITION("IsItalic",
+                               _("Italique"),
+                               _("Teste si un objet texte est en italique."),
+                               _("_PARAM0_ est en italique"),
+                               _("Style"),
+                               "res/conditions/italic.png",
+                               "res/conditions/italic16.png");
+
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("IsItalic").SetIncludeFile("TextObject/TextObject.h");
+
+                DECLARE_END_OBJECT_CONDITION()
+
+                DECLARE_OBJECT_ACTION("SetUnderlined",
+                               _("Souligné"),
+                               _("Souligne ou non le texte."),
+                               _("Souligner _PARAM0_ : _PARAM1_"),
+                               _("Style"),
+                               "res/actions/underline.png",
+                               "res/actions/underline16.png");
+
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+                    instrInfo.AddParameter("yesorno", _("Souligner"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetUnderlined").SetIncludeFile("TextObject/TextObject.h");
+
+                DECLARE_END_OBJECT_ACTION()
+
+                DECLARE_OBJECT_CONDITION("IsUnderlined",
+                               _("Souligné"),
+                               _("Teste si un objet texte est souligné."),
+                               _("_PARAM0_ est souligné"),
+                               _("Style"),
+                               "res/conditions/underline.png",
+                               "res/conditions/underline16.png");
+
+                    instrInfo.AddParameter("object", _("Objet"), "Text", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("IsUnderlined").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 

@@ -29,6 +29,7 @@ freely, subject to the following restrictions:
 #include "TextObjectEditor.h"
 
 //(*InternalHeaders(TextObjectEditor)
+#include <wx/font.h>
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
@@ -36,11 +37,15 @@ freely, subject to the following restrictions:
 #include <wx/filedlg.h>
 
 #include "GDL/Game.h"
-#include "TextObject.h"
 #include "GDL/IDE/MainEditorCommand.h"
+#include "TextObject.h"
 
 //(*IdInit(TextObjectEditor)
 const long TextObjectEditor::ID_TEXTCTRL1 = wxNewId();
+const long TextObjectEditor::ID_STATICTEXT3 = wxNewId();
+const long TextObjectEditor::ID_TOGGLEBUTTON1 = wxNewId();
+const long TextObjectEditor::ID_TOGGLEBUTTON2 = wxNewId();
+const long TextObjectEditor::ID_TOGGLEBUTTON3 = wxNewId();
 const long TextObjectEditor::ID_STATICTEXT1 = wxNewId();
 const long TextObjectEditor::ID_BUTTON3 = wxNewId();
 const long TextObjectEditor::ID_STATICTEXT2 = wxNewId();
@@ -69,6 +74,7 @@ object(object_)
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer2;
+	wxGridSizer* GridSizer1;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
@@ -77,22 +83,38 @@ object(object_)
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Texte"));
-	textEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(332,173), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	textEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(332,142), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	StaticBoxSizer1->Add(textEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Autres propriétés"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer3->AddGrowableCol(1);
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Style :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	FlexGridSizer3->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	GridSizer1 = new wxGridSizer(1, 3, 0, 0);
+	boldToggleButton = new wxToggleButton(this, ID_TOGGLEBUTTON1, _("Gras"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON1"));
+	wxFont boldToggleButtonFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	boldToggleButton->SetFont(boldToggleButtonFont);
+	GridSizer1->Add(boldToggleButton, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	italicToggleButton = new wxToggleButton(this, ID_TOGGLEBUTTON2, _("Italique"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON2"));
+	wxFont italicToggleButtonFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	italicToggleButton->SetFont(italicToggleButtonFont);
+	GridSizer1->Add(italicToggleButton, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	underlineToggleButton = new wxToggleButton(this, ID_TOGGLEBUTTON3, _("Souligné"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON3"));
+	wxFont underlineToggleButtonFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,true,wxEmptyString,wxFONTENCODING_DEFAULT);
+	underlineToggleButton->SetFont(underlineToggleButtonFont);
+	GridSizer1->Add(underlineToggleButton, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Couleur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	colorBt = new wxButton(this, ID_BUTTON3, _("Choisir la couleur"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer3->Add(colorBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Police :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer4->AddGrowableCol(1);
+	FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
+	FlexGridSizer4->AddGrowableCol(0);
 	fontEdit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(75,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
-	FlexGridSizer4->Add(fontEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(fontEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	fontBt = new wxButton(this, ID_BUTTON4, _("Choisir la police"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer4->Add(fontBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -131,12 +153,26 @@ object(object_)
 	sizeEdit->SetValue(object.GetCharacterSize());
 	colorBt->SetBackgroundColour(wxColour(object.GetColorR(), object.GetColorG(), object.GetColorB()));
 	smoothCheck->SetValue(object.IsSmoothed());
+
+	boldToggleButton->SetValue(object.HasFontStyle(sf::Text::Bold));
+	italicToggleButton->SetValue(object.HasFontStyle(sf::Text::Italic));
+	underlineToggleButton->SetValue(object.HasFontStyle(sf::Text::Underlined));
 }
 
 TextObjectEditor::~TextObjectEditor()
 {
 	//(*Destroy(TextObjectEditor)
 	//*)
+}
+
+void TextObjectEditor::AdaptFontColor(wxButton *button)
+{
+    wxColor color = button->GetBackgroundColour();
+
+    if(color.Red() < 140 && color.Green() < 140 && color.Blue() < 140)
+        button->SetForegroundColour(wxColour(255, 255, 255));
+    else
+        button->SetForegroundColour(wxColour(0, 0, 0));
 }
 
 
@@ -148,6 +184,10 @@ void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
     object.SetSmooth(smoothCheck->GetValue());
     object.SetColor(static_cast<int>(colorBt->GetBackgroundColour().Red()), static_cast<int>(colorBt->GetBackgroundColour().Green()), static_cast<int>(colorBt->GetBackgroundColour().Blue()));
 
+    object.SetFontStyle((boldToggleButton->GetValue() ? sf::Text::Bold : 0) |
+                        (italicToggleButton->GetValue() ? sf::Text::Italic : 0) |
+                        (underlineToggleButton->GetValue() ? sf::Text::Underlined : 0) );
+
     EndModal(1);
 }
 
@@ -156,6 +196,8 @@ void TextObjectEditor::OncolorBtClick(wxCommandEvent& event)
     wxColour color = wxGetColourFromUser(this, colorBt->GetBackgroundColour());
     if ( color.IsOk() )
         colorBt->SetBackgroundColour(color);
+
+    AdaptFontColor(colorBt);
 
     return;
 }

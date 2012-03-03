@@ -320,8 +320,6 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -340,7 +338,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
@@ -364,8 +362,6 @@
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -385,7 +381,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
@@ -408,8 +404,6 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
@@ -428,7 +422,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
@@ -448,8 +442,6 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
 					<Add option="-DSFML_DYNAMIC" />
-					
-					
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -468,7 +460,7 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
@@ -488,8 +480,8 @@
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="../../ExtLibs/boost" />
-					<Add directory="../../ExtLibs/SFML/include" />
+					<Add directory="..\..\ExtLibs\boost" />
+					<Add directory="..\..\ExtLibs\SFML\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -500,11 +492,11 @@
 					<Add option="-lsfml-system" />
 					<Add option="-framework OpenGL" />
 					<Add option="-dynamiclib" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\release" />
-					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/release/TextObject.xgdm" />
@@ -528,8 +520,8 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DMAC" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add directory="../../ExtLibs/boost" />
-					<Add directory="../../ExtLibs/SFML/include" />
+					<Add directory="..\..\ExtLibs\boost" />
+					<Add directory="..\..\ExtLibs\SFML\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -541,11 +533,11 @@
 					<Add option="-lsfml-system-d" />
 					<Add option="-framework OpenGL" />
 					<Add option="-dynamiclib" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libGLEW.a" />
-					<Add library="../../ExtLibs/SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
 					<Add directory="..\..\Runtime\bin\debug" />
-					<Add directory="../../ExtLibs/SFML/build-mac/lib" />
+					<Add directory="..\..\ExtLibs\SFML\build-mac\lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../../Runtime/bin/debug/TextObject.xgdm" />

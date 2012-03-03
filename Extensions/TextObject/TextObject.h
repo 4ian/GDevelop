@@ -114,6 +114,17 @@ class GD_EXTENSION_API TextObject : public Object
         inline unsigned int GetColorB() const { return colorB; };
         void SetColor(const std::string & colorStr);
 
+        void SetFontStyle(int style);
+        int GetFontStyle();
+        bool HasFontStyle(sf::Text::Style style);
+
+        bool IsBold();
+        void SetBold(bool bold);
+        bool IsItalic();
+        void SetItalic(bool italic);
+        bool IsUnderlined();
+        void SetUnderlined(bool underlined);
+
         void SetSmooth(bool smooth);
         bool IsSmoothed() const {return smoothed;};
 

@@ -8870,7 +8870,7 @@
 1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
 	"GDL/btScalar.h"
 
-1326232805 source:d:\florian\programmation\gamedevelop2\extensions\textobject\textobject.cpp
+1327230337 source:d:\florian\programmation\gamedevelop2\extensions\textobject\textobject.cpp
 	<SFML/Graphics.hpp>
 	"GDL/Object.h"
 	"GDL/ImageManager.h"
@@ -8881,7 +8881,6 @@
 	"GDL/CommonTools.h"
 	"GDL/XmlMacros.h"
 	"TextObject.h"
-	<wx/wx.h>
 	"GDL/IDE/ArbitraryResourceWorker.h"
 	"GDL/IDE/MainEditorCommand.h"
 	"TextObjectEditor.h"
@@ -9156,7 +9155,7 @@
 	<SFML/Graphics/Rect.hpp>
 	<string>
 
-1326144422 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
+1328304139 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
 	"GDL/Force.h"
 	<string>
 	<vector>
@@ -12217,7 +12216,7 @@
 
 1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\force.h
 
-1326058787 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
+1329063111 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
 	<boost/weak_ptr.hpp>
 	<iostream>
 	<vector>
@@ -15692,26 +15691,25 @@
 1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1322924408 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
-	"GDL/Game.h"
-	<SFML/System.hpp>
-	<SFML/Graphics.hpp>
-	<SFML/OpenGL.hpp>
-	<boost/shared_ptr.hpp>
+1329066373 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
 	<iostream>
 	<vector>
 	<string>
+	<boost/shared_ptr.hpp>
+	<boost/weak_ptr.hpp>
+	<SFML/System.hpp>
+	<SFML/Graphics.hpp>
+	<SFML/OpenGL.hpp>
 
-1326144572 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
+1329065784 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
-	"GDL/Scene.h"
 	"GDL/VariableList.h"
 	"GDL/LoadingScreen.h"
 	"GDL/ResourcesManager.h"
 
-1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
+1328891436 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
 	"GDL/Event.h"
 	<vector>
 	<map>
@@ -15728,11 +15726,12 @@
 	<set>
 	<utility>
 
-1325335071 d:\florian\programmation\gamedevelop2\gdl\gdl\position.h
+1328736380 d:\florian\programmation\gamedevelop2\gdl\gdl\position.h
 	<string>
 	<map>
+	"GDL/VariableList.h"
 
-1325335072 d:\florian\programmation\gamedevelop2\gdl\gdl\layer.h
+1327355525 d:\florian\programmation\gamedevelop2\gdl\gdl\layer.h
 	<string>
 	<vector>
 	<SFML/Graphics.hpp>
@@ -15784,7 +15783,7 @@
 	<string>
 	<vector>
 
-1325278123 d:\florian\programmation\gamedevelop2\extensions\textobject\textobject.h
+1327230337 d:\florian\programmation\gamedevelop2\extensions\textobject\textobject.h
 	"GDL/Object.h"
 	"GDL/ResourceWrapper.h"
 	<SFML/Graphics/Text.hpp>
@@ -15844,12 +15843,13 @@
 	"wx/pen.h"
 	"wx/bitmap.h"
 
-1325278123 d:\florian\programmation\gamedevelop2\extensions\textobject\textobjecteditor.h
+1327230162 d:\florian\programmation\gamedevelop2\extensions\textobject\textobjecteditor.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
 	<wx/checkbox.h>
 	<wx/spinctrl.h>
+	<wx/tglbtn.h>
 	<wx/statline.h>
 	<wx/button.h>
 	<wx/dialog.h>
@@ -15955,15 +15955,16 @@
 
 1307986701 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\statline.h
 
-1326058492 source:d:\florian\programmation\gamedevelop2\extensions\textobject\textobjecteditor.cpp
+1327230337 source:d:\florian\programmation\gamedevelop2\extensions\textobject\textobjecteditor.cpp
 	"TextObjectEditor.h"
+	<wx/font.h>
 	<wx/intl.h>
 	<wx/string.h>
 	<wx/colordlg.h>
 	<wx/filedlg.h>
 	"GDL/Game.h"
-	"TextObject.h"
 	"GDL/IDE/MainEditorCommand.h"
+	"TextObject.h"
 
 1307986706 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\colordlg.h
 	"wx/defs.h"
@@ -15994,7 +15995,7 @@
 	"wx/gdicmn.h"
 	"wx/dialog.h"
 
-1325278123 source:d:\florian\programmation\gamedevelop2\extensions\textobject\extension.cpp
+1327230337 source:d:\florian\programmation\gamedevelop2\extensions\textobject\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"TextObject.h"
@@ -16010,7 +16011,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1326316528 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1329345695 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299112181 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 
@@ -16110,4 +16111,39 @@
 	<algorithm>
 	<vector>
 	<wx/infobar.h>
+
+1307986706 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\tglbtn.h
+	"wx/defs.h"
+	"wx/event.h"
+	"wx/control.h"
+	"wx/univ/tglbtn.h"
+	"wx/msw/tglbtn.h"
+	"wx/gtk/tglbtn.h"
+	"wx/gtk1/tglbtn.h"
+	"wx/motif/tglbtn.h"
+	"wx/osx/tglbtn.h"
+	"wx/palmos/tglbtn.h"
+	"wx/os2/tglbtn.h"
+
+1307986664 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\tglbtn.h
+	"wx/button.h"
+
+1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\tglbtn.h
+	"wx/bitmap.h"
+
+1307986696 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\tglbtn.h
+	"wx/bitmap.h"
+
+1307986668 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\tglbtn.h
+	"wx/bitmap.h"
+
+1253304843 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\tglbtn.h
+	"wx/checkbox.h"
+
+1307986691 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\tglbtn.h
+
+1307986672 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\tglbtn.h
+	"wx/checkbox.h"
+
+1307986684 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\tglbtn.h
 

@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #include <iostream>
 #include <SFML/Network.hpp>
 #include "GDL/Scene.h"
-#include "GDL/tinyxml.h"
+#include "GDL/tinyxml/tinyxml.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/CommonTools.h"
 #include "ReceivedDataManager.h"
@@ -132,12 +132,22 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
 /**
  * Generate an object network identifier, unique for each object.
  */
-void NetworkAutomatism::GenerateObjectNetworkIdentifier( const std::string &, const std::string & automatismName, std::vector<Object*> list )
+void NetworkAutomatism::GenerateObjectNetworkIdentifier( const std::string &, const std::string & automatismName, std::map <std::string, std::vector<Object*> *> objectsLists1)
 {
-    for ( unsigned int i = 0; i<list.size(); ++i )
+    vector<Object*> objects1;
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
+    {
+        if ( it->second != NULL )
+        {
+            objects1.reserve(objects1.size()+it->second->size());
+            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects1));
+        }
+    }
+
+    for ( unsigned int i = 0; i<objects1.size(); ++i )
     {
         //We can afford a dynamic_cast in this action
-        NetworkAutomatism* automatism = dynamic_cast<NetworkAutomatism*>(list[i]->GetAutomatismRawPointer(automatismName));
+        NetworkAutomatism* automatism = dynamic_cast<NetworkAutomatism*>(objects1[i]->GetAutomatismRawPointer(automatismName));
 
         if ( automatism != NULL ) automatism->objectNetworkId = i;
     }

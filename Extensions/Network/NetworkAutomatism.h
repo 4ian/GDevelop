@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Network Extension
-Copyright (c) 2010-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2010-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -81,7 +81,7 @@ class GD_EXTENSION_API NetworkAutomatism : public Automatism
         /**
          * Generate a unique identifier for all objects of list, using automatism named automatismName.
          */
-        static void GenerateObjectNetworkIdentifier( const std::string &, const std::string & automatismName, std::vector<Object*> list );
+        static void GenerateObjectNetworkIdentifier( const std::string &, const std::string & automatismName, std::map <std::string, std::vector<Object*> *> objectsLists);
 
     private:
 

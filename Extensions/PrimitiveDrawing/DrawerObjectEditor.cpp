@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Primitive Drawing Extension
-Copyright (c) 2008-2011 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -36,7 +36,7 @@ freely, subject to the following restrictions:
 
 #include "GDL/Game.h"
 #include "DrawerObject.h"
-#include "GDL/MainEditorCommand.h"
+#include "GDL/IDE/MainEditorCommand.h"
 
 //(*IdInit(DrawerObjectEditor)
 const long DrawerObjectEditor::ID_STATICTEXT3 = wxNewId();
@@ -75,37 +75,37 @@ object(object_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _T("Edition de l\'objet Dessinateur manuel"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edition de l\'objet Dessinateur manuel"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _T("Remplissage"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Remplissage"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer2->AddGrowableCol(1);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _T("Couleur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Couleur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer2->Add(StaticText3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	fillColorBt = new wxButton(this, ID_BUTTON1, _T("Choisir la couleur"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	fillColorBt = new wxButton(this, ID_BUTTON1, _("Choisir la couleur"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(fillColorBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _T("Opacité :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Opacité :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer2->Add(StaticText5, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	fillOpacityEdit = new wxSpinCtrl(this, ID_SPINCTRL3, _T("255"), wxDefaultPosition, wxDefaultSize, 0, 0, 255, 255, _T("ID_SPINCTRL3"));
 	fillOpacityEdit->SetValue(_T("255"));
 	FlexGridSizer2->Add(fillOpacityEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _T("Contour"));
+	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Contour"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer3->AddGrowableCol(1);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _T("Couleur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Couleur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	outlineColorBt = new wxButton(this, ID_BUTTON3, _T("Choisir la couleur"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	outlineColorBt = new wxButton(this, ID_BUTTON3, _("Choisir la couleur"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer3->Add(outlineColorBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _T("Opacité :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Opacité :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	outlineOpacityEdit = new wxSpinCtrl(this, ID_SPINCTRL2, _T("255"), wxDefaultPosition, wxDefaultSize, 0, 0, 255, 255, _T("ID_SPINCTRL2"));
 	outlineOpacityEdit->SetValue(_T("255"));
 	FlexGridSizer3->Add(outlineOpacityEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _T("Taille :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Taille :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer3->Add(StaticText4, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	outlineSizeEdit = new wxSpinCtrl(this, ID_SPINCTRL1, _T("1"), wxDefaultPosition, wxDefaultSize, 0, 0, 10000, 1, _T("ID_SPINCTRL1"));
 	outlineSizeEdit->SetValue(_T("1"));
@@ -117,18 +117,18 @@ object(object_)
 	FlexGridSizer6->AddGrowableCol(0);
 	wxString __wxRadioBoxChoices_1[2] =
 	{
-		_T("Absolues"),
-		_T("Relatives à la position de l\'objet Dessinateur")
+		_("Absolues"),
+		_("Relatives à la position de l\'objet Dessinateur")
 	};
-	coordinatesRadio = new wxRadioBox(this, ID_RADIOBOX1, _T("Coordonnées de dessin"), wxDefaultPosition, wxDefaultSize, 2, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
+	coordinatesRadio = new wxRadioBox(this, ID_RADIOBOX1, _("Coordonnées de dessin"), wxDefaultPosition, wxDefaultSize, 2, __wxRadioBoxChoices_1, 1, wxRA_HORIZONTAL, wxDefaultValidator, _T("ID_RADIOBOX1"));
 	FlexGridSizer6->Add(coordinatesRadio, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
-	okBt = new wxButton(this, ID_BUTTON2, _T("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	okBt = new wxButton(this, ID_BUTTON2, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer5->Add(okBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cancelBt = new wxButton(this, ID_BUTTON4, _T("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	cancelBt = new wxButton(this, ID_BUTTON4, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer5->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer5, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);

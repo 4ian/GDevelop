@@ -142,6 +142,7 @@
 								<item>Relatives à la position de l&apos;objet Dessinateur</item>
 							</content>
 							<default>-1</default>
+							<style>wxRA_HORIZONTAL</style>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>

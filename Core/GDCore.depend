@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1331414598 source:d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\platform.cpp
+	"Platform.h"
+
+1331489640 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\platform.h
+	<string>
+
+1331414631 source:d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\layout.cpp
+	"Layout.h"
+
+1331489640 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\layout.h
+	<string>
+
+1331414587 source:d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.cpp
+	"Project.h"
+
+1331489640 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.h
+	"GDCore/PlatformDefinition/Layout.h"
+

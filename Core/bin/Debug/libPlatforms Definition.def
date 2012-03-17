@@ -1,0 +1,26 @@
+EXPORTS
+    _ZN2gd6LayoutC1Ev @1
+    _ZN2gd6LayoutC2Ev @2
+    _ZN2gd6LayoutD0Ev @3
+    _ZN2gd6LayoutD1Ev @4
+    _ZN2gd6LayoutD2Ev @5
+    _ZN2gd7Project9badLayoutE @6 DATA
+    _ZN2gd7ProjectC1Ev @7
+    _ZN2gd7ProjectC2Ev @8
+    _ZN2gd7ProjectD0Ev @9
+    _ZN2gd7ProjectD1Ev @10
+    _ZN2gd7ProjectD2Ev @11
+    _ZN2gd8PlatformC1Ev @12
+    _ZN2gd8PlatformC2Ev @13
+    _ZN2gd8PlatformD0Ev @14
+    _ZN2gd8PlatformD1Ev @15
+    _ZN2gd8PlatformD2Ev @16
+    _ZTIN2gd6LayoutE @17 DATA
+    _ZTIN2gd7ProjectE @18 DATA
+    _ZTIN2gd8PlatformE @19 DATA
+    _ZTSN2gd6LayoutE @20 DATA
+    _ZTSN2gd7ProjectE @21 DATA
+    _ZTSN2gd8PlatformE @22 DATA
+    _ZTVN2gd6LayoutE @23 DATA
+    _ZTVN2gd7ProjectE @24 DATA
+    _ZTVN2gd8PlatformE @25 DATA

@@ -206,10 +206,10 @@ Credits::Credits(wxWindow* parent)
 	StaticText1->SetLabel(version);
 	HtmlWindow1->SetPage("<html>\n<body>\n<h5>"+_("Contributeurs : ( Sans ordre spécial )")+"</h5>\n"
                       +"<br>"
-                      +_("François Dumortier : Conception du logo et graphismes divers.")+"<br>"
+                      +_("François Dumortier : Conception du logo et du site web de Game Develop")+"<br>"
                       +"( <a href=http://www.fdumortier.com>http://www.fdumortier.com</a> )"+"<br>"
                       +"<br>"
-                      +_("Victor Levasseur : Extension Widgets et contributions aux extensions Automatisme Moteur physique et Objet texte")+"<br>"
+                      +_("Victor Levasseur : Extension Widgets et contributions aux extensions Automatisme Moteur physique, Objet texte, Objet vidéo")+"<br>"
                       +"( <a href=http://www.levasseursoftware.net/>http://www.levasseursoftware.net</a> )"+"<br>"
                       +"<br>"
                       +_("Diego Schiavon : Traduction anglaise du tutoriel")+"<br>"

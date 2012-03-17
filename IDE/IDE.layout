@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
+	<ActiveTarget name="Release - Edittime" />
 	<File name="AdvancedPasteDlg.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="9685" topLine="143" />
 	</File>
@@ -83,7 +83,7 @@
 		<Cursor1 position="1573" topLine="30" />
 	</File>
 	<File name="CodeEditor.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="42" topLine="2" />
+		<Cursor1 position="4306" topLine="70" />
 	</File>
 	<File name="CodeEditor.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1105" topLine="10" />
@@ -137,7 +137,7 @@
 		<Cursor1 position="91" topLine="0" />
 	</File>
 	<File name="Credits.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="15225" topLine="199" />
+		<Cursor1 position="16177" topLine="202" />
 	</File>
 	<File name="Credits.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="893" topLine="8" />
@@ -224,7 +224,7 @@
 		<Cursor1 position="11000" topLine="197" />
 	</File>
 	<File name="EditorScene.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="605" topLine="65" />
+		<Cursor1 position="2328" topLine="65" />
 	</File>
 	<File name="ErrorCompilation.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="6171" topLine="158" />
@@ -236,7 +236,7 @@
 		<Cursor1 position="2909" topLine="85" />
 	</File>
 	<File name="EventsRefactorer.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="33911" topLine="751" />
+		<Cursor1 position="32395" topLine="728" />
 	</File>
 	<File name="EventsRefactorer.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="215" topLine="0" />
@@ -361,8 +361,8 @@
 	<File name="ProfileDlg.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="42" topLine="2" />
 	</File>
-	<File name="ProjectManager.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="33040" topLine="551" />
+	<File name="ProjectManager.cpp" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="49071" topLine="1022" />
 	</File>
 	<File name="ProjectManager.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="384" topLine="14" />
@@ -374,16 +374,16 @@
 		<Cursor1 position="186" topLine="0" />
 	</File>
 	<File name="SceneCanvas.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="31118" topLine="722" />
+		<Cursor1 position="67939" topLine="1554" />
 	</File>
 	<File name="SceneCanvas.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="350" topLine="7" />
+		<Cursor1 position="4931" topLine="131" />
 	</File>
 	<File name="SceneEdittimeRenderer.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="736" topLine="0" />
+		<Cursor1 position="574" topLine="0" />
 	</File>
 	<File name="SceneEdittimeRenderer.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="42" topLine="2" />
+		<Cursor1 position="389" topLine="2" />
 	</File>
 	<File name="SearchEvents.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="15663" topLine="185" />
@@ -452,7 +452,7 @@
 		<Cursor1 position="0" topLine="3" />
 	</File>
 	<File name="wxstedit\include\wx\stedit\steopts.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="560" topLine="3" />
+		<Cursor1 position="9603" topLine="282" />
 	</File>
 	<File name="wxstedit\src\stedit.cpp" open="0" top="0" tabpos="28" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="64418" topLine="2010" />

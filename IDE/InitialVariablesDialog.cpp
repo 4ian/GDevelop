@@ -115,7 +115,7 @@ variables(variables_)
 	Connect(ID_Help,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&InitialVariablesDialog::OnhelpBtClick);
 
 	variablesList->InsertColumn(0, _("Variable"));
-	variablesList->InsertColumn(1, _("Valeur initiale"));;
+	variablesList->InsertColumn(1, _("Valeur initiale"));
 	variablesList->SetColumnWidth(0, 150);
 	variablesList->SetColumnWidth(1, 130);
 

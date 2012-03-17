@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef DNDTEXTSCENEEDITOR_H
 #define DNDTEXTSCENEEDITOR_H
 

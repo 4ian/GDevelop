@@ -32,6 +32,7 @@ BEGIN_EVENT_TABLE(wxSFMLCanvas, wxControl)
     EVT_MOTION( wxSFMLCanvas::OnMotion)
     EVT_MOUSEWHEEL( wxSFMLCanvas::OnMouseWheel)
     EVT_KEY_DOWN( wxSFMLCanvas::OnKey)
+    EVT_KEY_UP( wxSFMLCanvas::OnKeyUp)
 END_EVENT_TABLE()
 
 
@@ -146,6 +147,14 @@ void wxSFMLCanvas::OnMiddleUp(wxMouseEvent &event) {}
 /// Appuie touche pour le control
 ////////////////////////////////////////////////////////////
 void wxSFMLCanvas::OnKey(wxKeyEvent& evt)
+{
+    // Don't do anything. We intercept this event in order to prevent the
+    // parent class to draw the background before repainting the window,
+    // which would cause some flickering
+    evt.StopPropagation();
+}
+
+void wxSFMLCanvas::OnKeyUp(wxKeyEvent& evt)
 {
     // Don't do anything. We intercept this event in order to prevent the
     // parent class to draw the background before repainting the window,

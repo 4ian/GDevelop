@@ -108,6 +108,7 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
         game(gameEdited),
         edittimeRenderer(this, &game, sceneEdited),
         hasJustRightClicked(false),
+        ctrlPressed(false),
         isReloading(false),
         mainEditorCommand( mainEditorCommand_ ),
         scrollBar1(NULL),
@@ -592,8 +593,17 @@ void SceneCanvas::OnDebugBtClick( wxCommandEvent & event )
     m_mgr->Update();
 }
 
+void SceneCanvas::OnKeyUp( wxKeyEvent& evt )
+{
+    if ( evt.GetKeyCode() == WXK_CONTROL )
+        ctrlPressed = false;
+}
+
 void SceneCanvas::OnKey( wxKeyEvent& evt )
 {
+    if ( evt.GetKeyCode() == WXK_CONTROL )
+        ctrlPressed = true;
+
     //Si on est en mode éditeur
     if ( edittimeRenderer.editing )
     {
@@ -970,7 +980,7 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
     else //Add object to selection
     {
         //Clone the object using Ctrl
-        if (!edittimeRenderer.isMovingObject && (sf::Keyboard::IsKeyPressed(sf::Keyboard::LControl) || sf::Keyboard::IsKeyPressed(sf::Keyboard::RControl) ))
+        if (!edittimeRenderer.isMovingObject && (ctrlPressed))
         {
             edittimeRenderer.objectsSelected.erase(remove(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object), edittimeRenderer.objectsSelected.end());
 
@@ -1214,11 +1224,10 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnLeftDClick( wxMouseEvent &event )
 {
-    int mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
-    int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+    edittimeRenderer.rightClickSelectedObject = edittimeRenderer.FindSmallestObject();
 
-    AddObjetSelected(mouseX, mouseY);
-    ChangesMade();
+    wxCommandEvent unusedEvent;
+    OnPropObjSelected(unusedEvent);
 }
 
 ////////////////////////////////////////////////////////////
@@ -1554,15 +1563,6 @@ void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
     }
 
     return;
-}
-
-////////////////////////////////////////////////////////////
-/// Double clic droit : propriétés direct de l'objet
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnRightDClick( wxMouseEvent &event )
-{
-    wxCommandEvent unusedEvent;
-    OnPropObjSelected(unusedEvent);
 }
 
 ////////////////////////////////////////////////////////////

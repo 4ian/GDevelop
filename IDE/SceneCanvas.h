@@ -145,9 +145,9 @@ private :
     virtual void OnLeftUp( wxMouseEvent &event );
     virtual void OnLeftDClick( wxMouseEvent &event );
     virtual void OnRightUp( wxMouseEvent &event );
-    virtual void OnRightDClick( wxMouseEvent &event );
     virtual void OnMiddleDown( wxMouseEvent &event );
     virtual void OnKey( wxKeyEvent& evt );
+    virtual void OnKeyUp( wxKeyEvent& evt );
     virtual void OnMotion( wxMouseEvent &event );
     virtual void OnMouseWheel( wxMouseEvent &event );
     void OnPropObjSelected(wxCommandEvent & event);
@@ -243,6 +243,7 @@ private :
     static const long ID_MENUITEM7; ///< Zoom menu item
 
     bool hasJustRightClicked;
+    bool ctrlPressed;
 
     wxMenu contextMenu;
     wxMenu noObjectContextMenu;

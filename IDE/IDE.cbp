@@ -25,6 +25,7 @@
 					<Add option="-mthreads" />
 					<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
 					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -50,6 +51,7 @@
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
+					<Add option="-lGDCore" />
 					<Add option="-lfreetype" />
 					<Add option="-lopenal32" />
 					<Add option="-lsndfile" />
@@ -185,6 +187,7 @@
 					<Add option="-mthreads" />
 					<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
 					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
@@ -211,6 +214,7 @@
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_stc" />
@@ -279,6 +283,7 @@
 					<Add option="-mthreads" />
 					<Add option='[[if (PLATFORM == PLATFORM_MSW &amp;&amp; (GetCompilerFactory().GetCompilerVersionString(_T(&quot;gcc&quot;)) &gt;= _T(&quot;4.0.0&quot;))) print(_T(&quot;-Wno-attributes&quot;));]]' />
 					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -304,6 +309,7 @@
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 				</ResourceCompiler>
 				<Linker>
+					<Add option="-lGDCore" />
 					<Add option="-lopenal32" />
 					<Add option="-lsndfile" />
 					<Add option="-lfreetype" />
@@ -408,6 +414,7 @@
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -418,6 +425,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
@@ -489,6 +497,7 @@
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
@@ -497,6 +506,7 @@
 					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<Linker>
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />

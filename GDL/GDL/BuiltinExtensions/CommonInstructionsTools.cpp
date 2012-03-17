@@ -34,7 +34,7 @@ double GD_API Random(int end)
 bool GD_API RelationTest(double rhs, float lhs, std::string relationalOperator)
 {
     if (    ( relationalOperator.empty() && rhs == lhs ) ||
-            ( relationalOperator == "=" && rhs == lhs ) ||
+            ( relationalOperator == "==" && rhs == lhs ) ||
             ( relationalOperator == "<" && rhs < lhs ) ||
             ( relationalOperator == ">" && rhs > lhs ) ||
             ( relationalOperator == "<=" && rhs <= lhs ) ||

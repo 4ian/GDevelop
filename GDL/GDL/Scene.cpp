@@ -56,7 +56,6 @@ Scene::~Scene()
 void Scene::Init(const Scene & scene)
 {
     name = scene.name;
-
     backgroundColorR = scene.backgroundColorR;
     backgroundColorG = scene.backgroundColorG;
     backgroundColorB = scene.backgroundColorB;

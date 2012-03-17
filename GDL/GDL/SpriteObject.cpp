@@ -92,7 +92,7 @@ bool SpriteObject::InitializeFromInitialPosition(const InitialPosition & positio
         InitialPosition & updatePosition = const_cast<InitialPosition&>(position);
         updatePosition.angle = position.floatInfos.find("direction")->second;
         if (    position.floatInfos.find("animation") != position.floatInfos.end()
-            &&  GetAnimation(position.floatInfos.find("animation")->second).typeNormal )
+            &&  GetAnimation(position.floatInfos.find("animation")->second).useMultipleDirections )
         {
             updatePosition.angle *= 45;
         }
@@ -217,7 +217,7 @@ void SpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name
 bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if ( propertyNb == 0 ) { return SetAnimation(ToInt(newValue)); }
-    else if ( propertyNb == 1 ) {return GetAnimation( currentAnimation ).typeNormal ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue)); }
+    else if ( propertyNb == 1 ) {return GetAnimation( currentAnimation ).useMultipleDirections ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue)); }
     else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
     else if ( propertyNb == 3 ) { SetOpacity(ToFloat(newValue)); }
     else if ( propertyNb == 4 ) { SetBlendMode(ToInt(newValue)); }
@@ -436,7 +436,7 @@ void SpriteObject::UpdateCurrentSprite() const
     {
         Animation & currentAnim = animations[currentAnimation].GetNonConst();
 
-        if ( currentAnim.typeNormal )
+        if ( currentAnim.useMultipleDirections )
         {
             //Update sprite pointer
             if ( currentDirection >= currentAnim.GetDirectionsNumber() || currentSprite >= currentAnim.GetDirection(currentDirection).GetSpritesNumber() )
@@ -596,7 +596,7 @@ bool SpriteObject::SetDirection( float nb )
 {
     if ( currentAnimation >= GetAnimationsNumber() ) return false;
 
-    if ( !GetAnimation( currentAnimation ).typeNormal )
+    if ( !GetAnimation( currentAnimation ).useMultipleDirections )
     {
         currentAngle = nb;
 
@@ -627,7 +627,7 @@ bool SpriteObject::SetAngle(float newAngle)
 {
     if ( currentAnimation >= GetAnimationsNumber() ) return false;
 
-    if ( !GetAnimation( currentAnimation ).typeNormal )
+    if ( !GetAnimation( currentAnimation ).useMultipleDirections )
     {
         currentAngle = newAngle;
 
@@ -649,7 +649,7 @@ bool SpriteObject::SetAngle(float newAngle)
  */
 float SpriteObject::GetAngle() const
 {
-    if ( !GetAnimation( currentAnimation ).typeNormal )
+    if ( !GetAnimation( currentAnimation ).useMultipleDirections )
         return currentAngle;
     else
         return currentDirection*45;
@@ -659,7 +659,7 @@ float SpriteObject::GetCurrentDirectionOrAngle() const
 {
     if ( currentAnimation >= GetAnimationsNumber() ) return 0;
 
-    if ( GetAnimation( currentAnimation ).typeNormal )
+    if ( GetAnimation( currentAnimation ).useMultipleDirections )
         return GetCurrentDirection();
     else
         return GetAngle();
@@ -884,13 +884,13 @@ void SpriteObject::LoadFromXml(const TiXmlElement * elemScene)
             //Direction
             const TiXmlElement *elemObjetDirecScene = elemObjetScene->FirstChildElement();
 
-            if ( elemObjetScene->Attribute( "typeNormal" )  != NULL )
+            if ( elemObjetScene->Attribute( "useMultipleDirections" )  != NULL )
             {
-                if ( strcmp( elemObjetScene->Attribute( "typeNormal" ), "false" ) == 0 )
+                if ( strcmp( elemObjetScene->Attribute( "useMultipleDirections" ), "false" ) == 0 )
                 {
-                    AnimToAdd.typeNormal = false;
+                    AnimToAdd.useMultipleDirections = false;
                 }
-                else {  AnimToAdd.typeNormal = true ; }
+                else {  AnimToAdd.useMultipleDirections = true ; }
             }
             else { cout << "Les informations sur le type des directions manquent"; }
 
@@ -1025,11 +1025,11 @@ void SpriteObject::SaveToXml(TiXmlElement * objet)
         animations->LinkEndChild( animation );
 
 
-        if ( GetAnimation( k ).typeNormal )
+        if ( GetAnimation( k ).useMultipleDirections )
         {
-            animation->SetAttribute( "typeNormal", "true" );
+            animation->SetAttribute( "useMultipleDirections", "true" );
         }
-        else { animation->SetAttribute( "typeNormal", "false" ); }
+        else { animation->SetAttribute( "useMultipleDirections", "false" ); }
 
         TiXmlElement * direction;
         for ( unsigned int l = 0;l < GetAnimation( k ).GetDirectionsNumber();l++ )

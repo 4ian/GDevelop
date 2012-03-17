@@ -475,6 +475,9 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 {
     MessageLoading( "Loading scene", 10 );
 
+    //Copy inherited scene
+    Scene::operator=(scene);
+
     //Clear RuntimeScene datas
     objectsInstances.Clear();
     textes.clear();
@@ -488,29 +491,8 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     timeFromStart = 0;
     specialAction = -1;
 
-    //Copy inherited datas
-    initialObjects = scene.initialObjects;
-    objectGroups = scene.objectGroups;
-    initialLayers = scene.initialLayers;
-    variables = scene.variables;
-
-    #if defined(GD_IDE_ONLY)
-    profiler = scene.profiler;
-    events = CloneVectorOfEvents(scene.events);
-    #endif
-
     codeExecutionEngine = scene.codeExecutionEngine;
     codeExecutionEngine->llvmRuntimeContext->scene = this;
-
-    backgroundColorR = scene.backgroundColorR;
-    backgroundColorG = scene.backgroundColorG;
-    backgroundColorB = scene.backgroundColorB;
-    standardSortMethod = scene.standardSortMethod;
-    title = scene.title;
-    oglFOV = scene.oglFOV;
-    oglZNear = scene.oglZNear;
-    oglZFar = scene.oglZFar;
-    stopSoundsOnStartup = scene.stopSoundsOnStartup;
 
     //Add global object groups
     copy(game->objectGroups.begin(), game->objectGroups.end(), back_inserter(objectGroups));

@@ -14,7 +14,7 @@
 Direction Animation::badDirection;
 
 Animation::Animation() :
-typeNormal(true),
+useMultipleDirections(false),
 directionsNumber(0)
 {
 }
@@ -37,7 +37,7 @@ void Animation::SetDirectionsNumber(unsigned int nb)
 
 const Direction & Animation::GetDirection(unsigned int nb) const
 {
-    if ( !typeNormal )
+    if ( !useMultipleDirections )
         nb = 0; //En mode rotation automatique, on est toujours à la direction 0
 
     if ( nb < directionsNumber )
@@ -48,7 +48,7 @@ const Direction & Animation::GetDirection(unsigned int nb) const
 
 Direction & Animation::GetDirectionToModify(unsigned int nb)
 {
-    if ( !typeNormal )
+    if ( !useMultipleDirections )
         nb = 0; //En mode rotation automatique, on est toujours à la direction 0
 
     if (nb < directionsNumber )

@@ -49,7 +49,7 @@ class GD_API Animation
          */
         inline bool HasNoDirections() const { return directions.empty(); };
 
-        bool typeNormal;
+        bool useMultipleDirections;
 
     private:
 

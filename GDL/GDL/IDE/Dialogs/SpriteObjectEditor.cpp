@@ -595,7 +595,7 @@ void EditorObjet::RefreshImages()
         return;
 
     //Type de directions
-    if ( !object.GetAnimation( animation ).typeNormal )
+    if ( !object.GetAnimation( animation ).useMultipleDirections )
     {
         RotationCheck->SetValue( true );
         NormalCheck->SetValue( false );
@@ -856,7 +856,7 @@ void EditorObjet::OnRotationCheckSelect( wxCommandEvent& event )
     }
     NormalCheck->SetValue( false );
 
-    if ( AnimationAndDirectionValid() ) GetEditedAnimation().typeNormal = false;
+    if ( AnimationAndDirectionValid() ) GetEditedAnimation().useMultipleDirections = false;
 
     direction = 0;
     Bt0->Enable( false );
@@ -878,7 +878,7 @@ void EditorObjet::OnNormalCheckSelect( wxCommandEvent& event )
     }
     RotationCheck->SetValue( false );
 
-    if ( AnimationAndDirectionValid() ) GetEditedAnimation().typeNormal = true;
+    if ( AnimationAndDirectionValid() ) GetEditedAnimation().useMultipleDirections = true;
 
 
     Bt0->Enable( true );
@@ -949,7 +949,7 @@ void EditorObjet::OnCopyBtClick(wxCommandEvent& event)
 
     int directionToCopy = 0;
 
-    if (object.GetAnimation( animToCopy ).typeNormal)
+    if (object.GetAnimation( animToCopy ).useMultipleDirections)
     {
         directionToCopy = wxGetNumberFromUser( "Direction à copier", "", "Entrez le numéro de la direction dans laquelle se trouve les images à copier", 0, 0, object.GetAnimation( animToCopy ).GetDirectionsNumber()-1, this);
         if (directionToCopy < 0 || static_cast<unsigned int>(directionToCopy) >= object.GetAnimation( animToCopy ).GetDirectionsNumber() ) return;

@@ -194,7 +194,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     #if defined(GD_IDE_ONLY)
     if ( major < 2 || (major == 2 && minor <= 0) )
     {
-        updateText += _("L'action \"Créer un objet de partir son nom\" nécessite dorénavant que vous indiquiez un groupe d'objet parmi lequel les objets sont susceptibles d'être créés.\nPar exemple, les objets que vous crééez à partir de cette fonction peuvent prendre comme nom Objet1, Objet2 ou Objet3, créez un groupe avec ces 3 objets et passez le en paramètre à l'action.\n\n");
+        updateText += _("L'action \"Créer un objet de partir son nom\" nécessite dorénavant que vous indiquiez un groupe d'objet parmi lequel les objets sont susceptibles d'être créés.\nPar exemple, si les objets que vous crééez à partir de cette action peuvent prendre comme nom Objet1, Objet2 ou Objet3, créez un groupe avec ces 3 objets et passez le en paramètre à l'action.\n\n");
         updateText += _("Les fonctions ont subi un changement au niveau de leur paramétrage. Vous devenez dorénavant indiquer les objets susceptibles passés en paramètre à la fonction, si vous en utilisez. De même que ci dessus, créez un groupe d'objet qui contient les objets devant être passés en argument à la fonction si vous en avez besoin.\n\n");
         updateText += _("Enfin, si vous utilisez l'extension Association d'objets, les actions/conditions nécessitent dorénavant de toujours indiquer le nom des objets associés à prendre en compte : Vérifiez que vos évènements liés à cette extension sont toujours valides.\n\n");
         updateText += _("Merci de votre compréhension.\n");

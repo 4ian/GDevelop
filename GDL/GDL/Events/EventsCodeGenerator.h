@@ -137,6 +137,11 @@ public:
     /**
      * Convert a plain string ( with line feed, quotes ) to a C++ string ( adding backslash ).
      *
+     * Usage example :
+     * \code
+        cppCode += "std::string(\""+EventsCodeGenerator::ConvertToCppString(name)+"\")";
+     / \endcode
+     *
      * \param plainString The string to convert
      * \return plainString which can be included in a C++ code.
      */

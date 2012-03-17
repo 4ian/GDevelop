@@ -10,7 +10,7 @@ namespace gd
  * \brief Base class for implementing a platform
  *
  */
-class Platform
+class GD_CORE_API Platform
 {
 public:
     Platform();

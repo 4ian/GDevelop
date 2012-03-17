@@ -5,7 +5,7 @@
 namespace gd
 {
 
-class Project
+class GD_CORE_API Project
 {
 public:
     Project();

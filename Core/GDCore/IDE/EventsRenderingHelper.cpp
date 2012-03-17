@@ -11,15 +11,13 @@
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
 #include <wx/renderer.h>
-#include "GDL/IDE/Instruction.h"
-#include "GDL/ExtensionsManager.h"
-#include "GDL/ExtensionBase.h"
-#include "GDL/IDE/ActionSentenceFormatter.h"
-#include "GDL/IDE/ConditionSentenceFormatter.h"
-#include "GDL/CommonTools.h"
-#include "GDL/IDE/EventsEditorItemsAreas.h"
-#include "GDL/IDE/EventsEditorSelection.h"
-#include "GDL/Event.h"
+#include "GDCore/Events/Instruction.h"
+#include "GDCore/PlatformDefinition/InstructionMetadataHolder.h"
+#include "GDCore/IDE/ActionSentenceFormatter.h"
+#include "GDCore/IDE/ConditionSentenceFormatter.h"
+#include "GDCore/IDE/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDCore/Events/Event.h"
 
 EventsRenderingHelper * EventsRenderingHelper::singleton = NULL;
 
@@ -34,7 +32,7 @@ wxPoint EventsRenderingHelper::DrawTextInArea(std::string text, wxDC & dc, wxRec
     {
         text = " "+text;
     }
-    point.x = rect.x; //We can now start from rect.x as space have been inserted.
+    point.x = rect.x; //We can now start from rect.x as spaces have been inserted.
 
     int charactersInALine = floor(static_cast<double>(rect.width)/static_cast<double>(fontCharacterWidth));
     if ( charactersInALine <= 0) charactersInALine = 1;
@@ -66,7 +64,7 @@ wxPoint EventsRenderingHelper::DrawTextInArea(std::string text, wxDC & dc, wxRec
         lastCutPosition += charactersInALine;
     }
 
-    //Return position to lastest drawn character
+    //Return position to latest drawn character
     return wxPoint(point.x+displayedText.length()*fontCharacterWidth, point.y);
 }
 
@@ -126,23 +124,22 @@ void EventsRenderingHelper::SetFont(const wxFont & font_)
 {
     font = font_;
 
+    //Update the character width
     wxMemoryDC dc;
     dc.SelectObject(fakeBmp);
     dc.SetFont(font);
-
     fontCharacterWidth = static_cast<float>(dc.GetTextExtent("abcdef").GetWidth())/6.0f;
 }
 
-int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionMetadataHolder & metadataHolder)
 {
     int initialYPosition = y;
 
     dc.SetFont(font);
     const int iconWidth = 18;
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
 
     //Draw Conditions rectangle
-    const int conditionsHeight = GetRenderedConditionsListHeight(conditions, width);
+    const int conditionsHeight = GetRenderedConditionsListHeight(conditions, width, metadataHolder);
     wxRect rect(x-1, y-1, width+2, conditionsHeight+2);
     dc.SetPen(conditionsRectangleOutline);
     dc.SetBrush(conditionsRectangleFill);
@@ -172,7 +169,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & condition
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
-        const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(conditions[j].GetType());
+        const InstructionMetadata & InstructionMetadata = metadataHolder.GetConditionMetadata(conditions[j].GetType());
         InstructionItem accessor(&conditions[j], /*isCondition=*/true, &conditions, j, event);
 
         //Get the width available
@@ -184,23 +181,23 @@ int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & condition
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = TranslateCondition::Translate(conditions[j], instructionInfos);
+            std::string text = TranslateCondition::Translate(conditions[j], InstructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
             dc.SetBrush(selectionRectangleFill);
             dc.DrawRectangle(x, y, width, height);
-            DrawInstruction(conditions[j], instructionInfos, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
+            DrawInstruction(conditions[j], InstructionMetadata, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = TranslateCondition::Translate(conditions[j], instructionInfos);
+            std::string text = TranslateCondition::Translate(conditions[j], InstructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(highlightRectangleOutline);
             dc.SetBrush(highlightRectangleFill);
             dc.DrawRectangle(x, y, width, height);
-            DrawInstruction(conditions[j], instructionInfos, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
+            DrawInstruction(conditions[j], InstructionMetadata, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
 
             if ( selection.IsDraggingInstruction() )
             {
@@ -210,37 +207,36 @@ int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & condition
             }
         }
         else
-            height = DrawInstruction(conditions[j], instructionInfos, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
+            height = DrawInstruction(conditions[j], InstructionMetadata, /*isCondition=*/true, dc, wxPoint(x + leftIconsWidth, y), freeWidth, event, areas, selection);
 
         //Draw needed icons
         if ( conditions[j].IsInverted() )
         {
             dc.DrawBitmap( wxBitmap( "res/contraire.png", wxBITMAP_TYPE_ANY ), x + 1, y, true );
-            if ( instructionInfos.smallicon.IsOk() ) dc.DrawBitmap( instructionInfos.smallicon, x + iconWidth + 1, y, true );
+            if ( InstructionMetadata.smallicon.IsOk() ) dc.DrawBitmap( InstructionMetadata.smallicon, x + iconWidth + 1, y, true );
         }
-        else if ( instructionInfos.smallicon.IsOk() ) dc.DrawBitmap( instructionInfos.smallicon, x + 1, y, true );
+        else if ( InstructionMetadata.smallicon.IsOk() ) dc.DrawBitmap( InstructionMetadata.smallicon, x + 1, y, true );
 
         areas.AddInstructionArea(wxRect(x,y, width, height), accessor);
         y+=height;
 
         //Draw sub conditions
-        if ( instructionInfos.canHaveSubInstructions )
-            y += DrawConditionsList(conditions[j].GetSubInstructions(), dc, x + 18, y, width-18, event, areas, selection);
+        if ( InstructionMetadata.canHaveSubInstructions )
+            y += DrawConditionsList(conditions[j].GetSubInstructions(), dc, x + 18, y, width-18, event, areas, selection, metadataHolder);
     }
 
     return y-initialYPosition;
 }
 
-int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionMetadataHolder & metadataHolder)
 {
     int initialYPosition = y;
 
     dc.SetFont(font);
     const int iconWidth = 18;
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
 
     //Draw Actions rectangle
-    const int actionsHeight = GetRenderedActionsListHeight(actions, width);
+    const int actionsHeight = GetRenderedActionsListHeight(actions, width, metadataHolder);
     wxRect rect(x-1, y-1, width+2, actionsHeight+2);
     dc.SetPen(actionsRectangleOutline);
     dc.SetBrush(actionsRectangleFill);
@@ -270,7 +266,7 @@ int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxD
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
-        const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(actions[j].GetType());
+        const InstructionMetadata & InstructionMetadata = metadataHolder.GetActionMetadata(actions[j].GetType());
         InstructionItem accessor(&actions[j], /*isCondition=*/false, &actions, j, event);
 
         //Get the width available
@@ -280,23 +276,23 @@ int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxD
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = TranslateAction::GetInstance()->Translate(actions[j], instructionInfos);
+            std::string text = TranslateAction::GetInstance()->Translate(actions[j], InstructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
             dc.SetBrush(selectionRectangleFill);
             dc.DrawRectangle(x, y, width, height);
-            DrawInstruction(actions[j], instructionInfos, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
+            DrawInstruction(actions[j], InstructionMetadata, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = TranslateAction::GetInstance()->Translate(actions[j], instructionInfos);
+            std::string text = TranslateAction::GetInstance()->Translate(actions[j], InstructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(highlightRectangleOutline);
             dc.SetBrush(highlightRectangleFill);
             dc.DrawRectangle(x, y, width, height);
-            DrawInstruction(actions[j], instructionInfos, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
+            DrawInstruction(actions[j], InstructionMetadata, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
 
             if ( selection.IsDraggingInstruction() )
             {
@@ -306,28 +302,27 @@ int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxD
             }
         }
         else
-            height = DrawInstruction(actions[j], instructionInfos, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
+            height = DrawInstruction(actions[j], InstructionMetadata, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
 
         //Draw needed icons
-        if ( instructionInfos.smallicon.IsOk() ) dc.DrawBitmap( instructionInfos.smallicon, x + 1, y, true );
+        if ( InstructionMetadata.smallicon.IsOk() ) dc.DrawBitmap( InstructionMetadata.smallicon, x + 1, y, true );
 
         areas.AddInstructionArea(wxRect(x,y, width, height), accessor);
         y+=height;
 
         //Draw sub actions
-        if ( instructionInfos.canHaveSubInstructions )
-            y += DrawActionsList(actions[j].GetSubInstructions(), dc, x + 18, y, width-18, event, areas, selection);
+        if ( InstructionMetadata.canHaveSubInstructions )
+            y += DrawActionsList(actions[j].GetSubInstructions(), dc, x + 18, y, width-18, event, areas, selection, metadataHolder);
     }
 
     return y-initialYPosition;
 }
 
-unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector < Instruction > & conditions, int width)
+unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector < Instruction > & conditions, int width, gd::InstructionMetadataHolder & metadataHolder)
 {
     int y = 0;
 
     const int iconWidth = 18;
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
 
     if ( conditions.empty() )
         return 15;
@@ -336,30 +331,29 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
-        const InstructionInfos & instructionInfos = extensionManager->GetConditionInfos(conditions[j].GetType());
+        const InstructionMetadata & InstructionMetadata = metadataHolder.GetConditionMetadata(conditions[j].GetType());
 
         //Get the width available
         int leftIconsWidth = conditions[j].IsInverted() ? iconWidth*2 : iconWidth;
         int freeWidth = width - leftIconsWidth;
         freeWidth = freeWidth <= 0 ? 1 : freeWidth;
 
-        int height = GetTextHeightInArea(TranslateCondition::Translate(conditions[j], instructionInfos), freeWidth);
+        int height = GetTextHeightInArea(TranslateCondition::Translate(conditions[j], InstructionMetadata), freeWidth);
         y += height;
 
         //Sub conditions
-        if ( instructionInfos.canHaveSubInstructions )
-            y += GetRenderedConditionsListHeight(conditions[j].GetSubInstructions(), width-18);
+        if ( InstructionMetadata.canHaveSubInstructions )
+            y += GetRenderedConditionsListHeight(conditions[j].GetSubInstructions(), width-18, metadataHolder);
     }
 
     return y;
 }
 
-unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < Instruction > & actions, int width)
+unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < Instruction > & actions, int width, gd::InstructionMetadataHolder & metadataHolder)
 {
     int y = 0;
 
     const int iconWidth = 18;
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
 
     //Draw Actions rectangle
     if ( actions.empty() )
@@ -370,27 +364,27 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
     {
         if ( j != 0 ) y += separationBetweenInstructions;
 
-        const InstructionInfos & instructionInfos = extensionManager->GetActionInfos(actions[j].GetType());
+        const InstructionMetadata & InstructionMetadata = metadataHolder.GetActionMetadata(actions[j].GetType());
 
         //Get the width available
         int freeWidth = width - iconWidth;
         freeWidth = freeWidth <= 0 ? 1 : freeWidth;
 
-        int height = GetTextHeightInArea(TranslateAction::GetInstance()->Translate(actions[j], instructionInfos), freeWidth);
+        int height = GetTextHeightInArea(TranslateAction::GetInstance()->Translate(actions[j], InstructionMetadata), freeWidth);
         y+=height;
 
         //Draw sub actions
-        if ( instructionInfos.canHaveSubInstructions )
-            y += GetRenderedActionsListHeight(actions[j].GetSubInstructions(), width-18);
+        if ( InstructionMetadata.canHaveSubInstructions )
+            y += GetRenderedActionsListHeight(actions[j].GetSubInstructions(), width-18, metadataHolder);
     }
 
     return y;
 }
 
-int EventsRenderingHelper::DrawInstruction(Instruction & instruction, const InstructionInfos & instructionInfos, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+int EventsRenderingHelper::DrawInstruction(Instruction & instruction, const InstructionMetadata & InstructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
-    std::vector< std::pair<std::string, TextFormatting > > formattedStr = isCondition ? TranslateCondition::GetAsFormattedText(instruction, instructionInfos) :
-                                                                                        TranslateAction::GetInstance()->GetAsFormattedText(instruction, instructionInfos);
+    std::vector< std::pair<std::string, TextFormatting > > formattedStr = isCondition ? TranslateCondition::GetAsFormattedText(instruction, InstructionMetadata) :
+                                                                                        TranslateAction::GetInstance()->GetAsFormattedText(instruction, InstructionMetadata);
 
     wxPoint lastPos = point;
     //size_t alreadyWrittenCharCount = 0;

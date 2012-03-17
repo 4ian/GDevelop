@@ -5,7 +5,7 @@
 namespace gd
 {
 
-class Layout
+class GD_CORE_API Layout
 {
 public:
     Layout();

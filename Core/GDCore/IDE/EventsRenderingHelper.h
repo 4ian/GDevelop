@@ -9,11 +9,13 @@
 #include <wx/dc.h>
 #include <wx/html/htmprint.h>
 #include <vector>
+
 class BaseEvent;
 class Instruction;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
-class InstructionInfos;
+class InstructionMetadata;
+namespace gd {class InstructionMetadataHolder;}
 
 /**
  * \brief Provides tools to draw events.
@@ -29,10 +31,10 @@ class GD_CORE_API EventsRenderingHelper
 
         void DrawNiceRectangle(wxDC & dc, const wxRect & rect) const;
 
-        int DrawConditionsList(std::vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
-        int DrawActionsList(std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
-        unsigned int GetRenderedConditionsListHeight(const std::vector < Instruction > & conditions, int width);
-        unsigned int GetRenderedActionsListHeight(const std::vector < Instruction > & actions, int width);
+        int DrawConditionsList(std::vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionMetadataHolder & metadataHolder);
+        int DrawActionsList(std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionMetadataHolder & metadataHolder);
+        unsigned int GetRenderedConditionsListHeight(const std::vector < Instruction > & conditions, int width, gd::InstructionMetadataHolder & metadataHolder);
+        unsigned int GetRenderedActionsListHeight(const std::vector < Instruction > & actions, int width, gd::InstructionMetadataHolder & metadataHolder);
 
         inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
         inline void SetConditionsColumnWidth(unsigned int conditionsColumnWidth_) { conditionsColumnWidth = conditionsColumnWidth_; };
@@ -48,7 +50,7 @@ class GD_CORE_API EventsRenderingHelper
          */
         unsigned int GetTextHeightInArea(const std::string & text, unsigned int widthAvailable);
 
-        int DrawInstruction(Instruction & instruction, const InstructionInfos & instructionInfos, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+        int DrawInstruction(Instruction & instruction, const InstructionMetadata & InstructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 
         /**
          * Change font. Only use a fixed width font.

@@ -44,7 +44,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/Dialogs/PropImage.h"
 #include "GDL/ExternalEvents.h"
-#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/IDE/gdTreeItemStringData.h"
 #include "GDL/IDE/ImagesUsedInventorizer.h"
 

@@ -7,7 +7,7 @@
 #include "GDExpressionParser.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
-#include "GDL/IDE/GDExpression.h"
+#include "GDCore/Events/GDExpression.h"
 #include "GDL/ExpressionInstruction.h"
 #include "GDL/StrExpressionInstruction.h"
 #include "GDL/ExtensionBase.h"
@@ -17,7 +17,7 @@
 
 std::string GDExpressionParser::parserSeparators = " ,+-*/%.<>=&|;()#^![]{}";
 
-size_t GDExpressionParser::GetMinimalParametersNumber(const std::vector < ParameterInfo > & parametersInfos)
+size_t GDExpressionParser::GetMinimalParametersNumber(const std::vector < ParameterMetadata > & parametersInfos)
 {
     size_t nb = 0;
     for (unsigned int i = 0;i<parametersInfos.size();++i)
@@ -28,7 +28,7 @@ size_t GDExpressionParser::GetMinimalParametersNumber(const std::vector < Parame
     return nb;
 }
 
-size_t GDExpressionParser::GetMaximalParametersNumber(const std::vector < ParameterInfo > & parametersInfos)
+size_t GDExpressionParser::GetMaximalParametersNumber(const std::vector < ParameterMetadata > & parametersInfos)
 {
     size_t nb = 0;
     for (unsigned int i = 0;i<parametersInfos.size();++i)
@@ -56,7 +56,7 @@ std::string ReplaceTildesBySpaces(std::string text)
  * \param Parameters information
  * \param vector of parameters without code only parameters.
  */
-std::vector<GDExpression> CompleteParameters(const std::vector < ParameterInfo > & parametersInfo, const std::vector < GDExpression > & parameters)
+std::vector<GDExpression> CompleteParameters(const std::vector < ParameterMetadata > & parametersInfo, const std::vector < GDExpression > & parameters)
 {
     std::vector<GDExpression> completeParameters = parameters;
     for (unsigned int i = 0;i<parametersInfo.size();++i) //Code only parameters are not included in expressions parameters.
@@ -873,7 +873,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
     return true;
 }
 
-bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks & callbacks, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression)
+bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks & callbacks, GDExpression & parameter, const ParameterMetadata & parametersInfo, const size_t positionInExpression)
 {
     if ( parametersInfo.type == "expression" || parametersInfo.type == "camera" )
     {

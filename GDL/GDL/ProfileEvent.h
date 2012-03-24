@@ -10,7 +10,7 @@
 #include <wx/bitmap.h>
 #include <wx/dcbuffer.h>
 #include <wx/html/htmprint.h>
-#include "Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/profile.h"
 
 /**

@@ -7,7 +7,7 @@
 
 #ifndef CPPCODEEVENT_H
 #define CPPCODEEVENT_H
-#include "Event.h"
+#include "GDCore/Events/Event.h"
 class RuntimeScene;
 class Instruction;
 class TiXmlElement;

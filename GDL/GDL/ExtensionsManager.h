@@ -15,7 +15,7 @@
 class Object;
 class Automatism;
 class ExtensionBase;
-class InstructionInfos;
+class InstructionMetadata;
 class ExpressionInfos;
 class StrExpressionInfos;
 class ExtensionObjectInfos;
@@ -112,13 +112,13 @@ class GD_API ExtensionsManager
          * Get information about an action from its type
          * Works for object, automatisms and static actions.
          */
-        const InstructionInfos & GetActionInfos(string actionType) const;
+        const InstructionMetadata & GetActionInfos(string actionType) const;
 
         /**
          * Get information about a condition from its type
          * Works for object, automatisms and static conditions.
          */
-        const InstructionInfos & GetConditionInfos(string conditionType) const;
+        const InstructionMetadata & GetConditionInfos(string conditionType) const;
 
         /**
          * Get information about an expression from its type
@@ -258,7 +258,7 @@ class GD_API ExtensionsManager
         std::map < std::string, DestroyFunPtr >          destroyFunctionTable;
 
         #if defined(GD_IDE_ONLY)
-        static InstructionInfos badInstructionInfos;
+        static InstructionMetadata badInstructionMetadata;
         static ExpressionInfos badExpressionInfos;
         static StrExpressionInfos badStrExpressionInfos;
         #endif

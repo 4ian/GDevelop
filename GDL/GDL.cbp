@@ -2,10 +2,9 @@
 <CodeBlocks_project_file>
 	<FileVersion major="1" minor="6" />
 	<Project>
-		<Option title="Game Develop C++ Implementation" />
+		<Option title="Game Develop C++ Platform" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="AES\;md5\;" />
 		<Build>
 			<Target title="Debug">
 				<Option platforms="Windows;" />
@@ -99,7 +98,7 @@
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
-					<Add option="-DGDIL_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -117,6 +116,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
+					<Add option="-lGDCore" />
 					<Add option="-lmingw32" />
 					<Add option="-lopengl32" />
 					<Add option="-limm32" />
@@ -195,6 +195,7 @@
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
 					<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
+					<Add directory="..\IDE\bin\debug" />
 				</Linker>
 			</Target>
 			<Target title="Release">
@@ -287,7 +288,7 @@
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
-					<Add option="-DGDIL_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -305,6 +306,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lmingw32" />
 					<Add option="-lopengl32" />
 					<Add option="-limm32" />
@@ -383,6 +385,7 @@
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
 					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
+					<Add directory="..\IDE\bin\release" />
 				</Linker>
 			</Target>
 			<Target title="Development">
@@ -475,7 +478,7 @@
 					<Add option="-D__WXMSW__" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
-					<Add option="-DGDIL_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -492,6 +495,7 @@
 					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<Linker>
+					<Add option="-lGDCore" />
 					<Add option="-lmingw32" />
 					<Add option="-lopengl32" />
 					<Add option="-limm32" />
@@ -673,6 +677,7 @@
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -687,6 +692,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -742,6 +748,7 @@
 					<Add option="-lLLVMPowerPCInfo" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
+					<Add directory="..\IDE\bin\release" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
@@ -761,6 +768,7 @@
 					<Add option="`wx-config --cppflags`" />
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
@@ -773,6 +781,7 @@
 					<Add directory="..\ExtLibs\llvm\build\tools\clang\include" />
 				</Compiler>
 				<Linker>
+					<Add option="-lGDCore" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -828,6 +837,7 @@
 					<Add option="-lLLVMPowerPCInfo" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
+					<Add directory="..\IDE\bin\debug" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
@@ -995,6 +1005,7 @@
 		</Build>
 		<Compiler>
 			<Add directory="..\GDL\" />
+			<Add directory="..\Core\" />
 			<Add directory="..\ExtLibs\boost" />
 			<Add directory="..\ExtLibs\SFML\include" />
 		</Compiler>
@@ -1097,8 +1108,6 @@
 		<Unit filename="GDL\DynamicLibrariesTools.h" />
 		<Unit filename="GDL\EmptyEvent.cpp" />
 		<Unit filename="GDL\EmptyEvent.h" />
-		<Unit filename="GDL\Event.cpp" />
-		<Unit filename="GDL\Event.h" />
 		<Unit filename="GDL\Events\CodeCompilationHelpers.cpp" />
 		<Unit filename="GDL\Events\CodeCompilationHelpers.h" />
 		<Unit filename="GDL\Events\EventsCodeGenerationContext.cpp" />
@@ -1128,8 +1137,6 @@
 		<Unit filename="GDL\Force.h" />
 		<Unit filename="GDL\Game.cpp" />
 		<Unit filename="GDL\Game.h" />
-		<Unit filename="GDL\IDE\ActionSentenceFormatter.cpp" />
-		<Unit filename="GDL\IDE\ActionSentenceFormatter.h" />
 		<Unit filename="GDL\IDE\ArbitraryResourceWorker.cpp" />
 		<Unit filename="GDL\IDE\ArbitraryResourceWorker.h" />
 		<Unit filename="GDL\IDE\BaseDebugger.cpp" />
@@ -1140,14 +1147,10 @@
 		<Unit filename="GDL\IDE\CodeCompiler.h" />
 		<Unit filename="GDL\IDE\CompilerMessagesParser.cpp" />
 		<Unit filename="GDL\IDE\CompilerMessagesParser.h" />
-		<Unit filename="GDL\IDE\ConditionSentenceFormatter.cpp" />
-		<Unit filename="GDL\IDE\ConditionSentenceFormatter.h" />
 		<Unit filename="GDL\IDE\Dialogs\AdvancedTextEntryDlg.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\AdvancedTextEntryDlg.h" />
 		<Unit filename="GDL\IDE\Dialogs\AjoutPlusImage.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\AjoutPlusImage.h" />
-		<Unit filename="GDL\IDE\Dialogs\BitmapGUIManager.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\BitmapGUIManager.h" />
 		<Unit filename="GDL\IDE\Dialogs\ChooseAutomatismDlg.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\ChooseAutomatismDlg.h" />
 		<Unit filename="GDL\IDE\Dialogs\ChooseLayer.cpp" />
@@ -1180,20 +1183,12 @@
 		<Unit filename="GDL\IDE\Dialogs\ResourcesEditor.h" />
 		<Unit filename="GDL\IDE\Dialogs\SpriteObjectEditor.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\SpriteObjectEditor.h" />
-		<Unit filename="GDL\IDE\EventsEditorItemsAreas.cpp" />
-		<Unit filename="GDL\IDE\EventsEditorItemsAreas.h" />
-		<Unit filename="GDL\IDE\EventsEditorSelection.cpp" />
-		<Unit filename="GDL\IDE\EventsEditorSelection.h" />
-		<Unit filename="GDL\IDE\EventsRenderingHelper.cpp" />
-		<Unit filename="GDL\IDE\EventsRenderingHelper.h" />
 		<Unit filename="GDL\IDE\ExecutableIconChanger.cpp" />
 		<Unit filename="GDL\IDE\ExecutableIconChanger.h" />
 		<Unit filename="GDL\IDE\ExpressionsCorrectnessTesting.cpp" />
 		<Unit filename="GDL\IDE\ExpressionsCorrectnessTesting.h" />
 		<Unit filename="GDL\IDE\FullProjectCompiler.cpp" />
 		<Unit filename="GDL\IDE\FullProjectCompiler.h" />
-		<Unit filename="GDL\IDE\GDExpression.cpp" />
-		<Unit filename="GDL\IDE\GDExpression.h" />
 		<Unit filename="GDL\IDE\GDExpressionParser.cpp" />
 		<Unit filename="GDL\IDE\GDExpressionParser.h" />
 		<Unit filename="GDL\IDE\HelpFileAccess.cpp" />
@@ -1202,8 +1197,6 @@
 		<Unit filename="GDL\IDE\ImageFilesWatcher.h" />
 		<Unit filename="GDL\IDE\ImagesUsedInventorizer.cpp" />
 		<Unit filename="GDL\IDE\ImagesUsedInventorizer.h" />
-		<Unit filename="GDL\IDE\Instruction.cpp" />
-		<Unit filename="GDL\IDE\Instruction.h" />
 		<Unit filename="GDL\IDE\LocaleManager.cpp" />
 		<Unit filename="GDL\IDE\LocaleManager.h" />
 		<Unit filename="GDL\IDE\MainEditorCommand.cpp" />
@@ -1212,8 +1205,6 @@
 		<Unit filename="GDL\IDE\ResourcesMergingHelper.h" />
 		<Unit filename="GDL\IDE\ResourcesUnmergingHelper.cpp" />
 		<Unit filename="GDL\IDE\ResourcesUnmergingHelper.h" />
-		<Unit filename="GDL\IDE\TextFormatting.cpp" />
-		<Unit filename="GDL\IDE\TextFormatting.h" />
 		<Unit filename="GDL\IDE\TreeItemExpressionInfoData.h" />
 		<Unit filename="GDL\IDE\TreeItemStrExpressionInfoData.h" />
 		<Unit filename="GDL\IDE\gdTreeItemStringData.cpp" />
@@ -1321,7 +1312,10 @@
 		<Unit filename="GDL\tinyxml\tinyxml.h" />
 		<Unit filename="GDL\tinyxml\tinyxmlerror.cpp" />
 		<Unit filename="GDL\tinyxml\tinyxmlparser.cpp" />
-		<Unit filename="wxsmith\ProjectUpdateDlg.wxs" />
+		<Unit filename="PlatformDefinition\InstructionMetadataHolder.cpp" />
+		<Unit filename="PlatformDefinition\InstructionMetadataHolder.h" />
+		<Unit filename="PlatformDefinition\Platform.cpp" />
+		<Unit filename="PlatformDefinition\Platform.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

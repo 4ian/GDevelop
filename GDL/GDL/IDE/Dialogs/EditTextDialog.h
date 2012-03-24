@@ -17,7 +17,7 @@
 #include <vector>
 class Game;
 class Scene;
-class ParameterInfo;
+class ParameterMetadata;
 
 using namespace std;
 
@@ -87,7 +87,7 @@ class GD_API EditTextDialog: public wxDialog
 		void TextModified(wxStyledTextEvent& event);
 		void UpdateTextCtrl(wxStyledTextEvent& event);
 
-		string ShowParameterDialog(const ParameterInfo & parameterInfo, bool & userCancelled, std::string object = "");
+		string ShowParameterDialog(const ParameterMetadata & ParameterMetadata, bool & userCancelled, std::string object = "");
 
 		//Items selected
 		wxTreeItemId itemObj;

@@ -13,7 +13,7 @@ class GDExpression;
 class ParserCallbacks;
 class Game;
 class Scene;
-class ParameterInfo;
+class ParameterMetadata;
 class ExpressionInstruction;
 class StrExpressionInstruction;
 class ExpressionInfos;
@@ -52,22 +52,22 @@ class GD_API GDExpressionParser
         /**
          * Tool function to add a parameter
          */
-        bool AddParameterToList(const Game & game, const Scene & scene, ParserCallbacks &, std::vector < GDExpression > & parameters, std::string parameterStr, std::vector < ParameterInfo > parametersInfos, const size_t positionInExpression);
+        bool AddParameterToList(const Game & game, const Scene & scene, ParserCallbacks &, std::vector < GDExpression > & parameters, std::string parameterStr, std::vector < ParameterMetadata > parametersInfos, const size_t positionInExpression);
 
         /**
          * Tool function to prepare a parameter
          */
-        bool PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks &, GDExpression & parameter, const ParameterInfo & parametersInfo, const size_t positionInExpression);
+        bool PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks &, GDExpression & parameter, const ParameterMetadata & parametersInfo, const size_t positionInExpression);
 
         /**
          * Return the minimal number of parameters which can be used when calling an expression ( i.e. ParametersCount-OptionalParameters-CodeOnlyParameters )
          */
-        size_t GetMinimalParametersNumber(const std::vector < ParameterInfo > & parametersInfos);
+        size_t GetMinimalParametersNumber(const std::vector < ParameterMetadata > & parametersInfos);
 
         /**
          * Return the maximal number of parameters which can be used when calling an expression ( i.e. ParametersCount-CodeOnlyParameters )
          */
-        size_t GetMaximalParametersNumber(const std::vector < ParameterInfo > & parametersInfos);
+        size_t GetMaximalParametersNumber(const std::vector < ParameterMetadata > & parametersInfos);
 
         bool ValidSyntax(const std::string & str);
 

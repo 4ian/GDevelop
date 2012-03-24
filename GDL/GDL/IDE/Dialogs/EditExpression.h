@@ -17,7 +17,7 @@
 
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-class ParameterInfo;
+class ParameterMetadata;
 
 #include <string>
 #include <vector>
@@ -185,7 +185,7 @@ class GD_API EditExpression: public wxDialog
 		//*)
 		void TextModified(wxStyledTextEvent& event);
 		void UpdateTextCtrl(wxStyledTextEvent& event);
-		std::string ShowParameterDialog(const ParameterInfo & parameter, bool & userCancelled);
+		std::string ShowParameterDialog(const ParameterMetadata & parameter, bool & userCancelled);
 
 		wxImageList * imageListObj;
 		wxImageList * imageListVal;

@@ -11,7 +11,7 @@
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/CommonTools.h"
 class Instruction;
-class InstructionInfos;
+class InstructionMetadata;
 class InitialPosition;
 class Layer;
 class BaseEvent;
@@ -69,8 +69,8 @@ private:
     void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
     static void SaveVariablesList(const ListVariable & list, TiXmlElement * elem);
 
-    static void AdaptConditionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos);
-    static void AdaptActionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos);
+    static void AdaptConditionFromGD1x(Instruction & instruction, const InstructionMetadata & instrInfos);
+    static void AdaptActionFromGD1x(Instruction & instruction, const InstructionMetadata & instrInfos);
 
     bool updateEventsFromGD1x;
     std::string updateText;

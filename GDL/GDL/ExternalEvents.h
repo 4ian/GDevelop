@@ -8,7 +8,8 @@
 #ifndef EXTERNALEVENTS_H
 #define EXTERNALEVENTS_H
 #include <string>
-#include "GDL/Event.h"
+#include <vector>
+#include "GDCore/Events/Event.h"
 
 /**
  * \brief Contains a list of events not directly linked to a scene.
@@ -29,9 +30,9 @@ class GD_API ExternalEvents
         /**
          * Change external events name
          */
-        inline void SetName(string name_) {name = name_;};
+        inline void SetName(std::string name_) {name = name_;};
 
-        vector < BaseEventSPtr > events; ///< List of events
+        std::vector < BaseEventSPtr > events; ///< List of events
 
     private:
 
@@ -49,8 +50,8 @@ class GD_API ExternalEvents
 /**
  * \brief Functor testing ExternalEvents' name
  */
-struct ExternalEventsHasName : public std::binary_function<boost::shared_ptr<ExternalEvents>, string, bool> {
-    bool operator()(const boost::shared_ptr<ExternalEvents> & externalEvents, string name) const { return externalEvents->GetName() == name; }
+struct ExternalEventsHasName : public std::binary_function<boost::shared_ptr<ExternalEvents>, std::string, bool> {
+    bool operator()(const boost::shared_ptr<ExternalEvents> & externalEvents, std::string name) const { return externalEvents->GetName() == name; }
 };
 
 #endif // EXTERNALEVENTS_H

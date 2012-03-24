@@ -6,14 +6,15 @@
 #if defined(GD_IDE_ONLY)
 
 #include "StandardEvent.h"
+#include "PlatformDefinition/InstructionMetadataHolder.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
+#include "GDCore/IDE/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/IDE/EventsRenderingHelper.h"
-#include "GDL/IDE/EventsEditorItemsAreas.h"
-#include "GDL/IDE/EventsEditorSelection.h"
 
 StandardEvent::StandardEvent() :
 BaseEvent()
@@ -118,14 +119,15 @@ void StandardEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEd
     wxRect rect(x, y, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width));
     renderingHelper->DrawNiceRectangle(dc, rect);
 
+    InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, metadataHolder);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, metadataHolder);
 
     //Make sure that Render is rendering an event with the same height as GetRenderedHeight : Use same values for border and similar calls to compute heights
 }
@@ -138,8 +140,9 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
         int border = renderingHelper->instructionsListBorder;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2);
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
+    InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2, metadataHolder);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, metadataHolder);
 
         renderedHeight = (conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight)+border*2;
         eventHeightNeedUpdate = false;

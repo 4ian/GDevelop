@@ -196,8 +196,8 @@ Actions are declared like this :
             DECLARE_END_ACTION()
  * \endcode
  * Declare conditions and expressions in a similar way.<br>
- * Parameters are added using InstructionInfos::AddParameter. See the function documentation for more information.<br>
- * See also InstructionInfos::CppCallingInformation class documentation for more information about SetFunctionName and similar functions.<br>
+ * Parameters are added using InstructionMetadata::AddParameter. See the function documentation for more information.<br>
+ * See also InstructionMetadata::CppCallingInformation class documentation for more information about SetFunctionName and similar functions.<br>
  *
 
  * \section objectsDeclaration Declaring objects

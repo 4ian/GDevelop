@@ -6,7 +6,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/colordlg.h>
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/IDE/HelpFileAccess.h"
 
 //(*IdInit(EditComment)

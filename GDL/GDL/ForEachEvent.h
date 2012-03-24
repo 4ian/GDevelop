@@ -7,7 +7,7 @@
 
 #ifndef FOREACHEVENT_H
 #define FOREACHEVENT_H
-#include "Event.h"
+#include "GDCore/Events/Event.h"
 class RuntimeScene;
 class Instruction;
 class TiXmlElement;
@@ -34,25 +34,25 @@ class ForEachEvent : public BaseEvent
         virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
-        virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
-        virtual vector < BaseEventSPtr > & GetSubEvents() {return events;};
-        void SetSubEvents(vector < BaseEventSPtr > & subEvents_) {events = subEvents_;};
+        virtual const std::vector < BaseEventSPtr > & GetSubEvents() const {return events;};
+        virtual std::vector < BaseEventSPtr > & GetSubEvents() {return events;};
+        void SetSubEvents(std::vector < BaseEventSPtr > & subEvents_) {events = subEvents_;};
 
-        const vector < Instruction > & GetConditions() const { return conditions; };
-        vector < Instruction > & GetConditions() { return conditions; };
-        void SetConditions(vector < Instruction > & conditions_) { conditions = conditions_; };
+        const std::vector < Instruction > & GetConditions() const { return conditions; };
+        std::vector < Instruction > & GetConditions() { return conditions; };
+        void SetConditions(std::vector < Instruction > & conditions_) { conditions = conditions_; };
 
-        const vector < Instruction > & GetActions() const { return actions; };
-        vector < Instruction > & GetActions() { return actions; };
-        void SetActions(vector < Instruction > & actions_) { actions = actions_; };
+        const std::vector < Instruction > & GetActions() const { return actions; };
+        std::vector < Instruction > & GetActions() { return actions; };
+        void SetActions(std::vector < Instruction > & actions_) { actions = actions_; };
 
-        string GetObjectToPick() const { return objectsToPick.GetPlainString(); };
-        string GetObjectToPick() { return objectsToPick.GetPlainString(); };
-        void SetObjectToPick(string objectsToPick_) { objectsToPick = GDExpression(objectsToPick_); };
+        std::string GetObjectToPick() const { return objectsToPick.GetPlainString(); };
+        std::string GetObjectToPick() { return objectsToPick.GetPlainString(); };
+        void SetObjectToPick(std::string objectsToPick_) { objectsToPick = GDExpression(objectsToPick_); };
 
-        virtual vector < vector<Instruction>* > GetAllConditionsVectors();
-        virtual vector < vector<Instruction>* > GetAllActionsVectors();
-        virtual vector < GDExpression* > GetAllExpressions();
+        virtual std::vector < std::vector<Instruction>* > GetAllConditionsVectors();
+        virtual std::vector < std::vector<Instruction>* > GetAllActionsVectors();
+        virtual std::vector < GDExpression* > GetAllExpressions();
 
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         virtual void LoadFromXml(const TiXmlElement * eventElem);
@@ -76,9 +76,9 @@ class ForEachEvent : public BaseEvent
         void Init(const ForEachEvent & event);
 
         GDExpression objectsToPick;
-        vector < Instruction > conditions;
-        vector < Instruction > actions;
-        vector < BaseEventSPtr > events;
+        std::vector < Instruction > conditions;
+        std::vector < Instruction > actions;
+        std::vector < BaseEventSPtr > events;
 
         bool objectsToPickSelected;
 };

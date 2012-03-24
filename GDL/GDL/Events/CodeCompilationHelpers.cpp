@@ -20,7 +20,7 @@
 
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/IDE/ArbitraryResourceWorker.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/CodeExecutionEngine.h"

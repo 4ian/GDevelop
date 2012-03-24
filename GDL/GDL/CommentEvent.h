@@ -7,7 +7,7 @@
 #ifndef COMMENTEVENT_H
 #define COMMENTEVENT_H
 
-#include "Event.h"
+#include "GDCore/Events/Event.h"
 class TiXmlElement;
 class Scene;
 class Game;
@@ -37,8 +37,8 @@ class GD_API CommentEvent : public BaseEvent
         int textG; ///< Text color Green component
         int textB; ///< Text color Blue component
 
-        string com1; ///< Comment string
-        string com2; ///< Optional second comment string
+        std::string com1; ///< Comment std::string
+        std::string com2; ///< Optional second comment std::string
 
         /**
          * Called by event editor to draw the event.

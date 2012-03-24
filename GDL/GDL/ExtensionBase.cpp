@@ -4,7 +4,7 @@
  */
 
 #include "GDL/ExtensionBase.h"
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/CommonTools.h"
@@ -18,8 +18,8 @@ std::map<std::string, ExtensionObjectInfos > ExtensionBase::badObjectsInfos;
 std::map<std::string, AutomatismInfo > ExtensionBase::badAutomatismsInfo;
 
 #if defined(GD_IDE_ONLY)
-std::map<std::string, InstructionInfos > ExtensionBase::badConditionsInfos;
-std::map<std::string, InstructionInfos > ExtensionBase::badActionsInfos;
+std::map<std::string, InstructionMetadata > ExtensionBase::badConditionsInfos;
+std::map<std::string, InstructionMetadata > ExtensionBase::badActionsInfos;
 std::map<std::string, ExpressionInfos > ExtensionBase::badExpressionsInfos;
 std::map<std::string, StrExpressionInfos > ExtensionBase::badStrExpressionsInfos;
 #endif
@@ -55,18 +55,6 @@ StrExpressionInfos & StrExpressionInfos::SetHidden()
     shown = false;
 
     return *this;
-}
-
-InstructionInfos::InstructionInfos(ExtensionBase & parentExtension) :
-canHaveSubInstructions(false),
-extensionNamespace(parentExtension.GetNameSpace())
-{
-}
-
-ParameterInfo::ParameterInfo() :
-optional(false),
-codeOnly(false)
-{
 }
 
 EventInfos::EventInfos() :
@@ -135,9 +123,10 @@ vector < std::string > ExtensionBase::GetAutomatismsTypes() const
     return automatisms;
 }
 
-ParameterInfo & InstructionInfos::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
+
+ParameterMetadata & ExpressionInfos::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
 {
-    ParameterInfo info;
+    ParameterMetadata info;
     info.type = type;
     info.description = ToString(description);
     info.codeOnly = false;
@@ -148,9 +137,9 @@ ParameterInfo & InstructionInfos::AddParameter(const std::string & type, const w
     return parameters.back();
 }
 
-ParameterInfo & InstructionInfos::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
+ParameterMetadata & ExpressionInfos::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
 {
-    ParameterInfo info;
+    ParameterMetadata info;
     info.type = type;
     info.codeOnly = true;
     info.supplementaryInformation = supplementaryInformation;
@@ -159,9 +148,9 @@ ParameterInfo & InstructionInfos::AddCodeOnlyParameter(const std::string & type,
     return parameters.back();
 }
 
-ParameterInfo & ExpressionInfos::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
+ParameterMetadata & StrExpressionInfos::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
 {
-    ParameterInfo info;
+    ParameterMetadata info;
     info.type = type;
     info.description = ToString(description);
     info.codeOnly = false;
@@ -172,9 +161,9 @@ ParameterInfo & ExpressionInfos::AddParameter(const std::string & type, const wx
     return parameters.back();
 }
 
-ParameterInfo & ExpressionInfos::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
+ParameterMetadata & StrExpressionInfos::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
 {
-    ParameterInfo info;
+    ParameterMetadata info;
     info.type = type;
     info.codeOnly = true;
     info.supplementaryInformation = supplementaryInformation;
@@ -183,36 +172,12 @@ ParameterInfo & ExpressionInfos::AddCodeOnlyParameter(const std::string & type, 
     return parameters.back();
 }
 
-ParameterInfo & StrExpressionInfos::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
-{
-    ParameterInfo info;
-    info.type = type;
-    info.description = ToString(description);
-    info.codeOnly = false;
-    info.optional = parameterIsOptional;
-    info.supplementaryInformation = optionalObjectType.empty() ? "" : extensionNamespace+optionalObjectType;
-
-    parameters.push_back(info);
-    return parameters.back();
-}
-
-ParameterInfo & StrExpressionInfos::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
-{
-    ParameterInfo info;
-    info.type = type;
-    info.codeOnly = true;
-    info.supplementaryInformation = supplementaryInformation;
-
-    parameters.push_back(info);
-    return parameters.back();
-}
-
-const std::map<std::string, InstructionInfos > & ExtensionBase::GetAllActions() const
+const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllActions() const
 {
     return actionsInfos;
 }
 
-const std::map<std::string, InstructionInfos > & ExtensionBase::GetAllConditions() const
+const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllConditions() const
 {
     return conditionsInfos;
 }
@@ -236,7 +201,7 @@ const std::map<std::string, AutomatismInfo > & ExtensionBase::GetAllAutomatisms(
 {
     return automatismsInfo;
 }
-const std::map<std::string, InstructionInfos > & ExtensionBase::GetAllActionsForObject(std::string objectType) const
+const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllActionsForObject(std::string objectType) const
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second.actionsInfos;
@@ -244,7 +209,7 @@ const std::map<std::string, InstructionInfos > & ExtensionBase::GetAllActionsFor
     return badActionsInfos;
 }
 
-const std::map<std::string, InstructionInfos > & ExtensionBase::GetAllConditionsForObject(std::string objectType) const
+const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllConditionsForObject(std::string objectType) const
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second.conditionsInfos;
@@ -268,7 +233,7 @@ const std::map<std::string, StrExpressionInfos > & ExtensionBase::GetAllStrExpre
     return badStrExpressionsInfos;
 }
 
-const std::map<std::string, InstructionInfos > & ExtensionBase::GetAllActionsForAutomatism(std::string autoType) const
+const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllActionsForAutomatism(std::string autoType) const
 {
     if ( automatismsInfo.find(autoType) != automatismsInfo.end())
         return automatismsInfo.find(autoType)->second.actionsInfos;
@@ -276,7 +241,7 @@ const std::map<std::string, InstructionInfos > & ExtensionBase::GetAllActionsFor
     return badActionsInfos;
 }
 
-const std::map<std::string, InstructionInfos > & ExtensionBase::GetAllConditionsForAutomatism(std::string autoType) const
+const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllConditionsForAutomatism(std::string autoType) const
 {
     if ( automatismsInfo.find(autoType) != automatismsInfo.end())
         return automatismsInfo.find(autoType)->second.conditionsInfos;

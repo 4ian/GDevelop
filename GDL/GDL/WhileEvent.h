@@ -8,7 +8,7 @@
 #ifndef WHILEEVENT_H
 #define WHILEEVENT_H
 
-#include "Event.h"
+#include "GDCore/Events/Event.h"
 class RuntimeScene;
 class Instruction;
 class TiXmlElement;
@@ -32,24 +32,24 @@ class WhileEvent : public BaseEvent
         virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
-        virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
-        virtual vector < BaseEventSPtr > & GetSubEvents() {return events;};
-        void SetSubEvents(vector < BaseEventSPtr > & subEvents_) {events = subEvents_;};
+        virtual const std::vector < BaseEventSPtr > & GetSubEvents() const {return events;};
+        virtual std::vector < BaseEventSPtr > & GetSubEvents() {return events;};
+        void SetSubEvents(std::vector < BaseEventSPtr > & subEvents_) {events = subEvents_;};
 
-        const vector < Instruction > & GetConditions() const { return conditions; };
-        vector < Instruction > & GetConditions() { return conditions; };
-        void SetConditions(vector < Instruction > & conditions_) { conditions = conditions_; };
+        const std::vector < Instruction > & GetConditions() const { return conditions; };
+        std::vector < Instruction > & GetConditions() { return conditions; };
+        void SetConditions(std::vector < Instruction > & conditions_) { conditions = conditions_; };
 
-        const vector < Instruction > & GetActions() const { return actions; };
-        vector < Instruction > & GetActions() { return actions; };
-        void SetActions(vector < Instruction > & actions_) { actions = actions_; };
+        const std::vector < Instruction > & GetActions() const { return actions; };
+        std::vector < Instruction > & GetActions() { return actions; };
+        void SetActions(std::vector < Instruction > & actions_) { actions = actions_; };
 
-        const vector < Instruction > & GetWhileConditions() const { return whileConditions; };
-        vector < Instruction > & GetWhileConditions() { return whileConditions; };
-        void SetWhileConditions(vector < Instruction > & whileConditions_) { whileConditions = whileConditions_; };
+        const std::vector < Instruction > & GetWhileConditions() const { return whileConditions; };
+        std::vector < Instruction > & GetWhileConditions() { return whileConditions; };
+        void SetWhileConditions(std::vector < Instruction > & whileConditions_) { whileConditions = whileConditions_; };
 
-        virtual vector < vector<Instruction>* > GetAllConditionsVectors();
-        virtual vector < vector<Instruction>* > GetAllActionsVectors();
+        virtual std::vector < std::vector<Instruction>* > GetAllConditionsVectors();
+        virtual std::vector < std::vector<Instruction>* > GetAllActionsVectors();
 
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         virtual void LoadFromXml(const TiXmlElement * eventElem);
@@ -72,10 +72,10 @@ class WhileEvent : public BaseEvent
     private:
         void Init(const WhileEvent & event);
 
-        vector < Instruction > whileConditions;
-        vector < Instruction > conditions;
-        vector < Instruction > actions;
-        vector < BaseEventSPtr > events;
+        std::vector < Instruction > whileConditions;
+        std::vector < Instruction > conditions;
+        std::vector < Instruction > actions;
+        std::vector < BaseEventSPtr > events;
 
         mutable unsigned int whileConditionsHeight;
 

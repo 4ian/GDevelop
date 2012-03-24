@@ -7,7 +7,7 @@
 
 #include "GDL/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDL/IDE/GDExpressionParser.h"
-#include "GDL/IDE/GDExpression.h"
+#include "GDCore/Events/GDExpression.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"

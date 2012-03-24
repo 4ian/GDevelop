@@ -7,7 +7,7 @@
 
 #ifndef LINKCOMMENT_H
 #define LINKCOMMENT_H
-#include "Event.h"
+#include "GDCore/Events/Event.h"
 #include <vector>
 class Game;
 class RuntimeScene;
@@ -30,7 +30,7 @@ class LinkEvent : public BaseEvent
 
         virtual void Preprocess(const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
 
-        string sceneLinked;
+        std::string sceneLinked;
         int start;
         int end;
 

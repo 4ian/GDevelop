@@ -8,15 +8,15 @@
 #ifndef EventsCodeGenerator_H
 #define EventsCodeGenerator_H
 
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include <string>
 #include <vector>
 #include <set>
 #include <utility>
 class Scene;
-class ParameterInfo;
+class ParameterMetadata;
 class EventsCodeGenerationContext;
-class InstructionInfos;
+class InstructionMetadata;
 
 /**
  * \brief Internal class used to prepare events for runtime.
@@ -29,7 +29,7 @@ public:
 
     static std::string GenerateEventsCompleteCode(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events, bool compilationForRuntime = false);
     static void DeleteUselessEvents(std::vector < BaseEventSPtr > & events);
-    static void PreprocessEventList( const Game & game, const Scene & scene, vector < BaseEventSPtr > & listEvent );
+    static void PreprocessEventList( const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & listEvent );
 
     EventsCodeGenerator() : errorOccurred(false), compilationForRuntime(false) {};
     virtual ~EventsCodeGenerator() {};
@@ -39,7 +39,7 @@ public:
      *
      * \param game Game used
      * \param scene Scene used
-     * \param events Vector of events
+     * \param events std::vector of events
      * \param context Context used for generation
      * \return C++ code
      */
@@ -50,7 +50,7 @@ public:
      *
      * \param game Game used
      * \param scene Scene used
-     * \param conditions Vector of conditions
+     * \param conditions std::vector of conditions
      * \param context Context used for generation
      * \return C++ code. Boolean containing conditions result are name conditionXIsTrue, with X = the number of the condition, starting from 0.
      */
@@ -61,7 +61,7 @@ public:
      *
      * \param game Game used
      * \param scene Scene used
-     * \param actions Vector of actions
+     * \param actions std::vector of actions
      * \param context Context used for generation
      * \return C++ code
      */
@@ -72,10 +72,10 @@ public:
      *
      * \param game Game used
      * \param scene Scene used
-     * \param parameters Vector of actual parameters.
-     * \param parametersInfo Vector of information about parameters
+     * \param parameters std::vector of actual parameters.
+     * \param parametersInfo std::vector of information about parameters
      * \param context Context used for generation
-     * \param supplementaryParametersTypes Optional vector of new parameters types ( vector of pair<std::string,std::string>("type", "valueToBeInserted") )
+     * \param supplementaryParametersTypes Optional std::vector of new parameters types ( std::vector of pair<std::string,std::string>("type", "valueToBeInserted") )
      *
      * Supported parameters type, and how they are used in C++ code:
      *
@@ -109,7 +109,7 @@ public:
     instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1"); //The called function will be called with this signature : Function(std::string, std::string, Object*)
      * \endcode
      */
-    std::vector<std::string> GenerateParametersCodes( const Game & game, const Scene & scene, std::vector < GDExpression > parameters, const std::vector < ParameterInfo > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
+    std::vector<std::string> GenerateParametersCodes( const Game & game, const Scene & scene, std::vector < GDExpression > parameters, const std::vector < ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
 
     /**
      * Generate code for a single condition
@@ -205,9 +205,9 @@ public:
 
 private:
 
-    std::string GenerateRelationalOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument = 0);
-    std::string GenerateOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, const string & getterStartString, unsigned int startFromArgument = 0);
-    std::string GenerateCompoundOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument = 0);
+    std::string GenerateRelationalOperatorCall(const InstructionMetadata & instrInfos, std::vector<std::string> & arguments, const std::string & callStartString, unsigned int startFromArgument = 0);
+    std::string GenerateOperatorCall(const InstructionMetadata & instrInfos, std::vector<std::string> & arguments, const std::string & callStartString, const std::string & getterStartString, unsigned int startFromArgument = 0);
+    std::string GenerateCompoundOperatorCall(const InstructionMetadata & instrInfos, std::vector<std::string> & arguments, const std::string & callStartString, unsigned int startFromArgument = 0);
 
     bool errorOccurred;
     bool compilationForRuntime;

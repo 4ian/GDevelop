@@ -11,9 +11,10 @@
 #include "GDL/OpenSaveGame.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/Events/ExpressionsCodeGeneration.h"
-#include "GDL/IDE/EventsRenderingHelper.h"
-#include "GDL/IDE/EventsEditorItemsAreas.h"
-#include "GDL/IDE/EventsEditorSelection.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
+#include "GDCore/IDE/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/EventsEditorSelection.h"
+#include "PlatformDefinition/InstructionMetadataHolder.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/ExtensionsManager.h"
 
@@ -135,7 +136,8 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     const int repeatHeight = 20;
 
     //Draw header rectangle
-    int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2)+border*2;
+    InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
+    int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, metadataHolder)+border*2;
     wxRect headerRect(x, y, width, whileConditionsHeight+repeatHeight);
     renderingHelper->DrawNiceRectangle(dc, headerRect);
 
@@ -145,7 +147,7 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     dc.DrawText( _("Tant que :"), x+5, y+5 );
 
     //Draw "while conditions"
-    renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection);
+    renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection, metadataHolder);
 
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
@@ -159,11 +161,11 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+whileConditionsHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, metadataHolder);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+whileConditionsHeight+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, metadataHolder);
 }
 
 unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
@@ -175,9 +177,10 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
         const int repeatHeight = 20;
 
         //Get maximum height needed
-        int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2);
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border);
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
+        InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
+        int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, metadataHolder);
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, metadataHolder);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, metadataHolder);
 
         renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + whileConditionsHeight + repeatHeight)+border*2+border*2;
         eventHeightNeedUpdate = false;

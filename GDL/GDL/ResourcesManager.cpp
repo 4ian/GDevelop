@@ -14,7 +14,7 @@
 #include <wx/log.h>
 #include <wx/dcclient.h>
 #include <wx/file.h>
-#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
 #endif
 
 std::string Resource::badStr;
@@ -81,7 +81,7 @@ void ImageResource::RenderPreview(wxPaintDC & dc, wxPanel & previewPanel)
     wxSize size = previewPanel.GetSize();
 
     //Fond en damier
-    dc.SetBrush(BitmapGUIManager::GetInstance()->transparentBg);
+    dc.SetBrush(CommonBitmapManager::GetInstance()->transparentBg);
     dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
     if ( !wxFile::Exists(file) )

@@ -33,7 +33,7 @@ using namespace std;
  * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Get
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string EventsCodeGenerator::GenerateRelationalOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
+string EventsCodeGenerator::GenerateRelationalOperatorCall(const InstructionMetadata & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
 {
     unsigned int relationalOperatorIndex = 0;
     for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
@@ -75,7 +75,7 @@ string EventsCodeGenerator::GenerateRelationalOperatorCall(const InstructionInfo
  * \param String to be placed at the start of the call of the getter ( the "getter" function to be called typically ). Example : MyObject->Get
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string EventsCodeGenerator::GenerateOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, const string & getterStartString, unsigned int startFromArgument)
+string EventsCodeGenerator::GenerateOperatorCall(const InstructionMetadata & instrInfos, vector<string> & arguments, const string & callStartString, const string & getterStartString, unsigned int startFromArgument)
 {
     unsigned int operatorIndex = 0;
     for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
@@ -139,7 +139,7 @@ string EventsCodeGenerator::GenerateOperatorCall(const InstructionInfos & instrI
  * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Set
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string EventsCodeGenerator::GenerateCompoundOperatorCall(const InstructionInfos & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
+string EventsCodeGenerator::GenerateCompoundOperatorCall(const InstructionMetadata & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
 {
     unsigned int operatorIndex = 0;
     for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
@@ -186,12 +186,12 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
 
     std::string conditionCode;
 
-    InstructionInfos instrInfos = extensionsManager->GetConditionInfos(condition.GetType());
+    InstructionMetadata instrInfos = extensionsManager->GetConditionInfos(condition.GetType());
 
     if ( !instrInfos.cppCallingInformation.optionalIncludeFile.empty() )
         AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
 
-    if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>() )
+    if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>() )
     {
         conditionCode += "{\nbool & conditionTrue = "+returnBoolean+";\n";
         conditionCode += instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, condition, *this, context);
@@ -458,12 +458,12 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
 
     string actionCode;
 
-    InstructionInfos instrInfos = extensionsManager->GetActionInfos(action.GetType());
+    InstructionMetadata instrInfos = extensionsManager->GetActionInfos(action.GetType());
 
     if ( !instrInfos.cppCallingInformation.optionalIncludeFile.empty() )
         AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
 
-    if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>() )
+    if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>() )
     {
         return instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, action, *this, context);
     }
@@ -503,7 +503,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
         string call;
         if ( instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string" )
         {
-            if ( instrInfos.cppCallingInformation.accessType == InstructionInfos::CppCallingInformation::MutatorAndOrAccessor )
+            if ( instrInfos.cppCallingInformation.accessType == InstructionMetadata::CppCallingInformation::MutatorAndOrAccessor )
                 call = GenerateOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName, instrInfos.cppCallingInformation.optionalAssociatedInstruction);
             else
                 call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName);
@@ -557,7 +557,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             string call;
             if ( instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string")
             {
-                if ( instrInfos.cppCallingInformation.accessType == InstructionInfos::CppCallingInformation::MutatorAndOrAccessor )
+                if ( instrInfos.cppCallingInformation.accessType == InstructionMetadata::CppCallingInformation::MutatorAndOrAccessor )
                     call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, objectPart+instrInfos.cppCallingInformation.optionalAssociatedInstruction,1);
                 else
                     call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName,1);
@@ -619,7 +619,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             string call;
             if ( (instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string") )
             {
-                if ( instrInfos.cppCallingInformation.accessType == InstructionInfos::CppCallingInformation::MutatorAndOrAccessor )
+                if ( instrInfos.cppCallingInformation.accessType == InstructionMetadata::CppCallingInformation::MutatorAndOrAccessor )
                     call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, objectPart+instrInfos.cppCallingInformation.optionalAssociatedInstruction,2);
                 else
                     call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName,2);
@@ -678,7 +678,7 @@ string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Sce
 
 /**
  */
-vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, const Scene & scene, vector < GDExpression > parameters, const vector < ParameterInfo > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
+vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, const Scene & scene, vector < GDExpression > parameters, const vector < ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
 {
     vector<string> arguments;
 

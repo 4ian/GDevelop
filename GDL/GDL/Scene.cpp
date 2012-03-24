@@ -2,7 +2,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Game.h"
 #include "GDL/Position.h"
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/Object.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"

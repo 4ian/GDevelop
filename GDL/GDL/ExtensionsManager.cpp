@@ -41,7 +41,7 @@ namespace GDpriv
 
 ExtensionsManager *ExtensionsManager::_singleton = NULL;
 #if defined(GD_IDE_ONLY)
-InstructionInfos ExtensionsManager::badInstructionInfos;
+InstructionMetadata ExtensionsManager::badInstructionMetadata;
 ExpressionInfos ExtensionsManager::badExpressionInfos;
 StrExpressionInfos ExtensionsManager::badStrExpressionInfos;
 #endif
@@ -74,9 +74,9 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
 
 #if defined(GD_IDE_ONLY)
-    badInstructionInfos.fullname = _("Instruction inconnue");
-    badInstructionInfos.description = _("Instruction inconnue");
-    badInstructionInfos.sentence = _("Instruction inconnue");
+    badInstructionMetadata.fullname = _("Instruction inconnue");
+    badInstructionMetadata.description = _("Instruction inconnue");
+    badInstructionMetadata.sentence = _("Instruction inconnue");
 #endif
 }
 
@@ -228,18 +228,18 @@ const AutomatismInfo& ExtensionsManager::GetAutomatismInfo(std::string automatis
     return badAutomatismInfo;
 }
 
-const InstructionInfos & ExtensionsManager::GetActionInfos(string actionType) const
+const InstructionMetadata & ExtensionsManager::GetActionInfos(string actionType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<string, InstructionInfos> & allActions = extensionsLoaded[i]->GetAllActions();
+        const std::map<string, InstructionMetadata> & allActions = extensionsLoaded[i]->GetAllActions();
         if ( allActions.find(actionType) != allActions.end() )
             return allActions.find(actionType)->second;
 
         const vector < string > & objects = extensionsLoaded[i]->GetExtensionObjectsTypes();
         for (unsigned int j = 0;j<objects.size();++j)
         {
-            const std::map<string, InstructionInfos> & allObjectsActions = extensionsLoaded[i]->GetAllActionsForObject(objects[j]);
+            const std::map<string, InstructionMetadata> & allObjectsActions = extensionsLoaded[i]->GetAllActionsForObject(objects[j]);
             if ( allObjectsActions.find(actionType) != allObjectsActions.end() )
                 return allObjectsActions.find(actionType)->second;
         }
@@ -247,27 +247,27 @@ const InstructionInfos & ExtensionsManager::GetActionInfos(string actionType) co
         const vector < string > & autos = extensionsLoaded[i]->GetAutomatismsTypes();
         for (unsigned int j = 0;j<autos.size();++j)
         {
-            const std::map<string, InstructionInfos> & allAutosActions = extensionsLoaded[i]->GetAllActionsForAutomatism(autos[j]);
+            const std::map<string, InstructionMetadata> & allAutosActions = extensionsLoaded[i]->GetAllActionsForAutomatism(autos[j]);
             if ( allAutosActions.find(actionType) != allAutosActions.end() )
                 return allAutosActions.find(actionType)->second;
         }
     }
 
-    return badInstructionInfos;
+    return badInstructionMetadata;
 }
 
-const InstructionInfos & ExtensionsManager::GetConditionInfos(string conditionType) const
+const InstructionMetadata & ExtensionsManager::GetConditionInfos(string conditionType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<string, InstructionInfos> & allConditions = extensionsLoaded[i]->GetAllConditions();
+        const std::map<string, InstructionMetadata> & allConditions = extensionsLoaded[i]->GetAllConditions();
         if ( allConditions.find(conditionType) != allConditions.end() )
             return allConditions.find(conditionType)->second;
 
         const vector < string > & objects = extensionsLoaded[i]->GetExtensionObjectsTypes();
         for (unsigned int j = 0;j<objects.size();++j)
         {
-            const std::map<string, InstructionInfos> & allObjetsConditions = extensionsLoaded[i]->GetAllConditionsForObject(objects[j]);
+            const std::map<string, InstructionMetadata> & allObjetsConditions = extensionsLoaded[i]->GetAllConditionsForObject(objects[j]);
             if ( allObjetsConditions.find(conditionType) != allObjetsConditions.end() )
                 return allObjetsConditions.find(conditionType)->second;
         }
@@ -275,13 +275,13 @@ const InstructionInfos & ExtensionsManager::GetConditionInfos(string conditionTy
         const vector < string > & autos = extensionsLoaded[i]->GetAutomatismsTypes();
         for (unsigned int j = 0;j<autos.size();++j)
         {
-            const std::map<string, InstructionInfos> & allAutosConditions = extensionsLoaded[i]->GetAllConditionsForAutomatism(autos[j]);
+            const std::map<string, InstructionMetadata> & allAutosConditions = extensionsLoaded[i]->GetAllConditionsForAutomatism(autos[j]);
             if ( allAutosConditions.find(conditionType) != allAutosConditions.end() )
                 return allAutosConditions.find(conditionType)->second;
         }
     }
 
-    return badInstructionInfos;
+    return badInstructionMetadata;
 }
 
 const ExpressionInfos & ExtensionsManager::GetObjectExpressionInfos(string objectType, string exprType) const
@@ -410,7 +410,7 @@ bool ExtensionsManager::HasAction(string name) const
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, InstructionInfos > & actions = extensionsLoaded[i]->GetAllActions();
+        const std::map<std::string, InstructionMetadata > & actions = extensionsLoaded[i]->GetAllActions();
         if ( actions.find(name) != actions.end() )
             return true;
     }
@@ -424,7 +424,7 @@ bool ExtensionsManager::HasObjectAction(std::string objectType, string name) con
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, InstructionInfos > & actions = extensionsLoaded[i]->GetAllActionsForObject(objectType);
+        const std::map<std::string, InstructionMetadata > & actions = extensionsLoaded[i]->GetAllActionsForObject(objectType);
         if ( actions.find(name) != actions.end() )
             return true;
     }
@@ -432,7 +432,7 @@ bool ExtensionsManager::HasObjectAction(std::string objectType, string name) con
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, InstructionInfos > & actions = extensionsLoaded[i]->GetAllActionsForObject("");
+        const std::map<std::string, InstructionMetadata > & actions = extensionsLoaded[i]->GetAllActionsForObject("");
         if ( actions.find(name) != actions.end() )
             return true;
     }
@@ -446,7 +446,7 @@ bool ExtensionsManager::HasAutomatismAction(std::string automatismType, string n
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, InstructionInfos > & actions = extensionsLoaded[i]->GetAllActionsForAutomatism(automatismType);
+        const std::map<std::string, InstructionMetadata > & actions = extensionsLoaded[i]->GetAllActionsForAutomatism(automatismType);
         if ( actions.find(name) != actions.end() )
             return true;
     }
@@ -454,7 +454,7 @@ bool ExtensionsManager::HasAutomatismAction(std::string automatismType, string n
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, InstructionInfos > & actions = extensionsLoaded[i]->GetAllActionsForAutomatism("");
+        const std::map<std::string, InstructionMetadata > & actions = extensionsLoaded[i]->GetAllActionsForAutomatism("");
         if ( actions.find(name) != actions.end() )
             return true;
     }
@@ -469,7 +469,7 @@ bool ExtensionsManager::HasCondition(string name) const
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, InstructionInfos > & conditions = extensionsLoaded[i]->GetAllConditions();
+        const std::map<std::string, InstructionMetadata > & conditions = extensionsLoaded[i]->GetAllConditions();
         if ( conditions.find(name) != conditions.end() )
             return true;
     }
@@ -483,7 +483,7 @@ bool ExtensionsManager::HasObjectCondition(std::string objectType, string name) 
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, InstructionInfos > & conditions = extensionsLoaded[i]->GetAllConditionsForObject(objectType);
+        const std::map<std::string, InstructionMetadata > & conditions = extensionsLoaded[i]->GetAllConditionsForObject(objectType);
         if ( conditions.find(name) != conditions.end() )
             return true;
     }
@@ -491,7 +491,7 @@ bool ExtensionsManager::HasObjectCondition(std::string objectType, string name) 
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, InstructionInfos > & conditions = extensionsLoaded[i]->GetAllConditionsForObject("");
+        const std::map<std::string, InstructionMetadata > & conditions = extensionsLoaded[i]->GetAllConditionsForObject("");
         if ( conditions.find(name) != conditions.end() )
             return true;
     }
@@ -505,7 +505,7 @@ bool ExtensionsManager::HasAutomatismCondition(std::string automatismType, strin
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, InstructionInfos > & conditions = extensionsLoaded[i]->GetAllConditionsForAutomatism(automatismType);
+        const std::map<std::string, InstructionMetadata > & conditions = extensionsLoaded[i]->GetAllConditionsForAutomatism(automatismType);
         if ( conditions.find(name) != conditions.end() )
             return true;
     }
@@ -513,7 +513,7 @@ bool ExtensionsManager::HasAutomatismCondition(std::string automatismType, strin
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, InstructionInfos > & conditions = extensionsLoaded[i]->GetAllConditionsForAutomatism("");
+        const std::map<std::string, InstructionMetadata > & conditions = extensionsLoaded[i]->GetAllConditionsForAutomatism("");
         if ( conditions.find(name) != conditions.end() )
             return true;
     }

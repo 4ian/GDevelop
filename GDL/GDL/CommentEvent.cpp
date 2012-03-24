@@ -6,13 +6,15 @@
 
 #include <wx/dcmemory.h>
 #include "CommentEvent.h"
-#include "GDL/IDE/EventsRenderingHelper.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/IDE/Dialogs/EditComment.h"
-#include "GDL/IDE/EventsEditorItemsAreas.h"
-#include "GDL/IDE/EventsEditorSelection.h"
+#include "GDCore/IDE/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/EventsEditorSelection.h"
+
+using namespace std;
 
 void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
 {

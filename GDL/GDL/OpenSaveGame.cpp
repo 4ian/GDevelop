@@ -34,8 +34,8 @@
 #include "GDL/Object.h"
 #include "GDL/Animation.h"
 #include "GDL/Position.h"
-#include "GDL/Event.h"
-#include "GDL/IDE/Instruction.h"
+#include "GDCore/Events/Event.h"
+#include "GDCore/Events/Instruction.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/ExtensionBase.h"
@@ -652,10 +652,8 @@ void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiX
             if ( elemPara->Attribute( "Contraire" ) != NULL ) { ContraireStr = elemPara->Attribute( "Contraire" ); }
             else { MSG("Les informations sur le type-contraire d'un évènement manquent"); }
 
-            instruction.SetInversion(false);
-            instruction.SetLocal(true);
-            if ( LocStr == "false" ) { instruction.SetLocal(false); }
-            if ( ContraireStr == "true" ) { instruction.SetInversion(true); }
+            instruction.SetInverted(false);
+            if ( ContraireStr == "true" ) { instruction.SetInverted(true); }
         }
 
         //Read parameters
@@ -692,9 +690,6 @@ void OpenSaveGame::OpenActions(vector < Instruction > & actions, const TiXmlElem
         if ( elemPara != NULL )
         {
             instruction.SetType( elemPara->Attribute( "value" ));
-            string LocStr = elemPara->Attribute( "loc" );
-            instruction.SetLocal(true);
-            if ( LocStr == "false" ) { instruction.SetLocal(false); }
         }
 
         //Read parameters
@@ -1178,8 +1173,6 @@ void OpenSaveGame::SaveActions(const vector < Instruction > & list, TiXmlElement
         action->LinkEndChild( typeAction );
 
         typeAction->SetAttribute( "value", list[k].GetType().c_str() );
-        if ( list[k].IsLocal() ) { typeAction->SetAttribute( "loc", "true" ); }
-        else { typeAction->SetAttribute( "loc", "false" ); }
 
 
         //Les autres paramètres
@@ -1187,7 +1180,7 @@ void OpenSaveGame::SaveActions(const vector < Instruction > & list, TiXmlElement
         {
             TiXmlElement * Parametre = new TiXmlElement( "Parametre" );
             action->LinkEndChild( Parametre );
-            Parametre->SetAttribute( "value", list[k].GetParameterSafely( l ).GetPlainString().c_str() );
+            Parametre->SetAttribute( "value", list[k].GetParameter( l ).GetPlainString().c_str() );
         }
 
         //Sub instructions
@@ -1213,8 +1206,6 @@ void OpenSaveGame::SaveConditions(const vector < Instruction > & list, TiXmlElem
         condition->LinkEndChild( typeCondition );
 
         typeCondition->SetAttribute( "value", list[k].GetType().c_str() );
-        if ( list[k].IsLocal() ) { typeCondition->SetAttribute( "loc", "true" ); }
-        else { typeCondition->SetAttribute( "loc", "false" ); }
         if ( list[k].IsInverted() ) { typeCondition->SetAttribute( "Contraire", "true" ); }
         else { typeCondition->SetAttribute( "Contraire", "false" ); }
 
@@ -1223,7 +1214,7 @@ void OpenSaveGame::SaveConditions(const vector < Instruction > & list, TiXmlElem
         {
             TiXmlElement * Parametre = new TiXmlElement( "Parametre" );
             condition->LinkEndChild( Parametre );
-            Parametre->SetAttribute( "value", list[k].GetParameterSafely( l ).GetPlainString().c_str() );
+            Parametre->SetAttribute( "value", list[k].GetParameter( l ).GetPlainString().c_str() );
         }
 
         //Sub instructions
@@ -1416,7 +1407,7 @@ void OpenSaveGame::OpenImagesFromGD2010498(const TiXmlElement * imagesElem, TiXm
 }
 
 
-void OpenSaveGame::AdaptConditionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos)
+void OpenSaveGame::AdaptConditionFromGD1x(Instruction & instruction, const InstructionMetadata & instrInfos)
 {
     vector < GDExpression > newParameters = instruction.GetParameters();
     for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)
@@ -1437,7 +1428,7 @@ void OpenSaveGame::AdaptConditionFromGD1x(Instruction & instruction, const Instr
     }
 }
 
-void OpenSaveGame::AdaptActionFromGD1x(Instruction & instruction, const InstructionInfos & instrInfos)
+void OpenSaveGame::AdaptActionFromGD1x(Instruction & instruction, const InstructionMetadata & instrInfos)
 {
     vector < GDExpression > newParameters = instruction.GetParameters();
     for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)

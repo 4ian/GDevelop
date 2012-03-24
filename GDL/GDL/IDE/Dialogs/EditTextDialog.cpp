@@ -406,39 +406,39 @@ void EditTextDialog::OnOkBtClick(wxCommandEvent& event)
 /**
  * Show a dialog for completing a parameter
  */
-string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, bool & userCancelled, std::string objectNameAssociated)
+string EditTextDialog::ShowParameterDialog(const ParameterMetadata & ParameterMetadata, bool & userCancelled, std::string objectNameAssociated)
 {
-    if ( parameterInfo.type == "expression" )
+    if ( ParameterMetadata.type == "expression" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), ParameterMetadata.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
             userCancelled = true;
     }
-    else if ( parameterInfo.type == "object" )
+    else if ( ParameterMetadata.type == "object" )
     {
-        ChooseObject Dialog(this, game, scene, true, parameterInfo.supplementaryInformation);
+        ChooseObject Dialog(this, game, scene, true, ParameterMetadata.supplementaryInformation);
         if ( Dialog.ShowModal() == 0 ) return "";
 
         return Dialog.objectChosen;
     }
-    else if ( parameterInfo.type == "string" )
+    else if ( ParameterMetadata.type == "string" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), ParameterMetadata.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
             userCancelled = true;
     }
-    else if ( parameterInfo.type == "layer" )
+    else if ( ParameterMetadata.type == "layer" )
     {
         ChooseLayer dialog(this, scene.initialLayers);
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.layerChosen;
     }
-    else if ( parameterInfo.type == "scenevar" )
+    else if ( ParameterMetadata.type == "scenevar" )
     {
         ChooseVariableDialog dialog(this, scene.variables);
         if ( dialog.ShowModal() == 1 )
@@ -449,7 +449,7 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
 
         return "";
     }
-    else if ( parameterInfo.type == "globalvar" )
+    else if ( ParameterMetadata.type == "globalvar" )
     {
         ChooseVariableDialog dialog(this, game.variables);
         if ( dialog.ShowModal() == 1 )
@@ -460,7 +460,7 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
 
         return "";
     }
-    else if ( parameterInfo.type == "objectvar" )
+    else if ( ParameterMetadata.type == "objectvar" )
     {
         std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectNameAssociated));
         std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), objectNameAssociated));
@@ -472,7 +472,7 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
         else if ( globalObject != game.globalObjects.end() )
             object = *globalObject;
         else
-            return string(wxGetTextFromUser(parameterInfo.description, _("Variable"), "", this).mb_str());
+            return string(wxGetTextFromUser(ParameterMetadata.description, _("Variable"), "", this).mb_str());
 
         ChooseVariableDialog dialog(this, object->variablesObjet);
         if ( dialog.ShowModal() == 1 )
@@ -483,14 +483,14 @@ string EditTextDialog::ShowParameterDialog(const ParameterInfo & parameterInfo, 
 
         return "";
     }
-    else if ( parameterInfo.type == "camera" )
+    else if ( ParameterMetadata.type == "camera" )
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Numéro de la caméra"), "0", this));
+        string param = static_cast<string> (wxGetTextFromUser(ParameterMetadata.description, _("Numéro de la caméra"), "0", this));
         return param;
     }
-    else if ( parameterInfo.type == "" )
+    else if ( ParameterMetadata.type == "" )
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Paramètre"), "", this));
+        string param = static_cast<string> (wxGetTextFromUser(ParameterMetadata.description, _("Paramètre"), "", this));
         return param;
     }
 

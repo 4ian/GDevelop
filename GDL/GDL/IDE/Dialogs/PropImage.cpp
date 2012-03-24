@@ -12,7 +12,7 @@
 //*)
 #include <wx/dcbuffer.h>
 #include <wx/filedlg.h>
-#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/CommonTools.h"
 
 //(*IdInit(PropImage)
@@ -185,10 +185,10 @@ void PropImage::OnapercuPanelPaint(wxPaintEvent& event)
     wxPaintDC dc( apercuPanel ); //Création obligatoire du wxBufferedPaintDC
     wxSize size = apercuPanel->GetSize();
 
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
+    CommonBitmapManager * CommonBitmapManager = CommonBitmapManager::GetInstance();
 
     //Fond en damier
-    dc.SetBrush(bitmapGUIManager->transparentBg);
+    dc.SetBrush(CommonBitmapManager->transparentBg);
     dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
     if ( !wxFileExists(FichierEdit->GetValue()) )

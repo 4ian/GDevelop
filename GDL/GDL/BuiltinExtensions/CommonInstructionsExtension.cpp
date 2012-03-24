@@ -3,6 +3,9 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#include <string>
+#include <set>
+#include "GDCore/Events/Event.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsExtension.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDL/StandardEvent.h"
@@ -13,12 +16,13 @@
 #include "GDL/CppCodeEvent.h"
 #include "GDL/LinkEvent.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Event.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/Events/EventsCodeNameMangler.h"
 
 #include "GDL/ExtensionBase.h"
+
+using namespace std;
 
 CommonInstructionsExtension::CommonInstructionsExtension()
 {
@@ -37,7 +41,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                    "res/conditions/or24.png",
                    "res/conditions/or.png");
 
-        class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
@@ -108,8 +112,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 return code;
             };
         };
-        InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
         instrInfo.SetCanHaveSubInstructions();
 
     DECLARE_END_CONDITION()
@@ -122,7 +126,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                    "res/conditions/and24.png",
                    "res/conditions/and.png");
 
-        class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
@@ -140,8 +144,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             };
         };
 
-        InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
         instrInfo.SetCanHaveSubInstructions();
 
     DECLARE_END_CONDITION()
@@ -154,7 +158,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                    "res/conditions/not24.png",
                    "res/conditions/not.png");
 
-        class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
@@ -191,8 +195,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             };
         };
 
-        InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
         instrInfo.SetCanHaveSubInstructions();
 
     DECLARE_END_CONDITION()

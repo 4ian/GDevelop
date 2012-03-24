@@ -8,7 +8,7 @@
 #ifndef EMPTYEVENT_H
 #define EMPTYEVENT_H
 
-#include "Event.h"
+#include "GDCore/Events/Event.h"
 
 /**
  * \brief Empty event doing nothing.

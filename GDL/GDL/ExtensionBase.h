@@ -21,6 +21,7 @@ class MainEditorCommand;
 #include <vector>
 #include <map>
 #include <boost/shared_ptr.hpp>
+#include "GDCore/Events/InstructionMetadata.h"
 class RuntimeScene;
 class Instruction;
 class Automatism;
@@ -58,7 +59,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo(*this); \
+            InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentConditionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -78,7 +79,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo(*this); \
+            InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentActionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -98,7 +99,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_OBJECT_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_OBJECT_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo(*this); \
+            InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentObjConditionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -117,7 +118,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_OBJECT_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_OBJECT_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo(*this); \
+            InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentObjActionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -138,7 +139,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_AUTOMATISM_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_AUTOMATISM_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo(*this); \
+            InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentAutoConditionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -157,7 +158,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_AUTOMATISM_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_AUTOMATISM_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionInfos instrInfo(*this); \
+            InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentAutoActionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -476,173 +477,6 @@ typedef Object * (*CreateFunPtr)(std::string name);
 
 
 #if defined(GD_IDE_ONLY)
-/**
- * \brief ParameterInfo contains user-friendly info about a parameter, only at edittime, and information about what a parameter need
- */
-class GD_API ParameterInfo
-{
-    public:
-
-    ParameterInfo();
-    virtual ~ParameterInfo() {};
-
-    std::string type; ///< Parameter type
-    std::string supplementaryInformation; ///< Used if needed
-    bool optional; ///< True if the parameter is optional
-
-    std::string description; ///< Description shown in editor
-    bool codeOnly; ///< True if parameter is relative to code generation only, i.e. must not be shown in editor
-    std::string defaultValue; ///< Used as a default value in editor or if an optional parameter is empty.
-
-
-    /**
-     * Set the default value used in editor or if an optional parameter is empty during code generation.
-     */
-    ParameterInfo & SetDefaultValue(std::string defaultValue_) {
-        defaultValue = defaultValue_;
-        return *this; };
-};
-
-/**
- * \brief Contains user-friendly infos about actions/conditions, only at edittime, and members needed to setup an instruction
- */
-class GD_API InstructionInfos
-{
-    public:
-
-    InstructionInfos(ExtensionBase & parentExtension);
-    virtual ~InstructionInfos() {};
-
-    std::string fullname;
-    std::string description;
-    std::string sentence;
-    std::string group;
-    wxBitmap icon;
-    wxBitmap smallicon;
-    bool canHaveSubInstructions;
-    std::vector < ParameterInfo > parameters;
-
-    /**
-     * Notify that the instruction can have sub instructions.
-     */
-    InstructionInfos & SetCanHaveSubInstructions()
-    {
-        canHaveSubInstructions = true;
-        return *this;
-    }
-
-    /**
-     * Add a parameter to the instruction ( condition or action ) information class.
-     * \param type One of the type handled by Game Develop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
-     * \param description Edittime only description for parameter
-     * \param optionalObjectType If type is "object", this parameter will describe which objects are allowed. If it is empty, all objects are allowed.
-     * \param parameterIsOptional true if the parameter must be optional, false otherwise.
-     */
-    ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
-
-    /**
-     * Add a parameter not displayed in editor.
-     * \param type One of the type handled by Game Develop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
-     * \param supplementaryInformation Can be used if needed. For example, when type == "inlineCode", the content of supplementaryInformation is inserted in the generated C++ code.
-     */
-    ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
-
-    /**
-     * \brief Defines information about how generate C++ code for an instruction
-     */
-    class CppCallingInformation
-    {
-    public:
-        enum AccessType {Reference, MutatorAndOrAccessor};
-        CppCallingInformation() : accessType(Reference) {};
-
-        /**
-         * Set the C++ function name which will be used when generating the C++ code.
-         */
-        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
-        {
-            cppCallingName = cppCallingName_;
-            return *this;
-        }
-
-        /**
-         * Declare if the instruction ( condition or action ) being declared is manipulating something in a standard way.
-         */
-        CppCallingInformation & SetManipulatedType(const std::string & type_)
-        {
-            type = type_;
-            return *this;
-        }
-
-        /**
-         * If InstructionInfos::CppCallingInformation::SetManipulatedType was called with "number" or "string", this function will tell the code generator
-         * the name of the getter function used to retrieve the data value.
-         *
-         * Usage example:
-         * \code
-         *  DECLARE_OBJECT_ACTION("String",
-         *                 _("Change the string"),
-         *                 _("Change the string of a text"),
-         *                 _("Do _PARAM2__PARAM1_ to the string of _PARAM0_"),
-         *                 _("Text"),
-         *                 "Extensions/text24.png",
-         *                 "Extensions/text.png");
-         *
-         *      instrInfo.AddParameter("object", _("Object"), "Text", false);
-         *      instrInfo.AddParameter("string", _("String"), "", false);
-         *      instrInfo.AddParameter("operator", _("Modification operator"), "", false);
-         *
-         *      instrInfo.cppCallingInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
-         *
-         *  DECLARE_END_OBJECT_ACTION()
-         * \endcode
-         */
-        CppCallingInformation & SetAssociatedGetter(const std::string & getter)
-        {
-            optionalAssociatedInstruction = getter;
-            accessType = MutatorAndOrAccessor;
-            return *this;
-        }
-
-        /**
-         * Set that the function is located in a specific include file
-         */
-        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
-        {
-            optionalIncludeFile = optionalIncludeFile_;
-            return *this;
-        }
-
-        /** \brief Class used to redefine instruction code generation
-         */
-        class CustomCodeGenerator
-        {
-        public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context) {return "";};
-        };
-
-        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
-        {
-            optionalCustomCodeGenerator = codeGenerator;
-            return *this;
-        }
-
-        std::string cppCallingName;
-        std::string type;
-        AccessType accessType;
-        std::string optionalAssociatedInstruction;
-        std::string optionalIncludeFile;
-        boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
-    };
-    CppCallingInformation cppCallingInformation; ///< Information about how generate C++ code for the instruction
-
-    /** Don't use this constructor. Only here to fullfil std::map requirements
-     */
-    InstructionInfos() {};
-
-    private:
-        std::string extensionNamespace;
-};
 
 /**
  * \brief Contains user-friendly infos about expressions, only at edittime, and members needed to setup an expression
@@ -664,17 +498,17 @@ class GD_API ExpressionInfos
     std::string group;
     bool shown;
     wxBitmap smallicon;
-    std::vector < ParameterInfo > parameters;
+    std::vector < ParameterMetadata > parameters;
 
     /**
-     * \see InstructionInfos::AddParameter
+     * \see InstructionMetadata::AddParameter
      */
-    ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
 
     /**
-     * \see InstructionInfos::AddCodeOnlyParameter
+     * \see InstructionMetadata::AddCodeOnlyParameter
      */
-    ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
     /**
      * \brief Defines information about how generate C++ code for an instruction
@@ -748,17 +582,17 @@ class GD_API StrExpressionInfos
     std::string group;
     bool shown;
     wxBitmap smallicon;
-    std::vector < ParameterInfo > parameters;
+    std::vector < ParameterMetadata > parameters;
 
     /**
-     * \see InstructionInfos::AddParameter
+     * \see InstructionMetadata::AddParameter
      */
-    ParameterInfo & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
 
     /**
-     * \see InstructionInfos::AddCodeOnlyParameter
+     * \see InstructionMetadata::AddCodeOnlyParameter
      */
-    ParameterInfo & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
     /**
      * \brief Defines information about how generate C++ code for an instruction
@@ -854,8 +688,8 @@ class GD_API AutomatismInfo
     std::string group;
     wxBitmap icon;
 
-    std::map<std::string, InstructionInfos > conditionsInfos;
-    std::map<std::string, InstructionInfos > actionsInfos;
+    std::map<std::string, InstructionMetadata > conditionsInfos;
+    std::map<std::string, InstructionMetadata > actionsInfos;
     std::map<std::string, ExpressionInfos > expressionsInfos;
     std::map<std::string, StrExpressionInfos > strExpressionsInfos;
 
@@ -887,8 +721,8 @@ class GD_API ExtensionObjectInfos
     std::string informations;
     wxBitmap icon;
 
-    std::map<std::string, InstructionInfos > conditionsInfos;
-    std::map<std::string, InstructionInfos > actionsInfos;
+    std::map<std::string, InstructionMetadata > conditionsInfos;
+    std::map<std::string, InstructionMetadata > actionsInfos;
     std::map<std::string, ExpressionInfos > expressionsInfos;
     std::map<std::string, StrExpressionInfos > strExpressionsInfos;
 
@@ -1012,18 +846,18 @@ class GD_API ExtensionBase
     const std::vector < std::string > & GetSupplementaryIncludeDirectories() const { return supplementaryIncludeDirectories; };
 
 
-    const std::map<std::string, InstructionInfos > & GetAllActions() const;
-    const std::map<std::string, InstructionInfos > & GetAllConditions() const;
+    const std::map<std::string, InstructionMetadata > & GetAllActions() const;
+    const std::map<std::string, InstructionMetadata > & GetAllConditions() const;
     const std::map<std::string, ExpressionInfos > & GetAllExpressions() const;
     const std::map<std::string, StrExpressionInfos > & GetAllStrExpressions() const;
-    const std::map<std::string, InstructionInfos > & GetAllActionsForObject(std::string objectType) const;
-    const std::map<std::string, InstructionInfos > & GetAllConditionsForObject(std::string objectType) const;
+    const std::map<std::string, InstructionMetadata > & GetAllActionsForObject(std::string objectType) const;
+    const std::map<std::string, InstructionMetadata > & GetAllConditionsForObject(std::string objectType) const;
     const std::map<std::string, ExpressionInfos > & GetAllExpressionsForObject(std::string objectType) const;
     const std::map<std::string, StrExpressionInfos > & GetAllStrExpressionsForObject(std::string objectType) const;
     const std::map<std::string, EventInfos > & GetAllEvents() const;
     const std::map<std::string, AutomatismInfo > & GetAllAutomatisms() const;
-    const std::map<std::string, InstructionInfos > & GetAllActionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, InstructionInfos > & GetAllConditionsForAutomatism(std::string autoType) const;
+    const std::map<std::string, InstructionMetadata > & GetAllActionsForAutomatism(std::string autoType) const;
+    const std::map<std::string, InstructionMetadata > & GetAllConditionsForAutomatism(std::string autoType) const;
     const std::map<std::string, ExpressionInfos > & GetAllExpressionsForAutomatism(std::string autoType) const;
     const std::map<std::string, StrExpressionInfos > & GetAllStrExpressionsForAutomatism(std::string autoType) const;
 
@@ -1096,14 +930,14 @@ class GD_API ExtensionBase
     std::vector < std::pair<std::string, std::string> > supplementaryRuntimeFiles; ///<Supplementary runtime files to copy on compilation
     std::vector < std::string > supplementaryIncludeDirectories; ///<Supplementary include directories to use on events compilation
 
-    std::map<std::string, InstructionInfos > conditionsInfos;
-    std::map<std::string, InstructionInfos > actionsInfos;
+    std::map<std::string, InstructionMetadata > conditionsInfos;
+    std::map<std::string, InstructionMetadata > actionsInfos;
     std::map<std::string, ExpressionInfos > expressionsInfos;
     std::map<std::string, StrExpressionInfos > strExpressionsInfos;
     std::map<std::string, EventInfos > eventsInfos;
 
-    static std::map<std::string, InstructionInfos > badConditionsInfos; ///< Used when a condition is not found in the extension
-    static std::map<std::string, InstructionInfos > badActionsInfos;  ///< Used when an action is not found in the extension
+    static std::map<std::string, InstructionMetadata > badConditionsInfos; ///< Used when a condition is not found in the extension
+    static std::map<std::string, InstructionMetadata > badActionsInfos;  ///< Used when an action is not found in the extension
     static std::map<std::string, ExpressionInfos > badExpressionsInfos; ///< Used when an expression is not found in the extension
     static std::map<std::string, StrExpressionInfos > badStrExpressionsInfos;///< Used when an expression is not found in the extension
     #endif

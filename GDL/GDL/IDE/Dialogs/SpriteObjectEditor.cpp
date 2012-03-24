@@ -35,7 +35,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/IDE/Dialogs/AjoutPlusImage.h"
-#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
@@ -979,17 +979,17 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
 
     wxSize size = thumbsPanel->GetSize();
 
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
+    CommonBitmapManager * CommonBitmapManager = CommonBitmapManager::GetInstance();
 
     //Fond gris avec des flèches
     dc.SetPen(wxPen(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWFRAME )));
-    dc.SetBrush(bitmapGUIManager->backthumbsBg);
+    dc.SetBrush(CommonBitmapManager->backthumbsBg);
     dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
     int decalage = thumbsScroll->GetThumbPosition();
 
     //Fond en damier pour les images
-    dc.SetBrush(bitmapGUIManager->transparentBg);
+    dc.SetBrush(CommonBitmapManager->transparentBg);
 
     //Affichage des images
     if ( !AnimationAndDirectionValid() ) return;
@@ -1078,10 +1078,10 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
 
     wxSize size = imagePanel->GetSize();
 
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
+    CommonBitmapManager * CommonBitmapManager = CommonBitmapManager::GetInstance();
 
     //Fond en damier
-    dc.SetBrush(bitmapGUIManager->transparentBg);
+    dc.SetBrush(CommonBitmapManager->transparentBg);
     dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
     if ( !AnimationAndDirectionValid() ) return;
@@ -1097,7 +1097,7 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
             {
                 //Chargement de l'image
                 wxBitmap bmp( image.file, wxBITMAP_TYPE_ANY);
-                wxBitmap point( bitmapGUIManager->point );
+                wxBitmap point( CommonBitmapManager->point );
 
                 scrollWidth->SetScrollbar(scrollWidth->GetThumbPosition(),size.GetWidth(), bmp.GetWidth(),size.GetWidth());
                 scrollHeight->SetScrollbar(scrollHeight->GetThumbPosition(), size.GetHeight(), bmp.GetHeight(), size.GetHeight());

@@ -4,7 +4,7 @@
 #include <boost/shared_ptr.hpp>
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/Game.h"
 
 ArbitraryResourceWorker::~ArbitraryResourceWorker()
@@ -36,14 +36,14 @@ void LaunchResourceWorkerOnEvents(const Game & game, std::vector < BaseEventSPtr
                     std::string type = allActionsVectors[i]->at( k ).GetType();
                     bool extensionHasAction = false;
 
-                    const std::map<string, InstructionInfos> & allActions = allGameExtensions[e]->GetAllActions();
+                    const std::map<string, InstructionMetadata> & allActions = allGameExtensions[e]->GetAllActions();
                     if ( allActions.find(type) != allActions.end() )
                         extensionHasAction = true;
 
                     const vector < string > & objects = allGameExtensions[e]->GetExtensionObjectsTypes();
                     for (unsigned int o = 0;o<objects.size();++o)
                     {
-                        const std::map<string, InstructionInfos> & allObjectsActions = allGameExtensions[e]->GetAllActionsForObject(objects[o]);
+                        const std::map<string, InstructionMetadata> & allObjectsActions = allGameExtensions[e]->GetAllActionsForObject(objects[o]);
                         if ( allObjectsActions.find(type) != allObjectsActions.end() )
                             extensionHasAction = true;
                     }
@@ -51,7 +51,7 @@ void LaunchResourceWorkerOnEvents(const Game & game, std::vector < BaseEventSPtr
                     const vector < string > & autos = allGameExtensions[e]->GetAutomatismsTypes();
                     for (unsigned int a = 0;a<autos.size();++a)
                     {
-                        const std::map<string, InstructionInfos> & allAutosActions = allGameExtensions[e]->GetAllActionsForAutomatism(autos[a]);
+                        const std::map<string, InstructionMetadata> & allAutosActions = allGameExtensions[e]->GetAllActionsForAutomatism(autos[a]);
                         if ( allAutosActions.find(type) != allAutosActions.end() )
                             extensionHasAction = true;
                     }
@@ -76,14 +76,14 @@ void LaunchResourceWorkerOnEvents(const Game & game, std::vector < BaseEventSPtr
                     std::string type = allConditionsVector[i]->at( k ).GetType();
                     bool extensionHasCondition = false;
 
-                    const std::map<string, InstructionInfos> & allConditions = allGameExtensions[e]->GetAllConditions();
+                    const std::map<string, InstructionMetadata> & allConditions = allGameExtensions[e]->GetAllConditions();
                     if ( allConditions.find(type) != allConditions.end() )
                         extensionHasCondition = true;
 
                     const vector < string > & objects = allGameExtensions[e]->GetExtensionObjectsTypes();
                     for (unsigned int j = 0;j<objects.size();++j)
                     {
-                        const std::map<string, InstructionInfos> & allObjectsConditions = allGameExtensions[e]->GetAllConditionsForObject(objects[j]);
+                        const std::map<string, InstructionMetadata> & allObjectsConditions = allGameExtensions[e]->GetAllConditionsForObject(objects[j]);
                         if ( allObjectsConditions.find(type) != allObjectsConditions.end() )
                             extensionHasCondition = true;
                     }
@@ -91,7 +91,7 @@ void LaunchResourceWorkerOnEvents(const Game & game, std::vector < BaseEventSPtr
                     const vector < string > & autos = allGameExtensions[e]->GetAutomatismsTypes();
                     for (unsigned int j = 0;j<autos.size();++j)
                     {
-                        const std::map<string, InstructionInfos> & allAutosConditions = allGameExtensions[e]->GetAllConditionsForAutomatism(autos[j]);
+                        const std::map<string, InstructionMetadata> & allAutosConditions = allGameExtensions[e]->GetAllConditionsForAutomatism(autos[j]);
                         if ( allAutosConditions.find(type) != allAutosConditions.end() )
                             extensionHasCondition = true;
                     }

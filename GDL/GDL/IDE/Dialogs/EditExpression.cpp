@@ -643,60 +643,60 @@ void EditExpression::OnSinBtClick(wxCommandEvent& event)
 /**
  * Show a dialog for completing a parameter
  */
-string EditExpression::ShowParameterDialog(const ParameterInfo & parameterInfo, bool & userCancelled)
+string EditExpression::ShowParameterDialog(const ParameterMetadata & ParameterMetadata, bool & userCancelled)
 {
-    if ( parameterInfo.type == "expression" )
+    if ( ParameterMetadata.type == "expression" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), ParameterMetadata.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
             userCancelled = true;
     }
-    else if ( parameterInfo.type == "string" )
+    else if ( ParameterMetadata.type == "string" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterInfo.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), ParameterMetadata.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
             userCancelled = true;
     }
-    else if ( parameterInfo.type == "object" )
+    else if ( ParameterMetadata.type == "object" )
     {
-        ChooseObject Dialog(this, game, scene, true, parameterInfo.supplementaryInformation);
+        ChooseObject Dialog(this, game, scene, true, ParameterMetadata.supplementaryInformation);
         if ( Dialog.ShowModal() == 0 ) return "";
 
         return Dialog.objectChosen;
     }
-    else if ( parameterInfo.type == "layer" )
+    else if ( ParameterMetadata.type == "layer" )
     {
         ChooseLayer dialog(this, scene.initialLayers);
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.layerChosen;
     }
-    else if ( parameterInfo.type == "scenevar" )
+    else if ( ParameterMetadata.type == "scenevar" )
     {
         ChooseVariableDialog dialog(this, scene.variables);
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.selectedVariable;
     }
-    else if ( parameterInfo.type == "globalvar" )
+    else if ( ParameterMetadata.type == "globalvar" )
     {
         ChooseVariableDialog dialog(this, game.variables);
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.selectedVariable;
     }
-    else if ( parameterInfo.type == "camera" )
+    else if ( ParameterMetadata.type == "camera" )
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Numéro de la caméra"), "0", this));
+        string param = static_cast<string> (wxGetTextFromUser(ParameterMetadata.description, _("Numéro de la caméra"), "0", this));
         return param;
     }
     else
     {
-        string param = static_cast<string> (wxGetTextFromUser(parameterInfo.description, _("Paramètre"), "", this));
+        string param = static_cast<string> (wxGetTextFromUser(ParameterMetadata.description, _("Paramètre"), "", this));
         return param;
     }
 

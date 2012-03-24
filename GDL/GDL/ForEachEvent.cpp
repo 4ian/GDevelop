@@ -10,14 +10,15 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml/tinyxml.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
+#include "GDCore/IDE/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/EventsEditorSelection.h"
+#include "PlatformDefinition/InstructionMetadataHolder.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/Events/ExpressionsCodeGeneration.h"
 #include "GDL/Events/EventsCodeNameMangler.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/IDE/EventsRenderingHelper.h"
 #include "GDL/IDE/Dialogs/EditForEachEvent.h"
-#include "GDL/IDE/EventsEditorItemsAreas.h"
-#include "GDL/IDE/EventsEditorSelection.h"
 
 ForEachEvent::ForEachEvent() :
 BaseEvent(),
@@ -228,14 +229,15 @@ void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     //Draw actions and conditions
+    InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+forEachTextHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, metadataHolder);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+forEachTextHeight+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, metadataHolder);
 }
 
 unsigned int ForEachEvent::GetRenderedHeight(unsigned int width) const
@@ -247,8 +249,9 @@ unsigned int ForEachEvent::GetRenderedHeight(unsigned int width) const
         const int forEachTextHeight = 20;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border);
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
+        InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, metadataHolder);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, metadataHolder);
 
         renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + forEachTextHeight)+border*2;
         eventHeightNeedUpdate = false;

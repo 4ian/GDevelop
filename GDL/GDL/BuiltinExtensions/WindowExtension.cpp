@@ -5,7 +5,7 @@
 
 #include "GDL/BuiltinExtensions/WindowExtension.h"
 #include "GDL/IDE/ArbitraryResourceWorker.h"
-#include "GDL/IDE/Instruction.h"
+#include "GDCore/Events/Instruction.h"
 
 WindowExtension::WindowExtension()
 {
@@ -129,13 +129,13 @@ WindowExtension::WindowExtension()
 #if defined(GD_IDE_ONLY)
 void WindowExtension::ExposeActionsResources(Instruction & action, ArbitraryResourceWorker & worker)
 {
-    if ( action.GetType() == "EcrireTexte" && !action.GetParameterSafely( 6 ).GetPlainString().empty() )
+    if ( action.GetType() == "EcrireTexte" && !action.GetParameter( 6 ).GetPlainString().empty() )
     {
         std::string parameter = action.GetParameter(6).GetPlainString();
         worker.ExposeResource(parameter);
         action.SetParameter(6, parameter);
     }
-    if ( action.GetType() == "SetWindowIcon" && !action.GetParameterSafely( 1 ).GetPlainString().empty() )
+    if ( action.GetType() == "SetWindowIcon" && !action.GetParameter( 1 ).GetPlainString().empty() )
     {
         std::string parameter = action.GetParameter(1).GetPlainString();
         worker.ExposeImage(parameter);

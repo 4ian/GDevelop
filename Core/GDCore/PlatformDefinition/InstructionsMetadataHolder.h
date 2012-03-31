@@ -3,8 +3,8 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#ifndef GDCORE_INSTRUCTIONMETADATAHOLDER_H
-#define GDCORE_INSTRUCTIONMETADATAHOLDER_H
+#ifndef GDCORE_InstructionsMetadataHolder_H
+#define GDCORE_InstructionsMetadataHolder_H
 #include <string>
 #include "GDCore/Events/InstructionMetadata.h"
 
@@ -12,15 +12,15 @@ namespace gd
 {
 
 /**
- * \brief Deliver metadata for instructions
+ * \brief Deliver metadata for instructions ( i.e. Actions and conditions )
  *
  * \todo Enhance this class to avoid that each platform has to implement it.
  */
-class GD_CORE_API InstructionMetadataHolder
+class GD_CORE_API InstructionsMetadataHolder
 {
 public:
-    InstructionMetadataHolder();
-    virtual ~InstructionMetadataHolder();
+    InstructionsMetadataHolder();
+    virtual ~InstructionsMetadataHolder();
 
     /**
      * Get information about an action from its type
@@ -40,4 +40,4 @@ protected:
 
 }
 
-#endif // GDCORE_INSTRUCTIONMETADATAHOLDER_H
+#endif // GDCORE_InstructionsMetadataHolder_H

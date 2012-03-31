@@ -11,8 +11,8 @@ public:
     Layout();
     virtual ~Layout();
 
-    void SetName() {};
-    std::string GetName() {return "";}
+    virtual void SetName() {};
+    virtual std::string GetName() {return "";}
 
 private:
 };

@@ -168,6 +168,8 @@
 		<Unit filename="GDCore\CommonTools.h" />
 		<Unit filename="GDCore\Events\Event.cpp" />
 		<Unit filename="GDCore\Events\Event.h" />
+		<Unit filename="GDCore\Events\ExpressionMetadata.cpp" />
+		<Unit filename="GDCore\Events\ExpressionMetadata.h" />
 		<Unit filename="GDCore\Events\GDExpression.h" />
 		<Unit filename="GDCore\Events\Instruction.cpp" />
 		<Unit filename="GDCore\Events\Instruction.h" />
@@ -175,6 +177,8 @@
 		<Unit filename="GDCore\Events\InstructionMetadata.h" />
 		<Unit filename="GDCore\IDE\ActionSentenceFormatter.cpp" />
 		<Unit filename="GDCore\IDE\ActionSentenceFormatter.h" />
+		<Unit filename="GDCore\IDE\ArbitraryResourceWorker.cpp" />
+		<Unit filename="GDCore\IDE\ArbitraryResourceWorker.h" />
 		<Unit filename="GDCore\IDE\CommonBitmapManager.cpp" />
 		<Unit filename="GDCore\IDE\CommonBitmapManager.h" />
 		<Unit filename="GDCore\IDE\ConditionSentenceFormatter.cpp" />
@@ -185,15 +189,23 @@
 		<Unit filename="GDCore\IDE\EventsEditorSelection.h" />
 		<Unit filename="GDCore\IDE\EventsRenderingHelper.cpp" />
 		<Unit filename="GDCore\IDE\EventsRenderingHelper.h" />
+		<Unit filename="GDCore\IDE\ResourcesMergingHelper.cpp" />
+		<Unit filename="GDCore\IDE\ResourcesMergingHelper.h" />
+		<Unit filename="GDCore\IDE\ResourcesUnmergingHelper.cpp" />
+		<Unit filename="GDCore\IDE\ResourcesUnmergingHelper.h" />
 		<Unit filename="GDCore\IDE\TextFormatting.h" />
-		<Unit filename="GDCore\PlatformDefinition\InstructionMetadataHolder.cpp" />
-		<Unit filename="GDCore\PlatformDefinition\InstructionMetadataHolder.h" />
+		<Unit filename="GDCore\PlatformDefinition\InstructionsMetadataHolder.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\InstructionsMetadataHolder.h" />
 		<Unit filename="GDCore\PlatformDefinition\Layout.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\Layout.h" />
 		<Unit filename="GDCore\PlatformDefinition\Platform.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\Platform.h" />
+		<Unit filename="GDCore\PlatformDefinition\PlatformExtension.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\PlatformExtension.h" />
 		<Unit filename="GDCore\PlatformDefinition\Project.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\Project.h" />
+		<Unit filename="GDCore\Tools\Locale\LocaleManager.cpp" />
+		<Unit filename="GDCore\Tools\Locale\LocaleManager.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

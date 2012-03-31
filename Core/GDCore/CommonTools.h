@@ -72,14 +72,12 @@ float ToFloat( const T & value )
     return f;
 }
 
-#if defined(GD_IDE_ONLY)
 /**
  * Specialization for converting wxString to a std::string
  * \ingroup CommonProgrammingTools
  */
 template<>
 std::string GD_CORE_API ToString( const wxString & value );
-#endif
 
 }
 

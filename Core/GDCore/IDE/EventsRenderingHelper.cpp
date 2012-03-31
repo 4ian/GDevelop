@@ -12,7 +12,7 @@
 #include <wx/dcmemory.h>
 #include <wx/renderer.h>
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/PlatformDefinition/InstructionMetadataHolder.h"
+#include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
 #include "GDCore/IDE/ActionSentenceFormatter.h"
 #include "GDCore/IDE/ConditionSentenceFormatter.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
@@ -131,7 +131,7 @@ void EventsRenderingHelper::SetFont(const wxFont & font_)
     fontCharacterWidth = static_cast<float>(dc.GetTextExtent("abcdef").GetWidth())/6.0f;
 }
 
-int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionMetadataHolder & metadataHolder)
+int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder)
 {
     int initialYPosition = y;
 
@@ -228,7 +228,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & condition
     return y-initialYPosition;
 }
 
-int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionMetadataHolder & metadataHolder)
+int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder)
 {
     int initialYPosition = y;
 
@@ -318,7 +318,7 @@ int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxD
     return y-initialYPosition;
 }
 
-unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector < Instruction > & conditions, int width, gd::InstructionMetadataHolder & metadataHolder)
+unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector < Instruction > & conditions, int width, gd::InstructionsMetadataHolder & metadataHolder)
 {
     int y = 0;
 
@@ -349,7 +349,7 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
     return y;
 }
 
-unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < Instruction > & actions, int width, gd::InstructionMetadataHolder & metadataHolder)
+unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < Instruction > & actions, int width, gd::InstructionsMetadataHolder & metadataHolder)
 {
     int y = 0;
 

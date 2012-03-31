@@ -42,8 +42,8 @@ namespace GDpriv
 ExtensionsManager *ExtensionsManager::_singleton = NULL;
 #if defined(GD_IDE_ONLY)
 InstructionMetadata ExtensionsManager::badInstructionMetadata;
-ExpressionInfos ExtensionsManager::badExpressionInfos;
-StrExpressionInfos ExtensionsManager::badStrExpressionInfos;
+ExpressionMetadata ExtensionsManager::badExpressionMetadata;
+StrExpressionMetadata ExtensionsManager::badStrExpressionMetadata;
 #endif
 AutomatismInfo ExtensionsManager::badAutomatismInfo;
 ExtensionObjectInfos ExtensionsManager::badObjectInfo;
@@ -284,14 +284,14 @@ const InstructionMetadata & ExtensionsManager::GetConditionInfos(string conditio
     return badInstructionMetadata;
 }
 
-const ExpressionInfos & ExtensionsManager::GetObjectExpressionInfos(string objectType, string exprType) const
+const ExpressionMetadata & ExtensionsManager::GetObjectExpressionMetadata(string objectType, string exprType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
         const vector < string > & objects = extensionsLoaded[i]->GetExtensionObjectsTypes();
         if ( find(objects.begin(), objects.end(), objectType) != objects.end())
         {
-            const std::map<string, ExpressionInfos> & allObjectExpressions = extensionsLoaded[i]->GetAllExpressionsForObject(objectType);
+            const std::map<string, ExpressionMetadata> & allObjectExpressions = extensionsLoaded[i]->GetAllExpressionsForObject(objectType);
             if ( allObjectExpressions.find(exprType) != allObjectExpressions.end() )
                 return allObjectExpressions.find(exprType)->second;
         }
@@ -300,22 +300,22 @@ const ExpressionInfos & ExtensionsManager::GetObjectExpressionInfos(string objec
     //Then check base
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<string, ExpressionInfos> & allObjectExpressions = extensionsLoaded[i]->GetAllExpressionsForObject("");
+        const std::map<string, ExpressionMetadata> & allObjectExpressions = extensionsLoaded[i]->GetAllExpressionsForObject("");
         if ( allObjectExpressions.find(exprType) != allObjectExpressions.end() )
             return allObjectExpressions.find(exprType)->second;
     }
 
-    return badExpressionInfos;
+    return badExpressionMetadata;
 }
 
-const ExpressionInfos & ExtensionsManager::GetAutomatismExpressionInfos(string autoType, string exprType) const
+const ExpressionMetadata & ExtensionsManager::GetAutomatismExpressionMetadata(string autoType, string exprType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
         const vector < string > & autos = extensionsLoaded[i]->GetAutomatismsTypes();
         if ( find(autos.begin(), autos.end(), autoType) != autos.end())
         {
-            const std::map<string, ExpressionInfos> & allAutoExpressions = extensionsLoaded[i]->GetAllExpressionsForAutomatism(autoType);
+            const std::map<string, ExpressionMetadata> & allAutoExpressions = extensionsLoaded[i]->GetAllExpressionsForAutomatism(autoType);
             if ( allAutoExpressions.find(exprType) != allAutoExpressions.end() )
                 return allAutoExpressions.find(exprType)->second;
         }
@@ -324,34 +324,34 @@ const ExpressionInfos & ExtensionsManager::GetAutomatismExpressionInfos(string a
     //Then check base
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<string, ExpressionInfos> & allAutoExpressions = extensionsLoaded[i]->GetAllExpressionsForAutomatism("");
+        const std::map<string, ExpressionMetadata> & allAutoExpressions = extensionsLoaded[i]->GetAllExpressionsForAutomatism("");
         if ( allAutoExpressions.find(exprType) != allAutoExpressions.end() )
             return allAutoExpressions.find(exprType)->second;
     }
 
-    return badExpressionInfos;
+    return badExpressionMetadata;
 }
 
-const ExpressionInfos & ExtensionsManager::GetExpressionInfos(string exprType) const
+const ExpressionMetadata & ExtensionsManager::GetExpressionMetadata(string exprType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<string, ExpressionInfos> & allExpr = extensionsLoaded[i]->GetAllExpressions();
+        const std::map<string, ExpressionMetadata> & allExpr = extensionsLoaded[i]->GetAllExpressions();
         if ( allExpr.find(exprType) != allExpr.end() )
             return allExpr.find(exprType)->second;
     }
 
-    return badExpressionInfos;
+    return badExpressionMetadata;
 }
 
-const StrExpressionInfos & ExtensionsManager::GetObjectStrExpressionInfos(string objectType, string exprType) const
+const StrExpressionMetadata & ExtensionsManager::GetObjectStrExpressionMetadata(string objectType, string exprType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
         const vector < string > & objects = extensionsLoaded[i]->GetExtensionObjectsTypes();
         if ( find(objects.begin(), objects.end(), objectType) != objects.end())
         {
-            const std::map<string, StrExpressionInfos> & allObjectStrExpressions = extensionsLoaded[i]->GetAllStrExpressionsForObject(objectType);
+            const std::map<string, StrExpressionMetadata> & allObjectStrExpressions = extensionsLoaded[i]->GetAllStrExpressionsForObject(objectType);
             if ( allObjectStrExpressions.find(exprType) != allObjectStrExpressions.end() )
                 return allObjectStrExpressions.find(exprType)->second;
         }
@@ -360,22 +360,22 @@ const StrExpressionInfos & ExtensionsManager::GetObjectStrExpressionInfos(string
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<string, StrExpressionInfos> & allObjectStrExpressions = extensionsLoaded[i]->GetAllStrExpressionsForObject("");
+        const std::map<string, StrExpressionMetadata> & allObjectStrExpressions = extensionsLoaded[i]->GetAllStrExpressionsForObject("");
         if ( allObjectStrExpressions.find(exprType) != allObjectStrExpressions.end() )
             return allObjectStrExpressions.find(exprType)->second;
     }
 
-    return badStrExpressionInfos;
+    return badStrExpressionMetadata;
 }
 
-const StrExpressionInfos & ExtensionsManager::GetAutomatismStrExpressionInfos(string autoType, string exprType) const
+const StrExpressionMetadata & ExtensionsManager::GetAutomatismStrExpressionMetadata(string autoType, string exprType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
         const vector < string > & autos = extensionsLoaded[i]->GetAutomatismsTypes();
         if ( find(autos.begin(), autos.end(), autoType) != autos.end())
         {
-            const std::map<string, StrExpressionInfos> & allAutomatismStrExpressions = extensionsLoaded[i]->GetAllStrExpressionsForAutomatism(autoType);
+            const std::map<string, StrExpressionMetadata> & allAutomatismStrExpressions = extensionsLoaded[i]->GetAllStrExpressionsForAutomatism(autoType);
             if ( allAutomatismStrExpressions.find(exprType) != allAutomatismStrExpressions.end() )
                 return allAutomatismStrExpressions.find(exprType)->second;
         }
@@ -384,24 +384,24 @@ const StrExpressionInfos & ExtensionsManager::GetAutomatismStrExpressionInfos(st
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<string, StrExpressionInfos> & allAutomatismStrExpressions = extensionsLoaded[i]->GetAllStrExpressionsForAutomatism("");
+        const std::map<string, StrExpressionMetadata> & allAutomatismStrExpressions = extensionsLoaded[i]->GetAllStrExpressionsForAutomatism("");
         if ( allAutomatismStrExpressions.find(exprType) != allAutomatismStrExpressions.end() )
             return allAutomatismStrExpressions.find(exprType)->second;
     }
 
-    return badStrExpressionInfos;
+    return badStrExpressionMetadata;
 }
 
-const StrExpressionInfos & ExtensionsManager::GetStrExpressionInfos(string exprType) const
+const StrExpressionMetadata & ExtensionsManager::GetStrExpressionMetadata(string exprType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<string, StrExpressionInfos> & allExpr = extensionsLoaded[i]->GetAllStrExpressions();
+        const std::map<string, StrExpressionMetadata> & allExpr = extensionsLoaded[i]->GetAllStrExpressions();
         if ( allExpr.find(exprType) != allExpr.end() )
             return allExpr.find(exprType)->second;
     }
 
-    return badStrExpressionInfos;
+    return badStrExpressionMetadata;
 }
 
 bool ExtensionsManager::HasAction(string name) const
@@ -525,7 +525,7 @@ bool ExtensionsManager::HasExpression(string name) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, ExpressionInfos > & expressions = extensionsLoaded[i]->GetAllExpressions();
+        const std::map<std::string, ExpressionMetadata > & expressions = extensionsLoaded[i]->GetAllExpressions();
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
@@ -539,7 +539,7 @@ bool ExtensionsManager::HasObjectExpression(std::string objectType, string name)
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, ExpressionInfos > & expressions = extensionsLoaded[i]->GetAllExpressionsForObject(objectType);
+        const std::map<std::string, ExpressionMetadata > & expressions = extensionsLoaded[i]->GetAllExpressionsForObject(objectType);
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
@@ -547,7 +547,7 @@ bool ExtensionsManager::HasObjectExpression(std::string objectType, string name)
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, ExpressionInfos > & expressions = extensionsLoaded[i]->GetAllExpressionsForObject("");
+        const std::map<std::string, ExpressionMetadata > & expressions = extensionsLoaded[i]->GetAllExpressionsForObject("");
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
@@ -561,7 +561,7 @@ bool ExtensionsManager::HasAutomatismExpression(std::string automatismType, stri
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, ExpressionInfos > & expressions = extensionsLoaded[i]->GetAllExpressionsForAutomatism(automatismType);
+        const std::map<std::string, ExpressionMetadata > & expressions = extensionsLoaded[i]->GetAllExpressionsForAutomatism(automatismType);
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
@@ -569,7 +569,7 @@ bool ExtensionsManager::HasAutomatismExpression(std::string automatismType, stri
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, ExpressionInfos > & expressions = extensionsLoaded[i]->GetAllExpressionsForAutomatism("");
+        const std::map<std::string, ExpressionMetadata > & expressions = extensionsLoaded[i]->GetAllExpressionsForAutomatism("");
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
@@ -582,7 +582,7 @@ bool ExtensionsManager::HasStrExpression(string name) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, StrExpressionInfos > & expressions = extensionsLoaded[i]->GetAllStrExpressions();
+        const std::map<std::string, StrExpressionMetadata > & expressions = extensionsLoaded[i]->GetAllStrExpressions();
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
@@ -596,7 +596,7 @@ bool ExtensionsManager::HasObjectStrExpression(std::string objectType, string na
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, StrExpressionInfos > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForObject(objectType);
+        const std::map<std::string, StrExpressionMetadata > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForObject(objectType);
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
@@ -604,7 +604,7 @@ bool ExtensionsManager::HasObjectStrExpression(std::string objectType, string na
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, StrExpressionInfos > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForObject("");
+        const std::map<std::string, StrExpressionMetadata > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForObject("");
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
@@ -618,7 +618,7 @@ bool ExtensionsManager::HasAutomatismStrExpression(std::string automatismType, s
     //as the function ptr will be stocked in a map and attributed to instructions
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, StrExpressionInfos > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForAutomatism(automatismType);
+        const std::map<std::string, StrExpressionMetadata > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForAutomatism(automatismType);
         if ( expressions.find(name) != expressions.end() )
             return true;
     }
@@ -626,7 +626,7 @@ bool ExtensionsManager::HasAutomatismStrExpression(std::string automatismType, s
     //Then check bases
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        const std::map<std::string, StrExpressionInfos > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForAutomatism("");
+        const std::map<std::string, StrExpressionMetadata > & expressions = extensionsLoaded[i]->GetAllStrExpressionsForAutomatism("");
         if ( expressions.find(name) != expressions.end() )
             return true;
     }

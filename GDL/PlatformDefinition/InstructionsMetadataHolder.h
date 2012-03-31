@@ -3,19 +3,19 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#ifndef INSTRUCTIONMETADATAHOLDER_H
-#define INSTRUCTIONMETADATAHOLDER_H
+#ifndef InstructionsMetadataHolder_H
+#define InstructionsMetadataHolder_H
 #include <string>
-#include "GDCore/PlatformDefinition/InstructionMetadataHolder.h"
+#include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
 
 /**
  * \brief (Currently) A simple wrapper around ExtensionsManager ( which currently take care of instruction metadata ).
  */
-class GD_API InstructionMetadataHolder : public gd::InstructionMetadataHolder
+class GD_API InstructionsMetadataHolder : public gd::InstructionsMetadataHolder
 {
 public:
-    InstructionMetadataHolder();
-    virtual ~InstructionMetadataHolder();
+    InstructionsMetadataHolder();
+    virtual ~InstructionsMetadataHolder();
 
     /**
      * Get information about an action from its type
@@ -30,4 +30,4 @@ public:
     virtual const InstructionMetadata & GetConditionMetadata(std::string conditionType) const;
 };
 
-#endif // INSTRUCTIONMETADATAHOLDER_H
+#endif // InstructionsMetadataHolder_H

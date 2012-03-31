@@ -198,8 +198,8 @@ lastErrorPos(std::string::npos)
                                             ObjList->AppendItem(extensionItem, _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,0) ;
 
             //Add each object expression
-            std::map<string, StrExpressionInfos > allObjExpr = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
-            for(std::map<string, StrExpressionInfos>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
+            std::map<string, StrExpressionMetadata > allObjExpr = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
+            for(std::map<string, StrExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
             {
                 if ( it->second.shown )
                 {
@@ -233,8 +233,8 @@ lastErrorPos(std::string::npos)
                                             ObjList->AppendItem(extensionItem, _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname,0) ;
 
             //Add each automatism expression
-            std::map<string, StrExpressionInfos > allAutoExpr = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<string, StrExpressionInfos>::const_iterator it = allAutoExpr.begin(); it != allAutoExpr.end(); ++it)
+            std::map<string, StrExpressionMetadata > allAutoExpr = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<string, StrExpressionMetadata>::const_iterator it = allAutoExpr.begin(); it != allAutoExpr.end(); ++it)
             {
                 if ( it->second.shown )
                 {
@@ -264,8 +264,8 @@ lastErrorPos(std::string::npos)
         //Add each expression
         extensionItem = ValList->GetRootItem();
 
-        std::map<string, StrExpressionInfos > allExpr = extensions[i]->GetAllStrExpressions();
-        for(std::map<string, StrExpressionInfos>::const_iterator it = allExpr.begin(); it != allExpr.end(); ++it)
+        std::map<string, StrExpressionMetadata > allExpr = extensions[i]->GetAllStrExpressions();
+        for(std::map<string, StrExpressionMetadata>::const_iterator it = allExpr.begin(); it != allExpr.end(); ++it)
         {
             if ( it->second.shown )
             {
@@ -314,24 +314,24 @@ lastErrorPos(std::string::npos)
             continue;
 
         //Add keywords of static expressions
-	    const std::map<std::string, ExpressionInfos > & allExprs = extensions[i]->GetAllExpressions();
-        for(std::map<std::string, ExpressionInfos >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+	    const std::map<std::string, ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressions();
+        for(std::map<std::string, ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
 	        keywords += " "+it->first;
 
-	    const std::map<std::string, StrExpressionInfos > & allStrExprs = extensions[i]->GetAllStrExpressions();
-        for(std::map<std::string, StrExpressionInfos >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+	    const std::map<std::string, StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressions();
+        for(std::map<std::string, StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
 	        keywords += " "+it->first;
 
         //Add keywords of objects expressions
 	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
         for (unsigned int j = 0;j<objectsTypes.size();++j)
         {
-            const std::map<std::string, ExpressionInfos > & allExprs = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
-            for(std::map<std::string, ExpressionInfos >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+            const std::map<std::string, ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
+            for(std::map<std::string, ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
                 keywords += " "+it->first;
 
-            const std::map<std::string, StrExpressionInfos > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
-            for(std::map<std::string, StrExpressionInfos >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+            const std::map<std::string, StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
+            for(std::map<std::string, StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
                 keywords += " "+it->first;
         }
 
@@ -339,12 +339,12 @@ lastErrorPos(std::string::npos)
 	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
         for (unsigned int j = 0;j<automatismsTypes.size();++j)
         {
-            const std::map<std::string, ExpressionInfos > & allExprs = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<std::string, ExpressionInfos >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+            const std::map<std::string, ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<std::string, ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
                 keywords += " "+it->first;
 
-            const std::map<std::string, StrExpressionInfos > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<std::string, StrExpressionInfos >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+            const std::map<std::string, StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<std::string, StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
                 keywords += " "+it->first;
         }
 	}
@@ -539,29 +539,30 @@ void EditTextDialog::OnAddPropBtClick(wxCommandEvent& event)
     TreeItemStrExpressionInfoData * infos = dynamic_cast<TreeItemStrExpressionInfoData*>(ObjList->GetItemData(itemObj));
     if ( infos != NULL )
     {
-        if ( infos->GetStrExpressionInfos().parameters.empty() ) return; //Not even a parameter for the object ?
+        if ( infos->GetStrExpressionMetadata().parameters.empty() ) return; //Not even a parameter for the object ?
 
         bool cancelled = false;
-        string object = ShowParameterDialog(infos->GetStrExpressionInfos().parameters[0], cancelled);
+        string object = ShowParameterDialog(infos->GetStrExpressionMetadata().parameters[0], cancelled);
         if ( cancelled ) return;
 
         string parametersStr, automatismStr;
-        for (unsigned int i = 1;i<infos->GetStrExpressionInfos().parameters.size();++i)
+        for (unsigned int i = 1;i<infos->GetStrExpressionMetadata().parameters.size();++i)
         {
-            if ( i == 1 && infos->GetStrExpressionInfos().parameters[i].type == "automatism")
+            if ( i == 1 && infos->GetStrExpressionMetadata().parameters[i].type == "automatism")
             {
-                ChooseAutomatismDlg dialog(this, game, scene, object, infos->GetStrExpressionInfos().parameters[i].supplementaryInformation);
+                ChooseAutomatismDlg dialog(this, game, scene, object, infos->GetStrExpressionMetadata().parameters[i].supplementaryInformation);
                 if ( dialog.ShowModal() == 1 )
                     automatismStr = dialog.automatismChosen+"::";
             }
             else
             {
                 if ( !parametersStr.empty() ) parametersStr += ",";
-                parametersStr += ShowParameterDialog(infos->GetStrExpressionInfos().parameters[i], cancelled, object);
+                parametersStr += ShowParameterDialog(infos->GetStrExpressionMetadata().parameters[i], cancelled, object);
                 if ( cancelled ) return;
             }
         }
 
+        if ( TexteEdit->GetText() == "\"\"" ) TexteEdit->SetText("");
         TexteEdit->AddText(ReplaceSpacesByTildes(object)+"."+automatismStr+infos->GetName()+"("+parametersStr+")");
         return;
     }
@@ -589,10 +590,10 @@ void EditTextDialog::OnAddFunctionBtClick(wxCommandEvent& event)
         bool cancelled = false;
 
         string parametersStr;
-        for (unsigned int i = 0;i<infos->GetStrExpressionInfos().parameters.size();++i)
+        for (unsigned int i = 0;i<infos->GetStrExpressionMetadata().parameters.size();++i)
         {
             if ( !parametersStr.empty() ) parametersStr += ",";
-            parametersStr += ShowParameterDialog(infos->GetStrExpressionInfos().parameters[i], cancelled);
+            parametersStr += ShowParameterDialog(infos->GetStrExpressionMetadata().parameters[i], cancelled);
             if ( cancelled ) return;
         }
 

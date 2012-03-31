@@ -14,7 +14,7 @@
 Direction Animation::badDirection;
 
 Animation::Animation() :
-useMultipleDirections(false),
+useMultipleDirections(true),
 directionsNumber(0)
 {
 }

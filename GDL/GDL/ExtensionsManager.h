@@ -16,8 +16,8 @@ class Object;
 class Automatism;
 class ExtensionBase;
 class InstructionMetadata;
-class ExpressionInfos;
-class StrExpressionInfos;
+class ExpressionMetadata;
+class StrExpressionMetadata;
 class ExtensionObjectInfos;
 class AutomatismInfo;
 class AutomatismsSharedDatas;
@@ -124,37 +124,37 @@ class GD_API ExtensionsManager
          * Get information about an expression from its type
          * Works for static expressions.
          */
-        const ExpressionInfos & GetExpressionInfos(string exprType) const;
+        const ExpressionMetadata & GetExpressionMetadata(string exprType) const;
 
         /**
          * Get information about an expression from its type
          * Works for object expressions.
          */
-        const ExpressionInfos & GetObjectExpressionInfos(string objectType, string exprType) const;
+        const ExpressionMetadata & GetObjectExpressionMetadata(string objectType, string exprType) const;
 
         /**
          * Get information about an expression from its type
          * Works for automatism expressions.
          */
-        const ExpressionInfos & GetAutomatismExpressionInfos(string autoType, string exprType) const;
+        const ExpressionMetadata & GetAutomatismExpressionMetadata(string autoType, string exprType) const;
 
         /**
          * Get information about a string expression from its type
          * Works for static expressions.
          */
-        const StrExpressionInfos & GetStrExpressionInfos(string exprType) const;
+        const StrExpressionMetadata & GetStrExpressionMetadata(string exprType) const;
 
         /**
          * Get information about a string expression from its type
          * Works for object expressions.
          */
-        const StrExpressionInfos & GetObjectStrExpressionInfos(string objectType, string exprType) const;
+        const StrExpressionMetadata & GetObjectStrExpressionMetadata(string objectType, string exprType) const;
 
         /**
          * Get information about a string expression from its type
          * Works for automatism expressions.
          */
-        const StrExpressionInfos & GetAutomatismStrExpressionInfos(string autoType, string exprType) const;
+        const StrExpressionMetadata & GetAutomatismStrExpressionMetadata(string autoType, string exprType) const;
 
         /**
          * Verifying if a ( object ) action exists
@@ -259,8 +259,8 @@ class GD_API ExtensionsManager
 
         #if defined(GD_IDE_ONLY)
         static InstructionMetadata badInstructionMetadata;
-        static ExpressionInfos badExpressionInfos;
-        static StrExpressionInfos badStrExpressionInfos;
+        static ExpressionMetadata badExpressionMetadata;
+        static StrExpressionMetadata badStrExpressionMetadata;
         #endif
         static AutomatismInfo badAutomatismInfo;
         static ExtensionObjectInfos badObjectInfo;

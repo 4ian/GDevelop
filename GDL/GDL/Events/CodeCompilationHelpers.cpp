@@ -21,7 +21,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDCore/Events/Event.h"
-#include "GDL/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/CodeExecutionEngine.h"
 #include "GDL/IDE/BaseProfiler.h"

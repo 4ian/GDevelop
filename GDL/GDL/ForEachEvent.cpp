@@ -13,7 +13,7 @@
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
-#include "PlatformDefinition/InstructionMetadataHolder.h"
+#include "PlatformDefinition/InstructionsMetadataHolder.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/Events/ExpressionsCodeGeneration.h"
 #include "GDL/Events/EventsCodeNameMangler.h"
@@ -229,7 +229,7 @@ void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     //Draw actions and conditions
-    InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
+    InstructionsMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+forEachTextHeight+border,
@@ -249,7 +249,7 @@ unsigned int ForEachEvent::GetRenderedHeight(unsigned int width) const
         const int forEachTextHeight = 20;
 
         //Get maximum height needed
-        InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
+        InstructionsMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
         int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, metadataHolder);
         int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, metadataHolder);
 

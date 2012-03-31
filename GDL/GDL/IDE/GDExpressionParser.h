@@ -16,8 +16,8 @@ class Scene;
 class ParameterMetadata;
 class ExpressionInstruction;
 class StrExpressionInstruction;
-class ExpressionInfos;
-class StrExpressionInfos;
+class ExpressionMetadata;
+class StrExpressionMetadata;
 
 /** \brief Internal class. Parse a plainExpression by calling functors at each token
  *
@@ -90,14 +90,14 @@ class ParserCallbacks
     virtual void OnNumber(std::string text) = 0;
     virtual void OnOperator(std::string text) = 0;
 
-    virtual void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo) = 0;
-    virtual void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfos) = 0;
+    virtual void OnStaticFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo) = 0;
+    virtual void OnStaticFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & ExpressionMetadata) = 0;
 
-    virtual void OnObjectFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo) = 0;
-    virtual void OnObjectFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfos) = 0;
+    virtual void OnObjectFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo) = 0;
+    virtual void OnObjectFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & ExpressionMetadata) = 0;
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo) = 0;
-    virtual void OnObjectAutomatismFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfos) = 0;
+    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo) = 0;
+    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & ExpressionMetadata) = 0;
 
     virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression) = 0;
     virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression) = 0;

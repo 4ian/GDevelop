@@ -32,7 +32,7 @@
 #include "GDL/Game.h"
 #include "GDL/Version.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/IDE/LocaleManager.h"
+#include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDL/CommonTools.h"
 
 #if defined(GD_IDE_ONLY)

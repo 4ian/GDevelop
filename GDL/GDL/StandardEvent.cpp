@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY)
 
 #include "StandardEvent.h"
-#include "PlatformDefinition/InstructionMetadataHolder.h"
+#include "PlatformDefinition/InstructionsMetadataHolder.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
@@ -90,21 +90,27 @@ void StandardEvent::SaveToXml(TiXmlElement * eventElem) const
 
 void StandardEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
+    if ( eventElem == NULL ) return;
+    std::cout << "YO";
+
     //Conditions
     if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
         OpenSaveGame::OpenConditions(conditions, eventElem->FirstChildElement( "Conditions" ));
     else
         cout << "Aucune informations sur les conditions d'un évènement";
 
+    std::cout << "YO";
     //Actions
     if ( eventElem->FirstChildElement( "Actions" ) != NULL )
         OpenSaveGame::OpenActions(actions, eventElem->FirstChildElement( "Actions" ));
     else
         cout << "Aucune informations sur les actions d'un évènement";
 
+    std::cout << "YO";
     //Subevents
     if ( eventElem->FirstChildElement( "Events" ) != NULL )
         OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
+    std::cout << "YOEND";
 }
 
 /**
@@ -119,7 +125,7 @@ void StandardEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEd
     wxRect rect(x, y, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width));
     renderingHelper->DrawNiceRectangle(dc, rect);
 
-    InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
+    InstructionsMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+border,
@@ -140,7 +146,7 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
         int border = renderingHelper->instructionsListBorder;
 
         //Get maximum height needed
-    InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
+    InstructionsMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
         int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2, metadataHolder);
         int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, metadataHolder);
 

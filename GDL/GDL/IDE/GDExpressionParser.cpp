@@ -393,11 +393,9 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
             }
         }
 
-        //Try to find an instruction with the same name
-        ExpressionInstruction instruction;
-        ExpressionInfos instructionInfos;
+        //Now we're going to identify the expression
+        ExpressionMetadata instructionInfos;
 
-        //Verify if we are not with a math expression.
         if ( functionName.substr(0, functionName.length()-1).find_first_of(parserSeparators) == string::npos )
         {
             bool functionFound = false;
@@ -409,13 +407,13 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
             if ( nameIsFunction && extensionsManager->HasExpression(functionName) )
             {
                 functionFound = true; staticFunctionFound = true;
-                instructionInfos = extensionsManager->GetExpressionInfos(functionName);
+                instructionInfos = extensionsManager->GetExpressionMetadata(functionName);
             }
             //Then search in object expression
             else if ( !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeOfObject(game, scene, objectName), functionName) )
             {
                 functionFound = true; objectFunctionFound = true;
-                instructionInfos = extensionsManager->GetObjectExpressionInfos(GetTypeOfObject(game, scene, objectName), functionName);
+                instructionInfos = extensionsManager->GetObjectExpressionMetadata(GetTypeOfObject(game, scene, objectName), functionName);
             }
             //And in automatisms expressions
             else if ( !nameIsFunction )
@@ -434,7 +432,7 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                         parameters.push_back(GDExpression(autoName));
                         functionFound = true; automatismFunctionFound = true;
 
-                        instructionInfos = extensionsManager->GetAutomatismExpressionInfos(GetTypeOfAutomatism(game, scene, autoName), functionName);
+                        instructionInfos = extensionsManager->GetAutomatismExpressionMetadata(GetTypeOfAutomatism(game, scene, autoName), functionName);
 
                         //Verify that object has automatism.
                         vector < std::string > automatisms = GetAutomatismsOfObject(game, scene, objectName);
@@ -524,16 +522,14 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                     return false;
                 }
 
-                instruction.parameters = parameters;
-
                 callbacks.OnConstantToken(nonFunctionToken+expression.substr(parsePosition, nameStart-parsePosition));
                 expressionWithoutFunctions += expression.substr(parsePosition, nameStart-parsePosition);
                 nonFunctionToken.clear();
                 nonFunctionTokenStartPos = std::string::npos;
 
-                if      ( objectFunctionFound ) callbacks.OnObjectFunction(functionName, instruction, instructionInfos);
-                else if ( automatismFunctionFound ) callbacks.OnObjectAutomatismFunction(functionName, instruction, instructionInfos);
-                else if ( staticFunctionFound ) callbacks.OnStaticFunction(functionName, instruction, instructionInfos);
+                if      ( objectFunctionFound ) callbacks.OnObjectFunction(functionName, parameters, instructionInfos);
+                else if ( automatismFunctionFound ) callbacks.OnObjectAutomatismFunction(functionName, parameters, instructionInfos);
+                else if ( staticFunctionFound ) callbacks.OnStaticFunction(functionName, parameters, instructionInfos);
 
                 if ( objectFunctionFound || automatismFunctionFound || staticFunctionFound ) expressionWithoutFunctions += "0";
 
@@ -622,14 +618,12 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             }
 
             //Adding constant text instruction
-            StrExpressionInstruction instruction;
 
             vector < GDExpression > parameters;
             parameters.push_back(finalText);
-            instruction.parameters = parameters;
-            StrExpressionInfos noParametersInfo; //TODO : A bit of hack here.
+            StrExpressionMetadata noParametersInfo; //TODO : A bit of hack here.
 
-            callbacks.OnStaticFunction("", instruction, noParametersInfo);
+            callbacks.OnStaticFunction("", parameters, noParametersInfo);
 
             parsePosition = finalQuotePosition+1;
         }
@@ -709,7 +703,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
             if ( nameIsFunction && extensionsManager->HasStrExpression(functionName) )
             {
                 functionFound = true;
-                const StrExpressionInfos & expressionInfo = extensionsManager->GetStrExpressionInfos(functionName);
+                const StrExpressionMetadata & expressionInfo = extensionsManager->GetStrExpressionMetadata(functionName);
 
                 //Testing the number of parameters
                 if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
@@ -729,14 +723,13 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                         return false;
                 }
 
-                instruction.parameters = parameters;
-                callbacks.OnStaticFunction(functionName, instruction, expressionInfo);
+                callbacks.OnStaticFunction(functionName, parameters, expressionInfo);
             }
             //Then an object member expression
             else if ( !nameIsFunction && extensionsManager->HasObjectStrExpression(GetTypeOfObject(game, scene, objectName), functionName) )
             {
                 functionFound = true;
-                const StrExpressionInfos & expressionInfo = extensionsManager->GetObjectStrExpressionInfos(GetTypeOfObject(game, scene, nameBefore), functionName);
+                const StrExpressionMetadata & expressionInfo = extensionsManager->GetObjectStrExpressionMetadata(GetTypeOfObject(game, scene, nameBefore), functionName);
 
                 //Testing the number of parameters
                 if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
@@ -759,8 +752,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                         return false;
                 }
 
-                instruction.parameters = parameters;
-                callbacks.OnObjectFunction(functionName, instruction, expressionInfo);
+                callbacks.OnObjectFunction(functionName, parameters, expressionInfo);
             }
             //And search automatisms expressions
             else
@@ -779,7 +771,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                         parameters.push_back(GDExpression(autoName));
                         functionFound = true;
 
-                        const StrExpressionInfos & expressionInfo = extensionsManager->GetAutomatismStrExpressionInfos(GetTypeOfAutomatism(game, scene, autoName), functionName);
+                        const StrExpressionMetadata & expressionInfo = extensionsManager->GetAutomatismStrExpressionMetadata(GetTypeOfAutomatism(game, scene, autoName), functionName);
 
                         //Verify that object has automatism.
                         vector < std::string > automatisms = GetAutomatismsOfObject(game, scene, objectName);
@@ -808,8 +800,7 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                                     return false;
                             }
 
-                            instruction.parameters = parameters;
-                            callbacks.OnObjectAutomatismFunction(functionName, instruction, expressionInfo);
+                            callbacks.OnObjectAutomatismFunction(functionName, parameters, expressionInfo);
                         }
                     }
                 }

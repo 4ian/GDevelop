@@ -32,9 +32,11 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/OpenSaveGame.h"
-#include "GDL/IDE/ResourcesMergingHelper.h"
+#include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDL/IDE/ExecutableIconChanger.h"
 #include "GDL/IDE/BaseProfiler.h"
+#include "PlatformDefinition/Platform.h"
+#include "PlatformDefinition/Project.h"
 
 using namespace std;
 
@@ -98,6 +100,9 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     //Create a separate copy of the game in memory, as we're going to apply it some modifications ( i.e changing resources path )
     Game game = gameToCompile;
+    //TODO : For now, construct a wrapper around Game
+    Platform platform;
+    Project project(&platform, &game);
 
     //Prepare resources to copy
     diagnosticManager.OnMessage( ToString( _("Préparation des ressources...") ));
@@ -122,12 +127,12 @@ void FullProjectCompiler::LaunchProjectCompilation()
         for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j) //Add objects resources
         	game.scenes[i]->initialObjects[j]->ExposeResources(resourcesMergingHelper);
 
-        LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(project, game.scenes[i]->events, resourcesMergingHelper);
     }
     //Add external events resources
     for ( unsigned int i = 0;i < game.externalEvents.size();i++ )
     {
-        LaunchResourceWorkerOnEvents(game, game.externalEvents[i]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(project, game.externalEvents[i]->events, resourcesMergingHelper);
     }
     //Add global objects resources
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources

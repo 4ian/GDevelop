@@ -4,7 +4,7 @@
  */
 
 #include "GDL/BuiltinExtensions/WindowExtension.h"
-#include "GDL/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/Events/Instruction.h"
 
 WindowExtension::WindowExtension()

@@ -4,7 +4,7 @@
  */
 
 #include "GDL/BuiltinExtensions/AudioExtension.h"
-#include "GDL/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDL/SoundManager.h"
 #include "GDL/CommonTools.h"
 #include "GDCore/Events/Instruction.h"

@@ -1137,8 +1137,6 @@
 		<Unit filename="GDL\Force.h" />
 		<Unit filename="GDL\Game.cpp" />
 		<Unit filename="GDL\Game.h" />
-		<Unit filename="GDL\IDE\ArbitraryResourceWorker.cpp" />
-		<Unit filename="GDL\IDE\ArbitraryResourceWorker.h" />
 		<Unit filename="GDL\IDE\BaseDebugger.cpp" />
 		<Unit filename="GDL\IDE\BaseDebugger.h" />
 		<Unit filename="GDL\IDE\BaseProfiler.cpp" />
@@ -1195,16 +1193,8 @@
 		<Unit filename="GDL\IDE\HelpFileAccess.h" />
 		<Unit filename="GDL\IDE\ImageFilesWatcher.cpp" />
 		<Unit filename="GDL\IDE\ImageFilesWatcher.h" />
-		<Unit filename="GDL\IDE\ImagesUsedInventorizer.cpp" />
-		<Unit filename="GDL\IDE\ImagesUsedInventorizer.h" />
-		<Unit filename="GDL\IDE\LocaleManager.cpp" />
-		<Unit filename="GDL\IDE\LocaleManager.h" />
 		<Unit filename="GDL\IDE\MainEditorCommand.cpp" />
 		<Unit filename="GDL\IDE\MainEditorCommand.h" />
-		<Unit filename="GDL\IDE\ResourcesMergingHelper.cpp" />
-		<Unit filename="GDL\IDE\ResourcesMergingHelper.h" />
-		<Unit filename="GDL\IDE\ResourcesUnmergingHelper.cpp" />
-		<Unit filename="GDL\IDE\ResourcesUnmergingHelper.h" />
 		<Unit filename="GDL\IDE\TreeItemExpressionInfoData.h" />
 		<Unit filename="GDL\IDE\TreeItemStrExpressionInfoData.h" />
 		<Unit filename="GDL\IDE\gdTreeItemStringData.cpp" />
@@ -1312,10 +1302,12 @@
 		<Unit filename="GDL\tinyxml\tinyxml.h" />
 		<Unit filename="GDL\tinyxml\tinyxmlerror.cpp" />
 		<Unit filename="GDL\tinyxml\tinyxmlparser.cpp" />
-		<Unit filename="PlatformDefinition\InstructionMetadataHolder.cpp" />
-		<Unit filename="PlatformDefinition\InstructionMetadataHolder.h" />
+		<Unit filename="PlatformDefinition\InstructionsMetadataHolder.cpp" />
+		<Unit filename="PlatformDefinition\InstructionsMetadataHolder.h" />
 		<Unit filename="PlatformDefinition\Platform.cpp" />
 		<Unit filename="PlatformDefinition\Platform.h" />
+		<Unit filename="PlatformDefinition\Project.cpp" />
+		<Unit filename="PlatformDefinition\Project.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

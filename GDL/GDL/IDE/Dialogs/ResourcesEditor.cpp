@@ -44,9 +44,11 @@
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/Dialogs/PropImage.h"
 #include "GDL/ExternalEvents.h"
+#include "PlatformDefinition/Platform.h"
+#include "PlatformDefinition/Project.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/IDE/gdTreeItemStringData.h"
-#include "GDL/IDE/ImagesUsedInventorizer.h"
+#include "GDCore/IDE/ImagesUsedInventorizer.h"
 
 
 #ifdef __WXGTK__
@@ -766,6 +768,10 @@ void ResourcesEditor::Refresh()
 
 void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 {
+    //TODO : For now, construct a wrapper around Game
+    Platform platform;
+    Project project(&platform, &game);
+
     //Search in scenes resources
     ImagesUsedInventorizer inventorizer;
     for ( unsigned int i = 0;i < game.scenes.size();i++ )
@@ -773,14 +779,14 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
         for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j)
         	game.scenes[i]->initialObjects[j]->ExposeResources(inventorizer);
 
-        LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, inventorizer);
+        LaunchResourceWorkerOnEvents(project, game.scenes[i]->events, inventorizer);
     }
     //Search in global objects resources
     for (unsigned int j = 0;j<game.globalObjects.size();++j)
         game.globalObjects[j]->ExposeResources(inventorizer);
     //Search in external events
     for ( unsigned int i = 0;i < game.externalEvents.size();i++ )
-        LaunchResourceWorkerOnEvents(game, game.externalEvents[i]->events, inventorizer);
+        LaunchResourceWorkerOnEvents(project, game.externalEvents[i]->events, inventorizer);
 
     //Construct a wxArrayString with unused images
     wxArrayString imagesNotUsed;

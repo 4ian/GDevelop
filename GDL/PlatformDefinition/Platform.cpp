@@ -1,9 +1,27 @@
 #include "Platform.h"
 #include "GDCore/PlatformDefinition/Platform.h"
+#include "GDL/ExtensionsManager.h"
+#include "GDL/ExtensionBase.h"
 
 Platform::~Platform()
 {
     //dtor
+}
+
+std::vector < boost::shared_ptr<gd::PlatformExtension> > Platform::GetAllPlatformExtensions() const
+{
+    std::vector < boost::shared_ptr<gd::PlatformExtension> > extensions;
+    for (unsigned int i = 0;i<GDpriv::ExtensionsManager::GetInstance()->GetExtensions().size();++i)
+    {
+        extensions.push_back(boost::shared_ptr<gd::PlatformExtension>(GDpriv::ExtensionsManager::GetInstance()->GetExtensions()[i]));
+
+    }
+    return extensions;
+}
+
+boost::shared_ptr<gd::PlatformExtension> Platform::GetExtension(const std::string & name) const
+{
+    return GDpriv::ExtensionsManager::GetInstance()->GetExtension(name);
 }
 
 /**

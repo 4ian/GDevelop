@@ -28,8 +28,6 @@ class GD_API ExpressionInstruction
     public:
         ExpressionInstruction() {};
         virtual ~ExpressionInstruction() {};
-
-        std::vector<GDExpression>   parameters;
 };
 
 #endif // EXPRESSIONINSTRUCTION_H

@@ -14,7 +14,7 @@
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
-#include "PlatformDefinition/InstructionMetadataHolder.h"
+#include "PlatformDefinition/InstructionsMetadataHolder.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/ExtensionsManager.h"
 
@@ -136,7 +136,7 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     const int repeatHeight = 20;
 
     //Draw header rectangle
-    InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
+    InstructionsMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
     int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, metadataHolder)+border*2;
     wxRect headerRect(x, y, width, whileConditionsHeight+repeatHeight);
     renderingHelper->DrawNiceRectangle(dc, headerRect);
@@ -177,7 +177,7 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
         const int repeatHeight = 20;
 
         //Get maximum height needed
-        InstructionMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
+        InstructionsMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
         int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, metadataHolder);
         int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, metadataHolder);
         int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, metadataHolder);

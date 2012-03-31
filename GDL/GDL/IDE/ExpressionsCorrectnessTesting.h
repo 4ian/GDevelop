@@ -12,9 +12,9 @@
 #include <string>
 #include "GDL/IDE/GDExpressionParser.h"
 class ExpressionInstruction;
-class ExpressionInfos;
+class ExpressionMetadata;
 class StrExpressionInstruction;
-class StrExpressionInfos;
+class StrExpressionMetadata;
 class GDExpression;
 class Game;
 class Scene;
@@ -32,12 +32,12 @@ class GD_API CallbacksForExpressionCorrectnessTesting : public ParserCallbacks
     void OnOperator(std::string text) {};
     void OnNumber(std::string text) {};
     void OnConstantToken(std::string text) {};
-    void OnStaticFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo) {};
-    void OnStaticFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo) {};
-    void OnObjectFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo) {};
-    void OnObjectFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo) {};
-    void OnObjectAutomatismFunction(std::string functionName, const ExpressionInstruction & instruction, const ExpressionInfos & expressionInfo) {};
-    void OnObjectAutomatismFunction(std::string functionName, const StrExpressionInstruction & instruction, const StrExpressionInfos & expressionInfo) {};
+    void OnStaticFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo) {};
+    void OnStaticFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo) {};
+    void OnObjectFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo) {};
+    void OnObjectFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo) {};
+    void OnObjectAutomatismFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo) {};
+    void OnObjectAutomatismFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo) {};
     bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression);
     bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression);
 

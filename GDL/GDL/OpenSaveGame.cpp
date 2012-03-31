@@ -8,6 +8,8 @@
     #define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
     #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
     #include "GDL/IDE/Dialogs/ProjectUpdateDlg.h"
+    #include "PlatformDefinition/Platform.h"
+    #include "PlatformDefinition/Project.h"
 #else
     #include "GDL/Log.h"
     #include <iostream>
@@ -27,7 +29,7 @@
 
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml/tinyxml.h"
-#include "GDL/IDE/ResourcesUnmergingHelper.h"
+#include "GDCore/IDE/ResourcesUnmergingHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
@@ -270,6 +272,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         if ( elem->FirstChildElement( "Layers" ) != NULL )
             OpenLayers(newScene->initialLayers, elem->FirstChildElement( "Layers" ));
 
+std::cout << "COOUC1";
         #if defined(GD_IDE_ONLY)
         if ( elem->FirstChildElement( "Events" ) != NULL )
             OpenEvents(newScene->events, elem->FirstChildElement( "Events" ));
@@ -278,7 +281,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 
         if ( elem->FirstChildElement( "Variables" ) != NULL )
             OpenVariablesList(newScene->variables, elem->FirstChildElement( "Variables" ));
-
+std::cout << "COOUC";
         if ( elem->FirstChildElement( "AutomatismsSharedDatas" ) != NULL )
         {
             TiXmlElement * elemSharedDatas = elem->FirstChildElement( "AutomatismsSharedDatas" )->FirstChildElement( "AutomatismSharedDatas" );
@@ -287,6 +290,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
                 std::string type = elemSharedDatas->Attribute("Type") ? elemSharedDatas->Attribute("Type") : "";
                 boost::shared_ptr<AutomatismsSharedDatas> sharedDatas = extensionsManager->CreateAutomatismSharedDatas(type);
 
+std::cout << "2";
                 if ( sharedDatas != boost::shared_ptr<AutomatismsSharedDatas>() )
                 {
                     sharedDatas->SetName( elemSharedDatas->Attribute("Name") ? elemSharedDatas->Attribute("Name") : "" );
@@ -298,6 +302,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
             }
         }
 
+std::cout << "COOUC3";
         newScene->externalSourcesDependList.clear();
         const TiXmlElement * dependenciesElem = elem->FirstChildElement( "Dependencies" );
         if ( dependenciesElem != NULL)
@@ -595,15 +600,19 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
     //Passage en revue des évènements
     while ( elemScene )
     {
+        cout << "JEFLKJ\n";
         string type;
 
-        if ( elemScene->FirstChildElement( "Type" )->Attribute( "value" ) != NULL ) { type = elemScene->FirstChildElement( "Type" )->Attribute( "value" );}
+        if ( elemScene->FirstChildElement( "Type" ) != NULL && elemScene->FirstChildElement( "Type" )->Attribute( "value" ) != NULL ) { type = elemScene->FirstChildElement( "Type" )->Attribute( "value" );}
         else { MSG( "Les informations concernant le type d'un évènement manquent." ); }
 
+        cout << "Abouttocreate\n";
         BaseEventSPtr event = extensionsManager->CreateEvent(type);
         if ( event != boost::shared_ptr<BaseEvent>())
         {
+        cout << "Load\n";
             event->LoadFromXml(elemScene);
+        cout << "EndLoad\n";
         }
         else
         {
@@ -611,6 +620,7 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
             event = boost::shared_ptr<BaseEvent>(new EmptyEvent);
         }
 
+        cout << "JEFLKJ2";
         if ( elemScene->Attribute( "disabled" ) != NULL ) { if ( string(elemScene->Attribute( "disabled" )) == "true" ) event->SetDisabled(); }
         if ( elemScene->Attribute( "folded" ) != NULL ) { event->folded = ( string(elemScene->Attribute( "folded" )) == "true" ); }
 
@@ -635,6 +645,7 @@ std::string AddBackSlashBeforeQuotes(std::string text)
 
 void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiXmlElement * elem)
 {
+    if (elem == NULL) return;
     const TiXmlElement * elemConditions = elem->FirstChildElement();
 
     //Passage en revue des conditions
@@ -646,14 +657,8 @@ void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiX
         const TiXmlElement *elemPara = elemConditions->FirstChildElement( "Type" );
         if ( elemPara != NULL )
         {
-            instruction.SetType( elemPara->Attribute( "value" ));
-            string LocStr = elemPara->Attribute( "loc" );
-            string ContraireStr;
-            if ( elemPara->Attribute( "Contraire" ) != NULL ) { ContraireStr = elemPara->Attribute( "Contraire" ); }
-            else { MSG("Les informations sur le type-contraire d'un évènement manquent"); }
-
-            instruction.SetInverted(false);
-            if ( ContraireStr == "true" ) { instruction.SetInverted(true); }
+            instruction.SetType( elemPara->Attribute( "value" ) != NULL ? elemPara->Attribute( "value" ) : "");
+            instruction.SetInverted( (elemPara->Attribute( "Contraire" ) != NULL) && (string(elemPara->Attribute( "Contraire" )) == "true") );
         }
 
         //Read parameters
@@ -661,7 +666,7 @@ void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiX
         elemPara = elemConditions->FirstChildElement("Parametre");
         while ( elemPara )
         {
-            parameters.push_back( GDExpression(elemPara->Attribute( "value" )) );
+            if ( elemPara->Attribute( "value" ) != NULL ) parameters.push_back( GDExpression(elemPara->Attribute( "value" )) );
             elemPara = elemPara->NextSiblingElement("Parametre");
         }
         instruction.SetParameters( parameters );
@@ -678,6 +683,7 @@ void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiX
 
 void OpenSaveGame::OpenActions(vector < Instruction > & actions, const TiXmlElement * elem)
 {
+    if (elem == NULL) return;
     const TiXmlElement * elemActions = elem->FirstChildElement();
 
     //Passage en revue des actions
@@ -689,7 +695,7 @@ void OpenSaveGame::OpenActions(vector < Instruction > & actions, const TiXmlElem
         const TiXmlElement *elemPara = elemActions->FirstChildElement( "Type" );
         if ( elemPara != NULL )
         {
-            instruction.SetType( elemPara->Attribute( "value" ));
+            if (elemPara->Attribute( "value" ) != NULL) instruction.SetType( elemPara->Attribute( "value" ));
         }
 
         //Read parameters
@@ -697,7 +703,7 @@ void OpenSaveGame::OpenActions(vector < Instruction > & actions, const TiXmlElem
         elemPara = elemActions->FirstChildElement("Parametre");
         while ( elemPara )
         {
-            parameters.push_back( GDExpression(elemPara->Attribute( "value" )) );
+            if (elemPara->Attribute( "value" ) != NULL) parameters.push_back( GDExpression(elemPara->Attribute( "value" )) );
             elemPara = elemPara->NextSiblingElement("Parametre");
         }
         instruction.SetParameters(parameters);
@@ -799,20 +805,24 @@ void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents
 void OpenSaveGame::OpenVariablesList(ListVariable & list, const TiXmlElement * elem)
 {
     list.Clear();
-
+std::cout << "HERE";
     if ( elem == NULL ) return;
     const TiXmlElement * elemScene = elem->FirstChildElement();
 
+std::cout << "A";
     while ( elemScene )
     {
+std::cout << "B";
         string name = elemScene->Attribute( "Name" ) != NULL ? elemScene->Attribute( "Name" ) : "";
         Variable & variable = list.ObtainVariable(name);
 
+std::cout << "C";
         if ( elemScene->Attribute( "Value" ) != NULL ) { variable.SetString(elemScene->Attribute( "Value" ));}
         else { MSG( "Les informations concernant la valeur d'une variable manquent." ); }
 
         elemScene = elemScene->NextSiblingElement();
     }
+std::cout << "D";
 }
 
 #if defined(GD_IDE_ONLY)
@@ -1332,7 +1342,10 @@ void OpenSaveGame::RecreatePaths(string file)
         for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j) //Add objects resources
         	game.scenes[i]->initialObjects[j]->ExposeResources(resourcesUnmergingHelper);
 
-        LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, resourcesUnmergingHelper);
+        //TODO : For now, construct a wrapper around Game
+        Platform platform;
+        Project project(&platform, &game);
+        LaunchResourceWorkerOnEvents(project, game.scenes[i]->events, resourcesUnmergingHelper);
     }
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
         game.globalObjects[j]->ExposeResources(resourcesUnmergingHelper);

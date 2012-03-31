@@ -21,7 +21,11 @@ class MainEditorCommand;
 #include <vector>
 #include <map>
 #include <boost/shared_ptr.hpp>
+#if defined(GD_IDE_ONLY)
 #include "GDCore/Events/InstructionMetadata.h"
+#include "GDCore/Events/ExpressionMetadata.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
+#endif
 class RuntimeScene;
 class Instruction;
 class Automatism;
@@ -203,7 +207,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            ExpressionInfos instrInfo(*this); \
+            ExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -223,7 +227,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_OBJECT_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            ExpressionInfos instrInfo(*this); \
+            ExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -243,7 +247,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            ExpressionInfos instrInfo(*this); \
+            ExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -262,7 +266,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  */
 #define DECLARE_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            StrExpressionInfos instrInfo(*this); \
+            StrExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -282,7 +286,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            StrExpressionInfos instrInfo(*this); \
+            StrExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -302,7 +306,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            StrExpressionInfos instrInfo(*this); \
+            StrExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -479,174 +483,6 @@ typedef Object * (*CreateFunPtr)(std::string name);
 #if defined(GD_IDE_ONLY)
 
 /**
- * \brief Contains user-friendly infos about expressions, only at edittime, and members needed to setup an expression
- */
-class GD_API ExpressionInfos
-{
-    public:
-
-    ExpressionInfos(ExtensionBase & parentExtension);
-    virtual ~ExpressionInfos() {};
-
-    /**
-     * When called, the expression will not be displayed in the editor
-     */
-    ExpressionInfos & SetHidden();
-
-    std::string fullname;
-    std::string description;
-    std::string group;
-    bool shown;
-    wxBitmap smallicon;
-    std::vector < ParameterMetadata > parameters;
-
-    /**
-     * \see InstructionMetadata::AddParameter
-     */
-    ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
-
-    /**
-     * \see InstructionMetadata::AddCodeOnlyParameter
-     */
-    ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
-
-    /**
-     * \brief Defines information about how generate C++ code for an instruction
-     */
-    class CppCallingInformation
-    {
-    public:
-        /**
-         * Set the C++ function name which will be used when generating the C++ code.
-         */
-        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
-        {
-            cppCallingName = cppCallingName_;
-            return *this;
-        }
-
-        /**
-         * Set that the function is located in a specific include file
-         */
-        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
-        {
-            optionalIncludeFile = optionalIncludeFile_;
-            return *this;
-        }
-
-        /** \brief Class used to redefine instruction code generation
-         */
-        class CustomCodeGenerator
-        {
-        public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const ExpressionInstruction & instruction, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context) {return "";};
-        };
-
-        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
-        {
-            optionalCustomCodeGenerator = codeGenerator;
-            return *this;
-        }
-
-        std::string cppCallingName;
-        std::string optionalIncludeFile;
-        boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
-    };
-    CppCallingInformation cppCallingInformation;
-
-    /** Don't use this constructor. Only here to fullfil std::map requirements
-     */
-    ExpressionInfos() {};
-
-    private:
-        std::string extensionNamespace;
-};
-
-/**
- * \brief Contains user-friendly infos about expressions, only at edittime, and members needed to setup an expression
- */
-class GD_API StrExpressionInfos
-{
-    public:
-
-    StrExpressionInfos(ExtensionBase & parentExtension);
-    virtual ~StrExpressionInfos() {};
-
-    /**
-     * When called, the expression will not be displayed in the editor
-     */
-    StrExpressionInfos & SetHidden();
-
-    std::string fullname;
-    std::string description;
-    std::string group;
-    bool shown;
-    wxBitmap smallicon;
-    std::vector < ParameterMetadata > parameters;
-
-    /**
-     * \see InstructionMetadata::AddParameter
-     */
-    ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
-
-    /**
-     * \see InstructionMetadata::AddCodeOnlyParameter
-     */
-    ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
-
-    /**
-     * \brief Defines information about how generate C++ code for an instruction
-     */
-    class CppCallingInformation
-    {
-    public:
-        /**
-         * Set the C++ function name which will be used when generating the C++ code.
-         */
-        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
-        {
-            cppCallingName = cppCallingName_;
-            return *this;
-        }
-
-        /**
-         * Set that the function is located in a specific include file
-         */
-        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
-        {
-            optionalIncludeFile = optionalIncludeFile_;
-            return *this;
-        }
-
-        /** \brief Class used to redefine instruction code generation
-         */
-        class CustomCodeGenerator
-        {
-        public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const StrExpressionInstruction & instruction, EventsCodeGenerator & codeGenerator_ ,EventsCodeGenerationContext & context) {return "";};
-        };
-
-        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
-        {
-            optionalCustomCodeGenerator = codeGenerator;
-            return *this;
-        }
-
-        std::string cppCallingName;
-        std::string optionalIncludeFile;
-        boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
-    };
-    CppCallingInformation cppCallingInformation;
-
-    /** Don't use this constructor. Only here to fullfil std::map requirements
-     */
-    StrExpressionInfos() {};
-
-    private:
-        std::string extensionNamespace;
-};
-
-/**
  * \brief Contains user-friendly infos about event, only at edittime, and members needed to create an event
  */
 class GD_API EventInfos
@@ -690,8 +526,8 @@ class GD_API AutomatismInfo
 
     std::map<std::string, InstructionMetadata > conditionsInfos;
     std::map<std::string, InstructionMetadata > actionsInfos;
-    std::map<std::string, ExpressionInfos > expressionsInfos;
-    std::map<std::string, StrExpressionInfos > strExpressionsInfos;
+    std::map<std::string, ExpressionMetadata > expressionsInfos;
+    std::map<std::string, StrExpressionMetadata > strExpressionsInfos;
 
     std::string optionalIncludeFile;
     std::string cppClassName;
@@ -723,8 +559,8 @@ class GD_API ExtensionObjectInfos
 
     std::map<std::string, InstructionMetadata > conditionsInfos;
     std::map<std::string, InstructionMetadata > actionsInfos;
-    std::map<std::string, ExpressionInfos > expressionsInfos;
-    std::map<std::string, StrExpressionInfos > strExpressionsInfos;
+    std::map<std::string, ExpressionMetadata > expressionsInfos;
+    std::map<std::string, StrExpressionMetadata > strExpressionsInfos;
 
     std::string optionalIncludeFile;
     std::string cppClassName;
@@ -781,6 +617,9 @@ class GD_API CompilationInfos
  *  - Information at edittime
  */
 class GD_API ExtensionBase
+#if defined(GD_IDE_ONLY)
+: public gd::PlatformExtension
+#endif
 {
     public :
 
@@ -848,18 +687,18 @@ class GD_API ExtensionBase
 
     const std::map<std::string, InstructionMetadata > & GetAllActions() const;
     const std::map<std::string, InstructionMetadata > & GetAllConditions() const;
-    const std::map<std::string, ExpressionInfos > & GetAllExpressions() const;
-    const std::map<std::string, StrExpressionInfos > & GetAllStrExpressions() const;
+    const std::map<std::string, ExpressionMetadata > & GetAllExpressions() const;
+    const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressions() const;
     const std::map<std::string, InstructionMetadata > & GetAllActionsForObject(std::string objectType) const;
     const std::map<std::string, InstructionMetadata > & GetAllConditionsForObject(std::string objectType) const;
-    const std::map<std::string, ExpressionInfos > & GetAllExpressionsForObject(std::string objectType) const;
-    const std::map<std::string, StrExpressionInfos > & GetAllStrExpressionsForObject(std::string objectType) const;
+    const std::map<std::string, ExpressionMetadata > & GetAllExpressionsForObject(std::string objectType) const;
+    const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressionsForObject(std::string objectType) const;
     const std::map<std::string, EventInfos > & GetAllEvents() const;
     const std::map<std::string, AutomatismInfo > & GetAllAutomatisms() const;
     const std::map<std::string, InstructionMetadata > & GetAllActionsForAutomatism(std::string autoType) const;
     const std::map<std::string, InstructionMetadata > & GetAllConditionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, ExpressionInfos > & GetAllExpressionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, StrExpressionInfos > & GetAllStrExpressionsForAutomatism(std::string autoType) const;
+    const std::map<std::string, ExpressionMetadata > & GetAllExpressionsForAutomatism(std::string autoType) const;
+    const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType) const;
 
     const ExtensionObjectInfos & GetObjectInfo(std::string objectType) const;
     const AutomatismInfo & GetAutomatismInfo(std::string objectType) const;
@@ -932,14 +771,14 @@ class GD_API ExtensionBase
 
     std::map<std::string, InstructionMetadata > conditionsInfos;
     std::map<std::string, InstructionMetadata > actionsInfos;
-    std::map<std::string, ExpressionInfos > expressionsInfos;
-    std::map<std::string, StrExpressionInfos > strExpressionsInfos;
+    std::map<std::string, ExpressionMetadata > expressionsInfos;
+    std::map<std::string, StrExpressionMetadata > strExpressionsInfos;
     std::map<std::string, EventInfos > eventsInfos;
 
     static std::map<std::string, InstructionMetadata > badConditionsInfos; ///< Used when a condition is not found in the extension
     static std::map<std::string, InstructionMetadata > badActionsInfos;  ///< Used when an action is not found in the extension
-    static std::map<std::string, ExpressionInfos > badExpressionsInfos; ///< Used when an expression is not found in the extension
-    static std::map<std::string, StrExpressionInfos > badStrExpressionsInfos;///< Used when an expression is not found in the extension
+    static std::map<std::string, ExpressionMetadata > badExpressionsInfos; ///< Used when an expression is not found in the extension
+    static std::map<std::string, StrExpressionMetadata > badStrExpressionsInfos;///< Used when an expression is not found in the extension
     #endif
 
     private:

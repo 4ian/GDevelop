@@ -13,7 +13,7 @@
 //*)
 #include <string>
 #include <vector>
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 class Game;
 class Scene;
 class EventsEditor;
@@ -26,7 +26,7 @@ class SearchEvents: public wxDialog
 {
 	public:
 
-		SearchEvents(EventsEditor * parent_, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_);
+		SearchEvents(EventsEditor * parent_, Game & game_, Scene & scene_, std::vector < BaseEventSPtr > * events_);
 		virtual ~SearchEvents();
 
 		//(*Declarations(SearchEvents)

@@ -50,15 +50,16 @@
 #include "ExtensionBugReportDlg.h"
 
 #include "GDL/Game.h"
+#include "GDL/Log.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/SoundManager.h"
 #include "GDL/FontManager.h"
 #include "GDL/IDE/HelpFileAccess.h"
-#include "GDL/IDE/ActionSentenceFormatter.h"
+#include "GDCore/IDE/ActionSentenceFormatter.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionsLoader.h"
 #include "GDL/VersionWrapper.h"
-#include "GDL/IDE/LocaleManager.h"
+#include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDL/IDE/CodeCompiler.h"
 
 #include <fstream>
@@ -267,7 +268,7 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Les log
     cout << "* Displaying Game Develop version information :" << endl;
-    GDLogBanner();
+    //GDLogBanner();
 
     //LLVM stuff
     cout << "* Initializing LLVM/Clang..." << endl;

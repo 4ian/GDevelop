@@ -6,7 +6,7 @@
 #ifndef TEMPLATEEVENTS_H
 #define TEMPLATEEVENTS_H
 
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 
 #include <string>
 #include <vector>

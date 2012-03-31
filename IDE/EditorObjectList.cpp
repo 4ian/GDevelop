@@ -34,7 +34,7 @@
 #include <algorithm>
 #include <numeric>
 #include "EditorObjetsGroups.h"
-#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/Automatism.h"
 #include "GDL/CommonTools.h"
 #include "DndTextObjectsEditor.h"
@@ -440,8 +440,8 @@ void EditorObjectList::Refresh()
     objectsList->DeleteAllItems();
     objectsImagesList->RemoveAll();
 
-    BitmapGUIManager *bitmapGUIManager = BitmapGUIManager::GetInstance();
-    objectsImagesList->Add(bitmapGUIManager->objects24);
+    CommonBitmapManager *CommonBitmapManager = CommonBitmapManager::GetInstance();
+    objectsImagesList->Add(CommonBitmapManager->objects24);
 
     objectsList->AddRoot( _( "Tous les objets" ), 0 );
 
@@ -768,8 +768,8 @@ bool EditorObjectList::CheckObjectName(std::string name)
         for(unsigned int j = 0;j<objectsTypes.size();++j)
         {
             //Add each object expression
-            std::map<string, ExpressionInfos > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
-            for(std::map<string, ExpressionInfos>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
+            std::map<string, ExpressionMetadata > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
+            for(std::map<string, ExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
             {
                 if ( name == it->first )
                     nameUsedByExpression = true;

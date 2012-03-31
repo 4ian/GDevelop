@@ -9,7 +9,7 @@
 		<Build>
 			<Target title="Debug - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="bin\debug\GDEditor" prefix_auto="1" extension_auto="1" />
+				<Option output="bin\debug\GDIDE" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin\debug" />
 				<Option object_output="obj\debug" />
 				<Option type="1" />
@@ -171,7 +171,7 @@
 			</Target>
 			<Target title="Release - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="bin\release\GDEditor" prefix_auto="1" extension_auto="1" />
+				<Option output="bin\release\GDIDE" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin\release" />
 				<Option object_output="obj\release" />
 				<Option type="0" />
@@ -269,7 +269,7 @@
 			</Target>
 			<Target title="Development - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="bin\dev\GDEditor" prefix_auto="1" extension_auto="1" />
+				<Option output="bin\dev\GDIDE" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="bin\dev" />
 				<Option object_output="obj\dev" />
 				<Option type="1" />
@@ -400,7 +400,7 @@
 			</Target>
 			<Target title="Linux - Release - Edittime">
 				<Option platforms="Windows;Unix;" />
-				<Option output="bin\release\GDEditor" prefix_auto="0" extension_auto="0" />
+				<Option output="bin\release\GDIDE" prefix_auto="0" extension_auto="0" />
 				<Option working_dir="bin\release" />
 				<Option object_output="obj\release" />
 				<Option type="0" />
@@ -482,7 +482,7 @@
 			</Target>
 			<Target title="Linux - Debug - Edittime">
 				<Option platforms="Windows;Unix;" />
-				<Option output="bin\debug\GDEditor" prefix_auto="0" extension_auto="0" />
+				<Option output="bin\debug\GDIDE" prefix_auto="0" extension_auto="0" />
 				<Option working_dir="bin\debug" />
 				<Option object_output="obj\debug" />
 				<Option type="0" />
@@ -565,12 +565,16 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-DWXMAKINGDLL_STEDIT" />
+			<Add directory="..\Core" />
 			<Add directory="..\GDL" />
 			<Add directory="..\ExtLibs\SFML\include" />
 			<Add directory="..\ExtLibs\boost" />
 			<Add directory="CppUnitLite\" />
 			<Add directory="wxstedit\include" />
 		</Compiler>
+		<ResourceCompiler>
+			<Add directory="..\GDL" />
+		</ResourceCompiler>
 		<Unit filename="AdvancedPasteDlg.cpp" />
 		<Unit filename="AdvancedPasteDlg.h" />
 		<Unit filename="AutomatismTypeChoice.cpp" />
@@ -1121,7 +1125,7 @@
 			</wxsmith>
 			<AutoVersioning>
 				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="1" />
-				<Settings autoincrement="0" date_declarations="1" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="C:\Users\Florian\Programmation\Game Develop SVN\conf" header_path="version.h" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="C:\Users\Florian\Programmation\Game Develop SVN\conf" header_path="" />
 				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
 				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
 			</AutoVersioning>

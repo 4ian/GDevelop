@@ -887,6 +887,7 @@
 													<object class="wxRadioButton" name="ID_RADIOBUTTON2" variable="internalCodeEditorCheck" member="yes">
 														<label>Editer les sources avec l&apos;éditeur intégré à Game Develop</label>
 														<selected>1</selected>
+														<style>wxRB_GROUP</style>
 													</object>
 													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>

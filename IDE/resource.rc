@@ -1,6 +1,6 @@
 aaaa ICON "icon.ico"
 
-#include "version.h"
+#include "GDL/Version.h"
 #include "wx/msw/wx.rc"
 
 #ifndef DEBUG
@@ -17,14 +17,14 @@ BEGIN
     BEGIN
         BLOCK "040904E4"
         BEGIN
-            VALUE "CompanyName",      "Compil Games"
-            VALUE "FileDescription",  "Game Develop"
+            VALUE "CompanyName",      "Florian Rival"
+            VALUE "FileDescription",  "Game Develop Integrated Development Environment"
             VALUE "FileVersion",      RC_FILEVERSION_STRING
-            VALUE "InternalName",     "Game Develop"
-            VALUE "LegalCopyright",   "2008-2012 Compil Games"
+            VALUE "InternalName",     "Game Develop IDE"
+            VALUE "LegalCopyright",   "2008-2012 Florian Rival"
             VALUE "LegalTrademarks1", ""
             VALUE "LegalTrademarks2", ""
-            VALUE "OriginalFilename", "GDEditor.exe"
+            VALUE "OriginalFilename", "GDIDE.exe"
             VALUE "ProductName",      "Game Develop"
             VALUE "ProductVersion",   RC_FILEVERSION_STRING
         END

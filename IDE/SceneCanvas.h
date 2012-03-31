@@ -18,7 +18,7 @@
 
 #include "GDL/Object.h"
 #include "GDL/Collisions.h"
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/RuntimeScene.h"

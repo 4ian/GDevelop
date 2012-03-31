@@ -21,14 +21,15 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "GDL/IDE/MainEditorCommand.h"
-#include "GDL/Event.h"
-#include "GDL/IDE/EventsEditorItemsAreas.h"
-#include "GDL/IDE/EventsEditorSelection.h"
+#include "GDCore/Events/Event.h"
+#include "GDCore/IDE/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/EventsEditorSelection.h"
 class SearchEvents;
 class ExternalEvents;
 class Game;
 class Scene;
 class BaseEvent;
+class EventsEditor;
 
 /**
  * Lightweight class to get refresh order
@@ -51,7 +52,7 @@ class EventsEditor: public wxPanel
 {
 	public:
 
-		EventsEditor(wxWindow* parent, Game & game, Scene & scene, vector < BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ );
+		EventsEditor(wxWindow* parent, Game & game, Scene & scene, std::vector < BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ );
 		virtual ~EventsEditor();
 
 		//(*Declarations(EventsEditor)
@@ -173,7 +174,7 @@ class EventsEditor: public wxPanel
         static wxRibbonButtonBar * clipboardRibbonBar;
         static wxRibbonButtonBar * templateRibbonBar;
         static wxRibbonButtonBar * undoRibbonBar;
-		vector < std::pair<long, std::string> > idForEventTypesMenu;
+		std::vector < std::pair<long, std::string> > idForEventTypesMenu;
 
 	private:
 
@@ -270,7 +271,7 @@ class EventsEditor: public wxPanel
 		Scene & scene; ///< Scene is required, even if it is a empty useless scene.
         ExternalEvents * externalEvents; ///< Events editor can be used to edit external events
 
-        vector < BaseEventSPtr > * events; ///< Events modified are not necessarily the events of the scene
+        std::vector < BaseEventSPtr > * events; ///< Events modified are not necessarily the events of the scene
 		MainEditorCommand & mainEditorCommand;
         SceneCanvas * sceneCanvas;
 
@@ -291,8 +292,8 @@ class EventsEditor: public wxPanel
 
         bool ctrlKeyDown;
 
-        vector < vector < BaseEventSPtr > > history; ///<Changes history
-        vector < vector < BaseEventSPtr > > redoHistory;
+        std::vector < std::vector < BaseEventSPtr > > history; ///<Changes history
+        std::vector < std::vector < BaseEventSPtr > > redoHistory;
         std::vector < BaseEventSPtr > latestState; ///< Necessary to keep track of what changed
 
         bool profilingActivated;

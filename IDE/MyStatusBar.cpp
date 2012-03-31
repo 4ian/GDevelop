@@ -36,7 +36,7 @@
 #include <wx/bmpbuttn.h>
 #include <wx/dcmemory.h>
 #include "MyStatusBar.h"
-#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
 #include <wx/config.h>
 
 #include <wx/datetime.h>
@@ -89,9 +89,9 @@ MyStatusBar::MyStatusBar(wxWindow *parent)
     SetFieldsCount(2);
     SetStatusWidths(2, widths);
 
-    BitmapGUIManager * bitmapGUIManager = BitmapGUIManager::GetInstance();
+    CommonBitmapManager * CommonBitmapManager = CommonBitmapManager::GetInstance();
 
-    m_statbmp = new wxBitmapButton(this, wxID_ANY, bitmapGUIManager->modeSimple,
+    m_statbmp = new wxBitmapButton(this, wxID_ANY, CommonBitmapManager->modeSimple,
                                          wxDefaultPosition, wxDefaultSize,
                                          wxBU_EXACTFIT);
 

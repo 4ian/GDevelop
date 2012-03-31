@@ -25,7 +25,7 @@
 #include "GDL/RuntimeGame.h"
 #include "GDL/Object.h"
 #include "GDL/Collisions.h"
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"

@@ -18,11 +18,11 @@
 #include <algorithm>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/IDE/MainEditorCommand.h"
-#include "GDL/IDE/EventsEditorItemsAreas.h"
-#include "GDL/IDE/EventsEditorSelection.h"
-#include "GDL/IDE/EventsRenderingHelper.h"
+#include "GDCore/IDE/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/ExtensionsManager.h"
@@ -768,7 +768,6 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
             ChoixCondition dialog(this, game, scene);
             dialog.Type = item.instruction->GetType();
             dialog.Param = item.instruction->GetParameters();
-            dialog.Loc = item.instruction->IsLocal();
             dialog.Contraire = item.instruction->IsInverted();
             dialog.RefreshFromCondition();
             dialog.Fit();
@@ -777,8 +776,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
             {
                 item.instruction->SetType( dialog.Type );
                 item.instruction->SetParameters( dialog.Param );
-                item.instruction->SetLocal( dialog.Loc );
-                item.instruction->SetInversion( dialog.Contraire );
+                item.instruction->SetInverted( dialog.Contraire );
 
                 item.event->eventHeightNeedUpdate = true;
                 Refresh();
@@ -790,7 +788,6 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
             ChoixAction dialog(this, game, scene);
             dialog.Type = item.instruction->GetType();
             dialog.Param = item.instruction->GetParameters();
-            dialog.Loc = item.instruction->IsLocal();
             dialog.RefreshFromAction();
             dialog.Fit();
 
@@ -798,7 +795,6 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
             {
                 item.instruction->SetType( dialog.Type );
                 item.instruction->SetParameters( dialog.Param );
-                item.instruction->SetLocal( dialog.Loc );
 
                 item.event->eventHeightNeedUpdate = true;
                 Refresh();
@@ -820,8 +816,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
                 Instruction instruction;
                 instruction.SetType( dialog.Type );
                 instruction.SetParameters( dialog.Param );
-                instruction.SetLocal( dialog.Loc );
-                instruction.SetInversion( dialog.Contraire );
+                instruction.SetInverted( dialog.Contraire );
 
                 item.instructionList->push_back(instruction);
                 item.event->eventHeightNeedUpdate = true;
@@ -837,7 +832,6 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
                 Instruction instruction;
                 instruction.SetType( dialog.Type );
                 instruction.SetParameters( dialog.Param );
-                instruction.SetLocal( dialog.Loc );
 
                 item.instructionList->push_back(instruction);
                 item.event->eventHeightNeedUpdate = true;
@@ -1143,8 +1137,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
             Instruction instruction;
             instruction.SetType(dialog.Type);
             instruction.SetParameters(dialog.Param);
-            instruction.SetLocal(dialog.Loc);
-            instruction.SetInversion(dialog.Contraire);
+            instruction.SetInverted(dialog.Contraire);
 
             listHighlighted.instructionList->push_back(instruction);
             listHighlighted.event->eventHeightNeedUpdate = true;
@@ -1160,7 +1153,6 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
             Instruction instruction;
             instruction.SetType(dialog.Type);
             instruction.SetParameters(dialog.Param);
-            instruction.SetLocal(dialog.Loc);
 
             listHighlighted.instructionList->push_back(instruction);
             listHighlighted.event->eventHeightNeedUpdate = true;
@@ -1617,7 +1609,6 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
         ChoixCondition dialog(this, game, scene);
         dialog.Type = item.instruction->GetType();
         dialog.Param = item.instruction->GetParameters();
-        dialog.Loc = item.instruction->IsLocal();
         dialog.Contraire = item.instruction->IsInverted();
         dialog.RefreshFromCondition();
         dialog.Fit();
@@ -1626,8 +1617,7 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
         {
             item.instruction->SetType( dialog.Type );
             item.instruction->SetParameters( dialog.Param );
-            item.instruction->SetLocal( dialog.Loc );
-            item.instruction->SetInversion( dialog.Contraire );
+            item.instruction->SetInverted( dialog.Contraire );
 
             item.event->eventHeightNeedUpdate = true;
             Refresh();
@@ -1639,7 +1629,6 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
         ChoixAction dialog(this, game, scene);
         dialog.Type = item.instruction->GetType();
         dialog.Param = item.instruction->GetParameters();
-        dialog.Loc = item.instruction->IsLocal();
         dialog.RefreshFromAction();
         dialog.Fit();
 
@@ -1647,7 +1636,6 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
         {
             item.instruction->SetType( dialog.Type );
             item.instruction->SetParameters( dialog.Param );
-            item.instruction->SetLocal( dialog.Loc );
 
             item.event->eventHeightNeedUpdate = true;
             Refresh();

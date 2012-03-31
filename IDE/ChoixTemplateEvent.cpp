@@ -212,7 +212,7 @@ void ChoixTemplateEvent::ProcessEvents(vector < BaseEventSPtr > & events )
             	    unsigned int paramNb = 0;
                     while ( paramNb < parametersEdit.size() )
                     {
-                        string str = allConditionsVectors[k]->at(l).GetParameterSafely(m).GetPlainString();
+                        string str = allConditionsVectors[k]->at(l).GetParameter(m).GetPlainString();
                         allConditionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+ToString(paramNb+1)+"_", static_cast<string>( parametersEdit[paramNb]->GetValue() ) ) );
                         paramNb++;
                     }
@@ -230,7 +230,7 @@ void ChoixTemplateEvent::ProcessEvents(vector < BaseEventSPtr > & events )
             	    unsigned int paramNb = 0;
                     while ( paramNb < parametersEdit.size() )
                     {
-                        string str = allActionsVectors[k]->at(l).GetParameterSafely(m).GetPlainString();
+                        string str = allActionsVectors[k]->at(l).GetParameter(m).GetPlainString();
                         allActionsVectors[k]->at(l).SetParameter(m , ConvertParam( str, "_PARAM"+ToString(paramNb+1)+"_", static_cast<string>( parametersEdit[paramNb]->GetValue() ) ) );
                         paramNb++;
                     }

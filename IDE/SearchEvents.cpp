@@ -6,14 +6,14 @@
 //*)
 #include <string>
 #include <vector>
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/IDE/HelpFileAccess.h"
 #include "EventsRefactorer.h"
 #include "EventsEditor.h"
-#include "GDL/IDE/EventsEditorSelection.h"
-#include "GDL/IDE/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDCore/IDE/EventsEditorItemsAreas.h"
 
 using namespace std;
 

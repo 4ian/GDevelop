@@ -34,7 +34,7 @@
 #include "GDL/DatFile.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/OpenSaveGame.h"
-#include "GDL/IDE/ResourcesMergingHelper.h"
+#include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/ExternalEvents.h"

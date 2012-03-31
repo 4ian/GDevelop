@@ -18,7 +18,7 @@
 #include <wx/dialog.h>
 //*)
 #include "GDL/Game.h"
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include <string>
 #include <vector>
 

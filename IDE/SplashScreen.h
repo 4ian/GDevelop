@@ -1,18 +1,10 @@
 #ifndef SPLASHSCREEN_H
 #define SPLASHSCREEN_H
 
-#ifdef DEBUG
-#include "nommgr.h"
-#endif
-
 #include <wx/bitmap.h>
 #include <wx/dc.h>
 #include <wx/timer.h>
 #include <wx/frame.h>
-
-#ifdef DEBUG
-
-#endif
 
 class SplashScreen : public wxFrame
 {

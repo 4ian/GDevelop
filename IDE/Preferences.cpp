@@ -21,8 +21,8 @@
 #include <wx/log.h>
 #include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/LocaleManager.h"
-#include "GDL/IDE/ActionSentenceFormatter.h"
+#include "GDCore/Tools/Locale/LocaleManager.h"
+#include "GDCore/IDE/ActionSentenceFormatter.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include <wx/listctrl.h>
 
@@ -432,7 +432,7 @@ changesNeedRestart(false)
     StaticBoxSizer13 = new wxStaticBoxSizer(wxHORIZONTAL, Panel7, _("Edition des sources"));
     FlexGridSizer25 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer25->AddGrowableCol(0);
-    internalCodeEditorCheck = new wxRadioButton(Panel7, ID_RADIOBUTTON2, _("Editer les sources avec l\'éditeur intégré à Game Develop"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
+    internalCodeEditorCheck = new wxRadioButton(Panel7, ID_RADIOBUTTON2, _("Editer les sources avec l\'éditeur intégré à Game Develop"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
     internalCodeEditorCheck->SetValue(true);
     FlexGridSizer25->Add(internalCodeEditorCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer26 = new wxFlexGridSizer(0, 3, 0, 0);

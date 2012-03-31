@@ -15,7 +15,7 @@
 //*)
 #include <vector>
 #include <deque>
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/IDE/BaseProfiler.h"
 class SceneCanvas;
 

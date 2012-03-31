@@ -2,9 +2,9 @@
 #define CLIPBOARD_H
 
 #include "GDL/Object.h"
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/Scene.h"
-#include "GDL/IDE/Instruction.h"
+#include "GDCore/Events/Instruction.h"
 #include "GDL/ExternalEvents.h"
 
 //Undefining an annoying macro changing GetObject in GetObjectA

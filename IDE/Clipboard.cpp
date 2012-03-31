@@ -1,8 +1,8 @@
 #include <boost/shared_ptr.hpp>
 #include "Clipboard.h"
 #include "GDL/Object.h"
-#include "GDL/Event.h"
-#include "GDL/IDE/Instruction.h"
+#include "GDCore/Events/Event.h"
+#include "GDCore/Events/Instruction.h"
 #include "GDL/ExtensionsManager.h"
 
 //Une macro a été définie quelque part ( windows.h ),

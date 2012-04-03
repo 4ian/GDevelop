@@ -979,23 +979,6 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
     }
     else //Add object to selection
     {
-        //Clone the object using Ctrl
-        if (!edittimeRenderer.isMovingObject && (ctrlPressed))
-        {
-            edittimeRenderer.objectsSelected.erase(remove(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object), edittimeRenderer.objectsSelected.end());
-
-            //Clone the object and its initial position
-            int idPos = GetInitialPositionFromObject(object);
-            if (idPos != -1)
-            {
-                object = object->Clone();
-                edittimeRenderer.runtimeScene.objectsInstances.AddObject(object);
-                sceneEdited.initialObjectsPositions.push_back(sceneEdited.initialObjectsPositions[idPos]);
-
-                if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
-            }
-        }
-
         //Adding the object to selection if needed
         if ( find(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object) == edittimeRenderer.objectsSelected.end() )
         {
@@ -1007,6 +990,27 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
 
             if ( initialPositionsBrowser )
                 initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
+        }
+
+        //Clone the selection using Ctrl
+        if (!edittimeRenderer.isMovingObject && (ctrlPressed))
+        {
+            for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
+            {
+                ObjSPtr selectedObject = edittimeRenderer.objectsSelected[i];
+
+                //Clone the object and its initial position
+                int idPos = GetInitialPositionFromObject(selectedObject);
+                if (idPos != -1)
+                {
+                    edittimeRenderer.objectsSelected[i] = selectedObject->Clone();
+                    edittimeRenderer.runtimeScene.objectsInstances.AddObject(edittimeRenderer.objectsSelected[i]);
+                    sceneEdited.initialObjectsPositions.push_back(sceneEdited.initialObjectsPositions[idPos]);
+
+                }
+            }
+
+            if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
         }
 
         edittimeRenderer.isMovingObject = true;

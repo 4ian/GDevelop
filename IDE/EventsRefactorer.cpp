@@ -2,8 +2,6 @@
 #include "GDCore/Events/Event.h"
 #include "GDL/IDE/GDExpressionParser.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/ExpressionInstruction.h"
-#include "GDL/StrExpressionInstruction.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/Scene.h"

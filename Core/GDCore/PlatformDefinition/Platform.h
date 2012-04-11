@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef GDCORE_PLATFORM_H
 #define GDCORE_PLATFORM_H
 #include <boost/shared_ptr.hpp>
@@ -11,6 +16,7 @@ class PlatformExtension;
 /**
  * \brief Base class for implementing a platform
  *
+ * \todo Current implementation status: Used in some part of the IDE: Currently, the IDE automatically create the Platform class of the GD C++ Platform when it is need.
  */
 class GD_CORE_API Platform
 {

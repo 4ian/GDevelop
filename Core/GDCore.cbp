@@ -166,6 +166,7 @@
 		</Compiler>
 		<Unit filename="GDCore\CommonTools.cpp" />
 		<Unit filename="GDCore\CommonTools.h" />
+		<Unit filename="GDCore\DocMainPage.h" />
 		<Unit filename="GDCore\Events\Event.cpp" />
 		<Unit filename="GDCore\Events\Event.h" />
 		<Unit filename="GDCore\Events\ExpressionMetadata.cpp" />
@@ -204,12 +205,23 @@
 		<Unit filename="GDCore\PlatformDefinition\PlatformExtension.h" />
 		<Unit filename="GDCore\PlatformDefinition\Project.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\Project.h" />
+		<Unit filename="GDCore\PlatformDefinition\ResourcesManager.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\ResourcesManager.h" />
 		<Unit filename="GDCore\Tools\Locale\LocaleManager.cpp" />
 		<Unit filename="GDCore\Tools\Locale\LocaleManager.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
 			<debugger />
+			<DoxyBlocks>
+				<comment_style block="0" line="0" />
+				<doxyfile_project output_directory="doc" />
+				<doxyfile_build />
+				<doxyfile_warnings />
+				<doxyfile_output html_help="1" />
+				<doxyfile_dot />
+				<general />
+			</DoxyBlocks>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

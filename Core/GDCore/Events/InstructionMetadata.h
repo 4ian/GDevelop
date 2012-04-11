@@ -91,7 +91,7 @@ public:
     {
     public:
         enum AccessType {Reference, MutatorAndOrAccessor};
-        CppCallingInformation() : accessType(Reference) {};
+        CppCallingInformation() : accessType(Reference), doNotEncloseInstructionCodeWithinBrackets(false) {};
 
         /**
          * Set the C++ function name which will be used when generating the C++ code.
@@ -150,6 +150,15 @@ public:
             return *this;
         }
 
+        /**
+         * Set that the instruction should not be enclose within brackets ( { } )
+         */
+        CppCallingInformation & DoNotEncloseInstructionCodeWithinBrackets(bool disableBrackets = true)
+        {
+            doNotEncloseInstructionCodeWithinBrackets = disableBrackets;
+            return *this;
+        }
+
         /** \brief Class used to redefine instruction code generation
          */
         class CustomCodeGenerator
@@ -168,12 +177,13 @@ public:
         std::string type;
         AccessType accessType;
         std::string optionalAssociatedInstruction;
+        bool doNotEncloseInstructionCodeWithinBrackets;
         std::string optionalIncludeFile;
         boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
     CppCallingInformation cppCallingInformation; ///< Information about how generate C++ code for the instruction
 
-    /** Don't use this constructor. Only here to fullfil std::map requirements
+    /** Don't use this constructor. Only here to fulfill std::map requirements
      */
     InstructionMetadata() {};
 

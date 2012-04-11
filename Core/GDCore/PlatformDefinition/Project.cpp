@@ -4,7 +4,6 @@
 namespace gd
 {
 
-Layout Project::badLayout;
 std::vector < std::string > Project::noPlatformExtensionsUsed;
 
 Project::Project()

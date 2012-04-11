@@ -16,8 +16,8 @@ class EventsEditorItemsAreas;
 class EventsEditorSelection;
 class InstructionMetadata;
 namespace gd {class InstructionsMetadataHolder;}
-
 /**
+
  * \brief Provides tools to draw events.
  *
  * Class providing default colors, fonts and drawing functions so as to

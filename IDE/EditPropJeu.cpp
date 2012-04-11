@@ -398,11 +398,11 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropJeu::OnAideBtClick);
     //*)
 
-    NomEdit->ChangeValue( game.name );
-    AuteurEdit->ChangeValue( game.author );
+    NomEdit->ChangeValue( game.GetName() );
+    AuteurEdit->ChangeValue( game.GetAuthor() );
 
-    HeightEdit->ChangeValue(ToString( game.windowHeight ) );
-    WidthEdit->ChangeValue(ToString( game.windowWidth ) );
+    HeightEdit->ChangeValue(ToString( game.GetMainWindowDefaultHeight() ));
+    WidthEdit->ChangeValue(ToString( game.GetMainWindowDefaultWidth() ));
 
     afficherEcranCheck->SetValue( game.loadingScreen.afficher );
 
@@ -427,8 +427,8 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     borderCheck->SetValue(game.loadingScreen.border);
     smoothCheck->SetValue(game.loadingScreen.smooth);
 
-    SyncCheck->SetValue( game.verticalSync );
-    if ( game.maxFPS == -1 )
+    SyncCheck->SetValue( game.IsVerticalSynchronizationEnabledByDefault() );
+    if ( game.GetMaximumFPS() == -1 )
     {
         FPSmaxCheck->SetValue(false);
         FPSmax->Enable(false);
@@ -436,10 +436,10 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     else
     {
         FPSmaxCheck->SetValue(true);
-        FPSmax->SetValue(game.maxFPS);
+        FPSmax->SetValue(game.GetMaximumFPS());
     }
 
-    FPSmin->SetValue(game.minFPS);
+    FPSmin->SetValue(game.GetMinimumFPS());
 
     winExeEdit->SetValue(game.winExecutableFilename);
     winIconEdit->SetValue(game.winExecutableIconFile);
@@ -457,11 +457,11 @@ EditPropJeu::~EditPropJeu()
 
 void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
 {
-    game.name = NomEdit->GetValue();
-    game.author = AuteurEdit->GetValue();
+    game.SetName( ToString(NomEdit->GetValue()) );
+    game.SetAuthor( ToString(AuteurEdit->GetValue()) );
 
-    game.windowWidth = ToInt(string(WidthEdit->GetValue().mb_str()));
-    game.windowHeight = ToInt(string(HeightEdit->GetValue().mb_str()));
+    game.SetMainWindowDefaultWidth(ToInt(string(WidthEdit->GetValue().mb_str())));
+    game.SetMainWindowDefaultHeight(ToInt(string(HeightEdit->GetValue().mb_str())));
 
     game.loadingScreen.afficher = afficherEcranCheck->GetValue();
 
@@ -486,12 +486,12 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
     game.loadingScreen.smooth = smoothCheck->GetValue();
 
     if ( FPSmaxCheck->GetValue() )
-        game.maxFPS = FPSmax->GetValue();
+        game.SetMaximumFPS(FPSmax->GetValue());
     else
-        game.maxFPS = -1;
+        game.SetMaximumFPS(-1);
 
-    game.minFPS = FPSmin->GetValue();
-    game.verticalSync = SyncCheck->GetValue();
+    game.SetMinimumFPS( FPSmin->GetValue() );
+    game.SetVerticalSyncActivatedByDefault( SyncCheck->GetValue() );
 
     game.winExecutableFilename = string(winExeEdit->GetValue().mb_str());
     game.winExecutableIconFile = string(winIconEdit->GetValue().mb_str());

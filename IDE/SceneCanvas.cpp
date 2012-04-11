@@ -121,8 +121,8 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
     reloadingText.SetCharacterSize(40);
 
     SetView( edittimeRenderer.view );
-    SetFramerateLimit( gameEdited.maxFPS );
-    EnableVerticalSync(gameEdited.verticalSync );
+    SetFramerateLimit( gameEdited.GetMaximumFPS() );
+    EnableVerticalSync(gameEdited.IsVerticalSynchronizationEnabledByDefault() );
     Clear( sf::Color( 125, 125, 125, 255 ) );
 
     Connect(ID_ADDOBJMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnAddObjetSelected);
@@ -324,10 +324,10 @@ void SceneCanvas::UpdateSize()
     else
     {
         //Scene has the size of the game's window size in preview mode.
-        Window::SetSize(game.windowWidth, game.windowHeight);
-        wxWindowBase::SetClientSize(game.windowWidth, game.windowHeight);
+        Window::SetSize(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
+        wxWindowBase::SetClientSize(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
 
-        externalWindow->SetSizeOfRenderingZone(game.windowWidth, game.windowHeight);
+        externalWindow->SetSizeOfRenderingZone(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
 
         //Scene is centered in preview mode
         wxWindowBase::SetPosition(wxPoint((parentPanel->GetSize().GetWidth()-wxWindowBase::GetSize().GetX())/2,
@@ -441,7 +441,7 @@ void SceneCanvas::OnZoomInitBtClick( wxCommandEvent & event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnOrigineBtClick(wxCommandEvent & event )
 {
-    edittimeRenderer.view.SetCenter( (game.windowWidth/2),(game.windowHeight/2));
+    edittimeRenderer.view.SetCenter( (game.GetMainWindowDefaultWidth()/2),(game.GetMainWindowDefaultHeight()/2));
 }
 
 
@@ -560,12 +560,12 @@ void SceneCanvas::OnPlayWindowBtClick( wxCommandEvent & event )
     edittimeRenderer.editing = false;
 
     externalWindow->Show(true);
-    externalWindow->renderCanvas->SetFramerateLimit( game.maxFPS );
+    externalWindow->renderCanvas->SetFramerateLimit( game.GetMaximumFPS() );
 
-    externalWindow->SetSizeOfRenderingZone(game.windowWidth, game.windowHeight);
+    externalWindow->SetSizeOfRenderingZone(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
     edittimeRenderer.runtimeScene.ChangeRenderWindow(externalWindow->renderCanvas);
 
-    externalWindow->SetSizeOfRenderingZone(game.windowWidth, game.windowHeight);
+    externalWindow->SetSizeOfRenderingZone(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
     edittimeRenderer.runtimeScene.ChangeRenderWindow(externalWindow->renderCanvas);
 
     if ( debugger ) debugger->Play();

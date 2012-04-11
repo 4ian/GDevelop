@@ -13,7 +13,7 @@ SceneEdittimeRenderer::SceneEdittimeRenderer(sf::RenderWindow * renderWindow_, R
 runtimeScene(renderWindow_, game_),
 sceneEdited(sceneEdited_),
 editing(true),
-view( sf::FloatRect( 0.0f, 0.0f, runtimeScene.game->windowWidth, runtimeScene.game->windowHeight ) ),
+view( sf::FloatRect( 0.0f, 0.0f, runtimeScene.game->GetMainWindowDefaultWidth(), runtimeScene.game->GetMainWindowDefaultHeight() ) ),
 isMovingObject( false ),
 isResizingX( false ),
 isResizingY( false ),
@@ -42,7 +42,7 @@ void SceneEdittimeRenderer::RenderSceneEdittimeRenderer()
 {
     runtimeScene.ManageRenderTargetEvents();
 
-    runtimeScene.renderWindow->Clear( sf::Color( runtimeScene.backgroundColorR, runtimeScene.backgroundColorG, runtimeScene.backgroundColorB ) );
+    runtimeScene.renderWindow->Clear( sf::Color( runtimeScene.GetBackgroundColorRed(), runtimeScene.GetBackgroundColorGreen(), runtimeScene.GetBackgroundColorBlue() ) );
     runtimeScene.renderWindow->SetView(view);
 
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -182,8 +182,8 @@ void SceneEdittimeRenderer::RenderSceneEdittimeRenderer()
 
     if ( sceneEdited.windowMask )
     {
-        sf::Shape windowMaskShape = sf::Shape::Rectangle(view.GetCenter().x-runtimeScene.game->windowWidth/2, view.GetCenter().y-runtimeScene.game->windowHeight/2,
-                                                         runtimeScene.game->windowWidth, runtimeScene.game->windowHeight, sf::Color( 0, 0, 0, 0 ), 1, sf::Color( 255, 255, 255, 128 ) );
+        sf::Shape windowMaskShape = sf::Shape::Rectangle(view.GetCenter().x-runtimeScene.game->GetMainWindowDefaultWidth()/2, view.GetCenter().y-runtimeScene.game->GetMainWindowDefaultHeight()/2,
+                                                         runtimeScene.game->GetMainWindowDefaultWidth(), runtimeScene.game->GetMainWindowDefaultHeight(), sf::Color( 0, 0, 0, 0 ), 1, sf::Color( 255, 255, 255, 128 ) );
 
         runtimeScene.renderWindow->Draw(windowMaskShape);
     }

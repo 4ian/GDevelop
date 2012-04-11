@@ -345,9 +345,9 @@ void ProjectManager::Refresh()
     projectsTree->AddRoot(_("Projets"));
     for (unsigned int i = 0;i<mainEditor.games.size();++i)
     {
-        wxString name = mainEditor.games[i]->name == "" ?
+        wxString name = mainEditor.games[i]->GetName() == "" ?
                         _("(Sans nom)") :
-                        mainEditor.games[i]->name;
+                        mainEditor.games[i]->GetName();
 
         //Adding game's root
         gdTreeItemGameData * gameItemData = new gdTreeItemGameData("Root", "", mainEditor.games[i].get());
@@ -392,7 +392,7 @@ void ProjectManager::Refresh()
 
         //Extensions
         gdTreeItemGameData * extensionsItemData = new gdTreeItemGameData("Extensions", "", mainEditor.games[i].get());
-        projectsTree->AppendItem(projectItem, _("Extensions") + " (" + ToString(mainEditor.games[i]->extensionsUsed.size()) + ")", 3 ,3, extensionsItemData);
+        projectsTree->AppendItem(projectItem, _("Extensions") + " (" + ToString(mainEditor.games[i]->GetUsedPlatformExtensions().size()) + ")", 3 ,3, extensionsItemData);
     }
 
     projectsTree->ExpandAll();
@@ -431,9 +431,9 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
     string prefix = "";
     if ( mainEditor.games.size() > 1 )
     {
-        prefix = "["+game->name+"] ";
-        if ( game->name.length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+game->name.substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
+        prefix = "["+game->GetName()+"] ";
+        if ( game->GetName().length() > gameMaxCharDisplayedInEditor )
+            prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
     if ( data->GetString() == "Root")
@@ -476,7 +476,7 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
     {
         EditExtensionsOfGame(game);
 
-        projectsTree->SetItemText(selectedItem, _("Extensions") + " (" + ToString(game->extensionsUsed.size()) + ")");
+        projectsTree->SetItemText(selectedItem, _("Extensions") + " (" + ToString(game->GetUsedPlatformExtensions().size()) + ")");
     }
     else if ( data->GetString() == "SourceFile")
     {
@@ -639,9 +639,9 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
     string prefix = "";
     if ( mainEditor.games.size() > 1 )
     {
-        prefix = "["+game->name+"] ";
-        if ( game->name.length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+game->name.substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
+        prefix = "["+game->GetName()+"] ";
+        if ( game->GetName().length() > gameMaxCharDisplayedInEditor )
+            prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
     EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), *game, *(*scene), mainEditor.GetMainEditorCommand());
@@ -750,7 +750,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
 
     if ( data->GetString() == "Root")
     {
-        game->name = newName;
+        game->SetName( newName );
     }
     //Renaming a scene
     else if ( data->GetString() == "Scene")
@@ -898,9 +898,9 @@ void ProjectManager::EditImagesOfGame(Game * game)
     string prefix = "";
     if ( mainEditor.games.size() > 1 )
     {
-        prefix = "["+game->name+"] ";
-        if ( game->name.length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+game->name.substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
+        prefix = "["+game->GetName()+"] ";
+        if ( game->GetName().length() > gameMaxCharDisplayedInEditor )
+            prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
     ResourcesEditor * editorImages = new ResourcesEditor(&mainEditor, *game, mainEditor.GetMainEditorCommand(), true);
@@ -1103,7 +1103,7 @@ void ProjectManager::OneditPropGameMenuItemSelected(wxCommandEvent& event)
     EditPropJeu Dialog( this, *game );
     if ( Dialog.ShowModal() )
 
-    projectsTree->SetItemText(selectedItem, game->name); //The name can have been changed
+    projectsTree->SetItemText(selectedItem, game->GetName()); //The name can have been changed
     if ( oldExternalSourcesFileUse != game->useExternalSourceFiles )
         Refresh();
 }
@@ -1283,9 +1283,9 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
     string prefix = "";
     if ( mainEditor.games.size() > 1 )
     {
-        prefix = "["+game->name+"] ";
-        if ( game->name.length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+game->name.substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
+        prefix = "["+game->GetName()+"] ";
+        if ( game->GetName().length() > gameMaxCharDisplayedInEditor )
+            prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
     ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, *(*events), mainEditor.GetMainEditorCommand());

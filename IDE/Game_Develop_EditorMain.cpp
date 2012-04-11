@@ -507,7 +507,7 @@ void Game_Develop_EditorFrame::SetCurrentGame(unsigned int i)
     else
     {
         wxString GD = "Game Develop";
-        SetTitle( GD + " - [" + games[i]->name + "] "+games[i]->gameFile );
+        SetTitle( GD + " - [" + games[i]->GetName() + "] "+games[i]->gameFile );
     }
 
     return;

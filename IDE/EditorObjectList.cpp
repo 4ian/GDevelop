@@ -758,9 +758,9 @@ bool EditorObjectList::CheckObjectName(std::string name)
     for (unsigned int i = 0;i<extensions.size();++i)
     {
         //Verify if that extension is enabled
-        if ( find(game.extensionsUsed.begin(),
-                  game.extensionsUsed.end(),
-                  extensions[i]->GetName()) == game.extensionsUsed.end() )
+        if ( find(game.GetUsedPlatformExtensions().begin(),
+                  game.GetUsedPlatformExtensions().end(),
+                  extensions[i]->GetName()) == game.GetUsedPlatformExtensions().end() )
             continue;
 
         vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();

@@ -177,7 +177,7 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
 	CaptionEdit->ChangeValue(scene->title);
 	NomSceneTxt->SetLabel(scene->GetName());
 
-	Panel1->SetBackgroundColour(wxColour(scene->backgroundColorR, scene->backgroundColorG, scene->backgroundColorB));
+	Panel1->SetBackgroundColour(wxColour(scene->GetBackgroundColorRed(), scene->GetBackgroundColorGreen(), scene->GetBackgroundColorBlue()));
 
     if ( scene->standardSortMethod )
         TriBox->SetSelection(0);
@@ -203,9 +203,7 @@ void EditPropScene::OnOkBtClick(wxCommandEvent& event)
 
     wxColourData cData;
     cData.SetColour(Panel1->GetBackgroundColour());
-    scene->backgroundColorR = cData.GetColour().Red();
-    scene->backgroundColorG = cData.GetColour().Green();
-    scene->backgroundColorB = cData.GetColour().Blue();
+    scene->SetBackgroundColor( cData.GetColour().Red(), cData.GetColour().Green(), cData.GetColour().Blue());
     scene->oglFOV = ToFloat(string(fovEdit->GetValue().mb_str()));
     scene->oglZNear = ToFloat(string(zNearEdit->GetValue().mb_str()));
     scene->oglZFar = ToFloat(string(zFarEdit->GetValue().mb_str()));

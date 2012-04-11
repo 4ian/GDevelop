@@ -131,11 +131,11 @@ void Game_Develop_EditorFrame::Open( string file )
 
         string unknownExtensions = "";
         GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
-        for (unsigned int i = 0;i<newGame->extensionsUsed.size();++i)
+        for (unsigned int i = 0;i<newGame->GetUsedPlatformExtensions().size();++i)
         {
-            if ( extensionsManager->GetExtension(newGame->extensionsUsed[i]) == boost::shared_ptr<ExtensionBase> () )
+            if ( extensionsManager->GetExtension(newGame->GetUsedPlatformExtensions()[i]) == boost::shared_ptr<ExtensionBase> () )
             {
-                unknownExtensions += newGame->extensionsUsed[i]+"\n";
+                unknownExtensions += newGame->GetUsedPlatformExtensions()[i]+"\n";
             }
         }
 

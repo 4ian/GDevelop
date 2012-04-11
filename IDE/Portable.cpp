@@ -16,7 +16,6 @@
 #include <wx/log.h>
 #include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "PlatformDefinition/Platform.h"
-#include "PlatformDefinition/Project.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/Game.h"
 #include "GDL/Object.h"
@@ -138,23 +137,19 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     }
     wxSafeYield();
 
-    //TODO : For now, construct a wrapper around Game
-    Platform platform;
-    Project project(&platform, &game);
-
     //Add scenes resources
     for ( unsigned int s = 0;s < game.scenes.size();s++ )
     {
         for (unsigned int j = 0;j<game.scenes[s]->initialObjects.size();++j) //Add objects resources
         	game.scenes[s]->initialObjects[j]->ExposeResources(resourcesMergingHelper);
 
-        LaunchResourceWorkerOnEvents(project, game.scenes[s]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.scenes[s]->events, resourcesMergingHelper);
         AvancementGauge->SetValue(s/game.scenes.size()*16.0f+33.0f);
     }
     //Add external events resources
     for ( unsigned int s = 0;s < game.externalEvents.size();s++ )
     {
-        LaunchResourceWorkerOnEvents(project, game.externalEvents[s]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.externalEvents[s]->events, resourcesMergingHelper);
     }
     wxSafeYield();
     //Add global objects resources

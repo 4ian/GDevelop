@@ -282,9 +282,9 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
-	    if ( find(game.extensionsUsed.begin(),
-                  game.extensionsUsed.end(),
-                  extensions[i]->GetName()) == game.extensionsUsed.end() )
+	    if ( find(game.GetUsedPlatformExtensions().begin(),
+                  game.GetUsedPlatformExtensions().end(),
+                  extensions[i]->GetName()) == game.GetUsedPlatformExtensions().end() )
             continue;
 
         //Add each event type provided

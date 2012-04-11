@@ -201,9 +201,9 @@ void Extensions::UpdateList()
         wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(i));
         if (associatedData)
         {
-            if ( find(  game.extensionsUsed.begin(),
-                        game.extensionsUsed.end(),
-                        associatedData->GetData()) != game.extensionsUsed.end() )
+            if ( find(  game.GetUsedPlatformExtensions().begin(),
+                        game.GetUsedPlatformExtensions().end(),
+                        associatedData->GetData()) != game.GetUsedPlatformExtensions().end() )
             {
                 ExtensionsList->Check(i, true);
             }
@@ -283,7 +283,7 @@ void Extensions::OnExtensionsListSelect(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void Extensions::OnFermerBtClick(wxCommandEvent& event)
 {
-    game.extensionsUsed.clear();
+    game.GetUsedPlatformExtensions().clear();
 
     for (unsigned int i =0;i<ExtensionsList->GetCount();++i)
     {
@@ -292,7 +292,7 @@ void Extensions::OnFermerBtClick(wxCommandEvent& event)
             wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(i));
 
             if (associatedData)
-                game.extensionsUsed.push_back(string(associatedData->GetData().mb_str()));
+                game.GetUsedPlatformExtensions().push_back(string(associatedData->GetData().mb_str()));
         }
     }
 

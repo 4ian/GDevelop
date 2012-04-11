@@ -184,9 +184,9 @@ objectChanged(true)
     objectsTree->AddRoot(_("Objets"));
 
     std::set<std::string> alreadyCreatedPanels; //Just to be sure not to create a panel twice ( extensionsUsed can contains the same extension name twice )
-    for (unsigned int i = 0;i<scene.game->extensionsUsed.size();++i)
+    for (unsigned int i = 0;i<scene.game->GetUsedPlatformExtensions().size();++i)
     {
-        boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(scene.game->extensionsUsed[i]);
+        boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && alreadyCreatedPanels.find(extension->GetName()) == alreadyCreatedPanels.end())
         {
@@ -285,7 +285,7 @@ void DebuggerGUI::UpdateGUI()
     generalList->SetItem(1, 1, ToString(static_cast<double>(scene.GetElapsedTime())/1000.0)+"s");
     generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
     //TODO //generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
-    generalList->SetItem(4, 1, ToString(scene.game->windowWidth)+"*"+ToString(scene.game->windowHeight));
+    generalList->SetItem(4, 1, ToString(scene.game->GetMainWindowDefaultWidth())+"*"+ToString(scene.game->GetMainWindowDefaultHeight()));
     generalList->SetItem(5, 1, ToString(sf::Mouse::GetPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::GetPosition(*scene.renderWindow).y));
     generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000.0)+"s");
 
@@ -328,9 +328,9 @@ void DebuggerGUI::UpdateGUI()
 
     //Extensions tab
     unsigned int extListCtrlId = 0;
-    for (unsigned int i = 0;i<scene.game->extensionsUsed.size();++i)
+    for (unsigned int i = 0;i<scene.game->GetUsedPlatformExtensions().size();++i)
     {
-        boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(scene.game->extensionsUsed[i]);
+        boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && extListCtrlId < extensionsListCtrls.size() )
         {

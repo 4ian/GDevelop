@@ -22,13 +22,7 @@ void GD_API HideLayer( RuntimeScene & scene, const std::string & layer )
 void GD_API ChangeSceneBackground( RuntimeScene & scene, std::string newColor )
 {
     vector < string > colors = SplitString <string> (newColor, ';');
-
-    if ( colors.size() > 2 )
-    {
-        scene.backgroundColorR = ToInt(colors[0]);
-        scene.backgroundColorG = ToInt(colors[1]);
-        scene.backgroundColorB = ToInt(colors[2]);
-    }
+    if ( colors.size() > 2 ) scene.SetBackgroundColor( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2]) );
 
     return;
 }
@@ -204,13 +198,13 @@ void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
 
 void GD_API SetWindowTitle(RuntimeScene & scene, const std::string & newName)
 {
-    scene.title = newName;
-    if (scene.renderWindow != NULL) scene.renderWindow->SetTitle(scene.title);
+    scene.SetWindowDefaultTitle( newName );
+    if (scene.renderWindow != NULL) scene.renderWindow->SetTitle(scene.GetWindowDefaultTitle());
 }
 
 const std::string & GD_API GetWindowTitle(RuntimeScene & scene)
 {
-    return scene.title;
+    return scene.GetWindowDefaultTitle();
 }
 
 void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeight, bool useTheNewSizeForCameraDefaultSize)
@@ -218,18 +212,18 @@ void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeig
     #if !defined(GD_IDE_ONLY)
     if ( useTheNewSizeForCameraDefaultSize ) //Change future cameras default size if wanted.
     {
-        scene.game->windowWidth = windowWidth;
-        scene.game->windowHeight = windowHeight;
+        scene.game->SetMainWindowDefaultWidth( windowWidth );
+        scene.game->SetMainWindowDefaultHeight( windowHeight );
     }
 
     if ( scene.RenderWindowIsFullScreen() )
     {
-        scene.renderWindow->Create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.title, sf::Style::Close | sf::Style::Fullscreen );
+        scene.renderWindow->Create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close | sf::Style::Fullscreen );
         scene.ChangeRenderWindow(scene.renderWindow);
     }
     else
     {
-        scene.renderWindow->Create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.title, sf::Style::Close );
+        scene.renderWindow->Create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close );
         scene.ChangeRenderWindow(scene.renderWindow);
     }
     #endif
@@ -241,13 +235,13 @@ void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen)
     if ( fullscreen && !scene.RenderWindowIsFullScreen() )
     {
         scene.SetRenderWindowIsFullScreen();
-        scene.renderWindow->Create( sf::VideoMode( scene.game->windowWidth, scene.game->windowHeight, 32 ), scene.title, sf::Style::Close | sf::Style::Fullscreen );
+        scene.renderWindow->Create( sf::VideoMode( scene.game->GetMainWindowDefaultWidth(), scene.game->GetMainWindowDefaultHeight(), 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close | sf::Style::Fullscreen );
         scene.ChangeRenderWindow(scene.renderWindow);
     }
     else if ( !fullscreen && scene.RenderWindowIsFullScreen() )
     {
         scene.SetRenderWindowIsFullScreen(false);
-        scene.renderWindow->Create( sf::VideoMode( scene.game->windowWidth, scene.game->windowHeight, 32 ), scene.title, sf::Style::Close );
+        scene.renderWindow->Create( sf::VideoMode( scene.game->GetMainWindowDefaultWidth(), scene.game->GetMainWindowDefaultHeight(), 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close );
         scene.ChangeRenderWindow(scene.renderWindow);
     }
     #endif

@@ -11,9 +11,7 @@
 #include <vector>
 #include <string>
 #include "GDL/IDE/GDExpressionParser.h"
-class ExpressionInstruction;
 class ExpressionMetadata;
-class StrExpressionInstruction;
 class StrExpressionMetadata;
 class GDExpression;
 class Game;

@@ -24,8 +24,6 @@ namespace sf
 class RotatedRectangle;
 class RuntimeScene;
 class Object;
-class ExpressionInstruction;
-class StrExpressionInstruction;
 class ImageManager;
 class InitialPosition;
 class TiXmlElement;

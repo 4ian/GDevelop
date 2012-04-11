@@ -5,8 +5,6 @@
 #if defined(GD_IDE_ONLY)
 
 #include "ExpressionsCodeGeneration.h"
-#include "GDL/StrExpressionInstruction.h"
-#include "GDL/ExpressionInstruction.h"
 #include "GDL/IDE/GDExpressionParser.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/ExtensionBase.h"

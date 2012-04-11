@@ -284,7 +284,7 @@ CppCodeEvent& CppCodeEvent::operator=(const CppCodeEvent & event)
 
 CppCodeEvent::CppCodeEvent() :
 BaseEvent(),
-inlineCode("scene.backgroundColorR = 100;\nscene.backgroundColorG = 100;\nscene.backgroundColorB = 240;\n"),
+inlineCode("scene.SetBackgroundColor(100,100,240);\n"),
 passSceneAsParameter(true),
 passObjectListAsParameter(false),
 codeDisplayedInEditor(false)

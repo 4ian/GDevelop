@@ -36,7 +36,6 @@
 #include "GDL/IDE/ExecutableIconChanger.h"
 #include "GDL/IDE/BaseProfiler.h"
 #include "PlatformDefinition/Platform.h"
-#include "PlatformDefinition/Project.h"
 
 using namespace std;
 
@@ -100,9 +99,6 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     //Create a separate copy of the game in memory, as we're going to apply it some modifications ( i.e changing resources path )
     Game game = gameToCompile;
-    //TODO : For now, construct a wrapper around Game
-    Platform platform;
-    Project project(&platform, &game);
 
     //Prepare resources to copy
     diagnosticManager.OnMessage( ToString( _("Préparation des ressources...") ));
@@ -127,12 +123,12 @@ void FullProjectCompiler::LaunchProjectCompilation()
         for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j) //Add objects resources
         	game.scenes[i]->initialObjects[j]->ExposeResources(resourcesMergingHelper);
 
-        LaunchResourceWorkerOnEvents(project, game.scenes[i]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, resourcesMergingHelper);
     }
     //Add external events resources
     for ( unsigned int i = 0;i < game.externalEvents.size();i++ )
     {
-        LaunchResourceWorkerOnEvents(project, game.externalEvents[i]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.externalEvents[i]->events, resourcesMergingHelper);
     }
     //Add global objects resources
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
@@ -284,10 +280,10 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     //Copy extensions
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
-    for (unsigned int i = 0;i<game.extensionsUsed.size();++i)
+    for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
     {
         //Builtin extensions does not have a namespace.
-        boost::shared_ptr<ExtensionBase> extension = extensionsManager->GetExtension(game.extensionsUsed[i]);
+        boost::shared_ptr<ExtensionBase> extension = extensionsManager->GetExtension(game.GetUsedPlatformExtensions()[i]);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() &&
             ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" )
@@ -295,20 +291,20 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             if ( windowsTarget)
             {
-                if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdw", tempDir + "/" + game.extensionsUsed[i]+".xgdw", true ) == false )
-                    diagnosticManager.AddError(ToString(_( "Impossible de copier l'extension ")+game.extensionsUsed[i]+_(" pour Windows dans le répertoire de compilation.\n" )));
+                if ( wxCopyFile( "Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdw", tempDir + "/" + game.GetUsedPlatformExtensions()[i]+".xgdw", true ) == false )
+                    diagnosticManager.AddError(ToString(_( "Impossible de copier l'extension ")+game.GetUsedPlatformExtensions()[i]+_(" pour Windows dans le répertoire de compilation.\n" )));
             }
 
             if ( linuxTarget )
             {
-                if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdl", tempDir + "/"+game.extensionsUsed[i]+".xgdl", true ) == false )
-                    diagnosticManager.AddError(ToString(_( "Impossible de copier l'extension ")+game.extensionsUsed[i]+_(" pour Linux dans le répertoire de compilation.\n" )));
+                if ( wxCopyFile( "Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdl", tempDir + "/"+game.GetUsedPlatformExtensions()[i]+".xgdl", true ) == false )
+                    diagnosticManager.AddError(ToString(_( "Impossible de copier l'extension ")+game.GetUsedPlatformExtensions()[i]+_(" pour Linux dans le répertoire de compilation.\n" )));
             }
 
             if ( macTarget )
             {
-                if ( wxCopyFile( "Extensions/"+game.extensionsUsed[i]+".xgdm", tempDir + "/"+game.extensionsUsed[i]+".xgdm", true ) == false )
-                    diagnosticManager.AddError(ToString(_( "Impossible de copier l'extension ")+game.extensionsUsed[i]+_(" pour Mac OS dans le répertoire de compilation.\n" )));
+                if ( wxCopyFile( "Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdm", tempDir + "/"+game.GetUsedPlatformExtensions()[i]+".xgdm", true ) == false )
+                    diagnosticManager.AddError(ToString(_( "Impossible de copier l'extension ")+game.GetUsedPlatformExtensions()[i]+_(" pour Mac OS dans le répertoire de compilation.\n" )));
             }
         }
         if ( extension != boost::shared_ptr<ExtensionBase>() )

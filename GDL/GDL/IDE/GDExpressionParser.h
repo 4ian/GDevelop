@@ -14,8 +14,6 @@ class ParserCallbacks;
 class Game;
 class Scene;
 class ParameterMetadata;
-class ExpressionInstruction;
-class StrExpressionInstruction;
 class ExpressionMetadata;
 class StrExpressionMetadata;
 

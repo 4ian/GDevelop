@@ -884,9 +884,9 @@ void SpriteObject::LoadFromXml(const TiXmlElement * elemScene)
             //Direction
             const TiXmlElement *elemObjetDirecScene = elemObjetScene->FirstChildElement();
 
-            if ( elemObjetScene->Attribute( "useMultipleDirections" )  != NULL )
+            if ( elemObjetScene->Attribute( "typeNormal" )  != NULL )
             {
-                if ( strcmp( elemObjetScene->Attribute( "useMultipleDirections" ), "false" ) == 0 )
+                if ( strcmp( elemObjetScene->Attribute( "typeNormal" ), "false" ) == 0 )
                 {
                     AnimToAdd.useMultipleDirections = false;
                 }
@@ -1027,9 +1027,9 @@ void SpriteObject::SaveToXml(TiXmlElement * objet)
 
         if ( GetAnimation( k ).useMultipleDirections )
         {
-            animation->SetAttribute( "useMultipleDirections", "true" );
+            animation->SetAttribute( "typeNormal", "true" );
         }
-        else { animation->SetAttribute( "useMultipleDirections", "false" ); }
+        else { animation->SetAttribute( "typeNormal", "false" ); }
 
         TiXmlElement * direction;
         for ( unsigned int l = 0;l < GetAnimation( k ).GetDirectionsNumber();l++ )

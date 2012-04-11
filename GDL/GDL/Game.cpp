@@ -11,6 +11,7 @@
 #include "GDL/Object.h"
 
 #if defined(GD_IDE_ONLY)
+#include "PlatformDefinition/Platform.h"
 #include <wx/wx.h>
 #elif !defined(_)
 #define _(x) x
@@ -26,9 +27,10 @@ maxFPS(60),
 minFPS(10),
 verticalSync(false),
 portable(false),
-fullscreen(false),
-useExternalSourceFiles(false)
+useExternalSourceFiles(false),
+platform(false)
 {
+    #if defined(GD_IDE_ONLY)
     //Game use builtin extensions by default
     extensionsUsed.push_back("BuiltinObject");
     extensionsUsed.push_back("BuiltinAudio");
@@ -48,6 +50,9 @@ useExternalSourceFiles(false)
     extensionsUsed.push_back("BuiltinCommonConversions");
     extensionsUsed.push_back("BuiltinStringInstructions");
     extensionsUsed.push_back("BuiltinMathematicalTools");
+
+    platform = new Platform; //For now, Platform is automatically created
+    #endif
 }
 
 Game::~Game()
@@ -58,17 +63,17 @@ void Game::Init(const Game & game)
 {
     //Some properties
     name = game.name;
-    author = game.author;
     windowWidth = game.windowWidth;
     windowHeight = game.windowHeight;
     maxFPS = game.maxFPS;
     minFPS = game.minFPS;
     verticalSync = game.verticalSync;
     portable = game.portable;
-    fullscreen = game.fullscreen;
 
-    //Extensions used
-    extensionsUsed = game.extensionsUsed;
+    #if defined(GD_IDE_ONLY)
+    author = game.author;
+    extensionsUsed = game.GetUsedPlatformExtensions();
+    #endif
 
     loadingScreen = game.loadingScreen;
 

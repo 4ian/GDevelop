@@ -8,8 +8,6 @@
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDCore/Events/GDExpression.h"
-#include "GDL/ExpressionInstruction.h"
-#include "GDL/StrExpressionInstruction.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
@@ -696,7 +694,6 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 parameters.push_back(lastParameter);
             }
 
-            StrExpressionInstruction instruction;
             bool functionFound = false;
 
             //First try to bind to a static str expression

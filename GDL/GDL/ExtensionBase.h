@@ -33,8 +33,6 @@ class Game;
 class Scene;
 class Object;
 class ExtensionBase;
-class ExpressionInstruction;
-class StrExpressionInstruction;
 class BaseEvent;
 class AutomatismsSharedDatas;
 class ArbitraryResourceWorker;

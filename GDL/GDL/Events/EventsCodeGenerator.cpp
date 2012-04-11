@@ -431,6 +431,8 @@ string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const 
 
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
+        InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
+
         string conditionCode = GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
         if ( !conditions[cId].GetType().empty() )
         {
@@ -440,9 +442,9 @@ string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const 
                 outputCode += "condition"+ToString(i)+"IsTrue";
                 if (i == cId-1) outputCode += ") ";
             }
-            outputCode += "{\n";
+            if ( !instrInfos.cppCallingInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += "{\n";
             outputCode += conditionCode;
-            outputCode += "}\n";
+            if ( !instrInfos.cppCallingInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += "}\n";
         }
     }
 
@@ -666,11 +668,13 @@ string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Sce
     string outputCode;
     for (unsigned int aId =0;aId < actions.size();++aId)
     {
+        InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
+
         string actionCode = GenerateActionCode(game, scene, actions[aId], context);
 
-        outputCode += "{\n";
+        if ( !instrInfos.cppCallingInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += "{\n";
         if ( !actions[aId].GetType().empty() ) outputCode += actionCode;
-        outputCode += "}\n";
+        if ( !instrInfos.cppCallingInformation.doNotEncloseInstructionCodeWithinBrackets ) outputCode += "}\n";
     }
 
     return outputCode;

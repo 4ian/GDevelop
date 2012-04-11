@@ -12,7 +12,6 @@ class Sprite;
 class ImageManager;
 class RuntimeScene;
 class Object;
-class ExpressionInstruction;
 class ImageManager;
 class InitialPosition;
 namespace sf

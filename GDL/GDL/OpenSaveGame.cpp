@@ -9,7 +9,6 @@
     #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
     #include "GDL/IDE/Dialogs/ProjectUpdateDlg.h"
     #include "PlatformDefinition/Platform.h"
-    #include "PlatformDefinition/Project.h"
 #else
     #include "GDL/Log.h"
     #include <iostream>
@@ -160,7 +159,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     if ( major <= 1 )
     {
         updateEventsFromGD1x = true;
-        game.extensionsUsed.push_back("BuiltinMathematicalTools");
+        game.GetUsedPlatformExtensions().push_back("BuiltinMathematicalTools");
 
         if ( minor < 4 || build < 9587 )
         {
@@ -236,12 +235,10 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         //Nom
         if ( elem->Attribute( "nom" ) != NULL ) { newScene->SetName( elem->Attribute( "nom" ) );}
         else { MSG( "Les informations concernant le nom de la scene manquent." ); }
-        if ( elem->Attribute( "r" ) != NULL ) { int value;elem->QueryIntAttribute( "r", &value ); newScene->backgroundColorR = value;}
-        else { MSG( "Les informations concernant la couleur de fond de la scene manquent." ); }
-        if ( elem->Attribute( "v" ) != NULL ) { int value;elem->QueryIntAttribute( "v", &value ); newScene->backgroundColorG = value;}
-        else { MSG( "Les informations concernant la couleur de fond de la scene manquent." ); }
-        if ( elem->Attribute( "b" ) != NULL ) { int value;elem->QueryIntAttribute( "b", &value ); newScene->backgroundColorB = value;}
-        else { MSG( "Les informations concernant la couleur de fond de la scene manquent." ); }
+
+        if ( elem->Attribute( "r" ) != NULL && elem->Attribute( "v" ) != NULL && elem->Attribute( "b" ) != NULL)
+        { newScene->SetBackgroundColor(ToInt(elem->Attribute( "r" )), ToInt(elem->Attribute( "v" )), ToInt(elem->Attribute( "b" ))); }
+
         if ( elem->Attribute( "titre" ) != NULL ) { newScene->title = elem->Attribute( "titre" );}
         else { MSG( "Les informations concernant le titre de la fenêtre de la scene manquent." ); }
         if ( elem->Attribute( "oglFOV" ) != NULL ) { elem->QueryFloatAttribute("oglFOV", &newScene->oglFOV); }
@@ -352,46 +349,22 @@ std::cout << "COOUC3";
 
 void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
 {
-    if ( elem->FirstChildElement( "Nom" ) != NULL ) { game.name = elem->FirstChildElement( "Nom" )->Attribute( "value" ); }
+    if ( elem->FirstChildElement( "Nom" ) != NULL ) { game.SetName( elem->FirstChildElement( "Nom" )->Attribute( "value" ) ); }
     else { MSG( "Les informations concernant le nom manquent." ); }
-    if ( elem->FirstChildElement( "Auteur" ) != NULL ) { game.author = elem->FirstChildElement( "Auteur" )->Attribute( "value" ); }
-    else { MSG( "Les informations concernant l'auteur manquent." ); }
-    if ( elem->FirstChildElement( "WindowW" ) != NULL ) { elem->FirstChildElement( "WindowW" )->QueryIntAttribute( "value", &game.windowWidth ); }
+    if ( elem->FirstChildElement( "WindowW" ) != NULL ) { game.SetMainWindowDefaultWidth(ToInt(elem->FirstChildElement( "WindowW" )->Attribute( "value"))); }
     else { MSG( "Les informations concernant la largeur manquent." ); }
-    if ( elem->FirstChildElement( "WindowH" ) != NULL ) { elem->FirstChildElement( "WindowH" )->QueryIntAttribute( "value", &game.windowHeight ); }
+    if ( elem->FirstChildElement( "WindowH" ) != NULL ) { game.SetMainWindowDefaultHeight(ToInt(elem->FirstChildElement( "WindowH" )->Attribute( "value"))); }
     else { MSG( "Les informations concernant la hauteur manquent." ); }
 
-    if ( elem->FirstChildElement( "Extensions" ) != NULL )
-    {
-        const TiXmlElement * extensionsElem = elem->FirstChildElement( "Extensions" )->FirstChildElement();
-        while (extensionsElem)
-        {
-            if ( extensionsElem->Attribute("name") )
-            {
-                std::string extensionName = extensionsElem->Attribute("name");
-                if ( find(game.extensionsUsed.begin(), game.extensionsUsed.end(), extensionName ) == game.extensionsUsed.end() )
-                    game.extensionsUsed.push_back(extensionName);
-            }
+    if ( elem->FirstChildElement( "FPSmax" ) != NULL ) { game.SetMaximumFPS(ToInt(elem->FirstChildElement( "FPSmax" )->Attribute( "value" ))); }
+    if ( elem->FirstChildElement( "FPSmin" ) != NULL ) { game.SetMinimumFPS(ToInt(elem->FirstChildElement( "FPSmin" )->Attribute( "value" ))); }
 
-            extensionsElem = extensionsElem->NextSiblingElement();
-        }
-    }
-
-    //Compatibility with Game Develop 1.3 and older
-    {
-        std::vector<string>::iterator oldName = find(game.extensionsUsed.begin(), game.extensionsUsed.end(), "BuiltinInterface");
-        if ( oldName != game.extensionsUsed.end() ) *oldName = "CommonDialogs";
-    }
-
-    if ( elem->FirstChildElement( "FPSmax" ) != NULL ) { elem->FirstChildElement( "FPSmax" )->QueryIntAttribute( "value", &game.maxFPS ); }
-    if ( elem->FirstChildElement( "FPSmin" ) != NULL ) { elem->FirstChildElement( "FPSmin" )->QueryIntAttribute( "value", &game.minFPS ); }
-
-    game.verticalSync = false;
+    game.SetVerticalSyncActivatedByDefault( false );
     if ( elem->FirstChildElement( "verticalSync" ) != NULL )
     {
         string result = elem->FirstChildElement( "verticalSync" )->Attribute("value");
         if ( result == "true")
-            game.verticalSync = true;
+            game.SetVerticalSyncActivatedByDefault(true);
     }
 
     game.portable = false;
@@ -404,6 +377,31 @@ void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
     } else { MSG(_("Aucune information sur la portabilité du jeu")); }
 
     #if defined(GD_IDE_ONLY)
+    if ( elem->FirstChildElement( "Auteur" ) != NULL ) { game.SetAuthor( elem->FirstChildElement( "Auteur" )->Attribute( "value" ) ); }
+    else { MSG( "Les informations concernant l'auteur manquent." ); }
+
+    if ( elem->FirstChildElement( "Extensions" ) != NULL )
+    {
+        const TiXmlElement * extensionsElem = elem->FirstChildElement( "Extensions" )->FirstChildElement();
+        while (extensionsElem)
+        {
+            if ( extensionsElem->Attribute("name") )
+            {
+                std::string extensionName = extensionsElem->Attribute("name");
+                if ( find(game.GetUsedPlatformExtensions().begin(), game.GetUsedPlatformExtensions().end(), extensionName ) == game.GetUsedPlatformExtensions().end() )
+                    game.GetUsedPlatformExtensions().push_back(extensionName);
+            }
+
+            extensionsElem = extensionsElem->NextSiblingElement();
+        }
+    }
+
+    //Compatibility with Game Develop 1.3 and older
+    {
+        std::vector<string>::iterator oldName = find(game.GetUsedPlatformExtensions().begin(), game.GetUsedPlatformExtensions().end(), "BuiltinInterface");
+        if ( oldName != game.GetUsedPlatformExtensions().end() ) *oldName = "CommonDialogs";
+    }
+
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableFilename", game.winExecutableFilename);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
@@ -854,16 +852,16 @@ bool OpenSaveGame::SaveToFile(string file)
     {
         info = new TiXmlElement( "Nom" );
         infos->LinkEndChild( info );
-        info->SetAttribute( "value", game.name.c_str() );
+        info->SetAttribute( "value", game.GetName().c_str() );
         info = new TiXmlElement( "Auteur" );
         infos->LinkEndChild( info );
-        info->SetAttribute( "value", game.author.c_str() );
+        info->SetAttribute( "value", game.GetAuthor().c_str() );
         info = new TiXmlElement( "WindowW" );
         infos->LinkEndChild( info );
-        info->SetAttribute( "value", game.windowWidth );
+        info->SetAttribute( "value", game.GetMainWindowDefaultWidth() );
         info = new TiXmlElement( "WindowH" );
         infos->LinkEndChild( info );
-        info->SetAttribute( "value", game.windowHeight );
+        info->SetAttribute( "value", game.GetMainWindowDefaultHeight() );
         info = new TiXmlElement( "Portable" );
         infos->LinkEndChild( info );
         if ( game.portable )
@@ -882,26 +880,23 @@ bool OpenSaveGame::SaveToFile(string file)
 
     TiXmlElement * extensions = new TiXmlElement( "Extensions" );
     infos->LinkEndChild( extensions );
-    for (unsigned int i =0;i<game.extensionsUsed.size();++i)
+    for (unsigned int i =0;i<game.GetUsedPlatformExtensions().size();++i)
     {
         TiXmlElement * extension = new TiXmlElement( "Extension" );
         extensions->LinkEndChild( extension );
-        extension->SetAttribute("name", game.extensionsUsed.at(i).c_str());
+        extension->SetAttribute("name", game.GetUsedPlatformExtensions().at(i).c_str());
     }
 
     info = new TiXmlElement( "FPSmax" );
     infos->LinkEndChild( info );
-    info->SetAttribute( "value", game.maxFPS );
+    info->SetAttribute( "value", game.GetMaximumFPS() );
     info = new TiXmlElement( "FPSmin" );
     infos->LinkEndChild( info );
-    info->SetAttribute( "value", game.minFPS );
+    info->SetAttribute( "value", game.GetMinimumFPS() );
 
     info = new TiXmlElement( "verticalSync" );
     infos->LinkEndChild( info );
-    if ( game.verticalSync )
-        info->SetAttribute( "value", "true" );
-    else
-        info->SetAttribute( "value", "false" );
+    info->SetAttribute( "value", game.IsVerticalSynchronizationEnabledByDefault() ? "true" : "false" );
 
     TiXmlElement * chargement = new TiXmlElement( "Chargement" );
     infos->LinkEndChild( chargement );
@@ -941,9 +936,9 @@ bool OpenSaveGame::SaveToFile(string file)
             scene = new TiXmlElement( "Scene" );
             scenes->LinkEndChild( scene );
             scene->SetAttribute( "nom", game.scenes[i]->GetName().c_str() );
-            scene->SetDoubleAttribute( "r", game.scenes[i]->backgroundColorR );
-            scene->SetDoubleAttribute( "v", game.scenes[i]->backgroundColorG );
-            scene->SetDoubleAttribute( "b", game.scenes[i]->backgroundColorB );
+            scene->SetDoubleAttribute( "r", game.scenes[i]->GetBackgroundColorRed() );
+            scene->SetDoubleAttribute( "v", game.scenes[i]->GetBackgroundColorGreen() );
+            scene->SetDoubleAttribute( "b", game.scenes[i]->GetBackgroundColorBlue() );
             scene->SetAttribute( "titre", game.scenes[i]->title.c_str() );
             scene->SetDoubleAttribute( "oglFOV", game.scenes[i]->oglFOV );
             scene->SetDoubleAttribute( "oglZNear", game.scenes[i]->oglZNear );
@@ -1342,10 +1337,7 @@ void OpenSaveGame::RecreatePaths(string file)
         for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j) //Add objects resources
         	game.scenes[i]->initialObjects[j]->ExposeResources(resourcesUnmergingHelper);
 
-        //TODO : For now, construct a wrapper around Game
-        Platform platform;
-        Project project(&platform, &game);
-        LaunchResourceWorkerOnEvents(project, game.scenes[i]->events, resourcesUnmergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, resourcesUnmergingHelper);
     }
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
         game.globalObjects[j]->ExposeResources(resourcesUnmergingHelper);

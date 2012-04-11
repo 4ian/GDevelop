@@ -55,10 +55,8 @@ timeFromStart(0),
 pauseTime(0),
 specialAction(-1)
 {
-    renderWindow->ShowMouseCursor( true );
-
     //Calque par défaut
-    sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->windowWidth, game->windowHeight ) );
+    sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight() ) );
     Layer layer;
     layer.SetCamerasNumber(1);
 
@@ -292,7 +290,7 @@ void RuntimeScene::RenderWithoutStep()
 
 void RuntimeScene::Render()
 {
-    renderWindow->Clear( sf::Color( backgroundColorR, backgroundColorG, backgroundColorB ) );
+    renderWindow->Clear( sf::Color( GetBackgroundColorRed(), GetBackgroundColorGreen(), GetBackgroundColorBlue() ) );
 
     //Sort object by order to render them
     ObjList allObjects = objectsInstances.GetAllObjects();
@@ -350,7 +348,7 @@ void RuntimeScene::Render()
         if ( sf::Keyboard::IsKeyPressed(sf::Keyboard::F2))
             CProfileManager::Reset();
 
-        renderWindow->SetView(sf::View(sf::FloatRect(0.0f,0.0f, game->windowWidth, game->windowHeight)));
+        renderWindow->SetView(sf::View(sf::FloatRect(0.0f,0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight())));
 
         CProfileIterator * iter = CProfileManager::Get_Iterator();
         int y = 0;
@@ -388,8 +386,8 @@ bool RuntimeScene::UpdateTime()
     realElapsedTime -= pauseTime; //On enlève le temps de pause
 
     //On modifie ce temps écoulé si il est trop bas.
-    if ( game->minFPS != 0 && realElapsedTime > 1000.0/static_cast<double>(game->minFPS) )
-        realElapsedTime = 1000.0/static_cast<double>(game->minFPS); //On ralentit le jeu si les FPS sont trop bas.
+    if ( game->GetMinimumFPS() != 0 && realElapsedTime > 1000.0/static_cast<double>(game->GetMinimumFPS()) )
+        realElapsedTime = 1000.0/static_cast<double>(game->GetMinimumFPS()); //On ralentit le jeu si les FPS sont trop bas.
 
     elapsedTime = realElapsedTime*timeScale; //Le temps écoulé par le jeu est modifié suivant l'échelle du temps
 
@@ -498,7 +496,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     copy(game->objectGroups.begin(), game->objectGroups.end(), back_inserter(objectGroups));
 
     //Initialize runtime layers
-    sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->windowWidth, game->windowHeight ) );
+    sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight() ) );
     for (unsigned int i = 0;i<initialLayers.size();++i)
     {
         layers.push_back(RuntimeLayer(initialLayers[i], defaultView));

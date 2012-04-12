@@ -106,6 +106,17 @@ public:
      */
     virtual Platform & GetPlatform() const =0;
 
+    virtual bool HasLayoutNamed(const std::string & name) =0;
+    virtual Layout & GetLayout(const std::string & name) =0;
+    virtual const Layout & GetLayout(const std::string & name) const =0;
+    virtual Layout & GetLayout(unsigned int index) =0;
+    virtual const Layout & GetLayout (unsigned int index) const =0;
+    virtual unsigned int GetLayoutPosition(const std::string & name) const =0;
+    virtual unsigned int GetLayoutCount() const =0;
+    virtual void InsertNewLayout(std::string & name, unsigned int position) =0;
+    virtual void InsertLayout(Layout & layout, unsigned int position) =0;
+    virtual void RemoveLayout(const std::string & name) =0;
+
 private:
 
     static std::vector < std::string > noPlatformExtensionsUsed;

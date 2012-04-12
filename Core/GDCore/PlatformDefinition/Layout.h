@@ -20,6 +20,16 @@ public:
     virtual ~Layout();
 
     /**
+     * Must return a pointer to a copy of the layout.
+     *
+     * Typical implementation example:
+     * \code
+     * return new MyLayout(*this);
+     * \endcode
+     */
+    virtual Layout * Clone() const =0;
+
+    /**
      * Must change the name of the layout with the name passed as parameter.
      */
     virtual void SetName(const std::string & name) =0;

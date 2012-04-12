@@ -17,6 +17,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/toolbar.h>
 
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDL/Game.h"
 #include "GDL/RuntimeGame.h"
 #include "Game_Develop_EditorMain.h"
@@ -54,11 +55,20 @@ BEGIN_EVENT_TABLE(EditorScene,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorScene::EditorScene(wxWindow* parent, RuntimeGame & game_, Scene & scene_, const MainEditorCommand & mainEditorCommand_) :
-scene(scene_),
+EditorScene::EditorScene(wxWindow* parent, RuntimeGame & game_, gd::Layout & layout_, const MainEditorCommand & mainEditorCommand_) :
+layout(layout_),
 game(game_),
 mainEditorCommand(mainEditorCommand_)
 {
+    //TODO: GD C++ Platform specific code
+    try
+    {
+        Scene & scene = dynamic_cast<Scene&>(layout);
+    }
+    catch (...) { std::cout << "Scene editor is not adapted to arbitrary gd::Layout, GD will crash."; /*Not a GD C++ Platform scene*/ }
+
+    Scene & scene = dynamic_cast<Scene&>(layout);
+
 	//(*Initialize(EditorScene)
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer1;

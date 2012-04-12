@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EDITPROPSCENE_H
 #define EDITPROPSCENE_H
 
@@ -12,16 +17,17 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDL/Scene.h"
+namespace gd { class Layout; }
+class Scene;
 
 class EditPropScene: public wxDialog
 {
 	public:
 
-		EditPropScene(wxWindow* parent, Scene * pScene);
+		EditPropScene(wxWindow* parent, gd::Layout & layout_);
 		virtual ~EditPropScene();
 
-		Scene * scene;
+		gd::Layout & layout;
 
 		//(*Declarations(EditPropScene)
 		wxButton* OkBt;

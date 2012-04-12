@@ -1,10 +1,16 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef CLIPBOARD_H
 #define CLIPBOARD_H
 
-#include "GDL/Object.h"
 #include "GDCore/Events/Event.h"
-#include "GDL/Scene.h"
 #include "GDCore/Events/Instruction.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDL/ObjectGroup.h"
+#include "GDL/Object.h"
 #include "GDL/ExternalEvents.h"
 
 //Undefining an annoying macro changing GetObject in GetObjectA
@@ -24,9 +30,9 @@ public:
     std::vector<BaseEventSPtr> GetEvents();
     bool HasEvents() { return hasEvents; };
 
-    void SetScene( const Scene & scene );
-    Scene GetScene();
-    bool HasScene() { return hasScene; };
+    void SetLayout( const gd::Layout * layout );
+    gd::Layout * GetLayout();
+    bool HasLayout() { return hasLayout; };
 
     void SetExternalEvents( const ExternalEvents & events );
     ExternalEvents GetExternalEvents();
@@ -43,8 +49,8 @@ public:
     ObjectGroup GetObjectGroup();
     bool HasObjectGroup() { return hasObjectGroup; };
 
-    void SetPositionsSelection( vector < InitialPosition > positionsSelection_ );
-    vector < InitialPosition > GetPositionsSelection() { return positionsSelection; };
+    void SetPositionsSelection( std::vector < InitialPosition > positionsSelection_ );
+    std::vector < InitialPosition > GetPositionsSelection() { return positionsSelection; };
     bool HasPositionsSelection() { return hasPositionsSelection; };
 
 private:
@@ -64,13 +70,13 @@ private:
     ExternalEvents externalEventsCopied;
     bool hasExternalEvents;
 
-    Scene sceneCopied;
-    bool hasScene;
+    gd::Layout * layoutCopied;
+    bool hasLayout;
 
     ObjectGroup objectGroupCopied;
     bool hasObjectGroup;
 
-    vector < InitialPosition > positionsSelection;
+    std::vector < InitialPosition > positionsSelection;
     bool hasPositionsSelection;
 
     static Clipboard *singleton;

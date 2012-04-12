@@ -1,6 +1,7 @@
 #include <boost/shared_ptr.hpp>
 #include "Clipboard.h"
 #include "GDL/Object.h"
+#include "GDL/Position.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDL/ExtensionsManager.h"
@@ -17,7 +18,8 @@ hasEvents(false),
 hasExternalEvents(false),
 hasInstructions(false),
 instructionsAreConditions(true),
-hasScene(false),
+layoutCopied(NULL),
+hasLayout(false),
 hasObjectGroup(false),
 hasPositionsSelection(false)
 {
@@ -26,7 +28,7 @@ hasPositionsSelection(false)
 
 Clipboard::~Clipboard()
 {
-    //dtor
+    if ( layoutCopied != NULL ) delete layoutCopied;
 }
 
 Clipboard * Clipboard::GetInstance()
@@ -69,15 +71,15 @@ std::vector<BaseEventSPtr> Clipboard::GetEvents()
     return CloneVectorOfEvents(eventsCopied);
 }
 
-void Clipboard::SetScene( const Scene & scene )
+void Clipboard::SetLayout( const gd::Layout * layout )
 {
-    sceneCopied = scene;
-    hasScene = true;
+    layoutCopied = layout->Clone();
+    hasLayout = true;
 }
 
-Scene Clipboard::GetScene()
+gd::Layout * Clipboard::GetLayout()
 {
-    return sceneCopied;
+    return layoutCopied->Clone();
 }
 
 void Clipboard::SetExternalEvents( const ExternalEvents & events )

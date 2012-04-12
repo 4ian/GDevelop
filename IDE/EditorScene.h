@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EDITORSCENE_H
 #define EDITORSCENE_H
 
@@ -15,6 +20,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/toolbar.h>
 
+namespace gd {class Layout;}
 #include "GDL/Game.h"
 class RuntimeGame;
 #include "GDL/IDE/MainEditorCommand.h"
@@ -36,7 +42,7 @@ class EditorScene: public wxPanel
 {
 	public:
 
-		EditorScene(wxWindow* parent, RuntimeGame & game_, Scene & scene_, const MainEditorCommand & mainEditorCommand_);
+		EditorScene(wxWindow* parent, RuntimeGame & game_, gd::Layout & layout_, const MainEditorCommand & mainEditorCommand_);
 		virtual ~EditorScene();
 
 		//(*Declarations(EditorScene)
@@ -49,7 +55,10 @@ class EditorScene: public wxPanel
 		wxAuiNotebook* notebook;
 		//*)
 
-		Scene & scene;
+		/**
+		 * Return the layout edited by the editor
+		 */
+		gd::Layout & GetLayout() { return layout; };
 
         /**
          * Can be called by parent so as to refresh ribbon for this editor.
@@ -87,6 +96,7 @@ class EditorScene: public wxPanel
 		//*)
 
 		RuntimeGame & game;
+		gd::Layout & layout;
 		MainEditorCommand mainEditorCommand;
 
         wxAuiManager m_mgr;

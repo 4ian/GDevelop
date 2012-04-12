@@ -1,23 +1,20 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "EditPropScene.h"
 
-#ifdef DEBUG
-#include "nommgr.h"
-#endif
-
-//(*InternalHeaders(EditPropScene)
-#include <wx/settings.h>
-#include <wx/font.h>
-#include <wx/intl.h>
-#include <wx/string.h>
-//*)
+//(*InternalHeaders(EditPropScene)#include <wx/settings.h>#include <wx/font.h>#include <wx/intl.h>#include <wx/string.h>//*)
 #include <wx/colour.h>
 #include <wx/colordlg.h>
 #include <wx/cmndata.h>
 #include <wx/help.h>
 #include <wx/config.h>
+
 #include "GDL/IDE/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
-
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDL/Scene.h"
 
 //(*IdInit(EditPropScene)
@@ -49,7 +46,8 @@ BEGIN_EVENT_TABLE(EditPropScene,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
+EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
+    layout(layout_)
 {
 	//(*Initialize(EditPropScene)
 	wxStaticBoxSizer* StaticBoxSizer2;
@@ -173,21 +171,27 @@ EditPropScene::EditPropScene(wxWindow* parent, Scene * pScene)
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropScene::OnAideBtClick);
 	//*)
 
-	scene = pScene;
-	CaptionEdit->ChangeValue(scene->title);
-	NomSceneTxt->SetLabel(scene->GetName());
+	CaptionEdit->ChangeValue(layout.GetWindowDefaultTitle());
+	NomSceneTxt->SetLabel(layout.GetName());
 
-	Panel1->SetBackgroundColour(wxColour(scene->GetBackgroundColorRed(), scene->GetBackgroundColorGreen(), scene->GetBackgroundColorBlue()));
+	Panel1->SetBackgroundColour(wxColour(layout.GetBackgroundColorRed(), layout.GetBackgroundColorGreen(), layout.GetBackgroundColorBlue()));
 
-    if ( scene->standardSortMethod )
-        TriBox->SetSelection(0);
-    else
-        TriBox->SetSelection(1);
+    //TODO: GD C++ Platform specific code
+    try
+    {
+        Scene & scene = dynamic_cast<Scene&>(layout);
 
-    fovEdit->SetValue(ToString(scene->oglFOV));
-    zNearEdit->SetValue(ToString(scene->oglZNear));
-    zFarEdit->SetValue(ToString(scene->oglZFar));
-    stopSoundsCheck->SetValue(scene->stopSoundsOnStartup);
+        if ( scene.standardSortMethod )
+            TriBox->SetSelection(0);
+        else
+            TriBox->SetSelection(1);
+
+        fovEdit->SetValue(ToString(scene.oglFOV));
+        zNearEdit->SetValue(ToString(scene.oglZNear));
+        zFarEdit->SetValue(ToString(scene.oglZFar));
+        stopSoundsCheck->SetValue(scene.stopSoundsOnStartup);
+    }
+    catch (...) { /*Not a GD C++ Platform scene*/ }
 }
 
 EditPropScene::~EditPropScene()
@@ -199,20 +203,28 @@ EditPropScene::~EditPropScene()
 
 void EditPropScene::OnOkBtClick(wxCommandEvent& event)
 {
-    scene->title = CaptionEdit->GetValue().mb_str();
+    layout.SetWindowDefaultTitle(ToString(CaptionEdit->GetValue()));
 
     wxColourData cData;
     cData.SetColour(Panel1->GetBackgroundColour());
-    scene->SetBackgroundColor( cData.GetColour().Red(), cData.GetColour().Green(), cData.GetColour().Blue());
-    scene->oglFOV = ToFloat(string(fovEdit->GetValue().mb_str()));
-    scene->oglZNear = ToFloat(string(zNearEdit->GetValue().mb_str()));
-    scene->oglZFar = ToFloat(string(zFarEdit->GetValue().mb_str()));
-    scene->stopSoundsOnStartup = stopSoundsCheck->GetValue();
+    layout.SetBackgroundColor( cData.GetColour().Red(), cData.GetColour().Green(), cData.GetColour().Blue());
 
-    if ( TriBox->GetSelection() == 0 )
-        scene->standardSortMethod = true;
-    else
-        scene->standardSortMethod = false;
+    //TODO: GD C++ Platform specific code
+    try
+    {
+        Scene & scene = dynamic_cast<Scene&>(layout);
+
+        scene.oglFOV = ToFloat(string(fovEdit->GetValue().mb_str()));
+        scene.oglZNear = ToFloat(string(zNearEdit->GetValue().mb_str()));
+        scene.oglZFar = ToFloat(string(zFarEdit->GetValue().mb_str()));
+        scene.stopSoundsOnStartup = stopSoundsCheck->GetValue();
+
+        if ( TriBox->GetSelection() == 0 )
+            scene.standardSortMethod = true;
+        else
+            scene.standardSortMethod = false;
+    }
+    catch (...) { /*Not a GD C++ Platform scene*/ }
 
     EndModal(1);
 }

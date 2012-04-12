@@ -175,7 +175,7 @@ class ProjectManager: public wxPanel
 		void EditExtensionsOfGame(Game * game);
 		void CloseGame(Game * game);
 		void OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event);
-		void AddSceneToGame(Game * game);
+		void AddSceneToGame(Game * game, unsigned int position);
 		void OnRibbonEditImagesSelected(wxRibbonButtonBarEvent& event);
 		void EditImagesOfGame(Game * game);
 		void OnRibbonEditSceneSelected(wxRibbonButtonBarEvent& event);

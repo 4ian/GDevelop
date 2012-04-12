@@ -33,12 +33,16 @@
 #include "InitialVariablesDialog.h"
 #include "EditPropScene.h"
 
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+
 #include <fstream>
 
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>
 #endif
 
+using namespace gd;
 using namespace GDpriv;
 
 //(*IdInit(ProjectManager)
@@ -361,10 +365,10 @@ void ProjectManager::Refresh()
         //Scenes
         gdTreeItemGameData * scenesItemData = new gdTreeItemGameData("Scenes", "", mainEditor.games[i].get());
         wxTreeItemId scenesItem = projectsTree->AppendItem(projectItem, _("Scenes"), 1 ,1, scenesItemData);
-        for (unsigned int j = 0;j<mainEditor.games[i]->scenes.size();++j)
+        for (unsigned int j = 0;j<mainEditor.games[i]->GetLayoutCount();++j)
         {
-            gdTreeItemGameData * sceneItemData = new gdTreeItemGameData("Scene", mainEditor.games[i]->scenes[j]->GetName(), mainEditor.games[i].get());
-            projectsTree->AppendItem(scenesItem, mainEditor.games[i]->scenes[j]->GetName(), 1 ,1, sceneItemData);
+            gdTreeItemGameData * sceneItemData = new gdTreeItemGameData("Scene", mainEditor.games[i]->GetLayout(j).GetName(), mainEditor.games[i].get());
+            projectsTree->AppendItem(scenesItem, mainEditor.games[i]->GetLayout(j).GetName(), 1 ,1, sceneItemData);
         }
 
         //Evenements externes
@@ -613,23 +617,22 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
         return;
     }
 
-    vector< boost::shared_ptr<Scene> >::const_iterator scene =
-        find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
-
-    if ( scene == game->scenes.end() )
+    if ( !game->HasLayoutNamed(data->GetSecondString()) )
     {
         wxLogWarning(_("Scène introuvable."));
         return;
     }
+
+    gd::Layout & layout = game->GetLayout(data->GetSecondString());
 
     //Verify if the scene editor is not already opened
     for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
     {
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(j));
 
-        if ( sceneEditorPtr != NULL && &sceneEditorPtr->scene == (*scene).get() )
+        if ( sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout )
         {
-            //Change notebook page to scene page
+            //Change notebook page to the layout page
             mainEditor.GetEditorsNotebook()->SetSelection(j);
             return;
         }
@@ -644,7 +647,7 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
             prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
-    EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), *game, *(*scene), mainEditor.GetMainEditorCommand());
+    EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), *game, layout, mainEditor.GetMainEditorCommand());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+data->GetSecondString(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY)) )
     {
         wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
@@ -664,19 +667,16 @@ void ProjectManager::OneditScenePropMenuItemSelected(wxCommandEvent& event)
         return;
     }
 
-    vector< boost::shared_ptr<Scene> >::const_iterator scene =
-        find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
-
-    if ( scene == game->scenes.end() )
+    if ( !game->HasLayoutNamed(data->GetSecondString()) )
     {
         wxLogWarning(_("Scène introuvable."));
         return;
     }
 
-    EditPropScene dialog( this, (*scene).get() );
-    dialog.ShowModal();
+    gd::Layout & layout = game->GetLayout(data->GetSecondString());
 
-    (*scene)->wasModified = true;
+    EditPropScene dialog( this, layout );
+    dialog.ShowModal();
 }
 
 /**
@@ -755,16 +755,15 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
     //Renaming a scene
     else if ( data->GetString() == "Scene")
     {
-        vector< boost::shared_ptr<Scene> >::iterator scene =
-            find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), itemTextBeforeEditing));
-
-        if ( scene == game->scenes.end() )
+        if ( !game->HasLayoutNamed(data->GetSecondString()) )
         {
             wxLogWarning(_("Scène introuvable."));
             return;
         }
 
-        if ( find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), newName)) != game->scenes.end() )
+        gd::Layout & layout = game->GetLayout(data->GetSecondString());
+
+        if ( game->HasLayoutNamed(newName) )
         {
             wxLogWarning( _( "Impossible de renommer : une scène porte déjà ce nom !" ) );
             Refresh();
@@ -773,7 +772,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
 
         projectsTree->SetItemData(selectedItem, new gdTreeItemGameData("Scene", newName, game));
 
-        (*scene)->SetName(newName);
+        layout.SetName(newName);
 
         //Updating editors
         for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -781,7 +780,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
             EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
             //Si il s'agit d'un éditeur de scène avec ce nom, on le renomme
-            if ( sceneEditorPtr != NULL && &sceneEditorPtr->scene == (*scene).get())
+            if ( sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout)
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
     }
@@ -827,7 +826,7 @@ void ProjectManager::OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event)
 {
     if ( !mainEditor.CurrentGameIsValid() ) return;
 
-    AddSceneToGame(mainEditor.GetCurrentGame().get());
+    AddSceneToGame(mainEditor.GetCurrentGame().get(), mainEditor.GetCurrentGame()->GetLayoutCount());
 
     Refresh();
 }
@@ -841,7 +840,7 @@ void ProjectManager::OnaddSceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    AddSceneToGame(game);
+    AddSceneToGame(game, game->GetLayoutCount());
 
     Refresh();
 }
@@ -849,21 +848,18 @@ void ProjectManager::OnaddSceneMenuItemSelected(wxCommandEvent& event)
 /**
  * Add a scene to a game
  */
-void ProjectManager::AddSceneToGame(Game * game)
+void ProjectManager::AddSceneToGame(Game * game, unsigned int position)
 {
     //Finding a new, unique name for the scene
     string newSceneName = string(_("Nouvelle scène"));
     int i = 2;
-    while(find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), newSceneName)) != game->scenes.end())
+    while(game->HasLayoutNamed(newSceneName))
     {
         newSceneName = _("Nouvelle scène") + " " + ToString(i);
         ++i;
     }
 
-    boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(new Scene());
-    newScene->SetName(newSceneName);
-
-    game->scenes.push_back(newScene);
+    game->InsertNewLayout(newSceneName, position);
 }
 
 /**
@@ -916,21 +912,20 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    vector< boost::shared_ptr<Scene> >::iterator scene =
-        find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
-
-    if ( scene == game->scenes.end() )
+    if ( !game->HasLayoutNamed(data->GetSecondString()) )
     {
         wxLogWarning(_("Scène introuvable."));
         return;
     }
+
+    gd::Layout & layout = game->GetLayout(data->GetSecondString());
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-        if ( sceneEditorPtr != NULL && &sceneEditorPtr->scene == (*scene).get())
+        if ( sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout)
         {
             if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                 wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
@@ -950,7 +945,7 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     }
     if ( waitDialog ) delete waitDialog;
 
-    game->scenes.erase(scene);
+    game->RemoveLayout(data->GetSecondString());
 }
 
 /**
@@ -962,17 +957,13 @@ void ProjectManager::OncopySceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    vector< boost::shared_ptr<Scene> >::const_iterator scene =
-        find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
-
-    if ( scene == game->scenes.end() )
+    if ( !game->HasLayoutNamed(data->GetSecondString()) )
     {
         wxLogWarning(_("Scène introuvable."));
         return;
     }
 
-    Clipboard * clipboard = Clipboard::GetInstance();
-    clipboard->SetScene(*(*scene));
+    Clipboard::GetInstance()->SetLayout(&game->GetLayout(data->GetSecondString()));
 }
 
 /**
@@ -984,24 +975,22 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    vector< boost::shared_ptr<Scene> >::iterator scene =
-        find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
-
-    if ( scene == game->scenes.end() )
+    if ( !game->HasLayoutNamed(data->GetSecondString()) )
     {
         wxLogWarning(_("Scène introuvable."));
         return;
     }
 
-    Clipboard * clipboard = Clipboard::GetInstance();
-    clipboard->SetScene(*(*scene));
+    gd::Layout & layout = game->GetLayout(data->GetSecondString());
+
+    Clipboard::GetInstance()->SetLayout(&layout);
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-        if ( sceneEditorPtr != NULL && &sceneEditorPtr->scene == (*scene).get())
+        if ( sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout)
         {
             if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                 wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
@@ -1021,7 +1010,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     }
     if ( waitDialog ) delete waitDialog;
 
-    game->scenes.erase(scene);
+    game->RemoveLayout(data->GetSecondString());
 }
 
 void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
@@ -1030,31 +1019,22 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    vector< boost::shared_ptr<Scene> >::iterator scene =
-        find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
-
-    if ( scene == game->scenes.end() )
-    {
-        wxLogWarning(_("Scène introuvable."));
-        return;
-    }
-
     Clipboard * clipboard = Clipboard::GetInstance();
-    if (!clipboard->HasScene()) return;
+    if (!clipboard->HasLayout()) return;
 
-    boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(new Scene(clipboard->GetScene()));
+    gd::Layout & newLayout = *clipboard->GetLayout();
 
-    //Finding a new, unique name for the scene
-    string newSceneName = string(_("Copie de")) + " " + newScene->GetName();
+    //Finding a new, unique name for the layout
+    string newSceneName = string(_("Copie de")) + " " + newLayout.GetName();
     int i = 2;
-    while(find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), newSceneName)) != game->scenes.end())
+    while(game->HasLayoutNamed(newSceneName))
     {
-        newSceneName = _("Copie de") + " " + newScene->GetName() + " " + ToString(i);
+        newSceneName = _("Copie de") + " " + newLayout.GetName() + " " + ToString(i);
         ++i;
     }
 
-    newScene->SetName(newSceneName);
-    game->scenes.insert(scene, newScene);
+    newLayout.SetName(newSceneName);
+    game->InsertLayout(newLayout, game->GetLayoutPosition(data->GetSecondString()));
 
     //Insert in tree
     gdTreeItemGameData * sceneItemData = new gdTreeItemGameData("Scene", newSceneName, game);
@@ -1144,7 +1124,7 @@ void ProjectManager::CloseGame(Game * game)
             bool sceneBelongToGame = false;
             for (unsigned int i = 0;i<game->scenes.size();++i)
             {
-            	if ( game->scenes[i].get() == &sceneEditorPtr->scene )
+            	if ( game->scenes[i].get() == &sceneEditorPtr->GetLayout() )
                     sceneBelongToGame = true;
             }
 

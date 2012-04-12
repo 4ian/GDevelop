@@ -19,6 +19,7 @@ class ExternalEvents;
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/Project.h"
 namespace gd { class Platform; }
+namespace gd { class Layout; }
 namespace GDpriv { class SourceFile; }
 #endif
 
@@ -149,6 +150,17 @@ public:
     #if defined(GD_IDE_ONLY) //Specialization of gd::Project members
     virtual void SetAuthor(const std::string & author_) { author = author_; };
     virtual const std::string & GetAuthor() {return author;}
+
+    virtual bool HasLayoutNamed(const std::string & name);
+    virtual gd::Layout & GetLayout(const std::string & name);
+    virtual const gd::Layout & GetLayout(const std::string & name) const;
+    virtual gd::Layout & GetLayout(unsigned int index);
+    virtual const gd::Layout & GetLayout (unsigned int index) const;
+    virtual unsigned int GetLayoutPosition(const std::string & name) const;
+    virtual unsigned int GetLayoutCount() const;
+    virtual void InsertNewLayout(std::string & name, unsigned int position);
+    virtual void InsertLayout(gd::Layout & layout, unsigned int position);
+    virtual void RemoveLayout(const std::string & name);
 
     virtual std::vector < std::string > & GetUsedPlatformExtensions() { return extensionsUsed; };
     virtual const std::vector < std::string > & GetUsedPlatformExtensions() const { return extensionsUsed; };

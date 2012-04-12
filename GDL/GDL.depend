@@ -12907,7 +12907,7 @@
 	<string>
 	<vector>
 
-1334167877 d:\florian\programmation\gamedevelop2\gdl\\gdl\game.h
+1334266721 d:\florian\programmation\gamedevelop2\gdl\\gdl\game.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
@@ -12987,7 +12987,7 @@
 1325338672 d:\florian\programmation\gamedevelop2\gdl\\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1334180218 d:\florian\programmation\gamedevelop2\gdl\\gdl\scene.h
+1334264358 d:\florian\programmation\gamedevelop2\gdl\\gdl\scene.h
 	<vector>
 	<map>
 	<string>
@@ -14468,7 +14468,7 @@
 	"GDL/GDMathParser.h"
 	<iostream>
 
-1334166873 source:d:\florian\programmation\gamedevelop2\gdl\gdl\game.cpp
+1334266721 source:d:\florian\programmation\gamedevelop2\gdl\gdl\game.cpp
 	"GDL/Game.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/ExternalEvents.h"
@@ -14476,6 +14476,7 @@
 	"GDL/Scene.h"
 	"GDL/Object.h"
 	"PlatformDefinition/Platform.h"
+	"GDCore/PlatformDefinition/Layout.h"
 	<wx/wx.h>
 
 1329069384 d:\florian\programmation\gamedevelop2\gdl\\gdl\sourcefile.h
@@ -14985,7 +14986,7 @@
 	<wx/panel.h>
 	<wx/combobox.h>
 
-1334177090 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
+1334181500 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
 	<SFML/Graphics.hpp>
 	"GDL/SpriteObject.h"
 	"GDL/RuntimeGame.h"
@@ -15853,7 +15854,7 @@
 	<wx/filename.h>
 	"GDL/IDE/CodeCompiler.h"
 
-1334175470 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1334264358 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -35349,12 +35350,12 @@
 	"GDCore/PlatformDefinition/Platform.h"
 	"GDL/Game.h"
 
-1334179689 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\project.h
+1334266674 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\project.h
 	<string>
 	<vector>
 	"GDCore/PlatformDefinition/Layout.h"
 
-1334180189 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\layout.h
+1334264475 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\layout.h
 	<string>
 
 1332621198 source:d:\florian\programmation\gamedevelop2\gdl\platformdefinition\project.cpp

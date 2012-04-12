@@ -43,6 +43,11 @@ public:
     Scene& operator=(const Scene & rhs);
 
     /**
+     * Return a pointer to a new Scene constructed from this one.
+     */
+    virtual Scene * Clone() const { return new Scene(*this); };
+
+    /**
      * Get scene name
      */
     virtual const std::string & GetName() const {return name;};

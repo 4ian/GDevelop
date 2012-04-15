@@ -195,6 +195,8 @@
 		<Unit filename="GDCore\IDE\ResourcesUnmergingHelper.cpp" />
 		<Unit filename="GDCore\IDE\ResourcesUnmergingHelper.h" />
 		<Unit filename="GDCore\IDE\TextFormatting.h" />
+		<Unit filename="GDCore\PlatformDefinition\ExternalEvents.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\ExternalEvents.h" />
 		<Unit filename="GDCore\PlatformDefinition\InstructionsMetadataHolder.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\InstructionsMetadataHolder.h" />
 		<Unit filename="GDCore\PlatformDefinition\Layout.cpp" />
@@ -205,8 +207,6 @@
 		<Unit filename="GDCore\PlatformDefinition\PlatformExtension.h" />
 		<Unit filename="GDCore\PlatformDefinition\Project.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\Project.h" />
-		<Unit filename="GDCore\PlatformDefinition\ResourcesManager.cpp" />
-		<Unit filename="GDCore\PlatformDefinition\ResourcesManager.h" />
 		<Unit filename="GDCore\Tools\Locale\LocaleManager.cpp" />
 		<Unit filename="GDCore\Tools\Locale\LocaleManager.h" />
 		<Extensions>

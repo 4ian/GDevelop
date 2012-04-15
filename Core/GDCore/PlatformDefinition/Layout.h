@@ -6,6 +6,10 @@
 #ifndef GDCORE_LAYOUT_H
 #define GDCORE_LAYOUT_H
 #include <string>
+#include <vector>
+#include <boost/shared_ptr.hpp>
+class BaseEvent;
+class TiXmlElement;
 
 namespace gd
 {
@@ -61,6 +65,31 @@ public:
 
     virtual const std::string & GetWindowDefaultTitle() const =0;
     virtual void SetWindowDefaultTitle(const std::string & title_) =0;
+
+    /**
+     * Must return a reference to the list of events associated to the Layout class.
+     */
+    virtual const std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() const =0;
+
+    /**
+     * Must return a reference to the list of events associated to the Layout class.
+     */
+    virtual std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() =0;
+
+    /**
+     * Called by the IDE when events have been changed.
+     */
+    virtual void OnEventsModified() {};
+
+    /**
+     * Redefine this method so as to save everything related to the scene.
+     */
+    virtual void SaveToXml(TiXmlElement * eventElem) const {} //TODO
+
+    /**
+     * Redefine this method so as to load everything related to the scene.
+     */
+    virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 
 private:
 };

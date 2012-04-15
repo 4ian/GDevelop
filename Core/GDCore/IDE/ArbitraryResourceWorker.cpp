@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #if defined(GD_IDE_ONLY)
 
 #include "ArbitraryResourceWorker.h"
@@ -111,6 +115,7 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, std::vector < Bas
             LaunchResourceWorkerOnEvents(project, events.at(j)->GetSubEvents(), worker);
     }
 
+    std::cout << "Inside LaunchResourceWorkerOnEvents ENDED" << std::endl;
     return;
 }
 #endif

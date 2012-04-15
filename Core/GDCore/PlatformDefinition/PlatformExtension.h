@@ -29,26 +29,107 @@ public:
     virtual ~PlatformExtension();
 
     /**
-     * Get objects types provided by the extension
+     * Must return the name extension user friendly name.
+     */
+    virtual const std::string & GetFullName() const =0;
+
+    /**
+     * Must return the name of the extension
+     */
+    virtual const std::string & GetName() const =0;
+
+    /**
+     * Must return a description of the extension
+     */
+    virtual const std::string & GetDescription() const =0;
+
+    /**
+     * Must return the name of the extension developer
+     */
+    virtual const std::string & GetAuthor() const =0;
+
+    /**
+     * Must return the name of extension license
+     */
+    virtual const std::string & GetLicense() const =0;
+
+    /**
+     * Must return true if the extension is a standard extension that cannot be deactivated
+     */
+    virtual bool IsBuiltin() const =0;
+
+    /**
+     * Must return a vector containing all the object types provided by the extension
      */
     virtual std::vector < std::string > GetExtensionObjectsTypes() const = 0;
 
     /**
-     * Get automatism types provided by the extension
+     * Must return a vector containing all the automatism types provided by the extension
      */
     virtual std::vector < std::string > GetAutomatismsTypes() const = 0;
 
+    /**
+     * Must return a reference to a map containing the names of the actions (in the first members) and the metadata associated with (in the second members).
+     *
+     * \note Typically, a such map is stored by the extension and filled when loading the extension.
+     */
     virtual const std::map<std::string, InstructionMetadata > & GetAllActions() const { return badActionsMetadata; };
+
+    /**
+     * \see gd::PlatformExtension::GetAllActions
+     */
     virtual const std::map<std::string, InstructionMetadata > & GetAllConditions() const { return badConditionsMetadata; };
+
+    /**
+     * \see gd::PlatformExtension::GetAllActions
+     */
     virtual const std::map<std::string, ExpressionMetadata > & GetAllExpressions() const { return badExpressionsMetadata; };
+
+    /**
+     * \see gd::PlatformExtension::GetAllActions
+     */
     virtual const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressions() const { return badStrExpressionsMetadata; };
+
+    /**
+     * Must return a reference to a map containing the names of the actions, related to the object type, and the metadata associated with.
+     *
+     * \note Typically, a such map is stored by the extension and filled when loading the extension.
+     */
     virtual const std::map<std::string, InstructionMetadata > & GetAllActionsForObject(std::string objectType) const { return badActionsMetadata; };
+
+    /**
+     * \see gd::PlatformExtension::GetAllActionsForObject
+     */
     virtual const std::map<std::string, InstructionMetadata > & GetAllConditionsForObject(std::string objectType) const { return badConditionsMetadata; };
+
+    /**
+     * \see gd::PlatformExtension::GetAllActionsForObject
+     */
     virtual const std::map<std::string, ExpressionMetadata > & GetAllExpressionsForObject(std::string objectType) const { return badExpressionsMetadata; };
+
+    /**
+     * \see gd::PlatformExtension::GetAllActionsForObject
+     */
     virtual const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressionsForObject(std::string objectType) const { return badStrExpressionsMetadata; };
+
+    /**
+     * \see gd::PlatformExtension::GetAllActionsForObject
+     */
     virtual const std::map<std::string, InstructionMetadata > & GetAllActionsForAutomatism(std::string autoType) const { return badActionsMetadata; };
+
+    /**
+     * \see gd::PlatformExtension::GetAllActionsForObject
+     */
     virtual const std::map<std::string, InstructionMetadata > & GetAllConditionsForAutomatism(std::string autoType) const { return badConditionsMetadata; };
+
+    /**
+     * \see gd::PlatformExtension::GetAllActionsForObject
+     */
     virtual const std::map<std::string, ExpressionMetadata > & GetAllExpressionsForAutomatism(std::string autoType) const { return badExpressionsMetadata; };
+
+    /**
+     * \see gd::PlatformExtension::GetAllActionsForObject
+     */
     virtual const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType) const { return badStrExpressionsMetadata; };
 
     /**

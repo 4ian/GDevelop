@@ -92,6 +92,9 @@ void Scene::Init(const Scene & scene)
     }
 
     #if defined(GD_IDE_ONLY)
+    eventsModified = true; //Force recompilation/refreshing
+    wasModified = true;
+
     grid = scene.grid;
     snap = scene.snap ;
     gridWidth = scene.gridWidth ;

@@ -224,96 +224,97 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     //Scenes
     elem = hdl.FirstChildElement().FirstChildElement( "Scenes" ).Element();
     if ( elem == NULL ) { MSG( "Les informations concernant les scenes manquent" ); }
-    game.scenes.clear();
 
     elem = hdl.FirstChildElement().FirstChildElement( "Scenes" ).FirstChildElement().Element();
     while ( elem )
     {
-        //Scene vide
-        boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(new Scene());
+        std::string layoutName = elem->Attribute( "nom" ) != NULL ? elem->Attribute( "nom" ) : "";
 
-        //Nom
-        if ( elem->Attribute( "nom" ) != NULL ) { newScene->SetName( elem->Attribute( "nom" ) );}
-        else { MSG( "Les informations concernant le nom de la scene manquent." ); }
+        //Add a new layout
+        game.InsertNewLayout(layoutName, game.GetLayoutCount());
+        gd::Layout & layout = game.GetLayout(layoutName);
 
+        //And load it
         if ( elem->Attribute( "r" ) != NULL && elem->Attribute( "v" ) != NULL && elem->Attribute( "b" ) != NULL)
-        { newScene->SetBackgroundColor(ToInt(elem->Attribute( "r" )), ToInt(elem->Attribute( "v" )), ToInt(elem->Attribute( "b" ))); }
-
-        if ( elem->Attribute( "titre" ) != NULL ) { newScene->title = elem->Attribute( "titre" );}
+        { layout.SetBackgroundColor(ToInt(elem->Attribute( "r" )), ToInt(elem->Attribute( "v" )), ToInt(elem->Attribute( "b" ))); }
+        if ( elem->Attribute( "titre" ) != NULL ) { layout.SetWindowDefaultTitle( elem->Attribute( "titre" ) );}
         else { MSG( "Les informations concernant le titre de la fenêtre de la scene manquent." ); }
-        if ( elem->Attribute( "oglFOV" ) != NULL ) { elem->QueryFloatAttribute("oglFOV", &newScene->oglFOV); }
-        if ( elem->Attribute( "oglZNear" ) != NULL ) { elem->QueryFloatAttribute("oglZNear", &newScene->oglZNear); }
-        if ( elem->Attribute( "oglZFar" ) != NULL ) { elem->QueryFloatAttribute("oglZFar", &newScene->oglZFar); }
-        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("standardSortMethod", newScene->standardSortMethod);
-        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("stopSoundsOnStartup", newScene->stopSoundsOnStartup);
-        #if defined(GD_IDE_ONLY)
-        if ( elem->Attribute( "grid" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("grid", newScene->grid); }
-        if ( elem->Attribute( "snap" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("snap", newScene->snap); }
-        if ( elem->Attribute( "windowMask" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("windowMask", newScene->windowMask); }
-        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridWidth", newScene->gridWidth);
-        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridHeight", newScene->gridHeight);
-        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridR", newScene->gridR);
-        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridG", newScene->gridG);
-        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridB", newScene->gridB);
-        #endif
 
-        if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
-            OpenGroupesObjets(newScene->objectGroups, elem->FirstChildElement( "GroupesObjets" ));
-
-        if ( elem->FirstChildElement( "Objets" ) != NULL )
-            OpenObjects(newScene->initialObjects, elem->FirstChildElement( "Objets" ));
-
-        if ( elem->FirstChildElement( "Positions" ) != NULL )
-            OpenPositions(newScene->initialObjectsPositions, elem->FirstChildElement( "Positions" ));
-
-        if ( elem->FirstChildElement( "Layers" ) != NULL )
-            OpenLayers(newScene->initialLayers, elem->FirstChildElement( "Layers" ));
-
-std::cout << "COOUC1";
-        #if defined(GD_IDE_ONLY)
-        if ( elem->FirstChildElement( "Events" ) != NULL )
-            OpenEvents(newScene->events, elem->FirstChildElement( "Events" ));
-        if ( updateEventsFromGD1x ) AdaptEventsFromGD1x(newScene->events);
-        #endif
-
-        if ( elem->FirstChildElement( "Variables" ) != NULL )
-            OpenVariablesList(newScene->variables, elem->FirstChildElement( "Variables" ));
-std::cout << "COOUC";
-        if ( elem->FirstChildElement( "AutomatismsSharedDatas" ) != NULL )
+        //TODO: GD C++ Platform specific code
+        try
         {
-            TiXmlElement * elemSharedDatas = elem->FirstChildElement( "AutomatismsSharedDatas" )->FirstChildElement( "AutomatismSharedDatas" );
-            while ( elemSharedDatas != NULL )
-            {
-                std::string type = elemSharedDatas->Attribute("Type") ? elemSharedDatas->Attribute("Type") : "";
-                boost::shared_ptr<AutomatismsSharedDatas> sharedDatas = extensionsManager->CreateAutomatismSharedDatas(type);
+            Scene & newScene = dynamic_cast<Scene&>(layout);
 
-std::cout << "2";
-                if ( sharedDatas != boost::shared_ptr<AutomatismsSharedDatas>() )
+            if ( elem->Attribute( "oglFOV" ) != NULL ) { elem->QueryFloatAttribute("oglFOV", &newScene.oglFOV); }
+            if ( elem->Attribute( "oglZNear" ) != NULL ) { elem->QueryFloatAttribute("oglZNear", &newScene.oglZNear); }
+            if ( elem->Attribute( "oglZFar" ) != NULL ) { elem->QueryFloatAttribute("oglZFar", &newScene.oglZFar); }
+            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("standardSortMethod", newScene.standardSortMethod);
+            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("stopSoundsOnStartup", newScene.stopSoundsOnStartup);
+            #if defined(GD_IDE_ONLY)
+            if ( elem->Attribute( "grid" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("grid", newScene.grid); }
+            if ( elem->Attribute( "snap" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("snap", newScene.snap); }
+            if ( elem->Attribute( "windowMask" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("windowMask", newScene.windowMask); }
+            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridWidth", newScene.gridWidth);
+            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridHeight", newScene.gridHeight);
+            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridR", newScene.gridR);
+            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridG", newScene.gridG);
+            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridB", newScene.gridB);
+            #endif
+
+            if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
+                OpenGroupesObjets(newScene.objectGroups, elem->FirstChildElement( "GroupesObjets" ));
+
+            if ( elem->FirstChildElement( "Objets" ) != NULL )
+                OpenObjects(newScene.initialObjects, elem->FirstChildElement( "Objets" ));
+
+            if ( elem->FirstChildElement( "Positions" ) != NULL )
+                OpenPositions(newScene.initialObjectsPositions, elem->FirstChildElement( "Positions" ));
+
+            if ( elem->FirstChildElement( "Layers" ) != NULL )
+                OpenLayers(newScene.initialLayers, elem->FirstChildElement( "Layers" ));
+
+            #if defined(GD_IDE_ONLY)
+            if ( elem->FirstChildElement( "Events" ) != NULL )
+                OpenEvents(newScene.GetEvents(), elem->FirstChildElement( "Events" ));
+            if ( updateEventsFromGD1x ) AdaptEventsFromGD1x(newScene.GetEvents());
+            #endif
+
+            if ( elem->FirstChildElement( "Variables" ) != NULL )
+                OpenVariablesList(newScene.variables, elem->FirstChildElement( "Variables" ));
+
+            if ( elem->FirstChildElement( "AutomatismsSharedDatas" ) != NULL )
+            {
+                TiXmlElement * elemSharedDatas = elem->FirstChildElement( "AutomatismsSharedDatas" )->FirstChildElement( "AutomatismSharedDatas" );
+                while ( elemSharedDatas != NULL )
                 {
-                    sharedDatas->SetName( elemSharedDatas->Attribute("Name") ? elemSharedDatas->Attribute("Name") : "" );
-                    sharedDatas->LoadFromXml(elemSharedDatas);
-                    newScene->automatismsInitialSharedDatas[sharedDatas->GetName()] = sharedDatas;
+                    std::string type = elemSharedDatas->Attribute("Type") ? elemSharedDatas->Attribute("Type") : "";
+                    boost::shared_ptr<AutomatismsSharedDatas> sharedDatas = extensionsManager->CreateAutomatismSharedDatas(type);
+
+                    if ( sharedDatas != boost::shared_ptr<AutomatismsSharedDatas>() )
+                    {
+                        sharedDatas->SetName( elemSharedDatas->Attribute("Name") ? elemSharedDatas->Attribute("Name") : "" );
+                        sharedDatas->LoadFromXml(elemSharedDatas);
+                        newScene.automatismsInitialSharedDatas[sharedDatas->GetName()] = sharedDatas;
+                    }
+
+                    elemSharedDatas = elemSharedDatas->NextSiblingElement("AutomatismSharedDatas");
                 }
-
-                elemSharedDatas = elemSharedDatas->NextSiblingElement("AutomatismSharedDatas");
             }
-        }
 
-std::cout << "COOUC3";
-        newScene->externalSourcesDependList.clear();
-        const TiXmlElement * dependenciesElem = elem->FirstChildElement( "Dependencies" );
-        if ( dependenciesElem != NULL)
-        {
-            const TiXmlElement * dependencyElem = dependenciesElem->FirstChildElement();
-            while(dependencyElem)
+            newScene.externalSourcesDependList.clear();
+            const TiXmlElement * dependenciesElem = elem->FirstChildElement( "Dependencies" );
+            if ( dependenciesElem != NULL)
             {
-                newScene->externalSourcesDependList.push_back(dependencyElem->Attribute("sourceFile") != NULL ? dependencyElem->Attribute("sourceFile") : "");
+                const TiXmlElement * dependencyElem = dependenciesElem->FirstChildElement();
+                while(dependencyElem)
+                {
+                    newScene.externalSourcesDependList.push_back(dependencyElem->Attribute("sourceFile") != NULL ? dependencyElem->Attribute("sourceFile") : "");
 
-                dependencyElem = dependencyElem->NextSiblingElement();
+                    dependencyElem = dependencyElem->NextSiblingElement();
+                }
             }
         }
-
-        game.scenes.push_back( newScene );
+        catch (...) { /*Not a GD C++ Platform scene*/ }
 
         elem = elem->NextSiblingElement();
     }
@@ -322,7 +323,7 @@ std::cout << "COOUC3";
     //External events
     elem = hdl.FirstChildElement().FirstChildElement( "ExternalEvents" ).Element();
     if ( elem )
-        OpenExternalEvents(game.externalEvents, elem);
+        OpenExternalEvents(game.GetExternalEvents(), elem);
 
     elem = hdl.FirstChildElement().FirstChildElement( "ExternalSourceFiles" ).Element();
     if ( elem )
@@ -598,19 +599,15 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
     //Passage en revue des évènements
     while ( elemScene )
     {
-        cout << "JEFLKJ\n";
         string type;
 
         if ( elemScene->FirstChildElement( "Type" ) != NULL && elemScene->FirstChildElement( "Type" )->Attribute( "value" ) != NULL ) { type = elemScene->FirstChildElement( "Type" )->Attribute( "value" );}
         else { MSG( "Les informations concernant le type d'un évènement manquent." ); }
 
-        cout << "Abouttocreate\n";
         BaseEventSPtr event = extensionsManager->CreateEvent(type);
         if ( event != boost::shared_ptr<BaseEvent>())
         {
-        cout << "Load\n";
             event->LoadFromXml(elemScene);
-        cout << "EndLoad\n";
         }
         else
         {
@@ -618,7 +615,6 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
             event = boost::shared_ptr<BaseEvent>(new EmptyEvent);
         }
 
-        cout << "JEFLKJ2";
         if ( elemScene->Attribute( "disabled" ) != NULL ) { if ( string(elemScene->Attribute( "disabled" )) == "true" ) event->SetDisabled(); }
         if ( elemScene->Attribute( "folded" ) != NULL ) { event->folded = ( string(elemScene->Attribute( "folded" )) == "true" ); }
 
@@ -791,8 +787,8 @@ void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents
         externalEvents->SetName(name);
 
         if ( elemScene->FirstChildElement("Events") != NULL )
-            OpenEvents(externalEvents->events, elemScene->FirstChildElement("Events"));
-        if ( updateEventsFromGD1x ) AdaptEventsFromGD1x(externalEvents->events);
+            OpenEvents(externalEvents->GetEvents(), elemScene->FirstChildElement("Events"));
+        if ( updateEventsFromGD1x ) AdaptEventsFromGD1x(externalEvents->GetEvents());
 
         list.push_back(externalEvents);
         elemScene = elemScene->NextSiblingElement();
@@ -803,24 +799,19 @@ void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents
 void OpenSaveGame::OpenVariablesList(ListVariable & list, const TiXmlElement * elem)
 {
     list.Clear();
-std::cout << "HERE";
     if ( elem == NULL ) return;
     const TiXmlElement * elemScene = elem->FirstChildElement();
 
-std::cout << "A";
     while ( elemScene )
     {
-std::cout << "B";
         string name = elemScene->Attribute( "Name" ) != NULL ? elemScene->Attribute( "Name" ) : "";
         Variable & variable = list.ObtainVariable(name);
 
-std::cout << "C";
         if ( elemScene->Attribute( "Value" ) != NULL ) { variable.SetString(elemScene->Attribute( "Value" ));}
         else { MSG( "Les informations concernant la valeur d'une variable manquent." ); }
 
         elemScene = elemScene->NextSiblingElement();
     }
-std::cout << "D";
 }
 
 #if defined(GD_IDE_ONLY)
@@ -929,97 +920,94 @@ bool OpenSaveGame::SaveToFile(string file)
     root->LinkEndChild( scenes );
     TiXmlElement * scene;
 
-    if ( !game.scenes.empty() )
+    for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
     {
-        for ( unsigned int i = 0;i < game.scenes.size();i++ )
+        scene = new TiXmlElement( "Scene" );
+        scenes->LinkEndChild( scene );
+        scene->SetAttribute( "nom", game.GetLayout(i).GetName().c_str() );
+        scene->SetDoubleAttribute( "r", game.GetLayout(i).GetBackgroundColorRed() );
+        scene->SetDoubleAttribute( "v", game.GetLayout(i).GetBackgroundColorGreen() );
+        scene->SetDoubleAttribute( "b", game.GetLayout(i).GetBackgroundColorBlue() );
+        scene->SetAttribute( "titre", game.GetLayout(i).GetWindowDefaultTitle().c_str() );
+        scene->SetDoubleAttribute( "oglFOV", game.GetLayouts()[i]->oglFOV );
+        scene->SetDoubleAttribute( "oglZNear", game.GetLayouts()[i]->oglZNear );
+        scene->SetDoubleAttribute( "oglZFar", game.GetLayouts()[i]->oglZFar );
+        if ( game.GetLayouts()[i]->standardSortMethod ) scene->SetAttribute( "standardSortMethod", "true" ); else scene->SetAttribute( "standardSortMethod", "false" );
+        if ( game.GetLayouts()[i]->stopSoundsOnStartup ) scene->SetAttribute( "stopSoundsOnStartup", "true" ); else scene->SetAttribute( "stopSoundsOnStartup", "false" );
+        #if defined(GD_IDE_ONLY)
+        scene->SetDoubleAttribute( "gridWidth", game.GetLayouts()[i]->gridWidth );
+        if ( game.GetLayouts()[i]->grid ) scene->SetAttribute( "grid", "true" ); else scene->SetAttribute( "grid", "false" );
+        if ( game.GetLayouts()[i]->snap ) scene->SetAttribute( "snap", "true" ); else scene->SetAttribute( "snap", "false" );
+        scene->SetDoubleAttribute( "gridWidth", game.GetLayouts()[i]->gridWidth );
+        scene->SetDoubleAttribute( "gridHeight", game.GetLayouts()[i]->gridHeight );
+        scene->SetDoubleAttribute( "gridR", game.GetLayouts()[i]->gridR );
+        scene->SetDoubleAttribute( "gridG", game.GetLayouts()[i]->gridG );
+        scene->SetDoubleAttribute( "gridB", game.GetLayouts()[i]->gridB );
+        if ( game.GetLayouts()[i]->windowMask ) scene->SetAttribute( "windowMask", "true" ); else scene->SetAttribute( "windowMask", "false" );
+        #endif
+
+        TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
+        scene->LinkEndChild( grpsobjets );
+        SaveGroupesObjets(game.GetLayouts()[i]->objectGroups, grpsobjets);
+
+        TiXmlElement * objets = new TiXmlElement( "Objets" );
+        scene->LinkEndChild( objets );
+        SaveObjects(game.GetLayouts()[i]->initialObjects, objets);
+
+        TiXmlElement * layers = new TiXmlElement( "Layers" );
+        scene->LinkEndChild( layers );
+        SaveLayers(game.GetLayouts()[i]->initialLayers, layers);
+
+        TiXmlElement * variables = new TiXmlElement( "Variables" );
+        scene->LinkEndChild( variables );
+        SaveVariablesList(game.GetLayouts()[i]->variables, variables);
+
+        TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedDatas" );
+        scene->LinkEndChild( autosSharedDatas );
+        for (std::map<std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = game.GetLayouts()[i]->automatismsInitialSharedDatas.begin();
+             it != game.GetLayouts()[i]->automatismsInitialSharedDatas.end();++it)
         {
-            scene = new TiXmlElement( "Scene" );
-            scenes->LinkEndChild( scene );
-            scene->SetAttribute( "nom", game.scenes[i]->GetName().c_str() );
-            scene->SetDoubleAttribute( "r", game.scenes[i]->GetBackgroundColorRed() );
-            scene->SetDoubleAttribute( "v", game.scenes[i]->GetBackgroundColorGreen() );
-            scene->SetDoubleAttribute( "b", game.scenes[i]->GetBackgroundColorBlue() );
-            scene->SetAttribute( "titre", game.scenes[i]->title.c_str() );
-            scene->SetDoubleAttribute( "oglFOV", game.scenes[i]->oglFOV );
-            scene->SetDoubleAttribute( "oglZNear", game.scenes[i]->oglZNear );
-            scene->SetDoubleAttribute( "oglZFar", game.scenes[i]->oglZFar );
-            if ( game.scenes[i]->standardSortMethod ) scene->SetAttribute( "standardSortMethod", "true" ); else scene->SetAttribute( "standardSortMethod", "false" );
-            if ( game.scenes[i]->stopSoundsOnStartup ) scene->SetAttribute( "stopSoundsOnStartup", "true" ); else scene->SetAttribute( "stopSoundsOnStartup", "false" );
-            #if defined(GD_IDE_ONLY)
-            scene->SetDoubleAttribute( "gridWidth", game.scenes[i]->gridWidth );
-            if ( game.scenes[i]->grid ) scene->SetAttribute( "grid", "true" ); else scene->SetAttribute( "grid", "false" );
-            if ( game.scenes[i]->snap ) scene->SetAttribute( "snap", "true" ); else scene->SetAttribute( "snap", "false" );
-            scene->SetDoubleAttribute( "gridWidth", game.scenes[i]->gridWidth );
-            scene->SetDoubleAttribute( "gridHeight", game.scenes[i]->gridHeight );
-            scene->SetDoubleAttribute( "gridR", game.scenes[i]->gridR );
-            scene->SetDoubleAttribute( "gridG", game.scenes[i]->gridG );
-            scene->SetDoubleAttribute( "gridB", game.scenes[i]->gridB );
-            if ( game.scenes[i]->windowMask ) scene->SetAttribute( "windowMask", "true" ); else scene->SetAttribute( "windowMask", "false" );
-            #endif
+            TiXmlElement * autoSharedDatas = new TiXmlElement( "AutomatismSharedDatas" );
+            autosSharedDatas->LinkEndChild( autoSharedDatas );
 
-            TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
-            scene->LinkEndChild( grpsobjets );
-            SaveGroupesObjets(game.scenes[i]->objectGroups, grpsobjets);
-
-            TiXmlElement * objets = new TiXmlElement( "Objets" );
-            scene->LinkEndChild( objets );
-            SaveObjects(game.scenes[i]->initialObjects, objets);
-
-            TiXmlElement * layers = new TiXmlElement( "Layers" );
-            scene->LinkEndChild( layers );
-            SaveLayers(game.scenes[i]->initialLayers, layers);
-
-            TiXmlElement * variables = new TiXmlElement( "Variables" );
-            scene->LinkEndChild( variables );
-            SaveVariablesList(game.scenes[i]->variables, variables);
-
-            TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedDatas" );
-            scene->LinkEndChild( autosSharedDatas );
-            for (std::map<std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = game.scenes[i]->automatismsInitialSharedDatas.begin();
-                 it != game.scenes[i]->automatismsInitialSharedDatas.end();++it)
-            {
-                TiXmlElement * autoSharedDatas = new TiXmlElement( "AutomatismSharedDatas" );
-                autosSharedDatas->LinkEndChild( autoSharedDatas );
-
-                autoSharedDatas->SetAttribute("Type", it->second->GetTypeName().c_str());
-                autoSharedDatas->SetAttribute("Name", it->second->GetName().c_str());
-                it->second->SaveToXml(autoSharedDatas);
-            }
-
-            TiXmlElement * dependenciesElem = new TiXmlElement( "Dependencies" );
-            scene->LinkEndChild( dependenciesElem );
-            for ( unsigned int j = 0;j < game.scenes[i]->externalSourcesDependList.size();++j)
-            {
-                TiXmlElement * dependencyElem = new TiXmlElement( "Dependency" );
-                dependenciesElem->LinkEndChild( dependencyElem );
-
-                dependencyElem->SetAttribute("sourceFile", game.scenes[i]->externalSourcesDependList[j].c_str());
-            }
-
-            if ( !game.scenes[i]->initialObjectsPositions.empty() )
-            {
-                TiXmlElement * positions = new TiXmlElement( "Positions" );
-                scene->LinkEndChild( positions );
-
-                SavePositions(game.scenes[i]->initialObjectsPositions, positions);
-            }
-
-            //Evènements
-            if ( !game.scenes[i]->events.empty() )
-            {
-                TiXmlElement * events = new TiXmlElement( "Events" );
-                scene->LinkEndChild( events );
-
-                SaveEvents(game.scenes[i]->events, events);
-            }
-
+            autoSharedDatas->SetAttribute("Type", it->second->GetTypeName().c_str());
+            autoSharedDatas->SetAttribute("Name", it->second->GetName().c_str());
+            it->second->SaveToXml(autoSharedDatas);
         }
+
+        TiXmlElement * dependenciesElem = new TiXmlElement( "Dependencies" );
+        scene->LinkEndChild( dependenciesElem );
+        for ( unsigned int j = 0;j < game.GetLayouts()[i]->externalSourcesDependList.size();++j)
+        {
+            TiXmlElement * dependencyElem = new TiXmlElement( "Dependency" );
+            dependenciesElem->LinkEndChild( dependencyElem );
+
+            dependencyElem->SetAttribute("sourceFile", game.GetLayouts()[i]->externalSourcesDependList[j].c_str());
+        }
+
+        if ( !game.GetLayouts()[i]->initialObjectsPositions.empty() )
+        {
+            TiXmlElement * positions = new TiXmlElement( "Positions" );
+            scene->LinkEndChild( positions );
+
+            SavePositions(game.GetLayouts()[i]->initialObjectsPositions, positions);
+        }
+
+        //Evènements
+        if ( !game.GetLayout(i).GetEvents().empty() )
+        {
+            TiXmlElement * events = new TiXmlElement( "Events" );
+            scene->LinkEndChild( events );
+
+            SaveEvents(game.GetLayout(i).GetEvents(), events);
+        }
+
     }
 
     //External events
     TiXmlElement * externalEvents = new TiXmlElement( "ExternalEvents" );
     root->LinkEndChild( externalEvents );
-    SaveExternalEvents(game.externalEvents, externalEvents);
+    SaveExternalEvents(game.GetExternalEvents(), externalEvents);
 
     //External events
     TiXmlElement * externalSourceFiles = new TiXmlElement( "ExternalSourceFiles" );
@@ -1298,7 +1286,7 @@ void OpenSaveGame::SaveExternalEvents(const vector < boost::shared_ptr<ExternalE
 
         TiXmlElement * events = new TiXmlElement( "Events" );
         externalEvents->LinkEndChild( events );
-        SaveEvents(list[j]->events, events);
+        SaveEvents(list[j]->GetEvents(), events);
     }
 }
 
@@ -1332,12 +1320,12 @@ void OpenSaveGame::RecreatePaths(string file)
     }
 
     //Add scenes resources
-    for ( unsigned int i = 0;i < game.scenes.size();i++ )
+    for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
     {
-        for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j) //Add objects resources
-        	game.scenes[i]->initialObjects[j]->ExposeResources(resourcesUnmergingHelper);
+        for (unsigned int j = 0;j<game.GetLayouts()[i]->initialObjects.size();++j) //Add objects resources
+        	game.GetLayouts()[i]->initialObjects[j]->ExposeResources(resourcesUnmergingHelper);
 
-        LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, resourcesUnmergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), resourcesUnmergingHelper);
     }
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
         game.globalObjects[j]->ExposeResources(resourcesUnmergingHelper);

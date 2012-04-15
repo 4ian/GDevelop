@@ -9,40 +9,58 @@
 #define EXTERNALEVENTS_H
 #include <string>
 #include <vector>
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/Events/Event.h"
 
 /**
  * \brief Contains a list of events not directly linked to a scene.
  */
 class GD_API ExternalEvents
+#if defined(GD_IDE_ONLY)
+: public gd::ExternalEvents
+#endif
 {
-    public:
-        ExternalEvents();
-        ExternalEvents(const ExternalEvents&);
-        virtual ~ExternalEvents() {};
-        ExternalEvents& operator=(const ExternalEvents & rhs);
+public:
+    ExternalEvents();
+    ExternalEvents(const ExternalEvents&);
+    virtual ~ExternalEvents() {};
+    ExternalEvents& operator=(const ExternalEvents & rhs);
 
-        /**
-         * Get external events name
-         */
-        inline std::string GetName() const {return name;};
+    /**
+     * Return a pointer to a new ExternalEvents constructed from this one.
+     */
+    virtual ExternalEvents * Clone() const { return new ExternalEvents(*this); };
 
-        /**
-         * Change external events name
-         */
-        inline void SetName(std::string name_) {name = name_;};
+    /**
+     * Get external events name
+     */
+    virtual const std::string & GetName() const {return name;};
 
-        std::vector < BaseEventSPtr > events; ///< List of events
+    /**
+     * Change external events name
+     */
+    virtual void SetName(const std::string & name_) {name = name_;};
 
-    private:
+    /**
+     * Return a reference to the list of events associated to the ExternalEvents class.
+     */
+    virtual const std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() const { return events; }
 
-        std::string name;
+    /**
+     * Return a reference to the list of events associated to the ExternalEvents class.
+     */
+    virtual std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() { return events; }
 
-        /**
-         * Initialize from another ExternalEvents. Used by copy-ctor and assign-op.
-         * Don't forget to update me if members were changed !
-         */
-        void Init(const ExternalEvents & externalEvents);
+private:
+
+    std::string name;
+    std::vector < BaseEventSPtr > events; ///< List of events
+
+    /**
+     * Initialize from another ExternalEvents. Used by copy-ctor and assign-op.
+     * Don't forget to update me if members were changed !
+     */
+    void Init(const ExternalEvents & externalEvents);
 };
 
 //"Tool" Functions

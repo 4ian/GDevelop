@@ -36,6 +36,9 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/IDE/ImagesUsedInventorizer.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/IDE/HelpFileAccess.h"
 
 #include "GDL/Game.h"
@@ -43,11 +46,8 @@
 #include "GDL/Object.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/Dialogs/PropImage.h"
-#include "GDL/ExternalEvents.h"
 #include "PlatformDefinition/Platform.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/IDE/gdTreeItemStringData.h"
-#include "GDCore/IDE/ImagesUsedInventorizer.h"
 
 
 #ifdef __WXGTK__
@@ -499,19 +499,19 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
         /*{
             //Search in scenes resources
             ImagesUsedInventorizer inventorizer;
-            for ( unsigned int i = 0;i < game.scenes.size();i++ )
+            for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
             {
-                for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j)
-                    game.scenes[i]->initialObjects[j]->ExposeResources(inventorizer);
+                for (unsigned int j = 0;j<game.GetLayouts()[i]->initialObjects.size();++j)
+                    game.GetLayouts()[i]->initialObjects[j]->ExposeResources(inventorizer);
 
-                LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, inventorizer);
+                LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), inventorizer);
             }
             //Search in global objects resources
             for (unsigned int j = 0;j<game.globalObjects.size();++j)
                 game.globalObjects[j]->ExposeResources(inventorizer);
             //Search in external events
-            for ( unsigned int i = 0;i < game.externalEvents.size();i++ )
-                LaunchResourceWorkerOnEvents(game, game.externalEvents[i]->events, inventorizer);
+            for ( unsigned int i = 0;i < game.GetExternalEventsCount();i++ )
+                LaunchResourceWorkerOnEvents(game, game.GetExternalEvents(i).GetEvents(), inventorizer);
 
             std::set<std::string> & usedImages = inventorizer.GetAllUsedImages();
             if ( usedImages.find(imageName) != usedImages.end() )
@@ -769,19 +769,19 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 {
     //Search in scenes resources
     ImagesUsedInventorizer inventorizer;
-    for ( unsigned int i = 0;i < game.scenes.size();i++ )
+    for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
     {
-        for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j)
-        	game.scenes[i]->initialObjects[j]->ExposeResources(inventorizer);
+        for (unsigned int j = 0;j<game.GetLayouts()[i]->initialObjects.size();++j)
+        	game.GetLayouts()[i]->initialObjects[j]->ExposeResources(inventorizer);
 
-        LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, inventorizer);
+        LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), inventorizer);
     }
     //Search in global objects resources
     for (unsigned int j = 0;j<game.globalObjects.size();++j)
         game.globalObjects[j]->ExposeResources(inventorizer);
     //Search in external events
-    for ( unsigned int i = 0;i < game.externalEvents.size();i++ )
-        LaunchResourceWorkerOnEvents(game, game.externalEvents[i]->events, inventorizer);
+    for ( unsigned int i = 0;i < game.GetExternalEventsCount();i++ )
+        LaunchResourceWorkerOnEvents(game, game.GetExternalEvents(i).GetEvents(), inventorizer);
 
     //Construct a wxArrayString with unused images
     wxArrayString imagesNotUsed;

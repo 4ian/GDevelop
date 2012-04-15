@@ -118,7 +118,7 @@ void Game::Init(const Game & game)
 }
 
 #if defined(GD_IDE_ONLY)
-bool Game::HasLayoutNamed(const std::string & name)
+bool Game::HasLayoutNamed(const std::string & name) const
 {
     return ( find_if(scenes.begin(), scenes.end(), bind2nd(SceneHasName(), name)) != scenes.end() );
 }
@@ -162,12 +162,12 @@ void Game::InsertNewLayout(std::string & name, unsigned int position)
     newScene->SetName(name);
 }
 
-void Game::InsertLayout(gd::Layout & layout, unsigned int position)
+void Game::InsertLayout(const gd::Layout & layout, unsigned int position)
 {
     try
     {
-        Scene & scene = dynamic_cast<Scene&>(layout);
-        boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(&scene);
+        const Scene & scene = dynamic_cast<const Scene&>(layout);
+        boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(new Scene(scene));
         if (position<scenes.size())
             scenes.insert(scenes.begin()+position, newScene);
         else
@@ -182,6 +182,72 @@ void Game::RemoveLayout(const std::string & name)
     if ( scene == scenes.end() ) return;
 
     scenes.erase(scene);
+}
+
+bool Game::HasExternalEventsNamed(const std::string & name) const
+{
+    return ( find_if(externalEvents.begin(), externalEvents.end(), bind2nd(ExternalEventsHasName(), name)) != externalEvents.end() );
+}
+gd::ExternalEvents & Game::GetExternalEvents(const std::string & name)
+{
+    return *(*find_if(externalEvents.begin(), externalEvents.end(), bind2nd(ExternalEventsHasName(), name)));
+}
+const gd::ExternalEvents & Game::GetExternalEvents(const std::string & name) const
+{
+    return *(*find_if(externalEvents.begin(), externalEvents.end(), bind2nd(ExternalEventsHasName(), name)));
+}
+gd::ExternalEvents & Game::GetExternalEvents(unsigned int index)
+{
+    return *externalEvents[index];
+}
+const gd::ExternalEvents & Game::GetExternalEvents (unsigned int index) const
+{
+    return *externalEvents[index];
+}
+unsigned int Game::GetExternalEventsPosition(const std::string & name) const
+{
+    for (unsigned int i = 0;i<externalEvents.size();++i)
+    {
+        if ( externalEvents[i]->GetName() == name ) return i;
+    }
+    return std::string::npos;
+}
+unsigned int Game::GetExternalEventsCount() const
+{
+    return externalEvents.size();
+}
+
+void Game::InsertNewExternalEvents(std::string & name, unsigned int position)
+{
+    boost::shared_ptr<ExternalEvents> newExternalEvents = boost::shared_ptr<ExternalEvents>(new ExternalEvents);
+    if (position<externalEvents.size())
+        externalEvents.insert(externalEvents.begin()+position, newExternalEvents);
+    else
+        externalEvents.push_back(newExternalEvents);
+
+    newExternalEvents->SetName(name);
+}
+
+void Game::InsertExternalEvents(const gd::ExternalEvents & events, unsigned int position)
+{
+    try
+    {
+        const ExternalEvents & castedEvents = dynamic_cast<const ExternalEvents&>(events);
+        boost::shared_ptr<ExternalEvents> newExternalEvents = boost::shared_ptr<ExternalEvents>(new ExternalEvents(castedEvents));
+        if (position<externalEvents.size())
+            externalEvents.insert(externalEvents.begin()+position, newExternalEvents);
+        else
+            externalEvents.push_back(newExternalEvents);
+    }
+    catch(...) { std::cout << "WARNING: Tried to add external events which are not GD C++ Platform ExternalEvents to a GD C++ Platform project"; }
+}
+
+void Game::RemoveExternalEvents(const std::string & name)
+{
+    std::vector< boost::shared_ptr<ExternalEvents> >::iterator events = find_if(externalEvents.begin(), externalEvents.end(), bind2nd(ExternalEventsHasName(), name));
+    if ( events == externalEvents.end() ) return;
+
+    externalEvents.erase(events);
 }
 #endif
 

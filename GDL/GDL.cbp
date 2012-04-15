@@ -1306,8 +1306,6 @@
 		<Unit filename="PlatformDefinition\InstructionsMetadataHolder.h" />
 		<Unit filename="PlatformDefinition\Platform.cpp" />
 		<Unit filename="PlatformDefinition\Platform.h" />
-		<Unit filename="PlatformDefinition\Project.cpp" />
-		<Unit filename="PlatformDefinition\Project.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
@@ -1342,7 +1340,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="2.1.10676" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="2.1.10762" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

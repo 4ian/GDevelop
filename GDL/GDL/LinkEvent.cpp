@@ -11,7 +11,7 @@
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/EmptyEvent.h"
-#include "GDL/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Game.h"
@@ -54,15 +54,9 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
     if ( IsDisabled() ) return;
 
     //Finding events to include
-    vector< BaseEventSPtr > * eventsToInclude = NULL;
-
-    vector< boost::shared_ptr<Scene> >::const_iterator sceneLinkedIter =
-        find_if(game.scenes.begin(), game.scenes.end(), bind2nd(SceneHasName(), sceneLinked));
-    vector< boost::shared_ptr<ExternalEvents> >::const_iterator eventsLinkedIter =
-        find_if(game.externalEvents.begin(), game.externalEvents.end(), bind2nd(ExternalEventsHasName(), sceneLinked));
-
-    if ( eventsLinkedIter != game.externalEvents.end() ) eventsToInclude = &(*eventsLinkedIter)->events;
-    else if ( sceneLinkedIter != game.scenes.end() ) eventsToInclude = &(*sceneLinkedIter)->events;
+    const vector< BaseEventSPtr > * eventsToInclude = NULL;
+    if ( game.HasExternalEventsNamed(sceneLinked) ) eventsToInclude = &game.GetExternalEvents(sceneLinked).GetEvents();
+    else if ( game.HasLayoutNamed(sceneLinked) ) eventsToInclude = &game.GetLayout(sceneLinked).GetEvents();
 
     if ( eventsToInclude == NULL )
     {

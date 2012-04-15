@@ -87,15 +87,34 @@ public:
      */
     virtual void SetWindowDefaultTitle(const std::string & title_) {title = title_;};
 
+    #if defined(GD_IDE_ONLY) //Specialization of gd::Layout members
+    virtual void OnEventsModified() { eventsModified = true; };
+
+    /**
+     * Return a reference to the list of events associated to the ExternalEvents class.
+     */
+    virtual const std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() const { return events; }
+
+    /**
+     * Return a reference to the list of events associated to the ExternalEvents class.
+     */
+    virtual std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() { return events; }
+
+    /**
+     * Must be called when compilation of events is over and so events are not considered "modified" anymore.
+     */
+    virtual void UnsetEventsModified() { eventsModified = false; };
+
+    virtual bool EventsModified() { return eventsModified; };
+    #endif
+
     bool standardSortMethod; ///< True to sort objects using standard sort.
-    std::string title; ///< Title displayed in the window
     float oglFOV; ///< OpenGL Field Of View value
     float oglZNear; ///< OpenGL Near Z position
     float oglZFar; ///< OpenGL Far Z position
     bool stopSoundsOnStartup; ///< True to make the scene stop all sounds at startup.
 
     #if defined(GD_IDE_ONLY)
-    vector < BaseEventSPtr >                events; ///< Scene events
     BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
     #endif
     vector < boost::shared_ptr<Object> >    initialObjects; ///< Objects availables.
@@ -110,7 +129,6 @@ public:
 
     #if defined(GD_IDE_ONLY)
     bool wasModified;
-    bool eventsModified;
 
     bool grid; ///< True if grid activated in editor -- Edittime only
     bool snap; ///< True if snap to grid activated in editor -- Edittime only
@@ -125,10 +143,15 @@ public:
 private:
 
     std::string name; ///< Scene name
-
     unsigned int backgroundColorR; ///< Background color Red component
     unsigned int backgroundColorG; ///< Background color Green component
     unsigned int backgroundColorB; ///< Background color Blue component
+    std::string title; ///< Title displayed in the window
+
+    #if defined(GD_IDE_ONLY)
+    vector < BaseEventSPtr >                events; ///< Scene events
+    bool eventsModified;
+    #endif
 
     /**
      * Initialize from another scene. Used by copy-ctor and assign-op.

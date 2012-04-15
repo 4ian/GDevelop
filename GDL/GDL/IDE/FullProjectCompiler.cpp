@@ -18,6 +18,7 @@
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
 #include <wx/filename.h>
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/IDE/CodeCompiler.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/DatFile.h"
@@ -118,36 +119,36 @@ void FullProjectCompiler::LaunchProjectCompilation()
         resourcesMergingHelper.ExposeResource( game.loadingScreen.imageFichier );
 
     //Add scenes resources
-    for ( unsigned int i = 0;i < game.scenes.size();i++ )
+    for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
     {
-        for (unsigned int j = 0;j<game.scenes[i]->initialObjects.size();++j) //Add objects resources
-        	game.scenes[i]->initialObjects[j]->ExposeResources(resourcesMergingHelper);
+        for (unsigned int j = 0;j<game.GetLayouts()[i]->initialObjects.size();++j) //Add objects resources
+        	game.GetLayouts()[i]->initialObjects[j]->ExposeResources(resourcesMergingHelper);
 
-        LaunchResourceWorkerOnEvents(game, game.scenes[i]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), resourcesMergingHelper);
     }
     //Add external events resources
-    for ( unsigned int i = 0;i < game.externalEvents.size();i++ )
+    for ( unsigned int i = 0;i < game.GetExternalEventsCount();i++ )
     {
-        LaunchResourceWorkerOnEvents(game, game.externalEvents[i]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.GetExternalEvents(i).GetEvents(), resourcesMergingHelper);
     }
     //Add global objects resources
     for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
         game.globalObjects[j]->ExposeResources(resourcesMergingHelper);
 
     //Compile all scene events to bitcode
-    for (unsigned int i = 0;i<game.scenes.size();++i)
+    for (unsigned int i = 0;i<game.GetLayoutCount();++i)
     {
-        if ( game.scenes[i]->profiler ) game.scenes[i]->profiler->profilingActivated = false;
+        if ( game.GetLayouts()[i]->profiler ) game.GetLayouts()[i]->profiler->profilingActivated = false;
 
-        diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+game.scenes[i]->GetName()+_(".")));
+        diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+game.GetLayout(i).GetName()+_(".")));
         CodeCompilerTask task;
         task.compilationForRuntime = true;
         task.optimize = optimize;
         task.eventsGeneratedCode = true;
-        task.inputFile = string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(game.scenes[i].get())+"events.cpp");
-        task.outputFile = tempDir+"/GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[i]->GetName())+".ir";
-        task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, game.scenes[i].get(), resourcesMergingHelper));
-        task.scene = game.scenes[i].get();
+        task.inputFile = string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(game.GetLayouts()[i].get())+"events.cpp");
+        task.outputFile = tempDir+"/GDpriv"+SceneNameMangler::GetMangledSceneName(game.GetLayouts()[i]->GetName())+".ir";
+        task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, game.GetLayouts()[i].get(), resourcesMergingHelper));
+        task.scene = game.GetLayouts()[i].get();
 
         CodeCompiler::GetInstance()->AddTask(task);
 
@@ -163,16 +164,16 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
         if ( !wxFileExists(task.outputFile) )
         {
-            diagnosticManager.AddError(ToString(_("La compilation de la scène ")+game.scenes[i]->GetName()+_(" a échouée : Rendez vous sur notre site pour nous rapporter cette erreur, en joignant le fichier suivant:\n"+CodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt"+"\n\nSi vous pensez que l'erreur provient d'une extension, contactez le développeur de celle ci.")));
+            diagnosticManager.AddError(ToString(_("La compilation de la scène ")+game.GetLayout(i).GetName()+_(" a échouée : Rendez vous sur notre site pour nous rapporter cette erreur, en joignant le fichier suivant:\n"+CodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt"+"\n\nSi vous pensez que l'erreur provient d'une extension, contactez le développeur de celle ci.")));
             diagnosticManager.OnCompilationFailed();
             return;
         }
         else
-            diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+game.scenes[i]->GetName()+_(" effectuée avec succès.")));
+            diagnosticManager.OnMessage(ToString(_("Compilation de la scène ")+game.GetLayout(i).GetName()+_(" effectuée avec succès.")));
 
         resourcesMergingHelper.ExposeResource(task.outputFile); //Export bitcode file.
 
-        diagnosticManager.OnPercentUpdate( static_cast<float>(i) / static_cast<float>(game.scenes.size())*50.0 );
+        diagnosticManager.OnPercentUpdate( static_cast<float>(i) / static_cast<float>(game.GetLayoutCount())*50.0 );
     }
 
     //Now copy resources

@@ -625,7 +625,7 @@ class GD_API ExtensionBase
     virtual ~ExtensionBase() {};
     CompilationInfos compilationInfo;
 
-    inline std::string GetName() const { return name; }
+    virtual const std::string & GetName() const { return name; }
 
     /**
      * Return a function to create the object if the type is handled by the extension
@@ -667,21 +667,20 @@ class GD_API ExtensionBase
     /**
      * Get objects types provided by the extension
      */
-    std::vector < std::string > GetExtensionObjectsTypes() const;
+    virtual std::vector < std::string > GetExtensionObjectsTypes() const;
 
     /**
      * Get automatism types provided by the extension
      */
-    std::vector < std::string > GetAutomatismsTypes() const;
+    virtual std::vector < std::string > GetAutomatismsTypes() const;
 
     #if defined(GD_IDE_ONLY)
-    inline std::string GetInfo() const { return informations; }
-    inline std::string GetAuthor() const { return author; }
-    inline std::string GetLicense() const { return license; }
-    inline std::string GetFullName() const { return fullname; }
-    const std::vector < std::pair<std::string, std::string> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
-    const std::vector < std::string > & GetSupplementaryIncludeDirectories() const { return supplementaryIncludeDirectories; };
-
+    //Specializations of gd::PlatformExtension methods
+    virtual const std::string & GetDescription() const { return informations; }
+    virtual const std::string & GetAuthor() const { return author; }
+    virtual const std::string & GetLicense() const { return license; }
+    virtual const std::string & GetFullName() const { return fullname; }
+    virtual bool IsBuiltin() const { return nameSpace.empty(); }
 
     const std::map<std::string, InstructionMetadata > & GetAllActions() const;
     const std::map<std::string, InstructionMetadata > & GetAllConditions() const;
@@ -697,6 +696,9 @@ class GD_API ExtensionBase
     const std::map<std::string, InstructionMetadata > & GetAllConditionsForAutomatism(std::string autoType) const;
     const std::map<std::string, ExpressionMetadata > & GetAllExpressionsForAutomatism(std::string autoType) const;
     const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType) const;
+
+    const std::vector < std::pair<std::string, std::string> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
+    const std::vector < std::string > & GetSupplementaryIncludeDirectories() const { return supplementaryIncludeDirectories; };
 
     const ExtensionObjectInfos & GetObjectInfo(std::string objectType) const;
     const AutomatismInfo & GetAutomatismInfo(std::string objectType) const;

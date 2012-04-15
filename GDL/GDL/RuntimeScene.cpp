@@ -135,7 +135,7 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
     }
 
     renderWindow = newWindow;
-    renderWindow->SetTitle(title);
+    renderWindow->SetTitle(GetWindowDefaultTitle());
 
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
@@ -573,7 +573,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     }
 
     if ( stopSoundsOnStartup ) {SoundManager::GetInstance()->ClearAllSoundsAndMusics(); }
-    if ( renderWindow ) renderWindow->SetTitle(title);
+    if ( renderWindow ) renderWindow->SetTitle(GetWindowDefaultTitle());
 
     MessageLoading( "Loading finished", 100 );
 

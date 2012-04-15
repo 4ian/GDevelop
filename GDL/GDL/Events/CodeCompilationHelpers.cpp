@@ -45,12 +45,12 @@ bool EventsCodeCompilerPreWork::Execute()
 
     cout << "Generating C++ code...\n";
     if ( sceneCopy.profiler != NULL ) sceneCopy.profiler->profileEventsInformation.clear();
-    EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.events);
-    EventsCodeGenerator::DeleteUselessEvents(sceneCopy.events);
+    EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
+    EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
 
     sceneCopy.externalSourcesDependList.clear(); //Empty the list which will contains the source file used by the scene
     //Generate the code
-    std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.events, false /*Compilation for edittime*/);
+    std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.GetEvents(), false /*Compilation for edittime*/);
     scene->externalSourcesDependList = sceneCopy.externalSourcesDependList;
 
     //Check that every dependence of the scene is ready.
@@ -116,12 +116,12 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
     Scene sceneCopy = *scene;
 
     if ( sceneCopy.profiler != NULL ) sceneCopy.profiler->profileEventsInformation.clear();
-    EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.events);
-    EventsCodeGenerator::DeleteUselessEvents(sceneCopy.events);
+    EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
+    EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
 
     sceneCopy.externalSourcesDependList.clear(); //Empty the list which will contains the source file used by the scene
     //Generate the code
-    std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.events, false /*Compilation for edittime*/);
+    std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.GetEvents(), false /*Compilation for edittime*/);
     scene->externalSourcesDependList = sceneCopy.externalSourcesDependList;
 
     //Check that every dependence of the scene is ready.
@@ -256,7 +256,7 @@ bool EventsCodeCompilerPostWork::Execute()
         wxRemoveFile(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(scene)+"events.cpp");
     }
 
-    scene->eventsModified = false;
+    scene->UnsetEventsModified();
     return true;
 }
 

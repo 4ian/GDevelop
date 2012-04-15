@@ -20,12 +20,15 @@ class ExternalEvents;
 #include "GDCore/PlatformDefinition/Project.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
+namespace gd { class ExternalEvents; }
 namespace GDpriv { class SourceFile; }
 #endif
 
 /**
  * \brief Represent a game.
  * Game contains all data of a game, from scenes to properties like game's name.
+ *
+ * \note When compiled for Game Develop IDE, this class inherits gd::Project and thus redefines methods related to gd::Project. When compiled for runtime, the class is stand alone and so contains only method useful for runtime.
  */
 class GD_API Game
 #if defined(GD_IDE_ONLY)
@@ -118,21 +121,38 @@ public:
      */
     virtual void SetVerticalSyncActivatedByDefault(bool enable) { verticalSync = enable; }
 
+    /**
+     * Return a reference to the vector containing the (smart) pointers to the layouts.
+     */
+    const std::vector < boost::shared_ptr<Scene> > & GetLayouts() const { return scenes; }
+
+    /**
+     * Return a reference to the vector containing the (smart) pointers to the layouts.
+     */
+    std::vector < boost::shared_ptr<Scene> > & GetLayouts() { return scenes; }
+
+    /**
+     * Return a reference to the vector containing the (smart) pointers to the external events.
+     */
+    const std::vector < boost::shared_ptr<ExternalEvents> > & GetExternalEvents() const { return externalEvents; }
+
+    /**
+     * Return a reference to the vector containing the (smart) pointers to the external events.
+     */
+    std::vector < boost::shared_ptr<ExternalEvents> > & GetExternalEvents() { return externalEvents; }
+
     bool portable; ///< True if the game was saved as a portable game file
 
     LoadingScreen loadingScreen; ///< Data concerning the loading screen
 
     ResourcesManager resourceManager; ///< Contains all resources used by the project
 
-    std::vector < boost::shared_ptr<Scene> >             scenes; ///< List of all scenes
     std::vector < boost::shared_ptr<Object> >            globalObjects; ///< Global objects
     std::vector < ObjectGroup >                          objectGroups; ///< Global objects groups
 
     ListVariable variables; ///< Initial global variables
 
     #if defined(GD_IDE_ONLY)
-    std::vector < boost::shared_ptr<ExternalEvents> >    externalEvents; ///< List of all externals events
-
     std::string gameFile; ///< File of the game
     std::vector < string > imagesChanged; ///< Images that have been changed and which have to be reloaded
 
@@ -151,7 +171,7 @@ public:
     virtual void SetAuthor(const std::string & author_) { author = author_; };
     virtual const std::string & GetAuthor() {return author;}
 
-    virtual bool HasLayoutNamed(const std::string & name);
+    virtual bool HasLayoutNamed(const std::string & name) const;
     virtual gd::Layout & GetLayout(const std::string & name);
     virtual const gd::Layout & GetLayout(const std::string & name) const;
     virtual gd::Layout & GetLayout(unsigned int index);
@@ -159,8 +179,19 @@ public:
     virtual unsigned int GetLayoutPosition(const std::string & name) const;
     virtual unsigned int GetLayoutCount() const;
     virtual void InsertNewLayout(std::string & name, unsigned int position);
-    virtual void InsertLayout(gd::Layout & layout, unsigned int position);
+    virtual void InsertLayout(const gd::Layout & layout, unsigned int position);
     virtual void RemoveLayout(const std::string & name);
+
+    virtual bool HasExternalEventsNamed(const std::string & name) const;
+    virtual gd::ExternalEvents & GetExternalEvents(const std::string & name);
+    virtual const gd::ExternalEvents & GetExternalEvents(const std::string & name) const;
+    virtual gd::ExternalEvents & GetExternalEvents(unsigned int index);
+    virtual const gd::ExternalEvents & GetExternalEvents (unsigned int index) const;
+    virtual unsigned int GetExternalEventsPosition(const std::string & name) const;
+    virtual unsigned int GetExternalEventsCount() const;
+    virtual void InsertNewExternalEvents(std::string & name, unsigned int position);
+    virtual void InsertExternalEvents(const gd::ExternalEvents & externalEvents, unsigned int position);
+    virtual void RemoveExternalEvents(const std::string & name);
 
     virtual std::vector < std::string > & GetUsedPlatformExtensions() { return extensionsUsed; };
     virtual const std::vector < std::string > & GetUsedPlatformExtensions() const { return extensionsUsed; };
@@ -175,12 +206,17 @@ private:
     int maxFPS; ///< Maximum Frame Per Seconds, -1 for unlimited
     unsigned int minFPS; ///< Minimum Frame Per Seconds ( slow down game if FPS are below this number )
     bool verticalSync; ///< If true, must activate vertical synchronization.
-
     #if defined(GD_IDE_ONLY)
     std::string author; ///< Game author name
     vector < std::string > extensionsUsed; ///< List of extensions used
     gd::Platform * platform; ///< Pointer to the platform owning the project
     #endif
+
+    std::vector < boost::shared_ptr<Scene> >             scenes; ///< List of all scenes
+    #if defined(GD_IDE_ONLY)
+    std::vector < boost::shared_ptr<ExternalEvents> >    externalEvents; ///< List of all externals events
+    #endif
+
 
     /**
      * Initialize from another game. Used by copy-ctor and assign-op.

@@ -10,10 +10,10 @@
 #include <wx/string.h>
 //*)
 #include <sstream>
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "GDL/ExternalEvents.h"
 #include <wx/help.h>
 
 //(*IdInit(EditLink)
@@ -135,11 +135,11 @@ game(game_)
 	    EndEdit->ChangeValue(ToString(editedEvent.end));
 	}
 
-	for (unsigned int i = 0;i<game.externalEvents.size();++i)
-        linkedNameEdit->Append(game.externalEvents[i]->GetName());
+	for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
+        linkedNameEdit->Append(game.GetExternalEvents(i).GetName());
 
-    for (unsigned int i = 0;i<game.scenes.size();++i)
-    	linkedNameEdit->Append(game.scenes[i]->GetName());
+    for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+    	linkedNameEdit->Append(game.GetLayout(i).GetName());
 }
 
 EditLink::~EditLink()

@@ -7,7 +7,7 @@
 #include <wx/textctrl.h>
 #include <wx/log.h>
 #include <wx/ribbon/bar.h>
-#include "GDL/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/Game.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "EventsEditor.h"
@@ -23,7 +23,7 @@ BEGIN_EVENT_TABLE(ExternalEventsEditor,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-ExternalEventsEditor::ExternalEventsEditor(wxWindow* parent, Game & game_, ExternalEvents & events_, const MainEditorCommand & mainEditorCommand_) :
+ExternalEventsEditor::ExternalEventsEditor(wxWindow* parent, Game & game_, gd::ExternalEvents & events_, const MainEditorCommand & mainEditorCommand_) :
 events(events_),
 game(game_),
 mainEditorCommand(mainEditorCommand_)
@@ -52,7 +52,7 @@ mainEditorCommand(mainEditorCommand_)
 	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer4->AddGrowableRow(0);
-	eventsEditor = new EventsEditor(this, game, emptyScene, &events.events, mainEditorCommand);
+	eventsEditor = new EventsEditor(this, game, emptyScene, &events.GetEvents(), mainEditorCommand);
 	FlexGridSizer4->Add(eventsEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -86,11 +86,11 @@ void ExternalEventsEditor::ForceRefreshRibbonAndConnect()
 void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
 {
     vector< boost::shared_ptr<Scene> >::iterator sceneFound =
-        find_if(game.scenes.begin(), game.scenes.end(), bind2nd(SceneHasName(), string(parentSceneComboBox->GetValue().mb_str())));
+        find_if(game.GetLayouts().begin(), game.GetLayouts().end(), bind2nd(SceneHasName(), string(parentSceneComboBox->GetValue().mb_str())));
 
     Scene * scene = NULL;
 
-    if ( sceneFound != game.scenes.end() )
+    if ( sceneFound != game.GetLayouts().end() )
         scene = (*sceneFound).get();
     else if ( parentSceneComboBox->GetSelection() == 0 ) //0 i.e. "No scene"
         scene = &emptyScene;
@@ -102,7 +102,7 @@ void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
 
     //Need to recreate an events editor.
     delete eventsEditor;
-    eventsEditor = new EventsEditor(this, game, *scene, &events.events, mainEditorCommand);
+    eventsEditor = new EventsEditor(this, game, *scene, &events.GetEvents(), mainEditorCommand);
 
     //Make sure the new events editor is properly displayed.
     FlexGridSizer4->Detach(eventsEditor);
@@ -118,6 +118,6 @@ void ExternalEventsEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
     parentSceneComboBox->Clear();
     parentSceneComboBox->Append(_("Aucune scène"));
 
-    for (unsigned int i = 0;i<game.scenes.size();++i)
-    	parentSceneComboBox->Append(game.scenes[i]->GetName());
+    for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+    	parentSceneComboBox->Append(game.GetLayout(i).GetName());
 }

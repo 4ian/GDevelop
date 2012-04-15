@@ -1065,7 +1065,7 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory, bool noNeedForSceneRe
         if ( externalEvents != NULL ) EventsRefactorer::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
 
         scene.wasModified = true;
-        scene.eventsModified = true;
+        scene.OnEventsModified();
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
     }
 }

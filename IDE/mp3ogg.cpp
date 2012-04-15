@@ -1,6 +1,7 @@
-#ifdef DEBUG
-#include "nommgr.h"
-#endif
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 
 //(*InternalHeaders(mp3ogg)
 #include <wx/bitmap.h>

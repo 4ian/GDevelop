@@ -4,6 +4,9 @@
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
+namespace gd {class Layout; }
+namespace gd {class Project; }
+namespace gd {class ExternalEvents; }
 class BaseEvent;
 class Game;
 class Scene;
@@ -49,8 +52,8 @@ class EventsRefactorer
                                           bool inConditions,
                                           bool inActions);
 
-		static void NotifyChangesInEventsOfScene(Game & game, Scene & scene);
-		static void NotifyChangesInEventsOfExternalEvents(Game & game, ExternalEvents & externalEvents);
+		static void NotifyChangesInEventsOfScene(gd::Project & project, gd::Layout & layout);
+		static void NotifyChangesInEventsOfExternalEvents(gd::Project & project, gd::ExternalEvents & externalEvents);
 
     private:
         /**
@@ -100,7 +103,13 @@ class EventsRefactorer
         static bool SearchStringInActions(Game & game, Scene & scene, std::vector < Instruction > & actions, std::string search, bool matchCase);
         static bool SearchStringInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string search, bool matchCase);
 
-		static void GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<BaseEvent> > & events, Game & game, std::vector< boost::shared_ptr<Scene> > & scenes, std::vector< boost::shared_ptr<ExternalEvents> > & externalEvents);
+        /**
+         * Fill layouts and externalEvents vector with pointers to layouts and external events linked (even indirectly) by the events.
+         *
+         * \see EventsRefactorer::NotifyChangesInEventsOfScene
+         * \see EventsRefactorer::NotifyChangesInEventsOfExternalEvents
+         */
+        static void GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<BaseEvent> > & events, gd::Project & project, std::vector< gd::Layout * > & layouts, std::vector< gd::ExternalEvents * > & externalEvents);
 
         EventsRefactorer() {};
         virtual ~EventsRefactorer() {};

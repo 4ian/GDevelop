@@ -6,12 +6,12 @@
 #ifndef CLIPBOARD_H
 #define CLIPBOARD_H
 
+namespace gd { class Layout; }
+namespace gd { class ExternalEvents; }
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDL/ObjectGroup.h"
 #include "GDL/Object.h"
-#include "GDL/ExternalEvents.h"
 
 //Undefining an annoying macro changing GetObject in GetObjectA
 #undef GetObject
@@ -34,8 +34,8 @@ public:
     gd::Layout * GetLayout();
     bool HasLayout() { return hasLayout; };
 
-    void SetExternalEvents( const ExternalEvents & events );
-    ExternalEvents GetExternalEvents();
+    void SetExternalEvents( const gd::ExternalEvents * events );
+    gd::ExternalEvents * GetExternalEvents();
     bool HasExternalEvents() { return hasExternalEvents; };
 
     void SetConditions( const std::vector<Instruction> & conditions );
@@ -67,7 +67,7 @@ private:
     bool hasInstructions;
     bool instructionsAreConditions;
 
-    ExternalEvents externalEventsCopied;
+    gd::ExternalEvents * externalEventsCopied;
     bool hasExternalEvents;
 
     gd::Layout * layoutCopied;

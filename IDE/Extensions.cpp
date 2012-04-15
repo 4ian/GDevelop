@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "Extensions.h"
 
 //(*InternalHeaders(Extensions)
@@ -12,15 +17,16 @@
 #include <fstream>
 #include <sys/types.h>
 #include <dirent.h>
+#include <vector>
+#include <boost/shared_ptr.hpp>
 #include <wx/clntdata.h>
 
-#include "GDL/ExtensionBase.h"
-#include "GDL/Object.h"
-#include "GDL/Game.h"
-#include "GDL/ExtensionsManager.h"
-#include "GDL/ExtensionsLoader.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/Project.h"
 
-#include "GDL/IDE/gdTreeItemStringData.h"
+using namespace std;
+using namespace gd;
 
 //(*IdInit(Extensions)
 const long Extensions::ID_STATICBITMAP3 = wxNewId();
@@ -48,8 +54,8 @@ BEGIN_EVENT_TABLE(Extensions,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-Extensions::Extensions(wxWindow* parent, Game & game_) :
-game(game_)
+Extensions::Extensions(wxWindow* parent, gd::Project & project_) :
+project(project_)
 {
 	//(*Initialize(Extensions)
 	wxStaticBoxSizer* StaticBoxSizer2;
@@ -181,10 +187,9 @@ void Extensions::UpdateList()
 {
     ExtensionsList->Clear();
 
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
-    const vector < boost::shared_ptr<ExtensionBase> > & extensionsInstalled = extensionsManager->GetExtensions();
+    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = project.GetPlatform().GetAllPlatformExtensions();
 
-    //Créer la liste à partir des extensions installées
+    //Create the list of available extensions
     for (unsigned int i = 0;i<extensionsInstalled.size();++i)
     {
         wxStringClientData * associatedData = new wxStringClientData(extensionsInstalled[i]->GetName());
@@ -196,14 +201,15 @@ void Extensions::UpdateList()
 
     }
 
+    //Check used extensions
     for (unsigned int i =0;i<ExtensionsList->GetCount();++i)
     {
         wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(i));
         if (associatedData)
         {
-            if ( find(  game.GetUsedPlatformExtensions().begin(),
-                        game.GetUsedPlatformExtensions().end(),
-                        associatedData->GetData()) != game.GetUsedPlatformExtensions().end() )
+            if ( find(  project.GetUsedPlatformExtensions().begin(),
+                        project.GetUsedPlatformExtensions().end(),
+                        associatedData->GetData()) != project.GetUsedPlatformExtensions().end() )
             {
                 ExtensionsList->Check(i, true);
             }
@@ -211,46 +217,28 @@ void Extensions::UpdateList()
     }
 }
 
-
-////////////////////////////////////////////////////////////
-/// Installer une nouvelle extension
-////////////////////////////////////////////////////////////
-void Extensions::OninstallNewExtensionBtClick(wxCommandEvent& event)
-{
-}
-
-////////////////////////////////////////////////////////////
-/// Désinstaller une extension :
-/// Supprimer le fichier du répertoire d'extensions
-////////////////////////////////////////////////////////////
-void Extensions::OnuninstallExtensionBtClick(wxCommandEvent& event)
-{
-}
-
-////////////////////////////////////////////////////////////
-/// Clic sur une extension : Affichage des informations
-////////////////////////////////////////////////////////////
+/**
+ * Display information about an extension when selecting one.
+ */
 void Extensions::OnExtensionsListSelect(wxCommandEvent& event)
 {
     int id = event.GetSelection();
     wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(id));
-
     if (associatedData == NULL) return;
 
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
-    const vector < boost::shared_ptr<ExtensionBase> > & extensionsInstalled = extensionsManager->GetExtensions();
+    const vector < boost::shared_ptr<PlatformExtension> > & extensionsInstalled = project.GetPlatform().GetAllPlatformExtensions();
 
     for (unsigned int i = 0;i<extensionsInstalled.size();++i)
     {
         if ( extensionsInstalled[i]->GetName() == associatedData->GetData() )
         {
-            infoEdit->ChangeValue(extensionsInstalled[i]->GetInfo());
+            infoEdit->ChangeValue(extensionsInstalled[i]->GetDescription());
             authorTxt->SetLabel(extensionsInstalled[i]->GetAuthor());
             licenseTxt->SetLabel(extensionsInstalled[i]->GetLicense());
 
             {
                 std::ifstream testFile( string("Extensions/"+extensionsInstalled[i]->GetName()+".xgdw").c_str() );
-                if ( testFile || ( extensionsInstalled[i]->GetNameSpace() == "" ) ) //Use namespace to check if it is a builtin extension
+                if ( testFile || ( extensionsInstalled[i]->IsBuiltin() ) ) //Use namespace to check if it is a builtin extension
                     wincompatibleBmp->SetBitmap(wxBitmap(_T("res/win-compatible.png"), wxBITMAP_TYPE_ANY));
                 else
                     wincompatibleBmp->SetBitmap(wxBitmap(_T("res/win-notcompatible.png"), wxBITMAP_TYPE_ANY));
@@ -258,7 +246,7 @@ void Extensions::OnExtensionsListSelect(wxCommandEvent& event)
 
             {
                 std::ifstream testFile( string("Extensions/"+extensionsInstalled[i]->GetName()+".xgdl").c_str() );
-                if ( testFile || ( extensionsInstalled[i]->GetNameSpace() == "" ) ) //Use namespace to check if it is a builtin extension
+                if ( testFile || ( extensionsInstalled[i]->IsBuiltin() ) ) //Use namespace to check if it is a builtin extension
                     linuxcompatibleBmp->SetBitmap(wxBitmap(_T("res/linux-compatible.png"), wxBITMAP_TYPE_ANY));
                 else
                     linuxcompatibleBmp->SetBitmap(wxBitmap(_T("res/linux-notcompatible.png"), wxBITMAP_TYPE_ANY));
@@ -266,7 +254,7 @@ void Extensions::OnExtensionsListSelect(wxCommandEvent& event)
 
             {
                 std::ifstream testFile( string("Extensions/"+extensionsInstalled[i]->GetName()+".xgdm").c_str() );
-                if ( testFile || ( extensionsInstalled[i]->GetNameSpace() == "" ) ) //Use namespace to check if it is a builtin extension
+                if ( testFile || ( extensionsInstalled[i]->IsBuiltin() ) ) //Use namespace to check if it is a builtin extension
                     maccompatibleBmp->SetBitmap(wxBitmap(_T("res/mac-compatible.png"), wxBITMAP_TYPE_ANY));
                 else
                     maccompatibleBmp->SetBitmap(wxBitmap(_T("res/mac-notcompatible.png"), wxBITMAP_TYPE_ANY));
@@ -277,13 +265,12 @@ void Extensions::OnExtensionsListSelect(wxCommandEvent& event)
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Fermeture : Chargement des extensions et ajout à la liste
-/// des extensions du jeu
-////////////////////////////////////////////////////////////
+/**
+ * Close dialog and save extensions used
+ */
 void Extensions::OnFermerBtClick(wxCommandEvent& event)
 {
-    game.GetUsedPlatformExtensions().clear();
+    project.GetUsedPlatformExtensions().clear();
 
     for (unsigned int i =0;i<ExtensionsList->GetCount();++i)
     {
@@ -292,7 +279,7 @@ void Extensions::OnFermerBtClick(wxCommandEvent& event)
             wxStringClientData * associatedData = dynamic_cast<wxStringClientData*>(ExtensionsList->GetClientObject(i));
 
             if (associatedData)
-                game.GetUsedPlatformExtensions().push_back(string(associatedData->GetData().mb_str()));
+                project.GetUsedPlatformExtensions().push_back(string(associatedData->GetData().mb_str()));
         }
     }
 

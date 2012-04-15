@@ -304,7 +304,7 @@ void ProfileDlg::OnactivateCheckClick(wxCommandEvent& event)
     if ( sceneCanvas )
     {
         sceneCanvas->sceneEdited.wasModified = true;
-        sceneCanvas->sceneEdited.eventsModified = true;
+        sceneCanvas->sceneEdited.OnEventsModified();
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(sceneCanvas->gameEdited, sceneCanvas->sceneEdited);
         sceneCanvas->Reload();
     }

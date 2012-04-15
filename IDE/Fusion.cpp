@@ -164,23 +164,22 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
     }
     if ( ScenesCheck->GetValue() )
     {
-        for(unsigned int i = 0;i<secondGame.scenes.size();i++)
+        for(unsigned int i = 0;i<secondGame.GetLayoutCount();i++)
         {
-            vector< boost::shared_ptr<Scene> >::iterator scene =
-                find_if(game.scenes.begin(), game.scenes.end(), bind2nd(SceneHasName(), secondGame.scenes[i]->GetName()));
-
-            if ( scene != game.scenes.end())
+            if ( game.HasLayoutNamed(secondGame.GetLayout(i).GetName() ))
             {
                 wxString depart = _("Une scène nommé \"");
                 wxString fin = _("\" est déjà présente dans le jeu. Voulez vous la remplacer ?");
-                if (wxMessageBox(depart+secondGame.scenes[i]->GetName()+fin, "Une scène de ce nom existe déjà",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+secondGame.GetLayout(i).GetName()+fin, "Une scène de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
-                    //Remplacement
-                    *scene = boost::shared_ptr<Scene>(new Scene(*secondGame.scenes[i]));
+                    //Replace layout by the new one
+                    unsigned int layoutPosition = game.GetLayoutPosition(secondGame.GetLayout(i).GetName());
+                    game.RemoveLayout(secondGame.GetLayout(i).GetName());
+                    game.InsertLayout(secondGame.GetLayout(i), layoutPosition);
                 }
             }
             else
-                game.scenes.push_back(boost::shared_ptr<Scene>(new Scene(*secondGame.scenes[i])));
+                game.InsertLayout(secondGame.GetLayout(i), game.GetLayoutCount());
         }
     }
     if ( objectsCheck->GetValue() )
@@ -227,23 +226,23 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
     }
     if ( externalEventsCheck->GetValue() )
     {
-        for(unsigned int i = 0;i<secondGame.externalEvents.size();i++)
+        for(unsigned int i = 0;i<secondGame.GetExternalEventsCount();i++)
         {
-            vector< boost::shared_ptr<ExternalEvents> >::iterator externalEvents =
-                find_if(game.externalEvents.begin(), game.externalEvents.end(), bind2nd(ExternalEventsHasName(), secondGame.externalEvents[i]->GetName()));
-
-            if ( externalEvents != game.externalEvents.end())
+            if ( game.HasExternalEventsNamed(secondGame.GetExternalEvents(i).GetName()) )
             {
+                //Ask for confirmation if we're about to replace already existing external events
                 wxString depart = _("Des évènements externes nommés \"");
                 wxString fin = _("\" sont déjà présent dans le jeu. Voulez vous les remplacer ?");
-                if (wxMessageBox(depart+secondGame.externalEvents[i]->GetName()+fin, "Evenements externes déjà existants",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+secondGame.GetExternalEvents(i).GetName()+fin, "Evenements externes déjà existants",wxYES_NO ) == wxYES)
                 {
-                    //Remplacement
-                    *(*externalEvents) = *secondGame.externalEvents[i];
+                    //Replace external events by the new ones
+                    unsigned int eventsPosition = game.GetExternalEventsPosition(secondGame.GetExternalEvents(i).GetName());
+                    game.RemoveLayout(secondGame.GetExternalEvents(i).GetName());
+                    game.InsertExternalEvents(secondGame.GetExternalEvents(i), eventsPosition);
                 }
             }
             else
-                game.externalEvents.push_back( boost::shared_ptr<ExternalEvents>(new ExternalEvents(*secondGame.externalEvents[i])) );
+                game.InsertExternalEvents(secondGame.GetExternalEvents(i), game.GetExternalEventsCount());
         }
     }
 

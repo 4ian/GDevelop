@@ -1,14 +1,19 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include <boost/shared_ptr.hpp>
 #include "Clipboard.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/Object.h"
 #include "GDL/Position.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDL/ExtensionsManager.h"
 
-//Une macro a été définie quelque part ( windows.h ),
-//transformant GetObject en GetObjectA.
-//On la désactive.
+//Undefining an annoying macro changing GetObject in GetObjectA
 #undef GetObject
 
 Clipboard::Clipboard() :
@@ -73,24 +78,30 @@ std::vector<BaseEventSPtr> Clipboard::GetEvents()
 
 void Clipboard::SetLayout( const gd::Layout * layout )
 {
+    if ( layout == NULL ) return;
+
     layoutCopied = layout->Clone();
     hasLayout = true;
 }
 
 gd::Layout * Clipboard::GetLayout()
 {
+    if ( layoutCopied == NULL ) return NULL;
     return layoutCopied->Clone();
 }
 
-void Clipboard::SetExternalEvents( const ExternalEvents & events )
+void Clipboard::SetExternalEvents( const gd::ExternalEvents * events )
 {
-    externalEventsCopied = events;
+    if ( events == NULL ) return;
+
+    externalEventsCopied = events->Clone();
     hasExternalEvents = true;
 }
 
-ExternalEvents Clipboard::GetExternalEvents()
+gd::ExternalEvents * Clipboard::GetExternalEvents()
 {
-    return externalEventsCopied;
+    if ( externalEventsCopied == NULL ) return NULL;
+    return externalEventsCopied->Clone();
 }
 
 void Clipboard::SetConditions( const std::vector<Instruction> & conditions )

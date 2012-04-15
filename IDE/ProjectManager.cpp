@@ -374,10 +374,10 @@ void ProjectManager::Refresh()
         //Evenements externes
         gdTreeItemGameData * eventsItemData = new gdTreeItemGameData("ExternalEventsRoot", "", mainEditor.games[i].get());
         wxTreeItemId eventsItem = projectsTree->AppendItem(projectItem, _("Evenements externes"), 4 ,4, eventsItemData);
-        for (unsigned int j = 0;j<mainEditor.games[i]->externalEvents.size();++j)
+        for (unsigned int j = 0;j<mainEditor.games[i]->GetExternalEventsCount();++j)
         {
-            gdTreeItemGameData * eventsItemData = new gdTreeItemGameData("ExternalEvents", mainEditor.games[i]->externalEvents[j]->GetName(), mainEditor.games[i].get());
-            projectsTree->AppendItem(eventsItem, mainEditor.games[i]->externalEvents[j]->GetName(), 4 ,4, eventsItemData);
+            gdTreeItemGameData * eventsItemData = new gdTreeItemGameData("ExternalEvents", mainEditor.games[i]->GetExternalEvents(j).GetName(), mainEditor.games[i].get());
+            projectsTree->AppendItem(eventsItem, mainEditor.games[i]->GetExternalEvents(j).GetName(), 4 ,4, eventsItemData);
         }
 
         if ( mainEditor.games[i]->useExternalSourceFiles )
@@ -404,7 +404,7 @@ void ProjectManager::Refresh()
 
 /**
  * Complete the pointers with the game and the datas corresponding to the selected item.
- * Return false if fail, in which case pointers are invalids.
+ * Return false if fail, in which case pointers are invalid.
  */
 bool ProjectManager::GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemGameData *& data)
 {
@@ -478,7 +478,7 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
     }
     else if ( data->GetString() == "Extensions")
     {
-        EditExtensionsOfGame(game);
+        EditExtensionsOfGame(*game);
 
         projectsTree->SetItemText(selectedItem, _("Extensions") + " (" + ToString(game->GetUsedPlatformExtensions().size()) + ")");
     }
@@ -693,9 +693,9 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
     }
 
     vector< boost::shared_ptr<Scene> >::const_iterator scene =
-        find_if(game->scenes.begin(), game->scenes.end(), bind2nd(SceneHasName(), data->GetSecondString()));
+        find_if(game->GetLayouts().begin(), game->GetLayouts().end(), bind2nd(SceneHasName(), data->GetSecondString()));
 
-    if ( scene == game->scenes.end() )
+    if ( scene == game->GetLayouts().end() )
     {
         wxLogWarning(_("Scène introuvable."));
         return;
@@ -779,7 +779,6 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
         {
             EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-            //Si il s'agit d'un éditeur de scène avec ce nom, on le renomme
             if ( sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout)
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
@@ -787,16 +786,13 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
     //Renaming external events
     else if ( data->GetString() == "ExternalEvents")
     {
-        vector< boost::shared_ptr<ExternalEvents> >::iterator events =
-            find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), itemTextBeforeEditing));
-
-        if ( events == game->externalEvents.end() )
+        if ( !game->HasExternalEventsNamed(itemTextBeforeEditing) )
         {
             wxLogWarning(_("Evenements introuvable."));
             return;
         }
 
-        if ( find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), newName)) != game->externalEvents.end() )
+        if ( game->HasExternalEventsNamed(newName) )
         {
             wxLogWarning( _( "Impossible de renommer : d'autres évènements externes portent déjà ce nom !" ) );
             Refresh();
@@ -805,15 +801,14 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
 
         projectsTree->SetItemData(selectedItem, new gdTreeItemGameData("ExternalEvents", newName, game));
 
-        (*events)->SetName(newName);
+        game->GetExternalEvents(itemTextBeforeEditing).SetName(newName);
 
         //Updating editors
         for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
         {
             ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-            //Si il s'agit d'un éditeur de scène avec ce nom, on le renomme
-            if ( editorPtr != NULL && &editorPtr->events == (*events).get())
+            if ( editorPtr != NULL && &editorPtr->events == &game->GetExternalEvents(newName))
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
     }
@@ -912,13 +907,14 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    if ( !game->HasLayoutNamed(data->GetSecondString()) )
+    std::string sceneName = data->GetSecondString();
+    if ( !game->HasLayoutNamed(sceneName) )
     {
         wxLogWarning(_("Scène introuvable."));
         return;
     }
 
-    gd::Layout & layout = game->GetLayout(data->GetSecondString());
+    gd::Layout & layout = game->GetLayout(sceneName);
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -945,7 +941,7 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     }
     if ( waitDialog ) delete waitDialog;
 
-    game->RemoveLayout(data->GetSecondString());
+    game->RemoveLayout(sceneName);
 }
 
 /**
@@ -975,13 +971,14 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    if ( !game->HasLayoutNamed(data->GetSecondString()) )
+    std::string layoutName = data->GetSecondString();
+    if ( !game->HasLayoutNamed(layoutName) )
     {
         wxLogWarning(_("Scène introuvable."));
         return;
     }
 
-    gd::Layout & layout = game->GetLayout(data->GetSecondString());
+    gd::Layout & layout = game->GetLayout(layoutName);
 
     Clipboard::GetInstance()->SetLayout(&layout);
 
@@ -1010,7 +1007,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     }
     if ( waitDialog ) delete waitDialog;
 
-    game->RemoveLayout(data->GetSecondString());
+    game->RemoveLayout(layoutName);
 }
 
 void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
@@ -1065,8 +1062,8 @@ void ProjectManager::OneditGblVarMenuItemSelected(wxCommandEvent& event)
     if ( dialog.ShowModal() == 1 )
     {
         game->variables = dialog.variables;
-        for (unsigned int i = 0;i<game->scenes.size();++i)
-        	game->scenes[i]->wasModified = true;
+        for (unsigned int i = 0;i<game->GetLayouts().size();++i)
+        	game->GetLayouts()[i]->wasModified = true;
     }
 }
 
@@ -1089,19 +1086,19 @@ void ProjectManager::OneditPropGameMenuItemSelected(wxCommandEvent& event)
 }
 
 /**
- * Edit extensions of a game
+ * Edit extensions used by a project
  */
-void ProjectManager::EditExtensionsOfGame(Game * game)
+void ProjectManager::EditExtensionsOfGame(gd::Project & project)
 {
-    Extensions dialog(this, *game);
+    Extensions dialog(this, project);
     dialog.ShowModal();
 }
 
 void ProjectManager::OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event)
 {
     if ( !mainEditor.CurrentGameIsValid() ) return;
+    EditExtensionsOfGame(*mainEditor.GetCurrentGame());
 
-    EditExtensionsOfGame(mainEditor.GetCurrentGame().get());
 
     Refresh();
 }
@@ -1122,9 +1119,9 @@ void ProjectManager::CloseGame(Game * game)
         if ( sceneEditorPtr != NULL )
         {
             bool sceneBelongToGame = false;
-            for (unsigned int i = 0;i<game->scenes.size();++i)
+            for (unsigned int i = 0;i<game->GetLayoutCount();++i)
             {
-            	if ( game->scenes[i].get() == &sceneEditorPtr->GetLayout() )
+            	if ( &game->GetLayout(i) == &sceneEditorPtr->GetLayout() )
                     sceneBelongToGame = true;
             }
 
@@ -1237,12 +1234,9 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    vector< boost::shared_ptr<ExternalEvents> >::const_iterator events =
-        find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), data->GetSecondString()));
-
-    if ( events == game->externalEvents.end() )
+    if ( !game->HasExternalEventsNamed(data->GetSecondString()) )
     {
-        wxLogWarning(_("Scène introuvable."));
+        wxLogWarning(_("Evenements externes introuvables."));
         return;
     }
 
@@ -1251,7 +1245,7 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
     {
         ExternalEventsEditor * eventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
 
-        if ( eventsEditorPtr != NULL && &eventsEditorPtr->events == (*events).get() )
+        if ( eventsEditorPtr != NULL && &eventsEditorPtr->events == &game->GetExternalEvents(data->GetSecondString()) )
         {
             //Change notebook page to scene page
             mainEditor.GetEditorsNotebook()->SetSelection(j);
@@ -1268,7 +1262,7 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
             prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
-    ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, *(*events), mainEditor.GetMainEditorCommand());
+    ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalEvents(data->GetSecondString()), mainEditor.GetMainEditorCommand());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, wxBitmap("res/events16.png", wxBITMAP_TYPE_ANY)) )
     {
         wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
@@ -1310,16 +1304,13 @@ void ProjectManager::AddExternalEventsToGame(Game * game)
     //Finding a new, unique name for the scene
     string newName = string(_("Evenements externes"));
     int i = 2;
-    while(find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), newName)) != game->externalEvents.end())
+    while(game->HasExternalEventsNamed(newName))
     {
         newName = _("Evenements externes") + " " + ToString(i);
         ++i;
     }
 
-    boost::shared_ptr<ExternalEvents> externalEventsPtr = boost::shared_ptr<ExternalEvents>(new ExternalEvents());
-    externalEventsPtr->SetName(newName);
-
-    game->externalEvents.push_back(externalEventsPtr);
+    game->InsertNewExternalEvents(newName, game->GetExternalEventsCount());
 }
 
 void ProjectManager::OnRenameExternalEventsSelected(wxCommandEvent& event)
@@ -1333,10 +1324,8 @@ void ProjectManager::OnDeleteExternalEventsSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    vector< boost::shared_ptr<ExternalEvents> >::iterator events =
-        find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), data->GetSecondString()));
-
-    if ( events == game->externalEvents.end() )
+    std::string externalEventsName = data->GetSecondString();
+    if ( !game->HasExternalEventsNamed(externalEventsName) )
     {
         wxLogWarning(_("Evenements introuvable."));
         return;
@@ -1347,7 +1336,7 @@ void ProjectManager::OnDeleteExternalEventsSelected(wxCommandEvent& event)
     {
         ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-        if ( editorPtr != NULL && &editorPtr->events == (*events).get())
+        if ( editorPtr != NULL && &editorPtr->events == &game->GetExternalEvents(data->GetSecondString()))
         {
             if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                 wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
@@ -1359,7 +1348,7 @@ void ProjectManager::OnDeleteExternalEventsSelected(wxCommandEvent& event)
     //Updating tree
     projectsTree->Delete(selectedItem);
 
-    game->externalEvents.erase(events);
+    game->RemoveExternalEvents(externalEventsName);
 }
 
 void ProjectManager::OnAddCppSourceFileSelected(wxCommandEvent& event)
@@ -1416,10 +1405,10 @@ void ProjectManager::OnDeleteSourceFileSelected(wxCommandEvent& event)
         }
     }
 
+    game->externalSourceFiles.erase(sourceFile);
+
     //Updating tree
     projectsTree->Delete(selectedItem);
-
-    game->externalSourceFiles.erase(sourceFile);
 }
 
 void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
@@ -1428,17 +1417,13 @@ void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    vector< boost::shared_ptr<ExternalEvents> >::iterator events =
-        find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), data->GetSecondString()));
-
-    if ( events == game->externalEvents.end() )
+    if ( !game->HasExternalEventsNamed(data->GetSecondString()) )
     {
         wxLogWarning(_("Evenements introuvable."));
         return;
     }
 
-    Clipboard * clipboard = Clipboard::GetInstance();
-    clipboard->SetExternalEvents(*(*events));
+    Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
 }
 
 void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
@@ -1447,24 +1432,21 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    vector< boost::shared_ptr<ExternalEvents> >::iterator events =
-        find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), data->GetSecondString()));
-
-    if ( events == game->externalEvents.end() )
+    std::string externalEventsName = data->GetSecondString();
+    if ( !game->HasExternalEventsNamed(externalEventsName) )
     {
         wxLogWarning(_("Evenements introuvable."));
         return;
     }
 
-    Clipboard * clipboard = Clipboard::GetInstance();
-    clipboard->SetExternalEvents(*(*events));
+    Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-        if ( editorPtr != NULL && &editorPtr->events == (*events).get())
+        if ( editorPtr != NULL && &editorPtr->events == &game->GetExternalEvents(data->GetSecondString()))
         {
             if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                 wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
@@ -1476,7 +1458,7 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
     //Updating tree
     projectsTree->Delete(selectedItem);
 
-    game->externalEvents.erase(events);
+    game->RemoveExternalEvents(externalEventsName);
 }
 
 void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
@@ -1485,29 +1467,19 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    vector< boost::shared_ptr<ExternalEvents> >::iterator events =
-        find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), data->GetSecondString()));
-
-    if ( events == game->externalEvents.end() )
-    {
-        wxLogWarning(_("Evenements introuvable."));
-        return;
-    }
-
-    Clipboard * clipboard = Clipboard::GetInstance();
-    boost::shared_ptr<ExternalEvents> newEvents = boost::shared_ptr<ExternalEvents>(new ExternalEvents(clipboard->GetExternalEvents()));
+    gd::ExternalEvents & newEvents = *Clipboard::GetInstance()->GetExternalEvents();
 
     //Finding a new, unique name for the events
-    string newName = string(_("Copie de")) + " " + newEvents->GetName();
+    string newName = string(_("Copie de")) + " " + newEvents.GetName();
     int i = 2;
-    while(find_if(game->externalEvents.begin(), game->externalEvents.end(), bind2nd(ExternalEventsHasName(), newName)) != game->externalEvents.end())
+    while(game->HasExternalEventsNamed(newName))
     {
-        newName = _("Copie de") + " " + newEvents->GetName() + " " + ToString(i);
+        newName = _("Copie de") + " " + newEvents.GetName() + " " + ToString(i);
         ++i;
     }
 
-    newEvents->SetName(newName);
-    game->externalEvents.insert(events, newEvents);
+    newEvents.SetName(newName);
+    game->InsertExternalEvents(newEvents, game->GetExternalEventsPosition(data->GetSecondString()));
 
     //Insert in tree
     gdTreeItemGameData * eventsItemData = new gdTreeItemGameData("ExternalEvents", newName, game);

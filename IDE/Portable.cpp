@@ -137,19 +137,19 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     }
     wxSafeYield();
 
-    //Add scenes resources
-    for ( unsigned int s = 0;s < game.scenes.size();s++ )
+    //Add layouts resources
+    for ( unsigned int s = 0;s < game.GetLayoutCount();s++ )
     {
-        for (unsigned int j = 0;j<game.scenes[s]->initialObjects.size();++j) //Add objects resources
-        	game.scenes[s]->initialObjects[j]->ExposeResources(resourcesMergingHelper);
+        for (unsigned int j = 0;j<game.GetLayouts()[s]->initialObjects.size();++j) //Add objects resources
+        	game.GetLayouts()[s]->initialObjects[j]->ExposeResources(resourcesMergingHelper);
 
-        LaunchResourceWorkerOnEvents(game, game.scenes[s]->events, resourcesMergingHelper);
-        AvancementGauge->SetValue(s/game.scenes.size()*16.0f+33.0f);
+        LaunchResourceWorkerOnEvents(game, game.GetLayout(s).GetEvents(), resourcesMergingHelper);
+        AvancementGauge->SetValue(s/game.GetLayoutCount()*16.0f+33.0f);
     }
     //Add external events resources
-    for ( unsigned int s = 0;s < game.externalEvents.size();s++ )
+    for ( unsigned int s = 0;s < game.GetExternalEventsCount();s++ )
     {
-        LaunchResourceWorkerOnEvents(game, game.externalEvents[s]->events, resourcesMergingHelper);
+        LaunchResourceWorkerOnEvents(game, game.GetExternalEvents(s).GetEvents(), resourcesMergingHelper);
     }
     wxSafeYield();
     //Add global objects resources

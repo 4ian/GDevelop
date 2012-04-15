@@ -1,8 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "Demarrage.h"
-
-#ifdef DEBUG
-#include "nommgr.h"
-#endif
 
 //(*InternalHeaders(Demarrage)
 #include <wx/bitmap.h>

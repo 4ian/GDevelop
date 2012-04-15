@@ -439,7 +439,7 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
 
             if ( answer == wxYES )
             {
-                EventsRefactorer::RemoveObjectInEvents(game, scene, scene.events, groupName);
+                EventsRefactorer::RemoveObjectInEvents(game, scene, scene.GetEvents(), groupName);
             }
 
             scene.wasModified = true;
@@ -550,7 +550,7 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
         {
             i->SetName( newName );
 
-            EventsRefactorer::RenameObjectInEvents(game, scene, scene.events, ancienNom, newName);
+            EventsRefactorer::RenameObjectInEvents(game, scene, scene.GetEvents(), ancienNom, newName);
 
             scene.wasModified = true;
             CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);

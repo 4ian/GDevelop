@@ -704,7 +704,7 @@ void SceneCanvas::ReloadFirstPart()
 
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
     //Useful when opening a scene for the first time for example.
-    if ( sceneEdited.eventsModified && !CodeCompiler::GetInstance()->HasTaskRelatedTo(sceneEdited) )
+    if ( sceneEdited.EventsModified() && !CodeCompiler::GetInstance()->HasTaskRelatedTo(sceneEdited) )
     {
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(gameEdited, sceneEdited);
 
@@ -811,9 +811,9 @@ void SceneCanvas::Refresh()
             }
             else if ( retourEvent != -1 )
             {
-                if (retourEvent < gameEdited.scenes.size())
+                if (retourEvent < gameEdited.GetLayouts().size())
                 {
-                    wxLogStatus( _( "Dans le jeu final, un changement de scène s'effectuera vers la scène " ) + "\"" + gameEdited.scenes[retourEvent]->GetName() + "\"" );
+                    wxLogStatus( _( "Dans le jeu final, un changement de scène s'effectuera vers la scène " ) + "\"" + gameEdited.GetLayouts()[retourEvent]->GetName() + "\"" );
                 }
             }
         }

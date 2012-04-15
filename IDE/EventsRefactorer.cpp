@@ -726,75 +726,83 @@ bool EventsRefactorer::SearchStringInConditions(Game & game, Scene & scene, vect
     return false;
 }
 
-void EventsRefactorer::NotifyChangesInEventsOfScene(Game & game, Scene & scene)
+void EventsRefactorer::NotifyChangesInEventsOfScene(gd::Project & project, gd::Layout & layout)
 {
-    scene.eventsModified = true; //Notify that events have changed in the scene
+    layout.OnEventsModified(); //Notify that events have changed in the scene
 
     //Notify others scenes, which include the changed scene ( even indirectly ), that their events has changed
-    for (unsigned int i = 0;i<game.scenes.size();++i)
+    for (unsigned int i = 0;i<project.GetLayoutCount();++i)
     {
-        if ( game.scenes[i].get() == &scene ) continue;
+        if ( &project.GetLayout(i) == &layout ) continue;
 
-        std::vector< boost::shared_ptr<Scene> > linkedScenes;
-        std::vector< boost::shared_ptr<ExternalEvents> > notUsed;
+        std::vector< gd::Layout* > linkedScenes;
+        std::vector< gd::ExternalEvents * > notUsed;
 
-        GetScenesAndExternalEventsLinkedTo(game.scenes[i]->events, game, linkedScenes, notUsed);
+        GetScenesAndExternalEventsLinkedTo(project.GetLayout(i).GetEvents(), project, linkedScenes, notUsed);
 
-        if( find_if(linkedScenes.begin(), linkedScenes.end(), bind2nd(SceneHasName(), scene.GetName())) != linkedScenes.end() )
-            game.scenes[i]->eventsModified = true;
+        for (unsigned int j = 0;j<linkedScenes.size();++j)
+        {
+            if ( linkedScenes[j]->GetName() == layout.GetName() )
+                project.GetLayout(i).OnEventsModified();
+        }
     }
 }
 
-void EventsRefactorer::NotifyChangesInEventsOfExternalEvents(Game & game, ExternalEvents & externalEvents)
+void EventsRefactorer::NotifyChangesInEventsOfExternalEvents(gd::Project & project, gd::ExternalEvents & externalEvents)
 {
     //Notify scenes, which include the external events ( even indirectly ), that their events has changed
-    for (unsigned int i = 0;i<game.scenes.size();++i)
+    for (unsigned int i = 0;i<project.GetLayoutCount();++i)
     {
-        std::vector< boost::shared_ptr<Scene> > notUsed;
-        std::vector< boost::shared_ptr<ExternalEvents> > linkedExternalEvents;
+        std::vector< gd::Layout* > notUsed;
+        std::vector< gd::ExternalEvents * > linkedExternalEvents;
 
-        GetScenesAndExternalEventsLinkedTo(game.scenes[i]->events, game, notUsed, linkedExternalEvents);
+        GetScenesAndExternalEventsLinkedTo(project.GetLayout(i).GetEvents(), project, notUsed, linkedExternalEvents);
 
-        if( find_if(linkedExternalEvents.begin(), linkedExternalEvents.end(), bind2nd(ExternalEventsHasName(), externalEvents.GetName())) != linkedExternalEvents.end())
-            game.scenes[i]->eventsModified = true;
+        for (unsigned int j = 0;j<linkedExternalEvents.size();++j)
+        {
+            if ( linkedExternalEvents[j]->GetName() == externalEvents.GetName() )
+                project.GetLayout(i).OnEventsModified();
+        }
     }
 }
 
-void EventsRefactorer::GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<BaseEvent> > & events, Game & game, std::vector< boost::shared_ptr<Scene> > & scenes, std::vector< boost::shared_ptr<ExternalEvents> > & externalEvents)
+void EventsRefactorer::GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<BaseEvent> > & events,
+                                                          gd::Project & project,
+                                                          std::vector< gd::Layout * > & layouts,
+                                                          std::vector< gd::ExternalEvents * > & externalEvents)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
+        //TODO: For now, only GD C++ Platform LinkEvent are supported here. Must add a custom method to events to indicate that they using events from external events/other layouts.
         boost::shared_ptr<LinkEvent> linkEvent = boost::dynamic_pointer_cast<LinkEvent>(events[i]);
         if ( linkEvent != boost::shared_ptr<LinkEvent>() )
         {
             //We've got a link event, search now linked scene/external events
-            vector< boost::shared_ptr<Scene> >::iterator linkedScene =
-                find_if(game.scenes.begin(), game.scenes.end(), bind2nd(SceneHasName(), linkEvent->sceneLinked));
-
-            vector< boost::shared_ptr<ExternalEvents> >::iterator linkedExternalEvents =
-                find_if(game.externalEvents.begin(), game.externalEvents.end(), bind2nd(ExternalEventsHasName(), linkEvent->sceneLinked));
-
-            if ( linkedExternalEvents != game.externalEvents.end() )
+            if ( project.HasExternalEventsNamed(linkEvent->sceneLinked) )
             {
+                gd::ExternalEvents & linkedExternalEvents = project.GetExternalEvents(linkEvent->sceneLinked);
+
                 //Protect against circular references
-                if ( find(externalEvents.begin(), externalEvents.end(), *linkedExternalEvents) == externalEvents.end() )
+                if ( find(externalEvents.begin(), externalEvents.end(), &linkedExternalEvents) == externalEvents.end() )
                 {
-                    externalEvents.push_back(*linkedExternalEvents);
-                    GetScenesAndExternalEventsLinkedTo((*linkedExternalEvents)->events, game, scenes, externalEvents);
+                    externalEvents.push_back(&linkedExternalEvents);
+                    GetScenesAndExternalEventsLinkedTo(linkedExternalEvents.GetEvents(), project, layouts, externalEvents);
                 }
             }
-            else if ( linkedScene != game.scenes.end() )
+            else if ( project.HasLayoutNamed(linkEvent->sceneLinked) )
             {
+                gd::Layout & linkedLayout = project.GetLayout(linkEvent->sceneLinked);
+
                 //Protect against circular references
-                if ( find(scenes.begin(), scenes.end(), *linkedScene) == scenes.end() )
+                if ( find(layouts.begin(), layouts.end(), &linkedLayout) == layouts.end() )
                 {
-                    scenes.push_back(*linkedScene);
-                    GetScenesAndExternalEventsLinkedTo((*linkedScene)->events, game, scenes, externalEvents);
+                    layouts.push_back(&linkedLayout);
+                    GetScenesAndExternalEventsLinkedTo(linkedLayout.GetEvents(), project, layouts, externalEvents);
                 }
             }
         }
 
         if ( events[i]->CanHaveSubEvents() )
-            GetScenesAndExternalEventsLinkedTo(events[i]->GetSubEvents(), game, scenes, externalEvents);
+            GetScenesAndExternalEventsLinkedTo(events[i]->GetSubEvents(), project, layouts, externalEvents);
     }
 }

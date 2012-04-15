@@ -988,12 +988,6 @@
 		<Unit filename="TrueOrFalse.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
 		</Unit>
-		<Unit filename="debugMem.cpp">
-			<Option virtualFolder="Log et Memoire\" />
-		</Unit>
-		<Unit filename="debugMem.h">
-			<Option virtualFolder="Log et Memoire\" />
-		</Unit>
 		<Unit filename="gdTreeItemGameData.cpp" />
 		<Unit filename="gdTreeItemGameData.h" />
 		<Unit filename="mp3ogg.cpp">

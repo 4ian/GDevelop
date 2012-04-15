@@ -7,8 +7,8 @@
 #include <wx/panel.h>
 #include <wx/combobox.h>
 //*)
+namespace gd { class ExternalEvents; };
 class Game;
-class ExternalEvents;
 class EventsEditor;
 #include "GDL/Scene.h"
 #include "GDL/IDE/MainEditorCommand.h"
@@ -17,7 +17,7 @@ class ExternalEventsEditor: public wxPanel
 {
 	public:
 
-		ExternalEventsEditor(wxWindow* parent, Game & game_, ExternalEvents & events_, const MainEditorCommand & mainEditorCommand_);
+		ExternalEventsEditor(wxWindow* parent, Game & game_, gd::ExternalEvents & events_, const MainEditorCommand & mainEditorCommand_);
 		virtual ~ExternalEventsEditor();
 
 		//(*Declarations(ExternalEventsEditor)
@@ -28,7 +28,7 @@ class ExternalEventsEditor: public wxPanel
 		wxFlexGridSizer* FlexGridSizer1;
 		//*)
 
-		ExternalEvents & events;
+		gd::ExternalEvents & events;
 		Game & game;
 
         /**

@@ -17,6 +17,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
+namespace gd { class Project; }
 class Game_Develop_EditorFrame;
 class Game;
 class RuntimeGame;
@@ -172,7 +173,7 @@ class ProjectManager: public wxPanel
 		bool GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemGameData *& data);
 
 		void OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event);
-		void EditExtensionsOfGame(Game * game);
+		void EditExtensionsOfGame(gd::Project & project);
 		void CloseGame(Game * game);
 		void OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event);
 		void AddSceneToGame(Game * game, unsigned int position);

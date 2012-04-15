@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef Extensions_H
 #define Extensions_H
 
@@ -14,20 +19,16 @@
 #include <wx/dialog.h>
 //*)
 #include <wx/htmllbox.h>
-#include <boost/shared_ptr.hpp>
-#include <string>
-#include <vector>
+namespace gd { class Project; }
 
-class ExtensionBase;
-class Game;
-
-using namespace std;
-
+/**
+ * \brief Dialog designed for editing the extensions used by a project.
+ */
 class Extensions: public wxDialog
 {
 	public:
 
-		Extensions(wxWindow* parent, Game & game_);
+		Extensions(wxWindow* parent, gd::Project & project_);
 		virtual ~Extensions();
 
 		//(*Declarations(Extensions)
@@ -84,7 +85,7 @@ class Extensions: public wxDialog
 		//*)
 		void UpdateList();
 
-		Game & game;
+		gd::Project & project;
 
 		DECLARE_EVENT_TABLE()
 };

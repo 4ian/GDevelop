@@ -143,6 +143,8 @@ bool Game_Develop_EditorApp::OnInit()
     }
 
     cout << "Game Develop initialization started:" << endl;
+    SetAppName("GDIDE");
+    SetAppDisplayName("Game Develop IDE");
 
     std::vector<std::string> filesToOpen;
     for (unsigned int i = 0;i<parser.GetParamCount();++i)

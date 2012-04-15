@@ -632,7 +632,7 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
                 {
                     if ( answer == wxYES )
                     {
-                        EventsRefactorer::RemoveObjectInEvents(game, *scene, scene->events, objectName);
+                        EventsRefactorer::RemoveObjectInEvents(game, *scene, scene->GetEvents(), objectName);
                         for (unsigned int g = 0;g<scene->objectGroups.size();++g)
                         {
                             if ( scene->objectGroups[g].Find(objectName)) scene->objectGroups[g].RemoveObject(objectName);
@@ -722,7 +722,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
 
     if ( scene ) //Change the object name in the scene.
     {
-        EventsRefactorer::RenameObjectInEvents(game, *scene, scene->events, ancienNom, newName);
+        EventsRefactorer::RenameObjectInEvents(game, *scene, scene->GetEvents(), ancienNom, newName);
         for (unsigned int p = 0;p<scene->initialObjectsPositions.size();++p)
         {
             if ( scene->initialObjectsPositions[p].objectName == ancienNom ) scene->initialObjectsPositions[p].objectName = newName;
@@ -1210,13 +1210,13 @@ void EditorObjectList::CreateSharedDatasIfNecessary(boost::shared_ptr<Automatism
 
     if ( scene == NULL || objects != &scene->initialObjects ) //We're editing global objects : Add automatism data to all scenes.
     {
-        for (unsigned int i = 0;i<game.scenes.size();++i)
+        for (unsigned int i = 0;i<game.GetLayouts().size();++i)
         {
-        	if ( game.scenes[i]->automatismsInitialSharedDatas.find(automatism->GetName()) == game.scenes[i]->automatismsInitialSharedDatas.end() )
+        	if ( game.GetLayouts()[i]->automatismsInitialSharedDatas.find(automatism->GetName()) == game.GetLayouts()[i]->automatismsInitialSharedDatas.end() )
             {
                 boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism->GetTypeName());
                 automatismsSharedDatas->SetName(automatism->GetName());
-                game.scenes[i]->automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
+                game.GetLayouts()[i]->automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
             }
         }
     }

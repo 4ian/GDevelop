@@ -1,8 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "ErrorCompilation.h"
-
-#ifdef DEBUG
-#include "nommgr.h"
-#endif
 
 //(*InternalHeaders(ErrorCompilation)
 #include <wx/bitmap.h>
@@ -45,7 +45,7 @@ ErrorCompilation::ErrorCompilation(wxWindow* parent, string report)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
-	
+
 	Create(parent, wxID_ANY, _("Erreur(s) lors de la compilation"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
@@ -95,7 +95,7 @@ ErrorCompilation::ErrorCompilation(wxWindow* parent, string report)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
-	
+
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ErrorCompilation::OnFermerBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ErrorCompilation::OnAideBtClick);
 	//*)

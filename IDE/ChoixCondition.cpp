@@ -23,6 +23,7 @@
 #include <wx/config.h>
 #include <wx/log.h>
 #include <wx/msgdlg.h>
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
@@ -475,7 +476,7 @@ void ChoixCondition::RefreshObjectConditionsList()
 
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
-    std::string selectedObjectType = GetTypeOfObject(game, scene, selectedObject);
+    std::string selectedObjectType = gd::GetTypeOfObject(game, scene, selectedObject);
 
     //Insert extension objects conditions
 	for (unsigned int i = 0;i<extensions.size();++i)
@@ -534,11 +535,11 @@ void ChoixCondition::RefreshObjectConditionsList()
         }
 
 	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
-	    vector<std::string> objectAutomatisms = GetAutomatismsOfObject(game, scene, selectedObject);
+	    vector<std::string> objectAutomatisms = gd::GetAutomatismsOfObject(game, scene, selectedObject);
 
 	    for(unsigned int j = 0;j<objectAutomatisms.size();++j)
 	    {
-	        std::string automatismType = GetTypeOfAutomatism(game, scene, objectAutomatisms[j]);
+	        std::string automatismType = gd::GetTypeOfAutomatism(game, scene, objectAutomatisms[j]);
 
 	        if ( find(automatismsTypes.begin(), automatismsTypes.end(), automatismType) == automatismsTypes.end() )
                 continue;
@@ -901,14 +902,14 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             if ( ParaEdit.empty() ) return;
 
             string objectWanted = string(ParaEdit[0]->GetValue().mb_str());
-            std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
-            std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
+            std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+            std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
             ObjSPtr object = boost::shared_ptr<Object> ();
 
-            if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
+            if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
                 object = *sceneObject;
-            else if ( globalObject != game.globalObjects.end() ) //Then the global object list
+            else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
                 object = *globalObject;
             else
                 return;

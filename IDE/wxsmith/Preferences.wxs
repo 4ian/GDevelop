@@ -144,6 +144,23 @@
 									<border>5</border>
 									<option>1</option>
 								</object>
+								<object class="sizeritem">
+									<object class="wxStaticBoxSizer" variable="StaticBoxSizer12" member="no">
+										<label>Divers</label>
+										<object class="sizeritem">
+											<object class="wxCheckBox" name="ID_CHECKBOX8" variable="logCheck" member="yes">
+												<label>Activer le suivi du déroulement du logiciel dans un fichier journal</label>
+												<handler function="OnlogCheckClick" entry="EVT_CHECKBOX" />
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
 							</object>
 						</object>
 						<label>Général</label>

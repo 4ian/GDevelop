@@ -14,7 +14,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "GDL/ObjectGroup.h"
+#include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDL/Object.h"
 #include "GDL/Game.h"
 #include "Game_Develop_EditorMain.h"
@@ -64,7 +64,7 @@ BEGIN_EVENT_TABLE(EditorObjetsGroups,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorObjetsGroups::EditorObjetsGroups( wxWindow* parent,  Game & game_, Scene & scene_, vector < ObjectGroup > * objectsGroups_, MainEditorCommand & mainEditorCommand_) :
+EditorObjetsGroups::EditorObjetsGroups( wxWindow* parent,  Game & game_, Scene & scene_, vector < gd::ObjectGroup > * objectsGroups_, MainEditorCommand & mainEditorCommand_) :
 game(game_),
 scene(scene_),
 objectsGroups(objectsGroups_),
@@ -232,7 +232,7 @@ void EditorObjetsGroups::OnMoveUpSelected(wxCommandEvent& event)
         {
             if ( i-1 >= 0)
             {
-                ObjectGroup group = objectsGroups->at(i);
+                gd::ObjectGroup group = objectsGroups->at(i);
                 objectsGroups->erase(objectsGroups->begin()+i);
                 objectsGroups->insert(objectsGroups->begin()+i-1, group);
 
@@ -265,7 +265,7 @@ void EditorObjetsGroups::OnMoveDownSelected(wxCommandEvent& event)
         {
             if ( static_cast<unsigned>(i+1) < objectsGroups->size())
             {
-                ObjectGroup group = objectsGroups->at(i);
+                gd::ObjectGroup group = objectsGroups->at(i);
                 objectsGroups->erase(objectsGroups->begin()+i);
                 objectsGroups->insert(objectsGroups->begin()+i+1, group);
 
@@ -357,9 +357,9 @@ void EditorObjetsGroups::OnTreeCtrl1ItemRightClick(wxTreeEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnEditGroupSelected(wxCommandEvent& event)
 {
-    vector<ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
+    vector<gd::ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
                                                     objectsGroups->end(),
-                                                    std::bind2nd(HasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
+                                                    std::bind2nd(gd::GroupHasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
     if ( i != objectsGroups->end() )
     {
         EditObjectGroup dialog(this, game, scene, *i);
@@ -378,14 +378,14 @@ void EditorObjetsGroups::OnEditGroupSelected(wxCommandEvent& event)
 void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
 {
     //Le nouvel objet
-    ObjectGroup NewGroup;
+    gd::ObjectGroup NewGroup;
     wxTreeItemId rootId = ObjetsGroupsList->GetRootItem();
 
     wxString name =  _( "Nouveau_groupe" );
     int i = 1;
 
     //Tant qu'un objet avec le même nom existe, on ajoute un chiffre
-    while ( std::find_if( objectsGroups->begin(), objectsGroups->end(), std::bind2nd(HasTheSameName(), name))
+    while ( std::find_if( objectsGroups->begin(), objectsGroups->end(), std::bind2nd(gd::GroupHasTheSameName(), name))
             != objectsGroups->end() )
     {
         ++i;
@@ -431,9 +431,9 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
 
         if ( selection[i].IsOk() && ObjetsGroupsList->GetRootItem() != selection[i] )
         {
-            vector<ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
+            vector<gd::ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
                                                             objectsGroups->end(),
-                                                            std::bind2nd(HasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
+                                                            std::bind2nd(gd::GroupHasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
             if ( i != objectsGroups->end() )
                 objectsGroups->erase( i );
 
@@ -478,9 +478,9 @@ void EditorObjetsGroups::OnObjetsGroupsListItemActivated(wxTreeEvent& event)
 
     string nomItemSelected = string(ObjetsGroupsList->GetItemText( event.GetItem() ).mb_str());
 
-    vector<ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
+    vector<gd::ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
                                                     objectsGroups->end(),
-                                                    std::bind2nd(HasTheSameName(), nomItemSelected));
+                                                    std::bind2nd(gd::GroupHasTheSameName(), nomItemSelected));
 
     //Si on a selectionné un groupe
     if ( i != objectsGroups->end() )
@@ -532,7 +532,7 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
     //On vérifie que le nom n'existe pas déjà
     if ( std::find_if(  objectsGroups->begin(),
                         objectsGroups->end(),
-                        std::bind2nd(HasTheSameName(), event.GetLabel()))
+                        std::bind2nd(gd::GroupHasTheSameName(), event.GetLabel()))
         != objectsGroups->end())
     {
         wxLogWarning( _( "Impossible de renommer le groupe : un autre groupe porte déjà ce nom." ) );
@@ -542,9 +542,9 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
     }
     else
     {
-        vector<ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
+        vector<gd::ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
                                                         objectsGroups->end(),
-                                                        std::bind2nd(HasTheSameName(), ancienNom));
+                                                        std::bind2nd(gd::GroupHasTheSameName(), ancienNom));
 
         if ( i != objectsGroups->end() )
         {
@@ -596,9 +596,9 @@ void EditorObjetsGroups::OnCopyGroupSelected(wxCommandEvent& event)
 
     if ( itemSelected == ObjetsGroupsList->GetRootItem() ) return;
 
-    vector<ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
+    vector<gd::ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
                                                     objectsGroups->end(),
-                                                    std::bind2nd(HasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
+                                                    std::bind2nd(gd::GroupHasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
     if ( i == objectsGroups->end() ) return;
 
     clipboard->SetObjectGroup(*i);
@@ -610,9 +610,9 @@ void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
 
     if ( itemSelected == ObjetsGroupsList->GetRootItem() ) return;
 
-    vector<ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
+    vector<gd::ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
                                                     objectsGroups->end(),
-                                                    std::bind2nd(HasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
+                                                    std::bind2nd(gd::GroupHasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
     if ( i == objectsGroups->end() ) return;
 
     clipboard->SetObjectGroup(*i);
@@ -627,13 +627,13 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
 {
     Clipboard * clipboard = Clipboard::GetInstance();
     if ( !clipboard->HasObjectGroup() ) return;
-    ObjectGroup groupPasted = clipboard->GetObjectGroup();
+    gd::ObjectGroup groupPasted = clipboard->GetObjectGroup();
 
     wxTreeItemId rootId = ObjetsGroupsList->GetRootItem();
 
     //Tant qu'un objet avec le même nom existe, on ajoute un chiffre
     unsigned int i = 0;
-    while ( std::find_if( objectsGroups->begin(), objectsGroups->end(), std::bind2nd(HasTheSameName(), groupPasted.GetName()))
+    while ( std::find_if( objectsGroups->begin(), objectsGroups->end(), std::bind2nd(gd::GroupHasTheSameName(), groupPasted.GetName()))
             != objectsGroups->end() )
     {
         ++i;

@@ -336,5 +336,12 @@ void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)
 
 void StartHerePage::OnresourcesLinkClick(wxCommandEvent& event)
 {
-    wxExecute("explorer.exe "+wxGetCwd()+"/Ressources/");
+    #if defined(WINDOWS)
+    wxExecute("explorer.exe \""+wxGetCwd()+"\Ressources\\\"");
+    #elif defined(LINUX)
+    system(string("xdg-open \""+string(wxGetCwd().mb_str())+"/Ressources/\"").c_str());
+    #elif defined(MAC)
+    system(string("open \""+string(wxGetCwd().mb_str())+"/Ressources/\"").c_str());
+    #endif
+
 }

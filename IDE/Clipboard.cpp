@@ -118,13 +118,13 @@ void Clipboard::SetActions( const std::vector<Instruction> & actions )
     instructionsCopied = actions;
 }
 
-void Clipboard::SetObjectGroup( const ObjectGroup & group )
+void Clipboard::SetObjectGroup( const gd::ObjectGroup & group )
 {
     objectGroupCopied = group;
     hasObjectGroup = true;
 }
 
-ObjectGroup Clipboard::GetObjectGroup()
+gd::ObjectGroup Clipboard::GetObjectGroup()
 {
     return objectGroupCopied;
 }

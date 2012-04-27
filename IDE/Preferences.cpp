@@ -24,6 +24,7 @@
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/IDE/ActionSentenceFormatter.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
+#include "LogFileManager.h"
 #include <wx/listctrl.h>
 
 #include <string>
@@ -43,6 +44,7 @@ const long Preferences::ID_CHECKBOX3 = wxNewId();
 const long Preferences::ID_TEXTCTRL1 = wxNewId();
 const long Preferences::ID_STATICTEXT5 = wxNewId();
 const long Preferences::ID_STATICTEXT14 = wxNewId();
+const long Preferences::ID_CHECKBOX8 = wxNewId();
 const long Preferences::ID_PANEL6 = wxNewId();
 const long Preferences::ID_STATICTEXT13 = wxNewId();
 const long Preferences::ID_CHOICE2 = wxNewId();
@@ -125,6 +127,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer4;
     wxFlexGridSizer* FlexGridSizer16;
     wxFlexGridSizer* FlexGridSizer19;
+    wxStaticBoxSizer* StaticBoxSizer12;
     wxFlexGridSizer* FlexGridSizer23;
     wxStaticBoxSizer* StaticBoxSizer15;
     wxStaticBoxSizer* StaticBoxSizer14;
@@ -216,6 +219,11 @@ changesNeedRestart(false)
     FlexGridSizer10->Add(StaticText14, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer4->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer14->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer12 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Divers"));
+    logCheck = new wxCheckBox(Panel2, ID_CHECKBOX8, _("Activer le suivi du déroulement du logiciel dans un fichier journal"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX8"));
+    logCheck->SetValue(false);
+    StaticBoxSizer12->Add(logCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer14->Add(StaticBoxSizer12, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel2->SetSizer(FlexGridSizer14);
     FlexGridSizer14->Fit(Panel2);
     FlexGridSizer14->SetSizeHints(Panel2);
@@ -471,6 +479,7 @@ changesNeedRestart(false)
     FlexGridSizer1->SetSizeHints(this);
     Center();
 
+    Connect(ID_CHECKBOX8,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&Preferences::OnlogCheckClick);
     Connect(ID_CHOICE2,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&Preferences::OnlangChoiceSelect);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseEditionImageClick);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnBrowseDossierTempBtClick);
@@ -735,6 +744,13 @@ changesNeedRestart(false)
         pConfig->Read("/Code/UseExternalEditor", &useExternalEditor, false);
         if ( useExternalEditor ) externalCodeEditorCheck->SetValue(true);
     }
+    {
+        bool useLogFile;
+        pConfig->Read("/Log/Activated", &useLogFile, false);
+        if ( useLogFile ) logCheck->SetValue(true);
+
+        pConfig->Read("/Log/File", &logFile);
+    }
 
 	conditionsColumnWidthEdit->SetValue(ToString(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
 
@@ -866,6 +882,10 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     pConfig->Write("/Code/ExternalEditor", codeEditorEdit->GetValue());
     pConfig->Write("/Code/UseExternalEditor", externalCodeEditorCheck->GetValue());
+
+    pConfig->Write("/Log/Activated", logCheck->GetValue());
+    pConfig->Write("/Log/File", logFile);
+    LogFileManager::GetInstance()->InitalizeFromConfig();
 
 
     TranslateAction * eventsEditorConfig = TranslateAction::GetInstance();
@@ -1382,5 +1402,16 @@ void Preferences::OnfileBtColorPnlLeftUp(wxMouseEvent& event)
         cData = Dialog.GetColourData();
         fileBtColorPnl->SetBackgroundColour( cData.GetColour() );
         fileBtColorPnl->Refresh();
+    }
+}
+
+void Preferences::OnlogCheckClick(wxCommandEvent& event)
+{
+    if ( logCheck->GetValue() )
+    {
+        wxFileDialog dialog( this, _( "Choisissez où enregistrer le fichier de suivi" ), "", "", _("Fichier log (*.txt)|*.txt"), wxFD_SAVE );
+        if ( dialog.ShowModal() == wxCANCEL) return;
+
+        logFile = dialog.GetPath();
     }
 }

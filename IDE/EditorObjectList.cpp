@@ -34,6 +34,7 @@
 #include <algorithm>
 #include <numeric>
 #include "EditorObjetsGroups.h"
+#include "LogFileManager.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/Automatism.h"
 #include "GDL/CommonTools.h"
@@ -402,7 +403,7 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
 
             idForAutomatism.push_back(std::make_pair(id, allObjectAutomatisms[j]));
             wxMenuItem * menuItem = new wxMenuItem(automatismsMenu, id,
-                                                   (*object)->GetAutomatism(allObjectAutomatisms[j])->GetName());
+                                                   (*object)->GetAutomatism(allObjectAutomatisms[j]).GetName());
             automatismsMenu->Insert(0, menuItem);
             Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnAutomatismSelected);
         }
@@ -429,6 +430,14 @@ void EditorObjectList::OnobjectsListSelectionChanged(wxTreeEvent& event)
     OnSetFocus(unusedEvent);
 
     item = event.GetItem();
+
+    if ( item != objectsList->GetRootItem() )
+    {
+        if ( scene != NULL )
+            LogFileManager::GetInstance()->WriteToLogFile(ToString("Object \""+objectsList->GetItemText(item)+"\" selected ( Layout \""+scene->GetName()+"\" )"));
+        else
+            LogFileManager::GetInstance()->WriteToLogFile(ToString("Object \""+objectsList->GetItemText(item)+"\" selected"));
+    }
 }
 
 
@@ -485,7 +494,7 @@ void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
             autoType = idForAutomatism[i].second;
     }
 
-    (*object)->GetAutomatism(autoType)->EditAutomatism(this, game, scene, mainEditorCommand);
+    (*object)->GetAutomatismSPtr(autoType)->EditAutomatism(this, game, scene, mainEditorCommand);
     if ( scene )
         scene->wasModified = true;
 }
@@ -633,9 +642,9 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
                     if ( answer == wxYES )
                     {
                         EventsRefactorer::RemoveObjectInEvents(game, *scene, scene->GetEvents(), objectName);
-                        for (unsigned int g = 0;g<scene->objectGroups.size();++g)
+                        for (unsigned int g = 0;g<scene->GetObjectGroups().size();++g)
                         {
-                            if ( scene->objectGroups[g].Find(objectName)) scene->objectGroups[g].RemoveObject(objectName);
+                            if ( scene->GetObjectGroups()[g].Find(objectName)) scene->GetObjectGroups()[g].RemoveObject(objectName);
                         }
                     }
                     for (unsigned int p = 0;p<scene->initialObjectsPositions.size();++p)
@@ -727,12 +736,12 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         {
             if ( scene->initialObjectsPositions[p].objectName == ancienNom ) scene->initialObjectsPositions[p].objectName = newName;
         }
-        for (unsigned int g = 0;g<scene->objectGroups.size();++g)
+        for (unsigned int g = 0;g<scene->GetObjectGroups().size();++g)
         {
-            if ( scene->objectGroups[g].Find(ancienNom))
+            if ( scene->GetObjectGroups()[g].Find(ancienNom))
             {
-                scene->objectGroups[g].RemoveObject(ancienNom);
-                scene->objectGroups[g].AddObject(newName);
+                scene->GetObjectGroups()[g].RemoveObject(ancienNom);
+                scene->GetObjectGroups()[g].AddObject(newName);
             }
         }
 
@@ -901,7 +910,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     //Add object's automatism's shared datas to scene if necessary
     vector <std::string> automatisms = object->GetAllAutomatismNames();
     for (unsigned int j = 0;j<automatisms.size();++j)
-        CreateSharedDatasIfNecessary(object->GetAutomatism(automatisms[j]));
+        CreateSharedDatasIfNecessary(object->GetAutomatismSPtr(automatisms[j]));
 
     if ( scene )
     {
@@ -1086,7 +1095,7 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
 
         //Add automatism to object
         automatism->SetName(infos.defaultName);
-        for (unsigned int j = 0;(*object)->HasAutomatism(automatism->GetName());++j)
+        for (unsigned int j = 0;(*object)->HasAutomatismNamed(automatism->GetName());++j)
             automatism->SetName(infos.defaultName+ToString(j));
 
         (*object)->AddAutomatism(automatism);
@@ -1118,7 +1127,7 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
     //Fill array
     vector <std::string> automatisms = (*object)->GetAllAutomatismNames();
     for (unsigned int i = 0;i<automatisms.size();++i)
-        automatismsStr.Add((*object)->GetAutomatism(automatisms[i])->GetName());
+        automatismsStr.Add((*object)->GetAutomatism(automatisms[i]).GetName());
 
     int selection = wxGetSingleChoiceIndex(_("Choisissez l'automatisme à supprimer"), _("Choisir l'automatisme à supprimer"), automatismsStr);
     if ( selection == -1 ) return;
@@ -1154,12 +1163,12 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
     //Fill array
     vector <std::string> automatisms = (*object)->GetAllAutomatismNames();
     for (unsigned int i = 0;i<automatisms.size();++i)
-        automatismsStr.Add((*object)->GetAutomatism(automatisms[i])->GetName());
+        automatismsStr.Add((*object)->GetAutomatism(automatisms[i]).GetName());
 
     int selection = wxGetSingleChoiceIndex(_("Choisissez l'automatisme à renommer"), _("Choisir l'automatisme à renommer"), automatismsStr);
     if ( selection == -1 ) return;
 
-    boost::shared_ptr<Automatism> automatism = (*object)->GetAutomatism(automatisms[selection]);
+    boost::shared_ptr<Automatism> automatism = (*object)->GetAutomatismSPtr(automatisms[selection]);
 
     std::string newName = string(wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism->GetName()).mb_str());
     if ( newName == automatism->GetName() || newName.empty() ) return;
@@ -1186,14 +1195,14 @@ void EditorObjectList::RemoveSharedDatasIfNecessary(std::string name)
     if ( scene != NULL && scene->automatismsInitialSharedDatas.find(name) != scene->automatismsInitialSharedDatas.end() )
     {
         //Check no object use this automatism anymore
-        for (unsigned int i = 0;i<scene->initialObjects.size();++i)
+        for (unsigned int i = 0;i<scene->GetInitialObjects().size();++i)
         {
-        	if (scene->initialObjects[i]->HasAutomatism(name))
+        	if (scene->GetInitialObjects()[i]->HasAutomatismNamed(name))
                 return;
         }
-        for (unsigned int i = 0;i<game.globalObjects.size();++i)
+        for (unsigned int i = 0;i<game.GetGlobalObjects().size();++i)
         {
-        	if (game.globalObjects[i]->HasAutomatism(name))
+        	if (game.GetGlobalObjects()[i]->HasAutomatismNamed(name))
                 return;
         }
 
@@ -1208,7 +1217,7 @@ void EditorObjectList::CreateSharedDatasIfNecessary(boost::shared_ptr<Automatism
 {
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
-    if ( scene == NULL || objects != &scene->initialObjects ) //We're editing global objects : Add automatism data to all scenes.
+    if ( scene == NULL || objects != &scene->GetInitialObjects() ) //We're editing global objects : Add automatism data to all scenes.
     {
         for (unsigned int i = 0;i<game.GetLayouts().size();++i)
         {

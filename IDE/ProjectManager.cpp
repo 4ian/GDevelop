@@ -18,6 +18,7 @@
 #include <wx/imaglist.h>
 #include <wx/busyinfo.h>
 #include <fstream>
+#include "LogFileManager.h"
 #include "Clipboard.h"
 #include "Game_Develop_EditorMain.h"
 #include "gdTreeItemGameData.h"
@@ -637,6 +638,9 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
             return;
         }
     }
+
+    //Save the event to log file
+    LogFileManager::GetInstance()->WriteToLogFile("Opened layout "+layout.GetName());
 
     //Open a new editor if necessary
     string prefix = "";

@@ -63,13 +63,13 @@ mainEditorCommand(mainEditorCommand_)
     Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
     Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(128,168), 0, _T("ID_NOTEBOOK1"));
     sceneNotebook = new wxNotebook(Notebook1, ID_NOTEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK2"));
-    sceneObjectsEditor = new EditorObjectList(sceneNotebook, game, &scene.initialObjects, mainEditorCommand, &scene);
-    ObjetsGroups = new EditorObjetsGroups(sceneNotebook, game, scene, &scene.objectGroups, mainEditorCommand);
+    sceneObjectsEditor = new EditorObjectList(sceneNotebook, game, &scene.GetInitialObjects(), mainEditorCommand, &scene);
+    ObjetsGroups = new EditorObjetsGroups(sceneNotebook, game, scene, &scene.GetObjectGroups(), mainEditorCommand);
     sceneNotebook->AddPage(sceneObjectsEditor, _("Objets"), false);
     sceneNotebook->AddPage(ObjetsGroups, _("Groupes d\'objets"), false);
     globalNotebook = new wxNotebook(Notebook1, ID_NOTEBOOK3, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK3"));
-    globalObjectsEditor = new EditorObjectList(globalNotebook, game, &game.globalObjects, mainEditorCommand, &scene);
-    globalObjectsGroups = new EditorObjetsGroups(globalNotebook, game, scene, &game.objectGroups, mainEditorCommand);
+    globalObjectsEditor = new EditorObjectList(globalNotebook, game, &game.GetGlobalObjects(), mainEditorCommand, &scene);
+    globalObjectsGroups = new EditorObjetsGroups(globalNotebook, game, scene, &game.GetObjectGroups(), mainEditorCommand);
     globalNotebook->AddPage(globalObjectsEditor, _("Objets globaux"), false);
     globalNotebook->AddPage(globalObjectsGroups, _("Groupes globaux"), false);
     Notebook1->AddPage(sceneNotebook, _("Scène"), false);

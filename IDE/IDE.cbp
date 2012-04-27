@@ -875,6 +875,8 @@
 		<Unit filename="InitialPositionBrowserDlg.h" />
 		<Unit filename="InitialVariablesDialog.cpp" />
 		<Unit filename="InitialVariablesDialog.h" />
+		<Unit filename="LogFileManager.cpp" />
+		<Unit filename="LogFileManager.h" />
 		<Unit filename="MAJ.cpp">
 			<Option virtualFolder="Editeur principal\Aide\" />
 		</Unit>

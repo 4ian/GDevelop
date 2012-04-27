@@ -140,8 +140,8 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     //Add layouts resources
     for ( unsigned int s = 0;s < game.GetLayoutCount();s++ )
     {
-        for (unsigned int j = 0;j<game.GetLayouts()[s]->initialObjects.size();++j) //Add objects resources
-        	game.GetLayouts()[s]->initialObjects[j]->ExposeResources(resourcesMergingHelper);
+        for (unsigned int j = 0;j<game.GetLayouts()[s]->GetInitialObjects().size();++j) //Add objects resources
+        	game.GetLayouts()[s]->GetInitialObjects()[j]->ExposeResources(resourcesMergingHelper);
 
         LaunchResourceWorkerOnEvents(game, game.GetLayout(s).GetEvents(), resourcesMergingHelper);
         AvancementGauge->SetValue(s/game.GetLayoutCount()*16.0f+33.0f);
@@ -153,8 +153,8 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     }
     wxSafeYield();
     //Add global objects resources
-    for (unsigned int j = 0;j<game.globalObjects.size();++j)
-        game.globalObjects[j]->ExposeResources(resourcesMergingHelper);
+    for (unsigned int j = 0;j<game.GetGlobalObjects().size();++j)
+        game.GetGlobalObjects()[j]->ExposeResources(resourcesMergingHelper);
     wxSafeYield();
 
     //Copy resources

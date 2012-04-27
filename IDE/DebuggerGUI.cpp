@@ -363,16 +363,16 @@ void DebuggerGUI::UpdateGUI()
         mustRecreateTree = false;
 
         //Scene's objects
-        for(unsigned int i = 0;i<scene.initialObjects.size();++i)
+        for(unsigned int i = 0;i<scene.GetInitialObjects().size();++i)
         {
-            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.initialObjects[i]->GetName());
-            initialObjects[scene.initialObjects[i]->GetName()] = objectItem;
+            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.GetInitialObjects()[i]->GetName());
+            initialObjects[scene.GetInitialObjects()[i]->GetName()] = objectItem;
         }
         //Globals objects
-        for(unsigned int i = 0;i<scene.game->globalObjects.size();++i)
+        for(unsigned int i = 0;i<scene.game->GetGlobalObjects().size();++i)
         {
-            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.game->globalObjects[i]->GetName());
-            initialObjects[scene.game->globalObjects[i]->GetName()] = objectItem;
+            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.game->GetGlobalObjects()[i]->GetName());
+            initialObjects[scene.game->GetGlobalObjects()[i]->GetName()] = objectItem;
         }
 
         objectsTree->ExpandAll();
@@ -737,15 +737,15 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     if ( dialog.ShowModal() != 1 ) return;
 
     string objectWanted = dialog.objectChosen;
-    std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
-    std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->globalObjects.begin(), scene.game->globalObjects.end(), std::bind2nd(ObjectHasName(), objectWanted));
+    std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+    std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->GetGlobalObjects().begin(), scene.game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
     ObjSPtr newObject = boost::shared_ptr<Object> ();
 
     //Creation of the object
-    if ( sceneObject != scene.initialObjects.end() )
+    if ( sceneObject != scene.GetInitialObjects().end() )
         newObject = (*sceneObject)->Clone();
-    else if ( globalObject != scene.game->globalObjects.end() )
+    else if ( globalObject != scene.game->GetGlobalObjects().end() )
         newObject = (*globalObject)->Clone();
     else
     {

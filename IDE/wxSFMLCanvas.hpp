@@ -1,4 +1,3 @@
-
 #ifndef WXSFMLCANVAS_HPP
 #define WXSFMLCANVAS_HPP
 
@@ -65,35 +64,18 @@ private :
     ////////////////////////////////////////////////////////////
     void OnEraseBackground(wxEraseEvent&);
 
-
-    ////////////////////////////////////////////////////////////
-    /// Clic sur le control.
-    ////////////////////////////////////////////////////////////
     virtual void OnLeftDown(wxMouseEvent &event);
     virtual void OnLeftUp(wxMouseEvent &event);
     virtual void OnLeftDClick(wxMouseEvent &event);
-
-    ////////////////////////////////////////////////////////////
-    /// Clic droit sur le control.
-    ////////////////////////////////////////////////////////////
     virtual void OnRightDown(wxMouseEvent &event);
     virtual void OnRightUp(wxMouseEvent &event);
     virtual void OnRightDClick(wxMouseEvent &event);
-
     virtual void OnMiddleDown(wxMouseEvent &event);
     virtual void OnMiddleUp(wxMouseEvent &event);
-
-    ////////////////////////////////////////////////////////////
-    /// Mouvement de souris
-    ////////////////////////////////////////////////////////////
+    virtual void OnAnyMouseEvent(wxMouseEvent & event);
     virtual void OnMotion(wxMouseEvent &event);
-
     virtual void OnKey(wxKeyEvent& evt);
     virtual void OnKeyUp(wxKeyEvent& evt);
-
-    ////////////////////////////////////////////////////////////
-    /// Rotation molette
-    ////////////////////////////////////////////////////////////
     virtual void OnMouseWheel(wxMouseEvent& event);
 };
 

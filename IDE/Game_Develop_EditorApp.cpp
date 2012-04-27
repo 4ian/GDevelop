@@ -47,6 +47,7 @@
 #include "BugReport.h"
 #include "CompilationChecker.h"
 #include "Clipboard.h"
+#include "LogFileManager.h"
 #include "ExtensionBugReportDlg.h"
 
 #include "GDL/Game.h"
@@ -368,6 +369,10 @@ bool Game_Develop_EditorApp::OnInit()
     if ( Config->Read( _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true) )
         CodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporaries);
 
+    //Save the event to log file
+    cout << "* Creating log file (if activated)" << endl;
+    LogFileManager::GetInstance()->InitalizeFromConfig();
+    LogFileManager::GetInstance()->WriteToLogFile("Game Develop initialization ended"),
 
     //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();

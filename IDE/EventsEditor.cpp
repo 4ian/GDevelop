@@ -31,6 +31,7 @@
 #include "GDL/ExternalEvents.h"
 #include "EventsRefactorer.h"
 #include "SceneCanvas.h"
+#include "LogFileManager.h"
 #include "ProfileDlg.h"
 #include "SearchEvents.h"
 #include "CreateTemplate.h"
@@ -732,6 +733,19 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
 
         if ( !ctrlKeyDown && !selection.InstructionSelected(item) ) selection.ClearSelection();
         selection.AddInstruction(item);
+
+        //Log file
+        if ( LogFileManager::GetInstance()->IsLogActivated() )
+        {
+            if ( itemsAreas.IsOnEvent(x, y) )
+            {
+                EventItem eventItem = itemsAreas.GetEventAt(x, y);
+                if ( item.isCondition )
+                    LogFileManager::GetInstance()->WriteToLogFile("Condition selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(eventItem.positionInList)+" )");
+                else
+                    LogFileManager::GetInstance()->WriteToLogFile("Action selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(eventItem.positionInList)+" )");
+            }
+        }
     }
     //Un/folding?
     else if ( itemsAreas.IsOnFoldingItem(x, y) )
@@ -751,6 +765,9 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
 
         if ( !ctrlKeyDown && !selection.EventSelected(item) ) selection.ClearSelection();
         selection.AddEvent(item);
+
+        //Log file
+        LogFileManager::GetInstance()->WriteToLogFile("Event selected ( Layout \""+scene.GetName()+"\", Event position in the last list: "+ToString(item.positionInList)+" )");
     }
 }
 

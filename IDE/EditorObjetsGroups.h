@@ -14,7 +14,7 @@
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include "GDL/ObjectGroup.h"
+#include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDL/Object.h"
 #include "GDL/Game.h"
 #include "GDL/IDE/MainEditorCommand.h"
@@ -28,7 +28,7 @@ class EditorObjetsGroups: public wxPanel
 {
 	public:
 
-		EditorObjetsGroups(wxWindow* parent, Game & game_, Scene & scene_, vector < ObjectGroup > * objectsGroups_, MainEditorCommand & mainEditorCommand);
+		EditorObjetsGroups(wxWindow* parent, Game & game_, Scene & scene_, vector < gd::ObjectGroup > * objectsGroups_, MainEditorCommand & mainEditorCommand);
 		virtual ~EditorObjetsGroups();
 
 		//(*Declarations(EditorObjetsGroups)
@@ -116,7 +116,7 @@ class EditorObjetsGroups: public wxPanel
          */
 		Scene & scene;
 
-		vector < ObjectGroup > * objectsGroups;
+		vector < gd::ObjectGroup > * objectsGroups;
 
 		MainEditorCommand & mainEditorCommand;
 

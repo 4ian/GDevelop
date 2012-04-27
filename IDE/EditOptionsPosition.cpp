@@ -258,14 +258,14 @@ scene(scene_)
     //Create the object-specific panel, if it has one.
     wxPanel * returnedPanel = NULL;
 
-    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), position.objectName));
-    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), position.objectName));
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), position.objectName));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), position.objectName));
 
     ObjSPtr object = boost::shared_ptr<Object> ();
 
-    if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
+    if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
         returnedPanel = (*sceneObject)->CreateInitialPositionPanel(this, game, scene, position);
-    else if ( globalObject != game.globalObjects.end() ) //Then the global object list
+    else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
         returnedPanel = (*globalObject)->CreateInitialPositionPanel(this, game, scene, position);
 
     if ( returnedPanel )
@@ -338,12 +338,12 @@ void EditOptionsPosition::OnOkBtClick(wxCommandEvent& event)
 
     position.initialVariables = initialVariables;
 
-    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), position.objectName));
-    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), position.objectName));
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), position.objectName));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), position.objectName));
 
-    if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
+    if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
         (*sceneObject)->UpdateInitialPositionFromPanel(customPanel, position);
-    else if ( globalObject != game.globalObjects.end() ) //Then the global object list
+    else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
         (*globalObject)->UpdateInitialPositionFromPanel(customPanel, position);
 
     EndModal(1);

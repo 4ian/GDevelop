@@ -16,7 +16,7 @@
 #include <wx/toolbar.h>
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
-#include "GDL/ObjectGroup.h"
+#include "GDCore/PlatformDefinition/ObjectGroup.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -29,10 +29,10 @@ class EditObjectGroup: public wxDialog
 {
 	public:
 
-		EditObjectGroup(wxWindow* parent, Game & game_, Scene & scene_, const ObjectGroup & group_);
+		EditObjectGroup(wxWindow* parent, Game & game_, Scene & scene_, const gd::ObjectGroup & group_);
 		virtual ~EditObjectGroup();
 
-		ObjectGroup group;
+		gd::ObjectGroup group;
 
 		//(*Declarations(EditObjectGroup)
 		wxAuiManager* AuiManager1;

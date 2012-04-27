@@ -146,14 +146,14 @@ void SceneEdittimeRenderer::RenderSceneEdittimeRenderer()
     //Affichage de l'objet à insérer en semi transparent
     if ( !objectToAdd.empty() )
     {
-        std::vector<ObjSPtr>::iterator sceneObject = std::find_if(runtimeScene.initialObjects.begin(), runtimeScene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectToAdd));
-        std::vector<ObjSPtr>::iterator globalObject = std::find_if(runtimeScene.game->globalObjects.begin(), runtimeScene.game->globalObjects.end(), std::bind2nd(ObjectHasName(), objectToAdd));
+        std::vector<ObjSPtr>::iterator sceneObject = std::find_if(runtimeScene.GetInitialObjects().begin(), runtimeScene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectToAdd));
+        std::vector<ObjSPtr>::iterator globalObject = std::find_if(runtimeScene.game->GetGlobalObjects().begin(), runtimeScene.game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectToAdd));
 
         ObjSPtr object = boost::shared_ptr<Object> ();
 
-        if ( sceneObject != runtimeScene.initialObjects.end() ) //We check first scene's objects' list.
+        if ( sceneObject != runtimeScene.GetInitialObjects().end() ) //We check first scene's objects' list.
             object = *sceneObject;
-        else if ( globalObject != runtimeScene.game->globalObjects.end() ) //Then the global object list
+        else if ( globalObject != runtimeScene.game->GetGlobalObjects().end() ) //Then the global object list
             object = *globalObject;
 
         if ( object != boost::shared_ptr<Object>() )

@@ -1,18 +1,11 @@
-
-
-////////////////////////////////////////////////////////////
-// Headers
-////////////////////////////////////////////////////////////
 #include "wxSFMLCanvas.hpp"
-
+#include <iostream>
 // Platform-specific includes
 #ifdef __WXGTK__
     #include <gdk/gdkx.h>
     #include <gtk/gtk.h>
     #include <wx/gtk/private/win_gtk.h>
 #endif
-
-#include <iostream>
 
 ////////////////////////////////////////////////////////////
 // Event table
@@ -33,6 +26,7 @@ BEGIN_EVENT_TABLE(wxSFMLCanvas, wxControl)
     EVT_MOUSEWHEEL( wxSFMLCanvas::OnMouseWheel)
     EVT_KEY_DOWN( wxSFMLCanvas::OnKey)
     EVT_KEY_UP( wxSFMLCanvas::OnKeyUp)
+    EVT_MOUSE_EVENTS( wxSFMLCanvas::OnAnyMouseEvent)
 END_EVENT_TABLE()
 
 
@@ -65,15 +59,10 @@ wxControl(Parent, Id, Position, Size, Style)
 
 }
 
-
-////////////////////////////////////////////////////////////
-/// Destructor
-////////////////////////////////////////////////////////////
 wxSFMLCanvas::~wxSFMLCanvas()
 {
     // Nothing to do...
 }
-
 
 ////////////////////////////////////////////////////////////
 /// Notification for the derived class that moment is good
@@ -95,7 +84,6 @@ void wxSFMLCanvas::OnIdle(wxIdleEvent&)
     Refresh();
 }
 
-
 ////////////////////////////////////////////////////////////
 /// Called when the control is repainted - we can display our
 /// SFML window
@@ -107,15 +95,8 @@ void wxSFMLCanvas::OnPaint(wxPaintEvent&)
 
     // Let the derived class do its specific stuff
     OnUpdate();
-
-    // Display on screen
-    /*Display();*/
 }
 
-
-////////////////////////////////////////////////////////////
-/// Called when the control needs to draw its background
-////////////////////////////////////////////////////////////
 void wxSFMLCanvas::OnEraseBackground(wxEraseEvent&)
 {
     // Don't do anything. We intercept this event in order to prevent the
@@ -123,51 +104,24 @@ void wxSFMLCanvas::OnEraseBackground(wxEraseEvent&)
     // which would cause some flickering
 }
 
-
-////////////////////////////////////////////////////////////
-/// Clic sur le control.
-////////////////////////////////////////////////////////////
-void wxSFMLCanvas::OnLeftDown(wxMouseEvent &event){}
-void wxSFMLCanvas::OnLeftUp(wxMouseEvent &event) {}
-void wxSFMLCanvas::OnLeftDClick(wxMouseEvent &event){}
-
-////////////////////////////////////////////////////////////
-/// Mouvement de souris
-////////////////////////////////////////////////////////////
-void wxSFMLCanvas::OnMotion(wxMouseEvent &event){}
-
-void wxSFMLCanvas::OnRightDown(wxMouseEvent &event) {}
-void wxSFMLCanvas::OnRightUp(wxMouseEvent &event) {}
-void wxSFMLCanvas::OnRightDClick(wxMouseEvent &event) {}
-
-void wxSFMLCanvas::OnMiddleDown(wxMouseEvent &event) {}
-void wxSFMLCanvas::OnMiddleUp(wxMouseEvent &event) {}
-
-////////////////////////////////////////////////////////////
-/// Appuie touche pour le control
-////////////////////////////////////////////////////////////
 void wxSFMLCanvas::OnKey(wxKeyEvent& evt)
 {
-    // Don't do anything. We intercept this event in order to prevent the
-    // parent class to draw the background before repainting the window,
-    // which would cause some flickering
     evt.StopPropagation();
 }
 
 void wxSFMLCanvas::OnKeyUp(wxKeyEvent& evt)
 {
-    // Don't do anything. We intercept this event in order to prevent the
-    // parent class to draw the background before repainting the window,
-    // which would cause some flickering
     evt.StopPropagation();
 }
 
-////////////////////////////////////////////////////////////
-/// Rotation molette
-////////////////////////////////////////////////////////////
-void wxSFMLCanvas::OnMouseWheel(wxMouseEvent& event)
-{
-    // Don't do anything. We intercept this event in order to prevent the
-    // parent class to draw the background before repainting the window,
-    // which would cause some flickering
-}
+void wxSFMLCanvas::OnLeftDown(wxMouseEvent &event) {}
+void wxSFMLCanvas::OnLeftUp(wxMouseEvent &event) {}
+void wxSFMLCanvas::OnLeftDClick(wxMouseEvent &event){}
+void wxSFMLCanvas::OnMotion(wxMouseEvent &event){}
+void wxSFMLCanvas::OnRightDown(wxMouseEvent &event) {}
+void wxSFMLCanvas::OnRightUp(wxMouseEvent &event) {}
+void wxSFMLCanvas::OnRightDClick(wxMouseEvent &event) {}
+void wxSFMLCanvas::OnMiddleDown(wxMouseEvent &event) {}
+void wxSFMLCanvas::OnMiddleUp(wxMouseEvent &event) {}
+void wxSFMLCanvas::OnAnyMouseEvent(wxMouseEvent & event) {}
+void wxSFMLCanvas::OnMouseWheel(wxMouseEvent& event) {}

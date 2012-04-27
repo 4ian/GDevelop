@@ -38,6 +38,7 @@
 #endif
 
 #include "Game_Develop_EditorMain.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
@@ -51,6 +52,7 @@
 #include "DnDFileEditor.h"
 #include "ConsoleManager.h"
 #include "ProjectManager.h"
+#include "LogFileManager.h"
 #include "StartHerePage.h"
 #include "BuildToolsPnl.h"
 #include "ExternalEventsEditor.h"
@@ -569,6 +571,7 @@ void Game_Develop_EditorFrame::OnClose( wxCloseEvent& event )
     ConsoleManager * consoleManager = ConsoleManager::GetInstance();
     consoleManager->DestroySingleton();
 
+    LogFileManager::GetInstance()->WriteToLogFile("Game Develop shutting down");
     Destroy();
 }
 
@@ -590,17 +593,26 @@ void Game_Develop_EditorFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
         editorsNotebook->SetWindowStyleFlag(style);
     }
 
-    //Update ribbon for new selected editor
-    EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(event.GetSelection()));
-    ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(editorsNotebook->GetPage(event.GetSelection()));
-    CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection()));
-    ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(editorsNotebook->GetPage(event.GetSelection()));
-
-
-    if ( sceneEditorPtr != NULL ) sceneEditorPtr->ForceRefreshRibbonAndConnect();
-    if ( imagesEditorPtr != NULL ) imagesEditorPtr->ForceRefreshRibbonAndConnect();
-    if ( codeEditorPtr != NULL ) codeEditorPtr->ForceRefreshRibbonAndConnect();
-    if ( externalEventsEditorPtr != NULL ) externalEventsEditorPtr->ForceRefreshRibbonAndConnect();
+    if ( EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(event.GetSelection())) )
+    {
+        sceneEditorPtr->ForceRefreshRibbonAndConnect();
+        LogFileManager::GetInstance()->WriteToLogFile("Switched to the editor of layout \""+sceneEditorPtr->GetLayout().GetName()+"\"");
+    }
+    else if ( ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
+    {
+        imagesEditorPtr->ForceRefreshRibbonAndConnect();
+        LogFileManager::GetInstance()->WriteToLogFile("Switched to resources editor of project \""+imagesEditorPtr->game.GetName()+"\"");
+    }
+    else if ( CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
+    {
+        codeEditorPtr->ForceRefreshRibbonAndConnect();
+        LogFileManager::GetInstance()->WriteToLogFile("Switched to code editor of file \""+codeEditorPtr->filename+"\"");
+    }
+    else if ( ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
+    {
+        externalEventsEditorPtr->ForceRefreshRibbonAndConnect();
+        LogFileManager::GetInstance()->WriteToLogFile("Switched to the editor of external events \""+externalEventsEditorPtr->events.GetName()+"\"");
+    }
 }
 
 void Game_Develop_EditorFrame::LoadSkin(wxRibbonBar * bar)
@@ -822,6 +834,11 @@ void Game_Develop_EditorFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& ev
     {
         if ( !editor->QueryClose() )
             event.Veto();
+    }
+    else if ( EditorScene * editor = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(event.GetSelection())) )
+    {
+        //Save the event to log file
+        LogFileManager::GetInstance()->WriteToLogFile("Closed layout "+editor->GetLayout().GetName());
     }
 }
 

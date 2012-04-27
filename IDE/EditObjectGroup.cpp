@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #include "EditObjectGroup.h"
 
 //(*InternalHeaders(EditObjectGroup)
@@ -12,7 +17,7 @@
 #include <wx/msgdlg.h>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "GDL/ObjectGroup.h"
+#include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/CommonTools.h"
 #ifdef __WXMSW__
@@ -48,7 +53,7 @@ BEGIN_EVENT_TABLE(EditObjectGroup,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditObjectGroup::EditObjectGroup(wxWindow* parent, Game & game_, Scene & scene_, const ObjectGroup & group_) :
+EditObjectGroup::EditObjectGroup(wxWindow* parent, Game & game_, Scene & scene_, const gd::ObjectGroup & group_) :
 group(group_),
 game(game_),
 scene(scene_),

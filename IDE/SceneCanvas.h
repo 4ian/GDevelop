@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef SceneCanvas_H
 #define SceneCanvas_H
 
@@ -149,6 +154,7 @@ private :
     virtual void OnKey( wxKeyEvent& evt );
     virtual void OnKeyUp( wxKeyEvent& evt );
     virtual void OnMotion( wxMouseEvent &event );
+    virtual void OnAnyMouseEvent( wxMouseEvent &event );
     virtual void OnMouseWheel( wxMouseEvent &event );
     void OnPropObjSelected(wxCommandEvent & event);
     void OnDelObjetSelected(wxCommandEvent & event);

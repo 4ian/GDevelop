@@ -184,44 +184,44 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
     }
     if ( objectsCheck->GetValue() )
     {
-        for(unsigned int i = 0;i<secondGame.globalObjects.size();i++)
+        for(unsigned int i = 0;i<secondGame.GetGlobalObjects().size();i++)
         {
             vector< boost::shared_ptr<Object> >::iterator object =
-                find_if(game.globalObjects.begin(), game.globalObjects.end(), bind2nd(ObjectHasName(), secondGame.globalObjects[i]->GetName()));
+                find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), bind2nd(ObjectHasName(), secondGame.GetGlobalObjects()[i]->GetName()));
 
-            if ( object != game.globalObjects.end())
+            if ( object != game.GetGlobalObjects().end())
             {
                 wxString depart = _("Un objet global nommé \"");
                 wxString fin = _("\" est déjà présent dans le jeu. Voulez vous le remplacer ?");
-                if (wxMessageBox(depart+secondGame.globalObjects[i]->GetName()+fin, "Un objet global de ce nom existe déjà",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+secondGame.GetGlobalObjects()[i]->GetName()+fin, "Un objet global de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
-                    *object = secondGame.globalObjects[i]->Clone();
+                    *object = secondGame.GetGlobalObjects()[i]->Clone();
                 }
             }
             else
-                game.globalObjects.push_back(secondGame.globalObjects[i]->Clone());
+                game.GetGlobalObjects().push_back(secondGame.GetGlobalObjects()[i]->Clone());
         }
     }
     if ( groupsCheck->GetValue() )
     {
-        for(unsigned int i = 0;i<secondGame.objectGroups.size();i++)
+        for(unsigned int i = 0;i<secondGame.GetObjectGroups().size();i++)
         {
-            vector< ObjectGroup >::iterator group =
-                find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), secondGame.objectGroups[i].GetName()));
+            vector< gd::ObjectGroup >::iterator group =
+                find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), secondGame.GetObjectGroups()[i].GetName()));
 
-            if ( group != game.objectGroups.end())
+            if ( group != game.GetObjectGroups().end())
             {
                 wxString depart = _("Un groupe global nommé \"");
                 wxString fin = _("\" est déjà présent dans le jeu. Voulez vous le remplacer ?");
-                if (wxMessageBox(depart+secondGame.objectGroups[i].GetName()+fin, "Un groupe global de ce nom existe déjà",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+secondGame.GetObjectGroups()[i].GetName()+fin, "Un groupe global de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
-                    *group = secondGame.objectGroups[i];
+                    *group = secondGame.GetObjectGroups()[i];
                 }
             }
             else
-                game.objectGroups.push_back(secondGame.objectGroups[i]);
+                game.GetObjectGroups().push_back(secondGame.GetObjectGroups()[i]);
         }
     }
     if ( externalEventsCheck->GetValue() )

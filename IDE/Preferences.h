@@ -50,6 +50,7 @@ class Preferences: public wxDialog
 		wxPanel* Panel4;
 		wxChoice* sceneEventsTabPosition;
 		wxStaticText* StaticText14;
+		wxCheckBox* logCheck;
 		wxCheckBox* deleteTemporariesCheck;
 		wxStaticText* StaticText6;
 		wxPanel* activeTabColorPnl;
@@ -119,6 +120,7 @@ class Preferences: public wxDialog
 		static const long ID_TEXTCTRL1;
 		static const long ID_STATICTEXT5;
 		static const long ID_STATICTEXT14;
+		static const long ID_CHECKBOX8;
 		static const long ID_PANEL6;
 		static const long ID_STATICTEXT13;
 		static const long ID_CHOICE2;
@@ -223,12 +225,15 @@ class Preferences: public wxDialog
 		void OninactiveTextColorPnlLeftUp(wxMouseEvent& event);
 		void OnoxygenStyleBtClick(wxCommandEvent& event);
 		void OnfileBtColorPnlLeftUp(wxMouseEvent& event);
+		void OnlogCheckClick(wxCommandEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();
 		void SetSkinAUI();
 		void SetSkinRadiance();
 		void SetSkinOxygen();
+
+		wxString logFile;
 
 		bool changesNeedRestart;
 

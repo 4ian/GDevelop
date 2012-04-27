@@ -10,7 +10,7 @@ namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
-#include "GDL/ObjectGroup.h"
+#include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDL/Object.h"
 
 //Undefining an annoying macro changing GetObject in GetObjectA
@@ -45,8 +45,8 @@ public:
     bool HasAction() { return hasInstructions && !instructionsAreConditions; };
     std::vector<Instruction> GetInstructions() const { return instructionsCopied; };
 
-    void SetObjectGroup( const ObjectGroup & group );
-    ObjectGroup GetObjectGroup();
+    void SetObjectGroup( const gd::ObjectGroup & group );
+    gd::ObjectGroup GetObjectGroup();
     bool HasObjectGroup() { return hasObjectGroup; };
 
     void SetPositionsSelection( std::vector < InitialPosition > positionsSelection_ );
@@ -73,7 +73,7 @@ private:
     gd::Layout * layoutCopied;
     bool hasLayout;
 
-    ObjectGroup objectGroupCopied;
+    gd::ObjectGroup objectGroupCopied;
     bool hasObjectGroup;
 
     std::vector < InitialPosition > positionsSelection;

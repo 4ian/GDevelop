@@ -1028,6 +1028,16 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnLeftUp( wxMouseEvent &event )
 {
+    #if defined(GD_IDE_ONLY) && defined(LINUX)
+    sf::Event myEvent;
+    myEvent.Type = sf::Event::MouseButtonReleased;
+    myEvent.MouseButton.X = event.GetX();
+    myEvent.MouseButton.Y = event.GetY();
+    myEvent.MouseButton.Button = sf::Mouse::Left;
+
+    edittimeRenderer.runtimeScene.GetRenderTargetEvents().push_back(myEvent);
+    #endif
+
     if ( !edittimeRenderer.editing ) return;
 
     //Relachement de la souris :
@@ -1234,6 +1244,30 @@ void SceneCanvas::OnLeftDClick( wxMouseEvent &event )
     OnPropObjSelected(unusedEvent);
 }
 
+void SceneCanvas::OnAnyMouseEvent( wxMouseEvent & event )
+{
+    #if defined(GD_IDE_ONLY) && defined(LINUX)
+    if ( event.GetButton() != wxMOUSE_BTN_NONE )
+    {
+        sf::Event myEvent;
+        if ( event.ButtonDown() )
+            myEvent.Type = sf::Event::MouseButtonPressed;
+        else ( event.ButtonUp() )
+            myEvent.Type = sf::Event::MouseButtonReleased;
+        myEvent.MouseButton.X = event.GetX();
+        myEvent.MouseButton.Y = event.GetY();
+
+        if ( event.GetButton() == wxMOUSE_BTN_LEFT ) myEvent.MouseButton.Button = sf::Mouse::Left;
+        else if ( event.GetButton() == wxMOUSE_BTN_RIGHT ) myEvent.MouseButton.Button = sf::Mouse::Right;
+        else if ( event.GetButton() == wxMOUSE_BTN_MIDDLE ) myEvent.MouseButton.Button = sf::Mouse::Middle;
+        else if ( event.GetButton() == wxMOUSE_BTN_AUX1 ) myEvent.MouseButton.Button = sf::Mouse::XButton1;
+        else if ( event.GetButton() == wxMOUSE_BTN_AUX2 ) myEvent.MouseButton.Button = sf::Mouse::XButton2;
+
+        edittimeRenderer.runtimeScene.GetRenderTargetEvents().push_back(myEvent);
+    }
+    #endif
+}
+
 ////////////////////////////////////////////////////////////
 /// Insertion d'un objet
 ////////////////////////////////////////////////////////////
@@ -1256,14 +1290,14 @@ void SceneCanvas::AddObjetSelected(float x, float y)
 
     if ( edittimeRenderer.objectToAdd.empty() ) { wxLogMessage( _( "Glissez-déposez les objets depuis la liste des objets. Vous pouvez aussi en sélectionner un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils pour pouvoir ensuite l'ajouter par double clic." ) ); return;}
 
-    std::vector<ObjSPtr>::iterator sceneObject = std::find_if(sceneEdited.initialObjects.begin(), sceneEdited.initialObjects.end(), std::bind2nd(ObjectHasName(), edittimeRenderer.objectToAdd));
-    std::vector<ObjSPtr>::iterator globalObject = std::find_if(gameEdited.globalObjects.begin(), gameEdited.globalObjects.end(), std::bind2nd(ObjectHasName(), edittimeRenderer.objectToAdd));
+    std::vector<ObjSPtr>::iterator sceneObject = std::find_if(sceneEdited.GetInitialObjects().begin(), sceneEdited.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), edittimeRenderer.objectToAdd));
+    std::vector<ObjSPtr>::iterator globalObject = std::find_if(gameEdited.GetGlobalObjects().begin(), gameEdited.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), edittimeRenderer.objectToAdd));
 
     ObjSPtr newObject = boost::shared_ptr<Object> ();
 
-    if ( sceneObject != sceneEdited.initialObjects.end() ) //We check first scene's objects' list.
+    if ( sceneObject != sceneEdited.GetInitialObjects().end() ) //We check first scene's objects' list.
         newObject = (*sceneObject)->Clone();
-    else if ( globalObject != gameEdited.globalObjects.end() ) //Then the global object list
+    else if ( globalObject != gameEdited.GetGlobalObjects().end() ) //Then the global object list
         newObject = (*globalObject)->Clone();
 
     if ( newObject == boost::shared_ptr<Object> () )
@@ -1312,6 +1346,16 @@ void SceneCanvas::AddObjetSelected(float x, float y)
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnRightUp( wxMouseEvent &event )
 {
+    #if defined(GD_IDE_ONLY) && defined(LINUX)
+    sf::Event myEvent;
+    myEvent.Type = sf::Event::MouseButtonReleased;
+    myEvent.MouseButton.X = event.GetX();
+    myEvent.MouseButton.Y = event.GetY();
+    myEvent.MouseButton.Button = sf::Mouse::Right;
+
+    edittimeRenderer.runtimeScene.GetRenderTargetEvents().push_back(myEvent);
+    #endif
+
     if ( !edittimeRenderer.editing )
         return;
 

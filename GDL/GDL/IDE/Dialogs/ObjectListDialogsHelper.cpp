@@ -20,12 +20,12 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     sceneObjectsList->DeleteAllItems();
     sceneObjectsList->AddRoot( _( "Tous les objets de la scène" ) );
 
-    for ( unsigned int i = 0;i < scene.initialObjects.size();i++ )
+    for ( unsigned int i = 0;i < scene.GetInitialObjects().size();i++ )
     {
-        std::string name = scene.initialObjects[i]->GetName();
+        std::string name = scene.GetInitialObjects()[i]->GetName();
 
         //Only add the object if it has the correct type
-        if (( objectTypeAllowed.empty() || scene.initialObjects[i]->GetType() == objectTypeAllowed ) &&
+        if (( objectTypeAllowed.empty() || scene.GetInitialObjects()[i]->GetType() == objectTypeAllowed ) &&
             ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
         {
             sceneObjectsList->AppendItem( sceneObjectsList->GetRootItem(), name );
@@ -37,12 +37,12 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     sceneGroupsList->DeleteAllItems();
     sceneGroupsList->AddRoot( _( "Tous les groupes de la scène" ) );
 
-    for ( unsigned int i = 0;i < scene.objectGroups.size();i++ )
+    for ( unsigned int i = 0;i < scene.GetObjectGroups().size();i++ )
     {
-        std::string name = scene.objectGroups.at( i ).GetName();
+        std::string name = scene.GetObjectGroups().at( i ).GetName();
 
         //Only add the group if it has all objects of the correct type
-        if (( objectTypeAllowed.empty() || GetTypeOfObject(game, scene, scene.objectGroups.at( i ).GetName()) == objectTypeAllowed ) &&
+        if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(game, scene, scene.GetObjectGroups().at( i ).GetName()) == objectTypeAllowed ) &&
             ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
         {
             sceneGroupsList->AppendItem( sceneGroupsList->GetRootItem(), name );
@@ -54,12 +54,12 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     globalObjectsList->DeleteAllItems();
     globalObjectsList->AddRoot( _( "Tous les objets globaux" ) );
 
-    for ( unsigned int i = 0;i < game.globalObjects.size();i++ )
+    for ( unsigned int i = 0;i < game.GetGlobalObjects().size();i++ )
     {
-        std::string name = game.globalObjects[i]->GetName();
+        std::string name = game.GetGlobalObjects()[i]->GetName();
 
         //Only add the object if it has the correct type
-        if ((objectTypeAllowed.empty() || game.globalObjects[i]->GetType() == objectTypeAllowed ) &&
+        if ((objectTypeAllowed.empty() || game.GetGlobalObjects()[i]->GetType() == objectTypeAllowed ) &&
             ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
         {
             globalObjectsList->AppendItem( globalObjectsList->GetRootItem(), name );
@@ -71,12 +71,12 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     globalGroupsList->DeleteAllItems();
     globalGroupsList->AddRoot( _( "Tous les groupes globaux" ) );
 
-    for ( unsigned int i = 0;i < game.objectGroups.size();i++ )
+    for ( unsigned int i = 0;i < game.GetObjectGroups().size();i++ )
     {
-        std::string name = game.objectGroups.at( i ).GetName();
+        std::string name = game.GetObjectGroups().at( i ).GetName();
 
         //Only add the group if it has all objects of the correct type
-        if (( objectTypeAllowed.empty() || GetTypeOfObject(game, scene, game.objectGroups.at( i ).GetName()) == objectTypeAllowed ) &&
+        if (( objectTypeAllowed.empty() || gd::GetTypeOfObject(game, scene, game.GetObjectGroups().at( i ).GetName()) == objectTypeAllowed ) &&
             ( !searching || (searching && boost::to_upper_copy(name).find(boost::to_upper_copy(searchText)) != std::string::npos)))
         {
             globalGroupsList->AppendItem( globalGroupsList->GetRootItem(), name );

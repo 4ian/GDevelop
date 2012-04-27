@@ -33,6 +33,7 @@
 #include "GDL/IDE/BaseDebugger.h"
 #include "GDL/BuiltinExtensions/ProfileTools.h"
 #endif
+#undef GetObject //Disable an annoying macro
 
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
@@ -492,9 +493,6 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     codeExecutionEngine = scene.codeExecutionEngine;
     codeExecutionEngine->llvmRuntimeContext->scene = this;
 
-    //Add global object groups
-    copy(game->objectGroups.begin(), game->objectGroups.end(), back_inserter(objectGroups));
-
     //Initialize runtime layers
     sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight() ) );
     for (unsigned int i = 0;i<initialLayers.size();++i)
@@ -504,26 +502,26 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
     //Load resources of initial objects
     MessageLoading( "Loading objects resources", 30 );
-    for (unsigned int i = 0; i < scene.initialObjects.size();++i)
-        scene.initialObjects[i]->LoadResources(*this, *game->imageManager);
+    for (unsigned int i = 0; i < GetInitialObjects().size();++i)
+        GetInitialObjects()[i]->LoadResources(*this, *game->imageManager);
 
     //Load resources of global objects
     //TODO : Make this only one time during game
-    for (unsigned int i = 0; i < game->globalObjects.size();++i)
-        game->globalObjects[i]->LoadResources(*this, *game->imageManager);
+    for (unsigned int i = 0; i < game->GetGlobalObjects().size();++i)
+        game->GetGlobalObjects()[i]->LoadResources(*this, *game->imageManager);
 
     //Create object instances which are originally positioned on scene
     MessageLoading( "Adding objects to their initial position", 66 );
     for(unsigned int i = 0;i < scene.initialObjectsPositions.size();++i)
     {
-        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), scene.initialObjectsPositions[i].objectName));
-        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game->globalObjects.begin(), game->globalObjects.end(), std::bind2nd(ObjectHasName(), scene.initialObjectsPositions[i].objectName));
+        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(GetInitialObjects().begin(), GetInitialObjects().end(), std::bind2nd(ObjectHasName(), scene.initialObjectsPositions[i].objectName));
+        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game->GetGlobalObjects().begin(), game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), scene.initialObjectsPositions[i].objectName));
 
         ObjSPtr newObject = boost::shared_ptr<Object> ();
 
-        if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
+        if ( sceneObject != GetInitialObjects().end() ) //We check first scene's objects' list.
             newObject = (*sceneObject)->Clone();
-        else if ( globalObject != game->globalObjects.end() ) //Then the global object list
+        else if ( globalObject != game->GetGlobalObjects().end() ) //Then the global object list
             newObject = (*globalObject)->Clone();
 
         if ( newObject != boost::shared_ptr<Object> () )

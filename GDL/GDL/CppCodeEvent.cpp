@@ -57,13 +57,13 @@ std::string CppCodeEvent::GenerateEventCode(Game & game, Scene & scene, EventsCo
     //Prepare objects list if needed
     if ( passObjectListAsParameter )
     {
-        vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectToPassAsParameter));
-        vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectToPassAsParameter));
+        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPassAsParameter));
+        vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPassAsParameter));
 
         std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
-        if ( globalGroup != game.objectGroups.end() )
+        if ( globalGroup != game.GetObjectGroups().end() )
             realObjects = (*globalGroup).GetAllObjectsNames();
-        else if ( sceneGroup != scene.objectGroups.end() )
+        else if ( sceneGroup != scene.GetObjectGroups().end() )
             realObjects = (*sceneGroup).GetAllObjectsNames();
         else
             realObjects.push_back(objectToPassAsParameter);

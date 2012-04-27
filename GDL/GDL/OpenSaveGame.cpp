@@ -9,6 +9,7 @@
     #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
     #include "GDL/IDE/Dialogs/ProjectUpdateDlg.h"
     #include "PlatformDefinition/Platform.h"
+    #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #else
     #include "GDL/Log.h"
     #include <iostream>
@@ -56,11 +57,12 @@
 
 using namespace std;
 
+#if defined(GD_IDE_ONLY)
+bool OpenSaveGame::updateEventsFromGD1x = false;
+#endif
+
 OpenSaveGame::OpenSaveGame( Game & game_ ) :
 game(game_)
-#if defined(GD_IDE_ONLY)
-,updateEventsFromGD1x(false)
-#endif
 {
 }
 
@@ -125,8 +127,6 @@ void OpenSaveGame::OpenFromString(string text)
 ////////////////////////////////////////////////////////////
 void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
-
     bool notBackwardCompatible = false;
 
     TiXmlHandle hdl( &doc );
@@ -167,6 +167,8 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         }
 
     }
+    else
+        updateEventsFromGD1x = false;
 
     //End of Compatibility code
     #endif
@@ -209,12 +211,14 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     //Global objects
     elem = hdl.FirstChildElement().FirstChildElement( "Objects" ).Element();
     if ( elem )
-        OpenObjects(game.globalObjects, elem);
+        OpenObjects(game.GetGlobalObjects(), elem);
 
+    #if defined(GD_IDE_ONLY)
     //Global object groups
     elem = hdl.FirstChildElement().FirstChildElement( "ObjectGroups" ).Element();
     if ( elem )
-        OpenGroupesObjets(game.objectGroups, elem);
+        OpenGroupesObjets(game.GetObjectGroups(), elem);
+    #endif
 
     //Global variables
     elem = hdl.FirstChildElement().FirstChildElement( "Variables" ).Element();
@@ -231,90 +235,9 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         std::string layoutName = elem->Attribute( "nom" ) != NULL ? elem->Attribute( "nom" ) : "";
 
         //Add a new layout
-        game.InsertNewLayout(layoutName, game.GetLayoutCount());
-        gd::Layout & layout = game.GetLayout(layoutName);
-
-        //And load it
-        if ( elem->Attribute( "r" ) != NULL && elem->Attribute( "v" ) != NULL && elem->Attribute( "b" ) != NULL)
-        { layout.SetBackgroundColor(ToInt(elem->Attribute( "r" )), ToInt(elem->Attribute( "v" )), ToInt(elem->Attribute( "b" ))); }
-        if ( elem->Attribute( "titre" ) != NULL ) { layout.SetWindowDefaultTitle( elem->Attribute( "titre" ) );}
-        else { MSG( "Les informations concernant le titre de la fenêtre de la scene manquent." ); }
-
-        //TODO: GD C++ Platform specific code
-        try
-        {
-            Scene & newScene = dynamic_cast<Scene&>(layout);
-
-            if ( elem->Attribute( "oglFOV" ) != NULL ) { elem->QueryFloatAttribute("oglFOV", &newScene.oglFOV); }
-            if ( elem->Attribute( "oglZNear" ) != NULL ) { elem->QueryFloatAttribute("oglZNear", &newScene.oglZNear); }
-            if ( elem->Attribute( "oglZFar" ) != NULL ) { elem->QueryFloatAttribute("oglZFar", &newScene.oglZFar); }
-            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("standardSortMethod", newScene.standardSortMethod);
-            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("stopSoundsOnStartup", newScene.stopSoundsOnStartup);
-            #if defined(GD_IDE_ONLY)
-            if ( elem->Attribute( "grid" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("grid", newScene.grid); }
-            if ( elem->Attribute( "snap" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("snap", newScene.snap); }
-            if ( elem->Attribute( "windowMask" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("windowMask", newScene.windowMask); }
-            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridWidth", newScene.gridWidth);
-            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridHeight", newScene.gridHeight);
-            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridR", newScene.gridR);
-            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridG", newScene.gridG);
-            GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridB", newScene.gridB);
-            #endif
-
-            if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
-                OpenGroupesObjets(newScene.objectGroups, elem->FirstChildElement( "GroupesObjets" ));
-
-            if ( elem->FirstChildElement( "Objets" ) != NULL )
-                OpenObjects(newScene.initialObjects, elem->FirstChildElement( "Objets" ));
-
-            if ( elem->FirstChildElement( "Positions" ) != NULL )
-                OpenPositions(newScene.initialObjectsPositions, elem->FirstChildElement( "Positions" ));
-
-            if ( elem->FirstChildElement( "Layers" ) != NULL )
-                OpenLayers(newScene.initialLayers, elem->FirstChildElement( "Layers" ));
-
-            #if defined(GD_IDE_ONLY)
-            if ( elem->FirstChildElement( "Events" ) != NULL )
-                OpenEvents(newScene.GetEvents(), elem->FirstChildElement( "Events" ));
-            if ( updateEventsFromGD1x ) AdaptEventsFromGD1x(newScene.GetEvents());
-            #endif
-
-            if ( elem->FirstChildElement( "Variables" ) != NULL )
-                OpenVariablesList(newScene.variables, elem->FirstChildElement( "Variables" ));
-
-            if ( elem->FirstChildElement( "AutomatismsSharedDatas" ) != NULL )
-            {
-                TiXmlElement * elemSharedDatas = elem->FirstChildElement( "AutomatismsSharedDatas" )->FirstChildElement( "AutomatismSharedDatas" );
-                while ( elemSharedDatas != NULL )
-                {
-                    std::string type = elemSharedDatas->Attribute("Type") ? elemSharedDatas->Attribute("Type") : "";
-                    boost::shared_ptr<AutomatismsSharedDatas> sharedDatas = extensionsManager->CreateAutomatismSharedDatas(type);
-
-                    if ( sharedDatas != boost::shared_ptr<AutomatismsSharedDatas>() )
-                    {
-                        sharedDatas->SetName( elemSharedDatas->Attribute("Name") ? elemSharedDatas->Attribute("Name") : "" );
-                        sharedDatas->LoadFromXml(elemSharedDatas);
-                        newScene.automatismsInitialSharedDatas[sharedDatas->GetName()] = sharedDatas;
-                    }
-
-                    elemSharedDatas = elemSharedDatas->NextSiblingElement("AutomatismSharedDatas");
-                }
-            }
-
-            newScene.externalSourcesDependList.clear();
-            const TiXmlElement * dependenciesElem = elem->FirstChildElement( "Dependencies" );
-            if ( dependenciesElem != NULL)
-            {
-                const TiXmlElement * dependencyElem = dependenciesElem->FirstChildElement();
-                while(dependencyElem)
-                {
-                    newScene.externalSourcesDependList.push_back(dependencyElem->Attribute("sourceFile") != NULL ? dependencyElem->Attribute("sourceFile") : "");
-
-                    dependencyElem = dependencyElem->NextSiblingElement();
-                }
-            }
-        }
-        catch (...) { /*Not a GD C++ Platform scene*/ }
+        game.GetLayouts().push_back(boost::shared_ptr<Scene>(new Scene));
+        game.GetLayouts().back()->SetName(layoutName);
+        game.GetLayouts().back()->LoadFromXml(elem);
 
         elem = elem->NextSiblingElement();
     }
@@ -416,9 +339,9 @@ void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
     return;
 }
 
-void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, TiXmlElement * elem)
+void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, const TiXmlElement * elem)
 {
-    TiXmlElement * elemScene = elem->FirstChildElement("Objet");
+    const TiXmlElement * elemScene = elem->FirstChildElement("Objet");
 
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
@@ -445,7 +368,7 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, T
 
             if ( elemScene->FirstChildElement( "Automatism" ) != NULL )
             {
-                TiXmlElement * elemAutomatism = elemScene->FirstChildElement( "Automatism" );
+                const TiXmlElement * elemAutomatism = elemScene->FirstChildElement( "Automatism" );
                 while ( elemAutomatism )
                 {
                     boost::shared_ptr<Automatism> newAutomatism = extensionsManager->CreateAutomatism(elemAutomatism->Attribute("Type") != NULL ? elemAutomatism->Attribute("Type") : "");
@@ -471,19 +394,20 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, T
     }
 }
 
-void OpenSaveGame::OpenGroupesObjets(vector < ObjectGroup > & list, TiXmlElement * elem)
+#if defined(GD_IDE_ONLY)
+void OpenSaveGame::OpenGroupesObjets(vector < gd::ObjectGroup > & list, const TiXmlElement * elem)
 {
-    TiXmlElement * elemScene = elem->FirstChildElement("Groupe");
+    const TiXmlElement * elemScene = elem->FirstChildElement("Groupe");
 
     //Passage en revue des positions initiales
     while ( elemScene )
     {
-        ObjectGroup objectGroup;
+        gd::ObjectGroup objectGroup;
 
         if ( elemScene->Attribute( "nom" ) != NULL ) { objectGroup.SetName(elemScene->Attribute( "nom" ));}
         else { MSG( "Les informations concernant le nom d'un groupe d'objet manquent." ); }
 
-        TiXmlElement * objet = elemScene->FirstChildElement( "Objet" );
+        const TiXmlElement * objet = elemScene->FirstChildElement( "Objet" );
         while ( objet )
         {
             string objetName;
@@ -499,10 +423,11 @@ void OpenSaveGame::OpenGroupesObjets(vector < ObjectGroup > & list, TiXmlElement
         elemScene = elemScene->NextSiblingElement();
     }
 }
+#endif
 
-void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement * rootElem)
+void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, const TiXmlElement * rootElem)
 {
-    TiXmlElement * elem = rootElem->FirstChildElement();
+    const TiXmlElement * elem = rootElem->FirstChildElement();
 
     //Passage en revue des positions initiales
     while ( elem )
@@ -558,7 +483,7 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement
         if ( elem->Attribute( "nom" ) != NULL ) { newPosition.objectName = elem->Attribute( "nom" );}
         else { MSG( "Les informations concernant le nom d'un objet manquent." ); }
 
-        TiXmlElement * floatInfos = elem->FirstChildElement( "floatInfos" );
+        const TiXmlElement * floatInfos = elem->FirstChildElement( "floatInfos" );
         if ( floatInfos ) floatInfos = floatInfos->FirstChildElement("Info");
         while ( floatInfos )
         {
@@ -572,7 +497,7 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, TiXmlElement
             floatInfos = floatInfos->NextSiblingElement();
         }
 
-        TiXmlElement * stringInfos = elem->FirstChildElement( "stringInfos" );
+        const TiXmlElement * stringInfos = elem->FirstChildElement( "stringInfos" );
         if ( stringInfos ) stringInfos = stringInfos->FirstChildElement("Info");
         while ( stringInfos )
         {
@@ -712,10 +637,10 @@ void OpenSaveGame::OpenActions(vector < Instruction > & actions, const TiXmlElem
 }
 #endif
 
-void OpenSaveGame::OpenLayers(vector < Layer > & list, TiXmlElement * elem)
+void OpenSaveGame::OpenLayers(vector < Layer > & list, const TiXmlElement * elem)
 {
     list.clear();
-    TiXmlElement * elemScene = elem->FirstChildElement();
+    const TiXmlElement * elemScene = elem->FirstChildElement();
 
     //Passage en revue des évènements
     while ( elemScene )
@@ -735,7 +660,7 @@ void OpenSaveGame::OpenLayers(vector < Layer > & list, TiXmlElement * elem)
         }
         else { MSG( "Les informations concernant la visibilité manquent." ); }
 
-        TiXmlElement * elemCamera = elemScene->FirstChildElement("Camera");
+        const TiXmlElement * elemCamera = elemScene->FirstChildElement("Camera");
 
         //Compatibility with Game Develop 1.2.8699 and inferior
         if ( !elemCamera ) layer.SetCamerasNumber(1);
@@ -774,10 +699,10 @@ void OpenSaveGame::OpenLayers(vector < Layer > & list, TiXmlElement * elem)
 
 
 #if defined(GD_IDE_ONLY)
-void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem )
+void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, const TiXmlElement * elem )
 {
     list.clear();
-    TiXmlElement * elemScene = elem->FirstChildElement();
+    const TiXmlElement * elemScene = elem->FirstChildElement();
 
     while ( elemScene )
     {
@@ -903,12 +828,14 @@ bool OpenSaveGame::SaveToFile(string file)
     //Global objects
     TiXmlElement * objects = new TiXmlElement( "Objects" );
     root->LinkEndChild( objects );
-    SaveObjects(game.globalObjects, objects);
+    SaveObjects(game.GetGlobalObjects(), objects);
 
+    #if defined(GD_IDE_ONLY)
     //Global object groups
     TiXmlElement * globalObjectGroups = new TiXmlElement( "ObjectGroups" );
     root->LinkEndChild( globalObjectGroups );
-    SaveGroupesObjets(game.objectGroups, globalObjectGroups);
+    SaveGroupesObjets(game.GetObjectGroups(), globalObjectGroups);
+    #endif
 
     //Global variables
     TiXmlElement * variables = new TiXmlElement( "Variables" );
@@ -948,11 +875,11 @@ bool OpenSaveGame::SaveToFile(string file)
 
         TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
         scene->LinkEndChild( grpsobjets );
-        SaveGroupesObjets(game.GetLayouts()[i]->objectGroups, grpsobjets);
+        SaveGroupesObjets(game.GetLayouts()[i]->GetObjectGroups(), grpsobjets);
 
         TiXmlElement * objets = new TiXmlElement( "Objets" );
         scene->LinkEndChild( objets );
-        SaveObjects(game.GetLayouts()[i]->initialObjects, objets);
+        SaveObjects(game.GetLayouts()[i]->GetInitialObjects(), objets);
 
         TiXmlElement * layers = new TiXmlElement( "Layers" );
         scene->LinkEndChild( layers );
@@ -1050,17 +977,17 @@ void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list
         {
             TiXmlElement * automatism = new TiXmlElement( "Automatism" );
             objet->LinkEndChild( automatism );
-            automatism->SetAttribute( "Type", list[j]->GetAutomatism(allAutomatisms[i])->GetTypeName().c_str() );
-            automatism->SetAttribute( "Name", list[j]->GetAutomatism(allAutomatisms[i])->GetName().c_str() );
+            automatism->SetAttribute( "Type", list[j]->GetAutomatism(allAutomatisms[i]).GetTypeName().c_str() );
+            automatism->SetAttribute( "Name", list[j]->GetAutomatism(allAutomatisms[i]).GetName().c_str() );
 
-            list[j]->GetAutomatism(allAutomatisms[i])->SaveToXml(automatism);
+            list[j]->GetAutomatismSPtr(allAutomatisms[i])->SaveToXml(automatism);
         }
 
         list[j]->SaveToXml(objet);
     }
 }
 
-void OpenSaveGame::SaveGroupesObjets(const vector < ObjectGroup > & list, TiXmlElement * grpsobjets)
+void OpenSaveGame::SaveGroupesObjets(const vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets)
 {
     for ( unsigned int j = 0;j < list.size();j++ )
     {
@@ -1322,13 +1249,13 @@ void OpenSaveGame::RecreatePaths(string file)
     //Add scenes resources
     for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
     {
-        for (unsigned int j = 0;j<game.GetLayouts()[i]->initialObjects.size();++j) //Add objects resources
-        	game.GetLayouts()[i]->initialObjects[j]->ExposeResources(resourcesUnmergingHelper);
+        for (unsigned int j = 0;j<game.GetLayouts()[i]->GetInitialObjects().size();++j) //Add objects resources
+        	game.GetLayouts()[i]->GetInitialObjects()[j]->ExposeResources(resourcesUnmergingHelper);
 
         LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), resourcesUnmergingHelper);
     }
-    for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
-        game.globalObjects[j]->ExposeResources(resourcesUnmergingHelper);
+    for (unsigned int j = 0;j<game.GetGlobalObjects().size();++j) //Add global objects resources
+        game.GetGlobalObjects()[j]->ExposeResources(resourcesUnmergingHelper);
 #endif
 }
 

@@ -6,6 +6,7 @@
 #if defined(GD_IDE_ONLY)
 
 #include <utility>
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
@@ -214,12 +215,12 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
         if ( instrInfos.parameters[pNb].type == "object" && instrInfos.parameters[pNb].supplementaryInformation != "" )
         {
             string objectInParameter = condition.GetParameter(pNb).GetPlainString();
-            if (GetTypeOfObject(game, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
+            if (gd::GetTypeOfObject(game, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
             {
                 cout << "Bad object type in a parameter of a condition " << condition.GetType() << endl;
                 cout << "Condition wanted " << instrInfos.parameters[pNb].supplementaryInformation << endl;
                 cout << "Condition wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
-                cout << "Condition has received " << objectInParameter << " of type " << GetTypeOfObject(game, scene, objectInParameter) << endl;
+                cout << "Condition has received " << objectInParameter << " of type " << gd::GetTypeOfObject(game, scene, objectInParameter) << endl;
 
                 condition.SetParameter(pNb, GDExpression(""));
                 condition.SetType("");
@@ -268,16 +269,16 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
 
     //Generate object condition if available
     string objectName = condition.GetParameters().empty() ? "" : condition.GetParameter(0).GetPlainString();
-    string objectType = GetTypeOfObject(game, scene, objectName);
+    string objectType = gd::GetTypeOfObject(game, scene, objectName);
     if ( !objectName.empty() && extensionsManager->HasObjectCondition(objectType, condition.GetType()) && !instrInfos.parameters.empty())
     {
-        vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
-        vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
+        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectName));
+        vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectName));
 
         std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
-        if ( globalGroup != game.objectGroups.end() )
+        if ( globalGroup != game.GetObjectGroups().end() )
             realObjects = (*globalGroup).GetAllObjectsNames();
-        else if ( sceneGroup != scene.objectGroups.end() )
+        else if ( sceneGroup != scene.GetObjectGroups().end() )
             realObjects = (*sceneGroup).GetAllObjectsNames();
         else
             realObjects.push_back(objectName);
@@ -337,16 +338,16 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
     }
 
     //Generate automatism condition if available
-    string automatismType = GetTypeOfAutomatism(game, scene, condition.GetParameters().size() < 2 ? "" : condition.GetParameter(1).GetPlainString());
+    string automatismType = gd::GetTypeOfAutomatism(game, scene, condition.GetParameters().size() < 2 ? "" : condition.GetParameter(1).GetPlainString());
     if (extensionsManager->HasAutomatismCondition(automatismType, condition.GetType()) && instrInfos.parameters.size() >= 2)
     {
-        vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
-        vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
+        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectName));
+        vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectName));
 
         std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
-        if ( globalGroup != game.objectGroups.end() )
+        if ( globalGroup != game.GetObjectGroups().end() )
             realObjects = (*globalGroup).GetAllObjectsNames();
-        else if ( sceneGroup != scene.objectGroups.end() )
+        else if ( sceneGroup != scene.GetObjectGroups().end() )
             realObjects = (*sceneGroup).GetAllObjectsNames();
         else
             realObjects.push_back(objectName);
@@ -367,7 +368,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             string objectFunctionCallNamePart =
             ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
                 "static_cast<"+autoInfo.cppClassName+"*>("+ManObjListName(realObjectName)+"[i]->GetAutomatismRawPointer(\""+condition.GetParameter(1).GetPlainString()+"\"))->"+instrInfos.cppCallingInformation.cppCallingName
-            :   ManObjListName(realObjectName)+"[i]->GetAutomatism(\""+condition.GetParameter(1).GetPlainString()+"\")->"+instrInfos.cppCallingInformation.cppCallingName;
+            :   ManObjListName(realObjectName)+"[i]->GetAutomatismRawPointer(\""+condition.GetParameter(1).GetPlainString()+"\")->"+instrInfos.cppCallingInformation.cppCallingName;
 
             //Create call
             string predicat;
@@ -389,7 +390,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             if ( condition.IsInverted() ) predicat = "!("+predicat+")";
 
             //Verify that object has automatism.
-            vector < string > automatisms = GetAutomatismsOfObject(game, scene, realObjectName);
+            vector < string > automatisms = gd::GetAutomatismsOfObject(game, scene, realObjectName);
             if ( find(automatisms.begin(), automatisms.end(), condition.GetParameter(1).GetPlainString()) == automatisms.end() )
             {
                 cout << "Bad automatism requested" << endl;
@@ -484,11 +485,11 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
         if ( instrInfos.parameters[pNb].type == "object" && instrInfos.parameters[pNb].supplementaryInformation != "" )
         {
             string objectInParameter = action.GetParameter(pNb).GetPlainString();
-            if (GetTypeOfObject(game, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
+            if (gd::GetTypeOfObject(game, scene, objectInParameter) != instrInfos.parameters[pNb].supplementaryInformation )
             {
                 cout << "Bad object type in parameter "+ToString(pNb)+" of an action " << action.GetType() << endl;
                 cout << "Action wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
-                cout << "Action has received " << objectInParameter << " of type " << GetTypeOfObject(game, scene, objectInParameter) << endl;
+                cout << "Action has received " << objectInParameter << " of type " << gd::GetTypeOfObject(game, scene, objectInParameter) << endl;
 
                 action.SetParameter(pNb, GDExpression(""));
                 action.SetType("");
@@ -527,16 +528,16 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
 
     //Call object function if available
     string objectName = action.GetParameters().empty() ? "" : action.GetParameter(0).GetPlainString();
-    string objectType = GetTypeOfObject(game, scene, objectName);
+    string objectType = gd::GetTypeOfObject(game, scene, objectName);
     if ( extensionsManager->HasObjectAction(objectType, action.GetType()) && !instrInfos.parameters.empty())
     {
-        vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
-        vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
+        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectName));
+        vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectName));
 
         std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
-        if ( globalGroup != game.objectGroups.end() )
+        if ( globalGroup != game.GetObjectGroups().end() )
             realObjects = (*globalGroup).GetAllObjectsNames();
-        else if ( sceneGroup != scene.objectGroups.end() )
+        else if ( sceneGroup != scene.GetObjectGroups().end() )
             realObjects = (*sceneGroup).GetAllObjectsNames();
         else
             realObjects.push_back(objectName);
@@ -586,16 +587,16 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
     }
 
     //Affection to an automatism member function if found
-    string automatismType = GetTypeOfAutomatism(game, scene, action.GetParameters().size() < 2 ? "" : action.GetParameter(1).GetPlainString());
+    string automatismType = gd::GetTypeOfAutomatism(game, scene, action.GetParameters().size() < 2 ? "" : action.GetParameter(1).GetPlainString());
     if (extensionsManager->HasAutomatismAction(automatismType, action.GetType()) && instrInfos.parameters.size() >= 2)
     {
-        vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
-        vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectName));
+        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectName));
+        vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectName));
 
         std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
-        if ( globalGroup != game.objectGroups.end() )
+        if ( globalGroup != game.GetObjectGroups().end() )
             realObjects = (*globalGroup).GetAllObjectsNames();
-        else if ( sceneGroup != scene.objectGroups.end() )
+        else if ( sceneGroup != scene.GetObjectGroups().end() )
             realObjects = (*sceneGroup).GetAllObjectsNames();
         else
             realObjects.push_back(objectName);
@@ -639,7 +640,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             }
 
             //Verify that object has automatism.
-            vector < string > automatisms = GetAutomatismsOfObject(game, scene, realObjectName);
+            vector < string > automatisms = gd::GetAutomatismsOfObject(game, scene, realObjectName);
             if ( find(automatisms.begin(), automatisms.end(), action.GetParameter(1).GetPlainString()) == automatisms.end() )
             {
                 cout << "Bad automatism requested" << endl;
@@ -788,13 +789,13 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
             unsigned int i = ToInt(parametersInfo[pNb].supplementaryInformation);
             if ( i < parameters.size() )
             {
-                vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), parameters[i].GetPlainString()));
-                vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), parameters[i].GetPlainString()));
+                vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[i].GetPlainString()));
+                vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[i].GetPlainString()));
 
                 std::vector<std::string> realObjects;
-                if ( globalGroup != game.objectGroups.end() )
+                if ( globalGroup != game.GetObjectGroups().end() )
                     realObjects = (*globalGroup).GetAllObjectsNames();
-                else if ( sceneGroup != scene.objectGroups.end() )
+                else if ( sceneGroup != scene.GetObjectGroups().end() )
                     realObjects = (*sceneGroup).GetAllObjectsNames();
                 else
                     realObjects.push_back(parameters[i].GetPlainString());
@@ -820,13 +821,13 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
             unsigned int i = ToInt(parametersInfo[pNb].supplementaryInformation);
             if ( i < parameters.size() )
             {
-                vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), parameters[i].GetPlainString()));
-                vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), parameters[i].GetPlainString()));
+                vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[i].GetPlainString()));
+                vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[i].GetPlainString()));
 
                 std::vector<std::string> realObjects;
-                if ( globalGroup != game.objectGroups.end() )
+                if ( globalGroup != game.GetObjectGroups().end() )
                     realObjects = (*globalGroup).GetAllObjectsNames();
-                else if ( sceneGroup != scene.objectGroups.end() )
+                else if ( sceneGroup != scene.GetObjectGroups().end() )
                     realObjects = (*sceneGroup).GetAllObjectsNames();
                 else
                     realObjects.push_back(parameters[i].GetPlainString());
@@ -852,13 +853,13 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
             unsigned int i = ToInt(parametersInfo[pNb].supplementaryInformation);
             if ( i < parameters.size() )
             {
-                vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), parameters[i].GetPlainString()));
-                vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), parameters[i].GetPlainString()));
+                vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[i].GetPlainString()));
+                vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[i].GetPlainString()));
 
                 std::vector<std::string> realObjects;
-                if ( globalGroup != game.objectGroups.end() ) //With groups, more than one object list can be needed
+                if ( globalGroup != game.GetObjectGroups().end() ) //With groups, more than one object list can be needed
                     realObjects = (*globalGroup).GetAllObjectsNames();
-                else if ( sceneGroup != scene.objectGroups.end() )
+                else if ( sceneGroup != scene.GetObjectGroups().end() )
                     realObjects = (*sceneGroup).GetAllObjectsNames();
                 else
                     realObjects.push_back(parameters[i].GetPlainString());

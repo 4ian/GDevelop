@@ -14,15 +14,19 @@ class Scene;
 typedef boost::shared_ptr<Object> ObjSPtr;
 class TiXmlElement;
 #if defined(GD_IDE_ONLY)
+#include "GDCore/PlatformDefinition/Automatism.h"
 class wxWindow;
 class Game;
 class MainEditorCommand;
 #endif
 
 /**
- * \brief Automatism are linked to objects and provided automatic behaviours to these latters.
+ * \brief Automatism are linked to objects and provided automatic behaviors to these latter.
  */
 class GD_API Automatism
+#if defined(GD_IDE_ONLY)
+: public gd::Automatism
+#endif
 {
     public:
         Automatism(std::string automatismTypeName);
@@ -30,19 +34,19 @@ class GD_API Automatism
         virtual boost::shared_ptr<Automatism> Clone() { return boost::shared_ptr<Automatism>(new Automatism(*this));}
 
         /**
-         * Change the name identifying the automatism. Change also AutomatismId.
+         * Change the name identifying the automatism.
          */
-        void SetName(std::string name_);
+        virtual void SetName(const std::string & name_);
 
         /**
          * Return the name identifying the automatism
          */
-        std::string GetName() { return name; }
+        virtual const std::string & GetName() const { return name; }
 
         /**
          * Return the name identifying the type of the automatism
          */
-        std::string GetTypeName() { return type; }
+        virtual const std::string & GetTypeName() const { return type; }
 
         /**
          * Set the object owning this automatism

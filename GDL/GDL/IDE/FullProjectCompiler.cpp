@@ -121,8 +121,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
     //Add scenes resources
     for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
     {
-        for (unsigned int j = 0;j<game.GetLayouts()[i]->initialObjects.size();++j) //Add objects resources
-        	game.GetLayouts()[i]->initialObjects[j]->ExposeResources(resourcesMergingHelper);
+        for (unsigned int j = 0;j<game.GetLayouts()[i]->GetInitialObjects().size();++j) //Add objects resources
+        	game.GetLayouts()[i]->GetInitialObjects()[j]->ExposeResources(resourcesMergingHelper);
 
         LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), resourcesMergingHelper);
     }
@@ -132,8 +132,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
         LaunchResourceWorkerOnEvents(game, game.GetExternalEvents(i).GetEvents(), resourcesMergingHelper);
     }
     //Add global objects resources
-    for (unsigned int j = 0;j<game.globalObjects.size();++j) //Add global objects resources
-        game.globalObjects[j]->ExposeResources(resourcesMergingHelper);
+    for (unsigned int j = 0;j<game.GetGlobalObjects().size();++j) //Add global objects resources
+        game.GetGlobalObjects()[j]->ExposeResources(resourcesMergingHelper);
 
     //Compile all scene events to bitcode
     for (unsigned int i = 0;i<game.GetLayoutCount();++i)

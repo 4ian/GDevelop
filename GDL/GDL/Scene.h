@@ -10,7 +10,6 @@
 #include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include "GDL/ObjectGroup.h"
 #include "GDL/Position.h"
 #include "GDL/Layer.h"
 #if defined(GD_IDE_ONLY)
@@ -22,7 +21,9 @@ class CodeExecutionEngine;
 class AutomatismsSharedDatas;
 class BaseProfiler;
 class BaseEvent;
+class TiXmlElement;
 typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
+#undef GetObject //Disable an annoying macro
 
 /**
  * \brief Represents a scene.
@@ -87,18 +88,39 @@ public:
      */
     virtual void SetWindowDefaultTitle(const std::string & title_) {title = title_;};
 
-    #if defined(GD_IDE_ONLY) //Specialization of gd::Layout members
-    virtual void OnEventsModified() { eventsModified = true; };
+    /**
+     * Return a reference to the vector containing the (smart) pointers to the objects.
+     */
+    inline const std::vector < boost::shared_ptr<Object> > & GetInitialObjects() const { return initialObjects; }
 
     /**
-     * Return a reference to the list of events associated to the ExternalEvents class.
+     * Return a reference to the vector containing the (smart) pointers to the objects.
      */
+    inline std::vector < boost::shared_ptr<Object> > & GetInitialObjects() { return initialObjects; }
+
+    virtual void LoadFromXml(const TiXmlElement * element);
+
+    #if defined(GD_IDE_ONLY)
+    /** \name Specialization of gd::Layout members
+     * See gd::Layout documentation for more information about what these members functions should do.
+     */
+    ///@{
     virtual const std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() const { return events; }
-
-    /**
-     * Return a reference to the list of events associated to the ExternalEvents class.
-     */
     virtual std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() { return events; }
+
+    virtual bool HasObjectNamed(const std::string & name) const;
+    virtual gd::Object & GetObject(const std::string & name);
+    virtual const gd::Object & GetObject(const std::string & name) const;
+    virtual gd::Object & GetObject(unsigned int index);
+    virtual const gd::Object & GetObject (unsigned int index) const;
+    virtual unsigned int GetObjectPosition(const std::string & name) const;
+    virtual unsigned int GetObjectsCount() const;
+    virtual void InsertNewObject(std::string & name, unsigned int position);
+    virtual void InsertObject(const gd::Object & theObject, unsigned int position);
+    virtual void RemoveObject(const std::string & name);
+
+    virtual void OnEventsModified() { eventsModified = true; };
+    ///@}
 
     /**
      * Must be called when compilation of events is over and so events are not considered "modified" anymore.
@@ -106,6 +128,8 @@ public:
     virtual void UnsetEventsModified() { eventsModified = false; };
 
     virtual bool EventsModified() { return eventsModified; };
+
+    virtual void SaveToXml(TiXmlElement * element) const;
     #endif
 
     bool standardSortMethod; ///< True to sort objects using standard sort.
@@ -117,8 +141,6 @@ public:
     #if defined(GD_IDE_ONLY)
     BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
     #endif
-    vector < boost::shared_ptr<Object> >    initialObjects; ///< Objects availables.
-    vector < ObjectGroup >                  objectGroups; ///< Objects groups availables.
     vector < InitialPosition >              initialObjectsPositions; ///< List of all objects to be put on the scene at the beginning
     vector < Layer >                        initialLayers; ///< Initial layers
     ListVariable                            variables; ///< Variables list
@@ -142,15 +164,16 @@ public:
 
 private:
 
-    std::string name; ///< Scene name
-    unsigned int backgroundColorR; ///< Background color Red component
-    unsigned int backgroundColorG; ///< Background color Green component
-    unsigned int backgroundColorB; ///< Background color Blue component
-    std::string title; ///< Title displayed in the window
+    std::string                             name; ///< Scene name
+    unsigned int                            backgroundColorR; ///< Background color Red component
+    unsigned int                            backgroundColorG; ///< Background color Green component
+    unsigned int                            backgroundColorB; ///< Background color Blue component
+    std::string                             title; ///< Title displayed in the window
+    vector < boost::shared_ptr<Object> >    initialObjects; ///< Objects available.
 
     #if defined(GD_IDE_ONLY)
     vector < BaseEventSPtr >                events; ///< Scene events
-    bool eventsModified;
+    bool                                    eventsModified;
     #endif
 
     /**
@@ -168,24 +191,5 @@ private:
 struct SceneHasName : public std::binary_function<boost::shared_ptr<Scene>, std::string, bool> {
     bool operator()(const boost::shared_ptr<Scene> & scene, std::string name) const { return scene->GetName() == name; }
 };
-
-/**
- * Get a type from an object/group name
- * @return type of the object/group.
- */
-std::string GD_API GetTypeOfObject(const Game & game, const Scene & scene, std::string objectName, bool searchInGroups = true);
-
-/**
- * Get a type from an automatism name
- * @return type of the automatism.
- */
-std::string GD_API GetTypeOfAutomatism(const Game & game, const Scene & scene, std::string automatismName, bool searchInGroups = true);
-
-/**
- * Get automatisms of an object/group
- * @return vector containing names of automatisms
- */
-vector < std::string > GD_API GetAutomatismsOfObject(const Game & game, const Scene & scene, std::string objectName, bool searchInGroups = true);
-
 
 #endif // SCENE_H

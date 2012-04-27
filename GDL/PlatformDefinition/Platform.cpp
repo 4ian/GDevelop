@@ -1,3 +1,10 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
+#if defined(GD_IDE_ONLY)
+
 #include "Platform.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDL/ExtensionsManager.h"
@@ -37,3 +44,4 @@ extern "C" gd::Platform * GD_API CreateGDPlatform() {
 extern "C" void GD_API DestroyGDPlatform(Platform * p) {
     delete p;
 }
+#endif

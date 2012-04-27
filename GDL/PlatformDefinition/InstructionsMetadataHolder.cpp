@@ -1,3 +1,9 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
+#if defined(GD_IDE_ONLY)
 #include "InstructionsMetadataHolder.h"
 #include "GDL/ExtensionsManager.h"
 
@@ -19,3 +25,5 @@ const InstructionMetadata & InstructionsMetadataHolder::GetConditionMetadata(std
 {
     return GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditionType);
 }
+
+#endif

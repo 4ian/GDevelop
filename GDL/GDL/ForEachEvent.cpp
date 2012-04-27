@@ -31,13 +31,13 @@ std::string ForEachEvent::GenerateEventCode(Game & game, Scene & scene, EventsCo
 {
     std::string outputCode;
 
-    vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), objectsToPick.GetPlainString()));
-    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), objectsToPick.GetPlainString()));
+    vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectsToPick.GetPlainString()));
+    vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectsToPick.GetPlainString()));
 
     std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
-    if ( globalGroup != game.objectGroups.end() )
+    if ( globalGroup != game.GetObjectGroups().end() )
         realObjects = (*globalGroup).GetAllObjectsNames();
-    else if ( sceneGroup != scene.objectGroups.end() )
+    else if ( sceneGroup != scene.GetObjectGroups().end() )
         realObjects = (*sceneGroup).GetAllObjectsNames();
     else
         realObjects.push_back(objectsToPick.GetPlainString());

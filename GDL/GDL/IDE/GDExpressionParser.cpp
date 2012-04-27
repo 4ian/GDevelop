@@ -4,6 +4,7 @@
  */
 #if defined(GD_IDE_ONLY)
 
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDExpressionParser.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
@@ -103,9 +104,7 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
         {
             if ( requestNumber )
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Nombre attendu");
-                #endif
 
                 return false;
             }
@@ -129,18 +128,14 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
             {
                 if ( !parsingNumber )
                 {
-                    #if defined(GD_IDE_ONLY)
                     firstErrorStr = _("Erreur de syntaxe");
-                    #endif
 
                     return false;
                 }
 
                 if ( parsingDecimalNumber )
                 {
-                    #if defined(GD_IDE_ONLY)
                     firstErrorStr = _("Erreur de syntaxe dans la formation d'un nombre.");
-                    #endif
 
                     return false;
                 }
@@ -152,9 +147,7 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
             {
                 if ( parsingScientificNotationNumber )
                 {
-                    #if defined(GD_IDE_ONLY)
                     firstErrorStr = _("Erreur de syntaxe dans la formation d'un nombre.");
-                    #endif
 
                     return false;
                 }
@@ -165,9 +158,7 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
 
             if ( numberWasParsedLast )
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Opérateur manquant devant un nombre");
-                #endif
 
                 return false;
             }
@@ -179,9 +170,7 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
         {
             if ( requestNumber )
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Nombre attendu");
-                #endif
 
                 return false;
             }
@@ -198,9 +187,7 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
 
             if ( !numberWasParsedLast )
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Opérateur en trop avant la parenthèse.");
-                #endif
 
                 return false;
             }
@@ -208,18 +195,14 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
             if (parenthesisLevel>0) parenthesisLevel--;
             else
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Parenthèse fermante en trop");
-                #endif
 
                 return false;
             }
 
             if ( str[parsePos-1] == '(' )
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Parenthèses vides");
-                #endif
 
                 return false;
             }
@@ -229,9 +212,7 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
         {
             if ( requestNumber )
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Nombre attendu");
-                #endif
 
                 return false;
             }
@@ -248,9 +229,7 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
 
             if ( numberWasParsedLast )
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorStr = _("Opérateur manquant devant une paranthèse");
-                #endif
 
                 return false;
             }
@@ -270,9 +249,7 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
             {
                 if ( requestNumber )
                 {
-                    #if defined(GD_IDE_ONLY)
                     firstErrorStr = _("Nombre attendu");
-                    #endif
 
                     return false;
                 }
@@ -289,9 +266,7 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
 
                 if ( str[parsePos] != '-' && str[parsePos] != '+' && !numberWasParsedLast )
                 {
-                    #if defined(GD_IDE_ONLY)
                     firstErrorStr = _("Opérateurs accolés sans nombres entre eux");
-                    #endif
 
                     return false;
                 }
@@ -302,9 +277,7 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
         }
         else
         {
-            #if defined(GD_IDE_ONLY)
             firstErrorStr = _("Erreur de syntaxe");
-            #endif
 
             return false;
         }
@@ -321,27 +294,21 @@ bool GDExpressionParser::ValidSyntax(const std::string & str)
     }
     else if ( requestNumber )
     {
-        #if defined(GD_IDE_ONLY)
         firstErrorStr = _("Nombre attendu");
-        #endif
 
         return false;
     }
 
     if ( parenthesisLevel != 0 )
     {
-        #if defined(GD_IDE_ONLY)
         firstErrorStr = _("Parenthèses mal formées");
-        #endif
 
         return false;
     }
 
     if (!numberWasParsedLast)
     {
-        #if defined(GD_IDE_ONLY)
         firstErrorStr = _("Opérateur seul en fin d'expression");
-        #endif
 
         return false;
     }
@@ -408,10 +375,10 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                 instructionInfos = extensionsManager->GetExpressionMetadata(functionName);
             }
             //Then search in object expression
-            else if ( !nameIsFunction && extensionsManager->HasObjectExpression(GetTypeOfObject(game, scene, objectName), functionName) )
+            else if ( !nameIsFunction && extensionsManager->HasObjectExpression(gd::GetTypeOfObject(game, scene, objectName), functionName) )
             {
                 functionFound = true; objectFunctionFound = true;
-                instructionInfos = extensionsManager->GetObjectExpressionMetadata(GetTypeOfObject(game, scene, objectName), functionName);
+                instructionInfos = extensionsManager->GetObjectExpressionMetadata(gd::GetTypeOfObject(game, scene, objectName), functionName);
             }
             //And in automatisms expressions
             else if ( !nameIsFunction )
@@ -425,15 +392,15 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                     else
                         functionName = "";
 
-                    if ( extensionsManager->HasAutomatismExpression(GetTypeOfAutomatism(game, scene, autoName), functionName) )
+                    if ( extensionsManager->HasAutomatismExpression(gd::GetTypeOfAutomatism(game, scene, autoName), functionName) )
                     {
                         parameters.push_back(GDExpression(autoName));
                         functionFound = true; automatismFunctionFound = true;
 
-                        instructionInfos = extensionsManager->GetAutomatismExpressionMetadata(GetTypeOfAutomatism(game, scene, autoName), functionName);
+                        instructionInfos = extensionsManager->GetAutomatismExpressionMetadata(gd::GetTypeOfAutomatism(game, scene, autoName), functionName);
 
                         //Verify that object has automatism.
-                        vector < std::string > automatisms = GetAutomatismsOfObject(game, scene, objectName);
+                        vector < std::string > automatisms = gd::GetAutomatismsOfObject(game, scene, objectName);
                         if ( find(automatisms.begin(), automatisms.end(), autoName) == automatisms.end() )
                         {
                             cout << "Bad automatism requested" << endl;
@@ -483,23 +450,21 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                     //Testing function call is properly closed
                     if(parametersEnd == expression.length() || expression[parametersEnd] != ')')
                     {
-                        #if defined(GD_IDE_ONLY)
                         firstErrorStr = _("Parenthèses non fermées");
                         firstErrorPos = parametersEnd-1;
-                        #endif
+
                         return false;
                     }
 
                     //Testing the number of parameters
                     if ( parameters.size() > GetMaximalParametersNumber(instructionInfos.parameters) || parameters.size() < GetMinimalParametersNumber(instructionInfos.parameters) )
                     {
-                        #if defined(GD_IDE_ONLY)
                         firstErrorPos = functionNameEnd;
                         firstErrorStr = _("Nombre de paramètre incorrect.");
                         firstErrorStr += " ";
                         firstErrorStr += _("Attendu ( au maximum ) :");
                         firstErrorStr += ToString(GetMaximalParametersNumber(instructionInfos.parameters));
-                        #endif
+
                         return false;
                     }
 
@@ -513,10 +478,9 @@ bool GDExpressionParser::ParseMathExpression(const Game & game, const Scene & sc
                 }
                 else
                 {
-                    #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
                     firstErrorStr = _("Parenthèses des paramètres manquantes");
-                    #endif
+
                     return false;
                 }
 
@@ -578,10 +542,9 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
     if ( firstPointPos == string::npos && firstParPos == string::npos && firstQuotePos == string::npos  )
     {
-        #if defined(GD_IDE_ONLY)
         firstErrorPos = 0;
         firstErrorStr = _("L'expression est invalide ou vide. Entrez un texte ( entouré de guillemets ) ou une fonction.");
-        #endif
+
         return false;
     }
 
@@ -598,10 +561,9 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
             if ( finalQuotePosition == string::npos )
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorPos = firstQuotePos;
                 firstErrorStr = _("Guillemets non fermés.");
-                #endif
+
                 return false;
             }
 
@@ -681,10 +643,9 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
             if ( parametersEnd == expression.length() || expression[parametersEnd] != ')' )
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorPos = parametersEnd-1;
                 firstErrorStr = _("Parenthèses non fermées");
-                #endif
+
                 return false;
             }
 
@@ -705,10 +666,9 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 //Testing the number of parameters
                 if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
                 {
-                    #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
                     firstErrorStr = _("Nombre de paramètres incorrect.");
-                    #endif
+
                     return false;
                 }
 
@@ -723,18 +683,17 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                 callbacks.OnStaticFunction(functionName, parameters, expressionInfo);
             }
             //Then an object member expression
-            else if ( !nameIsFunction && extensionsManager->HasObjectStrExpression(GetTypeOfObject(game, scene, objectName), functionName) )
+            else if ( !nameIsFunction && extensionsManager->HasObjectStrExpression(gd::GetTypeOfObject(game, scene, objectName), functionName) )
             {
                 functionFound = true;
-                const StrExpressionMetadata & expressionInfo = extensionsManager->GetObjectStrExpressionMetadata(GetTypeOfObject(game, scene, nameBefore), functionName);
+                const StrExpressionMetadata & expressionInfo = extensionsManager->GetObjectStrExpressionMetadata(gd::GetTypeOfObject(game, scene, nameBefore), functionName);
 
                 //Testing the number of parameters
                 if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
                 {
-                    #if defined(GD_IDE_ONLY)
                     firstErrorPos = functionNameEnd;
                     firstErrorStr = _("Nombre de paramètres incorrect.");
-                    #endif
+
                     for (unsigned int i = 0;i<parameters.size();++i)
                         cout << "Param:" << parameters[i].GetPlainString() << endl;
 
@@ -763,15 +722,15 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                     else
                         functionName = "";
 
-                    if ( extensionsManager->HasAutomatismStrExpression(GetTypeOfAutomatism(game, scene, autoName), functionName) )
+                    if ( extensionsManager->HasAutomatismStrExpression(gd::GetTypeOfAutomatism(game, scene, autoName), functionName) )
                     {
                         parameters.push_back(GDExpression(autoName));
                         functionFound = true;
 
-                        const StrExpressionMetadata & expressionInfo = extensionsManager->GetAutomatismStrExpressionMetadata(GetTypeOfAutomatism(game, scene, autoName), functionName);
+                        const StrExpressionMetadata & expressionInfo = extensionsManager->GetAutomatismStrExpressionMetadata(gd::GetTypeOfAutomatism(game, scene, autoName), functionName);
 
                         //Verify that object has automatism.
-                        vector < std::string > automatisms = GetAutomatismsOfObject(game, scene, objectName);
+                        vector < std::string > automatisms = gd::GetAutomatismsOfObject(game, scene, objectName);
                         if ( find(automatisms.begin(), automatisms.end(), autoName) == automatisms.end() )
                         {
                             cout << "Bad automatism requested" << endl;
@@ -782,10 +741,9 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
                             //Testing the number of parameters
                             if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
                             {
-                                #if defined(GD_IDE_ONLY)
                                 firstErrorPos = functionNameEnd;
                                 firstErrorStr = _("Nombre de paramètres incorrect.");
-                                #endif
+
                                 return false;
                             }
 
@@ -807,10 +765,9 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
             if ( !functionFound ) //Function was not found
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorPos = nameStart;
                 firstErrorStr = _("Fonction non reconnue.");
-                #endif
+
                 return false;
             }
 
@@ -832,18 +789,16 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
             if (nextTokenPos < firstPlusPos)
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorPos = nextTokenPos;
                 firstErrorStr = _("+ manquant entre deux chaines.");
-                #endif
+
                 return false;
             }
             else if ( expression.find("+", firstPlusPos+1) < nextTokenPos )
             {
-                #if defined(GD_IDE_ONLY)
                 firstErrorPos = firstPlusPos;
                 firstErrorStr = _("Symbole manquant entre deux +.");
-                #endif
+
                 return false;
             }
         }
@@ -851,10 +806,9 @@ bool GDExpressionParser::ParseTextExpression(const Game & game, const Scene & sc
 
     if ( expression.substr(parsePosition, expression.length()).find_first_not_of(" \n") != std::string::npos )
     {
-        #if defined(GD_IDE_ONLY)
         firstErrorPos = parsePosition;
         firstErrorStr = _("Symbole erroné en fin d'expression.");
-        #endif
+
         return false;
     }
 
@@ -870,10 +824,9 @@ bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene
 
         if ( !callbacks.OnSubMathExpression(game, scene, parameter) )
         {
-            #if defined(GD_IDE_ONLY)
             firstErrorStr = callbacks.firstErrorStr;
             firstErrorPos = callbacks.firstErrorPos+positionInExpression;
-            #endif
+
             return false;
         }
     }
@@ -884,10 +837,9 @@ bool GDExpressionParser::PrepareParameter(const Game & game, const Scene & scene
 
         if ( !callbacks.OnSubTextExpression(game, scene, parameter) )
         {
-            #if defined(GD_IDE_ONLY)
             firstErrorStr = callbacks.firstErrorStr;
             firstErrorPos = callbacks.firstErrorPos+positionInExpression;
-            #endif
+
             return false;
         }
     }

@@ -178,7 +178,7 @@ void Object::DoAutomatismsPostEvents(RuntimeScene & scene)
         it->second->StepPostEvents(scene);
 }
 
-std::vector < std::string > Object::GetAllAutomatismNames()
+std::vector < std::string > Object::GetAllAutomatismNames() const
 {
     std::vector < std::string > allNameIdentifiers;
 
@@ -385,12 +385,12 @@ bool Object::TestAngleOfDisplacement(float angle, float tolerance)
 
 void Object::ActivateAutomatism( const std::string & automatismName, bool activate )
 {
-    GetAutomatism(automatismName)->Activate(activate);
+    GetAutomatismSPtr(automatismName)->Activate(activate);
 }
 
 bool Object::AutomatismActivated( const std::string & automatismName )
 {
-    return GetAutomatism(automatismName)->Activated();
+    return GetAutomatismSPtr(automatismName)->Activated();
 }
 
 double Object::GetSqDistanceWithObject( const std::string &, Object * object )
@@ -597,6 +597,17 @@ Automatism* Object::GetAutomatismRawPointer(const std::string & name) const
 {
     return automatisms.find(name)->second.get();
 }
+#if defined(GD_IDE_ONLY)
+gd::Automatism & Object::GetAutomatism(const std::string & name)
+{
+    return *automatisms.find(name)->second;
+}
+
+const gd::Automatism & Object::GetAutomatism(const std::string & name) const
+{
+    return *automatisms.find(name)->second;
+}
+#endif
 
 void DestroyBaseObject(Object * object)
 {

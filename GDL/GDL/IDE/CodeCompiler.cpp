@@ -154,6 +154,9 @@ void CodeCompiler::ProcessTasks()
                 args.push_back((*header).c_str());
 
             //Additional headers
+            args.push_back("-nobuiltininc"); //Disable standard include directories. All includes files are provided by Game Develop to ensure compatibility.
+            args.push_back("-nostdinc");
+            args.push_back("-nostdinc++");
             std::vector<std::string> additionalHeadersArgs;
             for (unsigned int i = 0;i<currentTask.additionalHeaderDirectories.size();++i)
                 additionalHeadersArgs.push_back("-I"+currentTask.additionalHeaderDirectories[i]);
@@ -411,6 +414,7 @@ CodeCompiler::CodeCompiler() :
 
     headersDirectories.insert("-Iinclude/llvm/tools/clang/lib/Headers");
     headersDirectories.insert("-Iinclude/GDL");
+    headersDirectories.insert("-Iinclude/Core");
     headersDirectories.insert("-Iinclude/boost");
     headersDirectories.insert("-Iinclude/SFML/include");
     headersDirectories.insert("-Iinclude/wxwidgets/include");

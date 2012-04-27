@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY)
 
 #ifndef InstructionsMetadataHolder_H
 #define InstructionsMetadataHolder_H
@@ -31,3 +32,5 @@ public:
 };
 
 #endif // InstructionsMetadataHolder_H
+
+#endif

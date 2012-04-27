@@ -3,6 +3,8 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+
 #include "GDL/ObjectGroup.h"
 #include <vector>
 #include <string>
@@ -30,3 +32,5 @@ void ObjectGroup::RemoveObject(string name)
     memberObjects.erase(std::remove(memberObjects.begin(), memberObjects.end(), name), memberObjects.end());
     return;
 }
+
+#endif

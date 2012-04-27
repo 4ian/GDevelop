@@ -501,14 +501,14 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
             ImagesUsedInventorizer inventorizer;
             for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
             {
-                for (unsigned int j = 0;j<game.GetLayouts()[i]->initialObjects.size();++j)
-                    game.GetLayouts()[i]->initialObjects[j]->ExposeResources(inventorizer);
+                for (unsigned int j = 0;j<game.GetLayouts()[i]->GetInitialObjects().size();++j)
+                    game.GetLayouts()[i]->GetInitialObjects()[j]->ExposeResources(inventorizer);
 
                 LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), inventorizer);
             }
             //Search in global objects resources
-            for (unsigned int j = 0;j<game.globalObjects.size();++j)
-                game.globalObjects[j]->ExposeResources(inventorizer);
+            for (unsigned int j = 0;j<game.GetGlobalObjects().size();++j)
+                game.GetGlobalObjects()[j]->ExposeResources(inventorizer);
             //Search in external events
             for ( unsigned int i = 0;i < game.GetExternalEventsCount();i++ )
                 LaunchResourceWorkerOnEvents(game, game.GetExternalEvents(i).GetEvents(), inventorizer);
@@ -771,14 +771,14 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
     ImagesUsedInventorizer inventorizer;
     for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
     {
-        for (unsigned int j = 0;j<game.GetLayouts()[i]->initialObjects.size();++j)
-        	game.GetLayouts()[i]->initialObjects[j]->ExposeResources(inventorizer);
+        for (unsigned int j = 0;j<game.GetLayouts()[i]->GetInitialObjects().size();++j)
+        	game.GetLayouts()[i]->GetInitialObjects()[j]->ExposeResources(inventorizer);
 
         LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), inventorizer);
     }
     //Search in global objects resources
-    for (unsigned int j = 0;j<game.globalObjects.size();++j)
-        game.globalObjects[j]->ExposeResources(inventorizer);
+    for (unsigned int j = 0;j<game.GetGlobalObjects().size();++j)
+        game.GetGlobalObjects()[j]->ExposeResources(inventorizer);
     //Search in external events
     for ( unsigned int i = 0;i < game.GetExternalEventsCount();i++ )
         LaunchResourceWorkerOnEvents(game, game.GetExternalEvents(i).GetEvents(), inventorizer);

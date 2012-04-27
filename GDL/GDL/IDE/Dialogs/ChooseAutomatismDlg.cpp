@@ -8,6 +8,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include "GDCore/PlatformDefinition/Layout.h"
 #include <boost/algorithm/string.hpp>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
@@ -95,14 +96,14 @@ void ChooseAutomatismDlg::RefreshList()
     std::string search = string(searchCtrl->GetValue().mb_str());
     bool searching = search.empty() ? false : true;
 
-	vector <std::string> automatisms = GetAutomatismsOfObject(game, scene, parentObject);
+	vector <std::string> automatisms = gd::GetAutomatismsOfObject(game, scene, parentObject);
 
 	automatismsList->Clear();
 	for (unsigned int i = 0;i<automatisms.size();++i)
 	{
 	    std::string automatismName = automatisms[i];
 
-		if ( (automatismTypeAllowed.empty() || automatismTypeAllowed == GetTypeOfAutomatism(game, scene, automatismName)) &&
+		if ( (automatismTypeAllowed.empty() || automatismTypeAllowed == gd::GetTypeOfAutomatism(game, scene, automatismName)) &&
              (!searching || (searching && boost::to_upper_copy(automatismName).find(boost::to_upper_copy(search)) != std::string::npos) ))
             automatismsList->Append(automatismName);
 	}

@@ -5,6 +5,7 @@
 #if defined(GD_IDE_ONLY)
 
 #include "ExpressionsCodeGeneration.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDL/IDE/GDExpressionParser.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/ExtensionBase.h"
@@ -114,13 +115,13 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     }
 
     //Get object(s) concerned by function call
-    vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), parameters[0].GetPlainString()));
-    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), parameters[0].GetPlainString()));
+    vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[0].GetPlainString()));
+    vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[0].GetPlainString()));
 
     std::vector<std::string> realObjects; //With groups, we may have to generate expression for more than one object list.
-    if ( globalGroup != game.objectGroups.end() )
+    if ( globalGroup != game.GetObjectGroups().end() )
         realObjects = (*globalGroup).GetAllObjectsNames();
-    else if ( sceneGroup != scene.objectGroups.end() )
+    else if ( sceneGroup != scene.GetObjectGroups().end() )
         realObjects = (*sceneGroup).GetAllObjectsNames();
     else
         realObjects.push_back(parameters[0].GetPlainString());
@@ -138,7 +139,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         context.ObjectsListNeeded(realObjects[i]);
 
         //Cast the object if needed
-        string objectType = GetTypeOfObject(game, scene, realObjects[i]);
+        string objectType = gd::GetTypeOfObject(game, scene, realObjects[i]);
         const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
         bool castNeeded = !objInfo.cppClassName.empty();
 
@@ -182,13 +183,13 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     }
 
     //Get object(s) concerned by function call
-    vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), parameters[0].GetPlainString()));
-    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), parameters[0].GetPlainString()));
+    vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[0].GetPlainString()));
+    vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[0].GetPlainString()));
 
     std::vector<std::string> realObjects; //With groups, we may have to generate expression for more than one object list.
-    if ( globalGroup != game.objectGroups.end() )
+    if ( globalGroup != game.GetObjectGroups().end() )
         realObjects = (*globalGroup).GetAllObjectsNames();
-    else if ( sceneGroup != scene.objectGroups.end() )
+    else if ( sceneGroup != scene.GetObjectGroups().end() )
         realObjects = (*sceneGroup).GetAllObjectsNames();
     else
         realObjects.push_back(parameters[0].GetPlainString());
@@ -206,7 +207,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
         context.ObjectsListNeeded(realObjects[i]);
 
         //Cast the object if needed
-        string objectType = GetTypeOfObject(game, scene, realObjects[i]);
+        string objectType = gd::GetTypeOfObject(game, scene, realObjects[i]);
         const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
         bool castNeeded = !objInfo.cppClassName.empty();
 
@@ -250,13 +251,13 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     }
 
     //Get object(s) concerned by function call
-    vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), parameters[0].GetPlainString()));
-    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), parameters[0].GetPlainString()));
+    vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[0].GetPlainString()));
+    vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[0].GetPlainString()));
 
     std::vector<std::string> realObjects; //With groups, we may have to generate expression for more than one object list.
-    if ( globalGroup != game.objectGroups.end() )
+    if ( globalGroup != game.GetObjectGroups().end() )
         realObjects = (*globalGroup).GetAllObjectsNames();
-    else if ( sceneGroup != scene.objectGroups.end() )
+    else if ( sceneGroup != scene.GetObjectGroups().end() )
         realObjects = (*sceneGroup).GetAllObjectsNames();
     else
         realObjects.push_back(parameters[0].GetPlainString());
@@ -274,7 +275,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         context.ObjectsListNeeded(realObjects[i]);
 
         //Cast the object if needed
-        string automatismType = GetTypeOfAutomatism(game, scene, parameters[1].GetPlainString());
+        string automatismType = gd::GetTypeOfAutomatism(game, scene, parameters[1].GetPlainString());
         const AutomatismInfo & autoInfo = GDpriv::ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
         bool castNeeded = !autoInfo.cppClassName.empty();
 
@@ -318,13 +319,13 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     }
 
     //Get object(s) concerned by function call
-    vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), parameters[0].GetPlainString()));
-    vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), parameters[0].GetPlainString()));
+    vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[0].GetPlainString()));
+    vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), parameters[0].GetPlainString()));
 
     std::vector<std::string> realObjects; //With groups, we may have to generate expression for more than one object list.
-    if ( globalGroup != game.objectGroups.end() )
+    if ( globalGroup != game.GetObjectGroups().end() )
         realObjects = (*globalGroup).GetAllObjectsNames();
-    else if ( sceneGroup != scene.objectGroups.end() )
+    else if ( sceneGroup != scene.GetObjectGroups().end() )
         realObjects = (*sceneGroup).GetAllObjectsNames();
     else
         realObjects.push_back(parameters[0].GetPlainString());
@@ -342,7 +343,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
         context.ObjectsListNeeded(realObjects[i]);
 
         //Cast the object if needed
-        string automatismType = GetTypeOfAutomatism(game, scene, parameters[1].GetPlainString());
+        string automatismType = gd::GetTypeOfAutomatism(game, scene, parameters[1].GetPlainString());
         const AutomatismInfo & autoInfo = GDpriv::ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
         bool castNeeded = !autoInfo.cppClassName.empty();
 

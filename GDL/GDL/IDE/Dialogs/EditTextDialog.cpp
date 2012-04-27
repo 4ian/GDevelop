@@ -462,14 +462,14 @@ string EditTextDialog::ShowParameterDialog(const ParameterMetadata & ParameterMe
     }
     else if ( ParameterMetadata.type == "objectvar" )
     {
-        std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), objectNameAssociated));
-        std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), objectNameAssociated));
+        std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectNameAssociated));
+        std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectNameAssociated));
 
         ObjSPtr object = boost::shared_ptr<Object> ();
 
-        if ( sceneObject != scene.initialObjects.end() )
+        if ( sceneObject != scene.GetInitialObjects().end() )
             object = *sceneObject;
-        else if ( globalObject != game.globalObjects.end() )
+        else if ( globalObject != game.GetGlobalObjects().end() )
             object = *globalObject;
         else
             return string(wxGetTextFromUser(ParameterMetadata.description, _("Variable"), "", this).mb_str());

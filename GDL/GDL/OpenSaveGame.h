@@ -42,9 +42,17 @@ public:
     static void SaveConditions(const vector < Instruction > & list, TiXmlElement * elem);
     static void SaveActions(const vector < Instruction > & list, TiXmlElement * elem);
 
+    static void OpenGroupesObjets( vector < gd::ObjectGroup > & list, const TiXmlElement * elem );
+
     //Compatibility code --- with Game Develop 1
     static void AdaptEventsFromGD1x(vector < BaseEventSPtr > & list);
+    static bool updateEventsFromGD1x;
     #endif
+
+    static void OpenObjects(vector < boost::shared_ptr<Object> > & objects, const TiXmlElement * elem);
+    static void OpenPositions( vector < InitialPosition > & list, const TiXmlElement * elem );
+    static void OpenLayers( vector < Layer > & list, const TiXmlElement * elem );
+    static void OpenVariablesList(ListVariable & list, const TiXmlElement * elem);
 
 private:
 
@@ -52,19 +60,14 @@ private:
 
     void OpenDocument(TiXmlDocument & doc);
     void OpenGameInformations( const TiXmlElement * elem );
-    void OpenObjects(vector < boost::shared_ptr<Object> > & objects, TiXmlElement * elem);
-    void OpenPositions( vector < InitialPosition > & list, TiXmlElement * elem );
-    void OpenGroupesObjets( vector < ObjectGroup > & list, TiXmlElement * elem );
-    void OpenLayers( vector < Layer > & list, TiXmlElement * elem );
-    static void OpenVariablesList(ListVariable & list, const TiXmlElement * elem);
 
     #if defined(GD_IDE_ONLY)
-    void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem );
+    void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, const TiXmlElement * elem );
     void OpenImagesFromGD2010498( const TiXmlElement * elem, TiXmlElement * dossierElem );
 
     void SavePositions( const vector < InitialPosition > & list, TiXmlElement * positions );
     void SaveObjects( const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects );
-    void SaveGroupesObjets( const vector < ObjectGroup > & list, TiXmlElement * grpsobjets );
+    void SaveGroupesObjets( const vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets );
     void SaveLayers( const vector < Layer > & list, TiXmlElement * layers );
     void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
     static void SaveVariablesList(const ListVariable & list, TiXmlElement * elem);
@@ -72,7 +75,6 @@ private:
     static void AdaptConditionFromGD1x(Instruction & instruction, const InstructionMetadata & instrInfos);
     static void AdaptActionFromGD1x(Instruction & instruction, const InstructionMetadata & instrInfos);
 
-    bool updateEventsFromGD1x;
     std::string updateText;
     #endif
 };

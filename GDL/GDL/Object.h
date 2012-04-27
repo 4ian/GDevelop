@@ -14,13 +14,8 @@
 #include <boost/enable_shared_from_this.hpp>
 #include "GDL/VariableList.h"
 #include "GDL/ObjectHelpers.h"
-
-namespace sf
-{
-    class RenderTarget;
-    class Shader;
-}
-
+namespace sf {class RenderTarget;}
+namespace sf {class Shader;}
 class RotatedRectangle;
 class RuntimeScene;
 class Object;
@@ -29,6 +24,7 @@ class InitialPosition;
 class TiXmlElement;
 class Automatism;
 #if defined(GD_IDE_ONLY)
+#include "GDCore/PlatformDefinition/Object.h"
 class wxBitmap;
 class wxPanel;
 class Game;
@@ -52,6 +48,9 @@ class ArbitraryResourceWorker;
  * - Finally, objects can expose debugging features: Object::GetPropertyForDebugger, Object::ChangeProperty and Object::GetNumberOfProperties
  */
 class GD_API Object : public boost::enable_shared_from_this<Object>
+#if defined(GD_IDE_ONLY)
+, public gd::Object
+#endif
 {
     public:
 
@@ -230,20 +229,20 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         /** Change name
          */
-        void SetName(const std::string & name_) {name = name_;};
+        virtual void SetName(const std::string & name_) {name = name_;};
 
         /** Get string representing object's name.
          */
-        inline const std::string & GetName() { return name; }
-
-        /** Return the type indentifier of the object.
-         */
-        inline const std::string & GetType() const { return type; }
+        virtual inline const std::string & GetName() const { return name; }
 
         /**
-         * Set the type indentifier of the object.
+         * Set the type of the object.
          */
-        inline void SetType(const std::string & type_) { type = type_; }
+        virtual inline void SetType(const std::string & type_) { type = type_; }
+
+        /** Return the type of the object.
+         */
+        virtual inline const std::string & GetType() const { return type; }
 
         /**
          * Query the Z order of the object
@@ -304,12 +303,12 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Get automatism from name
          */
-        inline boost::shared_ptr<Automatism> & GetAutomatism(const std::string & name) { return automatisms.find(name)->second; }
+        inline boost::shared_ptr<Automatism> & GetAutomatismSPtr(const std::string & name) { return automatisms.find(name)->second; }
 
         /**
          * Get (const) automatism from name
          */
-        inline const boost::shared_ptr<Automatism> & GetAutomatism(const std::string & name) const { return automatisms.find(name)->second; }
+        inline const boost::shared_ptr<Automatism> & GetAutomatismSPtr(const std::string & name) const { return automatisms.find(name)->second; }
 
         /**
          * Only used by GD events generated code
@@ -329,18 +328,30 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
         /**
          * Get all types of automatisms used by the object
          */
-        std::vector < std::string > GetAllAutomatismNames();
+        virtual std::vector < std::string > GetAllAutomatismNames() const;
 
         /**
-         * Test if object has an automaism
+         * Return true if the object has the automatism with the specified name.
          */
-        bool HasAutomatism(const std::string & name) { return automatisms.find(name) != automatisms.end(); };
+        virtual bool HasAutomatismNamed(const std::string & name) const { return automatisms.find(name) != automatisms.end(); };
 
         #if defined(GD_IDE_ONLY)
         /**
+         * Return a reference to the automatism called "name".
+         * \note If you're writing code for Runtime, please use Object::GetAutomatismSPtr or Object::GetAutomatismRawPointer
+         */
+        virtual gd::Automatism & GetAutomatism(const std::string & name);
+
+        /**
+         * Return a reference to the automatism called "name".
+         * \note If you're writing code for Runtime, please use Object::GetAutomatismSPtr or Object::GetAutomatismRawPointer
+         */
+        virtual const gd::Automatism & GetAutomatism(const std::string & name) const;
+
+        /**
          * Remove an automatism
          */
-        void RemoveAutomatism(const std::string & name);
+        virtual void RemoveAutomatism(const std::string & name);
         #endif
 
         /**
@@ -465,7 +476,6 @@ class GD_API Object : public boost::enable_shared_from_this<Object>
 
         std::string name; ///< The full name of the object
         std::string type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )
-
         float X; ///<X position on the scene
         float Y; ///<Y position on the scene
         int zOrder; ///<Z order on the scene, to choose if an object is displayed before another object.

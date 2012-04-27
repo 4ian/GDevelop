@@ -28,8 +28,10 @@ windowHeight(600),
 maxFPS(60),
 minFPS(10),
 verticalSync(false),
-useExternalSourceFiles(false),
-platform(false)
+useExternalSourceFiles(false)
+#if defined(GD_IDE_ONLY)
+,platform(NULL)
+#endif
 {
     #if defined(GD_IDE_ONLY)
     //Game use builtin extensions by default
@@ -59,64 +61,6 @@ platform(false)
 Game::~Game()
 {
 }
-
-void Game::Init(const Game & game)
-{
-    //Some properties
-    name = game.name;
-    windowWidth = game.windowWidth;
-    windowHeight = game.windowHeight;
-    maxFPS = game.maxFPS;
-    minFPS = game.minFPS;
-    verticalSync = game.verticalSync;
-    portable = game.portable;
-
-    #if defined(GD_IDE_ONLY)
-    author = game.author;
-    extensionsUsed = game.GetUsedPlatformExtensions();
-    #endif
-
-    loadingScreen = game.loadingScreen;
-
-    //Resources
-    resourceManager = game.resourceManager;
-
-    globalObjects.clear();
-    for (unsigned int i =0;i<game.globalObjects.size();++i)
-    	globalObjects.push_back( game.globalObjects[i]->Clone() );
-
-    scenes.clear();
-    for (unsigned int i =0;i<game.scenes.size();++i)
-    	scenes.push_back( boost::shared_ptr<Scene>(new Scene(*game.scenes[i])) );
-
-    #if defined(GD_IDE_ONLY)
-    externalEvents.clear();
-    for (unsigned int i =0;i<game.externalEvents.size();++i)
-    	externalEvents.push_back( boost::shared_ptr<ExternalEvents>(new ExternalEvents(*game.externalEvents[i])) );
-    #endif
-
-    useExternalSourceFiles = game.useExternalSourceFiles;
-
-    #if defined(GD_IDE_ONLY)
-    externalSourceFiles.clear();
-    for (unsigned int i =0;i<game.externalSourceFiles.size();++i)
-    	externalSourceFiles.push_back( boost::shared_ptr<GDpriv::SourceFile>(new GDpriv::SourceFile(*game.externalSourceFiles[i])) );
-    #endif
-
-    variables = game.variables;
-    objectGroups = game.objectGroups;
-
-    #if defined(GD_IDE_ONLY)
-    gameFile = game.gameFile;
-    imagesChanged = game.imagesChanged;
-
-    winExecutableFilename = game.winExecutableFilename;
-    winExecutableIconFile = game.winExecutableIconFile;
-    linuxExecutableFilename = game.linuxExecutableFilename;
-    macExecutableFilename = game.macExecutableFilename;
-    #endif
-}
-
 #if defined(GD_IDE_ONLY)
 bool Game::HasLayoutNamed(const std::string & name) const
 {
@@ -249,17 +193,151 @@ void Game::RemoveExternalEvents(const std::string & name)
 
     externalEvents.erase(events);
 }
+
+
+bool Game::HasObjectNamed(const std::string & name) const
+{
+    return ( find_if(GetGlobalObjects().begin(), GetGlobalObjects().end(), bind2nd(ObjectHasName(), name)) != GetGlobalObjects().end() );
+}
+gd::Object & Game::GetObject(const std::string & name)
+{
+    return *(*find_if(GetGlobalObjects().begin(), GetGlobalObjects().end(), bind2nd(ObjectHasName(), name)));
+}
+const gd::Object & Game::GetObject(const std::string & name) const
+{
+    return *(*find_if(GetGlobalObjects().begin(), GetGlobalObjects().end(), bind2nd(ObjectHasName(), name)));
+}
+gd::Object & Game::GetObject(unsigned int index)
+{
+    return *GetGlobalObjects()[index];
+}
+const gd::Object & Game::GetObject (unsigned int index) const
+{
+    return *GetGlobalObjects()[index];
+}
+unsigned int Game::GetObjectPosition(const std::string & name) const
+{
+    for (unsigned int i = 0;i<GetGlobalObjects().size();++i)
+    {
+        if ( GetGlobalObjects()[i]->GetName() == name ) return i;
+    }
+    return std::string::npos;
+}
+unsigned int Game::GetObjectsCount() const
+{
+    return GetGlobalObjects().size();
+}
+
+void Game::InsertNewObject(std::string & name, unsigned int position)
+{
+    boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(new Object(name));
+    if (position<GetGlobalObjects().size())
+        GetGlobalObjects().insert(GetGlobalObjects().begin()+position, newObject);
+    else
+        GetGlobalObjects().push_back(newObject);
+}
+
+void Game::InsertObject(const gd::Object & events, unsigned int position)
+{
+    try
+    {
+        const Object & castedEvents = dynamic_cast<const Object&>(events);
+        boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(new Object(castedEvents));
+        if (position<GetGlobalObjects().size())
+            GetGlobalObjects().insert(GetGlobalObjects().begin()+position, newObject);
+        else
+            GetGlobalObjects().push_back(newObject);
+    }
+    catch(...) { std::cout << "WARNING: Tried to add an object which is not a GD C++ Platform Object to a GD C++ Platform project"; }
+}
+
+void Game::RemoveObject(const std::string & name)
+{
+    std::vector< boost::shared_ptr<Object> >::iterator events = find_if(GetGlobalObjects().begin(), GetGlobalObjects().end(), bind2nd(ObjectHasName(), name));
+    if ( events == GetGlobalObjects().end() ) return;
+
+    GetGlobalObjects().erase(events);
+}
 #endif
 
-Game::Game(const Game & game)
+void Game::Init(const Game & game)
 {
+    //Some properties
+    name = game.name;
+    windowWidth = game.windowWidth;
+    windowHeight = game.windowHeight;
+    maxFPS = game.maxFPS;
+    minFPS = game.minFPS;
+    verticalSync = game.verticalSync;
+    portable = game.portable;
+
+    #if defined(GD_IDE_ONLY)
+    author = game.author;
+    extensionsUsed = game.GetUsedPlatformExtensions();
+    #endif
+
+    loadingScreen = game.loadingScreen;
+
+    //Resources
+    resourceManager = game.resourceManager;
+
+    GetGlobalObjects().clear();
+    for (unsigned int i =0;i<game.GetGlobalObjects().size();++i)
+    	GetGlobalObjects().push_back( game.GetGlobalObjects()[i]->Clone() );
+
+    scenes.clear();
+    for (unsigned int i =0;i<game.scenes.size();++i)
+    	scenes.push_back( boost::shared_ptr<Scene>(new Scene(*game.scenes[i])) );
+
+    #if defined(GD_IDE_ONLY)
+    externalEvents.clear();
+    for (unsigned int i =0;i<game.externalEvents.size();++i)
+    	externalEvents.push_back( boost::shared_ptr<ExternalEvents>(new ExternalEvents(*game.externalEvents[i])) );
+    #endif
+
+    useExternalSourceFiles = game.useExternalSourceFiles;
+
+    #if defined(GD_IDE_ONLY)
+    externalSourceFiles.clear();
+    for (unsigned int i =0;i<game.externalSourceFiles.size();++i)
+    	externalSourceFiles.push_back( boost::shared_ptr<GDpriv::SourceFile>(new GDpriv::SourceFile(*game.externalSourceFiles[i])) );
+    #endif
+
+    variables = game.variables;
+
+    #if defined(GD_IDE_ONLY)
+    gameFile = game.gameFile;
+    imagesChanged = game.imagesChanged;
+
+    winExecutableFilename = game.winExecutableFilename;
+    winExecutableIconFile = game.winExecutableIconFile;
+    linuxExecutableFilename = game.linuxExecutableFilename;
+    macExecutableFilename = game.macExecutableFilename;
+    #endif
+}
+
+
+Game::Game(const Game & game)
+#if defined(GD_IDE_ONLY)
+    : gd::Project(game)
+#endif
+{
+#if defined(GD_IDE_ONLY)
+    platform = new Platform; //TODO For now, Platform is automatically created
+#endif
     Init(game);
 }
 
 Game& Game::operator=(const Game & game)
 {
     if ( this != &game )
+    {
+#if defined(GD_IDE_ONLY)
+        platform = new Platform; //TODO For now, Platform is automatically created
+        gd::Project::operator=(game);
+#endif
         Init(game);
+    }
 
     return *this;
 }

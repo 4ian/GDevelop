@@ -12,7 +12,6 @@
 #include "GDL/VariableList.h"
 #include "GDL/LoadingScreen.h"
 #include "GDL/ResourcesManager.h"
-class ObjectGroup;
 class Object;
 class Scene;
 class ExternalEvents;
@@ -124,50 +123,56 @@ public:
     /**
      * Return a reference to the vector containing the (smart) pointers to the layouts.
      */
-    const std::vector < boost::shared_ptr<Scene> > & GetLayouts() const { return scenes; }
+    inline const std::vector < boost::shared_ptr<Object> > & GetGlobalObjects() const { return globalObjects; }
 
     /**
      * Return a reference to the vector containing the (smart) pointers to the layouts.
      */
-    std::vector < boost::shared_ptr<Scene> > & GetLayouts() { return scenes; }
+    inline std::vector < boost::shared_ptr<Object> > & GetGlobalObjects() { return globalObjects; }
+
+    /**
+     * Return a reference to the vector containing the (smart) pointers to the layouts.
+     */
+    inline const std::vector < boost::shared_ptr<Scene> > & GetLayouts() const { return scenes; }
+
+    /**
+     * Return a reference to the vector containing the (smart) pointers to the layouts.
+     */
+    inline std::vector < boost::shared_ptr<Scene> > & GetLayouts() { return scenes; }
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Return a reference to the vector containing the (smart) pointers to the external events.
+     */
+    inline const std::vector < boost::shared_ptr<ExternalEvents> > & GetExternalEvents() const { return externalEvents; }
 
     /**
      * Return a reference to the vector containing the (smart) pointers to the external events.
      */
-    const std::vector < boost::shared_ptr<ExternalEvents> > & GetExternalEvents() const { return externalEvents; }
-
-    /**
-     * Return a reference to the vector containing the (smart) pointers to the external events.
-     */
-    std::vector < boost::shared_ptr<ExternalEvents> > & GetExternalEvents() { return externalEvents; }
+    inline std::vector < boost::shared_ptr<ExternalEvents> > & GetExternalEvents() { return externalEvents; }
+    #endif
 
     bool portable; ///< True if the game was saved as a portable game file
-
     LoadingScreen loadingScreen; ///< Data concerning the loading screen
-
     ResourcesManager resourceManager; ///< Contains all resources used by the project
-
-    std::vector < boost::shared_ptr<Object> >            globalObjects; ///< Global objects
-    std::vector < ObjectGroup >                          objectGroups; ///< Global objects groups
-
     ListVariable variables; ///< Initial global variables
+    bool useExternalSourceFiles; ///< True if game used external source files.
 
     #if defined(GD_IDE_ONLY)
     std::string gameFile; ///< File of the game
     std::vector < string > imagesChanged; ///< Images that have been changed and which have to be reloaded
-
     std::string winExecutableFilename; ///< Windows executable name
     std::string winExecutableIconFile; ///< Icon for Windows executable
     std::string linuxExecutableFilename;  ///< Linux executable name
     std::string macExecutableFilename;  ///< Mac executable name
+    std::vector < boost::shared_ptr<GDpriv::SourceFile> > externalSourceFiles; ///< List of C++ source files used.
     #endif
 
-    bool useExternalSourceFiles; ///< True if game used external source files.
     #if defined(GD_IDE_ONLY)
-    std::vector < boost::shared_ptr<GDpriv::SourceFile> >        externalSourceFiles; ///< List of C++ source files used.
-    #endif
-
-    #if defined(GD_IDE_ONLY) //Specialization of gd::Project members
+    /** \name Specialization of gd::Project members
+     * See gd::Project documentation for more information about what these members functions should do.
+     */
+    ///@{
     virtual void SetAuthor(const std::string & author_) { author = author_; };
     virtual const std::string & GetAuthor() {return author;}
 
@@ -193,30 +198,39 @@ public:
     virtual void InsertExternalEvents(const gd::ExternalEvents & externalEvents, unsigned int position);
     virtual void RemoveExternalEvents(const std::string & name);
 
+    virtual bool HasObjectNamed(const std::string & name) const;
+    virtual gd::Object & GetObject(const std::string & name);
+    virtual const gd::Object & GetObject(const std::string & name) const;
+    virtual gd::Object & GetObject(unsigned int index);
+    virtual const gd::Object & GetObject (unsigned int index) const;
+    virtual unsigned int GetObjectPosition(const std::string & name) const;
+    virtual unsigned int GetObjectsCount() const;
+    virtual void InsertNewObject(std::string & name, unsigned int position);
+    virtual void InsertObject(const gd::Object & theObject, unsigned int position);
+    virtual void RemoveObject(const std::string & name);
+
     virtual std::vector < std::string > & GetUsedPlatformExtensions() { return extensionsUsed; };
     virtual const std::vector < std::string > & GetUsedPlatformExtensions() const { return extensionsUsed; };
     virtual gd::Platform & GetPlatform() const { return *platform; }
+    ///@}
     #endif
 
 private:
 
-    std::string name; ///< Game name
-    unsigned int windowWidth; ///< Window default width
-    unsigned int windowHeight; ///< Window default height
-    int maxFPS; ///< Maximum Frame Per Seconds, -1 for unlimited
-    unsigned int minFPS; ///< Minimum Frame Per Seconds ( slow down game if FPS are below this number )
-    bool verticalSync; ///< If true, must activate vertical synchronization.
+    std::string                                         name; ///< Game name
+    unsigned int                                        windowWidth; ///< Window default width
+    unsigned int                                        windowHeight; ///< Window default height
+    int                                                 maxFPS; ///< Maximum Frame Per Seconds, -1 for unlimited
+    unsigned int                                        minFPS; ///< Minimum Frame Per Seconds ( slow down game if FPS are below this number )
+    bool                                                verticalSync; ///< If true, must activate vertical synchronization.
+    std::vector < boost::shared_ptr<Scene> >            scenes; ///< List of all scenes
+    std::vector < boost::shared_ptr<Object> >           globalObjects; ///< Global objects
     #if defined(GD_IDE_ONLY)
-    std::string author; ///< Game author name
-    vector < std::string > extensionsUsed; ///< List of extensions used
-    gd::Platform * platform; ///< Pointer to the platform owning the project
+    std::string                                         author; ///< Game author name
+    vector < std::string >                              extensionsUsed; ///< List of extensions used
+    gd::Platform *                                      platform; ///< Pointer to the platform owning the project
+    std::vector < boost::shared_ptr<ExternalEvents> >   externalEvents; ///< List of all externals events
     #endif
-
-    std::vector < boost::shared_ptr<Scene> >             scenes; ///< List of all scenes
-    #if defined(GD_IDE_ONLY)
-    std::vector < boost::shared_ptr<ExternalEvents> >    externalEvents; ///< List of all externals events
-    #endif
-
 
     /**
      * Initialize from another game. Used by copy-ctor and assign-op.

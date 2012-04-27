@@ -6,7 +6,7 @@ type(automatismTypeName)
 {
 }
 
-void Automatism::SetName(std::string name_)
+void Automatism::SetName(const std::string & name_)
 {
     name = name_;
 }

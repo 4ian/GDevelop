@@ -669,12 +669,12 @@ class GD_API ExtensionBase
      */
     virtual std::vector < std::string > GetExtensionObjectsTypes() const;
 
+    #if defined(GD_IDE_ONLY)
     /**
      * Get automatism types provided by the extension
      */
     virtual std::vector < std::string > GetAutomatismsTypes() const;
 
-    #if defined(GD_IDE_ONLY)
     //Specializations of gd::PlatformExtension methods
     virtual const std::string & GetDescription() const { return informations; }
     virtual const std::string & GetAuthor() const { return author; }

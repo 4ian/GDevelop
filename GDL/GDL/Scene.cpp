@@ -1,16 +1,26 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
+#include <iostream>
 #include "GDL/Scene.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Game.h"
 #include "GDL/Position.h"
-#include "GDCore/Events/Event.h"
 #include "GDL/Object.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/CodeExecutionEngine.h"
+#include "GDL/tinyxml/tinyxml.h"
+#include "GDL/OpenSaveGame.h"
+#include "GDL/XmlMacros.h"
 #if defined(GD_IDE_ONLY)
+#include "GDCore/Events/Event.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #endif
-#include <iostream>
+#undef GetObject //Disable an annoying macro
 
 Scene::Scene() :
 backgroundColorR(209),
@@ -53,6 +63,156 @@ Scene::~Scene()
     #endif
 }
 
+#if defined(GD_IDE_ONLY)
+bool Scene::HasObjectNamed(const std::string & name) const
+{
+    return ( find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name)) != GetInitialObjects().end() );
+}
+gd::Object & Scene::GetObject(const std::string & name)
+{
+    return *(*find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name)));
+}
+const gd::Object & Scene::GetObject(const std::string & name) const
+{
+    return *(*find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name)));
+}
+gd::Object & Scene::GetObject(unsigned int index)
+{
+    return *GetInitialObjects()[index];
+}
+const gd::Object & Scene::GetObject (unsigned int index) const
+{
+    return *GetInitialObjects()[index];
+}
+unsigned int Scene::GetObjectPosition(const std::string & name) const
+{
+    for (unsigned int i = 0;i<GetInitialObjects().size();++i)
+    {
+        if ( GetInitialObjects()[i]->GetName() == name ) return i;
+    }
+    return std::string::npos;
+}
+unsigned int Scene::GetObjectsCount() const
+{
+    return GetInitialObjects().size();
+}
+
+void Scene::InsertNewObject(std::string & name, unsigned int position)
+{
+    boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(new Object(name));
+    if (position<GetInitialObjects().size())
+        GetInitialObjects().insert(GetInitialObjects().begin()+position, newObject);
+    else
+        GetInitialObjects().push_back(newObject);
+}
+
+void Scene::InsertObject(const gd::Object & events, unsigned int position)
+{
+    try
+    {
+        const Object & castedEvents = dynamic_cast<const Object&>(events);
+        boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(new Object(castedEvents));
+        if (position<GetInitialObjects().size())
+            GetInitialObjects().insert(GetInitialObjects().begin()+position, newObject);
+        else
+            GetInitialObjects().push_back(newObject);
+    }
+    catch(...) { std::cout << "WARNING: Tried to add an object which is not a GD C++ Platform Object to a GD C++ Platform project"; }
+}
+
+void Scene::RemoveObject(const std::string & name)
+{
+    std::vector< boost::shared_ptr<Object> >::iterator events = find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name));
+    if ( events == GetInitialObjects().end() ) return;
+
+    GetInitialObjects().erase(events);
+}
+
+void Scene::SaveToXml(TiXmlElement * elem) const
+{
+    //TODO: For now, everything is still managed by OpenSaveGame
+}
+#endif
+
+void Scene::LoadFromXml(const TiXmlElement * elem)
+{
+    if ( elem->Attribute( "r" ) != NULL && elem->Attribute( "v" ) != NULL && elem->Attribute( "b" ) != NULL)
+        SetBackgroundColor(ToInt(elem->Attribute( "r" )), ToInt(elem->Attribute( "v" )), ToInt(elem->Attribute( "b" )));
+    SetWindowDefaultTitle( elem->Attribute( "titre" ) != NULL ? elem->Attribute( "titre" ) : "" );
+
+    if ( elem->Attribute( "oglFOV" ) != NULL ) { elem->QueryFloatAttribute("oglFOV", &oglFOV); }
+    if ( elem->Attribute( "oglZNear" ) != NULL ) { elem->QueryFloatAttribute("oglZNear", &oglZNear); }
+    if ( elem->Attribute( "oglZFar" ) != NULL ) { elem->QueryFloatAttribute("oglZFar", &oglZFar); }
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("standardSortMethod", standardSortMethod);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("stopSoundsOnStartup", stopSoundsOnStartup);
+    #if defined(GD_IDE_ONLY)
+    if ( elem->Attribute( "grid" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("grid", grid); }
+    if ( elem->Attribute( "snap" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("snap", snap); }
+    if ( elem->Attribute( "windowMask" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("windowMask", windowMask); }
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridWidth", gridWidth);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridHeight", gridHeight);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridR", gridR);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridG", gridG);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridB", gridB);
+    #endif
+
+    #if defined(GD_IDE_ONLY)
+    if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
+        OpenSaveGame::OpenGroupesObjets(GetObjectGroups(), elem->FirstChildElement( "GroupesObjets" ));
+    #endif
+
+    if ( elem->FirstChildElement( "Objets" ) != NULL )
+        OpenSaveGame::OpenObjects(initialObjects, elem->FirstChildElement( "Objets" ));
+
+    if ( elem->FirstChildElement( "Positions" ) != NULL )
+        OpenSaveGame::OpenPositions(initialObjectsPositions, elem->FirstChildElement( "Positions" ));
+
+    if ( elem->FirstChildElement( "Layers" ) != NULL )
+        OpenSaveGame::OpenLayers(initialLayers, elem->FirstChildElement( "Layers" ));
+
+    #if defined(GD_IDE_ONLY)
+    if ( elem->FirstChildElement( "Events" ) != NULL )
+        OpenSaveGame::OpenEvents(GetEvents(), elem->FirstChildElement( "Events" ));
+    if ( OpenSaveGame::updateEventsFromGD1x ) OpenSaveGame::AdaptEventsFromGD1x(GetEvents());
+    #endif
+
+    if ( elem->FirstChildElement( "Variables" ) != NULL )
+        OpenSaveGame::OpenVariablesList(variables, elem->FirstChildElement( "Variables" ));
+
+    if ( elem->FirstChildElement( "AutomatismsSharedDatas" ) != NULL )
+    {
+        const TiXmlElement * elemSharedDatas = elem->FirstChildElement( "AutomatismsSharedDatas" )->FirstChildElement( "AutomatismSharedDatas" );
+        while ( elemSharedDatas != NULL )
+        {
+            std::string type = elemSharedDatas->Attribute("Type") ? elemSharedDatas->Attribute("Type") : "";
+            boost::shared_ptr<AutomatismsSharedDatas> sharedDatas = GDpriv::ExtensionsManager::GetInstance()->CreateAutomatismSharedDatas(type);
+
+            if ( sharedDatas != boost::shared_ptr<AutomatismsSharedDatas>() )
+            {
+                sharedDatas->SetName( elemSharedDatas->Attribute("Name") ? elemSharedDatas->Attribute("Name") : "" );
+                sharedDatas->LoadFromXml(elemSharedDatas);
+                automatismsInitialSharedDatas[sharedDatas->GetName()] = sharedDatas;
+            }
+
+            elemSharedDatas = elemSharedDatas->NextSiblingElement("AutomatismSharedDatas");
+        }
+    }
+
+    externalSourcesDependList.clear();
+    const TiXmlElement * dependenciesElem = elem->FirstChildElement( "Dependencies" );
+    if ( dependenciesElem != NULL)
+    {
+        const TiXmlElement * dependencyElem = dependenciesElem->FirstChildElement();
+        while(dependencyElem)
+        {
+            externalSourcesDependList.push_back(dependencyElem->Attribute("sourceFile") != NULL ? dependencyElem->Attribute("sourceFile") : "");
+
+            dependencyElem = dependencyElem->NextSiblingElement();
+        }
+    }
+
+}
+
 void Scene::Init(const Scene & scene)
 {
     name = scene.name;
@@ -75,11 +235,10 @@ void Scene::Init(const Scene & scene)
     externalSourcesDependList = scene.externalSourcesDependList;
     codeExecutionEngine = boost::shared_ptr<CodeExecutionEngine>(new CodeExecutionEngine);
 
-    initialObjects.clear();
-    for (unsigned int i =0;i<scene.initialObjects.size();++i)
-    	initialObjects.push_back( scene.initialObjects[i]->Clone() );
+    GetInitialObjects().clear();
+    for (unsigned int i =0;i<scene.GetInitialObjects().size();++i)
+    	GetInitialObjects().push_back( scene.GetInitialObjects()[i]->Clone() );
 
-    objectGroups = scene.objectGroups;
     initialObjectsPositions = scene.initialObjectsPositions;
     initialLayers = scene.initialLayers;
     variables = scene.variables;
@@ -105,8 +264,10 @@ void Scene::Init(const Scene & scene)
     windowMask = scene.windowMask ;
     #endif
 }
-
 Scene::Scene(const Scene & scene)
+#if defined(GD_IDE_ONLY)
+    : gd::Layout(scene)
+#endif
 {
     Init(scene);
 }
@@ -114,191 +275,12 @@ Scene::Scene(const Scene & scene)
 Scene& Scene::operator=(const Scene & scene)
 {
     if ( this != &scene )
+    {
+#if defined(GD_IDE_ONLY)
+        gd::Layout::operator=(scene);
+#endif
         Init(scene);
+    }
 
     return *this;
-}
-
-std::string GD_API GetTypeOfObject(const Game & game, const Scene & scene, std::string name, bool searchInGroups)
-{
-    std::string type;
-
-    //Search in objects
-    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), name));
-    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), name));
-
-    if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
-        type = (*sceneObject)->GetType();
-    else if ( globalObject != game.globalObjects.end() ) //Then the global object list
-        type = (*globalObject)->GetType();
-
-    //Search in groups
-    if ( searchInGroups )
-    {
-        for (unsigned int i = 0;i<scene.objectGroups.size();++i)
-        {
-            if ( scene.objectGroups[i].GetName() == name )
-            {
-                //A group has the name searched
-                //Verifying now that all objects have the same type.
-
-                vector < string > groupsObjects = scene.objectGroups[i].GetAllObjectsNames();
-                std::string previousType = groupsObjects.empty() ? "" : GetTypeOfObject(game, scene, groupsObjects[0], false);
-
-                for (unsigned int j = 0;j<groupsObjects.size();++j)
-                {
-                    if ( GetTypeOfObject(game, scene, groupsObjects[j], false) != previousType )
-                        return ""; //The group has more than one type.
-
-                }
-
-                if ( !type.empty() && previousType != type )
-                    return ""; //The group has not the same type has an object
-
-                type = previousType;
-            }
-        }
-        for (unsigned int i = 0;i<game.objectGroups.size();++i)
-        {
-            if ( game.objectGroups[i].GetName() == name )
-            {
-                //A group has the name searched
-                //Verifying now that all objects have the same type.
-
-                vector < string > groupsObjects = game.objectGroups[i].GetAllObjectsNames();
-                std::string previousType = groupsObjects.empty() ? "" : GetTypeOfObject(game, scene, groupsObjects[0], false);
-
-                for (unsigned int j = 0;j<groupsObjects.size();++j)
-                {
-                    if ( GetTypeOfObject(game, scene, groupsObjects[j], false) != previousType )
-                        return ""; //The group has more than one type.
-
-                }
-
-                if ( !type.empty() && previousType != type )
-                    return ""; //The group has not the same type has an object
-
-                type = previousType;
-            }
-        }
-    }
-
-    return type;
-}
-
-std::string GD_API GetTypeOfAutomatism(const Game & game, const Scene & scene, std::string name, bool searchInGroups)
-{
-    for (unsigned int i = 0;i<scene.initialObjects.size();++i)
-    {
-        vector < std::string > automatisms = scene.initialObjects[i]->GetAllAutomatismNames();
-        for (unsigned int j = 0;j<automatisms.size();++j)
-        {
-            if ( scene.initialObjects[i]->GetAutomatism(automatisms[j])->GetName() == name )
-                return scene.initialObjects[i]->GetAutomatism(automatisms[j])->GetTypeName();
-        }
-    }
-
-    for (unsigned int i = 0;i<game.globalObjects.size();++i)
-    {
-        vector < std::string > automatisms = game.globalObjects[i]->GetAllAutomatismNames();
-        for (unsigned int j = 0;j<automatisms.size();++j)
-        {
-            if ( game.globalObjects[i]->GetAutomatism(automatisms[j])->GetName() == name )
-                return game.globalObjects[i]->GetAutomatism(automatisms[j])->GetTypeName();
-        }
-    }
-
-    return "";
-}
-
-vector < std::string > GD_API GetAutomatismsOfObject(const Game & game, const Scene & scene, std::string name, bool searchInGroups)
-{
-    bool automatismsAlreadyInserted = false;
-    vector < std::string > automatims;
-
-    //Search in objects
-    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.initialObjects.begin(), scene.initialObjects.end(), std::bind2nd(ObjectHasName(), name));
-    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.globalObjects.begin(), game.globalObjects.end(), std::bind2nd(ObjectHasName(), name));
-
-    if ( sceneObject != scene.initialObjects.end() ) //We check first scene's objects' list.
-    {
-        vector < std::string > objectAutomatisms = (*sceneObject)->GetAllAutomatismNames();
-        copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
-        automatismsAlreadyInserted = true;
-    }
-    else if ( globalObject != game.globalObjects.end() ) //Then the global object list
-    {
-        vector < std::string > objectAutomatisms = (*globalObject)->GetAllAutomatismNames();
-        copy(objectAutomatisms.begin(), objectAutomatisms.end(), back_inserter(automatims));
-        automatismsAlreadyInserted = true;
-    }
-
-    //Search in groups
-    if ( searchInGroups )
-    {
-        for (unsigned int i = 0;i<scene.objectGroups.size();++i)
-        {
-            if ( scene.objectGroups[i].GetName() == name )
-            {
-                //A group has the name searched
-                //Verifying now that all objects have common automatisms.
-
-                vector < string > groupsObjects = scene.objectGroups[i].GetAllObjectsNames();
-                for (unsigned int j = 0;j<groupsObjects.size();++j)
-                {
-                    //Get automatisms of the object of the group and delete automatism which are not in commons.
-                	vector < std::string > objectAutomatisms = GetAutomatismsOfObject(game, scene, groupsObjects[j], false);
-                	if (!automatismsAlreadyInserted)
-                	{
-                	    automatismsAlreadyInserted = true;
-                	    automatims = objectAutomatisms;
-                	}
-                	else
-                	{
-                        for (unsigned int a = 0 ;a<automatims.size();++a)
-                        {
-                            if ( find(objectAutomatisms.begin(), objectAutomatisms.end(), automatims[a]) == objectAutomatisms.end() )
-                            {
-                                automatims.erase(automatims.begin() + a);
-                                --a;
-                            }
-                        }
-                	}
-                }
-            }
-        }
-        for (unsigned int i = 0;i<game.objectGroups.size();++i)
-        {
-            if ( game.objectGroups[i].GetName() == name )
-            {
-                //A group has the name searched
-                //Verifying now that all objects have common automatisms.
-
-                vector < string > groupsObjects = game.objectGroups[i].GetAllObjectsNames();
-                for (unsigned int j = 0;j<groupsObjects.size();++j)
-                {
-                    //Get automatisms of the object of the group and delete automatism which are not in commons.
-                	vector < std::string > objectAutomatisms = GetAutomatismsOfObject(game, scene, groupsObjects[j], false);
-                	if (!automatismsAlreadyInserted)
-                	{
-                	    automatismsAlreadyInserted = true;
-                	    automatims = objectAutomatisms;
-                	}
-                	else
-                	{
-                        for (unsigned int a = 0 ;a<automatims.size();++a)
-                        {
-                            if ( find(objectAutomatisms.begin(), objectAutomatisms.end(), automatims[a]) == objectAutomatisms.end() )
-                            {
-                                automatims.erase(automatims.begin() + a);
-                                --a;
-                            }
-                        }
-                	}
-                }
-            }
-        }
-    }
-
-    return automatims;
 }

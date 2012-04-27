@@ -7,23 +7,28 @@
 #define GDCORE_PROJECT_H
 #include <string>
 #include <vector>
+#include "GDCore/PlatformDefinition/ObjectGroup.h"
+namespace gd { class Platform; }
 namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
+namespace gd { class Object; }
+#undef GetObject //Disable an annoying macro
 
 namespace gd
 {
-class Platform;
-
 /**
  * \brief Base class used to represent a project of a platform
- *
- * \todo Current implementation status: Used in some part of the IDE: Currently, the IDE automatically create the Project class of the GD C++ Platform when it is need.
  */
 class GD_CORE_API Project
 {
 public:
     Project();
     virtual ~Project();
+
+    /** \name Common properties
+     * Some properties for the project
+     */
+    ///@{
 
     /**
      * Must change the name of the project with the name passed as parameter.
@@ -95,6 +100,7 @@ public:
      */
     virtual void SetVerticalSyncActivatedByDefault(bool enable) =0;
 
+
     /**
      * Must return a reference to the vector containing the names of extensions used by the project.
      *
@@ -113,6 +119,13 @@ public:
      * Must return a reference to the platform the project is based on.
      */
     virtual Platform & GetPlatform() const =0;
+
+    ///@}
+
+    /** \name Layouts management
+     * Members functions related to layout management.
+     */
+    ///@{
 
     /**
      * Must return true if layout called "name" exists.
@@ -167,6 +180,13 @@ public:
      */
     virtual void RemoveLayout(const std::string & name) =0;
 
+    ///@}
+
+    /** \name External events management
+     * Members functions related to external events management.
+     */
+    ///@{
+
     /**
      * Must return true if external events called "name" exists.
      */
@@ -220,8 +240,81 @@ public:
      */
     virtual void RemoveExternalEvents(const std::string & name) =0;
 
+    ///@}
+
+    /** \name Global objects management
+     * Members functions related to global objects management.
+     */
+    ///@{
+
+    /**
+     * Must return true if global object called "name" exists.
+     */
+    virtual bool HasObjectNamed(const std::string & name) const =0;
+
+    /**
+     * Must return a reference to the global object called "name".
+     */
+    virtual Object & GetObject(const std::string & name) =0;
+
+    /**
+     * Must return a reference to the global object called "name".
+     */
+    virtual const Object & GetObject(const std::string & name) const =0;
+
+    /**
+     * Must return a reference to the global object at position "index" in the global objects list
+     */
+    virtual Object & GetObject(unsigned int index) =0;
+
+    /**
+     * Must return a reference to the global object at position "index" in the global objects list
+     */
+    virtual const Object & GetObject (unsigned int index) const =0;
+
+    /**
+     * Must return the position of the global object called "name" in the global objects list
+     */
+    virtual unsigned int GetObjectPosition(const std::string & name) const =0;
+
+    /**
+     * Must return the number of global object.
+     */
+    virtual unsigned int GetObjectsCount() const =0;
+
+    /**
+     * Must add a new empty global object sheet called "name" at the specified position in the layout list.
+     */
+    virtual void InsertNewObject(std::string & name, unsigned int position) =0;
+
+    /**
+     * Must add a new global object constructed from the layout passed as parameter.
+     * \note No pointer or reference must be kept on the global object passed as parameter.
+     * \param globalObject The global object that must be copied and inserted into the project
+     * \param position Insertion position. Even if the position is invalid, the global object must be inserted at the end of the global objects list.
+     */
+    virtual void InsertObject(const Object & globalObject, unsigned int position) =0;
+
+    /**
+     * Must delete the global object named "name".
+     */
+    virtual void RemoveObject(const std::string & name) =0;
+
+    /**
+     * Return a reference to the vector containing the project's objects groups.
+     */
+    std::vector <ObjectGroup> & GetObjectGroups() { return objectGroups; }
+
+    /**
+     * Return a const reference to the vector containing the project's objects groups.
+     */
+    const std::vector <ObjectGroup> & GetObjectGroups() const { return objectGroups; }
+
+    ///@}
+
 private:
 
+    std::vector<ObjectGroup> objectGroups; ///< Global objects groups
     static std::vector < std::string > noPlatformExtensionsUsed;
 };
 

@@ -493,6 +493,9 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     codeExecutionEngine = scene.codeExecutionEngine;
     codeExecutionEngine->llvmRuntimeContext->scene = this;
 
+    //Initialize variables
+    variables = scene.variables;
+
     //Initialize runtime layers
     sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight() ) );
     for (unsigned int i = 0;i<initialLayers.size();++i)

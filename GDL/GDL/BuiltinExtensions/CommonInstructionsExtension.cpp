@@ -19,6 +19,7 @@
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/Events/EventsCodeNameMangler.h"
+#include "GDL/Events/ExpressionsCodeGeneration.h"
 
 #include "GDL/ExtensionBase.h"
 
@@ -289,9 +290,9 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-audio.2.0.dylib"));
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-graphics.2.0.dylib"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-network.2.0.dylib"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-system.2.0.dylib"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-window.2.0.dylib"));
-    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "sndfile"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-network.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-system.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "libsfml-window.2.0.dylib"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "sndfile"));
     #endif
 }

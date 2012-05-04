@@ -131,7 +131,7 @@ string EventsCodeGenerator::GenerateOperatorCall(const InstructionMetadata & ins
 
 
 /**
- * Generate call using an compound assignment operators ( =,+=,-=,*=,/= ).
+ * Generate call using a compound assignment operators ( =,+=,-=,*=,/= ).
  * Operator position is deduced from parameters type.
  * Expression is assumed to be placed just before the operator.
  *

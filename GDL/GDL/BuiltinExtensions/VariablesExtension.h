@@ -13,11 +13,10 @@
  */
 class VariablesExtension : public ExtensionBase
 {
-    public:
-        VariablesExtension();
-        virtual ~VariablesExtension() {};
-    protected:
-    private:
+public:
+    VariablesExtension();
+    virtual ~VariablesExtension() {};
+
 };
 
 #endif // VARIABLESEXTENSION_H

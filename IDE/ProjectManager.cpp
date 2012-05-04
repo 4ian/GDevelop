@@ -710,6 +710,7 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
     {
         (*scene)->variables = dialog.variables;
         (*scene)->wasModified = true;
+        CodeCompilationHelpers::CreateSceneEventsCompilationTask(*game, *(*scene));
     }
 }
 
@@ -1067,7 +1068,10 @@ void ProjectManager::OneditGblVarMenuItemSelected(wxCommandEvent& event)
     {
         game->variables = dialog.variables;
         for (unsigned int i = 0;i<game->GetLayouts().size();++i)
+        {
         	game->GetLayouts()[i]->wasModified = true;
+            CodeCompilationHelpers::CreateSceneEventsCompilationTask(*game, *game->GetLayouts()[i]);
+        }
     }
 }
 

@@ -807,13 +807,13 @@ void SceneCanvas::Refresh()
 
             if ( retourEvent == -2 )
             {
-                wxLogStatus( _( "Dans le jeu final, le jeu se terminera." ) );
+                mainEditorCommand.GetInfoBar()->ShowMessage(_( "Dans le jeu final, le jeu se terminera." ));
             }
             else if ( retourEvent != -1 )
             {
                 if (retourEvent < gameEdited.GetLayouts().size())
                 {
-                    wxLogStatus( _( "Dans le jeu final, un changement de scène s'effectuera vers la scène " ) + "\"" + gameEdited.GetLayouts()[retourEvent]->GetName() + "\"" );
+                    mainEditorCommand.GetInfoBar()->ShowMessage(_( "Dans le jeu final, un changement de scène s'effectuera vers la scène " ) + "\"" + gameEdited.GetLayouts()[retourEvent]->GetName() + "\"");
                 }
             }
         }

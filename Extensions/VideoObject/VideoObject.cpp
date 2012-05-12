@@ -38,7 +38,7 @@ freely, subject to the following restrictions:
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
-#include "GDL/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "VideoObjectEditor.h"
 #endif
@@ -72,6 +72,10 @@ void VideoObject::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorG", g);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("colorB", b);
     SetColor(r,g,b);
+
+    int vol = 100;
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("volume", vol);
+    SetVolume(vol);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -83,8 +87,15 @@ void VideoObject::SaveToXml(TiXmlElement * elem)
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorR", colorR);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorG", colorG);
     GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE("colorB", colorB);
+    GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_DOUBLE("volume", static_cast<double>(GetVolume()));
 }
 #endif
+
+bool VideoObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
+{
+    ReloadVideo();
+    return true;
+}
 
 bool VideoObject::LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr )
 {
@@ -142,6 +153,17 @@ void VideoObject::SetColor(const std::string & colorStr)
                ToInt(colors[2]) );
 }
 
+unsigned int VideoObject::GetVolume()
+{
+    return video.GetVolume();
+}
+
+void VideoObject::SetVolume(unsigned int vol)
+{
+    if(vol < 0)
+        video.SetVolume(vol);
+}
+
 /**
  * Update animation and direction from the inital position
  */
@@ -188,6 +210,10 @@ bool VideoObject::DrawEdittime(sf::RenderTarget& renderTarget)
         rectangle.SetPosition(GetX(), GetY());
         rectangle.SetRotation(video.GetRenderSprite().GetRotation());
         renderTarget.Draw(rectangle);
+
+        //Display first frame
+        video.Seek(0.1);
+        video.GetRenderSprite().SetTexture(video.GetNextFrameImage(), true);
     }
 
     renderTarget.Draw( video.GetRenderSprite() );
@@ -195,7 +221,7 @@ bool VideoObject::DrawEdittime(sf::RenderTarget& renderTarget)
     return true;
 }
 
-void VideoObject::ExposeResources(ArbitraryResourceWorker & worker)
+void VideoObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
     worker.ExposeResource(videoFile);
 }

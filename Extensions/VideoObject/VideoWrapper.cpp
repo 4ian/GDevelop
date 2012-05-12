@@ -26,7 +26,11 @@ freely, subject to the following restrictions:
 
 #include "VideoWrapper.h"
 #include <SFML/Graphics.hpp>
+#include <GDL/RessourcesLoader.h>
 #include <TheoraPlayer.h>
+#include <TheoraVideoManager.h>
+#include "OpenAL_AudioInterface.h"
+#include "TheoraMemoryLoader.h"
 #include <TheoraException.h>
 #include <iostream>
 
@@ -35,10 +39,16 @@ renderSprite(new sf::Sprite),
 currentFrameImage(new sf::Texture),
 clip(NULL),
 started(false),
-valid(false)
+valid(false),
+volume(100)
 {
     if ( TheoraVideoManager::getSingletonPtr() == NULL )
-        new TheoraVideoManager;
+        new TheoraVideoManager();
+
+    if( TheoraVideoManager::getSingletonPtr()->getAudioInterfaceFactory() == NULL )
+    {
+        TheoraVideoManager::getSingletonPtr()->setAudioInterfaceFactory(new OpenAL_AudioInterfaceFactory);
+    }
 }
 
 VideoWrapper::~VideoWrapper()
@@ -53,6 +63,11 @@ void VideoWrapper::Init(const VideoWrapper & other)
     if ( TheoraVideoManager::getSingletonPtr() == NULL )
         new TheoraVideoManager;
 
+    if( TheoraVideoManager::getSingletonPtr()->getAudioInterfaceFactory() == NULL )
+    {
+        TheoraVideoManager::getSingletonPtr()->setAudioInterfaceFactory(new OpenAL_AudioInterfaceFactory);
+    }
+
     if ( currentFrameImage ) delete currentFrameImage;
     currentFrameImage = new sf::Texture(*other.currentFrameImage);
 
@@ -62,6 +77,7 @@ void VideoWrapper::Init(const VideoWrapper & other)
     if ( clip ) TheoraVideoManager::getSingletonPtr()->destroyVideoClip(clip);
     clip = NULL;
     started = false;
+    volume = other.volume;
 }
 
 bool VideoWrapper::Load(std::string filename)
@@ -75,7 +91,13 @@ bool VideoWrapper::Load(std::string filename)
     //Load new clip
     try
     {
+        #if defined(GD_IDE_ONLY)
         clip = TheoraVideoManager::getSingletonPtr()->createVideoClip(filename, TH_RGBA);
+        #else
+        TheoraMemoryLoader *memLoad = new TheoraMemoryLoader(filename, (unsigned char*)RessourcesLoader::GetInstance()->LoadBinaryFile(filename),
+                                                                       RessourcesLoader::GetInstance()->GetBinaryFileSize(filename));
+        clip = TheoraVideoManager::getSingletonPtr()->createVideoClip(memLoad, TH_RGBA);
+        #endif
     }
     catch(...)
     {
@@ -85,6 +107,7 @@ bool VideoWrapper::Load(std::string filename)
     if ( clip )
     {
         clip->setAutoRestart(1);
+        clip->setAudioGain(static_cast<float>(volume) / 100);
         currentFrameImage->Create(clip->getWidth(), clip->getHeight());
 
         valid = true;
@@ -131,20 +154,44 @@ void VideoWrapper::SetLooping(bool loop)
 void VideoWrapper::Seek(float time)
 {
     if ( clip != NULL ) clip->seek(time);
+    if ( dynamic_cast<OpenAL_AudioInterface*>(clip->getAudioInterface()) != NULL ) dynamic_cast<OpenAL_AudioInterface*>(clip->getAudioInterface())->seek(time);
 }
 
 void VideoWrapper::SetPause(bool pause)
 {
     if ( clip != NULL )
     {
-        if ( pause ) clip->pause();
-        else clip->play();
+        if ( pause )
+        {
+            clip->pause();
+            dynamic_cast<OpenAL_AudioInterface*>(clip->getAudioInterface())->pause();
+        }
+        else
+        {
+            clip->play();
+            dynamic_cast<OpenAL_AudioInterface*>(clip->getAudioInterface())->play();
+        }
     }
+}
+
+unsigned int VideoWrapper::GetVolume()
+{
+    return volume;
+}
+
+void VideoWrapper::SetVolume(unsigned int vol)
+{
+    volume = vol;
+    if(clip != NULL) clip->setAudioGain(static_cast<float>(volume) / 100);
 }
 
 void VideoWrapper::Restart()
 {
-    if ( clip != NULL ) return clip->restart();
+    if ( clip != NULL )
+    {
+        clip->restart();
+        dynamic_cast<OpenAL_AudioInterface*>(clip->getAudioInterface())->play();
+    }
 }
 
 float VideoWrapper::GetTimePosition() const

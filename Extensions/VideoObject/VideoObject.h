@@ -32,7 +32,7 @@ freely, subject to the following restrictions:
 class ImageManager;
 class RuntimeScene;
 class Object;
-class ExpressionInstruction;
+class ObjectsConcerned;
 class ImageManager;
 class InitialPosition;
 #if defined(GD_IDE_ONLY)
@@ -40,7 +40,7 @@ class wxBitmap;
 class Game;
 class wxWindow;
 class MainEditorCommand;
-class ResourcesMergingHelper;
+namespace gd {class ResourcesMergingHelper;}
 #endif
 
 /**
@@ -54,6 +54,7 @@ class GD_EXTENSION_API VideoObject : public Object
         virtual ~VideoObject();
         virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new VideoObject(*this));}
 
+        virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
         virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
         virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
@@ -61,7 +62,7 @@ class GD_EXTENSION_API VideoObject : public Object
 
         #if defined(GD_IDE_ONLY)
         virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-        virtual void ExposeResources(ArbitraryResourceWorker & worker);
+        virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
         virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
 
         virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
@@ -108,6 +109,9 @@ class GD_EXTENSION_API VideoObject : public Object
         bool GetLooping() const { return looping; }
 
         bool IsPaused() const { return paused; };
+
+        unsigned int GetVolume();
+        void SetVolume(unsigned int vol);
 
         virtual float GetWidth() const;
         virtual float GetHeight() const;

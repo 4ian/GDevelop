@@ -34,6 +34,7 @@ freely, subject to the following restrictions:
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
+#include <wx/spinctrl.h>
 #include <wx/statline.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -53,10 +54,12 @@ class VideoObjectEditor: public wxDialog
 		wxButton* converterBt;
 		wxTextCtrl* videoEdit;
 		wxCheckBox* loopCheck;
+		wxStaticText* StaticText2;
 		wxStaticText* StaticText1;
 		wxButton* cancelBt;
 		wxStaticLine* StaticLine1;
 		wxButton* browseBt;
+		wxSpinCtrl* soundSpin;
 		wxButton* okBt;
 		//*)
 
@@ -67,6 +70,8 @@ class VideoObjectEditor: public wxDialog
 		static const long ID_BUTTON2;
 		static const long ID_STATICTEXT1;
 		static const long ID_BUTTON4;
+		static const long ID_STATICTEXT2;
+		static const long ID_SPINCTRL1;
 		static const long ID_CHECKBOX1;
 		static const long ID_STATICLINE1;
 		static const long ID_BUTTON1;

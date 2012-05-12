@@ -34,6 +34,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add directory="..\..\Runtime\bin\debug" />
 				</Linker>
 			</Target>
@@ -50,6 +51,7 @@
 					<Add option="-m32" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -63,6 +65,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_richtext" />
@@ -103,6 +106,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Debug\libtheoraplayer.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add directory="..\..\IDE\bin\debug" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
@@ -136,6 +140,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add directory="..\..\Runtime\bin\release" />
 				</Linker>
 			</Target>
@@ -151,6 +156,7 @@
 					<Add option="-m32" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
@@ -164,6 +170,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -204,6 +211,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add directory="..\..\IDE\bin\release" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
@@ -237,6 +245,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add directory="..\..\Runtime\bin\dev" />
 				</Linker>
 			</Target>
@@ -252,6 +261,7 @@
 					<Add option="-m32" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -265,6 +275,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -305,6 +316,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add library="..\..\ExtLibs\libtheoraplayer\trunk\bin\Release\libtheoraplayer.a" />
+					<Add library="..\..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add directory="..\..\IDE\bin\dev" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
@@ -578,15 +590,21 @@
 		<Compiler>
 			<Add option="-DTHEORAVIDEO_STATIC" />
 			<Add directory="..\..\GDL" />
+			<Add directory="..\..\Core" />
 			<Add directory="..\..\ExtLibs\libtheoraplayer\trunk\include" />
 			<Add directory="..\..\ExtLibs\SFML\include" />
 			<Add directory="..\..\ExtLibs\boost" />
+			<Add directory="..\..\ExtLibs\SFML\extlibs\headers\" />
 		</Compiler>
 		<Linker>
 			<Add directory="..\..\ExtLibs\SFML\build-mingw-debug\lib" />
 			<Add directory="..\..\ExtLibs\SFML\build-mingw-release\lib" />
 		</Linker>
 		<Unit filename="Extension.cpp" />
+		<Unit filename="OpenAL_AudioInterface.cpp" />
+		<Unit filename="OpenAL_AudioInterface.h" />
+		<Unit filename="TheoraMemoryLoader.cpp" />
+		<Unit filename="TheoraMemoryLoader.h" />
 		<Unit filename="VideoInitialPositionPanel.cpp" />
 		<Unit filename="VideoInitialPositionPanel.h" />
 		<Unit filename="VideoObject.cpp" />

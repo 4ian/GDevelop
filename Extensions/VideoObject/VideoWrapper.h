@@ -27,6 +27,7 @@ freely, subject to the following restrictions:
 #ifndef VIDEOWRAPPER_H
 #define VIDEOWRAPPER_H
 class TheoraVideoClip;
+class TheoraVideoManager;
 namespace sf
 {
     class Texture;
@@ -34,6 +35,9 @@ namespace sf
 }
 #include <iostream>
 
+/**
+ * \brief VideoWrapper is used to hide implementation details from VideoObject interface.
+ */
 class GD_EXTENSION_API VideoWrapper
 {
     public:
@@ -107,9 +111,12 @@ class GD_EXTENSION_API VideoWrapper
         float GetTimePosition() const;
 
         /**
-         * Return current position in the video.
+         * Return length of the video.
          */
         float GetDuration() const;
+
+        unsigned int GetVolume();
+        void SetVolume(unsigned int vol);
 
         sf::Sprite & GetRenderSprite() { return *renderSprite; }
         const sf::Sprite & GetRenderSprite() const { return *renderSprite; }
@@ -123,6 +130,7 @@ class GD_EXTENSION_API VideoWrapper
         TheoraVideoClip * clip; ///< Theora video clip.
         bool started;
         bool valid; ///< True if the clip is valid
+        unsigned int volume;
 };
 
 #endif // VIDEOWRAPPER_H

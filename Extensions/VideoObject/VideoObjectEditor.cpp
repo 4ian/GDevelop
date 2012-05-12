@@ -47,6 +47,8 @@ const long VideoObjectEditor::ID_TEXTCTRL1 = wxNewId();
 const long VideoObjectEditor::ID_BUTTON2 = wxNewId();
 const long VideoObjectEditor::ID_STATICTEXT1 = wxNewId();
 const long VideoObjectEditor::ID_BUTTON4 = wxNewId();
+const long VideoObjectEditor::ID_STATICTEXT2 = wxNewId();
+const long VideoObjectEditor::ID_SPINCTRL1 = wxNewId();
 const long VideoObjectEditor::ID_CHECKBOX1 = wxNewId();
 const long VideoObjectEditor::ID_STATICLINE1 = wxNewId();
 const long VideoObjectEditor::ID_BUTTON1 = wxNewId();
@@ -96,11 +98,18 @@ object(object_)
 	StaticBoxSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Autres propriétés"));
-	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
+	FlexGridSizer4->AddGrowableCol(1);
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Volume du son :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	FlexGridSizer4->Add(StaticText2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	soundSpin = new wxSpinCtrl(this, ID_SPINCTRL1, _T("0"), wxDefaultPosition, wxDefaultSize, 0, 0, 100, 0, _T("ID_SPINCTRL1"));
+	soundSpin->SetValue(_T("0"));
+	FlexGridSizer4->Add(soundSpin, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	loopCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Jouer la vidéo en boucle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	loopCheck->SetValue(true);
-	FlexGridSizer4->Add(loopCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer2->Add(FlexGridSizer4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(loopCheck, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer2->Add(FlexGridSizer4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -122,6 +131,7 @@ object(object_)
 
     videoEdit->SetValue(object.GetVideoFile());
     loopCheck->SetValue(object.GetLooping());
+    soundSpin->SetValue(object.GetVolume());
 }
 
 VideoObjectEditor::~VideoObjectEditor()
@@ -135,6 +145,7 @@ void VideoObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
     object.SetVideoFile(string(videoEdit->GetValue().mb_str()));
     object.SetLooping(loopCheck->GetValue());
+    object.SetVolume(soundSpin->GetValue());
     EndModal(1);
 }
 
@@ -165,7 +176,7 @@ void VideoObjectEditor::OnconverterBtClick(wxCommandEvent& event)
     if ( fileDialog.ShowModal() == wxID_OK )
     {
         string parameters;
-        if ( wxMessageBox(_T("Voulez vous enlever le son de la vidéo ?\nGame Develop ne lit actuellement pas le son des vidéos."), _T("Suppression de l'audio"), wxYES_NO | wxICON_QUESTION, this) == wxYES )
+        if ( wxMessageBox(_T("Voulez vous enlever le son de la vidéo ?"), _T("Suppression de l'audio"), wxYES_NO | wxICON_QUESTION, this) == wxYES )
             parameters += " --noaudio";
 
         wxProgressDialog dialog(_T("Conversion en cours"), _T("Veuillez patienter pendant la durée de la conversion"));

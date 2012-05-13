@@ -16,6 +16,8 @@ namespace GDpriv
  * \brief Class allowing to use a common wxLocale object for GD IDE as well as for extensions.
  *
  * You may want to use this class if you have a custom translation catalog to add. See LocaleManager::AddCatalog
+ *
+ * \ingroup Tools
  */
 class GD_CORE_API LocaleManager
 {

@@ -12,5 +12,18 @@
  */
 
 /**
-    \defgroup CommonProgrammingTools Common programming tools
-*/
+ * \defgroup CommonProgrammingTools Common programming tools
+ */
+
+/**
+ * \defgroup IDE IDE Classes ( Classes to be used to implement a development environment )
+ */
+
+/**
+ * \defgroup IDEDialogs IDE Dialogs ( Premade dialogs to be used to implement a development environment )
+ */
+
+
+/**
+ * \defgroup Events Events ( Classes defining the event system and some tools associated with events )
+ */

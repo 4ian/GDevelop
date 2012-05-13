@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 namespace gd { class Automatism; }
+namespace gd { class VariablesContainer; }
 
 namespace gd
 {
@@ -73,6 +74,24 @@ public:
      * Must remove automatism called "name"
      */
     virtual void RemoveAutomatism(const std::string & name) =0;
+    ///@}
+
+    /** \name Variable management
+     * Members functions related to object variables management.
+     */
+    ///@{
+
+    /**
+     * Must return a reference to the container storing the object variables
+     * \see gd::VariablesContainer
+     */
+    virtual const gd::VariablesContainer & GetVariables() const =0;
+
+    /**
+     * Must return a reference to the container storing the object variables
+     * \see gd::VariablesContainer
+     */
+    virtual gd::VariablesContainer & GetVariables() =0;
     ///@}
 };
 

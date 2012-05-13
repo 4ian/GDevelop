@@ -15,12 +15,15 @@
 
 using namespace std;
 
+namespace gd
+{
+
 ArbitraryResourceWorker::~ArbitraryResourceWorker()
 {
     //dtor
 }
 
-void LaunchResourceWorkerOnEvents(const gd::Project & project, std::vector < BaseEventSPtr > & events, ArbitraryResourceWorker & worker)
+void LaunchResourceWorkerOnEvents(const gd::Project & project, std::vector < gd::BaseEventSPtr > & events, gd::ArbitraryResourceWorker & worker)
 {
     //Get all extensions used
     std::vector< boost::shared_ptr<gd::PlatformExtension> > allGameExtensions;
@@ -115,7 +118,8 @@ void LaunchResourceWorkerOnEvents(const gd::Project & project, std::vector < Bas
             LaunchResourceWorkerOnEvents(project, events.at(j)->GetSubEvents(), worker);
     }
 
-    std::cout << "Inside LaunchResourceWorkerOnEvents ENDED" << std::endl;
     return;
+}
+
 }
 #endif

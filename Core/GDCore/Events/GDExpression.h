@@ -14,6 +14,8 @@
  * This class is currently nothing more than a std::string.
  *
  * \see Instruction
+ *
+ * \ingroup Events
  */
 class GD_CORE_API GDExpression
 {

@@ -184,6 +184,8 @@
 		<Unit filename="GDCore\IDE\CommonBitmapManager.h" />
 		<Unit filename="GDCore\IDE\ConditionSentenceFormatter.cpp" />
 		<Unit filename="GDCore\IDE\ConditionSentenceFormatter.h" />
+		<Unit filename="GDCore\IDE\Dialogs\ChooseVariableDialog.cpp" />
+		<Unit filename="GDCore\IDE\Dialogs\ChooseVariableDialog.h" />
 		<Unit filename="GDCore\IDE\EventsEditorItemsAreas.cpp" />
 		<Unit filename="GDCore\IDE\EventsEditorItemsAreas.h" />
 		<Unit filename="GDCore\IDE\EventsEditorSelection.cpp" />
@@ -213,8 +215,15 @@
 		<Unit filename="GDCore\PlatformDefinition\PlatformExtension.h" />
 		<Unit filename="GDCore\PlatformDefinition\Project.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\Project.h" />
+		<Unit filename="GDCore\PlatformDefinition\Variable.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\Variable.h" />
+		<Unit filename="GDCore\PlatformDefinition\VariablesContainer.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\VariablesContainer.h" />
+		<Unit filename="GDCore\Tools\HelpFileAccess.cpp" />
+		<Unit filename="GDCore\Tools\HelpFileAccess.h" />
 		<Unit filename="GDCore\Tools\Locale\LocaleManager.cpp" />
 		<Unit filename="GDCore\Tools\Locale\LocaleManager.h" />
+		<Unit filename="wxsmith\ChooseVariableDialog.wxs" />
 		<Extensions>
 			<code_completion />
 			<envvars />
@@ -228,6 +237,11 @@
 				<doxyfile_dot />
 				<general />
 			</DoxyBlocks>
+			<wxsmith version="1">
+				<resources>
+					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDCore\IDE\Dialogs\ChooseVariableDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseVariableDialog.h" fwddecl="0" i18n="1" name="ChooseVariableDialog" language="CPP" />
+				</resources>
+			</wxsmith>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

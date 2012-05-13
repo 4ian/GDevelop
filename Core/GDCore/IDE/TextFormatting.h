@@ -15,6 +15,8 @@
  * Currently used by EventsRenderingHelper to render Instruction.
  *
  * \see EventsRenderingHelper
+ *
+ * \ingroup IDE
  */
 class GD_CORE_API TextFormatting
 {

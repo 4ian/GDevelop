@@ -12,6 +12,7 @@ namespace gd { class Platform; }
 namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
 namespace gd { class Object; }
+namespace gd { class VariablesContainer; }
 #undef GetObject //Disable an annoying macro
 
 namespace gd
@@ -310,6 +311,25 @@ public:
      */
     const std::vector <ObjectGroup> & GetObjectGroups() const { return objectGroups; }
 
+    ///@}
+
+
+    /** \name Variable management
+     * Members functions related to global variables management.
+     */
+    ///@{
+
+    /**
+     * Must return a reference to the container storing the global variables
+     * \see gd::VariablesContainer
+     */
+    virtual const gd::VariablesContainer & GetVariables() const =0;
+
+    /**
+     * Must return a reference to the container storing the global variables
+     * \see gd::VariablesContainer
+     */
+    virtual gd::VariablesContainer & GetVariables() =0;
     ///@}
 
 private:

@@ -1,4 +1,3 @@
-#if defined(GD_IDE_ONLY)
 
 #ifndef EXPRESSIONMETADATA_H
 #define EXPRESSIONMETADATA_H
@@ -12,7 +11,9 @@ class Game;
 class Scene;
 
 /**
- * \brief Contains user-friendly infos about expressions, only at edittime, and members needed to setup an expression
+ * \brief Contains user-friendly infos about expressions and members needed to setup an expression
+ *
+ * \ingroup Events
  */
 class GD_CORE_API ExpressionMetadata
 {
@@ -180,4 +181,3 @@ class GD_CORE_API StrExpressionMetadata
 };
 
 #endif // EXPRESSIONMETADATA_H
-#endif

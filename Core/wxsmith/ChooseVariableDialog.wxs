@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="ChooseVariableDialog">
+		<title>Choisir une variable</title>
+		<id_arg>0</id_arg>
+		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<growablecols>0</growablecols>
+			<growablerows>3</growablerows>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+					<cols>3</cols>
+					<growablecols>0</growablecols>
+					<growablerows>0</growablerows>
+					<object class="sizeritem">
+						<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
+							<bg>wxSYS_COLOUR_WINDOW</bg>
+							<object class="wxFlexGridSizer" variable="FlexGridSizer12" member="no">
+								<cols>3</cols>
+								<growablecols>1</growablecols>
+								<object class="sizeritem">
+									<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="StaticBitmap1" member="yes">
+										<bitmap>res/var64.png</bitmap>
+										<style>wxNO_BORDER</style>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText4" member="yes">
+										<label>Choisissez la variable à utiliser.&#x0A;Notez qu&apos;il n&apos;est pas obligatoire de déclarer une variable&#x0A;dans le tableau pour l&apos;utiliser. Déclarer une variable dans&#x0A;le tableau permet de lui affecter une valeur initiale, et de&#x0A;pouvoir la retrouver facilement.</label>
+										<style>wxALIGN_CENTRE</style>
+									</object>
+									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
+					<size>10,-1</size>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxPanel" name="ID_PANEL1" variable="toolbarPanel" member="yes">
+					<size>-1,26</size>
+					<object class="wxAuiManager" variable="AuiManager1" member="yes">
+						<object class="AuiManagerItem">
+							<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes" />
+							<name>PaneName</name>
+							<standardpanetype>Toolbar</standardpanetype>
+							<caption>Pane caption</caption>
+							<captionvisible>0</captionvisible>
+							<minimizebutton>0</minimizebutton>
+							<maximizebutton>0</maximizebutton>
+							<pinbutton>0</pinbutton>
+							<layer>10</layer>
+							<dockfixed>0</dockfixed>
+							<dockabledirection></dockabledirection>
+							<resizable>0</resizable>
+							<destroyonclose>0</destroyonclose>
+							<firstadd>0</firstadd>
+						</object>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxListCtrl" name="ID_LISTCTRL1" variable="variablesList" member="yes">
+					<size>374,149</size>
+					<style>wxLC_REPORT</style>
+					<handler function="OnvariablesListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
+					<handler function="OnvariablesListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<border>5</border>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxStaticLine" name="ID_STATICLINE2" variable="StaticLine2" member="yes">
+					<size>10,-1</size>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+					<cols>3</cols>
+					<growablecols>0</growablecols>
+					<object class="sizeritem">
+						<object class="wxButton" name="ID_BUTTON1" variable="okBt" member="yes">
+							<label>Choisir</label>
+							<handler function="OnokBtClick" entry="EVT_BUTTON" />
+						</object>
+						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxButton" name="ID_BUTTON3" variable="cancelBt" member="yes">
+							<label>Annuler</label>
+							<handler function="OncancelBtClick" entry="EVT_BUTTON" />
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxButton" name="ID_BUTTON2" variable="helpBt" member="yes">
+							<label>Aide</label>
+							<handler function="OnhelpBtClick" entry="EVT_BUTTON" />
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+	</object>
+</wxsmith>

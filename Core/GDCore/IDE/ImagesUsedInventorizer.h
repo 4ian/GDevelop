@@ -19,11 +19,11 @@
 /**
  * \brief Class used to track all images used in a game.
  */
-class ImagesUsedInventorizer : public ArbitraryResourceWorker
+class ImagesUsedInventorizer : public gd::ArbitraryResourceWorker
 {
     public:
 
-        ImagesUsedInventorizer() : ArbitraryResourceWorker() {};
+        ImagesUsedInventorizer() : gd::ArbitraryResourceWorker() {};
         virtual ~ImagesUsedInventorizer() {};
 
         std::set<std::string> & GetAllUsedImages() { return allUsedImages; };

@@ -66,7 +66,8 @@ private:
 };
 
 /**
- * \brief Functor to easily find an object group with a specific name
+ * \brief Functor to easily find an object group with a specific name.
+ *
  * Usage example:
  * \code
  * vector< gd::ObjectGroup >::const_iterator myGroup = find_if(layout.GetObjectGroups().begin(), layout.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), "myGroup"));
@@ -75,6 +76,8 @@ private:
  *     //...
  * }
  * \endcode
+ *
+ * \see gd::ObjectGroup
  */
 struct GroupHasTheSameName : public std::binary_function<ObjectGroup, std::string, bool>
 {

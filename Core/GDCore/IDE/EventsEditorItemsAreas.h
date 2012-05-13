@@ -12,7 +12,7 @@
 #include <boost/unordered_map.hpp>
 #include <vector>
 #include <utility>
-class BaseEvent;
+namespace gd { class BaseEvent; }
 class Instruction;
 class GDExpression;
 
@@ -22,14 +22,14 @@ class GDExpression;
 class GD_CORE_API EventItem
 {
 public:
-    EventItem(boost::shared_ptr<BaseEvent> event_, std::vector<boost::shared_ptr<BaseEvent> > * eventsList_, unsigned int positionInList_ );
+    EventItem(boost::shared_ptr<gd::BaseEvent> event_, std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList_, unsigned int positionInList_ );
     EventItem();
     ~EventItem() {};
 
     bool operator==(const EventItem & other) const;
 
-    boost::shared_ptr<BaseEvent> event;
-    std::vector<boost::shared_ptr<BaseEvent> > * eventsList;
+    boost::shared_ptr<gd::BaseEvent> event;
+    std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList;
     unsigned int positionInList;
 };
 size_t hash_value(const EventItem & a);
@@ -43,7 +43,7 @@ public:
     /**
      * Use this constructor to declare the instruction, the list it belongs to and its position in this list.
      */
-    InstructionItem(Instruction * instruction_, bool isCondition, std::vector<Instruction>* instructionList_, unsigned int positionInList_, BaseEvent * event );
+    InstructionItem(Instruction * instruction_, bool isCondition, std::vector<Instruction>* instructionList_, unsigned int positionInList_, gd::BaseEvent * event );
     InstructionItem();
     ~InstructionItem() {};
 
@@ -53,7 +53,7 @@ public:
     bool isCondition;
     std::vector<Instruction>* instructionList;
     unsigned int positionInList;
-    BaseEvent * event;
+    gd::BaseEvent * event;
 };
 size_t hash_value(const InstructionItem & a);
 
@@ -66,7 +66,7 @@ public:
     /**
      * Use this constructor to declare the instruction, the list it belongs to and its position in this list.
      */
-    InstructionListItem(bool isConditionList, std::vector<Instruction>* instructionList_, BaseEvent * event );
+    InstructionListItem(bool isConditionList, std::vector<Instruction>* instructionList_, gd::BaseEvent * event );
     InstructionListItem();
     ~InstructionListItem() {};
 
@@ -74,7 +74,7 @@ public:
 
     bool isConditionList;
     std::vector<Instruction>* instructionList;
-    BaseEvent * event;
+    gd::BaseEvent * event;
 };
 size_t hash_value(const InstructionListItem & a);
 
@@ -84,14 +84,14 @@ size_t hash_value(const InstructionListItem & a);
 class GD_CORE_API ParameterItem
 {
 public:
-    ParameterItem(GDExpression * parameter_, BaseEvent * event);
+    ParameterItem(GDExpression * parameter_, gd::BaseEvent * event);
     ParameterItem();
     ~ParameterItem() {};
 
     bool operator==(const ParameterItem & other) const;
 
     GDExpression * parameter;
-    BaseEvent * event;
+    gd::BaseEvent * event;
 };
 size_t hash_value(const ParameterItem & a);
 
@@ -101,13 +101,13 @@ size_t hash_value(const ParameterItem & a);
 class GD_CORE_API FoldingItem
 {
 public:
-    FoldingItem(BaseEvent * event);
+    FoldingItem(gd::BaseEvent * event);
     FoldingItem();
     ~FoldingItem() {};
 
     bool operator==(const FoldingItem & other) const;
 
-    BaseEvent * event;
+    gd::BaseEvent * event;
 };
 size_t hash_value(const FoldingItem & a);
 

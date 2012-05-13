@@ -10,7 +10,7 @@
 #include <wx/html/htmprint.h>
 #include <vector>
 
-class BaseEvent;
+namespace gd { class BaseEvent; }
 class Instruction;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
@@ -22,6 +22,8 @@ namespace gd {class InstructionsMetadataHolder;}
  *
  * Class providing default colors, fonts and drawing functions so as to
  * render events.
+ *
+ * \ingroup IDE
  */
 class GD_CORE_API EventsRenderingHelper
 {
@@ -31,8 +33,8 @@ class GD_CORE_API EventsRenderingHelper
 
         void DrawNiceRectangle(wxDC & dc, const wxRect & rect) const;
 
-        int DrawConditionsList(std::vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
-        int DrawActionsList(std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
+        int DrawConditionsList(std::vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
+        int DrawActionsList(std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
         unsigned int GetRenderedConditionsListHeight(const std::vector < Instruction > & conditions, int width, gd::InstructionsMetadataHolder & metadataHolder);
         unsigned int GetRenderedActionsListHeight(const std::vector < Instruction > & actions, int width, gd::InstructionsMetadataHolder & metadataHolder);
 
@@ -50,7 +52,7 @@ class GD_CORE_API EventsRenderingHelper
          */
         unsigned int GetTextHeightInArea(const std::string & text, unsigned int widthAvailable);
 
-        int DrawInstruction(Instruction & instruction, const InstructionMetadata & InstructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+        int DrawInstruction(Instruction & instruction, const InstructionMetadata & InstructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 
         /**
          * Change font. Only use a fixed width font.

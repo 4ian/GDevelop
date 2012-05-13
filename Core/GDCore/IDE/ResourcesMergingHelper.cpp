@@ -3,11 +3,12 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
-
 #include "ResourcesMergingHelper.h"
 #include <wx/filename.h>
 #include <string>
+
+namespace gd
+{
 
 void ResourcesMergingHelper::ExposeResource(std::string & resourceFilename)
 {
@@ -19,4 +20,4 @@ void ResourcesMergingHelper::ExposeResource(std::string & resourceFilename)
     resourceFilename = newResourceFilename;
 }
 
-#endif
+}

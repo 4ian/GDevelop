@@ -2,8 +2,6 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-#if defined(GD_IDE_ONLY)
-
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
 #include <string>
@@ -12,6 +10,8 @@
 
 /**
  * \brief An instruction is a member of an event. It can be a condition or an action.
+ *
+ * \ingroup Events
  */
 class GD_CORE_API Instruction
 {
@@ -104,7 +104,5 @@ private:
 
     static GDExpression badExpression;
 };
-
-#endif
 
 #endif // INSTRUCTION_H

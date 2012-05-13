@@ -22,7 +22,7 @@ void EventsEditorSelection::ClearSelection(bool refresh)
 
 void EventsEditorSelection::AddEvent(const EventItem & eventSelection)
 {
-    if ( eventSelection.event == boost::shared_ptr<BaseEvent>() || eventSelection.eventsList == NULL )
+    if ( eventSelection.event == boost::shared_ptr<gd::BaseEvent>() || eventSelection.eventsList == NULL )
     {
         std::cout << "WARNING, attempted to add a bad event to selection";
         return;
@@ -158,7 +158,7 @@ bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfter
     //Be sure we do not try to drag inside an event selected
     for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
     {
-        if ( (*it).event == boost::shared_ptr<BaseEvent>() )
+        if ( (*it).event == boost::shared_ptr<gd::BaseEvent>() )
         {
             std::cout << "WARNING: Bad event in selection";
             continue;
@@ -174,9 +174,9 @@ bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfter
     size_t positionInList = !dropAfterHighlightedElement ? eventHighlighted.positionInList : eventHighlighted.positionInList+1;
     for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
     {
-        if ( (*it).event != boost::shared_ptr<BaseEvent>() )
+        if ( (*it).event != boost::shared_ptr<gd::BaseEvent>() )
         {
-            boost::shared_ptr<BaseEvent> newEvent = (*it).event->Clone();
+            boost::shared_ptr<gd::BaseEvent> newEvent = (*it).event->Clone();
             if ( positionInList < eventHighlighted.eventsList->size() )
                 eventHighlighted.eventsList->insert(eventHighlighted.eventsList->begin()+positionInList, newEvent);
             else
@@ -189,7 +189,7 @@ bool EventsEditorSelection::EndDragEvent(bool deleteDraggedEvent, bool dropAfter
     {
         for (boost::unordered_set< EventItem >::iterator it = eventsSelected.begin();it!=eventsSelected.end();++it)
         {
-            if ( (*it).event != boost::shared_ptr<BaseEvent>() && (*it).eventsList != NULL)
+            if ( (*it).event != boost::shared_ptr<gd::BaseEvent>() && (*it).eventsList != NULL)
                 (*it).eventsList->erase(std::remove((*it).eventsList->begin(), (*it).eventsList->end(), (*it).event) , (*it).eventsList->end());
         }
     }
@@ -338,7 +338,7 @@ EventsEditorSelection::EventsEditorSelection(GDpriv::EventsEditorRefreshCallback
 {
 }
 
-bool EventsEditorSelection::FindInEventsAndSubEvents(std::vector<boost::shared_ptr<BaseEvent> > & list, boost::shared_ptr<BaseEvent> eventToSearch)
+bool EventsEditorSelection::FindInEventsAndSubEvents(std::vector<boost::shared_ptr<gd::BaseEvent> > & list, boost::shared_ptr<gd::BaseEvent> eventToSearch)
 {
     for (unsigned int i = 0;i<list.size();++i)
     {

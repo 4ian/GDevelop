@@ -9,10 +9,11 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
-class BaseEvent;
+namespace gd { class BaseEvent; }
 class TiXmlElement;
 namespace gd { class Object; }
 namespace gd { class Project; }
+namespace gd { class VariablesContainer; }
 #undef GetObject //Disable an annoying macro
 
 namespace gd
@@ -29,6 +30,7 @@ public:
 
     /**
      * Must return a pointer to a copy of the layout.
+     * A such method is needed as the IDE may want to store copies of some layouts and so need a way to do polymorphic copies.
      *
      * Typical implementation example:
      * \code
@@ -85,12 +87,12 @@ public:
     /**
      * Must return a reference to the list of events associated to the Layout class.
      */
-    virtual const std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() const =0;
+    virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const =0;
 
     /**
      * Must return a reference to the list of events associated to the Layout class.
      */
-    virtual std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() =0;
+    virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() =0;
 
     /**
      * Called by the IDE when events have been changed.
@@ -167,6 +169,24 @@ public:
      */
     const std::vector <ObjectGroup> & GetObjectGroups() const { return objectGroups; }
 
+    ///@}
+
+    /** \name Variable management
+     * Members functions related to layout variables management.
+     */
+    ///@{
+
+    /**
+     * Must return a reference to the container storing the layout variables
+     * \see gd::VariablesContainer
+     */
+    virtual const gd::VariablesContainer & GetVariables() const =0;
+
+    /**
+     * Must return a reference to the container storing the layout variables
+     * \see gd::VariablesContainer
+     */
+    virtual gd::VariablesContainer & GetVariables() =0;
     ///@}
 
     /** \name Saving and loading

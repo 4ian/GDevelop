@@ -12,7 +12,7 @@ class Instruction;
 class InstructionMetadata;
 class ExpressionMetadata;
 class StrExpressionMetadata;
-class ArbitraryResourceWorker;
+namespace gd {class ArbitraryResourceWorker;}
 
 namespace gd
 {
@@ -137,14 +137,14 @@ public:
      *
      * \see gd::PlatformExtension::ExposeActionsResources
      */
-    virtual void ExposeConditionsResources(Instruction & condition, ArbitraryResourceWorker & worker) {};
+    virtual void ExposeConditionsResources(Instruction & condition, gd::ArbitraryResourceWorker & worker) {};
 
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by actions and update their filename
      *
      * \see ArbitraryResourceWorker
      */
-    virtual void ExposeActionsResources(Instruction & action, ArbitraryResourceWorker & worker) {};
+    virtual void ExposeActionsResources(Instruction & action, gd::ArbitraryResourceWorker & worker) {};
 
 private:
 

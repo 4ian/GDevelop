@@ -15,7 +15,9 @@ class EventsCodeGenerator;
 class EventsCodeGenerationContext;
 
 /**
- * \brief Contains user-friendly info about a parameter, and informations about what a parameter need
+ * \brief Contains user-friendly info about a parameter, and information about what a parameter need
+ *
+ * \ingroup Events
  */
 class GD_CORE_API ParameterMetadata
 {
@@ -42,6 +44,8 @@ public:
 
 /**
  * \brief Contains user-friendly infos about actions/conditions, and members needed to setup an instruction
+ *
+ * \ingroup Events
  */
 class GD_CORE_API InstructionMetadata
 {

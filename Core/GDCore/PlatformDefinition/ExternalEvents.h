@@ -8,7 +8,7 @@
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
-class BaseEvent;
+namespace gd { class BaseEvent; }
 
 namespace gd
 {
@@ -47,12 +47,12 @@ public:
     /**
      * Must return a reference to the list of events associated to the ExternalEvents class.
      */
-    virtual const std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() const =0;
+    virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const =0;
 
     /**
      * Must return a reference to the list of events associated to the ExternalEvents class.
      */
-    virtual std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() =0;
+    virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() =0;
 
 private:
 };

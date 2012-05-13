@@ -131,7 +131,7 @@ void EventsRenderingHelper::SetFont(const wxFont & font_)
     fontCharacterWidth = static_cast<float>(dc.GetTextExtent("abcdef").GetWidth())/6.0f;
 }
 
-int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder)
+int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder)
 {
     int initialYPosition = y;
 
@@ -228,7 +228,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < Instruction > & condition
     return y-initialYPosition;
 }
 
-int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxDC & dc, int x, int y, int width, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder)
+int EventsRenderingHelper::DrawActionsList(vector < Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder)
 {
     int initialYPosition = y;
 
@@ -381,7 +381,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
     return y;
 }
 
-int EventsRenderingHelper::DrawInstruction(Instruction & instruction, const InstructionMetadata & InstructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+int EventsRenderingHelper::DrawInstruction(Instruction & instruction, const InstructionMetadata & InstructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
     std::vector< std::pair<std::string, TextFormatting > > formattedStr = isCondition ? TranslateCondition::GetAsFormattedText(instruction, InstructionMetadata) :
                                                                                         TranslateAction::GetInstance()->GetAsFormattedText(instruction, InstructionMetadata);

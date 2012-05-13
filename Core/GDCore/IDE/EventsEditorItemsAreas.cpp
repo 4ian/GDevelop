@@ -249,7 +249,7 @@ size_t hash_value(const EventItem & a)
     return seed;
 }
 
-EventItem::EventItem(boost::shared_ptr<BaseEvent> event_, std::vector<boost::shared_ptr<BaseEvent> > * eventsList_, unsigned int positionInList_ ) :
+EventItem::EventItem(boost::shared_ptr<gd::BaseEvent> event_, std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList_, unsigned int positionInList_ ) :
     event(event_),
     eventsList(eventsList_),
     positionInList(positionInList_)
@@ -280,7 +280,7 @@ size_t hash_value(const InstructionItem & a)
     return seed;
 }
 
-InstructionItem::InstructionItem(Instruction * instruction_, bool isCondition_, std::vector<Instruction>* instructionList_, unsigned int positionInList_, BaseEvent * event_ ) :
+InstructionItem::InstructionItem(Instruction * instruction_, bool isCondition_, std::vector<Instruction>* instructionList_, unsigned int positionInList_, gd::BaseEvent * event_ ) :
     instruction(instruction_),
     isCondition(isCondition_),
     instructionList(instructionList_),
@@ -312,7 +312,7 @@ size_t hash_value(const InstructionListItem & a)
     return seed;
 }
 
-InstructionListItem::InstructionListItem(bool isCondition_, std::vector<Instruction>* instructionList_, BaseEvent * event_ ) :
+InstructionListItem::InstructionListItem(bool isCondition_, std::vector<Instruction>* instructionList_, gd::BaseEvent * event_ ) :
     isConditionList(isCondition_),
     instructionList(instructionList_),
     event(event_)
@@ -338,7 +338,7 @@ size_t hash_value(const ParameterItem & a)
     return seed;
 }
 
-ParameterItem::ParameterItem(GDExpression * parameter_, BaseEvent * event_) :
+ParameterItem::ParameterItem(GDExpression * parameter_, gd::BaseEvent * event_) :
     parameter(parameter_),
     event(event_)
 {
@@ -362,7 +362,7 @@ size_t hash_value(const FoldingItem & a)
     return seed;
 }
 
-FoldingItem::FoldingItem(BaseEvent * event_) :
+FoldingItem::FoldingItem(gd::BaseEvent * event_) :
     event(event_)
 {
 }

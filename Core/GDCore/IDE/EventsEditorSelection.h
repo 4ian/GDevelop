@@ -12,7 +12,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_set.hpp>
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
-class BaseEvent;
+namespace gd { class BaseEvent; }
 namespace GDpriv
 {
 class EventsEditorRefreshCallbacks;
@@ -185,7 +185,7 @@ class GD_CORE_API EventsEditorSelection
         /**
          * Return true if an event is found in the list ( sub events are also taken in account )
          */
-        bool FindInEventsAndSubEvents(std::vector<boost::shared_ptr<BaseEvent> > & list, boost::shared_ptr<BaseEvent> eventToSearch);
+        bool FindInEventsAndSubEvents(std::vector<boost::shared_ptr<gd::BaseEvent> > & list, boost::shared_ptr<gd::BaseEvent> eventToSearch);
         /**
          * Return true if an instruction is found in the list ( sub instructions are also taken in account )
          */
@@ -198,7 +198,7 @@ namespace GDpriv
 {
 
 /**
- * Internal GD class used to notice events editor they must be refreshed.
+ * \brief Internal GD class used to notice events editor they must be refreshed.
  */
 class GD_CORE_API EventsEditorRefreshCallbacks
 {

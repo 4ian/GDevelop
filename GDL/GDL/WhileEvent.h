@@ -18,7 +18,7 @@ class EventsEditorSelection;
 /**
  * While event is a standard event that is repeated while conditions are true
  */
-class WhileEvent : public BaseEvent
+class WhileEvent : public gd::BaseEvent
 {
     public:
         WhileEvent() {};
@@ -26,15 +26,15 @@ class WhileEvent : public BaseEvent
         virtual ~WhileEvent() {};
 
         WhileEvent& operator=(const WhileEvent & event);
-        virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new WhileEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new WhileEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
         virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
-        virtual const std::vector < BaseEventSPtr > & GetSubEvents() const {return events;};
-        virtual std::vector < BaseEventSPtr > & GetSubEvents() {return events;};
-        void SetSubEvents(std::vector < BaseEventSPtr > & subEvents_) {events = subEvents_;};
+        virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
+        virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return events;};
+        void SetSubEvents(std::vector < gd::BaseEventSPtr > & subEvents_) {events = subEvents_;};
 
         const std::vector < Instruction > & GetConditions() const { return conditions; };
         std::vector < Instruction > & GetConditions() { return conditions; };
@@ -75,7 +75,7 @@ class WhileEvent : public BaseEvent
         std::vector < Instruction > whileConditions;
         std::vector < Instruction > conditions;
         std::vector < Instruction > actions;
-        std::vector < BaseEventSPtr > events;
+        std::vector < gd::BaseEventSPtr > events;
 
         mutable unsigned int whileConditionsHeight;
 

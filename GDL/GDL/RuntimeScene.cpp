@@ -13,6 +13,7 @@
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/Object.h"
+#include "GDL/ObjectHelpers.h"
 #include "GDL/ImageManager.h"
 #include "GDL/SoundManager.h"
 #include "GDL/ExtensionsManager.h"
@@ -87,7 +88,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
 
     objectsInstances = scene.objectsInstances.CopyAndCloneAllObjects();
 
-    variables = scene.variables;
+    variables = scene.GetVariables();
     textes = scene.textes;
     timers = scene.timers;
     pauseTime = scene.pauseTime;
@@ -437,7 +438,12 @@ void RuntimeScene::ManageObjectsAfterEvents()
     for (unsigned int id = 0;id<allObjects.size();++id)
     {
     	if ( allObjects[id]->GetName().empty() )
-            objectsInstances.RemoveObject(allObjects[id]); //Remove from objects Instances, not from the temporary list !
+        {
+            for (unsigned int i = 0;i<extensionsToBeNotifiedOnObjectDeletion.size();++i)
+                extensionsToBeNotifiedOnObjectDeletion[i]->ObjectDeletedFromScene(*this, allObjects[id].get());
+
+            objectsInstances.RemoveObject(allObjects[id]); //Remove from objects instances, not from the temporary list !
+        }
     }
 
     allObjects = objectsInstances.GetAllObjects();
@@ -494,7 +500,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     codeExecutionEngine->llvmRuntimeContext->scene = this;
 
     //Initialize variables
-    variables = scene.variables;
+    variables = scene.GetVariables();
 
     //Initialize runtime layers
     sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight() ) );
@@ -523,9 +529,9 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
         ObjSPtr newObject = boost::shared_ptr<Object> ();
 
         if ( sceneObject != GetInitialObjects().end() ) //We check first scene's objects' list.
-            newObject = (*sceneObject)->Clone();
+            newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
         else if ( globalObject != game->GetGlobalObjects().end() ) //Then the global object list
-            newObject = (*globalObject)->Clone();
+            newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
 
         if ( newObject != boost::shared_ptr<Object> () )
         {
@@ -546,7 +552,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
             const std::vector<Variable> & instanceSpecificVariables = scene.initialObjectsPositions[i].initialVariables.GetVariablesVector();
             for (unsigned int j = 0;j<instanceSpecificVariables.size();++j)
             {
-                newObject->variablesObjet.ObtainVariable(instanceSpecificVariables[j].GetName()) = instanceSpecificVariables[j];
+                newObject->GetVariables().ObtainVariable(instanceSpecificVariables[j].GetName()) = instanceSpecificVariables[j];
             }
 
             newObject->LoadRuntimeResources(*this, *game->imageManager);
@@ -570,7 +576,11 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     const vector < boost::shared_ptr<ExtensionBase> > extensions = GDpriv::ExtensionsManager::GetInstance()->GetExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
     {
-        if ( extensions[i] != boost::shared_ptr<ExtensionBase>() ) extensions[i]->SceneLoaded(*this);
+        if ( extensions[i] != boost::shared_ptr<ExtensionBase>() )
+        {
+            extensions[i]->SceneLoaded(*this);
+            if ( extensions[i]->ToBeNotifiedOnObjectDeletion() ) extensionsToBeNotifiedOnObjectDeletion.push_back(extensions[i].get());
+        }
     }
 
     if ( stopSoundsOnStartup ) {SoundManager::GetInstance()->ClearAllSoundsAndMusics(); }

@@ -5,13 +5,10 @@
 
 #ifndef AUTOMATISM_H
 #define AUTOMATISM_H
-
-#include <boost/shared_ptr.hpp>
 #include <string>
 class Object;
 class RuntimeScene;
 class Scene;
-typedef boost::shared_ptr<Object> ObjSPtr;
 class TiXmlElement;
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/Automatism.h"
@@ -31,7 +28,7 @@ class GD_API Automatism
     public:
         Automatism(std::string automatismTypeName);
         virtual ~Automatism() {};
-        virtual boost::shared_ptr<Automatism> Clone() { return boost::shared_ptr<Automatism>(new Automatism(*this));}
+        virtual Automatism* Clone() { return new Automatism(*this);}
 
         /**
          * Change the name identifying the automatism.
@@ -114,7 +111,7 @@ class GD_API Automatism
         virtual void DoStepPostEvents(RuntimeScene & scene) {};
 
         /**
-         * Redefine this method so as to do special works when owner is setted.
+         * Redefine this method so as to do special works when owner is set.
          */
         virtual void OnOwnerChanged() {};
 

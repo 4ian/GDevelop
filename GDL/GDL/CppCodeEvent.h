@@ -20,7 +20,7 @@ class wxWindow;
 /**
  * \brief Builtin internal event that pick an object of a list each time it is repeated
  */
-class CppCodeEvent : public BaseEvent
+class CppCodeEvent : public gd::BaseEvent
 {
     public:
         CppCodeEvent();
@@ -28,7 +28,7 @@ class CppCodeEvent : public BaseEvent
         virtual ~CppCodeEvent() {};
 
         CppCodeEvent& operator=(const CppCodeEvent & event);
-        virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new CppCodeEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new CppCodeEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
         virtual bool CanHaveSubEvents() const {return false;}

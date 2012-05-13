@@ -33,13 +33,17 @@ createFunPtr(NULL)
 #if defined(GD_IDE_ONLY)
 
 EventInfos::EventInfos() :
-instance(boost::shared_ptr<BaseEvent>())
+instance(boost::shared_ptr<gd::BaseEvent>())
 {
 }
 #endif
 
 AutomatismInfo::AutomatismInfo() :
 instance(boost::shared_ptr<Automatism>())
+{
+}
+
+AutomatismInfo::~AutomatismInfo()
 {
 }
 
@@ -225,21 +229,21 @@ DestroyFunPtr ExtensionBase::GetDestroyObjectFunction(std::string objectType) co
 }
 
 #if defined(GD_IDE_ONLY)
-BaseEventSPtr ExtensionBase::CreateEvent(std::string eventType) const
+gd::BaseEventSPtr ExtensionBase::CreateEvent(std::string eventType) const
 {
     if ( eventsInfos.find(eventType) != eventsInfos.end())
         return eventsInfos.find(eventType)->second.instance->Clone();
 
-    return boost::shared_ptr<BaseEvent>();
+    return boost::shared_ptr<gd::BaseEvent>();
 }
 #endif
 
-boost::shared_ptr<Automatism> ExtensionBase::CreateAutomatism(std::string type) const
+Automatism* ExtensionBase::CreateAutomatism(std::string type) const
 {
     if ( automatismsInfo.find(type) != automatismsInfo.end())
         return automatismsInfo.find(type)->second.instance->Clone();
 
-    return boost::shared_ptr<Automatism>();
+    return NULL;
 }
 
 

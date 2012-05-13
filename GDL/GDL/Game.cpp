@@ -9,6 +9,7 @@
 #include "GDL/SourceFile.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
+#include "GDL/ObjectHelpers.h"
 
 #if defined(GD_IDE_ONLY)
 #include "PlatformDefinition/Platform.h"
@@ -283,7 +284,7 @@ void Game::Init(const Game & game)
 
     GetGlobalObjects().clear();
     for (unsigned int i =0;i<game.GetGlobalObjects().size();++i)
-    	GetGlobalObjects().push_back( game.GetGlobalObjects()[i]->Clone() );
+    	GetGlobalObjects().push_back( boost::shared_ptr<Object>(game.GetGlobalObjects()[i]->Clone()) );
 
     scenes.clear();
     for (unsigned int i =0;i<game.scenes.size();++i)
@@ -303,7 +304,7 @@ void Game::Init(const Game & game)
     	externalSourceFiles.push_back( boost::shared_ptr<GDpriv::SourceFile>(new GDpriv::SourceFile(*game.externalSourceFiles[i])) );
     #endif
 
-    variables = game.variables;
+    variables = game.GetVariables();
 
     #if defined(GD_IDE_ONLY)
     gameFile = game.gameFile;

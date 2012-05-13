@@ -113,12 +113,7 @@ bool SpriteObject::Draw( sf::RenderTarget & renderTarget )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    if ( !optionalShader )
-        renderTarget.Draw( GetCurrentSFMLSprite() );
-    else
-        renderTarget.Draw( GetCurrentSFMLSprite(), *optionalShader );
-
-
+    renderTarget.Draw( GetCurrentSFMLSprite() );
     return true;
 }
 
@@ -128,11 +123,7 @@ bool SpriteObject::Draw( sf::RenderTarget & renderTarget )
  */
 bool SpriteObject::DrawEdittime( sf::RenderTarget & renderTarget )
 {
-
-    if ( !optionalShader )
-        renderTarget.Draw( GetCurrentSFMLSprite() );
-    else
-        renderTarget.Draw( GetCurrentSFMLSprite(), *optionalShader );
+    renderTarget.Draw( GetCurrentSFMLSprite() );
 
     return true;
 }
@@ -158,7 +149,7 @@ bool SpriteObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
     return false;
 }
 
-void SpriteObject::ExposeResources(ArbitraryResourceWorker & worker)
+void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
     for ( unsigned int j = 0; j < GetAnimationsNumber();j++ )
     {

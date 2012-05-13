@@ -9,6 +9,9 @@
 #include <vector>
 #include <string>
 #include "GDL/Variable.h"
+#if defined(GD_IDE_ONLY)
+#include "GDCore/PlatformDefinition/VariablesContainer.h"
+#endif
 
 /**
  * \brief A container for Game Develop variables.
@@ -16,6 +19,9 @@
  * A container containing Game Develop variables. Used by objects, games and scenes.
  */
 class GD_API ListVariable
+#if defined(GD_IDE_ONLY)
+ : public gd::VariablesContainer
+#endif
 {
 public:
     ListVariable() {};
@@ -40,18 +46,22 @@ public:
 
     /**
      * Return a reference to the variable at the @ index position in the list.
-     * \warning No bound check is made. Please use other overload of ListVariable::ObtainVariable when you do not have any efficiency request.
+     * \warning No bound check is made. Please use other overload of ListVariable::GetVariable when you do not have any efficiency request.
      * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
      */
-    inline Variable & ObtainVariable(unsigned int index)
-    {
-        return variables[index];
-    }
+    inline Variable & GetVariable(unsigned int index) { return variables[index]; }
 
     /**
-     * Check for resistance of a variable in the list.
+     * Return a reference to the variable at the @ index position in the list.
+     * \warning No bound check is made. Please use other overload of ListVariable::GetVariable when you do not have any efficiency request.
+     * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
      */
-    inline bool HasVariable(const std::string & varName) const
+    inline const Variable & GetVariable(unsigned int index) const { return variables[index]; }
+
+    /**
+     * Check for existence of a variable in the list.
+     */
+    inline bool HasVariableNamed(const std::string & varName) const
     {
         std::vector < Variable >::const_iterator end = variables.end();
         for (std::vector < Variable >::const_iterator i = variables.begin();i != end;++i)
@@ -72,23 +82,22 @@ public:
     }
 
     #if defined(GD_IDE_ONLY)
-    /**
-     * Remove a variable using its name.
+    /** \name Specialization of gd::VariablesContainer members
+     * See gd::VariablesContainer documentation for more information about what these members functions should do.
      */
-    inline void RemoveVariable(const std::string & varName)
-    {
-        std::vector < Variable >::const_iterator end = variables.end();
-        for (std::vector < Variable >::iterator i = variables.begin();i != end;++i)
-        {
-            if ( i->GetName() == varName)
-            {
-                variables.erase(i);
-                return;
-            }
-        }
+    ///@{
+    virtual ListVariable * Clone() const { return new ListVariable(*this); };
+    virtual void Create(const gd::VariablesContainer & source);
 
-        return;
-    }
+    virtual Variable & GetVariable(const std::string & name);
+    virtual const Variable & GetVariable(const std::string & name) const;
+    virtual unsigned int GetVariablePosition(const std::string & name) const;
+    virtual unsigned int GetVariableCount() const;
+    virtual void InsertNewVariable(const std::string & name, unsigned int position);
+    virtual void InsertVariable(const gd::Variable & variable, unsigned int position);
+    virtual void RemoveVariable(const std::string & name);
+    virtual void SwapVariables(unsigned int firstVariableIndex, unsigned int secondVariableIndex);
+    ///@}
     #endif
 
     /**
@@ -102,7 +111,7 @@ public:
                 return variables[i].GetString();
         }
 
-        return notFoundText;
+        return badVariable.GetString();
     }
 
     /**
@@ -117,7 +126,7 @@ public:
                 return i->GetValue();
         }
 
-        return 0;
+        return badVariable.GetValue();
     }
 
     /**
@@ -139,7 +148,7 @@ public:
 private:
     std::vector < Variable > variables;
 
-    static const std::string notFoundText;
+    static Variable badVariable;
 };
 
 #endif // LISTVARIABLE_H

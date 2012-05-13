@@ -15,7 +15,8 @@ namespace GDpriv
 
 /**
  * \brief Internal class loading static extensions.
- * Class that load static extensions ( only ) and store them in ExtensionsManager
+ *
+ * Class that load extensions and store them in ExtensionsManager
  */
 class GD_API ExtensionsLoader
 {

@@ -27,9 +27,9 @@ class GD_API EventsCodeGenerator
 {
 public:
 
-    static std::string GenerateEventsCompleteCode(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events, bool compilationForRuntime = false);
-    static void DeleteUselessEvents(std::vector < BaseEventSPtr > & events);
-    static void PreprocessEventList( const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & listEvent );
+    static std::string GenerateEventsCompleteCode(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events, bool compilationForRuntime = false);
+    static void DeleteUselessEvents(std::vector < gd::BaseEventSPtr > & events);
+    static void PreprocessEventList( const Game & game, const Scene & scene, std::vector < gd::BaseEventSPtr > & listEvent );
 
     EventsCodeGenerator() : errorOccurred(false), compilationForRuntime(false) {};
     virtual ~EventsCodeGenerator() {};
@@ -43,7 +43,7 @@ public:
      * \param context Context used for generation
      * \return C++ code
      */
-    std::string GenerateEventsListCode(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
+    std::string GenerateEventsListCode(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
 
     /**
      * Generate code for executing a condition list

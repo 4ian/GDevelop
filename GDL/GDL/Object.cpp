@@ -36,16 +36,16 @@ Object::Object(string name_) :
 
 Object::~Object()
 {
-    //C++ is like hell sometimes, his implementation at last.
-    //Implementing the, empty, destructor here prevent compiler to say that there is
-    //an undefined reference to "vtable of Object".
+    //Do not forget to delete automatisms which are managed using raw pointers.
+    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    	delete it->second;
 }
 
 void Object::Init(const Object & object)
 {
     Forces = object.Forces;
     Force5 = object.Force5;
-    variablesObjet = object.variablesObjet;
+    objectVariables = object.objectVariables;
 
     name = object.name;
     type = object.type;
@@ -56,11 +56,12 @@ void Object::Init(const Object & object)
     hidden = object.hidden;
     layer = object.layer;
 
-    if ( object.optionalShader )
-        optionalShader = boost::shared_ptr<sf::Shader>(new sf::Shader(*object.optionalShader));
+    //Do not forget to delete automatisms which are managed using raw pointers.
+    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    	delete it->second;
 
     automatisms.clear();
-    for (std::map<std::string, boost::shared_ptr<Automatism> >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
+    for (std::map<std::string, Automatism* >::const_iterator it = object.automatisms.begin() ; it != object.automatisms.end(); ++it )
     {
     	automatisms[it->first] = it->second->Clone();
     	automatisms[it->first]->SetOwner(this);
@@ -168,13 +169,13 @@ float Object::TotalForceLength() const
 
 void Object::DoAutomatismsPreEvents(RuntimeScene & scene)
 {
-    for (std::map<std::string, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
         it->second->StepPreEvents(scene);
 }
 
 void Object::DoAutomatismsPostEvents(RuntimeScene & scene)
 {
-    for (std::map<std::string, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
         it->second->StepPostEvents(scene);
 }
 
@@ -182,13 +183,13 @@ std::vector < std::string > Object::GetAllAutomatismNames() const
 {
     std::vector < std::string > allNameIdentifiers;
 
-    for (std::map<std::string, boost::shared_ptr<Automatism> >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
+    for (std::map<std::string, Automatism* >::const_iterator it = automatisms.begin() ; it != automatisms.end(); ++it )
     	allNameIdentifiers.push_back(it->first);
 
     return allNameIdentifiers;
 }
 
-void Object::AddAutomatism(boost::shared_ptr<Automatism> automatism)
+void Object::AddAutomatism(Automatism * automatism)
 {
     automatisms[automatism->GetName()] = automatism;
     automatisms[automatism->GetName()]->SetOwner(this);
@@ -196,18 +197,21 @@ void Object::AddAutomatism(boost::shared_ptr<Automatism> automatism)
 #if defined(GD_IDE_ONLY)
 void Object::RemoveAutomatism(const std::string & name)
 {
+    //Do not forget to delete automatisms which are managed using raw pointers.
+    delete(automatisms[name]);
+
     automatisms.erase(name);
 }
 #endif
 
 double Object::GetVariableValue( const std::string & variable )
 {
-    return variablesObjet.GetVariableValue(variable);
+    return objectVariables.GetVariableValue(variable);
 }
 
 const std::string & Object::GetVariableString( const std::string & variable )
 {
-    return variablesObjet.GetVariableString(variable);
+    return objectVariables.GetVariableString(variable);
 }
 
 #if defined(GD_IDE_ONLY)
@@ -278,7 +282,7 @@ void Object::DeleteFromScene(RuntimeScene & scene)
     SetName("");
 
     //Notify scene that object's name has changed.
-    scene.objectsInstances.ObjectIdentifierHasChanged(shared_from_this());
+    scene.objectsInstances.ObjectIdentifierHasChanged(this);
 }
 
 void Object::PutAroundAPosition( float positionX, float positionY, float distance, float angleInDegrees )
@@ -351,7 +355,7 @@ void Object::AddForceToMoveAround( float positionX, float positionY, float angul
 
 void Object::Duplicate(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists)
 {
-    ObjSPtr newObject = Clone();
+    boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(Clone());
 
     scene.objectsInstances.AddObject(newObject);
 
@@ -385,12 +389,12 @@ bool Object::TestAngleOfDisplacement(float angle, float tolerance)
 
 void Object::ActivateAutomatism( const std::string & automatismName, bool activate )
 {
-    GetAutomatismSPtr(automatismName)->Activate(activate);
+    GetAutomatismRawPointer(automatismName)->Activate(activate);
 }
 
 bool Object::AutomatismActivated( const std::string & automatismName )
 {
-    return GetAutomatismSPtr(automatismName)->Activated();
+    return GetAutomatismRawPointer(automatismName)->Activated();
 }
 
 double Object::GetSqDistanceWithObject( const std::string &, Object * object )
@@ -583,19 +587,14 @@ std::vector<RotatedRectangle> Object::GetHitBoxes() const
     return std::vector<RotatedRectangle>();
 }
 
-bool GD_API MustBeDeleted ( boost::shared_ptr<Object> object )
-{
-    return object->GetName().empty();
-}
-
 Automatism* Object::GetAutomatismRawPointer(const std::string & name)
 {
-    return automatisms.find(name)->second.get();
+    return automatisms.find(name)->second;
 }
 
 Automatism* Object::GetAutomatismRawPointer(const std::string & name) const
 {
-    return automatisms.find(name)->second.get();
+    return automatisms.find(name)->second;
 }
 #if defined(GD_IDE_ONLY)
 gd::Automatism & Object::GetAutomatism(const std::string & name)

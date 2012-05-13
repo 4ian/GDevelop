@@ -291,7 +291,7 @@ void GD_API ReadValueFromFile( const std::string & filename, const std::string &
     hdl.ToElement()->Attribute("value", &value);
 
     //Update variable value
-    scene.variables.ObtainVariable(sceneVariable) = value;
+    scene.GetVariables().ObtainVariable(sceneVariable) = value;
 
     return;
 }
@@ -325,7 +325,7 @@ void GD_API ReadStringFromFile( const std::string & filename, const std::string 
     if ( hdl.ToElement()->Attribute("texte") == NULL ) return;
 
     //Update variable texte
-    scene.variables.ObtainVariable( sceneVariable ) = hdl.ToElement()->Attribute("texte");
+    scene.GetVariables().ObtainVariable( sceneVariable ) = hdl.ToElement()->Attribute("texte");
 
     return;
 }

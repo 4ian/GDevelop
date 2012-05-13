@@ -7,23 +7,37 @@
 #define COMMONINSTRUCTIONS_H
 #include <string>
 
+namespace GDpriv
+{
+
+namespace CommonInstructions
+{
+
 /**
  * Generate a random number between 0 and max
  */
 double GD_API Random(int max);
 
 /**
- * \param Right hand side double
- * \param Left hand side double
- * \param Relation operator : =, <, >, <=, >= or !=. Empty string is considered as =.
- * \return rhs relationalOperator lhs
- */
-bool GD_API RelationTest(double rhs, float lhs, std::string relationalOperator);
-
-/**
  * Logical negation
  * \return !param
  */
 bool GD_API LogicalNegation(bool param);
+
+/**
+ * Convert the string to a double.
+ * \warning This function is meant to be used only in GD events generated code.
+ */
+double GD_API ToDouble( const std::string & str );
+
+/**
+ * Convert the double to a string.
+ * \warning This function is meant to be used only in GD events generated code.
+ */
+std::string GD_API ToString( double number );
+
+}
+
+}
 
 #endif // COMMONINSTRUCTIONS_H

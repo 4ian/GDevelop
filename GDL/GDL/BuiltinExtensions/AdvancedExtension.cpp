@@ -25,7 +25,7 @@ AdvancedExtension::AdvancedExtension()
 
         instrInfo.AddCodeOnlyParameter("conditionInverted", "");
 
-        instrInfo.cppCallingInformation.SetFunctionName("LogicalNegation").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::LogicalNegation").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
     DECLARE_END_CONDITION()
     #endif

@@ -45,8 +45,7 @@
 #include "llvm/Support/Program.h"
 #include "llvm/Support/Signals.h"
 #include "llvm/Support/system_error.h"
-#include "llvm/Target/TargetRegistry.h"
-#include "llvm/Target/TargetSelect.h"
+#include "llvm/Support/TargetSelect.h"
 #include "clang/Driver/Arg.h"
 #include "clang/Driver/ArgList.h"
 #include "clang/Driver/CC1Options.h"
@@ -133,20 +132,19 @@ void CodeCompiler::ProcessTasks()
 
             if ( currentTask.eventsGeneratedCode ) //Define special arguments for events generated code
             {
-                #if defined(WINDOWS)
+                //PCH disabled: The gain in speed is not that high ( about 1 seconds ) and it triggers some weird errors with some headers ( locale_facets.tcc )
+                /*#if defined(WINDOWS)
                 if ( !currentTask.optimize ) //Don't use precompiled header when optimizing, as they are built without optimizations
                 {
                     args.push_back("-include-pch");
                     args.push_back(!currentTask.compilationForRuntime ? "include/GDL/GDL/Events/PrecompiledHeader.h.pch" : "include/GDL/GDL/Events/PrecompiledHeaderRuntime.h.pch");
                 }
-                #endif
+                #endif*/
 
                 args.push_back("-fsyntax-only");
                 args.push_back("-fcxx-exceptions");
                 args.push_back("-fexceptions");
-                args.push_back("-fgnu-runtime");
-                args.push_back("-fdeprecated-macro");
-                args.push_back("-w"); //No warning
+                args.push_back("-w"); //No warnings
             }
 
             //Headers
@@ -154,8 +152,7 @@ void CodeCompiler::ProcessTasks()
                 args.push_back((*header).c_str());
 
             //Additional headers
-            args.push_back("-nobuiltininc"); //Disable standard include directories. All includes files are provided by Game Develop to ensure compatibility.
-            args.push_back("-nostdinc");
+            args.push_back("-nostdsysteminc"); //Disable standard include directories. All includes files are provided by Game Develop to ensure compatibility. Note: Arguments used with Clang prior to version 3.0:  -nobuiltininc, -nostdinc, -nostdinc++
             args.push_back("-nostdinc++");
             std::vector<std::string> additionalHeadersArgs;
             for (unsigned int i = 0;i<currentTask.additionalHeaderDirectories.size();++i)
@@ -166,19 +163,22 @@ void CodeCompiler::ProcessTasks()
             if ( !currentTask.compilationForRuntime ) args.push_back("-DGD_IDE_ONLY"); //Already set in PCH
             if ( currentTask.optimize ) args.push_back("-O1");
 
-            //GD library related defines. ( Also already set in PCH )
+            //GD library related defines.
             #if defined(WINDOWS)
+            args.push_back("-DGD_CORE_API=__declspec(dllimport)");
             args.push_back("-DGD_API=__declspec(dllimport)");
             args.push_back("-DGD_EXTENSION_API=__declspec(dllimport)");
             #elif defined(LINUX)
+            args.push_back("-DGD_CORE_API= ");
             args.push_back("-DGD_API= ");
             args.push_back("-DGD_EXTENSION_API= ");
             #elif defined(MAC)
+            args.push_back("-DGD_CORE_API= ");
             args.push_back("-DGD_API= ");
             args.push_back("-DGD_EXTENSION_API= ");
             #endif
 
-            //Other common defines. ( Also already set in PCH )
+            //Other common defines.
             #if defined(RELEASE)
             args.push_back("-DRELEASE");
             args.push_back("-DNDEBUG");
@@ -209,9 +209,16 @@ void CodeCompiler::ProcessTasks()
 
             TextDiagnosticPrinter * clangDiagClient = new TextDiagnosticPrinter(errorFile, DiagnosticOptions());
             llvm::IntrusiveRefCntPtr<DiagnosticIDs> clangDiagID(new DiagnosticIDs());
-            Diagnostic * clangDiags = new Diagnostic(clangDiagID, clangDiagClient);
+            DiagnosticsEngine * clangDiags = new DiagnosticsEngine(clangDiagID, clangDiagClient);
 
             CompilerInvocation::CreateFromArgs(Clang.getInvocation(), args.begin(),  args.end(), *clangDiags);
+
+            std::vector< std::string > allArgs;
+            Clang.getInvocation().toArgs(allArgs);
+            for (unsigned int i = 0;i<allArgs.size();++i)
+            {
+                std::cout << "Arg:" << allArgs[i] << std::endl;
+            }
 
             Clang.setDiagnostics(clangDiags);
             if (!Clang.hasDiagnostics())

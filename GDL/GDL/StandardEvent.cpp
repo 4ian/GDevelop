@@ -91,7 +91,6 @@ void StandardEvent::SaveToXml(TiXmlElement * eventElem) const
 void StandardEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
     if ( eventElem == NULL ) return;
-    std::cout << "YO";
 
     //Conditions
     if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
@@ -99,18 +98,15 @@ void StandardEvent::LoadFromXml(const TiXmlElement * eventElem)
     else
         cout << "Aucune informations sur les conditions d'un évènement";
 
-    std::cout << "YO";
     //Actions
     if ( eventElem->FirstChildElement( "Actions" ) != NULL )
         OpenSaveGame::OpenActions(actions, eventElem->FirstChildElement( "Actions" ));
     else
         cout << "Aucune informations sur les actions d'un évènement";
 
-    std::cout << "YO";
     //Subevents
     if ( eventElem->FirstChildElement( "Events" ) != NULL )
         OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
-    std::cout << "YOEND";
 }
 
 /**

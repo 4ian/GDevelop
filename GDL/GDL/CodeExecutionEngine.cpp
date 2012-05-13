@@ -11,8 +11,7 @@
 #include <llvm/Support/DynamicLibrary.h>
 #include <llvm/Config/config.h>
 #include <llvm/Module.h>
-#include <llvm/Target/TargetRegistry.h>
-#include <llvm/Target/TargetSelect.h>
+#include <llvm/Support/TargetSelect.h>
 #include <llvm/Bitcode/ReaderWriter.h>
 #include <llvm/Support/MemoryBuffer.h>
 #include <llvm/Support/TypeBuilder.h>
@@ -140,7 +139,7 @@ bool CodeExecutionEngine::LoadFromLLVMBitCode(std::vector<llvm::MemoryBuffer *> 
         }
 
         std::string linkError;
-        if ( llvm::Linker::LinkModules(llvmMainModule, llvmModule, &linkError) /*LinkModules return true if an error occurred. */)
+        if ( llvm::Linker::LinkModules(llvmMainModule, llvmModule, 0, &linkError) /*LinkModules return true if an error occurred. */)
         {
             std::cout << "WARNING: A (secondary) bitcode module could not be linked to the main module: " << linkError << std::endl;
             continue;

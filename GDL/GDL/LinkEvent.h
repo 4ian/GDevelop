@@ -18,17 +18,17 @@ class wxWindow;
 /**
  * \brief Internal built-in LinkEvent, inserting events from another scene/external events.
  */
-class LinkEvent : public BaseEvent
+class LinkEvent : public gd::BaseEvent
 {
     public:
         LinkEvent(): BaseEvent(), start(std::string::npos), end(std::string::npos) {};
         virtual ~LinkEvent() {};
-        virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new LinkEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new LinkEvent(*this));}
 
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-        virtual void Preprocess(const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
+        virtual void Preprocess(const Game & game, const Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
 
         std::string sceneLinked;
         int start;

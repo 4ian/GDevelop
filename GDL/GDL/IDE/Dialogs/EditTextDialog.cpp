@@ -15,10 +15,11 @@
 #include "GDL/IDE/Dialogs/EditExpression.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
-#include "GDL/IDE/Dialogs/ChooseVariableDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include <wx/textdlg.h>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
+#include "GDL/ObjectHelpers.h"
 #include "GDL/Object.h"
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
@@ -26,7 +27,7 @@
 #include "GDL/IDE/TreeItemStrExpressionInfoData.h"
 #include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
 #include "GDL/IDE/Dialogs/AdvancedTextEntryDlg.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/IDE/ExpressionsCorrectnessTesting.h"
 
 //(*IdInit(EditTextDialog)
@@ -440,23 +441,17 @@ string EditTextDialog::ShowParameterDialog(const ParameterMetadata & ParameterMe
     }
     else if ( ParameterMetadata.type == "scenevar" )
     {
-        ChooseVariableDialog dialog(this, scene.variables);
+        ChooseVariableDialog dialog(this, scene.GetVariables());
         if ( dialog.ShowModal() == 1 )
-        {
-            scene.variables = dialog.variables;
             return dialog.selectedVariable;
-        }
 
         return "";
     }
     else if ( ParameterMetadata.type == "globalvar" )
     {
-        ChooseVariableDialog dialog(this, game.variables);
+        ChooseVariableDialog dialog(this, game.GetVariables());
         if ( dialog.ShowModal() == 1 )
-        {
-            game.variables = dialog.variables;
             return dialog.selectedVariable;
-        }
 
         return "";
     }
@@ -474,12 +469,9 @@ string EditTextDialog::ShowParameterDialog(const ParameterMetadata & ParameterMe
         else
             return string(wxGetTextFromUser(ParameterMetadata.description, _("Variable"), "", this).mb_str());
 
-        ChooseVariableDialog dialog(this, object->variablesObjet);
+        ChooseVariableDialog dialog(this, object->GetVariables());
         if ( dialog.ShowModal() == 1 )
-        {
-            object->variablesObjet = dialog.variables;
             return dialog.selectedVariable;
-        }
 
         return "";
     }

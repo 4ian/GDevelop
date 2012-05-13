@@ -917,7 +917,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
 /**
  * Generate events list code.
  */
-string EventsCodeGenerator::GenerateEventsListCode(Game & game, Scene & scene, vector < BaseEventSPtr > & events, const EventsCodeGenerationContext & parentContext)
+string EventsCodeGenerator::GenerateEventsListCode(Game & game, Scene & scene, vector < gd::BaseEventSPtr > & events, const EventsCodeGenerationContext & parentContext)
 {
     string output;
 
@@ -936,7 +936,7 @@ string EventsCodeGenerator::GenerateEventsListCode(Game & game, Scene & scene, v
     return output;
 }
 
-string EventsCodeGenerator::GenerateEventsCompleteCode(Game & game, Scene & scene, vector < BaseEventSPtr > & events, bool compilationForRuntime)
+string EventsCodeGenerator::GenerateEventsCompleteCode(Game & game, Scene & scene, vector < gd::BaseEventSPtr > & events, bool compilationForRuntime)
 {
     string output;
 
@@ -948,13 +948,16 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(Game & game, Scene & scen
     //Generate whole events code
     string wholeEventsCode = codeGenerator.GenerateEventsListCode(game, scene, events, context);
 
-    //Generate default code around events
+    //Generate default code around events:
+    //Includes
+    output += "#include <vector>\n#include <map>\n#include <string>\n#include <SFML/System/Clock.hpp>\n#include <SFML/System/Vector2.hpp>\n#include <SFML/Graphics/Color.hpp>\n#include \"GDL/RuntimeContext.h\"\n#include \"GDL/Object.h\"\n";
     for ( set<string>::iterator include = codeGenerator.GetIncludeFiles().begin() ; include != codeGenerator.GetIncludeFiles().end(); ++include )
         output += "#include \""+*include+"\"\n";
 
     output +=
-    "#include <vector>\n#include <map>\n#include <string>\n#include <stdio.h>\n#include <SFML/System/Clock.hpp>\n#include <SFML/System/Vector2.hpp>\n#include <SFML/Graphics/Color.hpp>\n#include \"GDL/RuntimeContext.h\"\n#include \"GDL/Object.h\"\n#include \"GDL/BuiltinExtensions/AudioTools.h\"\n#include \"GDL/BuiltinExtensions/CommonInstructionsTools.h\"\n#include \"GDL/LightweightCommonTools.h\"\n#include \"GDL/BuiltinExtensions/FileTools.h\"\n#include \"GDL/BuiltinExtensions/KeyboardTools.h\"\n#include \"GDL/BuiltinExtensions/MouseTools.h\"\n#include \"GDL/BuiltinExtensions/NetworkTools.h\"\n#include \"GDL/BuiltinExtensions/ObjectTools.h\"\n#include \"GDL/BuiltinExtensions/RuntimeSceneCameraTools.h\"\n#include \"GDL/BuiltinExtensions/RuntimeSceneTools.h\"\n#include \"GDL/SpriteObject.h\"\n#include \"GDL/BuiltinExtensions/SpriteTools.h\"\n#include \"GDL/BuiltinExtensions/TimeTools.h\"\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
+    "\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
 
+    //Extra declarations needed by events
     for ( set<string>::iterator declaration = codeGenerator.GetCustomGlobalDeclaration().begin() ; declaration != codeGenerator.GetCustomGlobalDeclaration().end(); ++declaration )
         output += *declaration+"\n";
 
@@ -1009,7 +1012,7 @@ std::string EventsCodeGenerator::ConvertToCppString(std::string plainString)
 /**
  * Remove events not executed
  */
-void EventsCodeGenerator::DeleteUselessEvents(vector < BaseEventSPtr > & events)
+void EventsCodeGenerator::DeleteUselessEvents(vector < gd::BaseEventSPtr > & events)
 {
     for ( unsigned int eId = events.size()-1; eId < events.size();--eId )
     {
@@ -1024,7 +1027,7 @@ void EventsCodeGenerator::DeleteUselessEvents(vector < BaseEventSPtr > & events)
 /**
  * Call preprocession method of each event
  */
-void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & scene, vector < BaseEventSPtr > & listEvent )
+void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & scene, vector < gd::BaseEventSPtr > & listEvent )
 {
     #if defined(GD_IDE_ONLY)
     boost::shared_ptr<ProfileEvent> previousProfileEvent;

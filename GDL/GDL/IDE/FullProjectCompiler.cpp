@@ -76,7 +76,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     }
 
     //Used to handle all files which must be exported
-    ResourcesMergingHelper resourcesMergingHelper;
+    gd::ResourcesMergingHelper resourcesMergingHelper;
 
     wxLogNull noLogPlease;
     wxString tempDir = GetTempDir();

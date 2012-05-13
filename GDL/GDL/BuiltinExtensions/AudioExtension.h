@@ -7,7 +7,7 @@
 #define AUDIOEXTENSION_H
 #include "GDL/ExtensionBase.h"
 class Instruction;
-class ArbitraryResourceWorker;
+namespace gd {class ArbitraryResourceWorker;}
 
 /**
  * \brief Internal builtin extension providing audio features.
@@ -19,7 +19,7 @@ class AudioExtension : public ExtensionBase
         virtual ~AudioExtension() {};
 
         #if defined(GD_IDE_ONLY)
-        virtual void ExposeActionsResources(Instruction & action, ArbitraryResourceWorker & worker);
+        virtual void ExposeActionsResources(Instruction & action, gd::ArbitraryResourceWorker & worker);
 
         bool HasDebuggingProperties() const { return true; };
         void GetPropertyForDebugger(RuntimeScene & scene, unsigned int propertyNb, std::string & name, std::string & value) const;

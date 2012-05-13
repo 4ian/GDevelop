@@ -15,7 +15,7 @@
 #include <boost/shared_ptr.hpp>
 #include <SFML/System.hpp>
 #include "GDL/IDE/CodeCompiler.h"
-class ArbitraryResourceWorker;
+namespace gd {class ArbitraryResourceWorker;}
 class CodeExecutionEngine;
 class Scene;
 class Game;
@@ -82,9 +82,9 @@ public:
 
     Game * game;
     Scene * scene;
-    ArbitraryResourceWorker & resourceWorker;
+    gd::ArbitraryResourceWorker & resourceWorker;
 
-    EventsCodeCompilerRuntimePreWork(Game * game_, Scene * scene_, ArbitraryResourceWorker & resourceWorker_) : game(game_), scene(scene_), resourceWorker(resourceWorker_) {};
+    EventsCodeCompilerRuntimePreWork(Game * game_, Scene * scene_, gd::ArbitraryResourceWorker & resourceWorker_) : game(game_), scene(scene_), resourceWorker(resourceWorker_) {};
     virtual ~EventsCodeCompilerRuntimePreWork() {};
 };
 

@@ -12,17 +12,18 @@
 #include <boost/shared_ptr.hpp>
 #include "GDL/Position.h"
 #include "GDL/Layer.h"
-#if defined(GD_IDE_ONLY)
-#include "GDCore/PlatformDefinition/Layout.h"
-#endif
 class Object;
 class Game;
 class CodeExecutionEngine;
 class AutomatismsSharedDatas;
 class BaseProfiler;
-class BaseEvent;
 class TiXmlElement;
-typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
+#if defined(GD_IDE_ONLY)
+#include "GDCore/PlatformDefinition/Layout.h"
+namespace gd { class BaseEvent; }
+namespace gd { typedef boost::shared_ptr<BaseEvent> BaseEventSPtr; }
+#endif
+
 #undef GetObject //Disable an annoying macro
 
 /**
@@ -98,6 +99,16 @@ public:
      */
     inline std::vector < boost::shared_ptr<Object> > & GetInitialObjects() { return initialObjects; }
 
+    /**
+     * Provide access to the ListVariable member containing the layout variables
+     */
+    inline const ListVariable & GetVariables() const { return variables; }
+
+    /**
+     * Provide access to the ListVariable member containing the layout variables
+     */
+    inline ListVariable & GetVariables() { return variables; }
+
     virtual void LoadFromXml(const TiXmlElement * element);
 
     #if defined(GD_IDE_ONLY)
@@ -105,8 +116,8 @@ public:
      * See gd::Layout documentation for more information about what these members functions should do.
      */
     ///@{
-    virtual const std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() const { return events; }
-    virtual std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() { return events; }
+    virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const { return events; }
+    virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() { return events; }
 
     virtual bool HasObjectNamed(const std::string & name) const;
     virtual gd::Object & GetObject(const std::string & name);
@@ -143,7 +154,6 @@ public:
     #endif
     vector < InitialPosition >              initialObjectsPositions; ///< List of all objects to be put on the scene at the beginning
     vector < Layer >                        initialLayers; ///< Initial layers
-    ListVariable                            variables; ///< Variables list
     std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
 
     mutable std::vector<std::string>        externalSourcesDependList; ///< List of source files the scene code depends on.
@@ -170,9 +180,10 @@ private:
     unsigned int                            backgroundColorB; ///< Background color Blue component
     std::string                             title; ///< Title displayed in the window
     vector < boost::shared_ptr<Object> >    initialObjects; ///< Objects available.
+    ListVariable                            variables; ///< Variables list
 
     #if defined(GD_IDE_ONLY)
-    vector < BaseEventSPtr >                events; ///< Scene events
+    vector < gd::BaseEventSPtr >            events; ///< Scene events
     bool                                    eventsModified;
     #endif
 

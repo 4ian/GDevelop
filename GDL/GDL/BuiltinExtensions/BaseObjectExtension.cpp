@@ -294,7 +294,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("number");
+            instrInfo.cppCallingInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
 
         DECLARE_END_OBJECT_ACTION()
 
@@ -312,7 +312,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("string");
+            instrInfo.cppCallingInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
 
         DECLARE_END_OBJECT_ACTION()
 
@@ -466,7 +466,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("number");
+            instrInfo.cppCallingInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
 
         DECLARE_END_OBJECT_CONDITION()
 
@@ -484,7 +484,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.ObtainVariable").SetManipulatedType("string");
+            instrInfo.cppCallingInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
 
         DECLARE_END_OBJECT_CONDITION()
 
@@ -500,7 +500,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.HasVariable");
+            instrInfo.cppCallingInformation.SetFunctionName("GetVariables().HasVariable");
 
         DECLARE_END_OBJECT_CONDITION()
 
@@ -732,14 +732,14 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
 
-            instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.GetVariableValue");
+            instrInfo.cppCallingInformation.SetFunctionName("GetVariables().GetVariableValue");
         DECLARE_END_OBJECT_EXPRESSION()
 
         DECLARE_OBJECT_STR_EXPRESSION("VariableString", _("Variable d'un objet"), _("Texte d'une variable d'un objet"), _("Variables"), "res/actions/var.png")
             instrInfo.AddParameter("object", _("Objet"), "", false);
             instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
 
-            instrInfo.cppCallingInformation.SetFunctionName("variablesObjet.GetVariableString");
+            instrInfo.cppCallingInformation.SetFunctionName("GetVariables().GetVariableString");
         DECLARE_END_OBJECT_STR_EXPRESSION()
         #endif
 

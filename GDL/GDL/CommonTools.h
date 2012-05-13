@@ -2,24 +2,19 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
 #ifndef STDALGO_H_INCLUDED
 #define STDALGO_H_INCLUDED
-
 #include <string>
 #include <sstream>
-#include <iostream>
 #include <vector>
 #include <cmath>
 #if defined(GD_IDE_ONLY)
 class wxString;
 #endif
 
-#include "GDL/LightweightCommonTools.h"
-
 /**
  * Convert anything to an integer.
- * Example :
+ * Example:
  * \code
  * std::string five = 5;
  * int number = ToInt(five);
@@ -46,6 +41,31 @@ float ToFloat( const T & value )
     std::istringstream oss(value);
     oss >> f;
     return f;
+}
+
+/**
+ * Convert anything to a double
+ * \ingroup CommonProgrammingTools
+ */
+template<typename T>
+double ToDouble( const T & value )
+{
+    double d;
+    std::istringstream oss(value);
+    oss >> d;
+    return d;
+}
+
+/**
+ * Convert anything to a std::string
+ * \ingroup CommonProgrammingTools
+ */
+template<typename T>
+std::string ToString( const T & value )
+{
+    std::ostringstream oss;
+    oss << value;
+    return oss.str();
 }
 
 #if defined(GD_IDE_ONLY)
@@ -94,5 +114,25 @@ struct StringEmpty
       return a.empty();
    }
 };
+
+#ifdef __GNUC__
+/**
+ * Round the number to the nearest integer
+ * \ingroup CommonProgrammingTools
+ */
+inline int GDRound(float x)
+{
+    return round(x);
+}
+#else
+/**
+ * Round the number to the nearest integer
+ * \ingroup CommonProgrammingTools
+ */
+inline double GDRound( double d )
+{
+    return ( d >= 0 ? floor(d+0.5) : ceil(d-0.5) );
+}
+#endif
 
 #endif // STDALGO_H_INCLUDED

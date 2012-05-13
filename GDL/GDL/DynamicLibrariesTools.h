@@ -23,7 +23,7 @@ namespace GDpriv
 /**
  * Open a raw C++ dynamic library
  * On system with POSIX support, loading is made with RTLD_LAZY and RTLD_LOCAL flags.
- * If symbols of libraries need to be available globaly, call SetLibraryGlobal after.
+ * If symbols of libraries need to be available globally, call SetLibraryGlobal after.
  */
 Handle OpenLibrary(const char* path);
 
@@ -38,7 +38,7 @@ void* GetSymbol(Handle library, const char* name);
 void CloseLibrary(Handle library);
 
 /**
- * Get the last error occured when loading a dynamic library
+ * Get the last error occurred when loading a dynamic library
  */
 std::string DynamicLibraryLastError();
 

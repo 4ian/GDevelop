@@ -10,53 +10,6 @@
 
 #ifndef LIGHTWEIGHTCOMMONTOOLS_H_INCLUDED
 #define LIGHTWEIGHTCOMMONTOOLS_H_INCLUDED
-#include <sstream>
-#include <cmath>
 
-/**
- * Convert anything to a double
- * \ingroup CommonProgrammingTools
- */
-template<typename T>
-double ToDouble( const T & value )
-{
-    double d;
-    std::istringstream oss(value);
-    oss >> d;
-    return d;
-}
-
-/**
- * Convert anything to a std::string
- * \ingroup CommonProgrammingTools
- */
-template<typename T>
-std::string ToString( const T & value )
-{
-    std::ostringstream oss;
-    oss << value;
-    return oss.str();
-}
-
-
-#ifdef __GNUC__
-/**
- * Round the number to the nearest integer
- * \ingroup CommonProgrammingTools
- */
-inline int GDRound(float x)
-{
-    return round(x);
-}
-#else
-/**
- * Round the number to the nearest integer
- * \ingroup CommonProgrammingTools
- */
-inline double GDRound( double d )
-{
-return floor( d + 0.5 );
-}
-#endif
 
 #endif // LIGHTWEIGHTCOMMONTOOLS_H_INCLUDED

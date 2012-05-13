@@ -555,7 +555,7 @@ AudioExtension::AudioExtension()
 }
 
 #if defined(GD_IDE_ONLY)
-void AudioExtension::ExposeActionsResources(Instruction & action, ArbitraryResourceWorker & worker)
+void AudioExtension::ExposeActionsResources(Instruction & action, gd::ArbitraryResourceWorker & worker)
 {
     if ( action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" || action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal" )
     {

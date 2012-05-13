@@ -145,30 +145,30 @@ bool ExtensionsManager::HasEventType(std::string eventType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        if ( extensionsLoaded[i]->CreateEvent(eventType) != boost::shared_ptr<BaseEvent>() )
+        if ( extensionsLoaded[i]->CreateEvent(eventType) != boost::shared_ptr<gd::BaseEvent>() )
             return true;
     }
 
     return false;
 }
 
-boost::shared_ptr<BaseEvent> ExtensionsManager::CreateEvent(std::string eventType) const
+boost::shared_ptr<gd::BaseEvent> ExtensionsManager::CreateEvent(std::string eventType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        boost::shared_ptr<BaseEvent> event = extensionsLoaded[i]->CreateEvent(eventType);
-        if ( event != boost::shared_ptr<BaseEvent>() )
+        boost::shared_ptr<gd::BaseEvent> event = extensionsLoaded[i]->CreateEvent(eventType);
+        if ( event != boost::shared_ptr<gd::BaseEvent>() )
             return event;
     }
 
-    return boost::shared_ptr<BaseEvent>();
+    return boost::shared_ptr<gd::BaseEvent>();
 }
 
 bool ExtensionsManager::HasAutomatism(std::string automatismType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        if ( extensionsLoaded[i]->CreateAutomatism(automatismType) != boost::shared_ptr<Automatism>() )
+        if ( extensionsLoaded[i]->CreateAutomatism(automatismType) != NULL )
             return true;
     }
 
@@ -191,16 +191,16 @@ boost::shared_ptr<Object> ExtensionsManager::CreateObject(std::string type, std:
     return boost::shared_ptr<Object> (object, destroyFunctionTable[type]);
 }
 
-boost::shared_ptr<Automatism> ExtensionsManager::CreateAutomatism(std::string automatismType) const
+Automatism* ExtensionsManager::CreateAutomatism(std::string automatismType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        boost::shared_ptr<Automatism> automatism = extensionsLoaded[i]->CreateAutomatism(automatismType);
-        if ( automatism != boost::shared_ptr<Automatism>() )
+        Automatism* automatism = extensionsLoaded[i]->CreateAutomatism(automatismType);
+        if ( automatism != NULL )
             return automatism;
     }
 
-    return boost::shared_ptr<Automatism>();
+    return NULL;
 }
 
 boost::shared_ptr<AutomatismsSharedDatas> ExtensionsManager::CreateAutomatismSharedDatas(std::string automatismType) const

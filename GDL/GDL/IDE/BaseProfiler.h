@@ -11,10 +11,10 @@
 #include <boost/weak_ptr.hpp>
 #include <SFML/System.hpp>
 #include "GDL/profile.h"
-class BaseEvent;
+namespace gd { class BaseEvent; }
 
 /**
- * Used as a link between compiled events code and events.
+ * \brief Internal class used as a link between compiled events code and events.
  */
 class ProfileLink
 {
@@ -27,9 +27,7 @@ public:
 
     btClock profileClock;
     unsigned long int time;
-    boost::weak_ptr<BaseEvent> originalEvent;
-private:
-
+    boost::weak_ptr<gd::BaseEvent> originalEvent;
 };
 
 /**
@@ -37,34 +35,34 @@ private:
  */
 class GD_API BaseProfiler
 {
-    public:
-        BaseProfiler();
-        virtual ~BaseProfiler() {};
+public:
+    BaseProfiler();
+    virtual ~BaseProfiler() {};
 
-        bool profilingActivated; ///< Set this to true so as to activate profiling.
+    bool profilingActivated; ///< Set this to true so as to activate profiling.
 
-        unsigned long int lastEventsTime; ///< Time used by events during the last frame
-        unsigned long int lastRenderingTime; ///< Time used by rendering during the last frame
-        unsigned long int totalSceneTime; ///< Total time used by events and rendering since the beginning.
-        unsigned long int totalEventsTime; ///< Total time used by events since the beginning.
+    unsigned long int lastEventsTime; ///< Time used by events during the last frame
+    unsigned long int lastRenderingTime; ///< Time used by rendering during the last frame
+    unsigned long int totalSceneTime; ///< Total time used by events and rendering since the beginning.
+    unsigned long int totalEventsTime; ///< Total time used by events since the beginning.
 
-        btClock eventsClock; ///< Used to compute time used by events during the frame
-        btClock renderingClock; ///< Used to compute time used by rendering during the frame
+    btClock eventsClock; ///< Used to compute time used by events during the frame
+    btClock renderingClock; ///< Used to compute time used by rendering during the frame
 
-        std::vector<ProfileLink> profileEventsInformation; ///< Used by events generated code
+    std::vector<ProfileLink> profileEventsInformation; ///< Used by events generated code
 
-        void Update();
-        void Reset();
+    void Update();
+    void Reset();
 
-    protected:
-        sf::Uint32 stepTime; ///< Time between each UpdateGUI.
+protected:
+    sf::Uint32 stepTime; ///< Time between each UpdateGUI.
 
-        /**
-         * Redefine this function so as to update GUI.
-         */
-        virtual void UpdateGUI() = 0;
-    private:
-        sf::Clock stepClock;
+    /**
+     * Redefine this function so as to update GUI.
+     */
+    virtual void UpdateGUI() = 0;
+private:
+    sf::Clock stepClock;
 };
 
 #endif // BASEPROFILER_H

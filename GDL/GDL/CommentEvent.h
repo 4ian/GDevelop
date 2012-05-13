@@ -19,12 +19,12 @@ class EventsEditorSelection;
 /**
  * \brief Internal builtin Comment Event, allowing to add a simple text in events.
  */
-class GD_API CommentEvent : public BaseEvent
+class GD_API CommentEvent : public gd::BaseEvent
 {
     public:
         CommentEvent() : BaseEvent(), r(255), v(230), b(109), textR(0), textG(0), textB(0) {};
         virtual ~CommentEvent() {};
-        virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new CommentEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new CommentEvent(*this));}
 
         void SaveToXml(TiXmlElement * eventElem) const;
         void LoadFromXml(const TiXmlElement * eventElem);

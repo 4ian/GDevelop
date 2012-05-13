@@ -26,7 +26,7 @@
 #include <wx/textdlg.h>
 #include <wx/msgdlg.h>
 
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/Animation.h"

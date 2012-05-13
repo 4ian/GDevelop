@@ -39,7 +39,7 @@
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/IDE/ImagesUsedInventorizer.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 
 #include "GDL/Game.h"
 #include "GDL/Scene.h"

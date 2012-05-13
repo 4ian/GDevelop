@@ -24,6 +24,7 @@ class CodeExecutionEngine;
 class Object;
 class SoundManager;
 class AutomatismsRuntimeSharedDatas;
+class ExtensionBase;
 #undef GetObject //Disable an annoying macro
 
 #if defined(GD_IDE_ONLY)
@@ -53,9 +54,18 @@ public:
     BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
     #endif
     ObjInstancesHolder                      objectsInstances; ///< Contains all of the objects on the scene
-    ListVariable                            variables; ///<List of the scene variables
     std::vector < ManualTimer >             timers; ///<List of the timer currently used.
     bool                                    running; ///< True if the scene is being played
+
+    /**
+     * Provide access to the ListVariable member containing the variables
+     */
+    inline const ListVariable & GetVariables() const { return variables; }
+
+    /**
+     * Provide access to the ListVariable member containing the variables
+     */
+    inline ListVariable & GetVariables() { return variables; }
 
     /**
      * Get the list of all layers of the scene
@@ -188,22 +198,23 @@ protected:
     void ManageObjectsAfterEvents();
     bool UpdateTime();
 
-    bool firstLoop; ///<true if the scene was just rendered once.
-    bool isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
-    unsigned int realElapsedTime; ///< Elpased time since last frame, in milliseconds, without taking time scale in account.
-    unsigned int elapsedTime; ///< Elpased time since last frame, in milliseconds
-    double timeScale; ///< Time scale
-    unsigned int timeFromStart; ///< Time in milliseconds elapsed from start
-    unsigned int pauseTime;
-    int   specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
+    bool                                    firstLoop; ///<true if the scene was just rendered once.
+    bool                                    isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
+    std::vector<sf::Event>                  renderTargetEvents;
+    unsigned int                            realElapsedTime; ///< Elpased time since last frame, in milliseconds, without taking time scale in account.
+    unsigned int                            elapsedTime; ///< Elpased time since last frame, in milliseconds
+    double                                  timeScale; ///< Time scale
+    unsigned int                            timeFromStart; ///< Time in milliseconds elapsed from start
+    unsigned int                            pauseTime;
+    int                                     specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
+    ListVariable                            variables; ///<List of the scene variables
+    std::vector < RuntimeLayer >            layers; ///<List of the layers
+    std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
 
     std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
-    std::vector < RuntimeLayer > layers; ///<List of the layers
 
     vector < Text > textes; ///<Deprecated way of displaying a text
     bool DisplayLegacyTexts(string layer = "");
-
-    std::vector<sf::Event> renderTargetEvents;
 
     void Init(const RuntimeScene & scene);
 

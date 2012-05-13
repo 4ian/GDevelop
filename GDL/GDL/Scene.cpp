@@ -9,6 +9,7 @@
 #include "GDL/Game.h"
 #include "GDL/Position.h"
 #include "GDL/Object.h"
+#include "GDL/ObjectHelpers.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/CodeExecutionEngine.h"
@@ -237,11 +238,11 @@ void Scene::Init(const Scene & scene)
 
     GetInitialObjects().clear();
     for (unsigned int i =0;i<scene.GetInitialObjects().size();++i)
-    	GetInitialObjects().push_back( scene.GetInitialObjects()[i]->Clone() );
+    	GetInitialObjects().push_back( boost::shared_ptr<Object>(scene.GetInitialObjects()[i]->Clone()) );
 
     initialObjectsPositions = scene.initialObjectsPositions;
     initialLayers = scene.initialLayers;
-    variables = scene.variables;
+    variables = scene.GetVariables();
 
     automatismsInitialSharedDatas.clear();
     for (std::map< std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();

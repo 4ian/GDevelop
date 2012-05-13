@@ -84,11 +84,7 @@ public:
     /**
      * Call this when changing name/identifier of an object.
      */
-    inline void ObjectIdentifierHasChanged(const ObjSPtr & object)
-    {
-        RemoveObject(object);
-        AddObject(object);
-    }
+    void ObjectIdentifierHasChanged(Object * object);
 
     /**
      * Return an new ObjInstancesHolder containing the same

@@ -17,7 +17,7 @@ class EventsEditorSelection;
 /**
  * \brief Internal built-in event being repeated a number of times.
  */
-class RepeatEvent : public BaseEvent
+class RepeatEvent : public gd::BaseEvent
 {
     public:
         RepeatEvent();
@@ -25,15 +25,15 @@ class RepeatEvent : public BaseEvent
         virtual ~RepeatEvent() {};
 
         RepeatEvent& operator=(const RepeatEvent & event);
-        virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new RepeatEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new RepeatEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
         virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
-        virtual const std::vector < BaseEventSPtr > & GetSubEvents() const {return events;};
-        virtual std::vector < BaseEventSPtr > & GetSubEvents() {return events;};
-        void SetSubEvents(std::vector < BaseEventSPtr > & subEvents_) {events = subEvents_;};
+        virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
+        virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return events;};
+        void SetSubEvents(std::vector < gd::BaseEventSPtr > & subEvents_) {events = subEvents_;};
 
         const std::vector < Instruction > & GetConditions() const { return conditions; };
         std::vector < Instruction > & GetConditions() { return conditions; };
@@ -75,7 +75,7 @@ class RepeatEvent : public BaseEvent
         GDExpression repeatNumberExpression;
         std::vector < Instruction > conditions;
         std::vector < Instruction > actions;
-        std::vector < BaseEventSPtr > events;
+        std::vector < gd::BaseEventSPtr > events;
 
         bool repeatNumberExpressionSelected;
 };

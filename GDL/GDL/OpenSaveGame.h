@@ -14,8 +14,8 @@ class Instruction;
 class InstructionMetadata;
 class InitialPosition;
 class Layer;
-class BaseEvent;
-typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
+namespace gd { class BaseEvent; }
+namespace gd {typedef boost::shared_ptr<gd::BaseEvent> BaseEventSPtr;}
 
 using namespace std;
 
@@ -33,19 +33,19 @@ public:
     void RecreatePaths(string file);
 
     #if defined(GD_IDE_ONLY)
-    static void OpenEvents( vector < BaseEventSPtr > & list, const TiXmlElement * elem );
+    static void OpenEvents( vector < gd::BaseEventSPtr > & list, const TiXmlElement * elem );
     static void OpenConditions(vector < Instruction > & list, const TiXmlElement * elem);
     static void OpenActions(vector < Instruction > & list, const TiXmlElement * elem);
 
     bool SaveToFile(string file);
-    static void SaveEvents( const vector < BaseEventSPtr > & list, TiXmlElement * events );
+    static void SaveEvents( const vector < gd::BaseEventSPtr > & list, TiXmlElement * events );
     static void SaveConditions(const vector < Instruction > & list, TiXmlElement * elem);
     static void SaveActions(const vector < Instruction > & list, TiXmlElement * elem);
 
     static void OpenGroupesObjets( vector < gd::ObjectGroup > & list, const TiXmlElement * elem );
 
     //Compatibility code --- with Game Develop 1
-    static void AdaptEventsFromGD1x(vector < BaseEventSPtr > & list);
+    static void AdaptEventsFromGD1x(vector < gd::BaseEventSPtr > & list);
     static bool updateEventsFromGD1x;
     #endif
 

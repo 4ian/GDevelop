@@ -49,12 +49,12 @@ void LinkEvent::LoadFromXml(const TiXmlElement * eventElem)
     else { cout <<"Les informations concernant le nom de la scène liée."; }
 }
 
-void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector < BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
+void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
 {
     if ( IsDisabled() ) return;
 
     //Finding events to include
-    const vector< BaseEventSPtr > * eventsToInclude = NULL;
+    const vector< gd::BaseEventSPtr > * eventsToInclude = NULL;
     if ( game.HasExternalEventsNamed(sceneLinked) ) eventsToInclude = &game.GetExternalEvents(sceneLinked).GetEvents();
     else if ( game.HasLayoutNamed(sceneLinked) ) eventsToInclude = &game.GetLayout(sceneLinked).GetEvents();
 
@@ -98,7 +98,7 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
     //Insert an empty event to replace the link event ( we'll delete the link event at the end )
     //( If we just erase the link event without adding a blank event to replace it,
     //the first event inserted by the link will not be preprocessed ( and it can be annoying if it require preprocessing, such as another link event ). )
-    eventList.insert(eventList.begin() + indexOfTheEventInThisList, boost::shared_ptr<BaseEvent>(new EmptyEvent));
+    eventList.insert(eventList.begin() + indexOfTheEventInThisList, boost::shared_ptr<gd::BaseEvent>(new EmptyEvent));
 
     //Insert linked events
     for ( unsigned int insertion = 0;insertion <= static_cast<unsigned>(lastEvent-firstEvent);insertion++ )
@@ -112,7 +112,7 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
     eventList.erase( eventList.begin() + indexOfTheEventInThisList + 1 + static_cast<unsigned>(lastEvent-firstEvent)+1 );
 }
 
-BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game & game, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game & game, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     EditLink dialog(parent_, *this, game);
     if ( dialog.ShowModal() == 0 ) return Cancelled;

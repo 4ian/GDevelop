@@ -13,7 +13,7 @@
 /**
  * \brief Empty event doing nothing.
  */
-class EmptyEvent : public BaseEvent
+class EmptyEvent : public gd::BaseEvent
 {
     public:
         EmptyEvent() : BaseEvent() {};

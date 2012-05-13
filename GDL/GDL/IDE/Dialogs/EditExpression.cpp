@@ -27,10 +27,10 @@
 #include "GDL/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
-#include "GDL/IDE/Dialogs/ChooseVariableDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
 #include "GDL/IDE/Dialogs/AdvancedTextEntryDlg.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 
 #include <string>
 #include <vector>
@@ -677,14 +677,14 @@ string EditExpression::ShowParameterDialog(const ParameterMetadata & ParameterMe
     }
     else if ( ParameterMetadata.type == "scenevar" )
     {
-        ChooseVariableDialog dialog(this, scene.variables);
+        ChooseVariableDialog dialog(this, scene.GetVariables());
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.selectedVariable;
     }
     else if ( ParameterMetadata.type == "globalvar" )
     {
-        ChooseVariableDialog dialog(this, game.variables);
+        ChooseVariableDialog dialog(this, game.GetVariables());
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.selectedVariable;

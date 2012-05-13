@@ -20,7 +20,7 @@ class wxWindow;
 /**
  * \brief Builtin internal event that pick an object of a list each time it is repeated
  */
-class ForEachEvent : public BaseEvent
+class ForEachEvent : public gd::BaseEvent
 {
     public:
         ForEachEvent();
@@ -28,15 +28,15 @@ class ForEachEvent : public BaseEvent
         virtual ~ForEachEvent() {};
 
         ForEachEvent& operator=(const ForEachEvent & event);
-        virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new ForEachEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new ForEachEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
         virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
-        virtual const std::vector < BaseEventSPtr > & GetSubEvents() const {return events;};
-        virtual std::vector < BaseEventSPtr > & GetSubEvents() {return events;};
-        void SetSubEvents(std::vector < BaseEventSPtr > & subEvents_) {events = subEvents_;};
+        virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
+        virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return events;};
+        void SetSubEvents(std::vector < gd::BaseEventSPtr > & subEvents_) {events = subEvents_;};
 
         const std::vector < Instruction > & GetConditions() const { return conditions; };
         std::vector < Instruction > & GetConditions() { return conditions; };
@@ -78,7 +78,7 @@ class ForEachEvent : public BaseEvent
         GDExpression objectsToPick;
         std::vector < Instruction > conditions;
         std::vector < Instruction > actions;
-        std::vector < BaseEventSPtr > events;
+        std::vector < gd::BaseEventSPtr > events;
 
         bool objectsToPickSelected;
 };

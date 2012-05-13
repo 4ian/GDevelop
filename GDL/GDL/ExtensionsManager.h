@@ -21,7 +21,7 @@ class StrExpressionMetadata;
 class ExtensionObjectInfos;
 class AutomatismInfo;
 class AutomatismsSharedDatas;
-class BaseEvent;
+namespace gd { class BaseEvent; }
 typedef void (*DestroyFunPtr)(Object*);
 typedef Object * (*CreateFunPtr)(std::string name);
 
@@ -76,7 +76,7 @@ class GD_API ExtensionsManager
         /**
          * Create a new automatism of given type
          */
-        boost::shared_ptr<Automatism> CreateAutomatism(std::string automatismType) const;
+        Automatism* CreateAutomatism(std::string automatismType) const;
 
         /**
          * Create shared datas of the automatism of given type
@@ -212,7 +212,7 @@ class GD_API ExtensionsManager
         /**
          * Create a new event of given type
          */
-        boost::shared_ptr<BaseEvent> CreateEvent(std::string eventType) const;
+        boost::shared_ptr<gd::BaseEvent> CreateEvent(std::string eventType) const;
 
         /**
          * Check if an automatism type is available

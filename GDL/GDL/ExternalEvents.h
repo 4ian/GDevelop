@@ -44,17 +44,17 @@ public:
     /**
      * Return a reference to the list of events associated to the ExternalEvents class.
      */
-    virtual const std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() const { return events; }
+    virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const { return events; }
 
     /**
      * Return a reference to the list of events associated to the ExternalEvents class.
      */
-    virtual std::vector<boost::shared_ptr<BaseEvent> > & GetEvents() { return events; }
+    virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() { return events; }
 
 private:
 
     std::string name;
-    std::vector < BaseEventSPtr > events; ///< List of events
+    std::vector < gd::BaseEventSPtr > events; ///< List of events
 
     /**
      * Initialize from another ExternalEvents. Used by copy-ctor and assign-op.

@@ -6,83 +6,89 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
 #include <string>
+#if defined(GD_IDE_ONLY)
+#include "GDCore/PlatformDefinition/Variable.h"
+#endif
 
 /**
- * \brief Class used to represent a simple Game Develop variable.
+ * \brief Class used to represent a variable stored into ListVariable.
  * Example :
  * \code
- * myObject->variables.ObtainVariable("Life") = 100;
- * myObject->variables.ObtainVariable("Armor") += 10;
+ * myObject->GetVariables().ObtainVariable("Life") = 100;
+ * myObject->GetVariables().ObtainVariable("Armor") += 10;
  * \endcode
  */
 class GD_API Variable
+#if defined(GD_IDE_ONLY)
+: public gd::Variable
+#endif
 {
-    public:
+public:
 
-        /**
-         * Construct a Variable from its name
-         */
-        Variable(std::string name_) : name(name_), value(0), isNumber(true) {};
-        virtual ~Variable() {};
+    /**
+     * Construct a Variable from its name
+     */
+    Variable(std::string name_) : name(name_), value(0), isNumber(true) {};
+    virtual ~Variable() {};
 
-        /**
-         * Get name of the variable
-         */
-        const std::string & GetName() const { return name; }
+    /**
+     * Get name of the variable
+     */
+    const std::string & GetName() const { return name; }
 
-        /**
-         * Change name of the variable
-         */
-        void SetName(const std::string & newName) { name = newName; }
+    /**
+     * Change name of the variable
+     */
+    void SetName(const std::string & newName) { name = newName; }
 
-        /**
-         * Get value as a double
-         */
-        double GetValue() const;
+    /**
+     * Get value as a double
+     */
+    double GetValue() const;
 
-        /**
-         * Change value
-         */
-        void SetValue(double val);
+    /**
+     * Change value
+     */
+    void SetValue(double val);
 
-        //Operators are overloaded to allow accessing to variable using a simple int-like semantic.
+    //Operators are overloaded to allow accessing to variable using a simple int-like semantic.
 
-        void operator=(double val)  {SetValue(val);};
-        void operator+=(double val) {SetValue(val+GetValue());}
-        void operator-=(double val) {SetValue(GetValue()-val);}
-        void operator*=(double val) {SetValue(val*GetValue());}
-        void operator/=(double val) {SetValue(GetValue()/val);}
+    void operator=(double val)  {SetValue(val);};
+    void operator+=(double val) {SetValue(val+GetValue());}
+    void operator-=(double val) {SetValue(GetValue()-val);}
+    void operator*=(double val) {SetValue(val*GetValue());}
+    void operator/=(double val) {SetValue(GetValue()/val);}
 
-        bool operator<=(double val) const { return GetValue() <= val;};
-        bool operator>=(double val) const { return GetValue() >= val;};
-        bool operator<(double val) const { return GetValue() < val;};
-        bool operator>(double val) const { return GetValue() > val;};
-        bool operator==(double val) const { return GetValue() == val;};
-        bool operator!=(double val) const { return GetValue() != val;};
+    bool operator<=(double val) const { return GetValue() <= val;};
+    bool operator>=(double val) const { return GetValue() >= val;};
+    bool operator<(double val) const { return GetValue() < val;};
+    bool operator>(double val) const { return GetValue() > val;};
+    bool operator==(double val) const { return GetValue() == val;};
+    bool operator!=(double val) const { return GetValue() != val;};
 
-        /**
-         * Get value as a string
-         */
-        const std::string & GetString() const;
+    /**
+     * Get value as a string
+     */
+    const std::string & GetString() const;
 
-        /**
-         * Change string of the variable
-         */
-        void SetString(const std::string & val);
+    /**
+     * Change string of the variable
+     */
+    void SetString(const std::string & val);
 
-        //Operators are overloaded to allow accessing to variable using a simple string-like semantic.
+    //Operators are overloaded to allow accessing to variable using a simple string-like semantic.
 
-        void operator=(const std::string & val)  {SetString(val);};
-        void operator+=(const std::string & val) {SetString(GetString()+val);}
+    void operator=(const std::string & val)  {SetString(val);};
+    void operator+=(const std::string & val) {SetString(GetString()+val);}
 
-        bool operator==(const std::string & val) const { return GetString() == val;};
-        bool operator!=(const std::string & val) const { return GetString() != val;};
+    bool operator==(const std::string & val) const { return GetString() == val;};
+    bool operator!=(const std::string & val) const { return GetString() != val;};
 
-    private:
-        std::string name;
-        mutable double value;
-        mutable std::string str;
-        mutable bool isNumber;
+private:
+    std::string name;
+    mutable double value;
+    mutable std::string str;
+    mutable bool isNumber;
 };
 
 /**

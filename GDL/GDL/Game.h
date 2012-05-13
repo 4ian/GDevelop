@@ -140,6 +140,16 @@ public:
      */
     inline std::vector < boost::shared_ptr<Scene> > & GetLayouts() { return scenes; }
 
+    /**
+     * Provide access to the ListVariable member containing the global variables
+     */
+    inline const ListVariable & GetVariables() const { return variables; }
+
+    /**
+     * Provide access to the ListVariable member containing the global variables
+     */
+    inline ListVariable & GetVariables() { return variables; }
+
     #if defined(GD_IDE_ONLY)
     /**
      * Return a reference to the vector containing the (smart) pointers to the external events.
@@ -155,7 +165,6 @@ public:
     bool portable; ///< True if the game was saved as a portable game file
     LoadingScreen loadingScreen; ///< Data concerning the loading screen
     ResourcesManager resourceManager; ///< Contains all resources used by the project
-    ListVariable variables; ///< Initial global variables
     bool useExternalSourceFiles; ///< True if game used external source files.
 
     #if defined(GD_IDE_ONLY)
@@ -225,6 +234,7 @@ private:
     bool                                                verticalSync; ///< If true, must activate vertical synchronization.
     std::vector < boost::shared_ptr<Scene> >            scenes; ///< List of all scenes
     std::vector < boost::shared_ptr<Object> >           globalObjects; ///< Global objects
+    ListVariable                                        variables; ///< Initial global variables
     #if defined(GD_IDE_ONLY)
     std::string                                         author; ///< Game author name
     vector < std::string >                              extensionsUsed; ///< List of extensions used

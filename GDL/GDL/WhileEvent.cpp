@@ -189,7 +189,7 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+gd::BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     return ChangesMade;
 }

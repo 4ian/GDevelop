@@ -16,7 +16,7 @@
 /**
  * \brief Event used internally by Game Develop to profile events.
  */
-class GD_API ProfileEvent : public BaseEvent
+class GD_API ProfileEvent : public gd::BaseEvent
 {
     public:
         ProfileEvent();
@@ -24,7 +24,7 @@ class GD_API ProfileEvent : public BaseEvent
         virtual ~ProfileEvent();
 
         ProfileEvent& operator=(const ProfileEvent & event);
-        virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new ProfileEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new ProfileEvent(*this));}
 
         void SetPreviousProfileEvent( boost::shared_ptr<ProfileEvent> previousProfileEvent_ ) { previousProfileEvent = previousProfileEvent_; }
 

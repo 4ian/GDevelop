@@ -5,6 +5,13 @@
 
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include <SFML/Graphics.hpp>
+#include <sstream>
+
+namespace GDpriv
+{
+
+namespace CommonInstructions
+{
 
 /**
  * Private data to initialize randomizer global seed.
@@ -31,24 +38,26 @@ double GD_API Random(int end)
     return std::rand() % (end - begin + 1) + begin;
 }
 
-bool GD_API RelationTest(double rhs, float lhs, std::string relationalOperator)
-{
-    if (    ( relationalOperator.empty() && rhs == lhs ) ||
-            ( relationalOperator == "==" && rhs == lhs ) ||
-            ( relationalOperator == "<" && rhs < lhs ) ||
-            ( relationalOperator == ">" && rhs > lhs ) ||
-            ( relationalOperator == "<=" && rhs <= lhs ) ||
-            ( relationalOperator == ">=" && rhs >= lhs ) ||
-            ( relationalOperator == "!=" && rhs != lhs )
-       )
-    {
-        return true;
-    }
-
-    return false;
-}
-
 bool GD_API LogicalNegation(bool param)
 {
     return !param;
+}
+
+double GD_API ToDouble( const std::string & str )
+{
+    double d;
+    std::istringstream oss(str);
+    oss >> d;
+    return d;
+}
+
+std::string GD_API ToString( double number )
+{
+    std::ostringstream oss;
+    oss << number;
+    return oss.str();
+}
+
+}
+
 }

@@ -121,7 +121,7 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
 
     #if defined(LINUX) || defined (MAC)
     //Libraries are loaded using dlopen(.., ..|RTLD_LOCAL) meaning that their symbols are not available for other libraries
-    //nor for LLVM/Clang. We then reload set them as global to make thei symbols available for LLVM/Clang. We couldn't mark them
+    //nor for LLVM/Clang. We then reload set them as global to make their symbols available for LLVM/Clang. We couldn't mark them
     //as global when loading them as every extension use the sames "Create/DestroyGDExtension" symbols.
     for (unsigned int i = 0;i<librariesLoaded.size();++i)
         SetLibraryGlobal(librariesLoaded[i].c_str());
@@ -214,8 +214,8 @@ void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
             #endif
             #if defined(__GNUC__)
             else if ( extensionPtr->compilationInfo.gccMajorVersion != __GNUC__ ||
-                      extensionPtr->compilationInfo.gccMinorVersion != __GNUC_MINOR__ ||
-                      extensionPtr->compilationInfo.gccPatchLevel != __GNUC_PATCHLEVEL__ )
+                      extensionPtr->compilationInfo.gccMinorVersion != __GNUC_MINOR__ /*||
+                      extensionPtr->compilationInfo.gccPatchLevel != __GNUC_PATCHLEVEL__*/ )
                 error += "Not the same GNU Compiler version.\n";
 
             #endif

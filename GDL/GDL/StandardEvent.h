@@ -21,7 +21,7 @@ class EventsEditorSelection;
 /**
  * Standard event, with conditions, actions and sub events.
  */
-class GD_API StandardEvent : public BaseEvent
+class GD_API StandardEvent : public gd::BaseEvent
 {
     public:
         StandardEvent();
@@ -29,15 +29,15 @@ class GD_API StandardEvent : public BaseEvent
         virtual ~StandardEvent() {};
 
         StandardEvent& operator=(const StandardEvent & event);
-        virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new StandardEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new StandardEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
         virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
-        virtual const std::vector < BaseEventSPtr > & GetSubEvents() const {return events;};
-        virtual std::vector < BaseEventSPtr > & GetSubEvents() {return events;};
-        void SetSubEvents(std::vector < BaseEventSPtr > & subEvents_) {events = subEvents_;};
+        virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
+        virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return events;};
+        void SetSubEvents(std::vector < gd::BaseEventSPtr > & subEvents_) {events = subEvents_;};
 
         const std::vector < Instruction > & GetConditions() const { return conditions; };
         std::vector < Instruction > & GetConditions() { return conditions; };
@@ -67,7 +67,7 @@ class GD_API StandardEvent : public BaseEvent
 
         std::vector < Instruction > conditions;
         std::vector < Instruction > actions;
-        std::vector < BaseEventSPtr > events;
+        std::vector < gd::BaseEventSPtr > events;
 };
 
 

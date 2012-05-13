@@ -7,7 +7,7 @@
 #define WINDOWEXTENSION_H
 
 #include "GDL/ExtensionBase.h"
-class ArbitraryResourceWorker;
+namespace gd {class ArbitraryResourceWorker;}
 
 /**
  * \brief Internal built-in extension providing windows features.
@@ -19,7 +19,7 @@ class WindowExtension : public ExtensionBase
         virtual ~WindowExtension() {};
 
         #if defined(GD_IDE_ONLY)
-        virtual void ExposeActionsResources(Instruction & action, ArbitraryResourceWorker & worker);
+        virtual void ExposeActionsResources(Instruction & action, gd::ArbitraryResourceWorker & worker);
         #endif
 };
 

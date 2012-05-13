@@ -45,7 +45,7 @@ void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joys
     else return;
 
     //Update variable value
-    scene.variables.ObtainVariable(variable) = sf::Joystick::GetAxisPosition(joystick, axis);
+    scene.GetVariables().ObtainVariable(variable) = sf::Joystick::GetAxisPosition(joystick, axis);
 
     return;
 }

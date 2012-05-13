@@ -17,7 +17,7 @@ CommonConversionsExtension::CommonConversionsExtension()
 
         instrInfo.AddParameter("string", _("Texte à convertir en nombre"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("ToDouble").SetIncludeFile("GDL/LightweightCommonTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::ToDouble").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
     DECLARE_END_EXPRESSION()
 
@@ -29,7 +29,7 @@ CommonConversionsExtension::CommonConversionsExtension()
 
         instrInfo.AddParameter("expression", _("Expression à convertir en texte"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("ToString").SetIncludeFile("GDL/LightweightCommonTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::ToString").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
     DECLARE_END_STR_EXPRESSION()
     #endif

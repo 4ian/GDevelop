@@ -33,9 +33,9 @@ class Game;
 class Scene;
 class Object;
 class ExtensionBase;
-class BaseEvent;
+namespace gd { class BaseEvent; }
 class AutomatismsSharedDatas;
-class ArbitraryResourceWorker;
+namespace gd {class ArbitraryResourceWorker;}
 class EventsCodeGenerationContext;
 class EventsCodeGenerator;
 #undef CreateEvent
@@ -333,7 +333,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
             {\
                 eventInfo.smallicon = wxBitmap(smallicon_, wxBITMAP_TYPE_ANY); \
             } else { eventInfo.smallicon = wxBitmap(16,16);} \
-            eventInfo.instance = boost::shared_ptr<BaseEvent>(new className_); \
+            eventInfo.instance = boost::shared_ptr<gd::BaseEvent>(new className_); \
             eventInfo.instance->SetType(GetNameSpace()+currentEventDeclarationName);
 
 /**
@@ -495,7 +495,7 @@ class GD_API EventInfos
     std::string group;
     wxBitmap smallicon;
 
-    boost::shared_ptr<BaseEvent> instance;
+    boost::shared_ptr<gd::BaseEvent> instance;
 };
 
 #endif
@@ -508,7 +508,7 @@ class GD_API AutomatismInfo
     public:
 
     AutomatismInfo();
-    virtual ~AutomatismInfo() {};
+    virtual ~AutomatismInfo();
 
 #if defined(GD_IDE_ONLY)
     /**
@@ -641,7 +641,7 @@ class GD_API ExtensionBase
      * Create an automatism
      * Return NULL if automatismType is not provided by the extension.
      */
-    boost::shared_ptr<Automatism> CreateAutomatism(std::string automatismType) const;
+    Automatism* CreateAutomatism(std::string automatismType) const;
 
     /**
      * Create shared datas of an automatism
@@ -663,6 +663,20 @@ class GD_API ExtensionBase
      * Called when a scene is unloaded: Useful to destroy some extensions specific objects related to scene
      */
     virtual void SceneUnloaded(RuntimeScene & scene);
+
+    /**
+     * Redefine this method to return true if you want the method ObjectDeletedFromScene to be called by RuntimeScene when
+     *
+     * \see ExtensionBase::ToBeNotifiedOnObjectDeletion
+     */
+    virtual bool ToBeNotifiedOnObjectDeletion() { return false; }
+
+    /**
+     * Called by RuntimeScene, if ToBeNotifiedOnObjectDeletion() returns true, when an object is about to be deleted.
+     *
+     * \see ExtensionBase::ObjectDeletedFromScene
+     */
+    virtual void ObjectDeletedFromScene(RuntimeScene & scene, Object * objectDeleted) {};
 
     /**
      * Get objects types provided by the extension
@@ -707,21 +721,21 @@ class GD_API ExtensionBase
      * Create an custom event.
      * Return NULL if eventType is not provided by the extension.
      */
-    boost::shared_ptr<BaseEvent> CreateEvent(std::string eventType) const;
+    boost::shared_ptr<gd::BaseEvent> CreateEvent(std::string eventType) const;
 
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by conditions and update their filename
      *
      * \see ExtensionBase::ExposeActionsResources
      */
-    virtual void ExposeConditionsResources(Instruction & condition, ArbitraryResourceWorker & worker) {};
+    virtual void ExposeConditionsResources(Instruction & condition, gd::ArbitraryResourceWorker & worker) {};
 
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by actions and update their filename
      *
      * \see ArbitraryResourceWorker
      */
-    virtual void ExposeActionsResources(Instruction & action, ArbitraryResourceWorker & worker) {};
+    virtual void ExposeActionsResources(Instruction & action, gd::ArbitraryResourceWorker & worker) {};
 
     /**
      * Must return true if the extension has something to display in debugger.

@@ -24,7 +24,7 @@ SceneExtension::SceneExtension()
     DECLARE_EXPRESSION("Random", _("Valeur aléatoire"), _("Valeur aléatoire"), _("Aléatoire"), "res/actions/position.png")
         instrInfo.AddParameter("expression", _("Valeur maximale"), "", false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("Random").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::Random").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_CONDITION("DepartScene",

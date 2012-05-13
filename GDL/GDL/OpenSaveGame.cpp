@@ -223,7 +223,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     //Global variables
     elem = hdl.FirstChildElement().FirstChildElement( "Variables" ).Element();
     if ( elem )
-        OpenVariablesList(game.variables, elem);
+        OpenVariablesList(game.GetVariables(), elem);
 
     //Scenes
     elem = hdl.FirstChildElement().FirstChildElement( "Scenes" ).Element();
@@ -361,7 +361,7 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, c
 
         if ( newObject != boost::shared_ptr<Object>() )
         {
-            if ( elemScene->FirstChildElement( "Variables" ) != NULL ) { OpenVariablesList(newObject->variablesObjet, elemScene->FirstChildElement( "Variables" )); }
+            if ( elemScene->FirstChildElement( "Variables" ) != NULL ) { OpenVariablesList(newObject->GetVariables(), elemScene->FirstChildElement( "Variables" )); }
 
             //Spécifique à l'objet
             newObject->LoadFromXml(elemScene);
@@ -371,8 +371,8 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, c
                 const TiXmlElement * elemAutomatism = elemScene->FirstChildElement( "Automatism" );
                 while ( elemAutomatism )
                 {
-                    boost::shared_ptr<Automatism> newAutomatism = extensionsManager->CreateAutomatism(elemAutomatism->Attribute("Type") != NULL ? elemAutomatism->Attribute("Type") : "");
-                    if ( newAutomatism != boost::shared_ptr<Automatism>() )
+                    Automatism* newAutomatism = extensionsManager->CreateAutomatism(elemAutomatism->Attribute("Type") != NULL ? elemAutomatism->Attribute("Type") : "");
+                    if ( newAutomatism != NULL )
                     {
                         newAutomatism->SetName(elemAutomatism->Attribute("Name") != NULL ? elemAutomatism->Attribute("Name") : "");
                         newAutomatism->LoadFromXml(elemAutomatism);
@@ -516,7 +516,7 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, const TiXmlE
 }
 
 #if defined(GD_IDE_ONLY)
-void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElement * elem)
+void OpenSaveGame::OpenEvents(vector < gd::BaseEventSPtr > & list, const TiXmlElement * elem)
 {
     const TiXmlElement * elemScene = elem->FirstChildElement();
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
@@ -529,15 +529,15 @@ void OpenSaveGame::OpenEvents(vector < BaseEventSPtr > & list, const TiXmlElemen
         if ( elemScene->FirstChildElement( "Type" ) != NULL && elemScene->FirstChildElement( "Type" )->Attribute( "value" ) != NULL ) { type = elemScene->FirstChildElement( "Type" )->Attribute( "value" );}
         else { MSG( "Les informations concernant le type d'un évènement manquent." ); }
 
-        BaseEventSPtr event = extensionsManager->CreateEvent(type);
-        if ( event != boost::shared_ptr<BaseEvent>())
+        gd::BaseEventSPtr event = extensionsManager->CreateEvent(type);
+        if ( event != boost::shared_ptr<gd::BaseEvent>())
         {
             event->LoadFromXml(elemScene);
         }
         else
         {
             cout << "Unknown event of type " << type << endl;
-            event = boost::shared_ptr<BaseEvent>(new EmptyEvent);
+            event = boost::shared_ptr<gd::BaseEvent>(new EmptyEvent);
         }
 
         if ( elemScene->Attribute( "disabled" ) != NULL ) { if ( string(elemScene->Attribute( "disabled" )) == "true" ) event->SetDisabled(); }
@@ -840,7 +840,7 @@ bool OpenSaveGame::SaveToFile(string file)
     //Global variables
     TiXmlElement * variables = new TiXmlElement( "Variables" );
     root->LinkEndChild( variables );
-    SaveVariablesList(game.variables, variables);
+    SaveVariablesList(game.GetVariables(), variables);
 
     //Scenes
     TiXmlElement * scenes = new TiXmlElement( "Scenes" );
@@ -887,7 +887,7 @@ bool OpenSaveGame::SaveToFile(string file)
 
         TiXmlElement * variables = new TiXmlElement( "Variables" );
         scene->LinkEndChild( variables );
-        SaveVariablesList(game.GetLayouts()[i]->variables, variables);
+        SaveVariablesList(game.GetLayouts()[i]->GetVariables(), variables);
 
         TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedDatas" );
         scene->LinkEndChild( autosSharedDatas );
@@ -970,7 +970,7 @@ void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list
 
         TiXmlElement * variables = new TiXmlElement( "Variables" );
         objet->LinkEndChild( variables );
-        SaveVariablesList(list.at( j )->variablesObjet, variables);
+        SaveVariablesList(list[j]->GetVariables(), variables);
 
         vector < std::string > allAutomatisms = list[j]->GetAllAutomatismNames();
         for (unsigned int i = 0;i<allAutomatisms.size();++i)
@@ -980,7 +980,7 @@ void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list
             automatism->SetAttribute( "Type", list[j]->GetAutomatism(allAutomatisms[i]).GetTypeName().c_str() );
             automatism->SetAttribute( "Name", list[j]->GetAutomatism(allAutomatisms[i]).GetName().c_str() );
 
-            list[j]->GetAutomatismSPtr(allAutomatisms[i])->SaveToXml(automatism);
+            list[j]->GetAutomatismRawPointer(allAutomatisms[i])->SaveToXml(automatism);
         }
 
         list[j]->SaveToXml(objet);
@@ -1057,7 +1057,7 @@ void OpenSaveGame::SavePositions(const vector < InitialPosition > & list, TiXmlE
     }
 }
 
-void OpenSaveGame::SaveEvents(const vector < BaseEventSPtr > & list, TiXmlElement * events)
+void OpenSaveGame::SaveEvents(const vector < gd::BaseEventSPtr > & list, TiXmlElement * events)
 {
     for ( unsigned int j = 0;j < list.size();j++ )
     {
@@ -1230,7 +1230,7 @@ void OpenSaveGame::RecreatePaths(string file)
     string newDirectory = string( wxPathOnly( file ).mb_str() );
     if ( newDirectory.empty() ) return;
 
-    ResourcesUnmergingHelper resourcesUnmergingHelper(newDirectory);
+    gd::ResourcesUnmergingHelper resourcesUnmergingHelper(newDirectory);
 
     //Image du chargement
     if ( !game.loadingScreen.imageFichier.empty() )
@@ -1369,7 +1369,7 @@ void OpenSaveGame::AdaptActionFromGD1x(Instruction & instruction, const Instruct
     }
 }
 
-void OpenSaveGame::AdaptEventsFromGD1x(vector < BaseEventSPtr > & list)
+void OpenSaveGame::AdaptEventsFromGD1x(vector < gd::BaseEventSPtr > & list)
 {
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
 

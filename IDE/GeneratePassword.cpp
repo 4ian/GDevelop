@@ -114,7 +114,7 @@ void GeneratePassword::OnCreerBtClick(wxCommandEvent& event)
     mdpEdit->ChangeValue("");
     for (unsigned int i = 0;i<static_cast<unsigned>(number);i++)
     {
-        int nb = Random(41);
+        int nb = GDpriv::CommonInstructions::Random(41);
         mdpEdit->ChangeValue(mdpEdit->GetValue()+carac.substr(nb,1));
     }
 }

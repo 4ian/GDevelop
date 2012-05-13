@@ -20,6 +20,7 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/Object.h"
+#include "GDL/ObjectHelpers.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "ConsoleManager.h"
@@ -289,8 +290,8 @@ void DebuggerGUI::UpdateGUI()
     generalList->SetItem(5, 1, ToString(sf::Mouse::GetPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::GetPosition(*scene.renderWindow).y));
     generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000.0)+"s");
 
-    const vector < Variable > sceneVariables = scene.variables.GetVariablesVector();
-    const vector < Variable > gameVariables = scene.game->variables.GetVariablesVector();
+    const vector < Variable > sceneVariables = scene.GetVariables().GetVariablesVector();
+    const vector < Variable > gameVariables = scene.game->GetVariables().GetVariablesVector();
 
     //Suppression des lignes en trop pour les variables
     while(static_cast<unsigned int>(generalList->GetItemCount()) > generalBaseItemCount + sceneVariables.size() + gameVariables.size()+2)
@@ -469,7 +470,7 @@ void DebuggerGUI::UpdateGUI()
 
     currentLine += 2; //We have two lines to jump for "Variables"
 
-    const vector < Variable > objectVariables = object->variablesObjet.GetVariablesVector();
+    const vector < Variable > objectVariables = object->GetVariables().GetVariablesVector();
     //Suppression des lignes en trop pour les variables
     while(objectList->GetItemCount() > baseItemCount+objectVariables.size())
         objectList->DeleteItem(baseItemCount+objectVariables.size());
@@ -594,7 +595,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     }
     else //Or a variable
     {
-        const vector < Variable > objectVariables = object->variablesObjet.GetVariablesVector();
+        const vector < Variable > objectVariables = object->GetVariables().GetVariablesVector();
         int idVariable = event.GetIndex() - ( 1+object->Object::GetNumberOfProperties()
                                               +2+object->GetNumberOfProperties()
                                               +2);
@@ -603,7 +604,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
         {
             string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une variable"), objectVariables[idVariable].GetString()).mb_str());
 
-            object->variablesObjet.ObtainVariable(objectVariables[idVariable].GetName()) = newValue;
+            object->GetVariables().ObtainVariable(objectVariables[idVariable].GetName()) = newValue;
         }
     }
 
@@ -614,8 +615,8 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
  */
 void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
 {
-    const vector < Variable > sceneVariables = scene.variables.GetVariablesVector();
-    const vector < Variable > gameVariables = scene.game->variables.GetVariablesVector();
+    const vector < Variable > sceneVariables = scene.GetVariables().GetVariablesVector();
+    const vector < Variable > gameVariables = scene.game->GetVariables().GetVariablesVector();
 
     if ( event.GetIndex() < (generalBaseItemCount + sceneVariables.size()))
     {
@@ -624,7 +625,7 @@ void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
             return;
 
         string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), sceneVariables[id].GetString()).mb_str());
-        scene.variables.ObtainVariable(sceneVariables[id].GetName()).SetString(newValue);
+        scene.GetVariables().ObtainVariable(sceneVariables[id].GetName()).SetString(newValue);
     }
     else if ( event.GetIndex() < ( generalBaseAndVariablesItemCount + gameVariables.size()) )
     {
@@ -633,7 +634,7 @@ void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
             return;
 
         string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"),gameVariables[id].GetString()).mb_str());
-        scene.game->variables.ObtainVariable(gameVariables[id].GetName()).SetString(newValue);
+        scene.game->GetVariables().ObtainVariable(gameVariables[id].GetName()).SetString(newValue);
     }
 }
 
@@ -701,7 +702,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
     string variableName = string(wxGetTextFromUser(_("Entrez le nom de la nouvelle variable"), _("Ajout d'une variable de la scène")).mb_str());
 
     if ( variableName == "" ) return;
-    if ( scene.variables.HasVariable(variableName) )
+    if ( scene.GetVariables().HasVariableNamed(variableName) )
     {
         wxLogMessage(_("Une variable avec ce nom existe déjà"));
         return;
@@ -709,7 +710,7 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
 
     string variableValue = string(wxGetTextFromUser(_("Entrez la valeur de la variable"), _("Ajout d'une variable de la scène")).mb_str());
 
-    scene.variables.ObtainVariable(variableName) = variableValue;
+    scene.GetVariables().ObtainVariable(variableName) = variableValue;
 }
 
 /**
@@ -720,7 +721,7 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
     string variableName = string(wxGetTextFromUser(_("Entrez le nom de la nouvelle variable"), _("Ajout d'une variable globale")).mb_str());
 
     if ( variableName == "" ) return;
-    if ( scene.game->variables.HasVariable(variableName) )
+    if ( scene.game->GetVariables().HasVariableNamed(variableName) )
     {
         wxLogMessage(_("Une variable avec ce nom existe déjà"));
         return;
@@ -728,7 +729,7 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
 
     string variableValue = string(wxGetTextFromUser(_("Entrez la valeur de la variable"), _("Ajout d'une variable globale")).mb_str());
 
-    scene.game->variables.ObtainVariable(variableName) = variableValue;
+    scene.game->GetVariables().ObtainVariable(variableName) = variableValue;
 }
 
 void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
@@ -744,9 +745,9 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
 
     //Creation of the object
     if ( sceneObject != scene.GetInitialObjects().end() )
-        newObject = (*sceneObject)->Clone();
+        newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
     else if ( globalObject != scene.game->GetGlobalObjects().end() )
-        newObject = (*globalObject)->Clone();
+        newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
     else
     {
         wxLogWarning(_("Impossible de créer l'objet."));

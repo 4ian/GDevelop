@@ -12,7 +12,7 @@
 #include <wx/help.h>
 #include <wx/config.h>
 
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDL/Scene.h"

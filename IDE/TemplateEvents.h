@@ -25,7 +25,7 @@ class TemplateEvents
 
         TemplateEvents& operator=(const TemplateEvents & other);
 
-        vector < BaseEventSPtr > events;
+        vector < gd::BaseEventSPtr > events;
         vector < string > parameters;
         string name;
         string desc;

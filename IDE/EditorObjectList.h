@@ -134,7 +134,7 @@ class EditorObjectList: public wxPanel
 		void EnableAll();
 		void CreateToolbar();
 		void RemoveSharedDatasIfNecessary(std::string automatismType);
-		void CreateSharedDatasIfNecessary(boost::shared_ptr<Automatism> automatism);
+		void CreateSharedDatasIfNecessary(gd::Automatism & automatism);
 		bool CheckObjectName(std::string name);
 
 		wxImageList* imageList;

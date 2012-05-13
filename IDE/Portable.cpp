@@ -118,7 +118,7 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     //Copie du jeu
     Game game = *jeu;
 
-    ResourcesMergingHelper resourcesMergingHelper;
+    gd::ResourcesMergingHelper resourcesMergingHelper;
 
     //Add loading image
     if ( !game.loadingScreen.imageFichier.empty() )

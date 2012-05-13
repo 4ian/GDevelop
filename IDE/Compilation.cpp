@@ -36,7 +36,7 @@
 #include "GDL/OpenSaveGame.h"
 #include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/ExternalEvents.h"
 #include "Compilation.h"
 #include "ErrorCompilation.h"

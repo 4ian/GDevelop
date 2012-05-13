@@ -21,6 +21,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/Object.h"
+#include "GDL/ObjectHelpers.h"
 #include "GDL/Scene.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/ExternalEvents.h"
@@ -196,11 +197,11 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
                 if (wxMessageBox(depart+secondGame.GetGlobalObjects()[i]->GetName()+fin, "Un objet global de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
-                    *object = secondGame.GetGlobalObjects()[i]->Clone();
+                    *object = boost::shared_ptr<Object>(secondGame.GetGlobalObjects()[i]->Clone());
                 }
             }
             else
-                game.GetGlobalObjects().push_back(secondGame.GetGlobalObjects()[i]->Clone());
+                game.GetGlobalObjects().push_back(boost::shared_ptr<Object>(secondGame.GetGlobalObjects()[i]->Clone()));
         }
     }
     if ( groupsCheck->GetValue() )

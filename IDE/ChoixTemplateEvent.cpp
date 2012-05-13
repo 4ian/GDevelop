@@ -18,7 +18,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "TemplateEvents.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 
 #define MSG(x) wxLogWarning(_(x));
 
@@ -197,7 +197,7 @@ void ChoixTemplateEvent::OnInsererBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Remplace les _PARAMx_ par les paramètres
 ////////////////////////////////////////////////////////////
-void ChoixTemplateEvent::ProcessEvents(vector < BaseEventSPtr > & events )
+void ChoixTemplateEvent::ProcessEvents(vector < gd::BaseEventSPtr > & events )
 {
     //Pour chaque évènement
     for ( unsigned int j = 0;j < events.size() ; j++ )

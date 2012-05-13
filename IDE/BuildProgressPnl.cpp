@@ -29,7 +29,7 @@ BEGIN_EVENT_TABLE(BuildProgressPnl,wxPanel)
 END_EVENT_TABLE()
 
 BuildProgressPnl::BuildProgressPnl(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size) :
-clearOnNextTextAdding(false)
+clearOnNextTextAdding(true)
 {
 	//(*Initialize(BuildProgressPnl)
 	wxFlexGridSizer* FlexGridSizer1;
@@ -85,20 +85,21 @@ void BuildProgressPnl::OnMustRefresh(wxCommandEvent&)
         if (CodeCompiler::GetInstance()->LastTaskFailed())
         {
             statusTxt->SetLabel(_("Compilation terminée, mais une ou plusieurs tâches ont échouées."));
-            AppendText(_("Compilation terminée, mais une ou plusieurs tâches ont échouées.")+"\n\n");
+            AppendText(_("Compilation terminée, mais une ou plusieurs tâches ont échouées.")+"\n");
         }
         else
         {
+            wxString timeStr = wxString::Format(_("( %ld secondes )"), compilationTimer.Time()/1000);
             if (!currentTasks.empty())
             {
-                statusTxt->SetLabel(_("Compilation terminée, mais ")+ToString(currentTasks.size())+_(" tâche(s) sont encore en attente de pouvoir être lancées."));
-                AppendText(_("Les tâches ont été accomplies, mais ")+ToString(currentTasks.size())+_(" tâche(s) sont encore en attente de pouvoir être lancées.")+"\n");
+                statusTxt->SetLabel(_("Compilation terminée ")+timeStr+_(", mais ")+ToString(currentTasks.size())+_(" tâche(s) sont encore en attente de pouvoir être lancées."));
+                AppendText(_("Les tâches ont été accomplies ")+timeStr+_(", mais ")+ToString(currentTasks.size())+_(" tâche(s) sont encore en attente de pouvoir être lancées.")+"\n");
 
             }
             else
             {
                 statusTxt->SetLabel(_("Compilation terminée."));
-                AppendText(_("Toutes les tâches ont été accomplies.")+"\n\n");
+                AppendText(_("Toutes les tâches ont été accomplies.")+" "+timeStr+"\n");
             }
         }
         clearOnNextTextAdding = true;
@@ -115,6 +116,7 @@ void BuildProgressPnl::AppendText(wxString text)
         if (clearOnNextTextAdding)
         {
             tasksLogEdit->Clear();
+            compilationTimer.Start();
             clearOnNextTextAdding = false;
         }
 

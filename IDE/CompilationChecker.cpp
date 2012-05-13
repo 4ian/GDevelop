@@ -2,6 +2,7 @@
 #include "GDL/Version.h"
 #include "GDL/VersionWrapper.h"
 #include "GDL/CommonTools.h"
+#include <iostream>
 
 using namespace std;
 

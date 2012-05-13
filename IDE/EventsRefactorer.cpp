@@ -357,7 +357,7 @@ bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vect
     return somethingModified;
 }
 
-void EventsRefactorer::RenameObjectInEvents(Game & game, Scene & scene, vector < BaseEventSPtr > & events, std::string oldName, std::string newName)
+void EventsRefactorer::RenameObjectInEvents(Game & game, Scene & scene, vector < gd::BaseEventSPtr > & events, std::string oldName, std::string newName)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
@@ -493,7 +493,7 @@ bool EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vect
     return somethingModified;
 }
 
-void EventsRefactorer::RemoveObjectInEvents(Game & game, Scene & scene, vector < BaseEventSPtr > & events, std::string name)
+void EventsRefactorer::RemoveObjectInEvents(Game & game, Scene & scene, vector < gd::BaseEventSPtr > & events, std::string name)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
@@ -519,7 +519,7 @@ void EventsRefactorer::RemoveObjectInEvents(Game & game, Scene & scene, vector <
     }
 }
 
-void EventsRefactorer::ReplaceStringInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events,
+void EventsRefactorer::ReplaceStringInEvents(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events,
                                               std::string toReplace,
                                               std::string newString,
                                               bool matchCase,
@@ -638,13 +638,13 @@ bool EventsRefactorer::ReplaceStringInConditions(Game & game, Scene & scene, vec
     return somethingModified;
 }
 
-vector < boost::weak_ptr<BaseEvent> > EventsRefactorer::SearchInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events,
+vector < boost::weak_ptr<gd::BaseEvent> > EventsRefactorer::SearchInEvents(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events,
                                   std::string search,
                                   bool matchCase,
                                   bool inConditions,
                                   bool inActions)
 {
-    vector < boost::weak_ptr<BaseEvent> > results;
+    vector < boost::weak_ptr<gd::BaseEvent> > results;
 
     for (unsigned int i = 0;i<events.size();++i)
     {
@@ -657,7 +657,7 @@ vector < boost::weak_ptr<BaseEvent> > EventsRefactorer::SearchInEvents(Game & ga
             {
                 if (!eventAddedInResults && SearchStringInConditions(game, scene, *conditionsVectors[j], search, matchCase))
                 {
-                    results.push_back(boost::weak_ptr<BaseEvent>(events[i]));
+                    results.push_back(boost::weak_ptr<gd::BaseEvent>(events[i]));
                 }
             }
         }
@@ -669,14 +669,14 @@ vector < boost::weak_ptr<BaseEvent> > EventsRefactorer::SearchInEvents(Game & ga
             {
                 if (!eventAddedInResults && SearchStringInActions(game, scene, *actionsVectors[j], search, matchCase))
                 {
-                    results.push_back(boost::weak_ptr<BaseEvent>(events[i]));
+                    results.push_back(boost::weak_ptr<gd::BaseEvent>(events[i]));
                 }
             }
         }
 
         if ( events[i]->CanHaveSubEvents() )
         {
-            vector < boost::weak_ptr<BaseEvent> > subResults = SearchInEvents(game, scene, events[i]->GetSubEvents(), search, matchCase, inConditions, inActions);
+            vector < boost::weak_ptr<gd::BaseEvent> > subResults = SearchInEvents(game, scene, events[i]->GetSubEvents(), search, matchCase, inConditions, inActions);
             std::copy(subResults.begin(), subResults.end(), std::back_inserter(results));
         }
     }
@@ -766,7 +766,7 @@ void EventsRefactorer::NotifyChangesInEventsOfExternalEvents(gd::Project & proje
     }
 }
 
-void EventsRefactorer::GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<BaseEvent> > & events,
+void EventsRefactorer::GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<gd::BaseEvent> > & events,
                                                           gd::Project & project,
                                                           std::vector< gd::Layout * > & layouts,
                                                           std::vector< gd::ExternalEvents * > & externalEvents)

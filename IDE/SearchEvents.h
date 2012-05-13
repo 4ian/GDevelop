@@ -26,7 +26,7 @@ class SearchEvents: public wxDialog
 {
 	public:
 
-		SearchEvents(EventsEditor * parent_, Game & game_, Scene & scene_, std::vector < BaseEventSPtr > * events_);
+		SearchEvents(EventsEditor * parent_, Game & game_, Scene & scene_, std::vector < gd::BaseEventSPtr > * events_);
 		virtual ~SearchEvents();
 
 		//(*Declarations(SearchEvents)
@@ -98,8 +98,8 @@ class SearchEvents: public wxDialog
 		Game & game;
 		Scene & scene;
 
-		std::vector < BaseEventSPtr > * events;
-		std::vector < boost::weak_ptr<BaseEvent> > searchResults;
+		std::vector < gd::BaseEventSPtr > * events;
+		std::vector < boost::weak_ptr<gd::BaseEvent> > searchResults;
 		size_t currentResult;
 
 		DECLARE_EVENT_TABLE()

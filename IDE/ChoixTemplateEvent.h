@@ -104,7 +104,7 @@ class ChoixTemplateEvent: public wxDialog
 		wxTreeItemId item;
 
 		string ConvertParam( string parameter, const string & toReplace, const string & replaceBy );
-        void ProcessEvents(vector < BaseEventSPtr > & events );
+        void ProcessEvents(vector < gd::BaseEventSPtr > & events );
 
 		DECLARE_EVENT_TABLE()
 };

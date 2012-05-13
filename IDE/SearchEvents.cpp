@@ -9,7 +9,7 @@
 #include "GDCore/Events/Event.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "EventsRefactorer.h"
 #include "EventsEditor.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
@@ -48,7 +48,7 @@ BEGIN_EVENT_TABLE(SearchEvents,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-SearchEvents::SearchEvents(EventsEditor * parent_, Game & game_, Scene & scene_, vector < BaseEventSPtr > * events_) :
+SearchEvents::SearchEvents(EventsEditor * parent_, Game & game_, Scene & scene_, vector < gd::BaseEventSPtr > * events_) :
 parent(parent_),
 game(game_),
 scene(scene_),
@@ -219,7 +219,7 @@ SearchEvents::~SearchEvents()
 
 void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
 {
-    vector < BaseEventSPtr > eventsToInspect;
+    vector < gd::BaseEventSPtr > eventsToInspect;
 
     //Check events validity
     if ( !onlySelectedEventCheck->GetValue() && events == NULL ) return;
@@ -228,7 +228,7 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
         std::vector < EventItem > selectedEventsInfo = parent->GetSelection().GetAllSelectedEvents();
         for (unsigned int i = 0;i<selectedEventsInfo.size();++i)
         {
-            if ( selectedEventsInfo[i].event != boost::shared_ptr<BaseEvent>() )
+            if ( selectedEventsInfo[i].event != boost::shared_ptr<gd::BaseEvent>() )
                 eventsToInspect.push_back(selectedEventsInfo[i].event);
         }
     }
@@ -277,8 +277,8 @@ void SearchEvents::OnnextBtClick(wxCommandEvent&)
     if ( currentResult >= searchResults.size()) currentResult = 0;
 
     //Verify event still exists
-    BaseEventSPtr event = searchResults[currentResult].lock();
-    if ( event == boost::shared_ptr<BaseEvent>() ) return;
+    gd::BaseEventSPtr event = searchResults[currentResult].lock();
+    if ( event == boost::shared_ptr<gd::BaseEvent>() ) return;
 
     parent->ScrollToEvent(event);
 }
@@ -292,8 +292,8 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
     if ( currentResult >= searchResults.size()) currentResult = searchResults.size()-1;
 
     //Verify event still exists
-    BaseEventSPtr event = searchResults[currentResult].lock();
-    if ( event == boost::shared_ptr<BaseEvent>() ) return;
+    gd::BaseEventSPtr event = searchResults[currentResult].lock();
+    if ( event == boost::shared_ptr<gd::BaseEvent>() ) return;
 
     parent->ScrollToEvent(event);
 }

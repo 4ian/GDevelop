@@ -19,7 +19,7 @@
 #include <wx/help.h>
 #include <wx/dirdlg.h>
 #include <wx/log.h>
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/IDE/ActionSentenceFormatter.h"

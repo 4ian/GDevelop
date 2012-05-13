@@ -10,7 +10,7 @@
 //*)
 #include <wx/log.h>
 #include <wx/filedlg.h>
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include <string>
 #include <vector>
@@ -65,7 +65,7 @@ BEGIN_EVENT_TABLE( CreateTemplate, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-CreateTemplate::CreateTemplate( wxWindow* parent, vector < BaseEventSPtr > & events_ ) :
+CreateTemplate::CreateTemplate( wxWindow* parent, vector < gd::BaseEventSPtr > & events_ ) :
 events( events_ )
 {
     //(*Initialize(CreateTemplate)
@@ -282,7 +282,7 @@ void CreateTemplate::OnCreateBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 /// Remplace les paramètres par des _PARAMx_
 ////////////////////////////////////////////////////////////
-void CreateTemplate::ProcessEvents(vector < BaseEventSPtr > & eventsToProcess, vector < std::pair<string, int> > parameters)
+void CreateTemplate::ProcessEvents(vector < gd::BaseEventSPtr > & eventsToProcess, vector < std::pair<string, int> > parameters)
 {
     //On remplace dans chaque paramètre des actions et des conditions
     for ( unsigned int i = 0;i < eventsToProcess.size() ;i++ )

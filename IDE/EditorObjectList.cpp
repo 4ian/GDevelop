@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "EditorObjectList.h"
 
 //(*InternalHeaders(EditorObjectList)
@@ -40,8 +44,8 @@
 #include "GDL/CommonTools.h"
 #include "DndTextObjectsEditor.h"
 #include "ObjectTypeChoice.h"
-#include "InitialVariablesDialog.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/AutomatismsSharedDatas.h"
 #include "AutomatismTypeChoice.h"
 #include "EventsRefactorer.h"
@@ -494,7 +498,7 @@ void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
             autoType = idForAutomatism[i].second;
     }
 
-    (*object)->GetAutomatismSPtr(autoType)->EditAutomatism(this, game, scene, mainEditorCommand);
+    (*object)->GetAutomatismRawPointer(autoType)->EditAutomatism(this, game, scene, mainEditorCommand);
     if ( scene )
         scene->wasModified = true;
 }
@@ -888,7 +892,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     }
 
     //Add a new object of selected type to objects list
-    ObjSPtr object = clipboard->GetObject()->Clone();
+    ObjSPtr object = boost::shared_ptr<Object>(clipboard->GetObject()->Clone());
 
     wxString name = object->GetName();
 
@@ -910,7 +914,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     //Add object's automatism's shared datas to scene if necessary
     vector <std::string> automatisms = object->GetAllAutomatismNames();
     for (unsigned int j = 0;j<automatisms.size();++j)
-        CreateSharedDatasIfNecessary(object->GetAutomatismSPtr(automatisms[j]));
+        CreateSharedDatasIfNecessary(object->GetAutomatism(automatisms[j]));
 
     if ( scene )
     {
@@ -1058,12 +1062,9 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
         return;
     }
 
-    InitialVariablesDialog dialog(this, (*object)->variablesObjet);
+    ChooseVariableDialog dialog(this, (*object)->GetVariables(), /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
-    {
-        (*object)->variablesObjet = dialog.variables;
         if ( scene ) scene->wasModified = true;
-    }
 }
 
 /**
@@ -1083,9 +1084,9 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
     if ( dialog.ShowModal() == 1)
     {
         GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
-        boost::shared_ptr<Automatism> automatism = extensionManager->CreateAutomatism(dialog.selectedAutomatismType);
+        Automatism* automatism = extensionManager->CreateAutomatism(dialog.selectedAutomatismType);
 
-        if (automatism == boost::shared_ptr<Automatism>())
+        if (automatism == NULL)
         {
             wxLogError( _( "Impossible de créer l'automatisme." ) );
             return;
@@ -1101,7 +1102,7 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
         (*object)->AddAutomatism(automatism);
 
         //Add shared datas to scene if necessary
-        CreateSharedDatasIfNecessary(automatism);
+        CreateSharedDatasIfNecessary(*automatism);
 
         if ( scene )
         {
@@ -1168,15 +1169,15 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
     int selection = wxGetSingleChoiceIndex(_("Choisissez l'automatisme à renommer"), _("Choisir l'automatisme à renommer"), automatismsStr);
     if ( selection == -1 ) return;
 
-    boost::shared_ptr<Automatism> automatism = (*object)->GetAutomatismSPtr(automatisms[selection]);
+    gd::Automatism & automatism = (*object)->GetAutomatism(automatisms[selection]);
 
-    std::string newName = string(wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism->GetName()).mb_str());
-    if ( newName == automatism->GetName() || newName.empty() ) return;
+    std::string newName = string(wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism.GetName()).mb_str());
+    if ( newName == automatism.GetName() || newName.empty() ) return;
 
     //Remove shared datas if necessary
-    RemoveSharedDatasIfNecessary(automatism->GetName());
+    RemoveSharedDatasIfNecessary(automatism.GetName());
 
-    automatism->SetName(newName);
+    automatism.SetName(newName);
     CreateSharedDatasIfNecessary(automatism);
 
     if ( scene )
@@ -1213,7 +1214,7 @@ void EditorObjectList::RemoveSharedDatasIfNecessary(std::string name)
 /**
  * Create datas shared by an automatism type if these data don't yet exist.
  */
-void EditorObjectList::CreateSharedDatasIfNecessary(boost::shared_ptr<Automatism> automatism)
+void EditorObjectList::CreateSharedDatasIfNecessary(gd::Automatism & automatism)
 {
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
@@ -1221,19 +1222,19 @@ void EditorObjectList::CreateSharedDatasIfNecessary(boost::shared_ptr<Automatism
     {
         for (unsigned int i = 0;i<game.GetLayouts().size();++i)
         {
-        	if ( game.GetLayouts()[i]->automatismsInitialSharedDatas.find(automatism->GetName()) == game.GetLayouts()[i]->automatismsInitialSharedDatas.end() )
+        	if ( game.GetLayouts()[i]->automatismsInitialSharedDatas.find(automatism.GetName()) == game.GetLayouts()[i]->automatismsInitialSharedDatas.end() )
             {
-                boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism->GetTypeName());
-                automatismsSharedDatas->SetName(automatism->GetName());
+                boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism.GetTypeName());
+                automatismsSharedDatas->SetName(automatism.GetName());
                 game.GetLayouts()[i]->automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
             }
         }
     }
     //We're editing an object from a scene : Add the data if necessary
-    else if ( scene->automatismsInitialSharedDatas.find(automatism->GetName()) == scene->automatismsInitialSharedDatas.end() )
+    else if ( scene->automatismsInitialSharedDatas.find(automatism.GetName()) == scene->automatismsInitialSharedDatas.end() )
     {
-        boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism->GetTypeName());
-        automatismsSharedDatas->SetName(automatism->GetName());
+        boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism.GetTypeName());
+        automatismsSharedDatas->SetName(automatism.GetName());
         scene->automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
     }
 }

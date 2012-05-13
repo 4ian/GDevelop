@@ -55,7 +55,7 @@ void Clipboard::DestroySingleton()
 
 void Clipboard::SetObject( ObjSPtr object )
 {
-    objectCopied = object->Clone();
+    objectCopied = boost::shared_ptr<Object>(object->Clone());
 
     hasObject = true;
 }
@@ -65,13 +65,13 @@ ObjSPtr Clipboard::GetObject()
     return objectCopied;
 }
 
-void Clipboard::SetEvents( const std::vector<BaseEventSPtr> & events )
+void Clipboard::SetEvents( const std::vector<gd::BaseEventSPtr> & events )
 {
     eventsCopied = CloneVectorOfEvents(events);
     hasEvents = true;
 }
 
-std::vector<BaseEventSPtr> Clipboard::GetEvents()
+std::vector<gd::BaseEventSPtr> Clipboard::GetEvents()
 {
     return CloneVectorOfEvents(eventsCopied);
 }

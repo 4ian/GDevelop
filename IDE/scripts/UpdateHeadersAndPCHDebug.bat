@@ -1,9 +1,6 @@
 @echo off
 echo.
 echo Tool for updating include directory for Debug target.
-echo Optional parameters : noPCH to skip headers precompilation.
-echo Optional parameters : onlyPCH to do only headers precompilation.
-if "%1"=="onlyPCH" GOTO PCH
 echo.
 
 echo -Copying files...
@@ -39,13 +36,6 @@ echo -End of copy
 if NOT errorlevel 0 echo Some errors occurred.
 
 echo.
-:PCH
-if "%1"=="noPCH" GOTO END
-echo -Precompiling headers
-..\..\ExtLibs\llvm\build-tdmgcc45-release\bin\clang.exe -fcxx-exceptions -fexceptions -fgnu-runtime -D GD_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DGD_IDE_ONLY -DDEBUG -I..\Bin\Debug\include/TDM-GCC-4.5.2/include  -I..\Bin\Debug\include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include -I..\Bin\Debug\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++ -I..\Bin\Debug\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32 -I..\Bin\Debug\include/llvm/tools/clang/lib/Headers -I..\Bin\Debug\include/llvm/include -I..\Bin\Debug\include/llvm/build-tdmgcc45-release/include -I..\Bin\Debug\include/GDL -I..\Bin\Dev\include/Core -I..\Bin\Debug\include/boost -I..\Bin\Debug\include\SFML/include -x c++-header --relocatable-pch  ..\Bin\Debug\include\GDL\GDL\Events\EventsCodePrecompiledHeader.h -o ..\Bin\Debug\include\GDL\GDL\Events\PrecompiledHeader.h.pch
-
-..\..\ExtLibs\llvm\build-tdmgcc45-release\bin\clang.exe -fcxx-exceptions -fexceptions -fgnu-runtime -D GD_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DDEBUG -I..\Bin\Debug\include/TDM-GCC-4.5.2/include  -I..\Bin\Debug\include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include -I..\Bin\Debug\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++ -I..\Bin\Debug\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32 -I..\Bin\Debug\include/llvm/tools/clang/lib/Headers -I..\Bin\Debug\include/llvm/include -I..\Bin\Debug\include/llvm/build-tdmgcc45-release/include -I..\Bin\Debug\include/GDL -I..\Bin\Dev\include/Core -I..\Bin\Debug\include/boost -I..\Bin\Debug\include\SFML/include -x c++-header --relocatable-pch  ..\Bin\Debug\include\GDL\GDL\Events\EventsCodePrecompiledHeader.h -o ..\Bin\Debug\include\GDL\GDL\Events\PrecompiledHeaderRuntime.h.pch
-
 echo 
 
 :END

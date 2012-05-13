@@ -26,7 +26,7 @@
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
 										<label>Game Develop ne pouvant lire le format MP3 ( license et&#x0A;algorithmes brevetés par Fraunhofer-Gesellschaft ), vous pouvez &#x0A;convertir une musique MP3 au format libre OGG Vorbis ou WAV.</label>
-										<size>318,43</size>
+										<size>336,54</size>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

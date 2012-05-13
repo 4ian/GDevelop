@@ -266,8 +266,8 @@ void ProfileDlg::ParseProfileEvents()
 
     for (unsigned int i = 0;i<sceneCanvas->sceneEdited.profiler->profileEventsInformation.size();++i)
     {
-        boost::shared_ptr<BaseEvent> event = sceneCanvas->sceneEdited.profiler->profileEventsInformation[i].originalEvent.lock();
-        if ( event != boost::shared_ptr<BaseEvent>())
+        boost::shared_ptr<gd::BaseEvent> event = sceneCanvas->sceneEdited.profiler->profileEventsInformation[i].originalEvent.lock();
+        if ( event != boost::shared_ptr<gd::BaseEvent>())
         {
             event->totalTimeDuringLastSession = sceneCanvas->sceneEdited.profiler->profileEventsInformation[i].GetTime();
             event->percentDuringLastSession = static_cast<double>(event->totalTimeDuringLastSession)/static_cast<double>(totalEventsTime)*100.0;

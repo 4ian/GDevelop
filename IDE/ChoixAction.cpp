@@ -28,10 +28,11 @@
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/Object.h"
+#include "GDL/ObjectHelpers.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/IDE/gdTreeItemStringData.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/ActionSentenceFormatter.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/IDE/ExpressionsCorrectnessTesting.h"
@@ -40,7 +41,7 @@
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/IDE/Dialogs/EditExpression.h"
 #include "GDL/IDE/Dialogs/EditTextDialog.h"
-#include "GDL/IDE/Dialogs/ChooseVariableDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
 #include "GDL/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
@@ -892,34 +893,25 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             else
                 return;
 
-            ChooseVariableDialog dialog(this, object->variablesObjet);
+            ChooseVariableDialog dialog(this, object->GetVariables());
             if ( dialog.ShowModal() == 1 )
-            {
-                object->variablesObjet = dialog.variables;
                 ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
-            }
 
             return;
         }
         else if ( InstructionMetadata.parameters[i].type == "scenevar" )
         {
-            ChooseVariableDialog dialog(this, scene.variables);
+            ChooseVariableDialog dialog(this, scene.GetVariables());
             if ( dialog.ShowModal() == 1 )
-            {
-                scene.variables = dialog.variables;
                 ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
-            }
 
             return;
         }
         else if ( InstructionMetadata.parameters[i].type == "globalvar" )
         {
-            ChooseVariableDialog dialog(this, game.variables);
+            ChooseVariableDialog dialog(this, game.GetVariables());
             if ( dialog.ShowModal() == 1 )
-            {
-                game.variables = dialog.variables;
                 ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
-            }
 
             return;
         }

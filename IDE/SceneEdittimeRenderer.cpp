@@ -7,6 +7,7 @@
 #include "GDL/RuntimeGame.h"
 #include "GDL/Game.h"
 #include "GDL/Object.h"
+#include "GDL/ObjectHelpers.h"
 #include <vector>
 
 SceneEdittimeRenderer::SceneEdittimeRenderer(sf::RenderWindow * renderWindow_, RuntimeGame * game_, Scene & sceneEdited_) :

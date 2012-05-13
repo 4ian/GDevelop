@@ -7,12 +7,12 @@
 namespace gd {class Layout; }
 namespace gd {class Project; }
 namespace gd {class ExternalEvents; }
-class BaseEvent;
+namespace gd { class BaseEvent; }
 class Game;
 class Scene;
 class Instruction;
 class ExternalEvents;
-typedef boost::shared_ptr<BaseEvent> BaseEventSPtr;
+namespace gd {typedef boost::shared_ptr<gd::BaseEvent> BaseEventSPtr;}
 
 /**
  * \brief Class containing functions allowing to do refactoring tasks on events
@@ -26,17 +26,17 @@ class EventsRefactorer
          * Replace all occurences of an object name by another name
          * ( include : objects in parameters and in math/text expressions of all events ).
          */
-        static void RenameObjectInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events, std::string oldName, std::string newName);
+        static void RenameObjectInEvents(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events, std::string oldName, std::string newName);
 
         /**
          * Remove all actions or conditions using an object
          */
-        static void RemoveObjectInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events, std::string name);
+        static void RemoveObjectInEvents(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events, std::string name);
 
         /**
          * Search for a string in events
          */
-        static std::vector < boost::weak_ptr<BaseEvent> > SearchInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events,
+        static std::vector < boost::weak_ptr<gd::BaseEvent> > SearchInEvents(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events,
                                           std::string search,
                                           bool matchCase,
                                           bool inConditions,
@@ -45,7 +45,7 @@ class EventsRefactorer
         /**
          * Replace all occurences of a string in events
          */
-        static void ReplaceStringInEvents(Game & game, Scene & scene, std::vector < BaseEventSPtr > & events,
+        static void ReplaceStringInEvents(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events,
                                           std::string toReplace,
                                           std::string newString,
                                           bool matchCase,
@@ -109,7 +109,7 @@ class EventsRefactorer
          * \see EventsRefactorer::NotifyChangesInEventsOfScene
          * \see EventsRefactorer::NotifyChangesInEventsOfExternalEvents
          */
-        static void GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<BaseEvent> > & events, gd::Project & project, std::vector< gd::Layout * > & layouts, std::vector< gd::ExternalEvents * > & externalEvents);
+        static void GetScenesAndExternalEventsLinkedTo(const std::vector< boost::shared_ptr<gd::BaseEvent> > & events, gd::Project & project, std::vector< gd::Layout * > & layouts, std::vector< gd::ExternalEvents * > & externalEvents);
 
         EventsRefactorer() {};
         virtual ~EventsRefactorer() {};

@@ -55,7 +55,7 @@
 #include "GDL/OpenSaveGame.h"
 #include "GDL/SoundManager.h"
 #include "GDL/FontManager.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/ActionSentenceFormatter.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionsLoader.h"

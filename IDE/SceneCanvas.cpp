@@ -24,10 +24,11 @@
 #include "GDL/ImageManager.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/Object.h"
+#include "GDL/ObjectHelpers.h"
 #include "GDL/Collisions.h"
 #include "GDCore/Events/Event.h"
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
@@ -1003,7 +1004,7 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
                 int idPos = GetInitialPositionFromObject(selectedObject);
                 if (idPos != -1)
                 {
-                    edittimeRenderer.objectsSelected[i] = selectedObject->Clone();
+                    edittimeRenderer.objectsSelected[i] = boost::shared_ptr<Object>(selectedObject->Clone());
                     edittimeRenderer.runtimeScene.objectsInstances.AddObject(edittimeRenderer.objectsSelected[i]);
                     sceneEdited.initialObjectsPositions.push_back(sceneEdited.initialObjectsPositions[idPos]);
 
@@ -1296,9 +1297,9 @@ void SceneCanvas::AddObjetSelected(float x, float y)
     ObjSPtr newObject = boost::shared_ptr<Object> ();
 
     if ( sceneObject != sceneEdited.GetInitialObjects().end() ) //We check first scene's objects' list.
-        newObject = (*sceneObject)->Clone();
+        newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
     else if ( globalObject != gameEdited.GetGlobalObjects().end() ) //Then the global object list
-        newObject = (*globalObject)->Clone();
+        newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
 
     if ( newObject == boost::shared_ptr<Object> () )
     {

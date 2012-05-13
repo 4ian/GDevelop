@@ -6,7 +6,7 @@
 #include "Game_Develop_EditorMain.h"
 #include <wx/string.h>
 #include <wx/mimetype.h> // mimetype support
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "Credits.h"
 #include "MAJ.h"
 

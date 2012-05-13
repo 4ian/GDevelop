@@ -82,7 +82,7 @@ class ProfileDlg: public wxPanel, public BaseProfiler
 
 		DECLARE_EVENT_TABLE()
 
-		void ParseProfileEvents(const std::vector < BaseEventSPtr > & events);
+		void ParseProfileEvents(const std::vector < gd::BaseEventSPtr > & events);
 		void UpdateGUI();
 
         unsigned int maxData;

@@ -17,7 +17,7 @@
 #include <wx/mimetype.h> // mimetype support
 #include <string>
 #include <vector>
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 
 using namespace std;
 

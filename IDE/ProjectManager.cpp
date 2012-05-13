@@ -31,7 +31,7 @@
 #include "Extensions.h"
 #include "ExternalEventsEditor.h"
 #include "EditPropJeu.h"
-#include "InitialVariablesDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "EditPropScene.h"
 
 #include "GDCore/PlatformDefinition/Project.h"
@@ -705,10 +705,9 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
         return;
     }
 
-    InitialVariablesDialog dialog(this, (*scene)->variables);
+    ChooseVariableDialog dialog(this, (*scene)->GetVariables(), /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
     {
-        (*scene)->variables = dialog.variables;
         (*scene)->wasModified = true;
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(*game, *(*scene));
     }
@@ -1063,10 +1062,9 @@ void ProjectManager::OneditGblVarMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    InitialVariablesDialog dialog(this, game->variables);
+    ChooseVariableDialog dialog(this, game->GetVariables(), /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
     {
-        game->variables = dialog.variables;
         for (unsigned int i = 0;i<game->GetLayouts().size();++i)
         {
         	game->GetLayouts()[i]->wasModified = true;

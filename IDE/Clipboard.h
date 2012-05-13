@@ -12,6 +12,7 @@ namespace gd { class ExternalEvents; }
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDL/Object.h"
+#include "GDL/ObjectHelpers.h"
 
 //Undefining an annoying macro changing GetObject in GetObjectA
 #undef GetObject
@@ -26,8 +27,8 @@ public:
     ObjSPtr GetObject();
     bool HasObject() { return hasObject; };
 
-    void SetEvents( const std::vector<BaseEventSPtr> & event );
-    std::vector<BaseEventSPtr> GetEvents();
+    void SetEvents( const std::vector<gd::BaseEventSPtr> & event );
+    std::vector<gd::BaseEventSPtr> GetEvents();
     bool HasEvents() { return hasEvents; };
 
     void SetLayout( const gd::Layout * layout );
@@ -60,7 +61,7 @@ private:
     ObjSPtr objectCopied;
     bool hasObject;
 
-    std::vector<BaseEventSPtr> eventsCopied;
+    std::vector<gd::BaseEventSPtr> eventsCopied;
     bool hasEvents;
 
     std::vector<Instruction> instructionsCopied;

@@ -8,7 +8,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/config.h>
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include <wx/mimetype.h> // mimetype support
 #include "Game_Develop_EditorMain.h"
 
@@ -337,7 +337,7 @@ void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)
 void StartHerePage::OnresourcesLinkClick(wxCommandEvent& event)
 {
     #if defined(WINDOWS)
-    wxExecute("explorer.exe \""+wxGetCwd()+"\Ressources\\\"");
+    wxExecute("explorer.exe \""+wxGetCwd()+"\\Ressources\\\"");
     #elif defined(LINUX)
     system(string("xdg-open \""+string(wxGetCwd().mb_str())+"/Ressources/\"").c_str());
     #elif defined(MAC)

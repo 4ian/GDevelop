@@ -21,7 +21,7 @@
 #include "GDL/CommonTools.h"
 #include "EditObjectGroup.h"
 #include "Clipboard.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "EventsRefactorer.h"
 

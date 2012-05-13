@@ -10,7 +10,7 @@
 #include <wx/log.h>
 #include "GDL/CommonTools.h"
 #include "GDL/Position.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "ObjectsOnBadLayerBox.h"
 #include "EditLayer.h"
 #include "SceneCanvas.h"

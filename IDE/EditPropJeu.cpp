@@ -20,7 +20,7 @@
 #include <SFML/Graphics.hpp>
 #include <wx/filedlg.h>
 #include <wx/config.h>
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/FontManager.h"
 #include "GDL/SourceFile.h"
 

@@ -30,7 +30,7 @@
 #include "ProfileDlg.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
-#include "GDL/IDE/HelpFileAccess.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "EventsEditor.h"
 #include "GridSetup.h"
 #include "GDAuiTabArt.h"

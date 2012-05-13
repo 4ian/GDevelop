@@ -1,9 +1,6 @@
 @echo off
 echo.
 echo Tool for updating include directory for Dev target.
-echo Optional parameters : noPCH to skip headers precompilation.
-echo Optional parameters : onlyPCH to do only headers precompilation.
-if "%1"=="onlyPCH" GOTO PCH
 echo.
 
 echo -Copying files...
@@ -37,14 +34,6 @@ xcopy ..\..\Extensions\*.a ..\Bin\Dev\Extensions\Lib\*.a /S /Y /D /EXCLUDE:Heade
 echo.
 echo -End of copy
 if NOT errorlevel 0 echo Some errors occurred.
-
-echo.
-:PCH
-if "%1"=="noPCH" GOTO END
-echo -Precompiling headers
-..\..\ExtLibs\llvm\build-tdmgcc45-release\bin\clang.exe -fcxx-exceptions -fexceptions -fgnu-runtime -D GD_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DGD_IDE_ONLY -DDEV -DNDEBUG -DBOOST_DISABLE_ASSERTS -I..\Bin\Dev\include/TDM-GCC-4.5.2/include  -I..\Bin\Dev\include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include -I..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++ -I..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32 -I..\Bin\Dev\include/llvm/tools/clang/lib/Headers -I..\Bin\Dev\include/llvm/include -I..\Bin\Dev\include/llvm/build-tdmgcc45-release/include -I..\Bin\Dev\include/GDL -I..\Bin\Dev\include/Core -I..\Bin\Dev\include/boost -I..\Bin\Dev\include\SFML/include -x c++-header --relocatable-pch  ..\Bin\Dev\include\GDL\GDL\Events\EventsCodePrecompiledHeader.h -o ..\Bin\Dev\include\GDL\GDL\Events\PrecompiledHeader.h.pch
-
-..\..\ExtLibs\llvm\build-tdmgcc45-release\bin\clang.exe -fcxx-exceptions -fexceptions -fgnu-runtime -D GD_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DDEV -DNDEBUG  -DBOOST_DISABLE_ASSERTS -I..\Bin\Dev\include/TDM-GCC-4.5.2/include  -I..\Bin\Dev\include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include -I..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++ -I..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32 -I..\Bin\Dev\include/llvm/tools/clang/lib/Headers -I..\Bin\Dev\include/llvm/include -I..\Bin\Dev\include/llvm/build-tdmgcc45-release/include -I..\Bin\Dev\include/GDL -I..\Bin\Dev\include/Core -I..\Bin\Dev\include/boost -I..\Bin\Dev\include\SFML/include -x c++-header --relocatable-pch  ..\Bin\Dev\include\GDL\GDL\Events\EventsCodePrecompiledHeader.h -o ..\Bin\Dev\include\GDL\GDL\Events\PrecompiledHeaderRuntime.h.pch
 
 echo 
 

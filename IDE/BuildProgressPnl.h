@@ -14,6 +14,7 @@
 #include <wx/gauge.h>
 //*)
 #include <wx/thread.h>
+#include <wx/stopwatch.h>
 class Game;
 class SceneCanvas;
 
@@ -55,6 +56,7 @@ class BuildProgressPnl: public wxPanel
 		void OnMustRefresh(wxCommandEvent&);
 
 		wxString lastTextAdded; ///< Used to prevent duplicates
+		wxStopWatch compilationTimer;
 		bool clearOnNextTextAdding;
 
 		DECLARE_EVENT_TABLE()

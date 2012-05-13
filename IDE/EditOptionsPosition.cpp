@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "EditOptionsPosition.h"
 
 //(*InternalHeaders(EditOptionsPosition)
@@ -8,12 +12,13 @@
 //*)
 #include "GDL/Position.h"
 #include "GDL/Object.h"
+#include "GDL/ObjectHelpers.h"
 #include "GDL/Animation.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/HelpFileAccess.h"
-#include "InitialVariablesDialog.h"
+#include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include <sstream>
 #include <string>
 
@@ -376,12 +381,9 @@ void EditOptionsPosition::OnsizeCheckClick(wxCommandEvent& event)
 
 void EditOptionsPosition::OneditInitialVariablesClick(wxCommandEvent& event)
 {
-    InitialVariablesDialog dialog(this, initialVariables);
+    ChooseVariableDialog dialog(this, initialVariables, /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
-    {
-        initialVariables = dialog.variables;
         UpdateInitialVariablesStatus();
-    }
 }
 
 void EditOptionsPosition::UpdateInitialVariablesStatus()

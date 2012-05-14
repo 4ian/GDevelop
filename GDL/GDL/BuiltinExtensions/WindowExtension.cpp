@@ -4,8 +4,10 @@
  */
 
 #include "GDL/BuiltinExtensions/WindowExtension.h"
+#if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/Events/Instruction.h"
+#endif
 
 WindowExtension::WindowExtension()
 {
@@ -127,7 +129,7 @@ WindowExtension::WindowExtension()
 }
 
 #if defined(GD_IDE_ONLY)
-void WindowExtension::ExposeActionsResources(Instruction & action, gd::ArbitraryResourceWorker & worker)
+void WindowExtension::ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker)
 {
     if ( action.GetType() == "EcrireTexte" && !action.GetParameter( 6 ).GetPlainString().empty() )
     {

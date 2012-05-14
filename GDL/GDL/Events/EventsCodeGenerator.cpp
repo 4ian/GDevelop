@@ -34,7 +34,7 @@ using namespace std;
  * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Get
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string EventsCodeGenerator::GenerateRelationalOperatorCall(const InstructionMetadata & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
+string EventsCodeGenerator::GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
 {
     unsigned int relationalOperatorIndex = 0;
     for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
@@ -76,7 +76,7 @@ string EventsCodeGenerator::GenerateRelationalOperatorCall(const InstructionMeta
  * \param String to be placed at the start of the call of the getter ( the "getter" function to be called typically ). Example : MyObject->Get
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string EventsCodeGenerator::GenerateOperatorCall(const InstructionMetadata & instrInfos, vector<string> & arguments, const string & callStartString, const string & getterStartString, unsigned int startFromArgument)
+string EventsCodeGenerator::GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, vector<string> & arguments, const string & callStartString, const string & getterStartString, unsigned int startFromArgument)
 {
     unsigned int operatorIndex = 0;
     for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
@@ -140,7 +140,7 @@ string EventsCodeGenerator::GenerateOperatorCall(const InstructionMetadata & ins
  * \param String to be placed at the start of the call ( the function to be called typically ). Example : MyObject->Set
  * \param Arguments will be generated starting from this number. For example, set this to 1 to skip the first argument.
  */
-string EventsCodeGenerator::GenerateCompoundOperatorCall(const InstructionMetadata & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
+string EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, vector<string> & arguments, const string & callStartString, unsigned int startFromArgument)
 {
     unsigned int operatorIndex = 0;
     for (unsigned int i = startFromArgument+1;i<instrInfos.parameters.size();++i)
@@ -181,18 +181,18 @@ string EventsCodeGenerator::GenerateCompoundOperatorCall(const InstructionMetada
 }
 
 
-std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const Scene & scene, Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context)
+std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const Scene & scene, gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context)
 {
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     std::string conditionCode;
 
-    InstructionMetadata instrInfos = extensionsManager->GetConditionInfos(condition.GetType());
+    gd::InstructionMetadata instrInfos = extensionsManager->GetConditionInfos(condition.GetType());
 
     if ( !instrInfos.cppCallingInformation.optionalIncludeFile.empty() )
         AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
 
-    if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>() )
+    if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>() )
     {
         conditionCode += "{\nbool & conditionTrue = "+returnBoolean+";\n";
         conditionCode += instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, condition, *this, context);
@@ -204,8 +204,8 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
     //Insert code only parameters and be sure there is no lack of parameter.
     while(condition.GetParameters().size() < instrInfos.parameters.size())
     {
-        vector < GDExpression > parameters = condition.GetParameters();
-        parameters.push_back(GDExpression(""));
+        vector < gd::Expression > parameters = condition.GetParameters();
+        parameters.push_back(gd::Expression(""));
         condition.SetParameters(parameters);
     }
 
@@ -222,7 +222,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
                 cout << "Condition wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
                 cout << "Condition has received " << objectInParameter << " of type " << gd::GetTypeOfObject(game, scene, objectInParameter) << endl;
 
-                condition.SetParameter(pNb, GDExpression(""));
+                condition.SetParameter(pNb, gd::Expression(""));
                 condition.SetType("");
             }
         }
@@ -423,7 +423,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
  * Generate code for a list of conditions.
  * Bools containing conditions results are named conditionXIsTrue.
  */
-string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const Scene & scene, vector < Instruction > & conditions, EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const Scene & scene, vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context)
 {
     string outputCode;
 
@@ -432,7 +432,7 @@ string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const 
 
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
-        InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
+        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
 
         string conditionCode = GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
         if ( !conditions[cId].GetType().empty() )
@@ -455,18 +455,18 @@ string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const 
 /**
  * Generate code for an action.
  */
-std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Scene & scene, Instruction & action, EventsCodeGenerationContext & context)
+std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Scene & scene, gd::Instruction & action, EventsCodeGenerationContext & context)
 {
     GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
 
     string actionCode;
 
-    InstructionMetadata instrInfos = extensionsManager->GetActionInfos(action.GetType());
+    gd::InstructionMetadata instrInfos = extensionsManager->GetActionInfos(action.GetType());
 
     if ( !instrInfos.cppCallingInformation.optionalIncludeFile.empty() )
         AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
 
-    if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>() )
+    if ( instrInfos.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>() )
     {
         return instrInfos.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, action, *this, context);
     }
@@ -474,8 +474,8 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
     //Be sure there is no lack of parameter.
     while(action.GetParameters().size() < instrInfos.parameters.size())
     {
-        vector < GDExpression > parameters = action.GetParameters();
-        parameters.push_back(GDExpression(""));
+        vector < gd::Expression > parameters = action.GetParameters();
+        parameters.push_back(gd::Expression(""));
         action.SetParameters(parameters);
     }
 
@@ -491,7 +491,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
                 cout << "Action wanted " << instrInfos.parameters[pNb].supplementaryInformation << " of type " << instrInfos.parameters[pNb].supplementaryInformation << endl;
                 cout << "Action has received " << objectInParameter << " of type " << gd::GetTypeOfObject(game, scene, objectInParameter) << endl;
 
-                action.SetParameter(pNb, GDExpression(""));
+                action.SetParameter(pNb, gd::Expression(""));
                 action.SetType("");
             }
         }
@@ -506,7 +506,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
         string call;
         if ( instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string" )
         {
-            if ( instrInfos.cppCallingInformation.accessType == InstructionMetadata::CppCallingInformation::MutatorAndOrAccessor )
+            if ( instrInfos.cppCallingInformation.accessType == gd::InstructionMetadata::CppCallingInformation::MutatorAndOrAccessor )
                 call = GenerateOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName, instrInfos.cppCallingInformation.optionalAssociatedInstruction);
             else
                 call = GenerateCompoundOperatorCall(instrInfos, arguments, instrInfos.cppCallingInformation.cppCallingName);
@@ -560,7 +560,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             string call;
             if ( instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string")
             {
-                if ( instrInfos.cppCallingInformation.accessType == InstructionMetadata::CppCallingInformation::MutatorAndOrAccessor )
+                if ( instrInfos.cppCallingInformation.accessType == gd::InstructionMetadata::CppCallingInformation::MutatorAndOrAccessor )
                     call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, objectPart+instrInfos.cppCallingInformation.optionalAssociatedInstruction,1);
                 else
                     call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName,1);
@@ -622,7 +622,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             string call;
             if ( (instrInfos.cppCallingInformation.type == "number" || instrInfos.cppCallingInformation.type == "string") )
             {
-                if ( instrInfos.cppCallingInformation.accessType == InstructionMetadata::CppCallingInformation::MutatorAndOrAccessor )
+                if ( instrInfos.cppCallingInformation.accessType == gd::InstructionMetadata::CppCallingInformation::MutatorAndOrAccessor )
                     call = GenerateOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName, objectPart+instrInfos.cppCallingInformation.optionalAssociatedInstruction,2);
                 else
                     call = GenerateCompoundOperatorCall(instrInfos, arguments, objectPart+instrInfos.cppCallingInformation.cppCallingName,2);
@@ -664,12 +664,12 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
 /**
  * Generate actions code.
  */
-string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Scene & scene, vector < Instruction > & actions, EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Scene & scene, vector < gd::Instruction > & actions, EventsCodeGenerationContext & context)
 {
     string outputCode;
     for (unsigned int aId =0;aId < actions.size();++aId)
     {
-        InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
+        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
 
         string actionCode = GenerateActionCode(game, scene, actions[aId], context);
 
@@ -683,19 +683,19 @@ string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Sce
 
 /**
  */
-vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, const Scene & scene, vector < GDExpression > parameters, const vector < ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
+vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, const Scene & scene, vector < gd::Expression > parameters, const vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
 {
     vector<string> arguments;
 
     while(parameters.size() < parametersInfo.size())
-        parameters.push_back(GDExpression(""));
+        parameters.push_back(gd::Expression(""));
 
     for (unsigned int pNb = 0;pNb < parametersInfo.size() && pNb < parameters.size();++pNb)
     {
         string argOutput;
 
         if ( parameters[pNb].GetPlainString().empty() && parametersInfo[pNb].optional  )
-            parameters[pNb] = GDExpression(parametersInfo[pNb].defaultValue);
+            parameters[pNb] = gd::Expression(parametersInfo[pNb].defaultValue);
 
         if ( parametersInfo[pNb].type == "expression" || parametersInfo[pNb].type == "camera" )
         {

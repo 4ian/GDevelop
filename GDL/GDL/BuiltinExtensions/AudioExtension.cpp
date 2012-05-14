@@ -3,12 +3,14 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#include <iostream>
 #include "GDL/BuiltinExtensions/AudioExtension.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDL/SoundManager.h"
 #include "GDL/CommonTools.h"
+#if defined(GD_IDE_ONLY)
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/Events/Instruction.h"
-#include <iostream>
+#endif
 
 AudioExtension::AudioExtension()
 {
@@ -555,7 +557,7 @@ AudioExtension::AudioExtension()
 }
 
 #if defined(GD_IDE_ONLY)
-void AudioExtension::ExposeActionsResources(Instruction & action, gd::ArbitraryResourceWorker & worker)
+void AudioExtension::ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker)
 {
     if ( action.GetType() == "PlaySound" || action.GetType() == "PlaySoundCanal" || action.GetType() == "PlayMusic" || action.GetType() == "PlayMusicCanal" )
     {

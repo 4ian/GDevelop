@@ -5,7 +5,9 @@
 
 #include <string>
 #include <set>
+#if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Event.h"
+#endif
 #include "GDL/BuiltinExtensions/CommonInstructionsExtension.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDL/StandardEvent.h"
@@ -20,7 +22,6 @@
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/Events/EventsCodeNameMangler.h"
 #include "GDL/Events/ExpressionsCodeGeneration.h"
-
 #include "GDL/ExtensionBase.h"
 
 using namespace std;
@@ -42,13 +43,13 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                    "res/conditions/or24.png",
                    "res/conditions/or.png");
 
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
                 //Conditions code
                 std::string conditionsCode;
-                std::vector<Instruction> & conditions = instruction.GetSubInstructions();
+                std::vector<gd::Instruction> & conditions = instruction.GetSubInstructions();
 
                 //"OR" condition must declare objects list, but without picking the objects from the scene. Lists are either empty or come from a parent event.
                 set<string> emptyListsNeeded;
@@ -113,8 +114,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 return code;
             };
         };
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
         instrInfo.SetCanHaveSubInstructions();
 
     DECLARE_END_CONDITION()
@@ -127,9 +128,9 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                    "res/conditions/and24.png",
                    "res/conditions/and.png");
 
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
                 string outputCode;
 
@@ -145,8 +146,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             };
         };
 
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
         instrInfo.SetCanHaveSubInstructions();
 
     DECLARE_END_CONDITION()
@@ -159,11 +160,11 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                    "res/conditions/not24.png",
                    "res/conditions/not.png");
 
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
-                std::vector<Instruction> & conditions = instruction.GetSubInstructions();
+                std::vector<gd::Instruction> & conditions = instruction.GetSubInstructions();
                 string outputCode;
 
                 for (unsigned int i = 0;i<conditions.size();++i)
@@ -196,8 +197,8 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             };
         };
 
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
         instrInfo.SetCanHaveSubInstructions();
 
     DECLARE_END_CONDITION()

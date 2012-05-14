@@ -56,18 +56,18 @@ std::string WhileEvent::GenerateEventCode(Game & game, Scene & scene, EventsCode
     return outputCode;
 }
 
-vector < vector<Instruction>* > WhileEvent::GetAllConditionsVectors()
+vector < vector<gd::Instruction>* > WhileEvent::GetAllConditionsVectors()
 {
-    vector < vector<Instruction>* > allConditions;
+    vector < vector<gd::Instruction>* > allConditions;
     allConditions.push_back(&whileConditions);
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < vector<Instruction>* > WhileEvent::GetAllActionsVectors()
+vector < vector<gd::Instruction>* > WhileEvent::GetAllActionsVectors()
 {
-    vector < vector<Instruction>* > allActions;
+    vector < vector<gd::Instruction>* > allActions;
     allActions.push_back(&actions);
 
     return allActions;

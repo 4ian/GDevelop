@@ -364,24 +364,24 @@ lastErrorPos(std::string::npos)
             continue;
 
         //Add keywords of static expressions
-	    const std::map<std::string, ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressions();
-        for(std::map<std::string, ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+	    const std::map<std::string, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressions();
+        for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
 	        keywords += " "+it->first;
 
-	    const std::map<std::string, StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressions();
-        for(std::map<std::string, StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+	    const std::map<std::string, gd::StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressions();
+        for(std::map<std::string, gd::StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
 	        keywords += " "+it->first;
 
         //Add keywords of objects expressions
 	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
         for (unsigned int j = 0;j<objectsTypes.size();++j)
         {
-            const std::map<std::string, ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
-            for(std::map<std::string, ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+            const std::map<std::string, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
+            for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
                 keywords += " "+it->first;
 
-            const std::map<std::string, StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
-            for(std::map<std::string, StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+            const std::map<std::string, gd::StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
+            for(std::map<std::string, gd::StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
                 keywords += " "+it->first;
         }
 
@@ -389,12 +389,12 @@ lastErrorPos(std::string::npos)
 	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
         for (unsigned int j = 0;j<automatismsTypes.size();++j)
         {
-            const std::map<std::string, ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<std::string, ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
+            const std::map<std::string, gd::ExpressionMetadata > & allExprs = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<std::string, gd::ExpressionMetadata >::const_iterator it = allExprs.begin(); it != allExprs.end(); ++it)
                 keywords += " "+it->first;
 
-            const std::map<std::string, StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<std::string, StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
+            const std::map<std::string, gd::StrExpressionMetadata > & allStrExprs = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<std::string, gd::StrExpressionMetadata >::const_iterator it = allStrExprs.begin(); it != allStrExprs.end(); ++it)
                 keywords += " "+it->first;
         }
 	}
@@ -502,8 +502,8 @@ void EditExpression::RefreshLists()
                                             ObjList->AppendItem(extensionItem, _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,0) ;
 
             //Add each object expression
-            std::map<string, ExpressionMetadata > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
-            for(std::map<string, ExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
+            std::map<string, gd::ExpressionMetadata > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
+            for(std::map<string, gd::ExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
             {
                 if ( it->second.shown )
                 {
@@ -537,8 +537,8 @@ void EditExpression::RefreshLists()
                                             ObjList->AppendItem(extensionItem, _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname,0) ;
 
             //Add each automatism expression
-            std::map<string, ExpressionMetadata > allAutoExpr = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
-            for(std::map<string, ExpressionMetadata>::const_iterator it = allAutoExpr.begin(); it != allAutoExpr.end(); ++it)
+            std::map<string, gd::ExpressionMetadata > allAutoExpr = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
+            for(std::map<string, gd::ExpressionMetadata>::const_iterator it = allAutoExpr.begin(); it != allAutoExpr.end(); ++it)
             {
                 if ( it->second.shown )
                 {
@@ -568,8 +568,8 @@ void EditExpression::RefreshLists()
         //Add each expression
         extensionItem = ValList->GetRootItem();
 
-        std::map<string, ExpressionMetadata > allExpr = extensions[i]->GetAllExpressions();
-        for(std::map<string, ExpressionMetadata>::const_iterator it = allExpr.begin(); it != allExpr.end(); ++it)
+        std::map<string, gd::ExpressionMetadata > allExpr = extensions[i]->GetAllExpressions();
+        for(std::map<string, gd::ExpressionMetadata>::const_iterator it = allExpr.begin(); it != allExpr.end(); ++it)
         {
             if ( it->second.shown )
             {
@@ -643,60 +643,60 @@ void EditExpression::OnSinBtClick(wxCommandEvent& event)
 /**
  * Show a dialog for completing a parameter
  */
-string EditExpression::ShowParameterDialog(const ParameterMetadata & ParameterMetadata, bool & userCancelled)
+string EditExpression::ShowParameterDialog(const gd::ParameterMetadata & parameterMetadata, bool & userCancelled)
 {
-    if ( ParameterMetadata.type == "expression" )
+    if ( parameterMetadata.type == "expression" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), ParameterMetadata.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterMetadata.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
             userCancelled = true;
     }
-    else if ( ParameterMetadata.type == "string" )
+    else if ( parameterMetadata.type == "string" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), ParameterMetadata.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterMetadata.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
             userCancelled = true;
     }
-    else if ( ParameterMetadata.type == "object" )
+    else if ( parameterMetadata.type == "object" )
     {
-        ChooseObject Dialog(this, game, scene, true, ParameterMetadata.supplementaryInformation);
+        ChooseObject Dialog(this, game, scene, true, parameterMetadata.supplementaryInformation);
         if ( Dialog.ShowModal() == 0 ) return "";
 
         return Dialog.objectChosen;
     }
-    else if ( ParameterMetadata.type == "layer" )
+    else if ( parameterMetadata.type == "layer" )
     {
         ChooseLayer dialog(this, scene.initialLayers);
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.layerChosen;
     }
-    else if ( ParameterMetadata.type == "scenevar" )
+    else if ( parameterMetadata.type == "scenevar" )
     {
-        ChooseVariableDialog dialog(this, scene.GetVariables());
+        gd::ChooseVariableDialog dialog(this, scene.GetVariables());
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.selectedVariable;
     }
-    else if ( ParameterMetadata.type == "globalvar" )
+    else if ( parameterMetadata.type == "globalvar" )
     {
-        ChooseVariableDialog dialog(this, game.GetVariables());
+        gd::ChooseVariableDialog dialog(this, game.GetVariables());
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.selectedVariable;
     }
-    else if ( ParameterMetadata.type == "camera" )
+    else if ( parameterMetadata.type == "camera" )
     {
-        string param = static_cast<string> (wxGetTextFromUser(ParameterMetadata.description, _("Numéro de la caméra"), "0", this));
+        string param = static_cast<string> (wxGetTextFromUser(parameterMetadata.description, _("Numéro de la caméra"), "0", this));
         return param;
     }
     else
     {
-        string param = static_cast<string> (wxGetTextFromUser(ParameterMetadata.description, _("Paramètre"), "", this));
+        string param = static_cast<string> (wxGetTextFromUser(parameterMetadata.description, _("Paramètre"), "", this));
         return param;
     }
 
@@ -919,7 +919,7 @@ void EditExpression::OnButton17Click(wxCommandEvent& event)
 
 void EditExpression::OnhelpBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess::GetInstance()->DisplaySection(145);
+    gd::HelpFileAccess::GetInstance()->DisplaySection(145);
 }
 
 #endif

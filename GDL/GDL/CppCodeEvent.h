@@ -9,7 +9,7 @@
 #define CPPCODEEVENT_H
 #include "GDCore/Events/Event.h"
 class RuntimeScene;
-class Instruction;
+namespace gd { class Instruction; }
 class TiXmlElement;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;

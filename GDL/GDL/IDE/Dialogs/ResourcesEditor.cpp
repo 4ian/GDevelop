@@ -840,7 +840,7 @@ void ResourcesEditor::OnChercherBtClick( wxCommandEvent& event )
 
 void ResourcesEditor::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(9);
 }
 

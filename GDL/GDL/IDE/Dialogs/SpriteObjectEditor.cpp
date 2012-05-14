@@ -893,7 +893,7 @@ void EditorObjet::OnNormalCheckSelect( wxCommandEvent& event )
 
 void EditorObjet::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(47);
 }
 

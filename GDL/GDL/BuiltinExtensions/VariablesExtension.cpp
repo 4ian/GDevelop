@@ -37,9 +37,9 @@ VariablesExtension::VariablesExtension()
         //instrInfo.cppCallingInformation.SetFunctionName("GetSceneVariable").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 //Generate the code for the expression as usual
                 std::string expressionCode;
@@ -68,7 +68,7 @@ VariablesExtension::VariablesExtension()
                     return "conditionTrue = ("+variableGetCode+" < "+expressionCode+");\n";
                 else if ( instruction.GetParameters()[3].GetPlainString() == "<=")
                     return "conditionTrue = ("+variableGetCode+" <= "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == ">")
+                else if ( instruction.GetParameters()[3].GetPlainString() == ">=")
                     return "conditionTrue = ("+variableGetCode+" >= "+expressionCode+");\n";
                 else if ( instruction.GetParameters()[3].GetPlainString() == "!=")
                     return "conditionTrue = ("+variableGetCode+" != "+expressionCode+");\n";
@@ -77,8 +77,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
     DECLARE_END_CONDITION()
 
@@ -98,9 +98,9 @@ VariablesExtension::VariablesExtension()
         //instrInfo.cppCallingInformation.SetFunctionName("GetSceneVariable").SetManipulatedType("string").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 //Generate the code for the expression as usual
                 std::string expressionCode;
@@ -130,8 +130,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
     DECLARE_END_CONDITION()
 
@@ -166,9 +166,9 @@ VariablesExtension::VariablesExtension()
         instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariable").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 //Generate the code for the expression as usual
                 std::string expressionCode;
@@ -197,7 +197,7 @@ VariablesExtension::VariablesExtension()
                     return "conditionTrue = ("+variableGetCode+" < "+expressionCode+");\n";
                 else if ( instruction.GetParameters()[3].GetPlainString() == "<=")
                     return "conditionTrue = ("+variableGetCode+" <= "+expressionCode+");\n";
-                else if ( instruction.GetParameters()[3].GetPlainString() == ">")
+                else if ( instruction.GetParameters()[3].GetPlainString() == ">=")
                     return "conditionTrue = ("+variableGetCode+" >= "+expressionCode+");\n";
                 else if ( instruction.GetParameters()[3].GetPlainString() == "!=")
                     return "conditionTrue = ("+variableGetCode+" != "+expressionCode+");\n";
@@ -206,8 +206,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
     DECLARE_END_CONDITION()
 
@@ -227,9 +227,9 @@ VariablesExtension::VariablesExtension()
         //instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariable").SetManipulatedType("string").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 //Generate the code for the expression as usual
                 std::string expressionCode;
@@ -259,8 +259,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
     DECLARE_END_CONDITION()
 
@@ -295,9 +295,9 @@ VariablesExtension::VariablesExtension()
         //instrInfo.cppCallingInformation.SetFunctionName("GetSceneVariable").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 //Generate the code for the expression as usual
                 std::string expressionCode;
@@ -333,8 +333,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
     DECLARE_END_ACTION()
 
@@ -354,9 +354,9 @@ VariablesExtension::VariablesExtension()
         //instrInfo.cppCallingInformation.SetFunctionName("GetSceneVariable").SetManipulatedType("string").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 //Generate the code for the expression as usual
                 std::string expressionCode;
@@ -386,8 +386,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
     DECLARE_END_ACTION()
 
@@ -407,9 +407,9 @@ VariablesExtension::VariablesExtension()
         //instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariable").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 //Generate the code for the expression as usual
                 std::string expressionCode;
@@ -445,8 +445,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
     DECLARE_END_ACTION()
 
@@ -466,9 +466,9 @@ VariablesExtension::VariablesExtension()
         //instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariable").SetManipulatedType("string").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 //Generate the code for the expression as usual
                 std::string expressionCode;
@@ -498,8 +498,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
 
     DECLARE_END_ACTION()
@@ -512,9 +512,9 @@ VariablesExtension::VariablesExtension()
         //instrInfo.cppCallingInformation.SetFunctionName("GetSceneVariableValue").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Implementation optimized for declared scene variables:
-        class CodeGenerator : public ExpressionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<GDExpression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 std::string variableObtainCode = "GetSceneVariableValue(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
@@ -530,8 +530,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        ExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
     DECLARE_END_EXPRESSION()
 
@@ -543,9 +543,9 @@ VariablesExtension::VariablesExtension()
         //instrInfo.cppCallingInformation.SetFunctionName("GetSceneVariableString").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Implementation optimized for declared scene variables:
-        class CodeGenerator : public StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<GDExpression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 std::string variableObtainCode = "GetSceneVariableString(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
@@ -561,8 +561,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
     DECLARE_END_STR_EXPRESSION()
 
     DECLARE_EXPRESSION("GlobalVariable", _("Variable globale"), _("Variable globale"), _("Variables"), "res/actions/var.png")
@@ -572,16 +572,16 @@ VariablesExtension::VariablesExtension()
         //instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariableValue").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Implementation optimized for declared scene variables:
-        class CodeGenerator : public ExpressionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<GDExpression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 std::string variableObtainCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
                 for (unsigned int i = 0;i<game.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( game.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
                     {
-                        variableObtainCode = "GetGlobalVariableValue(*runtimeContext->scene, "+ToString(i)+")"; //Try to optimize the call when the variable position is known.
+                        variableObtainCode = "IndexGetGlobalVariableValue(*runtimeContext->scene, "+ToString(i)+")"; //Try to optimize the call when the variable position is known.
                         break;
                     }
                 }
@@ -590,8 +590,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        ExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
     DECLARE_END_EXPRESSION()
 
     DECLARE_STR_EXPRESSION("GlobalVariableString", _("Variable globale"), _("Texte d'une variable globale"), _("Variables"), "res/actions/var.png")
@@ -601,16 +601,16 @@ VariablesExtension::VariablesExtension()
         //instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariableString").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Implementation optimized for declared scene variables:
-        class CodeGenerator : public StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<GDExpression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 std::string variableObtainCode = "GetGlobalVariableString(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
                 for (unsigned int i = 0;i<game.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( game.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
                     {
-                        variableObtainCode = "GetGlobalVariableString(*runtimeContext->scene, "+ToString(i)+")"; //Try to optimize the call when the variable position is known.
+                        variableObtainCode = "IndexGetGlobalVariableString(*runtimeContext->scene, "+ToString(i)+")"; //Try to optimize the call when the variable position is known.
                         break;
                     }
                 }
@@ -619,8 +619,8 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
     DECLARE_END_STR_EXPRESSION()
     #endif
 }

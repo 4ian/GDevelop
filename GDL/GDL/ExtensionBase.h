@@ -27,7 +27,7 @@ class MainEditorCommand;
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #endif
 class RuntimeScene;
-class Instruction;
+namespace gd { class Instruction; }
 class Automatism;
 class Game;
 class Scene;
@@ -61,7 +61,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionMetadata instrInfo(GetNameSpace()); \
+            gd::InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentConditionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -81,7 +81,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionMetadata instrInfo(GetNameSpace()); \
+            gd::InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentActionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -101,7 +101,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_OBJECT_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_OBJECT_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionMetadata instrInfo(GetNameSpace()); \
+            gd::InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentObjConditionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -120,7 +120,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_OBJECT_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_OBJECT_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionMetadata instrInfo(GetNameSpace()); \
+            gd::InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentObjActionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -141,7 +141,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_AUTOMATISM_CONDITION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_AUTOMATISM_CONDITION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionMetadata instrInfo(GetNameSpace()); \
+            gd::InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentAutoConditionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -160,7 +160,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * DECLARE_END_AUTOMATISM_ACTION need to be used after having declared parameter ( instrInfo.AddParameter ).
  */
 #define DECLARE_AUTOMATISM_ACTION(name_, fullname_, description_, sentence_, group_, icon_, smallicon_) { \
-            InstructionMetadata instrInfo(GetNameSpace()); \
+            gd::InstructionMetadata instrInfo(GetNameSpace()); \
             std::string currentAutoActionDeclarationName = name_; \
             instrInfo.fullname = std::string(fullname_.mb_str()); \
             instrInfo.description = std::string(description_.mb_str()); \
@@ -205,7 +205,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            ExpressionMetadata instrInfo(GetNameSpace()); \
+            gd::ExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -225,7 +225,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_OBJECT_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            ExpressionMetadata instrInfo(GetNameSpace()); \
+            gd::ExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -245,7 +245,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_AUTOMATISM_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            ExpressionMetadata instrInfo(GetNameSpace()); \
+            gd::ExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -264,7 +264,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param filename for a small icon displayed in editor ( 16*16 )
  */
 #define DECLARE_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            StrExpressionMetadata instrInfo(GetNameSpace()); \
+            gd::StrExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -284,7 +284,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_OBJECT_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            StrExpressionMetadata instrInfo(GetNameSpace()); \
+            gd::StrExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -304,7 +304,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function
  */
 #define DECLARE_AUTOMATISM_STR_EXPRESSION(name_, fullname_, description_, group_, smallicon_) { \
-            StrExpressionMetadata instrInfo(GetNameSpace()); \
+            gd::StrExpressionMetadata instrInfo(GetNameSpace()); \
             std::string currentExprDeclarationName = name_;\
             instrInfo.fullname = fullname_; \
             instrInfo.description = description_; \
@@ -522,10 +522,10 @@ class GD_API AutomatismInfo
     std::string group;
     wxBitmap icon;
 
-    std::map<std::string, InstructionMetadata > conditionsInfos;
-    std::map<std::string, InstructionMetadata > actionsInfos;
-    std::map<std::string, ExpressionMetadata > expressionsInfos;
-    std::map<std::string, StrExpressionMetadata > strExpressionsInfos;
+    std::map<std::string, gd::InstructionMetadata > conditionsInfos;
+    std::map<std::string, gd::InstructionMetadata > actionsInfos;
+    std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
+    std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
 
     std::string optionalIncludeFile;
     std::string cppClassName;
@@ -555,10 +555,10 @@ class GD_API ExtensionObjectInfos
     std::string informations;
     wxBitmap icon;
 
-    std::map<std::string, InstructionMetadata > conditionsInfos;
-    std::map<std::string, InstructionMetadata > actionsInfos;
-    std::map<std::string, ExpressionMetadata > expressionsInfos;
-    std::map<std::string, StrExpressionMetadata > strExpressionsInfos;
+    std::map<std::string, gd::InstructionMetadata > conditionsInfos;
+    std::map<std::string, gd::InstructionMetadata > actionsInfos;
+    std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
+    std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
 
     std::string optionalIncludeFile;
     std::string cppClassName;
@@ -696,20 +696,20 @@ class GD_API ExtensionBase
     virtual const std::string & GetFullName() const { return fullname; }
     virtual bool IsBuiltin() const { return nameSpace.empty(); }
 
-    const std::map<std::string, InstructionMetadata > & GetAllActions() const;
-    const std::map<std::string, InstructionMetadata > & GetAllConditions() const;
-    const std::map<std::string, ExpressionMetadata > & GetAllExpressions() const;
-    const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressions() const;
-    const std::map<std::string, InstructionMetadata > & GetAllActionsForObject(std::string objectType) const;
-    const std::map<std::string, InstructionMetadata > & GetAllConditionsForObject(std::string objectType) const;
-    const std::map<std::string, ExpressionMetadata > & GetAllExpressionsForObject(std::string objectType) const;
-    const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressionsForObject(std::string objectType) const;
+    const std::map<std::string, gd::InstructionMetadata > & GetAllActions() const;
+    const std::map<std::string, gd::InstructionMetadata > & GetAllConditions() const;
+    const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressions() const;
+    const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressions() const;
+    const std::map<std::string, gd::InstructionMetadata > & GetAllActionsForObject(std::string objectType) const;
+    const std::map<std::string, gd::InstructionMetadata > & GetAllConditionsForObject(std::string objectType) const;
+    const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressionsForObject(std::string objectType) const;
+    const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressionsForObject(std::string objectType) const;
     const std::map<std::string, EventInfos > & GetAllEvents() const;
     const std::map<std::string, AutomatismInfo > & GetAllAutomatisms() const;
-    const std::map<std::string, InstructionMetadata > & GetAllActionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, InstructionMetadata > & GetAllConditionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, ExpressionMetadata > & GetAllExpressionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType) const;
+    const std::map<std::string, gd::InstructionMetadata > & GetAllActionsForAutomatism(std::string autoType) const;
+    const std::map<std::string, gd::InstructionMetadata > & GetAllConditionsForAutomatism(std::string autoType) const;
+    const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressionsForAutomatism(std::string autoType) const;
+    const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType) const;
 
     const std::vector < std::pair<std::string, std::string> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
     const std::vector < std::string > & GetSupplementaryIncludeDirectories() const { return supplementaryIncludeDirectories; };
@@ -728,14 +728,14 @@ class GD_API ExtensionBase
      *
      * \see ExtensionBase::ExposeActionsResources
      */
-    virtual void ExposeConditionsResources(Instruction & condition, gd::ArbitraryResourceWorker & worker) {};
+    virtual void ExposeConditionsResources(gd::Instruction & condition, gd::ArbitraryResourceWorker & worker) {};
 
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by actions and update their filename
      *
      * \see ArbitraryResourceWorker
      */
-    virtual void ExposeActionsResources(Instruction & action, gd::ArbitraryResourceWorker & worker) {};
+    virtual void ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker) {};
 
     /**
      * Must return true if the extension has something to display in debugger.
@@ -783,16 +783,16 @@ class GD_API ExtensionBase
     std::vector < std::pair<std::string, std::string> > supplementaryRuntimeFiles; ///<Supplementary runtime files to copy on compilation
     std::vector < std::string > supplementaryIncludeDirectories; ///<Supplementary include directories to use on events compilation
 
-    std::map<std::string, InstructionMetadata > conditionsInfos;
-    std::map<std::string, InstructionMetadata > actionsInfos;
-    std::map<std::string, ExpressionMetadata > expressionsInfos;
-    std::map<std::string, StrExpressionMetadata > strExpressionsInfos;
+    std::map<std::string, gd::InstructionMetadata > conditionsInfos;
+    std::map<std::string, gd::InstructionMetadata > actionsInfos;
+    std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
+    std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
     std::map<std::string, EventInfos > eventsInfos;
 
-    static std::map<std::string, InstructionMetadata > badConditionsInfos; ///< Used when a condition is not found in the extension
-    static std::map<std::string, InstructionMetadata > badActionsInfos;  ///< Used when an action is not found in the extension
-    static std::map<std::string, ExpressionMetadata > badExpressionsInfos; ///< Used when an expression is not found in the extension
-    static std::map<std::string, StrExpressionMetadata > badStrExpressionsInfos;///< Used when an expression is not found in the extension
+    static std::map<std::string, gd::InstructionMetadata > badConditionsInfos; ///< Used when a condition is not found in the extension
+    static std::map<std::string, gd::InstructionMetadata > badActionsInfos;  ///< Used when an action is not found in the extension
+    static std::map<std::string, gd::ExpressionMetadata > badExpressionsInfos; ///< Used when an expression is not found in the extension
+    static std::map<std::string, gd::StrExpressionMetadata > badStrExpressionsInfos;///< Used when an expression is not found in the extension
     #endif
 
     private:

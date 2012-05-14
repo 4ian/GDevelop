@@ -10,6 +10,9 @@
     #include "GDL/IDE/Dialogs/ProjectUpdateDlg.h"
     #include "PlatformDefinition/Platform.h"
     #include "GDCore/PlatformDefinition/ObjectGroup.h"
+    #include "GDCore/IDE/ResourcesUnmergingHelper.h"
+    #include "GDCore/Events/Event.h"
+    #include "GDCore/Events/Instruction.h"
 #else
     #include "GDL/Log.h"
     #include <iostream>
@@ -29,15 +32,12 @@
 
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml/tinyxml.h"
-#include "GDCore/IDE/ResourcesUnmergingHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
 #include "GDL/Animation.h"
 #include "GDL/Position.h"
-#include "GDCore/Events/Event.h"
-#include "GDCore/Events/Instruction.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/ExtensionBase.h"
@@ -562,7 +562,7 @@ std::string AddBackSlashBeforeQuotes(std::string text)
     return text;
 }
 
-void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiXmlElement * elem)
+void OpenSaveGame::OpenConditions(vector < gd::Instruction > & conditions, const TiXmlElement * elem)
 {
     if (elem == NULL) return;
     const TiXmlElement * elemConditions = elem->FirstChildElement();
@@ -570,7 +570,7 @@ void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiX
     //Passage en revue des conditions
     while ( elemConditions )
     {
-        Instruction instruction;
+        gd::Instruction instruction;
 
         //Read type and infos
         const TiXmlElement *elemPara = elemConditions->FirstChildElement( "Type" );
@@ -581,11 +581,11 @@ void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiX
         }
 
         //Read parameters
-        vector < GDExpression > parameters;
+        vector < gd::Expression > parameters;
         elemPara = elemConditions->FirstChildElement("Parametre");
         while ( elemPara )
         {
-            if ( elemPara->Attribute( "value" ) != NULL ) parameters.push_back( GDExpression(elemPara->Attribute( "value" )) );
+            if ( elemPara->Attribute( "value" ) != NULL ) parameters.push_back( gd::Expression(elemPara->Attribute( "value" )) );
             elemPara = elemPara->NextSiblingElement("Parametre");
         }
         instruction.SetParameters( parameters );
@@ -600,7 +600,7 @@ void OpenSaveGame::OpenConditions(vector < Instruction > & conditions, const TiX
     }
 }
 
-void OpenSaveGame::OpenActions(vector < Instruction > & actions, const TiXmlElement * elem)
+void OpenSaveGame::OpenActions(vector < gd::Instruction > & actions, const TiXmlElement * elem)
 {
     if (elem == NULL) return;
     const TiXmlElement * elemActions = elem->FirstChildElement();
@@ -608,7 +608,7 @@ void OpenSaveGame::OpenActions(vector < Instruction > & actions, const TiXmlElem
     //Passage en revue des actions
     while ( elemActions )
     {
-        Instruction instruction;
+        gd::Instruction instruction;
 
         //Read type and info
         const TiXmlElement *elemPara = elemActions->FirstChildElement( "Type" );
@@ -618,11 +618,11 @@ void OpenSaveGame::OpenActions(vector < Instruction > & actions, const TiXmlElem
         }
 
         //Read parameters
-        vector < GDExpression > parameters;
+        vector < gd::Expression > parameters;
         elemPara = elemActions->FirstChildElement("Parametre");
         while ( elemPara )
         {
-            if (elemPara->Attribute( "value" ) != NULL) parameters.push_back( GDExpression(elemPara->Attribute( "value" )) );
+            if (elemPara->Attribute( "value" ) != NULL) parameters.push_back( gd::Expression(elemPara->Attribute( "value" )) );
             elemPara = elemPara->NextSiblingElement("Parametre");
         }
         instruction.SetParameters(parameters);
@@ -1077,7 +1077,7 @@ void OpenSaveGame::SaveEvents(const vector < gd::BaseEventSPtr > & list, TiXmlEl
     }
 }
 
-void OpenSaveGame::SaveActions(const vector < Instruction > & list, TiXmlElement * actions)
+void OpenSaveGame::SaveActions(const vector < gd::Instruction > & list, TiXmlElement * actions)
 {
     for ( unsigned int k = 0;k < list.size();k++ )
     {
@@ -1113,7 +1113,7 @@ void OpenSaveGame::SaveActions(const vector < Instruction > & list, TiXmlElement
     }
 }
 
-void OpenSaveGame::SaveConditions(const vector < Instruction > & list, TiXmlElement * conditions)
+void OpenSaveGame::SaveConditions(const vector < gd::Instruction > & list, TiXmlElement * conditions)
 {
     for ( unsigned int k = 0;k < list.size();k++ )
     {
@@ -1327,13 +1327,13 @@ void OpenSaveGame::OpenImagesFromGD2010498(const TiXmlElement * imagesElem, TiXm
 }
 
 
-void OpenSaveGame::AdaptConditionFromGD1x(Instruction & instruction, const InstructionMetadata & instrInfos)
+void OpenSaveGame::AdaptConditionFromGD1x(gd::Instruction & instruction, const gd::InstructionMetadata & instrInfos)
 {
-    vector < GDExpression > newParameters = instruction.GetParameters();
+    vector < gd::Expression > newParameters = instruction.GetParameters();
     for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)
     {
         if ( instrInfos.parameters[i].codeOnly )
-            newParameters.insert(newParameters.begin()+i, GDExpression(""));
+            newParameters.insert(newParameters.begin()+i, gd::Expression(""));
     }
 
     instruction.SetParameters(newParameters);
@@ -1342,19 +1342,19 @@ void OpenSaveGame::AdaptConditionFromGD1x(Instruction & instruction, const Instr
     {
         GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
 
-        vector < Instruction > & subInstructions = instruction.GetSubInstructions();
+        vector < gd::Instruction > & subInstructions = instruction.GetSubInstructions();
         for (unsigned int i = 0;i<subInstructions.size();++i)
             AdaptConditionFromGD1x(subInstructions[i], extensionManager->GetConditionInfos(subInstructions[i].GetType()));
     }
 }
 
-void OpenSaveGame::AdaptActionFromGD1x(Instruction & instruction, const InstructionMetadata & instrInfos)
+void OpenSaveGame::AdaptActionFromGD1x(gd::Instruction & instruction, const gd::InstructionMetadata & instrInfos)
 {
-    vector < GDExpression > newParameters = instruction.GetParameters();
+    vector < gd::Expression > newParameters = instruction.GetParameters();
     for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)
     {
         if ( instrInfos.parameters[i].codeOnly )
-            newParameters.insert(newParameters.begin()+i, GDExpression(""));
+            newParameters.insert(newParameters.begin()+i, gd::Expression(""));
     }
 
     instruction.SetParameters(newParameters);
@@ -1363,7 +1363,7 @@ void OpenSaveGame::AdaptActionFromGD1x(Instruction & instruction, const Instruct
     {
         GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
 
-        vector < Instruction > & subInstructions = instruction.GetSubInstructions();
+        vector < gd::Instruction > & subInstructions = instruction.GetSubInstructions();
         for (unsigned int i = 0;i<subInstructions.size();++i)
             AdaptActionFromGD1x(subInstructions[i], extensionManager->GetActionInfos(subInstructions[i].GetType()));
     }
@@ -1375,7 +1375,7 @@ void OpenSaveGame::AdaptEventsFromGD1x(vector < gd::BaseEventSPtr > & list)
 
     for (unsigned int eId = 0;eId<list.size();++eId)
     {
-        vector < vector<Instruction>* > conditions = list[eId]->GetAllConditionsVectors();
+        vector < vector<gd::Instruction>* > conditions = list[eId]->GetAllConditionsVectors();
         for (unsigned cV = 0;cV<conditions.size();++cV)
         {
             for (unsigned int cId = 0;cId<conditions[cV]->size();++cId)
@@ -1384,7 +1384,7 @@ void OpenSaveGame::AdaptEventsFromGD1x(vector < gd::BaseEventSPtr > & list)
             }
         }
 
-        vector < vector<Instruction>* > actions = list[eId]->GetAllActionsVectors();
+        vector < vector<gd::Instruction>* > actions = list[eId]->GetAllActionsVectors();
         for (unsigned aV = 0;aV<actions.size();++aV)
         {
             for (unsigned int aId = 0;aId<actions[aV]->size();++aId)

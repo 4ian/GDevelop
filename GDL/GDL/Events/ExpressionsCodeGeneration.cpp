@@ -45,12 +45,12 @@ void CallbacksForGeneratingExpressionCode::OnNumber(string text)
     plainExpression += text;
 };
 
-void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo)
+void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
 {
     codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
 
     //Launch custom code generator if needed
-    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, parameters, codeGenerator, context); return; }
 
 
@@ -66,12 +66,11 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     plainExpression += expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+")";
 };
 
-void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo)
+void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
 {
     codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
-
     //Launch custom code generator if needed
-    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, parameters, codeGenerator, context); return; }
 
     //TODO : A bit of hack here..
@@ -96,13 +95,13 @@ void CallbacksForGeneratingExpressionCode::OnStaticFunction(string functionName,
     plainExpression += expressionInfo.cppCallingInformation.cppCallingName+"("+parametersStr+")";
 };
 
-void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo)
+void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
 {
     codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( parameters.empty() ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, parameters, codeGenerator, context); return; }
 
     //Prepare parameters
@@ -164,13 +163,13 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     plainExpression += output;
 };
 
-void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo)
+void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
 {
     codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( parameters.empty() ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, parameters, codeGenerator, context); return; }
 
     //Prepare parameters
@@ -232,13 +231,13 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
     plainExpression += output;
 };
 
-void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo)
+void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
 {
     codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( parameters.size() < 2 ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, parameters, codeGenerator, context); return; }
 
     //Prepare parameters
@@ -300,13 +299,13 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     plainExpression += output;
 };
 
-void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo)
+void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
 {
     codeGenerator.AddIncludeFile(expressionInfo.cppCallingInformation.optionalIncludeFile);
     if ( parameters.size() < 2 ) return;
 
     //Launch custom code generator if needed
-    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
+    if ( expressionInfo.cppCallingInformation.optionalCustomCodeGenerator != boost::shared_ptr<gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>() )
     { plainExpression += expressionInfo.cppCallingInformation.optionalCustomCodeGenerator->GenerateCode(game, scene, parameters, codeGenerator, context); return; }
 
     //Prepare parameters
@@ -368,7 +367,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     plainExpression += output;
 };
 
-bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)
+bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const Game & game, const Scene & scene, gd::Expression & expression)
 {
     string newExpression;
 
@@ -387,7 +386,7 @@ bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const Game & game
     return true;
 }
 
-bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression)
+bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(const Game & game, const Scene & scene, gd::Expression & expression)
 {
     string newExpression;
 

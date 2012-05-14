@@ -97,9 +97,9 @@ SceneExtension::SceneExtension()
         instrInfo.AddParameter("expression", _("Expression 2"), "",false);
         instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
 
-        class CodeGenerator : public InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 std::string value1Code;
                 {
@@ -123,7 +123,7 @@ SceneExtension::SceneExtension()
                     return "conditionTrue = ("+value1Code+" < "+value2Code+");\n";
                 else if ( instruction.GetParameters()[2].GetPlainString() == "<=")
                     return "conditionTrue = ("+value1Code+" <= "+value2Code+");\n";
-                else if ( instruction.GetParameters()[2].GetPlainString() == ">")
+                else if ( instruction.GetParameters()[2].GetPlainString() == ">=")
                     return "conditionTrue = ("+value1Code+" >= "+value2Code+");\n";
                 else if ( instruction.GetParameters()[2].GetPlainString() == "!=")
                     return "conditionTrue = ("+value1Code+" != "+value2Code+");\n";
@@ -132,8 +132,8 @@ SceneExtension::SceneExtension()
             };
         };
 
-        InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
     DECLARE_END_CONDITION()
     #endif

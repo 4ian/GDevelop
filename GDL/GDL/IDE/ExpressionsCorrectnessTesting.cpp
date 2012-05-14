@@ -7,7 +7,7 @@
 
 #include "GDL/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDL/IDE/GDExpressionParser.h"
-#include "GDCore/Events/GDExpression.h"
+#include "GDCore/Events/Expression.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
@@ -21,7 +21,7 @@ CallbacksForExpressionCorrectnessTesting::CallbacksForExpressionCorrectnessTesti
 
 }
 
-bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)
+bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(const Game & game, const Scene & scene, gd::Expression & expression)
 {
     CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
 
@@ -38,7 +38,7 @@ bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(const Game & 
     return true;
 }
 
-bool CallbacksForExpressionCorrectnessTesting::OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression)
+bool CallbacksForExpressionCorrectnessTesting::OnSubTextExpression(const Game & game, const Scene & scene, gd::Expression & expression)
 {
     CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
 

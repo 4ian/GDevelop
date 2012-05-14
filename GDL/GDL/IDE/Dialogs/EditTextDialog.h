@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #if defined(GD_IDE_ONLY)
 
 #ifndef EDITTEXTE_H
@@ -17,7 +21,7 @@
 #include <vector>
 class Game;
 class Scene;
-class ParameterMetadata;
+namespace gd { class ParameterMetadata; }
 
 using namespace std;
 
@@ -87,7 +91,7 @@ class GD_API EditTextDialog: public wxDialog
 		void TextModified(wxStyledTextEvent& event);
 		void UpdateTextCtrl(wxStyledTextEvent& event);
 
-		string ShowParameterDialog(const ParameterMetadata & ParameterMetadata, bool & userCancelled, std::string object = "");
+		string ShowParameterDialog(const gd::ParameterMetadata & ParameterMetadata, bool & userCancelled, std::string object = "");
 
 		//Items selected
 		wxTreeItemId itemObj;

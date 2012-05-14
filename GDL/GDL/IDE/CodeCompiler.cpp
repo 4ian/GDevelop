@@ -132,15 +132,6 @@ void CodeCompiler::ProcessTasks()
 
             if ( currentTask.eventsGeneratedCode ) //Define special arguments for events generated code
             {
-                //PCH disabled: The gain in speed is not that high ( about 1 seconds ) and it triggers some weird errors with some headers ( locale_facets.tcc )
-                /*#if defined(WINDOWS)
-                if ( !currentTask.optimize ) //Don't use precompiled header when optimizing, as they are built without optimizations
-                {
-                    args.push_back("-include-pch");
-                    args.push_back(!currentTask.compilationForRuntime ? "include/GDL/GDL/Events/PrecompiledHeader.h.pch" : "include/GDL/GDL/Events/PrecompiledHeaderRuntime.h.pch");
-                }
-                #endif*/
-
                 args.push_back("-fsyntax-only");
                 args.push_back("-fcxx-exceptions");
                 args.push_back("-fexceptions");

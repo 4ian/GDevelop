@@ -3,14 +3,16 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "GDL/ExtensionBase.h"
-#include "GDCore/Events/Event.h"
-#include "GDL/Automatism.h"
-#include "GDL/AutomatismsSharedDatas.h"
-#include "GDL/CommonTools.h"
 #include <vector>
 #include <string>
 #include <iostream>
+#include "GDL/ExtensionBase.h"
+#include "GDL/Automatism.h"
+#include "GDL/AutomatismsSharedDatas.h"
+#include "GDL/CommonTools.h"
+#if defined(GD_IDE_ONLY)
+#include "GDCore/Events/Event.h"
+#endif
 
 using namespace std;
 
@@ -18,10 +20,10 @@ std::map<std::string, ExtensionObjectInfos > ExtensionBase::badObjectsInfos;
 std::map<std::string, AutomatismInfo > ExtensionBase::badAutomatismsInfo;
 
 #if defined(GD_IDE_ONLY)
-std::map<std::string, InstructionMetadata > ExtensionBase::badConditionsInfos;
-std::map<std::string, InstructionMetadata > ExtensionBase::badActionsInfos;
-std::map<std::string, ExpressionMetadata > ExtensionBase::badExpressionsInfos;
-std::map<std::string, StrExpressionMetadata > ExtensionBase::badStrExpressionsInfos;
+std::map<std::string, gd::InstructionMetadata > ExtensionBase::badConditionsInfos;
+std::map<std::string, gd::InstructionMetadata > ExtensionBase::badActionsInfos;
+std::map<std::string, gd::ExpressionMetadata > ExtensionBase::badExpressionsInfos;
+std::map<std::string, gd::StrExpressionMetadata > ExtensionBase::badStrExpressionsInfos;
 #endif
 
 ExtensionObjectInfos::ExtensionObjectInfos() :
@@ -102,22 +104,22 @@ vector < std::string > ExtensionBase::GetAutomatismsTypes() const
     return automatisms;
 }
 
-const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllActions() const
+const std::map<std::string, gd::InstructionMetadata > & ExtensionBase::GetAllActions() const
 {
     return actionsInfos;
 }
 
-const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllConditions() const
+const std::map<std::string, gd::InstructionMetadata > & ExtensionBase::GetAllConditions() const
 {
     return conditionsInfos;
 }
 
-const std::map<std::string, ExpressionMetadata > & ExtensionBase::GetAllExpressions() const
+const std::map<std::string, gd::ExpressionMetadata > & ExtensionBase::GetAllExpressions() const
 {
     return expressionsInfos;
 }
 
-const std::map<std::string, StrExpressionMetadata > & ExtensionBase::GetAllStrExpressions() const
+const std::map<std::string, gd::StrExpressionMetadata > & ExtensionBase::GetAllStrExpressions() const
 {
     return strExpressionsInfos;
 }
@@ -131,7 +133,7 @@ const std::map<std::string, AutomatismInfo > & ExtensionBase::GetAllAutomatisms(
 {
     return automatismsInfo;
 }
-const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllActionsForObject(std::string objectType) const
+const std::map<std::string, gd::InstructionMetadata > & ExtensionBase::GetAllActionsForObject(std::string objectType) const
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second.actionsInfos;
@@ -139,7 +141,7 @@ const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllActions
     return badActionsInfos;
 }
 
-const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllConditionsForObject(std::string objectType) const
+const std::map<std::string, gd::InstructionMetadata > & ExtensionBase::GetAllConditionsForObject(std::string objectType) const
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second.conditionsInfos;
@@ -147,7 +149,7 @@ const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllConditi
     return badConditionsInfos;
 }
 
-const std::map<std::string, ExpressionMetadata > & ExtensionBase::GetAllExpressionsForObject(std::string objectType) const
+const std::map<std::string, gd::ExpressionMetadata > & ExtensionBase::GetAllExpressionsForObject(std::string objectType) const
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second.expressionsInfos;
@@ -155,7 +157,7 @@ const std::map<std::string, ExpressionMetadata > & ExtensionBase::GetAllExpressi
     return badExpressionsInfos;
 }
 
-const std::map<std::string, StrExpressionMetadata > & ExtensionBase::GetAllStrExpressionsForObject(std::string objectType) const
+const std::map<std::string, gd::StrExpressionMetadata > & ExtensionBase::GetAllStrExpressionsForObject(std::string objectType) const
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second.strExpressionsInfos;
@@ -163,7 +165,7 @@ const std::map<std::string, StrExpressionMetadata > & ExtensionBase::GetAllStrEx
     return badStrExpressionsInfos;
 }
 
-const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllActionsForAutomatism(std::string autoType) const
+const std::map<std::string, gd::InstructionMetadata > & ExtensionBase::GetAllActionsForAutomatism(std::string autoType) const
 {
     if ( automatismsInfo.find(autoType) != automatismsInfo.end())
         return automatismsInfo.find(autoType)->second.actionsInfos;
@@ -171,7 +173,7 @@ const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllActions
     return badActionsInfos;
 }
 
-const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllConditionsForAutomatism(std::string autoType) const
+const std::map<std::string, gd::InstructionMetadata > & ExtensionBase::GetAllConditionsForAutomatism(std::string autoType) const
 {
     if ( automatismsInfo.find(autoType) != automatismsInfo.end())
         return automatismsInfo.find(autoType)->second.conditionsInfos;
@@ -179,7 +181,7 @@ const std::map<std::string, InstructionMetadata > & ExtensionBase::GetAllConditi
     return badConditionsInfos;
 }
 
-const std::map<std::string, ExpressionMetadata > & ExtensionBase::GetAllExpressionsForAutomatism(std::string autoType) const
+const std::map<std::string, gd::ExpressionMetadata > & ExtensionBase::GetAllExpressionsForAutomatism(std::string autoType) const
 {
     if ( automatismsInfo.find(autoType) != automatismsInfo.end())
         return automatismsInfo.find(autoType)->second.expressionsInfos;
@@ -187,7 +189,7 @@ const std::map<std::string, ExpressionMetadata > & ExtensionBase::GetAllExpressi
     return badExpressionsInfos;
 }
 
-const std::map<std::string, StrExpressionMetadata > & ExtensionBase::GetAllStrExpressionsForAutomatism(std::string autoType) const
+const std::map<std::string, gd::StrExpressionMetadata > & ExtensionBase::GetAllStrExpressionsForAutomatism(std::string autoType) const
 {
     if ( automatismsInfo.find(autoType) != automatismsInfo.end())
         return automatismsInfo.find(autoType)->second.strExpressionsInfos;

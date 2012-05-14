@@ -132,25 +132,25 @@ std::string ForEachEvent::GenerateEventCode(Game & game, Scene & scene, EventsCo
     return outputCode;
 }
 
-vector < vector<Instruction>* > ForEachEvent::GetAllConditionsVectors()
+vector < vector<gd::Instruction>* > ForEachEvent::GetAllConditionsVectors()
 {
-    vector < vector<Instruction>* > allConditions;
+    vector < vector<gd::Instruction>* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < vector<Instruction>* > ForEachEvent::GetAllActionsVectors()
+vector < vector<gd::Instruction>* > ForEachEvent::GetAllActionsVectors()
 {
-    vector < vector<Instruction>* > allActions;
+    vector < vector<gd::Instruction>* > allActions;
     allActions.push_back(&actions);
 
     return allActions;
 }
 
-vector < GDExpression* > ForEachEvent::GetAllExpressions()
+vector < gd::Expression* > ForEachEvent::GetAllExpressions()
 {
-    vector < GDExpression* > allExpressions;
+    vector < gd::Expression* > allExpressions;
     allExpressions.push_back(&objectsToPick);
 
     return allExpressions;
@@ -186,7 +186,7 @@ void ForEachEvent::SaveToXml(TiXmlElement * eventElem) const
 void ForEachEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
     if ( eventElem->FirstChildElement( "Object" ) != NULL )
-        objectsToPick = GDExpression(eventElem->FirstChildElement("Object")->Attribute("value"));
+        objectsToPick = gd::Expression(eventElem->FirstChildElement("Object")->Attribute("value"));
 
     //Conditions
     if ( eventElem->FirstChildElement( "Conditions" ) != NULL )

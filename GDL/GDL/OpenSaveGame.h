@@ -10,8 +10,8 @@
 #include <string>
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/CommonTools.h"
-class Instruction;
-class InstructionMetadata;
+namespace gd { class Instruction; }
+namespace gd { class InstructionMetadata;}
 class InitialPosition;
 class Layer;
 namespace gd { class BaseEvent; }
@@ -34,13 +34,13 @@ public:
 
     #if defined(GD_IDE_ONLY)
     static void OpenEvents( vector < gd::BaseEventSPtr > & list, const TiXmlElement * elem );
-    static void OpenConditions(vector < Instruction > & list, const TiXmlElement * elem);
-    static void OpenActions(vector < Instruction > & list, const TiXmlElement * elem);
+    static void OpenConditions(vector < gd::Instruction > & list, const TiXmlElement * elem);
+    static void OpenActions(vector < gd::Instruction > & list, const TiXmlElement * elem);
 
     bool SaveToFile(string file);
     static void SaveEvents( const vector < gd::BaseEventSPtr > & list, TiXmlElement * events );
-    static void SaveConditions(const vector < Instruction > & list, TiXmlElement * elem);
-    static void SaveActions(const vector < Instruction > & list, TiXmlElement * elem);
+    static void SaveConditions(const vector < gd::Instruction > & list, TiXmlElement * elem);
+    static void SaveActions(const vector < gd::Instruction > & list, TiXmlElement * elem);
 
     static void OpenGroupesObjets( vector < gd::ObjectGroup > & list, const TiXmlElement * elem );
 
@@ -72,8 +72,8 @@ private:
     void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
     static void SaveVariablesList(const ListVariable & list, TiXmlElement * elem);
 
-    static void AdaptConditionFromGD1x(Instruction & instruction, const InstructionMetadata & instrInfos);
-    static void AdaptActionFromGD1x(Instruction & instruction, const InstructionMetadata & instrInfos);
+    static void AdaptConditionFromGD1x(gd::Instruction & instruction, const gd::InstructionMetadata & instrInfos);
+    static void AdaptActionFromGD1x(gd::Instruction & instruction, const gd::InstructionMetadata & instrInfos);
 
     std::string updateText;
     #endif

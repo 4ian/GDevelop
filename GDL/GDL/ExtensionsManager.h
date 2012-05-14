@@ -15,9 +15,9 @@
 class Object;
 class Automatism;
 class ExtensionBase;
-class InstructionMetadata;
-class ExpressionMetadata;
-class StrExpressionMetadata;
+namespace gd { class InstructionMetadata;}
+namespace gd { class ExpressionMetadata; }
+namespace gd { class StrExpressionMetadata; }
 class ExtensionObjectInfos;
 class AutomatismInfo;
 class AutomatismsSharedDatas;
@@ -112,49 +112,49 @@ class GD_API ExtensionsManager
          * Get information about an action from its type
          * Works for object, automatisms and static actions.
          */
-        const InstructionMetadata & GetActionInfos(string actionType) const;
+        const gd::InstructionMetadata & GetActionInfos(string actionType) const;
 
         /**
          * Get information about a condition from its type
          * Works for object, automatisms and static conditions.
          */
-        const InstructionMetadata & GetConditionInfos(string conditionType) const;
+        const gd::InstructionMetadata & GetConditionInfos(string conditionType) const;
 
         /**
          * Get information about an expression from its type
          * Works for static expressions.
          */
-        const ExpressionMetadata & GetExpressionMetadata(string exprType) const;
+        const gd::ExpressionMetadata & GetExpressionMetadata(string exprType) const;
 
         /**
          * Get information about an expression from its type
          * Works for object expressions.
          */
-        const ExpressionMetadata & GetObjectExpressionMetadata(string objectType, string exprType) const;
+        const gd::ExpressionMetadata & GetObjectExpressionMetadata(string objectType, string exprType) const;
 
         /**
          * Get information about an expression from its type
          * Works for automatism expressions.
          */
-        const ExpressionMetadata & GetAutomatismExpressionMetadata(string autoType, string exprType) const;
+        const gd::ExpressionMetadata & GetAutomatismExpressionMetadata(string autoType, string exprType) const;
 
         /**
          * Get information about a string expression from its type
          * Works for static expressions.
          */
-        const StrExpressionMetadata & GetStrExpressionMetadata(string exprType) const;
+        const gd::StrExpressionMetadata & GetStrExpressionMetadata(string exprType) const;
 
         /**
          * Get information about a string expression from its type
          * Works for object expressions.
          */
-        const StrExpressionMetadata & GetObjectStrExpressionMetadata(string objectType, string exprType) const;
+        const gd::StrExpressionMetadata & GetObjectStrExpressionMetadata(string objectType, string exprType) const;
 
         /**
          * Get information about a string expression from its type
          * Works for automatism expressions.
          */
-        const StrExpressionMetadata & GetAutomatismStrExpressionMetadata(string autoType, string exprType) const;
+        const gd::StrExpressionMetadata & GetAutomatismStrExpressionMetadata(string autoType, string exprType) const;
 
         /**
          * Verifying if a ( object ) action exists
@@ -258,9 +258,9 @@ class GD_API ExtensionsManager
         std::map < std::string, DestroyFunPtr >          destroyFunctionTable;
 
         #if defined(GD_IDE_ONLY)
-        static InstructionMetadata badInstructionMetadata;
-        static ExpressionMetadata badExpressionMetadata;
-        static StrExpressionMetadata badStrExpressionMetadata;
+        static gd::InstructionMetadata badInstructionMetadata;
+        static gd::ExpressionMetadata badExpressionMetadata;
+        static gd::StrExpressionMetadata badStrExpressionMetadata;
         #endif
         static AutomatismInfo badAutomatismInfo;
         static ExtensionObjectInfos badObjectInfo;

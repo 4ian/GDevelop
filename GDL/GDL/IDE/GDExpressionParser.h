@@ -9,13 +9,13 @@
 
 #include <string>
 #include <vector>
-class GDExpression;
+namespace gd { class Expression; }
 class ParserCallbacks;
 class Game;
 class Scene;
-class ParameterMetadata;
-class ExpressionMetadata;
-class StrExpressionMetadata;
+namespace gd { class ParameterMetadata; }
+namespace gd { class ExpressionMetadata; }
+namespace gd { class StrExpressionMetadata; }
 
 /** \brief Internal class. Parse a plainExpression by calling functors at each token
  *
@@ -50,22 +50,22 @@ class GD_API GDExpressionParser
         /**
          * Tool function to add a parameter
          */
-        bool AddParameterToList(const Game & game, const Scene & scene, ParserCallbacks &, std::vector < GDExpression > & parameters, std::string parameterStr, std::vector < ParameterMetadata > parametersInfos, const size_t positionInExpression);
+        bool AddParameterToList(const Game & game, const Scene & scene, ParserCallbacks &, std::vector < gd::Expression > & parameters, std::string parameterStr, std::vector < gd::ParameterMetadata > parametersInfos, const size_t positionInExpression);
 
         /**
          * Tool function to prepare a parameter
          */
-        bool PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks &, GDExpression & parameter, const ParameterMetadata & parametersInfo, const size_t positionInExpression);
+        bool PrepareParameter(const Game & game, const Scene & scene, ParserCallbacks &, gd::Expression & parameter, const gd::ParameterMetadata & parametersInfo, const size_t positionInExpression);
 
         /**
          * Return the minimal number of parameters which can be used when calling an expression ( i.e. ParametersCount-OptionalParameters-CodeOnlyParameters )
          */
-        size_t GetMinimalParametersNumber(const std::vector < ParameterMetadata > & parametersInfos);
+        size_t GetMinimalParametersNumber(const std::vector < gd::ParameterMetadata > & parametersInfos);
 
         /**
          * Return the maximal number of parameters which can be used when calling an expression ( i.e. ParametersCount-CodeOnlyParameters )
          */
-        size_t GetMaximalParametersNumber(const std::vector < ParameterMetadata > & parametersInfos);
+        size_t GetMaximalParametersNumber(const std::vector < gd::ParameterMetadata > & parametersInfos);
 
         bool ValidSyntax(const std::string & str);
 
@@ -88,17 +88,17 @@ class ParserCallbacks
     virtual void OnNumber(std::string text) = 0;
     virtual void OnOperator(std::string text) = 0;
 
-    virtual void OnStaticFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo) = 0;
-    virtual void OnStaticFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & ExpressionMetadata) = 0;
+    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
+    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) = 0;
 
-    virtual void OnObjectFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo) = 0;
-    virtual void OnObjectFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & ExpressionMetadata) = 0;
+    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
+    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) = 0;
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo) = 0;
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & ExpressionMetadata) = 0;
+    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
+    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) = 0;
 
-    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression) = 0;
-    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression) = 0;
+    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, gd::Expression & expression) = 0;
+    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, gd::Expression & expression) = 0;
 
     #if defined(GD_IDE_ONLY)
     std::string firstErrorStr;

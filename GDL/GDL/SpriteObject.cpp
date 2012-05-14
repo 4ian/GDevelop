@@ -15,10 +15,10 @@
 #include "GDL/Direction.h"
 #include "GDL/Sprite.h"
 #include "GDL/ShaderManager.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/IDE/Dialogs/SpriteObjectEditor.h"

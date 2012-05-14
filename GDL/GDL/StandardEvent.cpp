@@ -49,17 +49,17 @@ std::string StandardEvent::GenerateEventCode(Game & game, Scene & scene, EventsC
     return outputCode;
 }
 
-vector < vector<Instruction>* > StandardEvent::GetAllConditionsVectors()
+vector < vector<gd::Instruction>* > StandardEvent::GetAllConditionsVectors()
 {
-    vector < vector<Instruction>* > allConditions;
+    vector < vector<gd::Instruction>* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < vector<Instruction>* > StandardEvent::GetAllActionsVectors()
+vector < vector<gd::Instruction>* > StandardEvent::GetAllActionsVectors()
 {
-    vector < vector<Instruction>* > allActions;
+    vector < vector<gd::Instruction>* > allActions;
     allActions.push_back(&actions);
 
     return allActions;

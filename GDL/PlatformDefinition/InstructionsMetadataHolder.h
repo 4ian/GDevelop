@@ -22,13 +22,13 @@ public:
      * Get information about an action from its type
      * Works for object, automatisms and static actions.
      */
-    virtual const InstructionMetadata & GetActionMetadata(std::string actionType) const;
+    virtual const gd::InstructionMetadata & GetActionMetadata(std::string actionType) const;
 
     /**
      * Get information about a condition from its type
      * Works for object, automatisms and static conditions.
      */
-    virtual const InstructionMetadata & GetConditionMetadata(std::string conditionType) const;
+    virtual const gd::InstructionMetadata & GetConditionMetadata(std::string conditionType) const;
 };
 
 #endif // InstructionsMetadataHolder_H

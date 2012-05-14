@@ -28,8 +28,8 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("CreateByName",
-                   _("Créer un objet de partir son nom"),
-                   _("Créer un objet à la position spécifiée"),
+                   _("Créer un objet à partir de son nom"),
+                   _("Parmi les objets du groupe indiqué, l'action va créer l'objet ayant le nom spécifié."),
                    _("Parmi les objets _PARAM2_, créer l'objet ayant le nom _PARAM3_ à la position _PARAM4_;_PARAM5_"),
                    _("Objets"),
                    "res/actions/create24.png",

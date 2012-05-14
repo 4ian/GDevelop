@@ -19,7 +19,7 @@ class WindowExtension : public ExtensionBase
         virtual ~WindowExtension() {};
 
         #if defined(GD_IDE_ONLY)
-        virtual void ExposeActionsResources(Instruction & action, gd::ArbitraryResourceWorker & worker);
+        virtual void ExposeActionsResources(gd::Instruction & action, gd::ArbitraryResourceWorker & worker);
         #endif
 };
 

@@ -125,7 +125,7 @@ void EditComment::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditComment::OnAideBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(21);
 }
 void EditComment::OntxtColorBtClick(wxCommandEvent& event)

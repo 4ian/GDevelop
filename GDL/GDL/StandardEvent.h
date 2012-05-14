@@ -12,7 +12,7 @@
 #include <wx/html/htmprint.h>
 #include "GDCore/Events/Event.h"
 class RuntimeScene;
-class Instruction;
+namespace gd { class Instruction; }
 class TiXmlElement;
 class EventsCodeGenerationContext;
 class EventsEditorItemsAreas;
@@ -39,15 +39,15 @@ class GD_API StandardEvent : public gd::BaseEvent
         virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return events;};
         void SetSubEvents(std::vector < gd::BaseEventSPtr > & subEvents_) {events = subEvents_;};
 
-        const std::vector < Instruction > & GetConditions() const { return conditions; };
-        std::vector < Instruction > & GetConditions() { return conditions; };
-        void SetConditions(std::vector < Instruction > & conditions_) { conditions = conditions_; };
-        const std::vector < Instruction > & GetActions() const { return actions; };
-        std::vector < Instruction > & GetActions() { return actions; };
-        void SetActions(std::vector < Instruction > & actions_) { actions = actions_; };
+        const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
+        std::vector < gd::Instruction > & GetConditions() { return conditions; };
+        void SetConditions(std::vector < gd::Instruction > & conditions_) { conditions = conditions_; };
+        const std::vector < gd::Instruction > & GetActions() const { return actions; };
+        std::vector < gd::Instruction > & GetActions() { return actions; };
+        void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
 
-        virtual std::vector < std::vector<Instruction>* > GetAllConditionsVectors();
-        virtual std::vector < std::vector<Instruction>* > GetAllActionsVectors();
+        virtual std::vector < std::vector<gd::Instruction>* > GetAllConditionsVectors();
+        virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();
 
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         virtual void LoadFromXml(const TiXmlElement * eventElem);
@@ -65,8 +65,8 @@ class GD_API StandardEvent : public gd::BaseEvent
     private:
         void Init(const StandardEvent & event);
 
-        std::vector < Instruction > conditions;
-        std::vector < Instruction > actions;
+        std::vector < gd::Instruction > conditions;
+        std::vector < gd::Instruction > actions;
         std::vector < gd::BaseEventSPtr > events;
 };
 

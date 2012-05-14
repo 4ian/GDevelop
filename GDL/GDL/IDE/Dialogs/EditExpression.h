@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #if defined(GD_IDE_ONLY)
 
 #ifndef EDITEXPRESSION_H
@@ -17,7 +21,7 @@
 
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
-class ParameterMetadata;
+namespace gd { class ParameterMetadata; }
 
 #include <string>
 #include <vector>
@@ -185,7 +189,7 @@ class GD_API EditExpression: public wxDialog
 		//*)
 		void TextModified(wxStyledTextEvent& event);
 		void UpdateTextCtrl(wxStyledTextEvent& event);
-		std::string ShowParameterDialog(const ParameterMetadata & parameter, bool & userCancelled);
+		std::string ShowParameterDialog(const gd::ParameterMetadata & parameter, bool & userCancelled);
 
 		wxImageList * imageListObj;
 		wxImageList * imageListVal;

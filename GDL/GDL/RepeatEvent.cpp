@@ -69,25 +69,25 @@ std::string RepeatEvent::GenerateEventCode(Game & game, Scene & scene, EventsCod
     return outputCode;
 }
 
-vector < vector<Instruction>* > RepeatEvent::GetAllConditionsVectors()
+vector < vector<gd::Instruction>* > RepeatEvent::GetAllConditionsVectors()
 {
-    vector < vector<Instruction>* > allConditions;
+    vector < vector<gd::Instruction>* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < vector<Instruction>* > RepeatEvent::GetAllActionsVectors()
+vector < vector<gd::Instruction>* > RepeatEvent::GetAllActionsVectors()
 {
-    vector < vector<Instruction>* > allActions;
+    vector < vector<gd::Instruction>* > allActions;
     allActions.push_back(&actions);
 
     return allActions;
 }
 
-vector < GDExpression* > RepeatEvent::GetAllExpressions()
+vector < gd::Expression* > RepeatEvent::GetAllExpressions()
 {
-    vector < GDExpression* > allExpressions;
+    vector < gd::Expression* > allExpressions;
     allExpressions.push_back(&repeatNumberExpression);
 
     return allExpressions;
@@ -123,7 +123,7 @@ void RepeatEvent::SaveToXml(TiXmlElement * eventElem) const
 void RepeatEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
     if ( eventElem->FirstChildElement( "RepeatExpression" ) != NULL )
-        repeatNumberExpression = GDExpression(eventElem->FirstChildElement("RepeatExpression")->Attribute("value"));
+        repeatNumberExpression = gd::Expression(eventElem->FirstChildElement("RepeatExpression")->Attribute("value"));
 
     //Conditions
     if ( eventElem->FirstChildElement( "Conditions" ) != NULL )

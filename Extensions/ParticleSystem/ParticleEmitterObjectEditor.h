@@ -97,7 +97,6 @@ class ParticleEmitterObjectEditor: public wxDialog
 		wxSpinCtrlDouble* blue2Edit;
 		wxRadioButton* alphaRenderingCheck;
 		wxSpinCtrlDouble* alpha2RandomnessEdit;
-		wxTextCtrl* emitterDirYEdit;
 		wxStaticText* StaticText19;
 		wxStaticText* StaticText8;
 		wxStaticText* StaticText38;
@@ -121,7 +120,6 @@ class ParticleEmitterObjectEditor: public wxDialog
 		wxStaticText* StaticText54;
 		wxRadioButton* alphaMutableCheck;
 		wxPanel* Panel6;
-		wxStaticText* StaticText44;
 		wxPanel* Panel3;
 		wxStaticText* StaticText56;
 		wxStaticText* StaticText39;
@@ -152,12 +150,10 @@ class ParticleEmitterObjectEditor: public wxDialog
 		wxSpinCtrlDouble* alpha2Edit;
 		wxStaticText* StaticText52;
 		wxNotebook* particleNotebook;
-		wxTextCtrl* emitterDirXEdit;
 		wxSpinCtrlDouble* red2Edit;
 		wxRadioButton* redFixedCheck;
 		wxRadioButton* alphaRandomCheck;
 		wxStaticText* StaticText28;
-		wxStaticText* StaticText43;
 		wxStaticText* StaticText41;
 		wxStaticText* StaticText15;
 		wxStaticText* StaticText12;
@@ -181,7 +177,6 @@ class ParticleEmitterObjectEditor: public wxDialog
 		wxStaticText* StaticText4;
 		wxStaticText* StaticText17;
 		wxStaticText* StaticText48;
-		wxTextCtrl* simpleAngleEdit;
 		wxButton* okBt;
 		wxStaticText* StaticText16;
 		wxTextCtrl* rendererParam1Edit;
@@ -289,16 +284,11 @@ class ParticleEmitterObjectEditor: public wxDialog
 		static const long ID_TEXTCTRL7;
 		static const long ID_STATICTEXT33;
 		static const long ID_TEXTCTRL14;
-		static const long ID_STATICTEXT46;
-		static const long ID_TEXTCTRL21;
-		static const long ID_STATICTEXT47;
 		static const long ID_STATICTEXT48;
 		static const long ID_TEXTCTRL22;
 		static const long ID_STATICTEXT49;
 		static const long ID_PANEL5;
 		static const long ID_STATICTEXT34;
-		static const long ID_TEXTCTRL18;
-		static const long ID_TEXTCTRL19;
 		static const long ID_TEXTCTRL20;
 		static const long ID_STATICTEXT36;
 		static const long ID_STATICTEXT38;

@@ -138,16 +138,11 @@ const long ParticleEmitterObjectEditor::ID_STATICTEXT6 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_TEXTCTRL7 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_STATICTEXT33 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_TEXTCTRL14 = wxNewId();
-const long ParticleEmitterObjectEditor::ID_STATICTEXT46 = wxNewId();
-const long ParticleEmitterObjectEditor::ID_TEXTCTRL21 = wxNewId();
-const long ParticleEmitterObjectEditor::ID_STATICTEXT47 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_STATICTEXT48 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_TEXTCTRL22 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_STATICTEXT49 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_PANEL5 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_STATICTEXT34 = wxNewId();
-const long ParticleEmitterObjectEditor::ID_TEXTCTRL18 = wxNewId();
-const long ParticleEmitterObjectEditor::ID_TEXTCTRL19 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_TEXTCTRL20 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_STATICTEXT36 = wxNewId();
 const long ParticleEmitterObjectEditor::ID_STATICTEXT38 = wxNewId();
@@ -248,7 +243,6 @@ object(object_)
 	wxFlexGridSizer* FlexGridSizer36;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer46;
-	wxFlexGridSizer* FlexGridSizer48;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer33;
 	wxFlexGridSizer* FlexGridSizer43;
@@ -601,15 +595,6 @@ object(object_)
 	Panel4 = new wxPanel(emissionNotebook, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL5"));
 	FlexGridSizer46 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer46->AddGrowableCol(0);
-	FlexGridSizer48 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer48->AddGrowableCol(1);
-	StaticText43 = new wxStaticText(Panel4, ID_STATICTEXT46, _("Angle d\'émission :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT46"));
-	FlexGridSizer48->Add(StaticText43, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	simpleAngleEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL21, wxEmptyString, wxDefaultPosition, wxSize(66,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL21"));
-	FlexGridSizer48->Add(simpleAngleEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText44 = new wxStaticText(Panel4, ID_STATICTEXT47, _("°"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT47"));
-	FlexGridSizer48->Add(StaticText44, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer46->Add(FlexGridSizer48, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer49 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer49->AddGrowableCol(1);
 	StaticText45 = new wxStaticText(Panel4, ID_STATICTEXT48, _("Angle d\'ouverture du cone d\'émission :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT48"));
@@ -627,19 +612,13 @@ object(object_)
 	FlexGridSizer34->AddGrowableCol(0);
 	FlexGridSizer35 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer35->AddGrowableCol(1);
-	StaticText31 = new wxStaticText(Panel3, ID_STATICTEXT34, _("Direction d\'émission :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT34"));
+	StaticText31 = new wxStaticText(Panel3, ID_STATICTEXT34, _("Direction d\'émission sur l\'axe Z :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT34"));
 	FlexGridSizer35->Add(StaticText31, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
-	emitterDirXEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL18, wxEmptyString, wxDefaultPosition, wxSize(62,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL18"));
-	emitterDirXEdit->SetToolTip(_("Direction de l\'émission, sur l\'axe X"));
-	BoxSizer1->Add(emitterDirXEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	emitterDirYEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL19, wxEmptyString, wxDefaultPosition, wxSize(62,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL19"));
-	emitterDirYEdit->SetToolTip(_("Direction de l\'émission, sur l\'axe Y"));
-	BoxSizer1->Add(emitterDirYEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	emitterDirZEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL20, wxEmptyString, wxDefaultPosition, wxSize(62,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL20"));
 	emitterDirZEdit->SetToolTip(_("Direction de l\'émission, sur l\'axe Z ( profondeur )"));
 	BoxSizer1->Add(emitterDirZEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer35->Add(BoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer35->Add(BoxSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer34->Add(FlexGridSizer35, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer41 = new wxFlexGridSizer(0, 4, 0, 0);
 	FlexGridSizer41->AddGrowableCol(2);
@@ -776,7 +755,6 @@ object(object_)
 	Connect(ID_RADIOBUTTON27,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnangleMutableCheckSelect);
 	Connect(ID_RADIOBUTTON25,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnsizeRandomCheckSelect1);
 	Connect(ID_RADIOBUTTON24,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnsizeMutableCheckSelect);
-	Connect(ID_TEXTCTRL21,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnsimpleAngleText);
 	Connect(ID_TEXTCTRL22,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnsimpleConeAngleText);
 	Connect(ID_TEXTCTRL23,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnsimpleGravityAngleText);
 	Connect(ID_TEXTCTRL25,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ParticleEmitterObjectEditor::OnsimpleGravityAngleText);
@@ -815,8 +793,6 @@ object(object_)
     flowEdit->SetValue(ToString(object.GetFlow()));
     emitterForceMinEdit->SetValue(ToString(object.GetEmitterForceMin()));
     emitterForceMaxEdit->SetValue(ToString(object.GetEmitterForceMax()));
-    emitterDirXEdit->SetValue(ToString(object.GetEmitterXDirection()));
-    emitterDirYEdit->SetValue(ToString(object.GetEmitterYDirection()));
     emitterDirZEdit->SetValue(ToString(object.GetEmitterZDirection()));
     emitterAngleAEdit->SetValue(ToString(object.GetEmitterAngleA()));
     emitterAngleBEdit->SetValue(ToString(object.GetEmitterAngleB()));
@@ -916,11 +892,6 @@ object(object_)
     simpleColor1Bt->SetColour(wxColour(object.GetParticleRed1(), object.GetParticleGreen1(), object.GetParticleBlue1()));
     simpleColor2Bt->SetColour(wxColour(object.GetParticleRed2(), object.GetParticleGreen2(), object.GetParticleBlue2()));
 
-    {
-        float x = ToFloat(string(emitterDirXEdit->GetValue().mb_str()));
-        float y = ToFloat(string(emitterDirYEdit->GetValue().mb_str()));
-        simpleAngleEdit->ChangeValue(ToString(atan2(y,x)*180.0f/3.14159f));
-    }
     simpleConeAngleEdit->ChangeValue(emitterAngleBEdit->GetValue().mb_str());
 
     simpleFrictionEdit->ChangeValue(frictionEdit->GetValue());
@@ -954,7 +925,7 @@ ParticleEmitterObjectEditor::~ParticleEmitterObjectEditor()
 {
 	//(*Destroy(ParticleEmitterObjectEditor)
 	//*)
-    m_mgr.UnInit(); //We're using a wxAuiManager that need to be unitizialized.
+    m_mgr.UnInit(); //We're using a wxAuiManager that need to be uninitialized.
 }
 void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
@@ -978,8 +949,6 @@ void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
     object.SetFlow(ToFloat(string(flowEdit->GetValue().mb_str())));
     object.SetEmitterForceMin(ToFloat(string(emitterForceMinEdit->GetValue().mb_str())));
     object.SetEmitterForceMax(ToFloat(string(emitterForceMaxEdit->GetValue().mb_str())));
-    object.SetEmitterXDirection(ToFloat(string(emitterDirXEdit->GetValue().mb_str())));
-    object.SetEmitterYDirection(ToFloat(string(emitterDirYEdit->GetValue().mb_str())));
     object.SetEmitterZDirection(ToFloat(string(emitterDirZEdit->GetValue().mb_str())));
     object.SetEmitterAngleA(ToFloat(string(emitterAngleAEdit->GetValue().mb_str())));
     object.SetEmitterAngleB(ToFloat(string(emitterAngleBEdit->GetValue().mb_str())));
@@ -1181,14 +1150,6 @@ void ParticleEmitterObjectEditor::OnsimpleColor1BtColourChanged(wxColourPickerEv
     green2Edit->SetValue(simpleColor2Bt->GetColour().Green());
     blue1Edit->SetValue(simpleColor1Bt->GetColour().Blue());
     blue2Edit->SetValue(simpleColor2Bt->GetColour().Blue());
-}
-
-void ParticleEmitterObjectEditor::OnsimpleAngleText(wxCommandEvent& event)
-{
-    float angle = ToFloat(string(simpleAngleEdit->GetValue().mb_str()))/180.0f*3.14159f;
-
-    emitterDirXEdit->SetValue(ToString(cos(angle)));
-    emitterDirYEdit->SetValue(ToString(sin(angle)));
 }
 
 void ParticleEmitterObjectEditor::OnsimpleConeAngleText(wxCommandEvent& event)

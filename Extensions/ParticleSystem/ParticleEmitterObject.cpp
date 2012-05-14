@@ -43,7 +43,7 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "ParticleEmitterObjectEditor.h"
 #endif
@@ -72,7 +72,7 @@ emitterXDirection(0.0f),
 emitterYDirection(1.0f),
 emitterZDirection(0.0f),
 emitterAngleA(0),
-emitterAngleB(180),
+emitterAngleB(90),
 zoneRadius(3.0f),
 particleGravityX(0.0f),
 particleGravityY(-100.0f),
@@ -589,13 +589,23 @@ void ParticleEmitterObject::OnPositionChanged()
  */
 bool ParticleEmitterObject::DrawEdittime(sf::RenderTarget& renderTarget)
 {
-    edittimeIcon.SetPosition(GetX(), GetY());
-    renderTarget.Draw(edittimeIcon);
+    sf::Shape circle = sf::Shape::Circle(sf::Vector2f(GetX(), GetY()), 3, sf::Color(particleRed1, particleGreen1, particleBlue1));
+
+    float emitterAngle = atan2(emitterYDirection, emitterXDirection);
+    float line1Angle = emitterAngle-(emitterAngleB/2.0)/180.0*3.14159;
+    float line2Angle = emitterAngle+(emitterAngleB/2.0)/180.0*3.14159;
+
+    sf::Shape line1 = sf::Shape::Line(sf::Vector2f(GetX(), GetY()), sf::Vector2f(cos(line1Angle)*32+GetX(), sin(line1Angle)*32+GetY()), 1, sf::Color(particleRed2, particleGreen2, particleBlue2));
+    sf::Shape line2 = sf::Shape::Line(sf::Vector2f(GetX(), GetY()), sf::Vector2f(cos(line2Angle)*32+GetX(), sin(line2Angle)*32+GetY()), 1, sf::Color(particleRed2, particleGreen2, particleBlue2));
+
+    renderTarget.Draw(circle);
+    renderTarget.Draw(line1);
+    renderTarget.Draw(line2);
 
     return true;
 }
 
-void ParticleEmitterObject::ExposeResources(ArbitraryResourceWorker & worker)
+void ParticleEmitterObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
     worker.ExposeImage(textureParticleName);
 }
@@ -684,7 +694,6 @@ void ParticleEmitterObject::SetFriction(float newValue)
 }
 void ParticleEmitterObject::SetEmitterXDirection(float newValue)
 {
-    std::cout <<"SetXDirectionTO" << emitterXDirection;
     emitterXDirection = newValue;
     if ( particleSystem.emitter ) particleSystem.emitter->setDirection(SPK::Vector3D(emitterXDirection, -emitterYDirection, emitterZDirection));
 }
@@ -803,7 +812,7 @@ void ParticleEmitterObject::SetTexture( RuntimeScene & scene, const std::string 
  */
 float ParticleEmitterObject::GetDrawableX() const
 {
-    return GetX();
+    return GetX()-32;
 }
 
 /**
@@ -811,27 +820,27 @@ float ParticleEmitterObject::GetDrawableX() const
  */
 float ParticleEmitterObject::GetDrawableY() const
 {
-    return GetY();
+    return GetY()-32;
 }
 
 float ParticleEmitterObject::GetWidth() const
 {
-    return 32;
+    return 64;
 }
 
 float ParticleEmitterObject::GetHeight() const
 {
-    return 32;
+    return 64;
 }
 
 float ParticleEmitterObject::GetCenterX() const
 {
-    return 16;
+    return 32;
 }
 
 float ParticleEmitterObject::GetCenterY() const
 {
-    return 16;
+    return 32;
 }
 
 /**

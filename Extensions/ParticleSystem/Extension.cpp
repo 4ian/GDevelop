@@ -26,7 +26,9 @@ freely, subject to the following restrictions:
 
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
+#include "GDL/AutomatismsSharedDatas.h"
 #include "ParticleEmitterObject.h"
+#include "ParticleObstacleAutomatism.h"
 #include "ExtensionSubDeclaration1.h"
 #include "ExtensionSubDeclaration2.h"
 #include "ExtensionSubDeclaration3.h"
@@ -64,6 +66,23 @@ Extension::Extension()
         #endif
 
     DECLARE_END_OBJECT()
+
+    DECLARE_AUTOMATISM("ParticleObstacleAutomatism",
+              _("Obstacle"),
+              _("ParticleObstacle"),
+              _("Automatisme permettant de repousser les particules"),
+              "",
+              "res/path32.png",
+              ParticleObstacleAutomatism,
+              AutomatismsSharedDatas)
+
+        #if defined(GD_IDE_ONLY)
+
+        automatismInfo.SetIncludeFile("ParticleSystem/ParticleObstacleAutomatism.h");
+
+        #endif
+
+    DECLARE_END_AUTOMATISM()
 
 
     CompleteCompilationInformation();

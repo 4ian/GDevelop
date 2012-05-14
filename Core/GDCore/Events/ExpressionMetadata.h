@@ -10,6 +10,9 @@ class wxString;
 class Game;
 class Scene;
 
+namespace gd
+{
+
 /**
  * \brief Contains user-friendly infos about expressions and members needed to setup an expression
  *
@@ -32,17 +35,17 @@ class GD_CORE_API ExpressionMetadata
     std::string group;
     bool shown;
     wxBitmap smallicon;
-    std::vector < ParameterMetadata > parameters;
+    std::vector < gd::ParameterMetadata > parameters;
 
     /**
-     * \see InstructionMetadata::AddParameter
+     * \see gd::InstructionMetadata::AddParameter
      */
-    ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    gd::ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
 
     /**
-     * \see InstructionMetadata::AddCodeOnlyParameter
+     * \see gd::InstructionMetadata::AddCodeOnlyParameter
      */
-    ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    gd::ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
     /**
      * \brief Defines information about how generate C++ code for an instruction
@@ -73,7 +76,7 @@ class GD_CORE_API ExpressionMetadata
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<GDExpression> & parameters, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context) {return "";};
         };
 
         CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
@@ -116,17 +119,17 @@ class GD_CORE_API StrExpressionMetadata
     std::string group;
     bool shown;
     wxBitmap smallicon;
-    std::vector < ParameterMetadata > parameters;
+    std::vector < gd::ParameterMetadata > parameters;
 
     /**
-     * \see InstructionMetadata::AddParameter
+     * \see gd::InstructionMetadata::AddParameter
      */
-    ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    gd::ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
 
     /**
-     * \see InstructionMetadata::AddCodeOnlyParameter
+     * \see gd::InstructionMetadata::AddCodeOnlyParameter
      */
-    ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    gd::ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
     /**
      * \brief Defines information about how generate C++ code for an instruction
@@ -157,7 +160,7 @@ class GD_CORE_API StrExpressionMetadata
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<GDExpression> & parameters, EventsCodeGenerator & codeGenerator_ ,EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_ ,EventsCodeGenerationContext & context) {return "";};
         };
 
         CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
@@ -179,5 +182,7 @@ class GD_CORE_API StrExpressionMetadata
     private:
         std::string extensionNamespace;
 };
+
+}
 
 #endif // EXPRESSIONMETADATA_H

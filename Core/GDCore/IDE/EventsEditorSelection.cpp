@@ -215,7 +215,7 @@ bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bo
     draggingInstruction = false;
 
     //Find where to drag
-    std::vector<Instruction> * list = NULL;
+    std::vector<gd::Instruction> * list = NULL;
     size_t positionInList = std::string::npos;
     if ( instructionHighlighted.instructionList != NULL )
     {
@@ -257,7 +257,7 @@ bool EventsEditorSelection::EndDragInstruction(bool deleteDraggedInstruction, bo
     }
 
     //Copy dragged instructions
-    std::vector<Instruction> draggedInstructions;
+    std::vector<gd::Instruction> draggedInstructions;
     for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
     {
         if ( (*it).instruction != NULL )
@@ -312,7 +312,7 @@ void EventsEditorSelection::EventHighlightedOnBottomPart(bool isOnbottomHandSide
 void EventsEditorSelection::DeleteAllInstructionSelected()
 {
     //1) Construct a map with their list and their index in the list
-    std::map< std::vector<Instruction>*, std::list<unsigned int> > mapOfDeletionsRequest;
+    std::map< std::vector<gd::Instruction>*, std::list<unsigned int> > mapOfDeletionsRequest;
     for (boost::unordered_set< InstructionItem >::iterator it = instructionsSelected.begin();it!=instructionsSelected.end();++it)
     {
         if ( (*it).event != NULL ) (*it).event->eventHeightNeedUpdate = true;
@@ -320,7 +320,7 @@ void EventsEditorSelection::DeleteAllInstructionSelected()
             mapOfDeletionsRequest[(*it).instructionList].push_back((*it).positionInList);
     }
     //2) For each list, erase each index
-    for (std::map<std::vector<Instruction>*,std::list<unsigned int> >::iterator it = mapOfDeletionsRequest.begin();it!=mapOfDeletionsRequest.end();++it)
+    for (std::map<std::vector<gd::Instruction>*,std::list<unsigned int> >::iterator it = mapOfDeletionsRequest.begin();it!=mapOfDeletionsRequest.end();++it)
     {
         std::list<unsigned int> & listOfIndexesToDelete = it->second;
         listOfIndexesToDelete.sort();
@@ -350,7 +350,7 @@ bool EventsEditorSelection::FindInEventsAndSubEvents(std::vector<boost::shared_p
     return false;
 }
 
-bool EventsEditorSelection::FindInInstructionsAndSubInstructions(std::vector<Instruction> & list, const Instruction * instrToSearch)
+bool EventsEditorSelection::FindInInstructionsAndSubInstructions(std::vector<gd::Instruction> & list, const gd::Instruction * instrToSearch)
 {
     for (unsigned int i = 0;i<list.size();++i)
     {

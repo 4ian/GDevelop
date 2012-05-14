@@ -280,7 +280,7 @@ size_t hash_value(const InstructionItem & a)
     return seed;
 }
 
-InstructionItem::InstructionItem(Instruction * instruction_, bool isCondition_, std::vector<Instruction>* instructionList_, unsigned int positionInList_, gd::BaseEvent * event_ ) :
+InstructionItem::InstructionItem(gd::Instruction * instruction_, bool isCondition_, std::vector<gd::Instruction>* instructionList_, unsigned int positionInList_, gd::BaseEvent * event_ ) :
     instruction(instruction_),
     isCondition(isCondition_),
     instructionList(instructionList_),
@@ -312,7 +312,7 @@ size_t hash_value(const InstructionListItem & a)
     return seed;
 }
 
-InstructionListItem::InstructionListItem(bool isCondition_, std::vector<Instruction>* instructionList_, gd::BaseEvent * event_ ) :
+InstructionListItem::InstructionListItem(bool isCondition_, std::vector<gd::Instruction>* instructionList_, gd::BaseEvent * event_ ) :
     isConditionList(isCondition_),
     instructionList(instructionList_),
     event(event_)
@@ -338,7 +338,7 @@ size_t hash_value(const ParameterItem & a)
     return seed;
 }
 
-ParameterItem::ParameterItem(GDExpression * parameter_, gd::BaseEvent * event_) :
+ParameterItem::ParameterItem(gd::Expression * parameter_, gd::BaseEvent * event_) :
     parameter(parameter_),
     event(event_)
 {

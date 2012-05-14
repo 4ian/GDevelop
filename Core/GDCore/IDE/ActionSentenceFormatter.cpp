@@ -30,7 +30,7 @@ TranslateAction *TranslateAction::_singleton = NULL;
 ///
 /// Traduction en une phrase complète d'une action et ses paramètres
 ////////////////////////////////////////////////////////////
-string TranslateAction::Translate(const Instruction & action, const InstructionMetadata & infos)
+string TranslateAction::Translate(const Instruction & action, const gd::InstructionMetadata & infos)
 {
     std::string trad = infos.sentence;
 
@@ -55,7 +55,7 @@ string TranslateAction::Translate(const Instruction & action, const InstructionM
 /**
  * Create a formatted sentence from an action
  */
-std::vector< std::pair<std::string, TextFormatting> > TranslateAction::GetAsFormattedText(const Instruction & action, const InstructionMetadata & infos)
+std::vector< std::pair<std::string, TextFormatting> > TranslateAction::GetAsFormattedText(const Instruction & action, const gd::InstructionMetadata & infos)
 {
     std::vector< std::pair<std::string, TextFormatting> > formattedStr;
 

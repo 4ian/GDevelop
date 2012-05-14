@@ -1,6 +1,13 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "ExpressionMetadata.h"
 #include "GDCore/CommonTools.h"
 #include <string>
+
+namespace gd
+{
 
 ExpressionMetadata::ExpressionMetadata(std::string extensionNamespace_) :
 shown(true),
@@ -26,9 +33,9 @@ StrExpressionMetadata & StrExpressionMetadata::SetHidden()
     return *this;
 }
 
-ParameterMetadata & ExpressionMetadata::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
+gd::ParameterMetadata & ExpressionMetadata::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
 {
-    ParameterMetadata info;
+    gd::ParameterMetadata info;
     info.type = type;
     info.description = gd::ToString(description);
     info.codeOnly = false;
@@ -39,9 +46,9 @@ ParameterMetadata & ExpressionMetadata::AddParameter(const std::string & type, c
     return parameters.back();
 }
 
-ParameterMetadata & ExpressionMetadata::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
+gd::ParameterMetadata & ExpressionMetadata::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
 {
-    ParameterMetadata info;
+    gd::ParameterMetadata info;
     info.type = type;
     info.codeOnly = true;
     info.supplementaryInformation = supplementaryInformation;
@@ -50,9 +57,9 @@ ParameterMetadata & ExpressionMetadata::AddCodeOnlyParameter(const std::string &
     return parameters.back();
 }
 
-ParameterMetadata & StrExpressionMetadata::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
+gd::ParameterMetadata & StrExpressionMetadata::AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional)
 {
-    ParameterMetadata info;
+    gd::ParameterMetadata info;
     info.type = type;
     info.description = gd::ToString(description);
     info.codeOnly = false;
@@ -63,13 +70,15 @@ ParameterMetadata & StrExpressionMetadata::AddParameter(const std::string & type
     return parameters.back();
 }
 
-ParameterMetadata & StrExpressionMetadata::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
+gd::ParameterMetadata & StrExpressionMetadata::AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation)
 {
-    ParameterMetadata info;
+    gd::ParameterMetadata info;
     info.type = type;
     info.codeOnly = true;
     info.supplementaryInformation = supplementaryInformation;
 
     parameters.push_back(info);
     return parameters.back();
+}
+
 }

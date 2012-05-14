@@ -13,8 +13,8 @@
 #include <vector>
 #include <utility>
 namespace gd { class BaseEvent; }
-class Instruction;
-class GDExpression;
+namespace gd { class Instruction; }
+namespace gd { class Expression; }
 
 /**
  * \brief Used ( internally by Events editor ) to indicate to EventsEditorItemsAreas that an event is displayed somewhere
@@ -43,15 +43,15 @@ public:
     /**
      * Use this constructor to declare the instruction, the list it belongs to and its position in this list.
      */
-    InstructionItem(Instruction * instruction_, bool isCondition, std::vector<Instruction>* instructionList_, unsigned int positionInList_, gd::BaseEvent * event );
+    InstructionItem(gd::Instruction * instruction_, bool isCondition, std::vector<gd::Instruction>* instructionList_, unsigned int positionInList_, gd::BaseEvent * event );
     InstructionItem();
     ~InstructionItem() {};
 
     bool operator==(const InstructionItem & other) const;
 
-    Instruction * instruction;
+    gd::Instruction * instruction;
     bool isCondition;
-    std::vector<Instruction>* instructionList;
+    std::vector<gd::Instruction>* instructionList;
     unsigned int positionInList;
     gd::BaseEvent * event;
 };
@@ -66,14 +66,14 @@ public:
     /**
      * Use this constructor to declare the instruction, the list it belongs to and its position in this list.
      */
-    InstructionListItem(bool isConditionList, std::vector<Instruction>* instructionList_, gd::BaseEvent * event );
+    InstructionListItem(bool isConditionList, std::vector<gd::Instruction>* instructionList_, gd::BaseEvent * event );
     InstructionListItem();
     ~InstructionListItem() {};
 
     bool operator==(const InstructionListItem & other) const;
 
     bool isConditionList;
-    std::vector<Instruction>* instructionList;
+    std::vector<gd::Instruction>* instructionList;
     gd::BaseEvent * event;
 };
 size_t hash_value(const InstructionListItem & a);
@@ -84,13 +84,13 @@ size_t hash_value(const InstructionListItem & a);
 class GD_CORE_API ParameterItem
 {
 public:
-    ParameterItem(GDExpression * parameter_, gd::BaseEvent * event);
+    ParameterItem(gd::Expression * parameter_, gd::BaseEvent * event);
     ParameterItem();
     ~ParameterItem() {};
 
     bool operator==(const ParameterItem & other) const;
 
-    GDExpression * parameter;
+    gd::Expression * parameter;
     gd::BaseEvent * event;
 };
 size_t hash_value(const ParameterItem & a);

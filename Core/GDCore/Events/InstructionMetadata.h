@@ -14,6 +14,9 @@ class Scene;
 class EventsCodeGenerator;
 class EventsCodeGenerationContext;
 
+namespace gd
+{
+
 /**
  * \brief Contains user-friendly info about a parameter, and information about what a parameter need
  *
@@ -194,5 +197,7 @@ public:
 private:
     std::string extensionNamespace;
 };
+
+}
 
 #endif // INSTRUCTIONMETADATA_H

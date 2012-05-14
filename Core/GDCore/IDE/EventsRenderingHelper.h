@@ -11,10 +11,10 @@
 #include <vector>
 
 namespace gd { class BaseEvent; }
-class Instruction;
+namespace gd { class Instruction; }
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
-class InstructionMetadata;
+namespace gd { class InstructionMetadata;}
 namespace gd {class InstructionsMetadataHolder;}
 /**
 
@@ -33,10 +33,10 @@ class GD_CORE_API EventsRenderingHelper
 
         void DrawNiceRectangle(wxDC & dc, const wxRect & rect) const;
 
-        int DrawConditionsList(std::vector < Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
-        int DrawActionsList(std::vector < Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
-        unsigned int GetRenderedConditionsListHeight(const std::vector < Instruction > & conditions, int width, gd::InstructionsMetadataHolder & metadataHolder);
-        unsigned int GetRenderedActionsListHeight(const std::vector < Instruction > & actions, int width, gd::InstructionsMetadataHolder & metadataHolder);
+        int DrawConditionsList(std::vector < gd::Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
+        int DrawActionsList(std::vector < gd::Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
+        unsigned int GetRenderedConditionsListHeight(const std::vector < gd::Instruction > & conditions, int width, gd::InstructionsMetadataHolder & metadataHolder);
+        unsigned int GetRenderedActionsListHeight(const std::vector < gd::Instruction > & actions, int width, gd::InstructionsMetadataHolder & metadataHolder);
 
         inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
         inline void SetConditionsColumnWidth(unsigned int conditionsColumnWidth_) { conditionsColumnWidth = conditionsColumnWidth_; };
@@ -52,7 +52,7 @@ class GD_CORE_API EventsRenderingHelper
          */
         unsigned int GetTextHeightInArea(const std::string & text, unsigned int widthAvailable);
 
-        int DrawInstruction(Instruction & instruction, const InstructionMetadata & InstructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+        int DrawInstruction(gd::Instruction & instruction, const gd::InstructionMetadata & InstructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 
         /**
          * Change font. Only use a fixed width font.

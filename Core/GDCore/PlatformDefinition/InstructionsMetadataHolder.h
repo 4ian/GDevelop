@@ -26,16 +26,16 @@ public:
      * Get information about an action from its type
      * Must work for object, automatisms and static actions.
      */
-    virtual const InstructionMetadata & GetActionMetadata(std::string actionType) const;
+    virtual const gd::InstructionMetadata & GetActionMetadata(std::string actionType) const;
 
     /**
      * Get information about a condition from its type
      * Must Work for object, automatisms and static conditions.
      */
-    virtual const InstructionMetadata & GetConditionMetadata(std::string conditionType) const;
+    virtual const gd::InstructionMetadata & GetConditionMetadata(std::string conditionType) const;
 
 protected:
-    static InstructionMetadata badInstructionMetadata;
+    static gd::InstructionMetadata badInstructionMetadata;
 };
 
 }

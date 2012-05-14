@@ -8,10 +8,10 @@
 #include <map>
 #include <string>
 #include <vector>
-class Instruction;
-class InstructionMetadata;
-class ExpressionMetadata;
-class StrExpressionMetadata;
+namespace gd { class Instruction; }
+namespace gd { class InstructionMetadata;}
+namespace gd { class ExpressionMetadata; }
+namespace gd { class StrExpressionMetadata; }
 namespace gd {class ArbitraryResourceWorker;}
 
 namespace gd
@@ -73,64 +73,64 @@ public:
      *
      * \note Typically, a such map is stored by the extension and filled when loading the extension.
      */
-    virtual const std::map<std::string, InstructionMetadata > & GetAllActions() const { return badActionsMetadata; };
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllActions() const { return badActionsMetadata; };
 
     /**
      * \see gd::PlatformExtension::GetAllActions
      */
-    virtual const std::map<std::string, InstructionMetadata > & GetAllConditions() const { return badConditionsMetadata; };
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllConditions() const { return badConditionsMetadata; };
 
     /**
      * \see gd::PlatformExtension::GetAllActions
      */
-    virtual const std::map<std::string, ExpressionMetadata > & GetAllExpressions() const { return badExpressionsMetadata; };
+    virtual const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressions() const { return badExpressionsMetadata; };
 
     /**
      * \see gd::PlatformExtension::GetAllActions
      */
-    virtual const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressions() const { return badStrExpressionsMetadata; };
+    virtual const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressions() const { return badStrExpressionsMetadata; };
 
     /**
      * Must return a reference to a map containing the names of the actions, related to the object type, and the metadata associated with.
      *
      * \note Typically, a such map is stored by the extension and filled when loading the extension.
      */
-    virtual const std::map<std::string, InstructionMetadata > & GetAllActionsForObject(std::string objectType) const { return badActionsMetadata; };
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllActionsForObject(std::string objectType) const { return badActionsMetadata; };
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    virtual const std::map<std::string, InstructionMetadata > & GetAllConditionsForObject(std::string objectType) const { return badConditionsMetadata; };
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllConditionsForObject(std::string objectType) const { return badConditionsMetadata; };
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    virtual const std::map<std::string, ExpressionMetadata > & GetAllExpressionsForObject(std::string objectType) const { return badExpressionsMetadata; };
+    virtual const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressionsForObject(std::string objectType) const { return badExpressionsMetadata; };
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    virtual const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressionsForObject(std::string objectType) const { return badStrExpressionsMetadata; };
+    virtual const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressionsForObject(std::string objectType) const { return badStrExpressionsMetadata; };
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    virtual const std::map<std::string, InstructionMetadata > & GetAllActionsForAutomatism(std::string autoType) const { return badActionsMetadata; };
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllActionsForAutomatism(std::string autoType) const { return badActionsMetadata; };
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    virtual const std::map<std::string, InstructionMetadata > & GetAllConditionsForAutomatism(std::string autoType) const { return badConditionsMetadata; };
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllConditionsForAutomatism(std::string autoType) const { return badConditionsMetadata; };
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    virtual const std::map<std::string, ExpressionMetadata > & GetAllExpressionsForAutomatism(std::string autoType) const { return badExpressionsMetadata; };
+    virtual const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressionsForAutomatism(std::string autoType) const { return badExpressionsMetadata; };
 
     /**
      * \see gd::PlatformExtension::GetAllActionsForObject
      */
-    virtual const std::map<std::string, StrExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType) const { return badStrExpressionsMetadata; };
+    virtual const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType) const { return badStrExpressionsMetadata; };
 
     /**
      * Called ( e.g. during compilation ) so as to inventory resources used by conditions and update their filename
@@ -148,10 +148,10 @@ public:
 
 private:
 
-    static std::map<std::string, InstructionMetadata > badConditionsMetadata; ///< Used when a condition is not found in the extension
-    static std::map<std::string, InstructionMetadata > badActionsMetadata;  ///< Used when an action is not found in the extension
-    static std::map<std::string, ExpressionMetadata > badExpressionsMetadata; ///< Used when an expression is not found in the extension
-    static std::map<std::string, StrExpressionMetadata > badStrExpressionsMetadata;///< Used when an expression is not found in the extension
+    static std::map<std::string, gd::InstructionMetadata > badConditionsMetadata; ///< Used when a condition is not found in the extension
+    static std::map<std::string, gd::InstructionMetadata > badActionsMetadata;  ///< Used when an action is not found in the extension
+    static std::map<std::string, gd::ExpressionMetadata > badExpressionsMetadata; ///< Used when an expression is not found in the extension
+    static std::map<std::string, gd::StrExpressionMetadata > badStrExpressionsMetadata;///< Used when an expression is not found in the extension
 };
 
 }

@@ -21,7 +21,7 @@
 using namespace std;
 using namespace gd;
 
-string TranslateCondition::Translate(const Instruction & condition, const InstructionMetadata & infos)
+string TranslateCondition::Translate(const gd::Instruction & condition, const gd::InstructionMetadata & infos)
 {
     std::string trad = infos.sentence;
 
@@ -46,7 +46,7 @@ string TranslateCondition::Translate(const Instruction & condition, const Instru
 /**
  * Create a formatted sentence from a condition
  */
-std::vector< std::pair<std::string, TextFormatting> > TranslateCondition::GetAsFormattedText(const Instruction & condition, const InstructionMetadata & infos)
+std::vector< std::pair<std::string, TextFormatting> > TranslateCondition::GetAsFormattedText(const gd::Instruction & condition, const gd::InstructionMetadata & infos)
 {
     return TranslateAction::GetInstance()->GetAsFormattedText(condition, infos);
 }

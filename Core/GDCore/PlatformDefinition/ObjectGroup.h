@@ -20,7 +20,9 @@ namespace gd
  * \brief Represents an object group.
  *
  * Objects groups do not really contains objects : They are just used in events, so as to create events which can be applied to several objects.
- * \note This class is fully implemented in GDCore.
+ * \note This class is fully implemented in GDCore: There is no needed to make a custom class inheriting from it.
+ *
+ * \see gd::GroupHasTheSameName
  */
 class GD_CORE_API ObjectGroup
 {

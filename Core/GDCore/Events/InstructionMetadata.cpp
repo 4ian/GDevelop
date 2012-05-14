@@ -1,6 +1,9 @@
 #include "InstructionMetadata.h"
 #include "GDCore/CommonTools.h"
 
+namespace gd
+{
+
 InstructionMetadata::InstructionMetadata(std::string instructionNamespace_) :
 canHaveSubInstructions(false),
 extensionNamespace(instructionNamespace_)
@@ -35,4 +38,6 @@ ParameterMetadata & InstructionMetadata::AddCodeOnlyParameter(const std::string 
 
     parameters.push_back(info);
     return parameters.back();
+}
+
 }

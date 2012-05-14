@@ -13,7 +13,7 @@
 #include <wx/bitmap.h>
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/IDE/TextFormatting.h"
-class InstructionMetadata;
+namespace gd { class InstructionMetadata;}
 
 /**
  * \brief Generate user friendly sentences and information from an action
@@ -25,12 +25,12 @@ class GD_CORE_API TranslateAction
         /**
          * Create a sentence from an action
          */
-        std::string Translate(const Instruction & action, const InstructionMetadata & infos);
+        std::string Translate(const gd::Instruction & action, const gd::InstructionMetadata & infos);
 
         /**
          * Create a formatted sentence from an action
          */
-        std::vector< std::pair<std::string, TextFormatting> > GetAsFormattedText(const Instruction & action, const InstructionMetadata & infos);
+        std::vector< std::pair<std::string, TextFormatting> > GetAsFormattedText(const gd::Instruction & action, const gd::InstructionMetadata & infos);
 
         /**
          * Add some HTML code around the parameter if needed

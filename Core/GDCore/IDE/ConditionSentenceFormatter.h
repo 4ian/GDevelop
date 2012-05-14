@@ -15,7 +15,7 @@
 #include "GDCore/Events/Instruction.h"
 #include <string>
 #include <wx/bitmap.h>
-class InstructionMetadata;
+namespace gd { class InstructionMetadata;}
 
 using namespace std;
 
@@ -29,12 +29,12 @@ class GD_CORE_API TranslateCondition
         /**
          * Create a sentence from a condition
          */
-        static string Translate(const Instruction & condition, const InstructionMetadata & infos);
+        static string Translate(const gd::Instruction & condition, const gd::InstructionMetadata & infos);
 
         /**
          * Create a formatted sentence from a condition
          */
-        static std::vector< std::pair<std::string, TextFormatting> > GetAsFormattedText(const Instruction & condition, const InstructionMetadata & infos);
+        static std::vector< std::pair<std::string, TextFormatting> > GetAsFormattedText(const gd::Instruction & condition, const gd::InstructionMetadata & infos);
 
         /**
          * Add some HTML code around the parameter if needed

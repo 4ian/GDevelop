@@ -2,8 +2,8 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-#ifndef CHOIXVARIABLEDIALOG_H
-#define CHOIXVARIABLEDIALOG_H
+#ifndef GDCORE_CHOOSEVARIABLEDIALOG_H
+#define GDCORE_CHOOSEVARIABLEDIALOG_H
 
 //(*Headers(ChooseVariableDialog)
 #include <wx/listctrl.h>
@@ -20,6 +20,9 @@ namespace gd { class VariablesContainer; }
 #include <wx/toolbar.h>
 #include <boost/shared_ptr.hpp>
 #include <string>
+
+namespace gd
+{
 
 /**
  * \brief Dialog used to display variables of a gd::VariablesContainer and choose one.
@@ -110,5 +113,7 @@ private:
 
     DECLARE_EVENT_TABLE()
 };
+
+}
 
 #endif

@@ -9,6 +9,9 @@
 #include <wx/help.h>
 #include <wx/fs_zip.h>
 
+namespace gd
+{
+
 /**
  * \brief Tool class allowing to easily open help file.
  *
@@ -73,5 +76,7 @@ private:
     static HelpFileAccess *_singleton;
     wxHelpController * helpController;
 };
+
+}
 
 #endif // HELPFILEACCESS_H

@@ -5,10 +5,10 @@
 namespace gd
 {
 
-std::map<std::string, InstructionMetadata > PlatformExtension::badConditionsMetadata;
-std::map<std::string, InstructionMetadata > PlatformExtension::badActionsMetadata;
-std::map<std::string, ExpressionMetadata > PlatformExtension::badExpressionsMetadata;
-std::map<std::string, StrExpressionMetadata > PlatformExtension::badStrExpressionsMetadata;
+std::map<std::string, gd::InstructionMetadata > PlatformExtension::badConditionsMetadata;
+std::map<std::string, gd::InstructionMetadata > PlatformExtension::badActionsMetadata;
+std::map<std::string, gd::ExpressionMetadata > PlatformExtension::badExpressionsMetadata;
+std::map<std::string, gd::StrExpressionMetadata > PlatformExtension::badStrExpressionsMetadata;
 
 
 PlatformExtension::PlatformExtension()

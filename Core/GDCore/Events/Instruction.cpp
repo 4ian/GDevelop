@@ -2,10 +2,8 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
- #if defined(GD_IDE_ONLY)
-
 #include "GDCore/Events/Instruction.h"
-#include "GDCore/Events/GDExpression.h"
+#include "GDCore/Events/Expression.h"
 #include <string>
 #include <iostream>
 #include <vector>
@@ -13,7 +11,10 @@
 
 using namespace std;
 
-GDExpression Instruction::badExpression("");
+namespace gd
+{
+
+gd::Expression Instruction::badExpression("");
 
 Instruction::Instruction(string type_) :
 renderedHeightNeedUpdate(true),
@@ -26,7 +27,7 @@ inverted(false)
     parameters.reserve(8);
 }
 
-Instruction::Instruction(string type_, const vector <GDExpression> & parameters_, bool inverted_) :
+Instruction::Instruction(string type_, const vector <gd::Expression> & parameters_, bool inverted_) :
 renderedHeightNeedUpdate(true),
 renderedHeight(0),
 selected(false),
@@ -37,14 +38,14 @@ parameters(parameters_)
     parameters.reserve(8);
 }
 
-const GDExpression & Instruction::GetParameter(unsigned int index) const
+const gd::Expression & Instruction::GetParameter(unsigned int index) const
 {
     if ( index >= parameters.size() ) return badExpression;
 
     return parameters[index];
 }
 
-GDExpression & Instruction::GetParameter(unsigned int index)
+gd::Expression & Instruction::GetParameter(unsigned int index)
 {
     if ( index >= parameters.size() )  return badExpression;
 
@@ -56,7 +57,7 @@ Instruction::~Instruction()
     //dtor
 }
 
-void Instruction::SetParameter(unsigned int nb, const GDExpression & val)
+void Instruction::SetParameter(unsigned int nb, const gd::Expression & val)
 {
     if ( nb >= parameters.size() )
     {
@@ -66,4 +67,5 @@ void Instruction::SetParameter(unsigned int nb, const GDExpression & val)
     parameters[nb] = val;
 }
 
-#endif
+
+}

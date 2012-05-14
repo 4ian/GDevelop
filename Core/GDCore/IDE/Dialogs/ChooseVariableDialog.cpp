@@ -19,6 +19,9 @@
 #include "GDCore/PlatformDefinition/Variable.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 
+namespace gd
+{
+
 //(*IdInit(ChooseVariableDialog)
 const long ChooseVariableDialog::ID_STATICBITMAP1 = wxNewId();
 const long ChooseVariableDialog::ID_STATICTEXT6 = wxNewId();
@@ -343,4 +346,7 @@ void ChooseVariableDialog::OnvariablesListKeyDown(wxListEvent& event)
 void ChooseVariableDialog::OnvariablesListItemSelect(wxListEvent& event)
 {
     selectedVariable = event.GetText();
+}
+
+
 }

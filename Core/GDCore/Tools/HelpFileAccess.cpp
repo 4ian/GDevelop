@@ -5,4 +5,10 @@
 
 #include "GDCore/Tools/HelpFileAccess.h"
 
+namespace gd
+{
+
 HelpFileAccess * HelpFileAccess::_singleton = NULL;
+
+
+}

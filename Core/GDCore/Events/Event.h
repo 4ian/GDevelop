@@ -19,7 +19,7 @@ class wxWindow;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
 class Scene;
-class Instruction;
+namespace gd { class Instruction; }
 class TiXmlElement;
 class Game;
 class EventsCodeGenerator;
@@ -97,7 +97,7 @@ public:
      * Event must be able to return all expressions they have.
      * Used to preprocess the expressions.
      */
-    virtual std::vector < GDExpression* > GetAllExpressions() { std::vector < GDExpression* > noExpr; return noExpr;};
+    virtual std::vector < gd::Expression* > GetAllExpressions() { std::vector < gd::Expression* > noExpr; return noExpr;};
 
     ///@}
 

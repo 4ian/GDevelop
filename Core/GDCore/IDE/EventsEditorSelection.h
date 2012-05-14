@@ -189,7 +189,7 @@ class GD_CORE_API EventsEditorSelection
         /**
          * Return true if an instruction is found in the list ( sub instructions are also taken in account )
          */
-        bool FindInInstructionsAndSubInstructions(std::vector<Instruction> & list, const Instruction * instrToSearch);
+        bool FindInInstructionsAndSubInstructions(std::vector<gd::Instruction> & list, const gd::Instruction * instrToSearch);
 
         GDpriv::EventsEditorRefreshCallbacks & eventsEditorCallback;
 };

@@ -10,7 +10,7 @@ namespace gd {class ExternalEvents; }
 namespace gd { class BaseEvent; }
 class Game;
 class Scene;
-class Instruction;
+namespace gd { class Instruction; }
 class ExternalEvents;
 namespace gd {typedef boost::shared_ptr<gd::BaseEvent> BaseEventSPtr;}
 
@@ -62,7 +62,7 @@ class EventsRefactorer
          *
          * \return true if something was modified.
          */
-        static bool RenameObjectInActions(Game & game, Scene & scene, std::vector < Instruction > & instructions, std::string oldName, std::string newName);
+        static bool RenameObjectInActions(Game & game, Scene & scene, std::vector < gd::Instruction > & instructions, std::string oldName, std::string newName);
 
         /**
          * Replace all occurences of an object name by another name in a condition
@@ -70,38 +70,38 @@ class EventsRefactorer
          *
          * \return true if something was modified.
          */
-        static bool RenameObjectInConditions(Game & game, Scene & scene, std::vector < Instruction > & instructions, std::string oldName, std::string newName);
+        static bool RenameObjectInConditions(Game & game, Scene & scene, std::vector < gd::Instruction > & instructions, std::string oldName, std::string newName);
 
         /**
          * Remove all conditions of the list using an object
          *
          * \return true if something was modified.
          */
-        static bool RemoveObjectInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string name);
+        static bool RemoveObjectInConditions(Game & game, Scene & scene, std::vector < gd::Instruction > & conditions, std::string name);
 
         /**
          * Remove all actions of the list using an object
          *
          * \return true if something was modified.
          */
-        static bool RemoveObjectInActions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string name);
+        static bool RemoveObjectInActions(Game & game, Scene & scene, std::vector < gd::Instruction > & conditions, std::string name);
 
         /**
          * Replace all occurences of a string in conditions
          *
          * \return true if something was modified.
          */
-        static bool ReplaceStringInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase);
+        static bool ReplaceStringInConditions(Game & game, Scene & scene, std::vector < gd::Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase);
 
         /**
          * Replace all occurences of a string in actions
          *
          * \return true if something was modified.
          */
-        static bool ReplaceStringInActions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase);
+        static bool ReplaceStringInActions(Game & game, Scene & scene, std::vector < gd::Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase);
 
-        static bool SearchStringInActions(Game & game, Scene & scene, std::vector < Instruction > & actions, std::string search, bool matchCase);
-        static bool SearchStringInConditions(Game & game, Scene & scene, std::vector < Instruction > & conditions, std::string search, bool matchCase);
+        static bool SearchStringInActions(Game & game, Scene & scene, std::vector < gd::Instruction > & actions, std::string search, bool matchCase);
+        static bool SearchStringInConditions(Game & game, Scene & scene, std::vector < gd::Instruction > & conditions, std::string search, bool matchCase);
 
         /**
          * Fill layouts and externalEvents vector with pointers to layouts and external events linked (even indirectly) by the events.

@@ -15,7 +15,7 @@
  */
 void Game_Develop_EditorFrame::OnMenuAideSelected( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplayContents();
 }
 

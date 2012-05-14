@@ -161,7 +161,7 @@ void EditorLayers::OnMoreOptions(wxCommandEvent& event)
 
 void EditorLayers::OnHelp(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(226);
 }
 

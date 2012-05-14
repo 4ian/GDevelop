@@ -726,7 +726,7 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
         liveEdit->SetFocus();
         liveEditingChangesMade = false;
     }
-    //Instruction selection?
+    //gd::Instruction selection?
     else if ( itemsAreas.IsOnInstruction(x, y) )
     {
         InstructionItem item = itemsAreas.GetInstructionAt(x, y);
@@ -773,7 +773,7 @@ void EventsEditor::HandleSelectionAfterClick(int x, int y, bool allowLiveEditing
 
 void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
 {
-    //Instruction selection?
+    //gd::Instruction selection?
     if ( itemsAreas.IsOnInstruction(event.GetX(), event.GetY()) )
     {
         InstructionItem item = itemsAreas.GetInstructionAt(event.GetX(), event.GetY());
@@ -830,7 +830,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
             ChoixCondition dialog(this, game, scene);
             if ( dialog.ShowModal() == 0)
             {
-                Instruction instruction;
+                gd::Instruction instruction;
                 instruction.SetType( dialog.Type );
                 instruction.SetParameters( dialog.Param );
                 instruction.SetInverted( dialog.Contraire );
@@ -846,7 +846,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
             ChoixAction dialog(this, game, scene);
             if ( dialog.ShowModal() == 0)
             {
-                Instruction instruction;
+                gd::Instruction instruction;
                 instruction.SetType( dialog.Type );
                 instruction.SetParameters( dialog.Param );
 
@@ -933,7 +933,7 @@ void EventsEditor::OneventsPanelMouseMove(wxMouseEvent& event)
                     selection.SetHighlighted(itemsAreas.GetParameterAt(event.GetX(), event.GetY()));
             }
         }
-        else if ( itemsAreas.IsOnParameter(event.GetX(), event.GetY()) ) //Parameter without list ( a simple GDExpression )
+        else if ( itemsAreas.IsOnParameter(event.GetX(), event.GetY()) ) //Parameter without list ( a simple gd::Expression )
             selection.SetHighlighted(itemsAreas.GetParameterAt(event.GetX(), event.GetY()));
 
     }
@@ -1104,7 +1104,7 @@ void EventsEditor::EndLiveEditing()
     }
 
     eventsPanel->SetFocusIgnoringChildren();
-    *liveEditedParameter.parameter = GDExpression(ToString(liveEdit->GetValue()));
+    *liveEditedParameter.parameter = gd::Expression(ToString(liveEdit->GetValue()));
     liveEditedParameter.event->eventHeightNeedUpdate = true;
     liveEditingPanel->Show(false);
 
@@ -1151,7 +1151,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
         ChoixCondition dialog(this, game, scene);
         if ( dialog.ShowModal() == 0)
         {
-            Instruction instruction;
+            gd::Instruction instruction;
             instruction.SetType(dialog.Type);
             instruction.SetParameters(dialog.Param);
             instruction.SetInverted(dialog.Contraire);
@@ -1167,7 +1167,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
         ChoixAction dialog(this, game, scene);
         if ( dialog.ShowModal() == 0)
         {
-            Instruction instruction;
+            gd::Instruction instruction;
             instruction.SetType(dialog.Type);
             instruction.SetParameters(dialog.Param);
 
@@ -1392,7 +1392,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     if ( selection.HasSelectedConditions())
     {
         std::vector < InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
-        std::vector < Instruction > instructionsToCopy;
+        std::vector < gd::Instruction > instructionsToCopy;
         for (unsigned int i = 0;i<itemsSelected.size();++i)
         {
             if (itemsSelected[i].instruction != NULL)
@@ -1404,7 +1404,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
     else if ( selection.HasSelectedActions())
     {
         std::vector < InstructionItem > itemsSelected = selection.GetAllSelectedInstructions();
-        std::vector < Instruction > instructionsToCopy;
+        std::vector < gd::Instruction > instructionsToCopy;
         for (unsigned int i = 0;i<itemsSelected.size();++i)
         {
             if (itemsSelected[i].instruction != NULL)
@@ -1447,13 +1447,13 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if ( !Clipboard::GetInstance()->HasCondition() ) return;
 
         //Get information about list where conditions must be pasted
-        std::vector<Instruction> * instructionList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
+        std::vector<gd::Instruction> * instructionList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
         size_t positionInThisList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().positionInList : std::string::npos;
         gd::BaseEvent * event = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().event : selection.GetHighlightedInstructionList().event;
         if (instructionList == NULL) return;
 
         //Paste all conditions
-        const vector < Instruction > & instructions = Clipboard::GetInstance()->GetInstructions();
+        const vector < gd::Instruction > & instructions = Clipboard::GetInstance()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
@@ -1471,13 +1471,13 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if ( !Clipboard::GetInstance()->HasAction() ) return;
 
         //Get information about list where actions must be pasted
-        std::vector<Instruction> * instructionList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
+        std::vector<gd::Instruction> * instructionList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
         size_t positionInThisList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().positionInList : std::string::npos;
         gd::BaseEvent * event = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().event : selection.GetHighlightedInstructionList().event;
         if (instructionList == NULL) return;
 
         //Paste all actions
-        const vector < Instruction > & instructions = Clipboard::GetInstance()->GetInstructions();
+        const vector < gd::Instruction > & instructions = Clipboard::GetInstance()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
@@ -1541,7 +1541,7 @@ void EventsEditor::OnredoMenuSelected(wxCommandEvent& event)
 
 void EventsEditor::OnHelpBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(11);
 }
 

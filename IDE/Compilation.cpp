@@ -342,19 +342,19 @@ void Compilation::OnOuvrirBtClick( wxCommandEvent& event )
 
 void Compilation::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(125);
 }
 
 void Compilation::OnCGShareBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(192);
 }
 
 void Compilation::OnDistribuerBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(158);
 }
 

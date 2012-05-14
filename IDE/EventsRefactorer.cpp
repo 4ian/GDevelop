@@ -34,7 +34,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
         plainExpression += text;
     };
 
-    virtual void OnStaticFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo)
+    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         std::string parametersStr;
         for (unsigned int i = 0;i<parameters.size();++i)
@@ -48,7 +48,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
         plainExpression += functionName+"("+parametersStr+")";
     };
 
-    virtual void OnStaticFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo)
+    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
     {
         //Special case : Function without name is a litteral string.
         if ( functionName.empty() )
@@ -71,7 +71,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
         plainExpression += functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo)
+    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         if ( parameters.empty() ) return;
 
@@ -88,7 +88,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
                                +"."+functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo)
+    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
     {
         if ( parameters.empty() ) return;
 
@@ -105,7 +105,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
                                +"."+functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo)
+    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         if ( parameters.size() < 2 ) return;
 
@@ -122,7 +122,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
                                +"."+parameters[1].GetPlainString()+"::"+functionName+"("+parametersStr+")";
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo)
+    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
     {
         if ( parameters.size() < 2 ) return;
 
@@ -139,7 +139,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
                                +"."+parameters[1].GetPlainString()+"::"+functionName+"("+parametersStr+")";
     };
 
-    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)
+    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, gd::Expression & expression)
     {
         std::string newExpression;
 
@@ -149,11 +149,11 @@ class CallbacksForRenamingObject : public ParserCallbacks
         if ( !parser.ParseMathExpression(game, scene, callbacks) )
             return false;
 
-        expression = GDExpression(newExpression);
+        expression = gd::Expression(newExpression);
         return true;
     }
 
-    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression)
+    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, gd::Expression & expression)
     {
         std::string newExpression;
 
@@ -163,7 +163,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
         if ( !parser.ParseTextExpression(game, scene, callbacks) )
             return false;
 
-        expression = GDExpression(newExpression);
+        expression = gd::Expression(newExpression);
         return true;
     }
 
@@ -190,43 +190,43 @@ class CallbacksForRemovingObject : public ParserCallbacks
     virtual void OnOperator(std::string text){};
     virtual void OnNumber(std::string text){};
 
-    virtual void OnStaticFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo)
+    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
     };
 
-    virtual void OnStaticFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo)
+    virtual void OnStaticFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
     {
     };
 
-    virtual void OnObjectFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo)
-    {
-        if ( parameters.empty() ) return;
-
-        if ( parameters[0].GetPlainString() == name ) objectPresent = true;
-    };
-
-    virtual void OnObjectFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo)
+    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         if ( parameters.empty() ) return;
 
         if ( parameters[0].GetPlainString() == name ) objectPresent = true;
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<GDExpression> & parameters, const ExpressionMetadata & expressionInfo)
+    virtual void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
     {
         if ( parameters.empty() ) return;
 
         if ( parameters[0].GetPlainString() == name ) objectPresent = true;
     };
 
-    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<GDExpression> & parameters, const StrExpressionMetadata & expressionInfo)
+    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo)
     {
         if ( parameters.empty() ) return;
 
         if ( parameters[0].GetPlainString() == name ) objectPresent = true;
     };
 
-    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, GDExpression & expression)
+    virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo)
+    {
+        if ( parameters.empty() ) return;
+
+        if ( parameters[0].GetPlainString() == name ) objectPresent = true;
+    };
+
+    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, gd::Expression & expression)
     {
         CallbacksForRemovingObject callbacks(name);
 
@@ -238,7 +238,7 @@ class CallbacksForRemovingObject : public ParserCallbacks
         return true;
     }
 
-    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, GDExpression & expression)
+    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, gd::Expression & expression)
     {
         CallbacksForRemovingObject callbacks(name);
 
@@ -255,18 +255,18 @@ class CallbacksForRemovingObject : public ParserCallbacks
         std::string name;
 };
 
-bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string oldName, std::string newName)
+bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector < gd::Instruction > & actions, std::string oldName, std::string newName)
 {
     bool somethingModified = false;
 
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
-        InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
+        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
             if ( instrInfos.parameters[pNb].type == "object" && actions[aId].GetParameter(pNb).GetPlainString() == oldName )
-                actions[aId].SetParameter(pNb, GDExpression(newName));
+                actions[aId].SetParameter(pNb, gd::Expression(newName));
             //Replace object's name in expressions
             else if (instrInfos.parameters[pNb].type == "expression")
             {
@@ -279,7 +279,7 @@ bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
                 if ( parser.ParseMathExpression(game, scene, callbacks) && newExpression != oldExpression )
                 {
                     somethingModified = true;
-                    actions[aId].SetParameter(pNb, GDExpression(newExpression));
+                    actions[aId].SetParameter(pNb, gd::Expression(newExpression));
                 }
             }
             //Replace object's name in text expressions
@@ -294,7 +294,7 @@ bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
                 if ( parser.ParseTextExpression(game, scene, callbacks) && newExpression != oldExpression )
                 {
                     somethingModified = true;
-                    actions[aId].SetParameter(pNb, GDExpression(newExpression));
+                    actions[aId].SetParameter(pNb, gd::Expression(newExpression));
                 }
             }
         }
@@ -306,18 +306,18 @@ bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
     return somethingModified;
 }
 
-bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string oldName, std::string newName)
+bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vector < gd::Instruction > & conditions, std::string oldName, std::string newName)
 {
     bool somethingModified = false;
 
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
-        InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
+        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
             if ( instrInfos.parameters[pNb].type == "object" && conditions[cId].GetParameter(pNb).GetPlainString() == oldName )
-                conditions[cId].SetParameter(pNb, GDExpression(newName));
+                conditions[cId].SetParameter(pNb, gd::Expression(newName));
             //Replace object's name in expressions
             else if (instrInfos.parameters[pNb].type == "expression")
             {
@@ -330,7 +330,7 @@ bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vect
                 if ( parser.ParseMathExpression(game, scene, callbacks) )
                 {
                     somethingModified = true;
-                    conditions[cId].SetParameter(pNb, GDExpression(newExpression));
+                    conditions[cId].SetParameter(pNb, gd::Expression(newExpression));
                 }
             }
             //Replace object's name in text expressions
@@ -345,7 +345,7 @@ bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vect
                 if ( parser.ParseMathExpression(game, scene, callbacks) )
                 {
                     somethingModified = true;
-                    conditions[cId].SetParameter(pNb, GDExpression(newExpression));
+                    conditions[cId].SetParameter(pNb, gd::Expression(newExpression));
                 }
             }
         }
@@ -361,7 +361,7 @@ void EventsRefactorer::RenameObjectInEvents(Game & game, Scene & scene, vector <
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        vector < vector<Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
+        vector < vector<gd::Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
             bool somethingModified = RenameObjectInConditions(game, scene, *conditionsVectors[j], oldName, newName);
@@ -370,7 +370,7 @@ void EventsRefactorer::RenameObjectInEvents(Game & game, Scene & scene, vector <
             #endif
         }
 
-        vector < vector<Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
+        vector < vector<gd::Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
             bool somethingModified = RenameObjectInActions(game, scene, *actionsVectors[j], oldName, newName);
@@ -383,7 +383,7 @@ void EventsRefactorer::RenameObjectInEvents(Game & game, Scene & scene, vector <
     }
 }
 
-bool EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string name)
+bool EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector < gd::Instruction > & actions, std::string name)
 {
     bool somethingModified = false;
 
@@ -391,7 +391,7 @@ bool EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector 
     {
         bool deleteMe = false;
 
-        InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
+        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -439,7 +439,7 @@ bool EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector 
     return somethingModified;
 }
 
-bool EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string name)
+bool EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vector < gd::Instruction > & conditions, std::string name)
 {
     bool somethingModified = false;
 
@@ -447,7 +447,7 @@ bool EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vect
     {
         bool deleteMe = false;
 
-        InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
+        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -497,7 +497,7 @@ void EventsRefactorer::RemoveObjectInEvents(Game & game, Scene & scene, vector <
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
-        vector < vector<Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
+        vector < vector<gd::Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
         for (unsigned int j = 0;j < conditionsVectors.size();++j)
         {
             bool conditionsModified = RemoveObjectInConditions(game, scene, *conditionsVectors[j], name);
@@ -506,7 +506,7 @@ void EventsRefactorer::RemoveObjectInEvents(Game & game, Scene & scene, vector <
             #endif
         }
 
-        vector < vector<Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
+        vector < vector<gd::Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
         for (unsigned int j = 0;j < actionsVectors.size();++j)
         {
             bool actionsModified = RemoveObjectInActions(game, scene, *actionsVectors[j], name);
@@ -530,7 +530,7 @@ void EventsRefactorer::ReplaceStringInEvents(Game & game, Scene & scene, std::ve
     {
         if ( inConditions )
         {
-            vector < vector<Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
+            vector < vector<gd::Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
             for (unsigned int j = 0;j < conditionsVectors.size();++j)
             {
                 bool conditionsModified = ReplaceStringInConditions(game, scene, *conditionsVectors[j], toReplace, newString, matchCase);
@@ -542,7 +542,7 @@ void EventsRefactorer::ReplaceStringInEvents(Game & game, Scene & scene, std::ve
 
         if ( inActions )
         {
-            vector < vector<Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
+            vector < vector<gd::Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
             for (unsigned int j = 0;j < actionsVectors.size();++j)
             {
                 bool actionsModified = ReplaceStringInActions(game, scene, *actionsVectors[j], toReplace, newString, matchCase);
@@ -584,7 +584,7 @@ std::string ReplaceAllOccurencesCaseUnsensitive(string context, string from, con
     return context;
 }
 
-bool EventsRefactorer::ReplaceStringInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string toReplace, std::string newString, bool matchCase)
+bool EventsRefactorer::ReplaceStringInActions(Game & game, Scene & scene, vector < gd::Instruction > & actions, std::string toReplace, std::string newString, bool matchCase)
 {
     bool somethingModified = false;
 
@@ -597,7 +597,7 @@ bool EventsRefactorer::ReplaceStringInActions(Game & game, Scene & scene, vector
 
             if ( newParameter != actions[aId].GetParameter(pNb).GetPlainString())
             {
-                actions[aId].SetParameter(pNb, GDExpression(newParameter));
+                actions[aId].SetParameter(pNb, gd::Expression(newParameter));
                 somethingModified = true;
                 #if defined(GD_IDE_ONLY)
                 actions[aId].renderedHeightNeedUpdate = true;
@@ -611,7 +611,7 @@ bool EventsRefactorer::ReplaceStringInActions(Game & game, Scene & scene, vector
     return somethingModified;
 }
 
-bool EventsRefactorer::ReplaceStringInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase)
+bool EventsRefactorer::ReplaceStringInConditions(Game & game, Scene & scene, vector < gd::Instruction > & conditions, std::string toReplace, std::string newString, bool matchCase)
 {
     bool somethingModified = false;
 
@@ -624,7 +624,7 @@ bool EventsRefactorer::ReplaceStringInConditions(Game & game, Scene & scene, vec
 
             if ( newParameter != conditions[cId].GetParameter(pNb).GetPlainString())
             {
-                conditions[cId].SetParameter(pNb, GDExpression(newParameter));
+                conditions[cId].SetParameter(pNb, gd::Expression(newParameter));
                 somethingModified = true;
                 #if defined(GD_IDE_ONLY)
                 conditions[cId].renderedHeightNeedUpdate = true;
@@ -652,7 +652,7 @@ vector < boost::weak_ptr<gd::BaseEvent> > EventsRefactorer::SearchInEvents(Game 
 
         if ( inConditions )
         {
-            vector < vector<Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
+            vector < vector<gd::Instruction>* > conditionsVectors =  events[i]->GetAllConditionsVectors();
             for (unsigned int j = 0;j < conditionsVectors.size();++j)
             {
                 if (!eventAddedInResults && SearchStringInConditions(game, scene, *conditionsVectors[j], search, matchCase))
@@ -664,7 +664,7 @@ vector < boost::weak_ptr<gd::BaseEvent> > EventsRefactorer::SearchInEvents(Game 
 
         if ( inActions )
         {
-            vector < vector<Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
+            vector < vector<gd::Instruction>* > actionsVectors =  events[i]->GetAllActionsVectors();
             for (unsigned int j = 0;j < actionsVectors.size();++j)
             {
                 if (!eventAddedInResults && SearchStringInActions(game, scene, *actionsVectors[j], search, matchCase))
@@ -684,7 +684,7 @@ vector < boost::weak_ptr<gd::BaseEvent> > EventsRefactorer::SearchInEvents(Game 
     return results;
 }
 
-bool EventsRefactorer::SearchStringInActions(Game & game, Scene & scene, vector < Instruction > & actions, std::string search, bool matchCase)
+bool EventsRefactorer::SearchStringInActions(Game & game, Scene & scene, vector < gd::Instruction > & actions, std::string search, bool matchCase)
 {
     if ( !matchCase ) boost::to_upper(search);
 
@@ -705,7 +705,7 @@ bool EventsRefactorer::SearchStringInActions(Game & game, Scene & scene, vector 
     return false;
 }
 
-bool EventsRefactorer::SearchStringInConditions(Game & game, Scene & scene, vector < Instruction > & conditions, std::string search, bool matchCase)
+bool EventsRefactorer::SearchStringInConditions(Game & game, Scene & scene, vector < gd::Instruction > & conditions, std::string search, bool matchCase)
 {
     if ( !matchCase ) boost::to_upper(search);
 

@@ -781,8 +781,8 @@ bool EditorObjectList::CheckObjectName(std::string name)
         for(unsigned int j = 0;j<objectsTypes.size();++j)
         {
             //Add each object expression
-            std::map<string, ExpressionMetadata > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
-            for(std::map<string, ExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
+            std::map<string, gd::ExpressionMetadata > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
+            for(std::map<string, gd::ExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
             {
                 if ( name == it->first )
                     nameUsedByExpression = true;
@@ -824,7 +824,7 @@ void EditorObjectList::OnChercherBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(10);
 }
 
@@ -1062,7 +1062,7 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
         return;
     }
 
-    ChooseVariableDialog dialog(this, (*object)->GetVariables(), /*editingOnly=*/true);
+    gd::ChooseVariableDialog dialog(this, (*object)->GetVariables(), /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
         if ( scene ) scene->wasModified = true;
 }

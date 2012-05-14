@@ -24,7 +24,7 @@
 #include <wx/checkbox.h>
 #include <wx/imaglist.h>
 #include <wx/bmpbuttn.h>
-#include "GDCore/Events/GDExpression.h"
+#include "GDCore/Events/Expression.h"
 class Scene;
 class Game;
 
@@ -47,7 +47,7 @@ class ChoixAction: public wxDialog
         bool Loc;
         Game & game;
         Scene & scene;
-        vector < GDExpression > Param;
+        vector < gd::Expression > Param;
 
         unsigned static const int MaxPara = 8;
 

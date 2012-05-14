@@ -300,5 +300,5 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
 
 void SearchEvents::OnhelpBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess::GetInstance()->DisplaySection(58);
+    gd::HelpFileAccess::GetInstance()->DisplaySection(58);
 }

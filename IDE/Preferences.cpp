@@ -1228,7 +1228,7 @@ void Preferences::OnInactifColor2PnlRightUp( wxMouseEvent& event )
 
 void Preferences::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplayContents();
 }
 

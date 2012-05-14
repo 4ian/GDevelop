@@ -202,7 +202,7 @@ void ChoixTemplateEvent::ProcessEvents(vector < gd::BaseEventSPtr > & events )
     //Pour chaque évènement
     for ( unsigned int j = 0;j < events.size() ; j++ )
     {
-        vector < vector<Instruction>* > allConditionsVectors = events[j]->GetAllConditionsVectors();
+        vector < vector<gd::Instruction>* > allConditionsVectors = events[j]->GetAllConditionsVectors();
         for ( unsigned int k = 0;k < allConditionsVectors.size() ;k++ )
         {
             for (unsigned int l = 0;l<allConditionsVectors[k]->size();++l)
@@ -220,7 +220,7 @@ void ChoixTemplateEvent::ProcessEvents(vector < gd::BaseEventSPtr > & events )
             }
         }
 
-        vector < vector<Instruction>* > allActionsVectors = events[j]->GetAllActionsVectors();
+        vector < vector<gd::Instruction>* > allActionsVectors = events[j]->GetAllActionsVectors();
         for ( unsigned int k = 0;k < allActionsVectors.size() ;k++ )
         {
             for (unsigned int l = 0;l<allActionsVectors[k]->size();++l)
@@ -384,6 +384,6 @@ string ChoixTemplateEvent::ConvertParam( string parameter, const string & toRepl
 
 void ChoixTemplateEvent::OnAideBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(151);
 }

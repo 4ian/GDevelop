@@ -361,7 +361,7 @@ void EditOptionsPosition::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditOptionsPosition::OnAideBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(25);
 }
 
@@ -381,7 +381,7 @@ void EditOptionsPosition::OnsizeCheckClick(wxCommandEvent& event)
 
 void EditOptionsPosition::OneditInitialVariablesClick(wxCommandEvent& event)
 {
-    ChooseVariableDialog dialog(this, initialVariables, /*editingOnly=*/true);
+    gd::ChooseVariableDialog dialog(this, initialVariables, /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
         UpdateInitialVariablesStatus();
 }

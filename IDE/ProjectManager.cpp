@@ -705,7 +705,7 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
         return;
     }
 
-    ChooseVariableDialog dialog(this, (*scene)->GetVariables(), /*editingOnly=*/true);
+    gd::ChooseVariableDialog dialog(this, (*scene)->GetVariables(), /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
     {
         (*scene)->wasModified = true;
@@ -1062,7 +1062,7 @@ void ProjectManager::OneditGblVarMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    ChooseVariableDialog dialog(this, game->GetVariables(), /*editingOnly=*/true);
+    gd::ChooseVariableDialog dialog(this, game->GetVariables(), /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
     {
         for (unsigned int i = 0;i<game->GetLayouts().size();++i)

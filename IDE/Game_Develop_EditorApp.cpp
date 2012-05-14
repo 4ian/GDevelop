@@ -229,7 +229,7 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Set help file
     {
-        HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+        gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
         if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_ENGLISH )
             helpFileAccess->InitWithHelpFile("help.chm");
         else if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
@@ -421,7 +421,7 @@ int Game_Develop_EditorApp::OnExit()
     clipboard->DestroySingleton();
     FontManager * fontManager = FontManager::GetInstance();
     fontManager->DestroySingleton();
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DestroySingleton();
 
     #if defined(LINUX) || defined(MAC)

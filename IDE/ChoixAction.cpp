@@ -322,8 +322,8 @@ void ChoixAction::RefreshList()
                                                                 0) :
                                         extensionItem;
             //Add each object actions
-            std::map<string, InstructionMetadata > allObjActions = extensions[i]->GetAllActionsForObject(objectsTypes[j]);
-            for(std::map<string, InstructionMetadata>::const_iterator it = allObjActions.begin(); it != allObjActions.end(); ++it)
+            std::map<string, gd::InstructionMetadata > allObjActions = extensions[i]->GetAllActionsForObject(objectsTypes[j]);
+            for(std::map<string, gd::InstructionMetadata>::const_iterator it = allObjActions.begin(); it != allObjActions.end(); ++it)
             {
                 //Verify if the action match the search
                 if ( searching &&
@@ -361,8 +361,8 @@ void ChoixAction::RefreshList()
                                                                 0) :
                                         extensionItem;
             //Add each automatism actions
-            std::map<string, InstructionMetadata > allAutoActions = extensions[i]->GetAllActionsForAutomatism(automatismsTypes[j]);
-            for(std::map<string, InstructionMetadata>::const_iterator it = allAutoActions.begin(); it != allAutoActions.end(); ++it)
+            std::map<string, gd::InstructionMetadata > allAutoActions = extensions[i]->GetAllActionsForAutomatism(automatismsTypes[j]);
+            for(std::map<string, gd::InstructionMetadata>::const_iterator it = allAutoActions.begin(); it != allAutoActions.end(); ++it)
             {
                 //Verify if the action match the search
                 if ( searching
@@ -393,8 +393,8 @@ void ChoixAction::RefreshList()
 	    }
 
         //Add each (free) actions
-        std::map<string, InstructionMetadata > allActions = extensions[i]->GetAllActions();
-        for(std::map<string, InstructionMetadata>::const_iterator it = allActions.begin(); it != allActions.end(); ++it)
+        std::map<string, gd::InstructionMetadata > allActions = extensions[i]->GetAllActions();
+        for(std::map<string, gd::InstructionMetadata>::const_iterator it = allActions.begin(); it != allActions.end(); ++it)
         {
             //Verify if the action match the search
             if ( searching &&
@@ -473,8 +473,8 @@ void ChoixAction::RefreshObjectActionsList()
                                     extensionItem;
 
         //Add each object actions
-        std::map<string, InstructionMetadata > allObjActions = extensions[i]->GetAllActionsForObject(objectType);
-        for(std::map<string, InstructionMetadata>::const_iterator it = allObjActions.begin(); it != allObjActions.end(); ++it)
+        std::map<string, gd::InstructionMetadata > allObjActions = extensions[i]->GetAllActionsForObject(objectType);
+        for(std::map<string, gd::InstructionMetadata>::const_iterator it = allObjActions.begin(); it != allObjActions.end(); ++it)
         {
             //Verify if the action match the search
             if ( searching &&
@@ -519,8 +519,8 @@ void ChoixAction::RefreshObjectActionsList()
                                                                 0) :
                                         extensionItem;
             //Add each automatism actions
-            std::map<string, InstructionMetadata > allAutoActions = extensions[i]->GetAllActionsForAutomatism(automatismType);
-            for(std::map<string, InstructionMetadata>::const_iterator it = allAutoActions.begin(); it != allAutoActions.end(); ++it)
+            std::map<string, gd::InstructionMetadata > allAutoActions = extensions[i]->GetAllActionsForAutomatism(automatismType);
+            for(std::map<string, gd::InstructionMetadata>::const_iterator it = allAutoActions.begin(); it != allAutoActions.end(); ++it)
             {
                 //Verify if the action match the search
                 if ( searching &&
@@ -596,18 +596,18 @@ void ChoixAction::RefreshFromAction()
 {
     if ( Type.empty() ) return;
 
-    const InstructionMetadata & InstructionMetadata = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(Type);
+    const gd::InstructionMetadata & instructionMetadata = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(Type);
 
     //Display action main properties
-    NomActionTxt->SetLabel( InstructionMetadata.fullname );
+    NomActionTxt->SetLabel( instructionMetadata.fullname );
     NomActionTxt->Wrap( 450 );
-    ActionTextTxt->SetLabel( InstructionMetadata.description );
+    ActionTextTxt->SetLabel( instructionMetadata.description );
     ActionTextTxt->Wrap( 450 );
-    if ( InstructionMetadata.icon.IsOk() ) ActionImg->SetBitmap( InstructionMetadata.icon );
+    if ( instructionMetadata.icon.IsOk() ) ActionImg->SetBitmap( instructionMetadata.icon );
     else ActionImg->SetBitmap(CommonBitmapManager::GetInstance()->unknown24);
 
     //Update controls count
-    while ( ParaEdit.size() < InstructionMetadata.parameters.size() )
+    while ( ParaEdit.size() < instructionMetadata.parameters.size() )
     {
         const string num =ToString( ParaEdit.size() );
         long id = wxNewId(); //Bitmap buttons want an unique id so as to be displayed properly
@@ -635,7 +635,7 @@ void ChoixAction::RefreshFromAction()
         ParaSpacer1.back()->Show(false);
         ParaSpacer2.back()->Show(false);
     }
-    while ( ParaEdit.size() > InstructionMetadata.parameters.size() )
+    while ( ParaEdit.size() > instructionMetadata.parameters.size() )
     {
     	ParaFac.back()->Destroy();
     	ParaFac.erase(ParaFac.begin()+ParaFac.size()-1);
@@ -652,9 +652,9 @@ void ChoixAction::RefreshFromAction()
     }
 
     //Update parameters
-    for ( unsigned int i = 0;i < InstructionMetadata.parameters.size();i++ )
+    for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ )
     {
-        if (InstructionMetadata.parameters[i].codeOnly)
+        if (instructionMetadata.parameters[i].codeOnly)
         {
             ParaFac.at(i)->Show(false);
             ParaText.at(i)->Show(false);
@@ -663,21 +663,21 @@ void ChoixAction::RefreshFromAction()
         }
         else
         {
-            ParaFac.at(i)->Show(InstructionMetadata.parameters[i].optional);
+            ParaFac.at(i)->Show(instructionMetadata.parameters[i].optional);
             ParaFac.at(i)->SetValue(!ParaEdit.at( i )->GetValue().empty());
 
-            ParaText.at(i)->SetLabel( InstructionMetadata.parameters[i].description + _(" :") );
+            ParaText.at(i)->SetLabel( instructionMetadata.parameters[i].description + _(" :") );
             ParaText.at(i)->Show();
 
             if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
             ParaEdit.at(i)->Show();
 
-            ParaBmpBt.at(i)->SetBitmapLabel( TranslateAction::GetInstance()->BitmapFromType(InstructionMetadata.parameters[i].type) );
-            ParaBmpBt.at(i)->SetToolTip( TranslateAction::GetInstance()->LabelFromType(InstructionMetadata.parameters[i].type) );
-            ParaBmpBt.at(i)->Show( !InstructionMetadata.parameters[i].type.empty() );
+            ParaBmpBt.at(i)->SetBitmapLabel( TranslateAction::GetInstance()->BitmapFromType(instructionMetadata.parameters[i].type) );
+            ParaBmpBt.at(i)->SetToolTip( TranslateAction::GetInstance()->LabelFromType(instructionMetadata.parameters[i].type) );
+            ParaBmpBt.at(i)->Show( !instructionMetadata.parameters[i].type.empty() );
 
             //De/activate widgets if parameter is optional
-            if ( InstructionMetadata.parameters[i].optional && !ParaFac.at(i)->GetValue() && ParaEdit.at(i)->GetValue().empty() )
+            if ( instructionMetadata.parameters[i].optional && !ParaFac.at(i)->GetValue() && ParaEdit.at(i)->GetValue().empty() )
             {
                 ParaBmpBt.at(i)->Enable(false);
                 ParaText.at(i)->Enable(false);
@@ -693,11 +693,11 @@ void ChoixAction::RefreshFromAction()
             }
 
             //Add defaults
-            if ( !InstructionMetadata.parameters[i].optional && (i >= Param.size() || Param[i].GetPlainString().empty())  )
+            if ( !instructionMetadata.parameters[i].optional && (i >= Param.size() || Param[i].GetPlainString().empty())  )
             {
-                if ( InstructionMetadata.parameters[i].type == "expression" ) ParaEdit.at( i )->SetValue("0");
-                else if ( InstructionMetadata.parameters[i].type == "string" ) ParaEdit.at( i )->SetValue("\"\"");
-                else if ( InstructionMetadata.parameters[i].type == "operator" ) ParaEdit.at( i )->SetValue("=");
+                if ( instructionMetadata.parameters[i].type == "expression" ) ParaEdit.at( i )->SetValue("0");
+                else if ( instructionMetadata.parameters[i].type == "string" ) ParaEdit.at( i )->SetValue("\"\"");
+                else if ( instructionMetadata.parameters[i].type == "operator" ) ParaEdit.at( i )->SetValue("=");
             }
 
         }
@@ -723,29 +723,29 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
     unsigned int i = ToInt(num);
 
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
-    const InstructionMetadata & InstructionMetadata = extensionManager->GetActionInfos(Type);
+    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetActionInfos(Type);
 
-    if ( i < MaxPara && i < InstructionMetadata.parameters.size())
+    if ( i < MaxPara && i < instructionMetadata.parameters.size())
     {
-        if ( InstructionMetadata.parameters[i].type == "object" )
+        if ( instructionMetadata.parameters[i].type == "object" )
         {
-            ChooseObject Dialog(this, game, scene, true, InstructionMetadata.parameters[i].supplementaryInformation);
+            ChooseObject Dialog(this, game, scene, true, instructionMetadata.parameters[i].supplementaryInformation);
             if ( Dialog.ShowModal() == 1 )
             {
                 ParaEdit.at(i)->ChangeValue(Dialog.objectChosen);
             }
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "automatism" )
+        else if ( instructionMetadata.parameters[i].type == "automatism" )
         {
             std::string object = ParaEdit.empty() ? "" : ParaEdit[0]->GetValue().mb_str();
-            ChooseAutomatismDlg dialog(this, game, scene, object, InstructionMetadata.parameters[i].supplementaryInformation);
+            ChooseAutomatismDlg dialog(this, game, scene, object, instructionMetadata.parameters[i].supplementaryInformation);
             if ( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.automatismChosen);
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "expression" )
+        else if ( instructionMetadata.parameters[i].type == "expression" )
         {
             EditExpression Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( Dialog.ShowModal() == 1 )
@@ -754,7 +754,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             }
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "string" )
+        else if ( instructionMetadata.parameters[i].type == "string" )
         {
             EditTextDialog Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( Dialog.ShowModal() == 1 )
@@ -763,7 +763,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             }
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "color" )
+        else if ( instructionMetadata.parameters[i].type == "color" )
         {
             wxColour color = wxGetColourFromUser(this, wxColour(0,0,0));
             if ( color.IsOk() )
@@ -776,7 +776,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             }
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "police" )
+        else if ( instructionMetadata.parameters[i].type == "police" )
         {
             wxFileDialog dialog(this, _("Choisissez une police de caractère ( fichiers ttf, ttc )"), "", "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
             dialog.ShowModal();
@@ -788,7 +788,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "musicfile" )
+        else if ( instructionMetadata.parameters[i].type == "musicfile" )
         {
             wxFileDialog dialog(this, _("Choisissez une musique ( fichiers ogg )"), "", "", "Fichiers audio (*.ogg)|*.ogg");
             dialog.ShowModal();
@@ -800,7 +800,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "soundfile" )
+        else if ( instructionMetadata.parameters[i].type == "soundfile" )
         {
             wxFileDialog dialog(this, _("Choisissez un son ( fichiers wav )"), "", "", "Fichiers audio (*.wav)|*.wav");
             dialog.ShowModal();
@@ -812,7 +812,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "operator" )
+        else if ( instructionMetadata.parameters[i].type == "operator" )
         {
             SigneModification dialog(this);
             int retour = dialog.ShowModal();
@@ -830,7 +830,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "password" )
+        else if ( instructionMetadata.parameters[i].type == "password" )
         {
             GeneratePassword dialog(this);
 
@@ -839,7 +839,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "yesorno" )
+        else if ( instructionMetadata.parameters[i].type == "yesorno" )
         {
             if (wxMessageBox("Choisissez Oui ou Non pour compléter ce paramètre :", "Oui ou non",wxYES_NO ) == wxYES)
             {
@@ -852,7 +852,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "layer" )
+        else if ( instructionMetadata.parameters[i].type == "layer" )
         {
             ChooseLayer dialog(this, scene.initialLayers);
             if( dialog.ShowModal() == 1 )
@@ -860,7 +860,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "joyaxis" )
+        else if ( instructionMetadata.parameters[i].type == "joyaxis" )
         {
             ChoiceJoyAxis dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true);
             if( dialog.ShowModal() == 1 )
@@ -868,7 +868,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "file" )
+        else if ( instructionMetadata.parameters[i].type == "file" )
         {
             ChoiceFile dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true);
             if ( dialog.ShowModal() == 1 )
@@ -876,7 +876,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "objectvar" )
+        else if ( instructionMetadata.parameters[i].type == "objectvar" )
         {
             if ( ParaEdit.empty() ) return;
 
@@ -893,23 +893,23 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             else
                 return;
 
-            ChooseVariableDialog dialog(this, object->GetVariables());
+            gd::ChooseVariableDialog dialog(this, object->GetVariables());
             if ( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "scenevar" )
+        else if ( instructionMetadata.parameters[i].type == "scenevar" )
         {
-            ChooseVariableDialog dialog(this, scene.GetVariables());
+            gd::ChooseVariableDialog dialog(this, scene.GetVariables());
             if ( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
 
             return;
         }
-        else if ( InstructionMetadata.parameters[i].type == "globalvar" )
+        else if ( instructionMetadata.parameters[i].type == "globalvar" )
         {
-            ChooseVariableDialog dialog(this, game.GetVariables());
+            gd::ChooseVariableDialog dialog(this, game.GetVariables());
             if ( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
 
@@ -945,12 +945,12 @@ void ChoixAction::OnFacClicked(wxCommandEvent& event)
 void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 {
     GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
-    const InstructionMetadata & InstructionMetadata = extensionManager->GetActionInfos(Type);
+    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetActionInfos(Type);
 
     if ( Type == "" )
         return;
 
-    if (ParaEdit.size() < InstructionMetadata.parameters.size())
+    if (ParaEdit.size() < instructionMetadata.parameters.size())
     {
         wxLogWarning(_("Trop peu de paramètres. Ceci peut être dû à un bug de Game Develop."));
         return;
@@ -960,9 +960,9 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
     bool parametersHaveErrors = false;
     string message;
     size_t parameterDisplayedNb = 0;
-    for ( unsigned int i = 0;i < InstructionMetadata.parameters.size();i++ )
+    for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ )
     {
-        if (!InstructionMetadata.parameters[i].codeOnly ) parameterDisplayedNb++;
+        if (!instructionMetadata.parameters[i].codeOnly ) parameterDisplayedNb++;
 
         //Do not check optional parameters which are desactivated
         if ( !ParaFac.at(i)->IsShown() || (ParaFac.at(i)->IsShown() && ParaFac.at(i)->GetValue()))
@@ -970,12 +970,12 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
             CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
             GDExpressionParser expressionParser(string(ParaEdit.at(i)->GetValue().mb_str())) ;
 
-            if (  (InstructionMetadata.parameters[i].type == "string" && !expressionParser.ParseTextExpression(game, scene, callbacks))
-                ||(InstructionMetadata.parameters[i].type == "file" && !expressionParser.ParseTextExpression(game, scene, callbacks))
-                ||(InstructionMetadata.parameters[i].type == "color" && !expressionParser.ParseTextExpression(game, scene, callbacks))
-                ||(InstructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseTextExpression(game, scene, callbacks))
-                ||(InstructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseTextExpression(game, scene, callbacks))
-                ||(InstructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game, scene, callbacks)))
+            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseTextExpression(game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseTextExpression(game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseTextExpression(game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseTextExpression(game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseTextExpression(game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game, scene, callbacks)))
             {
                 message = expressionParser.firstErrorStr;
 
@@ -998,15 +998,15 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 
     //On ajoute les paramètres
     Param.clear();
-    for ( unsigned int i = 0;i < InstructionMetadata.parameters.size();i++ )
+    for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ )
     {
         //Si un paramètre facultatif est desactivé
         if ( ParaFac.at(i)->IsShown() && !ParaFac.at(i)->GetValue())
         {
-            Param.push_back(GDExpression(""));
+            Param.push_back(gd::Expression(""));
         }
         else
-            Param.push_back(GDExpression(string(ParaEdit.at(i)->GetValue().mb_str())));
+            Param.push_back(gd::Expression(string(ParaEdit.at(i)->GetValue().mb_str())));
     }
 
     if ( LocaliseCheck->GetValue() )
@@ -1024,7 +1024,7 @@ void ChoixAction::OnCancelBtClick(wxCommandEvent& event)
 
 void ChoixAction::OnAideBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(29);
 }
 

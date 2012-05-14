@@ -104,14 +104,14 @@ gd::ExternalEvents * Clipboard::GetExternalEvents()
     return externalEventsCopied->Clone();
 }
 
-void Clipboard::SetConditions( const std::vector<Instruction> & conditions )
+void Clipboard::SetConditions( const std::vector<gd::Instruction> & conditions )
 {
     hasInstructions = true;
     instructionsAreConditions = true;
     instructionsCopied = conditions;
 }
 
-void Clipboard::SetActions( const std::vector<Instruction> & actions )
+void Clipboard::SetActions( const std::vector<gd::Instruction> & actions )
 {
     hasInstructions = true;
     instructionsAreConditions = false;

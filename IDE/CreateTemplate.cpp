@@ -287,38 +287,38 @@ void CreateTemplate::ProcessEvents(vector < gd::BaseEventSPtr > & eventsToProces
     //On remplace dans chaque paramètre des actions et des conditions
     for ( unsigned int i = 0;i < eventsToProcess.size() ;i++ )
     {
-        vector < vector<Instruction>* > allConditionsVectors = eventsToProcess[i]->GetAllConditionsVectors();
+        vector < vector<gd::Instruction>* > allConditionsVectors = eventsToProcess[i]->GetAllConditionsVectors();
         for (unsigned int c = 0;c<allConditionsVectors.size();++c)
         {
             for ( unsigned int nb = 0;nb < allConditionsVectors[c]->size() ;nb++ )
             {
-                vector < GDExpression > parametres = allConditionsVectors[c]->at( nb ).GetParameters();
+                vector < gd::Expression > parametres = allConditionsVectors[c]->at( nb ).GetParameters();
                 for ( unsigned int j = 0;j < parametres.size() ;j++ )
                 {
                     //On respecte bien l'ordre, du plus grand au plus petit
                     for ( unsigned int k = 0; k < parameters.size() ;k++ )
                     {
                         string ReplaceBy = "_PARAM" +ToString( parameters.at( k ).second ) + "_";
-                        parametres.at( j ) = GDExpression( ConvertParam( parametres.at( j ).GetPlainString(), parameters.at( k ).first, ReplaceBy ) );
+                        parametres.at( j ) = gd::Expression( ConvertParam( parametres.at( j ).GetPlainString(), parameters.at( k ).first, ReplaceBy ) );
                     }
                 }
                 allConditionsVectors[c]->at( nb ).SetParameters(parametres);
             }
         }
 
-        vector < vector<Instruction>* > allActionsVectors = eventsToProcess[i]->GetAllActionsVectors();
+        vector < vector<gd::Instruction>* > allActionsVectors = eventsToProcess[i]->GetAllActionsVectors();
         for (unsigned int a = 0;a<allActionsVectors.size();++a)
         {
             for ( unsigned int nb = 0;nb < allActionsVectors[a]->size() ;nb++ )
             {
-                vector < GDExpression > parametres = allActionsVectors[a]->at( nb ).GetParameters();
+                vector < gd::Expression > parametres = allActionsVectors[a]->at( nb ).GetParameters();
                 for ( unsigned int j = 0;j < parametres.size() ;j++ )
                 {
                     //On respecte bien l'ordre, du plus grand au plus petit
                     for ( unsigned int k = 0; k < parameters.size() ;k++ )
                     {
                         string ReplaceBy = "_PARAM" +ToString( parameters.at( k ).second ) + "_";
-                        parametres.at( j ) = GDExpression( ConvertParam( parametres.at( j ).GetPlainString(), parameters.at( k ).first, ReplaceBy ) );
+                        parametres.at( j ) = gd::Expression( ConvertParam( parametres.at( j ).GetPlainString(), parameters.at( k ).first, ReplaceBy ) );
                     }
                 }
                 allActionsVectors[a]->at( nb ).SetParameters(parametres);
@@ -349,7 +349,7 @@ string CreateTemplate::ConvertParam( string Parametre, string ToReplace, string 
 
 void CreateTemplate::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(151);
 }
 

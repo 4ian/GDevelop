@@ -286,7 +286,7 @@ void StartHerePage::Onrecent9BtClick(wxCommandEvent& event)
 
 void StartHerePage::OnguideBtClick(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(16);
 }
 

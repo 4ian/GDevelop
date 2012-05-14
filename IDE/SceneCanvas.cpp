@@ -395,7 +395,7 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 
 void SceneCanvas::OnHelpBtClick( wxCommandEvent & event )
 {
-    HelpFileAccess::GetInstance()->DisplaySection(12);
+    gd::HelpFileAccess::GetInstance()->DisplaySection(12);
 }
 
 void SceneCanvas::OnLayersEditor( wxCommandEvent & event )

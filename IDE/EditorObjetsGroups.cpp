@@ -323,7 +323,7 @@ void EditorObjetsGroups::DisableAll()
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnHelp(wxCommandEvent& event)
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(180);
 }
 

@@ -504,7 +504,7 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
 
 void EditPropJeu::OnAideBtClick( wxCommandEvent& event )
 {
-    HelpFileAccess * helpFileAccess = HelpFileAccess::GetInstance();
+    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
     helpFileAccess->DisplaySection(8);
 }
 

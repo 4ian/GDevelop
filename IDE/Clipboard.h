@@ -39,12 +39,12 @@ public:
     gd::ExternalEvents * GetExternalEvents();
     bool HasExternalEvents() { return hasExternalEvents; };
 
-    void SetConditions( const std::vector<Instruction> & conditions );
-    void SetActions( const std::vector<Instruction> & actions );
+    void SetConditions( const std::vector<gd::Instruction> & conditions );
+    void SetActions( const std::vector<gd::Instruction> & actions );
 
     bool HasCondition() { return hasInstructions && instructionsAreConditions; };
     bool HasAction() { return hasInstructions && !instructionsAreConditions; };
-    std::vector<Instruction> GetInstructions() const { return instructionsCopied; };
+    std::vector<gd::Instruction> GetInstructions() const { return instructionsCopied; };
 
     void SetObjectGroup( const gd::ObjectGroup & group );
     gd::ObjectGroup GetObjectGroup();
@@ -64,7 +64,7 @@ private:
     std::vector<gd::BaseEventSPtr> eventsCopied;
     bool hasEvents;
 
-    std::vector<Instruction> instructionsCopied;
+    std::vector<gd::Instruction> instructionsCopied;
     bool hasInstructions;
     bool instructionsAreConditions;
 

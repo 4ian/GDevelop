@@ -23,10 +23,9 @@
 #include "GDL/SceneNameMangler.h"
 #include "GDL/Game.h"
 #include "GDL/RuntimeGame.h"
-#include "GDL/EventsExecutionEngine.h"
+#include "GDL/CodeExecutionEngine.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionsLoader.h"
-#include "GDL/DynamicExtensionsManager.h"
 #include "CompilationChecker.h"
 #include "GDL/Log.h"
 #include "GDL/AES.h"
@@ -38,6 +37,7 @@
 using namespace std;
 
 std::string GetCurrentWorkingDirectory();
+bool LoadSceneAndDependenciesBitCodeToExecutionEngine(Scene & scene);
 
 int main( int argc, char *p_argv[] )
 {
@@ -67,13 +67,10 @@ int main( int argc, char *p_argv[] )
     extensionsLoader->SetExtensionsDir("./");
     extensionsLoader->LoadAllStaticExtensionsAvailable();
 
-    #if !defined(GD_NO_DYNAMIC_EXTENSIONS)
-    GDpriv::DynamicExtensionsManager::GetInstance()->LoadDynamicExtension("dynext.dxgd");
-    #endif
-
-    //Load game
-    RessourcesLoader * exeGD = RessourcesLoader::GetInstance();
-    if ( !exeGD->SetExeGD( executablePath+"/"+executableFilename.substr(0, executableFilename.length()-4)+".egd" ) && !exeGD->SetExeGD( executablePath+"/gam.egd" ) )
+    //Load resource file
+    RessourcesLoader * resLoader = RessourcesLoader::GetInstance();
+    if ( !resLoader->SetResourceFile( executablePath+"/"+executableFilename.substr(0, executableFilename.length()-4)+".egd" )
+           && !resLoader->SetResourceFile( executablePath+"/gam.egd" ) )
     {
         std::cout << "Failed to properly load executable." << std::endl;
         return EXIT_FAILURE;
@@ -83,7 +80,7 @@ int main( int argc, char *p_argv[] )
 
     //Display optional loading screen
     OpenSaveLoadingScreen openLS(game.loadingScreen);
-    openLS.OpenFromString(exeGD->LoadPlainText( "loadingscreen" ));
+    openLS.OpenFromString(resLoader->LoadPlainText( "loadingscreen" ));
 
     unsigned long style = 0;
     if ( game.loadingScreen.border ) style |= sf::Style::Titlebar;
@@ -91,7 +88,7 @@ int main( int argc, char *p_argv[] )
     loadingApp.Show(game.loadingScreen.afficher);
     loadingApp.Clear( sf::Color( 100, 100, 100 ) );
 
-    boost::shared_ptr<sf::Texture> image = boost::shared_ptr<sf::Texture>(exeGD->LoadSFMLTexture( game.loadingScreen.imageFichier ));
+    boost::shared_ptr<sf::Texture> image = boost::shared_ptr<sf::Texture>(resLoader->LoadSFMLTexture( game.loadingScreen.imageFichier ));
     if ( !game.loadingScreen.smooth ) image->SetSmooth(false);
 
     sf::Sprite sprite( *image );
@@ -110,13 +107,13 @@ int main( int argc, char *p_argv[] )
     OpenSaveGame openGame( game );
     {
         cout << "Getting src file size..." << endl;
-        int fsize = exeGD->GetBinaryFileSize( "src" );
+        int fsize = resLoader->GetBinaryFileSize( "src" );
 
         // round up (ignore pad for here)
         int size = (fsize+15)&(~15);
 
         cout << "Getting src raw data..." << endl;
-        char * ibuffer = exeGD->LoadBinaryFile( "src" );
+        char * ibuffer = resLoader->LoadBinaryFile( "src" );
         char * obuffer = new char[size];
 
         AES crypt;
@@ -134,7 +131,7 @@ int main( int argc, char *p_argv[] )
         openGame.OpenFromString(uncryptedSrc);
 	}
 
-    if ( game.scenes.empty() )
+    if ( game.GetLayouts().empty() )
     {
         std::cout << "No scene to be loaded." << std::endl;
         return EXIT_FAILURE;
@@ -142,15 +139,14 @@ int main( int argc, char *p_argv[] )
 
     //LLVM stuff
     cout << "Initializing LLVM/Clang..." << endl;
-    EventsExecutionEngine::EnsureLLVMTargetsInitialization();
+    CodeExecutionEngine::EnsureLLVMTargetsInitialization();
     cout << "Loading required dynamic libraries..." << endl;
-    EventsExecutionEngine::LoadDynamicLibraries();
+    CodeExecutionEngine::LoadDynamicLibraries();
 
     //Loading first scene bitcode
-    if ( !game.scenes[0]->compiledEventsExecutionEngine->LoadFromLLVMBitCode(exeGD->LoadBinaryFile( "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[0]->GetName())+".ir" ),
-                                                                             exeGD->GetBinaryFileSize( "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[0]->GetName())+".ir" )) )
+    if ( !LoadSceneAndDependenciesBitCodeToExecutionEngine(*game.GetLayouts()[0]) )
     {
-        std::cout << "Unable to load bitcode from " << "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[0]->GetName())+".ir" << std::endl;
+        std::cout << "Unable to setup execution engine for first scene." << std::endl;
         return EXIT_FAILURE;
     }
 
@@ -172,14 +168,14 @@ int main( int argc, char *p_argv[] )
 
     //Fenêtre de jeu
     sf::RenderWindow window;
-    window.SetFramerateLimit( game.maxFPS );
-    window.EnableVerticalSync( game.verticalSync );
+    window.SetFramerateLimit( game.GetMaximumFPS() );
+    window.EnableVerticalSync( game.IsVerticalSynchronizationEnabledByDefault() );
 
     RuntimeScene scenePlayed(&window, &game);
-    if ( !scenePlayed.LoadFromScene( *game.scenes[0] ) )
+    if ( !scenePlayed.LoadFromScene( *game.GetLayouts()[0] ) )
         std::cout << "Unable to load first scene." << std::endl;
 
-    window.Create( sf::VideoMode( game.windowWidth, game.windowHeight, 32 ), scenePlayed.title, sf::Style::Close );
+    window.Create( sf::VideoMode( game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32 ), scenePlayed.GetWindowDefaultTitle(), sf::Style::Close );
     window.SetActive(true);
 
     glEnable(GL_DEPTH_TEST);
@@ -204,15 +200,13 @@ int main( int argc, char *p_argv[] )
             RuntimeScene newScenePlayed(&window, &game);
             scenePlayed = newScenePlayed; //Clear the scene
 
-            if ( !game.scenes[returnCode]->compiledEventsExecutionEngine->Ready() &&
-                 !game.scenes[returnCode]->compiledEventsExecutionEngine->LoadFromLLVMBitCode(exeGD->LoadBinaryFile( "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[returnCode]->GetName())+".ir" ),
-                                                                                              exeGD->GetBinaryFileSize( "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[returnCode]->GetName())+".ir" )) )
+            if ( !LoadSceneAndDependenciesBitCodeToExecutionEngine(*game.GetLayouts()[returnCode]) )
             {
-                std::cout << "Unable to load bitcode from " << "GDpriv"+SceneNameMangler::GetMangledSceneName(game.scenes[returnCode]->GetName())+".ir" << std::endl;
+                std::cout << "Unable to setup execution engine for new scene.";
                 return EXIT_FAILURE;
             }
 
-            if ( !scenePlayed.LoadFromScene( *game.scenes[returnCode] ) )
+            if ( !scenePlayed.LoadFromScene( *game.GetLayouts()[returnCode] ) )
                 std::cout << "Scene loading failed!" << std::endl;
         }
     }
@@ -223,6 +217,57 @@ int main( int argc, char *p_argv[] )
     fontManager->DestroySingleton();
 
     return EXIT_SUCCESS;
+}
+
+/**
+ * Load the bitcode of a scene and its dependencies from resources and
+ * setup the execution engine with them.
+ */
+bool LoadSceneAndDependenciesBitCodeToExecutionEngine(Scene & scene)
+{
+    if ( scene.codeExecutionEngine->Ready() ) return true;
+
+    RessourcesLoader * resLoader = RessourcesLoader::GetInstance();
+    if ( !resLoader->HasFile("GDpriv"+SceneNameMangler::GetMangledSceneName(scene.GetName())+".ir") )
+    {
+        std::cout << "Unable to find GDpriv"+SceneNameMangler::GetMangledSceneName(scene.GetName())+".ir" << std::endl;
+        std::cout << "Scene execution engine setup failed for scene " << scene.GetName() << std::endl;
+        return false;
+    }
+
+    std::vector<char*> buffers;
+    std::vector< std::pair<const char * /*src*/, unsigned int /*size*/> > data; //Keep track of buffers and their size
+
+    unsigned int size = resLoader->GetBinaryFileSize( "GDpriv"+SceneNameMangler::GetMangledSceneName(scene.GetName())+".ir" );
+
+    buffers.push_back(new char[size]);
+    memcpy(buffers.back(), resLoader->LoadBinaryFile( "GDpriv"+SceneNameMangler::GetMangledSceneName(scene.GetName())+".ir" ), size);
+    data.push_back(std::make_pair(buffers.back(), size));
+
+    for (unsigned int i = 0;i<scene.externalSourcesDependList.size();++i)
+    {
+        if ( !resLoader->HasFile(scene.externalSourcesDependList[i]) )
+        {
+            std::cout << "Unable to find "+scene.externalSourcesDependList[i] << std::endl;
+            std::cout << "Scene execution engine setup failed for scene " << scene.GetName() << std::endl;
+            return false;
+        }
+
+        unsigned int size = resLoader->GetBinaryFileSize( scene.externalSourcesDependList[i] );
+
+        buffers.push_back(new char[size]);
+        memcpy(buffers.back(), resLoader->LoadBinaryFile(scene.externalSourcesDependList[i]), size);
+        data.push_back(std::make_pair(buffers.back(), size));
+
+    }
+
+    if (!scene.codeExecutionEngine->LoadFromLLVMBitCode(data))
+    {
+        std::cout << "Bitcode loading failed for scene " << scene.GetName() << std::endl;
+        return false;
+    }
+
+    return true;
 }
 
 /**

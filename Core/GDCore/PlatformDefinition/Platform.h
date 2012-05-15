@@ -8,6 +8,7 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <string>
+namespace gd { class InstructionsMetadataHolder; }
 
 namespace gd
 {
@@ -17,6 +18,8 @@ class PlatformExtension;
  * \brief Base class for implementing a platform
  *
  * \todo Current implementation status: Used in some part of the IDE: Currently, the IDE automatically create the Platform class of the GD C++ Platform when it is need.
+ *
+ * \ingroup PlatformDefinition
  */
 class GD_CORE_API Platform
 {
@@ -24,6 +27,9 @@ public:
     Platform();
     virtual ~Platform();
 
+    /**
+     * Must return the platform name
+     */
     virtual std::string GetPlatformName() { return "Unnamed platform"; }
 
     /**
@@ -40,6 +46,12 @@ public:
      * \see PlatformExtension
      */
     virtual boost::shared_ptr<PlatformExtension> GetExtension(const std::string & name) const =0;
+
+    /**
+     * Must return a reference to the InstructionsMetadataHolder of the platform
+     * \see gd::InstructionsMetadataHolder
+     */
+    virtual gd::InstructionsMetadataHolder & GetInstructionsMetadataHolder() const = 0;
 
 private:
 };

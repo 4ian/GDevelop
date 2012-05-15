@@ -21,6 +21,8 @@ namespace gd
  * \brief Base class for implementing platform's extensions.
  *
  * \todo Current implementation status: Used in some part of the IDE: Currently, the IDE automatically create the PlatformExtension classes of the GD C++ Platform when it is need.
+ *
+ * \ingroup PlatformDefinition
  */
 class GD_CORE_API PlatformExtension
 {

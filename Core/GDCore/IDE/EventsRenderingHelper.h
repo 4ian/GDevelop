@@ -3,7 +3,6 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
 #ifndef EventsRenderingHelper_H
 #define EventsRenderingHelper_H
 #include <wx/dc.h>
@@ -16,12 +15,16 @@ class EventsEditorItemsAreas;
 class EventsEditorSelection;
 namespace gd { class InstructionMetadata;}
 namespace gd {class InstructionsMetadataHolder;}
+
+namespace gd
+{
+
 /**
 
- * \brief Provides tools to draw events.
+ * \brief Provides tools to draw events using wxWidgets toolkit.
  *
  * Class providing default colors, fonts and drawing functions so as to
- * render events.
+ * render events using wxWidgets toolkit.
  *
  * \ingroup IDE
  */
@@ -31,11 +34,44 @@ class GD_CORE_API EventsRenderingHelper
         static EventsRenderingHelper * GetInstance();
         static void DestroySingleton();
 
+        /**
+         * Draw a nice rectangle, often used as conditions background, on a wxDC.
+         */
         void DrawNiceRectangle(wxDC & dc, const wxRect & rect) const;
 
+        /**
+         * \brief Draw the specified condition list
+         * \param conditions Conditions to be rendered
+         * \param dc wxWidgets DC to be used
+         * \param x x position of the drawing
+         * \param y y position of the drawing
+         * \param width Width available for the drawing
+         * \param event Event owning the condition list
+         * \param areas EventsEditorItemsAreas object when drawn areas will be registered
+         * \param selection EventsEditorSelection object providing information about selection
+         * \param metadataHolder gd::InstructionsMetadataHolder object providing metadata about the conditions
+         * \return Height used for the drawing
+         */
         int DrawConditionsList(std::vector < gd::Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
+
+        /**
+         * \brief Draw the specified action list
+         * \see gd::EventsRenderingHelper::DrawConditionsList
+         */
         int DrawActionsList(std::vector < gd::Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
+
+        /**
+         * \brief Get the height taken by drawing a condition list
+         * \param conditions Conditions to be rendered
+         * \param width Width available for the drawing
+         * \param metadataHolder gd::InstructionsMetadataHolder object providing metadata about the conditions
+         * \return Height used for the drawing
+         */
         unsigned int GetRenderedConditionsListHeight(const std::vector < gd::Instruction > & conditions, int width, gd::InstructionsMetadataHolder & metadataHolder);
+        /**
+         * \brief Get the height taken by drawing a condition list
+         * \see gd::EventsRenderingHelper::GetRenderedConditionsListHeight
+         */
         unsigned int GetRenderedActionsListHeight(const std::vector < gd::Instruction > & actions, int width, gd::InstructionsMetadataHolder & metadataHolder);
 
         inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
@@ -52,7 +88,20 @@ class GD_CORE_API EventsRenderingHelper
          */
         unsigned int GetTextHeightInArea(const std::string & text, unsigned int widthAvailable);
 
-        int DrawInstruction(gd::Instruction & instruction, const gd::InstructionMetadata & InstructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+        /**
+         * Draw a specific instruction
+         * \param instruction Instruction to be rendered
+         * \param instructionMetadata Instruction metadata
+         * \param isCondition true if the instruction is a condition
+         * \param dc The wxWidgets DC to be used for rendering
+         * \param point The drawing position
+         * \param freeWidth Width available
+         * \param event Event owning the condition list
+         * \param areas EventsEditorItemsAreas object when drawn areas will be registered
+         * \param selection EventsEditorSelection object providing information about selection
+         * \return Height used for the drawing
+         */
+        int DrawInstruction(gd::Instruction & instruction, const gd::InstructionMetadata & instructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 
         /**
          * Change font. Only use a fixed width font.
@@ -146,5 +195,6 @@ class GD_CORE_API EventsRenderingHelper
         wxBitmap fakeBmp;
 };
 
+}
+
 #endif // EventsRenderingHelper_H
-#endif

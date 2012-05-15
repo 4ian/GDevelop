@@ -23,6 +23,8 @@ namespace gd
  * \note This class is fully implemented in GDCore: There is no needed to make a custom class inheriting from it.
  *
  * \see gd::GroupHasTheSameName
+ *
+ * \ingroup PlatformDefinition
  */
 class GD_CORE_API ObjectGroup
 {

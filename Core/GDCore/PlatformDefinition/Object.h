@@ -15,6 +15,8 @@ namespace gd
 
 /**
  * \brief Base class used to represent an object of a platform
+ *
+ * \ingroup PlatformDefinition
  */
 class Object
 {

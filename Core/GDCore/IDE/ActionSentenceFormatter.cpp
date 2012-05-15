@@ -21,16 +21,18 @@
 #include <map>
 
 using namespace std;
-using namespace gd;
 
-TranslateAction *TranslateAction::_singleton = NULL;
+namespace gd
+{
+
+ActionSentenceFormatter *ActionSentenceFormatter::_singleton = NULL;
 
 ////////////////////////////////////////////////////////////
 /// Traduction complète
 ///
 /// Traduction en une phrase complète d'une action et ses paramètres
 ////////////////////////////////////////////////////////////
-string TranslateAction::Translate(const Instruction & action, const gd::InstructionMetadata & infos)
+string ActionSentenceFormatter::Translate(const gd::Instruction & action, const gd::InstructionMetadata & infos)
 {
     std::string trad = infos.sentence;
 
@@ -55,9 +57,9 @@ string TranslateAction::Translate(const Instruction & action, const gd::Instruct
 /**
  * Create a formatted sentence from an action
  */
-std::vector< std::pair<std::string, TextFormatting> > TranslateAction::GetAsFormattedText(const Instruction & action, const gd::InstructionMetadata & infos)
+std::vector< std::pair<std::string, gd::TextFormatting> > ActionSentenceFormatter::GetAsFormattedText(const Instruction & action, const gd::InstructionMetadata & infos)
 {
-    std::vector< std::pair<std::string, TextFormatting> > formattedStr;
+    std::vector< std::pair<std::string, gd::TextFormatting> > formattedStr;
 
     std::string sentence = infos.sentence;
     std::replace( sentence.begin(), sentence.end(), '\n', ' ');
@@ -110,14 +112,14 @@ std::vector< std::pair<std::string, TextFormatting> > TranslateAction::GetAsForm
     return formattedStr;
 }
 
-TextFormatting TranslateAction::GetFormattingFromType(const std::string & type)
+TextFormatting ActionSentenceFormatter::GetFormattingFromType(const std::string & type)
 {
     TextFormatting format;
 
     return typesFormatting[type];
 }
 
-void TranslateAction::LoadTypesFormattingFromConfig()
+void ActionSentenceFormatter::LoadTypesFormattingFromConfig()
 {
     wxConfigBase * config = wxConfigBase::Get();
 
@@ -160,7 +162,7 @@ void TranslateAction::LoadTypesFormattingFromConfig()
     }
 }
 
-void TranslateAction::SaveTypesFormattingToConfig()
+void ActionSentenceFormatter::SaveTypesFormattingToConfig()
 {
     wxConfigBase * config = wxConfigBase::Get();
 
@@ -175,7 +177,7 @@ void TranslateAction::SaveTypesFormattingToConfig()
 ////////////////////////////////////////////////////////////
 /// Renvoi le nom du bouton en fonction du type
 ////////////////////////////////////////////////////////////
-string TranslateAction::LabelFromType(const std::string & type)
+string ActionSentenceFormatter::LabelFromType(const std::string & type)
 {
     if ( type == "" )
         return "";
@@ -220,9 +222,9 @@ string TranslateAction::LabelFromType(const std::string & type)
 ////////////////////////////////////////////////////////////
 /// Renvoi le bitmap du bouton en fonction du type
 ////////////////////////////////////////////////////////////
-wxBitmap TranslateAction::BitmapFromType(const std::string & type)
+wxBitmap ActionSentenceFormatter::BitmapFromType(const std::string & type)
 {
-    CommonBitmapManager * CommonBitmapManager = CommonBitmapManager::GetInstance();
+    gd::CommonBitmapManager * CommonBitmapManager = gd::CommonBitmapManager::GetInstance();
 
     if ( type == "" )
         return CommonBitmapManager->unknownBt;
@@ -262,6 +264,9 @@ wxBitmap TranslateAction::BitmapFromType(const std::string & type)
         return CommonBitmapManager->varBt;
 
     return CommonBitmapManager->unknownBt;
+}
+
+
 }
 
 #endif

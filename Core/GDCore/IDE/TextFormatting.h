@@ -3,15 +3,18 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
-
 #ifndef TEXTFORMATTING_H
 #define TEXTFORMATTING_H
 #include <wx/colour.h>
 #include <string>
 
+namespace gd
+{
+
 /**
- * \brief Lightweight class used to define information about how to render a text
+ * \brief Internal class used by gd::EventsRenderingHelper
+ *
+ * Lightweight internal class used to define information about how to render a text
  * Currently used by EventsRenderingHelper to render Instruction.
  *
  * \see EventsRenderingHelper
@@ -30,6 +33,7 @@ public:
     ~TextFormatting() {}
 };
 
-#endif // TEXTFORMATTING_H
 
-#endif
+}
+
+#endif // TEXTFORMATTING_H

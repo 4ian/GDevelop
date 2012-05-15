@@ -169,8 +169,11 @@
 		<Unit filename="GDCore\DocMainPage.h" />
 		<Unit filename="GDCore\Events\Event.cpp" />
 		<Unit filename="GDCore\Events\Event.h" />
+		<Unit filename="GDCore\Events\Expression.h" />
 		<Unit filename="GDCore\Events\ExpressionMetadata.cpp" />
 		<Unit filename="GDCore\Events\ExpressionMetadata.h" />
+		<Unit filename="GDCore\Events\ExpressionParser.cpp" />
+		<Unit filename="GDCore\Events\ExpressionParser.h" />
 		<Unit filename="GDCore\Events\GDExpression.h" />
 		<Unit filename="GDCore\Events\Instruction.cpp" />
 		<Unit filename="GDCore\Events\Instruction.h" />
@@ -192,6 +195,10 @@
 		<Unit filename="GDCore\IDE\EventsEditorSelection.h" />
 		<Unit filename="GDCore\IDE\EventsRenderingHelper.cpp" />
 		<Unit filename="GDCore\IDE\EventsRenderingHelper.h" />
+		<Unit filename="GDCore\IDE\EventsVariablesFinder.cpp" />
+		<Unit filename="GDCore\IDE\EventsVariablesFinder.h" />
+		<Unit filename="GDCore\IDE\ImagesUsedInventorizer.cpp" />
+		<Unit filename="GDCore\IDE\ImagesUsedInventorizer.h" />
 		<Unit filename="GDCore\IDE\ResourcesMergingHelper.cpp" />
 		<Unit filename="GDCore\IDE\ResourcesMergingHelper.h" />
 		<Unit filename="GDCore\IDE\ResourcesUnmergingHelper.cpp" />

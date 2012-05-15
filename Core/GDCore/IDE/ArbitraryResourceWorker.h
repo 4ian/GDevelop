@@ -23,6 +23,10 @@ namespace gd
  * \see ResourcesMergingHelper
  * \see gd::ResourcesUnmergingHelper
  * \see ImagesUsedInventorizer
+ *
+ * \see gd::LaunchResourceWorkerOnEvents
+ *
+ * \ingroup IDE
  */
 class GD_CORE_API ArbitraryResourceWorker
 {
@@ -37,8 +41,11 @@ public:
 };
 
 /**
- * Iterate over each event and call Expose(Actions/Conditions)Resources for each
+ * Tool function iterating over each event and calling Expose(Actions/Conditions)Resources for each
  * actions and conditions with the ArbitraryResourceWorker passed as argument.
+ *
+ * \see gd::ArbitraryResourceWorker
+ * \ingroup IDE
  */
 void GD_CORE_API LaunchResourceWorkerOnEvents(const gd::Project & project, std::vector < boost::shared_ptr<gd::BaseEvent> > & events, gd::ArbitraryResourceWorker & worker);
 

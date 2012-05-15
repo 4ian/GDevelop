@@ -3,7 +3,6 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
 #include "EventsRenderingHelper.h"
 #include <utility>
 #include <vector>
@@ -18,6 +17,11 @@
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/Events/Event.h"
+
+using namespace std;
+
+namespace gd
+{
 
 EventsRenderingHelper * EventsRenderingHelper::singleton = NULL;
 
@@ -112,7 +116,6 @@ conditionsRectangleFill(wxBrush(wxColour(252,252,255))),
 niceFont(wxFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL))
 {
     fakeBmp.Create(10,10,-1);
-    //SetFont(wxFont(10, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Arial"));
     #if defined(WINDOWS)
     SetFont(wxFont(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas"));
     #else
@@ -181,7 +184,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = TranslateCondition::Translate(conditions[j], InstructionMetadata);
+            std::string text = ConditionSentenceFormatter::Translate(conditions[j], InstructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
@@ -191,7 +194,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = TranslateCondition::Translate(conditions[j], InstructionMetadata);
+            std::string text = ConditionSentenceFormatter::Translate(conditions[j], InstructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(highlightRectangleOutline);
@@ -276,7 +279,7 @@ int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions,
         int height = 0;
         if ( selection.InstructionSelected(accessor) )
         {
-            std::string text = TranslateAction::GetInstance()->Translate(actions[j], instructionMetadata);
+            std::string text = ActionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(selectionRectangleOutline);
@@ -286,7 +289,7 @@ int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions,
         }
         else if ( selection.InstructionHighlighted(accessor) )
         {
-            std::string text = TranslateAction::GetInstance()->Translate(actions[j], instructionMetadata);
+            std::string text = ActionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata);
             height = GetTextHeightInArea(text, freeWidth);
 
             dc.SetPen(highlightRectangleOutline);
@@ -338,7 +341,7 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
         int freeWidth = width - leftIconsWidth;
         freeWidth = freeWidth <= 0 ? 1 : freeWidth;
 
-        int height = GetTextHeightInArea(TranslateCondition::Translate(conditions[j], instructionMetadata), freeWidth);
+        int height = GetTextHeightInArea(ConditionSentenceFormatter::Translate(conditions[j], instructionMetadata), freeWidth);
         y += height;
 
         //Sub conditions
@@ -370,7 +373,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
         int freeWidth = width - iconWidth;
         freeWidth = freeWidth <= 0 ? 1 : freeWidth;
 
-        int height = GetTextHeightInArea(TranslateAction::GetInstance()->Translate(actions[j], instructionMetadata), freeWidth);
+        int height = GetTextHeightInArea(ActionSentenceFormatter::GetInstance()->Translate(actions[j], instructionMetadata), freeWidth);
         y+=height;
 
         //Draw sub actions
@@ -383,8 +386,8 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
 
 int EventsRenderingHelper::DrawInstruction(gd::Instruction & instruction, const gd::InstructionMetadata & instructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
-    std::vector< std::pair<std::string, TextFormatting > > formattedStr = isCondition ? TranslateCondition::GetAsFormattedText(instruction, instructionMetadata) :
-                                                                                        TranslateAction::GetInstance()->GetAsFormattedText(instruction, instructionMetadata);
+    std::vector< std::pair<std::string, TextFormatting > > formattedStr = isCondition ? ConditionSentenceFormatter::GetAsFormattedText(instruction, instructionMetadata) :
+                                                                                        ActionSentenceFormatter::GetInstance()->GetAsFormattedText(instruction, instructionMetadata);
 
     wxPoint lastPos = point;
     //size_t alreadyWrittenCharCount = 0;
@@ -450,23 +453,6 @@ void EventsRenderingHelper::DrawNiceRectangle(wxDC & dc, const wxRect & rect) co
     dc.DrawLines(sizeof(border_points)/sizeof(wxPoint), border_points, rect.x, rect.y);
 }
 
-EventsRenderingHelper * EventsRenderingHelper::GetInstance()
-{
-    if ( NULL == singleton )
-        singleton = new EventsRenderingHelper;
-
-    return singleton;
-}
-
-void EventsRenderingHelper::DestroySingleton()
-{
-    if ( NULL != singleton )
-    {
-        delete singleton;
-        singleton = NULL;
-    }
-}
-
 std::string EventsRenderingHelper::GetHTMLText(std::string str)
 {
     size_t pos = 0;
@@ -488,4 +474,21 @@ std::string EventsRenderingHelper::GetHTMLText(std::string str)
     return str;
 }
 
-#endif
+EventsRenderingHelper * EventsRenderingHelper::GetInstance()
+{
+    if ( NULL == singleton )
+        singleton = new EventsRenderingHelper;
+
+    return singleton;
+}
+
+void EventsRenderingHelper::DestroySingleton()
+{
+    if ( NULL != singleton )
+    {
+        delete singleton;
+        singleton = NULL;
+    }
+}
+
+}

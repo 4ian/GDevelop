@@ -17,6 +17,8 @@
 #include <wx/dialog.h>
 //*)
 namespace gd { class VariablesContainer; }
+namespace gd { class Project; }
+namespace gd { class Layout; }
 #include <wx/toolbar.h>
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -25,8 +27,10 @@ namespace gd
 {
 
 /**
- * \brief Dialog used to display variables of a gd::VariablesContainer and choose one.
- * Can also be used as an editor.
+ * \brief Dialog used to display variables of a gd::VariablesContainer, edit them and/or choose one.
+ *
+ * Also offer a nice feature to scan the associated project/layout for undeclared variables.<br>
+ * The dialog can be used as an editor only, see the constructor.
  *
  * \ingroup IDEDialogs
  */
@@ -42,6 +46,19 @@ public:
      * \param editingOnly If set to true, the dialog will act as a dialog to edit the variables and not to choose one ( Double click won't close the dialog for example ).
      */
     ChooseVariableDialog(wxWindow* parent, gd::VariablesContainer & variablesContainer, bool editingOnly=false);
+
+    /**
+     * Specify an optional associated project
+     * \param project Associated project. If different from NULL, global variables from this project will be scanned when searching for undeclared variables
+     */
+    void SetAssociatedProject(const gd::Project * project);
+
+    /**
+     * Specify an optional associated layout
+     * \param project Associated project.
+     * \param project Associated layout. If different from NULL, layout variables from this layout will be scanned when searching for undeclared variables
+     */
+    void SetAssociatedLayout(const gd::Project * project, const gd::Layout * layout);
 
     /**
      * Destructor
@@ -87,6 +104,7 @@ protected:
     static const long idRenameVar;
     static const long idMoveDownVar;
     static const long ID_Help;
+    static const long idFindUndeclared;
 
 private:
 
@@ -98,6 +116,8 @@ private:
     void OnvariablesListItemActivated(wxListEvent& event);
     void OnvariablesListItemSelect(wxListEvent& event);
     void OnvariablesListKeyDown(wxListEvent& event);
+    void OnvariablesListEndLabelEdit(wxListEvent& event);
+    void OnvariablesListBeginLabelEdit(wxListEvent& event);
     //*)
     void OnAddVarSelected(wxCommandEvent& event);
     void OnDelVarSelected(wxCommandEvent& event);
@@ -105,11 +125,16 @@ private:
     void OnRenameVarSelected(wxCommandEvent& event);
     void OnMoveUpVarSelected(wxCommandEvent& event);
     void OnMoveDownVarSelected(wxCommandEvent& event);
+    void OnFindUndeclaredSelected(wxCommandEvent& event);
     void Refresh();
 
     gd::VariablesContainer & variablesContainer; ///< gd::VariablesContainer storing the variables
     boost::shared_ptr<gd::VariablesContainer> temporaryContainer; ///< Temporary container used to allow to make temporary changes before applying them to the real variables container if Ok is pressed.
     bool editingOnly; ///< If set to true, the dialog will act as a dialog to edit the variables and not to choose one ( Double click won't close the dialog for example ).
+    const gd::Project * associatedProject;
+    const gd::Layout * associatedLayout;
+
+    std::string oldName; ///< Used to remember the variable old name when renaming
 
     DECLARE_EVENT_TABLE()
 };

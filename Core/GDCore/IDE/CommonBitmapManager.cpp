@@ -3,8 +3,6 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
-
 #include "CommonBitmapManager.h"
 #include <wx/bitmap.h>
 #include <wx/wx.h>
@@ -13,8 +11,10 @@
 #include <wx/dcmemory.h>
 #include <string>
 
-
 using namespace std;
+
+namespace gd
+{
 
 CommonBitmapManager *CommonBitmapManager::_singleton = NULL;
 
@@ -50,4 +50,5 @@ CommonBitmapManager::CommonBitmapManager()
     unknown24.LoadFile("res/unknown24.png", wxBITMAP_TYPE_ANY);
     semitransparentHitBox.LoadFile("res/semitransparentHitBox.png", wxBITMAP_TYPE_ANY);
 }
-#endif
+
+}

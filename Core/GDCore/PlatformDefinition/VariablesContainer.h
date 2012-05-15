@@ -18,6 +18,8 @@ namespace gd
  * \see gd::Project
  * \see gd::Layout
  * \see gd::Object
+ *
+ * \ingroup PlatformDefinition
  */
 class VariablesContainer
 {

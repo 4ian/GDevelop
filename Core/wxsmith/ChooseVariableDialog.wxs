@@ -81,7 +81,9 @@
 			<object class="sizeritem">
 				<object class="wxListCtrl" name="ID_LISTCTRL1" variable="variablesList" member="yes">
 					<size>374,149</size>
-					<style>wxLC_REPORT</style>
+					<style>wxLC_REPORT|wxLC_EDIT_LABELS</style>
+					<handler function="OnvariablesListBeginLabelEdit" entry="EVT_LIST_BEGIN_LABEL_EDIT" />
+					<handler function="OnvariablesListEndLabelEdit" entry="EVT_LIST_END_LABEL_EDIT" />
 					<handler function="OnvariablesListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
 					<handler function="OnvariablesListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
 				</object>

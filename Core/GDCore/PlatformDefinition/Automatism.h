@@ -8,6 +8,8 @@ namespace gd
 
 /**
  * \brief Base class used to represent an automatism that can be applied to an object
+ *
+ * \ingroup PlatformDefinition
  */
 class Automatism
 {

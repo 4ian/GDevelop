@@ -19,6 +19,8 @@ namespace gd
 {
 /**
  * \brief Base class used to represent a project of a platform
+ *
+ * \ingroup PlatformDefinition
  */
 class GD_CORE_API Project
 {

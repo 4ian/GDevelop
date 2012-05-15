@@ -21,6 +21,8 @@ namespace gd
 
 /**
  * \brief Base class used to represent a layout ( also called a scene ) of a Platform.
+ *
+ * \ingroup PlatformDefinition
  */
 class GD_CORE_API Layout
 {

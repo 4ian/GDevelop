@@ -3,8 +3,6 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
-
 #include <stdexcept>
 #include <iostream>
 #include <string>
@@ -21,42 +19,25 @@
 using namespace std;
 using namespace gd;
 
-string TranslateCondition::Translate(const gd::Instruction & condition, const gd::InstructionMetadata & infos)
+namespace gd
 {
-    std::string trad = infos.sentence;
 
-    //Remplacement des _PARAMx_ par la valeur des paramètres
-    for (unsigned int i =0;i<infos.parameters.size();++i)
-    {
-        while ( trad.find( "_PARAM"+ToString(i)+"_" ) != std::string::npos )
-        {
-            std::string parameter = condition.GetParameter( i ).GetPlainString();
-
-            trad.replace(   trad.find( "_PARAM"+ToString(i)+"_" ), //Chaine à remplacer
-                            std::string("_PARAM"+ToString(i)+"_").length(), //Longueur de la chaine
-                            parameter );
-        }
-    }
-
-    std::replace( trad.begin(), trad.end(), '\n', ' ');
-
-    return trad;
+string ConditionSentenceFormatter::Translate(const gd::Instruction & condition, const gd::InstructionMetadata & infos)
+{
+    return ActionSentenceFormatter::GetInstance()->Translate(condition, infos);
 }
 
-/**
- * Create a formatted sentence from a condition
- */
-std::vector< std::pair<std::string, TextFormatting> > TranslateCondition::GetAsFormattedText(const gd::Instruction & condition, const gd::InstructionMetadata & infos)
+std::vector< std::pair<std::string, TextFormatting> > ConditionSentenceFormatter::GetAsFormattedText(const gd::Instruction & condition, const gd::InstructionMetadata & infos)
 {
-    return TranslateAction::GetInstance()->GetAsFormattedText(condition, infos);
+    return ActionSentenceFormatter::GetInstance()->GetAsFormattedText(condition, infos);
 }
 
-TextFormatting TranslateCondition::GetFormattingFromType(const std::string & type)
+TextFormatting ConditionSentenceFormatter::GetFormattingFromType(const std::string & type)
 {
-    return TranslateAction::GetInstance()->GetFormattingFromType(type);
+    return ActionSentenceFormatter::GetInstance()->GetFormattingFromType(type);
 }
 
-std::string TranslateCondition::LabelFromType( const std::string & type )
+std::string ConditionSentenceFormatter::LabelFromType( const std::string & type )
 {
     if ( type == "" )
         return "";
@@ -97,9 +78,9 @@ std::string TranslateCondition::LabelFromType( const std::string & type )
     return "undefined";
 }
 
-wxBitmap TranslateCondition::BitmapFromType( const std::string & type )
+wxBitmap ConditionSentenceFormatter::BitmapFromType( const std::string & type )
 {
-    CommonBitmapManager * CommonBitmapManager = CommonBitmapManager::GetInstance();
+    gd::CommonBitmapManager * CommonBitmapManager = gd::CommonBitmapManager::GetInstance();
 
     if ( type == "" )
         return CommonBitmapManager->unknownBt;
@@ -139,4 +120,5 @@ wxBitmap TranslateCondition::BitmapFromType( const std::string & type )
     wxLogWarning( "Game Develop n'a pas pu trouver le bitmap d'un bouton suivant le type du paramètre" );
     return CommonBitmapManager->unknownBt;
 }
-#endif
+
+}

@@ -12,7 +12,7 @@
  */
 
 /**
- * \defgroup CommonProgrammingTools Common programming tools
+ * \defgroup PlatformDefinition Platform Definition ( Classes defining the concepts that must be implemented by a platform )
  */
 
 /**
@@ -23,7 +23,10 @@
  * \defgroup IDEDialogs IDE Dialogs ( Premade dialogs to be used to implement a development environment )
  */
 
-
 /**
  * \defgroup Events Events ( Classes defining the event system and some tools associated with events )
+ */
+
+/**
+ * \defgroup CommonProgrammingTools Common programming tools
  */

@@ -207,7 +207,7 @@ public:
      *
      * \note The height of the drawing must be the same as the height returned by BaseEvent::GetRenderedHeight
      *
-     * \see EventsRenderingHelper
+     * \see gd::EventsRenderingHelper
      * \see EventsEditorSelection
      * \see EventsEditorItemsAreas
      */

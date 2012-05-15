@@ -3,11 +3,12 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
-
 #ifndef CommonBitmapManager_H
 #define CommonBitmapManager_H
 #include <wx/bitmap.h>
+
+namespace gd
+{
 
 /**
  * \brief Meant to provide easy access to usually used wxBitmap.
@@ -62,7 +63,6 @@ public:
         }
     }
 
-protected:
 private:
     CommonBitmapManager();
     virtual ~CommonBitmapManager() {};
@@ -70,5 +70,6 @@ private:
     static CommonBitmapManager *_singleton;
 };
 
+}
+
 #endif // CommonBitmapManager_H
-#endif

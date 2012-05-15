@@ -15,6 +15,8 @@ namespace gd
 
 /**
  * \brief Contains a list of events not directly linked to a layout.
+ *
+ * \ingroup PlatformDefinition
  */
 class ExternalEvents
 {

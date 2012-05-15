@@ -5,6 +5,8 @@
 
 /**
  * \brief Internal builtin-extension providing conversion ( ToString/ToNumber ) features.
+ *
+ * \ingroup BuiltinExtensions
  */
 class CommonConversionsExtension : public ExtensionBase
 {

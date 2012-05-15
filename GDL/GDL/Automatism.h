@@ -19,6 +19,9 @@ class MainEditorCommand;
 
 /**
  * \brief Automatism are linked to objects and provided automatic behaviors to these latter.
+ *
+ * \ingroup GameEngine
+ * \ingroup PlatformDefinition
  */
 class GD_API Automatism
 #if defined(GD_IDE_ONLY)

@@ -1,3 +1,5 @@
+#if defined(GD_IDE_ONLY) || defined(DEBUG) || defined(DEV)
+
 /***************************************************************************************************
 **
 ** Real-Time Hierarchical Profiling for Game Programming Gems 3
@@ -377,3 +379,5 @@ public:
 #endif //QUICK_PROF_H
 
 #undef LoadImage
+
+#endif

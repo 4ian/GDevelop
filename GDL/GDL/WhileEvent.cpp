@@ -14,7 +14,7 @@
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
-#include "PlatformDefinition/InstructionsMetadataHolder.h"
+#include "GDL/ExtensionsManager.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/ExtensionsManager.h"
 
@@ -131,13 +131,12 @@ void WhileEvent::LoadFromXml(const TiXmlElement * eventElem)
  */
 void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
     const int repeatHeight = 20;
 
     //Draw header rectangle
-    InstructionsMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
-    int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, metadataHolder)+border*2;
+    int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, *ExtensionsManager::GetInstance())+border*2;
     wxRect headerRect(x, y, width, whileConditionsHeight+repeatHeight);
     renderingHelper->DrawNiceRectangle(dc, headerRect);
 
@@ -147,7 +146,7 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     dc.DrawText( _("Tant que :"), x+5, y+5 );
 
     //Draw "while conditions"
-    renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection, metadataHolder);
+    renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
 
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
@@ -161,26 +160,25 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+whileConditionsHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, metadataHolder);
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, *ExtensionsManager::GetInstance());
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+whileConditionsHeight+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, metadataHolder);
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
 }
 
 unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
 {
     if ( eventHeightNeedUpdate )
     {
-        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
         int border = renderingHelper->instructionsListBorder;
         const int repeatHeight = 20;
 
         //Get maximum height needed
-        InstructionsMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
-        int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, metadataHolder);
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, metadataHolder);
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, metadataHolder);
+        int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, *ExtensionsManager::GetInstance());
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, *ExtensionsManager::GetInstance());
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
 
         renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + whileConditionsHeight + repeatHeight)+border*2+border*2;
         eventHeightNeedUpdate = false;

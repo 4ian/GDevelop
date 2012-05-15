@@ -9,12 +9,12 @@
 #if defined(GD_IDE_ONLY)
 class Game;
 class MainEditorCommand;
-#include <wx/bitmap.h>
-#include <wx/file.h>
-#include <wx/wx.h>
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
+#include <wx/bitmap.h>
+#include <wx/file.h>
+#include <wx/intl.h>
 #endif
 
 #include <string>

@@ -6,7 +6,7 @@
 
 #include "ExpressionsCodeGeneration.h"
 #include "GDCore/PlatformDefinition/Layout.h"
-#include "GDL/IDE/GDExpressionParser.h"
+#include "GDCore/Events/ExpressionParser.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/Scene.h"
@@ -139,7 +139,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
 
         //Cast the object if needed
         string objectType = gd::GetTypeOfObject(game, scene, realObjects[i]);
-        const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
+        const ExtensionObjectInfos & objInfo = ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
         bool castNeeded = !objInfo.cppClassName.empty();
 
         //Build string to access the object
@@ -207,7 +207,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
 
         //Cast the object if needed
         string objectType = gd::GetTypeOfObject(game, scene, realObjects[i]);
-        const ExtensionObjectInfos & objInfo = GDpriv::ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
+        const ExtensionObjectInfos & objInfo = ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
         bool castNeeded = !objInfo.cppClassName.empty();
 
         //Build string to access the object
@@ -275,7 +275,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 
         //Cast the object if needed
         string automatismType = gd::GetTypeOfAutomatism(game, scene, parameters[1].GetPlainString());
-        const AutomatismInfo & autoInfo = GDpriv::ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
+        const AutomatismInfo & autoInfo = ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
         bool castNeeded = !autoInfo.cppClassName.empty();
 
         //Build string to access the automatism
@@ -343,7 +343,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 
         //Cast the object if needed
         string automatismType = gd::GetTypeOfAutomatism(game, scene, parameters[1].GetPlainString());
-        const AutomatismInfo & autoInfo = GDpriv::ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
+        const AutomatismInfo & autoInfo = ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
         bool castNeeded = !autoInfo.cppClassName.empty();
 
         //Build string to access the automatism
@@ -367,13 +367,13 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
     plainExpression += output;
 };
 
-bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const Game & game, const Scene & scene, gd::Expression & expression)
+bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
 {
     string newExpression;
 
     CallbacksForGeneratingExpressionCode callbacks(newExpression, game, scene, codeGenerator, context);
 
-    GDExpressionParser parser(expression.GetPlainString());
+    gd::ExpressionParser parser(expression.GetPlainString());
     if ( !parser.ParseMathExpression(game, scene, callbacks) )
     {
         #if defined(GD_IDE_ONLY)
@@ -386,14 +386,14 @@ bool CallbacksForGeneratingExpressionCode::OnSubMathExpression(const Game & game
     return true;
 }
 
-bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(const Game & game, const Scene & scene, gd::Expression & expression)
+bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
 {
     string newExpression;
 
     CallbacksForGeneratingExpressionCode callbacks(newExpression, game, scene, codeGenerator, context);
 
-    GDExpressionParser parser(expression.GetPlainString());
-    if ( !parser.ParseTextExpression(game, scene, callbacks) )
+    gd::ExpressionParser parser(expression.GetPlainString());
+    if ( !parser.ParseStringExpression(game, scene, callbacks) )
     {
         #if defined(GD_IDE_ONLY)
         firstErrorStr = callbacks.firstErrorStr;

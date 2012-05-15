@@ -9,6 +9,8 @@
 /**
  * \brief Represents a force to be applied on an object.
  * Can have an X/Y component or an angle/length.
+ *
+ * \ingroup GameEngine
  */
 class GD_API Force
 {

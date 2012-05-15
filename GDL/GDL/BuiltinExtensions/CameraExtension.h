@@ -10,6 +10,8 @@
 
 /**
  * \brief Internal builtin extension providing features concerning cameras.
+ *
+ * \ingroup BuiltinExtensions
  */
 class CameraExtension : public ExtensionBase
 {

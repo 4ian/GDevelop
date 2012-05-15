@@ -12,6 +12,11 @@
 #include <SFML/Graphics.hpp>
 class Game;
 
+/**
+ * \brief Still work in progress class to manage shaders
+ *
+ * \ingroup GameEngine
+ */
 class ShaderManager
 {
 public:

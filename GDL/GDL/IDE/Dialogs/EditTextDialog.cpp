@@ -10,6 +10,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
+#include <wx/msgdlg.h>
 #include <wx/stc/stc.h>
 #include "GDL/ExtensionBase.h"
 #include "GDL/IDE/Dialogs/EditExpression.h"
@@ -175,7 +176,7 @@ lastErrorPos(std::string::npos)
     ValList->DeleteAllItems();
     ValList->AddRoot( _( "Toutes les valeurs spéciales" ), 0 );
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects expressions
@@ -393,9 +394,9 @@ void EditTextDialog::OnOkBtClick(wxCommandEvent& event)
     returnedText = string(TexteEdit->GetValue().mb_str());
 
     CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
-    GDExpressionParser expressionParser(returnedText);
+    gd::ExpressionParser expressionParser(returnedText);
 
-    if ( !expressionParser.ParseTextExpression(game, scene, callbacks) )
+    if ( !expressionParser.ParseStringExpression(game, scene, callbacks) )
     {
         if ( wxMessageBox(_("L'expression est mal formulée. Êtes vous sûr de vouloir valider cette expression ?"), _("L'expression contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
@@ -442,6 +443,7 @@ string EditTextDialog::ShowParameterDialog(const gd::ParameterMetadata & paramet
     else if ( parameterMetadata.type == "scenevar" )
     {
         gd::ChooseVariableDialog dialog(this, scene.GetVariables());
+        dialog.SetAssociatedLayout(&game, &scene);
         if ( dialog.ShowModal() == 1 )
             return dialog.selectedVariable;
 
@@ -450,6 +452,7 @@ string EditTextDialog::ShowParameterDialog(const gd::ParameterMetadata & paramet
     else if ( parameterMetadata.type == "globalvar" )
     {
         gd::ChooseVariableDialog dialog(this, game.GetVariables());
+        dialog.SetAssociatedProject(&game);
         if ( dialog.ShowModal() == 1 )
             return dialog.selectedVariable;
 
@@ -508,8 +511,8 @@ void EditTextDialog::TextModified(wxStyledTextEvent& event)
     string text = string(TexteEdit->GetValue().mb_str());
 
     CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
-    GDExpressionParser expressionParser(text);
-    if ( !expressionParser.ParseTextExpression(game, scene, callbacks) )
+    gd::ExpressionParser expressionParser(text);
+    if ( !expressionParser.ParseStringExpression(game, scene, callbacks) )
     {
         errorTxt->SetLabel(expressionParser.firstErrorStr);
         lastErrorPos = expressionParser.firstErrorPos;

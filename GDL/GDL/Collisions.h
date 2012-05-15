@@ -12,6 +12,13 @@
 #include "GDL/SpriteObject.h"
 #include <cmath>
 
+/**
+ * \brief Pixel perfect collision test between two sprite objects
+ * \ingroup SpriteObjectExtension
+ * Alpha transparency, rotation and zooms are taken into account.
+ *
+ * \return true if the sprite are overlapping
+ */
 bool GD_API CheckCollision( const SpriteObject* const objet1, const SpriteObject* const objet2);
 
 #endif // COLLISIONS_H_INCLUDED

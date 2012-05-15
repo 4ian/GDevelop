@@ -7,6 +7,8 @@ using namespace std;
  * \brief Manual timer updated using ManualTimer::UpdateTime member function.
  *
  *  A manual timer is a timer which is updated manually by calling UpdateTime.
+ *
+ * \ingroup GameEngine
  */
 class GD_API ManualTimer
 {

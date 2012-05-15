@@ -14,6 +14,8 @@
 
 /**
  * \brief Helper class wrapping a tinyxml document in RAII fashion
+ *
+ * \ingroup FileExtension
  */
 class XmlFile
 {
@@ -51,6 +53,8 @@ class XmlFile
 
 /**
  * \brief Helper class for opening XML files.
+ *
+ * \ingroup FileExtension
  */
 class XmlFilesManager
 {

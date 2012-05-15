@@ -11,6 +11,8 @@
 /**
  * \brief A camera is used to change the area of a scene to be rendered.
  * When a scene is played, RuntimeCamera are used.
+ *
+ * \ingroup GameEngine
  */
 class GD_API Camera
 {

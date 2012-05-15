@@ -63,7 +63,6 @@ unsigned int ListVariable::GetVariableCount() const
 
 void ListVariable::InsertNewVariable(const std::string & name, unsigned int position)
 {
-    std::cout << "Called";
     Variable newVariable(name);
 
     if (position<variables.size())
@@ -84,8 +83,8 @@ void ListVariable::InsertVariable(const gd::Variable & variable, unsigned int po
     }
     catch(...) { std::cout << "WARNING: Tried to add a variable which is not a GD C++ Platform Variable to a GD C++ Platform project"; }
 }
-
 void ListVariable::Create(const gd::VariablesContainer & source)
+
 {
     try
     {

@@ -4,7 +4,9 @@
 #include "GDL/Camera.h"
 
 /**
- * Camera used during runtime.
+ * \brief Class representing a camera used during runtime.
+ *
+ * \ingroup GameEngine
  */
 class GD_API RuntimeCamera
 {

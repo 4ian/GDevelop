@@ -24,7 +24,7 @@
 
 using namespace std;
 
-Object::Object(string name_) :
+Object::Object(std::string name_) :
         name( name_ ),
         X( 0 ),
         Y( 0 ),
@@ -92,7 +92,9 @@ bool Object::ClearForce()
     return true;
 }
 
-
+/**
+ * \brief Internal functor testing if a force's length is 0.
+ */
 struct NullForce
 {
     bool operator ()( const Force &A ) const
@@ -282,7 +284,7 @@ void Object::DeleteFromScene(RuntimeScene & scene)
     SetName("");
 
     //Notify scene that object's name has changed.
-    scene.objectsInstances.ObjectIdentifierHasChanged(this);
+    scene.objectsInstances.ObjectNameHasChanged(this);
 }
 
 void Object::PutAroundAPosition( float positionX, float positionY, float distance, float angleInDegrees )

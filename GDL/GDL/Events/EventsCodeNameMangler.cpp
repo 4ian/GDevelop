@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+#if defined(GD_IDE_ONLY)
 #include "GDL/CommonTools.h"
 #include "EventsCodeNameMangler.h"
 #include <string>
@@ -25,3 +30,4 @@ std::string ManObjListName(const std::string & objectName)
 {
     return EventsCodeNameMangler::GetInstance()->GetMangledObjectsListName(objectName);
 }
+#endif

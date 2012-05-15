@@ -27,10 +27,12 @@ namespace gd { typedef boost::shared_ptr<BaseEvent> BaseEventSPtr; }
 #undef GetObject //Disable an annoying macro
 
 /**
- * \brief Represents a scene.
+ * \brief Represents a layout of the Game Develop C++ Platform
  *
- * A scene is basically composed of events, objects and some other members.
- * RuntimeScene are
+ * During runtime ( i.e. When the game is being played ), Scene is loaded into a RuntimeScene.
+ *
+ * \see RuntimeScene
+ * \ingroup PlatformDefinition
  */
 class GD_API Scene
 #if defined(GD_IDE_ONLY)
@@ -197,7 +199,8 @@ private:
 //"Tool" Functions
 
 /**
- * Functor testing scene name
+ * \brief Functor testing scene name
+ * \see Scene
  */
 struct SceneHasName : public std::binary_function<boost::shared_ptr<Scene>, std::string, bool> {
     bool operator()(const boost::shared_ptr<Scene> & scene, std::string name) const { return scene->GetName() == name; }

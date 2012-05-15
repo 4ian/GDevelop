@@ -17,6 +17,9 @@
  * \brief A container for Game Develop variables.
  *
  * A container containing Game Develop variables. Used by objects, games and scenes.
+ *
+ * \ingroup GameEngine
+ * \ingroup PlatformDefinition
  */
 class GD_API ListVariable
 #if defined(GD_IDE_ONLY)

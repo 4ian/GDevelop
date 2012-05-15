@@ -14,7 +14,7 @@
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/Events/ExpressionsCodeGeneration.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
-#include "PlatformDefinition/InstructionsMetadataHolder.h"
+#include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/Dialogs/EditRepeatEvent.h"
 
 RepeatEvent::RepeatEvent() :
@@ -31,7 +31,7 @@ std::string RepeatEvent::GenerateEventCode(Game & game, Scene & scene, EventsCod
     //Prepare expression containing how many times event must be repeated
     std::string repeatCountCode;
     CallbacksForGeneratingExpressionCode callbacks(repeatCountCode, game, scene, codeGenerator, parentContext);
-    GDExpressionParser parser(repeatNumberExpression.GetPlainString());
+    gd::ExpressionParser parser(repeatNumberExpression.GetPlainString());
     if (!parser.ParseMathExpression(game, scene, callbacks) || repeatCountCode.empty()) repeatCountCode = "0";
 
     //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
@@ -147,7 +147,7 @@ void RepeatEvent::LoadFromXml(const TiXmlElement * eventElem)
  */
 void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
     const int repeatTextHeight = 20;
 
@@ -165,29 +165,27 @@ void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdit
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     //Draw actions and conditions
-    InstructionsMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+repeatTextHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, metadataHolder);
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, *ExtensionsManager::GetInstance());
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+repeatTextHeight+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, metadataHolder);
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
 }
 
 unsigned int RepeatEvent::GetRenderedHeight(unsigned int width) const
 {
     if ( eventHeightNeedUpdate )
     {
-        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
         int border = renderingHelper->instructionsListBorder;
         const int repeatTextHeight = 20;
 
         //Get maximum height needed
-    InstructionsMetadataHolder metadataHolder; //TODO : For now, construct a wrapper around ExtensionsManager
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, metadataHolder);
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, metadataHolder);
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, *ExtensionsManager::GetInstance());
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
 
         renderedHeight = ( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + repeatTextHeight + border*2;
         eventHeightNeedUpdate = false;

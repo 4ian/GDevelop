@@ -11,6 +11,8 @@ namespace gd {class ArbitraryResourceWorker;}
 
 /**
  * \brief Internal built-in extension providing windows features.
+ *
+ * \ingroup BuiltinExtensions
  */
 class WindowExtension : public ExtensionBase
 {

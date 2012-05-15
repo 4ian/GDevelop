@@ -3,7 +3,7 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 /**
- * \brief File containing tools to manipulate objects easier.
+ * \file File containing tools to manipulate objects easier.
  */
 
 #ifndef OBJECTHELPERS_H
@@ -24,14 +24,18 @@ typedef std::vector < boost::shared_ptr<Object> > ObjList;
 typedef boost::shared_ptr<Object> ObjSPtr;
 
 /**
- * Functor testing object name
+ * \brief Functor testing object name
+ *
+ * \see Object
  */
 struct ObjectHasName : public std::binary_function<boost::shared_ptr<Object>, std::string, bool> {
     bool operator()(const boost::shared_ptr<Object> & object, const std::string & name) const { return object->GetName() == name; }
 };
 
 /**
- * Functor for sorting an ObjList by ZOrder
+ * \brief Functor for sorting an ObjList by ZOrder
+ *
+ * \see Object
  */
 struct SortByZOrder
 {

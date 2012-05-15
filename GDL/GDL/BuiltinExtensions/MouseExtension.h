@@ -10,6 +10,8 @@
 
 /**
  * \brief Internal built-in extension providing mouse features.
+ *
+ * \ingroup BuiltinExtensions
  */
 class MouseExtension : public ExtensionBase
 {

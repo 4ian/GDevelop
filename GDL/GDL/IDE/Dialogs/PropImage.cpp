@@ -185,7 +185,7 @@ void PropImage::OnapercuPanelPaint(wxPaintEvent& event)
     wxPaintDC dc( apercuPanel ); //Création obligatoire du wxBufferedPaintDC
     wxSize size = apercuPanel->GetSize();
 
-    CommonBitmapManager * CommonBitmapManager = CommonBitmapManager::GetInstance();
+    gd::CommonBitmapManager * CommonBitmapManager = gd::CommonBitmapManager::GetInstance();
 
     //Fond en damier
     dc.SetBrush(CommonBitmapManager->transparentBg);

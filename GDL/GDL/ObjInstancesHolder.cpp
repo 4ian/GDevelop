@@ -46,7 +46,7 @@ std::vector<Object*> ObjInstancesHolder::GetObjectsRawPointers(const std::string
     return objectsRawPointersInstances[name];
 }
 
-void ObjInstancesHolder::ObjectIdentifierHasChanged(Object * object)
+void ObjInstancesHolder::ObjectNameHasChanged(Object * object)
 {
     boost::shared_ptr<Object> theObject; //We need the object to keep alive.
 

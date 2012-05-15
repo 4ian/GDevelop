@@ -12,27 +12,41 @@
  * -# \subpage GetFamiliarizedWithGDSDK
  * -# \subpage WritingANewExtension
  *
- *  <br>
+ *
+ * You can also read \subpage AboutGDCore .
  */
 
 /**
- *  \page setupDevEnv Setting up development environnement
+ * \page setupDevEnv Setting up the development environnement
+ *
+ * <b>Windows</b>
  *
  * Follow these three step to be able to compile extensions for %Game Develop:
- * -# \subpage installLibs
- * -# \subpage installCompiler
- * -# \subpage installCB
+ * -# \subpage installWinLibs
+ * -# \subpage installWinCompiler
+ * -# \subpage installWinCB
+ * <br>
  *
- * After installing these tool, you can read information about Game Develop SDK.
+ * <b>GNU/Linux</b>
+ * -# \subpage installLinux
+ *
+ * <br>
+ * After installing these tool, you can read information about %Game Develop SDK.
  */
 
 /**
- *  \page installLibs Download and install SFML, wxWidgets and Boost
+ *  \page installWinLibs (Windows) Download and install SFML, wxWidgets and Boost
  *
- * %Game Develop may use development versions of SFML, wxWidgets or Boost. So as to prevent incompatibilities between the core of %Game Develop and the extensions, %Game Develop require the extensions to use the same version of the librairies.
+ * %Game Develop uses development versions of SFML, wxWidgets or Boost. So as to prevent incompatibilities between the core of %Game Develop and the extensions,
+ * %Game Develop require the extensions to use the same version of the librairies.
  * \section download Download
 
- * You can download the specific versions of the librairies used by the current version of %Game Develop on the official website : http://www.en.compilgames.net<br>
+ * You can download the specific versions of the libraries used by the current version of %Game Develop using these links:<br>
+ * - http://www.compilgames.net/code/GameDevelopSDK/SFML.7z
+ * - http://www.compilgames.net/code/GameDevelopSDK/wxwidgets.7z
+ * - http://www.compilgames.net/code/GameDevelopSDK/boost_1_46_1.7z
+ *
+ *
  * They are already built for windows, and for an use with the TDM mingw GCC compiler.
 
  * \section uncompress Uncompress
@@ -41,7 +55,7 @@
  */
 
 /**
- *  \page installCompiler Install TDM-GCC compiler
+ *  \page installWinCompiler (Windows) Install TDM-GCC compiler
  *
  * %Game Develop is compiled with TDM Mingw ( GCC ) under Windows.<br>
  * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by %Game Develop and the compiler used by the extensions, %Game Develop require the extensions to use the same version of TDM Mingw.<br>
@@ -71,7 +85,7 @@
  */
 
 /**
- *  \page installCB Download and install Code::Blocks
+ *  \page installWinCB (Windows) Download and install Code::Blocks
  *
  * Projects files provided with the SDK are Code::Blocks projects.<br>
  * <br>
@@ -87,11 +101,48 @@
  * - \subpage SDKDirectoriesStructure
  * - \subpage AboutExtensionCpp
  *
+ *
  * After reading these informations, you can create a new extension.
  */
 
 /**
- * \page GetFamiliarizedWithGDL Get familiarized with %Game Develop Library
+ *  \page installLinux (Linux) Install development files
+ *
+ * %Game Develop is compiled with gcc under Linux.<br>
+ * So as to prevent incompatibilities between the compiler ( and the standard C++ library provided with ) used by %Game Develop and the compiler used by the extensions, %Game Develop require the extensions to use the same version of gcc.<br>
+
+ * \section download Download, (build) and install libraries
+ * \subsection sfml SFML
+
+ * %Game Develop may uses some specific version of SFML library. You can download a precompiled package for linux here: http://www.compilgames.net/code/GameDevelopSDK/SFMLlinux.7z <br>
+ * Just extract the archive inside the folder ExtLibs ( located at the root of the SDK ).
+ * \subsection boost Boost
+
+ * Boost version used by %Game Develop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/boost_1_46_1.7z <br>
+ * Just extract the archive inside the folder ExtLibs ( located at the root of the SDK ).
+ * \subsection wxWidgets wxWidgets
+
+ * wxWidgets version used by %Game Develop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/wxWidgets.7z <br>
+ * First extract the archive inside the folder ExtLibs. <br>
+ * You then have to build and install the library: Open a terminal, go to the ExtLibs/wxWidgets directory and follow the classical configure/make/make install process:
+ * \code
+ * ./configure
+ * make
+ * sudo make install
+ * \endcode
+ *
+ * \subsection codeBlocks Install Code::Blocks
+ * You'll need the Code::Blocks IDE to open %Game Develop Extensions project files.
+ * Code::Blocks is generally available for your distribution thanks to the usual package manager.
+ *
+ * \section copyFiles Copy some files
+
+ * Finally, go to the %Game Develop directory, locate the file "libgdl.so" and copy it to (SDK folder)/<b>IDE</b>/bin/release.<br>
+ * Then, locate the file "libgdl.so" into the folder (%Game Develop folder)/<b>Runtime</b> and copy it to (SDK folder)/<b>Runtime</b>/bin/release.<br>
+ */
+
+/**
+ * \page GetFamiliarizedWithGDL Get familiarized with Game Develop Library
  *
  * \section MainGDLClasses Game Develop Library most important classes
  *
@@ -325,6 +376,34 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
  */
 
 /**
+ * \page AboutGDCore A word about Game Develop Core
+ *
+ * \section GDCoreDescription Game Develop Core ( GDCore ) description
+
+ * You will notice that some functionalities or classes, notably classes defining main concepts such as Game, Scene or classes achieving tasks related to the IDE are using features
+ * provided by the %Game Develop Core library ( by using #includes files starting with GDCore/... ).
+ *
+ * %Game Develop Core is a still work-in-progress library meant to abstract the <b>main concepts</b> of %Game Develop. By doing so, the IDE will eventually be able to manage projects
+ * which are not specifically based on the current technologies ( i.e. 2D games using SFML/OpenGL/C++ ). For example, Game and Scene classes are, when GDL is compiled for the IDE
+ * inheriting from <b>gd::Project</b> and <b>gd::Layout</b> classes which are defining the main features that the classes must provides.
+ *
+ * %Game Develop Core thus contains, as said before, the definition of the main concepts used by %Game Develop as well as the implementation of some of these concepts, like the event system
+ * and some tools associated with ( like the classes dedicated to events rendering ).<br>
+ *
+ * For now, a lot of features of the IDE are still strongly linked to GDL, but the goal is to make the <b>IDE fully independent</b> of GDL by using only %Game Develop Core features.
+ *
+ * Have a look to GDCore documentation to see the definition of the main classes or the tools provided for writing code to be used with the IDE.
+ *
+ * \section GDCoreAndExtensions Concerning extensions writing
+ *
+ * Please note that, by design, %Game Develop Core library must not be used when compiling extensions for "Runtime": <br>
+ * You should rely on features offered by %Game Develop Core only when
+ * creating a IDE-only feature ( like an editor for an object ) or inside a code used in IDE-only mode ( that is too say, code enclosed by #if defined(GD_IDE_ONLY) .. #endif ).<br>
+ * GDCore is not linked to extensions when compiling for "Runtime", so that linking errors will be triggered if you inadvertently used a GDCore file where you should not have.
+
+*/
+
+/**
  * \page WritingANewExtension Writing an new extension
  *
  * \section createNewExtension Create a new extension
@@ -351,14 +430,163 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
  *
  * \section installExtension Use the extension with Game Develop
  *
- * To make your extension usable with Game Develop, you have to:
- * -Copy the generated file ( yourExtension.xgdw for example ) inside Game Develop "Extensions" folder. ( Extensions/yourExtension.xgdw )<br>
- *  You can change the output directory in the Code::Blocks project to automatically create the extension file inside Game Develop "Extensions" folder.<br><br>
- * -Copy all needed include file inside a folder with the name of your extension located in GD "Extensions/include" subfolder. ( Extensions/include/yourExtension/ )<br>
- *  You can use a small script ( batch file on Windows ) to copy all the needed includes files to Game Develop "Extensions/include" subfolder.<br><br>
- * -Translations catalog files must be put into Extensions/locale/<language>/yourExtension.mo ( Example : Extensions/locale/en_GB/yourExtension.mo )
+ * To make your extension usable with %Game Develop, you have to:
+ * -# <b>Copy the generated file</b> ( yourExtension.xgdw for example ) inside %Game Develop "Extensions" folder. ( Extensions/yourExtension.xgdw )<br>
+ *  You can change the output directory in the Code::Blocks project to automatically create the extension file inside %Game Develop "Extensions" folder.<br><br>
+ * -# Copy <b>all needed include file</b> inside a folder with the name of your extension located in GD "Extensions/include" subfolder. ( Extensions/include/yourExtension/ )<br>
+ *  You can use a <b>small script</b> ( batch file on Windows ) to copy all the needed includes files to %Game Develop "Extensions/include" subfolder.<br><br>
+ * -# <b>Translations catalog files</b> must be put into Extensions/locale/<language>/yourExtension.mo ( Example : Extensions/locale/en_GB/yourExtension.mo )
+ */
+
+//Group definitions:
+/**
+ * \defgroup GameEngine Game engine
  */
 
 /**
-    \defgroup CommonProgrammingTools Common programming tools
-*/
+ * \defgroup SoundEngine Sound engine
+ * \ingroup GameEngine
+ */
+
+/**
+ * \defgroup ResourcesManagement Resources management
+ * \ingroup GameEngine
+ */
+
+/**
+ * \defgroup CommonProgrammingTools Common programming tools
+ */
+
+/**
+ * \defgroup Tools Tools classes
+ */
+
+/**
+ * \defgroup PlatformDefinition Classes defining main concepts ( also found in Game engine )
+ */
+
+/**
+ * \defgroup BuiltinExtensions Built-in Game Develop extensions
+ */
+
+/**
+ * \defgroup SpriteObjectExtension Built-in Sprite Object extension
+ * \ingroup BuiltinExtensions
+ */
+
+/**
+ * \defgroup FileExtension Built-in File extension
+ * \ingroup BuiltinExtensions
+ */
+
+/**
+ * \defgroup TinyXml Integrated TinyXml library
+ */
+
+//Some classes documentation:
+/**
+ * \class AES
+ * \brief AES encryption algorithm
+ *
+ * Implementation of the AES encryption algorithm under the zlib-png licence by Chris Lomont.<br>
+ * See the header file for more information about its usage.
+ *
+ * \ingroup Tools
+ */
+
+/**
+ * \class MD5
+ * \brief MD5 hash algorithm
+ *
+ * Implementation of the MD5 encryption algorithm.<br>
+ * See the header file for more information about its usage.
+ *
+ * \ingroup Tools
+ */
+
+/**
+ * \class TiXmlAttribute
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlAttributeSet
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlBase
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlComment
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlCursor
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlDeclaration
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlDocument
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlElement
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlHandle
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlNode
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlOutStream
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlParsingData
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlPrinter
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlString
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlText
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlUnknown
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+/**
+ * \class TiXmlVisitor
+ * \brief Part of the tinyxml library
+ * \ingroup TinyXml
+ */
+

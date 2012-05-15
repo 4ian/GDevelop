@@ -10,6 +10,8 @@
 
 /**
  * \brief Internal built-in extension providing very basic network features.
+ *
+ * \ingroup BuiltinExtensions
  */
 class NetworkExtension : public ExtensionBase
 {

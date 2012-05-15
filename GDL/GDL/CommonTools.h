@@ -78,14 +78,14 @@ std::string GD_API ToString( const wxString & value );
 #endif
 
 /**
- * Replace all spaces by tildes in a std::string
+ * \brief Replace all spaces by tildes in a std::string
  */
 std::string ReplaceSpacesByTildes(std::string text);
 
 /**
- * Split a string into tokens stored in a vector, using separator defined.
- * \param String to split
- * \param Separator to use
+ * Split a string into tokens stored in a vector, using the specified separator.
+ * \param str String to split
+ * \param separator Separator to use
  */
 template <typename T>
 std::vector <T> SplitString( const std::string & str, char separator )
@@ -94,18 +94,22 @@ std::vector <T> SplitString( const std::string & str, char separator )
     std::string token;
     std::vector <T> array;
 
-    unsigned int i = 0;
     while ( std::getline( iss, token, separator ) )
-    {
         array.push_back( T(token) );
-        ++i;
-    }
 
     return array;
 }
 
 /**
- * Functor testing if a std::string is empty
+ * \brief Functor testing if a std::string is empty
+ *
+ * Usage example:
+ * \code
+ * //Remove all empty strings from a std::vector<std::string>.
+ * myVector.erase(std::remove_if(myVector.begin(), myVector.end(), StringEmpty()), myVector.end());
+ * \endcode
+ *
+ * \ingroup CommonProgrammingTools
  */
 struct StringEmpty
 {

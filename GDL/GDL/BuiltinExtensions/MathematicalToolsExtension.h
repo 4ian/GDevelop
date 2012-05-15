@@ -9,6 +9,8 @@
 
 /**
  * \brief Internal built-in extension providing mathematical features.
+ *
+ * \ingroup BuiltinExtensions
  */
 class MathematicalToolsExtension : public ExtensionBase
 {

@@ -161,7 +161,7 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
 void ExtensionsLoader::LoadStaticExtensionInManager(std::string fullpath)
 {
 
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
     Handle extensionHdl = OpenLibrary(fullpath.c_str());
     if (extensionHdl == NULL)
     {

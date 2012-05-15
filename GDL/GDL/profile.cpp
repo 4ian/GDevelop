@@ -1,3 +1,4 @@
+#if defined(DEBUG) || defined(DEV)
 /*
 
 ****************************************************************************************************
@@ -338,3 +339,4 @@ void	CProfileManager::dumpAll()
 	CProfileManager::Release_Iterator(profileIterator);
 }
 
+#endif

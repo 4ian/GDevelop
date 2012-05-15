@@ -26,7 +26,6 @@
 #include "GDL/BuiltinExtensions/FileExtension.h"
 #include "GDL/BuiltinExtensions/NetworkExtension.h"
 #include "GDL/BuiltinExtensions/WindowExtension.h"
-#include "GDL/BuiltinExtensions/StringInstructionsExtension.h"
 #include "GDL/Object.h"
 #include "GDL/IDE/CodeCompiler.h"
 
@@ -34,10 +33,6 @@
 #include "GDL/Game.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #endif
-
-
-namespace GDpriv
-{
 
 ExtensionsManager *ExtensionsManager::_singleton = NULL;
 #if defined(GD_IDE_ONLY)
@@ -74,9 +69,9 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
 
 #if defined(GD_IDE_ONLY)
-    badInstructionMetadata.fullname = _("gd::Instruction inconnue");
-    badInstructionMetadata.description = _("gd::Instruction inconnue");
-    badInstructionMetadata.sentence = _("gd::Instruction inconnue");
+    badInstructionMetadata.fullname = _("Instruction inconnue");
+    badInstructionMetadata.description = _("Instruction inconnue");
+    badInstructionMetadata.sentence = _("Instruction inconnue");
 #endif
 }
 
@@ -228,7 +223,7 @@ const AutomatismInfo& ExtensionsManager::GetAutomatismInfo(std::string automatis
     return badAutomatismInfo;
 }
 
-const gd::InstructionMetadata & ExtensionsManager::GetActionInfos(string actionType) const
+const gd::InstructionMetadata & ExtensionsManager::GetActionMetadata(string actionType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
@@ -256,7 +251,7 @@ const gd::InstructionMetadata & ExtensionsManager::GetActionInfos(string actionT
     return badInstructionMetadata;
 }
 
-const gd::InstructionMetadata & ExtensionsManager::GetConditionInfos(string conditionType) const
+const gd::InstructionMetadata & ExtensionsManager::GetConditionMetadata(string conditionType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
@@ -652,6 +647,3 @@ const ExtensionObjectInfos & ExtensionsManager::GetObjectInfo(std::string object
 	return badObjectInfo;
 }
 #endif
-
-}
-

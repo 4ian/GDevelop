@@ -8,6 +8,10 @@
 
 class RotatedRectangle;
 
+/**
+ * \brief Perform a collision test between the two RotatedRectangle.
+ * \ingroup GameEngine
+ */
 int GD_API RotatedRectanglesCollisionTest(RotatedRectangle * rr1, RotatedRectangle * rr2);
 
 #endif // ROTATEDRECTANGLECOLLISION_H

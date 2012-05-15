@@ -186,7 +186,7 @@ void Scene::LoadFromXml(const TiXmlElement * elem)
         while ( elemSharedDatas != NULL )
         {
             std::string type = elemSharedDatas->Attribute("Type") ? elemSharedDatas->Attribute("Type") : "";
-            boost::shared_ptr<AutomatismsSharedDatas> sharedDatas = GDpriv::ExtensionsManager::GetInstance()->CreateAutomatismSharedDatas(type);
+            boost::shared_ptr<AutomatismsSharedDatas> sharedDatas = ExtensionsManager::GetInstance()->CreateAutomatismSharedDatas(type);
 
             if ( sharedDatas != boost::shared_ptr<AutomatismsSharedDatas>() )
             {

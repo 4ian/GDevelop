@@ -13,7 +13,11 @@
 /**
  * \brief Layer used at runtime.
  *
- * RuntimeLayer basically contains RuntimeCamera.
+ * A RuntimeLayer is basically a container for RuntimeCamera.
+ *
+ * \see RuntimeCamera
+ * \see RuntimeScene
+ * \ingroup GameEngine
  */
 class GD_API RuntimeLayer
 {
@@ -91,6 +95,8 @@ class GD_API RuntimeLayer
 
 /**
  * \brief Functor testing RuntimeLayer name
+ * \see RuntimeLayer
+ * \ingroup GameEngine
  */
 struct RuntimeLayerHasName : public std::binary_function<RuntimeLayer, std::string, bool> {
     bool operator()(const RuntimeLayer & layer, const std::string & name) const { return layer.GetName() == name; }

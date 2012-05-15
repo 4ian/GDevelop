@@ -8,7 +8,9 @@
 #include <string>
 
 /**
- * Used to mangle the name of a scene
+ * \brief Used to mangle the name of a scene
+ *
+ * \ingroup CodeExecutionEngine
  */
 class GD_API SceneNameMangler
 {

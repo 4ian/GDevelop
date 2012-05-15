@@ -18,6 +18,8 @@ class ShaderManager;
  * for example ( in Editor, it could be annoying to let
  * initial global variables be changed when testing a scene! ).
  * Can also contains runtime-specific members.
+ *
+ * \ingroup GameEngine
  */
 class GD_API RuntimeGame : public Game
 {

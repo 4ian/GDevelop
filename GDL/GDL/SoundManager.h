@@ -18,6 +18,11 @@ using namespace std;
 
 /**
  * \brief Manage sounds and musics played by games.
+ *
+ * \see Sound
+ * \see Music
+ *
+ * \ingroup SoundEngine
  */
 class GD_API SoundManager
 {

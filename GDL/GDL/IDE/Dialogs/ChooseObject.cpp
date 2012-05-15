@@ -22,7 +22,6 @@
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/ObjectGroup.h"
 #include "GDL/IDE/Dialogs/ObjectListDialogsHelper.h"
 
 //(*IdInit(ChooseObject)

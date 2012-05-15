@@ -11,6 +11,8 @@ using namespace std;
 
 /**
  * \brief Named point used by Sprite.
+ *
+ * \ingroup SpriteObjectExtension
  */
 class GD_API Point
 {

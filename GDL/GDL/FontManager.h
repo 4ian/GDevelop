@@ -11,6 +11,8 @@
 
 /**
  * \brief FontManager loads and manages SFML fonts.
+ *
+ * \ingroup ResourcesManagement
  */
 class GD_API FontManager
 {

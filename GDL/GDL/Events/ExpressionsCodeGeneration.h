@@ -10,10 +10,12 @@
 
 #include <vector>
 #include <string>
-#include "GDL/IDE/GDExpressionParser.h"
+#include "GDCore/Events/ExpressionParser.h"
 namespace gd { class ExpressionMetadata; }
 namespace gd { class StrExpressionMetadata; }
 namespace gd { class Expression; }
+namespace gd { class Project; }
+namespace gd { class Layout; }
 class Game;
 class Scene;
 class EventsCodeGenerationContext;
@@ -27,14 +29,14 @@ class EventsCodeGenerator;
  *   std::string expressionOutputCppCode;
  *
  *   CallbacksForGeneratingExpressionCode callbacks(expressionOutputCppCode, game, scene, codeGenerator, context);
- *   GDExpressionParser parser(theOriginalGameDevelopExpression);
- *   parser.ParseTextExpression(game, scene, callbacks);
+ *   gd::ExpressionParser parser(theOriginalGameDevelopExpression);
+ *   parser.ParseStringExpression(game, scene, callbacks);
  *
  *   if (expressionOutputCppCode.empty()) expressionOutputCppCode = "\"\""; //If generation failed, we make sure output code is not empty.
  * \endcode
  * \see EventsCodeGenerator
  */
-class GD_API CallbacksForGeneratingExpressionCode : public ParserCallbacks
+class GD_API CallbacksForGeneratingExpressionCode : public gd::ParserCallbacks
 {
 public:
     CallbacksForGeneratingExpressionCode(std::string & output, const Game & game_, const Scene & scene_, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context_);
@@ -49,8 +51,8 @@ public:
     void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo);
     void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo);
     void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo);
-    bool OnSubMathExpression(const Game & game, const Scene & scene, gd::Expression & expression);
-    bool OnSubTextExpression(const Game & game, const Scene & scene, gd::Expression & expression);
+    bool OnSubMathExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
+    bool OnSubTextExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
 
 private :
     std::string & plainExpression;

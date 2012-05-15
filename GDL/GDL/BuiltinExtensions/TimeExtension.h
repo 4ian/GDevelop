@@ -10,6 +10,8 @@
 
 /**
  * \brief Internal built-in extension providing time features.
+ *
+ * \ingroup BuiltinExtensions
  */
 class TimeExtension : public ExtensionBase
 {

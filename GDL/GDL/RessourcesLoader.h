@@ -14,8 +14,9 @@ class Music;
 #undef LoadImage //Undef macro from windows.h
 
 /**
- * \brief Class that is used by games to load ressources
- * from an Game Develop Executable ( DatFile ) or from an external file.
+ * \brief Class that is used by games to load resources from an Game Develop Executable ( DatFile ) or from an external file.
+ *
+ * \ingroup ResourcesManagement
  */
 class GD_API RessourcesLoader
 {

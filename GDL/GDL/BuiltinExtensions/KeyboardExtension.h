@@ -10,6 +10,8 @@
 
 /**
  * \brief Internal built-in extension providing keyboard features
+ *
+ * \ingroup BuiltinExtensions
  */
 class KeyboardExtension : public ExtensionBase
 {

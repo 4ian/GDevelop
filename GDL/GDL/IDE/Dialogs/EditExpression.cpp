@@ -14,6 +14,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <wx/msgdlg.h>
 #include <wx/image.h>
 #include <wx/icon.h>
 #include <wx/bitmap.h>
@@ -354,7 +355,7 @@ lastErrorPos(std::string::npos)
 
     //Prepare keyword highlighting
     std::string keywords;
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = GDpriv::ExtensionsManager::GetInstance()->GetExtensions();
+    const vector < boost::shared_ptr<ExtensionBase> > extensions = ExtensionsManager::GetInstance()->GetExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -441,7 +442,7 @@ void EditExpression::TextModified(wxStyledTextEvent& event)
 
     CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
 
-    GDExpressionParser expressionParser(expression);
+    gd::ExpressionParser expressionParser(expression);
     if ( !expressionParser.ParseMathExpression(game, scene, callbacks) )
     {
         errorTxt->SetLabel(expressionParser.firstErrorStr);
@@ -459,7 +460,7 @@ void EditExpression::TextModified(wxStyledTextEvent& event)
 void EditExpression::OnOkBtClick(wxCommandEvent& event)
 {
     CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
-    GDExpressionParser expressionParser(expression);
+    gd::ExpressionParser expressionParser(expression);
 
     if ( !expressionParser.ParseMathExpression(game, scene, callbacks) )
     {
@@ -478,7 +479,7 @@ void EditExpression::RefreshLists()
     ValList->DeleteAllItems();
     ValList->AddRoot( _( "Toutes les valeurs spéciales" ), 0 );
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects expressions
@@ -678,6 +679,7 @@ string EditExpression::ShowParameterDialog(const gd::ParameterMetadata & paramet
     else if ( parameterMetadata.type == "scenevar" )
     {
         gd::ChooseVariableDialog dialog(this, scene.GetVariables());
+        dialog.SetAssociatedLayout(&game, &scene);
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.selectedVariable;
@@ -685,6 +687,7 @@ string EditExpression::ShowParameterDialog(const gd::ParameterMetadata & paramet
     else if ( parameterMetadata.type == "globalvar" )
     {
         gd::ChooseVariableDialog dialog(this, game.GetVariables());
+        dialog.SetAssociatedProject(&game);
         if ( dialog.ShowModal() == 0 ) return "";
 
         return dialog.selectedVariable;

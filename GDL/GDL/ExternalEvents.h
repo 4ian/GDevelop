@@ -14,6 +14,8 @@
 
 /**
  * \brief Contains a list of events not directly linked to a scene.
+ *
+ * \ingroup PlatformDefinition
  */
 class GD_API ExternalEvents
 #if defined(GD_IDE_ONLY)

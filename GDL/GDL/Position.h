@@ -15,6 +15,8 @@
  *
  * Class used so as to represent objects at their initial states on the scene.
  * During loading of a scene, "real" objects are created from the initial positions.
+ *
+ * \ingroup GameEngine
  */
 class GD_API InitialPosition
 {

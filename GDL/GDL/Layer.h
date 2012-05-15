@@ -14,7 +14,10 @@ using namespace std;
 
 /**
  * \brief Represents a layer of a scene. Contains cameras.
+ *
  * During runtime, RuntimeLayers are used instead of simple Layer.
+ *
+ * \ingroup GameEngine
  */
 class GD_API Layer
 {

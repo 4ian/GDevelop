@@ -69,7 +69,7 @@ specialAction(-1)
 
 RuntimeScene::~RuntimeScene()
 {
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = GDpriv::ExtensionsManager::GetInstance()->GetExtensions();
+    const vector < boost::shared_ptr<ExtensionBase> > extensions = ExtensionsManager::GetInstance()->GetExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
     {
         if ( extensions[i] != boost::shared_ptr<ExtensionBase>() )
@@ -185,7 +185,10 @@ void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, in
 
 int RuntimeScene::RenderAndStep(unsigned int nbStep)
 {
+#if defined(DEV) || defined(DEBUG)
     BT_PROFILE("RenderAndStep");
+#endif
+
     for (unsigned int step = 0;step<nbStep;++step)
     {
         //Gestion pré-évènements
@@ -203,7 +206,9 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         #endif
 
         {
+#if defined(DEV) || defined(DEBUG)
             BT_PROFILE("Events");
+#endif
             codeExecutionEngine->Execute();
         }
 
@@ -573,7 +578,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     }
 
     //Extensions specific initialization
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = GDpriv::ExtensionsManager::GetInstance()->GetExtensions();
+    const vector < boost::shared_ptr<ExtensionBase> > extensions = ExtensionsManager::GetInstance()->GetExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
     {
         if ( extensions[i] != boost::shared_ptr<ExtensionBase>() )

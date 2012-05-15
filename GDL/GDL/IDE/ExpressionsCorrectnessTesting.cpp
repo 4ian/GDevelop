@@ -6,7 +6,7 @@
 #if defined(GD_IDE_ONLY)
 
 #include "GDL/IDE/ExpressionsCorrectnessTesting.h"
-#include "GDL/IDE/GDExpressionParser.h"
+#include "GDCore/Events/ExpressionParser.h"
 #include "GDCore/Events/Expression.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
@@ -14,19 +14,19 @@
 
 using namespace std;
 
-CallbacksForExpressionCorrectnessTesting::CallbacksForExpressionCorrectnessTesting(const Game & game_, const Scene & scene_) :
-    game(game_),
-    scene(scene_)
+CallbacksForExpressionCorrectnessTesting::CallbacksForExpressionCorrectnessTesting(const gd::Project & project_, const gd::Layout & layout_) :
+    project(project_),
+    layout(layout_)
 {
 
 }
 
-bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(const Game & game, const Scene & scene, gd::Expression & expression)
+bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
 {
-    CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
+    CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
 
-    GDExpressionParser parser(expression.GetPlainString());
-    if ( !parser.ParseMathExpression(game, scene, callbacks) )
+    gd::ExpressionParser parser(expression.GetPlainString());
+    if ( !parser.ParseMathExpression(project, layout, callbacks) )
     {
         #if defined(GD_IDE_ONLY)
         firstErrorStr = callbacks.firstErrorStr;
@@ -38,12 +38,12 @@ bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(const Game & 
     return true;
 }
 
-bool CallbacksForExpressionCorrectnessTesting::OnSubTextExpression(const Game & game, const Scene & scene, gd::Expression & expression)
+bool CallbacksForExpressionCorrectnessTesting::OnSubTextExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
 {
-    CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
+    CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
 
-    GDExpressionParser parser(expression.GetPlainString());
-    if ( !parser.ParseTextExpression(game, scene, callbacks) )
+    gd::ExpressionParser parser(expression.GetPlainString());
+    if ( !parser.ParseStringExpression(project, layout, callbacks) )
     {
         #if defined(GD_IDE_ONLY)
         firstErrorStr = callbacks.firstErrorStr;

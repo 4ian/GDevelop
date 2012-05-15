@@ -20,7 +20,7 @@ namespace gd {typedef boost::shared_ptr<gd::BaseEvent> BaseEventSPtr;}
 using namespace std;
 
 /**
- * Internal class used so as to save and open games files.
+ * \brief Internal class used so as to save and open games files.
  */
 class GD_API OpenSaveGame
 {

@@ -8,29 +8,31 @@
 #include <string>
 
 /**
- * \brief Used to get information about Game Develop Library version.
+ * \brief Used to get information about the %Game Develop Library version.
+ *
+ * \ingroup Tools
  */
 class GD_API GDLVersionWrapper
 {
     public:
 
         /**
-         * Get Game Develop library Major version number
+         * Get %Game Develop library Major version number
          */
         static int Major();
 
         /**
-         * Get Game Develop library Minor version number
+         * Get %Game Develop library Minor version number
          */
         static int Minor();
 
         /**
-         * Get Game Develop library Build version number
+         * Get %Game Develop library Build version number
          */
         static int Build();
 
         /**
-         * Get Game Develop library Revision version number
+         * Get %Game Develop library Revision version number
          */
         static int Revision();
 

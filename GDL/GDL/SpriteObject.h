@@ -27,7 +27,13 @@ class MainEditorCommand;
 
 /**
  * \brief Internal built-in Sprite object.
+ *
  * Sprite object is an object composed of animations, containing directions with images.
+ *
+ * \see Animation
+ * \see Direction
+ * \see Sprite
+ * \ingroup SpriteObjectExtension
  */
 class GD_API SpriteObject : public Object
 {

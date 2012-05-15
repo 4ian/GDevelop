@@ -12,9 +12,12 @@
 class TiXmlElement;
 
 /**
- * Base class for defining automatisms shared datas.
+ * \brief Base class for defining automatisms shared datas.
+ *
  * Automatisms can use shared datas, as if they were extending the Scene members.
  * Inherit from this class, and redefine Clone and CreateRuntimeSharedDatas.
+ *
+ * \ingroup GameEngine
  */
 class GD_API AutomatismsSharedDatas
 {

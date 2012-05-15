@@ -23,9 +23,12 @@ using namespace std;
 
 /**
  * \brief Manage images at runtime, providing an easy way to get SFML images or OpenGL textures.
+ *
  * Image manager is used by objects to obtain their images from the image name.
  * Images are loaded dynamically when necessary, and are unloaded if there is no
  * more shared_ptr pointing on an image.
+ *
+ * \ingroup ResourcesManagement
  */
 class GD_API ImageManager
 {
@@ -104,6 +107,8 @@ class GD_API ImageManager
 
 /**
  * \brief Class wrapping an SFML texture.
+ *
+ * \ingroup ResourcesManagement
  */
 class GD_API SFMLTextureWrapper
 {
@@ -118,6 +123,8 @@ class GD_API SFMLTextureWrapper
 
 /**
  * \brief Class wrapping an OpenGL texture.
+ *
+ * \ingroup ResourcesManagement
  */
 class GD_API OpenGLTextureWrapper
 {

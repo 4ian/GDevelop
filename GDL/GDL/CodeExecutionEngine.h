@@ -20,12 +20,15 @@ namespace llvm
 class RuntimeContext;
 
 /**
- * \brief Manage all llvm related stuff to launch compiled events.
+ * \brief Manage all llvm related stuff to launch compiled events code.
+ *
  * RuntimeScene uses this class to launch compiled events.
  * Set up this class by loading bitcode compiled by CodeCompiler.
  *
  * \see CodeCompilationHelpers
  * \see CodeCompiler
+ *
+ * \ingroup CodeExecutionEngine
  */
 class GD_API CodeExecutionEngine
 {

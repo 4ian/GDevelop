@@ -18,9 +18,12 @@
 #endif
 
 std::string Resource::badStr;
-ResourceFolder ResourcesManager::badFolder;
 Resource ResourcesManager::badResource;
+#if defined(GD_IDE_ONLY)
+ResourceFolder ResourcesManager::badFolder;
+#endif
 
+#if defined(GD_IDE_ONLY)
 void ResourceFolder::Init(const ResourceFolder & other)
 {
     name = other.name;
@@ -31,6 +34,7 @@ void ResourceFolder::Init(const ResourceFolder & other)
         resources.push_back(other.resources[i]->Clone());
     }
 }
+#endif
 
 void ResourcesManager::Init(const ResourcesManager & other)
 {
@@ -39,11 +43,13 @@ void ResourcesManager::Init(const ResourcesManager & other)
     {
         resources.push_back(other.resources[i]->Clone());
     }
+#if defined(GD_IDE_ONLY)
     folders.clear();
     for (unsigned int i = 0;i<other.folders.size();++i)
     {
         folders.push_back(other.folders[i]);
     }
+#endif
 }
 
 #if defined(GD_IDE_ONLY)
@@ -81,7 +87,7 @@ void ImageResource::RenderPreview(wxPaintDC & dc, wxPanel & previewPanel)
     wxSize size = previewPanel.GetSize();
 
     //Fond en damier
-    dc.SetBrush(CommonBitmapManager::GetInstance()->transparentBg);
+    dc.SetBrush(gd::CommonBitmapManager::GetInstance()->transparentBg);
     dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
     if ( !wxFile::Exists(file) )
@@ -141,6 +147,7 @@ boost::shared_ptr<Resource> ResourcesManager::GetResourceSPtr(const std::string 
     return boost::shared_ptr<Resource>();
 }
 
+#if defined(GD_IDE_ONLY)
 bool ResourceFolder::HasResource(const std::string & name) const
 {
     for (unsigned int i = 0;i<resources.size();++i)
@@ -194,6 +201,7 @@ void ResourceFolder::RemoveResource(const std::string & name)
             ++i;
     }
 }
+#endif
 
 void ResourcesManager::RemoveResource(const std::string & name)
 {
@@ -205,8 +213,10 @@ void ResourcesManager::RemoveResource(const std::string & name)
             ++i;
     }
 
+#if defined(GD_IDE_ONLY)
     for (unsigned int i = 0;i<folders.size();++i)
         folders[i].RemoveResource(name);
+#endif
 }
 
 boost::shared_ptr<Resource> ResourcesManager::CreateResource(const std::string & kind)
@@ -220,6 +230,7 @@ boost::shared_ptr<Resource> ResourcesManager::CreateResource(const std::string &
     return boost::shared_ptr<Resource>(new Resource);
 }
 
+#if defined(GD_IDE_ONLY)
 bool ResourcesManager::HasFolder(const std::string & name) const
 {
     for (unsigned int i = 0;i<folders.size();++i)
@@ -294,7 +305,6 @@ void ResourceFolder::LoadFromXml(const TiXmlElement * elem, std::vector< boost::
     }
 }
 
-#if defined(GD_IDE_ONLY)
 /**
  * Save to an xml element.
  */
@@ -337,6 +347,7 @@ void ResourcesManager::LoadFromXml(const TiXmlElement * elem)
         resourceElem = resourceElem->NextSiblingElement();
     }
 
+#if defined(GD_IDE_ONLY)
     const TiXmlElement * resourceFoldersElem = elem->FirstChildElement("ResourceFolders");
     const TiXmlElement * resourceFolderElem  = resourceFoldersElem ? resourceFoldersElem->FirstChildElement() : NULL;
     while ( resourceFolderElem )
@@ -347,6 +358,7 @@ void ResourcesManager::LoadFromXml(const TiXmlElement * elem)
         folders.push_back(folder);
         resourceFolderElem = resourceFolderElem->NextSiblingElement();
     }
+#endif
 }
 
 #if defined(GD_IDE_ONLY)
@@ -397,7 +409,6 @@ void ImageResource::SaveToXml(TiXmlElement * elem)
     elem->SetAttribute("userAdded", userAdded ? "true" : "false");
     elem->SetAttribute("file", file.c_str());
 }
-#endif
 
 
 ResourceFolder::ResourceFolder(const ResourceFolder & other)
@@ -412,6 +423,7 @@ ResourceFolder& ResourceFolder::operator=(const ResourceFolder & other)
 
     return *this;
 }
+#endif
 
 ResourcesManager::ResourcesManager(const ResourcesManager & other)
 {

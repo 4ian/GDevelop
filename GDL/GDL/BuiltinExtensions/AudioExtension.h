@@ -11,6 +11,8 @@ namespace gd {class ArbitraryResourceWorker;}
 
 /**
  * \brief Internal builtin extension providing audio features.
+ *
+ * \ingroup BuiltinExtensions
  */
 class AudioExtension : public ExtensionBase
 {

@@ -8,7 +8,10 @@
 #include <SFML/System.hpp>
 
 /**
- * \brief Defines a rotated rectangle. Mainly used to define hit boxes.
+ * \brief Defines a rotated rectangle. Mainly used to define hit boxes of Object.
+ *
+ * \see Object
+ * \ingroup GameEngine
  */
 class RotatedRectangle
 {

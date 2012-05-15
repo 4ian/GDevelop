@@ -11,6 +11,7 @@
 #include <wx/filefn.h>
 #include <wx/log.h>
 #include <wx/msgdlg.h>
+#include <wx/stopwatch.h>
 #include <wx/dir.h>
 #include <wx/help.h>
 #include <wx/config.h>
@@ -27,7 +28,7 @@
 #include "GDL/Object.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/SceneNameMangler.h"
-#include "GDL/AES.h"
+#include "GDL/Tools/AES.h"
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
@@ -280,7 +281,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     wxSafeYield();
 
     //Copy extensions
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
     for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
     {
         //Builtin extensions does not have a namespace.

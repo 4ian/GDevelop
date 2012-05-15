@@ -10,7 +10,7 @@
 
 #include <vector>
 #include <string>
-#include "GDL/IDE/GDExpressionParser.h"
+#include "GDCore/Events/ExpressionParser.h"
 namespace gd { class ExpressionMetadata; }
 namespace gd { class StrExpressionMetadata; }
 namespace gd { class Expression; }
@@ -20,11 +20,11 @@ class Scene;
 /**
  * Used to check for expressions correctness
  */
-class GD_API CallbacksForExpressionCorrectnessTesting : public ParserCallbacks
+class GD_API CallbacksForExpressionCorrectnessTesting : public gd::ParserCallbacks
 {
-    public:
+public:
 
-    CallbacksForExpressionCorrectnessTesting(const Game & game_, const Scene & scene_);
+    CallbacksForExpressionCorrectnessTesting(const gd::Project & project, const gd::Layout & layout);
     virtual ~CallbacksForExpressionCorrectnessTesting() {};
 
     void OnOperator(std::string text) {};
@@ -36,13 +36,12 @@ class GD_API CallbacksForExpressionCorrectnessTesting : public ParserCallbacks
     void OnObjectFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) {};
     void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) {};
     void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) {};
-    bool OnSubMathExpression(const Game & game, const Scene & scene, gd::Expression & expression);
-    bool OnSubTextExpression(const Game & game, const Scene & scene, gd::Expression & expression);
+    bool OnSubMathExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
+    bool OnSubTextExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression);
 
-
-    private :
-        const Game & game;
-        const Scene & scene;
+private :
+    const gd::Project & project;
+    const gd::Layout & layout;
 };
 
 #endif // EXPRESSIONSCORRECTNESSTESTING_H

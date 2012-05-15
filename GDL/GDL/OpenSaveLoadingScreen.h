@@ -11,6 +11,9 @@
 
 using namespace std;
 
+/**
+ * \brief Internal class for saving and loading data of LoadingScreen.
+ */
 class GD_API OpenSaveLoadingScreen
 {
     public:

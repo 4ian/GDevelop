@@ -19,8 +19,6 @@
 #define _(x) x
 #endif
 
-using namespace GDpriv;
-
 Game::Game() :
 portable(false),
 name(_("Projet")),

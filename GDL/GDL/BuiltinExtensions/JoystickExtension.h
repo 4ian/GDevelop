@@ -10,6 +10,8 @@
 
 /**
  * \brief Internal built-in extension providing joysticks features
+ *
+ * \ingroup BuiltinExtensions
  */
 class JoystickExtension : public ExtensionBase
 {

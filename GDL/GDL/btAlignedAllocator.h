@@ -1,3 +1,4 @@
+#if defined(GD_IDE_ONLY) || defined(DEBUG) || defined(DEV)
 /*
 Bullet Continuous Collision Detection and Physics Library
 Copyright (c) 2003-2006 Erwin Coumans  http://continuousphysics.com/Bullet/
@@ -59,9 +60,9 @@ void btAlignedAllocSetCustomAligned(btAlignedAllocFunc *allocFunc, btAlignedFree
 ///Default implementations for unaligned and aligned allocations can be overridden by a custom allocator using btAlignedAllocSetCustom and btAlignedAllocSetCustomAligned.
 template < typename T , unsigned Alignment >
 class btAlignedAllocator {
-	
+
 	typedef btAlignedAllocator< T , Alignment > self_type;
-	
+
 public:
 
 	//just going down a list:
@@ -90,7 +91,7 @@ public:
 		btAlignedFree( reinterpret_cast< void * >( ptr ) );
 	}
 	void          destroy   ( pointer          ptr )                                 { ptr->~value_type(); }
-	
+
 
 	template < typename O > struct rebind {
 		typedef btAlignedAllocator< O , Alignment > other;
@@ -105,3 +106,4 @@ public:
 
 #endif //BT_ALIGNED_ALLOCATOR
 
+#endif

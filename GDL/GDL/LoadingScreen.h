@@ -13,6 +13,8 @@ using namespace std;
 
 /**
  * \brief Internal class containg information so as to display a loading screen.
+ *
+ * \ingroup GameEngine
  */
 class GD_API LoadingScreen
 {

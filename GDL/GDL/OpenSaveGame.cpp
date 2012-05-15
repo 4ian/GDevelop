@@ -343,7 +343,7 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, c
 {
     const TiXmlElement * elemScene = elem->FirstChildElement("Objet");
 
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
 
     //Passage en revue des objets
     while ( elemScene )
@@ -519,7 +519,7 @@ void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, const TiXmlE
 void OpenSaveGame::OpenEvents(vector < gd::BaseEventSPtr > & list, const TiXmlElement * elem)
 {
     const TiXmlElement * elemScene = elem->FirstChildElement();
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
 
     //Passage en revue des évènements
     while ( elemScene )
@@ -1340,11 +1340,11 @@ void OpenSaveGame::AdaptConditionFromGD1x(gd::Instruction & instruction, const g
 
     if ( instrInfos.canHaveSubInstructions )
     {
-        GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+        ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
 
         vector < gd::Instruction > & subInstructions = instruction.GetSubInstructions();
         for (unsigned int i = 0;i<subInstructions.size();++i)
-            AdaptConditionFromGD1x(subInstructions[i], extensionManager->GetConditionInfos(subInstructions[i].GetType()));
+            AdaptConditionFromGD1x(subInstructions[i], extensionManager->GetConditionMetadata(subInstructions[i].GetType()));
     }
 }
 
@@ -1361,17 +1361,17 @@ void OpenSaveGame::AdaptActionFromGD1x(gd::Instruction & instruction, const gd::
 
     if ( instrInfos.canHaveSubInstructions )
     {
-        GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+        ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
 
         vector < gd::Instruction > & subInstructions = instruction.GetSubInstructions();
         for (unsigned int i = 0;i<subInstructions.size();++i)
-            AdaptActionFromGD1x(subInstructions[i], extensionManager->GetActionInfos(subInstructions[i].GetType()));
+            AdaptActionFromGD1x(subInstructions[i], extensionManager->GetActionMetadata(subInstructions[i].GetType()));
     }
 }
 
 void OpenSaveGame::AdaptEventsFromGD1x(vector < gd::BaseEventSPtr > & list)
 {
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
 
     for (unsigned int eId = 0;eId<list.size();++eId)
     {
@@ -1380,7 +1380,7 @@ void OpenSaveGame::AdaptEventsFromGD1x(vector < gd::BaseEventSPtr > & list)
         {
             for (unsigned int cId = 0;cId<conditions[cV]->size();++cId)
             {
-                AdaptConditionFromGD1x((*conditions[cV])[cId], extensionManager->GetConditionInfos((*conditions[cV])[cId].GetType()));
+                AdaptConditionFromGD1x((*conditions[cV])[cId], extensionManager->GetConditionMetadata((*conditions[cV])[cId].GetType()));
             }
         }
 
@@ -1389,7 +1389,7 @@ void OpenSaveGame::AdaptEventsFromGD1x(vector < gd::BaseEventSPtr > & list)
         {
             for (unsigned int aId = 0;aId<actions[aV]->size();++aId)
             {
-                AdaptActionFromGD1x( (*actions[aV])[aId], extensionManager->GetActionInfos((*actions[aV])[aId].GetType()));
+                AdaptActionFromGD1x( (*actions[aV])[aId], extensionManager->GetActionMetadata((*actions[aV])[aId].GetType()));
             }
         }
 

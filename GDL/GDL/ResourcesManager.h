@@ -17,6 +17,8 @@ class wxPanel;
 
 /**
  * \brief Base class to describe a resource used by a game.
+ *
+ * \ingroup ResourcesManagement
  */
 class GD_API Resource
 {
@@ -94,6 +96,9 @@ private:
 
 /**
  * \brief Describe an image used by a game.
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
  */
 class GD_API ImageResource : public Resource
 {
@@ -157,6 +162,7 @@ public:
     #endif
 };
 
+#if defined(GD_IDE_ONLY)
 class GD_API ResourceFolder
 {
 public:
@@ -188,6 +194,104 @@ public:
      */
     virtual void LoadFromXml(const TiXmlElement * elem, std::vector< boost::shared_ptr<Resource> > & alreadyExistingResources);
 
+    /**
+     * Save to an xml element.
+     */
+    virtual void SaveToXml(TiXmlElement * elem);
+
+private:
+
+    void Init(const ResourceFolder & other);
+};
+#endif
+
+/**
+ * \brief Inventory all resources used by a project
+ *
+ * \see Resource
+ * \ingroup ResourcesManagement
+ */
+class GD_API ResourcesManager
+{
+public:
+    ResourcesManager();
+    virtual ~ResourcesManager();
+    ResourcesManager(const ResourcesManager&);
+    ResourcesManager& operator=(const ResourcesManager & rhs);
+
+    static boost::shared_ptr<Resource> CreateResource(const std::string & kind);
+
+    /**
+     * Remove a resource
+     */
+    void RemoveResource(const std::string & name);
+
+    /**
+     * Remove a resource
+     */
+    void RenameResource(const std::string & oldName, const std::string & newName);
+
+    /**
+     * Return true if a resource exists.
+     */
+    bool HasResource(const std::string & name) const;
+
+    /**
+     * Return a reference to a resource.
+     */
+    Resource & GetResource(const std::string & name);
+
+    /**
+     * Return a reference to a resource.
+     */
+    const Resource & GetResource(const std::string & name) const;
+
+    /**
+     * Return a (smart) pointer to a resource.
+     */
+    boost::shared_ptr<Resource> GetResourceSPtr(const std::string & name);
+
+    #if defined(GD_IDE_ONLY)
+    /** \name Folders management
+     * Members functions related to folders management
+     */
+    ///@{
+    /**
+     * Return true if the folder exists.
+     */
+    bool HasFolder(const std::string & name) const;
+
+    /**
+     * Return a reference to a folder
+     */
+    const ResourceFolder & GetFolder(const std::string & name) const;
+
+    /**
+     * Return a reference to a folder
+     */
+    ResourceFolder & GetFolder(const std::string & name);
+
+    /**
+     * Remove a folder.
+     */
+    void RemoveFolder(const std::string & name);
+
+    /**
+     * Create a new empty folder.
+     */
+    void CreateFolder(const std::string & name);
+    ///@}
+    #endif
+
+    std::vector< boost::shared_ptr<Resource> > resources;
+    #if defined(GD_IDE_ONLY)
+    std::vector< ResourceFolder > folders;
+    #endif
+    /**
+     * Load an xml element.
+     */
+    virtual void LoadFromXml(const TiXmlElement * elem);
+
     #if defined(GD_IDE_ONLY)
     /**
      * Save to an xml element.
@@ -197,97 +301,12 @@ public:
 
 private:
 
-    void Init(const ResourceFolder & other);
-};
+    void Init(const ResourcesManager & other);
 
-/**
- * \brief Inventory all resources used by a project
- */
-class GD_API ResourcesManager
-{
-    public:
-        ResourcesManager();
-        virtual ~ResourcesManager();
-        ResourcesManager(const ResourcesManager&);
-        ResourcesManager& operator=(const ResourcesManager & rhs);
-
-        static boost::shared_ptr<Resource> CreateResource(const std::string & kind);
-
-        /**
-         * Remove a resource
-         */
-        void RemoveResource(const std::string & name);
-
-        /**
-         * Remove a resource
-         */
-        void RenameResource(const std::string & oldName, const std::string & newName);
-
-        /**
-         * Return true if a resource exists.
-         */
-        bool HasResource(const std::string & name) const;
-
-        /**
-         * Return a reference to a resource.
-         */
-        Resource & GetResource(const std::string & name);
-
-        /**
-         * Return a reference to a resource.
-         */
-        const Resource & GetResource(const std::string & name) const;
-
-        /**
-         * Return a (smart) pointer to a resource.
-         */
-        boost::shared_ptr<Resource> GetResourceSPtr(const std::string & name);
-
-        /**
-         * Return true if the folder exists.
-         */
-        bool HasFolder(const std::string & name) const;
-
-        /**
-         * Return a reference to a folder
-         */
-        const ResourceFolder & GetFolder(const std::string & name) const;
-
-        /**
-         * Return a reference to a folder
-         */
-        ResourceFolder & GetFolder(const std::string & name);
-
-        /**
-         * Remove a folder.
-         */
-        void RemoveFolder(const std::string & name);
-
-        /**
-         * Create a new empty folder.
-         */
-        void CreateFolder(const std::string & name);
-
-        std::vector< boost::shared_ptr<Resource> > resources;
-        std::vector< ResourceFolder > folders;
-        /**
-         * Load an xml element.
-         */
-        virtual void LoadFromXml(const TiXmlElement * elem);
-
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Save to an xml element.
-         */
-        virtual void SaveToXml(TiXmlElement * elem);
-        #endif
-
-    private:
-
-        void Init(const ResourcesManager & other);
-
-        static ResourceFolder badFolder;
-        static Resource badResource;
+    #if defined(GD_IDE_ONLY)
+    static ResourceFolder badFolder;
+    #endif
+    static Resource badResource;
 };
 
 #endif // RESOURCESMANAGER_H

@@ -1,10 +1,11 @@
+#if defined(GD_IDE_ONLY) || defined(DEBUG) || defined(DEV)
 /*
 Copyright (c) 2003-2006 Gino van den Bergen / Erwin Coumans  http://continuousphysics.com/Bullet/
 
 This software is provided 'as-is', without any express or implied warranty.
 In no event will the authors be held liable for any damages arising from the use of this software.
-Permission is granted to anyone to use this software for any purpose, 
-including commercial applications, and to alter it and redistribute it freely, 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it freely,
 subject to the following restrictions:
 
 1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgment in the product documentation would be appreciated but is not required.
@@ -84,7 +85,7 @@ inline int	btGetVersion()
 		#define btUnlikely(_c) _c
 
 #else
-	
+
 #if defined	(__CELLOS_LV2__)
 		#define SIMD_FORCE_INLINE inline
 		#define ATTRIBUTE_ALIGNED16(a) a __attribute__ ((aligned (16)))
@@ -124,7 +125,7 @@ inline int	btGetVersion()
 
 		#define btLikely(_c)   __builtin_expect((_c), 1)
 		#define btUnlikely(_c) __builtin_expect((_c), 0)
-		
+
 
 #else
 	//non-windows systems
@@ -191,7 +192,7 @@ typedef float btScalar;
 
 
 #if defined(BT_USE_DOUBLE_PRECISION) || defined(BT_FORCE_DOUBLE_FUNCTIONS)
-		
+
 SIMD_FORCE_INLINE btScalar btSqrt(btScalar x) { return sqrt(x); }
 SIMD_FORCE_INLINE btScalar btFabs(btScalar x) { return fabs(x); }
 SIMD_FORCE_INLINE btScalar btCos(btScalar x) { return cos(x); }
@@ -206,9 +207,9 @@ SIMD_FORCE_INLINE btScalar btLog(btScalar x) { return log(x); }
 SIMD_FORCE_INLINE btScalar btPow(btScalar x,btScalar y) { return pow(x,y); }
 
 #else
-		
-SIMD_FORCE_INLINE btScalar btSqrt(btScalar y) 
-{ 
+
+SIMD_FORCE_INLINE btScalar btSqrt(btScalar y)
+{
 #ifdef USE_APPROXIMATION
     double x, z, tempf;
     unsigned long *tfptr = ((unsigned long *)&tempf) + 1;
@@ -224,16 +225,16 @@ SIMD_FORCE_INLINE btScalar btSqrt(btScalar y)
 	x = (btScalar(1.5)*x)-(x*x)*(x*z);
 	return x*y;
 #else
-	return sqrtf(y); 
+	return sqrtf(y);
 #endif
 }
 SIMD_FORCE_INLINE btScalar btFabs(btScalar x) { return fabsf(x); }
 SIMD_FORCE_INLINE btScalar btCos(btScalar x) { return cosf(x); }
 SIMD_FORCE_INLINE btScalar btSin(btScalar x) { return sinf(x); }
 SIMD_FORCE_INLINE btScalar btTan(btScalar x) { return tanf(x); }
-SIMD_FORCE_INLINE btScalar btAcos(btScalar x) { 
+SIMD_FORCE_INLINE btScalar btAcos(btScalar x) {
 	btAssert(x <= btScalar(1.));
-	return acosf(x); 
+	return acosf(x);
 }
 SIMD_FORCE_INLINE btScalar btAsin(btScalar x) { return asinf(x); }
 SIMD_FORCE_INLINE btScalar btAtan(btScalar x) { return atanf(x); }
@@ -241,7 +242,7 @@ SIMD_FORCE_INLINE btScalar btAtan2(btScalar x, btScalar y) { return atan2f(x, y)
 SIMD_FORCE_INLINE btScalar btExp(btScalar x) { return expf(x); }
 SIMD_FORCE_INLINE btScalar btLog(btScalar x) { return logf(x); }
 SIMD_FORCE_INLINE btScalar btPow(btScalar x,btScalar y) { return powf(x,y); }
-	
+
 #endif
 
 #define SIMD_2_PI         btScalar(6.283185307179586232)
@@ -258,7 +259,7 @@ SIMD_FORCE_INLINE btScalar btPow(btScalar x,btScalar y) { return powf(x,y); }
 #define SIMD_INFINITY     FLT_MAX
 #endif
 
-SIMD_FORCE_INLINE btScalar btAtan2Fast(btScalar y, btScalar x) 
+SIMD_FORCE_INLINE btScalar btAtan2Fast(btScalar y, btScalar x)
 {
 	btScalar coeff_1 = SIMD_PI / 4.0f;
 	btScalar coeff_2 = 3.0f * coeff_1;
@@ -316,20 +317,20 @@ SIMD_FORCE_INLINE bool btMachineIsLittleEndian()
 
 ///btSelect avoids branches, which makes performance much better for consoles like Playstation 3 and XBox 360
 ///Thanks Phil Knight. See also http://www.cellperformance.com/articles/2006/04/more_techniques_for_eliminatin_1.html
-SIMD_FORCE_INLINE unsigned btSelect(unsigned condition, unsigned valueIfConditionNonZero, unsigned valueIfConditionZero) 
+SIMD_FORCE_INLINE unsigned btSelect(unsigned condition, unsigned valueIfConditionNonZero, unsigned valueIfConditionZero)
 {
     // Set testNz to 0xFFFFFFFF if condition is nonzero, 0x00000000 if condition is zero
     // Rely on positive value or'ed with its negative having sign bit on
-    // and zero value or'ed with its negative (which is still zero) having sign bit off 
+    // and zero value or'ed with its negative (which is still zero) having sign bit off
     // Use arithmetic shift right, shifting the sign bit through all 32 bits
     unsigned testNz = (unsigned)(((int)condition | -(int)condition) >> 31);
     unsigned testEqz = ~testNz;
-    return ((valueIfConditionNonZero & testNz) | (valueIfConditionZero & testEqz)); 
+    return ((valueIfConditionNonZero & testNz) | (valueIfConditionZero & testEqz));
 }
 SIMD_FORCE_INLINE int btSelect(unsigned condition, int valueIfConditionNonZero, int valueIfConditionZero)
 {
     unsigned testNz = (unsigned)(((int)condition | -(int)condition) >> 31);
-    unsigned testEqz = ~testNz; 
+    unsigned testEqz = ~testNz;
     return static_cast<int>((valueIfConditionNonZero & testNz) | (valueIfConditionZero & testEqz));
 }
 SIMD_FORCE_INLINE float btSelect(unsigned condition, float valueIfConditionNonZero, float valueIfConditionZero)
@@ -337,7 +338,7 @@ SIMD_FORCE_INLINE float btSelect(unsigned condition, float valueIfConditionNonZe
 #ifdef BT_HAVE_NATIVE_FSEL
     return (float)btFsel((btScalar)condition - btScalar(1.0f), valueIfConditionNonZero, valueIfConditionZero);
 #else
-    return (condition != 0) ? valueIfConditionNonZero : valueIfConditionZero; 
+    return (condition != 0) ? valueIfConditionNonZero : valueIfConditionZero;
 #endif
 }
 
@@ -372,9 +373,9 @@ SIMD_FORCE_INLINE unsigned short btSwapEndian(short val)
 
 ///btSwapFloat uses using char pointers to swap the endianness
 ////btSwapFloat/btSwapDouble will NOT return a float, because the machine might 'correct' invalid floating point values
-///Not all values of sign/exponent/mantissa are valid floating point numbers according to IEEE 754. 
-///When a floating point unit is faced with an invalid value, it may actually change the value, or worse, throw an exception. 
-///In most systems, running user mode code, you wouldn't get an exception, but instead the hardware/os/runtime will 'fix' the number for you. 
+///Not all values of sign/exponent/mantissa are valid floating point numbers according to IEEE 754.
+///When a floating point unit is faced with an invalid value, it may actually change the value, or worse, throw an exception.
+///In most systems, running user mode code, you wouldn't get an exception, but instead the hardware/os/runtime will 'fix' the number for you.
 ///so instead of returning a float/double, we return integer/long long integer
 SIMD_FORCE_INLINE unsigned int  btSwapEndianFloat(float d)
 {
@@ -390,7 +391,7 @@ SIMD_FORCE_INLINE unsigned int  btSwapEndianFloat(float d)
 }
 
 // unswap using char pointers
-SIMD_FORCE_INLINE float btUnswapEndianFloat(unsigned int a) 
+SIMD_FORCE_INLINE float btUnswapEndianFloat(unsigned int a)
 {
     float d = 0.0f;
     unsigned char *src = (unsigned char *)&a;
@@ -422,7 +423,7 @@ SIMD_FORCE_INLINE void  btSwapEndianDouble(double d, unsigned char* dst)
 }
 
 // unswap using char pointers
-SIMD_FORCE_INLINE double btUnswapEndianDouble(const unsigned char *src) 
+SIMD_FORCE_INLINE double btUnswapEndianDouble(const unsigned char *src)
 {
     double d = 0.0;
     unsigned char *dst = (unsigned char *)&d;
@@ -441,3 +442,4 @@ SIMD_FORCE_INLINE double btUnswapEndianDouble(const unsigned char *src)
 
 
 #endif //SIMD___SCALAR_H
+#endif

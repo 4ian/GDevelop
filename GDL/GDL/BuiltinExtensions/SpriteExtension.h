@@ -8,7 +8,11 @@
 #include "GDL/ExtensionBase.h"
 
 /**
- * Internal built-in extension providing Sprite objects.
+ * \brief Internal built-in extension providing SpriteObject objects.
+ *
+ *
+ * \ingroup BuiltinExtensions
+ * \ingroup SpriteObjectExtension
  */
 class SpriteExtension : public ExtensionBase
 {

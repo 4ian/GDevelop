@@ -10,6 +10,8 @@
 
 /**
  * \brief Internal built-in extension providing variables features.
+ *
+ * \ingroup BuiltinExtensions
  */
 class VariablesExtension : public ExtensionBase
 {

@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
 #ifndef VARIABLE_H
 #define VARIABLE_H
 #include <string>
@@ -12,11 +11,15 @@
 
 /**
  * \brief Class used to represent a variable stored into ListVariable.
- * Example :
+ *
+ * Usage example :
  * \code
  * myObject->GetVariables().ObtainVariable("Life") = 100;
  * myObject->GetVariables().ObtainVariable("Armor") += 10;
  * \endcode
+ *
+ * \ingroup GameEngine
+ * \ingroup PlatformDefinition
  */
 class GD_API Variable
 #if defined(GD_IDE_ONLY)
@@ -90,13 +93,5 @@ private:
     mutable std::string str;
     mutable bool isNumber;
 };
-
-/**
- * Functor testing variable name
- */
-struct VariableHasName : public std::binary_function<const Variable &, std::string, bool> {
-    bool operator()(const Variable & variable, const std::string & name) const { return variable.GetName() == name; }
-};
-
 
 #endif // VARIABLE_H

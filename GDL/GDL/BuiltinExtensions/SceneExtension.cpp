@@ -104,14 +104,14 @@ SceneExtension::SceneExtension()
                 std::string value1Code;
                 {
                     CallbacksForGeneratingExpressionCode callbacks(value1Code, game, scene, codeGenerator, context);
-                    GDExpressionParser parser(instruction.GetParameters()[0].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[0].GetPlainString());
                     if (!parser.ParseMathExpression(game, scene, callbacks) || value1Code.empty()) value1Code = "0";
                 }
 
                 std::string value2Code;
                 {
                     CallbacksForGeneratingExpressionCode callbacks(value2Code, game, scene, codeGenerator, context);
-                    GDExpressionParser parser(instruction.GetParameters()[1].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[1].GetPlainString());
                     if (!parser.ParseMathExpression(game, scene, callbacks) || value2Code.empty()) value2Code = "0";
                 }
 

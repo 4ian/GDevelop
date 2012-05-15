@@ -979,7 +979,7 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
 
     wxSize size = thumbsPanel->GetSize();
 
-    CommonBitmapManager * CommonBitmapManager = CommonBitmapManager::GetInstance();
+    gd::CommonBitmapManager * CommonBitmapManager = gd::CommonBitmapManager::GetInstance();
 
     //Fond gris avec des flèches
     dc.SetPen(wxPen(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOWFRAME )));
@@ -1078,7 +1078,7 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
 
     wxSize size = imagePanel->GetSize();
 
-    CommonBitmapManager * CommonBitmapManager = CommonBitmapManager::GetInstance();
+    gd::CommonBitmapManager * CommonBitmapManager = gd::CommonBitmapManager::GetInstance();
 
     //Fond en damier
     dc.SetBrush(CommonBitmapManager->transparentBg);

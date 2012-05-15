@@ -14,7 +14,7 @@
 #include "GDL/Game.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/GDExpressionParser.h"
+#include "GDCore/Events/ExpressionParser.h"
 #include "GDL/Events/EventsCodeNameMangler.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/Events/ExpressionsCodeGeneration.h"
@@ -183,11 +183,11 @@ string EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMe
 
 std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const Scene & scene, gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
 
     std::string conditionCode;
 
-    gd::InstructionMetadata instrInfos = extensionsManager->GetConditionInfos(condition.GetType());
+    gd::InstructionMetadata instrInfos = extensionsManager->GetConditionMetadata(condition.GetType());
 
     if ( !instrInfos.cppCallingInformation.optionalIncludeFile.empty() )
         AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
@@ -432,7 +432,7 @@ string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const 
 
     for (unsigned int cId =0;cId < conditions.size();++cId)
     {
-        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
+        gd::InstructionMetadata instrInfos = ExtensionsManager::GetInstance()->GetConditionMetadata(conditions[cId].GetType());
 
         string conditionCode = GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
         if ( !conditions[cId].GetType().empty() )
@@ -457,11 +457,11 @@ string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const 
  */
 std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Scene & scene, gd::Instruction & action, EventsCodeGenerationContext & context)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
 
     string actionCode;
 
-    gd::InstructionMetadata instrInfos = extensionsManager->GetActionInfos(action.GetType());
+    gd::InstructionMetadata instrInfos = extensionsManager->GetActionMetadata(action.GetType());
 
     if ( !instrInfos.cppCallingInformation.optionalIncludeFile.empty() )
         AddIncludeFile(instrInfos.cppCallingInformation.optionalIncludeFile);
@@ -669,7 +669,7 @@ string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Sce
     string outputCode;
     for (unsigned int aId =0;aId < actions.size();++aId)
     {
-        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
+        gd::InstructionMetadata instrInfos = ExtensionsManager::GetInstance()->GetActionMetadata(actions[aId].GetType());
 
         string actionCode = GenerateActionCode(game, scene, actions[aId], context);
 
@@ -701,7 +701,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
         {
             CallbacksForGeneratingExpressionCode callbacks(argOutput, game, scene, *this, context);
 
-            GDExpressionParser parser(parameters[pNb].GetPlainString());
+            gd::ExpressionParser parser(parameters[pNb].GetPlainString());
             if ( !parser.ParseMathExpression(game, scene, callbacks) )
             {
                 cout << "Error :" << parser.firstErrorStr << " in: "<< parameters[pNb].GetPlainString() << endl;
@@ -715,8 +715,8 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
         {
             CallbacksForGeneratingExpressionCode callbacks(argOutput, game, scene, *this, context);
 
-            GDExpressionParser parser(parameters[pNb].GetPlainString());
-            if ( !parser.ParseTextExpression(game, scene, callbacks) )
+            gd::ExpressionParser parser(parameters[pNb].GetPlainString());
+            if ( !parser.ParseStringExpression(game, scene, callbacks) )
             {
                 cout << "Error in text expression" << parser.firstErrorStr << endl;
 

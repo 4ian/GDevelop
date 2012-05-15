@@ -10,6 +10,8 @@
 
 /**
  * \brief Internal built-in extension providing string features
+ *
+ * \ingroup BuiltinExtensions
  */
 class StringInstructionsExtension : public ExtensionBase
 {

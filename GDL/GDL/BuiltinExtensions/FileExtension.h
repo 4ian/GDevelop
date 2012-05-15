@@ -10,6 +10,8 @@
 
 /**
  * \brief Internal builtin extension providing files features.
+ *
+ * \ingroup FileExtension
  */
 class FileExtension : public ExtensionBase
 {

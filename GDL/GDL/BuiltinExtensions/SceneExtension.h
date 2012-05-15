@@ -3,6 +3,11 @@
 
 #include "GDL/ExtensionBase.h"
 
+/**
+ * \brief Internal builtin-extension providing features related to Scene.
+ *
+ * \ingroup BuiltinExtensions
+ */
 class SceneExtension : public ExtensionBase
 {
     public:

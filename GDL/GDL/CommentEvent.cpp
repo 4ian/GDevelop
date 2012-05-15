@@ -71,7 +71,7 @@ void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
 {
     x += 1; //Small border
 
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     renderingHelper->GetHTMLRenderer().SetDC(&dc);
     renderingHelper->GetHTMLRenderer().SetStandardFonts( 8 );
 
@@ -118,7 +118,7 @@ unsigned int CommentEvent::GetRenderedHeight(unsigned int width) const
 {
     if ( eventHeightNeedUpdate )
     {
-        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
 
         wxMemoryDC dc;
         wxBitmap fakeBmp(1,1);

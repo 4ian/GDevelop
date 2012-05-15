@@ -10,6 +10,8 @@
 
 /**
  * \brief Internal builtin extension providing advanced or special features.
+ *
+ * \ingroup BuiltinExtensions
  */
 class AdvancedExtension : public ExtensionBase
 {

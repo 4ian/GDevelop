@@ -2,13 +2,15 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
+#if defined(GD_IDE_ONLY)
 #ifndef EVENTSCODENAMEMANGLER_H
 #define EVENTSCODENAMEMANGLER_H
 #include <string>
 
 /**
  * Manage name mangling, so as to ensure all names used in code are valid.
+ *
+ * \see ManObjListName
  */
 class GD_API EventsCodeNameMangler
 {
@@ -45,8 +47,10 @@ private:
 
 /**
  * Shortcut to EventsCodeNameMangler::GetInstance()->GetMangledObjectsListName(objectName).
+ * \see EventsCodeNameMangler
  * \return Mangled object name
  */
 std::string GD_API ManObjListName(const std::string & objectName);
 
 #endif // EVENTSCODENAMEMANGLER_H
+#endif

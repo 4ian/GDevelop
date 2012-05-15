@@ -45,7 +45,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     CallbacksForGeneratingExpressionCode callbacks(expressionCode, game, scene, codeGenerator, context);
-                    GDExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
                     if (!parser.ParseMathExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
@@ -106,8 +106,8 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     CallbacksForGeneratingExpressionCode callbacks(expressionCode, game, scene, codeGenerator, context);
-                    GDExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseTextExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
+                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    if (!parser.ParseStringExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
                 //Generate variable getter call.
@@ -174,7 +174,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     CallbacksForGeneratingExpressionCode callbacks(expressionCode, game, scene, codeGenerator, context);
-                    GDExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
                     if (!parser.ParseMathExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
@@ -235,8 +235,8 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     CallbacksForGeneratingExpressionCode callbacks(expressionCode, game, scene, codeGenerator, context);
-                    GDExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseTextExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
+                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    if (!parser.ParseStringExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
                 //Generate variable getter call.
@@ -303,7 +303,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     CallbacksForGeneratingExpressionCode callbacks(expressionCode, game, scene, codeGenerator, context);
-                    GDExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
                     if (!parser.ParseMathExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
@@ -362,8 +362,8 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     CallbacksForGeneratingExpressionCode callbacks(expressionCode, game, scene, codeGenerator, context);
-                    GDExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseTextExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
+                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    if (!parser.ParseStringExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
                 //Generate variable getter call.
@@ -415,7 +415,7 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     CallbacksForGeneratingExpressionCode callbacks(expressionCode, game, scene, codeGenerator, context);
-                    GDExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
                     if (!parser.ParseMathExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
@@ -474,8 +474,8 @@ VariablesExtension::VariablesExtension()
                 std::string expressionCode;
                 {
                     CallbacksForGeneratingExpressionCode callbacks(expressionCode, game, scene, codeGenerator, context);
-                    GDExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseTextExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
+                    gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
+                    if (!parser.ParseStringExpression(game, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
                 //Generate variable getter call.

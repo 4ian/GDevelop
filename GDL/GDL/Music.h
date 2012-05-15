@@ -13,6 +13,8 @@ using namespace std;
 
 /**
  * \brief Used to play a music
+ *
+ * \ingroup SoundEngine
  */
 class GD_API Music
 {

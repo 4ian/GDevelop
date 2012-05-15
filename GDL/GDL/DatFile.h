@@ -1,5 +1,6 @@
 /**
- * \file Adapted from the article http://www.sfml-dev.org/wiki/en/tutorials/formatdat
+ * \file
+ * Adapted from the article http://www.sfml-dev.org/wiki/en/tutorials/formatdat
  * which is itself inspired from archive.gamedev.net/archive/reference/programming/features/pak/index.html
  */
 
@@ -11,6 +12,11 @@
 
 using namespace std;
 
+/**
+ * \brief Internal class related to DatFile
+ *
+ * \ingroup ResourcesManagement
+ */
 struct sDATHeader
 {
     char uniqueID[5]; /// Unique ID used to know if this file is a DAT File from this class
@@ -18,6 +24,11 @@ struct sDATHeader
     unsigned int nb_files; /// Number of files in the DAT file
 };
 
+/**
+ * \brief Internal class related to DatFile
+ *
+ * \ingroup ResourcesManagement
+ */
 struct sFileEntry
 {
     char name[1024]; /// Name of the data file
@@ -27,6 +38,8 @@ struct sFileEntry
 
 /**
  * \brief Internal class used to create and access "DAT files".
+ *
+ * \ingroup ResourcesManagement
  */
 class GD_API DatFile
 {

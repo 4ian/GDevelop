@@ -4,7 +4,9 @@
 #include "GDL/ExtensionBase.h"
 
 /**
- * Internal builtin extension providing features for all objects
+ * \brief Internal builtin extension providing features for all objects
+ *
+ * \ingroup BuiltinExtensions
  */
 class GD_API BaseObjectExtension : public ExtensionBase
 {

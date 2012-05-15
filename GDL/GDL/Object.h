@@ -43,6 +43,9 @@ namespace gd {class ArbitraryResourceWorker;}
  * - Objects are loaded and saved ( to xml ) with Object::LoadFromXml and Object::SaveToXml, using TinyXml library ( See the source of the Text Object or the Box 3D Object so as to view how to implement these functions ) :
  * - Objects can have also functions related to the edition: Object::GenerateThumbnail, Object::EditObject, Object::CreateInitialPositionPanel and Object::UpdateInitialPositionFromPanel
  * - Finally, objects can expose debugging features: Object::GetPropertyForDebugger, Object::ChangeProperty and Object::GetNumberOfProperties
+ *
+ * \ingroup GameEngine
+ * \ingroup PlatformDefinition
  */
 class GD_API Object
 #if defined(GD_IDE_ONLY)
@@ -63,7 +66,7 @@ public:
     Object(const Object & object) { Init(object); };
 
     /**
-     * Assignement operator. Calls Init().
+     * Assignment operator. Calls Init().
      */
     Object& operator=(const Object & object) {if( (this) != &object ) Init(object); return *this; }
 

@@ -25,7 +25,11 @@ namespace GDpriv { class SourceFile; }
 
 /**
  * \brief Represent a game.
+ *
  * Game contains all data of a game, from scenes to properties like game's name.
+ *
+ * \ingroup GameEngine
+ * \ingroup PlatformDefinition
  *
  * \note When compiled for Game Develop IDE, this class inherits gd::Project and thus redefines methods related to gd::Project. When compiled for runtime, the class is stand alone and so contains only method useful for runtime.
  */

@@ -10,10 +10,15 @@ class AutomatismsSharedDatas;
 #include <boost/shared_ptr.hpp>
 
 /**
- * Base class for defining automatisms runtime shared datas.
+ * \brief Base class for defining automatisms shared datas used at runtime.
+ *
  * Automatisms can use shared datas, as if they were extending the RuntimeScene members.
- * Inherit from this class, and define an appropriate constructor called by the
- * CreateRuntimeSharedDatas member function of AutomatismsharedDatas
+ * Inherit from this class, and define an appropriate constructor, which will be called by the
+ * CreateRuntimeSharedDatas member function of AutomatismsharedDatas.
+ *
+ * \see AutomatismsharedDatas::CreateRuntimeSharedDatas
+ *
+ * \ingroup GameEngine
  */
 class AutomatismsRuntimeSharedDatas
 {

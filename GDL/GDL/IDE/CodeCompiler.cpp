@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #if defined(GD_IDE_ONLY)
 
 #include "CodeCompiler.h"
@@ -203,13 +207,6 @@ void CodeCompiler::ProcessTasks()
             DiagnosticsEngine * clangDiags = new DiagnosticsEngine(clangDiagID, clangDiagClient);
 
             CompilerInvocation::CreateFromArgs(Clang.getInvocation(), args.begin(),  args.end(), *clangDiags);
-
-            std::vector< std::string > allArgs;
-            Clang.getInvocation().toArgs(allArgs);
-            for (unsigned int i = 0;i<allArgs.size();++i)
-            {
-                std::cout << "Arg:" << allArgs[i] << std::endl;
-            }
 
             Clang.setDiagnostics(clangDiags);
             if (!Clang.hasDiagnostics())

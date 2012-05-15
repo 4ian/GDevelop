@@ -26,14 +26,12 @@ typedef void (*DestroyFunPtr)(Object*);
 typedef Object * (*CreateFunPtr)(std::string name);
 
 #if defined(GD_IDE_ONLY)
+#include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
 class Game;
 class MainEditorCommand;
 #endif
 
 using namespace std;
-
-namespace GDpriv
-{
 
 /**
  * \brief Internal class managing static extensions.
@@ -43,6 +41,9 @@ namespace GDpriv
  * - Functions for getting pointers to actions/conditions functions.
  */
 class GD_API ExtensionsManager
+#if defined(GD_IDE_ONLY)
+: public gd::InstructionsMetadataHolder
+#endif
 {
     public:
 
@@ -112,13 +113,13 @@ class GD_API ExtensionsManager
          * Get information about an action from its type
          * Works for object, automatisms and static actions.
          */
-        const gd::InstructionMetadata & GetActionInfos(string actionType) const;
+        const gd::InstructionMetadata & GetActionMetadata(string actionType) const;
 
         /**
          * Get information about a condition from its type
          * Works for object, automatisms and static conditions.
          */
-        const gd::InstructionMetadata & GetConditionInfos(string conditionType) const;
+        const gd::InstructionMetadata & GetConditionMetadata(string conditionType) const;
 
         /**
          * Get information about an expression from its type
@@ -268,7 +269,4 @@ class GD_API ExtensionsManager
         static ExtensionsManager *_singleton;
 };
 
-
-
-}
 #endif // EXTENSIONSMANAGER_H

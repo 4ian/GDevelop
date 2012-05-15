@@ -7,6 +7,12 @@
 
 using namespace std;
 
+/**
+ * \brief Represents a sound to be played
+ *
+ * \see SoundManager
+ * \ingroup SoundEngine
+ */
 class GD_API Sound : sf::NonCopyable
 {
     public:

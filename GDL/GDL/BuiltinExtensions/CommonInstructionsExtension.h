@@ -5,6 +5,8 @@
 
 /**
  * \brief Internal builtin-extension providing common events and conditions/actions.
+ *
+ * \ingroup BuiltinExtensions
  */
 class CommonInstructionsExtension : public ExtensionBase
 {

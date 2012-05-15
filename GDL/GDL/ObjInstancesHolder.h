@@ -12,6 +12,9 @@ typedef boost::shared_ptr<Object> ObjSPtr;
 
 /**
  * \brief Hold lists of objects classified by the name of the objects.
+ *
+ * \see RuntimeScene
+ * \ingroup GameEngine
  */
 class GD_API ObjInstancesHolder
 {
@@ -54,8 +57,8 @@ public:
      *
      * \attention In an event, do not directly remove an object using this function, but make its name empty instead. Example :
      * \code
-     * scene.objectsInstances.ObjectIdentifierHasChanged(myObject); //Keep the object in objectsInstances from scene, but notify its identifier has changed.
-     * objectsConcerned.AnObjectWasDeleted(myObject); //Remove object from objectsConcerned.
+     * myObject->SetName(""); //The scene will take care of deleting the object
+     * scene.objectsInstances.ObjectNameHasChanged(myObject);
      * \endcode
      */
     inline void RemoveObject(const ObjSPtr & object)
@@ -84,7 +87,7 @@ public:
     /**
      * Call this when changing name/identifier of an object.
      */
-    void ObjectIdentifierHasChanged(Object * object);
+    void ObjectNameHasChanged(Object * object);
 
     /**
      * Return an new ObjInstancesHolder containing the same

@@ -1,0 +1,7 @@
+tests
+release
+addAdvanceXML.bat
+addAdvanceXML.sh
+src/AdvancedXML.depend
+src/AdvancedXML.layout
+src/obj

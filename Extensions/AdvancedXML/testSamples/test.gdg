@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<Game>
+    <GDVersion Major="2" Minor="1" Build="10682" Revision="53886" />
+    <Info winExecutableFilename="" winExecutableIconFile="" linuxExecutableFilename="" macExecutableFilename="" useExternalSourceFiles="false">
+        <Nom value="Projet" />
+        <Auteur value="" />
+        <WindowW value="800" />
+        <WindowH value="600" />
+        <Portable value="false" />
+        <Extensions>
+            <Extension name="BuiltinObject" />
+            <Extension name="BuiltinAudio" />
+            <Extension name="BuiltinVariables" />
+            <Extension name="BuiltinTime" />
+            <Extension name="BuiltinMouse" />
+            <Extension name="BuiltinKeyboard" />
+            <Extension name="BuiltinJoystick" />
+            <Extension name="BuiltinCamera" />
+            <Extension name="BuiltinWindow" />
+            <Extension name="BuiltinFile" />
+            <Extension name="BuiltinNetwork" />
+            <Extension name="BuiltinScene" />
+            <Extension name="BuiltinAdvanced" />
+            <Extension name="Sprite" />
+            <Extension name="BuiltinCommonInstructions" />
+            <Extension name="BuiltinCommonConversions" />
+            <Extension name="BuiltinStringInstructions" />
+            <Extension name="BuiltinMathematicalTools" />
+            <Extension name="TextObject" />
+            <Extension name="AdvancedXML" />
+        </Extensions>
+        <FPSmax value="60" />
+        <FPSmin value="10" />
+        <verticalSync value="false" />
+        <Chargement>
+            <Afficher value="false" />
+            <Border value="true" />
+            <Smooth value="true" />
+            <Width value="170.000000" />
+            <Height value="50.000000" />
+            <TexteAfficher value="true" />
+            <TexteXPos value="0.000000" />
+            <TexteYPos value="5.000000" />
+            <Texte value="Chargement" />
+            <PourcentAfficher value="false" />
+            <PourcentXPos value="0.000000" />
+            <PourcentYPos value="0.000000" />
+            <ImageAfficher value="false" />
+            <Image value="" />
+        </Chargement>
+    </Info>
+    <Resources>
+        <Resources />
+        <ResourceFolders />
+    </Resources>
+    <Objects />
+    <ObjectGroups />
+    <Variables />
+    <Scenes>
+        <Scene nom="Nouvelle scène" r="209.000000" v="209.000000" b="209.000000" titre="" oglFOV="90.000000" oglZNear="1.000000" oglZFar="500.000000" standardSortMethod="true" stopSoundsOnStartup="true" gridWidth="32.000000" grid="false" snap="false" gridHeight="32.000000" gridR="158.000000" gridG="180.000000" gridB="255.000000" windowMask="false">
+            <GroupesObjets />
+            <Objets>
+                <Objet nom="content" type="TextObject::Text" smoothed="true">
+                    <Variables />
+                    <String value="Text" />
+                    <Font value="" />
+                    <CharacterSize value="30" />
+                    <Color r="255" g="255" b="255" />
+                    <Style value="0" />
+                </Objet>
+            </Objets>
+            <Layers>
+                <Layer Name="" Visibility="true">
+                    <Camera DefaultSize="true" Width="0.000000" Height="0.000000" DefaultViewport="true" ViewportLeft="0.000000" ViewportTop="0.000000" ViewportRight="1.000000" ViewportBottom="1.000000" />
+                </Layer>
+            </Layers>
+            <Variables />
+            <AutomatismsSharedDatas />
+            <Dependencies />
+            <Events>
+                <Event disabled="false" folded="false">
+                    <Type value="BuiltinCommonInstructions::Standard" />
+                    <Conditions>
+                        <Condition>
+                            <Type value="DepartScene" loc="true" Contraire="false" />
+                            <Parametre value="" />
+                        </Condition>
+                    </Conditions>
+                    <Actions>
+                        <Action>
+                            <Type value="AdvancedXML::LoadFile" loc="true" />
+                            <Parametre value='&quot;test.xml&quot;' />
+                            <Parametre value='&quot;root&quot;' />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="AdvancedXML::BrowseTo" loc="true" />
+                            <Parametre value='&quot;root&quot;' />
+                            <Parametre value='&quot;firstElement&quot;' />
+                            <Parametre value='&quot;test&quot;' />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="AdvancedXML::BrowseTo" loc="true" />
+                            <Parametre value='&quot;firstElement&quot;' />
+                            <Parametre value='&quot;contentEle&quot;' />
+                            <Parametre value='&quot;element&quot;' />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="AdvancedXML::BrowseTo" loc="true" />
+                            <Parametre value='&quot;firstElement&quot;' />
+                            <Parametre value='&quot;version&quot;' />
+                            <Parametre value='&quot;infos/version&quot;' />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="AdvancedXML::SetTagName" loc="true" />
+                            <Parametre value='&quot;version&quot;' />
+                            <Parametre value='&quot;invalid&quot;' />
+                            <Parametre value="=" />
+                            <Parametre value="" />
+                        </Action>
+                        <Action>
+                            <Type value="ModVarScene" loc="true" />
+                            <Parametre value="" />
+                            <Parametre value="PosY" />
+                            <Parametre value="20" />
+                            <Parametre value="=" />
+                        </Action>
+                        <Action>
+                            <Type value="AdvancedXML::SaveFile" loc="true" />
+                            <Parametre value='&quot;D:\test.xml&quot;' />
+                            <Parametre value='&quot;root&quot;' />
+                            <Parametre value="" />
+                        </Action>
+                    </Actions>
+                    <Events>
+                        <Event disabled="false" folded="false">
+                            <Type value="BuiltinCommonInstructions::While" />
+                            <WhileConditions>
+                                <Condition>
+                                    <Type value="AdvancedXML::IsRefValid" loc="true" Contraire="false" />
+                                    <Parametre value='&quot;contentEle&quot;' />
+                                    <Parametre value="" />
+                                </Condition>
+                            </WhileConditions>
+                            <Conditions />
+                            <Actions>
+                                <Action>
+                                    <Type value="Create" loc="true" />
+                                    <Parametre value="" />
+                                    <Parametre value="" />
+                                    <Parametre value="" />
+                                    <Parametre value="content" />
+                                    <Parametre value="20" />
+                                    <Parametre value="Variable(PosY)" />
+                                    <Parametre value="" />
+                                </Action>
+                                <Action>
+                                    <Type value="TextObject::String" loc="true" />
+                                    <Parametre value="content" />
+                                    <Parametre value='AdvancedXML::GetAttributeString(&quot;contentEle&quot;,&quot;param&quot;)' />
+                                    <Parametre value="=" />
+                                </Action>
+                                <Action>
+                                    <Type value="ModVarScene" loc="true" />
+                                    <Parametre value="" />
+                                    <Parametre value="PosY" />
+                                    <Parametre value="35" />
+                                    <Parametre value="+" />
+                                </Action>
+                                <Action>
+                                    <Type value="AdvancedXML::NextSibling" loc="true" />
+                                    <Parametre value='&quot;contentEle&quot;' />
+                                    <Parametre value='&quot;contentEle&quot;' />
+                                    <Parametre value='&quot;element&quot;' />
+                                    <Parametre value="" />
+                                </Action>
+                            </Actions>
+                        </Event>
+                    </Events>
+                </Event>
+            </Events>
+        </Scene>
+    </Scenes>
+    <ExternalEvents />
+    <ExternalSourceFiles />
+</Game>

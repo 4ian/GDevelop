@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Linux - Release - Edittime" />
+	<File name="Extension.cpp" open="1" top="1" tabpos="1">
+		<Cursor position="31006" topLine="619" />
+	</File>
+	<File name="SoundInitialPositionPanel.cpp" open="1" top="0" tabpos="6">
+		<Cursor position="694" topLine="7" />
+	</File>
+	<File name="SoundInitialPositionPanel.h" open="1" top="0" tabpos="7">
+		<Cursor position="75" topLine="0" />
+	</File>
+	<File name="SoundListener.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="1652" topLine="33" />
+	</File>
+	<File name="SoundListener.h" open="0" top="0" tabpos="6">
+		<Cursor position="329" topLine="0" />
+	</File>
+	<File name="SoundObject.cpp" open="1" top="0" tabpos="3">
+		<Cursor position="11954" topLine="453" />
+	</File>
+	<File name="SoundObject.h" open="1" top="0" tabpos="2">
+		<Cursor position="3042" topLine="81" />
+	</File>
+	<File name="SoundObjectEditor.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="10763" topLine="152" />
+	</File>
+	<File name="SoundObjectEditor.h" open="1" top="0" tabpos="4">
+		<Cursor position="2015" topLine="11" />
+	</File>
+	<File name="SoundWrapperBase.cpp" open="1" top="0" tabpos="8">
+		<Cursor position="1944" topLine="105" />
+	</File>
+	<File name="SoundWrapperBase.h" open="1" top="0" tabpos="9">
+		<Cursor position="2450" topLine="71" />
+	</File>
+</CodeBlocks_layout_file>

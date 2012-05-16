@@ -5,6 +5,7 @@
 
 #ifndef HELPFILEACCESS_H
 #define HELPFILEACCESS_H
+#include "GDCore/Tools/Locale/LocaleManager.h"
 #include <string>
 #include <wx/help.h>
 #include <wx/fs_zip.h>
@@ -17,7 +18,7 @@ namespace gd
  *
  * Usage example:
  * \code
- * HelpFileAccess::GetInstance()->DisplaySection(52);
+ * gd::HelpFileAccess::GetInstance()->DisplaySection(52);
  * \endcode
  *
  * \ingroup Tools
@@ -51,6 +52,11 @@ public:
     {
         helpController->DisplayContents();
     }
+
+    /**
+     * Open an URL
+     */
+    void OpenURL(wxString url);
 
     static HelpFileAccess *GetInstance()
     {

@@ -648,14 +648,11 @@
 					<Add option="-lLLVMSupport" />
 					<Add option="-lLLVMCBackend" />
 					<Add option="-lLLVMCppBackend" />
-					<Add option="-lLLVMPowerPCCodeGen" />
 					<Add option="-lLLVMX86AsmParser" />
 					<Add option="-lLLVMX86Disassembler" />
 					<Add option="-lLLVMARMCodeGen" />
 					<Add option="-lLLVMCBackendInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
-					<Add option="-lLLVMPowerPCAsmPrinter" />
-					<Add option="-lLLVMPowerPCInfo" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>
@@ -709,6 +706,7 @@
 					<Add option="-lGLU" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
+					<Add option="-lclangFrontend  -lclangSerialization  -lclangDriver  -lclangCodeGen  -lclangSema  -lclangStaticAnalyzerFrontend  -lclangStaticAnalyzerCheckers  -lclangStaticAnalyzerCore  -lclangIndex  -lclangAnalysis  -lclangRewrite  -lclangAST  -lclangParse  -lclangLex  -lclangBasic  -lLLVMJIT  -lLLVMInterpreter  -lLLVMX86CodeGen  -lLLVMAsmParser  -lLLVMBitReader  -lLLVMBitWriter  -lLLVMipo  -lLLVMExecutionEngine  -lLLVMAsmPrinter  -lLLVMSelectionDAG  -lLLVMX86AsmPrinter  -lLLVMX86Info  -lLLVMMCParser  -lLLVMCodeGen  -lLLVMX86Utils  -lLLVMScalarOpts  -lLLVMInstCombine  -lLLVMTransformUtils  -lLLVMipa  -lLLVMAnalysis  -lLLVMTarget  -lLLVMCore  -lLLVMMC  -lLLVMSupport -lLLVMInstrumentation  -lclangFrontend  -lclangSerialization  -lclangDriver  -lclangParse  -lclangSema  -lclangAnalysis  -lclangIndex  -lclangAST  -lclangLex  -lclangBasic  -lLLVMMC  -lLLVMSupport" />
 					<Add option="-lLLVMJIT" />
 					<Add option="-lLLVMInterpreter" />
 					<Add option="-lLLVMX86CodeGen" />
@@ -738,16 +736,13 @@
 					<Add option="-lLLVMSupport" />
 					<Add option="-lLLVMCBackend" />
 					<Add option="-lLLVMCppBackend" />
-					<Add option="-lLLVMPowerPCCodeGen" />
 					<Add option="-lLLVMX86AsmParser" />
 					<Add option="-lLLVMX86Disassembler" />
 					<Add option="-lLLVMARMCodeGen" />
 					<Add option="-lLLVMCBackendInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
-					<Add option="-lLLVMPowerPCAsmPrinter" />
-					<Add option="-lLLVMPowerPCInfo" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
-					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
+					<Add directory="..\ExtLibs\llvm\build\lib" />
 					<Add directory="..\IDE\bin\release" />
 				</Linker>
 			</Target>
@@ -798,6 +793,7 @@
 					<Add option="-lGLU" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
+					<Add option="-lclangFrontend  -lclangSerialization  -lclangDriver  -lclangCodeGen  -lclangSema  -lclangStaticAnalyzerFrontend  -lclangStaticAnalyzerCheckers  -lclangStaticAnalyzerCore  -lclangIndex  -lclangAnalysis  -lclangRewrite  -lclangAST  -lclangParse  -lclangLex  -lclangBasic  -lLLVMJIT  -lLLVMInterpreter  -lLLVMX86CodeGen  -lLLVMAsmParser  -lLLVMBitReader  -lLLVMBitWriter  -lLLVMipo  -lLLVMExecutionEngine  -lLLVMAsmPrinter  -lLLVMSelectionDAG  -lLLVMX86AsmPrinter  -lLLVMX86Info  -lLLVMMCParser  -lLLVMCodeGen  -lLLVMX86Utils  -lLLVMScalarOpts  -lLLVMInstCombine  -lLLVMTransformUtils  -lLLVMipa  -lLLVMAnalysis  -lLLVMTarget  -lLLVMCore  -lLLVMMC  -lLLVMSupport -lLLVMInstrumentation  -lclangFrontend  -lclangSerialization  -lclangDriver  -lclangParse  -lclangSema  -lclangAnalysis  -lclangIndex  -lclangAST  -lclangLex  -lclangBasic  -lLLVMMC  -lLLVMSupport" />
 					<Add option="-lLLVMJIT" />
 					<Add option="-lLLVMInterpreter" />
 					<Add option="-lLLVMX86CodeGen" />
@@ -827,16 +823,13 @@
 					<Add option="-lLLVMSupport" />
 					<Add option="-lLLVMCBackend" />
 					<Add option="-lLLVMCppBackend" />
-					<Add option="-lLLVMPowerPCCodeGen" />
 					<Add option="-lLLVMX86AsmParser" />
 					<Add option="-lLLVMX86Disassembler" />
 					<Add option="-lLLVMARMCodeGen" />
 					<Add option="-lLLVMCBackendInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
-					<Add option="-lLLVMPowerPCAsmPrinter" />
-					<Add option="-lLLVMPowerPCInfo" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
-					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
+					<Add directory="..\ExtLibs\llvm\build\lib" />
 					<Add directory="..\IDE\bin\debug" />
 				</Linker>
 			</Target>
@@ -909,14 +902,11 @@
 					<Add option="-lLLVMSupport" />
 					<Add option="-lLLVMCBackend" />
 					<Add option="-lLLVMCppBackend" />
-					<Add option="-lLLVMPowerPCCodeGen" />
 					<Add option="-lLLVMX86AsmParser" />
 					<Add option="-lLLVMX86Disassembler" />
 					<Add option="-lLLVMARMCodeGen" />
 					<Add option="-lLLVMCBackendInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
-					<Add option="-lLLVMPowerPCAsmPrinter" />
-					<Add option="-lLLVMPowerPCInfo" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
 				</Linker>
@@ -1220,8 +1210,6 @@
 		<Unit filename="GDL\ProfileEvent.h" />
 		<Unit filename="GDL\RepeatEvent.cpp" />
 		<Unit filename="GDL\RepeatEvent.h" />
-		<Unit filename="GDL\ResourceWrapper.cpp" />
-		<Unit filename="GDL\ResourceWrapper.h" />
 		<Unit filename="GDL\ResourcesManager.cpp" />
 		<Unit filename="GDL\ResourcesManager.h" />
 		<Unit filename="GDL\RessourcesLoader.cpp" />
@@ -1323,7 +1311,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="2.1.10808" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="2.1.10821" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

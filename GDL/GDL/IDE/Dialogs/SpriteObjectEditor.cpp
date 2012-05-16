@@ -893,8 +893,10 @@ void EditorObjet::OnNormalCheckSelect( wxCommandEvent& event )
 
 void EditorObjet::OnAideBtClick( wxCommandEvent& event )
 {
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplaySection(47);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(47);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"));
 }
 
 void EditorObjet::OnOkBtClick(wxCommandEvent& event)

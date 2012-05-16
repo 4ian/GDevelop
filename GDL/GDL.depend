@@ -13607,7 +13607,7 @@
 1337099861 d:\florian\programmation\gamedevelop2\gdl\\gdl\runtimecamera.h
 	"GDL/Camera.h"
 
-1325338672 d:\florian\programmation\gamedevelop2\gdl\\gdl\text.h
+1337110754 d:\florian\programmation\gamedevelop2\gdl\\gdl\text.h
 	<SFML/Graphics.hpp>
 	<string>
 
@@ -14601,7 +14601,7 @@
 	"GDL/Object.h"
 	"GDL/profile.h"
 
-1337101304 source:d:\florian\programmation\gamedevelop2\gdl\gdl\object.cpp
+1337108423 source:d:\florian\programmation\gamedevelop2\gdl\gdl\object.cpp
 	"GDL/Object.h"
 	<iostream>
 	<string>
@@ -14957,7 +14957,7 @@
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\compilertoolchainpathmanager.h
 
-1314792792 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
+1337108423 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
 	"GDL/Sprite.h"
 	<SFML/Graphics.hpp>
 	"GDL/ImageManager.h"
@@ -15855,7 +15855,7 @@
 	<wx/filename.h>
 	"GDL/IDE/CodeCompiler.h"
 
-1337108454 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1337111757 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -33536,7 +33536,7 @@
 1337095355 d:\florian\programmation\gamedevelop2\gdl\\gdl\builtinextensions\commonconversionsextension.h
 	"GDL/ExtensionBase.h"
 
-1336946631 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\commoninstructionsextension.cpp
+1337182009 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\commoninstructionsextension.cpp
 	<string>
 	<set>
 	"GDCore/Events/Event.h"
@@ -33567,7 +33567,7 @@
 	<SFML/Graphics.hpp>
 	<sstream>
 
-1326142972 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\fileextension.cpp
+1337162233 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\fileextension.cpp
 	"GDL/BuiltinExtensions/FileExtension.h"
 	"GDL/XmlFilesHelper.h"
 
@@ -34157,7 +34157,7 @@
 	<wx/dialog.h>
 	"GDL/ResourcesManager.h"
 
-1337024579 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\resourceseditor.cpp
+1337199495 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\resourceseditor.cpp
 	"GDL/IDE/Dialogs/ResourcesEditor.h"
 	<wx/msw/winundef.h>
 	<wx/bitmap.h>
@@ -34226,7 +34226,7 @@
 	<boost/shared_ptr.hpp>
 	"GDL/IDE/ArbitraryResourceWorker.h"
 
-1337024579 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
+1337199495 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
 	"GDL/IDE/Dialogs/SpriteObjectEditor.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -34669,7 +34669,7 @@
 	<string>
 	<vector>
 
-1336935840 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editcomment.cpp
+1337199495 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editcomment.cpp
 	"EditComment.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -34684,7 +34684,7 @@
 	<wx/dialog.h>
 	"GDL/CommentEvent.h"
 
-1337013356 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editexpression.cpp
+1337199495 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editexpression.cpp
 	"EditExpression.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -34750,7 +34750,7 @@
 	<wx/dialog.h>
 	"GDL/ForEachEvent.h"
 
-1334438487 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editlink.cpp
+1337199544 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editlink.cpp
 	"EditLink.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -34759,6 +34759,7 @@
 	<wx/image.h>
 	<wx/string.h>
 	<sstream>
+	"GDCore/Tools/HelpFileAccess.h"
 	"GDCore/PlatformDefinition/ExternalEvents.h"
 	"GDL/CommonTools.h"
 	"GDL/Game.h"
@@ -34799,7 +34800,7 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1337013356 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\edittextdialog.cpp
+1337199495 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\edittextdialog.cpp
 	"EditTextDialog.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -35445,7 +35446,8 @@
 	<boost/shared_ptr.hpp>
 	<string>
 
-1336935840 d:\florian\programmation\gamedevelop2\core\\gdcore\tools\helpfileaccess.h
+1337199495 d:\florian\programmation\gamedevelop2\core\\gdcore\tools\helpfileaccess.h
+	"GDCore/Tools/Locale/LocaleManager.h"
 	<string>
 	<wx/help.h>
 	<wx/fs_zip.h>

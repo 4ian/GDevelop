@@ -12,7 +12,7 @@ using namespace std;
 
 /**
  * \brief Old class for drawing objects.
- * \deprecated Do not use this anymore, but Text objects instead.
+ * \deprecated Do not use this anymore, but the TextObject extension instead.
  */
 class GD_API Text
 {

@@ -10,6 +10,7 @@
 #include <wx/string.h>
 //*)
 #include <sstream>
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
@@ -151,9 +152,10 @@ EditLink::~EditLink()
 
 void EditLink::OnAideBtClick(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection(150);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(150);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/link_events"));
 }
 
 /**

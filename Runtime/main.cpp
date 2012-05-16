@@ -28,7 +28,7 @@
 #include "GDL/ExtensionsLoader.h"
 #include "CompilationChecker.h"
 #include "GDL/Log.h"
-#include "GDL/AES.h"
+#include "GDL/Tools/AES.h"
 
 #include <time.h>
 #include <stdlib.h>

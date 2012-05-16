@@ -15,8 +15,10 @@
  */
 void Game_Develop_EditorFrame::OnMenuAideSelected( wxCommandEvent& event )
 {
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplayContents();
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplayContents();
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"));
 }
 
 /**

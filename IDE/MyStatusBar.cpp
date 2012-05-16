@@ -89,7 +89,7 @@ MyStatusBar::MyStatusBar(wxWindow *parent)
     SetFieldsCount(2);
     SetStatusWidths(2, widths);
 
-    CommonBitmapManager * CommonBitmapManager = CommonBitmapManager::GetInstance();
+    gd::CommonBitmapManager * CommonBitmapManager = gd::CommonBitmapManager::GetInstance();
 
     m_statbmp = new wxBitmapButton(this, wxID_ANY, CommonBitmapManager->modeSimple,
                                          wxDefaultPosition, wxDefaultSize,

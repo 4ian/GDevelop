@@ -300,5 +300,8 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
 
 void SearchEvents::OnhelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->DisplaySection(58);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(58);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/search")); //TODO
 }

@@ -361,8 +361,10 @@ void EditOptionsPosition::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditOptionsPosition::OnAideBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplaySection(25);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(25);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_scene_edit"));
 }
 
 void EditOptionsPosition::OnsizeCheckClick(wxCommandEvent& event)

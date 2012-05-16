@@ -290,7 +290,7 @@ void ChoixAction::RefreshList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension objects actions
@@ -443,7 +443,7 @@ void ChoixAction::RefreshObjectActionsList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
     std::string selectedObjectType = gd::GetTypeOfObject(game, scene, selectedObject);
 
@@ -596,7 +596,7 @@ void ChoixAction::RefreshFromAction()
 {
     if ( Type.empty() ) return;
 
-    const gd::InstructionMetadata & instructionMetadata = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(Type);
+    const gd::InstructionMetadata & instructionMetadata = ExtensionsManager::GetInstance()->GetActionMetadata(Type);
 
     //Display action main properties
     NomActionTxt->SetLabel( instructionMetadata.fullname );
@@ -604,7 +604,7 @@ void ChoixAction::RefreshFromAction()
     ActionTextTxt->SetLabel( instructionMetadata.description );
     ActionTextTxt->Wrap( 450 );
     if ( instructionMetadata.icon.IsOk() ) ActionImg->SetBitmap( instructionMetadata.icon );
-    else ActionImg->SetBitmap(CommonBitmapManager::GetInstance()->unknown24);
+    else ActionImg->SetBitmap(gd::CommonBitmapManager::GetInstance()->unknown24);
 
     //Update controls count
     while ( ParaEdit.size() < instructionMetadata.parameters.size() )
@@ -618,7 +618,7 @@ void ChoixAction::RefreshFromAction()
         ParaSpacer1.push_back( new wxPanel(this) );
         ParaSpacer2.push_back( new wxPanel(this) );
         ParaEdit.push_back( new wxTextCtrl( this, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num ) ));
-        ParaBmpBt.push_back( new wxBitmapButton( this, id, CommonBitmapManager::GetInstance()->expressionBt, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, num ));
+        ParaBmpBt.push_back( new wxBitmapButton( this, id, gd::CommonBitmapManager::GetInstance()->expressionBt, wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, num ));
 
         //Connecting events
         Connect( id, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( ChoixAction::OnABtClick ) );
@@ -672,8 +672,8 @@ void ChoixAction::RefreshFromAction()
             if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
             ParaEdit.at(i)->Show();
 
-            ParaBmpBt.at(i)->SetBitmapLabel( TranslateAction::GetInstance()->BitmapFromType(instructionMetadata.parameters[i].type) );
-            ParaBmpBt.at(i)->SetToolTip( TranslateAction::GetInstance()->LabelFromType(instructionMetadata.parameters[i].type) );
+            ParaBmpBt.at(i)->SetBitmapLabel( gd::ActionSentenceFormatter::GetInstance()->BitmapFromType(instructionMetadata.parameters[i].type) );
+            ParaBmpBt.at(i)->SetToolTip( gd::ActionSentenceFormatter::GetInstance()->LabelFromType(instructionMetadata.parameters[i].type) );
             ParaBmpBt.at(i)->Show( !instructionMetadata.parameters[i].type.empty() );
 
             //De/activate widgets if parameter is optional
@@ -722,8 +722,8 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
     string num = ( string ) wxWindow::FindFocus()->GetName();
     unsigned int i = ToInt(num);
 
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
-    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetActionInfos(Type);
+    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
+    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetActionMetadata(Type);
 
     if ( i < MaxPara && i < instructionMetadata.parameters.size())
     {
@@ -902,6 +902,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         else if ( instructionMetadata.parameters[i].type == "scenevar" )
         {
             gd::ChooseVariableDialog dialog(this, scene.GetVariables());
+            dialog.SetAssociatedLayout(&game, &scene);
             if ( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
 
@@ -910,6 +911,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         else if ( instructionMetadata.parameters[i].type == "globalvar" )
         {
             gd::ChooseVariableDialog dialog(this, game.GetVariables());
+            dialog.SetAssociatedProject(&game);
             if ( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.selectedVariable);
 
@@ -944,8 +946,8 @@ void ChoixAction::OnFacClicked(wxCommandEvent& event)
 
 void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 {
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
-    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetActionInfos(Type);
+    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
+    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetActionMetadata(Type);
 
     if ( Type == "" )
         return;
@@ -968,13 +970,13 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
         if ( !ParaFac.at(i)->IsShown() || (ParaFac.at(i)->IsShown() && ParaFac.at(i)->GetValue()))
         {
             CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
-            GDExpressionParser expressionParser(string(ParaEdit.at(i)->GetValue().mb_str())) ;
+            gd::ExpressionParser expressionParser(string(ParaEdit.at(i)->GetValue().mb_str())) ;
 
-            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseTextExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseTextExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseTextExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseTextExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseTextExpression(game, scene, callbacks))
+            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseStringExpression(game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseStringExpression(game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game, scene, callbacks))
                 ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game, scene, callbacks)))
             {
                 message = expressionParser.firstErrorStr;
@@ -1024,8 +1026,10 @@ void ChoixAction::OnCancelBtClick(wxCommandEvent& event)
 
 void ChoixAction::OnAideBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplaySection(29);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(29);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action")); //TODO
 }
 
 void ChoixAction::OnextSortCheckClick(wxCommandEvent& event)

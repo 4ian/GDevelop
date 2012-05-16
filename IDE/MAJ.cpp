@@ -156,8 +156,9 @@ void MAJ::CheckForUpdate()
     linkCtrl->SetURL(link);
     linkCtrl->Refresh(); //Need to call manually update.
 
-    if ( checker.newVersionAvailable )
-        downloadAndInstallBt->Enable(true);
+    //Too slow
+    /*if ( checker.newVersionAvailable )
+        downloadAndInstallBt->Enable(true);*/
 }
 
 

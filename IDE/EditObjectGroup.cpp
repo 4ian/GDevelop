@@ -17,6 +17,7 @@
 #include <wx/msgdlg.h>
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/CommonTools.h"
@@ -145,9 +146,10 @@ EditObjectGroup::~EditObjectGroup()
 
 void EditObjectGroup::OnHelp(wxCommandEvent& event)
 {
-    wxHelpController * help = new wxHelpController;
-    help->Initialize( "aide.chm" );
-    help->DisplaySection( 181 );
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(181);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_group"));
 }
 
 

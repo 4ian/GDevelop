@@ -168,6 +168,7 @@ void SceneCanvas::ConnectEvents()
     mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnUndoMoreBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnRedoBtClick, NULL, this);
     mainEditorCommand.GetMainEditor()->Connect(idRibbonObjectsPositionList,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnObjectsPositionList, NULL, this);
+    mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnHelpBtClick, NULL, this);
 
 
     mainEditorCommand.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnRefreshBtClick, NULL, this);
@@ -395,7 +396,10 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 
 void SceneCanvas::OnHelpBtClick( wxCommandEvent & event )
 {
-    gd::HelpFileAccess::GetInstance()->DisplaySection(12);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(12);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_scene"));
 }
 
 void SceneCanvas::OnLayersEditor( wxCommandEvent & event )
@@ -1253,7 +1257,7 @@ void SceneCanvas::OnAnyMouseEvent( wxMouseEvent & event )
         sf::Event myEvent;
         if ( event.ButtonDown() )
             myEvent.Type = sf::Event::MouseButtonPressed;
-        else ( event.ButtonUp() )
+        else if ( event.ButtonUp() )
             myEvent.Type = sf::Event::MouseButtonReleased;
         myEvent.MouseButton.X = event.GetX();
         myEvent.MouseButton.Y = event.GetY();

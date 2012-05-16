@@ -534,8 +534,8 @@ changesNeedRestart(false)
     Listbook1->AddPage(Panel7, _("Compilation C++"), false, 5);
 
     //Events editor parameters property grid
-    TranslateAction * eventsEditorConfig = TranslateAction::GetInstance();
-    for (std::map<std::string, TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
+    gd::ActionSentenceFormatter * eventsEditorConfig = gd::ActionSentenceFormatter::GetInstance();
+    for (std::map<std::string, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
     {
         eventsEditorParametersProperties->Append( new wxColourProperty(it->first, wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].color) );
         eventsEditorParametersProperties->Append( new wxBoolProperty(it->first+_(": Gras"), wxPG_LABEL, eventsEditorConfig->typesFormatting[it->first].bold) );
@@ -888,8 +888,8 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     LogFileManager::GetInstance()->InitalizeFromConfig();
 
 
-    TranslateAction * eventsEditorConfig = TranslateAction::GetInstance();
-    for (std::map<std::string, TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
+    gd::ActionSentenceFormatter * eventsEditorConfig = gd::ActionSentenceFormatter::GetInstance();
+    for (std::map<std::string, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
     {
         if ( eventsEditorParametersProperties->GetProperty(it->first) != NULL)
         {
@@ -909,7 +909,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
         }
     }
 
-    TranslateAction::GetInstance()->SaveTypesFormattingToConfig();
+    gd::ActionSentenceFormatter::GetInstance()->SaveTypesFormattingToConfig();
 	pConfig->Write("EventsEditor/ConditionColumnWidth", ToInt(ToString(conditionsColumnWidthEdit->GetValue())));
 	pConfig->Write("EventsEditor/HideContextPanelsLabels", hideContextPanelsLabels->GetValue());
 
@@ -1228,8 +1228,10 @@ void Preferences::OnInactifColor2PnlRightUp( wxMouseEvent& event )
 
 void Preferences::OnAideBtClick( wxCommandEvent& event )
 {
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplayContents();
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplayContents();
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation")); //TODO
 }
 
 void Preferences::OnBrowseDossierTempBtClick( wxCommandEvent& event )

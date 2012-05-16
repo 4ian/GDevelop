@@ -27,12 +27,14 @@ rem Extensions headers
 xcopy ..\..\Extensions\*.h ..\Bin\Release\Extensions\include\*.h /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
 xcopy ..\..\Extensions\*.hpp ..\Bin\Release\Extensions\include\*.hpp /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
 xcopy ..\..\Extensions\*.inl ..\Bin\Release\Extensions\include\*.inl /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+rem AdvancedXML extension special case
+xcopy ..\..\Extensions\AdvancedXml\src\*.h ..\Bin\Release\Extensions\include\AdvancedXml\*.h /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+xcopy ..\..\Extensions\AdvancedXml\src\*.hpp ..\Bin\Release\Extensions\include\AdvancedXml\*.hpp /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+xcopy ..\..\Extensions\AdvancedXml\src\*.inl ..\Bin\Release\Extensions\include\AdvancedXml\*.inl /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+rmdir ..\Bin\Release\Extensions\include\AdvancedXml\src /S /Q
 
 rem Special case : Widgets extension
-xcopy ..\..\Extensions\Widgets-Extension\src\*.h ..\Bin\Release\Extensions\include\Widgets\*.h /S /Y /D
-
-rem Extensions libs
-xcopy ..\..\Extensions\*.a ..\Bin\Release\Extensions\Lib\*.a /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+rem xcopy ..\..\Extensions\Widgets-Extension\src\*.h ..\Bin\Release\Extensions\include\Widgets\*.h /S /Y /D
 
 echo.
 echo -End of copy

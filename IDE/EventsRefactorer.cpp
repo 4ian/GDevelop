@@ -1,6 +1,6 @@
 #include "EventsRefactorer.h"
 #include "GDCore/Events/Event.h"
-#include "GDL/IDE/GDExpressionParser.h"
+#include "GDCore/Events/ExpressionParser.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExternalEvents.h"
@@ -10,7 +10,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/weak_ptr.hpp>
 
-class CallbacksForRenamingObject : public ParserCallbacks
+class CallbacksForRenamingObject : public gd::ParserCallbacks
 {
     public:
 
@@ -139,28 +139,28 @@ class CallbacksForRenamingObject : public ParserCallbacks
                                +"."+parameters[1].GetPlainString()+"::"+functionName+"("+parametersStr+")";
     };
 
-    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, gd::Expression & expression)
+    virtual bool OnSubMathExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
         std::string newExpression;
 
         CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
-        GDExpressionParser parser(expression.GetPlainString());
-        if ( !parser.ParseMathExpression(game, scene, callbacks) )
+        gd::ExpressionParser parser(expression.GetPlainString());
+        if ( !parser.ParseMathExpression(project, layout, callbacks) )
             return false;
 
         expression = gd::Expression(newExpression);
         return true;
     }
 
-    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, gd::Expression & expression)
+    virtual bool OnSubTextExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
         std::string newExpression;
 
         CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
-        GDExpressionParser parser(expression.GetPlainString());
-        if ( !parser.ParseTextExpression(game, scene, callbacks) )
+        gd::ExpressionParser parser(expression.GetPlainString());
+        if ( !parser.ParseStringExpression(project, layout, callbacks) )
             return false;
 
         expression = gd::Expression(newExpression);
@@ -174,7 +174,7 @@ class CallbacksForRenamingObject : public ParserCallbacks
         std::string oldName;
 };
 
-class CallbacksForRemovingObject : public ParserCallbacks
+class CallbacksForRemovingObject : public gd::ParserCallbacks
 {
     public:
 
@@ -226,24 +226,24 @@ class CallbacksForRemovingObject : public ParserCallbacks
         if ( parameters[0].GetPlainString() == name ) objectPresent = true;
     };
 
-    virtual bool OnSubMathExpression(const Game & game, const Scene & scene, gd::Expression & expression)
+    virtual bool OnSubMathExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
         CallbacksForRemovingObject callbacks(name);
 
-        GDExpressionParser parser(expression.GetPlainString());
-        if ( !parser.ParseMathExpression(game, scene, callbacks) )
+        gd::ExpressionParser parser(expression.GetPlainString());
+        if ( !parser.ParseMathExpression(project, layout, callbacks) )
             return false;
 
         if(callbacks.objectPresent) objectPresent = true;
         return true;
     }
 
-    virtual bool OnSubTextExpression(const Game & game, const Scene & scene, gd::Expression & expression)
+    virtual bool OnSubTextExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
     {
         CallbacksForRemovingObject callbacks(name);
 
-        GDExpressionParser parser(expression.GetPlainString());
-        if ( !parser.ParseTextExpression(game, scene, callbacks) )
+        gd::ExpressionParser parser(expression.GetPlainString());
+        if ( !parser.ParseStringExpression(project, layout, callbacks) )
             return false;
 
         if(callbacks.objectPresent) objectPresent = true;
@@ -261,7 +261,7 @@ bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
 
     for (unsigned int aId = 0;aId < actions.size();++aId)
     {
-        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
+        gd::InstructionMetadata instrInfos = ExtensionsManager::GetInstance()->GetActionMetadata(actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -275,7 +275,7 @@ bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
-                GDExpressionParser parser(oldExpression);
+                gd::ExpressionParser parser(oldExpression);
                 if ( parser.ParseMathExpression(game, scene, callbacks) && newExpression != oldExpression )
                 {
                     somethingModified = true;
@@ -290,8 +290,8 @@ bool EventsRefactorer::RenameObjectInActions(Game & game, Scene & scene, vector 
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
-                GDExpressionParser parser(oldExpression);
-                if ( parser.ParseTextExpression(game, scene, callbacks) && newExpression != oldExpression )
+                gd::ExpressionParser parser(oldExpression);
+                if ( parser.ParseStringExpression(game, scene, callbacks) && newExpression != oldExpression )
                 {
                     somethingModified = true;
                     actions[aId].SetParameter(pNb, gd::Expression(newExpression));
@@ -312,7 +312,7 @@ bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vect
 
     for (unsigned int cId = 0;cId < conditions.size();++cId)
     {
-        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
+        gd::InstructionMetadata instrInfos = ExtensionsManager::GetInstance()->GetConditionMetadata(conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -326,7 +326,7 @@ bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vect
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
-                GDExpressionParser parser(oldExpression);
+                gd::ExpressionParser parser(oldExpression);
                 if ( parser.ParseMathExpression(game, scene, callbacks) )
                 {
                     somethingModified = true;
@@ -341,7 +341,7 @@ bool EventsRefactorer::RenameObjectInConditions(Game & game, Scene & scene, vect
 
                 CallbacksForRenamingObject callbacks(newExpression, oldName, newName);
 
-                GDExpressionParser parser(oldExpression);
+                gd::ExpressionParser parser(oldExpression);
                 if ( parser.ParseMathExpression(game, scene, callbacks) )
                 {
                     somethingModified = true;
@@ -391,7 +391,7 @@ bool EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector 
     {
         bool deleteMe = false;
 
-        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetActionInfos(actions[aId].GetType());
+        gd::InstructionMetadata instrInfos = ExtensionsManager::GetInstance()->GetActionMetadata(actions[aId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -405,7 +405,7 @@ bool EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector 
             {
                 CallbacksForRemovingObject callbacks(name);
 
-                GDExpressionParser parser(actions[aId].GetParameter(pNb).GetPlainString());
+                gd::ExpressionParser parser(actions[aId].GetParameter(pNb).GetPlainString());
                 if ( parser.ParseMathExpression(game, scene, callbacks) && callbacks.objectPresent )
                 {
                     deleteMe = true;
@@ -417,8 +417,8 @@ bool EventsRefactorer::RemoveObjectInActions(Game & game, Scene & scene, vector 
             {
                 CallbacksForRemovingObject callbacks(name);
 
-                GDExpressionParser parser(actions[aId].GetParameter(pNb).GetPlainString());
-                if ( parser.ParseTextExpression(game, scene, callbacks) && callbacks.objectPresent )
+                gd::ExpressionParser parser(actions[aId].GetParameter(pNb).GetPlainString());
+                if ( parser.ParseStringExpression(game, scene, callbacks) && callbacks.objectPresent )
                 {
                     deleteMe = true;
                     break;
@@ -447,7 +447,7 @@ bool EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vect
     {
         bool deleteMe = false;
 
-        gd::InstructionMetadata instrInfos = GDpriv::ExtensionsManager::GetInstance()->GetConditionInfos(conditions[cId].GetType());
+        gd::InstructionMetadata instrInfos = ExtensionsManager::GetInstance()->GetConditionMetadata(conditions[cId].GetType());
         for (unsigned int pNb = 0;pNb < instrInfos.parameters.size();++pNb)
         {
             //Replace object's name in parameters
@@ -460,7 +460,7 @@ bool EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vect
             {
                 CallbacksForRemovingObject callbacks(name);
 
-                GDExpressionParser parser(conditions[cId].GetParameter(pNb).GetPlainString());
+                gd::ExpressionParser parser(conditions[cId].GetParameter(pNb).GetPlainString());
                 if ( parser.ParseMathExpression(game, scene, callbacks) && callbacks.objectPresent )
                 {
                     deleteMe = true;
@@ -472,8 +472,8 @@ bool EventsRefactorer::RemoveObjectInConditions(Game & game, Scene & scene, vect
             {
                 CallbacksForRemovingObject callbacks(name);
 
-                GDExpressionParser parser(conditions[cId].GetParameter(pNb).GetPlainString());
-                if ( parser.ParseTextExpression(game, scene, callbacks) && callbacks.objectPresent )
+                gd::ExpressionParser parser(conditions[cId].GetParameter(pNb).GetPlainString());
+                if ( parser.ParseStringExpression(game, scene, callbacks) && callbacks.objectPresent )
                 {
                     deleteMe = true;
                     break;

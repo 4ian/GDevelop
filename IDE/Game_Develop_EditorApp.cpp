@@ -362,7 +362,7 @@ bool Game_Develop_EditorApp::OnInit()
     Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(Game_Develop_EditorApp::OnKeyPressed));
 
     cout << "* Loading events editor configuration" << endl;
-    TranslateAction::GetInstance()->LoadTypesFormattingFromConfig();
+    gd::ActionSentenceFormatter::GetInstance()->LoadTypesFormattingFromConfig();
 
     cout << "* Loading events code compiler configuration" << endl;
     bool deleteTemporaries;

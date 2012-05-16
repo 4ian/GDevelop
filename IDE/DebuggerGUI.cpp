@@ -15,6 +15,7 @@
 #include <wx/image.h>
 #include <boost/weak_ptr.hpp>
 #include <wx/textdlg.h>
+#include <wx/log.h>
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
@@ -187,7 +188,7 @@ objectChanged(true)
     std::set<std::string> alreadyCreatedPanels; //Just to be sure not to create a panel twice ( extensionsUsed can contains the same extension name twice )
     for (unsigned int i = 0;i<scene.game->GetUsedPlatformExtensions().size();++i)
     {
-        boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = ExtensionsManager::GetInstance()->GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && alreadyCreatedPanels.find(extension->GetName()) == alreadyCreatedPanels.end())
         {
@@ -331,7 +332,7 @@ void DebuggerGUI::UpdateGUI()
     unsigned int extListCtrlId = 0;
     for (unsigned int i = 0;i<scene.game->GetUsedPlatformExtensions().size();++i)
     {
-        boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = ExtensionsManager::GetInstance()->GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && extListCtrlId < extensionsListCtrls.size() )
         {
@@ -650,7 +651,7 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
         return;
     }
 
-    boost::shared_ptr<ExtensionBase> extension = GDpriv::ExtensionsManager::GetInstance()->GetExtension(string(list->GetName().mb_str()));
+    boost::shared_ptr<ExtensionBase> extension = ExtensionsManager::GetInstance()->GetExtension(string(list->GetName().mb_str()));
     if ( extension == boost::shared_ptr<ExtensionBase>() )
     {
         cout << "Unknown extension in debugger ( " << list->GetName() << " )" << endl;

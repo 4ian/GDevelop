@@ -286,8 +286,10 @@ void StartHerePage::Onrecent9BtClick(wxCommandEvent& event)
 
 void StartHerePage::OnguideBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplaySection(16);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(16);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_getstart"));
 }
 
 void StartHerePage::OntutoBtClick(wxCommandEvent& event)

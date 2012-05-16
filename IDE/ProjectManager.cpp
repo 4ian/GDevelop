@@ -34,6 +34,7 @@
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "EditPropScene.h"
 
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 
@@ -94,6 +95,7 @@ const long ProjectManager::idRibbonCppTools = wxNewId();
 const long ProjectManager::idRibbonImporter = wxNewId();
 const long ProjectManager::idRibbonEncoder = wxNewId();
 const long ProjectManager::idRibbonProjectsManager = wxNewId();
+const long ProjectManager::idRibbonHelp = wxNewId();
 
 BEGIN_EVENT_TABLE(ProjectManager,wxPanel)
 	//(*EventTable(ProjectManager)
@@ -316,7 +318,7 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(wxID_ANY, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
     }
 
 }
@@ -342,6 +344,8 @@ void ProjectManager::ConnectEvents()
     mainEditor.Connect( idRibbonProjectsManager, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnProjectsManagerClicked, NULL, &mainEditor );
     mainEditor.Connect( idRibbonEncoder, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuItem23Selected, NULL, &mainEditor );
     mainEditor.Connect( idRibbonImporter, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonDecomposerDropDownClicked, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonHelpSelected, NULL, &mainEditor );
+
 }
 
 void ProjectManager::Refresh()
@@ -706,6 +710,7 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
     }
 
     gd::ChooseVariableDialog dialog(this, (*scene)->GetVariables(), /*editingOnly=*/true);
+    dialog.SetAssociatedLayout(game, (*scene).get());
     if ( dialog.ShowModal() == 1 )
     {
         (*scene)->wasModified = true;
@@ -1063,6 +1068,7 @@ void ProjectManager::OneditGblVarMenuItemSelected(wxCommandEvent& event)
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
     gd::ChooseVariableDialog dialog(this, game->GetVariables(), /*editingOnly=*/true);
+    dialog.SetAssociatedProject(game);
     if ( dialog.ShowModal() == 1 )
     {
         for (unsigned int i = 0;i<game->GetLayouts().size();++i)
@@ -1524,4 +1530,15 @@ void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
     if ( alreadyExistingSourceFile == game->externalSourceFiles.end() )
         game->externalSourceFiles.push_back(sourceFile);
     Refresh();
+}
+
+/**
+ * Display help
+ */
+void ProjectManager::OnRibbonHelpSelected(wxRibbonButtonBarEvent& event)
+{
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplayContents();
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"));
 }

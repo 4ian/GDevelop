@@ -135,6 +135,7 @@ class ProjectManager: public wxPanel
         static const long idRibbonCppTools;
         static const long idRibbonEncoder;
         static const long idRibbonImporter;
+        static const long idRibbonHelp;
 
 	private:
 
@@ -182,6 +183,7 @@ class ProjectManager: public wxPanel
 		void OnRibbonEditSceneSelected(wxRibbonButtonBarEvent& event);
 		void OnRibbonAddExternalEventsSelected(wxRibbonButtonBarEvent& event);
 		void OnRibbonEditExternalEventsSelected(wxRibbonButtonBarEvent& event);
+		void OnRibbonHelpSelected(wxRibbonButtonBarEvent& event);
 		void AddExternalEventsToGame(Game * game);
 
         wxTreeItemId selectedItem;

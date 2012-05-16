@@ -504,8 +504,10 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
 
 void EditPropJeu::OnAideBtClick( wxCommandEvent& event )
 {
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplaySection(8);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(8);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_projman"));
 }
 
 

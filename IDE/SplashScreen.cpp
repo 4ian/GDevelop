@@ -100,6 +100,23 @@ SplashScreen::SplashScreen( wxBitmap &label, long timeout, wxWindow *parent, wxW
     SetThemeEnabled( false ); // seems to be useful by description
     SetBackgroundStyle( wxBG_STYLE_CUSTOM ); // the trick for GTK+ (notice it's after Show())
 
+    SetTitle("Game Develop");
+
+    wxIconBundle icons;
+    icons.AddIcon("res/icon16.png");
+    icons.AddIcon("res/icon24.png");
+    #if defined(LINUX) || defined(MAC)
+    icons.AddIcon("res/icon32linux.png");
+    icons.AddIcon("res/icon48linux.png");
+    icons.AddIcon("res/icon64linux.png");
+    icons.AddIcon("res/icon128linux.png");
+    #else
+    icons.AddIcon("res/icon32.png");
+    icons.AddIcon("res/icon48.png");
+    icons.AddIcon("res/icon128.png");
+    #endif
+    SetIcons(icons);
+
     Centre( wxBOTH | wxCENTRE_ON_SCREEN ); // centre only works when the window is showing
 
     Update();

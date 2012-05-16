@@ -161,8 +161,10 @@ void EditorLayers::OnMoreOptions(wxCommandEvent& event)
 
 void EditorLayers::OnHelp(wxCommandEvent& event)
 {
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplaySection(226);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(226);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
 }
 
 ////////////////////////////////////////////////////////////

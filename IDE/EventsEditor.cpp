@@ -39,6 +39,7 @@
 #include "ChoixCondition.h"
 #include "ChoixAction.h"
 #include "Clipboard.h"
+#undef CreateEvent //Disable an annoying macro
 
 #include <SFML/System.hpp>
 
@@ -276,7 +277,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	hideContextPanelsLabels = config->ReadBool("EventsEditor/HideContextPanelsLabels", false);
 
     //Adding events types
-    GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
 
     //Insert extension specific events types
@@ -319,7 +320,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 
     RecomputeAllEventsWidth(*events); //Recompute all widths
     liveEditingPanel->Show(false);
-    liveEdit->SetFont(EventsRenderingHelper::GetInstance()->GetFont());
+    liveEdit->SetFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
     liveEditingPanel->Show(false);
     eventContextPanel->Show(false);
     listContextPanel->Show(false);
@@ -477,7 +478,7 @@ void EventsEditor::OneventsPanelPaint(wxPaintEvent& event)
     else
         text = _("Passez la souris sur un évènement/action/condition pour obtenir plus d'options d'édition,\nou double cliquez pour éditer un élement.");
     dc.SetTextForeground(wxColor(0,0,0));
-    dc.SetFont(EventsRenderingHelper::GetInstance()->GetNiceFont());
+    dc.SetFont(gd::EventsRenderingHelper::GetInstance()->GetNiceFont());
     dc.DrawLabel(text,
                 wxRect( (eventsPanel->GetSize().x-dc.GetMultiLineTextExtent(text).GetWidth())/2,-scrollBar->GetThumbPosition()+totalHeight+25,
                         (eventsPanel->GetSize().x+dc.GetMultiLineTextExtent(text).GetWidth())/2-(eventsPanel->GetSize().x-dc.GetMultiLineTextExtent(text).GetWidth())/2,0)
@@ -500,10 +501,10 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
     {
         if ( scrollTo == events[i] ) scrollBar->SetThumbPosition(y);
 
-        dc.SetFont(EventsRenderingHelper::GetInstance()->GetFont());
+        dc.SetFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
         dc.SetTextForeground(wxColour(0,0,0));
 
-        EventsRenderingHelper::GetInstance()->SetConditionsColumnWidth(conditionColumnWidth-x);
+        gd::EventsRenderingHelper::GetInstance()->SetConditionsColumnWidth(conditionColumnWidth-x);
         unsigned int width = eventsPanel->GetSize().x-x > 0 ? eventsPanel->GetSize().x-x : 1;
         unsigned int height = events[i]->GetRenderedHeight(width);
 
@@ -515,8 +516,8 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
             bool drawDragTarget = false;
             if ( selection.EventHighlighted(eventAccessor) ) //Highlight and context panel if needed
             {
-                dc.SetPen(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleOutlinePen());
-                dc.SetBrush(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
+                dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetHighlightedRectangleOutlinePen());
+                dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
                 dc.DrawRectangle(0,y,eventsPanel->GetSize().x,height);
 
                 //Update context panel ( unless we're dragging something )
@@ -531,15 +532,15 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
             }
             if ( selection.EventSelected(eventAccessor) ) //Selection rectangle if needed
             {
-                dc.SetPen(EventsRenderingHelper::GetInstance()->GetSelectedRectangleOutlinePen());
-                dc.SetBrush(EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
+                dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetSelectedRectangleOutlinePen());
+                dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
                 dc.DrawRectangle(0,y,eventsPanel->GetSize().x,height);
             }
 
             if (profilingActivated && events[i]->IsExecutable())
             {
                 dc.DrawText(ToString(i+1), x-leftMargin+2-42, y);
-                dc.SetFont(EventsRenderingHelper::GetInstance()->GetNiceFont().Smaller());
+                dc.SetFont(gd::EventsRenderingHelper::GetInstance()->GetNiceFont().Smaller());
 
                 //Draw profile results
                 dc.SetPen(wxPen(wxColour(0,0,0)));
@@ -553,7 +554,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
                 std::ostringstream percentStr; percentStr.setf(ios::fixed,ios::floatfield); percentStr.precision(2);
                 percentStr << events[i]->percentDuringLastSession;
                 dc.DrawText(percentStr.str()+"%", x-41, y+13);
-                dc.SetFont(EventsRenderingHelper::GetInstance()->GetFont());
+                dc.SetFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
             }
             else
                 dc.DrawText(ToString(i+1), x-leftMargin+2, y+3);
@@ -612,13 +613,13 @@ void EventsEditor::OnlistContextPanelPaint(wxPaintEvent& event)
 
     if ( selection.GetHighlightedInstructionList().isConditionList )
     {
-        dc.SetPen(EventsRenderingHelper::GetInstance()->GetConditionsRectangleOutlinePen());
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetConditionsRectangleFillBrush());
+        dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetConditionsRectangleOutlinePen());
+        dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetConditionsRectangleFillBrush());
     }
     else
     {
-        dc.SetPen(EventsRenderingHelper::GetInstance()->GetActionsRectangleOutlinePen());
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetActionsRectangleFillBrush());
+        dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetActionsRectangleOutlinePen());
+        dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetActionsRectangleFillBrush());
     }
     dc.DrawRectangle(0,-1,listContextPanel->GetSize().x,listContextPanel->GetSize().y+1);
     addInstrBt->SetBackgroundColour(dc.GetBrush().GetColour());
@@ -631,13 +632,13 @@ void EventsEditor::OneventContextPanelPaint(wxPaintEvent& event)
 
     if ( selection.EventSelected(selection.GetHighlightedEvent()) )
     {
-        dc.SetPen(EventsRenderingHelper::GetInstance()->GetSelectedRectangleOutlinePen());
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
+        dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetSelectedRectangleOutlinePen());
+        dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetSelectedRectangleFillBrush());
     }
     else
     {
-        dc.SetPen(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleOutlinePen());
-        dc.SetBrush(EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
+        dc.SetPen(gd::EventsRenderingHelper::GetInstance()->GetHighlightedRectangleOutlinePen());
+        dc.SetBrush(gd::EventsRenderingHelper::GetInstance()->GetHighlightedRectangleFillBrush());
     }
     dc.DrawRectangle(0,-1,eventContextPanel->GetSize().x,eventContextPanel->GetSize().y+1);
     addEventBt->SetBackgroundColour(dc.GetBrush().GetColour());
@@ -1184,7 +1185,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
  */
 void EventsEditor::AddEvent(EventItem & previousEventItem)
 {
-    gd::BaseEventSPtr eventToAdd = GDpriv::ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Standard");
+    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Standard");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
         //Edit the event
@@ -1237,7 +1238,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
     EventItem previousEventItem;
     if ( !eventsSelected.empty() && eventsSelected[0].event != boost::shared_ptr<gd::BaseEvent>() ) previousEventItem = eventsSelected[0];
 
-    gd::BaseEventSPtr eventToAdd = GDpriv::ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Comment");
+    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Comment");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
         if ( eventToAdd->EditEvent(this, game, scene, mainEditorCommand) == gd::BaseEvent::Cancelled ) return;
@@ -1265,7 +1266,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
  */
 void EventsEditor::AddSubEvent(EventItem & parentEventItem)
 {
-    gd::BaseEventSPtr eventToAdd = GDpriv::ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Standard");
+    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Standard");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
         eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
@@ -1309,8 +1310,8 @@ void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, EventItem & previ
     }
 
     //Create event
-    if ( !GDpriv::ExtensionsManager::GetInstance()->HasEventType(eventType) ) return;
-    gd::BaseEventSPtr eventToAdd = GDpriv::ExtensionsManager::GetInstance()->CreateEvent(eventType);
+    if ( !ExtensionsManager::GetInstance()->HasEventType(eventType) ) return;
+    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent(eventType);
     if ( eventToAdd->EditEvent(this, game, scene, mainEditorCommand) == gd::BaseEvent::Cancelled ) return;
 
     //Adding event
@@ -1541,8 +1542,10 @@ void EventsEditor::OnredoMenuSelected(wxCommandEvent& event)
 
 void EventsEditor::OnHelpBtClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplaySection(11);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(11);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"));
 }
 
 void EventsEditor::OnCreateTemplateBtClick( wxCommandEvent& event )

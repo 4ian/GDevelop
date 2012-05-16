@@ -453,8 +453,7 @@ void EditorObjectList::Refresh()
     objectsList->DeleteAllItems();
     objectsImagesList->RemoveAll();
 
-    CommonBitmapManager *CommonBitmapManager = CommonBitmapManager::GetInstance();
-    objectsImagesList->Add(CommonBitmapManager->objects24);
+    objectsImagesList->Add(gd::CommonBitmapManager::GetInstance()->objects24);
 
     objectsList->AddRoot( _( "Tous les objets" ), 0 );
 
@@ -580,7 +579,7 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     }
 
     //Add a new object of selected type to objects list
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
     objects->push_back( extensionsManager->CreateObject(chooseTypeDialog.selectedObjectType, ToString(name)));
 
     //And to the TreeCtrl
@@ -761,7 +760,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
  */
 bool EditorObjectList::CheckObjectName(std::string name)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionsManager->GetExtensions();
 
     string allowedCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
@@ -824,8 +823,10 @@ void EditorObjectList::OnChercherBtClick( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OnAideBtClick( wxCommandEvent& event )
 {
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplaySection(10);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(10);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object")); //TODO
 }
 
 
@@ -897,11 +898,11 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     wxString name = object->GetName();
 
     //Add a number to the new name if necessary
-    unsigned int i = 0;
+    unsigned int i = 2;
     while ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ToString(name))) != objects->end() )
     {
-        i++;
         name =  _( "Copie_de_" ) + object->GetName()+"_"+ToString(i);
+        i++;
     }
 
     //Name the object
@@ -1083,7 +1084,7 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
     AutomatismTypeChoice dialog(this, game);
     if ( dialog.ShowModal() == 1)
     {
-        GDpriv::ExtensionsManager * extensionManager = GDpriv::ExtensionsManager::GetInstance();
+        ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
         Automatism* automatism = extensionManager->CreateAutomatism(dialog.selectedAutomatismType);
 
         if (automatism == NULL)
@@ -1216,7 +1217,7 @@ void EditorObjectList::RemoveSharedDatasIfNecessary(std::string name)
  */
 void EditorObjectList::CreateSharedDatasIfNecessary(gd::Automatism & automatism)
 {
-    GDpriv::ExtensionsManager * extensionsManager = GDpriv::ExtensionsManager::GetInstance();
+    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
 
     if ( scene == NULL || objects != &scene->GetInitialObjects() ) //We're editing global objects : Add automatism data to all scenes.
     {

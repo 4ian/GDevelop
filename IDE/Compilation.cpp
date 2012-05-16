@@ -29,7 +29,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "GDL/AES.h"
 #include "GDL/Game.h"
 #include "GDL/DatFile.h"
 #include "GDL/OpenSaveLoadingScreen.h"
@@ -342,20 +341,10 @@ void Compilation::OnOuvrirBtClick( wxCommandEvent& event )
 
 void Compilation::OnAideBtClick( wxCommandEvent& event )
 {
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplaySection(125);
-}
-
-void Compilation::OnCGShareBtClick(wxCommandEvent& event)
-{
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplaySection(192);
-}
-
-void Compilation::OnDistribuerBtClick(wxCommandEvent& event)
-{
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DisplaySection(158);
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(125);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/distribution/compilation"));
 }
 
 void Compilation::OnNext1Click(wxCommandEvent& event)

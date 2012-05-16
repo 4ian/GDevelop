@@ -27,6 +27,11 @@ rem Extensions headers
 xcopy ..\..\Extensions\*.h ..\Bin\Debug\Extensions\include\*.h /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
 xcopy ..\..\Extensions\*.hpp ..\Bin\Debug\Extensions\include\*.hpp /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
 xcopy ..\..\Extensions\*.inl ..\Bin\Debug\Extensions\include\*.inl /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+rem AdvancedXML extension special case
+xcopy ..\..\Extensions\AdvancedXml\src\*.h ..\Bin\Debug\Extensions\include\AdvancedXml\*.h /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+xcopy ..\..\Extensions\AdvancedXml\src\*.hpp ..\Bin\Debug\Extensions\include\AdvancedXml\*.hpp /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+xcopy ..\..\Extensions\AdvancedXml\src\*.inl ..\Bin\Debug\Extensions\include\AdvancedXml\*.inl /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases
+rmdir ..\Bin\Debug\Extensions\include\AdvancedXml\src /S /Q
 
 rem Extensions libs
 xcopy ..\..\Extensions\*.a ..\Bin\Debug\Extensions\Lib\*.a /S /Y /D /EXCLUDE:HeadersUpdateSpecialCases

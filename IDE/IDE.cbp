@@ -477,7 +477,7 @@
 					<Add option="-lLLVMCBackendInfo" />
 					<Add directory="bin\release" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
-					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
+					<Add directory="..\ExtLibs\llvm\build\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
@@ -558,7 +558,7 @@
 					<Add option="-lLLVMCBackendInfo" />
 					<Add directory="bin\debug" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
-					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
+					<Add directory="..\ExtLibs\llvm\build\lib" />
 				</Linker>
 			</Target>
 		</Build>

@@ -54,27 +54,84 @@
 								<growablecols>0</growablecols>
 								<growablerows>0</growablerows>
 								<object class="sizeritem">
-									<object class="wxFlexGridSizer" variable="FlexGridSizer9" member="no">
-										<cols>3</cols>
+									<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
+										<label>Oops...</label>
 										<object class="sizeritem">
-											<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
-												<bitmap stock_id="wxART_INFORMATION" stock_client="wxART_OTHER" />
-												<style>wxNO_BORDER</style>
+											<object class="wxFlexGridSizer" variable="FlexGridSizer9" member="no">
+												<cols>3</cols>
+												<object class="sizeritem">
+													<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
+														<bitmap stock_id="wxART_INFORMATION" stock_client="wxART_OTHER" />
+														<style>wxNO_BORDER</style>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+														<label>Il semble que Game Develop se soit fermé brusquement suite à une&#x0A;erreur. Si ceci s&apos;avère exact, nous nous excusons pour le dérangement&#x0A;encouru. Il ne s&apos;agit pas de votre faute, mais d&apos;un problème interne&#x0A;au programme.&#x0A;Vous pouvez néanmoins nous aider à corriger le problème en&#x0A;complétant le rapport d&apos;erreur.</label>
+													</object>
+													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-											<border>5</border>
-											<option>1</option>
-										</object>
-										<object class="sizeritem">
-											<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-												<label>Il semble que Game Develop se soit fermé brusquement suite à une&#x0A;erreur. Si ceci s&apos;avère vrai, nous nous excusons pour le dérangement&#x0A;encouru. Il ne s&apos;agit pas de votre faute, mais d&apos;un problème interne&#x0A;au programme.&#x0A;Vous pouvez néanmoins nous aider à corriger le problème en&#x0A;complétant le rapport d&apos;erreur.</label>
-											</object>
-											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-											<border>5</border>
 											<option>1</option>
 										</object>
 									</object>
-									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
+										<label>Bugs connus sur cette version de Game Develop</label>
+										<object class="sizeritem">
+											<object class="wxFlexGridSizer" variable="FlexGridSizer11" member="no">
+												<cols>3</cols>
+												<growablecols>1</growablecols>
+												<growablerows>0</growablerows>
+												<object class="sizeritem">
+													<object class="wxStaticBitmap" name="ID_STATICBITMAP4" variable="StaticBitmap4" member="yes">
+														<bitmap>res/internet32.png</bitmap>
+														<style>wxNO_BORDER</style>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxFlexGridSizer" variable="FlexGridSizer12" member="no">
+														<cols>1</cols>
+														<object class="sizeritem">
+															<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
+																<label>Vous pouvez consulter sur notre site une liste qui peut&#x0A;éventuellement contenir des problèmes qui ont été rapporté&#x0A;à propos de cette version de Game Develop :</label>
+															</object>
+															<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+														<object class="sizeritem">
+															<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="bugListBt" member="yes">
+																<label>Consulter les problèmes connus pour cette version</label>
+															</object>
+															<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+													</object>
+													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
@@ -166,7 +223,7 @@
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
 												<label>Les jeux en cours d&apos;édition on peut être pû etre sauvegardés, sous le nom de gameDumpX.gdg ( où X représente un numéro ).&#x0A;&#x0A;Game Develop peut les réouvrir automatiquement une fois la fenêtre fermée.</label>
-												<size>407,117</size>
+												<size>424,68</size>
 											</object>
 											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -177,32 +234,72 @@
 									<option>1</option>
 								</object>
 								<object class="sizeritem">
-									<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
-										<cols>3</cols>
-										<growablecols>1</growablecols>
-										<growablerows>0</growablerows>
+									<object class="wxStaticBoxSizer" variable="StaticBoxSizer4" member="no">
+										<label>Sauvegarde automatiques</label>
 										<object class="sizeritem">
-											<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap2" member="yes">
-												<bitmap stock_id="wxART_WARNING" stock_client="wxART_OTHER" />
-												<style>wxNO_BORDER</style>
+											<object class="wxFlexGridSizer" variable="FlexGridSizer13" member="no">
+												<cols>3</cols>
+												<object class="sizeritem">
+													<object class="wxStaticBitmap" name="ID_STATICBITMAP5" variable="StaticBitmap5" member="yes">
+														<bitmap stock_id="wxART_INFORMATION" stock_client="wxART_OTHER" />
+														<style>wxNO_BORDER</style>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
+														<label>Si votre jeu n&apos;a pas pû être sauvegardé avant le crash ou qu&apos;il&#x0A;est corrompu, vous pouvez aussi essayer de charger une sauvegarde&#x0A;automatique présente dans le dossier de votre jeu.</label>
+													</object>
+													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-											<border>5</border>
 											<option>1</option>
 										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticBoxSizer" variable="StaticBoxSizer3" member="no">
+										<label>Attention !</label>
 										<object class="sizeritem">
-											<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
-												<label>Vérifiez bien qu&apos;il s&apos;agit du jeu souhaité, et qu&apos;il soit au complet. &#x0A;Il n&apos;est pas garanti  que le jeu ait été enregistré complètement,&#x0A;et il est possible qu&apos;il s&apos;agisse d&apos;une sauvegarde ayant eu lieu&#x0A;lors d&apos;une ancienne erreur.&#x0A;&#x0A;Si il s&apos;agit bien de votre jeu au complet, vous pourrez le&#x0A;ré-enregistrer normalement.</label>
-												<font>
-													<weight>bold</weight>
-												</font>
+											<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+												<cols>3</cols>
+												<growablecols>1</growablecols>
+												<growablerows>0</growablerows>
+												<object class="sizeritem">
+													<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap2" member="yes">
+														<bitmap stock_id="wxART_WARNING" stock_client="wxART_OTHER" />
+														<style>wxNO_BORDER</style>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
+														<label>Si vous réouvrez les jeux qui ont peut être pu être sauvegardés&#x0A;avant que Game Develop ne crashe, prenez garde à bien vérifier&#x0A;que votre jeu est au complet avant de le réengistrer par dessus&#x0A;votre jeu original.</label>
+														<font>
+															<weight>bold</weight>
+														</font>
+													</object>
+													<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
 											</object>
-											<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-											<border>5</border>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<option>1</option>
 										</object>
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
 									<option>1</option>
 								</object>
 								<object class="sizeritem">

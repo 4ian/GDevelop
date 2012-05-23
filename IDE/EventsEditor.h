@@ -226,6 +226,8 @@ private:
     void OnaddMoreIconPnlMouseEnter(wxMouseEvent& event);
     void OnaddInstrIconPnlMouseEnter(wxMouseEvent& event);
     void OnaddInstrIconPnlMouseLeave(wxMouseEvent& event);
+    void OneventContextPanelEraseBackground(wxEraseEvent& event);
+    void OnlistContextPanelEraseBackground(wxEraseEvent& event);
     //*)
     void UpdateRibbonBars();
     void OnHelpBtClick(wxCommandEvent& event);

@@ -55,6 +55,7 @@
 						<size>224,40</size>
 						<style>wxNO_BORDER|wxTAB_TRAVERSAL</style>
 						<handler function="OneventContextPanelPaint" entry="EVT_PAINT" />
+						<handler function="OneventContextPanelEraseBackground" entry="EVT_ERASE_BACKGROUND" />
 						<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 							<cols>7</cols>
 							<object class="sizeritem">
@@ -117,6 +118,7 @@
 						<size>224,40</size>
 						<style>wxNO_BORDER|wxTAB_TRAVERSAL</style>
 						<handler function="OnlistContextPanelPaint" entry="EVT_PAINT" />
+						<handler function="OnlistContextPanelEraseBackground" entry="EVT_ERASE_BACKGROUND" />
 						<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
 							<cols>3</cols>
 							<object class="sizeritem">

@@ -294,10 +294,14 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
                 }
     	    }
 
-            //Delete the layer
+            //Delete the layer and select base layer
     	    layers->erase(layers->begin() + i );
+            if ( sceneCanvas )
+            {
+                sceneCanvas->edittimeRenderer.addOnLayer = "";
+                sceneCanvas->Reload();
+            }
             Refresh();
-            if ( sceneCanvas ) sceneCanvas->Reload();
     	    return;
     	}
     }
@@ -329,7 +333,6 @@ void EditorLayers::OnUpSelected(wxCommandEvent& event)
 
                 //On reslectionne le calque
                 layersList->SetItemState(layers->size()-i-1-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-                cout << "Selecte" << layers->size()-i-1;
     	    }
     	    return;
     	}
@@ -465,6 +468,8 @@ void EditorLayers::EditSelectedLayer()
             if ( scene.initialObjectsPositions[i].layer == oldName )
                 scene.initialObjectsPositions[i].layer = layer->GetName();
         }
+
+        if ( sceneCanvas && sceneCanvas->edittimeRenderer.addOnLayer == oldName ) sceneCanvas->edittimeRenderer.addOnLayer = layer->GetName();
     }
 
     Refresh();

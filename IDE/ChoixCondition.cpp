@@ -77,8 +77,6 @@ const long ChoixCondition::ID_STATICBITMAP1 = wxNewId();
 const long ChoixCondition::ID_STATICTEXT1 = wxNewId();
 const long ChoixCondition::ID_STATICTEXT2 = wxNewId();
 const long ChoixCondition::ID_STATICLINE1 = wxNewId();
-const long ChoixCondition::ID_RADIOBUTTON1 = wxNewId();
-const long ChoixCondition::ID_RADIOBUTTON2 = wxNewId();
 const long ChoixCondition::ID_CHECKBOX1 = wxNewId();
 const long ChoixCondition::ID_STATICLINE2 = wxNewId();
 const long ChoixCondition::ID_BUTTON4 = wxNewId();
@@ -117,15 +115,11 @@ scene(scene_)
     wxBoxSizer* BoxSizer10;
     wxBoxSizer* BoxSizer7;
     wxFlexGridSizer* FlexGridSizer3;
-    wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer2;
     wxBoxSizer* BoxSizer2;
     wxBoxSizer* BoxSizer11;
     wxFlexGridSizer* FlexGridSizer7;
     wxBoxSizer* BoxSizer1;
-    wxBoxSizer* BoxSizer9;
-    wxFlexGridSizer* FlexGridSizer6;
-    wxStaticBoxSizer* StaticBoxSizer1;
     wxFlexGridSizer* FlexGridSizer1;
     wxBoxSizer* BoxSizer3;
 
@@ -200,21 +194,6 @@ scene(scene_)
     GridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
     GridSizer1->AddGrowableCol(1);
     conditionSizer->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    BoxSizer9 = new wxBoxSizer(wxHORIZONTAL);
-    StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Sélection des objets"));
-    FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
-    FlexGridSizer5->AddGrowableCol(0);
-    FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
-    LocaliseCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("Par défaut"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
-    LocaliseCheck->SetValue(true);
-    LocaliseCheck->SetToolTip(_("Ne seront pris en compte que les objets concernés par les autres conditions de l\'évènement."));
-    FlexGridSizer6->Add(LocaliseCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    GlobalCheck = new wxRadioButton(this, ID_RADIOBUTTON2, _("Forcer en global"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
-    GlobalCheck->SetToolTip(_("Tous les objets de la scène seront concernés par cette condition."));
-    FlexGridSizer6->Add(GlobalCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    FlexGridSizer5->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    StaticBoxSizer1->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    BoxSizer9->Add(StaticBoxSizer1, 1, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 0);
     StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Inversion"));
     FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer7->AddGrowableCol(1);
@@ -224,8 +203,7 @@ scene(scene_)
     ContraireCheck->SetToolTip(_("Cochez pour que la condition vérifie l\'inverse de ce qu\'elle devrait faire."));
     FlexGridSizer7->Add(ContraireCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer2->Add(FlexGridSizer7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    BoxSizer9->Add(StaticBoxSizer2, 0, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 0);
-    conditionSizer->Add(BoxSizer9, 0, wxALL|wxALIGN_LEFT|wxALIGN_BOTTOM, 5);
+    conditionSizer->Add(StaticBoxSizer2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer7->Add(conditionSizer, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer6->Add(BoxSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
@@ -262,7 +240,6 @@ scene(scene_)
     Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChoixCondition::OnobjectsSearchCtrlText);
     Connect(ID_TREECTRL6,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnobjectConditionsTreeSelectionChanged);
     Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChoixCondition::OnsearchCtrlText);
-    Connect(ID_RADIOBUTTON2,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&ChoixCondition::OnGlobalCheckSelect);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnmoreBtClick);
     Connect(ID_CHECKBOX3,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnobjSortCheckClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnOkBtClick);
@@ -734,9 +711,6 @@ void ChoixCondition::RefreshFromCondition()
     Layout();
     GridSizer1->Layout();
 
-    //Update localization
-    LocaliseCheck->SetValue(Loc);
-    GlobalCheck->SetValue(!Loc);
     ContraireCheck->SetValue(Contraire);
 
     Layout();
@@ -1009,13 +983,6 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
         Contraire = true;
     } else { Contraire = false; }
 
-
-    if ( LocaliseCheck->GetValue() ){ Loc = true;}
-    else if ( GlobalCheck->GetValue()) { Loc = false; }
-    else //Automatique
-    {
-        Loc = true;
-    }
 
     EndModal( 0 );
 }

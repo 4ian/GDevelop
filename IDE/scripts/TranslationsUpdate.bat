@@ -7,6 +7,8 @@ dir ..\..\GDL\GDL\*.cpp /L /B /S >> %TEMP%\listfile.txt
 dir ..\..\GDL\GDL\*.h /L /B /S >> %TEMP%\listfile.txt
 dir ..\..\Extensions\*.cpp /L /B /S |find /v /i "\Widgets-Extension\"  >> %TEMP%\listfile.txt
 dir ..\..\Extensions\*.h /L /B /S |find /v /i "\Widgets-Extension\" >> %TEMP%\listfile.txt
+dir ..\..\Core\GDCore\*.cpp /L /B /S >> %TEMP%\listfile.txt
+dir ..\..\Core\GDCore\*.h /L /B /S >> %TEMP%\listfile.txt
 
 echo Generating .POT file...
 xgettext --from-code iso-8859-1  -o useMeToUpdateCatalogsWithPoEdit.pot --c++ --no-wrap -f %TEMP%\listfile.txt -k_

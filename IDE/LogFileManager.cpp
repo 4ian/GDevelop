@@ -1,6 +1,7 @@
 #include <wx/config.h>
 #include <wx/textfile.h>
 #include <wx/log.h>
+#include <wx/datetime.h>
 #include "LogFileManager.h"
 #include "GDL/CommonTools.h"
 
@@ -21,7 +22,8 @@ void LogFileManager::WriteToLogFile(const std::string & log)
         {
             if ( !file.Create() ) return; //Failed to create log file
         }
-        file.AddLine(log);
+        wxDateTime time = wxDateTime::Now();
+        file.AddLine("["+ToString(time.GetMonth()+1)+"/"+ToString(time.GetDay())+"/"+ToString(time.GetYear())+", "+ToString(time.GetHour())+":"+ToString(time.GetMinute())+":"+ToString(time.GetSecond())+"] "+log);
         file.Write();
     }
 }
@@ -37,6 +39,8 @@ void LogFileManager::InitalizeFromConfig()
     //Clear log
     if ( logActivated && !logFile.empty() )
     {
+        wxLogNull noLogPlease; //We take care of handling errors
+
         wxTextFile file(logFile);
         if ( file.Exists() )
         {

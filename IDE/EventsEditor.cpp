@@ -213,7 +213,9 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_ENTER,(wxObjectEventFunction)&EventsEditor::OnliveEditTextEnter);
 	Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EventsEditor::OnparameterEditBtClick);
 	eventContextPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OneventContextPanelPaint,0,this);
+	eventContextPanel->Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&EventsEditor::OneventContextPanelEraseBackground,0,this);
 	listContextPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OnlistContextPanelPaint,0,this);
+	listContextPanel->Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&EventsEditor::OnlistContextPanelEraseBackground,0,this);
 	eventsPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EventsEditor::OneventsPanelPaint,0,this);
 	eventsPanel->Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&EventsEditor::OneventsPanelEraseBackground,0,this);
 	eventsPanel->Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&EventsEditor::OneventsPanelKeyDown,0,this);
@@ -1119,6 +1121,15 @@ void EventsEditor::OneventsPanelEraseBackground(wxEraseEvent& event)
 {
     //Prevent flickering
 }
+void EventsEditor::OneventContextPanelEraseBackground(wxEraseEvent& event)
+{
+    //Prevent flickering
+}
+void EventsEditor::OnlistContextPanelEraseBackground(wxEraseEvent& event)
+{
+    //Prevent flickering
+}
+
 
 void EventsEditor::OnscrollBarScroll(wxScrollEvent& event)
 {

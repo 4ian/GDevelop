@@ -14,7 +14,6 @@
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/statline.h>
-#include <wx/radiobut.h>
 #include <wx/panel.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
@@ -62,7 +61,6 @@ class ChoixCondition: public wxDialog
 		wxFlexGridSizer* GridSizer1;
 		wxPanel* Panel1;
 		wxTreeCtrl* objectConditionsTree;
-		wxRadioButton* LocaliseCheck;
 		wxTreeCtrl* ObjetsList;
 		wxStaticLine* StaticLine2;
 		wxStaticText* ConditionTextTxt;
@@ -74,7 +72,6 @@ class ChoixCondition: public wxDialog
 		wxSearchCtrl* objectsSearchCtrl;
 		wxTreeCtrl* GroupesList;
 		wxCheckBox* objSortCheck;
-		wxRadioButton* GlobalCheck;
 		wxBoxSizer* conditionSizer;
 		wxButton* AideBt;
 		//*)
@@ -104,8 +101,6 @@ class ChoixCondition: public wxDialog
 		static const long ID_STATICTEXT1;
 		static const long ID_STATICTEXT2;
 		static const long ID_STATICLINE1;
-		static const long ID_RADIOBUTTON1;
-		static const long ID_RADIOBUTTON2;
 		static const long ID_CHECKBOX1;
 		static const long ID_STATICLINE2;
 		static const long ID_BUTTON4;

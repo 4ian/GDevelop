@@ -2,6 +2,7 @@
 echo.
 echo Tool for updating include directory for Dev target.
 echo.
+if "%1"=="PCHonly" GOTO PCH
 
 echo -Copying files...
 rem del ..\Bin\Dev\include\*.* /S /Q
@@ -40,7 +41,15 @@ echo.
 echo -End of copy
 if NOT errorlevel 0 echo Some errors occurred.
 
-echo 
+echo.
+
+:PCH
+if "%1"=="noPCH" GOTO END
+echo -Precompiling headers
+..\..\ExtLibs\llvm\build-tdmgcc45-release\bin\clang.exe -cc1 -fcxx-exceptions -fexceptions  -DGD_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DGD_IDE_ONLY -DDEV -DNDEBUG -DBOOST_DISABLE_ASSERTS -I..\Bin\Dev\include/TDM-GCC-4.5.2/include  -I..\Bin\Dev\include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include -I..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++ -I..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32 -I..\Bin\Dev\include/llvm/tools/clang/lib/Headers -I..\Bin\Dev\include/llvm/include -I..\Bin\Dev\include/llvm/build-tdmgcc45-release/include -I..\Bin\Dev\include/GDL -I..\Bin\Dev\include/Core -I..\Bin\Dev\include/boost -I..\Bin\Dev\include\SFML/include -x c++-header ..\Bin\Dev\include\GDL\GDL\Events\EventsCodePrecompiledHeader.h -emit-pch -o ..\Bin\Dev\include\GDL\GDL\Events\PrecompiledHeader.h.pch
+
+..\..\ExtLibs\llvm\build-tdmgcc45-release\bin\clang.exe -cc1 -fcxx-exceptions -fexceptions -DGD_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DDEV -DNDEBUG  -DBOOST_DISABLE_ASSERTS -I..\Bin\Dev\include/TDM-GCC-4.5.2/include  -I..\Bin\Dev\include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include -I..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++ -I..\Bin\Dev\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32 -I..\Bin\Dev\include/llvm/tools/clang/lib/Headers -I..\Bin\Dev\include/llvm/include -I..\Bin\Dev\include/llvm/build-tdmgcc45-release/include -I..\Bin\Dev\include/GDL -I..\Bin\Dev\include/Core -I..\Bin\Dev\include/boost -I..\Bin\Dev\include\SFML/include -x c++-header ..\Bin\Dev\include\GDL\GDL\Events\EventsCodePrecompiledHeader.h -emit-pch -o ..\Bin\Dev\include\GDL\GDL\Events\PrecompiledHeaderRuntime.h.pch
 
 :END
+echo 
 echo -Done

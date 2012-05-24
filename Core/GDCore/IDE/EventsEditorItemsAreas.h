@@ -3,8 +3,6 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
-
 #ifndef EVENTSEDITORITEMSAREAS_H
 #define EVENTSEDITORITEMSAREAS_H
 #include <wx/gdicmn.h>
@@ -17,7 +15,9 @@ namespace gd { class Instruction; }
 namespace gd { class Expression; }
 
 /**
- * \brief Used ( internally by Events editor ) to indicate to EventsEditorItemsAreas that an event is displayed somewhere
+ * \brief Tool class to store information about an event.
+ *
+ * Used  by events editor to indicate to EventsEditorItemsAreas that an event is displayed somewhere.
  */
 class GD_CORE_API EventItem
 {
@@ -239,4 +239,3 @@ private:
 };
 
 #endif // EVENTSEDITORITEMSAREAS_H
-#endif

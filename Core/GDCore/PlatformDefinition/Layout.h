@@ -8,12 +8,13 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+class TiXmlElement;
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 namespace gd { class BaseEvent; }
-class TiXmlElement;
 namespace gd { class Object; }
 namespace gd { class Project; }
 namespace gd { class VariablesContainer; }
+namespace gd { class InitialInstancesContainer; }
 #undef GetObject //Disable an annoying macro
 
 namespace gd
@@ -78,6 +79,23 @@ public:
 
     virtual const std::string & GetWindowDefaultTitle() const =0;
     virtual void SetWindowDefaultTitle(const std::string & title_) =0;
+
+    ///@}
+
+    /** \name Layout's initial instances
+     * Members functions related to initial instances of objects created at the layout start up
+     */
+    ///@{
+
+    /**
+     * Must return the container storing initial instances.
+     */
+    virtual const InitialInstancesContainer & GetInitialInstances() const =0;
+
+    /**
+     * Must return the container storing initial instances.
+     */
+    virtual InitialInstancesContainer & GetInitialInstances() =0;
 
     ///@}
 
@@ -197,19 +215,14 @@ public:
     ///@{
 
     /**
-     * This method take care of saving everything that could be accessed from the gd::Layout base class ( Layout name, default title, background color... )
-     * If your gd::Layout derived class has new members to be saved, you can redefine this method to save your class specific members.
-     * \note When redefining this method, do not forget to call this method by calling gd::Layout::SaveToXml(element);
+     * Called to save the layout to a TiXmlElement.
      */
     virtual void SaveToXml(TiXmlElement * element) const;
 
     /**
-     * This method take care of loading everything that could be accessed from the gd::Layout base class ( Layout name, default title, background color... )
-     * If your gd::Layout derived class has new members to be loaded, you can redefine this method to load your class specific members.
-     * \note When redefining this method, do not forget to call this method by calling gd::Layout::LoadFromXml(element);
+     * Called to load the layout from a TiXmlElement.
      */
     virtual void LoadFromXml(const TiXmlElement * element);
-
     ///@}
 
 private:

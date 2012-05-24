@@ -6,6 +6,7 @@
 #ifndef GDCORE_VARIABLESCONTAINER_H
 #define GDCORE_VARIABLESCONTAINER_H
 #include <string>
+class TiXmlElement;
 namespace gd {class Variable;}
 
 namespace gd
@@ -117,6 +118,22 @@ public:
      */
     virtual void SwapVariables(unsigned int firstVariableIndex, unsigned int secondVariableIndex) =0;
 
+    ///@}
+
+    /** \name Saving and loading
+     * Members functions related to saving and loading the object.
+     */
+    ///@{
+
+    /**
+     * Called to save the layout to a TiXmlElement.
+     */
+    virtual void SaveToXml(TiXmlElement * element) const {};
+
+    /**
+     * Called to load the layout from a TiXmlElement.
+     */
+    virtual void LoadFromXml(const TiXmlElement * element) {};
     ///@}
 
 private:

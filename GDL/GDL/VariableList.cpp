@@ -4,8 +4,10 @@
  */
 
 #include <iostream>
+#include <string>
 #include "GDL/VariableList.h"
 #include "GDL/Variable.h"
+#include "GDL/tinyxml/tinyxml.h"
 
 Variable ListVariable::badVariable("badVariable");
 
@@ -83,8 +85,8 @@ void ListVariable::InsertVariable(const gd::Variable & variable, unsigned int po
     }
     catch(...) { std::cout << "WARNING: Tried to add a variable which is not a GD C++ Platform Variable to a GD C++ Platform project"; }
 }
-void ListVariable::Create(const gd::VariablesContainer & source)
 
+void ListVariable::Create(const gd::VariablesContainer & source)
 {
     try
     {
@@ -102,5 +104,38 @@ void ListVariable::SwapVariables(unsigned int firstVariableIndex, unsigned int s
     Variable temp = variables[firstVariableIndex];
     variables[firstVariableIndex] = variables[secondVariableIndex];
     variables[secondVariableIndex] = temp;
+}
+#endif
+
+void ListVariable::LoadFromXml(const TiXmlElement * rootElement)
+{
+    if ( rootElement == NULL ) return;
+
+    Clear();
+    const TiXmlElement * element = rootElement->FirstChildElement();
+
+    while ( element )
+    {
+        std::string name = element->Attribute( "Name" ) != NULL ? element->Attribute( "Name" ) : "";
+        Variable variable(name);
+        if ( element->Attribute( "Value" ) != NULL ) variable.SetString(element->Attribute( "Value" ));
+
+        element = element->NextSiblingElement();
+    }
+}
+
+#if defined(GD_IDE_ONLY)
+void ListVariable::SaveToXml(TiXmlElement * element) const
+{
+    if ( element == NULL ) return;
+
+    for ( unsigned int j = 0;j < variables.size();j++ )
+    {
+        TiXmlElement * variable = new TiXmlElement( "Variable" );
+        element->LinkEndChild( variable );
+
+        variable->SetAttribute("Name", variables[j].GetName().c_str());
+        variable->SetAttribute("Value", variables[j].GetString().c_str());
+    }
 }
 #endif

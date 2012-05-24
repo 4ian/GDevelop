@@ -222,8 +222,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 
     //Global variables
     elem = hdl.FirstChildElement().FirstChildElement( "Variables" ).Element();
-    if ( elem )
-        OpenVariablesList(game.GetVariables(), elem);
+    if ( elem ) game.GetVariables().LoadFromXml(elem);
 
     //Scenes
     elem = hdl.FirstChildElement().FirstChildElement( "Scenes" ).Element();
@@ -361,7 +360,7 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, c
 
         if ( newObject != boost::shared_ptr<Object>() )
         {
-            if ( elemScene->FirstChildElement( "Variables" ) != NULL ) { OpenVariablesList(newObject->GetVariables(), elemScene->FirstChildElement( "Variables" )); }
+            if ( elemScene->FirstChildElement( "Variables" ) != NULL ) { newObject->GetVariables().LoadFromXml(elemScene->FirstChildElement( "Variables" )); }
 
             //Spécifique à l'objet
             newObject->LoadFromXml(elemScene);
@@ -424,96 +423,6 @@ void OpenSaveGame::OpenGroupesObjets(vector < gd::ObjectGroup > & list, const Ti
     }
 }
 #endif
-
-void OpenSaveGame::OpenPositions(vector < InitialPosition > & list, const TiXmlElement * rootElem)
-{
-    const TiXmlElement * elem = rootElem->FirstChildElement();
-
-    //Passage en revue des positions initiales
-    while ( elem )
-    {
-        InitialPosition newPosition;
-
-        if ( elem->Attribute( "x" ) != NULL ) { elem->QueryFloatAttribute( "x", &newPosition.x );}
-        else { MSG( "Les informations concernant la position X d'un objet manquent." ); }
-
-        if ( elem->Attribute( "y" ) != NULL ) { elem->QueryFloatAttribute( "y", &newPosition.y );}
-        else { MSG( "Les informations concernant la position Y d'un objet manquent." ); }
-
-        //Compatibility with Game Develop 1.2 and inferior
-        if ( elem->Attribute( "direction" ) != NULL )
-        {
-            int direction;
-            elem->QueryIntAttribute( "direction", &direction );
-            newPosition.floatInfos["direction"] = direction;
-        }
-
-        //Compatibility with Game Develop 1.2 and inferior
-        if ( elem->Attribute( "animation" ) != NULL )
-        {
-            int animation;
-            elem->QueryIntAttribute( "animation", &animation );
-            newPosition.floatInfos["animation"] = animation;
-        }
-
-        if ( elem->Attribute( "angle" ) != NULL ) { elem->QueryFloatAttribute( "angle", &newPosition.angle );}
-
-        //Compatibility with Game Develop 1.2.8522 and inferior
-        newPosition.personalizedSize = false;
-        if ( elem->Attribute( "personalizedSize" ) != NULL )
-        {
-            string personalizedSize = elem->Attribute( "personalizedSize" );
-            if ( personalizedSize == "true")
-                newPosition.personalizedSize = true;
-        }
-
-        //Compatibility with Game Develop 1.2.8522 and inferior
-        if ( elem->Attribute( "width" ) != NULL )
-            elem->QueryFloatAttribute( "width", &newPosition.width );
-
-        //Compatibility with Game Develop 1.2.8522 and inferior
-        if ( elem->Attribute( "height" ) != NULL )
-            elem->QueryFloatAttribute( "height", &newPosition.height );
-
-        if ( elem->Attribute( "plan" ) != NULL ) { elem->QueryIntAttribute( "plan", &newPosition.zOrder );}
-        else { MSG( "Les informations concernant le plan d'un objet manquent." ); }
-
-        if ( elem->Attribute( "layer" ) != NULL ) { newPosition.layer = elem->Attribute( "layer" ); }
-
-        if ( elem->Attribute( "nom" ) != NULL ) { newPosition.objectName = elem->Attribute( "nom" );}
-        else { MSG( "Les informations concernant le nom d'un objet manquent." ); }
-
-        const TiXmlElement * floatInfos = elem->FirstChildElement( "floatInfos" );
-        if ( floatInfos ) floatInfos = floatInfos->FirstChildElement("Info");
-        while ( floatInfos )
-        {
-            if ( floatInfos->Attribute("name") != NULL && floatInfos->Attribute("value") != NULL )
-            {
-                float value = 0;
-                floatInfos->QueryFloatAttribute("value", &value);
-                newPosition.floatInfos[floatInfos->Attribute("name")] = value;
-            }
-
-            floatInfos = floatInfos->NextSiblingElement();
-        }
-
-        const TiXmlElement * stringInfos = elem->FirstChildElement( "stringInfos" );
-        if ( stringInfos ) stringInfos = stringInfos->FirstChildElement("Info");
-        while ( stringInfos )
-        {
-            if ( stringInfos->Attribute("name") != NULL && stringInfos->Attribute("value") != NULL )
-                newPosition.stringInfos[stringInfos->Attribute("name")] = stringInfos->Attribute("value");
-
-            stringInfos = stringInfos->NextSiblingElement();
-        }
-
-        OpenVariablesList(newPosition.initialVariables, elem->FirstChildElement( "InitialVariables" ));
-
-        list.push_back( newPosition );
-
-        elem = elem->NextSiblingElement();
-    }
-}
 
 #if defined(GD_IDE_ONLY)
 void OpenSaveGame::OpenEvents(vector < gd::BaseEventSPtr > & list, const TiXmlElement * elem)
@@ -721,23 +630,6 @@ void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents
 }
 #endif
 
-void OpenSaveGame::OpenVariablesList(ListVariable & list, const TiXmlElement * elem)
-{
-    list.Clear();
-    if ( elem == NULL ) return;
-    const TiXmlElement * elemScene = elem->FirstChildElement();
-
-    while ( elemScene )
-    {
-        string name = elemScene->Attribute( "Name" ) != NULL ? elemScene->Attribute( "Name" ) : "";
-        Variable & variable = list.ObtainVariable(name);
-
-        if ( elemScene->Attribute( "Value" ) != NULL ) { variable.SetString(elemScene->Attribute( "Value" ));}
-        else { MSG( "Les informations concernant la valeur d'une variable manquent." ); }
-
-        elemScene = elemScene->NextSiblingElement();
-    }
-}
 
 #if defined(GD_IDE_ONLY)
 ////////////////////////////////////////////////////////////
@@ -840,7 +732,7 @@ bool OpenSaveGame::SaveToFile(string file)
     //Global variables
     TiXmlElement * variables = new TiXmlElement( "Variables" );
     root->LinkEndChild( variables );
-    SaveVariablesList(game.GetVariables(), variables);
+    game.GetVariables().SaveToXml(variables);
 
     //Scenes
     TiXmlElement * scenes = new TiXmlElement( "Scenes" );
@@ -887,7 +779,7 @@ bool OpenSaveGame::SaveToFile(string file)
 
         TiXmlElement * variables = new TiXmlElement( "Variables" );
         scene->LinkEndChild( variables );
-        SaveVariablesList(game.GetLayouts()[i]->GetVariables(), variables);
+        game.GetLayout(i).GetVariables().SaveToXml(variables);
 
         TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedDatas" );
         scene->LinkEndChild( autosSharedDatas );
@@ -912,12 +804,10 @@ bool OpenSaveGame::SaveToFile(string file)
             dependencyElem->SetAttribute("sourceFile", game.GetLayouts()[i]->externalSourcesDependList[j].c_str());
         }
 
-        if ( !game.GetLayouts()[i]->initialObjectsPositions.empty() )
         {
             TiXmlElement * positions = new TiXmlElement( "Positions" );
             scene->LinkEndChild( positions );
-
-            SavePositions(game.GetLayouts()[i]->initialObjectsPositions, positions);
+            game.GetLayout(i).GetInitialInstances().SaveToXml(positions);
         }
 
         //Evènements
@@ -970,7 +860,7 @@ void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list
 
         TiXmlElement * variables = new TiXmlElement( "Variables" );
         objet->LinkEndChild( variables );
-        SaveVariablesList(list[j]->GetVariables(), variables);
+        list[j]->GetVariables().SaveToXml(variables);
 
         vector < std::string > allAutomatisms = list[j]->GetAllAutomatismNames();
         for (unsigned int i = 0;i<allAutomatisms.size();++i)
@@ -1006,54 +896,6 @@ void OpenSaveGame::SaveGroupesObjets(const vector < gd::ObjectGroup > & list, Ti
             grp->LinkEndChild( objet );
             objet->SetAttribute( "nom", allObjects.at(k).c_str() );
         }
-    }
-}
-
-void OpenSaveGame::SavePositions(const vector < InitialPosition > & list, TiXmlElement * positions)
-{
-    for (unsigned int j = 0;j < list.size();++j)
-    {
-        TiXmlElement * objet = new TiXmlElement( "Objet" );
-        positions->LinkEndChild( objet );
-        objet->SetAttribute( "nom", list[j].objectName.c_str() );
-        objet->SetDoubleAttribute( "x", list[j].x );
-        objet->SetDoubleAttribute( "y", list[j].y );
-        objet->SetAttribute( "plan", list[j].zOrder );
-        objet->SetAttribute( "layer", list[j].layer.c_str() );
-        objet->SetDoubleAttribute( "angle", list[j].angle );
-
-        objet->SetAttribute( "personalizedSize", "false" );
-        if ( list[j].personalizedSize )
-            objet->SetAttribute( "personalizedSize", "true" );
-
-        objet->SetDoubleAttribute( "width", list[j].width );
-        objet->SetDoubleAttribute( "height", list[j].height );
-
-        TiXmlElement * floatInfos = new TiXmlElement( "floatInfos" );
-        objet->LinkEndChild( floatInfos );
-
-        for(map<string, float>::const_iterator floatInfo = list[j].floatInfos.begin(); floatInfo != list[j].floatInfos.end(); ++floatInfo)
-        {
-            TiXmlElement * info = new TiXmlElement( "Info" );
-            floatInfos->LinkEndChild( info );
-            info->SetAttribute( "name", floatInfo->first.c_str());
-            info->SetDoubleAttribute( "value", floatInfo->second);
-        }
-
-        TiXmlElement * stringInfos = new TiXmlElement( "stringInfos" );
-        objet->LinkEndChild( stringInfos );
-
-        for(map<string, string>::const_iterator stringInfo = list[j].stringInfos.begin(); stringInfo != list[j].stringInfos.end(); ++stringInfo)
-        {
-            TiXmlElement * info = new TiXmlElement( "Info" );
-            stringInfos->LinkEndChild( info );
-            info->SetAttribute( "name", stringInfo->first.c_str());
-            info->SetAttribute( "value", stringInfo->second.c_str());
-        }
-
-        TiXmlElement * initialVariables = new TiXmlElement( "InitialVariables" );
-        objet->LinkEndChild( initialVariables );
-        SaveVariablesList(list[j].initialVariables, initialVariables);
     }
 }
 
@@ -1184,21 +1026,6 @@ void OpenSaveGame::SaveLayers(const vector < Layer > & list, TiXmlElement * laye
             camera->SetDoubleAttribute("ViewportRight", list.at(j).GetCamera(c).viewport.Left+list.at(j).GetCamera(c).viewport.Width);
             camera->SetDoubleAttribute("ViewportBottom", list.at(j).GetCamera(c).viewport.Top+list.at(j).GetCamera(c).viewport.Height);
         }
-    }
-}
-
-void OpenSaveGame::SaveVariablesList(const ListVariable & list, TiXmlElement * elem)
-{
-    if ( elem == NULL ) return;
-
-    vector<Variable> variables = list.GetVariablesVector();
-    for ( unsigned int j = 0;j < variables.size();j++ )
-    {
-        TiXmlElement * variable = new TiXmlElement( "Variable" );
-        elem->LinkEndChild( variable );
-
-        variable->SetAttribute("Name", variables[j].GetName().c_str());
-        variable->SetAttribute("Value", variables[j].GetString().c_str());
     }
 }
 

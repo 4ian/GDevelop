@@ -654,7 +654,7 @@
 					<Add option="-lLLVMCBackendInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
-					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
+					<Add directory="..\ExtLibs\llvm\build\lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
@@ -908,7 +908,7 @@
 					<Add option="-lLLVMCBackendInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
-					<Add directory="..\ExtLibs\llvm\build\Release+Asserts\lib" />
+					<Add directory="..\ExtLibs\llvm\build\lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
@@ -1311,7 +1311,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="2.1.10821" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project project_number="2.1.10822" output_directory="doc" use_auto_version="1" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

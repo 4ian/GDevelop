@@ -350,7 +350,7 @@ AudioExtension::AudioExtension()
 
     DECLARE_END_CONDITION()
     DECLARE_CONDITION("SoundPlaying",
-                   _("Un son est entrain d'être jouée"),
+                   _("Un son est entrain d'être joué"),
                    _("Teste si le son sur le canal indiqué est entrain d'être joué."),
                    _("Le son sur le canal _PARAM1_ est entrain d'être joué"),
                    _("Sons"),
@@ -380,7 +380,7 @@ AudioExtension::AudioExtension()
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("SoundStopped",
-                   _("Un son est arrêtée"),
+                   _("Un son est arrêté"),
                    _("Teste si le son sur le canal indiqué est arrêté."),
                    _("Le son sur le canal _PARAM1_ est arrêté"),
                    _("Sons"),

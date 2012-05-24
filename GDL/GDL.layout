@@ -1,277 +1,265 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
-	<File name="GDL\Variable.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="181" topLine="2" />
+	<ActiveTarget name="Release - Edittime" />
+	<File name="GDL\Force.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="284" topLine="0" />
 	</File>
-	<File name="GDL\Animation.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="0" topLine="20" />
+	<File name="GDL\DatFile.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1058" topLine="12" />
 	</File>
-	<File name="GDL\Collisions.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3495" topLine="114" />
+	<File name="GDL\profile.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="482" topLine="0" />
+	</File>
+	<File name="GDL\ManualTimer.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="283" topLine="0" />
+	</File>
+	<File name="GDL\BuiltinExtensions\AudioExtension.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="19379" topLine="356" />
+	</File>
+	<File name="GDL\RuntimeCamera.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="116" topLine="0" />
+	</File>
+	<File name="GDL\FontManager.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="300" topLine="4" />
+	</File>
+	<File name="GDL\BuiltinExtensions\ProfileTools.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="256" topLine="0" />
+	</File>
+	<File name="GDL\IDE\Dialogs\SpriteObjectEditor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="48718" topLine="873" />
+	</File>
+	<File name="GDL\VersionWrapper.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="577" topLine="5" />
+	</File>
+	<File name="GDL\Position.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="492" topLine="0" />
+	</File>
+	<File name="GDL\Events\EventsCodeGenerator.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="14121" topLine="277" />
+	</File>
+	<File name="GDL\BuiltinExtensions\RuntimeSceneCameraTools.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="6444" topLine="158" />
+	</File>
+	<File name="GDL\RotatedRectangleCollision.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="267" topLine="0" />
+	</File>
+	<File name="GDL\ExternalEvents.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="408" topLine="0" />
+	</File>
+	<File name="GDL\CommonTools.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="441" topLine="0" />
+	</File>
+	<File name="GDL\IDE\Dialogs\ResourcesEditor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="40296" topLine="820" />
+	</File>
+	<File name="GDL\VariableList.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="449" topLine="0" />
+	</File>
+	<File name="GDL\Point.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="360" topLine="0" />
+	</File>
+	<File name="GDL\LoadingScreen.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="332" topLine="0" />
+	</File>
+	<File name="GDL\BuiltinExtensions\RuntimeSceneTools.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="915" topLine="0" />
+	</File>
+	<File name="GDL\BuiltinExtensions\BaseObjectExtension.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="620" topLine="0" />
+	</File>
+	<File name="GDL\RotatedRectangle.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="307" topLine="0" />
 	</File>
 	<File name="GDL\ExtensionsManager.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2139" topLine="55" />
+		<Cursor1 position="1314" topLine="30" />
+	</File>
+	<File name="GDL\Variable.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="478" topLine="5" />
+	</File>
+	<File name="GDL\OpenSaveLoadingScreen.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="764" topLine="0" />
 	</File>
 	<File name="GDL\BuiltinExtensions\BaseObjectExtension2.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4133" topLine="56" />
+		<Cursor1 position="695" topLine="0" />
 	</File>
-	<File name="GDL\Events\CodeCompilationHelpers.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="9248" topLine="0" />
+	<File name="GDL\Events\EventsCodeNameMangler.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="546" topLine="0" />
 	</File>
-	<File name="GDL\IDE\CompilerMessagesParser.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="327" topLine="11" />
-	</File>
-	<File name="GDL\CodeExecutionEngine.cpp" open="1" top="1" tabpos="33" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5076" topLine="124" />
+	<File name="GDL\RessourcesLoader.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="481" topLine="0" />
 	</File>
 	<File name="GDL\ExtensionsLoader.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="566" topLine="0" />
+		<Cursor1 position="379" topLine="24" />
 	</File>
-	<File name="GDL\OpenSaveGame.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="41422" topLine="956" />
+	<File name="GDL\Collisions.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="628" topLine="0" />
 	</File>
-	<File name="GDL\BuiltinExtensions\BaseObjectExtension.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="11693" topLine="208" />
+	<File name="GDL\Text.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="476" topLine="0" />
+	</File>
+	<File name="GDL\OpenSaveGame.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="796" topLine="0" />
+	</File>
+	<File name="GDL\SceneNameMangler.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="173" topLine="0" />
+	</File>
+	<File name="GDL\Layer.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="407" topLine="3" />
+	</File>
+	<File name="GDL\Events\ExpressionsCodeGeneration.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2672" topLine="47" />
+	</File>
+	<File name="GDL\ExtensionBase.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="340" topLine="609" />
+	</File>
+	<File name="GDL\CodeExecutionEngine.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1136" topLine="15" />
+	</File>
+	<File name="GDL\ObjInstancesHolder.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="516" topLine="5" />
+	</File>
+	<File name="GDL\InvalidImage.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="122" topLine="69" />
+	</File>
+	<File name="GDL\ResourcesManager.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="7726" topLine="133" />
+	</File>
+	<File name="GDL\Camera.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="344" topLine="0" />
+	</File>
+	<File name="GDL\IDE\Dialogs\EditTextDialog.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="29240" topLine="578" />
+	</File>
+	<File name="GDL\ObjectHelpers.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="513" topLine="0" />
+	</File>
+	<File name="GDL\BuiltinExtensions\CommonInstructionsExtension.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="12388" topLine="252" />
+	</File>
+	<File name="GDL\RuntimeScene.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="6294" topLine="173" />
+	</File>
+	<File name="GDL\DynamicLibrariesTools.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="835" topLine="6" />
+	</File>
+	<File name="GDL\btScalar.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="643" topLine="0" />
+	</File>
+	<File name="GDL\DocMainPage.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="23446" topLine="445" />
+	</File>
+	<File name="GDL\IDE\BaseProfiler.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="561" topLine="0" />
+	</File>
+	<File name="GDL\AutomatismsSharedDatas.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="541" topLine="0" />
+	</File>
+	<File name="GDL\XmlFilesHelper.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1279" topLine="28" />
+	</File>
+	<File name="GDL\BuiltinExtensions\FileExtension.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="9919" topLine="162" />
+	</File>
+	<File name="GDL\IDE\Dialogs\EditLink.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="212" topLine="0" />
+	</File>
+	<File name="GDL\Sprite.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="679" topLine="0" />
+	</File>
+	<File name="GDL\Object.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="19834" topLine="574" />
+	</File>
+	<File name="GDL\BuiltinExtensions\FileExtension.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="173" topLine="0" />
 	</File>
 	<File name="GDL\BuiltinExtensions\FileTools.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="869" topLine="0" />
 	</File>
-	<File name="GDL\IDE\CodeCompiler.cpp" open="1" top="0" tabpos="27" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="8308" topLine="185" />
-	</File>
-	<File name="GDL\Object.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="17409" topLine="449" />
-	</File>
-	<File name="GDL\ExtensionsLoader.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="86" topLine="0" />
-	</File>
-	<File name="GDL\BuiltinExtensions\AudioTools.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5668" topLine="180" />
-	</File>
-	<File name="GDL\StandardEvent.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2372" topLine="70" />
-	</File>
-	<File name="GDL\IDE\GDExpressionParser.cpp" open="1" top="0" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="720" topLine="0" />
-	</File>
-	<File name="GDL\BuiltinExtensions\SpriteTools.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5250" topLine="106" />
-	</File>
-	<File name="GDL\ObjInstancesHolder.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2124" topLine="51" />
-	</File>
-	<File name="GDL\ExtensionBase.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1132" topLine="13" />
-	</File>
-	<File name="GDL\SpriteObject.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3664" topLine="92" />
-	</File>
-	<File name="GDL\Scene.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="245" topLine="0" />
-	</File>
-	<File name="GDL\BuiltinExtensions\VariablesExtension.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="6983" topLine="102" />
-	</File>
-	<File name="GDL\IDE\FullProjectCompiler.cpp" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5310" topLine="121" />
-	</File>
-	<File name="GDL\ExpressionInstruction.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="105" topLine="0" />
-	</File>
-	<File name="GDL\BuiltinExtensions\MathematicalToolsExtension.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="332" topLine="0" />
-	</File>
-	<File name="GDL\IDE\Dialogs\ChooseObject.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="919" topLine="28" />
-	</File>
-	<File name="GDL\BuiltinExtensions\AdvancedExtension.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="966" topLine="0" />
-	</File>
-	<File name="GDL\LightweightCommonTools.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="309" topLine="0" />
-	</File>
-	<File name="GDL\Game.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="291" topLine="0" />
-	</File>
-	<File name="GDL\RuntimeScene.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="14172" topLine="421" />
-	</File>
-	<File name="GDL\RepeatEvent.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="632" topLine="0" />
-	</File>
-	<File name="GDL\BuiltinExtensions\SceneExtension.cpp" open="1" top="0" tabpos="24" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1374" topLine="3" />
-	</File>
-	<File name="PlatformDefinition\Platform.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="91" topLine="0" />
-	</File>
-	<File name="GDL\Events\ExpressionsCodeGeneration.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="17059" topLine="275" />
-	</File>
-	<File name="GDL\BuiltinExtensions\MathematicalTools.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="149" topLine="8" />
-	</File>
-	<File name="GDL\WhileEvent.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2044" topLine="25" />
-	</File>
-	<File name="GDL\Sprite.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1687" topLine="71" />
-	</File>
-	<File name="GDL\BuiltinExtensions\RuntimeSceneTools.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5504" topLine="111" />
-	</File>
-	<File name="PlatformDefinition\InstructionsMetadataHolder.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="89" topLine="0" />
-	</File>
-	<File name="GDL\BuiltinExtensions\CommonInstructionsTools.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="319" topLine="16" />
-	</File>
-	<File name="GDL\CommonTools.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1991" topLine="91" />
-	</File>
-	<File name="GDL\ImageManager.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3738" topLine="89" />
-	</File>
-	<File name="GDL\ForEachEvent.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1232" topLine="33" />
-	</File>
-	<File name="GDL\RuntimeGame.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="538" topLine="0" />
-	</File>
-	<File name="GDL\IDE\Dialogs\EditTextDialog.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="578" topLine="6" />
-	</File>
-	<File name="GDL\BuiltinExtensions\CommonInstructionsExtension.cpp" open="1" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="12360" topLine="242" />
-	</File>
-	<File name="GDL\VariableList.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="877" topLine="15" />
-	</File>
-	<File name="GDL\Automatism.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="168" topLine="0" />
-	</File>
-	<File name="GDL\SoundManager.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1415" topLine="42" />
-	</File>
-	<File name="GDL\IDE\Dialogs\ResourcesEditor.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="36280" topLine="727" />
-	</File>
-	<File name="GDL\BuiltinExtensions\CommonConversionsExtension.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="870" topLine="0" />
-	</File>
-	<File name="GDL\Events\EventsCodeGenerationContext.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="956" topLine="9" />
-	</File>
-	<File name="GDL\ObjInstancesHolder.cpp" open="1" top="0" tabpos="26" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1998" topLine="28" />
-	</File>
-	<File name="GDL\Variable.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="827" topLine="0" />
-	</File>
-	<File name="GDL\Animation.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="555" topLine="6" />
-	</File>
-	<File name="GDL\ExternalEvents.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="448" topLine="0" />
-	</File>
-	<File name="GDL\IDE\Dialogs\EditLink.cpp" open="0" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="236" topLine="5" />
-	</File>
-	<File name="GDL\ExtensionsManager.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="7702" topLine="161" />
-	</File>
-	<File name="GDL\BuiltinExtensions\StringTools.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="523" topLine="0" />
-	</File>
-	<File name="GDL\OpenSaveGame.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="537" topLine="1" />
-	</File>
-	<File name="GDL\IDE\CodeCompiler.h" open="1" top="0" tabpos="30" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4062" topLine="96" />
-	</File>
-	<File name="GDL\IDE\Dialogs\ObjectListDialogsHelper.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1009" topLine="22" />
-	</File>
-	<File name="GDL\ObjectHelpers.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="GDL\AutomatismsRuntimeSharedDatas.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="237" topLine="0" />
 	</File>
-	<File name="GDL\DynamicLibrariesTools.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="835" topLine="0" />
-	</File>
-	<File name="GDL\StandardEvent.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="766" topLine="0" />
-	</File>
-	<File name="GDL\Object.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="19735" topLine="550" />
-	</File>
-	<File name="GDL\ExtensionBase.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="802" topLine="0" />
-	</File>
-	<File name="GDL\BuiltinExtensions\CommonInstructionsTools.h" open="1" top="0" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="476" topLine="0" />
-	</File>
-	<File name="GDL\SpriteObject.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="730" topLine="4" />
-	</File>
-	<File name="GDL\Scene.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="470" topLine="21" />
-	</File>
-	<File name="GDL\LinkEvent.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4286" topLine="88" />
-	</File>
-	<File name="GDL\Game.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="9974" topLine="195" />
-	</File>
-	<File name="GDL\RuntimeScene.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="646" topLine="0" />
-	</File>
-	<File name="PlatformDefinition\Platform.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="89" topLine="0" />
-	</File>
-	<File name="GDL\BuiltinExtensions\MathematicalToolsExtension.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1482" topLine="0" />
-	</File>
-	<File name="GDL\IDE\Dialogs\ChooseObject.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="312" topLine="205" />
-	</File>
-	<File name="GDL\Sprite.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1284" topLine="127" />
-	</File>
-	<File name="GDL\RepeatEvent.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1319" topLine="21" />
-	</File>
-	<File name="GDL\BuiltinExtensions\MathematicalTools.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2530" topLine="0" />
-	</File>
-	<File name="GDL\CppCodeEvent.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2751" topLine="59" />
-	</File>
-	<File name="GDL\SourceFile.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2213" topLine="49" />
-	</File>
-	<File name="GDL\BuiltinExtensions\CommonInstructionsExtension.h" open="1" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="0" topLine="0" />
-	</File>
-	<File name="GDL\IDE\Dialogs\ChooseAutomatismDlg.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5352" topLine="82" />
-	</File>
 	<File name="GDL\Automatism.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="658" topLine="17" />
+		<Cursor1 position="465" topLine="0" />
 	</File>
-	<File name="GDL\ImageManager.cpp" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="155" topLine="0" />
+	<File name="GDL\VersionWrapper.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="867" topLine="8" />
+	</File>
+	<File name="GDL\profile.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="10144" topLine="294" />
 	</File>
 	<File name="GDL\SoundManager.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2552" topLine="64" />
+		<Cursor1 position="423" topLine="0" />
 	</File>
-	<File name="GDL\IDE\Dialogs\ResourcesEditor.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="754" topLine="9" />
+	<File name="GDL\Version.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="616" topLine="0" />
 	</File>
-	<File name="GDL\Events\EventsCodeGenerator.cpp" open="1" top="0" tabpos="25" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="45972" topLine="926" />
+	<File name="GDL\Sound.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1460" topLine="27" />
 	</File>
-	<File name="GDL\ExternalEvents.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="245" topLine="0" />
+	<File name="GDL\ShaderManager.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="374" topLine="0" />
+	</File>
+	<File name="GDL\BuiltinExtensions\VariablesExtension.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="37215" topLine="590" />
+	</File>
+	<File name="GDL\SceneNameMangler.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="217" topLine="0" />
+	</File>
+	<File name="GDL\Collisions.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="0" topLine="114" />
+	</File>
+	<File name="GDL\IDE\Dialogs\ChooseObject.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1439" topLine="15" />
+	</File>
+	<File name="GDL\Scene.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="823" topLine="0" />
+	</File>
+	<File name="GDL\ObjInstancesHolder.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1566" topLine="28" />
+	</File>
+	<File name="GDL\IDE\Dialogs\EditComment.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="6093" topLine="96" />
+	</File>
+	<File name="GDL\RuntimeScene.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2972" topLine="179" />
+	</File>
+	<File name="GDL\ImageManager.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="4837" topLine="94" />
+	</File>
+	<File name="GDL\tinyxml\tinyxml.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="867" topLine="93" />
+	</File>
+	<File name="GDL\ResourcesManager.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="12037" topLine="402" />
+	</File>
+	<File name="GDL\RuntimeLayer.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2621" topLine="56" />
+	</File>
+	<File name="GDL\Game.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="612" topLine="10" />
+	</File>
+	<File name="GDL\IDE\CodeCompiler.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="16081" topLine="389" />
+	</File>
+	<File name="GDL\btAlignedAllocator.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="28" topLine="0" />
+	</File>
+	<File name="GDL\Object.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2842" topLine="24" />
+	</File>
+	<File name="GDL\RuntimeGame.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="528" topLine="0" />
+	</File>
+	<File name="GDL\ForEachEvent.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="428" topLine="0" />
+	</File>
+	<File name="GDL\IDE\Dialogs\EditExpression.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="46045" topLine="884" />
+	</File>
+	<File name="GDL\Sprite.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="485" topLine="0" />
+	</File>
+	<File name="GDL\Music.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="234" topLine="0" />
 	</File>
 </CodeBlocks_layout_file>

@@ -75,6 +75,9 @@ RuntimeScene::~RuntimeScene()
         if ( extensions[i] != boost::shared_ptr<ExtensionBase>() )
             extensions[i]->SceneUnloaded(*this);
     }
+
+    objectsInstances.Clear(); //Force destroy objects NOW as they can have pointers to some
+                              //RuntimeScene members which so need to be destroyed AFTER objects.
 }
 
 void RuntimeScene::Init(const RuntimeScene & scene)
@@ -526,10 +529,12 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
     //Create object instances which are originally positioned on scene
     MessageLoading( "Adding objects to their initial position", 66 );
-    for(unsigned int i = 0;i < scene.initialObjectsPositions.size();++i)
+    for(unsigned int i = 0;i < scene.GetInitialInstances().GetInstancesCount();++i)
     {
-        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(GetInitialObjects().begin(), GetInitialObjects().end(), std::bind2nd(ObjectHasName(), scene.initialObjectsPositions[i].objectName));
-        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game->GetGlobalObjects().begin(), game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), scene.initialObjectsPositions[i].objectName));
+        const InitialPosition & initialInstance = scene.GetInitialInstances().GetInstance(i);
+
+        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(GetInitialObjects().begin(), GetInitialObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
+        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game->GetGlobalObjects().begin(), game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
 
         ObjSPtr newObject = boost::shared_ptr<Object> ();
 
@@ -540,21 +545,21 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
         if ( newObject != boost::shared_ptr<Object> () )
         {
-            newObject->SetX( scene.initialObjectsPositions[i].x );
-            newObject->SetY( scene.initialObjectsPositions[i].y );
-            newObject->SetZOrder( scene.initialObjectsPositions[i].zOrder );
-            newObject->SetLayer( scene.initialObjectsPositions[i].layer );
-            newObject->InitializeFromInitialPosition(scene.initialObjectsPositions[i]);
-            newObject->SetAngle( scene.initialObjectsPositions[i].angle );
+            newObject->SetX( initialInstance.GetX() );
+            newObject->SetY( initialInstance.GetY() );
+            newObject->SetZOrder( initialInstance.GetZOrder() );
+            newObject->SetLayer( initialInstance.GetLayer() );
+            newObject->InitializeFromInitialPosition(initialInstance);
+            newObject->SetAngle( initialInstance.GetAngle() );
 
-            if ( scene.initialObjectsPositions[i].personalizedSize )
+            if ( initialInstance.HasCustomSize() )
             {
-                newObject->SetWidth(scene.initialObjectsPositions[i].width);
-                newObject->SetHeight(scene.initialObjectsPositions[i].height);
+                newObject->SetWidth(initialInstance.GetWidth());
+                newObject->SetHeight(initialInstance.GetHeight());
             }
 
             //Substitute initial variables specific to that object instance.
-            const std::vector<Variable> & instanceSpecificVariables = scene.initialObjectsPositions[i].initialVariables.GetVariablesVector();
+            const std::vector<Variable> & instanceSpecificVariables = initialInstance.GetVariables().GetVariablesVector();
             for (unsigned int j = 0;j<instanceSpecificVariables.size();++j)
             {
                 newObject->GetVariables().ObtainVariable(instanceSpecificVariables[j].GetName()) = instanceSpecificVariables[j];
@@ -565,7 +570,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
             objectsInstances.AddObject(newObject);
         }
         else
-            std::cout << "Could not find and put object " << scene.initialObjectsPositions[i].objectName << std::endl;
+            std::cout << "Could not find and put object " << initialInstance.GetObjectName() << std::endl;
     }
 
     //Automatisms data

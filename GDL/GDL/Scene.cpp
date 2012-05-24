@@ -166,7 +166,7 @@ void Scene::LoadFromXml(const TiXmlElement * elem)
         OpenSaveGame::OpenObjects(initialObjects, elem->FirstChildElement( "Objets" ));
 
     if ( elem->FirstChildElement( "Positions" ) != NULL )
-        OpenSaveGame::OpenPositions(initialObjectsPositions, elem->FirstChildElement( "Positions" ));
+        initialInstances.LoadFromXml(elem->FirstChildElement( "Positions" ));
 
     if ( elem->FirstChildElement( "Layers" ) != NULL )
         OpenSaveGame::OpenLayers(initialLayers, elem->FirstChildElement( "Layers" ));
@@ -178,7 +178,7 @@ void Scene::LoadFromXml(const TiXmlElement * elem)
     #endif
 
     if ( elem->FirstChildElement( "Variables" ) != NULL )
-        OpenSaveGame::OpenVariablesList(variables, elem->FirstChildElement( "Variables" ));
+        variables.LoadFromXml(elem->FirstChildElement( "Variables" ));
 
     if ( elem->FirstChildElement( "AutomatismsSharedDatas" ) != NULL )
     {
@@ -240,7 +240,7 @@ void Scene::Init(const Scene & scene)
     for (unsigned int i =0;i<scene.GetInitialObjects().size();++i)
     	GetInitialObjects().push_back( boost::shared_ptr<Object>(scene.GetInitialObjects()[i]->Clone()) );
 
-    initialObjectsPositions = scene.initialObjectsPositions;
+    initialInstances = scene.initialInstances;
     initialLayers = scene.initialLayers;
     variables = scene.GetVariables();
 

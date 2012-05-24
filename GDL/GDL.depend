@@ -12987,21 +12987,22 @@
 1337099804 d:\florian\programmation\gamedevelop2\gdl\\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1337100150 d:\florian\programmation\gamedevelop2\gdl\\gdl\scene.h
+1337790619 d:\florian\programmation\gamedevelop2\gdl\\gdl\scene.h
 	<vector>
 	<map>
 	<string>
 	<boost/shared_ptr.hpp>
-	"GDL/Position.h"
+	"GDL/InitialInstancesContainer.h"
 	"GDL/Layer.h"
 	"GDCore/PlatformDefinition/Layout.h"
 
 1334693309 d:\florian\programmation\gamedevelop2\gdl\\gdl\objectgroup.h
 
-1337099650 d:\florian\programmation\gamedevelop2\gdl\\gdl\position.h
+1337794091 d:\florian\programmation\gamedevelop2\gdl\\gdl\position.h
 	<string>
 	<map>
 	"GDL/VariableList.h"
+	"GDCore/PlatformDefinition/InitialInstance.h"
 
 1337099492 d:\florian\programmation\gamedevelop2\gdl\\gdl\layer.h
 	<string>
@@ -13513,7 +13514,7 @@
 	"GDL/Log.h"
 	"GDL/IDE/Instruction.h"
 
-1337108101 d:\florian\programmation\gamedevelop2\gdl\\gdl\opensavegame.h
+1337793568 d:\florian\programmation\gamedevelop2\gdl\\gdl\opensavegame.h
 	"GDL/Game.h"
 	<string>
 	"GDL/tinyxml/tinyxml.h"
@@ -14649,7 +14650,7 @@
 	"GDL/ObjectGroup.h"
 	"GDL/profile.h"
 
-1336997751 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
+1337796281 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
 	<wx/wx.h>
 	"GDL/IDE/Dialogs/ProjectUpdateDlg.h"
 	"PlatformDefinition/Platform.h"
@@ -14839,7 +14840,7 @@
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1337104706 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
+1337871080 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
 	<sstream>
 	<fstream>
 	<iomanip>
@@ -14882,7 +14883,7 @@
 	<SFML/System.hpp>
 	"GDL/profile.h"
 
-1336997752 source:d:\florian\programmation\gamedevelop2\gdl\gdl\scene.cpp
+1337793800 source:d:\florian\programmation\gamedevelop2\gdl\gdl\scene.cpp
 	<iostream>
 	"GDL/Scene.h"
 	"GDL/ExtensionsManager.h"
@@ -14987,7 +14988,7 @@
 	<wx/panel.h>
 	<wx/combobox.h>
 
-1336946597 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
+1337795709 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
 	<SFML/Graphics.hpp>
 	"GDL/SpriteObject.h"
 	"GDL/RuntimeGame.h"
@@ -15855,7 +15856,7 @@
 	<wx/filename.h>
 	"GDL/IDE/CodeCompiler.h"
 
-1337111757 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1337804337 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -33475,7 +33476,7 @@
 1337095131 d:\florian\programmation\gamedevelop2\gdl\\gdl\builtinextensions\advancedextension.h
 	"GDL/ExtensionBase.h"
 
-1336946463 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\audioextension.cpp
+1337246855 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\audioextension.cpp
 	<iostream>
 	"GDL/BuiltinExtensions/AudioExtension.h"
 	"GDL/SoundManager.h"
@@ -33492,7 +33493,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1337100286 d:\florian\programmation\gamedevelop2\gdl\\gdl\variablelist.h
+1337793289 d:\florian\programmation\gamedevelop2\gdl\\gdl\variablelist.h
 	<vector>
 	<string>
 	"GDL/Variable.h"
@@ -33755,7 +33756,7 @@
 1326232818 d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\timetools.h
 	<string>
 
-1336996162 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\variablesextension.cpp
+1337252990 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\variablesextension.cpp
 	"GDL/BuiltinExtensions/VariablesExtension.h"
 	"GDL/Events/EventsCodeGenerator.h"
 	"GDL/Events/EventsCodeGenerationContext.h"
@@ -34442,10 +34443,12 @@
 	<vector>
 	<map>
 
-1337020592 source:d:\florian\programmation\gamedevelop2\gdl\gdl\variablelist.cpp
+1337796168 source:d:\florian\programmation\gamedevelop2\gdl\gdl\variablelist.cpp
 	<iostream>
+	<string>
 	"GDL/VariableList.h"
 	"GDL/Variable.h"
+	"GDL/tinyxml/tinyxml.h"
 
 1264360632 source:d:\florian\programmation\gamedevelop2\gdl\gdl\singleton.cpp
 	"GDL/singleton.h"
@@ -34996,7 +34999,7 @@
 	<boost/shared_ptr.hpp>
 	<wx/event.h>
 
-1337008087 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\codecompiler.cpp
+1337722812 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\codecompiler.cpp
 	"CodeCompiler.h"
 	<SFML/System.hpp>
 	<iostream>
@@ -35276,7 +35279,7 @@
 	<wx/html/htmprint.h>
 	<vector>
 
-1336939036 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\eventseditoritemsareas.h
+1337872990 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\eventseditoritemsareas.h
 	<wx/gdicmn.h>
 	<boost/weak_ptr.hpp>
 	<boost/unordered_map.hpp>
@@ -35391,7 +35394,7 @@
 	<vector>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
 
-1337092423 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\layout.h
+1337793903 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\layout.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
@@ -35426,7 +35429,7 @@
 1336161888 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\classwithvariables.h
 	<string>
 
-1337092424 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\variablescontainer.h
+1337793382 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\variablescontainer.h
 	<string>
 
 1337092423 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\variable.h
@@ -35518,4 +35521,27 @@
 	<iostream>
 
 1265226174 d:\florian\programmation\gamedevelop2\gdl\gdl\tools\aes.h
+
+1337804337 d:\florian\programmation\gamedevelop2\gdl\\gdl\initialinstancescontainer.h
+	"GDCore/PlatformDefinition/InitialInstancesContainer.h"
+	"GDL/Position.h"
+
+1337804307 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\initialinstancescontainer.h
+	<string>
+
+1337804307 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\initialinstance.h
+	<string>
+	"GDCore/PlatformDefinition/VariablesContainer.h"
+
+1337816601 source:d:\florian\programmation\gamedevelop2\gdl\gdl\initialinstancescontainer.cpp
+	<iostream>
+	<map>
+	"GDL/Position.h"
+	"GDL/tinyxml/tinyxml.h"
+	"GDL/CommonTools.h"
+	"InitialInstancesContainer.h"
+
+1337804337 d:\florian\programmation\gamedevelop2\gdl\gdl\initialinstancescontainer.h
+	"GDCore/PlatformDefinition/InitialInstancesContainer.h"
+	"GDL/Position.h"
 

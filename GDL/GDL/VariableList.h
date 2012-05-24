@@ -103,6 +103,16 @@ public:
     ///@}
     #endif
 
+    /** \name Serialization
+     * See gd::VariablesContainer documentation for more information about what these members functions should do.
+     */
+    ///@{
+    virtual void LoadFromXml(const TiXmlElement * element);
+    #if defined(GD_IDE_ONLY)
+    virtual void SaveToXml(TiXmlElement * element) const;
+    #endif
+    ///@}
+
     /**
      * Get the text of a variable
      */

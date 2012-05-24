@@ -10,7 +10,7 @@
 #include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include "GDL/Position.h"
+#include "GDL/InitialInstancesContainer.h"
 #include "GDL/Layer.h"
 class Object;
 class Game;
@@ -111,6 +111,16 @@ public:
      */
     inline ListVariable & GetVariables() { return variables; }
 
+    /**
+     * Return the container storing initial instances.
+     */
+    virtual const InitialInstancesContainer & GetInitialInstances() const { return initialInstances; }
+
+    /**
+     * Return the container storing initial instances.
+     */
+    virtual InitialInstancesContainer & GetInitialInstances() { return initialInstances; }
+
     virtual void LoadFromXml(const TiXmlElement * element);
 
     #if defined(GD_IDE_ONLY)
@@ -154,7 +164,6 @@ public:
     #if defined(GD_IDE_ONLY)
     BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
     #endif
-    vector < InitialPosition >              initialObjectsPositions; ///< List of all objects to be put on the scene at the beginning
     vector < Layer >                        initialLayers; ///< Initial layers
     std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
 
@@ -183,6 +192,7 @@ private:
     std::string                             title; ///< Title displayed in the window
     vector < boost::shared_ptr<Object> >    initialObjects; ///< Objects available.
     ListVariable                            variables; ///< Variables list
+    InitialInstancesContainer               initialInstances; ///< Initial instances
 
     #if defined(GD_IDE_ONLY)
     vector < gd::BaseEventSPtr >            events; ///< Scene events

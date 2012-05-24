@@ -86,22 +86,6 @@ bool SpriteObject::InitializeFromInitialPosition(const InitialPosition & positio
     if ( position.floatInfos.find("animation") != position.floatInfos.end() )
         SetAnimation(position.floatInfos.find("animation")->second);
 
-    //Compatibility with Game Develop 1.2.8522 and inferior
-    if ( position.floatInfos.find("direction") != position.floatInfos.end() )
-    {
-        InitialPosition & updatePosition = const_cast<InitialPosition&>(position);
-        updatePosition.angle = position.floatInfos.find("direction")->second;
-        if (    position.floatInfos.find("animation") != position.floatInfos.end()
-            &&  GetAnimation(position.floatInfos.find("animation")->second).useMultipleDirections )
-        {
-            updatePosition.angle *= 45;
-        }
-
-        updatePosition.floatInfos.erase(updatePosition.floatInfos.find("direction"));
-    }
-
-    SetAngle(position.angle);
-
     return true;
 }
 
@@ -171,7 +155,7 @@ wxPanel * SpriteObject::CreateInitialPositionPanel( wxWindow* parent, const Game
 {
     SpriteInitialPositionPanel * panel = new SpriteInitialPositionPanel(parent);
 
-    panel->DirectionEdit->ChangeValue(ToString( position.angle ));
+    panel->DirectionEdit->ChangeValue(ToString( position.GetAngle() ));
 
     for (unsigned int i = 0;i<GetAnimationsNumber();i++ )
         panel->AnimationCombo->Append(ToString(i));
@@ -187,7 +171,7 @@ void SpriteObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositi
     SpriteInitialPositionPanel * spritePanel = dynamic_cast<SpriteInitialPositionPanel*>(panel);
     if (spritePanel == NULL) return;
 
-    position.angle = ToInt(string(spritePanel->DirectionEdit->GetValue().mb_str()));
+    position.SetAngle(ToInt(string(spritePanel->DirectionEdit->GetValue().mb_str())));
     position.floatInfos["animation"] = ToInt(string(spritePanel->AnimationCombo->GetValue().mb_str()));
 }
 

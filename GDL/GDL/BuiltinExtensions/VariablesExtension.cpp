@@ -41,6 +41,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
@@ -102,6 +103,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
@@ -163,13 +165,14 @@ VariablesExtension::VariablesExtension()
         instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
         instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariable").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        //instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVariable").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
@@ -231,6 +234,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
@@ -299,6 +303,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
@@ -358,6 +363,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
@@ -411,6 +417,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
@@ -470,6 +477,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
@@ -516,6 +524,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 std::string variableObtainCode = "GetSceneVariableValue(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
@@ -547,6 +556,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 std::string variableObtainCode = "GetSceneVariableString(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
@@ -576,6 +586,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 std::string variableObtainCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
                 for (unsigned int i = 0;i<game.GetVariables().GetVariablesVector().size();++i)
                 {
@@ -605,6 +616,7 @@ VariablesExtension::VariablesExtension()
         {
             virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
+                codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 std::string variableObtainCode = "GetGlobalVariableString(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
                 for (unsigned int i = 0;i<game.GetVariables().GetVariablesVector().size();++i)
                 {

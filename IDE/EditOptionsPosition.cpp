@@ -59,7 +59,7 @@ END_EVENT_TABLE()
 
 EditOptionsPosition::EditOptionsPosition(wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position_) :
 position(position_),
-initialVariables(position.initialVariables),
+initialVariables(position.GetVariables()),
 game(game_),
 scene(scene_)
 {
@@ -231,13 +231,13 @@ scene(scene_)
 	//*)
 
     //Initializing controls with values
-    objectNameTxt->SetLabel( position.objectName );
+    objectNameTxt->SetLabel( position.GetObjectName() );
 
-    XEdit->ChangeValue( ToString(position.x) );
-    YEdit->ChangeValue( ToString(position.y) );
-    widthEdit->ChangeValue( ToString(position.width) );
-    heightEdit->ChangeValue( ToString(position.height) );
-    if ( position.personalizedSize )
+    XEdit->ChangeValue( ToString(position.GetX()) );
+    YEdit->ChangeValue( ToString(position.GetY()) );
+    widthEdit->ChangeValue( ToString(position.GetWidth()) );
+    heightEdit->ChangeValue( ToString(position.GetHeight()) );
+    if ( position.HasCustomSize() )
     {
         sizeCheck->SetValue(true);
         widthEdit->Enable(true);
@@ -252,19 +252,19 @@ scene(scene_)
             layerChoice->Insert(scene.initialLayers[i].GetName(), 0);
     }
 
-    layerChoice->SetStringSelection(position.layer);
-    if ( position.layer == "" )
+    layerChoice->SetStringSelection(position.GetLayer());
+    if ( position.GetLayer() == "" )
         layerChoice->SetStringSelection(_("Calque de base"));
 
-    zOrderEdit->ChangeValue(ToString(position.zOrder) );
+    zOrderEdit->ChangeValue(ToString(position.GetZOrder()) );
 
     UpdateInitialVariablesStatus();
 
     //Create the object-specific panel, if it has one.
     wxPanel * returnedPanel = NULL;
 
-    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), position.objectName));
-    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), position.objectName));
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), position.GetObjectName()));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), position.GetObjectName()));
 
     ObjSPtr object = boost::shared_ptr<Object> ();
 
@@ -294,57 +294,21 @@ EditOptionsPosition::~EditOptionsPosition()
 
 void EditOptionsPosition::OnOkBtClick(wxCommandEvent& event)
 {
-    {
-        string x = (string) XEdit->GetValue();
-        std::istringstream iss( x );
-        float i;
+    position.SetX(ToFloat(ToString(XEdit->GetValue())));
+    position.SetY(ToFloat(ToString(YEdit->GetValue())));
+    position.SetWidth(ToFloat(ToString(widthEdit->GetValue())));
+    position.SetHeight(ToFloat(ToString(heightEdit->GetValue())));
+    position.SetHasCustomSize(sizeCheck->GetValue());
+    position.SetZOrder(ToInt(ToString(zOrderEdit->GetValue())));
 
-        if ( ( iss >> i ) && ( iss.eof() ) )
-            position.x = i;
-    }
-
-    {
-        string y = (string) YEdit->GetValue();
-        std::istringstream iss( y );
-        float i;
-
-        if ( ( iss >> i ) && ( iss.eof() ) )
-            position.y = i;
-    }
-
-    {
-        string width = (string) widthEdit->GetValue();
-        std::istringstream iss( width );
-        float i;
-
-        if ( ( iss >> i ) && ( iss.eof() ) )
-            position.width = i;
-    }
-
-    {
-        string height = (string) heightEdit->GetValue();
-        std::istringstream iss( height );
-        float i;
-
-        if ( ( iss >> i ) && ( iss.eof() ) )
-            position.height = i;
-    }
-
-    if ( sizeCheck->GetValue() )
-        position.personalizedSize = true;
-    else
-        position.personalizedSize = false;
-
-    position.zOrder = ToInt(string(zOrderEdit->GetValue().mb_str()));
-
-    position.layer = static_cast<string>(layerChoice->GetStringSelection());
+    position.SetLayer(ToString(layerChoice->GetStringSelection()));
     if ( layerChoice->GetStringSelection() == _("Calque de base"))
-        position.layer = "";
+        position.SetLayer("");
 
-    position.initialVariables = initialVariables;
+    position.GetVariables().Create(initialVariables);
 
-    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), position.objectName));
-    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), position.objectName));
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), position.GetObjectName()));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), position.GetObjectName()));
 
     if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
         (*sceneObject)->UpdateInitialPositionFromPanel(customPanel, position);

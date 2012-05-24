@@ -638,13 +638,13 @@ bool EventsRefactorer::ReplaceStringInConditions(Game & game, Scene & scene, vec
     return somethingModified;
 }
 
-vector < boost::weak_ptr<gd::BaseEvent> > EventsRefactorer::SearchInEvents(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events,
+vector < EventsSearchResult > EventsRefactorer::SearchInEvents(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events,
                                   std::string search,
                                   bool matchCase,
                                   bool inConditions,
                                   bool inActions)
 {
-    vector < boost::weak_ptr<gd::BaseEvent> > results;
+    vector < EventsSearchResult > results;
 
     for (unsigned int i = 0;i<events.size();++i)
     {
@@ -657,7 +657,7 @@ vector < boost::weak_ptr<gd::BaseEvent> > EventsRefactorer::SearchInEvents(Game 
             {
                 if (!eventAddedInResults && SearchStringInConditions(game, scene, *conditionsVectors[j], search, matchCase))
                 {
-                    results.push_back(boost::weak_ptr<gd::BaseEvent>(events[i]));
+                    results.push_back(EventsSearchResult(boost::weak_ptr<gd::BaseEvent>(events[i]), &events, i));
                 }
             }
         }
@@ -669,14 +669,14 @@ vector < boost::weak_ptr<gd::BaseEvent> > EventsRefactorer::SearchInEvents(Game 
             {
                 if (!eventAddedInResults && SearchStringInActions(game, scene, *actionsVectors[j], search, matchCase))
                 {
-                    results.push_back(boost::weak_ptr<gd::BaseEvent>(events[i]));
+                    results.push_back(EventsSearchResult(boost::weak_ptr<gd::BaseEvent>(events[i]), &events, i));
                 }
             }
         }
 
         if ( events[i]->CanHaveSubEvents() )
         {
-            vector < boost::weak_ptr<gd::BaseEvent> > subResults = SearchInEvents(game, scene, events[i]->GetSubEvents(), search, matchCase, inConditions, inActions);
+            vector < EventsSearchResult > subResults = SearchInEvents(game, scene, events[i]->GetSubEvents(), search, matchCase, inConditions, inActions);
             std::copy(subResults.begin(), subResults.end(), std::back_inserter(results));
         }
     }
@@ -805,4 +805,19 @@ void EventsRefactorer::GetScenesAndExternalEventsLinkedTo(const std::vector< boo
         if ( events[i]->CanHaveSubEvents() )
             GetScenesAndExternalEventsLinkedTo(events[i]->GetSubEvents(), project, layouts, externalEvents);
     }
+}
+
+EventsSearchResult::EventsSearchResult(boost::weak_ptr<gd::BaseEvent> event_, std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList_, unsigned int positionInList_ ) :
+    event(event_),
+    eventsList(eventsList_),
+    positionInList(positionInList_)
+{
+
+}
+
+EventsSearchResult::EventsSearchResult() :
+    eventsList(NULL),
+    positionInList(0)
+{
+
 }

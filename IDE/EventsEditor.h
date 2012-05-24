@@ -52,6 +52,15 @@ class EventsEditor: public wxPanel
 {
 public:
 
+    /**
+     * \brief Default constructor
+     *
+     * \param parent Parent window
+     * \param game Game the events belongs to
+     * \param scene Scene to be used to get objects, variables... The events are not necessarily the events of this scene
+     * \param events The events to be edited
+     * \param mainEditorCommand MainEditorCommand object to be used so as to communicate with the editor.
+     */
     EventsEditor(wxWindow* parent, Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ );
     virtual ~EventsEditor();
 

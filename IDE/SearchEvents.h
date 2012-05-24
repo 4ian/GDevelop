@@ -17,6 +17,7 @@
 class Game;
 class Scene;
 class EventsEditor;
+class EventsSearchResult;
 
 /**
  * Search/Replace dialogs for events.
@@ -99,7 +100,7 @@ class SearchEvents: public wxDialog
 		Scene & scene;
 
 		std::vector < gd::BaseEventSPtr > * events;
-		std::vector < boost::weak_ptr<gd::BaseEvent> > searchResults;
+		std::vector < EventsSearchResult > searchResults;
 		size_t currentResult;
 
 		DECLARE_EVENT_TABLE()

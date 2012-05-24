@@ -277,8 +277,11 @@ void SearchEvents::OnnextBtClick(wxCommandEvent&)
     if ( currentResult >= searchResults.size()) currentResult = 0;
 
     //Verify event still exists
-    gd::BaseEventSPtr event = searchResults[currentResult].lock();
+    gd::BaseEventSPtr event = searchResults[currentResult].event.lock();
     if ( event == boost::shared_ptr<gd::BaseEvent>() ) return;
+
+    parent->GetSelection().ClearSelection(/*Refresh=*/false);
+    parent->GetSelection().AddEvent(EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));
 
     parent->ScrollToEvent(event);
 }
@@ -292,8 +295,11 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
     if ( currentResult >= searchResults.size()) currentResult = searchResults.size()-1;
 
     //Verify event still exists
-    gd::BaseEventSPtr event = searchResults[currentResult].lock();
+    gd::BaseEventSPtr event = searchResults[currentResult].event.lock();
     if ( event == boost::shared_ptr<gd::BaseEvent>() ) return;
+
+    parent->GetSelection().ClearSelection(/*Refresh=*/false);
+    parent->GetSelection().AddEvent(EventItem(event, searchResults[currentResult].eventsList, searchResults[currentResult].positionInList));
 
     parent->ScrollToEvent(event);
 }

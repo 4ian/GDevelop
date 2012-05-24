@@ -138,7 +138,7 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
 
     CreateMenus();
 
-    latestState = sceneEdited.initialObjectsPositions;
+    latestState.Create(sceneEdited.GetInitialInstances());
 
     SetDropTarget(new DndTextSceneEditor(*this));
 
@@ -494,11 +494,11 @@ void SceneCanvas::Undo()
 {
     if ( history.empty() ) return;
 
-    redoHistory.push_back(sceneEdited.initialObjectsPositions); //We can go back to the current state using redo button.
-    sceneEdited.initialObjectsPositions = history.back();
+    redoHistory.push_back(sceneEdited.GetInitialInstances()); //We can go back to the current state using redo button.
+    sceneEdited.GetInitialInstances() = history.back();
     history.pop_back();
 
-    latestState = sceneEdited.initialObjectsPositions;
+    latestState = sceneEdited.GetInitialInstances();
 }
 
 void SceneCanvas::OnUndo10Selected(wxCommandEvent& event)
@@ -528,11 +528,11 @@ void SceneCanvas::OnRedoBtClick( wxCommandEvent & event )
 {
     if ( redoHistory.empty() ) return;
 
-    history.push_back(sceneEdited.initialObjectsPositions);
-    sceneEdited.initialObjectsPositions = redoHistory.back();
+    history.push_back(sceneEdited.GetInitialInstances());
+    sceneEdited.GetInitialInstances() = redoHistory.back();
     redoHistory.pop_back();
 
-    latestState = sceneEdited.initialObjectsPositions;
+    latestState = sceneEdited.GetInitialInstances();
 
     Reload();
 }
@@ -633,7 +633,7 @@ void SceneCanvas::OnKey( wxKeyEvent& evt )
                 int idPos = GetInitialPositionFromObject(object);
                 if ( idPos != -1 )
                 {
-                    sceneEdited.initialObjectsPositions[idPos].y += 1;
+                    sceneEdited.GetInitialInstances().GetInstance(idPos).SetY(sceneEdited.GetInitialInstances().GetInstance(idPos).GetY()+1);
                     object->SetY(object->GetY()+1);
                 }
             }
@@ -647,7 +647,7 @@ void SceneCanvas::OnKey( wxKeyEvent& evt )
                 int idPos = GetInitialPositionFromObject(object);
                 if ( idPos != -1 )
                 {
-                    sceneEdited.initialObjectsPositions[idPos].y -= 1;
+                    sceneEdited.GetInitialInstances().GetInstance(idPos).SetY(sceneEdited.GetInitialInstances().GetInstance(idPos).GetY()-1);
                     object->SetY(object->GetY()-1);
                 }
             }
@@ -661,7 +661,7 @@ void SceneCanvas::OnKey( wxKeyEvent& evt )
                 int idPos = GetInitialPositionFromObject(object);
                 if ( idPos != -1 )
                 {
-                    sceneEdited.initialObjectsPositions[idPos].x += 1;
+                    sceneEdited.GetInitialInstances().GetInstance(idPos).SetX(sceneEdited.GetInitialInstances().GetInstance(idPos).GetX()+1);
                     object->SetX(object->GetX()+1);
                 }
             }
@@ -675,7 +675,7 @@ void SceneCanvas::OnKey( wxKeyEvent& evt )
                 int idPos = GetInitialPositionFromObject(object);
                 if ( idPos != -1 )
                 {
-                    sceneEdited.initialObjectsPositions[idPos].x -= 1;
+                    sceneEdited.GetInitialInstances().GetInstance(idPos).SetX(sceneEdited.GetInitialInstances().GetInstance(idPos).GetX()-1);
                     object->SetX(object->GetX()-1);
                 }
             }
@@ -842,7 +842,7 @@ void SceneCanvas::ChangesMade()
 {
     history.push_back(latestState);
     redoHistory.clear();
-    latestState = sceneEdited.initialObjectsPositions;
+    latestState = sceneEdited.GetInitialInstances();
 }
 
 ////////////////////////////////////////////////////////////
@@ -1010,7 +1010,7 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
                 {
                     edittimeRenderer.objectsSelected[i] = boost::shared_ptr<Object>(selectedObject->Clone());
                     edittimeRenderer.runtimeScene.objectsInstances.AddObject(edittimeRenderer.objectsSelected[i]);
-                    sceneEdited.initialObjectsPositions.push_back(sceneEdited.initialObjectsPositions[idPos]);
+                    sceneEdited.GetInitialInstances().InsertInitialInstance(sceneEdited.GetInitialInstances().GetInstance(idPos));
 
                 }
             }
@@ -1059,12 +1059,12 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
             int IDInitialPosition = GetInitialPositionFromObject(object);
             if ( IDInitialPosition != -1)
             {
-                if (edittimeRenderer.xObjectsSelected[i] != sceneEdited.initialObjectsPositions.at( IDInitialPosition ).x ||
-                    edittimeRenderer.yObjectsSelected[i] != sceneEdited.initialObjectsPositions.at( IDInitialPosition ).y )
+                if (edittimeRenderer.xObjectsSelected[i] != sceneEdited.GetInitialInstances().GetInstance( IDInitialPosition ).GetX() ||
+                    edittimeRenderer.yObjectsSelected[i] != sceneEdited.GetInitialInstances().GetInstance( IDInitialPosition ).GetY() )
                     changesMade = true;
 
-                edittimeRenderer.xObjectsSelected[i] = sceneEdited.initialObjectsPositions.at( IDInitialPosition ).x;
-                edittimeRenderer.yObjectsSelected[i] = sceneEdited.initialObjectsPositions.at( IDInitialPosition ).y;
+                edittimeRenderer.xObjectsSelected[i] = sceneEdited.GetInitialInstances().GetInstance( IDInitialPosition ).GetX();
+                edittimeRenderer.yObjectsSelected[i] = sceneEdited.GetInitialInstances().GetInstance( IDInitialPosition ).GetY();
 
                 if ( initialPositionsBrowser )
                     initialPositionsBrowser->SelectInitialPosition(IDInitialPosition);
@@ -1154,9 +1154,9 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
             int idPos = GetInitialPositionFromObject(object);
             if ( idPos != -1 )
             {
-                sceneEdited.initialObjectsPositions[idPos].personalizedSize = true;
-                sceneEdited.initialObjectsPositions[idPos].width = object->GetWidth();
-                sceneEdited.initialObjectsPositions[idPos].height = object->GetHeight();
+                sceneEdited.GetInitialInstances().GetInstance(idPos).SetHasCustomSize(true);
+                sceneEdited.GetInitialInstances().GetInstance(idPos).SetWidth(object->GetWidth());
+                sceneEdited.GetInitialInstances().GetInstance(idPos).SetHeight(object->GetHeight());
             }
         }
     }
@@ -1170,9 +1170,9 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
             int idPos = GetInitialPositionFromObject(object);
             if ( idPos != -1 )
             {
-                sceneEdited.initialObjectsPositions[idPos].personalizedSize = true;
-                sceneEdited.initialObjectsPositions[idPos].height = object->GetHeight();
-                sceneEdited.initialObjectsPositions[idPos].width = object->GetWidth();
+                sceneEdited.GetInitialInstances().GetInstance(idPos).SetHasCustomSize(true);
+                sceneEdited.GetInitialInstances().GetInstance(idPos).SetWidth(object->GetWidth());
+                sceneEdited.GetInitialInstances().GetInstance(idPos).SetHeight(object->GetHeight());
             }
         }
     }
@@ -1190,7 +1190,7 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
             int idPos = GetInitialPositionFromObject(object);
             if ( idPos != -1 )
             {
-                sceneEdited.initialObjectsPositions[idPos].angle = newAngle;
+                sceneEdited.GetInitialInstances().GetInstance(idPos).SetAngle(newAngle);
             }
         }
     }
@@ -1221,8 +1221,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
                 }
 
                 //Modification de l'emplacement initial
-                sceneEdited.initialObjectsPositions[idPos].x = newX;
-                sceneEdited.initialObjectsPositions[idPos].y = newY;
+                sceneEdited.GetInitialInstances().GetInstance(idPos).SetX(newX);
+                sceneEdited.GetInitialInstances().GetInstance(idPos).SetY(newY);
 
                 //On bouge aussi l'objet actuellement affiché
                 object->SetX( newX );
@@ -1313,27 +1313,27 @@ void SceneCanvas::AddObjetSelected(float x, float y)
 
     //Initial position creation
     InitialPosition pos;
-    pos.objectName = edittimeRenderer.objectToAdd; //A choisir avec un dialog approprié ou par drag'n'drop
+    pos.SetObjectName(edittimeRenderer.objectToAdd); //A choisir avec un dialog approprié ou par drag'n'drop
     if ( sceneEdited.grid && sceneEdited.snap )
     {
-        pos.x = static_cast<int>(x/sceneEdited.gridWidth)*sceneEdited.gridWidth;
-        pos.y = static_cast<int>(y/sceneEdited.gridHeight)*sceneEdited.gridHeight;
+        pos.SetX(static_cast<int>(x/sceneEdited.gridWidth)*sceneEdited.gridWidth);
+        pos.SetY(static_cast<int>(y/sceneEdited.gridHeight)*sceneEdited.gridHeight);
     }
     else
     {
-        pos.x = x;
-        pos.y = y;
+        pos.SetX(x);
+        pos.SetY(y);
     }
 
-    pos.zOrder = 0;
-    pos.layer = edittimeRenderer.addOnLayer;
-    sceneEdited.initialObjectsPositions.push_back( pos );
+    pos.SetZOrder(0);
+    pos.SetLayer(edittimeRenderer.addOnLayer);
+    sceneEdited.GetInitialInstances().InsertInitialInstance( pos );
 
     //Edittime scene object creation
-    newObject->SetX( pos.x );
-    newObject->SetY( pos.y );
-    newObject->SetZOrder( pos.zOrder );
-    newObject->SetLayer( pos.layer );
+    newObject->SetX( pos.GetX() );
+    newObject->SetY( pos.GetY() );
+    newObject->SetZOrder( pos.GetZOrder() );
+    newObject->SetLayer( pos.GetLayer() );
 
     newObject->InitializeFromInitialPosition(pos);
     newObject->LoadRuntimeResources( edittimeRenderer.runtimeScene, *game.imageManager );
@@ -1423,7 +1423,7 @@ void SceneCanvas::OnLayerUpSelected(wxCommandEvent & event)
         int posId = GetInitialPositionFromObject(edittimeRenderer.objectsSelected[i]);
         if ( posId != -1 )
         {
-            sceneEdited.initialObjectsPositions.at(posId).layer = layerName;
+            sceneEdited.GetInitialInstances().GetInstance(posId).SetLayer(layerName);
             edittimeRenderer.objectsSelected[i]->SetLayer(layerName);
         }
     }
@@ -1443,9 +1443,9 @@ void SceneCanvas::OnCopySelected(wxCommandEvent & event)
             int mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
             int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
 
-            copiedPositions.push_back(sceneEdited.initialObjectsPositions.at(posId));
-            copiedPositions.back().x -= mouseX;
-            copiedPositions.back().y -= mouseY;
+            copiedPositions.push_back(sceneEdited.GetInitialInstances().GetInstance(posId));
+            copiedPositions.back().SetX(copiedPositions.back().GetX() - mouseX);
+            copiedPositions.back().SetY(copiedPositions.back().GetY() - mouseY);
         }
     }
 
@@ -1465,12 +1465,12 @@ void SceneCanvas::OnCutSelected(wxCommandEvent & event)
             float mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
             float mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
 
-            copiedPositions.push_back(sceneEdited.initialObjectsPositions.at(posId));
-            copiedPositions.back().x -= mouseX;
-            copiedPositions.back().y -= mouseY;
+            copiedPositions.push_back(sceneEdited.GetInitialInstances().GetInstance(posId));
+            copiedPositions.back().SetX(copiedPositions.back().GetX() - mouseX);
+            copiedPositions.back().SetY(copiedPositions.back().GetY() - mouseY);
 
             //Remove objects
-            sceneEdited.initialObjectsPositions.erase(sceneEdited.initialObjectsPositions.begin() + posId);
+            sceneEdited.GetInitialInstances().RemoveInstance(posId);
             edittimeRenderer.runtimeScene.objectsInstances.RemoveObject(edittimeRenderer.objectsSelected[i]);
         }
     }
@@ -1497,9 +1497,10 @@ void SceneCanvas::OnPasteSelected(wxCommandEvent & event)
         float mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
         float mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
 
-        sceneEdited.initialObjectsPositions.push_back(pastedPositions[i]);
-        sceneEdited.initialObjectsPositions.back().x += mouseX;
-        sceneEdited.initialObjectsPositions.back().y += mouseY;
+        sceneEdited.GetInitialInstances().InsertInitialInstance(pastedPositions[i]);
+        gd::InitialInstance & insertedInstance = sceneEdited.GetInitialInstances().GetInstance(sceneEdited.GetInitialInstances().GetInstancesCount()-1);
+        insertedInstance.SetX(insertedInstance.GetX()+mouseX);
+        insertedInstance.SetY(insertedInstance.GetY()+mouseY);
     }
 
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
@@ -1534,10 +1535,11 @@ void SceneCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
     {
         for (unsigned int j = 0;j<dialog.GetXCount();++j)
         {
-            sceneEdited.initialObjectsPositions.push_back(pastedPositions.front());
-            sceneEdited.initialObjectsPositions.back().x = dialog.GetStartX()+dialog.GetXGap()*j;
-            sceneEdited.initialObjectsPositions.back().y = dialog.GetStartY()+dialog.GetYGap()*i;
-            sceneEdited.initialObjectsPositions.back().angle = pastedPositions.front().angle + angle;
+            sceneEdited.GetInitialInstances().InsertInitialInstance(pastedPositions.front());
+            gd::InitialInstance & insertedInstance = sceneEdited.GetInitialInstances().GetInstance(sceneEdited.GetInitialInstances().GetInstancesCount()-1);
+            insertedInstance.SetX(dialog.GetStartX()+dialog.GetXGap()*j);
+            insertedInstance.SetY(dialog.GetStartY()+dialog.GetYGap()*i);
+            insertedInstance.SetAngle(pastedPositions.front().GetAngle() + angle);
 
             angle += dialog.GetRotationIncrementation();
         }
@@ -1565,7 +1567,7 @@ void SceneCanvas::OnLayerDownSelected(wxCommandEvent & event)
         int posId = GetInitialPositionFromObject(edittimeRenderer.objectsSelected[i]);
         if ( posId != -1 )
         {
-            sceneEdited.initialObjectsPositions.at(posId).layer = layerName;
+            sceneEdited.GetInitialInstances().GetInstance(posId).SetLayer(layerName);
             edittimeRenderer.objectsSelected[i]->SetLayer(layerName);
         }
     }
@@ -1586,26 +1588,26 @@ void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
     int idPos = GetInitialPositionFromObject(edittimeRenderer.rightClickSelectedObject);
     if ( idPos == -1 ) return;
 
-    bool hadAPersonalizedSize = sceneEdited.initialObjectsPositions.at( idPos ).personalizedSize;
+    bool hadAPersonalizedSize = sceneEdited.GetInitialInstances().GetInstance( idPos ).HasCustomSize();
 
     //Affichage des propriétés de l'objet sous la souris
-    EditOptionsPosition DialogPosition( this, gameEdited, edittimeRenderer.runtimeScene, sceneEdited.initialObjectsPositions.at( idPos ) );
+    EditOptionsPosition DialogPosition( this, gameEdited, edittimeRenderer.runtimeScene, sceneEdited.GetInitialInstances().GetInstance( idPos ) );
     if ( DialogPosition.ShowModal() == 1 )
     {
-        sceneEdited.initialObjectsPositions.at( idPos ) = DialogPosition.position;
+        sceneEdited.GetInitialInstances().GetInstance( idPos ) = DialogPosition.position;
 
-        edittimeRenderer.rightClickSelectedObject->SetX( sceneEdited.initialObjectsPositions.at( idPos ).x );
-        edittimeRenderer.rightClickSelectedObject->SetY( sceneEdited.initialObjectsPositions.at( idPos ).y );
-        edittimeRenderer.rightClickSelectedObject->SetAngle( sceneEdited.initialObjectsPositions.at( idPos ).angle );
-        edittimeRenderer.rightClickSelectedObject->SetZOrder( sceneEdited.initialObjectsPositions.at( idPos ).zOrder );
-        edittimeRenderer.rightClickSelectedObject->SetLayer( sceneEdited.initialObjectsPositions.at( idPos ).layer );
+        edittimeRenderer.rightClickSelectedObject->SetX( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetX() );
+        edittimeRenderer.rightClickSelectedObject->SetY( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetY() );
+        edittimeRenderer.rightClickSelectedObject->SetAngle( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetAngle() );
+        edittimeRenderer.rightClickSelectedObject->SetZOrder( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetZOrder() );
+        edittimeRenderer.rightClickSelectedObject->SetLayer( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetLayer() );
 
-        edittimeRenderer.rightClickSelectedObject->InitializeFromInitialPosition(sceneEdited.initialObjectsPositions.at( idPos ));
+        edittimeRenderer.rightClickSelectedObject->InitializeFromInitialPosition(sceneEdited.GetInitialInstances().GetInstance( idPos ));
 
-        if ( sceneEdited.initialObjectsPositions.at( idPos ).personalizedSize )
+        if ( sceneEdited.GetInitialInstances().GetInstance( idPos ).HasCustomSize() )
         {
-            edittimeRenderer.rightClickSelectedObject->SetWidth( sceneEdited.initialObjectsPositions.at( idPos ).width );
-            edittimeRenderer.rightClickSelectedObject->SetHeight( sceneEdited.initialObjectsPositions.at( idPos ).height );
+            edittimeRenderer.rightClickSelectedObject->SetWidth( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetWidth() );
+            edittimeRenderer.rightClickSelectedObject->SetHeight( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetHeight() );
         }
         else if ( hadAPersonalizedSize ) //For now, we reload the scene so as the object get back its initial size
         {
@@ -1633,7 +1635,7 @@ void SceneCanvas::OnDelObjetSelected(wxCommandEvent & event)
         int idPos = GetInitialPositionFromObject(object);
         if ( idPos != -1 )
         {
-            sceneEdited.initialObjectsPositions.erase(sceneEdited.initialObjectsPositions.begin() + idPos);
+            sceneEdited.GetInitialInstances().RemoveInstance(idPos);
             edittimeRenderer.runtimeScene.objectsInstances.RemoveObject(object);
         }
     }
@@ -1705,7 +1707,7 @@ int SceneCanvas::GetObjectsSelectedHighestLayer()
             //On cherche le numéro du calque de l'objet
             for (unsigned int layerId = 0;layerId<edittimeRenderer.runtimeScene.initialLayers.size();++layerId)
             {
-                if ( edittimeRenderer.runtimeScene.initialLayers[layerId].GetName() == sceneEdited.initialObjectsPositions.at(posId).layer )
+                if ( edittimeRenderer.runtimeScene.initialLayers[layerId].GetName() == sceneEdited.GetInitialInstances().GetInstance(posId).GetLayer() )
                    layerObjId = layerId;
             }
 
@@ -1730,7 +1732,7 @@ int SceneCanvas::GetObjectsSelectedLowestLayer()
             //On cherche le numéro du calque de l'objet
             for (unsigned int layerId = 0;layerId<edittimeRenderer.runtimeScene.initialLayers.size();++layerId)
             {
-                if ( edittimeRenderer.runtimeScene.initialLayers[layerId].GetName() == sceneEdited.initialObjectsPositions.at(posId).layer )
+                if ( edittimeRenderer.runtimeScene.initialLayers[layerId].GetName() == sceneEdited.GetInitialInstances().GetInstance(posId).GetLayer() )
                    layerObjId = layerId;
             }
 
@@ -1749,11 +1751,11 @@ int SceneCanvas::GetInitialPositionFromObject(ObjSPtr object)
 {
     if ( object == boost::shared_ptr<Object> ()) return -1;
 
-    for (unsigned int j = 0;j < sceneEdited.initialObjectsPositions.size();++j)
+    for (unsigned int j = 0;j < sceneEdited.GetInitialInstances().GetInstancesCount();++j)
     {
-        if ( sceneEdited.initialObjectsPositions.at( j ).objectName == object->GetName() &&
-                sceneEdited.initialObjectsPositions.at( j ).x == object->GetX() &&
-                sceneEdited.initialObjectsPositions.at( j ).y == object->GetY() )
+        if ( sceneEdited.GetInitialInstances().GetInstance( j ).GetObjectName() == object->GetName() &&
+                sceneEdited.GetInitialInstances().GetInstance( j ).GetX() == object->GetX() &&
+                sceneEdited.GetInitialInstances().GetInstance( j ).GetY() == object->GetY() )
         {
             return j;
         }
@@ -1771,9 +1773,9 @@ ObjSPtr SceneCanvas::GetObjectFromInitialPosition(const InitialPosition & initia
 
     for (unsigned int id = 0;id < allObjects.size();++id)
     {
-        if ( allObjects[id]->GetX() == initialPosition.x &&
-                allObjects[id]->GetY() == initialPosition.y &&
-                allObjects[id]->GetAngle() == initialPosition.angle)
+        if ( allObjects[id]->GetX() == initialPosition.GetX() &&
+                allObjects[id]->GetY() == initialPosition.GetY() &&
+                allObjects[id]->GetAngle() == initialPosition.GetAngle())
         {
             return allObjects[id];
         }

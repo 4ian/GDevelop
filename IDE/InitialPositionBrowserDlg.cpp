@@ -1,9 +1,14 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "InitialPositionBrowserDlg.h"
 
 //(*InternalHeaders(InitialPositionBrowserDlg)
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
+#include "GDL/InitialInstancesContainer.h"
 #include "GDL/Position.h"
 #include "SceneCanvas.h"
 
@@ -16,8 +21,8 @@ BEGIN_EVENT_TABLE(InitialPositionBrowserDlg,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-InitialPositionBrowserDlg::InitialPositionBrowserDlg(wxWindow* parent, vector < InitialPosition > & initialPositions_, SceneCanvas & sceneCanvas_) :
-initialPositions(initialPositions_),
+InitialPositionBrowserDlg::InitialPositionBrowserDlg(wxWindow* parent, InitialInstancesContainer & initialInstancesContainer_, SceneCanvas & sceneCanvas_) :
+instancesContainer(initialInstancesContainer_),
 sceneCanvas(sceneCanvas_)
 {
 	//(*Initialize(InitialPositionBrowserDlg)
@@ -54,13 +59,13 @@ InitialPositionBrowserDlg::~InitialPositionBrowserDlg()
 void InitialPositionBrowserDlg::Refresh()
 {
     initialPositionsList->DeleteAllItems();
-    for (unsigned int i = 0;i<initialPositions.size();++i)
+    for (unsigned int i = 0;i<instancesContainer.GetInstancesCount();++i)
     {
-        initialPositionsList->InsertItem(i, initialPositions[i].objectName);
-        initialPositionsList->SetItem(i, 1, ToString(initialPositions[i].x));
-        initialPositionsList->SetItem(i, 2, ToString(initialPositions[i].y));
-        initialPositionsList->SetItem(i, 3, ToString(initialPositions[i].angle));
-        initialPositionsList->SetItem(i, 4, ToString(initialPositions[i].zOrder));
+        initialPositionsList->InsertItem(i, instancesContainer.GetInstance(i).GetObjectName());
+        initialPositionsList->SetItem(i, 1, ToString(instancesContainer.GetInstance(i).GetX()));
+        initialPositionsList->SetItem(i, 2, ToString(instancesContainer.GetInstance(i).GetY()));
+        initialPositionsList->SetItem(i, 3, ToString(instancesContainer.GetInstance(i).GetAngle()));
+        initialPositionsList->SetItem(i, 4, ToString(instancesContainer.GetInstance(i).GetZOrder()));
     }
 }
 
@@ -73,9 +78,9 @@ void InitialPositionBrowserDlg::OninitialPositionsListItemActivated(wxListEvent&
 
     unsigned long id = static_cast<unsigned long>(event.GetIndex());
 
-    if ( id >= initialPositions.size() ) return;
+    if ( id >= instancesContainer.GetInstancesCount() ) return;
 
-    sceneCanvas.edittimeRenderer.view.SetCenter( initialPositions[id].x,  initialPositions[id].y);
+    sceneCanvas.edittimeRenderer.view.SetCenter( instancesContainer.GetInstance(id).GetX(),  instancesContainer.GetInstance(id).GetY());
 
     //Update scene canvas selection with list selection
     sceneCanvas.edittimeRenderer.objectsSelected.clear();
@@ -91,9 +96,9 @@ void InitialPositionBrowserDlg::OninitialPositionsListItemActivated(wxListEvent&
         if (itemIndex == -1) break;
 
         // Add each selected object to scene canvas selection
-        if ( itemIndex < initialPositions.size() && itemIndex >= 0 )
+        if ( itemIndex < instancesContainer.GetInstancesCount() && itemIndex >= 0 )
         {
-            ObjSPtr object = sceneCanvas.GetObjectFromInitialPosition(initialPositions[itemIndex]);
+            ObjSPtr object = sceneCanvas.GetObjectFromInitialPosition(instancesContainer.GetInstance(itemIndex));
             if ( object )
             {
                 sceneCanvas.edittimeRenderer.objectsSelected.push_back(object);

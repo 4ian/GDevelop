@@ -650,14 +650,7 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
                             if ( scene->GetObjectGroups()[g].Find(objectName)) scene->GetObjectGroups()[g].RemoveObject(objectName);
                         }
                     }
-                    for (unsigned int p = 0;p<scene->initialObjectsPositions.size();++p)
-                    {
-                        if ( scene->initialObjectsPositions[p].objectName == objectName )
-                        {
-                            scene->initialObjectsPositions.erase(scene->initialObjectsPositions.begin() + p);
-                            --p;
-                        }
-                    }
+                    scene->GetInitialInstances().RemoveInitialInstancesOfObject(objectName);
                 }
 
                 //Remove automatisms shared datas if necessary
@@ -735,10 +728,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     if ( scene ) //Change the object name in the scene.
     {
         EventsRefactorer::RenameObjectInEvents(game, *scene, scene->GetEvents(), ancienNom, newName);
-        for (unsigned int p = 0;p<scene->initialObjectsPositions.size();++p)
-        {
-            if ( scene->initialObjectsPositions[p].objectName == ancienNom ) scene->initialObjectsPositions[p].objectName = newName;
-        }
+        scene->GetInitialInstances().RenameInstancesOfObject(ancienNom, newName);
         for (unsigned int g = 0;g<scene->GetObjectGroups().size();++g)
         {
             if ( scene->GetObjectGroups()[g].Find(ancienNom))

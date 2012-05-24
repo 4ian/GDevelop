@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "EditorScene.h"
 
 //(*InternalHeaders(EditorScene)
@@ -123,7 +127,7 @@ mainEditorCommand(mainEditorCommand_)
     sceneCanvas->SetOwnedLayersEditor( boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, &scene.initialLayers, mainEditorCommand) ));
     sceneCanvas->SetOwnedDebugger( boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(this, sceneCanvas->edittimeRenderer.runtimeScene) ));
     sceneCanvas->SetOwnedExternalWindow( boost::shared_ptr<RenderDialog>(new RenderDialog(this) ));
-    sceneCanvas->SetOwnedInitialPositionBrowser( boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, scene.initialObjectsPositions, *sceneCanvas) ));
+    sceneCanvas->SetOwnedInitialPositionBrowser( boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, scene.GetInitialInstances(), *sceneCanvas) ));
     sceneCanvas->SetOwnedProfileDialog( boost::shared_ptr<ProfileDlg>(new ProfileDlg(this) ));
     sceneCanvas->SetParentPanelAndDockManager( scenePanel, &m_mgr );
     sceneCanvas->SetScrollbars(scrollBar1, scrollBar2);

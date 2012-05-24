@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 namespace gd {class Layout; }
 namespace gd {class Project; }
 namespace gd {class ExternalEvents; }
@@ -17,6 +18,23 @@ class Scene;
 namespace gd { class Instruction; }
 class ExternalEvents;
 namespace gd {typedef boost::shared_ptr<gd::BaseEvent> BaseEventSPtr;}
+
+/**
+ * \brief Class used to return result when calling EventsRefactorer::SearchInEvents
+ *
+  \see EventsRefactorer::SearchInEvents
+ */
+class EventsSearchResult
+{
+public:
+    EventsSearchResult(boost::weak_ptr<gd::BaseEvent> event_, std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList_, unsigned int positionInList_ );
+    EventsSearchResult();
+    ~EventsSearchResult() {};
+
+    boost::weak_ptr<gd::BaseEvent> event;
+    std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList;
+    unsigned int positionInList;
+};
 
 /**
  * \brief Class containing functions allowing to do refactoring tasks on events
@@ -39,15 +57,17 @@ public:
 
     /**
      * Search for a string in events
+     *
+     * \return A vector containing EventsSearchResult objects filled with events containing the string
      */
-    static std::vector < boost::weak_ptr<gd::BaseEvent> > SearchInEvents(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events,
+    static std::vector < EventsSearchResult > SearchInEvents(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events,
                                       std::string search,
                                       bool matchCase,
                                       bool inConditions,
                                       bool inAction);
 
     /**
-     * Replace all occurences of a string in events
+     * Replace all occurrences of a string in events
      */
     static void ReplaceStringInEvents(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events,
                                       std::string toReplace,

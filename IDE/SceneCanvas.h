@@ -274,9 +274,9 @@ private :
     wxAuiManager * m_mgr; ///< Link to the wxAuiManager managing editors windows.
     wxPanel * parentPanel;  ///< Link to the panel in which the sceneCanvas is inserted
 
-    vector < vector < InitialPosition > > history; ///< History of changes
-    vector < vector < InitialPosition > > redoHistory; ///< Histoy of changes so as to "redo"
-    vector < InitialPosition > latestState; ///< Necessary to keep track of what changed
+    vector < InitialInstancesContainer > history; ///< History of changes
+    vector < InitialInstancesContainer > redoHistory; ///< Histoy of changes so as to "redo"
+    InitialInstancesContainer latestState; ///< Necessary to keep track of what changed
 
     static sf::Texture reloadingIconImage;
     static sf::Sprite reloadingIconSprite;

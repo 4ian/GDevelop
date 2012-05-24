@@ -263,9 +263,9 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
 
             //Verifying if there are objects on this layer
             bool objectsOnThisLayer = false;
-            for (unsigned int j =0;j<scene.initialObjectsPositions.size();++j)
+            for (unsigned int j =0;j<scene.GetInitialInstances().GetInstancesCount();++j)
             {
-                if ( scene.initialObjectsPositions[j].layer == name )
+                if ( scene.GetInitialInstances().GetInstance(j).GetLayer() == name )
                     objectsOnThisLayer = true;
             }
 
@@ -277,21 +277,9 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
 
                 if ( choice == 0 ) return; //Annulation
                 else if ( choice == 1 )
-                {
-                    for (int i = scene.initialObjectsPositions.size()-1;i>=0;--i)
-                    {
-                        if ( scene.initialObjectsPositions[i].layer == name )
-                            scene.initialObjectsPositions.erase(scene.initialObjectsPositions.begin()+i);
-                    }
-                }
+                    scene.GetInitialInstances().RemoveAllInstancesOnLayer(name);
                 else if ( choice == 2 )
-                {
-                    for (unsigned int i =0;i<scene.initialObjectsPositions.size();++i)
-                    {
-                        if ( scene.initialObjectsPositions[i].layer == name )
-                            scene.initialObjectsPositions[i].layer = dialog.moveOnLayerNamed;
-                    }
-                }
+                    scene.GetInitialInstances().MoveInstancesToLayer(name, dialog.moveOnLayerNamed);
     	    }
 
             //Delete the layer and select base layer
@@ -463,12 +451,7 @@ void EditorLayers::EditSelectedLayer()
     //On renomme les objets qui sont sur le calque
     if ( layer->GetName() != oldName )
     {
-        for (int i = scene.initialObjectsPositions.size()-1;i>=0;--i)
-        {
-            if ( scene.initialObjectsPositions[i].layer == oldName )
-                scene.initialObjectsPositions[i].layer = layer->GetName();
-        }
-
+        scene.GetInitialInstances().MoveInstancesToLayer(oldName, layer->GetName());
         if ( sceneCanvas && sceneCanvas->edittimeRenderer.addOnLayer == oldName ) sceneCanvas->edittimeRenderer.addOnLayer = layer->GetName();
     }
 

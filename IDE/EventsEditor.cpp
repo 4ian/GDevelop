@@ -525,8 +525,10 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
                 //Update context panel ( unless we're dragging something )
                 if ( !selection.IsDraggingEvent() && ! selection.IsDraggingInstruction())
                 {
-                    eventContextPanel->SetPosition(wxPoint(eventsPanel->GetSize().x-eventContextPanel->GetSize().x-10, y+height-1));
-                    eventContextPanel->Show(true);
+                    if ( eventContextPanel->GetPosition() != wxPoint(eventsPanel->GetSize().x-eventContextPanel->GetSize().x-10, y+height-1))
+                        eventContextPanel->SetPosition(wxPoint(eventsPanel->GetSize().x-eventContextPanel->GetSize().x-10, y+height-1));
+                    if ( !eventContextPanel->IsShown() )
+                        eventContextPanel->Show(true);
                 }
 
                 if ( selection.IsDraggingEvent() )
@@ -943,7 +945,8 @@ void EventsEditor::OneventsPanelMouseMove(wxMouseEvent& event)
     else
         eventContextPanel->Show(false);
 
-    listContextPanel->Show(showlistContextPanel); //Prevent flickering by change the state only once we know the real state.
+    if (listContextPanel->IsShown() != showlistContextPanel)
+        listContextPanel->Show(showlistContextPanel); //Prevent flickering by change the state only once we know the real state.
     Refresh();
 }
 

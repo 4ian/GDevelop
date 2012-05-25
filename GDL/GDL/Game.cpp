@@ -6,6 +6,7 @@
 #include "GDL/Game.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExternalEvents.h"
+#include "GDL/ExternalLayout.h"
 #include "GDL/SourceFile.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
@@ -191,6 +192,72 @@ void Game::RemoveExternalEvents(const std::string & name)
     if ( events == externalEvents.end() ) return;
 
     externalEvents.erase(events);
+}
+
+bool Game::HasExternalLayoutNamed(const std::string & name) const
+{
+    return ( find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(ExternalLayoutHasName(), name)) != externalLayouts.end() );
+}
+gd::ExternalLayout & Game::GetExternalLayout(const std::string & name)
+{
+    return *(*find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(ExternalLayoutHasName(), name)));
+}
+const gd::ExternalLayout & Game::GetExternalLayout(const std::string & name) const
+{
+    return *(*find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(ExternalLayoutHasName(), name)));
+}
+gd::ExternalLayout & Game::GetExternalLayout(unsigned int index)
+{
+    return *externalLayouts[index];
+}
+const gd::ExternalLayout & Game::GetExternalLayout (unsigned int index) const
+{
+    return *externalLayouts[index];
+}
+unsigned int Game::GetExternalLayoutPosition(const std::string & name) const
+{
+    for (unsigned int i = 0;i<externalLayouts.size();++i)
+    {
+        if ( externalLayouts[i]->GetName() == name ) return i;
+    }
+    return std::string::npos;
+}
+unsigned int Game::GetExternalLayoutsCount() const
+{
+    return externalLayouts.size();
+}
+
+void Game::InsertNewExternalLayout(std::string & name, unsigned int position)
+{
+    boost::shared_ptr<ExternalLayout> newExternalLayout = boost::shared_ptr<ExternalLayout>(new ExternalLayout);
+    if (position<externalLayouts.size())
+        externalLayouts.insert(externalLayouts.begin()+position, newExternalLayout);
+    else
+        externalLayouts.push_back(newExternalLayout);
+
+    newExternalLayout->SetName(name);
+}
+
+void Game::InsertExternalLayout(const gd::ExternalLayout & events, unsigned int position)
+{
+    try
+    {
+        const ExternalLayout & castedEvents = dynamic_cast<const ExternalLayout&>(events);
+        boost::shared_ptr<ExternalLayout> newExternalLayout = boost::shared_ptr<ExternalLayout>(new ExternalLayout(castedEvents));
+        if (position<externalLayouts.size())
+            externalLayouts.insert(externalLayouts.begin()+position, newExternalLayout);
+        else
+            externalLayouts.push_back(newExternalLayout);
+    }
+    catch(...) { std::cout << "WARNING: Tried to add external layout which are not GD C++ Platform ExternalLayout to a GD C++ Platform project"; }
+}
+
+void Game::RemoveExternalLayout(const std::string & name)
+{
+    std::vector< boost::shared_ptr<ExternalLayout> >::iterator externalLayout = find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(ExternalLayoutHasName(), name));
+    if ( externalLayout == externalLayouts.end() ) return;
+
+    externalLayouts.erase(externalLayout);
 }
 
 

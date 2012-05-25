@@ -50,6 +50,7 @@
 #include "GDL/ForEachEvent.h"
 #include "GDL/WhileEvent.h"
 #include "GDL/ExternalEvents.h"
+#include "GDL/ExternalLayout.h"
 #include "GDL/StandardEvent.h"
 #include "GDL/RepeatEvent.h"
 #include "GDL/XmlMacros.h"
@@ -205,7 +206,6 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     #endif
     //End of Compatibility code
 
-
     game.resourceManager.LoadFromXml(hdl.FirstChildElement().FirstChildElement( "Resources" ).Element());
 
     //Global objects
@@ -261,6 +261,20 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
         }
     }
     #endif
+
+    elem = hdl.FirstChildElement().FirstChildElement( "ExternalLayouts" ).Element();
+    if ( elem )
+    {
+        TiXmlElement * externalLayoutElem = elem->FirstChildElement( "ExternalLayout" );
+        while (externalLayoutElem)
+        {
+            boost::shared_ptr<ExternalLayout> newExternalLayout(new ExternalLayout);
+            newExternalLayout->LoadFromXml(externalLayoutElem);
+            game.GetExternalLayouts().push_back(newExternalLayout);
+
+            externalLayoutElem = externalLayoutElem->NextSiblingElement();
+        }
+    }
 
     if ( notBackwardCompatible )
     {
@@ -722,12 +736,10 @@ bool OpenSaveGame::SaveToFile(string file)
     root->LinkEndChild( objects );
     SaveObjects(game.GetGlobalObjects(), objects);
 
-    #if defined(GD_IDE_ONLY)
     //Global object groups
     TiXmlElement * globalObjectGroups = new TiXmlElement( "ObjectGroups" );
     root->LinkEndChild( globalObjectGroups );
     SaveGroupesObjets(game.GetObjectGroups(), globalObjectGroups);
-    #endif
 
     //Global variables
     TiXmlElement * variables = new TiXmlElement( "Variables" );
@@ -826,7 +838,17 @@ bool OpenSaveGame::SaveToFile(string file)
     root->LinkEndChild( externalEvents );
     SaveExternalEvents(game.GetExternalEvents(), externalEvents);
 
-    //External events
+    //External layouts
+    TiXmlElement * externalLayouts = new TiXmlElement( "ExternalLayouts" );
+    root->LinkEndChild( externalLayouts );
+    for (unsigned int i = 0;i<game.GetExternalLayouts().size();++i)
+    {
+        TiXmlElement * externalLayout = new TiXmlElement( "ExternalLayout" );
+        externalLayouts->LinkEndChild( externalLayout );
+        game.GetExternalLayouts()[i]->SaveToXml(externalLayout);
+    }
+
+    //External source files
     TiXmlElement * externalSourceFiles = new TiXmlElement( "ExternalSourceFiles" );
     root->LinkEndChild( externalSourceFiles );
     for (unsigned int i = 0;i<game.externalSourceFiles.size();++i)
@@ -903,10 +925,7 @@ void OpenSaveGame::SaveEvents(const vector < gd::BaseEventSPtr > & list, TiXmlEl
 {
     for ( unsigned int j = 0;j < list.size();j++ )
     {
-        //Pour chaque évènements
-        TiXmlElement * event;
-
-        event = new TiXmlElement( "Event" );
+        TiXmlElement * event = new TiXmlElement( "Event" );
         event->SetAttribute( "disabled", list[j]->IsDisabled() ? "true" : "false" );
         event->SetAttribute( "folded", list[j]->folded ? "true" : "false" );
         events->LinkEndChild( event );

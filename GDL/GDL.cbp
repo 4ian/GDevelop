@@ -1114,6 +1114,8 @@
 		<Unit filename="GDL\ExtensionsManager.h" />
 		<Unit filename="GDL\ExternalEvents.cpp" />
 		<Unit filename="GDL\ExternalEvents.h" />
+		<Unit filename="GDL\ExternalLayout.cpp" />
+		<Unit filename="GDL\ExternalLayout.h" />
 		<Unit filename="GDL\FontManager.cpp" />
 		<Unit filename="GDL\FontManager.h" />
 		<Unit filename="GDL\ForEachEvent.cpp" />
@@ -1180,6 +1182,8 @@
 		<Unit filename="GDL\IDE\gdTreeItemStringData.h" />
 		<Unit filename="GDL\ImageManager.cpp" />
 		<Unit filename="GDL\ImageManager.h" />
+		<Unit filename="GDL\InitialInstancesContainer.cpp" />
+		<Unit filename="GDL\InitialInstancesContainer.h" />
 		<Unit filename="GDL\InvalidImage.h" />
 		<Unit filename="GDL\Layer.cpp" />
 		<Unit filename="GDL\Layer.h" />

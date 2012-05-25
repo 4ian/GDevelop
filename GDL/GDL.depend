@@ -12907,7 +12907,7 @@
 	<string>
 	<vector>
 
-1337100336 d:\florian\programmation\gamedevelop2\gdl\\gdl\game.h
+1337886021 d:\florian\programmation\gamedevelop2\gdl\\gdl\game.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
@@ -14462,10 +14462,11 @@
 	"GDL/GDMathParser.h"
 	<iostream>
 
-1337082737 source:d:\florian\programmation\gamedevelop2\gdl\gdl\game.cpp
+1337886021 source:d:\florian\programmation\gamedevelop2\gdl\gdl\game.cpp
 	"GDL/Game.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/ExternalEvents.h"
+	"GDL/ExternalLayout.h"
 	"GDL/SourceFile.h"
 	"GDL/Scene.h"
 	"GDL/Object.h"
@@ -14650,7 +14651,7 @@
 	"GDL/ObjectGroup.h"
 	"GDL/profile.h"
 
-1337796281 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
+1337879047 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
 	<wx/wx.h>
 	"GDL/IDE/Dialogs/ProjectUpdateDlg.h"
 	"PlatformDefinition/Platform.h"
@@ -14683,6 +14684,7 @@
 	"GDL/ForEachEvent.h"
 	"GDL/WhileEvent.h"
 	"GDL/ExternalEvents.h"
+	"GDL/ExternalLayout.h"
 	"GDL/StandardEvent.h"
 	"GDL/RepeatEvent.h"
 	"GDL/XmlMacros.h"
@@ -15856,7 +15858,7 @@
 	<wx/filename.h>
 	"GDL/IDE/CodeCompiler.h"
 
-1337804337 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1337879203 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -35389,7 +35391,7 @@
 	"GDCore/PlatformDefinition/Platform.h"
 	"GDL/Game.h"
 
-1337092424 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\project.h
+1337886021 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\project.h
 	<string>
 	<vector>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
@@ -35544,4 +35546,18 @@
 1337804337 d:\florian\programmation\gamedevelop2\gdl\gdl\initialinstancescontainer.h
 	"GDCore/PlatformDefinition/InitialInstancesContainer.h"
 	"GDL/Position.h"
+
+1337888279 d:\florian\programmation\gamedevelop2\gdl\\gdl\externallayout.h
+	<string>
+	<boost/shared_ptr.hpp>
+	"GDCore/PlatformDefinition/ExternalLayout.h"
+	"GDL/InitialInstancesContainer.h"
+
+1337888279 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\externallayout.h
+	<string>
+	"GDCore/PlatformDefinition/InitialInstancesContainer.h"
+
+1337879203 source:d:\florian\programmation\gamedevelop2\gdl\gdl\externallayout.cpp
+	"GDL/tinyxml/tinyxml.h"
+	"GDL/ExternalLayout.h"
 

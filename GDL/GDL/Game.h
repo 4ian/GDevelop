@@ -15,6 +15,7 @@
 class Object;
 class Scene;
 class ExternalEvents;
+class ExternalLayout;
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/Project.h"
 namespace gd { class Platform; }
@@ -24,14 +25,14 @@ namespace GDpriv { class SourceFile; }
 #endif
 
 /**
- * \brief Represent a game.
+ * \brief Represents a game.
  *
  * Game contains all data of a game, from scenes to properties like game's name.
  *
+ * \note When compiled for Game Develop IDE, this class inherits gd::Project and thus redefines methods related to gd::Project. When compiled for runtime, the class is stand alone and so contains only method useful for runtime.
+ *
  * \ingroup GameEngine
  * \ingroup PlatformDefinition
- *
- * \note When compiled for Game Develop IDE, this class inherits gd::Project and thus redefines methods related to gd::Project. When compiled for runtime, the class is stand alone and so contains only method useful for runtime.
  */
 class GD_API Game
 #if defined(GD_IDE_ONLY)
@@ -145,6 +146,16 @@ public:
     inline std::vector < boost::shared_ptr<Scene> > & GetLayouts() { return scenes; }
 
     /**
+     * Return a reference to the vector containing the (smart) pointers to the external layouts.
+     */
+    inline const std::vector < boost::shared_ptr<ExternalLayout> > & GetExternalLayouts() const { return externalLayouts; }
+
+    /**
+     * Return a reference to the vector containing the (smart) pointers to the external layouts.
+     */
+    inline std::vector < boost::shared_ptr<ExternalLayout> > & GetExternalLayouts() { return externalLayouts; }
+
+    /**
      * Provide access to the ListVariable member containing the global variables
      */
     inline const ListVariable & GetVariables() const { return variables; }
@@ -183,7 +194,7 @@ public:
 
     #if defined(GD_IDE_ONLY)
     /** \name Specialization of gd::Project members
-     * See gd::Project documentation for more information about what these members functions should do.
+     * See gd::Project documentation ( Game Develo Core library ) for more information about what these members functions should do.
      */
     ///@{
     virtual void SetAuthor(const std::string & author_) { author = author_; };
@@ -222,6 +233,17 @@ public:
     virtual void InsertObject(const gd::Object & theObject, unsigned int position);
     virtual void RemoveObject(const std::string & name);
 
+    virtual bool HasExternalLayoutNamed(const std::string & name) const;
+    virtual gd::ExternalLayout & GetExternalLayout(const std::string & name);
+    virtual const gd::ExternalLayout & GetExternalLayout(const std::string & name) const;
+    virtual gd::ExternalLayout & GetExternalLayout(unsigned int index);
+    virtual const gd::ExternalLayout & GetExternalLayout (unsigned int index) const;
+    virtual unsigned int GetExternalLayoutPosition(const std::string & name) const;
+    virtual unsigned int GetExternalLayoutsCount() const;
+    virtual void InsertNewExternalLayout(std::string & name, unsigned int position);
+    virtual void InsertExternalLayout(const gd::ExternalLayout & externalEvents, unsigned int position);
+    virtual void RemoveExternalLayout(const std::string & name);
+
     virtual std::vector < std::string > & GetUsedPlatformExtensions() { return extensionsUsed; };
     virtual const std::vector < std::string > & GetUsedPlatformExtensions() const { return extensionsUsed; };
     virtual gd::Platform & GetPlatform() const { return *platform; }
@@ -239,6 +261,7 @@ private:
     std::vector < boost::shared_ptr<Scene> >            scenes; ///< List of all scenes
     std::vector < boost::shared_ptr<Object> >           globalObjects; ///< Global objects
     ListVariable                                        variables; ///< Initial global variables
+    std::vector < boost::shared_ptr<ExternalLayout> >   externalLayouts; ///< List of all externals layouts
     #if defined(GD_IDE_ONLY)
     std::string                                         author; ///< Game author name
     vector < std::string >                              extensionsUsed; ///< List of extensions used

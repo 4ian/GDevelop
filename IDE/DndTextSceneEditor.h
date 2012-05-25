@@ -5,10 +5,14 @@
 
 #ifndef DNDTEXTSCENEEDITOR_H
 #define DNDTEXTSCENEEDITOR_H
-
 #include <wx/dnd.h>
 class SceneCanvas;
 
+/**
+ * \brief Tool class used by SceneCanvas to enable inserting object using drag'n'drop
+ *
+ * \see SceneCanvas
+ */
 class DndTextSceneEditor : public wxTextDropTarget
 {
 public:

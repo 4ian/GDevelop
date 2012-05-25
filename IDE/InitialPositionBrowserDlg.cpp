@@ -80,12 +80,10 @@ void InitialPositionBrowserDlg::OninitialPositionsListItemActivated(wxListEvent&
 
     if ( id >= instancesContainer.GetInstancesCount() ) return;
 
-    sceneCanvas.edittimeRenderer.view.SetCenter( instancesContainer.GetInstance(id).GetX(),  instancesContainer.GetInstance(id).GetY());
+    sceneCanvas.GetEditionView().SetCenter( instancesContainer.GetInstance(id).GetX(),  instancesContainer.GetInstance(id).GetY());
 
     //Update scene canvas selection with list selection
-    sceneCanvas.edittimeRenderer.objectsSelected.clear();
-    sceneCanvas.edittimeRenderer.xObjectsSelected.clear();
-    sceneCanvas.edittimeRenderer.yObjectsSelected.clear();
+    sceneCanvas.ClearSelection();
 
     long itemIndex = -1;
     for (;;) { //Iterate over all controls
@@ -98,13 +96,7 @@ void InitialPositionBrowserDlg::OninitialPositionsListItemActivated(wxListEvent&
         // Add each selected object to scene canvas selection
         if ( itemIndex < instancesContainer.GetInstancesCount() && itemIndex >= 0 )
         {
-            ObjSPtr object = sceneCanvas.GetObjectFromInitialPosition(instancesContainer.GetInstance(itemIndex));
-            if ( object )
-            {
-                sceneCanvas.edittimeRenderer.objectsSelected.push_back(object);
-                sceneCanvas.edittimeRenderer.xObjectsSelected.push_back(object->GetX());
-                sceneCanvas.edittimeRenderer.yObjectsSelected.push_back(object->GetY());
-            }
+            sceneCanvas.SelectObject(sceneCanvas.GetObjectFromInitialPosition(instancesContainer.GetInstance(itemIndex)));
         }
     }
 }
@@ -116,10 +108,17 @@ void InitialPositionBrowserDlg::DeselectAll()
         initialPositionsList->SetItemState(i,0,wxLIST_STATE_SELECTED);
 }
 
-void InitialPositionBrowserDlg::SelectInitialPosition(unsigned int id)
+void InitialPositionBrowserDlg::SelectInitialPosition(const gd::InitialInstance & instance)
 {
-    if ( id >= initialPositionsList->GetItemCount() ) return;
+    for (unsigned int i = 0;i<instancesContainer.GetInstancesCount();++i)
+    {
+        if ( &instancesContainer.GetInstance(i) == &instance )
+        {
+            if ( i >= initialPositionsList->GetItemCount() ) return;
 
-    initialPositionsList->SetItemState(id, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-    initialPositionsList->EnsureVisible(id);
+            initialPositionsList->SetItemState(i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+            initialPositionsList->EnsureVisible(i);
+            return;
+        }
+    }
 }

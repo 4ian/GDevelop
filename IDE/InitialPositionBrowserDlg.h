@@ -11,8 +11,8 @@
 #include <wx/panel.h>
 //*)
 #include <vector>
+namespace gd { class InitialInstance; }
 class InitialInstancesContainer;
-class InitialPosition;
 class SceneCanvas;
 
 class InitialPositionBrowserDlg: public wxPanel
@@ -25,7 +25,7 @@ public:
     //(*Declarations(InitialPositionBrowserDlg)
     wxListCtrl* initialPositionsList;
     //*)
-    void SelectInitialPosition(unsigned int id);
+    void SelectInitialPosition(const gd::InitialInstance & instance);
     void DeselectAll();
     void Refresh();
 

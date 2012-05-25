@@ -632,6 +632,8 @@
 		<Unit filename="Demarrage.h">
 			<Option virtualFolder="Racine\Demarrage\" />
 		</Unit>
+		<Unit filename="Dialogs\ExternalLayoutEditor.cpp" />
+		<Unit filename="Dialogs\ExternalLayoutEditor.h" />
 		<Unit filename="DnDFileEditor.cpp">
 			<Option virtualFolder="Editeur principal\" />
 		</Unit>
@@ -851,6 +853,11 @@
 		<Unit filename="SceneCanvas.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\" />
 		</Unit>
+		<Unit filename="SceneCanvas2.cpp" />
+		<Unit filename="SceneCanvasEditionData.cpp" />
+		<Unit filename="SceneCanvasEditionData.h" />
+		<Unit filename="SceneCanvasPreviewData.cpp" />
+		<Unit filename="SceneCanvasPreviewData.h" />
 		<Unit filename="SceneEdittimeRenderer.cpp" />
 		<Unit filename="SceneEdittimeRenderer.h" />
 		<Unit filename="SearchEvents.cpp">
@@ -911,6 +918,7 @@
 		<Unit filename="wxSFMLCanvas.hpp">
 			<Option virtualFolder="wxSFML Canvas\" />
 		</Unit>
+		<Unit filename="wxsmith\ExternalLayoutEditor.wxs" />
 		<Unit filename="wxstedit\include\wx\stedit\pairarr.h" />
 		<Unit filename="wxstedit\include\wx\stedit\setup.h" />
 		<Unit filename="wxstedit\include\wx\stedit\setup0.h" />
@@ -1018,6 +1026,7 @@
 					<wxDialog wxs="wxsmith/ExtensionBugReportDlg.wxs" src="ExtensionBugReportDlg.cpp" hdr="ExtensionBugReportDlg.h" fwddecl="0" i18n="1" name="ExtensionBugReportDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/EventsEditor.wxs" src="EventsEditor.cpp" hdr="EventsEditor.h" fwddecl="0" i18n="1" name="EventsEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/AdvancedPasteDlg.wxs" src="AdvancedPasteDlg.cpp" hdr="AdvancedPasteDlg.h" fwddecl="0" i18n="1" name="AdvancedPasteDlg" language="CPP" />
+					<wxPanel wxs="wxsmith/ExternalLayoutEditor.wxs" src="Dialogs\ExternalLayoutEditor.cpp" hdr="Dialogs\ExternalLayoutEditor.h" fwddecl="0" i18n="1" name="ExternalLayoutEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

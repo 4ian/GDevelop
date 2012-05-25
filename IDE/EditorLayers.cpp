@@ -199,7 +199,7 @@ void EditorLayers::UpdateSelectedLayerIcon()
 
     for (unsigned int i =0;i<layers->size();++i)
     {
-    	if ( layers->at(i).GetName() == sceneCanvas->edittimeRenderer.addOnLayer )
+    	if ( layers->at(i).GetName() == sceneCanvas->GetCurrentLayer() )
             layersList->SetItemImage(layers->size()-i-1,1,1);
         else
             layersList->SetItemImage(layers->size()-i-1,-1,-1);
@@ -286,7 +286,7 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
     	    layers->erase(layers->begin() + i );
             if ( sceneCanvas )
             {
-                sceneCanvas->edittimeRenderer.addOnLayer = "";
+                sceneCanvas->SetCurrentLayer("");
                 sceneCanvas->Reload();
             }
             Refresh();
@@ -423,10 +423,10 @@ void EditorLayers::OnlayersListItemActivated(wxListEvent& event)
         //Changes without reloading
         if ( sceneCanvas )
         {
-            for (unsigned int i = 0;i<sceneCanvas->edittimeRenderer.runtimeScene.GetAllLayers().size();++i)
+            for (unsigned int i = 0;i<sceneCanvas->GetRuntimeScene().GetAllLayers().size();++i)
             {
-                if ( sceneCanvas->edittimeRenderer.runtimeScene.GetAllLayers()[i].GetName() == selectedLayer->GetName() )
-                    sceneCanvas->edittimeRenderer.runtimeScene.GetAllLayers()[i].SetVisibility(selectedLayer->GetVisibility());
+                if ( sceneCanvas->GetRuntimeScene().GetAllLayers()[i].GetName() == selectedLayer->GetName() )
+                    sceneCanvas->GetRuntimeScene().GetAllLayers()[i].SetVisibility(selectedLayer->GetVisibility());
             }
         }
         return;
@@ -452,7 +452,7 @@ void EditorLayers::EditSelectedLayer()
     if ( layer->GetName() != oldName )
     {
         scene.GetInitialInstances().MoveInstancesToLayer(oldName, layer->GetName());
-        if ( sceneCanvas && sceneCanvas->edittimeRenderer.addOnLayer == oldName ) sceneCanvas->edittimeRenderer.addOnLayer = layer->GetName();
+        if ( sceneCanvas && sceneCanvas->GetCurrentLayer() == oldName ) sceneCanvas->SetCurrentLayer(layer->GetName());
     }
 
     Refresh();
@@ -476,7 +476,7 @@ void EditorLayers::OnlayersListItemSelect1(wxListEvent& event)
     Layer * layer = GetSelectedLayer();
     if ( !layer ) return;
 
-    if ( sceneCanvas ) sceneCanvas->edittimeRenderer.addOnLayer = layer->GetName();
+    if ( sceneCanvas ) sceneCanvas->SetCurrentLayer(layer->GetName());
     UpdateSelectedLayerIcon();
 }
 
@@ -486,6 +486,6 @@ void EditorLayers::OnlayersListItemFocused(wxListEvent& event)
     Layer * layer = GetSelectedLayer();
     if ( !layer ) return;
 
-    if ( sceneCanvas ) sceneCanvas->edittimeRenderer.addOnLayer = layer->GetName();
+    if ( sceneCanvas ) sceneCanvas->SetCurrentLayer(layer->GetName());
     UpdateSelectedLayerIcon();
 }

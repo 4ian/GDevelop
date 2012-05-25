@@ -90,7 +90,7 @@ mainEditorCommand(mainEditorCommand_)
 	scrollBar2->SetScrollbar(2500, 10, 5000, 10);
 	scrollBar1 = new wxScrollBar(scenePanel, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
 	scrollBar1->SetScrollbar(2500, 10, 5000, 10);
-	sceneCanvas = new SceneCanvas(scenePanel, game, scene, mainEditorCommand, ID_CUSTOM1,wxPoint(0,0),wxSize(800,600), wxWANTS_CHARS | wxBORDER_SIMPLE);
+	sceneCanvas = new SceneCanvas(scenePanel, game, scene, scene.GetInitialInstances(), scene.GetAssociatedSceneCanvasSettings(), mainEditorCommand);
 	eventsPanel = new wxPanel(notebook, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
 	eventsPanel->SetBackgroundColour(wxColour(255,255,255));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -125,7 +125,7 @@ mainEditorCommand(mainEditorCommand_)
     //Create all editors linked to scene canvas.
     sceneCanvas->SetOwnedObjectsEditor( boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainEditorCommand) ));
     sceneCanvas->SetOwnedLayersEditor( boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, &scene.initialLayers, mainEditorCommand) ));
-    sceneCanvas->SetOwnedDebugger( boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(this, sceneCanvas->edittimeRenderer.runtimeScene) ));
+    sceneCanvas->SetOwnedDebugger( boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(this, sceneCanvas->GetRuntimeScene()) ));
     sceneCanvas->SetOwnedExternalWindow( boost::shared_ptr<RenderDialog>(new RenderDialog(this) ));
     sceneCanvas->SetOwnedInitialPositionBrowser( boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, scene.GetInitialInstances(), *sceneCanvas) ));
     sceneCanvas->SetOwnedProfileDialog( boost::shared_ptr<ProfileDlg>(new ProfileDlg(this) ));
@@ -195,7 +195,7 @@ void EditorScene::OnScrollBar2Scroll(wxScrollEvent& event)
     int position = event.GetPosition();
 
     int newY = position-(scrollBar2->GetRange()/2)+(sceneCanvas->GetHeight()/2);
-    sceneCanvas->edittimeRenderer.view.SetCenter( sceneCanvas->edittimeRenderer.view.GetCenter().x, newY);
+    sceneCanvas->GetEditionView().SetCenter( sceneCanvas->GetEditionView().GetCenter().x, newY);
 
     sceneCanvas->ManualRefresh();
 }
@@ -208,7 +208,7 @@ void EditorScene::OnScrollBar1Scroll(wxScrollEvent& event)
     int position = event.GetPosition();
 
     int newX = position-(scrollBar1->GetRange()/2)+(sceneCanvas->GetWidth()/2);
-    sceneCanvas->edittimeRenderer.view.SetCenter( newX,  sceneCanvas->edittimeRenderer.view.GetCenter().y);
+    sceneCanvas->GetEditionView().SetCenter( newX,  sceneCanvas->GetEditionView().GetCenter().y);
 
     sceneCanvas->ManualRefresh();
 }
@@ -217,7 +217,7 @@ void EditorScene::ForceRefreshRibbonAndConnect()
 {
     if ( notebook->GetPageText(notebook->GetSelection()) == _("Scène") )
     {
-        sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->edittimeRenderer.editing);
+        sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
         mainEditorCommand.GetRibbon()->SetActivePage(2);
         sceneCanvas->ConnectEvents();
     }
@@ -238,7 +238,7 @@ void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)
 
 void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
-    sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->edittimeRenderer.editing);
+    sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
     mainEditorCommand.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();
 }

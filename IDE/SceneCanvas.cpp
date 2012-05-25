@@ -7,31 +7,25 @@
 #include <string>
 #include <iostream>
 #include <vector>
-#include <cmath>
-#include <sstream>
+#include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
 #include <wx/config.h>
 #include <wx/cursor.h>
 #include <wx/log.h>
 #include <wx/scrolbar.h>
 #include <wx/infobar.h>
-#ifdef __WXMSW__
-#include <wx/msw/winundef.h>
-#endif
-#include <SFML/System.hpp>
-#include <SFML/Graphics.hpp>
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ImageManager.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
-#include "GDL/Collisions.h"
-#include "GDCore/Events/Event.h"
 #include "GDL/CommonTools.h"
-#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
+#include "GDL/IDE/SceneCanvasSettings.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/CodeExecutionEngine.h"
 #include "GDL/SoundManager.h"
@@ -44,12 +38,10 @@
 #include "InitialPositionBrowserDlg.h"
 #include "RenderDialog.h"
 #include "AdvancedPasteDlg.h"
-#include "EditorObjets.h"
 #include "EditorLayers.h"
 #include "DebuggerGUI.h"
 #include "GridSetup.h"
 #include "ProfileDlg.h"
-#include <wx/infobar.h>
 
 const long SceneCanvas::ID_ADDOBJMENU = wxNewId();
 const long SceneCanvas::ID_DELOBJMENU = wxNewId();
@@ -62,7 +54,6 @@ const long SceneCanvas::ID_PASTEMENU = wxNewId();
 const long SceneCanvas::ID_PASTESPECIALMENU = wxNewId();
 const long SceneCanvas::idRibbonEditMode = wxNewId();
 const long SceneCanvas::idRibbonPreviewMode = wxNewId();
-
 const long SceneCanvas::idRibbonObjectsEditor = wxNewId();
 const long SceneCanvas::idRibbonLayersEditor = wxNewId();
 const long SceneCanvas::idRibbonChooseObject = wxNewId();
@@ -75,7 +66,6 @@ const long SceneCanvas::idRibbonUndo = wxNewId();
 const long SceneCanvas::idRibbonRedo = wxNewId();
 const long SceneCanvas::idRibbonObjectsPositionList = wxNewId();
 const long SceneCanvas::idRibbonHelp = wxNewId();
-
 const long SceneCanvas::idRibbonRefresh = wxNewId();
 const long SceneCanvas::idRibbonPlay = wxNewId();
 const long SceneCanvas::idRibbonPlayWin = wxNewId();
@@ -84,7 +74,6 @@ const long SceneCanvas::idRibbonResetGlobalVars = wxNewId();
 const long SceneCanvas::idRibbonDebugger = wxNewId();
 const long SceneCanvas::idRibbonProfiler = wxNewId();
 const long SceneCanvas::idRibbonFullScreen = wxNewId();
-
 const long SceneCanvas::ID_MENUITEM8 = wxNewId();
 const long SceneCanvas::ID_MENUITEM1 = wxNewId();
 const long SceneCanvas::ID_MENUITEM2 = wxNewId();
@@ -97,267 +86,31 @@ const long SceneCanvas::idUndo10 = wxNewId();
 const long SceneCanvas::idUndo20 = wxNewId();
 const long SceneCanvas::idClearHistory = wxNewId();
 
-
 sf::Texture SceneCanvas::reloadingIconImage;
 sf::Sprite SceneCanvas::reloadingIconSprite;
 sf::Text SceneCanvas::reloadingText;
+InitialPosition SceneCanvas::badInstance;
 
-SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances_, SceneCanvasSettings & settings_, MainEditorCommand & mainEditorCommand_) :
-        wxSFMLCanvas( Parent, Id, Position, Size, Style ),
-        gameEdited(game_),
-        sceneEdited(scene_),
-        game(gameEdited),
-        edittimeRenderer(this, &game, sceneEdited),
-        hasJustRightClicked(false),
-        ctrlPressed(false),
-        isReloading(false),
-        instances(instances_),
-        settings(settings_),
-        mainEditorCommand( mainEditorCommand_ ),
-        scrollBar1(NULL),
-        scrollBar2(NULL)
-{
-    reloadingIconImage.LoadFromFile("res/compile128.png");
-    reloadingIconSprite.SetTexture(reloadingIconImage);
-    reloadingText.SetColor(sf::Color(0,0,0,128));
-    reloadingText.SetString(string(_("Compilation en cours...").mb_str()));
-    reloadingText.SetCharacterSize(40);
-
-    SetView( edittimeRenderer.view );
-    SetFramerateLimit( gameEdited.GetMaximumFPS() );
-    EnableVerticalSync(gameEdited.IsVerticalSynchronizationEnabledByDefault() );
-    Clear( sf::Color( 125, 125, 125, 255 ) );
-
-    Connect(ID_ADDOBJMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnAddObjetSelected);
-    Connect(ID_DELOBJMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnDelObjetSelected);
-    Connect(ID_PROPMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnPropObjSelected);
-    Connect(ID_LAYERUPMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnLayerUpSelected);
-    Connect(ID_LAYERDOWNMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnLayerDownSelected);
-    Connect(ID_COPYMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnCopySelected);
-    Connect(ID_CUTMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnCutSelected);
-    Connect(ID_PASTEMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnPasteSelected);
-    Connect(ID_PASTESPECIALMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnPasteSpecialSelected);
-
-    CreateMenus();
-
-    latestState.Create(sceneEdited.GetInitialInstances());
-
-    SetDropTarget(new DndTextSceneEditor(*this));
-
-    CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), edittimeRenderer.editing);
-}
-
-SceneCanvas::~SceneCanvas()
-{
-    mainEditorCommand.UnLockShortcuts(this);  //Make sure shortcuts are not locked.
-}
-
-void SceneCanvas::ConnectEvents()
-{
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonEditMode, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnEditionBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonPreviewMode, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPreviewBtClick, NULL, this);
-
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonObjectsEditor, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnObjectsEditor, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonLayersEditor, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnLayersEditor, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonChooseObject, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnChoisirObjetBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonOrigine, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnOrigineBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnZoomInitBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnZoomMoreBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonGrid, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnGridBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonGridSetup, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnGridSetupBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonWindowMask, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnWindowMaskBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnUndoBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnUndoMoreBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnRedoBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonObjectsPositionList,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnObjectsPositionList, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&SceneCanvas::OnHelpBtClick, NULL, this);
-
-
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnRefreshBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonPlay, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPlayBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonPlayWin, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPlayWindowBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonPause, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnPauseBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDebugger, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnDebugBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonProfiler, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnProfilerBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonFullScreen, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneCanvas::OnFullScreenBtClick, NULL, this);
-
-	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom5Selected, NULL, this);
-	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom10Selected, NULL, this);
-	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom25Selected, NULL, this);
-	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom50Selected, NULL, this);
-	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom100Selected, NULL, this);
-	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom150Selected, NULL, this);
-	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom200Selected, NULL, this);
-	mainEditorCommand.GetMainEditor()->Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::Onzoom500Selected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idUndo10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnUndo10Selected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idUndo20,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnUndo20Selected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idClearHistory,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnClearHistorySelected, NULL, this);
-}
-
-/**
- * Static method for creating the ribbon's page used by Scene canvas
- */
-wxRibbonButtonBar* SceneCanvas::CreateRibbonPage(wxRibbonPage * page)
-{
-    bool hideLabels = false;
-    wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels );
-
-    {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Aperçu") : "", wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY));
-    }
-
-    wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Outils"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-    wxRibbonButtonBar *toolsBar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
-    CreateToolsBar(toolsBar, true); //Create an initial tool bar
-
-    {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
-        wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
-    }
-
-    return toolsBar; //Returned to the mainEditor, and will then be passed to Scene Editors with MainEditorCommand
-}
-
-void SceneCanvas::OnZoomMoreBtClick(wxRibbonButtonBarEvent& evt)
-{
-    evt.PopupMenu(&zoomMenu);
-}
-
-void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
-{
-    wxConfigBase *pConfig = wxConfigBase::Get();
-    bool hideLabels = false;
-    pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
-
-    bar->ClearButtons();
-
-    if ( editing )
-    {
-        bar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Editeur d'objets") : "", wxBitmap("res/objeticon24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Editeur de calques") : "", wxBitmap("res/layers24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonChooseObject, !hideLabels ? _("Choisir un objet") : "", wxBitmap("res/addobjet24.png", wxBITMAP_TYPE_ANY));
-        bar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonOrigine, !hideLabels ? _("Revenir à l'origine") : "", wxBitmap("res/center24.png", wxBITMAP_TYPE_ANY));
-        bar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Zoom initial") : "", wxBitmap("res/zoom24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonGrid, !hideLabels ? _("Grille") : "", wxBitmap("res/grid24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonGridSetup, !hideLabels ? _("Editer la grille") : "", wxBitmap("res/gridedit24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonWindowMask, !hideLabels ? _("Masque de la fen. de jeu") : "", wxBitmap("res/windowMask24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Liste des objets") : "", wxBitmap("res/ObjectsPositionsList24.png", wxBITMAP_TYPE_ANY));
-    }
-    else
-    {
-        bar->AddButton(idRibbonRefresh, !hideLabels ? _("Rafraichir") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonPlay, !hideLabels ? _("Jouer") : "", wxBitmap("res/starticon24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonPlayWin, !hideLabels ? _("Jouer dans une fenêtre") : "", wxBitmap("res/startwindow24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", wxBitmap("res/pauseicon24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", wxBitmap("res/bug24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonProfiler, !hideLabels ? _("Performances") : "", wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonFullScreen, !hideLabels ? _("Afficher l'éditeur en plein écran") : "", wxBitmap("res/fullscreen24.png", wxBITMAP_TYPE_ANY));
-    }
-
-    bar->Realize();
-}
-
-/**
- * Toggle Game Develop full screen mode.
- */
-void SceneCanvas::OnFullScreenBtClick(wxCommandEvent & event)
-{
-    if (!mainEditorCommand.GetMainEditor()->IsFullScreen())
-        mainEditorCommand.GetMainEditor()->ShowFullScreen(true, wxFULLSCREEN_NOBORDER | wxFULLSCREEN_NOCAPTION);
-    else
-        mainEditorCommand.GetMainEditor()->ShowFullScreen(false);
-}
-
-void SceneCanvas::SetOwnedObjectsEditor(boost::shared_ptr<EditorObjets> objectsEditor_)
-{
-    objectsEditor = objectsEditor_;
-}
-void SceneCanvas::SetOwnedLayersEditor(boost::shared_ptr<EditorLayers> layersEditor_)
-{
-    layersEditor = layersEditor_;
-    if ( layersEditor && layersEditor->GetAssociatedSceneCanvas() != this)
-        layersEditor->SetAssociatedSceneCanvas(this);
-}
-void SceneCanvas::SetOwnedDebugger(boost::shared_ptr<DebuggerGUI> debugger_)
-{
-    debugger = debugger_;
-
-    if ( debugger )
-        edittimeRenderer.runtimeScene.debugger = debugger.get();
-}
-void SceneCanvas::SetOwnedExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_)
-{
-    externalWindow = externalWindow_;
-}
-void SceneCanvas::SetOwnedInitialPositionBrowser(boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser_)
-{
-    initialPositionsBrowser = initialPositionsBrowser_;
-}
-void SceneCanvas::SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDialog_)
-{
-    profileDialog = profileDialog_;
-    if ( profileDialog && profileDialog->GetAssociatedSceneCanvas() != this)
-        profileDialog->SetAssociatedSceneCanvas(this);
-
-    if ( profileDialog )
-        sceneEdited.profiler = profileDialog.get();
-}
-
-/**
- * Update the size and position of the canvas displaying the scene
- */
-void SceneCanvas::UpdateSize()
-{
-    if ( edittimeRenderer.editing )
-    {
-        //Scene takes all the space available in edition mode.
-
-        //This line is unnecessary and create a crash related to X in Linux.
-        //Window::SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
-        wxWindowBase::SetPosition(wxPoint(0,0));
-        wxWindowBase::SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
-
-        edittimeRenderer.view.SetSize(GetClientSize().GetWidth(), GetClientSize().GetHeight());
-    }
-    else
-    {
-        //Scene has the size of the game's window size in preview mode.
-        Window::SetSize(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
-        wxWindowBase::SetClientSize(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
-
-        externalWindow->SetSizeOfRenderingZone(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
-
-        //Scene is centered in preview mode
-        wxWindowBase::SetPosition(wxPoint((parentPanel->GetSize().GetWidth()-wxWindowBase::GetSize().GetX())/2,
-                              (parentPanel->GetSize().GetHeight()-wxWindowBase::GetSize().GetY())/2));
-    }
-}
-
+using namespace std;
 
 /**
  * Go in preview mode
  */
 void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
 {
-    cout << "OnPreviewBtClick: " << endl;
-    if ( !edittimeRenderer.editing ) return;
+    if ( !editing ) return;
+    cout << "Switching to preview mode..." << endl;
 
     mainEditorCommand.LockShortcuts(this);
 
-    edittimeRenderer.editing = false;
-    edittimeRenderer.runtimeScene.running = false;
+    editing = false;
+    previewData.scene.running = false;
 
     scrollBar1->Show(false);
     scrollBar2->Show(false);
     UpdateSize();
 
-    cout << "StartReload: " << endl;
+    cout << "Launch layout reload" << endl;
     Reload();
 
     if ( debugger ) debugger->Play();
@@ -370,19 +123,20 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
  */
 void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 {
-    if ( edittimeRenderer.editing ) return;
+    if ( editing ) return;
+    cout << "Switching to edition mode..." << endl;
 
     CodeCompiler::GetInstance()->EnableTaskRelatedTo(sceneEdited);
 
-    edittimeRenderer.editing = true;
-    edittimeRenderer.runtimeScene.running = false;
+    editing = true;
+    previewData.scene.running = false;
 
     mainEditorCommand.UnLockShortcuts(this);
 
     scrollBar1->Show(true);
     scrollBar2->Show(true);
     externalWindow->Show(false);
-    edittimeRenderer.runtimeScene.ChangeRenderWindow(this);
+    previewData.scene.ChangeRenderWindow(this);
     UpdateSize();
     UpdateScrollbars();
 
@@ -396,164 +150,22 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
 }
 
 
-void SceneCanvas::OnHelpBtClick( wxCommandEvent & event )
-{
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(12);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_scene"));
-}
-
-void SceneCanvas::OnLayersEditor( wxCommandEvent & event )
-{
-    m_mgr->GetPane(layersEditor.get()).Show();
-    m_mgr->Update();
-}
-
-void SceneCanvas::OnObjectsEditor( wxCommandEvent & event )
-{
-    m_mgr->GetPane(objectsEditor.get()).Show();
-    m_mgr->Update();
-}
-
-void SceneCanvas::OnObjectsPositionList( wxCommandEvent & event )
-{
-    m_mgr->GetPane(initialPositionsBrowser.get()).Show();
-    m_mgr->Update();
-}
-
-void SceneCanvas::OnProfilerBtClick( wxCommandEvent & event )
-{
-    if ( !profileDialog ) return;
-
-    m_mgr->GetPane(profileDialog.get()).Show();
-    m_mgr->Update();
-}
-
 void SceneCanvas::OnRefreshBtClick( wxCommandEvent & event )
 {
-    edittimeRenderer.editing = false;
-    edittimeRenderer.runtimeScene.running = false;
+    previewData.scene.running = false;
 
     Reload();
 }
-
-void SceneCanvas::OnZoomInitBtClick( wxCommandEvent & event )
-{
-    edittimeRenderer.view.SetSize(GetWidth(), GetHeight());
-}
-
-////////////////////////////////////////////////////////////
-/// Retour aux coordonnées 0;0 de la scène
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnOrigineBtClick(wxCommandEvent & event )
-{
-    edittimeRenderer.view.SetCenter( (game.GetMainWindowDefaultWidth()/2),(game.GetMainWindowDefaultHeight()/2));
-}
-
-
-/**
- * Choose an object to add
- */
-void SceneCanvas::OnChoisirObjetBtClick( wxCommandEvent & event )
-{
-    ChooseObject Dialog( this, game, edittimeRenderer.runtimeScene, false );
-    if ( Dialog.ShowModal() == 1 )
-    {
-        edittimeRenderer.objectToAdd = Dialog.objectChosen;
-    }
-}
-
-/**
- * De/activate grid.
- */
-void SceneCanvas::OnGridBtClick( wxCommandEvent & event )
-{
-    settings.grid = !settings.grid;
-}
-
-/**
- * Setup the grid.
- */
-void SceneCanvas::OnGridSetupBtClick( wxCommandEvent & event )
-{
-    GridSetup dialog(this, settings.gridWidth, settings.gridHeight, settings.snap, settings.gridR, settings.gridG, settings.gridB);
-    dialog.ShowModal();
-}
-
-
-void SceneCanvas::OnWindowMaskBtClick( wxCommandEvent & event )
-{
-    settings.windowMask = !settings.windowMask;
-}
-
-void SceneCanvas::OnUndoBtClick( wxCommandEvent & event )
-{
-    Undo();
-    Reload();
-}
-void SceneCanvas::Undo()
-{
-    if ( history.empty() ) return;
-
-    redoHistory.push_back(sceneEdited.GetInitialInstances()); //We can go back to the current state using redo button.
-    sceneEdited.GetInitialInstances() = history.back();
-    history.pop_back();
-
-    latestState = sceneEdited.GetInitialInstances();
-}
-
-void SceneCanvas::OnUndo10Selected(wxCommandEvent& event)
-{
-    for (unsigned int i = 0;i<10;++i) Undo();
-
-    Reload();
-}
-
-void SceneCanvas::OnUndo20Selected(wxCommandEvent& event)
-{
-    for (unsigned int i = 0;i<20;++i) Undo();
-
-    Reload();
-}
-
-void SceneCanvas::OnClearHistorySelected(wxCommandEvent& event)
-{
-    if (wxMessageBox("Etes-vous sûr de vouloir supprimer l'historique des modifications ?", "Êtes vous sûr ?",wxYES_NO ) != wxYES)
-        return;
-
-    history.clear();
-    redoHistory.clear();
-}
-
-void SceneCanvas::OnRedoBtClick( wxCommandEvent & event )
-{
-    if ( redoHistory.empty() ) return;
-
-    history.push_back(sceneEdited.GetInitialInstances());
-    sceneEdited.GetInitialInstances() = redoHistory.back();
-    redoHistory.pop_back();
-
-    latestState = sceneEdited.GetInitialInstances();
-
-    Reload();
-}
-
-void SceneCanvas::OnUndoMoreBtClick(wxRibbonButtonBarEvent& evt)
-{
-    evt.PopupMenu(&undoMenu);
-}
-
 /**
  * Test scene in editor
  */
 void SceneCanvas::OnPlayBtClick( wxCommandEvent & event )
 {
-    edittimeRenderer.runtimeScene.running = true;
-    edittimeRenderer.editing = false;
+    previewData.scene.running = true;
+    editing = false;
 
     externalWindow->Show(false);
-    edittimeRenderer.runtimeScene.ChangeRenderWindow(this);
+    previewData.scene.ChangeRenderWindow(this);
 
     if ( debugger ) debugger->Play();
 }
@@ -563,128 +175,28 @@ void SceneCanvas::OnPlayBtClick( wxCommandEvent & event )
  */
 void SceneCanvas::OnPlayWindowBtClick( wxCommandEvent & event )
 {
-    edittimeRenderer.runtimeScene.running = true;
-    edittimeRenderer.editing = false;
+    previewData.scene.running = true;
+    editing = false;
 
     externalWindow->Show(true);
-    externalWindow->renderCanvas->SetFramerateLimit( game.GetMaximumFPS() );
+    externalWindow->renderCanvas->SetFramerateLimit( previewData.game.GetMaximumFPS() );
 
-    externalWindow->SetSizeOfRenderingZone(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
-    edittimeRenderer.runtimeScene.ChangeRenderWindow(externalWindow->renderCanvas);
+    externalWindow->SetSizeOfRenderingZone(gameEdited.GetMainWindowDefaultWidth(), gameEdited.GetMainWindowDefaultHeight());
+    previewData.scene.ChangeRenderWindow(externalWindow->renderCanvas);
 
-    externalWindow->SetSizeOfRenderingZone(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
-    edittimeRenderer.runtimeScene.ChangeRenderWindow(externalWindow->renderCanvas);
+    externalWindow->SetSizeOfRenderingZone(gameEdited.GetMainWindowDefaultWidth(), gameEdited.GetMainWindowDefaultHeight());
+    previewData.scene.ChangeRenderWindow(externalWindow->renderCanvas);
 
     if ( debugger ) debugger->Play();
 }
 
-////////////////////////////////////////////////////////////
-/// Mettre la scène en pause
-////////////////////////////////////////////////////////////
 void SceneCanvas::OnPauseBtClick( wxCommandEvent & event )
 {
-    edittimeRenderer.runtimeScene.running = false;
-    edittimeRenderer.editing = false;
+    previewData.scene.running = false;
 
     if ( debugger ) debugger->Pause();
 }
 
-////////////////////////////////////////////////////////////
-/// Afficher le debugger de la scène
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnDebugBtClick( wxCommandEvent & event )
-{
-    if ( !m_mgr || !debugger ) return;
-
-    m_mgr->GetPane(debugger.get()).Show();
-    m_mgr->Update();
-}
-
-void SceneCanvas::OnKeyUp( wxKeyEvent& evt )
-{
-    if ( evt.GetKeyCode() == WXK_CONTROL )
-        ctrlPressed = false;
-}
-
-void SceneCanvas::OnKey( wxKeyEvent& evt )
-{
-    if ( evt.GetKeyCode() == WXK_CONTROL )
-        ctrlPressed = true;
-
-    //Si on est en mode éditeur
-    if ( edittimeRenderer.editing )
-    {
-        //ajout
-        if ( evt.GetKeyCode() == WXK_INSERT )
-        {
-            wxCommandEvent unused;
-            OnAddObjetSelected(unused);
-        }
-        //Suppression
-        else if ( evt.GetKeyCode() == WXK_DELETE )
-        {
-            wxCommandEvent unused;
-            OnDelObjetSelected(unused);
-        }
-        else if ( evt.GetKeyCode() == WXK_DOWN )
-        {
-            for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
-            {
-                ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
-
-                int idPos = GetInitialPositionFromObject(object);
-                if ( idPos != -1 )
-                {
-                    sceneEdited.GetInitialInstances().GetInstance(idPos).SetY(sceneEdited.GetInitialInstances().GetInstance(idPos).GetY()+1);
-                    object->SetY(object->GetY()+1);
-                }
-            }
-        }
-        else if ( evt.GetKeyCode() == WXK_UP )
-        {
-            for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
-            {
-                ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
-
-                int idPos = GetInitialPositionFromObject(object);
-                if ( idPos != -1 )
-                {
-                    sceneEdited.GetInitialInstances().GetInstance(idPos).SetY(sceneEdited.GetInitialInstances().GetInstance(idPos).GetY()-1);
-                    object->SetY(object->GetY()-1);
-                }
-            }
-        }
-        else if ( evt.GetKeyCode() == WXK_RIGHT )
-        {
-            for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
-            {
-                ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
-
-                int idPos = GetInitialPositionFromObject(object);
-                if ( idPos != -1 )
-                {
-                    sceneEdited.GetInitialInstances().GetInstance(idPos).SetX(sceneEdited.GetInitialInstances().GetInstance(idPos).GetX()+1);
-                    object->SetX(object->GetX()+1);
-                }
-            }
-        }
-        else if ( evt.GetKeyCode() == WXK_LEFT )
-        {
-            for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
-            {
-                ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
-
-                int idPos = GetInitialPositionFromObject(object);
-                if ( idPos != -1 )
-                {
-                    sceneEdited.GetInitialInstances().GetInstance(idPos).SetX(sceneEdited.GetInitialInstances().GetInstance(idPos).GetX()-1);
-                    object->SetX(object->GetX()-1);
-                }
-            }
-        }
-    }
-    evt.StopPropagation();
-}
 
 void SceneCanvas::Reload()
 {
@@ -700,14 +212,14 @@ void SceneCanvas::ReloadFirstPart()
     if ( gameEdited.imageManager ) gameEdited.imageManager->PreventImagesUnloading(); //Images are normally unloaded and loaded again when reloading the scene. We can prevent this to happen as it is time wasting.
 
     //Reset game
-    game = gameEdited;
-    game.imageManager = gameEdited.imageManager; //Use same image manager.
+    previewData.game = gameEdited;
+    previewData.game.imageManager = gameEdited.imageManager; //Use same image manager.
 
     //Reset scene
-    RuntimeScene newScene(this, &game);
-    edittimeRenderer.runtimeScene = newScene;
-    edittimeRenderer.runtimeScene.running = false;
-    if ( debugger ) edittimeRenderer.runtimeScene.debugger = debugger.get();
+    RuntimeScene newScene(this, &previewData.game);
+    previewData.scene = newScene;
+    previewData.scene.running = false;
+    if ( debugger ) previewData.scene.debugger = debugger.get();
 
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
     //Useful when opening a scene for the first time for example.
@@ -715,7 +227,7 @@ void SceneCanvas::ReloadFirstPart()
     {
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(gameEdited, sceneEdited);
 
-        if ( !edittimeRenderer.editing )
+        if ( !editing )
             mainEditorCommand.GetInfoBar()->ShowMessage(_("Les modifications apportées aux évènements seront prises en compte lors du retour au mode édition."));
     }
 
@@ -725,10 +237,10 @@ void SceneCanvas::ReloadFirstPart()
 void SceneCanvas::ReloadSecondPart()
 {
     cout << "Scene canvas reloading... ( Step 2/2 )" << endl;
-    if ( !edittimeRenderer.editing )
+    if ( !editing )
         CodeCompiler::GetInstance()->DisableTaskRelatedTo(sceneEdited);
 
-    edittimeRenderer.runtimeScene.LoadFromScene( sceneEdited );
+    previewData.scene.LoadFromScene( sceneEdited );
     sceneEdited.wasModified = false;
 
     UpdateSize();
@@ -745,7 +257,7 @@ void SceneCanvas::Refresh()
     if ( isReloading )
     {
         bool wait = false;
-        if ( !edittimeRenderer.editing && CodeCompiler::GetInstance()->CompilationInProcess()) //Ensure some events are not being compiled.
+        if ( !editing && CodeCompiler::GetInstance()->CompilationInProcess()) //Ensure some events are not being compiled.
             wait =true;
 
         if ( wait ) //We're still waiting for something to finish
@@ -776,7 +288,7 @@ void SceneCanvas::Refresh()
         {
 
             //But be sure that no error occured.
-            if ( !edittimeRenderer.editing && !sceneEdited.codeExecutionEngine->Ready() )
+            if ( !editing && !sceneEdited.codeExecutionEngine->Ready() )
             {
                 wxLogError(_("La compilation des évènements a échouée, et la scène ne peut être testée. Afin que le problème soit corrigé, veuillez le rapporter au développeur de Game Develop, en joignant le fichier suivant :\n")+CodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt");
                 wxCommandEvent useless;
@@ -790,13 +302,13 @@ void SceneCanvas::Refresh()
     else //We're displaying the scene
     {
         //First ensure scene does not need to be reloaded
-        if ( !edittimeRenderer.runtimeScene.running || edittimeRenderer.editing )
+        if ( !previewData.scene.running || editing )
         {
             //Reload changed images.
             if ( !gameEdited.imagesChanged.empty() )
             {
                 for (unsigned int i = 0;i<gameEdited.imagesChanged.size();++i)
-                    game.imageManager->ReloadImage(gameEdited.imagesChanged[i]);
+                    previewData.game.imageManager->ReloadImage(gameEdited.imagesChanged[i]);
 
                 gameEdited.imageManager->LoadPermanentImages();
                 gameEdited.imagesChanged.clear();
@@ -808,26 +320,163 @@ void SceneCanvas::Refresh()
         }
 
         //Then display the scene
-        if ( edittimeRenderer.runtimeScene.running ) //At runtime
+        if ( previewData.scene.running ) //At runtime
         {
-            int retourEvent = edittimeRenderer.runtimeScene.RenderAndStep(1);
+            int retourEvent = previewData.scene.RenderAndStep(1);
 
             if ( retourEvent == -2 )
-            {
                 mainEditorCommand.GetInfoBar()->ShowMessage(_( "Dans le jeu final, le jeu se terminera." ));
-            }
             else if ( retourEvent != -1 )
             {
                 if (retourEvent < gameEdited.GetLayouts().size())
-                {
                     mainEditorCommand.GetInfoBar()->ShowMessage(_( "Dans le jeu final, un changement de scène s'effectuera vers la scène " ) + "\"" + gameEdited.GetLayouts()[retourEvent]->GetName() + "\"");
+            }
+        }
+        else if ( !previewData.scene.running && !editing ) //Runtime paused
+            previewData.scene.RenderWithoutStep();
+        else //Edittime
+            EdittimeRender();
+    }
+}
+
+void SceneCanvas::EdittimeRender()
+{
+    previewData.scene.ManageRenderTargetEvents();
+
+    Clear( sf::Color( previewData.scene.GetBackgroundColorRed(), previewData.scene.GetBackgroundColorGreen(), previewData.scene.GetBackgroundColorBlue() ) );
+    SetView(editionData.view);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+    SaveGLStates(); //To allow using OpenGL to draw
+
+    //On trie les objets par leurs plans
+    ObjList allObjects = previewData.scene.objectsInstances.GetAllObjects();
+    previewData.scene.OrderObjectsByZOrder( allObjects );
+
+    std::vector < sf::Shape > GUIelements;
+
+    for (unsigned int layerIndex =0;layerIndex<previewData.scene.GetAllLayers().size();++layerIndex)
+    {
+        if ( previewData.scene.GetAllLayers()[layerIndex].GetVisibility() )
+        {
+            //Prepare OpenGL rendering
+            RestoreGLStates();
+
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            gluPerspective(previewData.scene.oglFOV, static_cast<double>(GetWidth())/static_cast<double>(GetHeight()), previewData.scene.oglZNear, previewData.scene.oglZFar);
+
+            glViewport(0,0, GetWidth(), GetHeight());
+
+            SaveGLStates();
+
+            //Render all objects
+            for (unsigned int id = 0;id < allObjects.size();++id)
+            {
+                if ( allObjects[id]->GetLayer() == previewData.scene.GetAllLayers()[layerIndex].GetName())
+                {
+                    allObjects[id]->DrawEdittime(*previewData.scene.renderWindow);
+
+                    //Selection rectangle
+                    if ( find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), allObjects[id]) != editionData.objectsSelected.end() )
+                    {
+                        sf::Shape selection = sf::Shape::Rectangle( 0, 0,
+                                                                   allObjects[id]->GetWidth(),
+                                                                   allObjects[id]->GetHeight(),
+                                                                   sf::Color( 0, 0, 200, 40 ), 1, sf::Color( 0, 0, 255, 128 ) );
+
+                        selection.SetPosition( allObjects[id]->GetDrawableX(),
+                                              allObjects[id]->GetDrawableY() );
+                        GUIelements.push_back( selection );
+
+                        if ( editionData.objectsSelected.size() == 1)
+                        {
+                            sf::Shape resizeXBt = sf::Shape::Rectangle( 0, 0, 4, 4, sf::Color( 255, 255, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
+                            sf::Shape resizeYBt = sf::Shape::Rectangle( 0, 0, 4, 4, sf::Color( 255, 255, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
+                            sf::Shape angleBt = sf::Shape::Rectangle( 0, 0, 4, 4, sf::Color( 255, 255, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
+                            sf::Shape center = sf::Shape::Circle( 0, 0, 2, sf::Color( 0, 0, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
+                            sf::Shape centerToAngle = sf::Shape::Line(0,0, 20, 0, 1, sf::Color( 0, 0, 255, 255 ), 0, sf::Color( 0, 0, 255, 255 ) );
+
+                            resizeXBt.SetPosition(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()-4,
+                                                  allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2-2 );
+
+                            resizeYBt.SetPosition(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2-2,
+                                                  allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()-4 );
+
+                            center.SetPosition(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
+                                               allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2);
+
+                            angleBt.SetPosition(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2-2
+                                                +20*cos(allObjects[id]->GetAngle()/180.f*3.14159),
+                                                allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2-2
+                                                +20*sin(allObjects[id]->GetAngle()/180.f*3.14159) );
+
+                            centerToAngle.Rotate(allObjects[id]->GetAngle());
+                            centerToAngle.SetPosition(  allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
+                                                        allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2);
+
+                            GUIelements.push_back( centerToAngle );
+                            GUIelements.push_back( center );
+                            GUIelements.push_back( angleBt );
+                            GUIelements.push_back( resizeXBt );
+                            GUIelements.push_back( resizeYBt );
+
+                        }
+                    }
                 }
             }
         }
-        else if ( !edittimeRenderer.runtimeScene.running && !edittimeRenderer.editing ) //Runtime paused
-            edittimeRenderer.runtimeScene.RenderWithoutStep();
-        else //Edittime
-            edittimeRenderer.RenderSceneEdittimeRenderer();
+    }
+
+    //Affichage de la grille
+    if ( settings.grid )
+        RenderGrid();
+
+    //Draw GUI Elements
+    for (unsigned int i = 0;i<GUIelements.size();++i)
+    	Draw(GUIelements[i]);
+
+    if ( editionData.isSelecting )
+    {
+        sf::Shape selection = sf::Shape::Rectangle(editionData.xRectangleSelection, editionData.yRectangleSelection,
+                                                   editionData.xEndRectangleSelection-editionData.xRectangleSelection, editionData.yEndRectangleSelection-editionData.yRectangleSelection,
+                                                   sf::Color( 0, 0, 200, 40 ), 1, sf::Color( 0, 0, 255, 128 ) );
+        Draw(selection);
+    }
+
+    if ( settings.windowMask )
+    {
+        sf::Shape windowMaskShape = sf::Shape::Rectangle(editionData.view.GetCenter().x-previewData.scene.game->GetMainWindowDefaultWidth()/2, editionData.view.GetCenter().y-previewData.scene.game->GetMainWindowDefaultHeight()/2,
+                                                         previewData.scene.game->GetMainWindowDefaultWidth(), previewData.scene.game->GetMainWindowDefaultHeight(), sf::Color( 0, 0, 0, 0 ), 1, sf::Color( 255, 255, 255, 128 ) );
+
+        Draw(windowMaskShape);
+    }
+
+    RestoreGLStates();
+    Display();
+}
+
+void SceneCanvas::RenderGrid()
+{
+    int departX = static_cast<int>((editionData.view.GetCenter().x-editionData.view.GetSize().x/2) / settings.gridWidth)-settings.gridWidth;
+    departX *= settings.gridWidth;
+    int positionX = departX;
+    int departY = static_cast<int>((editionData.view.GetCenter().y-editionData.view.GetSize().y/2) / settings.gridHeight)-settings.gridHeight;
+    departY *= settings.gridHeight;
+    int positionY = departY;
+
+    for ( positionX = departX;positionX < (editionData.view.GetCenter().x+editionData.view.GetSize().x/2) ; positionX += settings.gridWidth )
+    {
+        sf::Shape line = sf::Shape::Line( positionX, departY, positionX, (editionData.view.GetCenter().y+editionData.view.GetSize().y/2), 1, sf::Color( settings.gridR, settings.gridG, settings.gridB ));
+
+        Draw( line );
+    }
+
+    for ( positionY = departY;positionY < (editionData.view.GetCenter().y+editionData.view.GetSize().y/2) ; positionY += settings.gridHeight )
+    {
+        sf::Shape line = sf::Shape::Line( departX, positionY, (editionData.view.GetCenter().x+editionData.view.GetSize().x/2), positionY, 1, sf::Color( settings.gridR, settings.gridG, settings.gridB ));
+
+        Draw( line );
     }
 }
 
@@ -844,64 +493,23 @@ void SceneCanvas::ChangesMade()
 {
     history.push_back(latestState);
     redoHistory.clear();
-    latestState = sceneEdited.GetInitialInstances();
+    latestState = instances;
 }
 
-////////////////////////////////////////////////////////////
-/// Met à jour les barres de défilements
-////////////////////////////////////////////////////////////
-void SceneCanvas::UpdateScrollbars()
+void SceneCanvas::ClearSelection()
 {
-    if ( scrollBar1 == NULL || scrollBar2 == NULL)
-        return;
-
-    //On calcule la position du thumb
-    int thumbY = edittimeRenderer.view.GetCenter().y+scrollBar2->GetRange()/2-GetHeight()/2;
-    scrollBar2->SetScrollbar(thumbY, GetHeight(), scrollBar2->GetRange(), GetHeight());
-
-    int thumbX = edittimeRenderer.view.GetCenter().x+scrollBar1->GetRange()/2-GetWidth()/2;
-    scrollBar1->SetScrollbar(thumbX, GetWidth(), scrollBar1->GetRange(), GetWidth());
-
-    //On agrandit les scrollbars si besoin est
-    if ( thumbY <= 0 || static_cast<int>(thumbY+GetHeight()) >= scrollBar2->GetRange())
-    {
-        int ajout = GetHeight();
-        scrollBar2->SetScrollbar(thumbY+ajout/2, GetHeight(), scrollBar2->GetRange()+ajout, GetHeight());
-    }
-
-    if ( thumbX <= 0 || static_cast<int>(thumbX+GetWidth()) >= scrollBar1->GetRange())
-    {
-        int ajout = GetWidth();
-        scrollBar1->SetScrollbar(thumbX+ajout/2, GetWidth(), scrollBar1->GetRange()+ajout, GetWidth());
-    }
+    editionData.objectsSelected.clear();
+    editionData.xObjectsSelected.clear();
+    editionData.yObjectsSelected.clear();
 }
 
-void SceneCanvas::UpdateContextMenu()
+void SceneCanvas::SelectObject(boost::shared_ptr<Object> object)
 {
-    //Peut on remonter les objets sur un calque plus haut ?
-    int lowestLayer = GetObjectsSelectedLowestLayer();
+    if ( object == boost::shared_ptr<Object> () ) return;
 
-    contextMenu.FindItem(ID_LAYERUPMENU)->Enable(false);
-    if ( static_cast<unsigned>(lowestLayer+1) < edittimeRenderer.runtimeScene.initialLayers.size() )
-    {
-        string name = edittimeRenderer.runtimeScene.initialLayers[lowestLayer+1].GetName();
-        if ( name == "" ) name = _("Calque de base");
-        contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(string(_("Passer le(s) objet(s) sur le calque \"")) + name +"\"");
-    }
-
-    //Peut on descendre les objets sur un calque plus bas ? ( pléonasme )
-    int highestLayer = GetObjectsSelectedHighestLayer();
-
-    contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(false);
-    if ( highestLayer-1 >= 0 )
-    {
-        string name = edittimeRenderer.runtimeScene.initialLayers[highestLayer-1].GetName();
-        if ( name == "" ) name = _("Calque de base");
-
-        contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(string(_("Passer le(s) objet(s) sur le calque \"")) + name +"\"");
-    }
+    editionData.objectsSelected.push_back(object);
+    editionData.xObjectsSelected.push_back(object->GetX());
+    editionData.yObjectsSelected.push_back(object->GetY());
 }
 
 ////////////////////////////////////////////////////////////
@@ -911,7 +519,7 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
 {
     SetFocus();
 
-    if ( !edittimeRenderer.editing )
+    if ( !editing )
         return;
 
     if ( hasJustRightClicked )
@@ -920,19 +528,17 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
         return;
     }
 
-    ObjSPtr object = edittimeRenderer.FindSmallestObject();
+    ObjSPtr object = FindSmallestObjectUnderCursor();
 
-    int mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
-    int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+    int mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
+    int mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
 
     //Suppress selection
     if ( (!sf::Keyboard::IsKeyPressed(sf::Keyboard::LShift) && !sf::Keyboard::IsKeyPressed(sf::Keyboard::RShift)) && //Check that shift is not pressed
         ( object == boost::shared_ptr<Object> () || //If no object is clicked
-         find(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object) == edittimeRenderer.objectsSelected.end()) ) //Or an object which is not currently selected.
+         find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), object) == editionData.objectsSelected.end()) ) //Or an object which is not currently selected.
     {
-        edittimeRenderer.objectsSelected.clear();
-        edittimeRenderer.xObjectsSelected.clear();
-        edittimeRenderer.yObjectsSelected.clear();
+        ClearSelection();
 
         if ( initialPositionsBrowser )
             initialPositionsBrowser->DeselectAll();
@@ -942,92 +548,82 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
     if ( object == boost::shared_ptr<Object> () ) //If no object is clicked
     {
         //Creation
-        edittimeRenderer.isSelecting = true;
-        edittimeRenderer.xRectangleSelection = mouseX;
-        edittimeRenderer.yRectangleSelection = mouseY;
-        edittimeRenderer.xEndRectangleSelection = mouseX;
-        edittimeRenderer.yEndRectangleSelection = mouseY;
+        editionData.isSelecting = true;
+        editionData.xRectangleSelection = mouseX;
+        editionData.yRectangleSelection = mouseY;
+        editionData.xEndRectangleSelection = mouseX;
+        editionData.yEndRectangleSelection = mouseY;
     }
 
     //On ajoute l'objet surligné dans les objets à bouger
     if ( object == boost::shared_ptr<Object> () ) return;
 
     //Verify if user want to resize the object
-    if (    edittimeRenderer.objectsSelected.size() == 1 &&
+    if (    editionData.objectsSelected.size() == 1 &&
             mouseX > object->GetDrawableX()+object->GetWidth()-6 &&
             mouseX < object->GetDrawableX()+object->GetWidth() &&
             mouseY > object->GetDrawableY()+object->GetHeight()/2-3 &&
             mouseY < object->GetDrawableY()+object->GetHeight()/2+3)
     {
-        edittimeRenderer.isMovingObject = false;
-        edittimeRenderer.isRotatingObject = false;
-        edittimeRenderer.isResizingX = true;
+        editionData.isMovingObject = false;
+        editionData.isRotatingObject = false;
+        editionData.isResizingX = true;
     }
-    else if (   edittimeRenderer.objectsSelected.size() == 1 &&
+    else if (   editionData.objectsSelected.size() == 1 &&
                 mouseY > object->GetDrawableY()+object->GetHeight()-6 &&
                 mouseY < object->GetDrawableY()+object->GetHeight() &&
                 mouseX > object->GetDrawableX()+object->GetWidth()/2-3 &&
                 mouseX < object->GetDrawableX()+object->GetWidth()/2+3 )
     {
-        edittimeRenderer.isMovingObject = false;
-        edittimeRenderer.isRotatingObject = false;
-        edittimeRenderer.isResizingY = true;
+        editionData.isMovingObject = false;
+        editionData.isRotatingObject = false;
+        editionData.isResizingY = true;
     }
-    else if ( edittimeRenderer.objectsSelected.size() == 1 &&
+    else if ( editionData.objectsSelected.size() == 1 &&
                 mouseX > object->GetDrawableX()+object->GetWidth()/2+20*cos(object->GetAngle()/180.f*3.14159)-3 &&
                 mouseX < object->GetDrawableX()+object->GetWidth()/2+20*cos(object->GetAngle()/180.f*3.14159)+3 &&
                 mouseY > object->GetDrawableY()+object->GetHeight()/2+20*sin(object->GetAngle()/180.f*3.14159)-3 &&
                 mouseY < object->GetDrawableY()+object->GetHeight()/2+20*sin(object->GetAngle()/180.f*3.14159)+3 )
     {
-        edittimeRenderer.isRotatingObject = true;
-        edittimeRenderer.isMovingObject = false;
-        edittimeRenderer.isResizingX = false;
-        edittimeRenderer.isResizingY = false;
+        editionData.isRotatingObject = true;
+        editionData.isMovingObject = false;
+        editionData.isResizingX = false;
+        editionData.isResizingY = false;
     }
     else //Add object to selection
     {
         //Adding the object to selection if needed
-        if ( find(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object) == edittimeRenderer.objectsSelected.end() )
+        if ( find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), object) == editionData.objectsSelected.end() )
         {
-            edittimeRenderer.objectsSelected.push_back(object);
-
-            //Et on renseigne sa position de départ :
-            edittimeRenderer.xObjectsSelected.push_back(object->GetX());
-            edittimeRenderer.yObjectsSelected.push_back(object->GetY());
+            SelectObject(object);
 
             if ( initialPositionsBrowser )
                 initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
         }
 
         //Clone the selection using Ctrl
-        if (!edittimeRenderer.isMovingObject && (ctrlPressed))
+        if (!editionData.isMovingObject && (ctrlPressed))
         {
-            for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
+            for (unsigned int i = 0;i<editionData.objectsSelected.size();++i)
             {
-                ObjSPtr selectedObject = edittimeRenderer.objectsSelected[i];
+                ObjSPtr selectedObject = editionData.objectsSelected[i];
 
-                //Clone the object and its initial position
-                int idPos = GetInitialPositionFromObject(selectedObject);
-                if (idPos != -1)
-                {
-                    edittimeRenderer.objectsSelected[i] = boost::shared_ptr<Object>(selectedObject->Clone());
-                    edittimeRenderer.runtimeScene.objectsInstances.AddObject(edittimeRenderer.objectsSelected[i]);
-                    sceneEdited.GetInitialInstances().InsertInitialInstance(sceneEdited.GetInitialInstances().GetInstance(idPos));
-
-                }
+                editionData.objectsSelected[i] = boost::shared_ptr<Object>(selectedObject->Clone()); //Replace the selection with the new object
+                previewData.scene.objectsInstances.AddObject(editionData.objectsSelected[i]);
+                instances.InsertInitialInstance(GetInitialPositionFromObject(selectedObject));
             }
 
             if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
         }
 
-        edittimeRenderer.isMovingObject = true;
-        edittimeRenderer.isRotatingObject = false;
-        edittimeRenderer.isResizingX = false;
-        edittimeRenderer.isResizingY = false;
+        editionData.isMovingObject = true;
+        editionData.isRotatingObject = false;
+        editionData.isResizingX = false;
+        editionData.isResizingY = false;
     }
 
-    edittimeRenderer.oldMouseX = mouseX; //Position de départ de la souris
-    edittimeRenderer.oldMouseY = mouseY;
+    editionData.oldMouseX = mouseX; //Position de départ de la souris
+    editionData.oldMouseY = mouseY;
 }
 
 ////////////////////////////////////////////////////////////
@@ -1042,83 +638,71 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
     myEvent.MouseButton.Y = event.GetY();
     myEvent.MouseButton.Button = sf::Mouse::Left;
 
-    edittimeRenderer.runtimeScene.GetRenderTargetEvents().push_back(myEvent);
+    previewData.scene.GetRenderTargetEvents().push_back(myEvent);
     #endif
 
-    if ( !edittimeRenderer.editing ) return;
+    if ( !editing ) return;
 
     //Relachement de la souris :
     //Pour les objets selectionnés, leurs nouvelle
     //position de départ est celle où ils sont.
-    if ( edittimeRenderer.isMovingObject )
+    if ( editionData.isMovingObject )
     {
         bool changesMade = false;
 
         if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
-        for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
+        for (unsigned int i = 0;i<editionData.objectsSelected.size();++i)
         {
-            ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
-            int IDInitialPosition = GetInitialPositionFromObject(object);
-            if ( IDInitialPosition != -1)
+            ObjSPtr object = editionData.objectsSelected.at(i);
+            InitialPosition & initialInstance = GetInitialPositionFromObject(object);
+
+            if (editionData.xObjectsSelected[i] != initialInstance.GetX() ||
+                editionData.yObjectsSelected[i] != initialInstance.GetY() )
             {
-                if (edittimeRenderer.xObjectsSelected[i] != sceneEdited.GetInitialInstances().GetInstance( IDInitialPosition ).GetX() ||
-                    edittimeRenderer.yObjectsSelected[i] != sceneEdited.GetInitialInstances().GetInstance( IDInitialPosition ).GetY() )
-                    changesMade = true;
-
-                edittimeRenderer.xObjectsSelected[i] = sceneEdited.GetInitialInstances().GetInstance( IDInitialPosition ).GetX();
-                edittimeRenderer.yObjectsSelected[i] = sceneEdited.GetInitialInstances().GetInstance( IDInitialPosition ).GetY();
-
-                if ( initialPositionsBrowser )
-                    initialPositionsBrowser->SelectInitialPosition(IDInitialPosition);
+                changesMade = true;
+                editionData.xObjectsSelected[i] = initialInstance.GetX();
+                editionData.yObjectsSelected[i] = initialInstance.GetY();
             }
 
+            if ( initialPositionsBrowser )
+                initialPositionsBrowser->SelectInitialPosition(initialInstance);
         }
 
         if ( changesMade ) ChangesMade();
     }
 
     //Select object thanks to the selection area
-    if ( edittimeRenderer.isSelecting )
+    if ( editionData.isSelecting )
     {
         //Origin must be at the top left of the area
-        if ( edittimeRenderer.xEndRectangleSelection < edittimeRenderer.xRectangleSelection) std::swap(edittimeRenderer.xEndRectangleSelection, edittimeRenderer.xRectangleSelection);
-        if ( edittimeRenderer.yEndRectangleSelection < edittimeRenderer.yRectangleSelection) std::swap(edittimeRenderer.yEndRectangleSelection, edittimeRenderer.yRectangleSelection);
+        if ( editionData.xEndRectangleSelection < editionData.xRectangleSelection) std::swap(editionData.xEndRectangleSelection, editionData.xRectangleSelection);
+        if ( editionData.yEndRectangleSelection < editionData.yRectangleSelection) std::swap(editionData.yEndRectangleSelection, editionData.yRectangleSelection);
 
-        ObjList allObjects = edittimeRenderer.runtimeScene.objectsInstances.GetAllObjects();
+        ObjList allObjects = previewData.scene.objectsInstances.GetAllObjects();
 
         for (unsigned int id = 0;id < allObjects.size();++id)
         {
             //Find and add to selection all objects of the selection area
             ObjSPtr object = allObjects[id];
-            if ( object->GetX() >= edittimeRenderer.xRectangleSelection &&
-                 object->GetX()+object->GetWidth() <= edittimeRenderer.xEndRectangleSelection &&
-                 object->GetY() >= edittimeRenderer.yRectangleSelection &&
-                 object->GetY()+object->GetHeight() <= edittimeRenderer.yEndRectangleSelection )
+            if ( object->GetX() >= editionData.xRectangleSelection &&
+                 object->GetX()+object->GetWidth() <= editionData.xEndRectangleSelection &&
+                 object->GetY() >= editionData.yRectangleSelection &&
+                 object->GetY()+object->GetHeight() <= editionData.yEndRectangleSelection )
              {
-                int IDInitialPosition = GetInitialPositionFromObject(object);
-                if ( IDInitialPosition != -1)
+                if ( find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), object) == editionData.objectsSelected.end() )
                 {
-                    if ( find(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object) == edittimeRenderer.objectsSelected.end() )
-                    {
-                        edittimeRenderer.objectsSelected.push_back(object);
-
-                        //Et on renseigne sa position de départ :
-                        edittimeRenderer.xObjectsSelected.push_back(object->GetX());
-                        edittimeRenderer.yObjectsSelected.push_back(object->GetY());
-
-                        if ( initialPositionsBrowser )
-                            initialPositionsBrowser->SelectInitialPosition(IDInitialPosition);
-                    }
+                    SelectObject(object);
+                    if ( initialPositionsBrowser )initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
                 }
-             }
+            }
         }
     }
 
-    edittimeRenderer.isResizingX = false;
-    edittimeRenderer.isResizingY = false;
-    edittimeRenderer.isMovingObject = false;
-    edittimeRenderer.isRotatingObject = false;
-    edittimeRenderer.isSelecting = false;
+    editionData.isResizingX = false;
+    editionData.isResizingY = false;
+    editionData.isMovingObject = false;
+    editionData.isRotatingObject = false;
+    editionData.isSelecting = false;
 }
 
 ////////////////////////////////////////////////////////////
@@ -1130,112 +714,97 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
 void SceneCanvas::OnMotion( wxMouseEvent &event )
 {
     //Mille mercis Laurent.
-    float mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
-    float mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+    float mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
+    float mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
 
-    if ( !edittimeRenderer.editing )
+    if ( !editing )
         wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". ( Calque de base, Caméra 0 )" ) ) );
     else
         wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". SHIFT pour sélection multiple, clic droit pour plus d'options." ) ) );
 
     //The rest is for edittime
-    if ( edittimeRenderer.runtimeScene.running )
+    if ( previewData.scene.running )
         return;
 
     //Moving using middle click
-    if ( edittimeRenderer.isMoving )
-        edittimeRenderer.view.SetCenter( edittimeRenderer.viewStartPosition.x + edittimeRenderer.mouseStartPosition.x - sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, edittimeRenderer.viewStartPosition.y + edittimeRenderer.mouseStartPosition.y - sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y );
+    if ( editionData.isMoving )
+        editionData.view.SetCenter( editionData.viewStartPosition.x + editionData.mouseStartPosition.x - sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, editionData.viewStartPosition.y + editionData.mouseStartPosition.y - sf::Mouse::GetPosition(*previewData.scene.renderWindow).y );
 
-    if ( edittimeRenderer.isResizingX )
+    if ( editionData.isResizingX )
     {
-        for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
+        for (unsigned int i = 0;i<editionData.objectsSelected.size();++i)
         {
-            ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
-            object->SetWidth(mouseX-edittimeRenderer.xObjectsSelected.at(i));
+            ObjSPtr object = editionData.objectsSelected.at(i);
+            object->SetWidth(mouseX-editionData.xObjectsSelected.at(i));
 
-            int idPos = GetInitialPositionFromObject(object);
-            if ( idPos != -1 )
-            {
-                sceneEdited.GetInitialInstances().GetInstance(idPos).SetHasCustomSize(true);
-                sceneEdited.GetInitialInstances().GetInstance(idPos).SetWidth(object->GetWidth());
-                sceneEdited.GetInitialInstances().GetInstance(idPos).SetHeight(object->GetHeight());
-            }
+            InitialPosition & initialInstance = GetInitialPositionFromObject(object);
+            initialInstance.SetHasCustomSize(true);
+            initialInstance.SetWidth(object->GetWidth());
+            initialInstance.SetHeight(object->GetHeight());
         }
     }
-    if ( edittimeRenderer.isResizingY )
+    if ( editionData.isResizingY )
     {
-        for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
+        for (unsigned int i = 0;i<editionData.objectsSelected.size();++i)
         {
-            ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
-            object->SetHeight(mouseY-edittimeRenderer.yObjectsSelected.at(i));
+            ObjSPtr object = editionData.objectsSelected.at(i);
+            object->SetHeight(mouseY-editionData.yObjectsSelected.at(i));
 
-            int idPos = GetInitialPositionFromObject(object);
-            if ( idPos != -1 )
-            {
-                sceneEdited.GetInitialInstances().GetInstance(idPos).SetHasCustomSize(true);
-                sceneEdited.GetInitialInstances().GetInstance(idPos).SetWidth(object->GetWidth());
-                sceneEdited.GetInitialInstances().GetInstance(idPos).SetHeight(object->GetHeight());
-            }
+            InitialPosition & initialInstance = GetInitialPositionFromObject(object);
+            initialInstance.SetHasCustomSize(true);
+            initialInstance.SetWidth(object->GetWidth());
+            initialInstance.SetHeight(object->GetHeight());
         }
     }
-    if ( edittimeRenderer.isRotatingObject )
+    if ( editionData.isRotatingObject )
     {
-        for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
+        for (unsigned int i = 0;i<editionData.objectsSelected.size();++i)
         {
-            ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
+            ObjSPtr object = editionData.objectsSelected.at(i);
             float x = mouseX-(object->GetDrawableX()+object->GetWidth()/2);
             float y = mouseY-(object->GetDrawableY()+object->GetHeight()/2);
             float newAngle = atan2(y,x)*180/3.14159;
 
             object->SetAngle(newAngle);
 
-            int idPos = GetInitialPositionFromObject(object);
-            if ( idPos != -1 )
-            {
-                sceneEdited.GetInitialInstances().GetInstance(idPos).SetAngle(newAngle);
-            }
+            GetInitialPositionFromObject(object).SetAngle(newAngle);
         }
     }
-    //Déplacement de la position initiale d'un objet
-    if ( edittimeRenderer.isMovingObject )
+    //Moving an instance
+    if ( editionData.isMovingObject )
     {
-        for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
+        //Get the displacement of the cursor
+        int deltaX = mouseX - editionData.oldMouseX;
+        int deltaY = mouseY - editionData.oldMouseY;
+
+        for (unsigned int i = 0;i<editionData.objectsSelected.size();++i)
         {
-            ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
+            ObjSPtr object = editionData.objectsSelected.at(i);
 
-            int idPos = GetInitialPositionFromObject(object);
-            if ( idPos != -1 )
+            //Compute new position
+            int newX = editionData.xObjectsSelected[i] + deltaX;
+            int newY = editionData.yObjectsSelected[i] + deltaY;
+
+            if ( settings.grid && settings.snap )
             {
-                //Déplacement effectué par la souris
-                int deltaX = mouseX - edittimeRenderer.oldMouseX;
-                int deltaY = mouseY - edittimeRenderer.oldMouseY;
-
-                //Anciennes et nouvelles coordonnées
-                int oldX = edittimeRenderer.xObjectsSelected[i];
-                int oldY = edittimeRenderer.yObjectsSelected[i];
-                int newX = oldX + deltaX;
-                int newY = oldY + deltaY;
-
-                if ( settings.grid && settings.snap )
-                {
-                    newX = static_cast<int>(newX/settings.gridWidth)*settings.gridWidth;
-                    newY = static_cast<int>(newY/settings.gridHeight)*settings.gridHeight;
-                }
-
-                //Modification de l'emplacement initial
-                sceneEdited.GetInitialInstances().GetInstance(idPos).SetX(newX);
-                sceneEdited.GetInitialInstances().GetInstance(idPos).SetY(newY);
-
-                //On bouge aussi l'objet actuellement affiché
-                object->SetX( newX );
-                object->SetY( newY );
+                newX = static_cast<int>(newX/settings.gridWidth)*settings.gridWidth;
+                newY = static_cast<int>(newY/settings.gridHeight)*settings.gridHeight;
             }
+
+            //Modification de l'emplacement initial
+            InitialPosition & initialInstance = GetInitialPositionFromObject(object);
+            initialInstance.SetX(newX);
+            initialInstance.SetY(newY);
+
+            //On bouge aussi l'objet actuellement affiché
+            object->SetX( newX );
+            object->SetY( newY );
         }
     }
-    if ( edittimeRenderer.isSelecting )
+    if ( editionData.isSelecting )
     {
-        edittimeRenderer.xEndRectangleSelection = mouseX;
-        edittimeRenderer.yEndRectangleSelection = mouseY;
+        editionData.xEndRectangleSelection = mouseX;
+        editionData.yEndRectangleSelection = mouseY;
     }
 
 }
@@ -1245,60 +814,20 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnLeftDClick( wxMouseEvent &event )
 {
-    edittimeRenderer.rightClickSelectedObject = edittimeRenderer.FindSmallestObject();
+    editionData.rightClickSelectedObject = FindSmallestObjectUnderCursor();
 
     wxCommandEvent unusedEvent;
     OnPropObjSelected(unusedEvent);
 }
 
-void SceneCanvas::OnAnyMouseEvent( wxMouseEvent & event )
+void SceneCanvas::AddObject(const std::string & objectName, float x, float y)
 {
-    #if defined(GD_IDE_ONLY) && defined(LINUX)
-    if ( event.GetButton() != wxMOUSE_BTN_NONE )
-    {
-        sf::Event myEvent;
-        if ( event.ButtonDown() )
-            myEvent.Type = sf::Event::MouseButtonPressed;
-        else if ( event.ButtonUp() )
-            myEvent.Type = sf::Event::MouseButtonReleased;
-        myEvent.MouseButton.X = event.GetX();
-        myEvent.MouseButton.Y = event.GetY();
+    if ( !editing || objectName.empty() ) return;
 
-        if ( event.GetButton() == wxMOUSE_BTN_LEFT ) myEvent.MouseButton.Button = sf::Mouse::Left;
-        else if ( event.GetButton() == wxMOUSE_BTN_RIGHT ) myEvent.MouseButton.Button = sf::Mouse::Right;
-        else if ( event.GetButton() == wxMOUSE_BTN_MIDDLE ) myEvent.MouseButton.Button = sf::Mouse::Middle;
-        else if ( event.GetButton() == wxMOUSE_BTN_AUX1 ) myEvent.MouseButton.Button = sf::Mouse::XButton1;
-        else if ( event.GetButton() == wxMOUSE_BTN_AUX2 ) myEvent.MouseButton.Button = sf::Mouse::XButton2;
+    editionData.isMovingObject = false;
 
-        edittimeRenderer.runtimeScene.GetRenderTargetEvents().push_back(myEvent);
-    }
-    #endif
-}
-
-////////////////////////////////////////////////////////////
-/// Insertion d'un objet
-////////////////////////////////////////////////////////////
-void SceneCanvas::OnAddObjetSelected( wxCommandEvent & event )
-{
-    int mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
-    int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
-
-    AddObjetSelected(mouseX, mouseY);
-    ChangesMade();
-}
-
-void SceneCanvas::AddObjetSelected(float x, float y)
-{
-    //Seulement en mode éditeur
-    if ( !edittimeRenderer.editing )
-        return;
-
-    edittimeRenderer.isMovingObject = false;
-
-    if ( edittimeRenderer.objectToAdd.empty() ) { wxLogMessage( _( "Glissez-déposez les objets depuis la liste des objets. Vous pouvez aussi en sélectionner un avec le bouton \"Choisir un objet à ajouter\" dans la barre d'outils pour pouvoir ensuite l'ajouter par double clic." ) ); return;}
-
-    std::vector<ObjSPtr>::iterator sceneObject = std::find_if(sceneEdited.GetInitialObjects().begin(), sceneEdited.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), edittimeRenderer.objectToAdd));
-    std::vector<ObjSPtr>::iterator globalObject = std::find_if(gameEdited.GetGlobalObjects().begin(), gameEdited.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), edittimeRenderer.objectToAdd));
+    std::vector<ObjSPtr>::iterator sceneObject = std::find_if(sceneEdited.GetInitialObjects().begin(), sceneEdited.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectName));
+    std::vector<ObjSPtr>::iterator globalObject = std::find_if(gameEdited.GetGlobalObjects().begin(), gameEdited.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectName));
 
     ObjSPtr newObject = boost::shared_ptr<Object> ();
 
@@ -1309,13 +838,13 @@ void SceneCanvas::AddObjetSelected(float x, float y)
 
     if ( newObject == boost::shared_ptr<Object> () )
     {
-        wxLogMessage(_("L'objet à ajouter n'existe pas ou plus dans la liste des objets."));
+        wxLogMessage(_("L'objet à ajouter n'existe pas ou plus dans la liste des objets.\nGlissez-déposez les objets depuis la liste des objets."));
         return;
     }
 
     //Initial position creation
     InitialPosition pos;
-    pos.SetObjectName(edittimeRenderer.objectToAdd); //A choisir avec un dialog approprié ou par drag'n'drop
+    pos.SetObjectName(objectName);
     if ( settings.grid && settings.snap )
     {
         pos.SetX(static_cast<int>(x/settings.gridWidth)*settings.gridWidth);
@@ -1327,22 +856,21 @@ void SceneCanvas::AddObjetSelected(float x, float y)
         pos.SetY(y);
     }
 
-    pos.SetZOrder(0);
-    pos.SetLayer(edittimeRenderer.addOnLayer);
-    sceneEdited.GetInitialInstances().InsertInitialInstance( pos );
+    pos.SetZOrder(GetHighestZOrderOnLayer(editionData.currentLayer)+1);
+    pos.SetLayer(editionData.currentLayer);
+    instances.InsertInitialInstance( pos );
 
     //Edittime scene object creation
     newObject->SetX( pos.GetX() );
     newObject->SetY( pos.GetY() );
     newObject->SetZOrder( pos.GetZOrder() );
     newObject->SetLayer( pos.GetLayer() );
-
     newObject->InitializeFromInitialPosition(pos);
-    newObject->LoadRuntimeResources( edittimeRenderer.runtimeScene, *game.imageManager );
+    newObject->LoadRuntimeResources( previewData.scene, *previewData.game.imageManager );
 
-    edittimeRenderer.runtimeScene.objectsInstances.AddObject(newObject);
+    previewData.scene.objectsInstances.AddObject(newObject);
 
-    newObject->LoadResources(edittimeRenderer.runtimeScene, *game.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
+    newObject->LoadResources(previewData.scene, *previewData.game.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
 
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
     ChangesMade();
@@ -1360,25 +888,21 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
     myEvent.MouseButton.Y = event.GetY();
     myEvent.MouseButton.Button = sf::Mouse::Right;
 
-    edittimeRenderer.runtimeScene.GetRenderTargetEvents().push_back(myEvent);
+    previewData.scene.GetRenderTargetEvents().push_back(myEvent);
     #endif
 
-    if ( !edittimeRenderer.editing )
+    if ( !editing )
         return;
 
-    ObjSPtr object = edittimeRenderer.FindSmallestObject();
+    ObjSPtr object = FindSmallestObjectUnderCursor();
 
     //Suppress selection if
     if ( object == boost::shared_ptr<Object> () || /*Not clicked on an object*/
         (( !sf::Keyboard::IsKeyPressed(sf::Keyboard::LShift) && !sf::Keyboard::IsKeyPressed(sf::Keyboard::RShift) ) && /*Clicked without using shift*/
-         find(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object) == edittimeRenderer.objectsSelected.end() ))
+         find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), object) == editionData.objectsSelected.end() ))
     {
-        edittimeRenderer.objectsSelected.clear();
-        edittimeRenderer.xObjectsSelected.clear();
-        edittimeRenderer.yObjectsSelected.clear();
-
-        if ( initialPositionsBrowser )
-            initialPositionsBrowser->DeselectAll();
+        ClearSelection();
+        if ( initialPositionsBrowser ) initialPositionsBrowser->DeselectAll();
     }
 
     if ( object == boost::shared_ptr<Object> () ) //Popup "no object" context menu
@@ -1386,19 +910,13 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
         PopupMenu(&noObjectContextMenu);
         return;
     }
-    edittimeRenderer.rightClickSelectedObject = object;
+    editionData.rightClickSelectedObject = object;
 
     //Add the object to selection
-    if ( find(edittimeRenderer.objectsSelected.begin(), edittimeRenderer.objectsSelected.end(), object) == edittimeRenderer.objectsSelected.end() )
+    if ( find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), object) == editionData.objectsSelected.end() )
     {
-        edittimeRenderer.objectsSelected.push_back(object);
-
-        //Must also register its position
-        edittimeRenderer.xObjectsSelected.push_back(object->GetX());
-        edittimeRenderer.yObjectsSelected.push_back(object->GetY());
-
-        if ( initialPositionsBrowser )
-            initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
+        SelectObject(object);
+        if ( initialPositionsBrowser ) initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
     }
 
     OnUpdate(); //So as to display selection rectangle for the newly selected object
@@ -1414,20 +932,15 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
 void SceneCanvas::OnLayerUpSelected(wxCommandEvent & event)
 {
     int lowestLayer = GetObjectsSelectedLowestLayer();
-    if ( lowestLayer+1 < 0 || static_cast<unsigned>(lowestLayer+1) >= edittimeRenderer.runtimeScene.initialLayers.size() )
+    if ( lowestLayer+1 < 0 || static_cast<unsigned>(lowestLayer+1) >= previewData.scene.initialLayers.size() )
         return;
 
-    string layerName = edittimeRenderer.runtimeScene.initialLayers.at(lowestLayer+1).GetName();
+    string layerName = previewData.scene.initialLayers.at(lowestLayer+1).GetName();
 
-    for (unsigned int i =0;i<edittimeRenderer.objectsSelected.size();++i)
+    for (unsigned int i =0;i<editionData.objectsSelected.size();++i)
     {
-        //Récupérons la position initiale
-        int posId = GetInitialPositionFromObject(edittimeRenderer.objectsSelected[i]);
-        if ( posId != -1 )
-        {
-            sceneEdited.GetInitialInstances().GetInstance(posId).SetLayer(layerName);
-            edittimeRenderer.objectsSelected[i]->SetLayer(layerName);
-        }
+        GetInitialPositionFromObject(editionData.objectsSelected[i]).SetLayer(layerName);
+        editionData.objectsSelected[i]->SetLayer(layerName);
     }
 
     ChangesMade();
@@ -1437,18 +950,14 @@ void SceneCanvas::OnCopySelected(wxCommandEvent & event)
 {
     vector < InitialPosition > copiedPositions;
 
-    for (unsigned int i =0;i<edittimeRenderer.objectsSelected.size();++i)
+    for (unsigned int i =0;i<editionData.objectsSelected.size();++i)
     {
-        int posId = GetInitialPositionFromObject(edittimeRenderer.objectsSelected[i]);
-        if ( posId != -1 )
-        {
-            int mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
-            int mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+        int mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
+        int mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
 
-            copiedPositions.push_back(sceneEdited.GetInitialInstances().GetInstance(posId));
-            copiedPositions.back().SetX(copiedPositions.back().GetX() - mouseX);
-            copiedPositions.back().SetY(copiedPositions.back().GetY() - mouseY);
-        }
+        copiedPositions.push_back(GetInitialPositionFromObject(editionData.objectsSelected[i]));
+        copiedPositions.back().SetX(copiedPositions.back().GetX() - mouseX);
+        copiedPositions.back().SetY(copiedPositions.back().GetY() - mouseY);
     }
 
     Clipboard::GetInstance()->SetPositionsSelection(copiedPositions);
@@ -1458,28 +967,24 @@ void SceneCanvas::OnCutSelected(wxCommandEvent & event)
 {
     vector < InitialPosition > copiedPositions;
 
-    for (unsigned int i =0;i<edittimeRenderer.objectsSelected.size();++i)
+    for (unsigned int i =0;i<editionData.objectsSelected.size();++i)
     {
-        int posId = GetInitialPositionFromObject(edittimeRenderer.objectsSelected[i]);
-        if ( posId != -1 )
-        {
-            //Copy position
-            float mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
-            float mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+        InitialPosition & initialInstance = GetInitialPositionFromObject(editionData.objectsSelected[i]);
 
-            copiedPositions.push_back(sceneEdited.GetInitialInstances().GetInstance(posId));
-            copiedPositions.back().SetX(copiedPositions.back().GetX() - mouseX);
-            copiedPositions.back().SetY(copiedPositions.back().GetY() - mouseY);
+        //Copy position
+        float mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
+        float mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
 
-            //Remove objects
-            sceneEdited.GetInitialInstances().RemoveInstance(posId);
-            edittimeRenderer.runtimeScene.objectsInstances.RemoveObject(edittimeRenderer.objectsSelected[i]);
-        }
+        copiedPositions.push_back(initialInstance);
+        copiedPositions.back().SetX(copiedPositions.back().GetX() - mouseX);
+        copiedPositions.back().SetY(copiedPositions.back().GetY() - mouseY);
+
+        //Remove objects
+        instances.RemoveInstance(initialInstance);
+        previewData.scene.objectsInstances.RemoveObject(editionData.objectsSelected[i]);
     }
 
-    edittimeRenderer.objectsSelected.clear();
-    edittimeRenderer.xObjectsSelected.clear();
-    edittimeRenderer.yObjectsSelected.clear();
+    ClearSelection();
 
     if ( initialPositionsBrowser ) initialPositionsBrowser->DeselectAll();
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
@@ -1496,11 +1001,11 @@ void SceneCanvas::OnPasteSelected(wxCommandEvent & event)
 
     for (unsigned int i =0;i<pastedPositions.size();++i)
     {
-        float mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
-        float mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+        float mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
+        float mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
 
-        sceneEdited.GetInitialInstances().InsertInitialInstance(pastedPositions[i]);
-        gd::InitialInstance & insertedInstance = sceneEdited.GetInitialInstances().GetInstance(sceneEdited.GetInitialInstances().GetInstancesCount()-1);
+        instances.InsertInitialInstance(pastedPositions[i]);
+        gd::InitialInstance & insertedInstance = instances.GetInstance(instances.GetInstancesCount()-1);
         insertedInstance.SetX(insertedInstance.GetX()+mouseX);
         insertedInstance.SetY(insertedInstance.GetY()+mouseY);
     }
@@ -1515,8 +1020,8 @@ void SceneCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
     if ( !Clipboard::GetInstance()->HasPositionsSelection() ) return;
     vector < InitialPosition > pastedPositions = Clipboard::GetInstance()->GetPositionsSelection();
 
-    float mouseX = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).x;
-    float mouseY = ConvertCoords(sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).x, sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow).y).y;
+    float mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
+    float mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
 
     AdvancedPasteDlg dialog(this);
     dialog.SetStartX(mouseX);
@@ -1537,8 +1042,8 @@ void SceneCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
     {
         for (unsigned int j = 0;j<dialog.GetXCount();++j)
         {
-            sceneEdited.GetInitialInstances().InsertInitialInstance(pastedPositions.front());
-            gd::InitialInstance & insertedInstance = sceneEdited.GetInitialInstances().GetInstance(sceneEdited.GetInitialInstances().GetInstancesCount()-1);
+            instances.InsertInitialInstance(pastedPositions.front());
+            gd::InitialInstance & insertedInstance = instances.GetInstance(instances.GetInstancesCount()-1);
             insertedInstance.SetX(dialog.GetStartX()+dialog.GetXGap()*j);
             insertedInstance.SetY(dialog.GetStartY()+dialog.GetYGap()*i);
             insertedInstance.SetAngle(pastedPositions.front().GetAngle() + angle);
@@ -1558,20 +1063,15 @@ void SceneCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
 void SceneCanvas::OnLayerDownSelected(wxCommandEvent & event)
 {
     int highestLayer = GetObjectsSelectedLowestLayer();
-    if ( highestLayer-1 < 0 || static_cast<unsigned>(highestLayer-1) >= edittimeRenderer.runtimeScene.initialLayers.size() )
+    if ( highestLayer-1 < 0 || static_cast<unsigned>(highestLayer-1) >= previewData.scene.initialLayers.size() )
         return;
 
-    string layerName = edittimeRenderer.runtimeScene.initialLayers.at(highestLayer-1).GetName();
+    string layerName = previewData.scene.initialLayers.at(highestLayer-1).GetName();
 
-    for (unsigned int i =0;i<edittimeRenderer.objectsSelected.size();++i)
+    for (unsigned int i =0;i<editionData.objectsSelected.size();++i)
     {
-        //Récupérons la position initiale
-        int posId = GetInitialPositionFromObject(edittimeRenderer.objectsSelected[i]);
-        if ( posId != -1 )
-        {
-            sceneEdited.GetInitialInstances().GetInstance(posId).SetLayer(layerName);
-            edittimeRenderer.objectsSelected[i]->SetLayer(layerName);
-        }
+        GetInitialPositionFromObject(editionData.objectsSelected[i]).SetLayer(layerName);
+        editionData.objectsSelected[i]->SetLayer(layerName);
     }
 
     ChangesMade();
@@ -1582,39 +1082,41 @@ void SceneCanvas::OnLayerDownSelected(wxCommandEvent & event)
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
 {
-    if ( !edittimeRenderer.editing )
+    if ( !editing )
         return;
 
-    if ( edittimeRenderer.rightClickSelectedObject == boost::shared_ptr<Object> ()) return;
+    if ( editionData.rightClickSelectedObject == boost::shared_ptr<Object> ()) return;
 
-    int idPos = GetInitialPositionFromObject(edittimeRenderer.rightClickSelectedObject);
-    if ( idPos == -1 ) return;
+    InitialPosition & initialInstance = GetInitialPositionFromObject(editionData.rightClickSelectedObject);
+    if ( &initialInstance == &badInstance ) return;
 
-    bool hadAPersonalizedSize = sceneEdited.GetInitialInstances().GetInstance( idPos ).HasCustomSize();
+    bool hadAPersonalizedSize = initialInstance.HasCustomSize();
 
-    //Affichage des propriétés de l'objet sous la souris
-    EditOptionsPosition DialogPosition( this, gameEdited, edittimeRenderer.runtimeScene, sceneEdited.GetInitialInstances().GetInstance( idPos ) );
+    //Display dialog to update properties
+    EditOptionsPosition DialogPosition( this, gameEdited, previewData.scene, initialInstance );
     if ( DialogPosition.ShowModal() == 1 )
     {
-        sceneEdited.GetInitialInstances().GetInstance( idPos ) = DialogPosition.position;
+        initialInstance = DialogPosition.position;
 
-        edittimeRenderer.rightClickSelectedObject->SetX( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetX() );
-        edittimeRenderer.rightClickSelectedObject->SetY( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetY() );
-        edittimeRenderer.rightClickSelectedObject->SetAngle( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetAngle() );
-        edittimeRenderer.rightClickSelectedObject->SetZOrder( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetZOrder() );
-        edittimeRenderer.rightClickSelectedObject->SetLayer( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetLayer() );
+        //We need to update the associated object
+        editionData.rightClickSelectedObject->SetX( initialInstance.GetX() );
+        editionData.rightClickSelectedObject->SetY( initialInstance.GetY() );
+        editionData.rightClickSelectedObject->SetAngle( initialInstance.GetAngle() );
+        editionData.rightClickSelectedObject->SetZOrder( initialInstance.GetZOrder() );
+        editionData.rightClickSelectedObject->SetLayer( initialInstance.GetLayer() );
 
-        edittimeRenderer.rightClickSelectedObject->InitializeFromInitialPosition(sceneEdited.GetInitialInstances().GetInstance( idPos ));
+        editionData.rightClickSelectedObject->InitializeFromInitialPosition(initialInstance);
 
-        if ( sceneEdited.GetInitialInstances().GetInstance( idPos ).HasCustomSize() )
+        if ( initialInstance.HasCustomSize() )
         {
-            edittimeRenderer.rightClickSelectedObject->SetWidth( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetWidth() );
-            edittimeRenderer.rightClickSelectedObject->SetHeight( sceneEdited.GetInitialInstances().GetInstance( idPos ).GetHeight() );
+            editionData.rightClickSelectedObject->SetWidth( initialInstance.GetWidth() );
+            editionData.rightClickSelectedObject->SetHeight( initialInstance.GetHeight() );
         }
         else if ( hadAPersonalizedSize ) //For now, we reload the scene so as the object get back its initial size
         {
             Reload();
         }
+
         if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
         ChangesMade();
     }
@@ -1627,24 +1129,17 @@ void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnDelObjetSelected(wxCommandEvent & event)
 {
-    if ( !edittimeRenderer.editing )
-        return;
+    if ( !editing ) return;
 
-    for (unsigned int i = 0;i<edittimeRenderer.objectsSelected.size();++i)
+    for (unsigned int i = 0;i<editionData.objectsSelected.size();++i)
     {
-        ObjSPtr object = edittimeRenderer.objectsSelected.at(i);
+        ObjSPtr object = editionData.objectsSelected.at(i);
 
-        int idPos = GetInitialPositionFromObject(object);
-        if ( idPos != -1 )
-        {
-            sceneEdited.GetInitialInstances().RemoveInstance(idPos);
-            edittimeRenderer.runtimeScene.objectsInstances.RemoveObject(object);
-        }
+        instances.RemoveInstance(GetInitialPositionFromObject(object));
+        previewData.scene.objectsInstances.RemoveObject(object);
     }
 
-    edittimeRenderer.objectsSelected.clear();
-    edittimeRenderer.xObjectsSelected.clear();
-    edittimeRenderer.yObjectsSelected.clear();
+    ClearSelection();
 
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
 
@@ -1656,20 +1151,20 @@ void SceneCanvas::OnDelObjetSelected(wxCommandEvent & event)
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnMiddleDown( wxMouseEvent &event )
 {
-    if ( !edittimeRenderer.editing ) return;
+    if ( !editing ) return;
 
-    if ( !edittimeRenderer.isMoving )
+    if ( !editionData.isMoving )
     {
-        edittimeRenderer.isMoving = true;
-        edittimeRenderer.mouseStartPosition = sf::Mouse::GetPosition(*edittimeRenderer.runtimeScene.renderWindow);
-        edittimeRenderer.viewStartPosition = GetView().GetCenter();
+        editionData.isMoving = true;
+        editionData.mouseStartPosition = sf::Mouse::GetPosition(*previewData.scene.renderWindow);
+        editionData.viewStartPosition = GetView().GetCenter();
         SetCursor( wxCursor( wxCURSOR_SIZING ) );
 
         return;
     }
     else
     {
-        edittimeRenderer.isMoving = false;
+        editionData.isMoving = false;
         SetCursor( wxNullCursor );
     }
 }
@@ -1680,42 +1175,39 @@ void SceneCanvas::OnMiddleDown( wxMouseEvent &event )
 ////////////////////////////////////////////////////////////
 void SceneCanvas::OnMouseWheel( wxMouseEvent &event )
 {
-    if (edittimeRenderer.runtimeScene.running)
+    if (previewData.scene.running)
         return;
 
     //La rotation de la molette
     float rotation = event.GetWheelRotation()*3;
-    edittimeRenderer.zoom += ( rotation / 25 );
+    editionData.zoom += ( rotation / 25 );
 
     //Le rapport entre la largeur et la hauteur
-    float qwoh = edittimeRenderer.view.GetSize().x / edittimeRenderer.view.GetSize().y;
+    float qwoh = editionData.view.GetSize().x / editionData.view.GetSize().y;
 
     //La nouvelle hauteur
-    float newheight = edittimeRenderer.view.GetSize().y + ( rotation / 25 );
+    float newheight = editionData.view.GetSize().y + ( rotation / 25 );
 
-    edittimeRenderer.view.SetSize( newheight*qwoh, newheight );
+    editionData.view.SetSize( newheight*qwoh, newheight );
 }
 
 int SceneCanvas::GetObjectsSelectedHighestLayer()
 {
     int highestLayer = 0;
-    for (unsigned int i =0;i<edittimeRenderer.objectsSelected.size();++i)
+    for (unsigned int i =0;i<editionData.objectsSelected.size();++i)
     {
-        //Récupérons la position initiale
-        int posId = GetInitialPositionFromObject(edittimeRenderer.objectsSelected[i]);
-        if ( posId != -1 )
-        {
-            int layerObjId = 0;
-            //On cherche le numéro du calque de l'objet
-            for (unsigned int layerId = 0;layerId<edittimeRenderer.runtimeScene.initialLayers.size();++layerId)
-            {
-                if ( edittimeRenderer.runtimeScene.initialLayers[layerId].GetName() == sceneEdited.GetInitialInstances().GetInstance(posId).GetLayer() )
-                   layerObjId = layerId;
-            }
+        gd::InitialInstance & initialInstance = GetInitialPositionFromObject(editionData.objectsSelected[i]);
 
-            if ( layerObjId > highestLayer )
-                highestLayer = layerObjId;
+        int layerObjId = 0;
+        //On cherche le numéro du calque de l'objet
+        for (unsigned int layerId = 0;layerId<previewData.scene.initialLayers.size();++layerId)
+        {
+            if ( previewData.scene.initialLayers[layerId].GetName() == initialInstance.GetLayer() )
+               layerObjId = layerId;
         }
+
+        if ( layerObjId > highestLayer )
+            highestLayer = layerObjId;
     }
 
     return highestLayer;
@@ -1723,24 +1215,21 @@ int SceneCanvas::GetObjectsSelectedHighestLayer()
 
 int SceneCanvas::GetObjectsSelectedLowestLayer()
 {
-    int lowestLayer = edittimeRenderer.runtimeScene.initialLayers.size()-1;
-    for (unsigned int i =0;i<edittimeRenderer.objectsSelected.size();++i)
+    int lowestLayer = previewData.scene.initialLayers.size()-1;
+    for (unsigned int i =0;i<editionData.objectsSelected.size();++i)
     {
-        //Récupérons la position initiale
-        int posId = GetInitialPositionFromObject(edittimeRenderer.objectsSelected[i]);
-        if ( posId != -1 )
-        {
-            int layerObjId = 0;
-            //On cherche le numéro du calque de l'objet
-            for (unsigned int layerId = 0;layerId<edittimeRenderer.runtimeScene.initialLayers.size();++layerId)
-            {
-                if ( edittimeRenderer.runtimeScene.initialLayers[layerId].GetName() == sceneEdited.GetInitialInstances().GetInstance(posId).GetLayer() )
-                   layerObjId = layerId;
-            }
+        gd::InitialInstance & initialInstance = GetInitialPositionFromObject(editionData.objectsSelected[i]);
 
-            if ( layerObjId < lowestLayer )
-                lowestLayer = layerObjId;
+        int layerObjId = 0;
+        //On cherche le numéro du calque de l'objet
+        for (unsigned int layerId = 0;layerId<previewData.scene.initialLayers.size();++layerId)
+        {
+            if ( previewData.scene.initialLayers[layerId].GetName() == initialInstance.GetLayer() )
+               layerObjId = layerId;
         }
+
+        if ( layerObjId < lowestLayer )
+            lowestLayer = layerObjId;
     }
 
     return lowestLayer;
@@ -1749,21 +1238,23 @@ int SceneCanvas::GetObjectsSelectedLowestLayer()
 /**
  * Tool function to get the initial position from an object.
  */
-int SceneCanvas::GetInitialPositionFromObject(ObjSPtr object)
+InitialPosition & SceneCanvas::GetInitialPositionFromObject(ObjSPtr object)
 {
-    if ( object == boost::shared_ptr<Object> ()) return -1;
+    if ( object == boost::shared_ptr<Object> ()) return badInstance;
 
-    for (unsigned int j = 0;j < sceneEdited.GetInitialInstances().GetInstancesCount();++j)
+    for (unsigned int j = 0;j < instances.GetInstancesCount();++j)
     {
-        if ( sceneEdited.GetInitialInstances().GetInstance( j ).GetObjectName() == object->GetName() &&
-                sceneEdited.GetInitialInstances().GetInstance( j ).GetX() == object->GetX() &&
-                sceneEdited.GetInitialInstances().GetInstance( j ).GetY() == object->GetY() )
+        if (instances.GetInstance( j ).GetObjectName() == object->GetName() &&
+            instances.GetInstance( j ).GetX() == object->GetX() &&
+            instances.GetInstance( j ).GetY() == object->GetY() &&
+            instances.GetInstance( j ).GetAngle() == object->GetAngle() )
         {
-            return j;
+            return instances.GetInstance( j );
         }
     }
 
-    return -1;
+    std::cout << "SceneCanvas: Initial instance not found." << std::endl;
+    return badInstance;
 }
 
 /**
@@ -1771,136 +1262,94 @@ int SceneCanvas::GetInitialPositionFromObject(ObjSPtr object)
  */
 ObjSPtr SceneCanvas::GetObjectFromInitialPosition(const InitialPosition & initialPosition)
 {
-    ObjList allObjects = edittimeRenderer.runtimeScene.objectsInstances.GetAllObjects();
+    ObjList allObjects = previewData.scene.objectsInstances.GetAllObjects();
 
     for (unsigned int id = 0;id < allObjects.size();++id)
     {
-        if ( allObjects[id]->GetX() == initialPosition.GetX() &&
-                allObjects[id]->GetY() == initialPosition.GetY() &&
-                allObjects[id]->GetAngle() == initialPosition.GetAngle())
+        if (allObjects[id]->GetName() == initialPosition.GetObjectName() &&
+            allObjects[id]->GetX() == initialPosition.GetX() &&
+            allObjects[id]->GetY() == initialPosition.GetY() )
         {
             return allObjects[id];
         }
     }
 
-    cout << "Object not found";
+    std::cout << "SceneCanvas: Object not found." << std::endl;
     return boost::shared_ptr<Object> ();
 }
 
-void SceneCanvas::Onzoom5Selected(wxCommandEvent& event)
+boost::shared_ptr<Object> SceneCanvas::FindSmallestObjectUnderCursor()
 {
-    edittimeRenderer.view.SetSize(GetWidth()/0.05f, GetHeight()/0.05f);
-}
+    ObjList potentialObjects;
+    float x = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
+    float y = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
 
-void SceneCanvas::Onzoom10Selected(wxCommandEvent& event)
-{
-    edittimeRenderer.view.SetSize(GetWidth()/0.1f, GetHeight()/0.1f);
-}
+    ObjList allObjects = previewData.scene.objectsInstances.GetAllObjects();
 
-void SceneCanvas::Onzoom25Selected(wxCommandEvent& event)
-{
-    edittimeRenderer.view.SetSize(GetWidth()/0.25f, GetHeight()/0.25f);
-}
-
-void SceneCanvas::Onzoom50Selected(wxCommandEvent& event)
-{
-    edittimeRenderer.view.SetSize(GetWidth()/0.5f, GetHeight()/0.5f);
-}
-
-void SceneCanvas::Onzoom100Selected(wxCommandEvent& event)
-{
-    edittimeRenderer.view.SetSize(GetWidth(), GetHeight());
-}
-
-void SceneCanvas::Onzoom150Selected(wxCommandEvent& event)
-{
-    edittimeRenderer.view.SetSize(GetWidth()/1.5f, GetHeight()/1.5f);
-}
-
-void SceneCanvas::Onzoom200Selected(wxCommandEvent& event)
-{
-    edittimeRenderer.view.SetSize(GetWidth()/2.f, GetHeight()/2.f);
-}
-
-void SceneCanvas::Onzoom500Selected(wxCommandEvent& event)
-{
-    edittimeRenderer.view.SetSize(GetWidth()/5.f, GetHeight()/5.f);
-}
-
-void SceneCanvas::CreateMenus()
-{
-    //Generate context menu
-    wxMenuItem * layerUpItem = new wxMenuItem((&contextMenu), ID_LAYERUPMENU, _("Passer le(s) objet(s) sur le calque supérieur"), wxEmptyString, wxITEM_NORMAL);
-    layerUpItem->SetBitmap(wxImage( "res/up.png" ) );
-    wxMenuItem * layerDownItem = new wxMenuItem((&contextMenu), ID_LAYERDOWNMENU, _("Passer le(s) objet(s) sur le calque inférieur"), wxEmptyString, wxITEM_NORMAL);
-    layerDownItem->SetBitmap(wxImage( "res/down.png" ) );
-    wxMenuItem * deleteItem = new wxMenuItem((&contextMenu), ID_DELOBJMENU, _("Supprimer la sélection\tDEL"), wxEmptyString, wxITEM_NORMAL);
-    deleteItem->SetBitmap(wxImage( "res/deleteicon.png" ) );
-    wxMenuItem * addItem = new wxMenuItem((&contextMenu), ID_ADDOBJMENU, _("Ajouter un objet\tINSER"), wxEmptyString, wxITEM_NORMAL);
-    addItem->SetBitmap(wxImage( "res/addobjet.png" ) );
-
-    contextMenu.Append(ID_PROPMENU, _("Propriétés"));
-    contextMenu.AppendSeparator();
-    contextMenu.Append(addItem);
-    contextMenu.Append(deleteItem);
-    contextMenu.AppendSeparator();
-    contextMenu.Append(layerUpItem);
-    contextMenu.Append(layerDownItem);
-    contextMenu.AppendSeparator();
+    for (unsigned int id = 0;id < allObjects.size();++id)
     {
-        wxMenuItem * copyItem = new wxMenuItem((&contextMenu), ID_COPYMENU, _("Copier"), wxEmptyString, wxITEM_NORMAL);
-        copyItem->SetBitmap(wxImage( "res/copyicon.png" ) );
-        contextMenu.Append(copyItem);
-        wxMenuItem * cutItem = new wxMenuItem((&contextMenu), ID_CUTMENU, _("Couper"), wxEmptyString, wxITEM_NORMAL);
-        cutItem->SetBitmap(wxImage( "res/cuticon.png" ) );
-        contextMenu.Append(cutItem);
-        wxMenuItem * pasteItem = new wxMenuItem((&contextMenu), ID_PASTEMENU, _("Coller"), wxEmptyString, wxITEM_NORMAL);
-        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
-        contextMenu.Append(pasteItem);
-        wxMenuItem * pasteSpecialItem = new wxMenuItem((&contextMenu), ID_PASTESPECIALMENU, _("Collage spécial"), wxEmptyString, wxITEM_NORMAL);
-        contextMenu.Append(pasteSpecialItem);
+        if ( allObjects[id]->GetDrawableX() < x &&
+                allObjects[id]->GetDrawableY() < y &&
+                allObjects[id]->GetDrawableX() + allObjects[id]->GetWidth() > x &&
+                allObjects[id]->GetDrawableY() + allObjects[id]->GetHeight() > y &&
+                previewData.scene.GetLayer(allObjects[id]->GetLayer()).GetVisibility())
+        {
+            potentialObjects.push_back( allObjects[id] );
+        }
+    }
+    if ( potentialObjects.empty() ) return boost::shared_ptr<Object> (); //Aucun objet trouvé
+
+    ObjSPtr smallest = potentialObjects[0];
+    for ( unsigned int j = 0;j < potentialObjects.size();j++ )
+    {
+        if (( potentialObjects[j]->GetWidth() * potentialObjects[j]->GetHeight() ) < ( smallest->GetWidth() * smallest->GetHeight() ) )
+        {
+            smallest = potentialObjects[j];
+        }
     }
 
-    //Generate "no object" context menu
-    {
-        wxMenuItem * addItem = new wxMenuItem((&noObjectContextMenu), ID_ADDOBJMENU, _("Ajouter un objet\tINSER"), wxEmptyString, wxITEM_NORMAL);
-        addItem->SetBitmap(wxImage( "res/addobjet.png" ) );
-        noObjectContextMenu.Append(addItem);
-        noObjectContextMenu.AppendSeparator();
-        wxMenuItem * pasteItem = new wxMenuItem((&noObjectContextMenu), ID_PASTEMENU, _("Coller"), wxEmptyString, wxITEM_NORMAL);
-        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
-        noObjectContextMenu.Append(pasteItem);
-        wxMenuItem * pasteSpecialItem = new wxMenuItem((&noObjectContextMenu), ID_PASTESPECIALMENU, _("Collage spécial"), wxEmptyString, wxITEM_NORMAL);
-        noObjectContextMenu.Append(pasteSpecialItem);
-    }
-
-    //Generate undo menu
-    {
-        wxMenuItem * undo10item = new wxMenuItem(&undoMenu, idUndo10, _("Annuler les 10 précédentes actions"), wxEmptyString, wxITEM_NORMAL);
-        undoMenu.Append(undo10item);
-        wxMenuItem * undo20item = new wxMenuItem(&undoMenu, idUndo20, _("Annuler les 20 précédentes actions"), wxEmptyString, wxITEM_NORMAL);
-        undoMenu.Append(undo20item);
-        undoMenu.AppendSeparator();
-        wxMenuItem * clearHistoryItem = new wxMenuItem(&undoMenu, idClearHistory, _("Supprimer l'historique des changements"), wxEmptyString, wxITEM_NORMAL);
-        clearHistoryItem->SetBitmap(wxImage( "res/history_clear16.png" ) );
-        undoMenu.Append(clearHistoryItem);
-    }
-
-    //Generate zoom menu
-	wxMenuItem * zoom5 = new wxMenuItem((&zoomMenu), ID_MENUITEM8, _("5%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom5);
-	wxMenuItem * zoom10 = new wxMenuItem((&zoomMenu), ID_MENUITEM1, _("10%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom10);
-	wxMenuItem * zoom25 = new wxMenuItem((&zoomMenu), ID_MENUITEM2, _("25%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom25);
-	wxMenuItem * zoom50 = new wxMenuItem((&zoomMenu), ID_MENUITEM3, _("50%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom50);
-	wxMenuItem * zoom100 = new wxMenuItem((&zoomMenu), ID_MENUITEM4, _("100%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom100);
-	wxMenuItem * zoom150 = new wxMenuItem((&zoomMenu), ID_MENUITEM5, _("150%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom150);
-	wxMenuItem * zoom200 = new wxMenuItem((&zoomMenu), ID_MENUITEM6, _("200%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom200);
-	wxMenuItem * zoom500 = new wxMenuItem((&zoomMenu), ID_MENUITEM7, _("500%"), wxEmptyString, wxITEM_NORMAL);
-	zoomMenu.Append(zoom500);
+    return smallest;
 }
+
+void SceneCanvas::OnUndoBtClick( wxCommandEvent & event )
+{
+    Undo();
+    Reload();
+}
+
+void SceneCanvas::Undo()
+{
+    if ( history.empty() ) return;
+
+    redoHistory.push_back(instances); //We can go back to the current state using redo button.
+    instances = history.back();
+    history.pop_back();
+
+    latestState = instances;
+}
+
+void SceneCanvas::OnClearHistorySelected(wxCommandEvent& event)
+{
+    if (wxMessageBox("Etes-vous sûr de vouloir supprimer l'historique des modifications ?", "Êtes vous sûr ?",wxYES_NO ) != wxYES)
+        return;
+
+    history.clear();
+    redoHistory.clear();
+}
+
+void SceneCanvas::OnRedoBtClick( wxCommandEvent & event )
+{
+    if ( redoHistory.empty() ) return;
+
+    history.push_back(instances);
+    instances = redoHistory.back();
+    redoHistory.pop_back();
+
+    latestState = instances;
+
+    Reload();
+}
+
+
+
+//The rest of the implementation is available in SceneCanvas2.cpp

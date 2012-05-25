@@ -39,7 +39,7 @@
 								<handler function="OnScrollBar1Scroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
 							</object>
 							<object class="Custom" name="ID_CUSTOM1" subclass="SceneCanvas" variable="sceneCanvas" member="yes">
-								<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, mainEditorCommand, ID__CUSTOM1,$(POS),$(SIZE), $(STYLE));</creating_code>
+								<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, scene.GetInitialInstances(), scene.GetAssociatedSceneCanvasSettings(), mainEditorCommand);</creating_code>
 								<style>wxWANTS__CHARS | wxBORDER__SIMPLE</style>
 								<pos>0,0</pos>
 								<size>800,600</size>

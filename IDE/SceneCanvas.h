@@ -3,39 +3,39 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#ifndef SceneCanvas_H
-#define SceneCanvas_H
+#ifndef SCENECANVAS_H
+#define SCENECANVAS_H
 
+#include <vector>
+#include <string>
 #include <SFML/Graphics.hpp>
 #include <SFML/System.hpp>
 #include "wxSFMLCanvas.hpp"
 #include <wx/dnd.h>
 #include <wx/aui/aui.h>
-#include <vector>
-#include <string>
 #include <wx/scrolbar.h>
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
-
-#include "GDL/Object.h"
 #include "GDCore/Events/Event.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
-#include "GDL/SceneCanvasSettings.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/InitialInstancesContainer.h"
-#include "SceneEdittimeRenderer.h"
+#include "SceneCanvasEditionData.h"
+#include "SceneCanvasPreviewData.h"
 class RenderDialog;
 class EditorObjets;
 class EditorLayers;
 class DebuggerGUI;
 class ProfileDlg;
 class InitialPositionBrowserDlg;
+class SceneCanvasSettings;
 
 /**
- * Canvas for display, edit and preview a scene.
+ * \brief Control to be used to render, edit and preview a layout.
+ *
  * Several editors can be plugged in ( and then owned ) by the scene canvas.
  */
 class SceneCanvas : public wxSFMLCanvas
@@ -50,8 +50,13 @@ public :
      * \param instances Instances to be edited. Note that the instances do not necessarily belong to the scene.
      * \param settings A reference to the class where settings must be stored.
      * \param mainEditorCommand A MainEditorCommand object to be used to communicate with the IDE.
+     * \param allowPreview If set to false, preview mode will be deactivated ( Useful when editing an external layout )
      */
-    SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances, SceneCanvasSettings & settings, MainEditorCommand & mainEditorCommand_);
+    SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances, SceneCanvasSettings & settings, MainEditorCommand & mainEditorCommand_, bool allowPreview = true);
+
+    /**
+     * \brief Default destructor
+     */
     ~SceneCanvas();
 
     /**
@@ -84,15 +89,46 @@ public :
      */
     void SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDialog_);
 
+    /**
+     * Return the objects editor owned by the SceneCanvas.
+     */
     boost::shared_ptr<EditorObjets> GetOwnedObjectsEditor() const { return objectsEditor; };
+
+    /**
+     * Return the layers editor owned by the SceneCanvas.
+     */
     boost::shared_ptr<EditorLayers> GetOwnedLayersEditor() const { return layersEditor; };
+
+    /**
+     * Return the debugger owned by the SceneCanvas.
+     */
     boost::shared_ptr<DebuggerGUI> GetOwnedDebugger() const { return debugger; };
+
+    /**
+     * Return the external window owned by the SceneCanvas.
+     */
     boost::shared_ptr<RenderDialog> GetOwnedExternalWindow() const { return externalWindow; };
+
+    /**
+     * Return the initial instances browser owned by the SceneCanvas.
+     */
     boost::shared_ptr<InitialPositionBrowserDlg> GetOwnedInitialPositionBrowser() const { return initialPositionsBrowser; };
+
+    /**
+     * Return the profiler dialog owned by the SceneCanvas.
+     */
     boost::shared_ptr<ProfileDlg> GetOwnedProfileDialog() const { return profileDialog; };
 
     /**
+     * To be called when the size must be updated ( Parent panel size have changed )
+     *
+     * \see SceneCanvas::SetParentPanelAndDockManager
+     */
+    void UpdateSize();
+
+    /**
      * Set the parent panel in which the sceneCanvas is placed and the wxAuiManager managing editors panes.
+     * \see SceneCanvas::UpdateSize
      */
     void SetParentPanelAndDockManager(wxPanel * parentPanel_, wxAuiManager * m_mgr_) {parentPanel = parentPanel_; m_mgr = m_mgr_; };
 
@@ -100,12 +136,6 @@ public :
      * Set scrollbars to be used with the sceneCanvas
      */
     void SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_) { scrollBar1 = scrollbar1_; scrollBar2 = scrollbar2_;};
-
-    RuntimeGame & gameEdited; ///< Game to edit
-    Scene & sceneEdited; ///< Scene to edit
-
-    RuntimeGame game; ///< Runtime game used during preview
-    SceneEdittimeRenderer edittimeRenderer; ///< Used to render the scene
 
     /**
      * Call this method when any changes are made so as to manage undo/redo.
@@ -118,16 +148,74 @@ public :
     void Reload();
 
     /**
-     * Refresh the scene canvas immediatly
+     * Refresh the scene canvas immediately
      */
     inline void ManualRefresh() { Refresh(); };
 
-    void UpdateScrollbars();
+    /**
+     * Add the object \a objectName to the specified position on the current layer
+     */
+    void AddObject(const std::string & objectName, float x, float y);
 
-    void OnAddObjetSelected(wxCommandEvent & event);
-    void AddObjetSelected(float x, float y);
+    /**
+     * Get the current layer
+     */
+    const std::string & GetCurrentLayer() const { return editionData.currentLayer; };
 
-    int GetInitialPositionFromObject(ObjSPtr object);
+    /**
+     * Change the layer where objects are added
+     */
+    void SetCurrentLayer(const std::string & newLayer) { editionData.currentLayer = newLayer; };
+
+    /**
+     * Return the sf::View used for edition
+     */
+    sf::View & GetEditionView() { return editionData.view; }
+
+    /**
+     * Return true if the edition mode is activated
+     */
+    bool IsEditing() { return editing; }
+
+    /**
+     * Return a reference to the scene being edited
+     */
+    Scene & GetEditedScene() { return sceneEdited; }
+
+    /**
+     * Return a reference to the runtime game being edited
+     */
+    RuntimeGame & GetEditedGame() { return gameEdited; }
+
+    /**
+     * Return the runtime scene used for preview/render the scene.
+     */
+    RuntimeScene & GetRuntimeScene() { return previewData.scene; };
+
+    /**
+     * Clear the current selection
+     */
+    void ClearSelection();
+
+    /**
+     * Select an object
+     */
+    void SelectObject(boost::shared_ptr<Object> object);
+
+    /**
+     * Scene canvas manages simultaneously the instances and their equivalent real objects in the associated RuntimeScene used for rendering.
+     * This function helps to get an InitialInstance from an object of the RuntimeScene.
+     *
+     * \see SceneCanvas::GetObjectFromInitialPosition
+     */
+    InitialPosition & GetInitialPositionFromObject(ObjSPtr object);
+
+    /**
+     * Scene canvas manages simultaneously the instances and their equivalent real objects in the associated RuntimeScene used for rendering.
+     * This function helps to get a "real" Object from the associated InitialPosition.
+     *
+     * \see SceneCanvas::GetInitialPositionFromObject
+     */
     ObjSPtr GetObjectFromInitialPosition(const InitialPosition & initialPosition);
 
     static wxRibbonButtonBar * CreateRibbonPage(wxRibbonPage * page);
@@ -138,7 +226,6 @@ public :
     static void CreateToolsBar(wxRibbonButtonBar * bar, bool editing);
 
     void ConnectEvents();
-    void UpdateSize();
 
 private :
 
@@ -171,7 +258,6 @@ private :
     void OnPreviewBtClick( wxCommandEvent & event );
     void OnEditionBtClick( wxCommandEvent & event );
     void OnOrigineBtClick( wxCommandEvent & event );
-    void OnChoisirObjetBtClick( wxCommandEvent & event );
     void OnZoomInitBtClick( wxCommandEvent & event );
     void OnZoomMoreBtClick( wxRibbonButtonBarEvent & event );
     void OnGridBtClick( wxCommandEvent & event );
@@ -251,6 +337,22 @@ private :
     static const long ID_MENUITEM6; ///< Zoom menu item
     static const long ID_MENUITEM7; ///< Zoom menu item
 
+    void ReloadFirstPart();
+    void ReloadSecondPart();
+    void UpdateScrollbars();
+    boost::shared_ptr<Object> FindSmallestObjectUnderCursor();
+    int GetHighestZOrderOnLayer(const std::string & layer);
+
+    /**
+     * Used to render a scene when editing it. For previewing a scene, the RuntimeScene takes care of rendering itself.
+     */
+    void EdittimeRender();
+
+    /**
+     * Render a grid in edition mode
+     */
+    void RenderGrid();
+
     bool hasJustRightClicked;
     bool ctrlPressed;
 
@@ -259,15 +361,19 @@ private :
     wxMenu zoomMenu;
     wxMenu undoMenu;
 
-    void ReloadFirstPart();
-    void ReloadSecondPart();
-
     bool isReloading; ///< True when the scene is being reloaded ( and dynamic extensions compiled ) and cannot be previewed yet.
+    bool editing; ///< True when the editor is in edition mode
+    bool allowPreview; ///< If set to false, no preview can be made. ( Useful when editing external layouts )
 
-
+    RuntimeGame & gameEdited; ///< Game owning the instances being edited
+    Scene & sceneEdited; ///< Scene to be used for edition
     InitialInstancesContainer & instances; ///< Instances to be edited
     SceneCanvasSettings & settings; ///< Settings to be used
+    SceneCanvasEditionData editionData; ///< Contains all the data relevant to the edition mode
+    SceneCanvasPreviewData previewData; ///< Contains all the data relevant to the preview mode
+
     MainEditorCommand & mainEditorCommand; ///< Provide a link to the main editor
+
     wxScrollBar * scrollBar1; ///< Link to the scrollbar used by the sceneCanvas.
     wxScrollBar * scrollBar2; ///< Link to the scrollbar used by the sceneCanvas.
     boost::shared_ptr<EditorObjets> objectsEditor; ///< Object editor owned by the sceneCanvas
@@ -286,7 +392,9 @@ private :
     static sf::Texture reloadingIconImage;
     static sf::Sprite reloadingIconSprite;
     static sf::Text reloadingText;
+
+    static InitialPosition badInstance;
 };
 
 
-#endif // SceneCanvas_H
+#endif // SCENECANVAS_H

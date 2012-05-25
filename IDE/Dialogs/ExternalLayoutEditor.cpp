@@ -65,7 +65,7 @@ mainEditorCommand(mainEditorCommand_)
 	scrollBar2->SetScrollbar(2500, 10, 5000, 10);
 	scrollBar1 = new wxScrollBar(scenePanel, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
 	scrollBar1->SetScrollbar(2500, 10, 5000, 10);
-	sceneCanvas = new SceneCanvas(scenePanel, game, emptyScene, mainEditorCommand, ID_CUSTOM1,wxPoint(0,0),wxSize(800,600), wxWANTS_CHARS | wxBORDER_SIMPLE);
+	sceneCanvas = new SceneCanvas(scenePanel, game, emptyScene, emptyScene.GetInitialInstances() ,emptyScene.GetAssociatedSceneCanvasSettings(),mainEditorCommand);
 	FlexGridSizer3->Add(scenePanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -134,7 +134,7 @@ void ExternalLayoutEditor::OnscrollBar2Scroll(wxScrollEvent& event)
     int position = event.GetPosition();
 
     int newY = position-(scrollBar2->GetRange()/2)+(sceneCanvas->GetHeight()/2);
-    sceneCanvas->edittimeRenderer.view.SetCenter( sceneCanvas->edittimeRenderer.view.GetCenter().x, newY);
+    sceneCanvas->GetEditionView().SetCenter( sceneCanvas->GetEditionView().GetCenter().x, newY);
 
     sceneCanvas->ManualRefresh();
 }
@@ -144,21 +144,21 @@ void ExternalLayoutEditor::OnscrollBar1Scroll(wxScrollEvent& event)
     int position = event.GetPosition();
 
     int newX = position-(scrollBar1->GetRange()/2)+(sceneCanvas->GetWidth()/2);
-    sceneCanvas->edittimeRenderer.view.SetCenter( newX,  sceneCanvas->edittimeRenderer.view.GetCenter().y);
+    sceneCanvas->GetEditionView().SetCenter( newX,  sceneCanvas->GetEditionView().GetCenter().y);
 
     sceneCanvas->ManualRefresh();
 }
 
 void ExternalLayoutEditor::ForceRefreshRibbonAndConnect()
 {
-    sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->edittimeRenderer.editing);
+    sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
     mainEditorCommand.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();
 }
 
 void ExternalLayoutEditor::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
-    sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->edittimeRenderer.editing);
+    sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
     mainEditorCommand.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();
 }

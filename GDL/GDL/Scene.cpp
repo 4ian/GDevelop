@@ -38,15 +38,7 @@ profiler(NULL),
 codeExecutionEngine(boost::shared_ptr<CodeExecutionEngine>(new CodeExecutionEngine))
 #if defined(GD_IDE_ONLY)
 ,wasModified(false),
-eventsModified(true),
-grid( false ),
-snap( false),
-gridWidth( 32 ),
-gridHeight( 32 ),
-gridR( 158 ),
-gridG( 180 ),
-gridB( 255 ),
-windowMask(false)
+eventsModified(true)
 #endif
 {
     //ctor
@@ -146,15 +138,9 @@ void Scene::LoadFromXml(const TiXmlElement * elem)
     if ( elem->Attribute( "oglZFar" ) != NULL ) { elem->QueryFloatAttribute("oglZFar", &oglZFar); }
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("standardSortMethod", standardSortMethod);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("stopSoundsOnStartup", stopSoundsOnStartup);
+
     #if defined(GD_IDE_ONLY)
-    if ( elem->Attribute( "grid" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("grid", grid); }
-    if ( elem->Attribute( "snap" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("snap", snap); }
-    if ( elem->Attribute( "windowMask" ) != NULL ) { GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("windowMask", windowMask); }
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridWidth", gridWidth);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridHeight", gridHeight);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridR", gridR);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridG", gridG);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridB", gridB);
+    associatedSettings.LoadFromXml(elem->FirstChildElement( "UISettings" ));
     #endif
 
     #if defined(GD_IDE_ONLY)
@@ -255,14 +241,7 @@ void Scene::Init(const Scene & scene)
     eventsModified = true; //Force recompilation/refreshing
     wasModified = true;
 
-    grid = scene.grid;
-    snap = scene.snap ;
-    gridWidth = scene.gridWidth ;
-    gridHeight = scene.gridHeight ;
-    gridR = scene.gridR ;
-    gridG = scene.gridG ;
-    gridB = scene.gridB ;
-    windowMask = scene.windowMask ;
+    associatedSettings = scene.associatedSettings;
     #endif
 }
 Scene::Scene(const Scene & scene)

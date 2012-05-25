@@ -12987,13 +12987,14 @@
 1337099804 d:\florian\programmation\gamedevelop2\gdl\\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1337790619 d:\florian\programmation\gamedevelop2\gdl\\gdl\scene.h
+1337947455 d:\florian\programmation\gamedevelop2\gdl\\gdl\scene.h
 	<vector>
 	<map>
 	<string>
 	<boost/shared_ptr.hpp>
 	"GDL/InitialInstancesContainer.h"
 	"GDL/Layer.h"
+	"GDL/IDE/SceneCanvasSettings.h"
 	"GDCore/PlatformDefinition/Layout.h"
 
 1334693309 d:\florian\programmation\gamedevelop2\gdl\\gdl\objectgroup.h
@@ -14651,7 +14652,7 @@
 	"GDL/ObjectGroup.h"
 	"GDL/profile.h"
 
-1337879047 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
+1337948298 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
 	<wx/wx.h>
 	"GDL/IDE/Dialogs/ProjectUpdateDlg.h"
 	"PlatformDefinition/Platform.h"
@@ -14885,7 +14886,7 @@
 	<SFML/System.hpp>
 	"GDL/profile.h"
 
-1337793800 source:d:\florian\programmation\gamedevelop2\gdl\gdl\scene.cpp
+1337947931 source:d:\florian\programmation\gamedevelop2\gdl\gdl\scene.cpp
 	<iostream>
 	"GDL/Scene.h"
 	"GDL/ExtensionsManager.h"
@@ -35524,18 +35525,18 @@
 
 1265226174 d:\florian\programmation\gamedevelop2\gdl\gdl\tools\aes.h
 
-1337804337 d:\florian\programmation\gamedevelop2\gdl\\gdl\initialinstancescontainer.h
+1337961732 d:\florian\programmation\gamedevelop2\gdl\\gdl\initialinstancescontainer.h
 	"GDCore/PlatformDefinition/InitialInstancesContainer.h"
 	"GDL/Position.h"
 
-1337804307 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\initialinstancescontainer.h
+1337961900 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\initialinstancescontainer.h
 	<string>
 
 1337804307 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\initialinstance.h
 	<string>
 	"GDCore/PlatformDefinition/VariablesContainer.h"
 
-1337816601 source:d:\florian\programmation\gamedevelop2\gdl\gdl\initialinstancescontainer.cpp
+1337961732 source:d:\florian\programmation\gamedevelop2\gdl\gdl\initialinstancescontainer.cpp
 	<iostream>
 	<map>
 	"GDL/Position.h"
@@ -35543,7 +35544,7 @@
 	"GDL/CommonTools.h"
 	"InitialInstancesContainer.h"
 
-1337804337 d:\florian\programmation\gamedevelop2\gdl\gdl\initialinstancescontainer.h
+1337961732 d:\florian\programmation\gamedevelop2\gdl\gdl\initialinstancescontainer.h
 	"GDCore/PlatformDefinition/InitialInstancesContainer.h"
 	"GDL/Position.h"
 
@@ -35560,4 +35561,13 @@
 1337879203 source:d:\florian\programmation\gamedevelop2\gdl\gdl\externallayout.cpp
 	"GDL/tinyxml/tinyxml.h"
 	"GDL/ExternalLayout.h"
+
+1337948165 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\scenecanvassettings.h
+
+1337948260 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\scenecanvassettings.cpp
+	"SceneCanvasSettings.h"
+	"GDL/tinyxml/tinyxml.h"
+	"GDL/XmlMacros.h"
+
+1337948165 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\scenecanvassettings.h
 

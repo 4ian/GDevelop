@@ -766,15 +766,9 @@ bool OpenSaveGame::SaveToFile(string file)
         if ( game.GetLayouts()[i]->standardSortMethod ) scene->SetAttribute( "standardSortMethod", "true" ); else scene->SetAttribute( "standardSortMethod", "false" );
         if ( game.GetLayouts()[i]->stopSoundsOnStartup ) scene->SetAttribute( "stopSoundsOnStartup", "true" ); else scene->SetAttribute( "stopSoundsOnStartup", "false" );
         #if defined(GD_IDE_ONLY)
-        scene->SetDoubleAttribute( "gridWidth", game.GetLayouts()[i]->gridWidth );
-        if ( game.GetLayouts()[i]->grid ) scene->SetAttribute( "grid", "true" ); else scene->SetAttribute( "grid", "false" );
-        if ( game.GetLayouts()[i]->snap ) scene->SetAttribute( "snap", "true" ); else scene->SetAttribute( "snap", "false" );
-        scene->SetDoubleAttribute( "gridWidth", game.GetLayouts()[i]->gridWidth );
-        scene->SetDoubleAttribute( "gridHeight", game.GetLayouts()[i]->gridHeight );
-        scene->SetDoubleAttribute( "gridR", game.GetLayouts()[i]->gridR );
-        scene->SetDoubleAttribute( "gridG", game.GetLayouts()[i]->gridG );
-        scene->SetDoubleAttribute( "gridB", game.GetLayouts()[i]->gridB );
-        if ( game.GetLayouts()[i]->windowMask ) scene->SetAttribute( "windowMask", "true" ); else scene->SetAttribute( "windowMask", "false" );
+        TiXmlElement * settings = new TiXmlElement( "UISettings" );
+        scene->LinkEndChild( settings );
+        game.GetLayouts()[i]->GetAssociatedSceneCanvasSettings().SaveToXml(settings);
         #endif
 
         TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );

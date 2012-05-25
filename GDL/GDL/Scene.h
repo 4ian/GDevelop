@@ -19,6 +19,7 @@ class AutomatismsSharedDatas;
 class BaseProfiler;
 class TiXmlElement;
 #if defined(GD_IDE_ONLY)
+#include "GDL/IDE/SceneCanvasSettings.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 namespace gd { class BaseEvent; }
 namespace gd { typedef boost::shared_ptr<BaseEvent> BaseEventSPtr; }

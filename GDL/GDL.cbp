@@ -1176,6 +1176,8 @@
 		<Unit filename="GDL\IDE\ImageFilesWatcher.h" />
 		<Unit filename="GDL\IDE\MainEditorCommand.cpp" />
 		<Unit filename="GDL\IDE\MainEditorCommand.h" />
+		<Unit filename="GDL\IDE\SceneCanvasSettings.cpp" />
+		<Unit filename="GDL\IDE\SceneCanvasSettings.h" />
 		<Unit filename="GDL\IDE\TreeItemExpressionInfoData.h" />
 		<Unit filename="GDL\IDE\TreeItemStrExpressionInfoData.h" />
 		<Unit filename="GDL\IDE\gdTreeItemStringData.cpp" />

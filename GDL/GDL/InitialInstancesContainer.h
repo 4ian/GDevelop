@@ -32,6 +32,7 @@ public:
     virtual InitialPosition & GetInstance(unsigned int index);
     virtual void InsertNewInitialInstance();
     virtual void RemoveInstance(unsigned int index);
+    virtual void RemoveInstance(const gd::InitialInstance & instance);
 
     #if defined(GD_IDE_ONLY)
     virtual void InsertInitialInstance(const gd::InitialInstance & instance);

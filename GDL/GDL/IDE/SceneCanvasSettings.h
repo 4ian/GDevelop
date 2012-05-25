@@ -4,6 +4,7 @@
  */
 #ifndef SCENECANVASSETTINGS_H
 #define SCENECANVASSETTINGS_H
+class TiXmlElement;
 
 /**
  * \brief Tool class used to store settings of a SceneCanvas.
@@ -13,8 +14,11 @@
 class SceneCanvasSettings
 {
 public:
-    SceneCanvasSettings() {};
+    SceneCanvasSettings();
     virtual ~SceneCanvasSettings() {};
+
+    void LoadFromXml(const TiXmlElement * element);
+    void SaveToXml(TiXmlElement * element) const;
 
     bool grid; ///< True if grid activated in editor
     bool snap; ///< True if snap to grid activated in editor

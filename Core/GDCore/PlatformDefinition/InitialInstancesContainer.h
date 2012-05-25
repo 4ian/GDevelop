@@ -50,12 +50,38 @@ public:
      */
     ///@{
 
+    /**
+     * Must return the number of instances
+     */
     virtual unsigned int GetInstancesCount() const =0;
+
+    /**
+     * Must return the specified \a instance
+     */
     virtual const InitialInstance & GetInstance(unsigned int index) const =0;
+
+    /**
+     * Must return the specified \a instance
+     */
     virtual InitialInstance & GetInstance(unsigned int index) =0;
+
+    /**
+     * Must insert the specified \a instance into the list
+     */
     virtual void InsertInitialInstance(const InitialInstance & instance) =0;
+    /**
+     * Must insert a new blank instance at the end of the list
+     */
     virtual void InsertNewInitialInstance() =0;
+    /**
+     * Must remove the specified \a instance
+     */
     virtual void RemoveInstance(unsigned int index) =0;
+
+    /**
+     * Must remove the specified \a instance
+     */
+    virtual void RemoveInstance(const gd::InitialInstance & instance) =0;
 
     /**
      * Must remove all instances from layer \a layerName.

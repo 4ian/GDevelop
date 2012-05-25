@@ -3,8 +3,8 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#ifndef EXTERNALLAYOUT_H
-#define EXTERNALLAYOUT_H
+#ifndef GDCORE_EXTERNALLAYOUT_H
+#define GDCORE_EXTERNALLAYOUT_H
 #include <string>
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 
@@ -16,6 +16,18 @@ class GD_CORE_API ExternalLayout
 public:
     ExternalLayout() {};
     virtual ~ExternalLayout() {};
+
+    /**
+     * Must return a pointer to a copy of the layout.
+     *
+     * \note A such method is useful when the IDE must store a copy of a ExternalLayout derived class ( e.g. for Clipboard ) so as to avoid slicing
+     *
+     * Typical implementation example:
+     * \code
+     * return new MyExternalLayoutClass(*this);
+     * \endcode
+     */
+    virtual ExternalLayout * Clone() const =0;
 
     /**
      * Must return the name of the external layout.
@@ -40,4 +52,4 @@ public:
 
 }
 
-#endif // EXTERNALLAYOUT_H
+#endif // GDCORE_EXTERNALLAYOUT_H

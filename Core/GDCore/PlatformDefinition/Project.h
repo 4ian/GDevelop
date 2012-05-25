@@ -11,6 +11,7 @@
 namespace gd { class Platform; }
 namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
+namespace gd { class ExternalLayout; }
 namespace gd { class Object; }
 namespace gd { class VariablesContainer; }
 #undef GetObject //Disable an annoying macro
@@ -242,6 +243,66 @@ public:
      * Must delete external events named "name".
      */
     virtual void RemoveExternalEvents(const std::string & name) =0;
+
+    ///@}
+
+    /** \name External layout management
+     * Members functions related to external layout management.
+     */
+    ///@{
+
+    /**
+     * Must return true if external layout called "name" exists.
+     */
+    virtual bool HasExternalLayoutNamed(const std::string & name) const =0;
+
+    /**
+     * Must return a reference to the external layout called "name".
+     */
+    virtual ExternalLayout & GetExternalLayout(const std::string & name) =0;
+
+    /**
+     * Must return a reference to the external layout called "name".
+     */
+    virtual const ExternalLayout & GetExternalLayout(const std::string & name) const =0;
+
+    /**
+     * Must return a reference to the external layout at position "index" in the external layout list
+     */
+    virtual ExternalLayout & GetExternalLayout(unsigned int index) =0;
+
+    /**
+     * Must return a reference to the external layout at position "index" in the external layout list
+     */
+    virtual const ExternalLayout & GetExternalLayout (unsigned int index) const =0;
+
+    /**
+     * Must return the position of the external layout called "name" in the external layout list
+     */
+    virtual unsigned int GetExternalLayoutPosition(const std::string & name) const =0;
+
+    /**
+     * Must return the number of external layout.
+     */
+    virtual unsigned int GetExternalLayoutsCount() const =0;
+
+    /**
+     * Must add a new empty external layout called "name" at the specified position in the layout list.
+     */
+    virtual void InsertNewExternalLayout(std::string & name, unsigned int position) =0;
+
+    /**
+     * Must add a new external layout constructed from the layout passed as parameter.
+     * \note No pointer or reference must be kept on the external layout passed as parameter.
+     * \param externalLayout The external layout that must be copied and inserted into the project
+     * \param position Insertion position. Even if the position is invalid, the external layout must be inserted at the end of the external layout list.
+     */
+    virtual void InsertExternalLayout(const ExternalLayout & externalLayout, unsigned int position) =0;
+
+    /**
+     * Must delete external layout named "name".
+     */
+    virtual void RemoveExternalLayout(const std::string & name) =0;
 
     ///@}
 

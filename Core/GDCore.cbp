@@ -254,6 +254,12 @@
 		<Unit filename="GDCore\PlatformDefinition\Automatism.h" />
 		<Unit filename="GDCore\PlatformDefinition\ExternalEvents.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\ExternalEvents.h" />
+		<Unit filename="GDCore\PlatformDefinition\ExternalLayout.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\ExternalLayout.h" />
+		<Unit filename="GDCore\PlatformDefinition\InitialInstance.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\InitialInstance.h" />
+		<Unit filename="GDCore\PlatformDefinition\InitialInstancesContainer.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\InitialInstancesContainer.h" />
 		<Unit filename="GDCore\PlatformDefinition\InstructionsMetadataHolder.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\InstructionsMetadataHolder.h" />
 		<Unit filename="GDCore\PlatformDefinition\Layout.cpp" />

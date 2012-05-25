@@ -179,5 +179,51 @@
 				<handler function="OnAddCppSourceFileSelected" entry="EVT_MENU" />
 			</object>
 		</object>
+		<object class="wxMenu" variable="emptyExternalLayoutsContextMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM20" variable="MenuItem16" member="yes">
+				<label>Ajouter un agencement externe</label>
+				<bitmap>res/eventsadd16.png</bitmap>
+				<handler function="OnAddExternalLayoutSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+		<object class="wxMenu" variable="externalLayoutContextMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM21" variable="MenuItem17" member="yes">
+				<label>Editer</label>
+				<bitmap>res/eventsedit16.png</bitmap>
+				<handler function="OnEditExternalLayoutSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM22" variable="MenuItem18" member="yes">
+				<label>Renommer</label>
+				<bitmap>res/editnom.png</bitmap>
+				<handler function="OnRenameExternalLayoutSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM23" variable="MenuItem19" member="yes">
+				<label>Ajouter un agencement externe</label>
+				<bitmap>res/eventsadd16.png</bitmap>
+				<handler function="OnAddExternalLayoutSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM24" variable="MenuItem20" member="yes">
+				<label>Supprimer</label>
+				<bitmap>res/deleteicon.png</bitmap>
+				<handler function="OnDeleteExternalLayoutSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM25" variable="MenuItem21" member="yes">
+				<label>Copier</label>
+				<bitmap>res/copyicon.png</bitmap>
+				<handler function="OnCopyExternalLayoutSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM26" variable="MenuItem22" member="yes">
+				<label>Couper</label>
+				<bitmap>res/cuticon.png</bitmap>
+				<handler function="OnCutExternalLayoutSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM27" variable="MenuItem23" member="yes">
+				<label>Coller</label>
+				<bitmap>res/pasteicon.png</bitmap>
+				<handler function="OnPasteExternalLayoutSelected" entry="EVT_MENU" />
+			</object>
+		</object>
 	</object>
 </wxsmith>

@@ -745,8 +745,8 @@ void Game_Develop_EditorFrame::LoadSkin(wxAuiManager * auiManager, wxAuiNotebook
         tabArt->SetActiveColour(wxColour(220, 225, 232));
     }
 
-    auiManager->SetArtProvider(dockArt);
-    notebook->SetArtProvider(tabArt);
+    if (auiManager) auiManager->SetArtProvider(dockArt);
+    if (notebook) notebook->SetArtProvider(tabArt);
 }
 
 void Game_Develop_EditorFrame::RealizeRibbonCustomButtons()

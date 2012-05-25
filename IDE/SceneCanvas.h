@@ -11,24 +11,21 @@
 #include "wxSFMLCanvas.hpp"
 #include <wx/dnd.h>
 #include <wx/aui/aui.h>
-#include <iostream>
 #include <vector>
 #include <string>
-#include <cmath>
-#include <iostream>
-#include <sstream>
 #include <wx/scrolbar.h>
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 
 #include "GDL/Object.h"
-#include "GDL/Collisions.h"
 #include "GDCore/Events/Event.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
+#include "GDL/SceneCanvasSettings.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/IDE/MainEditorCommand.h"
+#include "GDL/InitialInstancesContainer.h"
 #include "SceneEdittimeRenderer.h"
 class RenderDialog;
 class EditorObjets;
@@ -45,7 +42,16 @@ class SceneCanvas : public wxSFMLCanvas
 {
 public :
 
-    SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style );
+    /**
+     * \brief Default constructor
+     * \param Parent Parent window.
+     * \param game The game owning the instances.
+     * \param scene Scene associated with the instances.
+     * \param instances Instances to be edited. Note that the instances do not necessarily belong to the scene.
+     * \param settings A reference to the class where settings must be stored.
+     * \param mainEditorCommand A MainEditorCommand object to be used to communicate with the IDE.
+     */
+    SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances, SceneCanvasSettings & settings, MainEditorCommand & mainEditorCommand_);
     ~SceneCanvas();
 
     /**
@@ -94,9 +100,6 @@ public :
      * Set scrollbars to be used with the sceneCanvas
      */
     void SetScrollbars(wxScrollBar * scrollbar1_, wxScrollBar * scrollbar2_) { scrollBar1 = scrollbar1_; scrollBar2 = scrollbar2_;};
-
-    wxScrollBar * GetHorizontalScrollbar() const { return scrollBar1; };
-    wxScrollBar * GetVerticalScrollbar() const { return scrollBar2; };
 
     RuntimeGame & gameEdited; ///< Game to edit
     Scene & sceneEdited; ///< Scene to edit
@@ -261,8 +264,10 @@ private :
 
     bool isReloading; ///< True when the scene is being reloaded ( and dynamic extensions compiled ) and cannot be previewed yet.
 
-    MainEditorCommand & mainEditorCommand;
 
+    InitialInstancesContainer & instances; ///< Instances to be edited
+    SceneCanvasSettings & settings; ///< Settings to be used
+    MainEditorCommand & mainEditorCommand; ///< Provide a link to the main editor
     wxScrollBar * scrollBar1; ///< Link to the scrollbar used by the sceneCanvas.
     wxScrollBar * scrollBar2; ///< Link to the scrollbar used by the sceneCanvas.
     boost::shared_ptr<EditorObjets> objectsEditor; ///< Object editor owned by the sceneCanvas

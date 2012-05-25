@@ -30,6 +30,7 @@
 #include "CodeEditor.h"
 #include "Extensions.h"
 #include "ExternalEventsEditor.h"
+#include "Dialogs/ExternalLayoutEditor.h"
 #include "EditPropJeu.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "EditPropScene.h"
@@ -37,6 +38,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/ExternalLayout.h"
 
 #include <fstream>
 
@@ -77,6 +79,14 @@ const long ProjectManager::ID_MENUITEM15 = wxNewId();
 const long ProjectManager::ID_MENUITEM16 = wxNewId();
 const long ProjectManager::ID_MENUITEM19 = wxNewId();
 const long ProjectManager::ID_MENUITEM17 = wxNewId();
+const long ProjectManager::ID_MENUITEM20 = wxNewId();
+const long ProjectManager::ID_MENUITEM21 = wxNewId();
+const long ProjectManager::ID_MENUITEM22 = wxNewId();
+const long ProjectManager::ID_MENUITEM23 = wxNewId();
+const long ProjectManager::ID_MENUITEM24 = wxNewId();
+const long ProjectManager::ID_MENUITEM25 = wxNewId();
+const long ProjectManager::ID_MENUITEM26 = wxNewId();
+const long ProjectManager::ID_MENUITEM27 = wxNewId();
 //*)
 const long ProjectManager::idRibbonNew = wxNewId();
 const long ProjectManager::idRibbonOpen = wxNewId();
@@ -87,9 +97,8 @@ const long ProjectManager::idRibbonClose = wxNewId();
 const long ProjectManager::idRibbonExtensions = wxNewId();
 const long ProjectManager::idRibbonAddScene = wxNewId();
 const long ProjectManager::idRibbonEditImages = wxNewId();
-const long ProjectManager::idRibbonEditScene = wxNewId();
+const long ProjectManager::idRibbonEditSelected = wxNewId();
 const long ProjectManager::idRibbonAddExternalEvents = wxNewId();
-const long ProjectManager::idRibbonEditExternalEvents = wxNewId();
 const long ProjectManager::idRibbonStartPage = wxNewId();
 const long ProjectManager::idRibbonCppTools = wxNewId();
 const long ProjectManager::idRibbonImporter = wxNewId();
@@ -208,6 +217,32 @@ mainEditor(mainEditor_)
 	MenuItem13 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM17, _("Ajouter un fichier C++ déjà existant"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem13->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	sourceFileContextMenu.Append(MenuItem13);
+	MenuItem16 = new wxMenuItem((&emptyExternalLayoutsContextMenu), ID_MENUITEM20, _("Ajouter un agencement externe"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem16->SetBitmap(wxBitmap(wxImage(_T("res/eventsadd16.png"))));
+	emptyExternalLayoutsContextMenu.Append(MenuItem16);
+	MenuItem17 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM21, _("Editer"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem17->SetBitmap(wxBitmap(wxImage(_T("res/eventsedit16.png"))));
+	externalLayoutContextMenu.Append(MenuItem17);
+	MenuItem18 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM22, _("Renommer"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem18->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
+	externalLayoutContextMenu.Append(MenuItem18);
+	externalLayoutContextMenu.AppendSeparator();
+	MenuItem19 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM23, _("Ajouter un agencement externe"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem19->SetBitmap(wxBitmap(wxImage(_T("res/eventsadd16.png"))));
+	externalLayoutContextMenu.Append(MenuItem19);
+	MenuItem20 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM24, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem20->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
+	externalLayoutContextMenu.Append(MenuItem20);
+	externalLayoutContextMenu.AppendSeparator();
+	MenuItem21 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM25, _("Copier"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem21->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
+	externalLayoutContextMenu.Append(MenuItem21);
+	MenuItem22 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM26, _("Couper"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem22->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
+	externalLayoutContextMenu.Append(MenuItem22);
+	MenuItem23 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM27, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem23->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
+	externalLayoutContextMenu.Append(MenuItem23);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
@@ -244,6 +279,14 @@ mainEditor(mainEditor_)
 	Connect(ID_MENUITEM16,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnDeleteSourceFileSelected);
 	Connect(ID_MENUITEM19,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCreateNewCppFileSelected);
 	Connect(ID_MENUITEM17,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnAddCppSourceFileSelected);
+	Connect(ID_MENUITEM20,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnAddExternalLayoutSelected);
+	Connect(ID_MENUITEM21,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnEditExternalLayoutSelected);
+	Connect(ID_MENUITEM22,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnRenameExternalLayoutSelected);
+	Connect(ID_MENUITEM23,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnAddExternalLayoutSelected);
+	Connect(ID_MENUITEM24,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnDeleteExternalLayoutSelected);
+	Connect(ID_MENUITEM25,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCopyExternalLayoutSelected);
+	Connect(ID_MENUITEM26,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnCutExternalLayoutSelected);
+	Connect(ID_MENUITEM27,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnPasteExternalLayoutSelected);
 	//*)
 
     wxImageList * imageList = new wxImageList(16,16);
@@ -253,9 +296,10 @@ mainEditor(mainEditor_)
     imageList->Add(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
     imageList->Add(wxBitmap("res/events16.png", wxBITMAP_TYPE_ANY));
     imageList->Add(wxBitmap("res/source_cpp16.png", wxBITMAP_TYPE_ANY));
+    imageList->Add(wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY));
     projectsTree->SetImageList(imageList);
 
-    #if defined(__WXMSW__) //Offer nice look to wxTreeCtrl
+    #if defined(__WXMSW__) //Offers nice look to wxTreeCtrl
     wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
     if(theme) theme->SetWindowTheme((HWND) projectsTree->GetHWND(), L"EXPLORER", NULL);
     #endif
@@ -298,9 +342,9 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", wxBitmap("res/imageicon24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Ajouter une scène") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Ajouter des évènements externes") : "", wxBitmap("res/eventsadd24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Ajouter un agencement externe") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions") : "", wxBitmap("res/extension24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonEditScene, !hideLabels ? _("Editer la scène") : "", wxBitmap("res/sceneedit24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonEditExternalEvents, !hideLabels ? _("Editer les év. externes") : "", wxBitmap("res/eventsedit24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonEditSelected, !hideLabels ? _("Editer l'élement selectionné") : "", wxBitmap("res/sceneedit24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *affichagePanel = new wxRibbonPanel(page, wxID_ANY, _("Affichage"), wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -337,8 +381,7 @@ void ProjectManager::ConnectEvents()
     mainEditor.Connect( idRibbonEditImages, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditImagesSelected, NULL, this );
     mainEditor.Connect( idRibbonAddScene, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonAddSceneSelected, NULL, this );
     mainEditor.Connect( idRibbonAddExternalEvents, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonAddExternalEventsSelected, NULL, this );
-    mainEditor.Connect( idRibbonEditScene, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditSceneSelected, NULL, this );
-    mainEditor.Connect( idRibbonEditExternalEvents, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditExternalEventsSelected, NULL, this );
+    mainEditor.Connect( idRibbonEditSelected, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditSelectionSelected, NULL, this );
     mainEditor.Connect( idRibbonStartPage, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonStartPageClicked, NULL, &mainEditor );
     mainEditor.Connect( idRibbonCppTools, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonCppToolsClicked, NULL, &mainEditor );
     mainEditor.Connect( idRibbonProjectsManager, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnProjectsManagerClicked, NULL, &mainEditor );
@@ -383,6 +426,14 @@ void ProjectManager::Refresh()
         {
             gdTreeItemGameData * eventsItemData = new gdTreeItemGameData("ExternalEvents", mainEditor.games[i]->GetExternalEvents(j).GetName(), mainEditor.games[i].get());
             projectsTree->AppendItem(eventsItem, mainEditor.games[i]->GetExternalEvents(j).GetName(), 4 ,4, eventsItemData);
+        }
+
+        gdTreeItemGameData * externalLayoutsItemData = new gdTreeItemGameData("ExternalLayoutsRoot", "", mainEditor.games[i].get());
+        wxTreeItemId externalayoutsItem = projectsTree->AppendItem(projectItem, _("Agencements externes"), 6 , 6, externalLayoutsItemData);
+        for (unsigned int j = 0;j<mainEditor.games[i]->GetExternalLayoutsCount();++j)
+        {
+            gdTreeItemGameData * externalLayoutsItemData = new gdTreeItemGameData("ExternalLayout", mainEditor.games[i]->GetExternalLayout(j).GetName(), mainEditor.games[i].get());
+            projectsTree->AppendItem(externalayoutsItem, mainEditor.games[i]->GetExternalLayout(j).GetName(), 6 , 6, externalLayoutsItemData);
         }
 
         if ( mainEditor.games[i]->useExternalSourceFiles )
@@ -481,6 +532,11 @@ void ProjectManager::OnprojectsTreeItemActivated(wxTreeEvent& event)
         wxCommandEvent unusedEvent;
         OnEditExternalEventsSelected(unusedEvent);
     }
+    else if ( data->GetString() == "ExternalLayout")
+    {
+        wxCommandEvent unusedEvent;
+        OnEditExternalLayoutSelected(unusedEvent);
+    }
     else if ( data->GetString() == "Extensions")
     {
         EditExtensionsOfGame(*game);
@@ -521,6 +577,14 @@ void ProjectManager::OnprojectsTreeItemRightClick(wxTreeEvent& event)
     {
         PopupMenu(&externalEventsContextMenu);
     }
+    else if ( data->GetString() == "ExternalLayoutsRoot")
+    {
+        PopupMenu(&emptyExternalLayoutsContextMenu);
+    }
+    else if ( data->GetString() == "ExternalLayout")
+    {
+        PopupMenu(&externalLayoutContextMenu);
+    }
     else if ( data->GetString() == "SourceFiles")
     {
         PopupMenu(&sourceFilesContextMenu);
@@ -533,15 +597,6 @@ void ProjectManager::OnprojectsTreeItemRightClick(wxTreeEvent& event)
     {
         PopupMenu(&gameContextMenu);
     }
-}
-
-/**
- * Edit a scene from ribbon
- */
-void ProjectManager::OnRibbonEditSceneSelected(wxRibbonButtonBarEvent& event)
-{
-    wxCommandEvent unusedEvent;
-    OneditSceneMenuItemSelected(unusedEvent);
 }
 
 void ProjectManager::OnEditSourceFileSelected(wxCommandEvent& event)
@@ -739,7 +794,7 @@ void ProjectManager::OnprojectsTreeBeginLabelEdit(wxTreeEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    if ( data->GetString() != "Scene" && data->GetString() != "Root" && data->GetString() != "ExternalEvents")
+    if ( data->GetString() != "Scene" && data->GetString() != "Root" && data->GetString() != "ExternalEvents"&& data->GetString() != "ExternalLayout")
         projectsTree->EndEditLabel( selectedItem, true );
 }
 
@@ -818,6 +873,35 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
             ExternalEventsEditor * editorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
             if ( editorPtr != NULL && &editorPtr->events == &game->GetExternalEvents(newName))
+                mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
+        }
+    }
+    //Renaming external layout
+    else if ( data->GetString() == "ExternalLayout")
+    {
+        if ( !game->HasExternalLayoutNamed(itemTextBeforeEditing) )
+        {
+            wxLogWarning(_("Evenements introuvable."));
+            return;
+        }
+
+        if ( game->HasExternalLayoutNamed(newName) )
+        {
+            wxLogWarning( _( "Impossible de renommer : d'autres évènements externes portent déjà ce nom !" ) );
+            Refresh();
+            return;
+        }
+
+        projectsTree->SetItemData(selectedItem, new gdTreeItemGameData("ExternalLayout", newName, game));
+
+        game->GetExternalLayout(itemTextBeforeEditing).SetName(newName);
+
+        //Updating editors
+        for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+        {
+            ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+
+            if ( editorPtr != NULL && &editorPtr->externalLayout == &game->GetExternalLayout(newName))
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
     }
@@ -1127,6 +1211,8 @@ void ProjectManager::CloseGame(Game * game)
         ExternalEventsEditor * externalEventsEditorPtr = dynamic_cast<ExternalEventsEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
         ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
         CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+        ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+
 
         if ( sceneEditorPtr != NULL )
         {
@@ -1165,6 +1251,15 @@ void ProjectManager::CloseGame(Game * game)
         else if ( codeEditorPtr != NULL )
         {
             if ( codeEditorPtr->game == game)
+            {
+                if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
+                    wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
+                k--;
+            }
+        }
+        else if ( externalLayoutEditorPtr != NULL )
+        {
+            if ( &externalLayoutEditorPtr->game == game)
             {
                 if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                     wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
@@ -1229,12 +1324,12 @@ void ProjectManager::OnprojectsTreeSelectionChanged(wxTreeEvent& event)
 }
 
 /**
- * Edit external events from ribbon button
+ * Edit anything selected in the tree
  */
-void ProjectManager::OnRibbonEditExternalEventsSelected(wxRibbonButtonBarEvent& event)
+void ProjectManager::OnRibbonEditSelectionSelected(wxRibbonButtonBarEvent& event)
 {
-    wxCommandEvent unusedEvent;
-    OnEditExternalEventsSelected(unusedEvent);
+    wxTreeEvent unusedEvent;
+    OnprojectsTreeItemActivated(unusedEvent);
 }
 
 /**
@@ -1363,66 +1458,6 @@ void ProjectManager::OnDeleteExternalEventsSelected(wxCommandEvent& event)
     game->RemoveExternalEvents(externalEventsName);
 }
 
-void ProjectManager::OnAddCppSourceFileSelected(wxCommandEvent& event)
-{
-    RuntimeGame * game;
-    gdTreeItemGameData * data;
-    if ( !GetGameOfSelectedItem(game, data) ) return;
-
-    wxFileDialog fileDialog( this, _("Choisissez un ou plusieurs fichiers à ajouter"), "", "", _("Sources C++|*.cpp;*.cxx|Tous les fichiers|*.*"), wxFD_MULTIPLE );
-    if ( fileDialog.ShowModal() != wxID_OK ) return;
-
-    wxArrayString files;
-    wxArrayString names;
-    fileDialog.GetFilenames( names );
-    fileDialog.GetPaths( files );
-
-    for ( unsigned int i = 0; i < files.GetCount();i++ )
-    {
-        boost::shared_ptr<SourceFile> sourceFile(new SourceFile);
-        sourceFile->SetFileName(string(files[i].mb_str()));
-
-        game->externalSourceFiles.push_back(sourceFile);
-    }
-
-    Refresh();
-}
-
-void ProjectManager::OnDeleteSourceFileSelected(wxCommandEvent& event)
-{
-    RuntimeGame * game;
-    gdTreeItemGameData * data;
-    if ( !GetGameOfSelectedItem(game, data) ) return;
-
-    vector< boost::shared_ptr<SourceFile> >::iterator sourceFile =
-        find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), data->GetSecondString()));
-
-    if ( sourceFile == game->externalSourceFiles.end() )
-    {
-        wxLogWarning(_("Fichier introuvable"));
-        return;
-    }
-
-    //Updating editors
-    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
-    {
-        CodeEditor * editorPtr = dynamic_cast<CodeEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
-
-        if ( editorPtr != NULL && editorPtr->filename == (*sourceFile)->GetFileName())
-        {
-            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
-                wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
-
-            k--;
-        }
-    }
-
-    game->externalSourceFiles.erase(sourceFile);
-
-    //Updating tree
-    projectsTree->Delete(selectedItem);
-}
-
 void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
 {
     RuntimeGame * game;
@@ -1501,6 +1536,263 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
         projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, newName, 4, 4, eventsItemData);
 }
 
+/**
+ * Add external layout to a game
+ */
+void ProjectManager::AddExternalLayoutToGame(Game * game)
+{
+    //Finding a new, unique name for the scene
+    string newName = string(_("Agencement externe"));
+    int i = 2;
+    while(game->HasExternalLayoutNamed(newName))
+    {
+        newName = _("Agencement externe") + " " + ToString(i);
+        ++i;
+    }
+
+    game->InsertNewExternalLayout(newName, game->GetExternalLayoutsCount());
+}
+
+void ProjectManager::OnAddExternalLayoutSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    AddExternalLayoutToGame(game);
+
+    Refresh();
+}
+
+/**
+ * Add external layout from ribbon button
+ */
+void ProjectManager::OnRibbonAddExternalLayoutSelected(wxRibbonButtonBarEvent& event)
+{
+    if ( !mainEditor.CurrentGameIsValid() ) return;
+
+    AddExternalLayoutToGame(mainEditor.GetCurrentGame().get());
+
+    Refresh();
+}
+
+void ProjectManager::OnEditExternalLayoutSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    if ( !game->HasExternalLayoutNamed(data->GetSecondString()) )
+    {
+        wxLogWarning(_("Evenements externes introuvables."));
+        return;
+    }
+
+    //Verify if the scene editor is not already opened
+    for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
+    {
+        ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
+
+        if ( externalLayoutEditorPtr != NULL && &externalLayoutEditorPtr->externalLayout == &game->GetExternalLayout(data->GetSecondString()) )
+        {
+            //Change notebook page to scene page
+            mainEditor.GetEditorsNotebook()->SetSelection(j);
+            return;
+        }
+    }
+
+    //Open a new editor if necessary
+    string prefix = "";
+    if ( mainEditor.games.size() > 1 )
+    {
+        prefix = "["+game->GetName()+"] ";
+        if ( game->GetName().length() > gameMaxCharDisplayedInEditor )
+            prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
+    }
+
+    ExternalLayoutEditor * editor = new ExternalLayoutEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalLayout(data->GetSecondString()), mainEditor.GetMainEditorCommand());
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY)) )
+    {
+        wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
+    }
+}
+
+void ProjectManager::OnRenameExternalLayoutSelected(wxCommandEvent& event)
+{
+    projectsTree->EditLabel( selectedItem );
+}
+
+void ProjectManager::OnDeleteExternalLayoutSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    std::string externalLayoutName = data->GetSecondString();
+    if ( !game->HasExternalLayoutNamed(externalLayoutName) )
+    {
+        wxLogWarning(_("Agencement externes introuvable."));
+        return;
+    }
+
+    //Updating editors
+    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    {
+        ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+
+        if ( editorPtr != NULL && &editorPtr->externalLayout == &game->GetExternalLayout(data->GetSecondString()))
+        {
+            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
+                wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
+
+            k--;
+        }
+    }
+
+    //Updating tree
+    projectsTree->Delete(selectedItem);
+
+    game->RemoveExternalLayout(externalLayoutName);
+}
+
+void ProjectManager::OnCopyExternalLayoutSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    if ( !game->HasExternalLayoutNamed(data->GetSecondString()) )
+    {
+        wxLogWarning(_("Agencement externe introuvable."));
+        return;
+    }
+
+    Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
+}
+
+void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    std::string externalLayoutName = data->GetSecondString();
+    if ( !game->HasExternalLayoutNamed(externalLayoutName) )
+    {
+        wxLogWarning(_("Agencement externe introuvable."));
+        return;
+    }
+
+    Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
+
+    //Updating editors
+    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    {
+        ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+
+        if ( editorPtr != NULL && &editorPtr->externalLayout == &game->GetExternalLayout(data->GetSecondString()))
+        {
+            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
+                wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
+
+            k--;
+        }
+    }
+
+    //Updating tree
+    projectsTree->Delete(selectedItem);
+
+    game->RemoveExternalLayout(externalLayoutName);
+}
+
+void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    gd::ExternalLayout & newExternalLayout = *Clipboard::GetInstance()->GetExternalLayout();
+
+    //Finding a new, unique name for the events
+    string newName = string(_("Copie de")) + " " + newExternalLayout.GetName();
+    int i = 2;
+    while(game->HasExternalLayoutNamed(newName))
+    {
+        newName = _("Copie de") + " " + newExternalLayout.GetName() + " " + ToString(i);
+        ++i;
+    }
+
+    newExternalLayout.SetName(newName);
+    game->InsertExternalLayout(newExternalLayout, game->GetExternalLayoutPosition(data->GetSecondString()));
+
+    //Insert in tree
+    gdTreeItemGameData * eventsItemData = new gdTreeItemGameData("ExternalLayout", newName, game);
+    if ( projectsTree->GetPrevSibling(selectedItem).IsOk() )
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), newName, 4, 4, eventsItemData);
+    else
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, newName, 4, 4, eventsItemData);
+}
+
+void ProjectManager::OnAddCppSourceFileSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    wxFileDialog fileDialog( this, _("Choisissez un ou plusieurs fichiers à ajouter"), "", "", _("Sources C++|*.cpp;*.cxx|Tous les fichiers|*.*"), wxFD_MULTIPLE );
+    if ( fileDialog.ShowModal() != wxID_OK ) return;
+
+    wxArrayString files;
+    wxArrayString names;
+    fileDialog.GetFilenames( names );
+    fileDialog.GetPaths( files );
+
+    for ( unsigned int i = 0; i < files.GetCount();i++ )
+    {
+        boost::shared_ptr<SourceFile> sourceFile(new SourceFile);
+        sourceFile->SetFileName(string(files[i].mb_str()));
+
+        game->externalSourceFiles.push_back(sourceFile);
+    }
+
+    Refresh();
+}
+
+void ProjectManager::OnDeleteSourceFileSelected(wxCommandEvent& event)
+{
+    RuntimeGame * game;
+    gdTreeItemGameData * data;
+    if ( !GetGameOfSelectedItem(game, data) ) return;
+
+    vector< boost::shared_ptr<SourceFile> >::iterator sourceFile =
+        find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), data->GetSecondString()));
+
+    if ( sourceFile == game->externalSourceFiles.end() )
+    {
+        wxLogWarning(_("Fichier introuvable"));
+        return;
+    }
+
+    //Updating editors
+    for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
+    {
+        CodeEditor * editorPtr = dynamic_cast<CodeEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+
+        if ( editorPtr != NULL && editorPtr->filename == (*sourceFile)->GetFileName())
+        {
+            if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
+                wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );
+
+            k--;
+        }
+    }
+
+    game->externalSourceFiles.erase(sourceFile);
+
+    //Updating tree
+    projectsTree->Delete(selectedItem);
+}
+
 void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
 {
     RuntimeGame * game;
@@ -1542,3 +1834,4 @@ void ProjectManager::OnRibbonHelpSelected(wxRibbonButtonBarEvent& event)
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"));
 }
+

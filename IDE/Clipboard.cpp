@@ -7,11 +7,11 @@
 #include "Clipboard.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/ExternalLayout.h"
 #include "GDL/Object.h"
 #include "GDL/Position.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
-#include "GDL/ExtensionsManager.h"
 
 //Undefining an annoying macro changing GetObject in GetObjectA
 #undef GetObject
@@ -104,6 +104,20 @@ gd::ExternalEvents * Clipboard::GetExternalEvents()
     return externalEventsCopied->Clone();
 }
 
+void Clipboard::SetExternalLayout( const gd::ExternalLayout * layout )
+{
+    if ( layout == NULL ) return;
+
+    externalLayoutCopied = layout->Clone();
+    hasExternalLayout = true;
+}
+
+gd::ExternalLayout * Clipboard::GetExternalLayout()
+{
+    if ( externalLayoutCopied == NULL ) return NULL;
+    return externalLayoutCopied->Clone();
+}
+
 void Clipboard::SetConditions( const std::vector<gd::Instruction> & conditions )
 {
     hasInstructions = true;
@@ -129,7 +143,7 @@ gd::ObjectGroup Clipboard::GetObjectGroup()
     return objectGroupCopied;
 }
 
-void Clipboard::SetPositionsSelection( vector < InitialPosition > positionsSelection_ )
+void Clipboard::SetPositionsSelection( std::vector < InitialPosition > positionsSelection_ )
 {
     positionsSelection = positionsSelection_;
     hasPositionsSelection = true;

@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
 #ifndef PROJECTMANAGER_H
 #define PROJECTMANAGER_H
 
@@ -62,27 +61,37 @@ class ProjectManager: public wxPanel
 		wxMenuItem* MenuItem11;
 		wxTreeCtrl* projectsTree;
 		wxMenuItem* MenuItem15;
+		wxMenuItem* MenuItem22;
 		wxMenuItem* cutSceneMenuItem;
+		wxMenuItem* MenuItem17;
 		wxMenuItem* MenuItem13;
 		wxMenuItem* modVarSceneMenuI;
 		wxMenuItem* MenuItem10;
 		wxMenuItem* MenuItem12;
 		wxMenu externalEventsContextMenu;
+		wxMenu externalLayoutContextMenu;
 		wxMenuItem* MenuItem3;
 		wxMenu sourceFilesContextMenu;
+		wxMenuItem* MenuItem20;
 		wxMenu sourceFileContextMenu;
 		wxMenu scenesContextMenu;
 		wxMenuItem* copySceneMenuItem;
 		wxMenuItem* MenuItem6;
+		wxMenuItem* MenuItem23;
 		wxMenu gameContextMenu;
 		wxMenu emptyExternalEventsContextMenu;
 		wxMenu sceneContextMenu;
 		wxMenuItem* editPropGameMenuItem;
+		wxMenuItem* MenuItem21;
 		wxMenuItem* pasteSceneMenuItem;
 		wxMenuItem* editGblVarMenuItem;
+		wxMenuItem* MenuItem16;
 		wxMenuItem* MenuItem9;
 		wxMenuItem* closeGameBt;
+		wxMenuItem* MenuItem18;
+		wxMenu emptyExternalLayoutsContextMenu;
 		wxMenuItem* editScenePropMenuItem;
+		wxMenuItem* MenuItem19;
 		//*)
 
 	protected:
@@ -117,6 +126,14 @@ class ProjectManager: public wxPanel
 		static const long ID_MENUITEM16;
 		static const long ID_MENUITEM19;
 		static const long ID_MENUITEM17;
+		static const long ID_MENUITEM20;
+		static const long ID_MENUITEM21;
+		static const long ID_MENUITEM22;
+		static const long ID_MENUITEM23;
+		static const long ID_MENUITEM24;
+		static const long ID_MENUITEM25;
+		static const long ID_MENUITEM26;
+		static const long ID_MENUITEM27;
 		//*)
         static const long idRibbonNew;
         static const long idRibbonOpen;
@@ -125,11 +142,10 @@ class ProjectManager: public wxPanel
         static const long idRibbonClose;
         static const long idRibbonExtensions;
         static const long idRibbonAddScene;
-        static const long idRibbonEditScene;
+        static const long idRibbonEditSelected;
         static const long idRibbonEditImages;
         static const long idRibbonCompil;
         static const long idRibbonAddExternalEvents;
-        static const long idRibbonEditExternalEvents;
         static const long idRibbonProjectsManager;
         static const long idRibbonStartPage;
         static const long idRibbonCppTools;
@@ -169,22 +185,31 @@ class ProjectManager: public wxPanel
 		void OnDeleteSourceFileSelected(wxCommandEvent& event);
 		void OnEditSourceFileSelected(wxCommandEvent& event);
 		void OnCreateNewCppFileSelected(wxCommandEvent& event);
+		void OnAddExternalLayoutSelected(wxCommandEvent& event);
+		void OnEditExternalLayoutSelected(wxCommandEvent& event);
+		void OnRenamExternalLayoutSelected(wxCommandEvent& event);
+		void OnRenameExternalLayoutSelected(wxCommandEvent& event);
+		void OnDeleteExternalLayoutSelected(wxCommandEvent& event);
+		void OnCopyExternalLayoutSelected(wxCommandEvent& event);
+		void OnCutExternalLayoutSelected(wxCommandEvent& event);
+		void OnPasteExternalLayoutSelected(wxCommandEvent& event);
 		//*)
 
 		bool GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemGameData *& data);
 
 		void OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event);
+		void OnRibbonHelpSelected(wxRibbonButtonBarEvent& event);
 		void EditExtensionsOfGame(gd::Project & project);
 		void CloseGame(Game * game);
 		void OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event);
 		void AddSceneToGame(Game * game, unsigned int position);
 		void OnRibbonEditImagesSelected(wxRibbonButtonBarEvent& event);
 		void EditImagesOfGame(Game * game);
-		void OnRibbonEditSceneSelected(wxRibbonButtonBarEvent& event);
 		void OnRibbonAddExternalEventsSelected(wxRibbonButtonBarEvent& event);
-		void OnRibbonEditExternalEventsSelected(wxRibbonButtonBarEvent& event);
-		void OnRibbonHelpSelected(wxRibbonButtonBarEvent& event);
 		void AddExternalEventsToGame(Game * game);
+		void OnRibbonAddExternalLayoutSelected(wxRibbonButtonBarEvent& event);
+		void AddExternalLayoutToGame(Game * game);
+		void OnRibbonEditSelectionSelected(wxRibbonButtonBarEvent& event);
 
         wxTreeItemId selectedItem;
         std::string itemTextBeforeEditing;

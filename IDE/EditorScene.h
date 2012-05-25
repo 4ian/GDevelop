@@ -6,6 +6,8 @@
 #ifndef EDITORSCENE_H
 #define EDITORSCENE_H
 
+#include <string>
+#include <vector>
 //(*Headers(EditorScene)
 #include <wx/sizer.h>
 #include <wx/aui/aui.h>
@@ -15,23 +17,15 @@
 #include <wx/help.h>
 #include <wx/aui/aui.h>
 #include <wx/toolbar.h>
-
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/toolbar.h>
-
 namespace gd {class Layout;}
-#include "GDL/Game.h"
 class RuntimeGame;
-#include "GDL/IDE/MainEditorCommand.h"
-#ifdef __WXMSW__
-#include <wx/msw/winundef.h>
-#endif
-#include "SceneCanvas.h"
 class EventsEditor;
+#include "GDL/IDE/MainEditorCommand.h"
 #include "RenderDialog.h"
-#include <string>
-#include <vector>
+#include "SceneCanvas.h"
 
 using namespace std;
 

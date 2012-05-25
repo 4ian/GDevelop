@@ -102,7 +102,7 @@ sf::Texture SceneCanvas::reloadingIconImage;
 sf::Sprite SceneCanvas::reloadingIconSprite;
 sf::Text SceneCanvas::reloadingText;
 
-SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_, wxWindowID Id, const wxPoint& Position, const wxSize& Size, long Style ) :
+SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances_, SceneCanvasSettings & settings_, MainEditorCommand & mainEditorCommand_) :
         wxSFMLCanvas( Parent, Id, Position, Size, Style ),
         gameEdited(game_),
         sceneEdited(scene_),
@@ -111,6 +111,8 @@ SceneCanvas::SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_,
         hasJustRightClicked(false),
         ctrlPressed(false),
         isReloading(false),
+        instances(instances_),
+        settings(settings_),
         mainEditorCommand( mainEditorCommand_ ),
         scrollBar1(NULL),
         scrollBar2(NULL)
@@ -467,7 +469,7 @@ void SceneCanvas::OnChoisirObjetBtClick( wxCommandEvent & event )
  */
 void SceneCanvas::OnGridBtClick( wxCommandEvent & event )
 {
-    sceneEdited.grid = !sceneEdited.grid;
+    settings.grid = !settings.grid;
 }
 
 /**
@@ -475,14 +477,14 @@ void SceneCanvas::OnGridBtClick( wxCommandEvent & event )
  */
 void SceneCanvas::OnGridSetupBtClick( wxCommandEvent & event )
 {
-    GridSetup dialog(this, sceneEdited.gridWidth, sceneEdited.gridHeight, sceneEdited.snap, sceneEdited.gridR, sceneEdited.gridG, sceneEdited.gridB);
+    GridSetup dialog(this, settings.gridWidth, settings.gridHeight, settings.snap, settings.gridR, settings.gridG, settings.gridB);
     dialog.ShowModal();
 }
 
 
 void SceneCanvas::OnWindowMaskBtClick( wxCommandEvent & event )
 {
-    sceneEdited.windowMask = !sceneEdited.windowMask;
+    settings.windowMask = !settings.windowMask;
 }
 
 void SceneCanvas::OnUndoBtClick( wxCommandEvent & event )
@@ -1214,10 +1216,10 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
                 int newX = oldX + deltaX;
                 int newY = oldY + deltaY;
 
-                if ( sceneEdited.grid && sceneEdited.snap )
+                if ( settings.grid && settings.snap )
                 {
-                    newX = static_cast<int>(newX/sceneEdited.gridWidth)*sceneEdited.gridWidth;
-                    newY = static_cast<int>(newY/sceneEdited.gridHeight)*sceneEdited.gridHeight;
+                    newX = static_cast<int>(newX/settings.gridWidth)*settings.gridWidth;
+                    newY = static_cast<int>(newY/settings.gridHeight)*settings.gridHeight;
                 }
 
                 //Modification de l'emplacement initial
@@ -1314,10 +1316,10 @@ void SceneCanvas::AddObjetSelected(float x, float y)
     //Initial position creation
     InitialPosition pos;
     pos.SetObjectName(edittimeRenderer.objectToAdd); //A choisir avec un dialog approprié ou par drag'n'drop
-    if ( sceneEdited.grid && sceneEdited.snap )
+    if ( settings.grid && settings.snap )
     {
-        pos.SetX(static_cast<int>(x/sceneEdited.gridWidth)*sceneEdited.gridWidth);
-        pos.SetY(static_cast<int>(y/sceneEdited.gridHeight)*sceneEdited.gridHeight);
+        pos.SetX(static_cast<int>(x/settings.gridWidth)*settings.gridWidth);
+        pos.SetY(static_cast<int>(y/settings.gridHeight)*settings.gridHeight);
     }
     else
     {

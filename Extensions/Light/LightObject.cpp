@@ -39,7 +39,7 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "LightObjectEditor.h"
 #endif
@@ -249,7 +249,7 @@ bool LightObject::DrawEdittime(sf::RenderTarget& renderWindow)
     return true;
 }
 
-void LightObject::ExposeResources(ArbitraryResourceWorker & worker)
+void LightObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
 }
 

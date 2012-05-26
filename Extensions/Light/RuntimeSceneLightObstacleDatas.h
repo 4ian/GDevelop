@@ -26,9 +26,6 @@ freely, subject to the following restrictions:
 
 #ifndef RUNTIMESCENELIGHTOBSTACLEDATAS_H
 #define RUNTIMESCENELIGHTOBSTACLEDATAS_H
-
-#include <iostream>
-#include <boost/weak_ptr.hpp>
 #include <vector>
 #include "GDL/AutomatismsRuntimeSharedDatas.h"
 class SceneLightObstacleDatas;
@@ -39,18 +36,16 @@ class LightObstacleAutomatism;
  */
 class GD_EXTENSION_API RuntimeSceneLightObstacleDatas : public AutomatismsRuntimeSharedDatas
 {
-    public:
-        RuntimeSceneLightObstacleDatas(const SceneLightObstacleDatas & automatismSharedDatas);
-        virtual ~RuntimeSceneLightObstacleDatas();
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneLightObstacleDatas(*this));}
+public:
+    RuntimeSceneLightObstacleDatas(const SceneLightObstacleDatas & automatismSharedDatas);
+    virtual ~RuntimeSceneLightObstacleDatas();
+    virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneLightObstacleDatas(*this));}
 
-        std::vector < boost::weak_ptr<LightObstacleAutomatism> > objects; ///< Each object using the automatism add itself to this list, used to compute obstacles
+    float gridWidth;
+    float gridHeight;
+    bool diagonalMove;
 
-        float gridWidth;
-        float gridHeight;
-        bool diagonalMove;
-
-    private:
+private:
 };
 
 #endif // RUNTIMESCENELIGHTOBSTACLEDATAS_H

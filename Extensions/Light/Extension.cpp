@@ -28,10 +28,11 @@ freely, subject to the following restrictions:
 #include "GDL/Version.h"
 #include "LightObstacleAutomatism.h"
 #include "LightObject.h"
+#include "SceneLightObstacleDatas.h"
 #include <boost/version.hpp>
 
 /**
- * This class declare information about the extension.
+ * \brief This class declares information about the extension.
  */
 class Extension : public ExtensionBase
 {

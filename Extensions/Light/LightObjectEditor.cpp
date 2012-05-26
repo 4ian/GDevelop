@@ -34,11 +34,11 @@ freely, subject to the following restrictions:
 //*)
 #include <wx/colordlg.h>
 #include <wx/filedlg.h>
-
+#include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "LightObject.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "SceneLightObstacleDatas.h"
 
 //(*IdInit(LightObjectEditor)
 const long LightObjectEditor::ID_STATICTEXT1 = wxNewId();

@@ -29,6 +29,8 @@ freely, subject to the following restrictions:
 
 #include "GDL/Object.h"
 #include "LightManager.h"
+#include <boost/weak_ptr.hpp>
+#include <boost/shared_ptr.hpp>
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/System/Clock.hpp>
 namespace sf
@@ -42,15 +44,15 @@ class ImageManager;
 class RuntimeScene;
 class Object;
 class Scene;
-class ExpressionInstruction;
 class ImageManager;
 class InitialPosition;
+class RuntimeSceneLightObstacleDatas;
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
 class Game;
 class wxWindow;
 class MainEditorCommand;
-class ResourcesMergingHelper;
+namespace gd {class ResourcesMergingHelper;}
 #endif
 
 /**
@@ -58,106 +60,106 @@ class ResourcesMergingHelper;
  */
 class GD_EXTENSION_API LightObject : public Object
 {
-    public :
+public :
 
-        LightObject(std::string name_);
-        virtual ~LightObject() {};
-        virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new LightObject(*this));}
+    LightObject(std::string name_);
+    virtual ~LightObject() {};
+    virtual Object * Clone() { return new LightObject(*this);}
 
-        virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr);
-        virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-        virtual bool InitializeFromInitialPosition(const InitialPosition & position);
+    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr);
+    virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
+    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
-        virtual bool Draw(sf::RenderTarget & renderTarget);
+    virtual bool Draw(sf::RenderTarget & renderTarget);
 
-        #if defined(GD_IDE_ONLY)
-        virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-        virtual void ExposeResources(ArbitraryResourceWorker & worker);
-        virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+    #if defined(GD_IDE_ONLY)
+    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
+    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
+    virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
 
-        virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
-        virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-        virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
+    virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
+    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
+    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-        virtual unsigned int GetNumberOfProperties() const;
-        #endif
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
 
-        virtual void LoadFromXml(const TiXmlElement * elemScene);
-        #if defined(GD_IDE_ONLY)
-        virtual void SaveToXml(TiXmlElement * elemScene);
-        #endif
+    virtual void LoadFromXml(const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void SaveToXml(TiXmlElement * elemScene);
+    #endif
 
-        virtual void UpdateTime(float timeElapsed);
+    virtual void UpdateTime(float timeElapsed);
 
-        virtual void OnPositionChanged();
+    virtual void OnPositionChanged();
 
-        virtual float GetWidth() const;
-        virtual float GetHeight() const;
-        virtual void SetWidth(float ) {};
-        virtual void SetHeight(float ) {};
+    virtual float GetWidth() const;
+    virtual float GetHeight() const;
+    virtual void SetWidth(float ) {};
+    virtual void SetHeight(float ) {};
 
-        virtual float GetDrawableX() const;
-        virtual float GetDrawableY() const;
+    virtual float GetDrawableX() const;
+    virtual float GetDrawableY() const;
 
-        virtual float GetCenterX() const;
-        virtual float GetCenterY() const;
+    virtual float GetCenterX() const;
+    virtual float GetCenterY() const;
 
-        virtual bool SetAngle(float newAngle) { angle = newAngle; return true;};
-        virtual float GetAngle() const {return angle;};
+    virtual bool SetAngle(float newAngle) { angle = newAngle; return true;};
+    virtual float GetAngle() const {return angle;};
 
-        float GetIntensity() const { return light.GetIntensity(); };
-        float GetRadius() const { return light.GetRadius(); };
-        int GetQuality() const { return light.GetQuality(); };
-        sf::Color GetColor() const { return light.GetColor(); };
+    float GetIntensity() const { return light.GetIntensity(); };
+    float GetRadius() const { return light.GetRadius(); };
+    int GetQuality() const { return light.GetQuality(); };
+    sf::Color GetColor() const { return light.GetColor(); };
 
-        void SetIntensity(float intensity) { light.SetIntensity(intensity); };
-        void SetRadius(float radius) { light.SetRadius(radius); };
-        void SetQuality(int quality) { light.SetQuality(quality); };
-        void SetColor(const sf::Color & color) { light.SetColor(color); };
+    void SetIntensity(float intensity) { light.SetIntensity(intensity); };
+    void SetRadius(float radius) { light.SetRadius(radius); };
+    void SetQuality(int quality) { light.SetQuality(quality); };
+    void SetColor(const sf::Color & color) { light.SetColor(color); };
 
-        bool IsGlobalLight() const { return globalLight; };
-        void SetGlobalLight(bool global) { globalLight = global; UpdateGlobalLightMembers(); };
-        sf::Color GetGlobalColor() const { return globalLightColor; };
-        void SetGlobalColor(const sf::Color & color) { globalLightColor = color; };
+    bool IsGlobalLight() const { return globalLight; };
+    void SetGlobalLight(bool global) { globalLight = global; UpdateGlobalLightMembers(); };
+    sf::Color GetGlobalColor() const { return globalLightColor; };
+    void SetGlobalColor(const sf::Color & color) { globalLightColor = color; };
 
-        /**
-         * Only used internally by GD events generated code
-         */
-        void SetGlobalColor(const std::string & color);
+    /**
+     * Only used internally by GD events generated code
+     */
+    void SetGlobalColor(const std::string & color);
 
-        /**
-         * Only used internally by GD events generated code
-         */
-        void SetColor(const std::string & color);
+    /**
+     * Only used internally by GD events generated code
+     */
+    void SetColor(const std::string & color);
 
-        virtual std::vector<RotatedRectangle> GetHitBoxes() const;
+    virtual std::vector<RotatedRectangle> GetHitBoxes() const;
 
-        static std::map<const Scene*, boost::weak_ptr<Light_Manager> > lightManagersList;
+    static std::map<const Scene*, boost::weak_ptr<Light_Manager> > lightManagersList;
 
-    private:
+private:
 
-        void UpdateGlobalLightMembers();
+    void UpdateGlobalLightMembers();
 
-        float angle;
+    float angle;
 
-        sf::Clock updateClock;
+    sf::Clock updateClock;
 
-        boost::shared_ptr<Light_Manager> manager; ///< Keep a link to the light manager of the scene.
-        Light light; ///< Light object used to render light
+    boost::shared_ptr<Light_Manager>  manager; ///< Keep a link to the light manager of the scene.
+    Light light; ///< Light object used to render light
 
-        bool globalLight;
-        boost::shared_ptr<sf::RenderTexture> globalLightImage;
-        sf::Color globalLightColor;
+    bool globalLight;
+    boost::shared_ptr<sf::RenderTexture> globalLightImage;
+    sf::Color globalLightColor;
 
-        static sf::Shader commonBlurEffect;
-        static bool commonBlurEffectLoaded;
+    static sf::Shader commonBlurEffect;
+    static bool commonBlurEffectLoaded;
 
-        #if defined(GD_IDE_ONLY)
-        static sf::Texture edittimeIconImage;
-        static sf::Sprite edittimeIcon;
-        #endif
+    #if defined(GD_IDE_ONLY)
+    static sf::Texture edittimeIconImage;
+    static sf::Sprite edittimeIcon;
+    #endif
 };
 
 void DestroyLightObject(Object * object);

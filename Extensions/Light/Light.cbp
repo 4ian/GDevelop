@@ -50,6 +50,7 @@
 					<Add option="-m32" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -59,9 +60,11 @@
 					<Add option="-DWXUSINGDLL" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
 					<Add directory="..\..\ExtLibs\wxwidgets\include" />
+					<Add directory="..\..\Core" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_richtext" />
@@ -150,6 +153,7 @@
 					<Add option="-m32" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
@@ -159,9 +163,11 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\..\ExtLibs\wxwidgets\include" />
+					<Add directory="..\..\Core" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -250,6 +256,7 @@
 					<Add option="-m32" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -259,9 +266,11 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
 					<Add directory="..\..\ExtLibs\wxwidgets\include" />
+					<Add directory="..\..\Core" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -361,6 +370,7 @@
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -404,6 +414,7 @@
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
@@ -548,6 +559,7 @@
 			<Add directory="..\..\GDL" />
 			<Add directory="..\..\ExtLibs\SFML\include" />
 			<Add directory="..\..\ExtLibs\boost" />
+			<Add directory="..\..\Core" />
 		</Compiler>
 		<Unit filename="Directional_light.cpp" />
 		<Unit filename="Directional_light.h" />

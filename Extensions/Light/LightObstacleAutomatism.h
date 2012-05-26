@@ -31,9 +31,6 @@ freely, subject to the following restrictions:
 #include "GDL/Object.h"
 #include "Light.h"
 #include "LightManager.h"
-#include "SceneLightObstacleDatas.h"
-#include <boost/weak_ptr.hpp>
-#include <iostream>
 #include <map>
 #include <set>
 #include "GDL/RuntimeScene.h"
@@ -44,14 +41,14 @@ class LightObstacleAutomatismEditor;
 /**
  * Automatism that set an object as an obstacle for light objects
  */
-class GD_EXTENSION_API LightObstacleAutomatism : public Automatism, public boost::enable_shared_from_this<LightObstacleAutomatism>
+class GD_EXTENSION_API LightObstacleAutomatism : public Automatism
 {
     friend class LightObstacleAutomatismEditor;
 
     public:
         LightObstacleAutomatism(std::string automatismTypeName);
         virtual ~LightObstacleAutomatism();
-        virtual boost::shared_ptr<Automatism> Clone() { return boost::shared_ptr<Automatism>(new LightObstacleAutomatism(*this));}
+        virtual Automatism* Clone() { return new LightObstacleAutomatism(*this);}
 
         #if defined(GD_IDE_ONLY)
         /**

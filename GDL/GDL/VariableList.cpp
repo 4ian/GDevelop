@@ -120,6 +120,7 @@ void ListVariable::LoadFromXml(const TiXmlElement * rootElement)
         Variable variable(name);
         if ( element->Attribute( "Value" ) != NULL ) variable.SetString(element->Attribute( "Value" ));
 
+        variables.push_back(variable);
         element = element->NextSiblingElement();
     }
 }

@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include "GDL/Variable.h"
+class TiXmlElement;
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #endif

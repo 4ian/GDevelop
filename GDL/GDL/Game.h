@@ -252,6 +252,12 @@ public:
 
 private:
 
+    /**
+     * Initialize from another game. Used by copy-ctor and assign-op.
+     * Don't forget to update me if members were changed !
+     */
+    void Init(const Game & game);
+
     std::string                                         name; ///< Game name
     unsigned int                                        windowWidth; ///< Window default width
     unsigned int                                        windowHeight; ///< Window default height
@@ -269,11 +275,6 @@ private:
     std::vector < boost::shared_ptr<ExternalEvents> >   externalEvents; ///< List of all externals events
     #endif
 
-    /**
-     * Initialize from another game. Used by copy-ctor and assign-op.
-     * Don't forget to update me if members were changed !
-     */
-    void Init(const Game & game);
 };
 
 #endif // GAME_H

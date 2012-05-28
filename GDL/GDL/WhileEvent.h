@@ -21,7 +21,7 @@ class EventsEditorSelection;
 class WhileEvent : public gd::BaseEvent
 {
     public:
-        WhileEvent() {};
+        WhileEvent() : infiniteLoopWarning(true), justCreatedByTheUser(true) {};
         WhileEvent(const WhileEvent & event);
         virtual ~WhileEvent() {};
 
@@ -76,6 +76,8 @@ class WhileEvent : public gd::BaseEvent
         std::vector < gd::Instruction > conditions;
         std::vector < gd::Instruction > actions;
         std::vector < gd::BaseEventSPtr > events;
+        bool infiniteLoopWarning; ///< If true, code will be generated to warn the developer against an infinite loop.
+        bool justCreatedByTheUser; ///< Used so as not to show message box to de/activate infinite loop warning when the user create the event
 
         mutable unsigned int whileConditionsHeight;
 

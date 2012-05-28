@@ -6,6 +6,8 @@
 #if defined(GD_IDE_ONLY)
 
 #include "WhileEvent.h"
+#include <wx/msgdlg.h>
+#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
@@ -25,6 +27,7 @@ std::string WhileEvent::GenerateEventCode(Game & game, Scene & scene, EventsCode
     //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
     EventsCodeGenerationContext context;
     context.InheritsFrom(parentContext);
+    if ( infiniteLoopWarning && !codeGenerator.GenerateCodeForRuntime() ) codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     //Prepare codes
     std::string whileConditionsStr = codeGenerator.GenerateConditionsListCode(game, scene, whileConditions, context);
@@ -35,12 +38,18 @@ std::string WhileEvent::GenerateEventCode(Game & game, Scene & scene, EventsCode
 
     //Write final code
     outputCode += "bool stopDoWhile = false;";
+    if ( infiniteLoopWarning && !codeGenerator.GenerateCodeForRuntime() ) outputCode += "unsigned int loopCount = 0;";
     outputCode += "do";
     outputCode += "{\n";
     outputCode += context.GenerateObjectsDeclarationCode();
     outputCode +=  whileConditionsStr;
     outputCode += "if ("+whileIfPredicat+")\n";
     outputCode += "{\n";
+    if ( infiniteLoopWarning && !codeGenerator.GenerateCodeForRuntime() )
+    {
+        outputCode += "if (loopCount == 100000) { if ( WarnAboutInfiniteLoop(*runtimeContext->scene) ) break; }\n";
+        outputCode += "loopCount++;\n\n";
+    }
     outputCode += conditionsCode;
     outputCode += "if (" +ifPredicat+ ")\n";
     outputCode += "{\n";
@@ -75,6 +84,10 @@ vector < vector<gd::Instruction>* > WhileEvent::GetAllActionsVectors()
 
 void WhileEvent::SaveToXml(TiXmlElement * eventElem) const
 {
+    if ( eventElem == NULL ) return;
+
+    eventElem->SetAttribute("infiniteLoopWarning", infiniteLoopWarning ? "true" : "false");
+
     //Save "While conditions"
     TiXmlElement * whileConditionsElem = new TiXmlElement( "WhileConditions" );
     eventElem->LinkEndChild( whileConditionsElem );
@@ -104,6 +117,11 @@ void WhileEvent::SaveToXml(TiXmlElement * eventElem) const
 
 void WhileEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
+    if ( eventElem == NULL ) return;
+
+    infiniteLoopWarning = (eventElem->Attribute("infiniteLoopWarning") == NULL || std::string(eventElem->Attribute("infiniteLoopWarning")) == "true");
+    justCreatedByTheUser = false;
+
     if ( eventElem->FirstChildElement( "WhileConditions" ) != NULL )
         OpenSaveGame::OpenConditions(whileConditions, eventElem->FirstChildElement( "WhileConditions" ));
     else
@@ -137,6 +155,7 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
 
     //Draw header rectangle
     int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, *ExtensionsManager::GetInstance())+border*2;
+    if (!infiniteLoopWarning && whileConditionsHeight < 32 ) whileConditionsHeight = 32;
     wxRect headerRect(x, y, width, whileConditionsHeight+repeatHeight);
     renderingHelper->DrawNiceRectangle(dc, headerRect);
 
@@ -144,6 +163,13 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
     dc.DrawText( _("Tant que :"), x+5, y+5 );
+
+    //Draw icon if infinite loop warning is deactivated.
+    if (!infiniteLoopWarning)
+    {
+        if ( gd::CommonBitmapManager::GetInstance()->noProtection.IsOk() )
+            dc.DrawBitmap(gd::CommonBitmapManager::GetInstance()->noProtection, wxPoint(x+5,y+5+18), /*useMask=*/true);
+    }
 
     //Draw "while conditions"
     renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
@@ -177,6 +203,7 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
 
         //Get maximum height needed
         int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, *ExtensionsManager::GetInstance());
+        if (!infiniteLoopWarning && whileConditionsHeight < 32 ) whileConditionsHeight = 32;
         int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, *ExtensionsManager::GetInstance());
         int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
 
@@ -189,6 +216,23 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
 
 gd::BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
+    if ( !justCreatedByTheUser )
+    {
+        wxMessageDialog dialog(parent_, _("Voulez vous activer l'affichage d'un message si l'évènement se répète 100000 fois ? Ce message permet d'éviter que le logiciel bloque, "
+                                          "dans le cas où vous créez accidentellement une boucle infinie ( en laissant les conditions vides par exemple ), en vous permettant alors "
+                                          "d'arrêter l'aperçu."),
+                               _("Protection contre les boucles infinies"),
+                               wxYES_NO|wxCANCEL|wxICON_INFORMATION);
+
+        dialog.SetExtendedMessage(_("Ce message est activé par défaut pour les évènements \"Tant que\" dans l'éditeur, et est désactivé lorsque le jeu est compilé en executable."));
+        dialog.SetYesNoCancelLabels(_("Activer"), _("Désactiver"), _("Annuler"));
+
+        int answer = dialog.ShowModal();
+        if ( answer == wxID_YES ) infiniteLoopWarning = true;
+        else if ( answer == wxID_NO ) infiniteLoopWarning = false;
+    }
+    justCreatedByTheUser = false; //Show Message dialog next time.
+
     return ChangesMade;
 }
 
@@ -203,6 +247,8 @@ void WhileEvent::Init(const WhileEvent & event)
     whileConditions = event.whileConditions;
     conditions = event.conditions;
     actions = event.actions;
+    infiniteLoopWarning = event.infiniteLoopWarning;
+    justCreatedByTheUser = event.justCreatedByTheUser;
 }
 
 /**

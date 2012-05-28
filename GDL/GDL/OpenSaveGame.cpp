@@ -206,6 +206,14 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     #endif
     //End of Compatibility code
 
+    //Compatibility code
+    #if defined(GD_IDE_ONLY)
+    if ( major < 2 || (major == 2 && minor <= 1 && build <= 10822) )
+    {
+        game.GetUsedPlatformExtensions().push_back("BuiltinExternalLayouts");
+    }
+    #endif
+
     game.resourceManager.LoadFromXml(hdl.FirstChildElement().FirstChildElement( "Resources" ).Element());
 
     //Global objects

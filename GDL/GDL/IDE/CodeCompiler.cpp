@@ -233,6 +233,7 @@ void CodeCompiler::ProcessTasks()
             }
             else
             {
+                sf::Clock time;
                 std::cout << "Compilation succeeded. Writing bitcode to file...\n";
                 sf::Lock lock(openSaveDialogMutex); //On windows, GD is crashing if we write bitcode while an open/save file dialog is displayed.
 
@@ -244,6 +245,7 @@ void CodeCompiler::ProcessTasks()
                 std::cout << error;
 
                 compilationSucceeded = true;
+                std::cout << "WritingBitCodeTIme :"<<time.GetElapsedTime() << std::endl;
             }
 
             //Compilation ended, loading diagnostics

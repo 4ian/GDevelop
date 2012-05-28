@@ -481,6 +481,53 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
     specialAction = scene;
 }
 
+void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container)
+{
+    for(unsigned int i = 0;i < container.GetInstancesCount();++i)
+    {
+        const InitialPosition & initialInstance = container.GetInstance(i);
+
+        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(GetInitialObjects().begin(), GetInitialObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
+        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game->GetGlobalObjects().begin(), game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
+
+        ObjSPtr newObject = boost::shared_ptr<Object> ();
+
+        if ( sceneObject != GetInitialObjects().end() ) //We check first scene's objects' list.
+            newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
+        else if ( globalObject != game->GetGlobalObjects().end() ) //Then the global object list
+            newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
+
+        if ( newObject != boost::shared_ptr<Object> () )
+        {
+            newObject->SetX( initialInstance.GetX() );
+            newObject->SetY( initialInstance.GetY() );
+            newObject->SetZOrder( initialInstance.GetZOrder() );
+            newObject->SetLayer( initialInstance.GetLayer() );
+            newObject->InitializeFromInitialPosition(initialInstance);
+            newObject->SetAngle( initialInstance.GetAngle() );
+
+            if ( initialInstance.HasCustomSize() )
+            {
+                newObject->SetWidth(initialInstance.GetWidth());
+                newObject->SetHeight(initialInstance.GetHeight());
+            }
+
+            //Substitute initial variables specific to that object instance.
+            const std::vector<Variable> & instanceSpecificVariables = initialInstance.GetVariables().GetVariablesVector();
+            for (unsigned int j = 0;j<instanceSpecificVariables.size();++j)
+            {
+                newObject->GetVariables().ObtainVariable(instanceSpecificVariables[j].GetName()) = instanceSpecificVariables[j];
+            }
+
+            newObject->LoadRuntimeResources(*this, *game->imageManager);
+
+            objectsInstances.AddObject(newObject);
+        }
+        else
+            std::cout << "Could not find and put object " << initialInstance.GetObjectName() << std::endl;
+    }
+}
+
 ////////////////////////////////////////////////////////////
 /// Ouvre un jeu, et stocke dans les tableaux passés en paramétres.
 ////////////////////////////////////////////////////////////
@@ -529,49 +576,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
     //Create object instances which are originally positioned on scene
     MessageLoading( "Adding objects to their initial position", 66 );
-    for(unsigned int i = 0;i < scene.GetInitialInstances().GetInstancesCount();++i)
-    {
-        const InitialPosition & initialInstance = scene.GetInitialInstances().GetInstance(i);
-
-        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(GetInitialObjects().begin(), GetInitialObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
-        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game->GetGlobalObjects().begin(), game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
-
-        ObjSPtr newObject = boost::shared_ptr<Object> ();
-
-        if ( sceneObject != GetInitialObjects().end() ) //We check first scene's objects' list.
-            newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
-        else if ( globalObject != game->GetGlobalObjects().end() ) //Then the global object list
-            newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
-
-        if ( newObject != boost::shared_ptr<Object> () )
-        {
-            newObject->SetX( initialInstance.GetX() );
-            newObject->SetY( initialInstance.GetY() );
-            newObject->SetZOrder( initialInstance.GetZOrder() );
-            newObject->SetLayer( initialInstance.GetLayer() );
-            newObject->InitializeFromInitialPosition(initialInstance);
-            newObject->SetAngle( initialInstance.GetAngle() );
-
-            if ( initialInstance.HasCustomSize() )
-            {
-                newObject->SetWidth(initialInstance.GetWidth());
-                newObject->SetHeight(initialInstance.GetHeight());
-            }
-
-            //Substitute initial variables specific to that object instance.
-            const std::vector<Variable> & instanceSpecificVariables = initialInstance.GetVariables().GetVariablesVector();
-            for (unsigned int j = 0;j<instanceSpecificVariables.size();++j)
-            {
-                newObject->GetVariables().ObtainVariable(instanceSpecificVariables[j].GetName()) = instanceSpecificVariables[j];
-            }
-
-            newObject->LoadRuntimeResources(*this, *game->imageManager);
-
-            objectsInstances.AddObject(newObject);
-        }
-        else
-            std::cout << "Could not find and put object " << initialInstance.GetObjectName() << std::endl;
-    }
+    CreateObjectsFrom(scene.GetInitialInstances());
 
     //Automatisms data
     automatismsSharedDatas.clear();

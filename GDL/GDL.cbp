@@ -1025,6 +1025,10 @@
 		<Unit filename="GDL\BuiltinExtensions\CommonInstructionsExtension.h" />
 		<Unit filename="GDL\BuiltinExtensions\CommonInstructionsTools.cpp" />
 		<Unit filename="GDL\BuiltinExtensions\CommonInstructionsTools.h" />
+		<Unit filename="GDL\BuiltinExtensions\ExternalLayoutsExtension.cpp" />
+		<Unit filename="GDL\BuiltinExtensions\ExternalLayoutsExtension.h" />
+		<Unit filename="GDL\BuiltinExtensions\ExternalLayoutsTools.cpp" />
+		<Unit filename="GDL\BuiltinExtensions\ExternalLayoutsTools.h" />
 		<Unit filename="GDL\BuiltinExtensions\FileExtension.cpp" />
 		<Unit filename="GDL\BuiltinExtensions\FileExtension.h" />
 		<Unit filename="GDL\BuiltinExtensions\FileTools.cpp" />

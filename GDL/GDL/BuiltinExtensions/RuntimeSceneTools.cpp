@@ -1,9 +1,16 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "GDL/BuiltinExtensions/RuntimeSceneTools.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/RuntimeGame.h"
+#if defined(GD_IDE_ONLY)
+#include <wx/msgdlg.h>
+#endif
 
 bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
 {
@@ -331,3 +338,18 @@ void GD_API DisplayLegacyTextOnScene( RuntimeScene & scene, const std::string & 
 
     return;
 }
+
+#if defined(GD_IDE_ONLY)
+bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene )
+{
+    if (wxMessageBox(_("Un évènement \"Tant que\" s'est repété pendant 100000 itérations : Il se peut que vous ayez créé une boucle infine, qui se répète sans s'arrêter et qui va donc bloquer le logiciel.\n\n"
+                       "Si vous souhaitez arrêter l'aperçu pour corriger le problème, cliquez sur Oui.\n"
+                       "Si vous souhaitez continuer l'aperçu, cliquez sur Non.\n"
+                       "Vous pouvez désactiver cette avertissement en éditant les évènements \"Tant que\" en double cliquant dessus.\n\n"
+                        "Arrêter l'aperçu ?"), _("Risque de boucle infine"), wxYES_NO|wxICON_EXCLAMATION ) == wxYES)
+    {
+        scene.running = false;
+        return true;
+    }
+}
+#endif

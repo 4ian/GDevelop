@@ -97,6 +97,11 @@ public:
     bool LoadFromScene( const Scene & scene );
 
     /**
+     * Create the objects from an InitialInstancesContainer object.
+     */
+    void CreateObjectsFrom(const InitialInstancesContainer & container);
+
+    /**
      * Change the window used for rendering the scene
      */
     void ChangeRenderWindow(sf::RenderWindow * window);

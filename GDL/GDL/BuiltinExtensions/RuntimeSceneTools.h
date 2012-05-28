@@ -191,13 +191,37 @@ unsigned int GD_API GetSceneWindowWidth(RuntimeScene & scene);
  */
 unsigned int GD_API GetSceneWindowHeight(RuntimeScene & scene);
 
+/**
+ * Only used internally by GD events generated code.
+ */
 unsigned int GD_API GetScreenWidth();
+
+/**
+ * Only used internally by GD events generated code.
+ */
 unsigned int GD_API GetScreenHeight();
+
+/**
+ * Only used internally by GD events generated code.
+ */
 unsigned int GD_API GetScreenColorDepth();
 
 /**
  * Only used internally by GD events generated code.
  */
 void GD_API DisplayLegacyTextOnScene( RuntimeScene & scene, const std::string & str, float x, float y, const std::string & color, float characterSize, const std::string & fontName, const std::string & layer);
+
+#if defined(GD_IDE_ONLY)
+/**
+ * \brief Called so as to warn the developer about a while event doing a large number of iterations.
+ *
+ * Displays a warning and offer a chance to stop the preview.
+ * Only used internally by GD events generated code and only available for the IDE.
+ *
+ * \return true if scene must be stopped ( scene.running was set to false )
+ */
+bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene );
+
+#endif
 
 #endif // RUNTIMESCENETOOLS_H

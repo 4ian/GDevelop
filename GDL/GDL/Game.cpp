@@ -361,6 +361,10 @@ void Game::Init(const Game & game)
     	externalEvents.push_back( boost::shared_ptr<ExternalEvents>(new ExternalEvents(*game.externalEvents[i])) );
     #endif
 
+    externalLayouts.clear();
+    for (unsigned int i =0;i<game.externalLayouts.size();++i)
+    	externalLayouts.push_back( boost::shared_ptr<ExternalLayout>(new ExternalLayout(*game.externalLayouts[i])) );
+
     useExternalSourceFiles = game.useExternalSourceFiles;
 
     #if defined(GD_IDE_ONLY)

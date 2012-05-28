@@ -500,7 +500,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("objectvar", _("Nom de la variable"), "", false);
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("GetVariables().HasVariable");
+            instrInfo.cppCallingInformation.SetFunctionName("GetVariables().HasVariableNamed");
 
         DECLARE_END_OBJECT_CONDITION()
 

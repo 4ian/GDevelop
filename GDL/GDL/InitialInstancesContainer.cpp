@@ -43,18 +43,6 @@ void InitialInstancesContainer::RemoveInstance(unsigned int index)
     initialInstances.erase(initialInstances.begin()+index);
 }
 
-void InitialInstancesContainer::RemoveInstance(const gd::InitialInstance & instance)
-{
-    for (unsigned int i = 0;i<initialInstances.size();++i)
-    {
-        if ( &initialInstances[i] == &instance )
-        {
-            initialInstances.erase(initialInstances.begin()+i);
-            return;
-        }
-    }
-}
-
 void InitialInstancesContainer::LoadFromXml(const TiXmlElement * rootElem)
 {
     if ( rootElem == NULL ) return;
@@ -107,6 +95,19 @@ void InitialInstancesContainer::LoadFromXml(const TiXmlElement * rootElem)
 }
 
 #if defined(GD_IDE_ONLY)
+
+void InitialInstancesContainer::RemoveInstance(const gd::InitialInstance & instance)
+{
+    for (unsigned int i = 0;i<initialInstances.size();++i)
+    {
+        if ( &initialInstances[i] == &instance )
+        {
+            initialInstances.erase(initialInstances.begin()+i);
+            return;
+        }
+    }
+}
+
 void InitialInstancesContainer::InsertInitialInstance(const gd::InitialInstance & instance)
 {
     try

@@ -32,9 +32,9 @@ public:
     virtual InitialPosition & GetInstance(unsigned int index);
     virtual void InsertNewInitialInstance();
     virtual void RemoveInstance(unsigned int index);
-    virtual void RemoveInstance(const gd::InitialInstance & instance);
 
     #if defined(GD_IDE_ONLY)
+    virtual void RemoveInstance(const gd::InitialInstance & instance);
     virtual void InsertInitialInstance(const gd::InitialInstance & instance);
     virtual void RemoveAllInstancesOnLayer(const std::string & layerName);
     virtual void MoveInstancesToLayer(const std::string & fromLayer, const std::string & toLayer);

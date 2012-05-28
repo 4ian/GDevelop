@@ -31,6 +31,7 @@ public:
     wxStaticText* StaticText1;
     SceneCanvas* sceneCanvas;
     wxPanel* contextPanel;
+    wxPanel* corePanel;
     wxPanel* scenePanel;
     wxComboBox* parentSceneComboBox;
     //*)
@@ -53,6 +54,7 @@ protected:
     static const long ID_SCROLLBAR1;
     static const long ID_CUSTOM1;
     static const long ID_PANEL5;
+    static const long ID_PANEL2;
     //*)
 
 private:
@@ -63,9 +65,13 @@ private:
     void OnscrollBar1Scroll(wxScrollEvent& event);
     void OnsceneCanvasSetFocus(wxFocusEvent& event);
     void OnResize(wxSizeEvent& event);
+    void OnparentSceneComboBoxSelected(wxCommandEvent& event);
     //*)
+    void OnparentSceneComboBoxDropDown(wxCommandEvent& event);
 
     DECLARE_EVENT_TABLE()
+
+    void SetupForScene(Scene & scene);
 
     Scene emptyScene;
     MainEditorCommand mainEditorCommand;

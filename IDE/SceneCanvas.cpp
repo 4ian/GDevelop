@@ -240,7 +240,17 @@ void SceneCanvas::ReloadSecondPart()
     if ( !editing )
         CodeCompiler::GetInstance()->DisableTaskRelatedTo(sceneEdited);
 
-    previewData.scene.LoadFromScene( sceneEdited );
+    if ( &instances != &sceneEdited.GetInitialInstances() )
+    {
+        //TODO: Dirty hack for now
+        InitialInstancesContainer originalContainer = sceneEdited.GetInitialInstances();
+        sceneEdited.GetInitialInstances() = instances;
+        previewData.scene.LoadFromScene( sceneEdited );
+        sceneEdited.GetInitialInstances() = originalContainer;
+
+    }
+    else
+        previewData.scene.LoadFromScene( sceneEdited );
     sceneEdited.wasModified = false;
 
     UpdateSize();

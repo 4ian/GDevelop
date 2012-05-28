@@ -858,8 +858,6 @@
 		<Unit filename="SceneCanvasEditionData.h" />
 		<Unit filename="SceneCanvasPreviewData.cpp" />
 		<Unit filename="SceneCanvasPreviewData.h" />
-		<Unit filename="SceneEdittimeRenderer.cpp" />
-		<Unit filename="SceneEdittimeRenderer.h" />
 		<Unit filename="SearchEvents.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\" />
 		</Unit>

@@ -46,6 +46,8 @@ SceneCanvas::SceneCanvas( wxWindow* parent, RuntimeGame & game_, Scene & scene_,
     reloadingText.SetCharacterSize(40);
 
     SetView( editionData.view );
+    editionData.view.SetCenter( (gameEdited.GetMainWindowDefaultWidth()/2),(gameEdited.GetMainWindowDefaultHeight()/2));
+
     SetFramerateLimit( gameEdited.GetMaximumFPS() );
     EnableVerticalSync(gameEdited.IsVerticalSynchronizationEnabledByDefault() );
     Clear( sf::Color( 125, 125, 125, 255 ) );
@@ -216,6 +218,8 @@ void SceneCanvas::SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDia
  */
 void SceneCanvas::UpdateSize()
 {
+    if (parentPanel == NULL) return;
+
     if ( editing )
     {
         //Scene takes all the space available in edition mode.

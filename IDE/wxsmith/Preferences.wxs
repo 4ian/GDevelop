@@ -129,7 +129,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT14" variable="StaticText14" member="yes">
-														<label>Les fichiers seront sauvegardés en ajoutant .autosave.gdg à leur nom</label>
+														<label>Les fichiers seront sauvegardés en ajoutant .gdg.autosave à leur nom</label>
 													</object>
 													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>

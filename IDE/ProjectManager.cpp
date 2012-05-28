@@ -428,7 +428,7 @@ void ProjectManager::Refresh()
             projectsTree->AppendItem(eventsItem, mainEditor.games[i]->GetExternalEvents(j).GetName(), 4 ,4, eventsItemData);
         }
 
-        gdTreeItemGameData * externalLayoutsItemData = new gdTreeItemGameData("ExternalLayoutsRoot", "", mainEditor.games[i].get());
+        /gdTreeItemGameData * externalLayoutsItemData = new gdTreeItemGameData("ExternalLayoutsRoot", "", mainEditor.games[i].get());
         wxTreeItemId externalayoutsItem = projectsTree->AppendItem(projectItem, _("Agencements externes"), 6 , 6, externalLayoutsItemData);
         for (unsigned int j = 0;j<mainEditor.games[i]->GetExternalLayoutsCount();++j)
         {

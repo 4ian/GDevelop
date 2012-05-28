@@ -131,6 +131,7 @@ mainEditorCommand(mainEditorCommand_)
     sceneCanvas->SetOwnedProfileDialog( boost::shared_ptr<ProfileDlg>(new ProfileDlg(this) ));
     sceneCanvas->SetParentPanelAndDockManager( scenePanel, &m_mgr );
     sceneCanvas->SetScrollbars(scrollBar1, scrollBar2);
+    sceneCanvas->Reload();
 
     eventsEditor->SetAssociatedSceneCanvas(sceneCanvas);
 
@@ -154,6 +155,7 @@ mainEditorCommand(mainEditorCommand_)
             notebook->SetWindowStyleFlag(style);
         }
     }
+
     Game_Develop_EditorFrame::LoadSkin(&m_mgr, notebook);
 
     mainEditorCommand.GetRibbon()->SetActivePage(2);
@@ -164,7 +166,6 @@ mainEditorCommand(mainEditorCommand_)
 	m_mgr.LoadPerspective(perspective);
 
     m_mgr.Update();
-    sceneCanvas->Reload();
 }
 
 

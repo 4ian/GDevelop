@@ -876,7 +876,7 @@ void Game_Develop_EditorFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
     {
         if ( !games[i]->gameFile.empty() )
         {
-            wxString filename = wxFileName(games[i]->gameFile).GetPath()+"/"+wxFileName(games[i]->gameFile).GetName()+".autosave.gdg";
+            wxString filename = wxFileName(games[i]->gameFile).GetPath()+"/"+wxFileName(games[i]->gameFile).GetName()+".gdg.autosave";
 
             OpenSaveGame saveGame( *games[i] );
             if ( !saveGame.SaveToFile(string(filename.mb_str())) ) {wxLogStatus( "L'enregistrement automatique a échoué." );}

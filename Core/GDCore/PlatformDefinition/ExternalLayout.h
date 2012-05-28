@@ -7,6 +7,7 @@
 #define GDCORE_EXTERNALLAYOUT_H
 #include <string>
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
+class SceneCanvasSettings;
 
 namespace gd
 {
@@ -48,6 +49,10 @@ public:
      * Must return the container storing initial instances.
      */
     virtual InitialInstancesContainer & GetInitialInstances() =0;
+
+    //TODO
+    virtual const SceneCanvasSettings & GetAssociatedSettings() const =0;
+    virtual SceneCanvasSettings & GetAssociatedSettings() =0;
 };
 
 }

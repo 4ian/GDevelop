@@ -49,6 +49,7 @@ CommonBitmapManager::CommonBitmapManager()
     varBt.LoadFile("res/var.png", wxBITMAP_TYPE_ANY);
     unknown24.LoadFile("res/unknown24.png", wxBITMAP_TYPE_ANY);
     semitransparentHitBox.LoadFile("res/semitransparentHitBox.png", wxBITMAP_TYPE_ANY);
+    noProtection.LoadFile("res/noProtection.png", wxBITMAP_TYPE_ANY);
 }
 
 }

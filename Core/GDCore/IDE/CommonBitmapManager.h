@@ -45,6 +45,7 @@ public:
     wxBitmap backthumbsBg;
     wxBitmap varBt;
     wxBitmap semitransparentHitBox;
+    wxBitmap noProtection;
 
     static CommonBitmapManager *GetInstance()
     {

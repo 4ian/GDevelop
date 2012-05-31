@@ -13591,7 +13591,7 @@
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1337100931 d:\florian\programmation\gamedevelop2\gdl\\gdl\imagemanager.h
+1338411378 d:\florian\programmation\gamedevelop2\gdl\\gdl\imagemanager.h
 	<iostream>
 	<vector>
 	<string>
@@ -14282,7 +14282,7 @@
 1264360632 source:d:\florian\programmation\gamedevelop2\gdl\gdl\tinyxmlerror.cpp
 	"GDL/tinyxml.h"
 
-1337982784 source:d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsmanager.cpp
+1338215965 source:d:\florian\programmation\gamedevelop2\gdl\gdl\extensionsmanager.cpp
 	<vector>
 	<map>
 	<string>
@@ -14494,7 +14494,7 @@
 	"GDL/Game.h"
 	"GDL/ImageFilesWatcher.h"
 
-1329069973 source:d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.cpp
+1338411488 source:d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.cpp
 	"GDL/ImageManager.h"
 	"GDL/RessourcesLoader.h"
 	"GDL/Game.h"
@@ -14653,7 +14653,7 @@
 	"GDL/ObjectGroup.h"
 	"GDL/profile.h"
 
-1337983085 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
+1338218473 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
 	<wx/wx.h>
 	"GDL/IDE/Dialogs/ProjectUpdateDlg.h"
 	"PlatformDefinition/Platform.h"
@@ -33703,7 +33703,7 @@
 	<string>
 	<vector>
 
-1338037907 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\runtimescenetools.cpp
+1338411678 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\runtimescenetools.cpp
 	"GDL/BuiltinExtensions/RuntimeSceneTools.h"
 	"GDL/RuntimeScene.h"
 	"GDL/BuiltinExtensions/CommonInstructionsTools.h"
@@ -34615,7 +34615,7 @@
 	<set>
 	<boost/shared_ptr.hpp>
 
-1338056926 source:d:\florian\programmation\gamedevelop2\gdl\gdl\events\eventscodegenerator.cpp
+1338407386 source:d:\florian\programmation\gamedevelop2\gdl\gdl\events\eventscodegenerator.cpp
 	<utility>
 	"GDCore/PlatformDefinition/Layout.h"
 	"GDL/Events/EventsCodeGenerator.h"

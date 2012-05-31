@@ -50,25 +50,37 @@ class GD_API ImageManager
         /**
          * Get a shared pointer to an OpenGL texture. The shared pointer must be kept alive as long as the texture is used.
          */
-        boost::shared_ptr<OpenGLTextureWrapper> GetOpenGLTexture(std::string name) const;
+        boost::shared_ptr<OpenGLTextureWrapper> GetOpenGLTexture(const std::string & name) const;
 
         /**
          * Get a shared pointer to a SFML texture.  The shared pointer must be kept alive as long as the texture is used.
          * For example, if the texture is used in an object, you should store the shared pointer in a member to make sure the texture
          * is available as long as the object is alive.
          */
-        boost::shared_ptr<SFMLTextureWrapper> GetSFMLTexture(std::string name) const;
+        boost::shared_ptr<SFMLTextureWrapper> GetSFMLTexture(const std::string & name) const;
 
         /**
-         * Reload a single image
+         * Return true if a SFML texture with the specified name is available and loaded in memory
          */
-        void ReloadImage(std::string name) const;
+        bool HasLoadedSFMLTexture(const std::string & name) const;
+
+        /**
+         * Add the SFMLTextureWrapper to loaded images ( so that it can be accessed thanks to ImageManager::GetSFMLTexture ) with the specified name and
+         * mark it as permanently loaded ( so that is is unloaded only when scene is unloaded ).
+         */
+        void SetSFMLTextureAsPermanentlyLoaded(const std::string & name, boost::shared_ptr<SFMLTextureWrapper> & texture) const;
+
+        /**
+         * Reload a single image from the game resources
+         */
+        void ReloadImage(const std::string & name) const;
 
         /**
          * Return true if the image called "name" can be found in the game resources list.
          */
-        bool HasImage(std::string name) const;
+        bool HasImage(const std::string & name) const;
 
+        #if defined(GD_IDE_ONLY)
         /**
          * When called, images won't be unloaded from memory until EnableImagesUnloading is called.
          * Can be used when reloading a scene so as to prevent images from being unloaded and then immediately reloaded.
@@ -79,6 +91,7 @@ class GD_API ImageManager
          * Enable again unused images to be unloaded from memory.
          */
         void EnableImagesUnloading();
+        #endif
 
     private:
         mutable map < string, boost::weak_ptr<SFMLTextureWrapper> > alreadyLoadedImages; ///< Reference all images loaded in memory.

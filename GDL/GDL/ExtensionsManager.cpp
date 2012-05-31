@@ -68,7 +68,7 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new WindowExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new StringInstructionsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
-    AddExtension(boost::shared_ptr<ExtensionBase>(new ExternalLayoutsExtension()));
+    //AddExtension(boost::shared_ptr<ExtensionBase>(new ExternalLayoutsExtension()));
 
 #if defined(GD_IDE_ONLY)
     badInstructionMetadata.fullname = _("Instruction inconnue");

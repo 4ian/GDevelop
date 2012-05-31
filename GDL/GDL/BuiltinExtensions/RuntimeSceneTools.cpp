@@ -351,5 +351,7 @@ bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene )
         scene.running = false;
         return true;
     }
+
+    return false;
 }
 #endif

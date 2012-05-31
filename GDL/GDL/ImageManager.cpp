@@ -24,7 +24,7 @@ game(NULL)
     badTexture->image = badTexture->texture.CopyToImage();
 }
 
-boost::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(std::string name) const
+boost::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(const std::string & name) const
 {
     if ( !game )
     {
@@ -66,7 +66,24 @@ boost::shared_ptr<SFMLTextureWrapper> ImageManager::GetSFMLTexture(std::string n
     return badTexture;
 }
 
-void ImageManager::ReloadImage(std::string name) const
+bool ImageManager::HasLoadedSFMLTexture(const std::string & name) const
+{
+    if ( alreadyLoadedImages.find(name) != alreadyLoadedImages.end() && !alreadyLoadedImages.find(name)->second.expired() )
+        return true;
+
+    return false;
+}
+
+void ImageManager::SetSFMLTextureAsPermanentlyLoaded(const std::string & name, boost::shared_ptr<SFMLTextureWrapper> & texture) const
+{
+    if ( alreadyLoadedImages.find(name) == alreadyLoadedImages.end() || alreadyLoadedImages.find(name)->second.expired() )
+        alreadyLoadedImages[name] = texture;
+
+    if ( permanentlyLoadedImages.find(name) == permanentlyLoadedImages.end() )
+        permanentlyLoadedImages[name] = texture;
+}
+
+void ImageManager::ReloadImage(const std::string & name) const
 {
     if ( !game )
     {
@@ -104,7 +121,7 @@ void ImageManager::ReloadImage(std::string name) const
     *oldTexture = *badTexture;
 }
 
-boost::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(std::string name) const
+boost::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(const std::string & name) const
 {
     if ( !game )
     {
@@ -122,7 +139,7 @@ boost::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(std::stri
     return texture;
 }
 
-bool ImageManager::HasImage(std::string name) const
+bool ImageManager::HasImage(const std::string & name) const
 {
     if ( !game )
     {

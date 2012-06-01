@@ -491,29 +491,6 @@ void DrawerObject::DrawCircle( float x, float y, float radius )
                                              sf::Color(outlineColorR, outlineColorG, outlineColorB, outlineOpacity)));
 }
 
-namespace GDpriv
-{
-namespace PrimitiveDrawingExtension
-{
-
-void GD_EXTENSION_API CopyImageOnAnother( const std::string & destName, const std::string & srcName, float destX, float destY, RuntimeScene & scene )
-{
-    if ( !scene.game->imageManager->HasImage(destName) ) return;
-    if ( !scene.game->imageManager->HasImage(srcName) ) return;
-
-    boost::shared_ptr<SFMLTextureWrapper> dest = scene.game->imageManager->GetSFMLTexture(destName);
-
-    //Make sure the coordinates are correct.
-    if ( destX < 0 || static_cast<unsigned>(destX) >= dest->texture.GetWidth()) return;
-    if ( destY < 0 || static_cast<unsigned>(destY) >= dest->texture.GetWidth()) return;
-
-    dest->image.Copy(scene.game->imageManager->GetSFMLTexture(srcName)->image, destX, destY);
-    dest->texture.LoadFromImage(dest->image);
-}
-
-}
-}
-
 /**
  * Function destroying an extension Object.
  * Game Develop does not delete directly extension object

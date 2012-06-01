@@ -30,7 +30,7 @@ freely, subject to the following restrictions:
 #include <boost/version.hpp>
 
 /**
- * This class declare information about the extension.
+ * \brief This class declares information about the extension.
  */
 class Extension : public ExtensionBase
 {
@@ -260,19 +260,87 @@ class Extension : public ExtensionBase
 
             DECLARE_ACTION("CopyImageOnAnother",
                            _("Copier une image sur une autre"),
-                           _("Copie une image sur une autre.\nNotez qu'il est préférable que l'image source reste chargée en mémoire."),
+                           _("Copie une image sur une autre.\nNotez qu'il est préférable que l'image source reste chargée en mémoire si l'opération est répétée."),
                            _("Copier l'image _PARAM1_ sur _PARAM0_ à l'emplacement _PARAM2_;_PARAM3_"),
                            _("Images"),
-                           "res/actions/copy24.png",
-                           "res/actions/copy.png");
+                           "res/copy24.png",
+                           "res/copyicon.png");
 
                 instrInfo.AddParameter("string", _("Nom de l'image à modifier"), "", false);
                 instrInfo.AddParameter("string", _("Nom de l'image source"), "", false);
                 instrInfo.AddParameter("expression", _("Position X"), "", false);
                 instrInfo.AddParameter("expression", _("Position Y"), "", false);
+                instrInfo.AddParameter("yesorno", _("Utiliser la transparence de la source ( non si vide )"), "",false);
+                instrInfo.AddCodeOnlyParameter("currentScene", "");
 
-                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingExtension::CopyImageOnAnother").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::CopyImageOnAnother").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
+
+            DECLARE_END_ACTION()
+
+            DECLARE_ACTION("CaptureScreen",
+                           _("Capturer l'écran"),
+                           _("Effectue une copie de l'écran et l'enregistre dans le fichier indiqué et/ou\ndans l'image de la banque d'images indiquée."),
+                           _("Faire une copie de l'écran ( L'enregistrer dans le fichier _PARAM1_ et/ou dans l'image _PARAM2_ )"),
+                           _("Images"),
+                           "res/imageicon24.png",
+                           "res/imageicon.png");
+
+                instrInfo.AddCodeOnlyParameter("currentScene", "");
+                instrInfo.AddParameter("string", _("Nom du fichier sous lequel enregistrer la capture"), "", true).SetDefaultValue("");
+                instrInfo.AddParameter("string", _("Nom de l'image sous laquelle enregistrer la capture"), "", true).SetDefaultValue("");
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::CaptureScreen").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
+
+            DECLARE_END_ACTION()
+
+            DECLARE_ACTION("CreateSFMLTexture",
+                           _("Créer une image en mémoire"),
+                           _("Créé une image en mémoire, stockée dans la banque d'images du jeu.\nVous pouvez par exemple ensuite ouvrir une image depuis le disque et la stocker dedans"),
+                           _("Créer une image nommée _PARAM1_ en mémoire ( Largeur : _PARAM2_, Hauteur : _PARAM3_, Couleur : _PARAM4_ )"),
+                           _("Images"),
+                           "res/imageicon24.png",
+                           "res/imageicon.png");
+
+                instrInfo.AddCodeOnlyParameter("currentScene", "");
+                instrInfo.AddParameter("string", _("Nom de l'image"), "", false);
+                instrInfo.AddParameter("expression", _("Largeur"), "", true);
+                instrInfo.AddParameter("expression", _("Hauteur"), "", true);
+                instrInfo.AddParameter("color", _("Couleur initiale"), "", true).SetDefaultValue("0;0;0");
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::CreateSFMLTexture").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
+
+            DECLARE_END_ACTION()
+
+            DECLARE_ACTION("OpenSFMLTextureFromFile",
+                           _("Ouvrir une image depuis un fichier"),
+                           _("Charge en mémoire une image depuis un fichier."),
+                           _("Charger en mémoire le fichier _PARAM1_ dans l'image _PARAM2_"),
+                           _("Images"),
+                           "res/imageicon24.png",
+                           "res/imageicon.png");
+
+                instrInfo.AddCodeOnlyParameter("currentScene", "");
+                instrInfo.AddParameter("file", _("Nom du ficher"), "", false);
+                instrInfo.AddParameter("string", _("Nom de l'image"), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::OpenSFMLTextureFromFile").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
+
+            DECLARE_END_ACTION()
+
+            DECLARE_ACTION("SaveSFMLTextureToFile",
+                           _("Enregistrer une image dans un fichier"),
+                           _("Enregistre une image dans un fichier."),
+                           _("Sauver l'image _PARAM2_ dans le fichier _PARAM1_"),
+                           _("Images"),
+                           "res/imageicon24.png",
+                           "res/imageicon.png");
+
+                instrInfo.AddCodeOnlyParameter("currentScene", "");
+                instrInfo.AddParameter("file", _("Nom du ficher"), "", false);
+                instrInfo.AddParameter("string", _("Nom de l'image"), "", false);
+
+                instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::SaveSFMLTextureToFile").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
             DECLARE_END_ACTION()
 

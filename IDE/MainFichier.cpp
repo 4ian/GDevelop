@@ -83,7 +83,14 @@ void Game_Develop_EditorFrame::OnOpenExampleSelected(wxCommandEvent& event)
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Examples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+    #if defined(WINDOWS)
+    wxString examplesDir = wxGetCwd()+"\\Examples";
+    std::cout << examplesDir;
+    #else
+    wxString examplesDir = wxGetCwd()+"/Examples/";
+    #endif
+
+    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), examplesDir, "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
 
     if ( open.ShowModal() != wxID_CANCEL && !open.GetPath().empty() )
         Open(ToString(open.GetPath()));

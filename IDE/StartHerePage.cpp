@@ -330,7 +330,14 @@ void StartHerePage::OnTutorial2BtClick(wxCommandEvent& event)
 
 void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)
 {
-    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Examples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+    #if defined(WINDOWS)
+    wxString examplesDir = wxGetCwd()+"\\Examples";
+    std::cout << examplesDir;
+    #else
+    wxString examplesDir = wxGetCwd()+"/Examples/";
+    #endif
+
+    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), examplesDir, "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
     open.ShowModal();
 
     if ( !open.GetPath().empty() ) mainEditor.Open(string(open.GetPath().mb_str()));

@@ -282,6 +282,8 @@ void DebuggerGUI::UpdateGUI()
     if ( !doMAJ || !IsShown())
         return;
 
+        std::cout << "Coucou:" << this << std::endl;
+
     //General tab
     generalList->SetItem(0, 1, ToString(1000.0/scene.GetElapsedTime())+_(" i/s"));
     generalList->SetItem(1, 1, ToString(static_cast<double>(scene.GetElapsedTime())/1000.0)+"s");
@@ -411,15 +413,16 @@ void DebuggerGUI::UpdateGUI()
     map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
     map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
 
-    for(;objectsInTreeIter != objectsInTreeEnd;++objectsInTreeIter)
+    while(objectsInTreeIter != objectsInTreeEnd)
     {
         if ( (*objectsInTreeIter).first.expired() )
         {
-            objectsTree->Delete((*objectsInTreeIter).second.second); //Suppression de l'arbre
-            map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator temp = objectsInTreeIter;
-            objectsInTreeIter--;
-            objectsInTree.erase(temp); //Suppression de la map
+            objectsTree->Delete((*objectsInTreeIter).second.second); //Delete from the tree
+            objectsInTree.erase(objectsInTreeIter++); //Post increment is important. It increment the iterator and then return the *original* iterator.
+            //( Erasing an value does not invalidate any iterator except the deleted one )
         }
+        else
+            ++objectsInTreeIter;
     }
 
     //Obtain the shared_ptr to the selected object

@@ -282,8 +282,6 @@ void DebuggerGUI::UpdateGUI()
     if ( !doMAJ || !IsShown())
         return;
 
-        std::cout << "Coucou:" << this << std::endl;
-
     //General tab
     generalList->SetItem(0, 1, ToString(1000.0/scene.GetElapsedTime())+_(" i/s"));
     generalList->SetItem(1, 1, ToString(static_cast<double>(scene.GetElapsedTime())/1000.0)+"s");

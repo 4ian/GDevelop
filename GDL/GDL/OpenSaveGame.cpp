@@ -93,7 +93,7 @@ bool OpenSaveGame::OpenFromFile(string file)
 
     OpenDocument(doc);
     #if defined(GD_IDE_ONLY)
-    game.gameFile = file;
+    game.SetProjectFile(file);
     #endif
 
     //Vérification de la portabilité du jeu

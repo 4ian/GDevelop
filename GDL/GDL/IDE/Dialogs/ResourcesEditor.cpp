@@ -865,7 +865,7 @@ void ResourcesEditor::OnModPropSelected(wxCommandEvent& event)
     }
 
     Resource & resource = game.resourceManager.GetResource(data->GetSecondString());
-    if ( resource.EditResource() )
+    if ( resource.EditResource(game) )
         game.imagesChanged.push_back(resource.name);
 }
 
@@ -901,7 +901,7 @@ void ResourcesEditor::OnOpenPaintProgramClick(wxCommandEvent& event)
     }
 
     if ( !result.empty() )
-        wxExecute(result+" \""+resource.GetFile()+"\"");
+        wxExecute(result+" \""+resource.GetAbsoluteFile(game)+"\"");
 }
 
 /**
@@ -913,7 +913,7 @@ void ResourcesEditor::OnapercuPanelPaint(wxPaintEvent& event)
 
     boost::shared_ptr<Resource> resource = resourceSelected.lock();
     if ( resource != boost::shared_ptr<Resource>() )
-        resource->RenderPreview(dc, *apercuPanel);
+        resource->RenderPreview(dc, *apercuPanel, game);
     else
     {
         wxSize size = apercuPanel->GetSize();

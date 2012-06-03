@@ -14,7 +14,9 @@
 #include <wx/log.h>
 #include <wx/dcclient.h>
 #include <wx/file.h>
+#include <wx/filename.h>
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #endif
 
 std::string Resource::badStr;
@@ -71,29 +73,31 @@ std::string ImageResource::GetMainPropertyDescription()
     return ToString(_("Fichier de l'image"));
 }
 
-bool ImageResource::EditResource()
+bool ImageResource::EditResource(gd::Project & project)
 {
-    PropImage dialog(NULL, *this);
+    PropImage dialog(NULL, *this, project);
     if ( dialog.ShowModal() == 1 )
         return true;
 
     return false;
 }
 
-void ImageResource::RenderPreview(wxPaintDC & dc, wxPanel & previewPanel)
+void ImageResource::RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Project & project)
 {
     wxLogNull noLog; //We take care of errors.
 
     wxSize size = previewPanel.GetSize();
 
-    //Fond en damier
+    //Checkerboard background
     dc.SetBrush(gd::CommonBitmapManager::GetInstance()->transparentBg);
     dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
-    if ( !wxFile::Exists(file) )
+    wxString fullFilename = GetAbsoluteFile(project);
+
+    if ( !wxFile::Exists(fullFilename) )
         return;
 
-    wxBitmap bmp( file, wxBITMAP_TYPE_ANY);
+    wxBitmap bmp( fullFilename, wxBITMAP_TYPE_ANY);
     if ( bmp.GetWidth() > previewPanel.GetSize().x || bmp.GetHeight() > previewPanel.GetSize().y )
     {
         //Rescale to fit in previewPanel
@@ -229,6 +233,16 @@ boost::shared_ptr<Resource> ResourcesManager::CreateResource(const std::string &
     std::cout << "Bad resource created ( type: " << kind << ")" << std::endl;
     return boost::shared_ptr<Resource>(new Resource);
 }
+
+#if defined(GD_IDE_ONLY)
+std::string Resource::GetAbsoluteFile(const gd::Project & project)
+{
+    wxString projectDir = wxFileName::FileName(project.GetProjectFile()).GetPath();
+    wxFileName filename = wxFileName::FileName(GetFile());
+    filename.MakeAbsolute(projectDir);
+    return ToString(filename.GetFullPath());
+}
+#endif
 
 #if defined(GD_IDE_ONLY)
 bool ResourcesManager::HasFolder(const std::string & name) const

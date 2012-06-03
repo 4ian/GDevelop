@@ -13,6 +13,7 @@ class TiXmlElement;
 #if defined(GD_IDE_ONLY)
 class wxPaintDC;
 class wxPanel;
+namespace gd { class Project; }
 #endif
 
 /**
@@ -48,6 +49,7 @@ public:
 
     /**
      * Must return, if applicable, a reference to the string containing the file used by the resource.
+     * The file is relative to the project directory.
      *
      * \see UseFile
      */
@@ -55,10 +57,18 @@ public:
 
     /**
      * Must return, if applicable, a reference to the string containing the file used by the resource.
+     * The file is relative to the project directory.
      *
      * \see UseFile
      */
     virtual const std::string & GetFile() const {return badStr;};
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Return, if applicable, a string containing the absolute filename of the resource.
+     */
+    std::string GetAbsoluteFile(const gd::Project & game);
+    #endif
 
     /**
      * Return a description of the main property provided by the resource ( Example : "Image file" )
@@ -70,12 +80,12 @@ public:
      *
      * \return true if resource was changed
      */
-    virtual bool EditResource() {return false;};
+    virtual bool EditResource(gd::Project & project) {return false;};
 
     /**
      * Called when the resource must be rendered in a preview panel.
      */
-    virtual void RenderPreview(wxPaintDC & dc, wxPanel & previewPanel) {};
+    virtual void RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Project & game) {};
     #endif
 
     /**
@@ -122,12 +132,12 @@ public:
     virtual bool UseFile() { return true; }
 
     /**
-     * Must return, if applicable, the file used by the resource.
+     * Return the file used by the resource.
      */
     virtual std::string & GetFile() {return file;};
 
     /**
-     * Must return, if applicable, the file used by the resource.
+     * Return the file used by the resource.
      */
     virtual const std::string & GetFile() const {return file;};
 
@@ -141,12 +151,12 @@ public:
      *
      * \return true if resource was changed
      */
-    virtual bool EditResource();
+    virtual bool EditResource(gd::Project & project);
 
     /**
      * Called when the resource must be rendered in a preview panel.
      */
-    virtual void RenderPreview(wxPaintDC & dc, wxPanel & previewPanel);
+    virtual void RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Project & game);
     #endif
 
     /**

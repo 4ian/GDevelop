@@ -123,9 +123,11 @@ public:
     std::vector < CodeCompilerTask > GetCurrentTasks() const;
 
     /**
-     * Add a directory where headers can be found
+     * Add a directory where headers can be found.
+     * The directory is relative to the base directory ( which is by default the IDE directory. See CodeCompiler::SetBaseDirectory )
+     * The directory can be absolute ( "C:\...", "/usr/..." ) even if it is not recommended.
      */
-    void AddHeaderDirectory(const std::string & dir) { headersDirectories.insert(std::string("-I"+dir)); };
+    void AddHeaderDirectory(const std::string & dir);
 
     /**
      * Add a (wxWidgets) control to the list of objects notified when progress has been made
@@ -158,14 +160,26 @@ public:
     bool MustDeleteTemporaries() { return mustDeleteTemporaries; };
 
     /**
-     * Set the directory used as temporary directory for output files.
+     * Set the directory used as the base directory for includes.
+     * \note If the base directory does not end with a slash ( / ) or a backslash ( \ ), a slash is added at the end.
      */
-    void SetWorkingDirectory(std::string workingDir_);
+    void SetBaseDirectory(std::string baseDir_);
+
+    /**
+     * Return the directory used as the base directory for includes.
+     */
+    const std::string & GetBaseDirectory() const { return baseDir; };
+
+    /**
+     * Set the directory used as temporary directory for output files.
+     * \note If the base directory does not end with a slash ( / ) or a backslash ( \ ), a slash is added at the end.
+     */
+    void SetOutputDirectory(std::string outputDir_);
 
     /**
      * Return the directory used as temporary directory for output files.
      */
-    const std::string & GetWorkingDirectory() const { return workingDir; };
+    const std::string & GetOutputDirectory() const { return outputDir; };
 
     static CodeCompiler * GetInstance();
     static void DestroySingleton();
@@ -196,7 +210,8 @@ private:
     std::vector < Scene* > compilationDisallowed; ///< List of scenes which disallow their events to be compiled. (However, if a compilation is being made, it will not be stopped)
 
     //Global compiler configuration
-    std::string workingDir; ///< The directory where temporary files are created
+    std::string baseDir; ///< The directory used as the base directory for searching for includes files.
+    std::string outputDir; ///< The directory where temporary files are created
     std::set < std::string > headersDirectories; ///< List of headers that should be used for every compilation task
     bool mustDeleteTemporaries; ///< True if temporary must be deleted
 

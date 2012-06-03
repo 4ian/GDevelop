@@ -9,7 +9,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <wx/filefn.h>
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 
@@ -59,6 +58,10 @@
 #include "llvm/ADT/Statistic.h"
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "clang/Basic/FileManager.h"
+
+//wxWidgets include are put after llvm as they defines the _ macro which can cause errors in llvm headers.
+#include <wx/filename.h>
+#include <wx/filefn.h>
 
 using namespace std;
 using namespace clang;
@@ -148,6 +151,7 @@ void CodeCompiler::ProcessTasks()
                 args.push_back("-fcxx-exceptions");
                 args.push_back("-fexceptions");
                 args.push_back("-w"); //No warnings
+                args.push_back("-working-directory=\"D:/Florian/Programmation/GameDevelop2/IDE/bin/release\""); //No warnings
             }
 
             //Headers
@@ -207,7 +211,7 @@ void CodeCompiler::ProcessTasks()
 
             //Diagnostic classes
             std::string compilationErrorFileErrors;
-            llvm::raw_fd_ostream errorFile(std::string(workingDir+"compilationErrors.txt").c_str(), compilationErrorFileErrors);
+            llvm::raw_fd_ostream errorFile(std::string(outputDir+"compilationErrors.txt").c_str(), compilationErrorFileErrors);
             if ( !compilationErrorFileErrors.empty() ) std::cout << "Unable to create compilation errors report file!\n";
 
             TextDiagnosticPrinter * clangDiagClient = new TextDiagnosticPrinter(errorFile, DiagnosticOptions());
@@ -250,7 +254,7 @@ void CodeCompiler::ProcessTasks()
 
             //Compilation ended, loading diagnostics
             {
-                std::ifstream t(std::string(workingDir+"compilationErrors.txt").c_str());
+                std::ifstream t(std::string(outputDir+"compilationErrors.txt").c_str());
                 lastTaskMessages.assign(std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>()));
             }
         }
@@ -388,14 +392,60 @@ bool CodeCompiler::CompilationInProcess() const
     return (threadLaunched);
 }
 
-void CodeCompiler::SetWorkingDirectory(std::string workingDir_)
+void CodeCompiler::SetOutputDirectory(std::string outputDir_)
 {
-    workingDir = workingDir_;
-    if ( workingDir.empty() || (workingDir[workingDir.length()-1] != '/' && workingDir[workingDir.length()-1] != '\\' ) )
-        workingDir += "/";
+    outputDir = outputDir_;
+    if ( outputDir.empty() || (outputDir[outputDir.length()-1] != '/' && outputDir[outputDir.length()-1] != '\\' ) )
+        outputDir += "/";
 
-    if (!wxDirExists(workingDir.c_str()))
-        wxMkdir(workingDir);
+    if (!wxDirExists(outputDir.c_str()))
+        wxMkdir(outputDir);
+}
+
+void CodeCompiler::AddHeaderDirectory(const std::string & dir)
+{
+    wxFileName filename = wxFileName::FileName(dir);
+    filename.MakeAbsolute(baseDir);
+
+    headersDirectories.insert("-I"+ToString(filename.GetPath()));
+}
+
+void CodeCompiler::SetBaseDirectory(std::string baseDir_)
+{
+    std::string oldBaseDir = baseDir; //Remember the old base directory, see below
+    baseDir = baseDir_;
+
+    if ( baseDir.empty() || (baseDir[baseDir.length()-1] != '/' && baseDir[baseDir.length()-1] != '\\' ) )
+        baseDir += "/"; //Normalize the path if needed
+
+    std::vector<std::string> standardsIncludeDirs;
+    #if defined(WINDOWS)
+    standardsIncludeDirs.push_back("include/TDM-GCC-4.5.2/include");
+    standardsIncludeDirs.push_back("include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++");
+    standardsIncludeDirs.push_back("include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
+    #elif defined(LINUX)
+    standardsIncludeDirs.push_back("include/linux/usr/include/i386-linux-gnu/");
+    standardsIncludeDirs.push_back("include/linux/usr/include");
+    standardsIncludeDirs.push_back("include/linux/usr/include/c++/4.6/");
+    standardsIncludeDirs.push_back("include/linux/usr/include/c++/4.6/i686-linux-gnu");
+    standardsIncludeDirs.push_back("include/linux/usr/include/c++/4.6/backward");
+    #elif defined(MAC)
+    #endif
+
+    standardsIncludeDirs.push_back("include/llvm/tools/clang/lib/Headers");
+    standardsIncludeDirs.push_back("include/GDL");
+    standardsIncludeDirs.push_back("include/Core");
+    standardsIncludeDirs.push_back("include/boost");
+    standardsIncludeDirs.push_back("include/SFML/include");
+    standardsIncludeDirs.push_back("include/wxwidgets/include");
+    standardsIncludeDirs.push_back("include/wxwidgets/lib/gcc_dll/msw");
+    standardsIncludeDirs.push_back("Extensions/include");
+
+    for (unsigned int i =0;i<standardsIncludeDirs.size();++i)
+    {
+        headersDirectories.erase("-I"+oldBaseDir+standardsIncludeDirs[i]); //Be sure to remove old include directories
+        headersDirectories.insert("-I"+baseDir+standardsIncludeDirs[i]);
+    }
 }
 
 CodeCompiler::CodeCompiler() :
@@ -403,28 +453,6 @@ CodeCompiler::CodeCompiler() :
     currentTaskThread(&CodeCompiler::ProcessTasks, this),
     lastTaskFailed(false)
 {
-    #if defined(WINDOWS)
-    headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/include");
-    headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++");
-    headersDirectories.insert("-Iinclude/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
-    #elif defined(LINUX)
-    headersDirectories.insert("-Iinclude/linux/usr/include/i386-linux-gnu/");
-    headersDirectories.insert("-Iinclude/linux/usr/include");
-    headersDirectories.insert("-Iinclude/linux/usr/include/c++/4.6/");
-    headersDirectories.insert("-Iinclude/linux/usr/include/c++/4.6/i686-linux-gnu");
-    headersDirectories.insert("-Iinclude/linux/usr/include/c++/4.6/backward");
-    #elif defined(MAC)
-
-    #endif
-
-    headersDirectories.insert("-Iinclude/llvm/tools/clang/lib/Headers");
-    headersDirectories.insert("-Iinclude/GDL");
-    headersDirectories.insert("-Iinclude/Core");
-    headersDirectories.insert("-Iinclude/boost");
-    headersDirectories.insert("-Iinclude/SFML/include");
-    headersDirectories.insert("-Iinclude/wxwidgets/include");
-    headersDirectories.insert("-Iinclude/wxwidgets/lib/gcc_dll/msw");
-    headersDirectories.insert("-IExtensions/include");
 }
 
 CodeCompilerExtraWork::CodeCompilerExtraWork() :

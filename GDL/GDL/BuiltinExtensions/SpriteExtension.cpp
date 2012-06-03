@@ -332,8 +332,8 @@ SpriteExtension::SpriteExtension()
                        _("Copie une image sur celle d'un objet.\nNotez qu'il est préférable que l'image source reste chargée en mémoire."),
                        _("Copier l'image _PARAM2_ sur celle de _PARAM0_ à l'emplacement _PARAM3_;_PARAM4_"),
                        _("Effets"),
-                       "res/actions/copy24.png",
-                       "res/actions/copy.png");
+                       "res/copy24.png",
+                       "res/copyicon.png");
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
             instrInfo.AddCodeOnlyParameter("currentScene", "");

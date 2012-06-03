@@ -19,12 +19,13 @@
 #include <wx/dialog.h>
 //*)
 #include "GDL/ResourcesManager.h"
+namespace gd { class Project; }
 
 class GD_API PropImage: public wxDialog
 {
 	public:
 
-		PropImage(wxWindow* parent, ImageResource & image_);
+		PropImage(wxWindow* parent, ImageResource & image_, gd::Project & project_);
 		virtual ~PropImage();
 
 		//(*Declarations(PropImage)
@@ -36,6 +37,7 @@ class GD_API PropImage: public wxDialog
 		wxButton* BrowseBt;
 		wxCheckBox* LissageCheck;
 		wxStaticText* StaticText1;
+		wxStaticText* StaticText3;
 		wxScrollBar* scrollHeight;
 		wxStaticText* widthTxt;
 		wxStaticText* StaticText5;
@@ -56,6 +58,7 @@ class GD_API PropImage: public wxDialog
 		static const long ID_STATICTEXT2;
 		static const long ID_TEXTCTRL2;
 		static const long ID_BUTTON3;
+		static const long ID_STATICTEXT7;
 		static const long ID_CHECKBOX1;
 		static const long ID_CHECKBOX2;
 		static const long ID_STATICTEXT4;
@@ -81,6 +84,8 @@ class GD_API PropImage: public wxDialog
 		void OnBrowseBtClick(wxCommandEvent& event);
 		//*)
         void OnSize(wxSizeEvent& event);
+
+        gd::Project & project;
 
 		DECLARE_EVENT_TABLE()
 };

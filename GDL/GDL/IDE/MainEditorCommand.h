@@ -7,8 +7,6 @@
 
 #ifndef NEEDREFRESHCOMMAND_H
 #define NEEDREFRESHCOMMAND_H
-
-#include <iostream>
 #include <algorithm>
 #include <vector>
 #include <wx/infobar.h> //Strangely needed
@@ -19,6 +17,7 @@ class BuildToolsPnl;
 class Game_Develop_EditorFrame;
 class BuildToolsPnl;
 class wxAuiManager;
+class wxAuiNotebook;
 class SceneCanvas;
 
 /**
@@ -28,81 +27,113 @@ class SceneCanvas;
  */
 class GD_API MainEditorCommand
 {
-    public:
-        /**
-         * Constructor, only called by the main editor itself to construct the MainEditorCommand.
-         */
-        MainEditorCommand(wxRibbonBar * ribbon_,
-                          wxRibbonButtonBar * ribbonSceneEditorButtonBar_,
-                          wxTopLevelWindow * mainEditor_,
-                          BuildToolsPnl * buildToolsPnl_,
-                          wxAuiManager * paneManager_,
-                          wxInfoBar * infoBar_,
-                          std::vector<SceneCanvas*> * scenesLockingShortcuts_) :
-            ribbon(ribbon_),
-            ribbonSceneEditorButtonBar(ribbonSceneEditorButtonBar_),
-            mainEditor(mainEditor_),
-            buildToolsPnl(buildToolsPnl_),
-            paneManager(paneManager_),
-            infoBar(infoBar_),
-            scenesLockingShortcuts(scenesLockingShortcuts_)
-        {
-        };
+public:
+    /**
+     * Constructor, only called by the IDE itself to construct the MainEditorCommand.
+     */
+    MainEditorCommand(wxRibbonBar * ribbon_,
+                      wxRibbonButtonBar * ribbonSceneEditorButtonBar_,
+                      wxTopLevelWindow * mainEditor_,
+                      BuildToolsPnl * buildToolsPnl_,
+                      wxAuiManager * paneManager_,
+                      wxAuiNotebook * editorsNotebook_,
+                      wxInfoBar * infoBar_,
+                      std::vector<SceneCanvas*> * scenesLockingShortcuts_,
+                      const wxString & workingDirectory_) :
+        ribbon(ribbon_),
+        ribbonSceneEditorButtonBar(ribbonSceneEditorButtonBar_),
+        mainEditor(mainEditor_),
+        buildToolsPnl(buildToolsPnl_),
+        paneManager(paneManager_),
+        editorsNotebook(editorsNotebook_),
+        infoBar(infoBar_),
+        scenesLockingShortcuts(scenesLockingShortcuts_),
+        workingDirectory(workingDirectory_)
+    {
+    };
 
-        virtual ~MainEditorCommand() {};
+    virtual ~MainEditorCommand() {};
 
-        /**
-         * Return the pointer to the ribbon of the main editor.
-         */
-        wxRibbonBar * GetRibbon() const { return ribbon; };
+    /**
+     * Return the pointer to the ribbon of the IDE.
+     */
+    wxRibbonBar * GetRibbon() const { return ribbon; };
 
-        /**
-         * Return the pointer to the Scene ribbon's wxRibbonButtonBar of the main editor.
-         */
-        wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() const { return ribbonSceneEditorButtonBar; };
+    /**
+     * Return the pointer to the Scene ribbon's wxRibbonButtonBar of the main editor.
+     */
+    wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() const { return ribbonSceneEditorButtonBar; };
 
-        /**
-         * Get pointer to the build tools panel.
-         */
-        BuildToolsPnl * GetBuildToolsPanel() const { return buildToolsPnl; };
+    /**
+     * Get pointer to the build tools panel.
+     */
+    BuildToolsPnl * GetBuildToolsPanel() const { return buildToolsPnl; };
 
-        /**
-         * Get pointer to the wxAUI pane manager
-         */
-        wxAuiManager & GetPaneManager() const { return *paneManager; };
+    /**
+     * Get pointer to the wxAUI pane manager
+     */
+    wxAuiManager & GetPaneManager() const { return *paneManager; };
 
-        /**
-         * Return the pointer to the Main Editor window.
-         */
-        wxTopLevelWindow * GetMainEditor() const { return mainEditor; };
+    /**
+     * Return the pointer to the IDE window.
+     */
+    wxTopLevelWindow * GetMainEditor() const { return mainEditor; };
 
-        /**
-         * Add a scene to the list of scenes being previewed and so locking shortcuts
-         */
-        void LockShortcuts(SceneCanvas * sceneCanvas) { scenesLockingShortcuts->push_back(sceneCanvas); }
+    /**
+     * Add a scene to the list of scenes being previewed and so locking shortcuts
+     */
+    void LockShortcuts(SceneCanvas * sceneCanvas) { scenesLockingShortcuts->push_back(sceneCanvas); }
 
-        /**
-         * Remove a scene from the list of scenes locking shortcuts.
-         */
-        void UnLockShortcuts(SceneCanvas * sceneCanvas)
-        {
-            scenesLockingShortcuts->erase(std::remove(scenesLockingShortcuts->begin(), scenesLockingShortcuts->end(), sceneCanvas), scenesLockingShortcuts->end());
-        }
+    /**
+     * Remove a scene from the list of scenes locking shortcuts.
+     */
+    void UnLockShortcuts(SceneCanvas * sceneCanvas)
+    {
+        scenesLockingShortcuts->erase(std::remove(scenesLockingShortcuts->begin(), scenesLockingShortcuts->end(), sceneCanvas), scenesLockingShortcuts->end());
+    }
 
-        /**
-         * Get pointer to the main editor infobar.
-         */
-        wxInfoBar * GetInfoBar() const { return infoBar; };
+    /**
+     * Get pointer to the IDE infobar.
+     */
+    wxInfoBar * GetInfoBar() const { return infoBar; };
 
-    private:
+    /**
+     * Return a pointer to the notebook holding editors
+     */
+    wxAuiNotebook * GetEditorsNotebook() { return editorsNotebook; }
 
-        wxRibbonBar * ribbon;
-        wxRibbonButtonBar * ribbonSceneEditorButtonBar;
-        wxTopLevelWindow * mainEditor;
-        BuildToolsPnl * buildToolsPnl;
-        wxAuiManager * paneManager;
-        wxInfoBar * infoBar;
-        std::vector<SceneCanvas*> * scenesLockingShortcuts; ///< When a scene is being previewed, it is added to this list to disable shortcuts.
+    /**
+     * Return the working directory of the IDE. ( i.e. IDE executable directory )
+     */
+    wxString GetIDEWorkingDirectory() const { return workingDirectory; }
+
+    /**
+     * Call this method when a scene is going to be previewed and others controls than the scene editor must be deactivated
+     */
+    void DisableControlsForScenePreviewing();
+
+    /**
+     * Call this method when a scene preview has ended.
+     */
+    void EnableControlsAfterScenePreviewing() { for (unsigned int i = 0;i<disableOnPreview.size();++i) disableOnPreview[i]->Enable(); };
+
+    /**
+     * Used by the IDE to setup controls to be disabled when a scene is previewed.
+     */
+    void AddControlToBeDisabledOnPreview(wxWindow * control) { disableOnPreview.push_back(control); }
+
+private:
+
+    wxRibbonBar * ribbon;
+    wxRibbonButtonBar * ribbonSceneEditorButtonBar;
+    wxTopLevelWindow * mainEditor;
+    BuildToolsPnl * buildToolsPnl;
+    wxAuiManager * paneManager;
+    wxAuiNotebook * editorsNotebook;
+    wxInfoBar * infoBar;
+    std::vector<SceneCanvas*> * scenesLockingShortcuts; ///< When a scene is being previewed, it is added to this list to disable shortcuts.
+    std::vector<wxWindow*> disableOnPreview; ///< To be filled with controls to be deactivated when a scene is previewed.
+    wxString workingDirectory; ///< Contains the working directory of the IDE. ( i.e. IDE executable directory )
 };
 
 #endif // NEEDREFRESHCOMMAND_H

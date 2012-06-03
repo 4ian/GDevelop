@@ -483,9 +483,6 @@ ySelectionOffset(0)
     Connect(idDelPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDelPointSelected);
     //*)
 
-    /*toolbar = new wxToolbar( toolbarPanel, -1, wxDefaultPosition, wxDefaultSize,
-                             wxTB_FLAT | wxTB_NODIVIDER | wxTB_HORIZONTAL );*/
-
     toolbar->ClearTools();
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
     toolbar->AddTool( idMenuAddFromEnd, wxT( "Ajouter l'image à la fin" ), wxBitmap( wxImage( "res/addfromimagebanque.png" ) ), _( "Ajouter une image à la fin depuis la banque d'image" ) );
@@ -1011,9 +1008,9 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
             {
                 ImageResource & image = dynamic_cast<ImageResource&>(game.resourceManager.GetResource(directionToDisplay.GetSprite(i).GetImageName()));
 
-                if ( wxFileExists(image.file) )
+                if ( wxFileExists(image.GetAbsoluteFile(game)) )
                 {
-                    wxBitmap bmp( image.file, wxBITMAP_TYPE_ANY);
+                    wxBitmap bmp( image.GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
                     if ( bmp.GetWidth() != 48 || bmp.GetHeight() != 48 )
                     {
                         wxImage bmpImage = bmp.ConvertToImage();
@@ -1095,10 +1092,10 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
         {
             ImageResource & image = dynamic_cast<ImageResource&>(game.resourceManager.GetResource(sprite.GetImageName()));
 
-            if ( wxFileExists(image.file) )
+            if ( wxFileExists(image.GetAbsoluteFile(game)) )
             {
                 //Chargement de l'image
-                wxBitmap bmp( image.file, wxBITMAP_TYPE_ANY);
+                wxBitmap bmp( image.GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
                 wxBitmap point( CommonBitmapManager->point );
 
                 scrollWidth->SetScrollbar(scrollWidth->GetThumbPosition(),size.GetWidth(), bmp.GetWidth(),size.GetWidth());
@@ -1239,10 +1236,8 @@ void EditorObjet::OnAddMoreBeforeSelected(wxCommandEvent& event)
 
 void EditorObjet::OnAddFromEndSelected(wxCommandEvent& event)
 {
-    cout << "called";
     if ( !AnimationAndDirectionValid() )
     {
-        cout << "return";
         return;
     }
 
@@ -1413,7 +1408,7 @@ void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
 
             //Tailles nécessaire pour placer le point
             wxSize size = imagePanel->GetSize();
-            wxBitmap bmp( image.file, wxBITMAP_TYPE_ANY);
+            wxBitmap bmp( image.GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
 
             int SpritePosX = (size.GetWidth() - bmp.GetWidth() - scrollWidth->GetThumbPosition()) / 2;
             int SpritePosY = (size.GetHeight() - bmp.GetHeight() - scrollHeight->GetThumbPosition()) / 2;
@@ -1577,6 +1572,7 @@ void EditorObjet::OnAddPointSelected(wxCommandEvent& event)
         }
     }
 
+    selectedPoint = name;
 }
 
 ////////////////////////////////////////////////////////////
@@ -1708,7 +1704,7 @@ void EditorObjet::OnAddMaskRectangleSelected(wxCommandEvent& event)
         RotatedRectangle newRectangle;
         newRectangle.halfSize.x = ToFloat(string(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Nouveau rectangle"), "32").mb_str()))/2.0f;
         newRectangle.halfSize.y = ToFloat(string(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Nouveau rectangle"), "32").mb_str()))/2.0f;
-        newRectangle.angle = 0;//ToFloat(string(wxGetTextFromUser(_("Angle du rectangle, en degrés."), _("Nouveau rectangle"), "0").mb_str()))/180.0f*3.14159f;
+        newRectangle.angle = 0;
         boxes.push_back(newRectangle);
 
         GetEditedSprite().SetCollisionMaskAutomatic(false);
@@ -1760,7 +1756,6 @@ void EditorObjet::OnModifyMaskRectangleSelected(wxCommandEvent& event)
         {
             boxes[selectedBox].halfSize.x = ToFloat(string(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.x*2.0f)).mb_str()))/2.0f;
             boxes[selectedBox].halfSize.y = ToFloat(string(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.y*2.0f)).mb_str()))/2.0f;
-            //boxes[selectedBox].angle = ToFloat(string(wxGetTextFromUser(_("Angle du rectangle, en degrés."), _("Edition d'un rectangle"), ToString(boxes[selectedBox].angle/3.14159f*180.0f)).mb_str()))/180.0f*3.14159f;
         }
         GetEditedSprite().SetCollisionMaskAutomatic(false);
         GetEditedSprite().SetCustomCollisionMask(boxes);
@@ -1795,10 +1790,8 @@ void EditorObjet::OnEnterMaskRectanglePositionSelected(wxCommandEvent& event)
 
         if ( applyMaskToAllDirectionSprites->IsChecked() )
         {
-            cout << "Apply";
             for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size();++i)
             {
-                cout << "ApplyToSprite";
                 object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCollisionMaskAutomatic(false);
                 object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i).SetCustomCollisionMask(boxes);
             }

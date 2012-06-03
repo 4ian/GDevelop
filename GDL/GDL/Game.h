@@ -183,7 +183,6 @@ public:
     bool useExternalSourceFiles; ///< True if game used external source files.
 
     #if defined(GD_IDE_ONLY)
-    std::string gameFile; ///< File of the game
     std::vector < string > imagesChanged; ///< Images that have been changed and which have to be reloaded
     std::string winExecutableFilename; ///< Windows executable name
     std::string winExecutableIconFile; ///< Icon for Windows executable
@@ -199,6 +198,8 @@ public:
     ///@{
     virtual void SetAuthor(const std::string & author_) { author = author_; };
     virtual const std::string & GetAuthor() {return author;}
+    virtual void SetProjectFile(const std::string & file) { gameFile = file; }
+    virtual const std::string & GetProjectFile() const { return gameFile; }
 
     virtual bool HasLayoutNamed(const std::string & name) const;
     virtual gd::Layout & GetLayout(const std::string & name);
@@ -270,6 +271,7 @@ private:
     std::vector < boost::shared_ptr<ExternalLayout> >   externalLayouts; ///< List of all externals layouts
     #if defined(GD_IDE_ONLY)
     std::string                                         author; ///< Game author name
+    std::string                                         gameFile; ///< File of the game
     vector < std::string >                              extensionsUsed; ///< List of extensions used
     gd::Platform *                                      platform; ///< Pointer to the platform owning the project
     std::vector < boost::shared_ptr<ExternalEvents> >   externalEvents; ///< List of all externals events

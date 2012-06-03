@@ -68,6 +68,23 @@
 									</object>
 									<object class="spacer">
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+										<size>5,5</size>
+									</object>
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText3" member="yes">
+											<label>Le fichier est relatif au dossier du projet</label>
+											<font>
+												<style>italic</style>
+											</font>
+										</object>
+										<flag>wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="spacer">
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<option>1</option>
 									</object>
 									<object class="sizeritem">

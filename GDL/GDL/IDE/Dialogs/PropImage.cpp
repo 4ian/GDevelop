@@ -7,12 +7,15 @@
 #include "GDL/IDE/Dialogs/PropImage.h"
 
 //(*InternalHeaders(PropImage)
+#include <wx/font.h>
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
 #include <wx/dcbuffer.h>
 #include <wx/filedlg.h>
+#include <wx/filename.h>
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "GDL/CommonTools.h"
 
 //(*IdInit(PropImage)
@@ -21,6 +24,7 @@ const long PropImage::ID_TEXTCTRL1 = wxNewId();
 const long PropImage::ID_STATICTEXT2 = wxNewId();
 const long PropImage::ID_TEXTCTRL2 = wxNewId();
 const long PropImage::ID_BUTTON3 = wxNewId();
+const long PropImage::ID_STATICTEXT7 = wxNewId();
 const long PropImage::ID_CHECKBOX1 = wxNewId();
 const long PropImage::ID_CHECKBOX2 = wxNewId();
 const long PropImage::ID_STATICTEXT4 = wxNewId();
@@ -40,8 +44,9 @@ BEGIN_EVENT_TABLE(PropImage,wxDialog)
 	EVT_SIZE    (PropImage::OnSize)
 END_EVENT_TABLE()
 
-PropImage::PropImage(wxWindow* parent, ImageResource & image_) :
-image(image_)
+PropImage::PropImage(wxWindow* parent, ImageResource & image_, gd::Project & project_) :
+image(image_),
+project(project_)
 {
 	//(*Initialize(PropImage)
 	wxStaticBoxSizer* StaticBoxSizer2;
@@ -74,6 +79,11 @@ image(image_)
 	BrowseBt = new wxButton(this, ID_BUTTON3, _("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer7->Add(BrowseBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer3->Add(5,5,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT7, _("Le fichier est relatif au dossier du projet"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	wxFont StaticText3Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	StaticText3->SetFont(StaticText3Font);
+	FlexGridSizer3->Add(StaticText3, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	LissageCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Lisser l\'image"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	LissageCheck->SetValue(false);
@@ -191,10 +201,15 @@ void PropImage::OnapercuPanelPaint(wxPaintEvent& event)
     dc.SetBrush(CommonBitmapManager->transparentBg);
     dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
-    if ( !wxFileExists(FichierEdit->GetValue()) )
+    //Note that the file is relative to the project directory
+    wxString projectDirectory = wxFileName::FileName(project.GetProjectFile()).GetPath();
+    wxFileName filename(FichierEdit->GetValue());
+    filename.MakeAbsolute(projectDirectory);
+
+    if ( !wxFileExists(filename.GetFullPath()) )
         return;
 
-    wxBitmap bmp( FichierEdit->GetValue(), wxBITMAP_TYPE_ANY);
+    wxBitmap bmp( filename.GetFullPath(), wxBITMAP_TYPE_ANY);
     widthTxt->SetLabel(ToString(bmp.GetWidth()) + " pixels");
     heightTxt->SetLabel(ToString(bmp.GetHeight()) + " pixels");
 

@@ -100,27 +100,27 @@ WindowExtension::WindowExtension()
 
     DECLARE_END_ACTION()
 
-    DECLARE_EXPRESSION("SceneWindowWidth", "Largeur de la fenêtre de la scène", "Largeur de la fenêtre de la scène", "Ecran", "res/display16.png")
+    DECLARE_EXPRESSION("SceneWindowWidth", _("Largeur de la fenêtre de la scène"), _("Largeur de la fenêtre de la scène"), _("Ecran"), "res/window.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSceneWindowWidth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("SceneWindowHeight", "Hauteur de la fenêtre de la scène", "Hauteur de la fenêtre de la scène", "Ecran", "res/display16.png")
+    DECLARE_EXPRESSION("SceneWindowHeight", _("Hauteur de la fenêtre de la scène"), _("Hauteur de la fenêtre de la scène"), _("Ecran"), "res/window.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSceneWindowHeight").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("ScreenWidth", "Largeur de la résolution actuelle", "Largeur de la résolution actuelle", "Ecran", "res/display16.png")
+    DECLARE_EXPRESSION("ScreenWidth", _("Largeur de la résolution actuelle"), _("Largeur de la résolution actuelle"), _("Ecran"), "res/display16.png")
         instrInfo.cppCallingInformation.SetFunctionName("GetScreenWidth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("ScreenHeight", "Hauteur de la résolution actuelle", "Hauteur de la résolution actuelle", "Ecran", "res/display16.png")
+    DECLARE_EXPRESSION("ScreenHeight", _("Hauteur de la résolution actuelle"), _("Hauteur de la résolution actuelle"), _("Ecran"), "res/display16.png")
         instrInfo.cppCallingInformation.SetFunctionName("GetScreenHeight").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("ColorDepth", "Profondeur de couleur de la résolution actuelle", "Profondeur de couleur de la résolution actuelle", "Ecran", "res/display16.png")
+    DECLARE_EXPRESSION("ColorDepth", _("Profondeur de couleur de la résolution actuelle"), _("Profondeur de couleur de la résolution actuelle"), _("Ecran"), "res/display16.png")
         instrInfo.cppCallingInformation.SetFunctionName("GetColorDepth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_STR_EXPRESSION("WindowTitle", "Titre de la fenêtre", "Titre de la fenêtre", "Ecran", "res/display16.png")
+    DECLARE_STR_EXPRESSION("WindowTitle", _("Titre de la fenêtre"), _("Titre de la fenêtre"), _("Ecran"), "res/window.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetWindowTitle").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");

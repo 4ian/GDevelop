@@ -63,18 +63,18 @@ bool EventsCodeCompilerPreWork::Execute()
         {
             //Check if the source file need to be recompiled
             bool launchSourceFileCompilation = false;
-            if ( !wxFileExists(string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString((*sourceFile).get())+"LLVMIR.bc") ))
+            if ( !wxFileExists(string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString((*sourceFile).get())+"LLVMIR.bc") ))
                 launchSourceFileCompilation = true;
             else
             {
                 wxFileName sourceFileInfo((*sourceFile)->GetFileName() );
-                sourceFileInfo.MakeAbsolute(wxFileName::FileName(game->gameFile).GetPath());
+                sourceFileInfo.MakeAbsolute(wxFileName::FileName(game->GetProjectFile()).GetPath());
 
                 if (!wxFileExists(sourceFileInfo.GetFullPath()))
                     launchSourceFileCompilation = true;
                 else
                 {
-                    wxFileName bitcodeFileInfo(string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString((*sourceFile).get())+"LLVMIR.bc"));
+                    wxFileName bitcodeFileInfo(string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString((*sourceFile).get())+"LLVMIR.bc"));
                     if ( bitcodeFileInfo.GetModificationTime().GetTicks() < sourceFileInfo.GetModificationTime().GetTicks() )
                         launchSourceFileCompilation = true;
                 }
@@ -96,7 +96,7 @@ bool EventsCodeCompilerPreWork::Execute()
     if ( !requestRelaunchCompilationLater )
     {
         std::ofstream myfile;
-        myfile.open ( string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(scene)+"events.cpp").c_str() );
+        myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(scene)+"events.cpp").c_str() );
         myfile << eventsOutput;
         myfile.close();
     }
@@ -132,7 +132,7 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
 
         if (sourceFile != game->externalSourceFiles.end() && *sourceFile != boost::shared_ptr<SourceFile>())
         {
-            std::string file = string(CodeCompiler::GetInstance()->GetWorkingDirectory()+"GDpriv"+ToString((*sourceFile).get())+".ir");
+            std::string file = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GDpriv"+ToString((*sourceFile).get())+".ir");
 
             //Check if the source file need to be recompiled
             bool launchSourceFileCompilation = false;
@@ -154,10 +154,10 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
                 task.eventsGeneratedCode = false;
 
                 wxFileName inputFile((*sourceFile)->GetFileName());
-                inputFile.MakeAbsolute(wxFileName::FileName(game->gameFile).GetPath());
+                inputFile.MakeAbsolute(wxFileName::FileName(game->GetProjectFile()).GetPath());
                 task.inputFile = ToString(inputFile.GetFullPath());
                 task.outputFile = file;
-                task.additionalHeaderDirectories.push_back(ToString(wxFileName::FileName(game->gameFile).GetPath()));
+                task.additionalHeaderDirectories.push_back(ToString(wxFileName::FileName(game->GetProjectFile()).GetPath()));
                 task.scene = NULL;
                 task.postWork = boost::shared_ptr<CodeCompilerExtraWork>(new SourceFileCodeCompilerPostWork(scene));
 
@@ -179,7 +179,7 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
     if ( !requestRelaunchCompilationLater )
     {
         std::ofstream myfile;
-        myfile.open ( string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(scene)+"events.cpp").c_str() );
+        myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(scene)+"events.cpp").c_str() );
         myfile << eventsOutput;
         myfile.close();
     }
@@ -209,10 +209,10 @@ bool EventsCodeCompilerPostWork::Execute()
 
     //Open scene bitcode in a buffer
     llvm::OwningPtr<llvm::MemoryBuffer> codeBufferOPtr;
-    llvm::error_code err = llvm::MemoryBuffer::getFile(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(scene)+"LLVMIR.bc", codeBufferOPtr);
+    llvm::error_code err = llvm::MemoryBuffer::getFile(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(scene)+"LLVMIR.bc", codeBufferOPtr);
     if ( err.value() != 0 )
     {
-        std::cout << "Failed to load "+CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(scene)+"LLVMIR.bc: " << err.message() << std::endl << char(7);
+        std::cout << "Failed to load "+CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(scene)+"LLVMIR.bc: " << err.message() << std::endl << char(7);
         return false;
     }
     codeBuffers.push_back(codeBufferOPtr.take());
@@ -226,10 +226,10 @@ bool EventsCodeCompilerPostWork::Execute()
         if (sourceFile != game->externalSourceFiles.end() && *sourceFile != boost::shared_ptr<SourceFile>())
         {
             llvm::OwningPtr<llvm::MemoryBuffer> codeBufferOPtr;
-            llvm::error_code err = llvm::MemoryBuffer::getFile(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString((*sourceFile).get())+"LLVMIR.bc", codeBufferOPtr);
+            llvm::error_code err = llvm::MemoryBuffer::getFile(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString((*sourceFile).get())+"LLVMIR.bc", codeBufferOPtr);
             if ( err.value() != 0 )
             {
-                std::cout << "Failed to load "+CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString((*sourceFile).get())+"LLVMIR.bc: " << err.message() << std::endl << char(7);
+                std::cout << "Failed to load "+CodeCompiler::GetInstance()->GetOutputDirectory()+ToString((*sourceFile).get())+"LLVMIR.bc: " << err.message() << std::endl << char(7);
 
                 for (unsigned int j = 0;j<codeBuffers.size();++j) delete codeBuffers[j];
                 return false;
@@ -252,8 +252,8 @@ bool EventsCodeCompilerPostWork::Execute()
     //Make some clean up
     if ( CodeCompiler::GetInstance()->MustDeleteTemporaries() )
     {
-        wxRemoveFile(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(scene)+"LLVMIR.bc");
-        wxRemoveFile(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(scene)+"events.cpp");
+        wxRemoveFile(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(scene)+"LLVMIR.bc");
+        wxRemoveFile(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(scene)+"events.cpp");
     }
 
     scene->UnsetEventsModified();
@@ -277,8 +277,8 @@ void GD_API CodeCompilationHelpers::CreateSceneEventsCompilationTask(Game & game
     task.compilationForRuntime = false;
     task.optimize = false;
     task.eventsGeneratedCode = true;
-    task.inputFile = string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(&scene)+"events.cpp");
-    task.outputFile = string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(&scene)+"LLVMIR.bc");
+    task.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&scene)+"events.cpp");
+    task.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&scene)+"LLVMIR.bc");
     task.scene = &scene;
     task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPreWork(&game, &scene, scene.codeExecutionEngine));
     task.postWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPostWork(&game, &scene, scene.codeExecutionEngine));
@@ -295,11 +295,11 @@ void GD_API CodeCompilationHelpers::CreateExternalSourceFileCompilationTask(Game
     task.eventsGeneratedCode = false;
 
     wxFileName inputFile(file.GetFileName());
-    inputFile.MakeAbsolute(wxFileName::FileName(game.gameFile).GetPath());
+    inputFile.MakeAbsolute(wxFileName::FileName(game.GetProjectFile()).GetPath());
     task.inputFile = ToString(inputFile.GetFullPath());
-    task.outputFile = string(CodeCompiler::GetInstance()->GetWorkingDirectory()+ToString(&file)+"LLVMIR.bc");
+    task.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&file)+"LLVMIR.bc");
 
-    task.additionalHeaderDirectories.push_back(ToString(wxFileName::FileName(game.gameFile).GetPath()));
+    task.additionalHeaderDirectories.push_back(ToString(wxFileName::FileName(game.GetProjectFile()).GetPath()));
     task.scene = scene;
     if ( scene ) task.postWork = boost::shared_ptr<CodeCompilerExtraWork>(new SourceFileCodeCompilerPostWork(scene));
 

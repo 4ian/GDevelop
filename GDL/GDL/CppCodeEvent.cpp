@@ -29,7 +29,7 @@ std::string CppCodeEvent::GenerateEventCode(Game & game, Scene & scene, EventsCo
 {
     //Write real source file
     wxFileName outputFile(associatedGDManagedSourceFile);
-    outputFile.MakeAbsolute(wxFileName::FileName(game.gameFile).GetPath());
+    outputFile.MakeAbsolute(wxFileName::FileName(game.GetProjectFile()).GetPath());
 
     std::ofstream file;
     file.open( ToString(outputFile.GetFullPath()).c_str() );

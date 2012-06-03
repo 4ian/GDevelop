@@ -376,7 +376,7 @@ void Game::Init(const Game & game)
     variables = game.GetVariables();
 
     #if defined(GD_IDE_ONLY)
-    gameFile = game.gameFile;
+    gameFile = game.GetProjectFile();
     imagesChanged = game.imagesChanged;
 
     winExecutableFilename = game.winExecutableFilename;

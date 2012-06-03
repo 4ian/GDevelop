@@ -29,6 +29,12 @@ public:
     ResourcesMergingHelper() : ArbitraryResourceWorker() {};
     virtual ~ResourcesMergingHelper() {};
 
+    /**
+     * Set the directory used as base directory: All resources filename are relative to this directory.
+     * ( Usually, it is the project directory )
+     */
+    void SetBaseDirectory(const std::string & baseDirectory);
+
     std::map<std::string, std::string> & GetAllResourcesNewFilename() { return resourcesNewFilename; };
 
     /**
@@ -41,6 +47,7 @@ public:
 
 protected:
     std::map<std::string, std::string> resourcesNewFilename;
+    std::string baseDirectory;
 };
 
 }

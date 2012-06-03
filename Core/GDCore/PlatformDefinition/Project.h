@@ -55,6 +55,17 @@ public:
     virtual const std::string & GetAuthor() =0;
 
     /**
+     * Called when project file has changed.
+     */
+    virtual void SetProjectFile(const std::string & name) =0;
+
+    /**
+     * Must return project file
+     * \see gd::Project::SetProjectFile
+     */
+    virtual const std::string & GetProjectFile() const =0;
+
+    /**
      * Must change the default width of the project main window
      */
     virtual void SetMainWindowDefaultWidth(unsigned int width) =0;

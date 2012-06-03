@@ -11,8 +11,6 @@
 #include <wx/dcmemory.h>
 #include <string>
 
-using namespace std;
-
 namespace gd
 {
 
@@ -20,7 +18,6 @@ CommonBitmapManager *CommonBitmapManager::_singleton = NULL;
 
 CommonBitmapManager::CommonBitmapManager()
 {
-    //ctor
     expressionBt.LoadFile("res/expressionicon.png", wxBITMAP_TYPE_ANY);
     objectBt.LoadFile("res/objeticon.png", wxBITMAP_TYPE_ANY);
     automatismBt.LoadFile("res/automatism16.png", wxBITMAP_TYPE_ANY);
@@ -50,6 +47,26 @@ CommonBitmapManager::CommonBitmapManager()
     unknown24.LoadFile("res/unknown24.png", wxBITMAP_TYPE_ANY);
     semitransparentHitBox.LoadFile("res/semitransparentHitBox.png", wxBITMAP_TYPE_ANY);
     noProtection.LoadFile("res/noProtection.png", wxBITMAP_TYPE_ANY);
+
+    layers24.LoadFile("res/layers24.png", wxBITMAP_TYPE_ANY);
+    undo24.LoadFile("res/undo24.png", wxBITMAP_TYPE_ANY);
+    redo24.LoadFile("res/redo24.png", wxBITMAP_TYPE_ANY);
+    redo24.LoadFile("res/redo24.png", wxBITMAP_TYPE_ANY);
+    center24.LoadFile("res/center24.png", wxBITMAP_TYPE_ANY);
+    zoom24.LoadFile("res/zoom24.png", wxBITMAP_TYPE_ANY);
+    grid24.LoadFile("res/grid24.png", wxBITMAP_TYPE_ANY);
+    gridedit24.LoadFile("res/gridedit24.png", wxBITMAP_TYPE_ANY);
+    windowMask24.LoadFile("res/windowMask24.png", wxBITMAP_TYPE_ANY);
+    windowMask24.LoadFile("res/windowMask24.png", wxBITMAP_TYPE_ANY);
+    objectsPositionsList24.LoadFile("res/ObjectsPositionsList24.png", wxBITMAP_TYPE_ANY);
+    refreshicon24.LoadFile("res/refreshicon24.png", wxBITMAP_TYPE_ANY);
+    starticon24.LoadFile("res/starticon24.png", wxBITMAP_TYPE_ANY);
+    startwindow24.LoadFile("res/startwindow24.png", wxBITMAP_TYPE_ANY);
+    pauseicon24.LoadFile("res/pauseicon24.png", wxBITMAP_TYPE_ANY);
+    bug24.LoadFile("res/bug24.png", wxBITMAP_TYPE_ANY);
+    profiler24.LoadFile("res/profiler24.png", wxBITMAP_TYPE_ANY);
+    fullscreen24.LoadFile("res/fullscreen24.png", wxBITMAP_TYPE_ANY);
+
 }
 
 }

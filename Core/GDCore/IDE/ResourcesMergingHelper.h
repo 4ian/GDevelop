@@ -26,7 +26,7 @@ namespace gd
 class GD_CORE_API ResourcesMergingHelper : public ArbitraryResourceWorker
 {
 public:
-    ResourcesMergingHelper() : ArbitraryResourceWorker() {};
+    ResourcesMergingHelper() : ArbitraryResourceWorker(), preserveDirectoriesStructure(false) {};
     virtual ~ResourcesMergingHelper() {};
 
     /**
@@ -35,7 +35,17 @@ public:
      */
     void SetBaseDirectory(const std::string & baseDirectory);
 
-    std::map<std::string, std::string> & GetAllResourcesNewFilename() { return resourcesNewFilename; };
+    /**
+     * Change the if the directories structure, starting from the base directory, must be preserved.
+     * For compilation, all resources must be in a single folder, so that the directories structure is not preserved.
+     */
+    void PreserveDirectoriesStructure(bool preserveDirectoriesStructure_ = true) {preserveDirectoriesStructure = preserveDirectoriesStructure_;};
+
+    /**
+     * Return a map containing the resources old absolute filename as key, and the resources new filenames as value.
+     * The new filenames are relative to the Base Directory.
+     */
+    std::map<std::string, std::string> & GetAllResourcesOldAndNewFilename() { return resourcesNewFilename; };
 
     /**
      * Resources merging helper collects all resources filenames and update these filenames.
@@ -48,6 +58,7 @@ public:
 protected:
     std::map<std::string, std::string> resourcesNewFilename;
     std::string baseDirectory;
+    bool preserveDirectoriesStructure; ///< If set to true, the directory structure, starting from baseDirectory, will be preserved in filenames.
 };
 
 }

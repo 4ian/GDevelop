@@ -183,7 +183,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     //Now copy resources
     diagnosticManager.OnMessage( gd::ToString( _("Copie des ressources...") ) );
-    map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesNewFilename();
+    map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
     unsigned int i = 0;
     for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {

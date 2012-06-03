@@ -96,11 +96,6 @@ bool OpenSaveGame::OpenFromFile(string file)
     game.SetProjectFile(file);
     #endif
 
-    //Vérification de la portabilité du jeu
-    if ( game.portable )
-        RecreatePaths(file);
-    game.portable = false;
-
     #if defined(GD_IDE_ONLY)
     if (!updateText.empty())
     {
@@ -1066,46 +1061,6 @@ void OpenSaveGame::SaveExternalEvents(const vector < boost::shared_ptr<ExternalE
 }
 
 #endif
-
-////////////////////////////////////////////////////////////
-/// Recréer les chemins
-///
-/// Recréer les chemins des ressources utilisées par le jeu
-////////////////////////////////////////////////////////////
-void OpenSaveGame::RecreatePaths(string file)
-{
-#if defined(GD_IDE_ONLY)
-    string newDirectory = string( wxPathOnly( file ).mb_str() );
-    if ( newDirectory.empty() ) return;
-
-    gd::ResourcesUnmergingHelper resourcesUnmergingHelper(newDirectory);
-
-    //Image du chargement
-    if ( !game.loadingScreen.imageFichier.empty() )
-        resourcesUnmergingHelper.ExposeResource(game.loadingScreen.imageFichier);
-
-
-    for ( unsigned int i = 0;i < game.resourceManager.resources.size() ;i++ )
-    {
-        if ( game.resourceManager.resources[i] == boost::shared_ptr<Resource>() )
-            continue;
-
-        if ( game.resourceManager.resources[i]->UseFile() )
-            resourcesUnmergingHelper.ExposeResource(game.resourceManager.resources[i]->GetFile());
-    }
-
-    //Add scenes resources
-    for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
-    {
-        for (unsigned int j = 0;j<game.GetLayouts()[i]->GetInitialObjects().size();++j) //Add objects resources
-        	game.GetLayouts()[i]->GetInitialObjects()[j]->ExposeResources(resourcesUnmergingHelper);
-
-        LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), resourcesUnmergingHelper);
-    }
-    for (unsigned int j = 0;j<game.GetGlobalObjects().size();++j) //Add global objects resources
-        game.GetGlobalObjects()[j]->ExposeResources(resourcesUnmergingHelper);
-#endif
-}
 
 #if defined(GD_IDE_ONLY)
 void OpenSaveGame::OpenImagesFromGD2010498(const TiXmlElement * imagesElem, TiXmlElement * dossierElem)

@@ -528,10 +528,12 @@ void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Ouvre un jeu, et stocke dans les tableaux passés en paramétres.
-////////////////////////////////////////////////////////////
 bool RuntimeScene::LoadFromScene( const Scene & scene )
+{
+    return LoadFromSceneAndCustomInstances(scene, scene.GetInitialInstances());
+}
+
+bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const InitialInstancesContainer & instances )
 {
     MessageLoading( "Loading scene", 10 );
 
@@ -576,7 +578,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
 
     //Create object instances which are originally positioned on scene
     MessageLoading( "Adding objects to their initial position", 66 );
-    CreateObjectsFrom(scene.GetInitialInstances());
+    CreateObjectsFrom(instances);
 
     //Automatisms data
     automatismsSharedDatas.clear();

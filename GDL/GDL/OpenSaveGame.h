@@ -30,7 +30,6 @@ public:
 
     bool OpenFromFile(string file);
     void OpenFromString(string text);
-    void RecreatePaths(string file);
 
     #if defined(GD_IDE_ONLY)
     static void OpenEvents( vector < gd::BaseEventSPtr > & list, const TiXmlElement * elem );

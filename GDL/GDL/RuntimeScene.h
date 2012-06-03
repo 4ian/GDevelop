@@ -93,8 +93,18 @@ public:
 
     /**
      * Set up the Runtime Scene using a Scene
+     *
+     * \note Similar to calling LoadFromSceneAndCustomInstances(scene, scene.GetInitialInstances());
+     * \see LoadFromSceneAndCustomInstances
      */
     bool LoadFromScene( const Scene & scene );
+
+    /**
+     * Set up the Runtime Scene using the \a instances and the \a scene.
+     * \param scene Scene used as context.
+     * \param instances Initial instances to be put on the scene
+     */
+    bool LoadFromSceneAndCustomInstances( const Scene & scene, const InitialInstancesContainer & instances );
 
     /**
      * Create the objects from an InitialInstancesContainer object.

@@ -163,17 +163,17 @@ void Game_Develop_EditorFrame::OnMenuSaveSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
-    if ( GetCurrentGame()->gameFile.empty() )
+    if ( GetCurrentGame()->GetProjectFile().empty() )
         SaveAs();
     else
     {
         OpenSaveGame saveGame( *GetCurrentGame() );
-        if ( !saveGame.SaveToFile(GetCurrentGame()->gameFile) )
+        if ( !saveGame.SaveToFile(GetCurrentGame()->GetProjectFile()) )
             wxLogError( "L'enregistrement a échoué." );
         else
             wxLogStatus(_("Enregistrement du fichier terminé."));
 
-        m_recentlist.SetLastUsed( GetCurrentGame()->gameFile );
+        m_recentlist.SetLastUsed( GetCurrentGame()->GetProjectFile() );
 
         return;
     }
@@ -198,7 +198,7 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
 {
     for (unsigned int i = 0;i<games.size();++i)
     {
-        if ( games[i]->gameFile.empty() )
+        if ( games[i]->GetProjectFile().empty() )
         {
             sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
@@ -216,16 +216,16 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
             if ( !path.empty() )
             {
                 //oui, donc on l'enregistre
-                games[i]->gameFile = path;
+                games[i]->SetProjectFile(path);
                 OpenSaveGame saveGame( *games[i] );
 
-                if ( !saveGame.SaveToFile(games[i]->gameFile) ) {wxLogError( "L'enregistrement a échoué." );}
-                m_recentlist.SetLastUsed( games[i]->gameFile );
+                if ( !saveGame.SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( "L'enregistrement a échoué." );}
+                m_recentlist.SetLastUsed( games[i]->GetProjectFile() );
 
                 if ( games[i] == GetCurrentGame() )
                 {
                     wxString GD = "Game Develop";
-                    wxString Fichier = GetCurrentGame()->gameFile;
+                    wxString Fichier = GetCurrentGame()->GetProjectFile();
                     SetTitle( GD + " - " + Fichier );
                 }
             }
@@ -233,7 +233,7 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
         else
         {
             OpenSaveGame saveGame( *games[i] );
-            if ( !saveGame.SaveToFile(games[i]->gameFile) ) {wxLogError( "L'enregistrement a échoué." );}
+            if ( !saveGame.SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( "L'enregistrement a échoué." );}
         }
     }
 
@@ -276,18 +276,18 @@ void Game_Develop_EditorFrame::SaveAs()
     if ( !path.empty() )
     {
         //oui, donc on l'enregistre
-        GetCurrentGame()->gameFile = path;
+        GetCurrentGame()->SetProjectFile(path);
         OpenSaveGame saveGame( *GetCurrentGame() );
 
-        if ( !saveGame.SaveToFile(GetCurrentGame()->gameFile) )
+        if ( !saveGame.SaveToFile(GetCurrentGame()->GetProjectFile()) )
         {
             wxLogError( "L'enregistrement a échoué" );
         }
 
-        m_recentlist.SetLastUsed( GetCurrentGame()->gameFile );
+        m_recentlist.SetLastUsed( GetCurrentGame()->GetProjectFile() );
 
         wxString GD = "Game Develop";
-        wxString Fichier = GetCurrentGame()->gameFile;
+        wxString Fichier = GetCurrentGame()->GetProjectFile();
         SetTitle( GD + " - " + Fichier );
 
         return;

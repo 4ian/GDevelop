@@ -725,7 +725,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
     ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
     const gd::InstructionMetadata & instructionMetadata = extensionManager->GetActionMetadata(Type);
 
-    if ( i < MaxPara && i < instructionMetadata.parameters.size())
+    if ( i < ParaEdit.size() && i < instructionMetadata.parameters.size())
     {
         if ( instructionMetadata.parameters[i].type == "object" )
         {
@@ -778,36 +778,42 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         }
         else if ( instructionMetadata.parameters[i].type == "police" )
         {
-            wxFileDialog dialog(this, _("Choisissez une police de caractère ( fichiers ttf, ttc )"), "", "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
+            wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
+            wxFileDialog dialog(this, _("Choisissez une police de caractère ( fichiers ttf, ttc )"), gameDirectory, "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
             dialog.ShowModal();
 
-            if ( dialog.GetPath() != "" )
+            if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
             {
-                ParaEdit.at(i)->ChangeValue(static_cast<string> ( dialog.GetPath() ));
+                wxFileName filename(dialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
+                ParaEdit[i]->ChangeValue(filename.GetFullPath());
             }
 
             return;
         }
         else if ( instructionMetadata.parameters[i].type == "musicfile" )
         {
-            wxFileDialog dialog(this, _("Choisissez une musique ( fichiers ogg )"), "", "", "Fichiers audio (*.ogg)|*.ogg");
+            wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
+            wxFileDialog dialog(this, _("Choisissez une musique ( fichiers ogg )"), gameDirectory, "", "Fichiers audio (*.ogg)|*.ogg");
             dialog.ShowModal();
 
-            if ( dialog.GetPath() != "" )
+            if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
             {
-                ParaEdit.at(i)->ChangeValue(static_cast<string> ( dialog.GetPath() ));
+                wxFileName filename(dialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
+                ParaEdit[i]->ChangeValue(filename.GetFullPath());
             }
 
             return;
         }
         else if ( instructionMetadata.parameters[i].type == "soundfile" )
         {
-            wxFileDialog dialog(this, _("Choisissez un son ( fichiers wav )"), "", "", "Fichiers audio (*.wav)|*.wav");
+            wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
+            wxFileDialog dialog(this, _("Choisissez un son ( fichiers wav )"), gameDirectory, "", "Fichiers audio (*.wav)|*.wav");
             dialog.ShowModal();
 
-            if ( dialog.GetPath() != "" )
+            if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
             {
-                ParaEdit.at(i)->ChangeValue(static_cast<string> ( dialog.GetPath() ));
+                wxFileName filename(dialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
+                ParaEdit[i]->ChangeValue(filename.GetFullPath());
             }
 
             return;
@@ -870,9 +876,14 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         }
         else if ( instructionMetadata.parameters[i].type == "file" )
         {
-            ChoiceFile dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true);
-            if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.file);
+            ChoiceFile dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene, true);
+
+            wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
+            if ( dialog.ShowModal() == 1 ) //Note that path is relative to the project file:
+            {
+                wxFileName filename(dialog.file); filename.MakeRelativeTo(gameDirectory);
+                ParaEdit[i]->ChangeValue(filename.GetFullPath());
+            }
 
             return;
         }

@@ -49,8 +49,6 @@ class ChoixAction: public wxDialog
         Scene & scene;
         vector < gd::Expression > Param;
 
-        unsigned static const int MaxPara = 8;
-
 		//(*Declarations(ChoixAction)
 		wxButton* OkBt;
 		wxSearchCtrl* searchCtrl;

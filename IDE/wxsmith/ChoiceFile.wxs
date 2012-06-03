@@ -5,9 +5,11 @@
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
+			<growablecols>0</growablecols>
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 					<cols>1</cols>
+					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
 							<label>Entrez le nom d&apos;un fichier :</label>
@@ -26,7 +28,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-							<label>Le fichier devra être ou sera créé dans le répertoire...&#x0A;-...de l&apos;éditeur, quand vous éditez le jeu.&#x0A;-...dans le répertoire du jeu, une fois le jeu compilé.</label>
+							<label>Le nom du fichier est relatif à l&apos;emplacement du fichier .gdg du jeu.</label>
 						</object>
 						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -46,6 +48,16 @@
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
 					<cols>3</cols>
+					<growablecols>0</growablecols>
+					<object class="sizeritem">
+						<object class="wxButton" name="ID_BUTTON2" variable="advancedBt" member="yes">
+							<label>Avancé</label>
+							<handler function="OnadvancedBtClick" entry="EVT_BUTTON" />
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON4" variable="okBt" member="yes">
 							<label>Ok</label>
@@ -64,17 +76,8 @@
 						<border>5</border>
 						<option>1</option>
 					</object>
-					<object class="sizeritem">
-						<object class="wxButton" name="ID_BUTTON2" variable="advancedBt" member="yes">
-							<label>Avancé</label>
-							<handler function="OnadvancedBtClick" entry="EVT_BUTTON" />
-						</object>
-						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-						<border>5</border>
-						<option>1</option>
-					</object>
 				</object>
-				<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+				<flag>wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
 			</object>
 		</object>

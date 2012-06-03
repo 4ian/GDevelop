@@ -281,11 +281,12 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Events compiler setup
     cout << "* Setting up events compiler..." << endl;
+    CodeCompiler::GetInstance()->SetBaseDirectory(ToString(wxGetCwd()));
     wxString eventsCompilerTempDir;
     if ( Config->Read("/Dossier/EventsCompilerTempDir", &eventsCompilerTempDir) && !eventsCompilerTempDir.empty() )
-        CodeCompiler::GetInstance()->SetWorkingDirectory(ToString(eventsCompilerTempDir));
+        CodeCompiler::GetInstance()->SetOutputDirectory(ToString(eventsCompilerTempDir));
     else
-        CodeCompiler::GetInstance()->SetWorkingDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
+        CodeCompiler::GetInstance()->SetOutputDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
 
     //Load extensions
     cout << "* Loading extensions:" << endl;

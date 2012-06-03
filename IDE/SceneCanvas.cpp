@@ -38,6 +38,7 @@
 #include "InitialPositionBrowserDlg.h"
 #include "RenderDialog.h"
 #include "AdvancedPasteDlg.h"
+#include "EditorObjets.h"
 #include "EditorLayers.h"
 #include "DebuggerGUI.h"
 #include "GridSetup.h"
@@ -101,7 +102,13 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
     if ( !editing ) return;
     cout << "Switching to preview mode..." << endl;
 
+    //Let the IDE go into to preview state
+    //Note: Working directory is changed later, just before loading the scene
     mainEditorCommand.LockShortcuts(this);
+    mainEditorCommand.DisableControlsForScenePreviewing();
+    if ( objectsEditor ) objectsEditor->Disable();
+    if ( layersEditor ) layersEditor->Disable();
+    if ( initialPositionsBrowser ) initialPositionsBrowser->Disable();
 
     editing = false;
     previewData.scene.running = false;
@@ -110,7 +117,6 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
     scrollBar2->Show(false);
     UpdateSize();
 
-    cout << "Launch layout reload" << endl;
     Reload();
 
     if ( debugger ) debugger->Play();
@@ -126,13 +132,20 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
     if ( editing ) return;
     cout << "Switching to edition mode..." << endl;
 
+    //Let the IDE go back to edition state
+    wxSetWorkingDirectory(mainEditorCommand.GetIDEWorkingDirectory());
+    mainEditorCommand.UnLockShortcuts(this);
+    mainEditorCommand.EnableControlsAfterScenePreviewing();
+    if ( objectsEditor ) objectsEditor->Enable(true);
+    if ( layersEditor ) layersEditor->Enable(true);
+    if ( initialPositionsBrowser ) initialPositionsBrowser->Enable(true);
+
     CodeCompiler::GetInstance()->EnableTaskRelatedTo(sceneEdited);
 
     editing = true;
     previewData.scene.running = false;
 
-    mainEditorCommand.UnLockShortcuts(this);
-
+    //Let the editor go back to edition state
     scrollBar1->Show(true);
     scrollBar2->Show(true);
     externalWindow->Show(false);
@@ -140,6 +153,7 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
     UpdateSize();
     UpdateScrollbars();
 
+    //Parse now the results of profiling
     if ( profileDialog ) profileDialog->ParseProfileEvents();
 
     Reload();
@@ -168,6 +182,15 @@ void SceneCanvas::OnPlayBtClick( wxCommandEvent & event )
     previewData.scene.ChangeRenderWindow(this);
 
     if ( debugger ) debugger->Play();
+}
+
+void SceneCanvas::ExternalWindowClosed()
+{
+    if ( !editing && previewData.scene.running )
+    {
+        wxCommandEvent uselessEvent;
+        OnPlayBtClick(uselessEvent);
+    }
 }
 
 /**
@@ -237,9 +260,10 @@ void SceneCanvas::ReloadFirstPart()
 void SceneCanvas::ReloadSecondPart()
 {
     cout << "Scene canvas reloading... ( Step 2/2 )" << endl;
-    if ( !editing )
-        CodeCompiler::GetInstance()->DisableTaskRelatedTo(sceneEdited);
+    if ( !editing )  CodeCompiler::GetInstance()->DisableTaskRelatedTo(sceneEdited);
 
+    //Switch the working directory as we are making calls to the runtime scene
+    wxSetWorkingDirectory(wxFileName::FileName(gameEdited.GetProjectFile()).GetPath());
     if ( &instances != &sceneEdited.GetInitialInstances() )
     {
         //TODO: Dirty hack for now
@@ -252,6 +276,9 @@ void SceneCanvas::ReloadSecondPart()
     else
         previewData.scene.LoadFromScene( sceneEdited );
     sceneEdited.wasModified = false;
+
+    //If a preview is not going to be made, switch back to the IDE working directory
+    if ( editing ) wxSetWorkingDirectory(mainEditorCommand.GetIDEWorkingDirectory());
 
     UpdateSize();
     UpdateScrollbars();
@@ -300,7 +327,7 @@ void SceneCanvas::Refresh()
             //But be sure that no error occured.
             if ( !editing && !sceneEdited.codeExecutionEngine->Ready() )
             {
-                wxLogError(_("La compilation des évènements a échouée, et la scène ne peut être testée. Afin que le problème soit corrigé, veuillez le rapporter au développeur de Game Develop, en joignant le fichier suivant :\n")+CodeCompiler::GetInstance()->GetWorkingDirectory()+"compilationErrors.txt");
+                wxLogError(_("La compilation des évènements a échouée, et la scène ne peut être testée. Afin que le problème soit corrigé, veuillez le rapporter au développeur de Game Develop, en joignant le fichier suivant :\n")+CodeCompiler::GetInstance()->GetOutputDirectory()+"compilationErrors.txt");
                 wxCommandEvent useless;
                 OnEditionBtClick(useless);
             }
@@ -317,12 +344,16 @@ void SceneCanvas::Refresh()
             //Reload changed images.
             if ( !gameEdited.imagesChanged.empty() )
             {
+                wxSetWorkingDirectory(wxFileName::FileName(gameEdited.GetProjectFile()).GetPath()); //Resources loading stuff incoming: Switch current work dir.
+
                 for (unsigned int i = 0;i<gameEdited.imagesChanged.size();++i)
                     previewData.game.imageManager->ReloadImage(gameEdited.imagesChanged[i]);
 
                 gameEdited.imageManager->LoadPermanentImages();
                 gameEdited.imagesChanged.clear();
                 sceneEdited.wasModified = true;
+
+                wxSetWorkingDirectory(mainEditorCommand.GetIDEWorkingDirectory()); //Go back to the IDE cwd.
             }
 
             if ( sceneEdited.wasModified ) //Reload scene if necessary
@@ -1256,8 +1287,7 @@ InitialPosition & SceneCanvas::GetInitialPositionFromObject(ObjSPtr object)
     {
         if (instances.GetInstance( j ).GetObjectName() == object->GetName() &&
             instances.GetInstance( j ).GetX() == object->GetX() &&
-            instances.GetInstance( j ).GetY() == object->GetY() &&
-            instances.GetInstance( j ).GetAngle() == object->GetAngle() )
+            instances.GetInstance( j ).GetY() == object->GetY() )
         {
             return instances.GetInstance( j );
         }

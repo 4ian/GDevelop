@@ -674,6 +674,6 @@ void EditPropJeu::OnuseExternalSourcesCheckClick(wxCommandEvent& event)
 {
     if ( useExternalSourcesCheck->GetValue() && game.externalSourceFiles.empty() )
     {
-        //if ( game.gameFile.empty() )
+        //if ( game.GetProjectFile().empty() )
     }
 }

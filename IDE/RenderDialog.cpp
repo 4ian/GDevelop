@@ -1,14 +1,17 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "RenderDialog.h"
+#include "SceneCanvas.h"
 
 //(*InternalHeaders(RenderDialog)
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include <iostream>
-using namespace std;
 
-//(*IdInit(RenderDialog)
 const long RenderDialog::ID_CUSTOM1 = wxNewId();
+//(*IdInit(RenderDialog)
 //*)
 
 BEGIN_EVENT_TABLE(RenderDialog,wxDialog)
@@ -16,11 +19,14 @@ BEGIN_EVENT_TABLE(RenderDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-RenderDialog::RenderDialog(wxWindow* parent)
+RenderDialog::RenderDialog(wxWindow* parent, SceneCanvas * sceneCanvasNotifiedOnClose_) :
+    toBeNotifiedOnClose(sceneCanvasNotifiedOnClose_)
 {
 	//(*Initialize(RenderDialog)
 	Create(parent, wxID_ANY, _("Aperçu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	renderCanvas = new wxSFMLCanvas(this,ID_CUSTOM1,wxDefaultPosition,wxSize(800,600),wxWANTS_CHARS | wxNO_BORDER);
+
+	Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&RenderDialog::OnClose);
 	//*)
 }
 
@@ -43,4 +49,10 @@ void RenderDialog::SetSizeOfRenderingZone(unsigned int width, unsigned int heigh
 
     Update();
     Refresh();
+}
+
+void RenderDialog::OnClose(wxCloseEvent& event)
+{
+    if ( toBeNotifiedOnClose != NULL ) toBeNotifiedOnClose->ExternalWindowClosed();
+    Hide();
 }

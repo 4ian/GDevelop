@@ -33,8 +33,20 @@ class EditorLayers: public wxPanel
 		wxImageList* imageList;
 		//*)
 
+        /**
+         * Refresh the layers list.
+         */
 		void Refresh();
+
+		/**
+		 * The editor can be linked to a scene canvas to update it according to changes made in the editor.
+		 */
 		void SetAssociatedSceneCanvas(SceneCanvas * sceneCanvas_) { sceneCanvas = sceneCanvas_; Refresh(); };
+
+		/**
+		 * Return the associated scene canvas.
+		 * \see EditorLayers::SetAssociatedSceneCanvas
+		 */
 		SceneCanvas * GetAssociatedSceneCanvas() { return sceneCanvas; };
 
 	protected:

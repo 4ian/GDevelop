@@ -12,6 +12,7 @@
 #include <wx/config.h>
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/Object.h"
 #include "EditorLayers.h"
 #include "DebuggerGUI.h"
@@ -24,7 +25,7 @@
 #include "DndTextSceneEditor.h"
 
 SceneCanvas::SceneCanvas( wxWindow* parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances_, SceneCanvasSettings & settings_, MainEditorCommand & mainEditorCommand_, bool allowPreview_) :
-    wxSFMLCanvas( parent ),
+    wxSFMLCanvas( parent, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS | wxBORDER_SIMPLE ),
     gameEdited(game_),
     sceneEdited(scene_),
     hasJustRightClicked(false),
@@ -151,28 +152,29 @@ void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
 
     bar->ClearButtons();
 
+    gd::CommonBitmapManager * bitmapManager = gd::CommonBitmapManager::GetInstance();
     if ( editing )
     {
-        bar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Editeur d'objets") : "", wxBitmap("res/objeticon24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Editeur de calques") : "", wxBitmap("res/layers24.png", wxBITMAP_TYPE_ANY));
-        bar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonOrigine, !hideLabels ? _("Revenir à l'origine") : "", wxBitmap("res/center24.png", wxBITMAP_TYPE_ANY));
-        bar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Zoom initial") : "", wxBitmap("res/zoom24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonGrid, !hideLabels ? _("Grille") : "", wxBitmap("res/grid24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonGridSetup, !hideLabels ? _("Editer la grille") : "", wxBitmap("res/gridedit24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonWindowMask, !hideLabels ? _("Masque de la fen. de jeu") : "", wxBitmap("res/windowMask24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Liste des objets") : "", wxBitmap("res/ObjectsPositionsList24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Editeur d'objets") : "", bitmapManager->objects24);
+        bar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Editeur de calques") : "", bitmapManager->layers24);
+        bar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", bitmapManager->undo24);
+        bar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", bitmapManager->redo24);
+        bar->AddButton(idRibbonOrigine, !hideLabels ? _("Revenir à l'origine") : "", bitmapManager->center24);
+        bar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Zoom initial") : "", bitmapManager->zoom24);
+        bar->AddButton(idRibbonGrid, !hideLabels ? _("Grille") : "", bitmapManager->grid24);
+        bar->AddButton(idRibbonGridSetup, !hideLabels ? _("Editer la grille") : "", bitmapManager->gridedit24);
+        bar->AddButton(idRibbonWindowMask, !hideLabels ? _("Masque de la fen. de jeu") : "", bitmapManager->windowMask24);
+        bar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Liste des objets") : "", bitmapManager->objectsPositionsList24);
     }
     else
     {
-        bar->AddButton(idRibbonRefresh, !hideLabels ? _("Rafraichir") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonPlay, !hideLabels ? _("Jouer") : "", wxBitmap("res/starticon24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonPlayWin, !hideLabels ? _("Jouer dans une fenêtre") : "", wxBitmap("res/startwindow24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", wxBitmap("res/pauseicon24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", wxBitmap("res/bug24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonProfiler, !hideLabels ? _("Performances") : "", wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY));
-        bar->AddButton(idRibbonFullScreen, !hideLabels ? _("Afficher l'éditeur en plein écran") : "", wxBitmap("res/fullscreen24.png", wxBITMAP_TYPE_ANY));
+        bar->AddButton(idRibbonRefresh, !hideLabels ? _("Rafraichir") : "", bitmapManager->refreshicon24);
+        bar->AddButton(idRibbonPlay, !hideLabels ? _("Jouer") : "", bitmapManager->starticon24);
+        bar->AddButton(idRibbonPlayWin, !hideLabels ? _("Jouer dans une fenêtre") : "", bitmapManager->startwindow24);
+        bar->AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", bitmapManager->pauseicon24);
+        bar->AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", bitmapManager->bug24);
+        bar->AddButton(idRibbonProfiler, !hideLabels ? _("Performances") : "", bitmapManager->profiler24);
+        bar->AddButton(idRibbonFullScreen, !hideLabels ? _("Afficher l'éditeur en plein écran") : "", bitmapManager->fullscreen24);
     }
 
     bar->Realize();

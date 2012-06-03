@@ -51,9 +51,9 @@ class ChoiceFile: public wxDialog
 		static const long ID_TEXTCTRL1;
 		static const long ID_STATICTEXT2;
 		static const long ID_STATICLINE1;
+		static const long ID_BUTTON2;
 		static const long ID_BUTTON4;
 		static const long ID_BUTTON3;
-		static const long ID_BUTTON2;
 		//*)
 
 	private:

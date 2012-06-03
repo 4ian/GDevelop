@@ -218,6 +218,11 @@ public :
      */
     ObjSPtr GetObjectFromInitialPosition(const InitialPosition & initialPosition);
 
+    /**
+     * Called by the external preview window, when it is closed.
+     */
+    void ExternalWindowClosed();
+
     static wxRibbonButtonBar * CreateRibbonPage(wxRibbonPage * page);
 
     /**

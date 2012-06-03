@@ -31,6 +31,7 @@ class EditorObjets: public wxPanel
 		EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
 		virtual ~EditorObjets();
 
+
 		//(*Declarations(EditorObjets)
 		wxNotebook* sceneNotebook;
 		wxNotebook* Notebook1;

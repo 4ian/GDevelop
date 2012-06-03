@@ -804,9 +804,14 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionMetadata.parameters[i].type == "file" )
         {
-            ChoiceFile dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true);
-            if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.file);
+            ChoiceFile dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene, true);
+
+            wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
+            if ( dialog.ShowModal() == 1 ) //Note that path is relative to the project file:
+            {
+                wxFileName filename(dialog.file); filename.MakeRelativeTo(gameDirectory);
+                ParaEdit[i]->ChangeValue(filename.GetFullPath());
+            }
 
             return;
         }

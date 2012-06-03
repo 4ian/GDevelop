@@ -126,7 +126,7 @@ ribbonFileBt(NULL),
 ribbonHelpBt(NULL),
 ribbonSceneEditorButtonBar(NULL),
 buildToolsPnl(NULL),
-mainEditorCommand(NULL, NULL, this, NULL, NULL, NULL, &scenesLockingShortcuts),
+mainEditorCommand(NULL, NULL, this, NULL, NULL, NULL, NULL, &scenesLockingShortcuts, wxGetCwd()),
 startPage(NULL),
 projectManager(NULL)
 {
@@ -472,7 +472,8 @@ projectManager(NULL)
 
     infoBar->SetShowHideEffects(wxSHOW_EFFECT_SLIDE_TO_BOTTOM, wxSHOW_EFFECT_BLEND);
 
-    mainEditorCommand = MainEditorCommand(m_ribbon, ribbonSceneEditorButtonBar, this, buildToolsPnl, &m_mgr, infoBar, &scenesLockingShortcuts);
+    mainEditorCommand = MainEditorCommand(m_ribbon, ribbonSceneEditorButtonBar, this, buildToolsPnl, &m_mgr, editorsNotebook, infoBar, &scenesLockingShortcuts, wxGetCwd());
+    mainEditorCommand.AddControlToBeDisabledOnPreview(projectManager);
 
     SetSize(900,740);
     Center();
@@ -517,7 +518,7 @@ void Game_Develop_EditorFrame::SetCurrentGame(unsigned int i)
     else
     {
         wxString GD = "Game Develop";
-        SetTitle( GD + " - [" + games[i]->GetName() + "] "+games[i]->gameFile );
+        SetTitle( GD + " - [" + games[i]->GetName() + "] "+games[i]->GetProjectFile() );
     }
 
     return;
@@ -874,9 +875,9 @@ void Game_Develop_EditorFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
 {
     for (unsigned int i = 0;i<games.size();++i)
     {
-        if ( !games[i]->gameFile.empty() )
+        if ( !games[i]->GetProjectFile().empty() )
         {
-            wxString filename = wxFileName(games[i]->gameFile).GetPath()+"/"+wxFileName(games[i]->gameFile).GetName()+".gdg.autosave";
+            wxString filename = wxFileName(games[i]->GetProjectFile()).GetPath()+"/"+wxFileName(games[i]->GetProjectFile()).GetName()+".gdg.autosave";
 
             OpenSaveGame saveGame( *games[i] );
             if ( !saveGame.SaveToFile(string(filename.mb_str())) ) {wxLogStatus( "L'enregistrement automatique a échoué." );}

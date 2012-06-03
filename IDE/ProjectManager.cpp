@@ -606,7 +606,7 @@ void ProjectManager::OnEditSourceFileSelected(wxCommandEvent& event)
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
     wxFileName filename(data->GetSecondString());
-    filename.MakeAbsolute(wxFileName::FileName(game->gameFile).GetPath());
+    filename.MakeAbsolute(wxFileName::FileName(game->GetProjectFile()).GetPath());
 
     EditSourceFile(game, ToString(filename.GetFullPath()));
 }
@@ -1813,7 +1813,7 @@ void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
     boost::shared_ptr<SourceFile> sourceFile(new SourceFile);
 
     wxFileName filename(dialog.GetPath()); //Files are added with their paths relative to the project directory
-    filename.MakeRelativeTo(wxFileName::FileName(game->gameFile).GetPath());
+    filename.MakeRelativeTo(wxFileName::FileName(game->GetProjectFile()).GetPath());
     sourceFile->SetFileName(ToString(filename.GetFullPath()));
 
     vector< boost::shared_ptr<SourceFile> >::iterator alreadyExistingSourceFile =

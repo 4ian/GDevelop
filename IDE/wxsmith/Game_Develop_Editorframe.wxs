@@ -109,15 +109,15 @@
 				<bitmap>res/openicon.png</bitmap>
 				<handler function="OnMenuOpenSelected" entry="EVT_MENU" />
 			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem4" member="yes">
+				<label>Ouvrir un jeu d&apos;exemple</label>
+				<handler function="OnOpenExampleSelected" entry="EVT_MENU" />
+			</object>
 			<object class="wxMenu" name="ID_MENUITEM26" variable="menuRecentFiles" member="yes">
 				<label>Fichiers récemments ouverts</label>
 				<object class="wxMenuItem" name="toBeDeletedMenuItem" variable="MenuItem23" member="yes">
 					<label>useless</label>
 				</object>
-			</object>
-			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem4" member="yes">
-				<label>Ouvrir un jeu d&apos;exemple</label>
-				<handler function="OnOpenExampleSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem5" member="yes">
 				<label>Importer un jeu</label>
@@ -130,10 +130,6 @@
 				<accel>Ctrl+S</accel>
 				<bitmap>res/saveicon.png</bitmap>
 				<handler function="OnMenuSaveSelected" entry="EVT_MENU" />
-			</object>
-			<object class="wxMenuItem" name="ID_MENUITEM18" variable="MenuItem14" member="yes">
-				<label>Enregistrer en mode portable</label>
-				<handler function="OnMenuPortableSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM13" variable="MenuItem7" member="yes">
 				<label>Enregistrer sous...</label>
@@ -152,6 +148,13 @@
 				<bitmap>res/compilationicon.png</bitmap>
 				<handler function="OnMenuCompilationSelected" entry="EVT_MENU" />
 			</object>
+			<object class="wxMenu" name="ID_MENUITEM28" variable="MenuItem24" member="yes">
+				<label>Autre</label>
+				<object class="wxMenuItem" name="ID_MENUITEM18" variable="MenuItem14" member="yes">
+					<label>Rassembler projet et ressources dans un dossier</label>
+					<handler function="OnMenuPortableSelected" entry="EVT_MENU" />
+				</object>
+			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM19" variable="MenuItem15" member="yes">
 				<label>Fermer le projet</label>
@@ -164,8 +167,16 @@
 				<handler function="OnMenuPrefSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM27" variable="MenuItem22" member="yes">
+				<label>Aide</label>
+				<accel>F1</accel>
+				<bitmap>res/helpicon.png</bitmap>
+				<handler function="OnMenuAideSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM14" variable="MenuItem8" member="yes">
 				<label>Quitter</label>
+				<help>Quitter Game develop</help>
 				<handler function="OnQuit" entry="EVT_MENU" />
 			</object>
 		</object>

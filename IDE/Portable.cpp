@@ -14,7 +14,9 @@
 #include <vector>
 #include <wx/dirdlg.h>
 #include <wx/log.h>
+#include <wx/filename.h>
 #include "GDCore/IDE/ResourcesMergingHelper.h"
+#include "GDCore/CommonTools.h"
 #include "PlatformDefinition/Platform.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/Game.h"
@@ -119,6 +121,8 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     Game game = *jeu;
 
     gd::ResourcesMergingHelper resourcesMergingHelper;
+    resourcesMergingHelper.SetBaseDirectory(gd::ToString(wxFileName::FileName(game.GetProjectFile()).GetPath()));
+    resourcesMergingHelper.PreserveDirectoriesStructure(true);
 
     //Add loading image
     if ( !game.loadingScreen.imageFichier.empty() )
@@ -158,16 +162,23 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     wxSafeYield();
 
     //Copy resources
-    map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesNewFilename();
+    map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
     unsigned int i = 0;
     for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {
         if ( !it->first.empty() )
         {
-            if ( !wxFileExists(rep + "/" + it->second) )
-                wxCopyFile( it->first, rep + "/" + it->second, true );
-            else if ( wxCopyFile( it->first, rep + "/" + it->second, true ) == false )
-                wxLogWarning( _( "Impossible de copier \""+it->first+"\" dans le répertoire de compilation.\n" ) );
+            std::string destination = rep + "/" + it->second;
+
+            if ( !wxDirExists(wxFileName::FileName(destination).GetPath()) )
+                wxMkDir(wxFileName::FileName(destination).GetPath());
+
+            bool copySucceeded = false;
+            {
+                wxLogNull noLogPlease;
+                copySucceeded = wxCopyFile( it->first, destination, true );
+            }
+            if ( !copySucceeded ) wxLogWarning( _( "Impossible de copier \"")+it->first+_("\" vers \"")+destination+_("\"."));
         }
 
         ++i;
@@ -175,10 +186,10 @@ void Portable::OnButton1Click(wxCommandEvent& event)
         wxSafeYield();
     }
 
-    game.portable = true;
     OpenSaveGame saveGame(game);
-    saveGame.SaveToFile(rep+"/Game.gdg");
+    wxString filename = game.GetProjectFile().empty() ? "Game.gdg" : wxFileName::FileName(game.GetProjectFile()).GetName()+".gdg";
+    saveGame.SaveToFile(rep+"/"+gd::ToString(filename));
 
     AvancementGauge->SetValue(100);
-    wxLogMessage(_("Le jeu est disponible dans le répertoire choisi sous le nom de Game.gdg."));
+    wxLogMessage(_("Le jeu est disponible dans le répertoire choisi sous le nom : ")+gd::ToString(filename));
 }

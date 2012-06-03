@@ -230,17 +230,19 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long ID_TIMER1;
         static const long ID_MENUITEM7;
         static const long ID_MENUITEM9;
+        static const long ID_MENUITEM10;
         static const long toBeDeletedMenuItem;
         static const long ID_MENUITEM26;
-        static const long ID_MENUITEM10;
         static const long ID_MENUITEM11;
         static const long ID_MENUITEM12;
-        static const long ID_MENUITEM18;
         static const long ID_MENUITEM13;
         static const long ID_MENUITEM16;
         static const long ID_MENUITEM15;
+        static const long ID_MENUITEM18;
+        static const long ID_MENUITEM28;
         static const long ID_MENUITEM19;
         static const long ID_MENUITEM17;
+        static const long ID_MENUITEM27;
         static const long ID_MENUITEM14;
         static const long ID_MENUITEM20;
         static const long ID_MENUITEM23;
@@ -278,6 +280,7 @@ class Game_Develop_EditorFrame: public wxFrame
         wxMenuItem* MenuItem14;
         wxMenuItem* MenuItem15;
         wxMenu* menuRecentFiles;
+        wxMenuItem* MenuItem22;
         wxPanel* Panel1;
         wxMenuItem* MenuItem17;
         wxAuiNotebook* editorsNotebook;
@@ -291,6 +294,7 @@ class Game_Develop_EditorFrame: public wxFrame
         wxMenuItem* MenuItem6;
         wxMenuItem* MenuItem23;
         wxInfoBar* infoBar;
+        wxMenu* MenuItem24;
         wxMenu helpMenu;
         wxMenuItem* MenuItem21;
         wxMenuItem* MenuItem16;

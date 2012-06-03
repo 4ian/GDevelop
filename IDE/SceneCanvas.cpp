@@ -264,17 +264,8 @@ void SceneCanvas::ReloadSecondPart()
 
     //Switch the working directory as we are making calls to the runtime scene
     wxSetWorkingDirectory(wxFileName::FileName(gameEdited.GetProjectFile()).GetPath());
-    if ( &instances != &sceneEdited.GetInitialInstances() )
-    {
-        //TODO: Dirty hack for now
-        InitialInstancesContainer originalContainer = sceneEdited.GetInitialInstances();
-        sceneEdited.GetInitialInstances() = instances;
-        previewData.scene.LoadFromScene( sceneEdited );
-        sceneEdited.GetInitialInstances() = originalContainer;
 
-    }
-    else
-        previewData.scene.LoadFromScene( sceneEdited );
+    previewData.scene.LoadFromSceneAndCustomInstances( sceneEdited, instances );
     sceneEdited.wasModified = false;
 
     //If a preview is not going to be made, switch back to the IDE working directory

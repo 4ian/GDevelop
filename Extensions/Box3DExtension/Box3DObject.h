@@ -28,11 +28,11 @@ freely, subject to the following restrictions:
 #define BOX3DOBJECT_H
 
 #include "GDL/Object.h"
+#include <boost/shared_ptr.hpp>
 class SFMLTextureWrapper;
 class ImageManager;
 class RuntimeScene;
 class Object;
-class ExpressionInstruction;
 class ImageManager;
 class InitialPosition;
 #if defined(GD_IDE_ONLY)
@@ -47,88 +47,88 @@ class MainEditorCommand;
  */
 class GD_EXTENSION_API Box3DObject : public Object
 {
-    public :
+public :
 
-        Box3DObject(std::string name_);
-        virtual ~Box3DObject();
-        virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new Box3DObject(*this));}
+    Box3DObject(std::string name_);
+    virtual ~Box3DObject();
+    virtual Object * Clone() { return new Box3DObject(*this);}
 
-        virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-        virtual bool InitializeFromInitialPosition(const InitialPosition & position);
+    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
+    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
-        virtual bool Draw(sf::RenderTarget & renderTarget);
+    virtual bool Draw(sf::RenderTarget & renderTarget);
 
-        #if defined(GD_IDE_ONLY)
-        virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-        virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
-        virtual void ExposeResources(ArbitraryResourceWorker & worker);
+    #if defined(GD_IDE_ONLY)
+    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
+    virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
-        virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
-        virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-        virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
+    virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
+    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
+    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-        virtual unsigned int GetNumberOfProperties() const;
-        #endif
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
 
-        virtual void LoadFromXml(const TiXmlElement * elemScene);
-        #if defined(GD_IDE_ONLY)
-        virtual void SaveToXml(TiXmlElement * elemScene);
-        #endif
+    virtual void LoadFromXml(const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void SaveToXml(TiXmlElement * elemScene);
+    #endif
 
-        virtual void OnPositionChanged() {};
+    virtual void OnPositionChanged() {};
 
-        virtual float GetDrawableX() const;
-        virtual float GetDrawableY() const;
+    virtual float GetDrawableX() const;
+    virtual float GetDrawableY() const;
 
-        virtual float GetCenterX() const;
-        virtual float GetCenterY() const;
+    virtual float GetCenterX() const;
+    virtual float GetCenterY() const;
 
-        inline void SetZPosition(float newZ) {zPosition = newZ;};
-        inline float GetZPosition() const {return zPosition;};
+    inline void SetZPosition(float newZ) {zPosition = newZ;};
+    inline float GetZPosition() const {return zPosition;};
 
-        virtual inline bool SetAngle(float newAngle) { yaw = newAngle; return true;};
-        virtual inline float GetAngle() const {return yaw;};
-        float GetPitch() const { return pitch; }
-        void SetPitch(float pitch_) { pitch = pitch_; }
-        float GetRoll() const { return roll; }
-        void SetRoll(float roll_) { roll = roll_; }
+    virtual inline bool SetAngle(float newAngle) { yaw = newAngle; return true;};
+    virtual inline float GetAngle() const {return yaw;};
+    float GetPitch() const { return pitch; }
+    void SetPitch(float pitch_) { pitch = pitch_; }
+    float GetRoll() const { return roll; }
+    void SetRoll(float roll_) { roll = roll_; }
 
-        virtual float GetWidth() const;
-        virtual float GetHeight() const;
+    virtual float GetWidth() const;
+    virtual float GetHeight() const;
 
-        virtual inline void SetWidth(float newWidth) {width = newWidth;};
-        virtual inline void SetHeight(float newHeight) {height = newHeight;};
+    virtual inline void SetWidth(float newWidth) {width = newWidth;};
+    virtual inline void SetHeight(float newHeight) {height = newHeight;};
 
-        float GetDepth() const { return depth; }
-        void SetDepth(float depth_) { depth = depth_; }
+    float GetDepth() const { return depth; }
+    void SetDepth(float depth_) { depth = depth_; }
 
-        virtual std::vector<RotatedRectangle> GetHitBoxes() const;
+    virtual std::vector<RotatedRectangle> GetHitBoxes() const;
 
-        std::string frontTextureName;
-        std::string topTextureName;
-        std::string bottomTextureName;
-        std::string leftTextureName;
-        std::string rightTextureName;
-        std::string backTextureName;
+    std::string frontTextureName;
+    std::string topTextureName;
+    std::string bottomTextureName;
+    std::string leftTextureName;
+    std::string rightTextureName;
+    std::string backTextureName;
 
-    private:
+private:
 
-        float width;
-        float height;
-        float depth;
-        float zPosition;
-        float yaw;
-        float pitch;
-        float roll;
+    float width;
+    float height;
+    float depth;
+    float zPosition;
+    float yaw;
+    float pitch;
+    float roll;
 
-        boost::shared_ptr<SFMLTextureWrapper> frontTexture;
-        boost::shared_ptr<SFMLTextureWrapper> topTexture;
-        boost::shared_ptr<SFMLTextureWrapper> bottomTexture;
-        boost::shared_ptr<SFMLTextureWrapper> leftTexture;
-        boost::shared_ptr<SFMLTextureWrapper> rightTexture;
-        boost::shared_ptr<SFMLTextureWrapper> backTexture;
+    boost::shared_ptr<SFMLTextureWrapper> frontTexture;
+    boost::shared_ptr<SFMLTextureWrapper> topTexture;
+    boost::shared_ptr<SFMLTextureWrapper> bottomTexture;
+    boost::shared_ptr<SFMLTextureWrapper> leftTexture;
+    boost::shared_ptr<SFMLTextureWrapper> rightTexture;
+    boost::shared_ptr<SFMLTextureWrapper> backTexture;
 };
 
 void DestroyBox3DObject(Object * object);

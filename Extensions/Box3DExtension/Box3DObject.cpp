@@ -33,7 +33,6 @@ freely, subject to the following restrictions:
 #include "GDL/Position.h"
 #include "GDL/RotatedRectangle.h"
 #include "GDL/tinyxml/tinyxml.h"
-#include "GDL/IDE/ArbitraryResourceWorker.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/bitmap.h>
@@ -42,6 +41,7 @@ freely, subject to the following restrictions:
 #include "GDL/IDE/MainEditorCommand.h"
 #include "Box3DObjectEditor.h"
 #include "Box3DInitialPositionPanel.h"
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #endif
 
 Box3DObject::Box3DObject(std::string name_) :
@@ -395,7 +395,7 @@ bool Box3DObject::DrawEdittime(sf::RenderTarget& window)
     return true;
 }
 
-void Box3DObject::ExposeResources(ArbitraryResourceWorker & worker)
+void Box3DObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
     worker.ExposeImage(frontTextureName);
     worker.ExposeImage(topTextureName);
@@ -425,7 +425,7 @@ wxPanel * Box3DObject::CreateInitialPositionPanel( wxWindow* parent, const Game 
     if ( position.floatInfos.find("z") != position.floatInfos.end())
         panel->zEdit->ChangeValue(ToString( position.floatInfos.find("z")->second));
 
-    panel->yawEdit->ChangeValue(ToString(position.angle));
+    panel->yawEdit->ChangeValue(ToString(position.GetAngle()));
 
     if ( position.floatInfos.find("pitch") != position.floatInfos.end())
         panel->pitchEdit->ChangeValue(ToString(position.floatInfos.find("pitch")->second));
@@ -442,7 +442,7 @@ void Box3DObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
     if (box3DPanel == NULL) return;
 
     position.floatInfos["z"] = ToFloat(string(box3DPanel->zEdit->GetValue().mb_str()));
-    position.angle = ToFloat(string(box3DPanel->yawEdit->GetValue().mb_str()));
+    position.SetAngle(ToFloat(string(box3DPanel->yawEdit->GetValue().mb_str())));
     position.floatInfos["pitch"] = ToFloat(string(box3DPanel->pitchEdit->GetValue().mb_str()));
     position.floatInfos["roll"] = ToFloat(string(box3DPanel->rollEdit->GetValue().mb_str()));
 }

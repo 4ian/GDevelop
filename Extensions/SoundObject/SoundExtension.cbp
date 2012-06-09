@@ -63,6 +63,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_richtext" />
@@ -164,6 +165,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -265,6 +267,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -335,15 +338,15 @@
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
 					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
+					<Add option="-lFLAC" />
 					<Add option="-lX11" />
 					<Add option="-lXrandr" />
 					<Add option="-lXrender" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
-					<Add library="..\..\ExtLibs\Others\libFLAC.so.7" />
-					<Add library="..\..\ExtLibs\Others\libopenal.so.1" />
-					<Add library="..\..\ExtLibs\Others\libsndfile.so.1" />
 					<Add directory="..\..\Runtime\bin\release" />
 					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
@@ -373,21 +376,22 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
 					<Add option="-lsfml-window" />
 					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
 					<Add option="-lfreetype" />
+					<Add option="-lFLAC" />
 					<Add option="-lX11" />
 					<Add option="-lXrandr" />
 					<Add option="-lXrender" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
-					<Add library="..\..\ExtLibs\Others\libFLAC.so.7" />
-					<Add library="..\..\ExtLibs\Others\libopenal.so.1" />
-					<Add library="..\..\ExtLibs\Others\libsndfile.so.1" />
 					<Add directory="..\..\IDE\bin\release" />
 					<Add directory="..\..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
@@ -415,6 +419,7 @@
 					<Add option="-DSFML_DYNAMIC" />
 				</Compiler>
 				<Linker>
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />

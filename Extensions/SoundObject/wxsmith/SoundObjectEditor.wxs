@@ -10,7 +10,7 @@
 			<cols>1</cols>
 			<rows>3</rows>
 			<growablecols>0</growablecols>
-			<growablerows>1</growablerows>
+			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 					<cols>1</cols>
@@ -24,8 +24,10 @@
 									<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 										<cols>1</cols>
 										<growablecols>0</growablecols>
+										<growablerows>1</growablerows>
 										<object class="sizeritem">
-											<object class="wxBoxSizer" variable="BoxSizer1" member="no">
+											<object class="wxStaticBoxSizer" variable="StaticBoxSizer4" member="no">
+												<label>Type du son</label>
 												<object class="sizeritem">
 													<object class="wxRadioButton" name="ID_RADIOBUTTON2" variable="MusicRadioBt" member="yes">
 														<label>Musique</label>
@@ -41,23 +43,54 @@
 														<label>Son</label>
 														<tooltip>Le fichier son est chargé entièrement en mémoire afin d&apos;ere joué rapidement. Particulièrement approprié au bruitages pas trop longs.</tooltip>
 													</object>
+													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="spacer">
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxStaticBoxSizer" variable="StaticBoxSizer3" member="no">
+												<label>Notes</label>
+												<object class="sizeritem">
+													<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
+														<cols>1</cols>
+														<object class="sizeritem">
+															<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
+																<label>Le mode &quot;Musique&quot; est plus approprié pour les fichier son qui durent plus de 10 sec. Le&#x0A;fichier son n&apos;est chargé que partiellement au fur et à mesure de la lecture.&#x0A;Le mode &quot;Son&quot; est adapté au petits fichiers son. Le son est chargé totalement et peu&#x0A;être joué sans aucun délai. Toutefois, ce  mode ralentit fortement le jeu pour des&#x0A;grands fichiers.</label>
+																<font>
+																	<size>8</size>
+																</font>
+															</object>
+															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+														<object class="sizeritem">
+															<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
+																<label>La spatialisation du son n&apos;est possible que pour les sons &quot;monos&quot;.</label>
+																<font>
+																	<size>8</size>
+																</font>
+															</object>
+															<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-											<border>5</border>
-											<option>1</option>
-										</object>
-										<object class="sizeritem">
-											<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
-												<label>Le mode &quot;Musique&quot; est plus approprié pour&#x0A;les fichier son qui durent plus de 10 sec. Le&#x0A;fichier son n&apos;est chargé que partiellement&#x0A;au fur et à mesure de la lecture.&#x0A;Le mode &quot;Son&quot; est adapté au petits fichiers&#x0A;son. Le son est chargé totalement et peu&#x0A;être joué sans aucun délai. Toutefois, ce &#x0A;mode ralentit fortement le jeu pour des&#x0A;grands fichiers.</label>
-												<font>
-													<size>8</size>
-												</font>
-											</object>
-											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>
@@ -225,9 +258,11 @@
 				<border>5</border>
 				<option>1</option>
 			</object>
-			<object class="spacer">
-				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<border>5</border>
+			<object class="sizeritem">
+				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
+					<size>10,-1</size>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
@@ -235,7 +270,7 @@
 					<cols>3</cols>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON1" variable="ValidateButton" member="yes">
-							<label>Valider</label>
+							<label>Ok</label>
 							<handler function="OnValidateButtonClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -253,7 +288,6 @@
 					</object>
 				</object>
 				<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
-				<border>5</border>
 				<option>1</option>
 			</object>
 		</object>

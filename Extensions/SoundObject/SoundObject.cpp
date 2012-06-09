@@ -74,7 +74,6 @@ void SoundObject::Init(const SoundObject &other)
     SetPitch(other.GetPitch());
 
     SetZPos(other.GetZPos());
-    SetListenerPosition()
 
     Stop();
 }

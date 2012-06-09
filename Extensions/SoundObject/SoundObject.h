@@ -27,7 +27,6 @@ freely, subject to the following restrictions:
 #define SoundObject_H
 
 #include "GDL/Object.h"
-#include "GDL/ResourceWrapper.h"
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/Music.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>

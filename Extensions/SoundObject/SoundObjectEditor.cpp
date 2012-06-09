@@ -34,6 +34,7 @@ freely, subject to the following restrictions:
 #include <wx/string.h>
 //*)
 #include <wx/colordlg.h>
+#include <wx/filename.h>
 #include <wx/filedlg.h>
 
 #include "GDL/Game.h"
@@ -45,6 +46,7 @@ freely, subject to the following restrictions:
 const long SoundObjectEditor::ID_RADIOBUTTON2 = wxNewId();
 const long SoundObjectEditor::ID_RADIOBUTTON1 = wxNewId();
 const long SoundObjectEditor::ID_STATICTEXT6 = wxNewId();
+const long SoundObjectEditor::ID_STATICTEXT7 = wxNewId();
 const long SoundObjectEditor::ID_PANEL1 = wxNewId();
 const long SoundObjectEditor::ID_STATICTEXT1 = wxNewId();
 const long SoundObjectEditor::ID_SPINCTRL1 = wxNewId();
@@ -60,6 +62,7 @@ const long SoundObjectEditor::ID_TEXTCTRL1 = wxNewId();
 const long SoundObjectEditor::ID_BUTTON2 = wxNewId();
 const long SoundObjectEditor::ID_PANEL2 = wxNewId();
 const long SoundObjectEditor::ID_NOTEBOOK1 = wxNewId();
+const long SoundObjectEditor::ID_STATICLINE1 = wxNewId();
 const long SoundObjectEditor::ID_BUTTON1 = wxNewId();
 const long SoundObjectEditor::ID_BUTTON3 = wxNewId();
 //*)
@@ -77,11 +80,13 @@ object(object_)
 	//(*Initialize(SoundObjectEditor)
 	wxStaticBoxSizer* StaticBoxSizer2;
 	wxFlexGridSizer* FlexGridSizer4;
+	wxStaticBoxSizer* StaticBoxSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
-	wxBoxSizer* BoxSizer1;
+	wxStaticBoxSizer* StaticBoxSizer3;
+	wxFlexGridSizer* FlexGridSizer8;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
@@ -90,7 +95,7 @@ object(object_)
 	SetClientSize(wxSize(399,399));
 	FlexGridSizer3 = new wxFlexGridSizer(3, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
-	FlexGridSizer3->AddGrowableRow(1);
+	FlexGridSizer3->AddGrowableRow(0);
 	FlexGridSizer1 = new wxFlexGridSizer(2, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(1);
@@ -98,18 +103,28 @@ object(object_)
 	Panel1 = new wxPanel(Notebook1, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
-	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
+	FlexGridSizer2->AddGrowableRow(1);
+	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Type du son"));
 	MusicRadioBt = new wxRadioButton(Panel1, ID_RADIOBUTTON2, _("Musique"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
 	MusicRadioBt->SetToolTip(_("Charge le contenu du fichier son progressivement tout au long de la lecture. Particulièrement utile pour les musiques qui durent plus d\'une dizaine de seconde. Cela permet de ne pas surcharger la mémoire."));
-	BoxSizer1->Add(MusicRadioBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer4->Add(MusicRadioBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	SoundRadioBt = new wxRadioButton(Panel1, ID_RADIOBUTTON1, _("Son"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
 	SoundRadioBt->SetToolTip(_("Le fichier son est chargé entièrement en mémoire afin d\'ere joué rapidement. Particulièrement approprié au bruitages pas trop longs."));
-	BoxSizer1->Add(SoundRadioBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(BoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText6 = new wxStaticText(Panel1, ID_STATICTEXT6, _("Le mode \"Musique\" est plus approprié pour\nles fichier son qui durent plus de 10 sec. Le\nfichier son n\'est chargé que partiellement\nau fur et à mesure de la lecture.\nLe mode \"Son\" est adapté au petits fichiers\nson. Le son est chargé totalement et peu\nêtre joué sans aucun délai. Toutefois, ce \nmode ralentit fortement le jeu pour des\ngrands fichiers."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	StaticBoxSizer4->Add(SoundRadioBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(StaticBoxSizer4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(-1,-1,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Notes"));
+	FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
+	StaticText6 = new wxStaticText(Panel1, ID_STATICTEXT6, _("Le mode \"Musique\" est plus approprié pour les fichier son qui durent plus de 10 sec. Le\nfichier son n\'est chargé que partiellement au fur et à mesure de la lecture.\nLe mode \"Son\" est adapté au petits fichiers son. Le son est chargé totalement et peu\nêtre joué sans aucun délai. Toutefois, ce  mode ralentit fortement le jeu pour des\ngrands fichiers."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	wxFont StaticText6Font(8,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText6->SetFont(StaticText6Font);
-	FlexGridSizer2->Add(StaticText6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer8->Add(StaticText6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText7 = new wxStaticText(Panel1, ID_STATICTEXT7, _("La spatialisation du son n\'est possible que pour les sons \"monos\"."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	wxFont StaticText7Font(8,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	StaticText7->SetFont(StaticText7Font);
+	FlexGridSizer8->Add(StaticText7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBoxSizer3->Add(FlexGridSizer8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
 	Panel1->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(Panel1);
 	FlexGridSizer2->SetSizeHints(Panel1);
@@ -162,13 +177,14 @@ object(object_)
 	Notebook1->AddPage(Panel2, _("Son/Musique"), false);
 	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer3->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
+	FlexGridSizer3->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
-	ValidateButton = new wxButton(this, ID_BUTTON1, _("Valider"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	ValidateButton = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer7->Add(ValidateButton, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Button2 = new wxButton(this, ID_BUTTON3, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer7->Add(Button2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer3->Add(FlexGridSizer7, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3->Add(FlexGridSizer7, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer3);
 	FlexGridSizer3->SetSizeHints(this);
 	Center();
@@ -219,12 +235,14 @@ void SoundObjectEditor::OnButton2Click(wxCommandEvent& event)
 
 void SoundObjectEditor::OnButton1Click(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Choisissez un fichier son ( fichiers wav, ogg )"), "", "", "Fichiers son (*.wav, *.ogg)|*.wav;*.ogg");
-    dialog.ShowModal();
+    wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
+    wxFileDialog fileDialog(this, _("Choisissez un fichier son ( fichiers wav, ogg )"), gameDirectory, "", "Fichiers son (*.wav, *.ogg)|*.wav;*.ogg");
 
-    if(dialog.GetPath() != "")
+    if ( fileDialog.ShowModal() == wxID_OK )
     {
-        FileNameTextCtrl->ChangeValue(dialog.GetPath());
+        //Note that the file is relative to the project directory
+        wxFileName filename(fileDialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
+        FileNameTextCtrl->SetValue(filename.GetFullPath());
     }
 }
 #endif

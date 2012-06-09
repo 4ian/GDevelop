@@ -35,6 +35,7 @@ freely, subject to the following restrictions:
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/spinctrl.h>
+#include <wx/statline.h>
 #include <wx/radiobut.h>
 #include <wx/panel.h>
 #include <wx/button.h>
@@ -66,8 +67,10 @@ class SoundObjectEditor: public wxDialog
 		wxButton* Button2;
 		wxStaticText* StaticText5;
 		wxTextCtrl* AttenuationSpinCtrl;
+		wxStaticText* StaticText7;
 		wxTextCtrl* pitchTextCtrl;
 		wxSpinCtrl* VolumeSpinCtrl;
+		wxStaticLine* StaticLine1;
 		wxRadioButton* SoundRadioBt;
 		wxPanel* Panel2;
 		wxRadioButton* MusicRadioBt;
@@ -80,6 +83,7 @@ class SoundObjectEditor: public wxDialog
 		static const long ID_RADIOBUTTON2;
 		static const long ID_RADIOBUTTON1;
 		static const long ID_STATICTEXT6;
+		static const long ID_STATICTEXT7;
 		static const long ID_PANEL1;
 		static const long ID_STATICTEXT1;
 		static const long ID_SPINCTRL1;
@@ -95,6 +99,7 @@ class SoundObjectEditor: public wxDialog
 		static const long ID_BUTTON2;
 		static const long ID_PANEL2;
 		static const long ID_NOTEBOOK1;
+		static const long ID_STATICLINE1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON3;
 		//*)

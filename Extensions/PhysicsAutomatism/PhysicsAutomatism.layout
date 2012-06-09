@@ -1,38 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
-	<ActiveTarget name="Development - Edittime" />
-	<File name="Box2D\Box2D\Box2D\Box2D.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1565" topLine="30" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2CircleShape.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2470" topLine="55" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="10997" topLine="402" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3937" topLine="99" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Collision\b2BroadPhase.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="980" topLine="85" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Collision\b2Distance.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1190" topLine="12" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Common\b2BlockAllocator.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1553" topLine="37" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Common\b2Settings.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1251" topLine="13" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Common\b2StackAllocator.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1786" topLine="49" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3533" topLine="77" />
-	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5231" topLine="182" />
+	<ActiveTarget name="Release - Edittime" />
+	<File name="RuntimeScenePhysicsDatas.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1780" topLine="32" />
 	</File>
 	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="4" topLine="0" />
@@ -40,52 +10,85 @@
 	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="6345" topLine="251" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="12952" topLine="306" />
+	<File name="PhysicsAutomatismEditor.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="88" topLine="3" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\b2World.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="20687" topLine="877" />
+	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2TOISolver.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="5231" topLine="182" />
 	</File>
-	<File name="Box2D\Box2D\Box2D\Dynamics\b2World.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3825" topLine="74" />
+	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1267" topLine="15" />
 	</File>
-	<File name="ContactListener.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="639" topLine="0" />
+	<File name="Box2D\Box2D\Box2D\Collision\b2BroadPhase.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1650" topLine="33" />
+	</File>
+	<File name="PhysicsAutomatism.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1122" topLine="135" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Collision\b2BroadPhase.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="980" topLine="85" />
+	</File>
+	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1822" topLine="40" />
+	</File>
+	<File name="Extension.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1225" topLine="12" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3937" topLine="99" />
+	</File>
+	<File name="CustomPolygonDialog.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2028" topLine="52" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2PolygonShape.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="10997" topLine="402" />
+	</File>
+	<File name="CustomPolygonDialog.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1438" topLine="45" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Dynamics\Contacts\b2ContactSolver.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3533" topLine="77" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Common\b2StackAllocator.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1786" topLine="49" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Collision\Shapes\b2CircleShape.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2470" topLine="55" />
 	</File>
 	<File name="ContactListener.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="238" topLine="0" />
 	</File>
-	<File name="CustomPolygonDialog.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="88" topLine="3" />
+	<File name="Box2D\Box2D\Box2D\Common\b2Settings.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1251" topLine="13" />
 	</File>
-	<File name="CustomPolygonDialog.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="88" topLine="3" />
+	<File name="ContactListener.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="639" topLine="0" />
 	</File>
-	<File name="Extension.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="980" topLine="3" />
+	<File name="Box2D\Box2D\Box2D\Box2D.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1215" topLine="15" />
 	</File>
-	<File name="PhysicsAutomatism.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="88" topLine="3" />
+	<File name="Box2D\Box2D\Box2D\Dynamics\b2World.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3815" topLine="74" />
 	</File>
-	<File name="PhysicsAutomatism.h" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1069" topLine="63" />
+	<File name="Box2D\Box2D\Box2D\Dynamics\b2World.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2880" topLine="101" />
 	</File>
-	<File name="PhysicsAutomatismEditor.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="88" topLine="3" />
-	</File>
-	<File name="PhysicsAutomatismEditor.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="88" topLine="3" />
-	</File>
-	<File name="RuntimeScenePhysicsDatas.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="51" topLine="3" />
-	</File>
-	<File name="RuntimeScenePhysicsDatas.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="88" topLine="3" />
-	</File>
-	<File name="ScenePhysicsDatas.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="88" topLine="3" />
+	<File name="Box2D\Box2D\Box2D\Common\b2BlockAllocator.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1553" topLine="37" />
 	</File>
 	<File name="ScenePhysicsDatas.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="88" topLine="3" />
+		<Cursor1 position="1116" topLine="17" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Collision\b2Distance.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1190" topLine="12" />
+	</File>
+	<File name="ScenePhysicsDatas.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1343" topLine="16" />
+	</File>
+	<File name="RuntimeScenePhysicsDatas.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2667" topLine="41" />
+	</File>
+	<File name="Box2D\Box2D\Box2D\Dynamics\b2Body.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="12952" topLine="306" />
 	</File>
 </CodeBlocks_layout_file>

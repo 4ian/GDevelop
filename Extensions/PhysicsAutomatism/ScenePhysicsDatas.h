@@ -29,7 +29,6 @@ freely, subject to the following restrictions:
 
 #include "GDL/AutomatismsSharedDatas.h"
 #include "RuntimeScenePhysicsDatas.h"
-#include <iostream>
 
 /**
  * Datas shared by Physics Automatism

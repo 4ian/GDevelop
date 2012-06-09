@@ -58,6 +58,7 @@
 												<object class="wxRadioButton" name="ID_RADIOBUTTON3" variable="OnCenterRadioBt" member="yes">
 													<label>Positionner par rapport au centre</label>
 													<selected>1</selected>
+													<style>wxRB_GROUP</style>
 													<handler function="OnRadioButton1Select" entry="EVT_RADIOBUTTON" />
 												</object>
 												<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

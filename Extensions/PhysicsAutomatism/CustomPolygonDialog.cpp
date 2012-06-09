@@ -43,7 +43,7 @@ freely, subject to the following restrictions:
 #include <wx/numdlg.h>
 
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/Dialogs/BitmapGUIManager.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
 #include <string>
 #include <cmath>
 
@@ -121,7 +121,7 @@ CustomPolygonDialog::CustomPolygonDialog(wxWindow* parent, std::vector<sf::Vecto
 	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Positionnement"));
 	GridSizer1 = new wxGridSizer(3, 1, 0, 0);
-	OnCenterRadioBt = new wxRadioButton(this, ID_RADIOBUTTON3, _("Positionner par rapport au centre"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON3"));
+	OnCenterRadioBt = new wxRadioButton(this, ID_RADIOBUTTON3, _("Positionner par rapport au centre"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON3"));
 	OnCenterRadioBt->SetValue(true);
 	GridSizer1->Add(OnCenterRadioBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	OnOriginRadioBt = new wxRadioButton(this, ID_RADIOBUTTON1, _("Positionner par rapport à l\'origine"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
@@ -291,7 +291,7 @@ void CustomPolygonDialog::OnpreviewPnlPaint(wxPaintEvent& event)
     float yOffset = (previewPnlVerticalScroll->GetThumbPosition() - previewPnlVerticalScroll->GetRange()/2);
 
     //Draw background
-    dc.SetBrush(BitmapGUIManager::GetInstance()->transparentBg);
+    dc.SetBrush(gd::CommonBitmapManager::GetInstance()->transparentBg);
     dc.DrawRectangle(0,0, panelSize.GetWidth(), panelSize.GetHeight());
 
     //Draw Collision Polygon
@@ -343,7 +343,7 @@ void CustomPolygonDialog::OnpreviewPnlPaint(wxPaintEvent& event)
     }
 
     //Draw origin
-    wxBitmap point(BitmapGUIManager::GetInstance()->point);
+    wxBitmap point(gd::CommonBitmapManager::GetInstance()->point);
     dc.DrawBitmap(point,
                   (0-point.GetWidth()/2)    -xOffset,
                   (0-point.GetHeight()/2)   -yOffset,

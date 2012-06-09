@@ -39,10 +39,11 @@ freely, subject to the following restrictions:
 #include <wx/msw/winundef.h>
 #endif
 #include "GDL/Game.h"
-#include "PhysicsAutomatism.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
+#include "PhysicsAutomatism.h"
+#include "ScenePhysicsDatas.h"
 
 #include "CustomPolygonDialog.h"
 

@@ -25,6 +25,7 @@ freely, subject to the following restrictions:
 */
 
 #include "PhysicsAutomatism.h"
+#include <string>
 #include "Box2D/Box2D.h"
 #include "Triangulation/triangulate.h"
 #include "GDL/RuntimeScene.h"
@@ -32,7 +33,7 @@ freely, subject to the following restrictions:
 #include "GDL/XmlMacros.h"
 #include "PhysicsAutomatismEditor.h"
 #include "GDL/CommonTools.h"
-#include <string>
+#include "RuntimeScenePhysicsDatas.h"
 
 #undef GetObject
 
@@ -47,7 +48,8 @@ averageFriction(0.8),
 averageRestitution(0),
 linearDamping(0.1),
 angularDamping(0.1),
-body(NULL)
+body(NULL),
+runtimeScenesPhysicsDatas(NULL)
 {
     polygonHeight = 200;
     polygonWidth = 200;
@@ -59,7 +61,7 @@ body(NULL)
 
 PhysicsAutomatism::~PhysicsAutomatism()
 {
-    if ( runtimeScenesPhysicsDatas != boost::shared_ptr<RuntimeScenePhysicsDatas>() && body)
+    if ( runtimeScenesPhysicsDatas != NULL && body)
         runtimeScenesPhysicsDatas->world->DestroyBody(body);
 }
 
@@ -126,8 +128,8 @@ void PhysicsAutomatism::DoStepPostEvents(RuntimeScene & scene)
  */
 void PhysicsAutomatism::CreateBody(const RuntimeScene & scene)
 {
-    if ( runtimeScenesPhysicsDatas == boost::shared_ptr<RuntimeScenePhysicsDatas>() )
-        runtimeScenesPhysicsDatas = boost::static_pointer_cast<RuntimeScenePhysicsDatas>(scene.GetAutomatismSharedDatas(name));
+    if ( runtimeScenesPhysicsDatas == NULL )
+        runtimeScenesPhysicsDatas = static_cast<RuntimeScenePhysicsDatas*>(scene.GetAutomatismSharedDatas(name).get());
 
     //Create body from object
     b2BodyDef bodyDef;
@@ -313,7 +315,7 @@ void PhysicsAutomatism::ApplyForce(double xCoordinate, double yCoordinate, Runti
 void PhysicsAutomatism::ApplyForceUsingPolarCoordinates( float angle, float length, RuntimeScene & scene )
 {
     if ( !body ) CreateBody(scene);
-    body->ApplyForce(b2Vec2(cos(angle)*length,-sin(angle)*length), body->GetPosition());
+    body->ApplyForce(b2Vec2(cos(angle*b2_pi/180.0f)*length,-sin(angle*b2_pi/180.0f)*length), body->GetPosition());
 }
 
 /**
@@ -381,7 +383,7 @@ void PhysicsAutomatism::AddRevoluteJointBetweenObjects( const std::string & , Ob
 {
     if ( !body ) CreateBody(scene);
 
-    if ( object == NULL || !object->HasAutomatism(name) ) return;
+    if ( object == NULL || !object->HasAutomatismNamed(name) ) return;
     b2Body * otherBody = static_cast<PhysicsAutomatism*>(object->GetAutomatismRawPointer(name))->GetBox2DBody(scene);
 
     if ( body == otherBody ) return;
@@ -425,8 +427,8 @@ void PhysicsAutomatism::AddGearJointBetweenObjects( const std::string & , Object
 {
     if ( !body ) CreateBody(scene);
 
-    if ( object == NULL || !object->HasAutomatism(name) ) return;
-    b2Body * otherBody = boost::static_pointer_cast<PhysicsAutomatism>(object->GetAutomatism(name))->GetBox2DBody(scene);
+    if ( object == NULL || !object->HasAutomatismNamed(name) ) return;
+    b2Body * otherBody = static_cast<PhysicsAutomatism*>(object->GetAutomatismRawPointer(name))->GetBox2DBody(scene);
 
     if ( body == otherBody ) return;
 

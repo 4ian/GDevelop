@@ -29,7 +29,6 @@ freely, subject to the following restrictions:
 
 class b2World;
 class b2Body;
-#include <iostream>
 #include "GDL/AutomatismsRuntimeSharedDatas.h"
 class ScenePhysicsDatas;
 class ContactListener;

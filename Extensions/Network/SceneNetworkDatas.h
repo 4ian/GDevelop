@@ -29,7 +29,6 @@ freely, subject to the following restrictions:
 
 #include "GDL/AutomatismsSharedDatas.h"
 #include "RuntimeSceneNetworkDatas.h"
-#include <iostream>
 
 /**
  * Datas shared by Network Automatism ( i.e. Nothing )

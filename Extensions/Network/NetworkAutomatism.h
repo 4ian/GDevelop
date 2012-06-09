@@ -30,7 +30,6 @@ freely, subject to the following restrictions:
 #include "GDL/Automatism.h"
 #include "GDL/Object.h"
 #include "SceneNetworkDatas.h"
-#include <iostream>
 #include <map>
 class TiXmlElement;
 class Scene;
@@ -43,7 +42,7 @@ class GD_EXTENSION_API NetworkAutomatism : public Automatism
     public:
         NetworkAutomatism(std::string automatismTypeName);
         virtual ~NetworkAutomatism();
-        virtual boost::shared_ptr<Automatism> Clone() { return boost::shared_ptr<Automatism>(new NetworkAutomatism(*this));}
+        virtual Automatism * Clone() { return (new NetworkAutomatism(*this));}
 
         #if defined(GD_IDE_ONLY)
         /**

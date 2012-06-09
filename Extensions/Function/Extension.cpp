@@ -26,8 +26,6 @@ freely, subject to the following restrictions:
 
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
-#include "GDL/StrExpressionInstruction.h"
-#include "GDL/IDE/GDExpressionParser.h"
 #include "GDL/Events/ExpressionsCodeGeneration.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/Events/EventsCodeGenerator.h"
@@ -35,12 +33,15 @@ freely, subject to the following restrictions:
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/Instruction.h"
+#if defined(GD_IDE_ONLY)
+#include "GDCore/Events/ExpressionParser.h"
+#include "GDCore/Events/Instruction.h"
+#endif
 #include "FunctionEvent.h"
 #include <boost/version.hpp>
 
 /**
- * This class declare information about the extension.
+ * \brief This class declares information about the extension.
  */
 class Extension : public ExtensionBase
 {
@@ -76,14 +77,14 @@ class Extension : public ExtensionBase
                 instrInfo.AddParameter("string", _("Paramètre 6"), "", true);
                 instrInfo.AddParameter("string", _("Paramètre 7"), "", true);
 
-            class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
+            class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
             {
-                virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+                virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
                 {
                     codeGenerator.AddGlobalDeclaration(FunctionEvent::globalDeclaration);
-                    std::string functionName = instruction.GetParameterSafely(0).GetPlainString();
+                    std::string functionName = instruction.GetParameter(0).GetPlainString();
 
-                    boost::shared_ptr<FunctionEvent> functionEvent = FunctionEvent::SearchForFunctionInEvents(scene.events, functionName);
+                    boost::shared_ptr<FunctionEvent> functionEvent = FunctionEvent::SearchForFunctionInEvents(scene.GetEvents(), functionName);
                     if ( functionEvent == boost::shared_ptr<FunctionEvent>() )
                     {
                         std::cout << "Function \""+functionName+"\" not found!" << std::endl;
@@ -95,13 +96,13 @@ class Extension : public ExtensionBase
                     //Generate code for objects passed as arguments
                     std::string objectsAsArgumentCode;
                     {
-                        vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), functionEvent->GetObjectsPassedAsArgument()));
-                        vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), functionEvent->GetObjectsPassedAsArgument()));
+                        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), functionEvent->GetObjectsPassedAsArgument()));
+                        vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), functionEvent->GetObjectsPassedAsArgument()));
 
                         std::vector<std::string> realObjects;
-                        if ( globalGroup != game.objectGroups.end() )
+                        if ( globalGroup != game.GetObjectGroups().end() )
                             realObjects = (*globalGroup).GetAllObjectsNames();
-                        else if ( sceneGroup != scene.objectGroups.end() )
+                        else if ( sceneGroup != scene.GetObjectGroups().end() )
                             realObjects = (*sceneGroup).GetAllObjectsNames();
                         else
                             realObjects.push_back(functionEvent->GetObjectsPassedAsArgument());
@@ -121,8 +122,8 @@ class Extension : public ExtensionBase
                     {
                         std::string parameterCode;
                         CallbacksForGeneratingExpressionCode callbacks(parameterCode, game, scene, codeGenerator, context);
-                        GDExpressionParser parser(instruction.GetParameterSafely(i).GetPlainString());
-                        parser.ParseTextExpression(game, scene, callbacks);
+                        gd::ExpressionParser parser(instruction.GetParameter(i).GetPlainString());
+                        parser.ParseStringExpression(game, scene, callbacks);
                         if (parameterCode.empty()) parameterCode = "\"\"";
 
                         code += "functionParameters.push_back("+parameterCode+");\n";
@@ -137,8 +138,8 @@ class Extension : public ExtensionBase
                 };
             };
 
-            InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+            gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
             DECLARE_END_ACTION()
 
@@ -159,9 +160,9 @@ class Extension : public ExtensionBase
 
                 instrInfo.AddParameter("expression", _("Numéro du paramètre ( Commence à 0 ! )"), "", false);
 
-            class CodeGenerator : public StrExpressionInfos::CppCallingInformation::CustomCodeGenerator
+            class CodeGenerator : public gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator
             {
-                virtual std::string GenerateCode(const Game & game, const Scene & scene, const StrExpressionInstruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+                virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
                 {
                     codeGenerator.AddGlobalDeclaration(FunctionEvent::globalDeclaration);
                     codeGenerator.AddIncludeFile("Function/FunctionTools.h");
@@ -169,7 +170,7 @@ class Extension : public ExtensionBase
                     //Generate code for evaluating index
                     std::string expression;
                     CallbacksForGeneratingExpressionCode callbacks(expression, game, scene, codeGenerator, context);
-                    GDExpressionParser parser(instruction.parameters[0].GetPlainString());
+                    gd::ExpressionParser parser(parameters[0].GetPlainString());
                     if (!parser.ParseMathExpression(game, scene, callbacks) || expression.empty()) expression = "0";
 
                     std::string code;
@@ -180,8 +181,8 @@ class Extension : public ExtensionBase
                 };
             };
 
-            StrExpressionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<StrExpressionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+            gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
             DECLARE_END_STR_EXPRESSION()
 

@@ -35,9 +35,10 @@ freely, subject to the following restrictions:
 #include "GDL/Events/EventsCodeNameMangler.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/tinyxml/tinyxml.h"
-#include "GDL/IDE/EventsRenderingHelper.h"
-#include "GDL/IDE/EventsEditorItemsAreas.h"
-#include "GDL/IDE/EventsEditorSelection.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
+#include "GDCore/IDE/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDL/ExtensionsManager.h"
 #include "FunctionEventEditorDlg.h"
 #include <wx/textdlg.h>
 
@@ -65,13 +66,13 @@ std::string FunctionEvent::GenerateEventCode(Game & game, Scene & scene, EventsC
 
     EventsCodeGenerationContext callerContext;
     {
-        vector< ObjectGroup >::const_iterator globalGroup = find_if(game.objectGroups.begin(), game.objectGroups.end(), bind2nd(HasTheSameName(), GetObjectsPassedAsArgument()));
-        vector< ObjectGroup >::const_iterator sceneGroup = find_if(scene.objectGroups.begin(), scene.objectGroups.end(), bind2nd(HasTheSameName(), GetObjectsPassedAsArgument()));
+        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), GetObjectsPassedAsArgument()));
+        vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), GetObjectsPassedAsArgument()));
 
         std::vector<std::string> realObjects;
-        if ( globalGroup != game.objectGroups.end() )
+        if ( globalGroup != game.GetObjectGroups().end() )
             realObjects = (*globalGroup).GetAllObjectsNames();
-        else if ( sceneGroup != scene.objectGroups.end() )
+        else if ( sceneGroup != scene.GetObjectGroups().end() )
             realObjects = (*sceneGroup).GetAllObjectsNames();
         else
             realObjects.push_back(GetObjectsPassedAsArgument());
@@ -117,17 +118,17 @@ std::string FunctionEvent::GenerateEventCode(Game & game, Scene & scene, EventsC
     return "";
 }
 
-vector < vector<Instruction>* > FunctionEvent::GetAllConditionsVectors()
+vector < vector<gd::Instruction>* > FunctionEvent::GetAllConditionsVectors()
 {
-    vector < vector<Instruction>* > allConditions;
+    vector < vector<gd::Instruction>* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < vector<Instruction>* > FunctionEvent::GetAllActionsVectors()
+vector < vector<gd::Instruction>* > FunctionEvent::GetAllActionsVectors()
 {
-    vector < vector<Instruction>* > allActions;
+    vector < vector<gd::Instruction>* > allActions;
     allActions.push_back(&actions);
 
     return allActions;
@@ -191,7 +192,7 @@ void FunctionEvent::LoadFromXml(const TiXmlElement * elem)
  */
 void FunctionEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
     const int functionTextHeight = 20;
 
@@ -214,24 +215,24 @@ void FunctionEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEd
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+functionTextHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, *ExtensionsManager::GetInstance());
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+functionTextHeight+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
 }
 
 unsigned int FunctionEvent::GetRenderedHeight(unsigned int width) const
 {
     if ( eventHeightNeedUpdate )
     {
-        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
         int border = renderingHelper->instructionsListBorder;
         const int functionTextHeight = 20;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2);
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
 
         renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + functionTextHeight)+border*2;
         eventHeightNeedUpdate = false;
@@ -240,7 +241,7 @@ unsigned int FunctionEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-BaseEvent::EditEventReturnType FunctionEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+gd::BaseEvent::EditEventReturnType FunctionEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
 {
     FunctionEventEditorDlg dialog(parent_, *this, game_, scene_);
     if ( dialog.ShowModal() == 0 ) return Cancelled;
@@ -284,7 +285,7 @@ FunctionEvent& FunctionEvent::operator=(const FunctionEvent & event)
     return *this;
 }
 
-boost::shared_ptr<FunctionEvent> FunctionEvent::SearchForFunctionInEvents(const std::vector < boost::shared_ptr<BaseEvent> > & events, const std::string & functionName)
+boost::shared_ptr<FunctionEvent> FunctionEvent::SearchForFunctionInEvents(const std::vector < boost::shared_ptr<gd::BaseEvent> > & events, const std::string & functionName)
 {
     for (unsigned int i = 0;i<events.size();++i)
     {
@@ -305,7 +306,7 @@ boost::shared_ptr<FunctionEvent> FunctionEvent::SearchForFunctionInEvents(const 
     return boost::shared_ptr<FunctionEvent>();
 }
 
-std::vector< boost::shared_ptr<FunctionEvent> > FunctionEvent::GetAllFunctionsInEvents(const std::vector < boost::shared_ptr<BaseEvent> > & events)
+std::vector< boost::shared_ptr<FunctionEvent> > FunctionEvent::GetAllFunctionsInEvents(const std::vector < boost::shared_ptr<gd::BaseEvent> > & events)
 {
     std::vector< boost::shared_ptr<FunctionEvent> > results;
 

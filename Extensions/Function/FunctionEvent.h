@@ -28,10 +28,10 @@ freely, subject to the following restrictions:
 
 #ifndef FUNCTIONEVENT_H
 #define FUNCTIONEVENT_H
-#include "GDL/Event.h"
+#include "GDCore/Events/Event.h"
 #include "GDL/CommonTools.h"
 class RuntimeScene;
-class Instruction;
+namespace gd { class Instruction; }
 class TiXmlElement;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
@@ -43,7 +43,7 @@ class wxWindow;
  * Function event is an event which is executed by an action ( This action can pass to the function parameters and objects concerned )
  * Functions are referenced in a (static) std::map so as to let action call them.
  */
-class GD_EXTENSION_API FunctionEvent : public BaseEvent
+class GD_EXTENSION_API FunctionEvent : public gd::BaseEvent
 {
     public:
         FunctionEvent();
@@ -51,32 +51,32 @@ class GD_EXTENSION_API FunctionEvent : public BaseEvent
         virtual ~FunctionEvent() {};
 
         FunctionEvent& operator=(const FunctionEvent & event);
-        virtual BaseEventSPtr Clone() { return boost::shared_ptr<BaseEvent>(new FunctionEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new FunctionEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
         virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & callerContext);
 
         virtual bool CanHaveSubEvents() const {return true;}
-        virtual const vector < BaseEventSPtr > & GetSubEvents() const {return events;};
-        virtual vector < BaseEventSPtr > & GetSubEvents() {return events;};
-        void SetSubEvents(vector < BaseEventSPtr > & subEvents_) {events = subEvents_;};
+        virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
+        virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return events;};
+        void SetSubEvents(std::vector < gd::BaseEventSPtr > & subEvents_) {events = subEvents_;};
 
-        const vector < Instruction > & GetConditions() const { return conditions; };
-        vector < Instruction > & GetConditions() { return conditions; };
-        void SetConditions(vector < Instruction > & conditions_) { conditions = conditions_; };
+        const std::vector < gd::Instruction > & GetConditions() const { return conditions; };
+        std::vector < gd::Instruction > & GetConditions() { return conditions; };
+        void SetConditions(std::vector < gd::Instruction > & conditions_) { conditions = conditions_; };
 
-        const vector < Instruction > & GetActions() const { return actions; };
-        vector < Instruction > & GetActions() { return actions; };
-        void SetActions(vector < Instruction > & actions_) { actions = actions_; };
+        const std::vector < gd::Instruction > & GetActions() const { return actions; };
+        std::vector < gd::Instruction > & GetActions() { return actions; };
+        void SetActions(std::vector < gd::Instruction > & actions_) { actions = actions_; };
 
-        string GetName() const { return name; };
-        void SetName(string name_) { name = name_; };
+        std::string GetName() const { return name; };
+        void SetName(std::string name_) { name = name_; };
 
         const std::string & GetObjectsPassedAsArgument() const { return objectsPassedAsArgument; };
         void SetObjectsPassedAsArgument(const std::string & objects) { objectsPassedAsArgument = objects; };
 
-        virtual vector < vector<Instruction>* > GetAllConditionsVectors();
-        virtual vector < vector<Instruction>* > GetAllActionsVectors();
+        virtual std::vector < std::vector<gd::Instruction>* > GetAllConditionsVectors();
+        virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();
 
         virtual void SaveToXml(TiXmlElement * eventElem) const;
         virtual void LoadFromXml(const TiXmlElement * eventElem);
@@ -104,12 +104,12 @@ class GD_EXTENSION_API FunctionEvent : public BaseEvent
         /**
          * Tool function to search for a function event in an event list.
          */
-        static boost::shared_ptr<FunctionEvent> SearchForFunctionInEvents(const std::vector < boost::shared_ptr<BaseEvent> > & events, const std::string & functionName);
+        static boost::shared_ptr<FunctionEvent> SearchForFunctionInEvents(const std::vector < boost::shared_ptr<gd::BaseEvent> > & events, const std::string & functionName);
 
         /**
          * Tool function to list function events in an event list.
          */
-        static std::vector< boost::shared_ptr<FunctionEvent> > GetAllFunctionsInEvents(const std::vector < boost::shared_ptr<BaseEvent> > & events);
+        static std::vector< boost::shared_ptr<FunctionEvent> > GetAllFunctionsInEvents(const std::vector < boost::shared_ptr<gd::BaseEvent> > & events);
 
         static const std::string globalDeclaration;
 
@@ -118,9 +118,9 @@ class GD_EXTENSION_API FunctionEvent : public BaseEvent
 
         std::string name;
         std::string objectsPassedAsArgument;
-        vector < Instruction > conditions;
-        vector < Instruction > actions;
-        vector < BaseEventSPtr > events;
+        std::vector < gd::Instruction > conditions;
+        std::vector < gd::Instruction > actions;
+        std::vector < gd::BaseEventSPtr > events;
 
         bool nameSelected;
 };

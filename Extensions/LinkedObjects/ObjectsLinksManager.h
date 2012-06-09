@@ -50,28 +50,28 @@ public:
     /**
      * Link two object
      */
-    void LinkObjects(boost::weak_ptr<Object> a, boost::weak_ptr<Object> b);
+    void LinkObjects(Object * a, Object * b);
 
     /**
      * Remove link between a and b
      */
-    void RemoveLinkBetween(boost::weak_ptr<Object> a, boost::weak_ptr<Object> b);
+    void RemoveLinkBetween(Object * a, Object * b);
 
     /**
      * Remove all links concerning the object
      */
-    void RemoveAllLinksOf(boost::weak_ptr<Object> object);
+    void RemoveAllLinksOf(Object * object);
 
     /**
      * Get a list of all (raw pointers to) objects linked with the object
      */
-    std::vector<Object*> GetAllRawPointersToObjectsLinkedWith(boost::weak_ptr<Object> object);
+    std::vector<Object*> GetAllRawPointersToObjectsLinkedWith(Object * object);
 
 
     /**
      * Get a list of (raw pointers to) objects, with the specified name, linked with the object
      */
-    std::vector<Object*> GetRawPointersToObjectsLinkedWith(boost::weak_ptr<Object> object, std::string linkedName);
+    std::vector<Object*> GetRawPointersToObjectsLinkedWith(Object * object, std::string linkedName);
 
     /**
      * Delete all links
@@ -81,7 +81,7 @@ public:
     static std::map < RuntimeScene* , ObjectsLinksManager > managers; //List of managers associated with scenes.
 
 private:
-    std::map < boost::weak_ptr<Object>, std::set< boost::weak_ptr<Object> > > links;
+    std::map < Object *, std::set< Object * > > links;
 };
 
 }

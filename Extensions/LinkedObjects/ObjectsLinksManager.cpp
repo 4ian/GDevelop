@@ -41,76 +41,69 @@ namespace GDpriv
 namespace LinkedObjects
 {
 
-void ObjectsLinksManager::LinkObjects(boost::weak_ptr<Object> a, boost::weak_ptr<Object> b)
+void ObjectsLinksManager::LinkObjects(Object * a, Object * b)
 {
     {
-        std::set< boost::weak_ptr<Object> > & objectLinks = links[a];
+        std::set< Object * > & objectLinks = links[a];
         objectLinks.insert(b);
     }
     {
-        std::set< boost::weak_ptr<Object> > & objectLinks = links[b];
+        std::set< Object * > & objectLinks = links[b];
         objectLinks.insert(a);
     }
 }
 
-void ObjectsLinksManager::RemoveLinkBetween(boost::weak_ptr<Object> a, boost::weak_ptr<Object> b)
+void ObjectsLinksManager::RemoveLinkBetween(Object * a, Object * b)
 {
     {
-        std::set< boost::weak_ptr<Object> > & objectLinks = links[a];
+        std::set< Object * > & objectLinks = links[a];
         objectLinks.erase(b);
     }
     {
-        std::set< boost::weak_ptr<Object> > & objectLinks = links[b];
+        std::set< Object * > & objectLinks = links[b];
         objectLinks.erase(a);
     }
 }
 
-void ObjectsLinksManager::RemoveAllLinksOf(boost::weak_ptr<Object> object)
+void ObjectsLinksManager::RemoveAllLinksOf(Object * object)
 {
-    std::set< boost::weak_ptr<Object> > & objectLinks = links[object];
-    for (std::set< boost::weak_ptr<Object> >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
+    std::set< Object * > & objectLinks = links[object];
+    for (std::set< Object * >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
     {
-        if ( (*linkedObj).expired() )
-        {
-            links.erase((*linkedObj));  //If linked object does not exist anymore, take this opportunity to erase it from links list
-        }
-        else
-        {
-            std::set< boost::weak_ptr<Object> > & linkedObjectLinks = links[*linkedObj];
-            linkedObjectLinks.erase(object);
-        }
+        std::set< Object * > & linkedObjectLinks = links[*linkedObj];
+        linkedObjectLinks.erase(object);
     }
 
     links.erase(object); //Remove all links of object
 }
 
-std::vector< Object* > ObjectsLinksManager::GetAllRawPointersToObjectsLinkedWith(boost::weak_ptr<Object> object)
+std::vector< Object* > ObjectsLinksManager::GetAllRawPointersToObjectsLinkedWith(Object * object)
 {
     //Get links of object
-    const std::set< boost::weak_ptr<Object> > & objectLinks = links[object];
+    const std::set< Object * > & objectLinks = links[object];
     std::vector< Object* > list; list.reserve(objectLinks.size());
 
     //Create the list, avoiding dead links or links to just deleted objects
-    for (std::set< boost::weak_ptr<Object> >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
+    for (std::set< Object * >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
     {
-        if ( !(*linkedObj).expired() && !(*linkedObj).lock()->GetName().empty() )
-            list.push_back((*linkedObj).lock().get());
+        if ( !(*linkedObj)->GetName().empty() )
+            list.push_back((*linkedObj));
     }
 
     return list;
 }
 
-std::vector< Object* > ObjectsLinksManager::GetRawPointersToObjectsLinkedWith(boost::weak_ptr<Object> object, std::string linkedName)
+std::vector< Object* > ObjectsLinksManager::GetRawPointersToObjectsLinkedWith(Object * object, std::string linkedName)
 {
     //Get links of object
-    const std::set< boost::weak_ptr<Object> > & objectLinks = links[object];
+    const std::set< Object * > & objectLinks = links[object];
     std::vector< Object* > list; list.reserve(objectLinks.size());
 
     //Create the list
-    for (std::set< boost::weak_ptr<Object> >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
+    for (std::set< Object * >::iterator linkedObj = objectLinks.begin();linkedObj != objectLinks.end();++linkedObj)
     {
-        if ( !(*linkedObj).expired() && (*linkedObj).lock()->GetName() == linkedName)
-            list.push_back((*linkedObj).lock().get());
+        if ( (*linkedObj)->GetName() == linkedName)
+            list.push_back((*linkedObj));
     }
 
     return list;

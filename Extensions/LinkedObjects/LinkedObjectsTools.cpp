@@ -45,7 +45,7 @@ std::map < RuntimeScene* , ObjectsLinksManager > ObjectsLinksManager::managers;
 bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectsLists, int useless, const std::string &, Object * object, std::string linkedName)
 {
     //Get a list of all objects with the desired name linked to our object
-    std::vector<Object*> linkedObjects = ObjectsLinksManager::managers[&scene].GetRawPointersToObjectsLinkedWith(object->Shared_ptrFromObject(), linkedName);
+    std::vector<Object*> linkedObjects = ObjectsLinksManager::managers[&scene].GetRawPointersToObjectsLinkedWith(object, linkedName);
 
     //Then pick all of these objects
     for (unsigned int j = 0;j<linkedObjects.size();++j)
@@ -66,17 +66,17 @@ bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::s
 
 void GD_EXTENSION_API LinkObjects(RuntimeScene & scene, Object * a, Object * b, const std::string & ,const std::string & )
 {
-    ObjectsLinksManager::managers[&scene].LinkObjects(a->Shared_ptrFromObject(),b->Shared_ptrFromObject());
+    ObjectsLinksManager::managers[&scene].LinkObjects(a, b);
 }
 
 void GD_EXTENSION_API RemoveLinkBetween(RuntimeScene & scene, Object * a, Object * b, const std::string & ,const std::string & )
 {
-    ObjectsLinksManager::managers[&scene].RemoveLinkBetween(a->Shared_ptrFromObject(),b->Shared_ptrFromObject());
+    ObjectsLinksManager::managers[&scene].RemoveLinkBetween(a, b);
 }
 
 void GD_EXTENSION_API RemoveAllLinksOf(RuntimeScene & scene, Object * object)
 {
-    ObjectsLinksManager::managers[&scene].RemoveAllLinksOf(object->Shared_ptrFromObject());
+    ObjectsLinksManager::managers[&scene].RemoveAllLinksOf(object);
 }
 
 }

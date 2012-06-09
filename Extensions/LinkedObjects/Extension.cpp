@@ -31,7 +31,7 @@ freely, subject to the following restrictions:
 #include <iostream>
 
 /**
- * This class declare information about the extension.
+ * \brief This class declares information about the extension.
  */
 class Extension : public ExtensionBase
 {
@@ -145,6 +145,19 @@ class Extension : public ExtensionBase
             CompleteCompilationInformation();
         };
         virtual ~Extension() {};
+
+        /**
+         * The extension must be aware of objects deletion
+         */
+        virtual bool ToBeNotifiedOnObjectDeletion() { return true; }
+
+        /**
+         * Be sure to remove all links when an object is deleted
+         */
+        virtual void ObjectDeletedFromScene(RuntimeScene & scene, Object * object)
+        {
+            GDpriv::LinkedObjects::ObjectsLinksManager::managers[&scene].RemoveAllLinksOf(object);
+        }
 
         /**
          * Initialize manager of linked objects of scene

@@ -27,10 +27,11 @@ freely, subject to the following restrictions:
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
 #include "AStarAutomatism.h"
+#include "SceneAStarDatas.h"
 #include <boost/version.hpp>
 
 /**
- * This class declare information about the extension.
+ * \brief This class declares information about the extension.
  */
 class Extension : public ExtensionBase
 {

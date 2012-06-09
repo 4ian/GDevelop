@@ -35,6 +35,8 @@ freely, subject to the following restrictions:
 #include <wx/log.h>
 #include "GDL/Game.h"
 #include "AStarAutomatism.h"
+#include "SceneAStarDatas.h"
+#include "RuntimeSceneAStarDatas.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"

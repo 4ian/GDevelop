@@ -27,7 +27,6 @@ freely, subject to the following restrictions:
 #ifndef RUNTIMESCENEASTARDATAS_H
 #define RUNTIMESCENEASTARDATAS_H
 
-#include <iostream>
 #include <boost/weak_ptr.hpp>
 #include <vector>
 #include "GDL/AutomatismsRuntimeSharedDatas.h"
@@ -44,7 +43,7 @@ class GD_EXTENSION_API RuntimeSceneAStarDatas : public AutomatismsRuntimeSharedD
         virtual ~RuntimeSceneAStarDatas();
         virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneAStarDatas(*this));}
 
-        std::vector < boost::weak_ptr<AStarAutomatism> > objects; ///< Each object using the automatism add itself to this list, used to compute obstacles
+        std::vector < AStarAutomatism* > objects; ///< Each object using the automatism add itself to this list, used to compute obstacles
 
         float gridWidth;
         float gridHeight;

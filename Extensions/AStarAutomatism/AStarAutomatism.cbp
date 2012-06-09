@@ -49,6 +49,7 @@
 					<Add option="-m32" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
@@ -61,6 +62,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_richtext" />
@@ -147,6 +149,7 @@
 					<Add option="-m32" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
@@ -159,6 +162,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -245,6 +249,7 @@
 					<Add option="-m32" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
 					<Add option="-DGD_EXTENSION_API=__declspec(dllexport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
@@ -257,6 +262,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -355,6 +361,7 @@
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -364,6 +371,7 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lgdl" />
+					<Add option="-lGDCore" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -398,6 +406,7 @@
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />
@@ -405,6 +414,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
+					<Add option="-lGDCore" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
 					<Add option="-lsfml-graphics" />
@@ -547,6 +557,7 @@
 			<Add directory="..\..\ExtLibs\SFML\include" />
 			<Add directory="..\..\ExtLibs\boost" />
 			<Add directory="Box2D\Box2D" />
+			<Add directory="..\..\Core" />
 		</Compiler>
 		<Linker>
 			<Add directory="..\..\ExtLibs\SFML\build-mingw-debug\lib" />

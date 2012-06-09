@@ -31,6 +31,7 @@ freely, subject to the following restrictions:
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/XmlMacros.h"
 #include "MapSearchNode.h"
+#include "RuntimeSceneAStarDatas.h"
 
 AStarAutomatism::AStarAutomatism(std::string automatismTypeName) :
     Automatism(automatismTypeName),
@@ -44,12 +45,16 @@ AStarAutomatism::AStarAutomatism(std::string automatismTypeName) :
     currentSegment(0),
     destinationX(0),
     destinationY(0),
-    cost(9)
+    cost(9),
+    runtimeScenesAStarDatas(NULL)
 {
     Reset();
 }
+
 AStarAutomatism::~AStarAutomatism()
 {
+    if ( runtimeScenesAStarDatas != NULL )
+        runtimeScenesAStarDatas->objects.erase(std::remove(runtimeScenesAStarDatas->objects.begin(), runtimeScenesAStarDatas->objects.end(), this), runtimeScenesAStarDatas->objects.end());
 }
 
 void AStarAutomatism::Reset()
@@ -82,10 +87,10 @@ void AStarAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * sc
  */
 void AStarAutomatism::DoStepPreEvents(RuntimeScene & scene)
 {
-    if ( runtimeScenesAStarDatas == boost::shared_ptr<RuntimeSceneAStarDatas>() )
+    if ( runtimeScenesAStarDatas == NULL )
     {
-        runtimeScenesAStarDatas = boost::static_pointer_cast<RuntimeSceneAStarDatas>(scene.GetAutomatismSharedDatas(name));
-        runtimeScenesAStarDatas->objects.push_back(shared_from_this());
+        runtimeScenesAStarDatas = static_cast<RuntimeSceneAStarDatas*>(scene.GetAutomatismSharedDatas(name).get());
+        runtimeScenesAStarDatas->objects.push_back(this);
     }
 
     //  add to the current time along the path
@@ -113,10 +118,10 @@ void AStarAutomatism::DoStepPreEvents(RuntimeScene & scene)
 
 void AStarAutomatism::ComputePath(RuntimeScene & scene)
 {
-    if ( runtimeScenesAStarDatas == boost::shared_ptr<RuntimeSceneAStarDatas>() )
+    if ( runtimeScenesAStarDatas == NULL )
     {
-        runtimeScenesAStarDatas = boost::static_pointer_cast<RuntimeSceneAStarDatas>(scene.GetAutomatismSharedDatas(name));
-        runtimeScenesAStarDatas->objects.push_back(shared_from_this());
+        runtimeScenesAStarDatas = static_cast<RuntimeSceneAStarDatas*>(scene.GetAutomatismSharedDatas(name).get());
+        runtimeScenesAStarDatas->objects.push_back(this);
     }
 
     //Recreate a new path
@@ -235,19 +240,19 @@ void AStarAutomatism::MoveTo( RuntimeScene & scene, float destinationX_, float d
 
 void AStarAutomatism::SetGridWidth( RuntimeScene & scene, float gridWidth )
 {
-    if ( runtimeScenesAStarDatas != boost::shared_ptr<RuntimeSceneAStarDatas>() ) runtimeScenesAStarDatas->gridWidth = gridWidth;
+    if ( runtimeScenesAStarDatas != NULL ) runtimeScenesAStarDatas->gridWidth = gridWidth;
 }
 void AStarAutomatism::SetGridHeight( RuntimeScene & scene, float gridHeight )
 {
-    if ( runtimeScenesAStarDatas != boost::shared_ptr<RuntimeSceneAStarDatas>() ) runtimeScenesAStarDatas->gridHeight = gridHeight;
+    if ( runtimeScenesAStarDatas != NULL ) runtimeScenesAStarDatas->gridHeight = gridHeight;
 }
 float AStarAutomatism::GetGridWidth( RuntimeScene & scene )
 {
-    return runtimeScenesAStarDatas != boost::shared_ptr<RuntimeSceneAStarDatas>() ? runtimeScenesAStarDatas->gridWidth : 0;
+    return runtimeScenesAStarDatas != NULL ? runtimeScenesAStarDatas->gridWidth : 0;
 }
 float AStarAutomatism::GetGridHeight( RuntimeScene & scene )
 {
-    return runtimeScenesAStarDatas != boost::shared_ptr<RuntimeSceneAStarDatas>() ? runtimeScenesAStarDatas->gridHeight : 0;
+    return runtimeScenesAStarDatas != NULL ? runtimeScenesAStarDatas->gridHeight : 0;
 }
 
 #if defined(GD_IDE_ONLY)

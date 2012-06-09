@@ -35,19 +35,15 @@ int MapSearchNode::GetCellOfMapAt( int x, int y )
 
     for (unsigned int i = 0;i<context.objects.size();++i)
     {
-        boost::shared_ptr<AStarAutomatism> automatism = context.objects[i].lock();
+        AStarAutomatism * automatism = context.objects[i];
 
-        if ( automatism )
+        if ( x*context.gridWidth  >= static_cast<int>(automatism->GetObject()->GetX()/context.gridWidth)*context.gridWidth - automatism->leftBorder*context.gridWidth &&
+             x*context.gridWidth  <  static_cast<int>((automatism->GetObject()->GetX()+automatism->GetObject()->GetWidth())/context.gridWidth)*context.gridWidth+context.gridWidth + automatism->rightBorder*context.gridWidth &&
+             y*context.gridHeight >= static_cast<int>(automatism->GetObject()->GetY()/context.gridHeight)*context.gridHeight - automatism->topBorder*context.gridWidth &&
+             y*context.gridHeight <  static_cast<int>((automatism->GetObject()->GetY()+automatism->GetObject()->GetHeight())/context.gridHeight)*context.gridHeight+context.gridHeight + automatism->bottomBorder*context.gridWidth )
         {
-            if ( x*context.gridWidth  >= static_cast<int>(automatism->GetObject()->GetX()/context.gridWidth)*context.gridWidth - automatism->leftBorder*context.gridWidth &&
-                 x*context.gridWidth  <  static_cast<int>((automatism->GetObject()->GetX()+automatism->GetObject()->GetWidth())/context.gridWidth)*context.gridWidth+context.gridWidth + automatism->rightBorder*context.gridWidth &&
-                 y*context.gridHeight >= static_cast<int>(automatism->GetObject()->GetY()/context.gridHeight)*context.gridHeight - automatism->topBorder*context.gridWidth &&
-                 y*context.gridHeight <  static_cast<int>((automatism->GetObject()->GetY()+automatism->GetObject()->GetHeight())/context.gridHeight)*context.gridHeight+context.gridHeight + automatism->bottomBorder*context.gridWidth )
-            {
-                if ( automatism->GetCost() == 9 ) return 9;
-                if ( automatism->GetCost() > maxCost ) maxCost = automatism->GetCost();
-            }
-
+            if ( automatism->GetCost() == 9 ) return 9;
+            if ( automatism->GetCost() > maxCost ) maxCost = automatism->GetCost();
         }
     }
 

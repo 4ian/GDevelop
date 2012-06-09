@@ -29,7 +29,6 @@ freely, subject to the following restrictions:
 
 #include "GDL/AutomatismsSharedDatas.h"
 #include "RuntimeSceneAStarDatas.h"
-#include <iostream>
 
 /**
  * Datas shared by A Star Automatism

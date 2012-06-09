@@ -29,169 +29,164 @@ freely, subject to the following restrictions:
 
 #include "GDL/Automatism.h"
 #include "GDL/Object.h"
-#include "SceneAStarDatas.h"
-#include <boost/weak_ptr.hpp>
 #include <SFML/System/Vector2.hpp>
-#include <iostream>
 #include <map>
 #include <set>
 class RuntimeScene;
 class TiXmlElement;
 class Scene;
 class AStarAutomatismEditor;
+class RuntimeSceneAStarDatas;
 
 /**
  * Automatism that position object on a predefined path.
  */
-class GD_EXTENSION_API AStarAutomatism : public Automatism, public boost::enable_shared_from_this<AStarAutomatism>
+class GD_EXTENSION_API AStarAutomatism : public Automatism
 {
-    friend class AStarAutomatismEditor;
+friend class AStarAutomatismEditor;
 
-    public:
-        AStarAutomatism(std::string automatismTypeName);
-        virtual ~AStarAutomatism();
-        virtual boost::shared_ptr<Automatism> Clone() { return boost::shared_ptr<Automatism>(new AStarAutomatism(*this));}
+public:
+    AStarAutomatism(std::string automatismTypeName);
+    virtual ~AStarAutomatism();
+    virtual Automatism* Clone() { return new AStarAutomatism(*this);}
 
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Save Automatism to XML
-         */
-        virtual void SaveToXml(TiXmlElement * elem) const;
-        #endif
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Save Automatism to XML
+     */
+    virtual void SaveToXml(TiXmlElement * elem) const;
+    #endif
 
-        /**
-         * Load Automatism from XML
-         */
-        virtual void LoadFromXml(const TiXmlElement * elem);
+    /**
+     * Load Automatism from XML
+     */
+    virtual void LoadFromXml(const TiXmlElement * elem);
 
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Called when user wants to edit the automatism.
-         */
-        virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ );
-        #endif
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Called when user wants to edit the automatism.
+     */
+    virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ );
+    #endif
 
-        /**
-         * Access to the object owning the automatism
-         */
-        inline Object * GetObject() {return object;};
+    /**
+     * Access to the object owning the automatism
+     */
+    inline Object * GetObject() {return object;};
 
-        /**
-         * Access to the object owning the automatism
-         */
-        inline const Object * GetObject() const {return object;};
+    /**
+     * Access to the object owning the automatism
+     */
+    inline const Object * GetObject() const {return object;};
 
-        /**
-         * Reset path
-         */
-        void Reset();
+    /**
+     * Reset path
+     */
+    void Reset();
 
-        void MoveTo( RuntimeScene & scene, float destinationX_, float destinationY_ );
+    void MoveTo( RuntimeScene & scene, float destinationX_, float destinationY_ );
 
-        /**
-         * Change segment of the path where the object is
-         */
-        void EnterSegment(unsigned int segmentNumber);
+    /**
+     * Change segment of the path where the object is
+     */
+    void EnterSegment(unsigned int segmentNumber);
 
-        unsigned int GetCurrentSegment() const { return currentSegment; }
+    unsigned int GetCurrentSegment() const { return currentSegment; }
 
-        /**
-         * Get the cost of the object when considered as an obstacle
-         */
-        unsigned int GetCost() const { return cost; };
+    /**
+     * Get the cost of the object when considered as an obstacle
+     */
+    unsigned int GetCost() const { return cost; };
 
-        /**
-         * Change the cost of the object when considered as an obstacle
-         */
-        void SetCost(unsigned int cost_) { cost = cost_; };
+    /**
+     * Change the cost of the object when considered as an obstacle
+     */
+    void SetCost(unsigned int cost_) { cost = cost_; };
 
-        void SetSpeed(float speed_) { speed = speed_; };
-        float GetSpeed() const { return speed; };
+    void SetSpeed(float speed_) { speed = speed_; };
+    float GetSpeed() const { return speed; };
 
-        float GetDestinationX() const { return destinationX; };
-        float GetDestinationY() const { return destinationY; };
+    float GetDestinationX() const { return destinationX; };
+    float GetDestinationY() const { return destinationY; };
 
-        double GetLastNodeX()
-        {
-            return path.empty() ? object->GetX() : path[currentSegment].x;
-        }
+    double GetLastNodeX()
+    {
+        return path.empty() ? object->GetX() : path[currentSegment].x;
+    }
 
-        double GetLastNodeY()
-        {
-            return path.empty() ? object->GetY() : path[currentSegment].y;
-        }
+    double GetLastNodeY()
+    {
+        return path.empty() ? object->GetY() : path[currentSegment].y;
+    }
 
-        double GetNextNodeX()
-        {
-            return !path.empty() && currentSegment < path.size()-1 ? path[currentSegment+1].x : destinationX;
-        }
-        double GetNextNodeY()
-        {
-            return !path.empty() && currentSegment < path.size()-1 ? path[currentSegment+1].y : destinationY;
-        }
+    double GetNextNodeX()
+    {
+        return !path.empty() && currentSegment < path.size()-1 ? path[currentSegment+1].x : destinationX;
+    }
+    double GetNextNodeY()
+    {
+        return !path.empty() && currentSegment < path.size()-1 ? path[currentSegment+1].y : destinationY;
+    }
 
-        bool PathFound() { return !path.empty(); };
-        bool DestinationReached() { return currentSegment >= path.size(); };
+    bool PathFound() { return !path.empty(); };
+    bool DestinationReached() { return currentSegment >= path.size(); };
 
-        void SetLeftBorder(unsigned int leftBorder_) { leftBorder = leftBorder_; };
-        unsigned int GetLeftBorder() const { return leftBorder; };
+    void SetLeftBorder(unsigned int leftBorder_) { leftBorder = leftBorder_; };
+    unsigned int GetLeftBorder() const { return leftBorder; };
 
-        void SetRightBorder(unsigned int rightBorder_) { rightBorder = rightBorder_; };
-        unsigned int GetRightBorder() const { return rightBorder; };
+    void SetRightBorder(unsigned int rightBorder_) { rightBorder = rightBorder_; };
+    unsigned int GetRightBorder() const { return rightBorder; };
 
-        void SetTopBorder(unsigned int topBorder_) { topBorder = topBorder_; };
-        unsigned int GetTopBorder() const { return topBorder; };
+    void SetTopBorder(unsigned int topBorder_) { topBorder = topBorder_; };
+    unsigned int GetTopBorder() const { return topBorder; };
 
-        void SetBottomBorder(unsigned int bottomBorder_) { bottomBorder = bottomBorder_; };
-        unsigned int GetBottomBorder() const { return bottomBorder; };
+    void SetBottomBorder(unsigned int bottomBorder_) { bottomBorder = bottomBorder_; };
+    unsigned int GetBottomBorder() const { return bottomBorder; };
 
-        /** Used only by GD events generated code
-         */
-        void SetGridWidth( RuntimeScene & scene, float gridWidth );
+    /** Used only by GD events generated code
+     */
+    void SetGridWidth( RuntimeScene & scene, float gridWidth );
 
-        /** Used only by GD events generated code
-         */
-        void SetGridHeight( RuntimeScene & scene, float gridHeight );
+    /** Used only by GD events generated code
+     */
+    void SetGridHeight( RuntimeScene & scene, float gridHeight );
 
-        /** Used only by GD events generated code
-         */
-        float GetGridWidth( RuntimeScene & scene );
+    /** Used only by GD events generated code
+     */
+    float GetGridWidth( RuntimeScene & scene );
 
-        /** Used only by GD events generated code
-         */
-        float GetGridHeight( RuntimeScene & scene );
+    /** Used only by GD events generated code
+     */
+    float GetGridHeight( RuntimeScene & scene );
 
+    unsigned int leftBorder;
+    unsigned int rightBorder;
+    unsigned int topBorder;
+    unsigned int bottomBorder;
+private:
 
-        static std::map < const Scene* , SceneAStarDatas > scenesPathDatas; ///< Static map associating scene to datas
+    virtual void DoStepPreEvents(RuntimeScene & scene);
 
-        unsigned int leftBorder;
-        unsigned int rightBorder;
-        unsigned int topBorder;
-        unsigned int bottomBorder;
-    private:
+    /**
+     * Compute the path thanks to A* algorithm
+     */
+    void ComputePath(RuntimeScene & scene);
 
-        virtual void DoStepPreEvents(RuntimeScene & scene);
+    //Path related members
+    //sf::Vector2f has been choosen to represent position, but any simple vector2 class would do the job.
+    std::vector<sf::Vector2f> path; ///< Path computed by the algorithm
+    sf::Vector2f offset; ///< Position on the path
+    float speed;
+    float timeOnSegment;
+    float totalSegmentTime;
+    unsigned int currentSegment;
 
-        /**
-         * Compute the path thanks to A* algorithm
-         */
-        void ComputePath(RuntimeScene & scene);
+    //A* Algorithm related members
+    float destinationX;
+    float destinationY;
+    unsigned int cost;
 
-        //Path related members
-        //sf::Vector2f has been choosen to represent position, but any simple vector2 class would do the job.
-        std::vector<sf::Vector2f> path; ///< Path computed by the algorithm
-        sf::Vector2f offset; ///< Position on the path
-        float speed;
-        float timeOnSegment;
-        float totalSegmentTime;
-        unsigned int currentSegment;
-
-        //A* Algorithm related members
-        float destinationX;
-        float destinationY;
-        unsigned int cost;
-
-        boost::shared_ptr<RuntimeSceneAStarDatas> runtimeScenesAStarDatas;
+    RuntimeSceneAStarDatas* runtimeScenesAStarDatas;
 };
 
 #endif // ASTARAUTOMATISM_H

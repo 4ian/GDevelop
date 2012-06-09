@@ -230,6 +230,16 @@ void EditorScene::ForceRefreshRibbonAndConnect()
 }
 
 /**
+ * Return true if the editor can be closed, false otherwise ( i.e. Scene is being previewed )
+ */
+bool EditorScene::CanBeClosed()
+{
+    if ( !sceneCanvas ) return true;
+
+    return sceneCanvas->IsEditing();
+}
+
+/**
  * Update ribbon
  */
 void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)

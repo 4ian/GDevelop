@@ -99,7 +99,7 @@ bool Game_Develop_EditorApp::OnInit()
     chdir( tmp.c_str() );
 #endif
 #ifdef WINDOWS
-    string exeDirectory = argv[0]; //Make sure current working directory is executable directory.
+    wxString exeDirectory = argv[0]; //Make sure current working directory is executable directory.
     unsigned int backslashpos = exeDirectory.find_last_of( "\\" );
     if ( backslashpos > exeDirectory.length() ) backslashpos = 0;
     unsigned int slashpos = exeDirectory.find_last_of( "/" );

@@ -855,6 +855,12 @@ void Game_Develop_EditorFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& ev
     }
     else if ( EditorScene * editor = dynamic_cast<EditorScene*>(editorsNotebook->GetPage(event.GetSelection())) )
     {
+        if ( !editor->CanBeClosed() )
+        {
+            event.Veto();
+            infoBar->ShowMessage(_("Fermez l'aperçu de la scène avant de fermer l'éditeur."));
+        }
+
         //Save the event to log file
         LogFileManager::GetInstance()->WriteToLogFile("Closed layout "+editor->GetLayout().GetName());
     }

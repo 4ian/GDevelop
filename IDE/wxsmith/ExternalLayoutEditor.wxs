@@ -10,6 +10,7 @@
 			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxPanel" name="ID_PANEL2" variable="corePanel" member="yes">
+					<bg>#FFFFFF</bg>
 					<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
 						<cols>1</cols>
 						<growablecols>0</growablecols>
@@ -48,9 +49,9 @@
 						</object>
 						<object class="sizeritem">
 							<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
-								<cols>3</cols>
+								<cols>1</cols>
 								<growablecols>0</growablecols>
-								<growablerows>0</growablerows>
+								<growablerows>0,1</growablerows>
 								<object class="sizeritem">
 									<object class="wxPanel" name="ID_PANEL5" variable="scenePanel" member="yes">
 										<bg>#FFFFFF</bg>
@@ -82,6 +83,35 @@
 										</object>
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxPanel" name="ID_PANEL3" variable="helpPanel" member="yes">
+										<bg>#FFFFFF</bg>
+										<object class="wxFlexGridSizer" variable="helpSizer" member="no">
+											<cols>3</cols>
+											<growablerows>0</growablerows>
+											<object class="sizeritem">
+												<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+													<label>Choisissez la scène à utiliser comme base pour éditer l&apos;agencement externe</label>
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+											<object class="sizeritem">
+												<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="StaticBitmap1" member="yes">
+													<bitmap>res/up.png</bitmap>
+													<style>wxNO_BORDER</style>
+												</object>
+												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+										</object>
+									</object>
+									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
 									<option>1</option>
 								</object>
 							</object>

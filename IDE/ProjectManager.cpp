@@ -428,13 +428,13 @@ void ProjectManager::Refresh()
             projectsTree->AppendItem(eventsItem, mainEditor.games[i]->GetExternalEvents(j).GetName(), 4 ,4, eventsItemData);
         }
 
-        /*gdTreeItemGameData * externalLayoutsItemData = new gdTreeItemGameData("ExternalLayoutsRoot", "", mainEditor.games[i].get());
+        gdTreeItemGameData * externalLayoutsItemData = new gdTreeItemGameData("ExternalLayoutsRoot", "", mainEditor.games[i].get());
         wxTreeItemId externalayoutsItem = projectsTree->AppendItem(projectItem, _("Agencements externes"), 6 , 6, externalLayoutsItemData);
         for (unsigned int j = 0;j<mainEditor.games[i]->GetExternalLayoutsCount();++j)
         {
             gdTreeItemGameData * externalLayoutsItemData = new gdTreeItemGameData("ExternalLayout", mainEditor.games[i]->GetExternalLayout(j).GetName(), mainEditor.games[i].get());
             projectsTree->AppendItem(externalayoutsItem, mainEditor.games[i]->GetExternalLayout(j).GetName(), 6 , 6, externalLayoutsItemData);
-        }*/
+        }
 
         if ( mainEditor.games[i]->useExternalSourceFiles )
         {
@@ -1013,8 +1013,10 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         EditorScene * sceneEditorPtr = dynamic_cast<EditorScene*>(mainEditor.GetEditorsNotebook()->GetPage(k));
+        ExternalLayoutEditor * externalLayoutEditPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-        if ( sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout)
+        if ( (sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout) ||
+             (externalLayoutEditPtr != NULL && &externalLayoutEditPtr->GetAssociatedLayout() == &layout) )
         {
             if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                 wxMessageBox(_("Impossible de supprimer l'onglet !"), _("Erreur"), wxICON_ERROR );

@@ -19,11 +19,27 @@
 						<option>1</option>
 					</object>
 					<object class="sizeritem">
-						<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="fileEdit" member="yes">
-							<handler function="OnfileEditText" entry="EVT_TEXT" />
+						<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+							<cols>3</cols>
+							<growablecols>0</growablecols>
+							<object class="sizeritem">
+								<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="fileEdit" member="yes" />
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxButton" name="ID_BUTTON1" variable="browseBt" member="yes">
+									<label>...</label>
+									<size>38,23</size>
+									<handler function="OnbrowseBtClick" entry="EVT_BUTTON" />
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-						<border>5</border>
 						<option>1</option>
 					</object>
 					<object class="sizeritem">

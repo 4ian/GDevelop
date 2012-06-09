@@ -878,12 +878,8 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         {
             ChoiceFile dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene, true);
 
-            wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-            if ( dialog.ShowModal() == 1 ) //Note that path is relative to the project file:
-            {
-                wxFileName filename(dialog.file); filename.MakeRelativeTo(gameDirectory);
-                ParaEdit[i]->ChangeValue(filename.GetFullPath());
-            }
+            if ( dialog.ShowModal() == 1 )
+                ParaEdit[i]->ChangeValue(dialog.file);
 
             return;
         }

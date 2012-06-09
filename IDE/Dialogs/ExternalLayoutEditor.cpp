@@ -5,7 +5,9 @@
 #include "ExternalLayoutEditor.h"
 
 //(*InternalHeaders(ExternalLayoutEditor)
+#include <wx/bitmap.h>
 #include <wx/intl.h>
+#include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <wx/config.h>
@@ -24,6 +26,9 @@ const long ExternalLayoutEditor::ID_SCROLLBAR2 = wxNewId();
 const long ExternalLayoutEditor::ID_SCROLLBAR1 = wxNewId();
 const long ExternalLayoutEditor::ID_CUSTOM1 = wxNewId();
 const long ExternalLayoutEditor::ID_PANEL5 = wxNewId();
+const long ExternalLayoutEditor::ID_STATICTEXT2 = wxNewId();
+const long ExternalLayoutEditor::ID_STATICBITMAP1 = wxNewId();
+const long ExternalLayoutEditor::ID_PANEL3 = wxNewId();
 const long ExternalLayoutEditor::ID_PANEL2 = wxNewId();
 //*)
 
@@ -57,6 +62,7 @@ mainEditorCommand(mainEditorCommand_)
 	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer2;
+	wxFlexGridSizer* helpSizer;
 	wxFlexGridSizer* FlexGridSizer1;
 
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
@@ -65,6 +71,7 @@ mainEditorCommand(mainEditorCommand_)
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
 	corePanel = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
+	corePanel->SetBackgroundColour(wxColour(255,255,255));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer4->AddGrowableRow(1);
@@ -82,9 +89,10 @@ mainEditorCommand(mainEditorCommand_)
 	FlexGridSizer2->Fit(contextPanel);
 	FlexGridSizer2->SetSizeHints(contextPanel);
 	FlexGridSizer4->Add(contextPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
 	FlexGridSizer3->AddGrowableRow(0);
+	FlexGridSizer3->AddGrowableRow(1);
 	scenePanel = new wxPanel(corePanel, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL5"));
 	scenePanel->SetBackgroundColour(wxColour(255,255,255));
 	scrollBar2 = new wxScrollBar(scenePanel, ID_SCROLLBAR2, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL, wxDefaultValidator, _T("ID_SCROLLBAR2"));
@@ -93,6 +101,18 @@ mainEditorCommand(mainEditorCommand_)
 	scrollBar1->SetScrollbar(2500, 10, 5000, 10);
 	sceneCanvas = new SceneCanvas(scenePanel, game, emptyScene, instanceContainer, externalLayout.GetAssociatedSettings(), mainEditorCommand, false);
 	FlexGridSizer3->Add(scenePanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	helpPanel = new wxPanel(corePanel, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
+	helpPanel->SetBackgroundColour(wxColour(255,255,255));
+	helpSizer = new wxFlexGridSizer(0, 3, 0, 0);
+	helpSizer->AddGrowableRow(0);
+	StaticText2 = new wxStaticText(helpPanel, ID_STATICTEXT2, _("Choisissez la scène à utiliser comme base pour éditer l\'agencement externe"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	helpSizer->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticBitmap1 = new wxStaticBitmap(helpPanel, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/up.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
+	helpSizer->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	helpPanel->SetSizer(helpSizer);
+	helpSizer->Fit(helpPanel);
+	helpSizer->SetSizeHints(helpPanel);
+	FlexGridSizer3->Add(helpPanel, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	corePanel->SetSizer(FlexGridSizer4);
 	FlexGridSizer4->Fit(corePanel);
@@ -120,9 +140,14 @@ mainEditorCommand(mainEditorCommand_)
 
     Game_Develop_EditorFrame::LoadSkin(&m_mgr, NULL);
 
-    mainEditorCommand.GetRibbon()->SetActivePage(2);
-    sceneCanvas->ConnectEvents();
-    m_mgr.Update();
+    //If the
+    vector< boost::shared_ptr<Scene> >::iterator sceneFound =
+        find_if(game.GetLayouts().begin(), game.GetLayouts().end(), bind2nd(SceneHasName(), externalLayout.GetAssociatedSettings().associatedLayout));
+
+    if ( sceneFound != game.GetLayouts().end() )
+        SetupForScene(*(*sceneFound));
+    else
+        SetupForScene(emptyScene);
 }
 
 ExternalLayoutEditor::~ExternalLayoutEditor()
@@ -130,7 +155,8 @@ ExternalLayoutEditor::~ExternalLayoutEditor()
 	//(*Destroy(ExternalLayoutEditor)
 	//*)
 
-	wxConfigBase::Get()->Write("/ExternalLayoutEditor/LastWorkspace", m_mgr.SavePerspective());
+    //Save the configuration
+    if ( &sceneCanvas->GetEditedScene() != &emptyScene ) wxConfigBase::Get()->Write("/ExternalLayoutEditor/LastWorkspace", m_mgr.SavePerspective());
 	m_mgr.UnInit();
 }
 
@@ -189,60 +215,73 @@ void ExternalLayoutEditor::OnsceneCanvasSetFocus(wxFocusEvent& event)
 
 void ExternalLayoutEditor::SetupForScene(Scene & scene)
 {
-    try
+    if ( &scene == &emptyScene )
     {
-        InitialInstancesContainer & instanceContainer = dynamic_cast<InitialInstancesContainer&>(externalLayout.GetInitialInstances());
-
-        //Keeping external editors alive if they already exists
-        boost::shared_ptr<EditorObjets> objectsEditor;
-        if ( sceneCanvas ) objectsEditor = sceneCanvas->GetOwnedObjectsEditor();
-        boost::shared_ptr<EditorLayers> layersEditor;
-        if ( sceneCanvas ) layersEditor = sceneCanvas->GetOwnedLayersEditor();
-        boost::shared_ptr<InitialPositionBrowserDlg> browserEditor;
-        if ( sceneCanvas ) browserEditor = sceneCanvas->GetOwnedInitialPositionBrowser();
-
-        //(Re)create scene canvas
-        if ( sceneCanvas ) delete sceneCanvas;
-        sceneCanvas = new SceneCanvas(scenePanel, game, scene, instanceContainer, externalLayout.GetAssociatedSettings(), mainEditorCommand, false);
-        sceneCanvas->SetParentPanelAndDockManager( scenePanel, &m_mgr );
-        sceneCanvas->SetScrollbars(scrollBar1, scrollBar2);
-
-        //Creating external editors if needed and linking them to the scene canvas
-        bool creatingEditorsForFirsttime = false;
-        if ( objectsEditor == boost::shared_ptr<EditorObjets>() || layersEditor == boost::shared_ptr<EditorLayers>() || browserEditor == boost::shared_ptr<InitialPositionBrowserDlg>() )
-        {
-            creatingEditorsForFirsttime = true;
-            objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainEditorCommand));
-            layersEditor = boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, &scene.initialLayers, mainEditorCommand) );
-            browserEditor = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *sceneCanvas) );
-        }
-        sceneCanvas->SetOwnedObjectsEditor(objectsEditor);
-        sceneCanvas->SetOwnedLayersEditor(layersEditor);
-        sceneCanvas->SetOwnedInitialPositionBrowser(browserEditor);
-        sceneCanvas->Reload();
-
-        //Display editors in panes
-        if ( creatingEditorsForFirsttime )
-        {
-            if ( !m_mgr.GetPane("ObjectsEditor").IsOk() )
-                m_mgr.AddPane( sceneCanvas->GetOwnedObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "ObjectsEditor" ) ).Right().CloseButton( true ).Caption( _( "Editeur d'objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-            if ( !m_mgr.GetPane("LayersEditor").IsOk() )
-                m_mgr.AddPane( sceneCanvas->GetOwnedLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "LayersEditor" ) ).Right().CloseButton( true ).Caption( _( "Editeur de calques" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-            if ( !m_mgr.GetPane("InstancesBrowser").IsOk() )
-                m_mgr.AddPane( sceneCanvas->GetOwnedInitialPositionBrowser().get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Positions initiales des objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-
-            wxString perspective;
-            wxConfigBase::Get()->Read("/ExternalLayoutEditor/LastWorkspace", &perspective);
-            m_mgr.LoadPerspective(perspective);
-        }
-
-        m_mgr.Update();
-        ForceRefreshRibbonAndConnect();
+        scenePanel->Hide();
+        helpPanel->Show();
     }
-    catch(...)
+    else
     {
-        std::cout << "ERROR: ExternalLayoutEditor is not ready for arbitrary Platform. GD will crash";
+        scenePanel->Show();
+        helpPanel->Hide();
+
+        try
+        {
+            InitialInstancesContainer & instanceContainer = dynamic_cast<InitialInstancesContainer&>(externalLayout.GetInitialInstances());
+
+            //Check if external editors already have been created
+            bool creatingEditorsForFirsttime = (sceneCanvas->GetOwnedObjectsEditor() == boost::shared_ptr<EditorObjets>() ||
+                                                 sceneCanvas->GetOwnedLayersEditor() == boost::shared_ptr<EditorLayers>() ||
+                                                 sceneCanvas->GetOwnedInitialPositionBrowser() == boost::shared_ptr<InitialPositionBrowserDlg>());
+
+            //(Re)create scene canvas
+            if ( sceneCanvas ) delete sceneCanvas;
+            sceneCanvas = new SceneCanvas(scenePanel, game, scene, instanceContainer, externalLayout.GetAssociatedSettings(), mainEditorCommand, false);
+            sceneCanvas->SetParentPanelAndDockManager( scenePanel, &m_mgr );
+            sceneCanvas->SetScrollbars(scrollBar1, scrollBar2);
+
+            //Creating external editors and linking them to the scene canvas
+            boost::shared_ptr<EditorObjets> objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainEditorCommand));
+            boost::shared_ptr<EditorLayers> layersEditor = boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, &scene.initialLayers, mainEditorCommand) );
+            boost::shared_ptr<InitialPositionBrowserDlg> browserEditor = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *sceneCanvas) );
+            sceneCanvas->SetOwnedObjectsEditor(objectsEditor);
+            sceneCanvas->SetOwnedLayersEditor(layersEditor);
+            sceneCanvas->SetOwnedInitialPositionBrowser(browserEditor);
+            sceneCanvas->Reload();
+
+            //Display editors in panes
+            if ( creatingEditorsForFirsttime )
+            {
+                if ( !m_mgr.GetPane("ObjectsEditor").IsOk() )
+                    m_mgr.AddPane( sceneCanvas->GetOwnedObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "ObjectsEditor" ) ).Right().CloseButton( true ).Caption( _( "Editeur d'objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+                if ( !m_mgr.GetPane("LayersEditor").IsOk() )
+                    m_mgr.AddPane( sceneCanvas->GetOwnedLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "LayersEditor" ) ).Right().CloseButton( true ).Caption( _( "Editeur de calques" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+                if ( !m_mgr.GetPane("InstancesBrowser").IsOk() )
+                    m_mgr.AddPane( sceneCanvas->GetOwnedInitialPositionBrowser().get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Positions initiales des objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+
+                wxString perspective;
+                wxConfigBase::Get()->Read("/ExternalLayoutEditor/LastWorkspace", &perspective);
+                m_mgr.LoadPerspective(perspective);
+            }
+            else
+            {
+                m_mgr.GetPane("ObjectsEditor").Window(sceneCanvas->GetOwnedObjectsEditor().get());
+                m_mgr.GetPane("LayersEditor").Window(sceneCanvas->GetOwnedLayersEditor().get());
+                m_mgr.GetPane("InstancesBrowser").Window(sceneCanvas->GetOwnedInitialPositionBrowser().get());
+            }
+
+            m_mgr.Update();
+            ForceRefreshRibbonAndConnect();
+        }
+        catch(...)
+        {
+            std::cout << "ERROR: ExternalLayoutEditor is not ready for arbitrary Platform. GD will crash";
+        }
     }
+
+    //Save the choice
+    externalLayout.GetAssociatedSettings().associatedLayout = scene.GetName();
+    if(parentSceneComboBox->GetValue() != scene.GetName()) parentSceneComboBox->SetValue(scene.GetName());
 }
 
 void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
@@ -275,4 +314,9 @@ void ExternalLayoutEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
 
     for (unsigned int i = 0;i<game.GetLayoutCount();++i)
     	parentSceneComboBox->Append(game.GetLayout(i).GetName());
+}
+
+gd::Layout & ExternalLayoutEditor::GetAssociatedLayout()
+{
+    return sceneCanvas->GetEditedScene();
 }

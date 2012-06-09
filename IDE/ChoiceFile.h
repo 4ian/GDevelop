@@ -39,6 +39,7 @@ class ChoiceFile: public wxDialog
 		wxButton* cancelBt;
 		wxTextCtrl* fileEdit;
 		wxStaticLine* StaticLine1;
+		wxButton* browseBt;
 		wxButton* okBt;
 		//*)
 
@@ -49,6 +50,7 @@ class ChoiceFile: public wxDialog
 		//(*Identifiers(ChoiceFile)
 		static const long ID_STATICTEXT1;
 		static const long ID_TEXTCTRL1;
+		static const long ID_BUTTON1;
 		static const long ID_STATICTEXT2;
 		static const long ID_STATICLINE1;
 		static const long ID_BUTTON2;
@@ -63,6 +65,7 @@ class ChoiceFile: public wxDialog
 		void OnokBtClick(wxCommandEvent& event);
 		void OncancelBtClick(wxCommandEvent& event);
 		void OnfileEditText(wxCommandEvent& event);
+		void OnbrowseBtClick(wxCommandEvent& event);
 		//*)
 
         //Données pour éditer une expression textuelle

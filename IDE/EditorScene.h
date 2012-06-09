@@ -59,6 +59,11 @@ class EditorScene: public wxPanel
          */
         void ForceRefreshRibbonAndConnect();
 
+        /**
+         * Return true if the editor can be closed, false otherwise ( i.e. Scene is being previewed )
+         */
+        bool CanBeClosed();
+
 	protected:
 
 		//(*Identifiers(EditorScene)

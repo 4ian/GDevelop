@@ -37,6 +37,7 @@ class Preferences: public wxDialog
 		wxPanel* backColorPnl;
 		wxPanel* Panel5;
 		wxCheckBox* hideLabelsCheck;
+		wxCheckBox* avertOnSaveCheck;
 		wxButton* auiStyleBt;
 		wxCheckBox* MAJCheck;
 		wxRadioBox* ribbonStyleBox;
@@ -121,6 +122,7 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT5;
 		static const long ID_STATICTEXT14;
 		static const long ID_CHECKBOX8;
+		static const long ID_CHECKBOX9;
 		static const long ID_PANEL6;
 		static const long ID_STATICTEXT13;
 		static const long ID_CHOICE2;

@@ -4,6 +4,7 @@
  */
 
 #include <wx/progdlg.h>
+#include <wx/richmsgdlg.h>
 #include <boost/shared_ptr.hpp>
 #include <SFML/System.hpp>
 #include "GDL/OpenSaveGame.h"
@@ -263,32 +264,48 @@ void Game_Develop_EditorFrame::SaveAs()
     if ( !CurrentGameIsValid() ) return;
 
     //Affichage de la boite de dialogue
-    wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg|All files|*.*", wxFD_SAVE );
-    FileDialog.ShowModal();
+    wxFileDialog fileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg|All files|*.*", wxFD_SAVE );
+    fileDialog.ShowModal();
 
-    std::string path = ToString(FileDialog.GetPath());
+    std::string path = ToString(fileDialog.GetPath());
     #if defined(LINUX) //Extension seems not be added with wxGTK?
-    if ( FileDialog.GetFilterIndex() == 0 && !path.empty() )
+    if ( fileDialog.GetFilterIndex() == 0 && !path.empty() )
         path += ".gdg";
     #endif
 
     //A t on  un fichier à enregistrer ?
     if ( !path.empty() )
     {
+        wxString oldPath = !GetCurrentGame()->GetProjectFile().empty() ? wxFileName::FileName(GetCurrentGame()->GetProjectFile()).GetPath() : "";
+
         //oui, donc on l'enregistre
         GetCurrentGame()->SetProjectFile(path);
         OpenSaveGame saveGame( *GetCurrentGame() );
 
         if ( !saveGame.SaveToFile(GetCurrentGame()->GetProjectFile()) )
-        {
             wxLogError( "L'enregistrement a échoué" );
-        }
 
         m_recentlist.SetLastUsed( GetCurrentGame()->GetProjectFile() );
 
         wxString GD = "Game Develop";
-        wxString Fichier = GetCurrentGame()->GetProjectFile();
-        SetTitle( GD + " - " + Fichier );
+        SetTitle( GD + " - " + GetCurrentGame()->GetProjectFile() );
+
+        //Warn the user that resources should maybe be also moved.
+        bool avertOnSaveCheck;
+        wxConfigBase::Get()->Read("/Save/AvertOnSaveAs", &avertOnSaveCheck, true);
+        wxString newPath = wxFileName::FileName(GetCurrentGame()->GetProjectFile()).GetPath();
+        if ( avertOnSaveCheck && newPath != oldPath && oldPath != "" )
+        {
+            wxRichMessageDialog dlg(this, _("Le projet a été enregistré dans un nouveau répertoire.\nPensez à copier dans ce repertoire les ressources utilisées par le jeu, si nécessaire."), _("Enregistrement dans un nouveau répertoire"), wxOK|wxICON_INFORMATION );
+            dlg.ShowCheckBox(_("Ne plus afficher ce message"));
+            dlg.ShowDetailedText(_("Depuis les dernières versions de Game Develop, les ressources sont enregistrées relativement\n"
+                                   "au dossier du jeu, permettant de copier ou déplacer un projet en déplacant simplement le répertoire\n"
+                                   "de celui ci, pour peu que les ressources soit enregistrées dans celui ci."));
+
+            dlg.ShowModal();
+            if ( dlg.IsCheckBoxChecked() )
+                wxConfigBase::Get()->Write("/Save/AvertOnSaveAs", "false");
+        }
 
         return;
     }

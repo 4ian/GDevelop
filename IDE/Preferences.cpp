@@ -45,6 +45,7 @@ const long Preferences::ID_TEXTCTRL1 = wxNewId();
 const long Preferences::ID_STATICTEXT5 = wxNewId();
 const long Preferences::ID_STATICTEXT14 = wxNewId();
 const long Preferences::ID_CHECKBOX8 = wxNewId();
+const long Preferences::ID_CHECKBOX9 = wxNewId();
 const long Preferences::ID_PANEL6 = wxNewId();
 const long Preferences::ID_STATICTEXT13 = wxNewId();
 const long Preferences::ID_CHOICE2 = wxNewId();
@@ -171,7 +172,7 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer26;
     wxFlexGridSizer* FlexGridSizer30;
 
-    Create(parent, wxID_ANY, _("Préférences de Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("PrÃ©fÃ©rences de Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(467,330));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer1->AddGrowableCol(0);
@@ -183,7 +184,7 @@ changesNeedRestart(false)
     FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/preferencelogo.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
     FlexGridSizer12->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText7 = new wxStaticText(Panel1, ID_STATICTEXT7, _("La fenêtre des préférences vous permet de personnaliser\nGame Develop. Chaque utilisateur de l\'ordinateur possède\nses propres préférences."), wxDefaultPosition, wxSize(417,48), wxALIGN_LEFT, _T("ID_STATICTEXT7"));
+    StaticText7 = new wxStaticText(Panel1, ID_STATICTEXT7, _("La fenÃªtre des prÃ©fÃ©rences vous permet de personnaliser\nGame Develop. Chaque utilisateur de l\'ordinateur possÃ¨de\nses propres prÃ©fÃ©rences."), wxDefaultPosition, wxSize(417,48), wxALIGN_LEFT, _T("ID_STATICTEXT7"));
     FlexGridSizer12->Add(StaticText7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel1->SetSizer(FlexGridSizer12);
     FlexGridSizer12->SetSizeHints(Panel1);
@@ -195,11 +196,11 @@ changesNeedRestart(false)
     Panel2 = new wxPanel(Listbook1, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL6"));
     FlexGridSizer14 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer14->AddGrowableCol(0);
-    StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel2, _("Démarrage"));
-    GuideCheck = new wxCheckBox(Panel2, ID_CHECKBOX1, _("Afficher le guide de démarrage"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+    StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel2, _("DÃ©marrage"));
+    GuideCheck = new wxCheckBox(Panel2, ID_CHECKBOX1, _("Afficher le guide de dÃ©marrage"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
     GuideCheck->SetValue(false);
     StaticBoxSizer1->Add(GuideCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    MAJCheck = new wxCheckBox(Panel2, ID_CHECKBOX4, _("Vérification des mises à jour"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
+    MAJCheck = new wxCheckBox(Panel2, ID_CHECKBOX4, _("VÃ©rification des mises Ã  jour"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
     MAJCheck->SetValue(false);
     StaticBoxSizer1->Add(MAJCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer14->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -215,14 +216,18 @@ changesNeedRestart(false)
     StaticText5 = new wxStaticText(Panel2, ID_STATICTEXT5, _("minutes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
     FlexGridSizer19->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer10->Add(FlexGridSizer19, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    StaticText14 = new wxStaticText(Panel2, ID_STATICTEXT14, _("Les fichiers seront sauvegardés en ajoutant .gdg.autosave à leur nom"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
+    StaticText14 = new wxStaticText(Panel2, ID_STATICTEXT14, _("Les fichiers seront sauvegardÃ©s en ajoutant .gdg.autosave Ã  leur nom"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
     FlexGridSizer10->Add(StaticText14, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer4->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer14->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer12 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Divers"));
-    logCheck = new wxCheckBox(Panel2, ID_CHECKBOX8, _("Activer le suivi du déroulement du logiciel dans un fichier journal"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX8"));
+    StaticBoxSizer12 = new wxStaticBoxSizer(wxVERTICAL, Panel2, _("Divers"));
+    logCheck = new wxCheckBox(Panel2, ID_CHECKBOX8, _("Activer le suivi du dÃ©roulement du logiciel dans un fichier journal"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX8"));
     logCheck->SetValue(false);
-    StaticBoxSizer12->Add(logCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer12->Add(logCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
+    avertOnSaveCheck = new wxCheckBox(Panel2, ID_CHECKBOX9, _("PrÃ©venir lors de l\'enregistrement d\'un fichier dans un nouveau rÃ©pertoire"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX9"));
+    avertOnSaveCheck->SetValue(false);
+    avertOnSaveCheck->SetToolTip(_("PrÃ©venir, quand un jeu est enregistrÃ© dans un nouveau rÃ©pertoire, qu\'il faut sans doute copier Ã©galement les ressources du jeu dedans."));
+    StaticBoxSizer12->Add(avertOnSaveCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer14->Add(StaticBoxSizer12, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel2->SetSizer(FlexGridSizer14);
     FlexGridSizer14->Fit(Panel2);
@@ -245,7 +250,7 @@ changesNeedRestart(false)
     StaticText6 = new wxStaticText(Panel3, ID_STATICTEXT6, _("Edition images :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
     FlexGridSizer11->Add(StaticText6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     EditeurImageEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
-    EditeurImageEdit->SetToolTip(_("Chemin vers le programme d\'édition d\'images."));
+    EditeurImageEdit->SetToolTip(_("Chemin vers le programme d\'Ã©dition d\'images."));
     FlexGridSizer11->Add(EditeurImageEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BrowseEditionImage = new wxButton(Panel3, ID_BUTTON5, _("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
     FlexGridSizer11->Add(BrowseEditionImage, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -254,10 +259,10 @@ changesNeedRestart(false)
     StaticBoxSizer6 = new wxStaticBoxSizer(wxVERTICAL, Panel3, _("Compilation"));
     FlexGridSizer13 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer13->AddGrowableCol(1);
-    StaticText8 = new wxStaticText(Panel3, ID_STATICTEXT8, _("Dossier temporaire de déploiement :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+    StaticText8 = new wxStaticText(Panel3, ID_STATICTEXT8, _("Dossier temporaire de dÃ©ploiement :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
     FlexGridSizer13->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     DossierTempCompEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
-    DossierTempCompEdit->SetToolTip(_("Dossier servant à compiler un jeu.\nVous devez posséder les droits d\'écriture pour ce dossier.\nPar défaut, il s\'agit du dossier \"Compil\" dans le répertoire de Game Develop."));
+    DossierTempCompEdit->SetToolTip(_("Dossier servant Ã  compiler un jeu.\nVous devez possÃ©der les droits d\'Ã©criture pour ce dossier.\nPar dÃ©faut, il s\'agit du dossier \"Compil\" dans le rÃ©pertoire de Game Develop."));
     FlexGridSizer13->Add(DossierTempCompEdit, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
     BrowseDossierTempBt = new wxButton(Panel3, ID_BUTTON4, _("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
     FlexGridSizer13->Add(BrowseDossierTempBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -267,12 +272,12 @@ changesNeedRestart(false)
     StaticText21 = new wxStaticText(Panel3, ID_STATICTEXT21, _("Dossier temporaire de compilation :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT21"));
     FlexGridSizer31->Add(StaticText21, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     eventsCompilerTempDirEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL6, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
-    eventsCompilerTempDirEdit->SetToolTip(_("Dossier servant à compiler un jeu.\nVous devez posséder les droits d\'écriture pour ce dossier.\nPar défaut, il s\'agit du dossier \"Compil\" dans le répertoire de Game Develop."));
+    eventsCompilerTempDirEdit->SetToolTip(_("Dossier servant Ã  compiler un jeu.\nVous devez possÃ©der les droits d\'Ã©criture pour ce dossier.\nPar dÃ©faut, il s\'agit du dossier \"Compil\" dans le rÃ©pertoire de Game Develop."));
     FlexGridSizer31->Add(eventsCompilerTempDirEdit, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
     browseCompilationTempDir = new wxButton(Panel3, ID_BUTTON12, _("Parcourir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
     FlexGridSizer31->Add(browseCompilationTempDir, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer6->Add(FlexGridSizer31, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    deleteTemporariesCheck = new wxCheckBox(Panel3, ID_CHECKBOX7, _("Supprimer les fichiers temporaires de compilation dès que possible"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
+    deleteTemporariesCheck = new wxCheckBox(Panel3, ID_CHECKBOX7, _("Supprimer les fichiers temporaires de compilation dÃ¨s que possible"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
     deleteTemporariesCheck->SetValue(true);
     StaticBoxSizer6->Add(deleteTemporariesCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer15->Add(StaticBoxSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -282,9 +287,9 @@ changesNeedRestart(false)
     Panel6 = new wxPanel(Listbook1, ID_PANEL16, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL16"));
     FlexGridSizer20 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer20->AddGrowableCol(0);
-    StaticBoxSizer11 = new wxStaticBoxSizer(wxHORIZONTAL, Panel6, _("Editeur de scènes"));
+    StaticBoxSizer11 = new wxStaticBoxSizer(wxHORIZONTAL, Panel6, _("Editeur de scÃ¨nes"));
     FlexGridSizer21 = new wxFlexGridSizer(0, 3, 0, 0);
-    StaticText15 = new wxStaticText(Panel6, ID_STATICTEXT15, _("Onglet \"Scène/Evenements\" :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT15"));
+    StaticText15 = new wxStaticText(Panel6, ID_STATICTEXT15, _("Onglet \"ScÃ¨ne/Evenements\" :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT15"));
     FlexGridSizer21->Add(StaticText15, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     sceneEventsTabPosition = new wxChoice(Panel6, ID_CHOICE1, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
     sceneEventsTabPosition->Append(_("En haut"));
@@ -298,7 +303,7 @@ changesNeedRestart(false)
     Panel4 = new wxPanel(Listbook1, ID_PANEL8, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL8"));
     FlexGridSizer16 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer16->AddGrowableCol(0);
-    StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Apparence prédéfinie"));
+    StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Apparence prÃ©dÃ©finie"));
     FlexGridSizer2 = new wxFlexGridSizer(0, 5, 0, 0);
     gdStyleBt = new wxButton(Panel4, ID_BUTTON6, _("Standard Game Develop"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
     FlexGridSizer2->Add(gdStyleBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -370,9 +375,9 @@ changesNeedRestart(false)
     FlexGridSizer7->Add(InactifColor2Pnl, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer3->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer18->Add(StaticBoxSizer3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer8 = new wxStaticBoxSizer(wxVERTICAL, Panel4, _("Couleur des séparations"));
+    StaticBoxSizer8 = new wxStaticBoxSizer(wxVERTICAL, Panel4, _("Couleur des sÃ©parations"));
     FlexGridSizer8 = new wxFlexGridSizer(0, 2, 0, 0);
-    StaticText9 = new wxStaticText(Panel4, ID_STATICTEXT9, _("Arrière plan :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+    StaticText9 = new wxStaticText(Panel4, ID_STATICTEXT9, _("ArriÃ¨re plan :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
     FlexGridSizer8->Add(StaticText9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     backColorPnl = new wxPanel(Panel4, ID_PANEL11, wxDefaultPosition, wxSize(39,16), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL11"));
     FlexGridSizer8->Add(backColorPnl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -414,7 +419,7 @@ changesNeedRestart(false)
     FlexGridSizer27 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer27->AddGrowableCol(0);
     FlexGridSizer28 = new wxFlexGridSizer(0, 3, 0, 0);
-    StaticText17 = new wxStaticText(Panel8, ID_STATICTEXT17, _("Taille par défaut de la colonnes des conditions :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT17"));
+    StaticText17 = new wxStaticText(Panel8, ID_STATICTEXT17, _("Taille par dÃ©faut de la colonnes des conditions :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT17"));
     FlexGridSizer28->Add(StaticText17, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     conditionsColumnWidthEdit = new wxTextCtrl(Panel8, ID_TEXTCTRL5, wxEmptyString, wxDefaultPosition, wxSize(65,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
     FlexGridSizer28->Add(conditionsColumnWidthEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -424,7 +429,7 @@ changesNeedRestart(false)
     hideContextPanelsLabels = new wxCheckBox(Panel8, ID_CHECKBOX6, _("Cacher les noms des boutons dans les panneaux contextuels"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
     hideContextPanelsLabels->SetValue(false);
     FlexGridSizer27->Add(hideContextPanelsLabels, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer15 = new wxStaticBoxSizer(wxHORIZONTAL, Panel8, _("Couleurs des paramètres"));
+    StaticBoxSizer15 = new wxStaticBoxSizer(wxHORIZONTAL, Panel8, _("Couleurs des paramÃ¨tres"));
     FlexGridSizer29 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer29->AddGrowableCol(0);
     eventsEditorParametersProperties = new wxPropertyGrid(Panel8,ID_CUSTOM1,wxDefaultPosition,wxSize(342,168),0,_T("ID_CUSTOM1"));
@@ -440,7 +445,7 @@ changesNeedRestart(false)
     StaticBoxSizer13 = new wxStaticBoxSizer(wxHORIZONTAL, Panel7, _("Edition des sources"));
     FlexGridSizer25 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer25->AddGrowableCol(0);
-    internalCodeEditorCheck = new wxRadioButton(Panel7, ID_RADIOBUTTON2, _("Editer les sources avec l\'éditeur intégré à Game Develop"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
+    internalCodeEditorCheck = new wxRadioButton(Panel7, ID_RADIOBUTTON2, _("Editer les sources avec l\'Ã©diteur intÃ©grÃ© Ã  Game Develop"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
     internalCodeEditorCheck->SetValue(true);
     FlexGridSizer25->Add(internalCodeEditorCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer26 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -456,12 +461,12 @@ changesNeedRestart(false)
     FlexGridSizer23->Add(StaticBoxSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel7->SetSizer(FlexGridSizer23);
     FlexGridSizer23->SetSizeHints(Panel7);
-    Listbook1->AddPage(Panel2, _("Général"), false);
+    Listbook1->AddPage(Panel2, _("GÃ©nÃ©ral"), false);
     Listbook1->AddPage(Panel5, _("Langue"), false);
-    Listbook1->AddPage(Panel3, _("Répertoires"), false);
-    Listbook1->AddPage(Panel6, _("Positionnements par défaut"), false);
+    Listbook1->AddPage(Panel3, _("RÃ©pertoires"), false);
+    Listbook1->AddPage(Panel6, _("Positionnements par dÃ©faut"), false);
     Listbook1->AddPage(Panel4, _("Apparence"), false);
-    Listbook1->AddPage(Panel8, _("Editeur d\'évènements"), false);
+    Listbook1->AddPage(Panel8, _("Editeur d\'Ã©vÃ¨nements"), false);
     Listbook1->AddPage(Panel7, _("Compilation C++"), false);
     FlexGridSizer1->Add(Listbook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
@@ -525,12 +530,12 @@ changesNeedRestart(false)
     while (Listbook1->GetPageCount() > 0)
         Listbook1->RemovePage(0);
 
-    Listbook1->AddPage(Panel2, _("Général"), false, 0);
+    Listbook1->AddPage(Panel2, _("GÃ©nÃ©ral"), false, 0);
     Listbook1->AddPage(Panel5, _("Langue"), false, 1);
-    Listbook1->AddPage(Panel3, _("Répertoires"), false, 2);
-    Listbook1->AddPage(Panel6, _("Positionnements par défaut"), false, 3);
+    Listbook1->AddPage(Panel3, _("RÃ©pertoires"), false, 2);
+    Listbook1->AddPage(Panel6, _("Positionnements par dÃ©faut"), false, 3);
     Listbook1->AddPage(Panel4, _("Apparence"), false, 4);
-    Listbook1->AddPage(Panel8, _("Editeurs d'évènements"), false, 6);
+    Listbook1->AddPage(Panel8, _("Editeurs d'Ã©vÃ¨nements"), false, 6);
     Listbook1->AddPage(Panel7, _("Compilation C++"), false, 5);
 
     //Events editor parameters property grid
@@ -546,7 +551,7 @@ changesNeedRestart(false)
     {
         wxString result;
 
-        pConfig->Read( _T( "/Démarrage/Guide" ), &result );
+        pConfig->Read( _T( "/DÃ©marrage/Guide" ), &result );
         if ( result == "false" )
         {
             GuideCheck->SetValue( false );
@@ -557,7 +562,7 @@ changesNeedRestart(false)
     {
         wxString result;
 
-        pConfig->Read( _T( "/Démarrage/MAJ" ), &result );
+        pConfig->Read( _T( "/DÃ©marrage/MAJ" ), &result );
         if ( result == "false" )
         {
             MAJCheck->SetValue( false );
@@ -751,6 +756,11 @@ changesNeedRestart(false)
 
         pConfig->Read("/Log/File", &logFile);
     }
+    {
+        bool avertOnSave;
+        pConfig->Read("/Save/AvertOnSaveAs", &avertOnSave, true);
+        if ( avertOnSave ) avertOnSaveCheck->SetValue(true);
+    }
 
 	conditionsColumnWidthEdit->SetValue(ToString(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
 
@@ -768,19 +778,19 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 {
     wxConfigBase * pConfig = wxConfigBase::Get();
 
-    //Démarrage
+    //DÃ©marrage
     if ( GuideCheck->GetValue() )
     {
-        pConfig->Write( _T( "/Démarrage/Guide" ), "true" );
+        pConfig->Write( _T( "/DÃ©marrage/Guide" ), "true" );
     }
-    else { pConfig->Write( _T( "/Démarrage/Guide" ), "false" ); }
+    else { pConfig->Write( _T( "/DÃ©marrage/Guide" ), "false" ); }
 
 
     if ( MAJCheck->GetValue() )
     {
-        pConfig->Write( _T( "/Démarrage/MAJ" ), "true" );
+        pConfig->Write( _T( "/DÃ©marrage/MAJ" ), "true" );
     }
-    else { pConfig->Write( _T( "/Démarrage/MAJ" ), "false" ); }
+    else { pConfig->Write( _T( "/DÃ©marrage/MAJ" ), "false" ); }
 
 
     //Apparence
@@ -872,7 +882,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 
     if ( changesNeedRestart )
     {
-        wxLogMessage(_("Certains changements nécessitent de redémarrer Game Develop pour prendre effet."));
+        wxLogMessage(_("Certains changements nÃ©cessitent de redÃ©marrer Game Develop pour prendre effet."));
     }
 
     pConfig->Write( "/Autosave/Activated", autosaveActivatedCheck->GetValue());
@@ -887,6 +897,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     pConfig->Write("/Log/File", logFile);
     LogFileManager::GetInstance()->InitalizeFromConfig();
 
+    pConfig->Write("/Save/AvertOnSaveAs", avertOnSaveCheck->GetValue());
 
     gd::ActionSentenceFormatter * eventsEditorConfig = gd::ActionSentenceFormatter::GetInstance();
     for (std::map<std::string, gd::TextFormatting>::iterator it = eventsEditorConfig->typesFormatting.begin();it!=eventsEditorConfig->typesFormatting.end();++it)
@@ -1236,7 +1247,7 @@ void Preferences::OnAideBtClick( wxCommandEvent& event )
 
 void Preferences::OnBrowseDossierTempBtClick( wxCommandEvent& event )
 {
-    wxDirDialog dialog( this, _( "Choisissez le répertoire temporaire pour le déploiement" ), "");
+    wxDirDialog dialog( this, _( "Choisissez le rÃ©pertoire temporaire pour le dÃ©ploiement" ), "");
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
@@ -1247,7 +1258,7 @@ void Preferences::OnBrowseDossierTempBtClick( wxCommandEvent& event )
 
 void Preferences::OnbrowseCompilationTempDirClick(wxCommandEvent& event)
 {
-    wxDirDialog dialog( this, _( "Choisissez le répertoire temporaire pour la compilation" ), "");
+    wxDirDialog dialog( this, _( "Choisissez le rÃ©pertoire temporaire pour la compilation" ), "");
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
@@ -1258,7 +1269,7 @@ void Preferences::OnbrowseCompilationTempDirClick(wxCommandEvent& event)
 
 void Preferences::OnBrowseEditionImageClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog( this, _( "Choisissez un programme d'édition d'image" ), "", "", "Programme (*.exe)|*.exe" );
+    wxFileDialog dialog( this, _( "Choisissez un programme d'Ã©dition d'image" ), "", "", "Programme (*.exe)|*.exe" );
     dialog.ShowModal();
 
     if ( !dialog.GetPath().empty() )
@@ -1329,7 +1340,7 @@ void Preferences::OnlangChoiceSelect(wxCommandEvent& event)
 
 void Preferences::OnbrowseCodeEditorBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog( this, _( "Choisissez un éditeur de code externe" ), "", "", _("Programme (*.exe)|*.exe") );
+    wxFileDialog dialog( this, _( "Choisissez un Ã©diteur de code externe" ), "", "", _("Programme (*.exe)|*.exe") );
     dialog.ShowModal();
 
     if ( !dialog.GetPath().empty() )
@@ -1411,7 +1422,7 @@ void Preferences::OnlogCheckClick(wxCommandEvent& event)
 {
     if ( logCheck->GetValue() )
     {
-        wxFileDialog dialog( this, _( "Choisissez où enregistrer le fichier de suivi" ), "", "", _("Fichier log (*.txt)|*.txt"), wxFD_SAVE );
+        wxFileDialog dialog( this, _( "Choisissez oÃ¹ enregistrer le fichier de suivi" ), "", "", _("Fichier log (*.txt)|*.txt"), wxFD_SAVE );
         if ( dialog.ShowModal() == wxCANCEL) return;
 
         logFile = dialog.GetPath();

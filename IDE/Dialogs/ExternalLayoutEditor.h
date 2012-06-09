@@ -9,6 +9,7 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/panel.h>
+#include <wx/statbmp.h>
 #include <wx/scrolbar.h>
 #include <wx/combobox.h>
 //*)
@@ -27,7 +28,10 @@ public:
 
     //(*Declarations(ExternalLayoutEditor)
     wxScrollBar* scrollBar1;
+    wxPanel* helpPanel;
     wxScrollBar* scrollBar2;
+    wxStaticText* StaticText2;
+    wxStaticBitmap* StaticBitmap1;
     wxStaticText* StaticText1;
     SceneCanvas* sceneCanvas;
     wxPanel* contextPanel;
@@ -38,6 +42,11 @@ public:
 
     gd::ExternalLayout & externalLayout;
     RuntimeGame & game;
+
+    /**
+     * Return the layout being used for editing the external layout
+     */
+    gd::Layout & GetAssociatedLayout();
 
     /**
      * Can be called by parent so as to refresh ribbon for this editor.
@@ -54,6 +63,9 @@ protected:
     static const long ID_SCROLLBAR1;
     static const long ID_CUSTOM1;
     static const long ID_PANEL5;
+    static const long ID_STATICTEXT2;
+    static const long ID_STATICBITMAP1;
+    static const long ID_PANEL3;
     static const long ID_PANEL2;
     //*)
 

@@ -35,6 +35,7 @@ freely, subject to the following restrictions:
 #include <wx/msgdlg.h>
 #include <wx/log.h>
 #include <wx/colordlg.h>
+#include <wx/filename.h>
 #include <wx/filedlg.h>
 
 #include "GDL/Game.h"
@@ -156,11 +157,15 @@ void VideoObjectEditor::OncancelBtClick(wxCommandEvent& event)
 
 void VideoObjectEditor::OnbrowseBtClick(wxCommandEvent& event)
 {
-    wxFileDialog fileDialog( this, _T("Choisissez le fichier vidéo"), "", "", _T("Vidéo Ogg Theora|*.ogg;*.ogv|Tous les fichiers|*.*"));
+    wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
+    wxFileDialog fileDialog( this, _T("Choisissez le fichier vidéo"), gameDirectory, "", _T("Vidéo Ogg Theora|*.ogg;*.ogv|Tous les fichiers|*.*"));
 
     if ( fileDialog.ShowModal() == wxID_OK )
-        videoEdit->SetValue(fileDialog.GetPath());
-
+    {
+        //Note that the file is relative to the project directory
+        wxFileName filename(fileDialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
+        videoEdit->SetValue(filename.GetFullPath());
+    }
 }
 
 void VideoObjectEditor::OnconverterBtClick(wxCommandEvent& event)

@@ -60,7 +60,7 @@ Mac :
 #include <boost/version.hpp>
 
 /**
- * This class declare information about the extension.
+ * \brief This class declares information about the extension.
  */
 class Extension : public ExtensionBase
 {

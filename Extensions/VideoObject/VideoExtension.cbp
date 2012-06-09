@@ -380,6 +380,7 @@
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DRELEASE" />
 					<Add option="-DLINUX" />
@@ -427,6 +428,7 @@
 					<Add option="`pkg-config gtk+-2.0 --cflags`" />
 					<Add option="-DGD_IDE_ONLY" />
 					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option='-DGD_CORE_API=&quot;&quot;' />
 					<Add option='-DGD_EXTENSION_API=&quot;&quot;' />
 					<Add option="-DDEBUG" />
 					<Add option="-DLINUX" />

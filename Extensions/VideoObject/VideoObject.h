@@ -48,124 +48,124 @@ namespace gd {class ResourcesMergingHelper;}
  */
 class GD_EXTENSION_API VideoObject : public Object
 {
-    public :
+public :
 
-        VideoObject(std::string name_);
-        virtual ~VideoObject();
-        virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new VideoObject(*this));}
+    VideoObject(std::string name_);
+    virtual ~VideoObject();
+    virtual Object * Clone() { return new VideoObject(*this);}
 
-        virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-        virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-        virtual bool InitializeFromInitialPosition(const InitialPosition & position);
+    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
+    virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
+    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
-        virtual bool Draw(sf::RenderTarget & renderTarget);
+    virtual bool Draw(sf::RenderTarget & renderTarget);
 
-        #if defined(GD_IDE_ONLY)
-        virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-        virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
-        virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+    #if defined(GD_IDE_ONLY)
+    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
+    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
+    virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
 
-        virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
-        virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-        virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
+    virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
+    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
+    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-        virtual unsigned int GetNumberOfProperties() const;
-        #endif
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
 
-        virtual void LoadFromXml(const TiXmlElement * elemScene);
-        #if defined(GD_IDE_ONLY)
-        virtual void SaveToXml(TiXmlElement * elemScene);
-        #endif
+    virtual void LoadFromXml(const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void SaveToXml(TiXmlElement * elemScene);
+    #endif
 
-        virtual void UpdateTime(float timeElapsed);
+    virtual void UpdateTime(float timeElapsed);
 
-        virtual void OnPositionChanged();
+    virtual void OnPositionChanged();
 
-        /**
-         * Change the video file loaded when a call is made to LoadRuntimeResources
-         */
-        void SetVideoFile(std::string file) { videoFile = file; }
+    /**
+     * Change the video file loaded when a call is made to LoadRuntimeResources
+     */
+    void SetVideoFile(std::string file) { videoFile = file; }
 
-        /**
-         * Get video filename.
-         */
-        std::string GetVideoFile() const { return videoFile; }
+    /**
+     * Get video filename.
+     */
+    std::string GetVideoFile() const { return videoFile; }
 
-        /**
-         * Load and start video using the video Filename.
-         */
-        void ReloadVideo();
+    /**
+     * Load and start video using the video Filename.
+     */
+    void ReloadVideo();
 
-        /**
-         * Set the looping of the video
-         */
-        void SetLooping(bool loop_) { looping = loop_; video.SetLooping(looping); }
+    /**
+     * Set the looping of the video
+     */
+    void SetLooping(bool loop_) { looping = loop_; video.SetLooping(looping); }
 
-        /**
-         * Return true if looping is activated
-         */
-        bool GetLooping() const { return looping; }
+    /**
+     * Return true if looping is activated
+     */
+    bool GetLooping() const { return looping; }
 
-        bool IsPaused() const { return paused; };
+    bool IsPaused() const { return paused; };
 
-        unsigned int GetVolume();
-        void SetVolume(unsigned int vol);
+    unsigned int GetVolume();
+    void SetVolume(unsigned int vol);
 
-        virtual float GetWidth() const;
-        virtual float GetHeight() const;
-        virtual void SetWidth(float ) {};
-        virtual void SetHeight(float ) {};
+    virtual float GetWidth() const;
+    virtual float GetHeight() const;
+    virtual void SetWidth(float ) {};
+    virtual void SetHeight(float ) {};
 
-        virtual float GetDrawableX() const;
-        virtual float GetDrawableY() const;
+    virtual float GetDrawableX() const;
+    virtual float GetDrawableY() const;
 
-        virtual float GetCenterX() const;
-        virtual float GetCenterY() const;
+    virtual float GetCenterX() const;
+    virtual float GetCenterY() const;
 
-        virtual bool SetAngle(float newAngle);
-        virtual float GetAngle() const {return angle;};
+    virtual bool SetAngle(float newAngle);
+    virtual float GetAngle() const {return angle;};
 
-        void SetOpacity(float val);
-        inline float GetOpacity() const {return opacity;};
+    void SetOpacity(float val);
+    inline float GetOpacity() const {return opacity;};
 
-        void SetColor(unsigned int r,unsigned int v,unsigned int b);
-        inline unsigned int GetColorR() const { return colorR; };
-        inline unsigned int GetColorG() const { return colorG; };
-        inline unsigned int GetColorB() const { return colorB; };
+    void SetColor(unsigned int r,unsigned int v,unsigned int b);
+    inline unsigned int GetColorR() const { return colorR; };
+    inline unsigned int GetColorG() const { return colorG; };
+    inline unsigned int GetColorB() const { return colorB; };
 
-        /**
-         * Only used internally by GD events generated code: Prefer using original SetColor.
-         */
-        void SetColor(const std::string & colorStr);
+    /**
+     * Only used internally by GD events generated code: Prefer using original SetColor.
+     */
+    void SetColor(const std::string & colorStr);
 
-        virtual std::vector<RotatedRectangle> GetHitBoxes() const;
+    virtual std::vector<RotatedRectangle> GetHitBoxes() const;
 
-        void LoadAndPlayVideo( const std::string & videoFile );
+    void LoadAndPlayVideo( const std::string & videoFile );
 
-        void Seek( double position );
+    void Seek( double position );
 
-        double GetTimePosition() const;
-        double GetDuration() const;
+    double GetTimePosition() const;
+    double GetDuration() const;
 
-    private:
+private:
 
-        std::string videoFile;
-        VideoWrapper video;
+    std::string videoFile;
+    VideoWrapper video;
 
-        bool looping;
-        bool paused;
+    bool looping;
+    bool paused;
 
-        //Opacity
-        float opacity;
+    //Opacity
+    float opacity;
 
-        //Color
-        unsigned int colorR;
-        unsigned int colorG;
-        unsigned int colorB;
+    //Color
+    unsigned int colorR;
+    unsigned int colorG;
+    unsigned int colorB;
 
-        float angle;
+    float angle;
 };
 
 void DestroyVideoObject(Object * object);

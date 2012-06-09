@@ -915,7 +915,7 @@ object(object_)
 	//Init wxAuiManager with two pane : the editor and the image bank editor
     m_mgr.SetManagedWindow( this );
     m_mgr.AddPane( Core, wxAuiPaneInfo().Name( wxT( "Core" ) ).Center().CaptionVisible(false) );
-    m_mgr.AddPane( editorImagesPnl, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _T( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(150, 100) );
+    m_mgr.AddPane( editorImagesPnl, wxAuiPaneInfo().Name( wxT( "EI" ) ).Left().Caption( _( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(150, 100) );
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );
     m_mgr.Update();
@@ -932,7 +932,7 @@ void ParticleEmitterObjectEditor::OnokBtClick(wxCommandEvent& event)
     unsigned int particleNb = ToInt(string(maxParticleNbEdit->GetValue().mb_str())) > 0 ? ToInt(string(maxParticleNbEdit->GetValue().mb_str())) : 0;
     if ( particleNb > 30000 )
     {
-        if ( wxMessageBox(_T("Le nombre de particule est important. Un nombre trop important pourrait entrainer le crash du jeu.\nÊtes vous sur de vouloir continuer ?"), _T("Nombre de particules maximum"), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(_("Le nombre de particule est important. Un nombre trop important pourrait entrainer le crash du jeu.\nÊtes vous sur de vouloir continuer ?"), _("Nombre de particules maximum"), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 
@@ -1028,7 +1028,7 @@ void ParticleEmitterObjectEditor::PrepareControlsForPointRenderer()
     textureEdit->Show(false);
     imageChooseBt->Show(false);
 
-    rendererParam1Txt->SetLabel(_T("Taille initiale :"));
+    rendererParam1Txt->SetLabel(_("Taille initiale :"));
     Layout();
     Refresh();
 }
@@ -1043,8 +1043,8 @@ void ParticleEmitterObjectEditor::PrepareControlsForQuadRenderer()
     textureEdit->Show(true);
     imageChooseBt->Show(true);
 
-    rendererParam1Txt->SetLabel(_T("Largeur initiale :"));
-    rendererParam2Txt->SetLabel(_T("Hauteur initiale :"));
+    rendererParam1Txt->SetLabel(_("Largeur initiale :"));
+    rendererParam2Txt->SetLabel(_("Hauteur initiale :"));
     Layout();
     Refresh();
 }
@@ -1059,8 +1059,8 @@ void ParticleEmitterObjectEditor::PrepareControlsForLineRenderer()
     textureEdit->Show(false);
     imageChooseBt->Show(false);
 
-    rendererParam1Txt->SetLabel(_T("Longueur :"));
-    rendererParam2Txt->SetLabel(_T("Largeur :"));
+    rendererParam1Txt->SetLabel(_("Longueur :"));
+    rendererParam2Txt->SetLabel(_("Largeur :"));
     Layout();
     Refresh();
 }
@@ -1118,7 +1118,7 @@ void ParticleEmitterObjectEditor::OnimageChooseBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
     {
-        wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 

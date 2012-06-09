@@ -67,6 +67,7 @@ Extension::Extension()
 
     DECLARE_END_OBJECT()
 
+/* Work in progress
     DECLARE_AUTOMATISM("ParticleObstacleAutomatism",
               _("Obstacle"),
               _("ParticleObstacle"),
@@ -83,7 +84,7 @@ Extension::Extension()
         #endif
 
     DECLARE_END_AUTOMATISM()
-
+*/
 
     CompleteCompilationInformation();
 };

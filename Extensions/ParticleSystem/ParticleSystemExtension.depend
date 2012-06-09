@@ -4308,15 +4308,14 @@
 
 1236015922 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\smart_ptr\detail\operator_bool.hpp
 
-1336994670 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1339013749 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
-1325281723 d:\florian\programmation\gamedevelop2\extensions\particlesystem\extension.h
+1337075187 d:\florian\programmation\gamedevelop2\extensions\particlesystem\extension.h
 
-1336833403 d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleemitterobject.h
+1338054563 d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleemitterobject.h
 	"GDL/Object.h"
-	"ParticleSystemWrapper.h"
 
-1336834475 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
+1337104465 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
 	"GDL/Force.h"
 	<string>
 	<vector>
@@ -4324,7 +4323,7 @@
 	"GDL/VariableList.h"
 	"GDCore/PlatformDefinition/Object.h"
 
-1325338673 d:\florian\programmation\gamedevelop2\gdl\gdl\force.h
+1337099492 d:\florian\programmation\gamedevelop2\gdl\gdl\force.h
 
 1236014536 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\enable_shared_from_this.hpp
 	<boost/smart_ptr/enable_shared_from_this.hpp>
@@ -4345,7 +4344,7 @@
 	<string>
 	"GDL/Variable.h"
 
-1336234220 d:\florian\programmation\gamedevelop2\gdl\gdl\variable.h
+1337100286 d:\florian\programmation\gamedevelop2\gdl\gdl\variable.h
 	<string>
 	"GDCore/PlatformDefinition/Variable.h"
 
@@ -4379,7 +4378,7 @@
 	<wx/textctrl.h>
 	<wx/panel.h>
 
-1336319344 source:d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleemitterobject.cpp
+1338053954 source:d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleemitterobject.cpp
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
 	"GDL/Object.h"
@@ -4681,7 +4680,7 @@
 	<OpenGL/gl.h>
 	<OpenGL/glu.h>
 
-1329069973 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
+1338411378 d:\florian\programmation\gamedevelop2\gdl\gdl\imagemanager.h
 	<iostream>
 	<vector>
 	<string>
@@ -4691,7 +4690,7 @@
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
 
-1336230970 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
+1338661923 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
@@ -4700,13 +4699,14 @@
 	"GDL/ResourcesManager.h"
 	"GDCore/PlatformDefinition/Project.h"
 
-1336318737 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
+1337947455 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
 	<vector>
 	<map>
 	<string>
 	<boost/shared_ptr.hpp>
-	"GDL/Position.h"
+	"GDL/InitialInstancesContainer.h"
 	"GDL/Layer.h"
+	"GDL/IDE/SceneCanvasSettings.h"
 	"GDCore/PlatformDefinition/Layout.h"
 
 1329063111 d:\florian\programmation\gamedevelop2\gdl\gdl\event.h
@@ -6921,18 +6921,19 @@
 	<set>
 	<utility>
 
-1328739980 d:\florian\programmation\gamedevelop2\gdl\gdl\position.h
+1337794091 d:\florian\programmation\gamedevelop2\gdl\gdl\position.h
 	<string>
 	<map>
 	"GDL/VariableList.h"
+	"GDCore/PlatformDefinition/InitialInstance.h"
 
-1327359125 d:\florian\programmation\gamedevelop2\gdl\gdl\layer.h
+1337099492 d:\florian\programmation\gamedevelop2\gdl\gdl\layer.h
 	<string>
 	<vector>
 	<SFML/Graphics.hpp>
 	"GDL/Camera.h"
 
-1325338673 d:\florian\programmation\gamedevelop2\gdl\gdl\camera.h
+1337098736 d:\florian\programmation\gamedevelop2\gdl\gdl\camera.h
 	<SFML/System.hpp>
 	<SFML/Graphics.hpp>
 
@@ -6944,7 +6945,7 @@
 	<string>
 	<vector>
 
-1325338673 d:\florian\programmation\gamedevelop2\gdl\gdl\loadingscreen.h
+1337099492 d:\florian\programmation\gamedevelop2\gdl\gdl\loadingscreen.h
 	<string>
 	<vector>
 
@@ -6963,14 +6964,14 @@
 	<assert.h>
 	<string.h>
 
-1326059802 d:\florian\programmation\gamedevelop2\gdl\gdl\fontmanager.h
+1337099672 d:\florian\programmation\gamedevelop2\gdl\gdl\fontmanager.h
 	<SFML/Graphics.hpp>
 	<string>
 	<vector>
 
 1334167483 d:\florian\programmation\gamedevelop2\gdl\gdl\xmlmacros.h
 
-1336839845 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
+1339237050 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
 	"GDL/Scene.h"
 	<iostream>
 	<sstream>
@@ -6985,12 +6986,12 @@
 	"GDL/ManualTimer.h"
 	"GDL/ObjInstancesHolder.h"
 
-1325338673 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimegame.h
+1337099962 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimegame.h
 	<boost/shared_ptr.hpp>
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1336832520 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
+1337108369 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
 	<string>
 	<sstream>
 	<vector>
@@ -7000,28 +7001,28 @@
 	<sstream>
 	<cmath>
 
-1327260363 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimelayer.h
+1337099962 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimelayer.h
 	<SFML/Graphics.hpp>
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1268858366 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimecamera.h
+1337099861 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimecamera.h
 	"GDL/Camera.h"
 
-1325338672 d:\florian\programmation\gamedevelop2\gdl\gdl\text.h
+1337110754 d:\florian\programmation\gamedevelop2\gdl\gdl\text.h
 	<SFML/Graphics.hpp>
 	<string>
 
-1329318939 d:\florian\programmation\gamedevelop2\gdl\gdl\manualtimer.h
+1337099492 d:\florian\programmation\gamedevelop2\gdl\gdl\manualtimer.h
 	<string>
 
-1336837872 d:\florian\programmation\gamedevelop2\gdl\gdl\objinstancesholder.h
+1337101447 d:\florian\programmation\gamedevelop2\gdl\gdl\objinstancesholder.h
 	<string>
 	<vector>
 	<map>
 	<boost/shared_ptr.hpp>
 
-1325338672 d:\florian\programmation\gamedevelop2\gdl\gdl\rotatedrectangle.h
+1337099804 d:\florian\programmation\gamedevelop2\gdl\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
 1286998248 d:\florian\programmation\gamedevelop2\extensions\particlesystem\spark\include\spk.h
@@ -7634,7 +7635,7 @@
 	"wx/icon.h"
 	"wx/aui/auibook.h"
 
-1329512080 source:d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleemitterobjecteditor.cpp
+1337937599 source:d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleemitterobjecteditor.cpp
 	"ParticleEmitterObjectEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -7804,7 +7805,7 @@
 	<SPK.h>
 	<SPK_GL.h>
 
-1330382247 source:d:\florian\programmation\gamedevelop2\extensions\particlesystem\extension.cpp
+1337163629 source:d:\florian\programmation\gamedevelop2\extensions\particlesystem\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"GDL/AutomatismsSharedDatas.h"
@@ -7854,7 +7855,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1325338672 d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.h
+1339007134 d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.h
 	<boost/shared_ptr.hpp>
 	<vector>
 	<string>
@@ -7898,7 +7899,7 @@
 
 1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\infobar.h
 
-1336252240 d:\florian\programmation\gamedevelop2\gdl\gdl\variablelist.h
+1338214249 d:\florian\programmation\gamedevelop2\gdl\gdl\variablelist.h
 	<vector>
 	<string>
 	"GDL/Variable.h"
@@ -7934,8 +7935,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1325338672 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\maineditorcommand.h
-	<iostream>
+1338638329 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\maineditorcommand.h
 	<algorithm>
 	<vector>
 	<wx/infobar.h>
@@ -7961,24 +7961,25 @@
 	<wx/msw/winundef.h>
 	<wx/fswatcher.h>
 
-1325338672 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsshareddatas.h
+1337098736 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsshareddatas.h
 	"GDL/AutomatismsRuntimeSharedDatas.h"
 	<boost/shared_ptr.hpp>
 	<string>
 
-1325338673 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsruntimeshareddatas.h
+1337098736 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsruntimeshareddatas.h
 	<boost/shared_ptr.hpp>
 
 1336841821 d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleobstacleautomatism.h
 	"GDL/Automatism.h"
 
-1336835180 d:\florian\programmation\gamedevelop2\gdl\gdl\automatism.h
+1337104465 d:\florian\programmation\gamedevelop2\gdl\gdl\automatism.h
 	<string>
 	"GDCore/PlatformDefinition/Automatism.h"
 
-1330382854 source:d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleobstacleautomatism.cpp
+1338053914 source:d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleobstacleautomatism.cpp
 	"ParticleObstacleAutomatism.h"
 	"ParticleEmitterObject.h"
+	"ParticleSystemWrapper.h"
 	"GDL/RuntimeScene.h"
 	"GDL/Object.h"
 	<SPK.h>
@@ -8005,7 +8006,7 @@
 	<boost/shared_ptr.hpp>
 	<wx/bitmap.h>
 
-1336994190 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\platformextension.h
+1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\platformextension.h
 	<map>
 	<string>
 	<vector>
@@ -8016,36 +8017,50 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1336234079 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.h
+1338661923 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.h
 	<string>
 	<vector>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
 
-1336318035 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\layout.h
+1337793903 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\layout.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
 
-1334697667 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\automatism.h
+1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\automatism.h
 	<string>
 
-1336234062 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\object.h
+1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\object.h
 	<string>
 	<vector>
 
-1336935997 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\objectgroup.h
+1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\objectgroup.h
 	<vector>
 	<string>
 	<utility>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
 
-1336161821 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\variable.h
+1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\variable.h
 	<string>
 
-1336252239 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\variablescontainer.h
+1337793382 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\variablescontainer.h
 	<string>
 
 1336937069 d:\florian\programmation\gamedevelop2\core\gdcore\events\expression.h
+	<string>
+
+1338214257 d:\florian\programmation\gamedevelop2\gdl\gdl\initialinstancescontainer.h
+	"GDCore/PlatformDefinition/InitialInstancesContainer.h"
+	"GDL/Position.h"
+
+1337961900 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\initialinstancescontainer.h
+	<string>
+
+1337804307 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\initialinstance.h
+	<string>
+	"GDCore/PlatformDefinition/VariablesContainer.h"
+
+1339188475 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\scenecanvassettings.h
 	<string>
 

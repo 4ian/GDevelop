@@ -28,7 +28,7 @@ freely, subject to the following restrictions:
 #define PARTICLEEMITTEROBJECT_H
 
 #include "GDL/Object.h"
-#include "ParticleSystemWrapper.h"
+class ParticleSystemWrapper;
 namespace sf
 {
     class Texture;
@@ -57,6 +57,8 @@ public :
     ParticleEmitterObject(std::string name_);
     virtual ~ParticleEmitterObject();
     virtual Object * Clone() { return new ParticleEmitterObject(*this);}
+    ParticleEmitterObject(const ParticleEmitterObject & other) : Object(other), particleSystem(NULL) { Init(other); };
+    ParticleEmitterObject & operator=(const ParticleEmitterObject & other) {  if ( &other != this ) Init(other); return *this; }
 
     virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
     virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
@@ -241,14 +243,23 @@ public :
     bool gravityEditionSimpleMode; ///< User preference related to object's edition
     #endif
 
-    const ParticleSystemWrapper & GetAssociatedParticleSystemWrapper() const { return particleSystem; };
-    ParticleSystemWrapper & GetAssociatedParticleSystemWrapper() { return particleSystem; };
+    const ParticleSystemWrapper & GetAssociatedParticleSystemWrapper() const { return *particleSystem; };
+    ParticleSystemWrapper & GetAssociatedParticleSystemWrapper() { return *particleSystem; };
 
 private:
 
+    /**
+     * Initialize the particle system with the current objects settings.
+     */
     void CreateParticleSystem();
 
-    ParticleSystemWrapper particleSystem;
+    /**
+     * Used by copy constructor and assignment operator.
+     * \warning Do not forget to update me if members were changed!
+     */
+    void Init(const ParticleEmitterObject & other);
+
+    ParticleSystemWrapper * particleSystem; ///< Pointer to the class wrapping all the real particle engine related stuff. This pointer is managed by the object.
 
     std::string textureParticleName;
     RendererType rendererType;

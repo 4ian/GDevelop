@@ -34,6 +34,7 @@ freely, subject to the following restrictions:
 #include <wx/string.h>
 //*)
 #include <wx/colordlg.h>
+#include <wx/filename.h>
 #include <wx/filedlg.h>
 
 #include "GDL/Game.h"
@@ -149,7 +150,7 @@ object(object_)
 	//*)
 
 	textEdit->ChangeValue(object.GetString());
-	fontEdit->ChangeValue(object.GetFont());
+	fontEdit->ChangeValue(object.GetFontFilename());
 	sizeEdit->SetValue(object.GetCharacterSize());
 	colorBt->SetBackgroundColour(wxColour(object.GetColorR(), object.GetColorG(), object.GetColorB()));
 	smoothCheck->SetValue(object.IsSmoothed());
@@ -179,7 +180,6 @@ void TextObjectEditor::AdaptFontColor(wxButton *button)
 void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
 {
     object.SetString(string(textEdit->GetValue().mb_str()));
-    object.SetFont(string(fontEdit->GetValue().mb_str()));
     object.SetCharacterSize(sizeEdit->GetValue());
     object.SetSmooth(smoothCheck->GetValue());
     object.SetColor(static_cast<int>(colorBt->GetBackgroundColour().Red()), static_cast<int>(colorBt->GetBackgroundColour().Green()), static_cast<int>(colorBt->GetBackgroundColour().Blue()));
@@ -187,6 +187,14 @@ void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
     object.SetFontStyle((boldToggleButton->GetValue() ? sf::Text::Bold : 0) |
                         (italicToggleButton->GetValue() ? sf::Text::Italic : 0) |
                         (underlineToggleButton->GetValue() ? sf::Text::Underlined : 0) );
+
+    //Text object is going to reload its font: Switch the working directory
+    wxSetWorkingDirectory(wxFileName::FileName(game.GetProjectFile()).GetPath());
+
+    object.ChangeFont(string(fontEdit->GetValue().mb_str()));
+
+    //Switch back to IDE working directory
+    wxSetWorkingDirectory(mainEditorCommand.GetIDEWorkingDirectory());
 
     EndModal(1);
 }
@@ -204,12 +212,14 @@ void TextObjectEditor::OncolorBtClick(wxCommandEvent& event)
 
 void TextObjectEditor::OnfontBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Choisissez une police de caractère ( fichiers ttf, ttc )"), "", "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
-    dialog.ShowModal();
+    wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
+    wxFileDialog fileDialog(this, _("Choisissez une police de caractère ( fichiers ttf, ttc )"), gameDirectory, "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
 
-    if ( dialog.GetPath() != "" )
+    if ( fileDialog.ShowModal() == wxID_OK )
     {
-        fontEdit->ChangeValue(dialog.GetPath());
+        //Note that the file is relative to the project directory
+        wxFileName filename(fileDialog.GetPath()); filename.MakeRelativeTo(gameDirectory);
+        fontEdit->SetValue(filename.GetFullPath());
     }
 }
 

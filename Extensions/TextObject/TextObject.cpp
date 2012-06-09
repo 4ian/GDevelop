@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 #include "TextObject.h"
 
 #if defined(GD_IDE_ONLY)
-#include "GDL/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "TextObjectEditor.h"
 #endif
@@ -73,7 +73,7 @@ void TextObject::LoadFromXml(const TiXmlElement * elem)
     }
     else
     {
-        SetFont(elem->FirstChildElement("Font")->Attribute("value"));
+        SetFontFilename(elem->FirstChildElement("Font")->Attribute("value"));
     }
 
     if ( elem->FirstChildElement( "CharacterSize" ) == NULL ||
@@ -134,7 +134,7 @@ void TextObject::SaveToXml(TiXmlElement * elem)
 
     TiXmlElement * font = new TiXmlElement( "Font" );
     elem->LinkEndChild( font );
-    font->SetAttribute("value", GetFont().c_str());
+    font->SetAttribute("value", GetFontFilename().c_str());
 
     TiXmlElement * characterSize = new TiXmlElement( "CharacterSize" );
     elem->LinkEndChild( characterSize );
@@ -156,7 +156,7 @@ void TextObject::SaveToXml(TiXmlElement * elem)
 
 bool TextObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
 {
-    //No ressources to load.
+    ReloadFont();
 
     return true;
 }
@@ -193,7 +193,7 @@ bool TextObject::DrawEdittime( sf::RenderTarget& renderTarget )
     return true;
 }
 
-void TextObject::ExposeResources(ArbitraryResourceWorker & worker)
+void TextObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
     worker.ExposeResource(fontName);
 }
@@ -223,7 +223,7 @@ void TextObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition
 void TextObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Texte");                     value = GetString();}
-    else if ( propertyNb == 1 ) {name = _("Police");                    value = GetFont();}
+    else if ( propertyNb == 1 ) {name = _("Police");                    value = GetFontFilename();}
     else if ( propertyNb == 2 ) {name = _("Taille de caractères");      value = ToString(GetCharacterSize());}
     else if ( propertyNb == 3 ) {name = _("Couleur");       value = ToString(GetColorR())+";"+ToString(GetColorG())+";"+ToString(GetColorB());}
     else if ( propertyNb == 4 ) {name = _("Opacité");       value = ToString(GetOpacity());}
@@ -233,7 +233,7 @@ void TextObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, 
 bool TextObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if      ( propertyNb == 0 ) { SetString(newValue); return true; }
-    else if ( propertyNb == 1 ) { SetFont(newValue); }
+    else if ( propertyNb == 1 ) { SetFontFilename(newValue); }
     else if ( propertyNb == 2 ) { SetCharacterSize(ToInt(newValue)); }
     else if ( propertyNb == 3 )
     {
@@ -383,11 +383,20 @@ void TextObject::SetOpacity(float val)
     text.SetColor(sf::Color(colorR, colorG, colorB, opacity));
 }
 
-void TextObject::SetFont(const std::string & fontName_)
+void TextObject::SetFontFilename(const std::string & fontName_)
 {
     fontName = fontName_;
+}
 
-    text.SetFont(*FontManager::GetInstance()->GetFont(fontName_));
+void TextObject::ChangeFont(const std::string & fontName_)
+{
+    SetFontFilename(fontName_);
+    ReloadFont();
+}
+
+void TextObject::ReloadFont()
+{
+    text.SetFont(*FontManager::GetInstance()->GetFont(fontName));
     text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2);
 }
 

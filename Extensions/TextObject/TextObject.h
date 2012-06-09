@@ -27,9 +27,8 @@ freely, subject to the following restrictions:
 #ifndef TEXTOBJECT_H
 #define TEXTOBJECT_H
 
-#include "GDL/Object.h"
-#include "GDL/ResourceWrapper.h"
 #include <SFML/Graphics/Text.hpp>
+#include "GDL/Object.h"
 class ImageManager;
 class RuntimeScene;
 class Object;
@@ -40,7 +39,7 @@ class wxBitmap;
 class Game;
 class wxWindow;
 class MainEditorCommand;
-class ResourcesMergingHelper;
+namespace gd {class ResourcesMergingHelper;}
 #endif
 
 /**
@@ -48,104 +47,123 @@ class ResourcesMergingHelper;
  */
 class GD_EXTENSION_API TextObject : public Object
 {
-    public :
+public :
 
-        TextObject(std::string name_);
-        virtual ~TextObject() {};
-        virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new TextObject(*this));}
+    TextObject(std::string name_);
+    virtual ~TextObject() {};
+    virtual Object * Clone() { return new TextObject(*this); }
 
-        virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-        virtual bool InitializeFromInitialPosition(const InitialPosition & position);
+    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
+    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
-        virtual bool Draw(sf::RenderTarget & renderTarget);
+    virtual bool Draw(sf::RenderTarget & renderTarget);
 
-        #if defined(GD_IDE_ONLY)
-        virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-        virtual void ExposeResources(ArbitraryResourceWorker & worker);
-        virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+    #if defined(GD_IDE_ONLY)
+    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
+    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
+    virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
 
-        virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
-        virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-        virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
+    virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
+    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
+    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-        virtual unsigned int GetNumberOfProperties() const;
-        #endif
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
 
-        virtual void LoadFromXml(const TiXmlElement * elemScene);
-        #if defined(GD_IDE_ONLY)
-        virtual void SaveToXml(TiXmlElement * elemScene);
-        #endif
+    virtual void LoadFromXml(const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void SaveToXml(TiXmlElement * elemScene);
+    #endif
 
-        virtual void UpdateTime(float timeElapsed);
+    virtual void UpdateTime(float timeElapsed);
 
-        virtual void OnPositionChanged();
+    virtual void OnPositionChanged();
 
-        virtual float GetWidth() const;
-        virtual float GetHeight() const;
-        virtual void SetWidth(float ) {};
-        virtual void SetHeight(float ) {};
+    virtual float GetWidth() const;
+    virtual float GetHeight() const;
+    virtual void SetWidth(float ) {};
+    virtual void SetHeight(float ) {};
 
-        virtual float GetDrawableX() const;
-        virtual float GetDrawableY() const;
+    virtual float GetDrawableX() const;
+    virtual float GetDrawableY() const;
 
-        virtual float GetCenterX() const;
-        virtual float GetCenterY() const;
+    virtual float GetCenterX() const;
+    virtual float GetCenterY() const;
 
-        virtual bool SetAngle(float newAngle) { angle = newAngle; text.SetRotation(angle); return true;};
-        virtual float GetAngle() const {return angle;};
+    virtual bool SetAngle(float newAngle) { angle = newAngle; text.SetRotation(angle); return true;};
+    virtual float GetAngle() const {return angle;};
 
-        inline void SetString(const std::string & str) { text.SetString(str); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
-        inline std::string GetString() const {return text.GetString();};
+    inline void SetString(const std::string & str) { text.SetString(str); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
+    inline std::string GetString() const {return text.GetString();};
 
-        inline void SetCharacterSize(float size) { text.SetCharacterSize(size); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
-        inline float GetCharacterSize() const { return text.GetCharacterSize(); };
+    inline void SetCharacterSize(float size) { text.SetCharacterSize(size); text.SetOrigin(text.GetRect().Width/2, text.GetRect().Height/2); };
+    inline float GetCharacterSize() const { return text.GetCharacterSize(); };
 
-        void SetFont(const std::string & fontName_);
-        inline std::string GetFont() const {return fontName; };
+    /**
+     * Change the text object font filename.
+     * Call ReloadFont to make the change effective
+     */
+    void SetFontFilename(const std::string & fontFilename);
 
-        void SetOpacity(float val);
-        inline float GetOpacity() const {return opacity;};
+    /**
+     * Change the text object font filename and reload the font
+     */
+    void ChangeFont(const std::string & fontFilename);
 
-        void SetColor(unsigned int r,unsigned int v,unsigned int b);
-        inline unsigned int GetColorR() const { return colorR; };
-        inline unsigned int GetColorG() const { return colorG; };
-        inline unsigned int GetColorB() const { return colorB; };
-        void SetColor(const std::string & colorStr);
+    /**
+     * Load the font according to font filename stored in the object.
+     * \see SetFontFilename
+     */
+    void ReloadFont();
 
-        void SetFontStyle(int style);
-        int GetFontStyle();
-        bool HasFontStyle(sf::Text::Style style);
+    /**
+     * Return the font file name.
+     */
+    inline std::string GetFontFilename() const {return fontName; };
 
-        bool IsBold();
-        void SetBold(bool bold);
-        bool IsItalic();
-        void SetItalic(bool italic);
-        bool IsUnderlined();
-        void SetUnderlined(bool underlined);
+    void SetOpacity(float val);
+    inline float GetOpacity() const {return opacity;};
 
-        void SetSmooth(bool smooth);
-        bool IsSmoothed() const {return smoothed;};
+    void SetColor(unsigned int r,unsigned int v,unsigned int b);
+    inline unsigned int GetColorR() const { return colorR; };
+    inline unsigned int GetColorG() const { return colorG; };
+    inline unsigned int GetColorB() const { return colorB; };
+    void SetColor(const std::string & colorStr);
 
-        virtual std::vector<RotatedRectangle> GetHitBoxes() const;
-    private:
+    void SetFontStyle(int style);
+    int GetFontStyle();
+    bool HasFontStyle(sf::Text::Style style);
 
-        //The text to display
-        sf::Text text;
-        std::string fontName;
+    bool IsBold();
+    void SetBold(bool bold);
+    bool IsItalic();
+    void SetItalic(bool italic);
+    bool IsUnderlined();
+    void SetUnderlined(bool underlined);
 
-        //Opacity
-        float opacity;
+    void SetSmooth(bool smooth);
+    bool IsSmoothed() const {return smoothed;};
 
-        bool smoothed;
+    virtual std::vector<RotatedRectangle> GetHitBoxes() const;
+private:
 
-        //Color
-        unsigned int colorR;
-        unsigned int colorG;
-        unsigned int colorB;
+    //The text to display
+    sf::Text text;
+    std::string fontName;
 
-        float angle;
+    //Opacity
+    float opacity;
+
+    bool smoothed;
+
+    //Color
+    unsigned int colorR;
+    unsigned int colorG;
+    unsigned int colorB;
+
+    float angle;
 };
 
 void DestroyTextObject(Object * object);

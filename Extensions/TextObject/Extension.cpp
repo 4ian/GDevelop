@@ -34,7 +34,7 @@ freely, subject to the following restrictions:
 #include <boost/version.hpp>
 
 /**
- * This class declare information about the extension.
+ * \brief This class declares information about the extension.
  */
 class Extension : public ExtensionBase
 {
@@ -106,10 +106,9 @@ class Extension : public ExtensionBase
                                "res/actions/font.png");
 
                     instrInfo.AddParameter("object", _("Objet"), "Text", false);
-                    instrInfo.AddParameter("police", _("Valeur"), "", false);
+                    instrInfo.AddParameter("police", _("Police"), "", false);
 
-
-                    instrInfo.cppCallingInformation.SetFunctionName("SetFont").SetManipulatedType("string").SetIncludeFile("TextObject/TextObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("ChangeFont").SetIncludeFile("TextObject/TextObject.h");
 
                 DECLARE_END_OBJECT_ACTION()
 

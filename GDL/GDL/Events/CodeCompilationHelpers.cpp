@@ -121,7 +121,7 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
 
     sceneCopy.externalSourcesDependList.clear(); //Empty the list which will contains the source file used by the scene
     //Generate the code
-    std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.GetEvents(), false /*Compilation for edittime*/);
+    std::string eventsOutput = EventsCodeGenerator::GenerateEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.GetEvents(), true /*Compilation for runtime*/);
     scene->externalSourcesDependList = sceneCopy.externalSourcesDependList;
 
     //Check that every dependence of the scene is ready.

@@ -481,7 +481,7 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
     specialAction = scene;
 }
 
-void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container)
+void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container, float xOffset, float yOffset)
 {
     for(unsigned int i = 0;i < container.GetInstancesCount();++i)
     {
@@ -499,8 +499,8 @@ void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container
 
         if ( newObject != boost::shared_ptr<Object> () )
         {
-            newObject->SetX( initialInstance.GetX() );
-            newObject->SetY( initialInstance.GetY() );
+            newObject->SetX( initialInstance.GetX() + xOffset );
+            newObject->SetY( initialInstance.GetY() + yOffset );
             newObject->SetZOrder( initialInstance.GetZOrder() );
             newObject->SetLayer( initialInstance.GetLayer() );
             newObject->InitializeFromInitialPosition(initialInstance);

@@ -55,12 +55,14 @@ void ResourcesManager::Init(const ResourcesManager & other)
 }
 
 #if defined(GD_IDE_ONLY)
-bool ImageResource::EditMainProperty()
+bool ImageResource::EditMainProperty(gd::Project & project)
 {
     wxFileDialog dialog( NULL, _( "Choisissez le fichier de l'image" ), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_OPEN );
     if ( dialog.ShowModal() == wxID_OK )
     {
-        file = ToString(dialog.GetPath());
+        wxFileName filename = wxFileName::FileName(dialog.GetPath());
+        filename.MakeRelativeTo(wxFileName::FileName(project.GetProjectFile()).GetPath());
+        file = ToString(filename.GetFullPath());
 
         return true;
     }
@@ -235,7 +237,7 @@ boost::shared_ptr<Resource> ResourcesManager::CreateResource(const std::string &
 }
 
 #if defined(GD_IDE_ONLY)
-std::string Resource::GetAbsoluteFile(const gd::Project & project)
+std::string Resource::GetAbsoluteFile(const gd::Project & project) const
 {
     wxString projectDir = wxFileName::FileName(project.GetProjectFile()).GetPath();
     wxFileName filename = wxFileName::FileName(GetFile());

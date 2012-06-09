@@ -3,6 +3,8 @@
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <vector>
+#include <iostream>
+#include <direct.h>
 
 using namespace std;
 
@@ -51,6 +53,11 @@ const sf::Font * FontManager::GetFont(const string & fontName)
     //Load an new font
     RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
     fonts[fontName] = ressourcesLoader->LoadFont(fontName);
+
+
+   char temp[2048];
+   std::cout << "CWD:" << ( getcwd(temp, 2048) ? std::string( temp ) : std::string("") ) << std::endl;
+
 
     return fonts[fontName];
 }

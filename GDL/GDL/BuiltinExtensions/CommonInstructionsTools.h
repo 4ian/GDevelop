@@ -36,6 +36,12 @@ double GD_API ToDouble( const std::string & str );
  */
 std::string GD_API ToString( double number );
 
+/**
+ * Convert the double to a string, disabling scientific notation.
+ * \warning This function is meant to be used only in GD events generated code.
+ */
+std::string GD_API LargeNumberToString( double number );
+
 }
 
 }

@@ -205,7 +205,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     #if defined(GD_IDE_ONLY)
     if ( major < 2 || (major == 2 && minor <= 1 && build <= 10822) )
     {
-        //game.GetUsedPlatformExtensions().push_back("BuiltinExternalLayouts");
+        game.GetUsedPlatformExtensions().push_back("BuiltinExternalLayouts");
     }
     #endif
 

@@ -108,8 +108,12 @@ public:
 
     /**
      * Create the objects from an InitialInstancesContainer object.
+     *
+     * \param container The object containing the initial instances to be created
+     * \param xOffset The offset on x axis to be applied to objects created
+     * \param yOffset The offset on y axis to be applied to objects created
      */
-    void CreateObjectsFrom(const InitialInstancesContainer & container);
+    void CreateObjectsFrom(const InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0);
 
     /**
      * Change the window used for rendering the scene

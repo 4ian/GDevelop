@@ -250,11 +250,14 @@ void PropImage::OnscrollHeightScroll(wxScrollEvent& event)
 ////////////////////////////////////////////////////////////
 void PropImage::OnBrowseBtClick(wxCommandEvent& event)
 {
-    wxFileDialog FileDialog( this, _("Choisissez l'image"), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_MULTIPLE );
+    wxFileDialog fileDialog( this, _("Choisissez l'image"), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_MULTIPLE );
 
-    if ( FileDialog.ShowModal() == wxID_OK )
+    if ( fileDialog.ShowModal() == wxID_OK )
     {
-        FichierEdit->SetValue(FileDialog.GetPath());
+        wxFileName filename = wxFileName::FileName(fileDialog.GetPath());
+        filename.MakeRelativeTo(wxFileName::FileName(project.GetProjectFile()).GetPath());
+
+        FichierEdit->SetValue(filename.GetFullPath());
 
         apercuPanel->Refresh();
         apercuPanel->Update(); //Immédiatement

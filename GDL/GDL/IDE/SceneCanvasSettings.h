@@ -4,6 +4,7 @@
  */
 #ifndef SCENECANVASSETTINGS_H
 #define SCENECANVASSETTINGS_H
+#include <string>
 class TiXmlElement;
 
 /**
@@ -28,6 +29,7 @@ public:
     int gridG; ///< Grid green color in editor
     int gridB; ///< Grid blue color in editor
     bool windowMask; ///< True if window mask displayed in editor
+    std::string associatedLayout; ///< Only used for external layout: Contains the name of the layout used ( for loading objects ) when editing the external layout.
 };
 
 #endif // SCENECANVASSETTINGS_H

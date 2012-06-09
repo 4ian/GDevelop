@@ -119,9 +119,9 @@ bool SpriteObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
     {
         std::string imageName = GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName();
 
-        if ( game.resourceManager.HasResource(imageName) && wxFileExists(game.resourceManager.GetResource(imageName).GetFile()) )
+        if ( game.resourceManager.HasResource(imageName) && wxFileExists(game.resourceManager.GetResource(imageName).GetAbsoluteFile(game)) )
         {
-            thumbnail = wxBitmap( game.resourceManager.GetResource(imageName).GetFile(), wxBITMAP_TYPE_ANY);
+            thumbnail = wxBitmap( game.resourceManager.GetResource(imageName).GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
 
             wxImage thumbImage = thumbnail.ConvertToImage();
             thumbnail = wxBitmap(thumbImage.Scale(24, 24));

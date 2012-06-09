@@ -830,7 +830,7 @@ void ResourcesEditor::OnModFileImage( wxCommandEvent& event )
         return;
     }
 
-    if ( game.resourceManager.GetResource(data->GetSecondString()).EditMainProperty() )
+    if ( game.resourceManager.GetResource(data->GetSecondString()).EditMainProperty(game) )
         game.imagesChanged.push_back(data->GetSecondString());
 }
 

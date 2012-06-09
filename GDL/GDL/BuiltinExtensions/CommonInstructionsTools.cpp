@@ -58,6 +58,27 @@ std::string GD_API ToString( double number )
     return oss.str();
 }
 
+std::string GD_API LargeNumberToString( double number )
+{
+    std::ostringstream oss;
+    oss.setf(std::ios::fixed);
+    oss << number;
+    std::string formattedStr = oss.str();
+
+    //Delete trailing zero if needed
+    size_t pointPos = formattedStr.find('.');
+    if ( pointPos < formattedStr.length() )
+    {
+        size_t searchPos = formattedStr.length()-1;
+        while (formattedStr[searchPos] == '0') searchPos--;
+        if ( formattedStr[searchPos] == '.') searchPos--;
+
+        formattedStr.resize(searchPos+1);
+    }
+
+    return formattedStr;
+}
+
 }
 
 }

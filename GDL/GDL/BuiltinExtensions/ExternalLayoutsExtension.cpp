@@ -20,6 +20,8 @@ ExternalLayoutsExtension::ExternalLayoutsExtension()
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddParameter("string", _("Nom de l'agencement externe"), "",false);
+        instrInfo.AddParameter("expression", _("Position X de l'origine"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Position Y de l'origine"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("ExternalLayoutsTools::CreateObjectsFromExternalLayout").SetIncludeFile("GDL/BuiltinExtensions/ExternalLayoutsTools.h");
 

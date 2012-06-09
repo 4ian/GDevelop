@@ -32,5 +32,17 @@ CommonConversionsExtension::CommonConversionsExtension()
         instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::ToString").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
     DECLARE_END_STR_EXPRESSION()
+
+    DECLARE_STR_EXPRESSION("LargeNumberToString",
+                       _("Convertir un grand nombre en un texte"),
+                       _("Converti le résultat de l'expression en un texte, sans utiliser la notation scientifique"),
+                       _("Conversion"),
+                       "res/conditions/toujours24.png")
+
+        instrInfo.AddParameter("expression", _("Expression à convertir en texte"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::LargeNumberToString").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+
+    DECLARE_END_STR_EXPRESSION()
     #endif
 }

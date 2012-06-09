@@ -31,6 +31,7 @@ void SceneCanvasSettings::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridR", gridR);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridG", gridG);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridB", gridB);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("associatedLayout", associatedLayout);
 }
 
 void SceneCanvasSettings::SaveToXml(TiXmlElement * element) const
@@ -46,4 +47,5 @@ void SceneCanvasSettings::SaveToXml(TiXmlElement * element) const
     element->SetDoubleAttribute( "gridG", gridG );
     element->SetDoubleAttribute( "gridB", gridB );
     element->SetAttribute( "windowMask", windowMask ? "true" : "false" );
+    element->SetAttribute( "associatedLayout", associatedLayout.c_str() );
 }

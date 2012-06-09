@@ -38,7 +38,7 @@ public:
      *
      * \return true if the resource was changed
      */
-    virtual bool EditMainProperty() {return false;};
+    virtual bool EditMainProperty(gd::Project & project) {return false;};
 
     /**
      * Must return true if the resource use a file.
@@ -67,7 +67,7 @@ public:
     /**
      * Return, if applicable, a string containing the absolute filename of the resource.
      */
-    std::string GetAbsoluteFile(const gd::Project & game);
+    std::string GetAbsoluteFile(const gd::Project & game) const;
     #endif
 
     /**
@@ -127,7 +127,7 @@ public:
      *
      * \return true if resource was changed
      */
-    virtual bool EditMainProperty();
+    virtual bool EditMainProperty(gd::Project & project);
 
     virtual bool UseFile() { return true; }
 

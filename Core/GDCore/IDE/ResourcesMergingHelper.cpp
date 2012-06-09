@@ -14,6 +14,8 @@ namespace gd
 
 void ResourcesMergingHelper::ExposeResource(std::string & resourceFilename)
 {
+    if ( resourceFilename.empty() ) return;
+
     wxFileName filename = wxFileName::FileName(resourceFilename);
     filename.MakeAbsolute(baseDirectory);
     std::string resourceFullFilename = ToString(filename.GetFullPath());

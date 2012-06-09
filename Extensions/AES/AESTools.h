@@ -34,8 +34,8 @@ namespace GDpriv
 namespace AES
 {
 
-void GD_EXTENSION_API EncryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters );
-void GD_EXTENSION_API DecryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters );
+void GD_EXTENSION_API EncryptFile( const std::string & srcFile, const std::string & destFile, std::string passwordWith24characters );
+void GD_EXTENSION_API DecryptFile( const std::string & srcFile, const std::string & destFile, std::string passwordWith24characters );
 
 }
 

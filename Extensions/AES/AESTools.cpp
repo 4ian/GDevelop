@@ -24,7 +24,7 @@ freely, subject to the following restrictions:
 
 */
 
-#include "GDL/AES.h"
+#include "GDL/Tools/AES.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -37,8 +37,13 @@ namespace GDpriv
 namespace AES
 {
 
-void GD_EXTENSION_API EncryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters )
+void GD_EXTENSION_API EncryptFile( const std::string & srcFile, const std::string & destFile, std::string passwordWith24characters )
 {
+    while ( passwordWith24characters.length() < 24 )
+        passwordWith24characters += " ";
+    if ( passwordWith24characters.length() > 24 )
+        passwordWith24characters.resize(24);
+
     ifstream ifile(srcFile.c_str(),ios_base::binary);
     ofstream ofile(destFile.c_str(),ios_base::binary);
 
@@ -69,8 +74,13 @@ void GD_EXTENSION_API EncryptFile( const std::string & srcFile, const std::strin
     ifile.close();
 }
 
-void GD_EXTENSION_API DecryptFile( const std::string & srcFile, const std::string & destFile, const std::string & passwordWith24characters )
+void GD_EXTENSION_API DecryptFile( const std::string & srcFile, const std::string & destFile, std::string passwordWith24characters )
 {
+    while ( passwordWith24characters.length() < 24 )
+        passwordWith24characters += " ";
+    if ( passwordWith24characters.length() > 24 )
+        passwordWith24characters.resize(24);
+
     ifstream ifile(srcFile.c_str(),ios_base::binary);
     ofstream ofile(destFile.c_str(),ios_base::binary);
 

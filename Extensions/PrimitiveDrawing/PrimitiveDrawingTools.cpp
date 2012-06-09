@@ -45,7 +45,7 @@ void GD_EXTENSION_API CopyImageOnAnother( const std::string & destName, const st
     if ( destX < 0 || static_cast<unsigned>(destX) >= dest->texture.GetWidth()) return;
     if ( destY < 0 || static_cast<unsigned>(destY) >= dest->texture.GetWidth()) return;
 
-    dest->image.Copy(scene.game->imageManager->GetSFMLTexture(srcName)->image, destX, destY, useTransparency);
+    dest->image.Copy(scene.game->imageManager->GetSFMLTexture(srcName)->image, destX, destY, sf::IntRect(0, 0, 0, 0), useTransparency);
     dest->texture.LoadFromImage(dest->image);
 }
 

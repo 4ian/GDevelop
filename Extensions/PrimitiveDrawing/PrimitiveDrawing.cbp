@@ -570,6 +570,8 @@
 		<Unit filename="DrawerObjectEditor.cpp" />
 		<Unit filename="DrawerObjectEditor.h" />
 		<Unit filename="Extension.cpp" />
+		<Unit filename="PrimitiveDrawingTools.cpp" />
+		<Unit filename="PrimitiveDrawingTools.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />

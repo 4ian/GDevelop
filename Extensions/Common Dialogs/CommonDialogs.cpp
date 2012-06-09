@@ -26,15 +26,16 @@ freely, subject to the following restrictions:
 
 #include <vector>
 #include <string>
-#include "GDL/Object.h"
-#include "GDL/Event.h"
 #include <iostream>
 #include <sstream>
-
-#include "GDL/RuntimeScene.h"
-#include <string>
 #include <vector>
 #include <algorithm>
+
+#include "GDL/Object.h"
+#include "GDL/RuntimeScene.h"
+#if defined(GD_IDE_ONLY)
+#include "GDCore/Events/Event.h"
+#endif
 
 //Windows build uses native windows-dialogs
 #if defined(WINDOWS)
@@ -116,7 +117,7 @@ void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, const std::string & va
     scene.NotifyPauseWasMade(timeSpent.GetElapsedTime());//Don't take the time spent in this function in account.
 
     //Update the variable
-    scene.variables.ObtainVariable(variable) = result;
+    scene.GetVariables().ObtainVariable(variable) = result;
 }
 
 /**
@@ -143,7 +144,7 @@ void GD_EXTENSION_API ShowYesNoMsgBox( RuntimeScene & scene, const std::string &
     scene.NotifyPauseWasMade(timeSpent.GetElapsedTime());//Don't take the time spent in this function in account.
 
     //Update the variable
-    scene.variables.ObtainVariable(variable) = result;
+    scene.GetVariables().ObtainVariable(variable) = result;
 }
 
 //Declaration and definition of a simple input box for windows
@@ -459,7 +460,7 @@ bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, const std::string & v
     scene.NotifyPauseWasMade(timeSpent.GetElapsedTime());//Don't take the time spent in this function in account.
 
     //Update the variable
-    scene.variables.ObtainVariable(variable) = result;
+    scene.GetVariables().ObtainVariable(variable) = result;
 
     return true;
 }

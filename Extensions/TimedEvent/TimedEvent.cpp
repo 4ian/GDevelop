@@ -33,9 +33,10 @@ freely, subject to the following restrictions:
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/Events/ExpressionsCodeGeneration.h"
-#include "GDL/IDE/EventsRenderingHelper.h"
-#include "GDL/IDE/EventsEditorItemsAreas.h"
-#include "GDL/IDE/EventsEditorSelection.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
+#include "GDCore/IDE/EventsEditorItemsAreas.h"
+#include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDL/ExtensionsManager.h"
 #include "TimedEventEditorDlg.h"
 
 std::vector< TimedEvent* > TimedEvent::codeGenerationCurrentParents;
@@ -64,7 +65,7 @@ std::string TimedEvent::GenerateEventCode(Game & game, Scene & scene, EventsCode
     //Prepare code for computing timeout
     std::string timeOutCode;
     CallbacksForGeneratingExpressionCode callbacks(timeOutCode, game, scene, codeGenerator, context);
-    GDExpressionParser parser(timeout.GetPlainString());
+    gd::ExpressionParser parser(timeout.GetPlainString());
     if (!parser.ParseMathExpression(game, scene, callbacks) || timeOutCode.empty()) timeOutCode = "0";
 
     //Prepare name
@@ -107,25 +108,25 @@ std::string TimedEvent::GenerateEventCode(Game & game, Scene & scene, EventsCode
     return outputCode;
 }
 
-vector < vector<Instruction>* > TimedEvent::GetAllConditionsVectors()
+vector < vector<gd::Instruction>* > TimedEvent::GetAllConditionsVectors()
 {
-    vector < vector<Instruction>* > allConditions;
+    vector < vector<gd::Instruction>* > allConditions;
     allConditions.push_back(&conditions);
 
     return allConditions;
 }
 
-vector < vector<Instruction>* > TimedEvent::GetAllActionsVectors()
+vector < vector<gd::Instruction>* > TimedEvent::GetAllActionsVectors()
 {
-    vector < vector<Instruction>* > allActions;
+    vector < vector<gd::Instruction>* > allActions;
     allActions.push_back(&actions);
 
     return allActions;
 }
 
-vector < GDExpression* > TimedEvent::GetAllExpressions()
+vector < gd::Expression* > TimedEvent::GetAllExpressions()
 {
-    vector < GDExpression* > allExpressions;
+    vector < gd::Expression* > allExpressions;
     allExpressions.push_back(&timeout);
 
     return allExpressions;
@@ -168,7 +169,7 @@ void TimedEvent::LoadFromXml(const TiXmlElement * eventElem)
         name = eventElem->FirstChildElement("Name")->Attribute("value");
 
     if ( eventElem->FirstChildElement( "Timeout" ) != NULL )
-        timeout = GDExpression(eventElem->FirstChildElement("Timeout")->Attribute("value"));
+        timeout = gd::Expression(eventElem->FirstChildElement("Timeout")->Attribute("value"));
 
     //Conditions
     if ( eventElem->FirstChildElement( "Conditions" ) != NULL )
@@ -192,7 +193,7 @@ void TimedEvent::LoadFromXml(const TiXmlElement * eventElem)
  */
 void TimedEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
-    EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+    gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
     const int functionTextHeight = 20;
 
@@ -215,24 +216,24 @@ void TimedEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+functionTextHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection);
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, *ExtensionsManager::GetInstance());
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+functionTextHeight+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection);
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
 }
 
 unsigned int TimedEvent::GetRenderedHeight(unsigned int width) const
 {
     if ( eventHeightNeedUpdate )
     {
-        EventsRenderingHelper * renderingHelper = EventsRenderingHelper::GetInstance();
+        gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
         int border = renderingHelper->instructionsListBorder;
         const int functionTextHeight = 20;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2);
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2);
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
 
         renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + functionTextHeight)+border*2;
         eventHeightNeedUpdate = false;
@@ -241,7 +242,7 @@ unsigned int TimedEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-BaseEvent::EditEventReturnType TimedEvent::EditEvent(wxWindow* parent, Game & game, Scene & scene, MainEditorCommand & mainEditorCommand)
+gd::BaseEvent::EditEventReturnType TimedEvent::EditEvent(wxWindow* parent, Game & game, Scene & scene, MainEditorCommand & mainEditorCommand)
 {
     TimedEventEditorDlg dialog(parent, *this, game, scene);
     if ( dialog.ShowModal() == 0 ) return Cancelled;

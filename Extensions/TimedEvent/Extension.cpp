@@ -35,7 +35,7 @@ freely, subject to the following restrictions:
 #include "GDL/Events/EventsCodeGenerationContext.h"
 
 /**
- * This class declare information about the extension.
+ * \brief This class declares information about the extension.
  */
 class Extension : public ExtensionBase
 {
@@ -74,20 +74,20 @@ class Extension : public ExtensionBase
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
                 instrInfo.AddParameter("", _("Nom"), "", false);
 
-            class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
+            class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
             {
-                virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+                virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
                 {
                     codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
 
-                    std::string codeName = "GDNamedTimedEvent_"+EventsCodeGenerator::ConvertToCppString(instruction.GetParameterSafely(0).GetPlainString());
+                    std::string codeName = "GDNamedTimedEvent_"+EventsCodeGenerator::ConvertToCppString(instruction.GetParameter(1).GetPlainString());
                     return "GDpriv::TimedEvents::Reset(*runtimeContext->scene, \""+codeName+"\");\n";
 
                     return "";
                 };
             };
-            InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+            gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
             DECLARE_END_ACTION()
 
@@ -101,9 +101,9 @@ class Extension : public ExtensionBase
 
                 instrInfo.AddParameter("", _("Nom"), "", false);
 
-            class CodeGenerator : public InstructionInfos::CppCallingInformation::CustomCodeGenerator
+            class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
             {
-                virtual std::string GenerateCode(const Game & game, const Scene & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+                virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
                 {
                     codeGenerator.AddIncludeFile("TimedEvent/TimedEventTools.h");
 
@@ -115,7 +115,7 @@ class Extension : public ExtensionBase
                             continue;
                         }
 
-                        if (TimedEvent::codeGenerationCurrentParents[i]->GetName() == instruction.GetParameterSafely(0).GetPlainString())
+                        if (TimedEvent::codeGenerationCurrentParents[i]->GetName() == instruction.GetParameter(0).GetPlainString())
                         {
                             TimedEvent & timedEvent = *TimedEvent::codeGenerationCurrentParents[i];
 
@@ -136,8 +136,8 @@ class Extension : public ExtensionBase
                     return "";
                 };
             };
-            InstructionInfos::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<InstructionInfos::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+            gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+            instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
             instrInfo.cppCallingInformation.SetIncludeFile("TimedEvent/TimedEventTools.h");
 

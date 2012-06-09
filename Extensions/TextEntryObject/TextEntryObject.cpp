@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY)
 #include <wx/wx.h>
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "TextEntryObjectEditor.h"
 #endif
@@ -112,7 +112,7 @@ bool TextEntryObject::DrawEdittime( sf::RenderTarget& renderTarget )
     return true;
 }
 
-void TextEntryObject::ExposeResources(ArbitraryResourceWorker & worker)
+void TextEntryObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
 }
 

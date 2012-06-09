@@ -31,7 +31,6 @@ freely, subject to the following restrictions:
 class ImageManager;
 class RuntimeScene;
 class Object;
-class ExpressionInstruction;
 class ImageManager;
 class InitialPosition;
 #if defined(GD_IDE_ONLY)
@@ -39,7 +38,7 @@ class wxBitmap;
 class Game;
 class wxWindow;
 class MainEditorCommand;
-class ResourcesMergingHelper;
+namespace gd {class ResourcesMergingHelper;}
 #endif
 
 /**
@@ -47,58 +46,58 @@ class ResourcesMergingHelper;
  */
 class GD_EXTENSION_API TextEntryObject : public Object
 {
-    public :
+public :
 
-        TextEntryObject(std::string name_);
-        virtual ~TextEntryObject() {};
-        virtual ObjSPtr Clone() { return boost::shared_ptr<Object>(new TextEntryObject(*this));}
+    TextEntryObject(std::string name_);
+    virtual ~TextEntryObject() {};
+    virtual Object * Clone() { return new TextEntryObject(*this); }
 
-        virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-        virtual bool InitializeFromInitialPosition(const InitialPosition & position);
+    virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
+    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
-        virtual bool Draw(sf::RenderTarget & renderTarget);
+    virtual bool Draw(sf::RenderTarget & renderTarget);
 
-        virtual void UpdateTime(float);
+    virtual void UpdateTime(float);
 
-        #if defined(GD_IDE_ONLY)
-        virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-        virtual void ExposeResources(ArbitraryResourceWorker & worker);
-        virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+    #if defined(GD_IDE_ONLY)
+    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
+    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
+    virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
 
-        virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
-        virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-        virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
+    virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
+    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
+    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-        virtual unsigned int GetNumberOfProperties() const;
-        #endif
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
 
-        virtual void LoadFromXml(const TiXmlElement * elemScene);
-        #if defined(GD_IDE_ONLY)
-        virtual void SaveToXml(TiXmlElement * elemScene);
-        #endif
+    virtual void LoadFromXml(const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void SaveToXml(TiXmlElement * elemScene);
+    #endif
 
-        virtual float GetWidth() const;
-        virtual float GetHeight() const;
+    virtual float GetWidth() const;
+    virtual float GetHeight() const;
 
-        virtual float GetDrawableX() const;
-        virtual float GetDrawableY() const;
+    virtual float GetDrawableX() const;
+    virtual float GetDrawableY() const;
 
-        virtual float GetCenterX() const;
-        virtual float GetCenterY() const;
+    virtual float GetCenterX() const;
+    virtual float GetCenterY() const;
 
-        inline void SetString(std::string str) { text = str; };
-        const std::string & GetString() const;
+    inline void SetString(std::string str) { text = str; };
+    const std::string & GetString() const;
 
-        void Activate( bool activate = true ) { activated = activate; };
-        bool IsActivated() const { return activated; };
+    void Activate( bool activate = true ) { activated = activate; };
+    bool IsActivated() const { return activated; };
 
-    private:
+private:
 
-        std::string text;
-        const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
-        bool activated;
+    std::string text;
+    const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
+    bool activated;
 };
 
 void DestroyTextEntryObject(Object * object);

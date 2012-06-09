@@ -31,6 +31,7 @@ freely, subject to the following restrictions:
 #include "GDL/ExtensionBase.h"
 #include "GDL/Version.h"
 #include "PathAutomatism.h"
+#include "ScenePathDatas.h"
 #include <boost/version.hpp>
 
 /**
@@ -143,7 +144,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_CONDITION("GetSegment",
                                    _("Numéro du segment sur le chemin"),
                                    _("Renvoie vrai si le numéro du segment sur le chemin vérifie bien le test."),
-                                   _("_PARAM0_ est sur le segment _PARAM3__PARAM2_"),
+                                   _("Le numéro du segment actuellement parcouru par _PARAM0_ est _PARAM3__PARAM2_"),
                                    _("Position"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
@@ -160,7 +161,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_ACTION("EnterSegment",
                                    _("Placer sur un segment du chemin"),
                                    _("Place l'objet sur un segment du chemin."),
-                                   _("Placer _PARAM0_ sur le segment _PARAM3__PARAM2_"),
+                                   _("Faire _PARAM3__PARAM2_ au numéro du segment actuellement parcouru par _PARAM0_"),
                                    _("Position"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
@@ -184,7 +185,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_CONDITION("GetPosition",
                                    _("Position de l'objet sur le segment"),
                                    _("Renvoie vrai si la position de l'objet sur le segment vérifie bien le test.\nValeur comprise entre 0 et 1."),
-                                   _("_PARAM0_ est positionné à _PARAM3__PARAM2_ du segment actuel"),
+                                   _("La position de _PARAM0_ sur le segment actuel est _PARAM3__PARAM2_"),
                                    _("Position"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
@@ -224,7 +225,7 @@ class Extension : public ExtensionBase
 
                     DECLARE_AUTOMATISM_CONDITION("GetPathName",
                                    _("Nom du chemin"),
-                                   _("Renvoie vrai si le nom du chemion vérifie bien le test.."),
+                                   _("Renvoie vrai si le nom du chemin vérifie bien le test."),
                                    _("Le nom du chemin actuel de _PARAM0_ est _PARAM3__PARAM2_"),
                                    _("Chemin"),
                                    "res/actions/window24.png",
@@ -395,7 +396,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_ACTION("SetAngleOffset",
                                    _("Modifier le décalage d'angle"),
                                    _("Modifie le décalage d'angle de la rotation automatique."),
-                                   _("Mettre le décalage d'angle de l'objet _PARAM0_ sur le chemin à _PARAM3__PARAM2_"),
+                                   _("Faire _PARAM3__PARAM2_ au décalage de l'angle de l'objet _PARAM0_"),
                                    _("Options"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
@@ -436,7 +437,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_ACTION("SetSpeed",
                                    _("Modifier la vitesse"),
                                    _("Modifie la vitesse de l'objet sur le chemin."),
-                                   _("Mettre la vitesse de l'objet _PARAM0_ sur le chemin à _PARAM3__PARAM2_"),
+                                   _("Faire _PARAM3__PARAM2_ à la vitesse de _PARAM0_ sur le chemin"),
                                    _("Mouvement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");

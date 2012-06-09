@@ -26,7 +26,6 @@ freely, subject to the following restrictions:
 
 #include "RuntimeScenePathDatas.h"
 #include "ScenePathDatas.h"
-#include <iostream>
 
 RuntimeScenePathDatas::RuntimeScenePathDatas(const ScenePathDatas & automatismSharedDatas)
 {

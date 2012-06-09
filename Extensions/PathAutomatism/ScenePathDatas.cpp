@@ -28,7 +28,6 @@ freely, subject to the following restrictions:
 #include "PathAutomatism.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/XmlMacros.h"
-#include <iostream>
 
 #if defined(GD_IDE_ONLY)
 void ScenePathDatas::SaveToXml(TiXmlElement * elem) const

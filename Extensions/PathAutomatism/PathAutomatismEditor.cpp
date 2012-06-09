@@ -38,21 +38,21 @@ freely, subject to the following restrictions:
 #include <cmath>
 #include <limits>
 #include <algorithm>
-
+#include <boost/shared_ptr.hpp>
 #include <wx/log.h>
 #include <wx/dcbuffer.h>
 #include <wx/msgdlg.h>
 #include <wx/textdlg.h>
 #include <wx/numdlg.h>
 #include <wx/filedlg.h>
-
-#include "GDL/CommonTools.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDL/CommonTools.h"
 #include "GDL/Game.h"
-#include "PathAutomatism.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
+#include "ScenePathDatas.h"
+#include "PathAutomatism.h"
 
 //(*IdInit(PathAutomatismEditor)
 const long PathAutomatismEditor::ID_STATICTEXT6 = wxNewId();

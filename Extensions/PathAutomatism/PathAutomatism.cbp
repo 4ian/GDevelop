@@ -63,6 +63,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29d_xrc" />
 					<Add option="-lwxmsw29d_richtext" />
@@ -163,6 +164,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -263,6 +265,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29_xrc" />
 					<Add option="-lwxmsw29_richtext" />
@@ -371,6 +374,7 @@
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
@@ -413,6 +417,7 @@
 					<Add option="-DSFML_DYNAMIC" />
 				</Compiler>
 				<Linker>
+					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
 					<Add option="`wx-config --libs all`" />
 					<Add option="-lsfml-audio" />
@@ -568,11 +573,8 @@
 		<Unit filename="Extension.cpp" />
 		<Unit filename="PathAutomatism.cpp" />
 		<Unit filename="PathAutomatism.h" />
-		<Unit filename="PathAutomatismActions.cpp" />
-		<Unit filename="PathAutomatismConditions.cpp" />
 		<Unit filename="PathAutomatismEditor.cpp" />
 		<Unit filename="PathAutomatismEditor.h" />
-		<Unit filename="PathAutomatismExpressions.cpp" />
 		<Unit filename="RuntimeScenePathDatas.cpp" />
 		<Unit filename="RuntimeScenePathDatas.h" />
 		<Unit filename="ScenePathDatas.cpp" />

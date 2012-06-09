@@ -26,8 +26,6 @@ freely, subject to the following restrictions:
 
 #ifndef RUNTIMESCENEPATHDATAS_H
 #define RUNTIMESCENEPATHDATAS_H
-
-#include <iostream>
 #include "GDL/AutomatismsRuntimeSharedDatas.h"
 #include <map>
 #include <vector>

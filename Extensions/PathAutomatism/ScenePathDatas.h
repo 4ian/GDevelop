@@ -32,7 +32,6 @@ freely, subject to the following restrictions:
 #include <SFML/System/Vector2.hpp>
 #include <map>
 #include <vector>
-#include <iostream>
 
 /**
  * Datas shared by Path Automatism

@@ -24,12 +24,14 @@ freely, subject to the following restrictions:
 
 */
 
+#include <boost/shared_ptr.hpp>
 #include "PathAutomatism.h"
 #include "PathAutomatismEditor.h"
 #include "GDL/Scene.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/RuntimeScene.h"
+#include "RuntimeScenePathDatas.h"
 
 PathAutomatism::PathAutomatism(std::string automatismTypeName) :
     Automatism(automatismTypeName),
@@ -43,7 +45,8 @@ PathAutomatism::PathAutomatism(std::string automatismTypeName) :
     angleOffset(0),
     isPathLoaded(false),
     futureSegment(-1),
-    futurePosition(-1)
+    futurePosition(-1),
+    runtimeScenesPathDatas(NULL)
 {
     Reset();
     SetPath("Object main path", std::vector<sf::Vector2f>(1, sf::Vector2f(0,0)));
@@ -337,17 +340,12 @@ void PathAutomatism::LoadPath(RuntimeScene & scene)
 {
     if(localePaths.count(pathName) == 0)
     {
-        if (runtimeScenesPathDatas == boost::shared_ptr<RuntimeScenePathDatas>())
-            runtimeScenesPathDatas = boost::static_pointer_cast<RuntimeScenePathDatas>(scene.GetAutomatismSharedDatas(name));
+        if (runtimeScenesPathDatas == NULL)
+            runtimeScenesPathDatas = static_cast<RuntimeScenePathDatas*>(scene.GetAutomatismSharedDatas(name).get());
 
-        if(runtimeScenesPathDatas == boost::shared_ptr<RuntimeScenePathDatas>() || runtimeScenesPathDatas->globalPaths.count(pathName) == 0)
-        {
-
-        }
-        else
-        {
+        if(runtimeScenesPathDatas != NULL && runtimeScenesPathDatas->globalPaths.count(pathName) != 0)
             path = std::vector<sf::Vector2f>(runtimeScenesPathDatas->globalPaths.at(pathName));
-        }
+
     }
     else
     {

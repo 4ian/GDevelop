@@ -301,7 +301,7 @@ class Extension : public ExtensionBase
 
             DECLARE_ACTION("SetAttributeNumber",
                            _("Changer la valeur d'un attribut"),
-                           _("Change la valeur d'un attribut d'un élément (qui doit être une balide)."),
+                           _("Change la valeur d'un attribut d'un élément (qui doit être une balise)."),
                            _("Faire _PARAM3__PARAM2_ à l'attribut _PARAM1_ de l'élément _PARAM0_"),
                            _("XML avancé : Balise"),
                            "res/AdvancedXML/AdvancedXML.png",
@@ -333,7 +333,7 @@ class Extension : public ExtensionBase
 
             DECLARE_ACTION("SetAttributeString",
                            _("Changer le texte d'un attribut"),
-                           _("Change le texte d'un attribut d'un élément (qui doit être une balide)."),
+                           _("Change le texte d'un attribut d'un élément (qui doit être une balise)."),
                            _("Faire _PARAM3__PARAM2_ à l'attribut _PARAM1_ de l'élément _PARAM0_"),
                            _("XML avancé : Balise"),
                            "res/AdvancedXML/AdvancedXML.png",

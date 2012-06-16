@@ -77,8 +77,14 @@ std::vector < EventItem > EventsEditorSelection::GetAllSelectedEventsWithoutSubE
         bool isAlreadyIncludedAsSubEvent = false;
         for (boost::unordered_set< EventItem >::iterator it2 = eventsSelected.begin();it2!=eventsSelected.end();++it2)
         {
-            if ( (*it).event != (*it2).event && (*it2).eventsList != NULL && FindInEventsAndSubEvents(*(*it2).eventsList, (*it).event) )
-                isAlreadyIncludedAsSubEvent = true;
+            if ((*it).event != (*it2).event &&
+                (*it2).event != boost::shared_ptr<gd::BaseEvent>() &&
+                (*it2).event->CanHaveSubEvents() )
+            {
+                if ( FindInEventsAndSubEvents((*it2).event->GetSubEvents(), (*it).event) )
+                    isAlreadyIncludedAsSubEvent = true;
+
+            }
         }
 
         if (!isAlreadyIncludedAsSubEvent)

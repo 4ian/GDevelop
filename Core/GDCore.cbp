@@ -21,11 +21,11 @@
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-D__WXDEBUG__" />
-					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswud" />
 				</Compiler>
 				<Linker>
 					<Add option="-lmingw32" />
@@ -36,29 +36,29 @@
 					<Add option="-lws2_32" />
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
-					<Add option="-lwxmsw29d_xrc" />
-					<Add option="-lwxmsw29d_stc" />
-					<Add option="-lwxmsw29d_richtext" />
-					<Add option="-lwxmsw29d_ribbon" />
-					<Add option="-lwxmsw29d_aui" />
-					<Add option="-lwxmsw29d_adv" />
-					<Add option="-lwxmsw29d_html" />
-					<Add option="-lwxmsw29d_core" />
-					<Add option="-lwxbase29d_xml" />
-					<Add option="-lwxbase29d_net" />
+					<Add option="-lwxmsw29ud_xrc" />
+					<Add option="-lwxmsw29ud_stc" />
+					<Add option="-lwxmsw29ud_richtext" />
+					<Add option="-lwxmsw29ud_ribbon" />
+					<Add option="-lwxmsw29ud_aui" />
+					<Add option="-lwxmsw29ud_adv" />
+					<Add option="-lwxmsw29ud_html" />
+					<Add option="-lwxmsw29ud_core" />
+					<Add option="-lwxbase29ud_xml" />
+					<Add option="-lwxbase29ud_net" />
 					<Add option="-lwxexpatd" />
-					<Add option="-lwxbase29d" />
+					<Add option="-lwxbase29ud" />
 					<Add option="-lwxpngd" />
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
 					<Add option="-lwxtiffd" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswud" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
 				<Option output="..\IDE\bin\dev\GDCore" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Release\" />
+				<Option object_output="obj\Dev\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -70,11 +70,11 @@
 					<Add option="-DWINDOWS" />
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
-					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -86,23 +86,23 @@
 					<Add option="-lws2_32" />
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
-					<Add option="-lwxmsw29_xrc" />
-					<Add option="-lwxmsw29_stc" />
-					<Add option="-lwxmsw29_richtext" />
-					<Add option="-lwxmsw29_ribbon" />
-					<Add option="-lwxmsw29_aui" />
-					<Add option="-lwxmsw29_adv" />
-					<Add option="-lwxmsw29_html" />
-					<Add option="-lwxmsw29_core" />
-					<Add option="-lwxbase29_xml" />
-					<Add option="-lwxbase29_net" />
+					<Add option="-lwxmsw29u_xrc" />
+					<Add option="-lwxmsw29u_stc" />
+					<Add option="-lwxmsw29u_richtext" />
+					<Add option="-lwxmsw29u_ribbon" />
+					<Add option="-lwxmsw29u_aui" />
+					<Add option="-lwxmsw29u_adv" />
+					<Add option="-lwxmsw29u_html" />
+					<Add option="-lwxmsw29u_core" />
+					<Add option="-lwxbase29u_xml" />
+					<Add option="-lwxbase29u_net" />
 					<Add option="-lwxexpat" />
-					<Add option="-lwxbase29" />
+					<Add option="-lwxbase29u" />
 					<Add option="-lwxpng" />
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>
@@ -120,11 +120,11 @@
 					<Add option="-DWINDOWS" />
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
-					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -136,23 +136,23 @@
 					<Add option="-lws2_32" />
 					<Add option="-lgdi32" />
 					<Add option="-lwinmm" />
-					<Add option="-lwxmsw29_xrc" />
-					<Add option="-lwxmsw29_stc" />
-					<Add option="-lwxmsw29_richtext" />
-					<Add option="-lwxmsw29_ribbon" />
-					<Add option="-lwxmsw29_aui" />
-					<Add option="-lwxmsw29_adv" />
-					<Add option="-lwxmsw29_html" />
-					<Add option="-lwxmsw29_core" />
-					<Add option="-lwxbase29_xml" />
-					<Add option="-lwxbase29_net" />
+					<Add option="-lwxmsw29u_xrc" />
+					<Add option="-lwxmsw29u_stc" />
+					<Add option="-lwxmsw29u_richtext" />
+					<Add option="-lwxmsw29u_ribbon" />
+					<Add option="-lwxmsw29u_aui" />
+					<Add option="-lwxmsw29u_adv" />
+					<Add option="-lwxmsw29u_html" />
+					<Add option="-lwxmsw29u_core" />
+					<Add option="-lwxbase29u_xml" />
+					<Add option="-lwxbase29u_net" />
 					<Add option="-lwxexpat" />
-					<Add option="-lwxbase29" />
+					<Add option="-lwxbase29u" />
 					<Add option="-lwxpng" />
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 				</Linker>
 			</Target>

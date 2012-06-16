@@ -9,6 +9,8 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
+#undef CreateDialog //Thanks windows.h
+#include <wx/textdlg.h>
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/ProfileEvent.h"
 #include "SceneCanvas.h"

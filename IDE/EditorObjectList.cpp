@@ -22,7 +22,7 @@
 #include <wx/textdlg.h>
 #include <wx/choicdlg.h>
 #include <wx/imaglist.h>
-
+#include <wx/richtooltip.h>
 #include <string>
 #include <vector>
 
@@ -306,16 +306,16 @@ void EditorObjectList::CreateToolbar()
                                    wxTB_FLAT | wxTB_NODIVIDER );
 
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( ID_BITMAPBUTTON1, wxT( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Rafraichir la liste d'images") );
+    toolbar->AddTool( ID_BITMAPBUTTON1, _( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Rafraichir la liste d'images") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idMenuAddObj, wxT( "Ajouter un objet" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un objet") );
-    toolbar->AddTool( idMenuDelObj, wxT( "Supprimer l'objet selectionné" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer l'objet selectionné") );
-    toolbar->AddTool( idMenuModObj, wxT( "Modifier les propriétés de l'objet" ), wxBitmap( wxImage( "res/editpropicon.png" ) ), _("Modifier les propriétés de l'objet") );
-    toolbar->AddTool( ID_BITMAPBUTTON6, wxT( "Plus d'options d'édition ( clic droit sur la liste )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _("Plus d'options d'édition ( clic droit sur la liste )") );
+    toolbar->AddTool( idMenuAddObj, _( "Ajouter un objet" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un objet") );
+    toolbar->AddTool( idMenuDelObj, _( "Supprimer l'objet selectionné" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer l'objet selectionné") );
+    toolbar->AddTool( idMenuModObj, _( "Modifier les propriétés de l'objet" ), wxBitmap( wxImage( "res/editpropicon.png" ) ), _("Modifier les propriétés de l'objet") );
+    toolbar->AddTool( ID_BITMAPBUTTON6, _( "Plus d'options d'édition ( clic droit sur la liste )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _("Plus d'options d'édition ( clic droit sur la liste )") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON2, wxT( "Rechercher un objet" ), wxBitmap( wxImage( "res/searchicon.png" ) ), _("Rechercher un objet") );
+    toolbar->AddTool( ID_BITMAPBUTTON2, _( "Rechercher un objet" ), wxBitmap( wxImage( "res/searchicon.png" ) ), _("Rechercher un objet") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON3, wxT( "Aide de l'éditeur d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur d'objets") );
+    toolbar->AddTool( ID_BITMAPBUTTON3, _( "Aide de l'éditeur d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur d'objets") );
     toolbar->Realize();
 
     //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
@@ -714,7 +714,10 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     //Be sure the name is valid
     if ( !CheckObjectName(newName) )
     {
-        wxMessageBox(_("Le nom de l'objet contient des espaces, des caractères non autorisés ou représente un nom d'une expression. Utilisez uniquement des lettres, chiffres et underscores ( _ )."), _("Attention"), wxOK | wxICON_EXCLAMATION, this);
+        wxRichToolTip tip("Nom invalide",
+                          "Utilisez uniquement des lettres,\nchiffres et underscores ( _ ).\nLes noms réservés par des\nexpressions sont aussi interdits.");
+        tip.SetIcon(wxICON_INFORMATION);
+        tip.ShowFor(this);
 
         event.Veto();
         return;

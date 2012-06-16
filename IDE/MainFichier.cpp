@@ -109,6 +109,12 @@ void Game_Develop_EditorFrame::OnRibbonOpenDropDownClicked(wxRibbonButtonBarEven
     evt.PopupMenu(&openContextMenu);
 }
 
+void Game_Develop_EditorFrame::SetLastUsedFile(wxString file)
+{
+    m_recentlist.SetLastUsed( file );
+    for ( unsigned int i = 0;i < 9;i++ )
+        wxConfigBase::Get()->Write( wxString::Format( _T( "/Recent/%d" ), i ), m_recentlist.GetEntry( i ) );
+}
 
 ////////////////////////////////////////////////////////////
 /// Ouverture du fichier, puis ajout à la RecentList et rafraichissement des éditeurs
@@ -125,12 +131,7 @@ void Game_Develop_EditorFrame::Open( string file )
         games.push_back(newGame);
 
         //Sauvegarde fichiers récents
-        m_recentlist.SetLastUsed( file );
-        for ( int i = 0;i < 9;i++ )
-        {
-            wxConfigBase *pConfig = wxConfigBase::Get();
-            pConfig->Write( wxString::Format( _T( "/Recent/%d" ), i ), m_recentlist.GetEntry( i ) );
-        }
+        SetLastUsedFile( file );
 
         //Mise à jour des éditeurs
         SetCurrentGame(games.size()-1);
@@ -174,7 +175,7 @@ void Game_Develop_EditorFrame::OnMenuSaveSelected( wxCommandEvent& event )
         else
             wxLogStatus(_("Enregistrement du fichier terminé."));
 
-        m_recentlist.SetLastUsed( GetCurrentGame()->GetProjectFile() );
+        SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
 
         return;
     }
@@ -221,7 +222,7 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
                 OpenSaveGame saveGame( *games[i] );
 
                 if ( !saveGame.SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( "L'enregistrement a échoué." );}
-                m_recentlist.SetLastUsed( games[i]->GetProjectFile() );
+                SetLastUsedFile( games[i]->GetProjectFile() );
 
                 if ( games[i] == GetCurrentGame() )
                 {
@@ -285,7 +286,7 @@ void Game_Develop_EditorFrame::SaveAs()
         if ( !saveGame.SaveToFile(GetCurrentGame()->GetProjectFile()) )
             wxLogError( "L'enregistrement a échoué" );
 
-        m_recentlist.SetLastUsed( GetCurrentGame()->GetProjectFile() );
+        SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
 
         wxString GD = "Game Develop";
         SetTitle( GD + " - " + GetCurrentGame()->GetProjectFile() );

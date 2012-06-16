@@ -30,7 +30,7 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-D__WXDEBUG__" />
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
@@ -38,7 +38,7 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswud" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
@@ -46,7 +46,7 @@
 					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswud" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 				</ResourceCompiler>
 				<Linker>
@@ -56,19 +56,20 @@
 					<Add option="-lopenal32" />
 					<Add option="-lsndfile" />
 					<Add option="-lgdl" />
-					<Add option="-lwxmsw29d_xrc" />
-					<Add option="-lwxmsw29d_stc" />
-					<Add option="-lwxmsw29d_propgrid" />
-					<Add option="-lwxmsw29d_richtext" />
-					<Add option="-lwxmsw29d_ribbon" />
-					<Add option="-lwxmsw29d_aui" />
-					<Add option="-lwxmsw29d_adv" />
-					<Add option="-lwxmsw29d_html" />
-					<Add option="-lwxmsw29d_core" />
-					<Add option="-lwxbase29d_xml" />
-					<Add option="-lwxbase29d_net" />
+					<Add option="-lwxmsw29ud_xrc" />
+					<Add option="-lwxmsw29ud_stc" />
+					<Add option="-lwxmsw29ud_propgrid" />
+					<Add option="-lwxmsw29ud_richtext" />
+					<Add option="-lwxmsw29ud_webview" />
+					<Add option="-lwxmsw29ud_ribbon" />
+					<Add option="-lwxmsw29ud_aui" />
+					<Add option="-lwxmsw29ud_adv" />
+					<Add option="-lwxmsw29ud_html" />
+					<Add option="-lwxmsw29ud_core" />
+					<Add option="-lwxbase29ud_xml" />
+					<Add option="-lwxbase29ud_net" />
 					<Add option="-lwxexpatd" />
-					<Add option="-lwxbase29d" />
+					<Add option="-lwxbase29ud" />
 					<Add option="-lwxpngd" />
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
@@ -97,7 +98,7 @@
 					<Add library="Ws2_32" />
 					<Add library="winmm" />
 					<Add directory="bin\debug" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswud" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 					<Add directory="..\ExtLibs\SFML\extlibs\libs-mingw" />
 					<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
@@ -127,7 +128,7 @@
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DNDEBUG" />
@@ -136,7 +137,7 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
@@ -144,26 +145,27 @@
 					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 				</ResourceCompiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
-					<Add option="-lwxmsw29_xrc" />
-					<Add option="-lwxmsw29_stc" />
-					<Add option="-lwxmsw29_propgrid" />
-					<Add option="-lwxmsw29_richtext" />
-					<Add option="-lwxmsw29_ribbon" />
-					<Add option="-lwxmsw29_aui" />
-					<Add option="-lwxmsw29_adv" />
-					<Add option="-lwxmsw29_html" />
-					<Add option="-lwxmsw29_core" />
-					<Add option="-lwxbase29_xml" />
-					<Add option="-lwxbase29_net" />
+					<Add option="-lwxmsw29u_xrc" />
+					<Add option="-lwxmsw29u_stc" />
+					<Add option="-lwxmsw29u_propgrid" />
+					<Add option="-lwxmsw29u_richtext" />
+					<Add option="-lwxmsw29u_webview" />
+					<Add option="-lwxmsw29u_ribbon" />
+					<Add option="-lwxmsw29u_aui" />
+					<Add option="-lwxmsw29u_adv" />
+					<Add option="-lwxmsw29u_html" />
+					<Add option="-lwxmsw29u_core" />
+					<Add option="-lwxbase29u_xml" />
+					<Add option="-lwxbase29u_net" />
 					<Add option="-lwxexpat" />
-					<Add option="-lwxbase29" />
+					<Add option="-lwxbase29u" />
 					<Add option="-lwxpng" />
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
@@ -195,7 +197,7 @@
 					<Add library="Ws2_32" />
 					<Add library="winmm" />
 					<Add directory="bin\release" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 					<Add directory="..\ExtLibs\SFML\extlibs\libs-mingw" />
 					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
@@ -223,7 +225,7 @@
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-D__GNUWIN32__" />
 					<Add option="-D__WXMSW__" />
 					<Add option="-DNDEBUG" />
@@ -232,7 +234,7 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
 					<Add directory="..\ExtLibs\llvm\include" />
@@ -240,7 +242,7 @@
 					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
 				</Compiler>
 				<ResourceCompiler>
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\ExtLibs\wxwidgets\include" />
 				</ResourceCompiler>
 				<Linker>
@@ -249,19 +251,20 @@
 					<Add option="-lsndfile" />
 					<Add option="-lfreetype" />
 					<Add option="-lgdl" />
-					<Add option="-lwxmsw29_xrc" />
-					<Add option="-lwxmsw29_stc" />
-					<Add option="-lwxmsw29_propgrid" />
-					<Add option="-lwxmsw29_richtext" />
-					<Add option="-lwxmsw29_ribbon" />
-					<Add option="-lwxmsw29_aui" />
-					<Add option="-lwxmsw29_adv" />
-					<Add option="-lwxmsw29_html" />
-					<Add option="-lwxmsw29_core" />
-					<Add option="-lwxbase29_xml" />
-					<Add option="-lwxbase29_net" />
+					<Add option="-lwxmsw29u_xrc" />
+					<Add option="-lwxmsw29u_stc" />
+					<Add option="-lwxmsw29u_propgrid" />
+					<Add option="-lwxmsw29u_richtext" />
+					<Add option="-lwxmsw29u_webview" />
+					<Add option="-lwxmsw29u_ribbon" />
+					<Add option="-lwxmsw29u_aui" />
+					<Add option="-lwxmsw29u_adv" />
+					<Add option="-lwxmsw29u_html" />
+					<Add option="-lwxmsw29u_core" />
+					<Add option="-lwxbase29u_xml" />
+					<Add option="-lwxbase29u_net" />
 					<Add option="-lwxexpat" />
-					<Add option="-lwxbase29" />
+					<Add option="-lwxbase29u" />
 					<Add option="-lwxpng" />
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
@@ -290,7 +293,7 @@
 					<Add library="Ws2_32" />
 					<Add library="winmm" />
 					<Add directory="bin\dev" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
 					<Add directory="..\ExtLibs\SFML\extlibs\libs-mingw" />
 					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
@@ -634,6 +637,8 @@
 		</Unit>
 		<Unit filename="Dialogs\ExternalLayoutEditor.cpp" />
 		<Unit filename="Dialogs\ExternalLayoutEditor.h" />
+		<Unit filename="Dialogs\HtmlViewerPnl.cpp" />
+		<Unit filename="Dialogs\HtmlViewerPnl.h" />
 		<Unit filename="DnDFileEditor.cpp">
 			<Option virtualFolder="Editeur principal\" />
 		</Unit>
@@ -917,6 +922,7 @@
 			<Option virtualFolder="wxSFML Canvas\" />
 		</Unit>
 		<Unit filename="wxsmith\ExternalLayoutEditor.wxs" />
+		<Unit filename="wxsmith\HtmlViewerPnl.wxs" />
 		<Unit filename="wxstedit\include\wx\stedit\pairarr.h" />
 		<Unit filename="wxstedit\include\wx\stedit\setup.h" />
 		<Unit filename="wxstedit\include\wx\stedit\setup0.h" />
@@ -1025,6 +1031,7 @@
 					<wxPanel wxs="wxsmith/EventsEditor.wxs" src="EventsEditor.cpp" hdr="EventsEditor.h" fwddecl="0" i18n="1" name="EventsEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/AdvancedPasteDlg.wxs" src="AdvancedPasteDlg.cpp" hdr="AdvancedPasteDlg.h" fwddecl="0" i18n="1" name="AdvancedPasteDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/ExternalLayoutEditor.wxs" src="Dialogs\ExternalLayoutEditor.cpp" hdr="Dialogs\ExternalLayoutEditor.h" fwddecl="0" i18n="1" name="ExternalLayoutEditor" language="CPP" />
+					<wxPanel wxs="wxsmith/HtmlViewerPnl.wxs" src="Dialogs\HtmlViewerPnl.cpp" hdr="Dialogs\HtmlViewerPnl.h" fwddecl="0" i18n="1" name="HtmlViewerPnl" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

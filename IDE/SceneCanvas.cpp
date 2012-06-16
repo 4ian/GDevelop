@@ -11,6 +11,7 @@
 #include <SFML/Graphics.hpp>
 #include <wx/config.h>
 #include <wx/cursor.h>
+#include <wx/msgdlg.h>
 #include <wx/log.h>
 #include <wx/scrolbar.h>
 #include <wx/infobar.h>
@@ -115,9 +116,12 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
 
     scrollBar1->Show(false);
     scrollBar2->Show(false);
-    UpdateSize();
 
     Reload();
+    UpdateSize();
+    UpdateScrollbars();
+
+    SetFocus();
 
     if ( debugger ) debugger->Play();
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), false);
@@ -150,13 +154,13 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
     scrollBar2->Show(true);
     externalWindow->Show(false);
     previewData.scene.ChangeRenderWindow(this);
-    UpdateSize();
-    UpdateScrollbars();
 
     //Parse now the results of profiling
     if ( profileDialog ) profileDialog->ParseProfileEvents();
 
     Reload();
+    UpdateSize();
+    UpdateScrollbars();
 
     if ( debugger ) debugger->Pause();
     CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), true);
@@ -263,16 +267,14 @@ void SceneCanvas::ReloadSecondPart()
     if ( !editing )  CodeCompiler::GetInstance()->DisableTaskRelatedTo(sceneEdited);
 
     //Switch the working directory as we are making calls to the runtime scene
-    wxSetWorkingDirectory(wxFileName::FileName(gameEdited.GetProjectFile()).GetPath());
+    if ( wxDirExists(wxFileName::FileName(gameEdited.GetProjectFile()).GetPath()))
+        wxSetWorkingDirectory(wxFileName::FileName(gameEdited.GetProjectFile()).GetPath());
 
     previewData.scene.LoadFromSceneAndCustomInstances( sceneEdited, instances );
     sceneEdited.wasModified = false;
 
     //If a preview is not going to be made, switch back to the IDE working directory
     if ( editing ) wxSetWorkingDirectory(mainEditorCommand.GetIDEWorkingDirectory());
-
-    UpdateSize();
-    UpdateScrollbars();
 
     if ( gameEdited.imageManager ) gameEdited.imageManager->EnableImagesUnloading(); //We were preventing images unloading so as to be sure not to waste time unloading and reloading just after scenes images.
 
@@ -335,7 +337,8 @@ void SceneCanvas::Refresh()
             //Reload changed images.
             if ( !gameEdited.imagesChanged.empty() )
             {
-                wxSetWorkingDirectory(wxFileName::FileName(gameEdited.GetProjectFile()).GetPath()); //Resources loading stuff incoming: Switch current work dir.
+                if ( wxDirExists(wxFileName::FileName(gameEdited.GetProjectFile()).GetPath()))
+                    wxSetWorkingDirectory(wxFileName::FileName(gameEdited.GetProjectFile()).GetPath()); //Resources loading stuff incoming: Switch current work dir.
 
                 for (unsigned int i = 0;i<gameEdited.imagesChanged.size();++i)
                     previewData.game.imageManager->ReloadImage(gameEdited.imagesChanged[i]);
@@ -760,7 +763,12 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
 
     //Moving using middle click
     if ( editionData.isMoving )
-        editionData.view.SetCenter( editionData.viewStartPosition.x + editionData.mouseStartPosition.x - sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, editionData.viewStartPosition.y + editionData.mouseStartPosition.y - sf::Mouse::GetPosition(*previewData.scene.renderWindow).y );
+    {
+        float zoomFactor = static_cast<float>(GetWidth())/editionData.view.GetSize().x;
+
+        editionData.view.SetCenter( editionData.viewStartPosition.x + (editionData.mouseStartPosition.x - sf::Mouse::GetPosition(*previewData.scene.renderWindow).x)/zoomFactor,
+                                   editionData.viewStartPosition.y + (editionData.mouseStartPosition.y - sf::Mouse::GetPosition(*previewData.scene.renderWindow).y)/zoomFactor );
+    }
 
     if ( editionData.isResizingX )
     {
@@ -1210,17 +1218,10 @@ void SceneCanvas::OnMouseWheel( wxMouseEvent &event )
     if (previewData.scene.running)
         return;
 
-    //La rotation de la molette
     float rotation = event.GetWheelRotation()*3;
-    editionData.zoom += ( rotation / 25 );
-
-    //Le rapport entre la largeur et la hauteur
-    float qwoh = editionData.view.GetSize().x / editionData.view.GetSize().y;
-
-    //La nouvelle hauteur
     float newheight = editionData.view.GetSize().y + ( rotation / 25 );
-
-    editionData.view.SetSize( newheight*qwoh, newheight );
+    settings.zoomFactor = static_cast<float>(GetHeight())/newheight;
+    UpdateAccordingToZoomFactor();
 }
 
 int SceneCanvas::GetObjectsSelectedHighestLayer()

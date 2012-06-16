@@ -13,21 +13,22 @@
 #include <wx/event.h>
 #include <wx/config.h>
 #include <wx/dcbuffer.h>
+#include <wx/log.h>
 #include <iostream>
 #include <utility>
 #include <algorithm>
-#include "GDL/Game.h"
-#include "GDL/Scene.h"
 #include "GDCore/Events/Event.h"
-#include "GDL/IDE/MainEditorCommand.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
+#include "GDCore/Tools/HelpFileAccess.h"
+#include "GDL/IDE/MainEditorCommand.h"
+#include "GDL/Game.h"
+#include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
-#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/ExternalEvents.h"
 #include "EventsRefactorer.h"
 #include "SceneCanvas.h"
@@ -40,6 +41,7 @@
 #include "ChoixAction.h"
 #include "Clipboard.h"
 #undef CreateEvent //Disable an annoying macro
+#undef DrawText //Disable an annoying macro
 
 #include <SFML/System.hpp>
 
@@ -1439,6 +1441,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
         }
 
         Clipboard::GetInstance()->SetEvents(eventsToCopy);
+        std::cout << "itemsSelected" << itemsSelected.size();
     }
 }
 
@@ -1505,18 +1508,32 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if ( !instructions.empty() ) ChangesMadeOnEvents();
         Refresh();
     }
-    else if ( selection.HasSelectedEvents())
+    else
     {
-        EventItem item = selection.GetAllSelectedEvents().back();
-        if (item.eventsList == NULL) return;
+        std::vector<boost::shared_ptr<gd::BaseEvent> > * eventsList; //The list where events should be inserted.
+        unsigned int position = std::string::npos; //The position where events should be inserted in the list.
 
-        const vector < boost::shared_ptr<gd::BaseEvent> > & eventsToPaste = Clipboard::GetInstance()->GetEvents();
+        //Find where events should be inserted
+        if ( selection.HasSelectedEvents())
+        {
+            EventItem item = selection.GetAllSelectedEvents().back();
+            eventsList = item.eventsList;
+            position = item.positionInList;
+        }
+        else
+            eventsList = events;
+
+        if (eventsList == NULL) return;
+
+        //Insert events
+        vector < boost::shared_ptr <gd::BaseEvent> > eventsToPaste = Clipboard::GetInstance()->GetEvents();
+        std::cout << "EventToPaste" << eventsToPaste.size();
         for (unsigned int i = 0;i<eventsToPaste.size();++i)
         {
-            if ( item.positionInList < item.eventsList->size() )
-                item.eventsList->insert(item.eventsList->begin()+item.positionInList, eventsToPaste[i]->Clone());
+            if ( position < eventsList->size() )
+                eventsList->insert(eventsList->begin()+position, eventsToPaste[i]->Clone());
             else
-                item.eventsList->push_back(eventsToPaste[i]->Clone());
+                eventsList->push_back(eventsToPaste[i]->Clone());
         }
 
         if ( !eventsToPaste.empty() ) ChangesMadeOnEvents();

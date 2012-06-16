@@ -19,7 +19,6 @@ public:
     bool editing; //Store the state of the ScenCanvas
 
     sf::View view; //sf::View used at edtitime
-    float zoom;
 
     //Ajout d'objet
     std::string objectToAdd;

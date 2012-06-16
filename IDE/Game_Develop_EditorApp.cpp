@@ -324,7 +324,7 @@ bool Game_Develop_EditorApp::OnInit()
     //Welcome window
     {
         wxString result;
-        Config->Read( "Démarrage/Guide", &result );
+        Config->Read( "Startup/GettingStartedWindow", &result );
         if ( result != "false" )
         {
             Demarrage bienvenue( NULL );
@@ -335,7 +335,7 @@ bool Game_Develop_EditorApp::OnInit()
 
                 if ( !open.GetPath().empty() ) filesToOpen.push_back( string(open.GetPath().mb_str()) );
             }
-            Config->Write( "Démarrage/Guide", "false" );
+            Config->Write( "Startup/GettingStartedWindow", "false" );
         }
     }
 
@@ -383,7 +383,7 @@ bool Game_Develop_EditorApp::OnInit()
     //Checking for updates
     {
         wxString result;
-        Config->Read( "Démarrage/MAJ", &result );
+        Config->Read( "Startup/CheckUpdate", &result );
         if ( result != "false" )
         {
             CheckMAJ verif;

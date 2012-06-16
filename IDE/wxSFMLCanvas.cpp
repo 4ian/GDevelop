@@ -1,5 +1,6 @@
 #include "wxSFMLCanvas.hpp"
 #include <iostream>
+#include <wx/dcclient.h>
 // Platform-specific includes
 #ifdef __WXGTK__
     #include <gdk/gdkx.h>

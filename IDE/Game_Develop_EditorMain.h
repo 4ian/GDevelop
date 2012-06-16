@@ -213,6 +213,7 @@ class Game_Develop_EditorFrame: public wxFrame
         void MakeImagesEditorRibbon();
         void PrepareAutosave();
         void RealizeRibbonCustomButtons();
+        void SetLastUsedFile(wxString file);
 
     private:
 

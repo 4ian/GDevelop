@@ -120,7 +120,7 @@ objectChanged(true)
 	Panel2->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(Panel2);
 	FlexGridSizer2->SetSizeHints(Panel2);
-	Notebook1->AddPage(Panel1, _("G√©n√©ral"), false);
+	Notebook1->AddPage(Panel1, _("GÈnÈral"), false);
 	Notebook1->AddPage(Panel2, _("Objets"), false);
 	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -137,16 +137,16 @@ objectChanged(true)
 
     toolbar->ClearTools();
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( ID_PLAYBT, wxT( "Jouer la sc√®ne" ), wxBitmap( wxImage( "res/starticon.png" ) ), _("Jouer la sc√®ne") );
-    toolbar->AddTool( ID_PAUSEBT, wxT( "Mettre en pause" ), wxBitmap( wxImage( "res/pauseicon.png" ) ), _("Mettre en pause la sc√®ne") );
+    toolbar->AddTool( ID_PLAYBT, _( "Jouer la scËne" ), wxBitmap( wxImage( "res/starticon.png" ) ), _("Jouer la scËne") );
+    toolbar->AddTool( ID_PAUSEBT, _( "Mettre en pause" ), wxBitmap( wxImage( "res/pauseicon.png" ) ), _("Mettre en pause la scËne") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_STEPBT, wxT( "Avancer d'une √©tape" ), wxBitmap( wxImage( "res/stepicon.png" ) ), _("Avancer d'une √©tape") );
+    toolbar->AddTool( ID_STEPBT, _( "Avancer d'une Ètape" ), wxBitmap( wxImage( "res/stepicon.png" ) ), _("Avancer d'une Ètape") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_ADDOBJBT, wxT( "Ajouter un objet" ), wxBitmap( wxImage( "res/addobjetdbg.png" ) ), _("Ajouter un objet") );
-    toolbar->AddTool( ID_VARSCENEBT, wxT( "Ajouter une variable de la sc√®ne" ), wxBitmap( wxImage( "res/addvaricon.png" ) ), _("Ajouter une variable de la sc√®ne") );
-    toolbar->AddTool( ID_VARGLOBALBT, wxT( "Ajouter une variable globale" ), wxBitmap( wxImage( "res/addvargicon.png" ) ), _("Ajouter une variable globale") );
+    toolbar->AddTool( ID_ADDOBJBT, _( "Ajouter un objet" ), wxBitmap( wxImage( "res/addobjetdbg.png" ) ), _("Ajouter un objet") );
+    toolbar->AddTool( ID_VARSCENEBT, _( "Ajouter une variable de la scËne" ), wxBitmap( wxImage( "res/addvaricon.png" ) ), _("Ajouter une variable de la scËne") );
+    toolbar->AddTool( ID_VARGLOBALBT, _( "Ajouter une variable globale" ), wxBitmap( wxImage( "res/addvargicon.png" ) ), _("Ajouter une variable globale") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_CONSOLEBT, wxT( "Console Game Develop" ), wxBitmap( wxImage( "res/console.png" ) ), _("Console Game Develop") );
+    toolbar->AddTool( ID_CONSOLEBT, _( "Console Game Develop" ), wxBitmap( wxImage( "res/console.png" ) ), _("Console Game Develop") );
     toolbar->Realize();
 
     Connect(ID_PLAYBT,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnPlayBtClick);
@@ -161,24 +161,24 @@ objectChanged(true)
     font = *wxNORMAL_FONT;
     font.SetWeight(wxFONTWEIGHT_BOLD);
 
-    generalList->InsertColumn(0, "Propri√©t√©");
+    generalList->InsertColumn(0, "PropriÈtÈ");
     generalList->InsertColumn(1, "Valeur");
     generalList->SetColumnWidth(0, 225);
     generalList->SetColumnWidth(1, 165);
 
     generalList->InsertItem(0, _("Images par secondes ( FPS )"));
-    generalList->InsertItem(1, _("Temps depuis la derni√®re image"));
+    generalList->InsertItem(1, _("Temps depuis la derniËre image"));
     generalList->InsertItem(2, _("Nombres d'objets"));
     generalList->InsertItem(3, _("Nombres de ressources"));
-    generalList->InsertItem(4, _("Taille de la fen√™tre"));
-    generalList->InsertItem(5, _("Position de la souris sur la fen√™tre"));
-    generalList->InsertItem(6, _("Temps depuis le d√©but de la sc√®ne"));
+    generalList->InsertItem(4, _("Taille de la fenÍtre"));
+    generalList->InsertItem(5, _("Position de la souris sur la fenÍtre"));
+    generalList->InsertItem(6, _("Temps depuis le dÈbut de la scËne"));
     generalList->InsertItem(7, "");
-    generalList->InsertItem(8, _("Variables de la sc√®ne"));
+    generalList->InsertItem(8, _("Variables de la scËne"));
     generalList->SetItemFont(8, font);
     generalBaseItemCount = generalList->GetItemCount();
 
-    objectList->InsertColumn(0, "Propri√©t√©");
+    objectList->InsertColumn(0, "PropriÈtÈ");
     objectList->InsertColumn(1, "Valeur");
     objectList->SetColumnWidth(0, 175);
     objectList->SetColumnWidth(1, 100);
@@ -203,7 +203,7 @@ objectChanged(true)
             sizer->Fit(extPanel);
             sizer->SetSizeHints(extPanel);
 
-            extList->InsertColumn(0, "Propri√©t√©");
+            extList->InsertColumn(0, "PropriÈtÈ");
             extList->InsertColumn(1, "Valeur");
             extList->SetColumnWidth(0, 175);
             extList->SetColumnWidth(1, -1);
@@ -224,14 +224,14 @@ DebuggerGUI::~DebuggerGUI()
 
 
 ////////////////////////////////////////////////////////////
-/// Mise √† jour de la taille de la toolbar
+/// Mise ‡ jour de la taille de la toolbar
 ////////////////////////////////////////////////////////////
 void DebuggerGUI::OntoolbarPanelResize(wxSizeEvent& event)
 {
 }
 
 ////////////////////////////////////////////////////////////
-/// Contr√¥le du d√©roulement de la sc√®ne
+/// ContrÙle du dÈroulement de la scËne
 ////////////////////////////////////////////////////////////
 void DebuggerGUI::OnPlayBtClick(wxCommandEvent& event)
 {
@@ -355,7 +355,7 @@ void DebuggerGUI::UpdateGUI()
         }
     }
 
-    //Arbre des objets : Cr√©ation des objets
+    //Arbre des objets : CrÈation des objets
     if ( mustRecreateTree )
     {
         objectsTree->DeleteAllItems();
@@ -397,7 +397,7 @@ void DebuggerGUI::UpdateGUI()
         }
         else
         {
-            //Si l'objet qui est dans l'arbre n'est pas le m√™me, on le supprime et le reajoute au bon endroit
+            //Si l'objet qui est dans l'arbre n'est pas le mÍme, on le supprime et le reajoute au bon endroit
             if ( objectsInTree[weakPtrToObject].first != allObjects[i]->GetName() && initialObjects.find(allObjects[i]->GetName()) != initialObjects.end() )
             {
                 objectsTree->Delete(objectsInTree[weakPtrToObject].second);
@@ -407,7 +407,7 @@ void DebuggerGUI::UpdateGUI()
         }
     }
 
-    //Suppression des √©lements en trop
+    //Suppression des Èlements en trop
     map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
     map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
 
@@ -483,7 +483,7 @@ void DebuggerGUI::UpdateGUI()
         objectList->InsertItem(baseItemCount, "");
     }
 
-    //Mise √† jour des variables
+    //Mise ‡ jour des variables
     for (unsigned int i =0;i<objectVariables.size();++i)
     {
         objectList->SetItem(baseItemCount+i, 0, objectVariables[i].GetName());
@@ -500,7 +500,7 @@ void DebuggerGUI::RecreateListForObject(const ObjSPtr & object)
     unsigned int currentLine = 0;
     string name, uselessValue;
 
-    objectList->InsertItem(0, _("G√©n√©ral"));
+    objectList->InsertItem(0, _("GÈnÈral"));
     objectList->SetItemFont(0, font);
     currentLine++;
 
@@ -514,7 +514,7 @@ void DebuggerGUI::RecreateListForObject(const ObjSPtr & object)
     }
 
     objectList->InsertItem(objectList->GetItemCount(), "");
-    objectList->InsertItem(objectList->GetItemCount(), _("Sp√©cifique"));
+    objectList->InsertItem(objectList->GetItemCount(), _("SpÈcifique"));
     objectList->SetItemFont(objectList->GetItemCount()-1, font);
     currentLine += 2;
 
@@ -531,7 +531,7 @@ void DebuggerGUI::RecreateListForObject(const ObjSPtr & object)
     objectList->InsertItem(objectList->GetItemCount(), _("Variables"));
     objectList->SetItemFont(objectList->GetItemCount()-1, font);
 
-    //On retient combien il y a d'item de base pour savoir o√π commencer
+    //On retient combien il y a d'item de base pour savoir o˘ commencer
     //pour ajouter les variables.
     baseItemCount = objectList->GetItemCount();
 
@@ -577,7 +577,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         if ( !object->Object::ChangeProperty(propNb, newValue) )
         {
-            wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entr√©e peut √™tre incorrecte, ou la propri√©t√© en lecture seule."));
+            wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entrÈe peut Ítre incorrecte, ou la propriÈtÈ en lecture seule."));
         }
     }
     //A specific property
@@ -592,7 +592,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         if ( !object->ChangeProperty(propNb, newValue) )
         {
-            wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entr√©e peut √™tre incorrecte, ou la propri√©t√© en lecture seule."));
+            wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entrÈe peut Ítre incorrecte, ou la propriÈtÈ en lecture seule."));
         }
     }
     else //Or a variable
@@ -666,7 +666,7 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
 
     if ( !extension->ChangeProperty(scene, propNb, newValue) )
     {
-        wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entr√©e peut √™tre incorrecte, ou la propri√©t√© en lecture seule."));
+        wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entrÈe peut Ítre incorrecte, ou la propriÈtÈ en lecture seule."));
     }
 }
 
@@ -701,16 +701,16 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
  */
 void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
 {
-    string variableName = string(wxGetTextFromUser(_("Entrez le nom de la nouvelle variable"), _("Ajout d'une variable de la sc√®ne")).mb_str());
+    string variableName = string(wxGetTextFromUser(_("Entrez le nom de la nouvelle variable"), _("Ajout d'une variable de la scËne")).mb_str());
 
     if ( variableName == "" ) return;
     if ( scene.GetVariables().HasVariableNamed(variableName) )
     {
-        wxLogMessage(_("Une variable avec ce nom existe d√©j√†"));
+        wxLogMessage(_("Une variable avec ce nom existe dÈj‡"));
         return;
     }
 
-    string variableValue = string(wxGetTextFromUser(_("Entrez la valeur de la variable"), _("Ajout d'une variable de la sc√®ne")).mb_str());
+    string variableValue = string(wxGetTextFromUser(_("Entrez la valeur de la variable"), _("Ajout d'une variable de la scËne")).mb_str());
 
     scene.GetVariables().ObtainVariable(variableName) = variableValue;
 }
@@ -725,7 +725,7 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
     if ( variableName == "" ) return;
     if ( scene.game->GetVariables().HasVariableNamed(variableName) )
     {
-        wxLogMessage(_("Une variable avec ce nom existe d√©j√†"));
+        wxLogMessage(_("Une variable avec ce nom existe dÈj‡"));
         return;
     }
 
@@ -752,7 +752,7 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
         newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
     else
     {
-        wxLogWarning(_("Impossible de cr√©er l'objet."));
+        wxLogWarning(_("Impossible de crÈer l'objet."));
         return;
     }
 

@@ -56,6 +56,7 @@
 #include "StartHerePage.h"
 #include "BuildToolsPnl.h"
 #include "ExternalEventsEditor.h"
+#include "Dialogs/HtmlViewerPnl.h"
 
 //(*IdInit(Game_Develop_EditorFrame)
 const long Game_Develop_EditorFrame::ID_CUSTOM1 = wxNewId();
@@ -493,6 +494,9 @@ projectManager(NULL)
         games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
         projectManager->Refresh();
     }
+
+    HtmlViewerPnl * htmlViewerPnl = new HtmlViewerPnl(editorsNotebook);
+    editorsNotebook->AddPage(htmlViewerPnl, _("Aide en ligne"));
 }
 
 void Game_Develop_EditorFrame::OnResize(wxSizeEvent& event)

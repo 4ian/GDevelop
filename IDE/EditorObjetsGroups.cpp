@@ -140,12 +140,12 @@ mainEditorCommand(mainEditorCommand_)
     toolbar->AddTool( ID_Refresh, wxT( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Rafraichir la liste d'images") );
     toolbar->AddSeparator();
     toolbar->AddTool( idAddGroup, wxT( "Ajouter un groupe" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un groupe") );
-    toolbar->AddTool( idDelGroup, wxT( "Supprimer le groupe selectionnÈ" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer le groupe selectionnÈ") );
+    toolbar->AddTool( idDelGroup, wxT( "Supprimer le groupe selectionn√©" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer le groupe selectionn√©") );
     toolbar->AddTool( IdGroupEdit, wxT( "Modifier le groupe" ), wxBitmap( wxImage( "res/editpropicon.png" ) ), _("Modifier le groupe") );
-    toolbar->AddTool( idRibbonUp, wxT( "DÈplacer le groupe vers le haut" ), wxBitmap( wxImage( "res/up24.png" ) ), _("DÈplacer le groupe vers le haut") );
-    toolbar->AddTool( idRibbonDown, wxT( "DÈplacer le groupe vers le bas" ), wxBitmap( wxImage( "res/down24.png" ) ), _("DÈplacer le groupe vers le bas") );
+    toolbar->AddTool( idRibbonUp, wxT( "D√©placer le groupe vers le haut" ), wxBitmap( wxImage( "res/up24.png" ) ), _("D√©placer le groupe vers le haut") );
+    toolbar->AddTool( idRibbonDown, wxT( "D√©placer le groupe vers le bas" ), wxBitmap( wxImage( "res/down24.png" ) ), _("D√©placer le groupe vers le bas") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_Help, wxT( "Aide de l'Èditeur de groupes d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'Èditeur de groupes d'objets") );
+    toolbar->AddTool( ID_Help, wxT( "Aide de l'√©diteur de groupes d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'√©diteur de groupes d'objets") );
     toolbar->Realize();
 
     Connect(ID_Refresh,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorObjetsGroups::Refresh);
@@ -180,11 +180,11 @@ void EditorObjetsGroups::CreateRibbonPage(wxRibbonPage * page)
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Ajouter un groupe") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Supprimer") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("DÈplacer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("DÈplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("D√©placer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("D√©placer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objet sÈlectionnÈ"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objet s√©lectionn√©"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonEdit, !hideLabels ? _("Editer le groupe") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonModName, !hideLabels ? _("Editer le nom") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
@@ -214,7 +214,7 @@ void EditorObjetsGroups::ConnectEvents()
 void EditorObjetsGroups::Refresh()
 {
     ObjetsGroupsList->DeleteAllItems();
-    ObjetsGroupsList->AddRoot( _( "Tous les groupes d'objets de la scËne" ) );
+    ObjetsGroupsList->AddRoot( _( "Tous les groupes d'objets de la sc√®ne" ) );
 
     for (unsigned int i = 0;i<objectsGroups->size();++i)
         ObjetsGroupsList->AppendItem( ObjetsGroupsList->GetRootItem(), objectsGroups->at( i ).GetName() );
@@ -289,7 +289,7 @@ void EditorObjetsGroups::OnMoveDownSelected(wxCommandEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-/// Active l'Èditeur
+/// Active l'√©diteur
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::EnableAll()
 {
@@ -304,7 +304,7 @@ void EditorObjetsGroups::EnableAll()
 }
 
 ////////////////////////////////////////////////////////////
-/// DÈsactive l'Èditeur
+/// D√©sactive l'√©diteur
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::DisableAll()
 {
@@ -319,7 +319,7 @@ void EditorObjetsGroups::DisableAll()
 }
 
 ////////////////////////////////////////////////////////////
-/// Aide de l'Èditeur
+/// Aide de l'√©diteur
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnHelp(wxCommandEvent& event)
 {
@@ -330,7 +330,7 @@ void EditorObjetsGroups::OnHelp(wxCommandEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-/// Mise ‡ jour de la taille de la toolbar
+/// Mise √† jour de la taille de la toolbar
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnPanel3Resize(wxSizeEvent& event)
 {
@@ -386,7 +386,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     wxString name =  _( "Nouveau_groupe" );
     int i = 1;
 
-    //Tant qu'un objet avec le mÍme nom existe, on ajoute un chiffre
+    //Tant qu'un objet avec le m√™me nom existe, on ajoute un chiffre
     while ( std::find_if( objectsGroups->begin(), objectsGroups->end(), std::bind2nd(gd::GroupHasTheSameName(), name))
             != objectsGroups->end() )
     {
@@ -401,7 +401,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
 
     scene.wasModified = true;
     CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
-    wxLogStatus( _( "Le groupe a ÈtÈ correctement ajoutÈ" ) );
+    wxLogStatus( _( "Le groupe a √©t√© correctement ajout√©" ) );
 }
 
 ////////////////////////////////////////////////////////////
@@ -414,15 +414,15 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
     ObjetsGroupsList->GetSelections(selection);
     std::vector < string > groupsDeleted;
 
-    int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Supprimer Ègalement toutes les rÈfÈrences au groupe dans les ÈvËnements ( Soit les actions et conditions utilisant le groupe ) ?") :
-                                                             wxString::Format(_("Supprimer Ègalement toutes les rÈfÈrences aux %i groupes dans les ÈvËnements ( Soit les actions et conditions utilisant les groupes ) ?"), selection.GetCount()),
+    int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Supprimer √©galement toutes les r√©f√©rences au groupe dans les √©v√®nements ( Soit les actions et conditions utilisant le groupe ) ?") :
+                                                             wxString::Format(_("Supprimer √©galement toutes les r√©f√©rences aux %i groupes dans les √©v√®nements ( Soit les actions et conditions utilisant les groupes ) ?"), selection.GetCount()),
                               _("Confirmation de la suppression"), wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT);
 
     if ( answer == wxCANCEL ) return;
 
     if ( itemSelected == ObjetsGroupsList->GetRootItem() )
     {
-        wxLogStatus( _( "Aucun groupe sÈlectionnÈ" ) );
+        wxLogStatus( _( "Aucun groupe s√©lectionn√©" ) );
         return;
     }
 
@@ -484,7 +484,7 @@ void EditorObjetsGroups::OnObjetsGroupsListItemActivated(wxTreeEvent& event)
                                                     objectsGroups->end(),
                                                     std::bind2nd(gd::GroupHasTheSameName(), nomItemSelected));
 
-    //Si on a selectionnÈ un groupe
+    //Si on a selectionn√© un groupe
     if ( i != objectsGroups->end() )
     {
         //Affichage du contenu du groupe
@@ -503,7 +503,7 @@ void EditorObjetsGroups::OnObjetsGroupsListItemActivated(wxTreeEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-/// DÈbut de l'Èdition d'un nom de groupe
+/// D√©but de l'√©dition d'un nom de groupe
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnObjetsGroupsListBeginLabelEdit(wxTreeEvent& event)
 {
@@ -522,7 +522,7 @@ void EditorObjetsGroups::OnObjetsGroupsListBeginLabelEdit(wxTreeEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-/// Fin de l'Èdition d'un nom de groupe
+/// Fin de l'√©dition d'un nom de groupe
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
 {
@@ -531,13 +531,13 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
 
     std::string newName = string(event.GetLabel().mb_str());
 
-    //On vÈrifie que le nom n'existe pas dÈj‡
+    //On v√©rifie que le nom n'existe pas d√©j√†
     if ( std::find_if(  objectsGroups->begin(),
                         objectsGroups->end(),
                         std::bind2nd(gd::GroupHasTheSameName(), event.GetLabel()))
         != objectsGroups->end())
     {
-        wxLogWarning( _( "Impossible de renommer le groupe : un autre groupe porte dÈj‡ ce nom." ) );
+        wxLogWarning( _( "Impossible de renommer le groupe : un autre groupe porte d√©j√† ce nom." ) );
 
         event.Veto();
         return;
@@ -566,10 +566,10 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnModNameSelected(wxCommandEvent& event)
 {
-    if ( ObjetsGroupsList->GetItemText( itemSelected ) != _( "Tous les groupes de de la scËne" ) )
+    if ( ObjetsGroupsList->GetItemText( itemSelected ) != _( "Tous les groupes de de la sc√®ne" ) )
         ObjetsGroupsList->EditLabel( itemSelected );
     else
-        wxLogStatus( _( "Aucun groupe sÈlectionnÈ" ) );
+        wxLogStatus( _( "Aucun groupe s√©lectionn√©" ) );
 }
 
 ////////////////////////////////////////////////////////////
@@ -633,7 +633,7 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
 
     wxTreeItemId rootId = ObjetsGroupsList->GetRootItem();
 
-    //Tant qu'un objet avec le mÍme nom existe, on ajoute un chiffre
+    //Tant qu'un objet avec le m√™me nom existe, on ajoute un chiffre
     unsigned int i = 0;
     while ( std::find_if( objectsGroups->begin(), objectsGroups->end(), std::bind2nd(gd::GroupHasTheSameName(), groupPasted.GetName()))
             != objectsGroups->end() )

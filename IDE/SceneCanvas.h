@@ -12,6 +12,7 @@
 #include <SFML/System.hpp>
 #include "wxSFMLCanvas.hpp"
 #include <wx/dnd.h>
+#include <wx/menu.h>
 #include <wx/aui/aui.h>
 #include <wx/scrolbar.h>
 #include <wx/ribbon/bar.h>
@@ -347,6 +348,11 @@ private :
     void UpdateScrollbars();
     boost::shared_ptr<Object> FindSmallestObjectUnderCursor();
     int GetHighestZOrderOnLayer(const std::string & layer);
+
+    /**
+     * Update the zoom according to the value stored in settings.zoomFactor
+     */
+    void UpdateAccordingToZoomFactor();
 
     /**
      * Used to render a scene when editing it. For previewing a scene, the RuntimeScene takes care of rendering itself.

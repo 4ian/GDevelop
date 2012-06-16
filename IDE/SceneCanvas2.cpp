@@ -231,7 +231,7 @@ void SceneCanvas::UpdateSize()
         wxWindowBase::SetPosition(wxPoint(0,0));
         wxWindowBase::SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
 
-        editionData.view.SetSize(GetClientSize().GetWidth(), GetClientSize().GetHeight());
+        UpdateAccordingToZoomFactor();
     }
     else
     {
@@ -470,7 +470,8 @@ void SceneCanvas::CreateMenus()
 
 void SceneCanvas::OnZoomInitBtClick( wxCommandEvent & event )
 {
-    editionData.view.SetSize(GetWidth(), GetHeight());
+    settings.zoomFactor = 1;
+    UpdateAccordingToZoomFactor();
 }
 
 void SceneCanvas::OnOrigineBtClick(wxCommandEvent & event )
@@ -567,44 +568,57 @@ void SceneCanvas::OnZoomMoreBtClick(wxRibbonButtonBarEvent& evt)
     evt.PopupMenu(&zoomMenu);
 }
 
+void SceneCanvas::UpdateAccordingToZoomFactor()
+{
+    editionData.view.SetSize(GetClientSize().GetWidth()/settings.zoomFactor, GetClientSize().GetHeight()/settings.zoomFactor);
+}
+
 void SceneCanvas::Onzoom5Selected(wxCommandEvent& event)
 {
-    editionData.view.SetSize(GetWidth()/0.05f, GetHeight()/0.05f);
+    settings.zoomFactor = 0.05f;
+    UpdateAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom10Selected(wxCommandEvent& event)
 {
-    editionData.view.SetSize(GetWidth()/0.1f, GetHeight()/0.1f);
+    settings.zoomFactor = 0.1f;
+    UpdateAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom25Selected(wxCommandEvent& event)
 {
-    editionData.view.SetSize(GetWidth()/0.25f, GetHeight()/0.25f);
+    settings.zoomFactor = 0.25f;
+    UpdateAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom50Selected(wxCommandEvent& event)
 {
-    editionData.view.SetSize(GetWidth()/0.5f, GetHeight()/0.5f);
+    settings.zoomFactor = 0.5f;
+    UpdateAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom100Selected(wxCommandEvent& event)
 {
-    editionData.view.SetSize(GetWidth(), GetHeight());
+    settings.zoomFactor = 1;
+    UpdateAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom150Selected(wxCommandEvent& event)
 {
-    editionData.view.SetSize(GetWidth()/1.5f, GetHeight()/1.5f);
+    settings.zoomFactor = 1.5f;
+    UpdateAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom200Selected(wxCommandEvent& event)
 {
-    editionData.view.SetSize(GetWidth()/2.f, GetHeight()/2.f);
+    settings.zoomFactor = 2.0f;
+    UpdateAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom500Selected(wxCommandEvent& event)
 {
-    editionData.view.SetSize(GetWidth()/5.f, GetHeight()/5.f);
+    settings.zoomFactor = 5.0;
+    UpdateAccordingToZoomFactor();
 }
 
 int SceneCanvas::GetHighestZOrderOnLayer(const std::string & layer)

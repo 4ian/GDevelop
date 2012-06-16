@@ -42,6 +42,18 @@ std::string GD_API ToString( double number );
  */
 std::string GD_API LargeNumberToString( double number );
 
+/**
+ * Convert the angle from degrees to radians
+ * \warning This function is meant to be used only in GD events generated code.
+ */
+double GD_API ToRad( double angle );
+
+/**
+ * Convert the angle from radians to degrees.
+ * \warning This function is meant to be used only in GD events generated code.
+ */
+double GD_API ToDeg( double angle );
+
 }
 
 }

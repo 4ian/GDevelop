@@ -14,6 +14,7 @@ SceneCanvasSettings::SceneCanvasSettings() :
     gridR( 158 ),
     gridG( 180 ),
     gridB( 255 ),
+    zoomFactor(1),
     windowMask(false)
 {
 
@@ -31,6 +32,7 @@ void SceneCanvasSettings::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridR", gridR);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridG", gridG);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_INT("gridB", gridB);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("zoomFactor", zoomFactor);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("associatedLayout", associatedLayout);
 }
 
@@ -46,6 +48,7 @@ void SceneCanvasSettings::SaveToXml(TiXmlElement * element) const
     element->SetDoubleAttribute( "gridR", gridR );
     element->SetDoubleAttribute( "gridG", gridG );
     element->SetDoubleAttribute( "gridB", gridB );
+    element->SetDoubleAttribute( "zoomFactor", zoomFactor );
     element->SetAttribute( "windowMask", windowMask ? "true" : "false" );
     element->SetAttribute( "associatedLayout", associatedLayout.c_str() );
 }

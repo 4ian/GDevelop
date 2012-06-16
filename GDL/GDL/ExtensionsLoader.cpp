@@ -1,4 +1,12 @@
-#include "GDL/ExtensionsManager.h" // Must be placed first
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
+#if defined(GD_IDE_ONLY)
+#include <wx/wx.h> //Otherwise we get nice errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
+#endif
+#include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionsLoader.h"
 #include <stdio.h>
 #include <sys/types.h>
@@ -14,20 +22,6 @@
 
 #include <boost/version.hpp>
 
-#include "GDL/BuiltinExtensions/BaseObjectExtension.h"
-#include "GDL/BuiltinExtensions/AudioExtension.h"
-#include "GDL/BuiltinExtensions/MouseExtension.h"
-#include "GDL/BuiltinExtensions/KeyboardExtension.h"
-#include "GDL/BuiltinExtensions/JoystickExtension.h"
-#include "GDL/BuiltinExtensions/TimeExtension.h"
-#include "GDL/BuiltinExtensions/FileExtension.h"
-#include "GDL/BuiltinExtensions/VariablesExtension.h"
-#include "GDL/BuiltinExtensions/CameraExtension.h"
-#include "GDL/BuiltinExtensions/WindowExtension.h"
-#include "GDL/BuiltinExtensions/NetworkExtension.h"
-#include "GDL/BuiltinExtensions/SpriteExtension.h"
-#include "GDL/BuiltinExtensions/SceneExtension.h"
-#include "GDL/BuiltinExtensions/AdvancedExtension.h"
 #include "GDL/Object.h"
 #include "GDL/Game.h"
 #include "GDL/Version.h"

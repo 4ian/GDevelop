@@ -14,6 +14,13 @@ MathematicalToolsExtension::MathematicalToolsExtension()
                           "Freeware")
     #if defined(GD_IDE_ONLY)
 
+    DECLARE_EXPRESSION("AngleDifference", _("Différence entre deux angles"), _("Différence entre deux angles"), _("Outils mathématiques"), "res/mathfunction.png")
+        instrInfo.AddParameter("expression", _("Premier angle"), "", false);
+        instrInfo.AddParameter("expression", _("Second angle"), "", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::MathematicalTools::angleDifference").SetIncludeFile("GDL/BuiltinExtensions/MathematicalTools.h");
+    DECLARE_END_EXPRESSION()
+
     DECLARE_EXPRESSION("mod", _("Modulo"), _("x mod y"), _("Outils mathématiques"), "res/mathfunction.png")
         instrInfo.AddParameter("expression", _("x ( dans x mod y )"), "", false);
         instrInfo.AddParameter("expression", _("y ( dans x mod y )"), "", false);

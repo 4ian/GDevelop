@@ -151,5 +151,11 @@ double GD_API mod(double x, double y)
     return x - y * ::floor(x / y);
 }
 
+double GD_API angleDifference(double angle1, double angle2)
+{
+    return mod(angle1+180-angle2,360)-180;
+}
+
+
 }
 }

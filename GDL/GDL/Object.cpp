@@ -99,7 +99,7 @@ struct NullForce
 {
     bool operator ()( const Force &A ) const
     {
-        return A.GetLength() == 0;
+        return A.GetLength() <= 0.001;
     }
 };
 

@@ -79,6 +79,16 @@ std::string GD_API LargeNumberToString( double number )
     return formattedStr;
 }
 
+double GD_API ToRad( double angle )
+{
+    return angle*180.0/3.14159;
+}
+
+double GD_API ToDeg( double angle )
+{
+    return angle*3.14159/180.0;
+}
+
 }
 
 }

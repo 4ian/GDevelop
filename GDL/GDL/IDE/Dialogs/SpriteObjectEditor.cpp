@@ -485,17 +485,17 @@ ySelectionOffset(0)
 
     toolbar->ClearTools();
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( idMenuAddFromEnd, wxT( "Ajouter l'image à la fin" ), wxBitmap( wxImage( "res/addfromimagebanque.png" ) ), _( "Ajouter une image à la fin depuis la banque d'image" ) );
-    toolbar->AddTool( idMenuDel, wxT( "Supprimer l'image selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _( "Supprimer l'image selectionnée" ) );
-    toolbar->AddTool( idMenuCopyFrom, wxT( "Copier les images depuis une animation/direction" ), wxBitmap( wxImage( "res/copyicon.png" ) ), _( "Copier les images depuis une animation/direction" ) );
+    toolbar->AddTool( idMenuAddFromEnd, _( "Ajouter l'image à la fin" ), wxBitmap( wxImage( "res/addfromimagebanque.png" ) ), _( "Ajouter une image à la fin depuis la banque d'image" ) );
+    toolbar->AddTool( idMenuDel, _( "Supprimer l'image selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _( "Supprimer l'image selectionnée" ) );
+    toolbar->AddTool( idMenuCopyFrom, _( "Copier les images depuis une animation/direction" ), wxBitmap( wxImage( "res/copyicon.png" ) ), _( "Copier les images depuis une animation/direction" ) );
     toolbar->AddSeparator();
-    toolbar->AddTool( idPosPoint, wxT( "Positionner un point" ), wxBitmap( wxImage( "res/pointmod.png" ) ), _( "Positionner un point" ) );
-    toolbar->AddTool( idAddPoint, wxT( "Ajouter un point" ), wxBitmap( wxImage( "res/pointadd.png" ) ), _( "Ajouter un point" ) );
-    toolbar->AddTool( idDelPoint, wxT( "Supprimer un point" ), wxBitmap( wxImage( "res/pointdel.png" ) ), _( "Supprimer un point" ) );
+    toolbar->AddTool( idPosPoint, _( "Positionner un point" ), wxBitmap( wxImage( "res/pointmod.png" ) ), _( "Positionner un point" ) );
+    toolbar->AddTool( idAddPoint, _( "Ajouter un point" ), wxBitmap( wxImage( "res/pointadd.png" ) ), _( "Ajouter un point" ) );
+    toolbar->AddTool( idDelPoint, _( "Supprimer un point" ), wxBitmap( wxImage( "res/pointdel.png" ) ), _( "Supprimer un point" ) );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_MENUITEM3, wxT( "Editer le masque de collision" ), wxBitmap( wxImage( "res/maskEdit16.png" ) ), _( "Editer le masque de collision" ) );
-    toolbar->AddTool( ID_MENUITEM8, wxT( "Ajouter un rectangle au masque" ), wxBitmap( wxImage( "res/maskAdd16.png" ) ), _( "Ajouter un rectangle au masque" ) );
-    toolbar->AddTool( ID_MENUITEM9, wxT( "Supprimer le rectangle selectionné du masque" ), wxBitmap( wxImage( "res/maskRemove16.png" ) ), _( "Supprimer le rectangle selectionné du masque" ) );
+    toolbar->AddTool( ID_MENUITEM3, _( "Editer le masque de collision" ), wxBitmap( wxImage( "res/maskEdit16.png" ) ), _( "Editer le masque de collision" ) );
+    toolbar->AddTool( ID_MENUITEM8, _( "Ajouter un rectangle au masque" ), wxBitmap( wxImage( "res/maskAdd16.png" ) ), _( "Ajouter un rectangle au masque" ) );
+    toolbar->AddTool( ID_MENUITEM9, _( "Supprimer le rectangle selectionné du masque" ), wxBitmap( wxImage( "res/maskRemove16.png" ) ), _( "Supprimer le rectangle selectionné du masque" ) );
     toolbar->Realize();
 
     toolbar->EnableTool(idAddPoint, false);

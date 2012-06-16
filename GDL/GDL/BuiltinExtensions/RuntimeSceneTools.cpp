@@ -2,15 +2,15 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY)
+#include <wx/msgdlg.h> //Must be placed first
+#endif
 #include "GDL/BuiltinExtensions/RuntimeSceneTools.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/RuntimeGame.h"
-#if defined(GD_IDE_ONLY)
-#include <wx/msgdlg.h>
-#endif
 
 bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
 {

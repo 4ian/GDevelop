@@ -3,6 +3,9 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+#include <wx/wx.h> //Must be include first otherwise we get nice errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
+#endif
 #include <sstream>
 #include <fstream>
 #include <iomanip>
@@ -19,7 +22,6 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Layer.h"
 #include "GDL/profile.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/Position.h"
 #include "GDL/FontManager.h"
 #include "GDL/AutomatismsSharedDatas.h"

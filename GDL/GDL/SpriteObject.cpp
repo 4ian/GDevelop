@@ -3,6 +3,9 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+#include <wx/wx.h> //Must be placed first, otherwise we get nice errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
+#endif
 #include <SFML/Graphics.hpp>
 #include "GDL/SpriteObject.h"
 #include "GDL/RuntimeGame.h"
@@ -17,7 +20,6 @@
 #include "GDL/ShaderManager.h"
 
 #if defined(GD_IDE_ONLY)
-#include <wx/wx.h>
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/MainEditorCommand.h"
@@ -162,6 +164,8 @@ wxPanel * SpriteObject::CreateInitialPositionPanel( wxWindow* parent, const Game
 
     if ( position.floatInfos.find("animation") != position.floatInfos.end())
         panel->AnimationCombo->SetSelection(position.floatInfos.find("animation")->second);
+    else
+        panel->AnimationCombo->SetSelection(0);
 
     return panel;
 }

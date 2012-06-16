@@ -23,7 +23,7 @@ CommonConversionsExtension::CommonConversionsExtension()
 
     DECLARE_STR_EXPRESSION("ToString",
                        _("Convertir en un texte"),
-                       _("Converti le résultat de l'expression en un texte"),
+                       _("Convertit le résultat de l'expression en un texte"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
 
@@ -35,7 +35,7 @@ CommonConversionsExtension::CommonConversionsExtension()
 
     DECLARE_STR_EXPRESSION("LargeNumberToString",
                        _("Convertir un grand nombre en un texte"),
-                       _("Converti le résultat de l'expression en un texte, sans utiliser la notation scientifique"),
+                       _("Convertit le résultat de l'expression en un texte, sans utiliser la notation scientifique"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
 
@@ -44,5 +44,29 @@ CommonConversionsExtension::CommonConversionsExtension()
         instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::LargeNumberToString").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
     DECLARE_END_STR_EXPRESSION()
+
+    DECLARE_EXPRESSION("ToRad",
+                       _("Convertir en radians"),
+                       _("Convertit l'angle, exprimé en degrés, en radians"),
+                       _("Conversion"),
+                       "res/conditions/toujours24.png")
+
+        instrInfo.AddParameter("expression", _("Angle en degrés"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::ToRad").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+
+    DECLARE_END_EXPRESSION()
+
+    DECLARE_EXPRESSION("ToRad",
+                       _("Convertir en radians"),
+                       _("Convertit l'angle, exprimé en radians, en degrés"),
+                       _("Conversion"),
+                       "res/conditions/toujours24.png")
+
+        instrInfo.AddParameter("expression", _("Angle en radians"), "",false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::ToDeg").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+
+    DECLARE_END_EXPRESSION()
     #endif
 }

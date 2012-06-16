@@ -13,9 +13,9 @@
 #include "GDL/ObjectHelpers.h"
 
 #if defined(GD_IDE_ONLY)
+#include <wx/intl.h>
 #include "PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Layout.h"
-#include <wx/wx.h>
 #elif !defined(_)
 #define _(x) x
 #endif

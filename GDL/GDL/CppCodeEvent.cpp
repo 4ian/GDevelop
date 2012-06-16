@@ -89,9 +89,6 @@ std::string CppCodeEvent::GenerateAssociatedFileCode()
 {
     std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") +((passSceneAsParameter && passObjectListAsParameter) ? ", ":"")+ (passObjectListAsParameter ? "std::vector<Object*> objectsList" :"") + ")";
     std::string output;
-    output += "#include <cstdio>\n";
-    output += "#include <vector>\n";
-    output += "#include <string>\n";
     if (passSceneAsParameter ) output += "#include \"GDL/RuntimeScene.h\"\n";
     if (passObjectListAsParameter ) output += "#include \"GDL/Object.h\"\n";
     for (unsigned int i = 0;i<includeFiles.size();++i) output += "#include "+includeFiles[i]+"\n";

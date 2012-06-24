@@ -17,6 +17,7 @@ class Scene;
 class ExternalEvents;
 class ExternalLayout;
 #if defined(GD_IDE_ONLY)
+class wxPropertyGrid;
 #include "GDCore/PlatformDefinition/Project.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
@@ -177,7 +178,6 @@ public:
     inline std::vector < boost::shared_ptr<ExternalEvents> > & GetExternalEvents() { return externalEvents; }
     #endif
 
-    bool portable; ///< True if the game was saved as a portable game file
     LoadingScreen loadingScreen; ///< Data concerning the loading screen
     ResourcesManager resourceManager; ///< Contains all resources used by the project
     bool useExternalSourceFiles; ///< True if game used external source files.
@@ -200,6 +200,9 @@ public:
     virtual const std::string & GetAuthor() {return author;}
     virtual void SetProjectFile(const std::string & file) { gameFile = file; }
     virtual const std::string & GetProjectFile() const { return gameFile; }
+
+    virtual void PopulatePropertyGrid(wxPropertyGrid * grid);
+    virtual void UpdateFromPropertyGrid(wxPropertyGrid * grid);
 
     virtual bool HasLayoutNamed(const std::string & name) const;
     virtual gd::Layout & GetLayout(const std::string & name);

@@ -15,11 +15,12 @@ ImageFilesWatcher::ImageFilesWatcher(const Game & game_) :
     game(game_)
 {
     Connect(wxEVT_FSWATCHER, wxFileSystemWatcherEventHandler(ImageFilesWatcher::OnChange));
+    Connect(wxFSW_EVENT_MODIFY, wxFileSystemWatcherEventHandler(ImageFilesWatcher::OnChange));
 }
 
 void ImageFilesWatcher::OnChange(wxFileSystemWatcherEvent& event)
 {
-    //Do nothing for now.
+    //Do nothing for now
     //std::cout << "changed :" << event.GetNewPath().GetPath() << std::endl;
 }
 

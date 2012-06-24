@@ -307,15 +307,6 @@ void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
             game.SetVerticalSyncActivatedByDefault(true);
     }
 
-    game.portable = false;
-    if ( elem->FirstChildElement( "Portable" ) != NULL )
-    {
-        if ( strcmp(elem->FirstChildElement( "Portable" )->Attribute( "value" ), "true") == 0 )
-        {
-            game.portable = true;
-        }
-    } else { MSG(_("Aucune information sur la portabilité du jeu")); }
-
     #if defined(GD_IDE_ONLY)
     if ( elem->FirstChildElement( "Auteur" ) != NULL ) { game.SetAuthor( elem->FirstChildElement( "Auteur" )->Attribute( "value" ) ); }
     else { MSG( "Les informations concernant l'auteur manquent." ); }
@@ -689,10 +680,6 @@ bool OpenSaveGame::SaveToFile(string file)
         info->SetAttribute( "value", game.GetMainWindowDefaultHeight() );
         info = new TiXmlElement( "Portable" );
         infos->LinkEndChild( info );
-        if ( game.portable )
-            info->SetAttribute( "value", "true" );
-        else
-            info->SetAttribute( "value", "false" );
     }
     {
         TiXmlElement * elem = infos;

@@ -128,6 +128,7 @@
 					<Add option="-lwxmsw29ud_xrc" />
 					<Add option="-lwxmsw29ud_stc" />
 					<Add option="-lwxmsw29ud_richtext" />
+					<Add option="-lwxmsw29ud_propgrid" />
 					<Add option="-lwxmsw29ud_ribbon" />
 					<Add option="-lwxmsw29ud_aui" />
 					<Add option="-lwxmsw29ud_adv" />
@@ -318,6 +319,7 @@
 					<Add option="-lwxmsw29u_xrc" />
 					<Add option="-lwxmsw29u_stc" />
 					<Add option="-lwxmsw29u_richtext" />
+					<Add option="-lwxmsw29u_propgrid" />
 					<Add option="-lwxmsw29u_ribbon" />
 					<Add option="-lwxmsw29u_aui" />
 					<Add option="-lwxmsw29u_adv" />
@@ -507,6 +509,7 @@
 					<Add option="-lwxmsw29u_xrc" />
 					<Add option="-lwxmsw29u_stc" />
 					<Add option="-lwxmsw29u_richtext" />
+					<Add option="-lwxmsw29u_propgrid" />
 					<Add option="-lwxmsw29u_ribbon" />
 					<Add option="-lwxmsw29u_aui" />
 					<Add option="-lwxmsw29u_adv" />
@@ -1170,6 +1173,8 @@
 		<Unit filename="GDL\IDE\Dialogs\ResourcesEditor.h" />
 		<Unit filename="GDL\IDE\Dialogs\SpriteObjectEditor.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\SpriteObjectEditor.h" />
+		<Unit filename="GDL\IDE\DndResourcesEditor.cpp" />
+		<Unit filename="GDL\IDE\DndResourcesEditor.h" />
 		<Unit filename="GDL\IDE\ExecutableIconChanger.cpp" />
 		<Unit filename="GDL\IDE\ExecutableIconChanger.h" />
 		<Unit filename="GDL\IDE\ExpressionsCorrectnessTesting.cpp" />

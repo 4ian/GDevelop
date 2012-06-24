@@ -12907,7 +12907,7 @@
 	<string>
 	<vector>
 
-1338661923 d:\florian\programmation\gamedevelop2\gdl\\gdl\game.h
+1339933776 d:\florian\programmation\gamedevelop2\gdl\\gdl\game.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
@@ -14464,7 +14464,7 @@
 	"GDL/GDMathParser.h"
 	<iostream>
 
-1339270072 source:d:\florian\programmation\gamedevelop2\gdl\gdl\game.cpp
+1340141059 source:d:\florian\programmation\gamedevelop2\gdl\gdl\game.cpp
 	"GDL/Game.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/ExternalEvents.h"
@@ -14474,8 +14474,11 @@
 	"GDL/Object.h"
 	"GDL/ObjectHelpers.h"
 	<wx/intl.h>
+	<wx/propgrid/propgrid.h>
+	<wx/propgrid/advprops.h>
 	"PlatformDefinition/Platform.h"
 	"GDCore/PlatformDefinition/Layout.h"
+	"GDCore/CommonTools.h"
 
 1329069384 d:\florian\programmation\gamedevelop2\gdl\\gdl\sourcefile.h
 	<ctime>
@@ -14653,7 +14656,7 @@
 	"GDL/ObjectGroup.h"
 	"GDL/profile.h"
 
-1339185816 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
+1339932423 source:d:\florian\programmation\gamedevelop2\gdl\gdl\opensavegame.cpp
 	<wx/wx.h>
 	"GDL/IDE/Dialogs/ProjectUpdateDlg.h"
 	"PlatformDefinition/Platform.h"
@@ -15849,7 +15852,7 @@
 	<wx/filename.h>
 	"GDL/IDE/CodeCompiler.h"
 
-1339270954 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1340482921 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -33537,7 +33540,7 @@
 1337095438 d:\florian\programmation\gamedevelop2\gdl\\gdl\builtinextensions\cameraextension.h
 	"GDL/ExtensionBase.h"
 
-1339859289 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\commonconversionsextension.cpp
+1339883375 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\commonconversionsextension.cpp
 	"GDL/BuiltinExtensions/CommonConversionsExtension.h"
 
 1337095355 d:\florian\programmation\gamedevelop2\gdl\\gdl\builtinextensions\commonconversionsextension.h
@@ -33628,7 +33631,7 @@
 
 1339859289 d:\florian\programmation\gamedevelop2\gdl\\gdl\builtinextensions\mathematicaltools.h
 
-1339859638 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\mathematicaltoolsextension.cpp
+1339883425 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\mathematicaltoolsextension.cpp
 	"MathematicalToolsExtension.h"
 
 1337095419 d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\mathematicaltoolsextension.h
@@ -34167,7 +34170,7 @@
 	<wx/dialog.h>
 	"GDL/ResourcesManager.h"
 
-1339341698 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\resourceseditor.cpp
+1340554840 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\resourceseditor.cpp
 	"GDL/IDE/Dialogs/ResourcesEditor.h"
 	<wx/msw/winundef.h>
 	<wx/bitmap.h>
@@ -34198,16 +34201,17 @@
 	"GDCore/IDE/ImagesUsedInventorizer.h"
 	"GDCore/IDE/CommonBitmapManager.h"
 	"GDCore/Tools/HelpFileAccess.h"
+	"GDCore/IDE/Dialogs/ResourceLibraryDialog.h"
 	"GDL/Game.h"
 	"GDL/Scene.h"
 	"GDL/Object.h"
 	"GDL/CommonTools.h"
-	"GDL/IDE/Dialogs/PropImage.h"
+	"GDL/IDE/DndResourcesEditor.h"
 	"PlatformDefinition/Platform.h"
 	"GDL/IDE/gdTreeItemStringData.h"
 	<gtk/gtk.h>
 
-1326144964 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\resourceseditor.h
+1340570216 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\resourceseditor.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -34372,7 +34376,7 @@
 1326144665 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\helpfileaccess.cpp
 	"GDL/IDE/HelpFileAccess.h"
 
-1326144964 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\imagefileswatcher.cpp
+1339926460 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\imagefileswatcher.cpp
 	<iostream>
 	<wx/fswatcher.h>
 	"GDL/Game.h"
@@ -35284,7 +35288,7 @@
 	<boost/weak_ptr.hpp>
 	"GDCore/Events/Instruction.h"
 
-1338580796 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\commonbitmapmanager.h
+1340478601 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\commonbitmapmanager.h
 	<wx/bitmap.h>
 
 1337021284 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\eventsrenderinghelper.h
@@ -35402,7 +35406,7 @@
 	"GDCore/PlatformDefinition/Platform.h"
 	"GDL/Game.h"
 
-1338661923 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\project.h
+1339933776 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\project.h
 	<string>
 	<vector>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
@@ -35602,8 +35606,9 @@
 1337981829 d:\florian\programmation\gamedevelop2\gdl\\gdl\builtinextensions\externallayoutsextension.h
 	"GDL/ExtensionBase.h"
 
-1332608985 d:\florian\programmation\gamedevelop2\core\\gdcore\commontools.h
+1340484159 d:\florian\programmation\gamedevelop2\core\\gdcore\commontools.h
 	<string>
+	<vector>
 	<sstream>
 
 1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswu\wx\setup.h
@@ -35655,4 +35660,154 @@
 	"wx/containr.h"
 
 1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswud\wx\setup.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\propgrid.h
+	"wx/defs.h"
+	"wx/thread.h"
+	"wx/dcclient.h"
+	"wx/control.h"
+	"wx/scrolwin.h"
+	"wx/tooltip.h"
+	"wx/datetime.h"
+	"wx/recguard.h"
+	"wx/propgrid/property.h"
+	"wx/propgrid/propgridiface.h"
+	"wx/propgrid/props.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\recguard.h
+	"wx/defs.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\property.h
+	"wx/defs.h"
+	"wx/propgrid/propgriddefs.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\propgriddefs.h
+	"wx/defs.h"
+	"wx/dynarray.h"
+	"wx/vector.h"
+	"wx/hashmap.h"
+	"wx/variant.h"
+	"wx/any.h"
+	"wx/longlong.h"
+	"wx/clntdata.h"
+	"wx/tokenzr.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\tokenzr.h
+	"wx/object.h"
+	"wx/string.h"
+	"wx/arrstr.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\propgridiface.h
+	"wx/defs.h"
+	"wx/propgrid/property.h"
+	"wx/propgrid/propgridpagestate.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\propgridpagestate.h
+	"wx/defs.h"
+	"wx/propgrid/property.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\props.h
+	"wx/defs.h"
+	"wx/propgrid/editors.h"
+	"wx/filename.h"
+	"wx/dialog.h"
+	"wx/textctrl.h"
+	"wx/button.h"
+	"wx/listbox.h"
+	"wx/valtext.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\editors.h
+	"wx/defs.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\propgrid\advprops.h
+	"wx/defs.h"
+	"wx/propgrid/props.h"
+	"wx/image.h"
+	"wx/spinbutt.h"
+	"wx/propgrid/editors.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\spinbutt.h
+	"wx/defs.h"
+	"wx/control.h"
+	"wx/event.h"
+	"wx/range.h"
+	"wx/univ/spinbutt.h"
+	"wx/msw/spinbutt.h"
+	"wx/motif/spinbutt.h"
+	"wx/gtk/spinbutt.h"
+	"wx/gtk1/spinbutt.h"
+	"wx/osx/spinbutt.h"
+	"wx/cocoa/spinbutt.h"
+	"wx/os2/spinbutt.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\range.h
+	"wx/defs.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\spinbutt.h
+	"wx/univ/scrarrow.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\spinbutt.h
+	"wx/control.h"
+	"wx/event.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\spinbutt.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\spinbutt.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\spinbutt.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\spinbutt.h
+	"wx/control.h"
+	"wx/event.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\spinbutt.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\spinbutt.h
+	"wx/control.h"
+	"wx/event.h"
+
+1340533272 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\dialogs\resourcelibrarydialog.h
+	<wx/listctrl.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<wx/treelist.h>
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dirctrl.h
+	"wx/generic/dirctrlg.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\dirctrlg.h
+	"wx/treectrl.h"
+	"wx/dialog.h"
+	"wx/dirdlg.h"
+	"wx/choice.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\treelist.h
+	"wx/defs.h"
+	"wx/compositewin.h"
+	"wx/containr.h"
+	"wx/headercol.h"
+	"wx/itemid.h"
+	"wx/vector.h"
+	"wx/window.h"
+	"wx/withimages.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\headercol.h
+	"wx/bitmap.h"
+
+1340536608 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dndresourceseditor.cpp
+	"DndResourcesEditor.h"
+	"GDL/IDE/Dialogs/ResourcesEditor.h"
+	"GDCore/CommonTools.h"
+	<iostream>
+
+1340533670 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dndresourceseditor.h
+	<wx/dnd.h>
+
+1340533670 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dndresourceseditor.h
+	<wx/dnd.h>
 

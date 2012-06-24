@@ -20,6 +20,7 @@
 #include "GDL/ImageManager.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "GDL/IDE/ImageFilesWatcher.h"
+namespace gd { class ResourceLibraryDialog; }
 
 class GD_API ResourcesEditor: public wxPanel
 {
@@ -31,6 +32,18 @@ class GD_API ResourcesEditor: public wxPanel
 		Game & game;
 
 		void Refresh();
+
+        /**
+         * Ask the resources editor to add the resources contained into \a filenames.
+         */
+		void AddResources(const std::vector<std::string> & filenames);
+
+        /**
+         * Ask the resources editor to add the resources contained into \a filenames.
+         * If \a destinationDir is not empty, the resources files are copied into this directory
+         * ( which is relative to the project directory ) before being added to the project.
+         */
+		void CopyAndAddResources(std::vector<std::string> filenames, const std::string & destinationDir);
 
 		//Item sélectionné dans la liste
 		wxTreeItemId m_itemSelected;
@@ -74,6 +87,7 @@ class GD_API ResourcesEditor: public wxPanel
 		static const long idRibbonMod;
 		static const long idRibbonModFile;
 		static const long idRibbonAdd;
+		static const long idRibbonAddFromLibrary;
 		static const long idRibbonDel;
 		static const long idRibbonAddDossier;
 		static const long idRibbonRemoveDossier;
@@ -120,6 +134,7 @@ class GD_API ResourcesEditor: public wxPanel
 		static const long ID_BITMAPBUTTON2;
 		static const long ID_BITMAPBUTTON3;
 		static const long ID_BITMAPBUTTON6;
+		static const long idMenuResourcesLibrary;
 
 
 	private:
@@ -166,6 +181,7 @@ class GD_API ResourcesEditor: public wxPanel
 		void OnapercuPanelResize(wxSizeEvent& event);
 		//*)
         void OnMoreOptions( wxCommandEvent& event );
+		void OnAddFromLibraryBtClick(wxCommandEvent& event);
         void OnDeleteUnusedFiles( wxCommandEvent& event );
         void CreateToolbar();
         void ConnectEvents();
@@ -184,6 +200,8 @@ class GD_API ResourcesEditor: public wxPanel
 		bool useRibbon;
 
 		string renamedItemOldName;
+
+        gd::ResourceLibraryDialog * resourceLibraryDialog;
 
 		DECLARE_EVENT_TABLE()
 };

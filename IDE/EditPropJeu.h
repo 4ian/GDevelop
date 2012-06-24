@@ -8,6 +8,7 @@
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/spinctrl.h>
+#include <wx/propgrid/propgrid.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
 #include <wx/statbmp.h>
@@ -72,6 +73,7 @@ class EditPropJeu: public wxDialog
 		wxTextCtrl* linuxExeEdit;
 		wxTextCtrl* texteEdit;
 		wxButton* browseIcon;
+		wxPropertyGrid* propertyGrid;
 		wxStaticText* StaticText15;
 		wxCheckBox* imageCheck;
 		wxStaticText* StaticText12;
@@ -114,6 +116,7 @@ class EditPropJeu: public wxDialog
 		static const long ID_CHECKBOX6;
 		static const long ID_STATICTEXT12;
 		static const long ID_SPINCTRL2;
+		static const long ID_CUSTOM1;
 		static const long ID_PANEL2;
 		static const long ID_CHECKBOX4;
 		static const long ID_STATICTEXT1;

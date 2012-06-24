@@ -47,6 +47,7 @@ const long EditPropJeu::ID_SPINCTRL1 = wxNewId();
 const long EditPropJeu::ID_CHECKBOX6 = wxNewId();
 const long EditPropJeu::ID_STATICTEXT12 = wxNewId();
 const long EditPropJeu::ID_SPINCTRL2 = wxNewId();
+const long EditPropJeu::ID_CUSTOM1 = wxNewId();
 const long EditPropJeu::ID_PANEL2 = wxNewId();
 const long EditPropJeu::ID_CHECKBOX4 = wxNewId();
 const long EditPropJeu::ID_STATICTEXT1 = wxNewId();
@@ -161,6 +162,7 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     Panel2 = new wxPanel(Notebook1, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
     FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer5->AddGrowableCol(0);
+    FlexGridSizer5->AddGrowableRow(5);
     FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer2->AddGrowableCol(1);
     StaticText2 = new wxStaticText(Panel2, ID_STATICTEXT2, _("Nom :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
@@ -207,6 +209,8 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     FPSmin->SetValue(_T("0"));
     FlexGridSizer20->Add(FPSmin, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer20, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    propertyGrid = new wxPropertyGrid(Panel2,ID_CUSTOM1,wxDefaultPosition,wxSize(342,168),0,_T("ID_CUSTOM1"));
+    FlexGridSizer5->Add(propertyGrid, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel2->SetSizer(FlexGridSizer5);
     FlexGridSizer5->Fit(Panel2);
     FlexGridSizer5->SetSizeHints(Panel2);
@@ -446,6 +450,8 @@ EditPropJeu::EditPropJeu( wxWindow* parent, Game & game_ ) :
     linuxExeEdit->SetValue(game.linuxExecutableFilename);
 
     useExternalSourcesCheck->SetValue(game.useExternalSourceFiles);
+
+    game.PopulatePropertyGrid(propertyGrid);
 }
 
 EditPropJeu::~EditPropJeu()
@@ -498,6 +504,8 @@ void EditPropJeu::OnOkBtClick( wxCommandEvent& event )
     game.linuxExecutableFilename = string(linuxExeEdit->GetValue().mb_str());
 
     game.useExternalSourceFiles = useExternalSourcesCheck->GetValue();
+
+    game.UpdateFromPropertyGrid(propertyGrid);
 
     EndModal( 0 );
 }

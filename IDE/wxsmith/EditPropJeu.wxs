@@ -59,6 +59,7 @@
 							<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
 								<cols>1</cols>
 								<growablecols>0</growablecols>
+								<growablerows>5</growablerows>
 								<object class="sizeritem">
 									<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 										<cols>3</cols>
@@ -210,6 +211,17 @@
 										</object>
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="Custom" name="ID_CUSTOM1" subclass="wxPropertyGrid" variable="propertyGrid" member="yes">
+										<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),0,$(NAME));</creating_code>
+										<include_file>wx/propgrid/propgrid.h</include_file>
+										<style></style>
+										<size>342,168</size>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
 									<option>1</option>
 								</object>
 							</object>

@@ -1074,12 +1074,10 @@ void ChoixAction::OnObjetsListSelectionChanged(wxTreeEvent& event)
 void ChoixAction::OnobjectsSearchCtrlText(wxCommandEvent& event)
 {
     RefreshObjectsLists();
-    objectsSearchCtrl->SetFocus();
 }
 
 void ChoixAction::OnsearchCtrlText(wxCommandEvent& event)
 {
     RefreshList();
     RefreshObjectActionsList();
-    searchCtrl->SetFocus();
 }

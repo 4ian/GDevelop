@@ -1028,13 +1028,11 @@ void ChoixCondition::OnsearchCtrlText(wxCommandEvent& event)
 {
     RefreshList();
     RefreshObjectConditionsList();
-    searchCtrl->SetFocus();
 }
 
 void ChoixCondition::OnobjectsSearchCtrlText(wxCommandEvent& event)
 {
     RefreshObjectsLists();
-    objectsSearchCtrl->SetFocus();
 }
 
 void ChoixCondition::OnObjetsListSelectionChanged(wxTreeEvent& event)

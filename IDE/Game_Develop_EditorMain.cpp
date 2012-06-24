@@ -376,6 +376,7 @@ projectManager(NULL)
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Ajout de ressources"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
             ribbonBar->AddButton(ResourcesEditor::idRibbonAdd, !hideLabels ? _("Ajouter une image") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAddFromLibrary, !hideLabels ? _("Ajouter depuis la bibliothèque") : "", wxBitmap("res/addFromLibrary24.png", wxBITMAP_TYPE_ANY));
             ribbonBar->AddButton(ResourcesEditor::idRibbonAddDossier, !hideLabels ? _("Ajouter un dossier virtuel") : "", wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY));
         }
         {

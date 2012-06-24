@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef DNDFILEEDITOR_H
 #define DNDFILEEDITOR_H
 
@@ -5,6 +10,9 @@
 #include <wx/log.h>
 class Game_Develop_EditorFrame;
 
+/**
+ * \brief Used to open files dropped on the editor
+ */
 class DnDFileEditor : public wxFileDropTarget
 {
 public:

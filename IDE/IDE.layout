@@ -1,508 +1,520 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Development - Edittime" />
-	<File name="EditorLayers.cpp" open="1" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5571" topLine="103" />
+	<File name="wxSFMLCanvas.hpp" open="0" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="237" topLine="0" />
 	</File>
-	<File name="ChoixClavier.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="6614" topLine="147" />
-	</File>
-	<File name="Dialogs\ExternalLayoutEditor.h" open="1" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1273" topLine="14" />
-	</File>
-	<File name="wxstedit\src\steprint.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="14059" topLine="378" />
-	</File>
-	<File name="Portable.cpp" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="7260" topLine="148" />
-	</File>
-	<File name="wxstedit\include\wx\stedit\steopts.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="9603" topLine="282" />
-	</File>
-	<File name="InitialPositionBrowserDlg.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3737" topLine="88" />
-	</File>
-	<File name="AutomatismTypeChoice.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="120" topLine="114" />
-	</File>
-	<File name="SceneCanvas2.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="27857" topLine="526" />
-	</File>
-	<File name="ExtensionBugReportDlg.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="472" topLine="6" />
+	<File name="Preferences.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="216" topLine="0" />
 	</File>
 	<File name="ConsoleManager.h" open="0" top="0" tabpos="64" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="42" topLine="2" />
 	</File>
-	<File name="EditorJeu.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1466" topLine="0" />
-	</File>
-	<File name="ChoixBouton.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2452" topLine="56" />
-	</File>
-	<File name="Demarrage.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2298" topLine="64" />
-	</File>
-	<File name="wxstedit\include\wx\stedit\stelangs.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="0" topLine="3" />
-	</File>
-	<File name="TrueOrFalse.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2311" topLine="45" />
-	</File>
-	<File name="ImportImage.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4838" topLine="106" />
-	</File>
-	<File name="AdvancedPasteDlg.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="9751" topLine="0" />
-	</File>
-	<File name="SceneCanvas.cpp" open="1" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="12360" topLine="316" />
-	</File>
-	<File name="EventsRefactorer.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="0" topLine="0" />
-	</File>
-	<File name="ConsoleFrame.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1074" topLine="12" />
-	</File>
-	<File name="EditPropScene.cpp" open="0" top="0" tabpos="34" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="14031" topLine="354" />
-	</File>
-	<File name="ChoixAction.cpp" open="1" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="44299" topLine="857" />
-	</File>
-	<File name="DebuggerGUI.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3100" topLine="67" />
-	</File>
-	<File name="wxstedit\src\stemenum.cpp" open="0" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="43110" topLine="1050" />
-	</File>
-	<File name="ObjectTypeChoice.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="802" topLine="10" />
-	</File>
-	<File name="TemplateEvents.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="42" topLine="2" />
-	</File>
-	<File name="Credits.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="893" topLine="8" />
-	</File>
-	<File name="ImageEditor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="462" topLine="0" />
-	</File>
-	<File name="RenderDialog.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="528" topLine="0" />
-	</File>
-	<File name="EventsEditor.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3211" topLine="83" />
-	</File>
-	<File name="CompilationChecker.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="88" topLine="0" />
-	</File>
-	<File name="EditPropJeu.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="39858" topLine="632" />
-	</File>
-	<File name="ChoiceJoyAxis.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="42" topLine="2" />
-	</File>
-	<File name="wxstedit\include\wx\stedit\stedlgs.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="561" topLine="0" />
-	</File>
-	<File name="wxstedit\src\steframe.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="29319" topLine="862" />
-	</File>
-	<File name="StartHerePage.cpp" open="0" top="0" tabpos="54" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="17903" topLine="266" />
-	</File>
-	<File name="CreateTemplate.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="445" topLine="5" />
-	</File>
-	<File name="GridSetup.cpp" open="0" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5863" topLine="111" />
-	</File>
-	<File name="Compilation.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2950" topLine="97" />
-	</File>
-	<File name="EditOptionsPosition.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="18437" topLine="286" />
-	</File>
-	<File name="ChoiceFile.cpp" open="1" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4626" topLine="77" />
-	</File>
-	<File name="wxstedit\include\wx\stedit\stedefs.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="14024" topLine="70" />
-	</File>
-	<File name="wxstedit\src\steexprt.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="68799" topLine="1824" />
-	</File>
-	<File name="SplashScreen.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2639" topLine="72" />
-	</File>
-	<File name="GeneratePassword.cpp" open="0" top="0" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="6585" topLine="85" />
-	</File>
-	<File name="EditorScene.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="923" topLine="36" />
-	</File>
-	<File name="CodeEditor.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="787" topLine="10" />
-	</File>
-	<File name="EditObjectGroup.cpp" open="1" top="0" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="7678" topLine="107" />
-	</File>
-	<File name="CheckMAJ.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="42" topLine="2" />
-	</File>
-	<File name="wxstedit\src\stedlgs_wdr.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="65705" topLine="1459" />
-	</File>
-	<File name="MainOutils.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="0" topLine="12" />
-	</File>
-	<File name="SigneTest.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1151" topLine="24" />
-	</File>
-	<File name="CppUnitLite\CppUnitLite\TestRegistry.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="0" topLine="3" />
-	</File>
-	<File name="Game_Develop_EditorMain.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="30027" topLine="465" />
-	</File>
-	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="690" topLine="10" />
-	</File>
-	<File name="Clipboard.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1203" topLine="0" />
-	</File>
-	<File name="EditLayer.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="18157" topLine="353" />
-	</File>
-	<File name="wxstedit\src\stedit.cpp" open="0" top="0" tabpos="28" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="64418" topLine="2010" />
-	</File>
-	<File name="MainFichier.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="9785" topLine="279" />
-	</File>
-	<File name="BuildProgressPnl.h" open="0" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1356" topLine="18" />
-	</File>
-	<File name="SigneModification.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1198" topLine="25" />
-	</File>
-	<File name="CppUnitLite\CppUnitLite\TestHarness.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="304" topLine="0" />
-	</File>
-	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="13842" topLine="351" />
-	</File>
-	<File name="EditorObjets.h" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="768" topLine="17" />
-	</File>
-	<File name="ChoixTemplateEvent.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="335" topLine="0" />
-	</File>
-	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="264" topLine="0" />
-	</File>
-	<File name="ProfileDlg.h" open="1" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="409" topLine="3" />
-	</File>
-	<File name="wxSFMLCanvas.cpp" open="1" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="74" topLine="0" />
-	</File>
-	<File name="MAJ.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="767" topLine="10" />
-	</File>
-	<File name="BuildMessagesPnl.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="42" topLine="2" />
-	</File>
-	<File name="SearchEvents.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="16537" topLine="265" />
-	</File>
-	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="16575" topLine="530" />
-	</File>
-	<File name="EditorObjectList.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4559" topLine="0" />
-	</File>
-	<File name="ChoixCondition.h" open="0" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="570" topLine="0" />
-	</File>
-	<File name="DndTextObjectsEditor.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="311" topLine="0" />
-	</File>
-	<File name="wxstedit\src\stestyls.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="44581" topLine="904" />
-	</File>
-	<File name="Preferences.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="7503" topLine="58" />
+	<File name="ChoixAction.h" open="0" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3045" topLine="94" />
 	</File>
 	<File name="LogFileManager.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="655" topLine="11" />
 	</File>
-	<File name="SceneCanvasPreviewData.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="87" topLine="0" />
+	<File name="AdvancedPasteDlg.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="9751" topLine="0" />
 	</File>
-	<File name="Fusion.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="760" topLine="12" />
+	<File name="InitialPositionBrowserDlg.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3985" topLine="80" />
 	</File>
-	<File name="Dialogs\HtmlViewerPnl.h" open="1" top="0" tabpos="58" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="430" topLine="0" />
+	<File name="EditPropJeu.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="32232" topLine="397" />
 	</File>
-	<File name="EditorLayers.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1283" topLine="18" />
+	<File name="Extensions.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="459" topLine="7" />
 	</File>
-	<File name="DnDFileEditor.cpp" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="59" topLine="0" />
+	<File name="DebuggerGUI.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3100" topLine="67" />
 	</File>
-	<File name="gdTreeItemGameData.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="256" topLine="0" />
+	<File name="SearchEvents.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2591" topLine="61" />
 	</File>
-	<File name="InitialPositionBrowserDlg.h" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1123" topLine="2" />
+	<File name="EditorLayers.cpp" open="0" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="5571" topLine="103" />
 	</File>
-	<File name="AutomatismTypeChoice.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="193" topLine="0" />
+	<File name="resource.rc" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="129" topLine="0" />
 	</File>
-	<File name="SceneCanvasEditionData.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="200" topLine="0" />
-	</File>
-	<File name="Extensions.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="15079" topLine="225" />
-	</File>
-	<File name="ExternalEventsEditor.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4664" topLine="20" />
-	</File>
-	<File name="EditorJeu.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1290" topLine="35" />
-	</File>
-	<File name="Dialogs\ExternalLayoutEditor.cpp" open="1" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1596" topLine="25" />
-	</File>
-	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="50" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="292" topLine="0" />
-	</File>
-	<File name="AdvancedPasteDlg.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1138" topLine="45" />
-	</File>
-	<File name="SceneCanvas.h" open="1" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
-		<Cursor1 position="192" topLine="0" />
-	</File>
-	<File name="ExtensionBugReportDlg.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="6852" topLine="98" />
-	</File>
-	<File name="ConsoleManager.cpp" open="0" top="0" tabpos="67" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="188" topLine="0" />
-	</File>
-	<File name="EditPropScene.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="593" topLine="0" />
-	</File>
-	<File name="ChoixAction.h" open="0" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3045" topLine="94" />
-	</File>
-	<File name="Demarrage.cpp" open="0" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="16189" topLine="387" />
-	</File>
-	<File name="wxstedit\src\stenoteb.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4901" topLine="119" />
-	</File>
-	<File name="ObjectsOnBadLayerBox.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="5222" topLine="78" />
-	</File>
-	<File name="TemplateEvents.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="177" topLine="6" />
-	</File>
-	<File name="ImageEditor.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="256" topLine="0" />
-	</File>
-	<File name="RenderDialog.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="780" topLine="0" />
-	</File>
-	<File name="EventsRefactorer.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="89" topLine="0" />
-	</File>
-	<File name="ConsoleFrame.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2513" topLine="49" />
-	</File>
-	<File name="EditPropJeu.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="410" topLine="4" />
+	<File name="ConsoleFrame.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1074" topLine="12" />
 	</File>
 	<File name="ChoiceJoyAxis.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="42" topLine="2" />
 	</File>
-	<File name="DebuggerGUI.cpp" open="1" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="19916" topLine="387" />
+	<File name="ImportImage.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="4838" topLine="106" />
 	</File>
-	<File name="wxstedit\include\wx\stedit\steexprt.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3056" topLine="80" />
+	<File name="wxstedit\src\steprint.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="14059" topLine="378" />
 	</File>
-	<File name="wxstedit\src\stelangs.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="196545" topLine="3301" />
+	<File name="EditOptionsPosition.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="18437" topLine="286" />
+	</File>
+	<File name="ExtensionBugReportDlg.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="472" topLine="6" />
+	</File>
+	<File name="wxstedit\include\wx\stedit\steopts.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="9603" topLine="282" />
+	</File>
+	<File name="Credits.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="893" topLine="8" />
+	</File>
+	<File name="SceneCanvasPreviewData.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="523" topLine="0" />
+	</File>
+	<File name="EditorJeu.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1466" topLine="0" />
+	</File>
+	<File name="mp3ogg.cpp" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="91" topLine="102" />
+	</File>
+	<File name="CompilationChecker.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="88" topLine="0" />
+	</File>
+	<File name="PlayerUnitTests.cpp" open="0" top="0" tabpos="50" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="292" topLine="0" />
+	</File>
+	<File name="ChoiceFile.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="42" topLine="2" />
+	</File>
+	<File name="ImageEditor.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="462" topLine="0" />
+	</File>
+	<File name="EditObjectGroup.cpp" open="0" top="0" tabpos="23" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="7678" topLine="107" />
+	</File>
+	<File name="EventsRefactorer.h" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="0" topLine="0" />
+	</File>
+	<File name="CreateTemplate.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="445" topLine="5" />
+	</File>
+	<File name="SceneCanvasEditionData.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="660" topLine="9" />
+	</File>
+	<File name="Compilation.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="17908" topLine="282" />
+	</File>
+	<File name="ObjectsOnBadLayerBox.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="5222" topLine="78" />
+	</File>
+	<File name="CheckMAJ.h" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="42" topLine="2" />
+	</File>
+	<File name="GridSetup.cpp" open="0" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="5863" topLine="111" />
+	</File>
+	<File name="wxstedit\src\stemenum.cpp" open="0" top="0" tabpos="21" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="43110" topLine="1050" />
+	</File>
+	<File name="EditLayer.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="18157" topLine="353" />
+	</File>
+	<File name="EventsEditor.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="11180" topLine="261" />
+	</File>
+	<File name="SceneCanvas2.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3004" topLine="53" />
+	</File>
+	<File name="CodeEditor.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="4306" topLine="70" />
+	</File>
+	<File name="TrueOrFalse.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2311" topLine="45" />
 	</File>
 	<File name="ObjectTypeChoice.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="383" topLine="0" />
 	</File>
-	<File name="StartHerePage.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="933" topLine="13" />
+	<File name="BuildToolsPnl.h" open="0" top="0" tabpos="69" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="915" topLine="17" />
 	</File>
-	<File name="Credits.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="14718" topLine="186" />
+	<File name="GeneratePassword.cpp" open="0" top="0" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="6585" topLine="85" />
 	</File>
-	<File name="EventsEditor.cpp" open="1" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1000" topLine="10" />
+	<File name="wxstedit\src\steframe.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="29319" topLine="862" />
 	</File>
-	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="141" topLine="0" />
+	<File name="DndTextSceneEditor.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="410" topLine="0" />
 	</File>
-	<File name="EditOptionsPosition.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2754" topLine="61" />
+	<File name="wxstedit\include\wx\stedit\steexprt.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3056" topLine="80" />
 	</File>
-	<File name="ChoiceFile.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="CppUnitLite\CppUnitLite\TestRegistry.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="0" topLine="3" />
+	</File>
+	<File name="SceneCanvas.cpp" open="1" top="1" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3797" topLine="85" />
+	</File>
+	<File name="Clipboard.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1612" topLine="50" />
+	</File>
+	<File name="TemplateEvents.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="42" topLine="2" />
 	</File>
 	<File name="MyStatusBar.cpp" open="0" top="0" tabpos="48" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="3011" topLine="46" />
 	</File>
-	<File name="SplashScreen.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="288" topLine="6" />
+	<File name="BuildProgressPnl.h" open="0" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1356" topLine="18" />
 	</File>
-	<File name="CreateTemplate.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="22122" topLine="310" />
+	<File name="Game_Develop_EditorMain.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="22391" topLine="361" />
 	</File>
-	<File name="ProjectManager.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="490" topLine="28" />
+	<File name="wxstedit\src\steexprt.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="68799" topLine="1824" />
 	</File>
-	<File name="ErrorCompilation.cpp" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="89" topLine="0" />
+	<File name="DndTextObjectsEditor.cpp" open="0" top="0" tabpos="12" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="311" topLine="0" />
 	</File>
-	<File name="Compilation.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="17908" topLine="282" />
+	<File name="EditorScene.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="923" topLine="36" />
 	</File>
-	<File name="EditObjectGroup.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1889" topLine="65" />
+	<File name="CppUnitLite\CppUnitLite\TestHarness.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="304" topLine="0" />
 	</File>
-	<File name="CheckMAJ.h" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="42" topLine="2" />
-	</File>
-	<File name="wxstedit\src\stedlgs_wdr.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="6205" topLine="127" />
-	</File>
-	<File name="MessagePlus.cpp" open="0" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="239" topLine="103" />
-	</File>
-	<File name="CppUnitLite\CppUnitLite\TestResult.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1110" topLine="38" />
-	</File>
-	<File name="Game_Develop_EditorMain.h" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3097" topLine="192" />
-	</File>
-	<File name="EditorScene.cpp" open="1" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="11715" topLine="197" />
-	</File>
-	<File name="CodeEditor.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4306" topLine="70" />
-	</File>
-	<File name="EditLayer.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2582" topLine="62" />
-	</File>
-	<File name="BuildToolsPnl.h" open="0" top="0" tabpos="69" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="915" topLine="17" />
-	</File>
-	<File name="wxstedit\src\stedlgs.cpp" open="0" top="0" tabpos="27" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="78140" topLine="2007" />
-	</File>
-	<File name="MainOptions.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="0" topLine="0" />
-	</File>
-	<File name="BuildToolsPnl.cpp" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1085" topLine="18" />
-	</File>
-	<File name="CppUnitLite\CppUnitLite\TestRegistry.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="93" topLine="0" />
-	</File>
-	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="488" topLine="0" />
-	</File>
-	<File name="EditorObjetsGroups.cpp" open="1" top="0" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="7963" topLine="119" />
-	</File>
-	<File name="Clipboard.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3433" topLine="105" />
-	</File>
-	<File name="DndTextSceneEditor.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="284" topLine="0" />
-	</File>
-	<File name="ProjectManager.cpp" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="51215" topLine="998" />
-	</File>
-	<File name="wxSFMLCanvas.hpp" open="1" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="237" topLine="0" />
-	</File>
-	<File name="MainAide.cpp" open="0" top="0" tabpos="47" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="386" topLine="2" />
-	</File>
-	<File name="BuildProgressPnl.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="3235" topLine="71" />
-	</File>
-	<File name="SearchEvents.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="2591" topLine="61" />
-	</File>
-	<File name="CppUnitLite\CppUnitLite\Test.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="1518" topLine="38" />
-	</File>
-	<File name="GDAuiTabArt.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="493" topLine="9" />
-	</File>
-	<File name="EditorObjets.cpp" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="4243" topLine="68" />
+	<File name="RenderDialog.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="528" topLine="0" />
 	</File>
 	<File name="ChoixTemplateEvent.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="19305" topLine="344" />
 	</File>
-	<File name="ProfileDlg.cpp" open="1" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="MessagePlus.cpp" open="0" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="239" topLine="103" />
+	</File>
+	<File name="BuildMessagesPnl.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="42" topLine="2" />
+	</File>
+	<File name="Game_Develop_EditorApp.cpp" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="13842" topLine="351" />
+	</File>
+	<File name="wxstedit\src\stedlgs_wdr.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="65705" topLine="1459" />
+	</File>
+	<File name="StartHerePage.cpp" open="0" top="0" tabpos="54" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="17900" topLine="15" />
+	</File>
+	<File name="DnDFileEditor.cpp" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="268" topLine="0" />
+	</File>
+	<File name="EditorObjetsGroups.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="690" topLine="10" />
+	</File>
+	<File name="RecentList.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="385" topLine="12" />
+	</File>
+	<File name="ChoixCondition.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="15400" topLine="230" />
+	</File>
+	<File name="MainOptions.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="0" topLine="0" />
+	</File>
+	<File name="GDAuiTabArt.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="16575" topLine="530" />
+	</File>
+	<File name="wxstedit\src\stedit.cpp" open="0" top="0" tabpos="28" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="64418" topLine="2010" />
+	</File>
+	<File name="SplashScreen.cpp" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2639" topLine="72" />
+	</File>
+	<File name="EditorObjets.h" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="768" topLine="17" />
+	</File>
+	<File name="ProjectManager.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="14114" topLine="224" />
+	</File>
+	<File name="ChoixClavier.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="6614" topLine="147" />
+	</File>
+	<File name="MainAide.cpp" open="0" top="0" tabpos="47" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="386" topLine="2" />
+	</File>
+	<File name="AutomatismTypeChoice.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="193" topLine="0" />
+	</File>
+	<File name="Fusion.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="760" topLine="12" />
+	</File>
+	<File name="SigneTest.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1151" topLine="24" />
+	</File>
+	<File name="Dialogs\ExternalLayoutEditor.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1596" topLine="25" />
+	</File>
+	<File name="EditorObjectList.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="4559" topLine="0" />
+	</File>
+	<File name="ProfileDlg.cpp" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="200" topLine="0" />
 	</File>
-	<File name="resource.rc" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="129" topLine="0" />
+	<File name="ChoixBouton.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2452" topLine="56" />
 	</File>
 	<File name="MAJ.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="8525" topLine="130" />
 	</File>
+	<File name="AdvancedPasteDlg.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1138" topLine="45" />
+	</File>
+	<File name="InitialPositionBrowserDlg.h" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1123" topLine="2" />
+	</File>
+	<File name="wxstedit\src\stestyls.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="44581" topLine="904" />
+	</File>
+	<File name="EditPropJeu.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="444" topLine="0" />
+	</File>
+	<File name="ExternalEventsEditor.cpp" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="4664" topLine="20" />
+	</File>
+	<File name="Demarrage.cpp" open="0" top="0" tabpos="15" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="16189" topLine="387" />
+	</File>
+	<File name="SigneModification.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1198" topLine="25" />
+	</File>
+	<File name="EditorLayers.h" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1283" topLine="18" />
+	</File>
+	<File name="wxSFMLCanvas.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="74" topLine="0" />
+	</File>
+	<File name="Preferences.cpp" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="56876" topLine="884" />
+	</File>
+	<File name="ConsoleManager.cpp" open="0" top="0" tabpos="67" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="188" topLine="0" />
+	</File>
+	<File name="ChoixAction.cpp" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="51059" topLine="1036" />
+	</File>
+	<File name="EditOptionsPosition.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2754" topLine="61" />
+	</File>
+	<File name="Extensions.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="15079" topLine="225" />
+	</File>
+	<File name="DebuggerGUI.cpp" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="8592" topLine="126" />
+	</File>
+	<File name="SearchEvents.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="16537" topLine="265" />
+	</File>
+	<File name="EditorJeu.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1290" topLine="35" />
+	</File>
+	<File name="Portable.cpp" open="0" top="0" tabpos="13" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="7260" topLine="148" />
+	</File>
+	<File name="ConsoleFrame.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2513" topLine="49" />
+	</File>
+	<File name="ChoiceJoyAxis.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="42" topLine="2" />
+	</File>
+	<File name="ImageEditor.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="256" topLine="0" />
+	</File>
+	<File name="EditObjectGroup.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1889" topLine="65" />
+	</File>
+	<File name="ExtensionBugReportDlg.cpp" open="0" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="6852" topLine="98" />
+	</File>
+	<File name="Credits.cpp" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="14718" topLine="186" />
+	</File>
+	<File name="SceneCanvasPreviewData.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="87" topLine="0" />
+	</File>
+	<File name="Compilation.h" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2950" topLine="97" />
+	</File>
+	<File name="EditPropScene.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="593" topLine="0" />
+	</File>
+	<File name="gdTreeItemGameData.h" open="0" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="256" topLine="0" />
+	</File>
+	<File name="CompilationChecker.cpp" open="0" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="141" topLine="0" />
+	</File>
+	<File name="ChoiceFile.cpp" open="0" top="0" tabpos="9" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="4626" topLine="77" />
+	</File>
+	<File name="wxstedit\src\stenoteb.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="4901" topLine="119" />
+	</File>
+	<File name="EditLayer.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2582" topLine="62" />
+	</File>
+	<File name="EventsRefactorer.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="89" topLine="0" />
+	</File>
+	<File name="wxstedit\include\wx\stedit\stelangs.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="0" topLine="3" />
+	</File>
+	<File name="CreateTemplate.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="22122" topLine="310" />
+	</File>
+	<File name="SceneCanvasEditionData.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="200" topLine="0" />
+	</File>
+	<File name="CodeEditor.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="787" topLine="10" />
+	</File>
+	<File name="ObjectTypeChoice.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="802" topLine="10" />
+	</File>
+	<File name="CheckMAJ.cpp" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="42" topLine="2" />
+	</File>
+	<File name="wxstedit\src\stelangs.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="196545" topLine="3301" />
+	</File>
+	<File name="DndTextSceneEditor.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="585" topLine="0" />
+	</File>
+	<File name="EventsEditor.cpp" open="0" top="0" tabpos="19" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="67882" topLine="1403" />
+	</File>
+	<File name="CppUnitLite\CppUnitLite\TestResult.cpp" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1110" topLine="38" />
+	</File>
+	<File name="SceneCanvas.h" open="0" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="-1" zoom_2="0">
+		<Cursor1 position="13896" topLine="361" />
+	</File>
+	<File name="Clipboard.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="319" topLine="12" />
+	</File>
+	<File name="TemplateEvents.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="177" topLine="6" />
+	</File>
+	<File name="BuildToolsPnl.cpp" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1085" topLine="18" />
+	</File>
+	<File name="Game_Develop_EditorMain.h" open="1" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="8392" topLine="2" />
+	</File>
+	<File name="DndTextObjectsEditor.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="489" topLine="0" />
+	</File>
+	<File name="ErrorCompilation.cpp" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="89" topLine="0" />
+	</File>
+	<File name="wxstedit\include\wx\stedit\stedlgs.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="561" topLine="0" />
+	</File>
+	<File name="CppUnitLite\CppUnitLite\TestRegistry.cpp" open="0" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="93" topLine="0" />
+	</File>
+	<File name="RenderDialog.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="780" topLine="0" />
+	</File>
+	<File name="ChoixTemplateEvent.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="335" topLine="0" />
+	</File>
+	<File name="StartHerePage.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="933" topLine="13" />
+	</File>
+	<File name="BuildProgressPnl.cpp" open="0" top="0" tabpos="18" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="3235" topLine="71" />
+	</File>
+	<File name="Game_Develop_EditorApp.h" open="0" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="488" topLine="0" />
+	</File>
+	<File name="wxstedit\src\stedlgs_wdr.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="6205" topLine="127" />
+	</File>
+	<File name="DnDFileEditor.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="275" topLine="0" />
+	</File>
+	<File name="EditorScene.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="9332" topLine="163" />
+	</File>
+	<File name="wxstedit\include\wx\stedit\stedefs.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="14024" topLine="70" />
+	</File>
+	<File name="CppUnitLite\CppUnitLite\Test.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1518" topLine="38" />
+	</File>
+	<File name="RecentList.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="275" topLine="0" />
+	</File>
+	<File name="ChoixCondition.h" open="0" top="0" tabpos="20" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="570" topLine="0" />
+	</File>
+	<File name="MainOutils.cpp" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="0" topLine="12" />
+	</File>
 	<File name="BuildMessagesPnl.cpp" open="0" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="2280" topLine="56" />
 	</File>
-	<File name="SceneCanvasPreviewData.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="435" topLine="0" />
+	<File name="GDAuiTabArt.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="493" topLine="9" />
 	</File>
-	<File name="Fusion.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="441" topLine="3" />
+	<File name="wxstedit\src\stedlgs.cpp" open="0" top="0" tabpos="27" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="78140" topLine="2007" />
 	</File>
-	<File name="EditorObjectList.cpp" open="1" top="0" tabpos="24" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="33662" topLine="696" />
+	<File name="SplashScreen.h" open="0" top="0" tabpos="6" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="288" topLine="6" />
 	</File>
-	<File name="ChoixCondition.cpp" open="1" top="0" tabpos="11" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="41507" topLine="775" />
+	<File name="Dialogs\HtmlViewerPnl.h" open="0" top="0" tabpos="58" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="430" topLine="0" />
 	</File>
-	<File name="Preferences.cpp" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="51809" topLine="760" />
+	<File name="EditorObjetsGroups.cpp" open="0" top="0" tabpos="22" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="7963" topLine="119" />
 	</File>
-	<File name="mp3ogg.cpp" open="0" top="0" tabpos="14" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="91" topLine="102" />
+	<File name="ProjectManager.h" open="0" top="0" tabpos="10" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="490" topLine="28" />
 	</File>
-	<File name="LogFileManager.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="715" topLine="0" />
+	<File name="MainFichier.cpp" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="9609" topLine="264" />
 	</File>
 	<File name="BugReport.cpp" open="0" top="0" tabpos="27" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="928" topLine="167" />
 	</File>
-	<File name="SceneCanvasEditionData.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="597" topLine="21" />
+	<File name="Fusion.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="441" topLine="3" />
 	</File>
-	<File name="Extensions.h" open="0" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
-		<Cursor1 position="459" topLine="7" />
+	<File name="Dialogs\ExternalLayoutEditor.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="1273" topLine="14" />
+	</File>
+	<File name="EditorObjets.cpp" open="0" top="0" tabpos="16" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="4243" topLine="68" />
+	</File>
+	<File name="ProfileDlg.h" open="0" top="0" tabpos="17" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="409" topLine="3" />
 	</File>
 	<File name="CppUnitLite\CppUnitLite\Failure.h" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="0" topLine="6" />
 	</File>
+	<File name="MAJ.h" open="0" top="0" tabpos="7" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="767" topLine="10" />
+	</File>
+	<File name="AutomatismTypeChoice.cpp" open="0" top="0" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="120" topLine="114" />
+	</File>
+	<File name="LogFileManager.cpp" open="0" top="0" tabpos="0" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="715" topLine="0" />
+	</File>
+	<File name="EditPropScene.cpp" open="0" top="0" tabpos="34" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="14031" topLine="354" />
+	</File>
 	<File name="ExternalEventsEditor.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor1 position="1423" topLine="18" />
+	</File>
+	<File name="Demarrage.h" open="0" top="0" tabpos="8" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="2298" topLine="64" />
+	</File>
+	<File name="EditorObjectList.cpp" open="0" top="0" tabpos="24" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor1 position="44511" topLine="1002" />
 	</File>
 </CodeBlocks_layout_file>

@@ -6,6 +6,7 @@
 #ifndef COMMONTOOLS_H
 #define COMMONTOOLS_H
 #include <string>
+#include <vector>
 #include <sstream>
 class wxString;
 
@@ -78,6 +79,24 @@ float ToFloat( const T & value )
  */
 template<>
 std::string GD_CORE_API ToString( const wxString & value );
+
+/**
+ * Split a string into tokens stored in a vector, using the specified separator.
+ * \param str String to split
+ * \param separator Separator to use
+ */
+template <typename T>
+std::vector <T> SplitString( const std::string & str, char separator )
+{
+    std::istringstream iss( str );
+    std::string token;
+    std::vector <T> array;
+
+    while ( std::getline( iss, token, separator ) )
+        array.push_back( T(token) );
+
+    return array;
+}
 
 }
 

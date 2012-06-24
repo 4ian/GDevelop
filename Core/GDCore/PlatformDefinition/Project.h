@@ -7,6 +7,7 @@
 #define GDCORE_PROJECT_H
 #include <string>
 #include <vector>
+class wxPropertyGrid;
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
@@ -135,6 +136,15 @@ public:
      */
     virtual Platform & GetPlatform() const =0;
 
+    /**
+     * IDE calls this function so as to let the project populate a wxPropertyGrid with its properties.
+     */
+    virtual void PopulatePropertyGrid(wxPropertyGrid * grid) =0;
+
+    /**
+     * IDE calls this function so that the project update its properties from the values stored in the wxPropertyGrid.
+     */
+    virtual void UpdateFromPropertyGrid(wxPropertyGrid * grid) =0;
     ///@}
 
     /** \name Layouts management

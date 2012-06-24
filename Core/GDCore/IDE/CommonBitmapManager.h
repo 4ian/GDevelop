@@ -47,6 +47,8 @@ public:
     wxBitmap varBt;
     wxBitmap semitransparentHitBox;
     wxBitmap noProtection;
+    wxBitmap folder40;
+    wxBitmap parentFolder40;
 
     /** \name 24x24 bitmaps
      * wxBitmap which can be used for ribbons.

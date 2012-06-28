@@ -17,7 +17,7 @@
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDL/Object.h"
 #include "GDL/Game.h"
-#include "Game_Develop_EditorMain.h"
+#include "MainFrame.h"
 #include "GDL/CommonTools.h"
 #include "EditObjectGroup.h"
 #include "Clipboard.h"

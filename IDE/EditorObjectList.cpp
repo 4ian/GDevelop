@@ -26,7 +26,7 @@
 #include <string>
 #include <vector>
 
-#include "Game_Develop_EditorMain.h"
+#include "MainFrame.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"

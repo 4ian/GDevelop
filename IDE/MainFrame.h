@@ -3,10 +3,10 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#ifndef GAME_DEVELOP_EDITORMAIN_H
-#define GAME_DEVELOP_EDITORMAIN_H
+#ifndef GDIDE_MAINFRAME_H
+#define GDIDE_MAINFRAME_H
 
-//(*Headers(Game_Develop_EditorFrame)
+//(*Headers(MainFrame)
 #include <wx/sizer.h>
 #include <wx/menu.h>
 #include <wx/aui/aui.h>
@@ -44,13 +44,14 @@ class RuntimeGame;
 class ProjectManager;
 class StartHerePage;
 class BuildToolsPnl;
+class ProjectPropertiesPnl;
 
 using namespace std;
 
 /**
- * Class representing the main editor
+ * \brief The IDE main frame
  */
-class Game_Develop_EditorFrame: public wxFrame
+class MainFrame: public wxFrame
 {
     friend class ResourcesEditor;
     public:
@@ -60,11 +61,11 @@ class Game_Develop_EditorFrame: public wxFrame
          * \param Parent window
          * \param True to create an initial empty project
          */
-        Game_Develop_EditorFrame(wxWindow* parent, bool createEmptyProject);
-        virtual ~Game_Develop_EditorFrame();
+        MainFrame(wxWindow* parent, bool createEmptyProject);
+        virtual ~MainFrame();
 
         vector < boost::shared_ptr<RuntimeGame> > games; ///< All games opened
-        unsigned int gameCurrentlyEdited; ///< Index of the current game ( "Current" means choosen in the project manager )
+        unsigned int gameCurrentlyEdited; ///< Index of the current game ( "Current" means chosen in the project manager )
 
         /**
          * Get a shared pointer to the current game ( "Current" means choosen in the project manager )
@@ -100,13 +101,17 @@ class Game_Develop_EditorFrame: public wxFrame
         static void LoadSkin(wxAuiManager * auiManager, wxAuiNotebook * notebook);
 
         /**
-         * Get a pointer to notebook containing editors
+         * Get a pointer to the notebook containing editors
          */
         inline const wxAuiNotebook * GetEditorsNotebook() const { return editorsNotebook; };
+        /**
+         * Get a pointer to the notebook containing editors
+         */
         inline wxAuiNotebook * GetEditorsNotebook() { return editorsNotebook; };
 
         /**
          * Get a lightweight interface to this class.
+         * \see MainEditorCommand
          */
         MainEditorCommand & GetMainEditorCommand() { return mainEditorCommand; };
 
@@ -114,6 +119,10 @@ class Game_Develop_EditorFrame: public wxFrame
          * Get a pointer to the ribbon
          */
         inline const wxRibbonBar * GetRibbon() const { return m_ribbon; };
+
+        /**
+         * Get a pointer to the ribbon
+         */
         inline wxRibbonBar * GetRibbon() { return m_ribbon; };
 
         /**
@@ -136,11 +145,16 @@ class Game_Develop_EditorFrame: public wxFrame
         inline wxAuiManager * GetAUIPaneManger() { return &m_mgr; }
 
         /**
+         * Get a pointer to the project properties panel
+         */
+        inline ProjectPropertiesPnl * GetProjectPropertiesPanel() const { return projectPropertiesPnl; }
+
+        /**
          * Get a pointer to scene locking shortcuts list.
          */
         inline std::vector<SceneCanvas*> * GetScenesLockingShortcutsList() { return &scenesLockingShortcuts; };
 
-        //(*Handlers(Game_Develop_EditorFrame)
+        //(*Handlers(MainFrame)
         void OnQuit(wxCommandEvent& event);
         void OnAbout(wxCommandEvent& event);
         void OnClose(wxCloseEvent& event);
@@ -217,7 +231,7 @@ class Game_Develop_EditorFrame: public wxFrame
 
     private:
 
-        //(*Identifiers(Game_Develop_EditorFrame)
+        //(*Identifiers(MainFrame)
         static const long ID_CUSTOM1;
         static const long ID_AUINOTEBOOK1;
         static const long ID_PANEL1;
@@ -271,7 +285,7 @@ class Game_Develop_EditorFrame: public wxFrame
         static const long idRibbonFileBt;
         static const long idRibbonHelpBt;
 
-        //(*Declarations(Game_Develop_EditorFrame)
+        //(*Declarations(MainFrame)
         wxMenuItem* MenuItem8;
         wxMenuItem* MenuItem7;
         wxMenuItem* MenuItem5;
@@ -317,6 +331,7 @@ class Game_Develop_EditorFrame: public wxFrame
 
         StartHerePage * startPage;
         ProjectManager * projectManager;
+        ProjectPropertiesPnl * projectPropertiesPnl;
 
         RecentList m_recentlist; ///<Inventory and manage recent files
 
@@ -328,4 +343,4 @@ class Game_Develop_EditorFrame: public wxFrame
         DECLARE_EVENT_TABLE()
 };
 
-#endif // GAME_DEVELOP_EDITORMAIN_H
+#endif // GDIDE_MAINFRAME_H

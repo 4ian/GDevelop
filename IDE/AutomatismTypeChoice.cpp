@@ -12,7 +12,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/gdTreeItemStringData.h"
 #include "GDL/ExtensionBase.h"
-#include "Extensions.h"
+#include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 
 //(*IdInit(AutomatismTypeChoice)
 const long AutomatismTypeChoice::ID_STATICBITMAP2 = wxNewId();
@@ -204,7 +204,7 @@ void AutomatismTypeChoice::OncancelBtClick(wxCommandEvent& event)
 
 void AutomatismTypeChoice::OnmoreAutomatismsBtClick(wxCommandEvent& event)
 {
-    Extensions dialog(this, game);
+    gd::ProjectExtensionsDialog dialog(this, game);
     dialog.ShowModal();
 
     RefreshList();

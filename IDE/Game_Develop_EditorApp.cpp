@@ -36,7 +36,7 @@
 #include "GDL/CodeExecutionEngine.h"
 #include <llvm/Support/DynamicLibrary.h>
 
-#include "Game_Develop_EditorMain.h"
+#include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
 #include "Log.h"
 #include "Demarrage.h"
@@ -341,7 +341,7 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Creating main window
     cout << "* Creating main window" << endl;
-    mainEditor = new Game_Develop_EditorFrame( 0, filesToOpen.empty() && !openRecupFiles );
+    mainEditor = new MainFrame( 0, filesToOpen.empty() && !openRecupFiles );
     SetTopWindow( mainEditor );
 
     //Open files

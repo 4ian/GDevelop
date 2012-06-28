@@ -24,7 +24,7 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDL/Game.h"
 #include "GDL/RuntimeGame.h"
-#include "Game_Develop_EditorMain.h"
+#include "MainFrame.h"
 #include "GDL/IDE/MainEditorCommand.h"
 #include "SceneCanvas.h"
 #include "DebuggerGUI.h"
@@ -156,7 +156,7 @@ mainEditorCommand(mainEditorCommand_)
         }
     }
 
-    Game_Develop_EditorFrame::LoadSkin(&m_mgr, notebook);
+    MainFrame::LoadSkin(&m_mgr, notebook);
 
     mainEditorCommand.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();

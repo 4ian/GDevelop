@@ -17,7 +17,7 @@
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
 namespace gd { class Project; }
-class Game_Develop_EditorFrame;
+class MainFrame;
 class Game;
 class RuntimeGame;
 class gdTreeItemGameData;
@@ -26,7 +26,7 @@ class ProjectManager: public wxPanel
 {
 	public:
 
-		ProjectManager(wxWindow* parent, Game_Develop_EditorFrame & mainEditor_);
+		ProjectManager(wxWindow* parent, MainFrame & mainEditor_);
 		virtual ~ProjectManager();
 
         /**
@@ -47,7 +47,7 @@ class ProjectManager: public wxPanel
          */
 		void OnRibbonCloseSelected(wxRibbonButtonBarEvent& event);
 
-		Game_Develop_EditorFrame & mainEditor;
+		MainFrame & mainEditor;
 
 		//(*Declarations(ProjectManager)
 		wxMenuItem* MenuItem8;

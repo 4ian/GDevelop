@@ -13,7 +13,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/Game.h"
-#include "Extensions.h"
+#include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>
@@ -225,7 +225,7 @@ void ObjectTypeChoice::OnClose(wxCloseEvent& event)
 
 void ObjectTypeChoice::OnmoreObjectsBtClick(wxCommandEvent& event)
 {
-    Extensions dialog(this, game);
+    gd::ProjectExtensionsDialog dialog(this, game);
     dialog.ShowModal();
 
     RefreshList();

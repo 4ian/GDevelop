@@ -5,7 +5,7 @@
 		<Option title="IDE" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeur principal\Options\;Fichiers\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
+		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Fichiers\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
 		<Build>
 			<Target title="Debug - Edittime">
 				<Option platforms="Windows;" />
@@ -639,6 +639,8 @@
 		<Unit filename="Dialogs\ExternalLayoutEditor.h" />
 		<Unit filename="Dialogs\HtmlViewerPnl.cpp" />
 		<Unit filename="Dialogs\HtmlViewerPnl.h" />
+		<Unit filename="Dialogs\ProjectPropertiesPnl.cpp" />
+		<Unit filename="Dialogs\ProjectPropertiesPnl.h" />
 		<Unit filename="DnDFileEditor.cpp">
 			<Option virtualFolder="Editeur principal\" />
 		</Unit>
@@ -733,8 +735,6 @@
 		<Unit filename="EventsRefactorer.h" />
 		<Unit filename="ExtensionBugReportDlg.cpp" />
 		<Unit filename="ExtensionBugReportDlg.h" />
-		<Unit filename="Extensions.cpp" />
-		<Unit filename="Extensions.h" />
 		<Unit filename="ExternalEventsEditor.cpp" />
 		<Unit filename="ExternalEventsEditor.h" />
 		<Unit filename="Fusion.cpp">
@@ -754,12 +754,6 @@
 		</Unit>
 		<Unit filename="Game_Develop_EditorApp.h">
 			<Option virtualFolder="Racine\" />
-		</Unit>
-		<Unit filename="Game_Develop_EditorMain.cpp">
-			<Option virtualFolder="Editeur principal\" />
-		</Unit>
-		<Unit filename="Game_Develop_EditorMain.h">
-			<Option virtualFolder="Editeur principal\" />
 		</Unit>
 		<Unit filename="GeneratePassword.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
@@ -797,9 +791,8 @@
 		<Unit filename="MainFichier.cpp">
 			<Option virtualFolder="Editeur principal\Fichier\" />
 		</Unit>
-		<Unit filename="MainOptions.cpp">
-			<Option virtualFolder="Editeur principal\Options\" />
-		</Unit>
+		<Unit filename="MainFrame.cpp" />
+		<Unit filename="MainFrame.h" />
 		<Unit filename="MainOutils.cpp">
 			<Option virtualFolder="Editeur principal\Outils\" />
 		</Unit>
@@ -923,6 +916,7 @@
 		</Unit>
 		<Unit filename="wxsmith\ExternalLayoutEditor.wxs" />
 		<Unit filename="wxsmith\HtmlViewerPnl.wxs" />
+		<Unit filename="wxsmith\ProjectPropertiesPnl.wxs" />
 		<Unit filename="wxstedit\include\wx\stedit\pairarr.h" />
 		<Unit filename="wxstedit\include\wx\stedit\setup.h" />
 		<Unit filename="wxstedit\include\wx\stedit\setup0.h" />
@@ -965,9 +959,8 @@
 			<wxsmith version="1">
 				<gui name="wxWidgets" src="Game_Develop_EditorApp.cpp" main="-- None --" init_handlers="necessary" language="CPP" />
 				<resources>
-					<wxFrame wxs="wxsmith/Game_Develop_Editorframe.wxs" src="Game_Develop_EditorMain.cpp" hdr="Game_Develop_EditorMain.h" fwddecl="0" i18n="1" name="Game_Develop_EditorFrame" language="CPP" />
+					<wxFrame wxs="wxsmith/MainFrame.wxs" src="MainFrame.cpp" hdr="MainFrame.h" fwddecl="0" i18n="1" name="MainFrame" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorObjets.wxs" src="EditorObjets.cpp" hdr="EditorObjets.h" fwddecl="0" i18n="1" name="EditorObjets" language="CPP" />
-					<wxPanel wxs="wxsmith/OldEventsEditor.wxs" src="OldEventsEditor.cpp" hdr="OldEventsEditor.h" fwddecl="0" i18n="1" name="OldEventsEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixCondition.wxs" src="ChoixCondition.cpp" hdr="ChoixCondition.h" fwddecl="0" i18n="1" name="ChoixCondition" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixAction.wxs" src="ChoixAction.cpp" hdr="ChoixAction.h" fwddecl="0" i18n="1" name="ChoixAction" language="CPP" />
 					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="EditorObjet.cpp" hdr="EditorObjet.h" fwddecl="0" i18n="1" name="EditorObjet" language="CPP" />
@@ -1001,7 +994,6 @@
 					<wxFrame wxs="wxsmith/ImageEditor.wxs" src="ImageEditor.cpp" hdr="ImageEditor.h" fwddecl="0" i18n="1" name="ImageEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/TrueOrFalse.wxs" src="TrueOrFalse.cpp" hdr="TrueOrFalse.h" fwddecl="0" i18n="1" name="TrueOrFalse" language="CPP" />
 					<wxDialog wxs="wxsmith/SearchEvents.wxs" src="SearchEvents.cpp" hdr="SearchEvents.h" fwddecl="0" i18n="1" name="SearchEvents" language="CPP" />
-					<wxDialog wxs="wxsmith/Extensions.wxs" src="Extensions.cpp" hdr="Extensions.h" fwddecl="0" i18n="1" name="Extensions" language="CPP" />
 					<wxDialog wxs="wxsmith/GridSetup.wxs" src="GridSetup.cpp" hdr="GridSetup.h" fwddecl="0" i18n="1" name="GridSetup" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorLayers.wxs" src="EditorLayers.cpp" hdr="EditorLayers.h" fwddecl="0" i18n="1" name="EditorLayers" language="CPP" />
 					<wxDialog wxs="wxsmith/EditLayer.wxs" src="EditLayer.cpp" hdr="EditLayer.h" fwddecl="0" i18n="1" name="EditLayer" language="CPP" />
@@ -1032,6 +1024,7 @@
 					<wxDialog wxs="wxsmith/AdvancedPasteDlg.wxs" src="AdvancedPasteDlg.cpp" hdr="AdvancedPasteDlg.h" fwddecl="0" i18n="1" name="AdvancedPasteDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/ExternalLayoutEditor.wxs" src="Dialogs\ExternalLayoutEditor.cpp" hdr="Dialogs\ExternalLayoutEditor.h" fwddecl="0" i18n="1" name="ExternalLayoutEditor" language="CPP" />
 					<wxPanel wxs="wxsmith/HtmlViewerPnl.wxs" src="Dialogs\HtmlViewerPnl.cpp" hdr="Dialogs\HtmlViewerPnl.h" fwddecl="0" i18n="1" name="HtmlViewerPnl" language="CPP" />
+					<wxPanel wxs="wxsmith/ProjectPropertiesPnl.wxs" src="Dialogs\ProjectPropertiesPnl.cpp" hdr="Dialogs\ProjectPropertiesPnl.h" fwddecl="0" i18n="1" name="ProjectPropertiesPnl" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

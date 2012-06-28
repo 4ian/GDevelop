@@ -10,7 +10,7 @@
 #include <wx/config.h>
 #include "GDCore/Tools/HelpFileAccess.h"
 #include <wx/mimetype.h> // mimetype support
-#include "Game_Develop_EditorMain.h"
+#include "MainFrame.h"
 
 //(*IdInit(StartHerePage)
 const long StartHerePage::ID_STATICBITMAP1 = wxNewId();
@@ -50,7 +50,7 @@ BEGIN_EVENT_TABLE(StartHerePage,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-StartHerePage::StartHerePage(wxWindow* parent, Game_Develop_EditorFrame & mainEditor_) :
+StartHerePage::StartHerePage(wxWindow* parent, MainFrame & mainEditor_) :
 mainEditor(mainEditor_)
 {
 	//(*Initialize(StartHerePage)

@@ -14,8 +14,7 @@
 #include "GDL/IDE/CodeCompiler.h"
 #include "GDL/CommonTools.h"
 #include "BuildMessagesPnl.h"
-
-#include "Game_Develop_EditorMain.h"
+#include "MainFrame.h"
 #include "BuildToolsPnl.h"
 #include "BuildProgressPnl.h"
 #include "Compilation.h"
@@ -28,12 +27,12 @@
 /**
  * Request close
  */
-void Game_Develop_EditorFrame::OnQuit( wxCommandEvent& event )
+void MainFrame::OnQuit( wxCommandEvent& event )
 {
     Close();
 }
 
-void Game_Develop_EditorFrame::OnCloseCurrentProjectSelected(wxCommandEvent& event)
+void MainFrame::OnCloseCurrentProjectSelected(wxCommandEvent& event)
 {
     wxRibbonButtonBarEvent uselessEvent;
     if ( projectManager ) projectManager->OnRibbonCloseSelected(uselessEvent);
@@ -42,7 +41,7 @@ void Game_Develop_EditorFrame::OnCloseCurrentProjectSelected(wxCommandEvent& eve
 ////////////////////////////////////////////////////////////
 /// Créer un nouveau jeu vierge
 ////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::OnMenuNewSelected( wxCommandEvent& event )
+void MainFrame::OnMenuNewSelected( wxCommandEvent& event )
 {
     games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
     wxString GD = "Game Develop - "+_( "Nouveau jeu" );
@@ -58,7 +57,7 @@ void Game_Develop_EditorFrame::OnMenuNewSelected( wxCommandEvent& event )
 /**
  * Adapter for the ribbon
  */
-void Game_Develop_EditorFrame::OnRibbonNewClicked(wxRibbonButtonBarEvent& evt)
+void MainFrame::OnRibbonNewClicked(wxRibbonButtonBarEvent& evt)
 {
     wxCommandEvent uselessEvent;
     OnMenuNewSelected(uselessEvent);
@@ -67,11 +66,11 @@ void Game_Develop_EditorFrame::OnRibbonNewClicked(wxRibbonButtonBarEvent& evt)
 /**
  * Open a file
  */
-void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
+void MainFrame::OnMenuOpenSelected( wxCommandEvent& event )
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-    wxFileDialog openFileDialog( this, _( "Choisissez le jeu à ouvrir" ), "", "", "*\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+    wxFileDialog openFileDialog( this, _( "Choisissez le projet à ouvrir" ), "", "", "\"Game Develop\" Project(*.gdg)|*.gdg|\"Game Develop\" Project Autosave (*.gdg.autosave)|*.gdg.autosave" );
 
     if (openFileDialog.ShowModal() != wxID_CANCEL && !openFileDialog.GetPath().empty() )
         Open( ToString(openFileDialog.GetPath()) );
@@ -80,7 +79,7 @@ void Game_Develop_EditorFrame::OnMenuOpenSelected( wxCommandEvent& event )
 /**
  * Open an example file
  */
-void Game_Develop_EditorFrame::OnOpenExampleSelected(wxCommandEvent& event)
+void MainFrame::OnOpenExampleSelected(wxCommandEvent& event)
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
@@ -91,7 +90,7 @@ void Game_Develop_EditorFrame::OnOpenExampleSelected(wxCommandEvent& event)
     wxString examplesDir = wxGetCwd()+"/Examples/";
     #endif
 
-    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), examplesDir, "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), examplesDir, "", "\"Game Develop\" Project (*.gdg)|*.gdg" );
 
     if ( open.ShowModal() != wxID_CANCEL && !open.GetPath().empty() )
         Open(ToString(open.GetPath()));
@@ -99,27 +98,27 @@ void Game_Develop_EditorFrame::OnOpenExampleSelected(wxCommandEvent& event)
 /**
  * Adapter for the ribbon
  */
-void Game_Develop_EditorFrame::OnRibbonOpenClicked(wxRibbonButtonBarEvent& evt)
+void MainFrame::OnRibbonOpenClicked(wxRibbonButtonBarEvent& evt)
 {
     wxCommandEvent uselessEvent;
     OnMenuOpenSelected(uselessEvent);
 }
-void Game_Develop_EditorFrame::OnRibbonOpenDropDownClicked(wxRibbonButtonBarEvent& evt)
+void MainFrame::OnRibbonOpenDropDownClicked(wxRibbonButtonBarEvent& evt)
 {
     evt.PopupMenu(&openContextMenu);
 }
 
-void Game_Develop_EditorFrame::SetLastUsedFile(wxString file)
+void MainFrame::SetLastUsedFile(wxString file)
 {
     m_recentlist.SetLastUsed( file );
     for ( unsigned int i = 0;i < 9;i++ )
         wxConfigBase::Get()->Write( wxString::Format( _T( "/Recent/%d" ), i ), m_recentlist.GetEntry( i ) );
 }
 
-////////////////////////////////////////////////////////////
-/// Ouverture du fichier, puis ajout à la RecentList et rafraichissement des éditeurs
-////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::Open( string file )
+/**
+ * Open a file
+ */
+void MainFrame::Open( string file )
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
@@ -158,10 +157,7 @@ void Game_Develop_EditorFrame::Open( string file )
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Enregistrement du jeu
-////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::OnMenuSaveSelected( wxCommandEvent& event )
+void MainFrame::OnMenuSaveSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
@@ -183,12 +179,12 @@ void Game_Develop_EditorFrame::OnMenuSaveSelected( wxCommandEvent& event )
 /**
  * Adapter for the ribbon
  */
-void Game_Develop_EditorFrame::OnRibbonSaveClicked(wxRibbonButtonBarEvent& evt)
+void MainFrame::OnRibbonSaveClicked(wxRibbonButtonBarEvent& evt)
 {
     wxCommandEvent uselessEvent;
     OnMenuSaveSelected(uselessEvent);
 }
-void Game_Develop_EditorFrame::OnRibbonSaveDropDownClicked(wxRibbonButtonBarEvent& evt)
+void MainFrame::OnRibbonSaveDropDownClicked(wxRibbonButtonBarEvent& evt)
 {
     evt.PopupMenu(&saveContextMenu);
 }
@@ -196,7 +192,7 @@ void Game_Develop_EditorFrame::OnRibbonSaveDropDownClicked(wxRibbonButtonBarEven
 /**
  * Save all
  */
-void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
+void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
 {
     for (unsigned int i = 0;i<games.size();++i)
     {
@@ -204,7 +200,7 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
         {
             sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-            wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg", wxFD_SAVE );
+            wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
             FileDialog.ShowModal();
 
             std::string path = ToString(FileDialog.GetPath());
@@ -241,31 +237,25 @@ void Game_Develop_EditorFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& ev
 
     wxLogStatus(_("Enregistrements des fichiers terminés."));
 }
-void Game_Develop_EditorFrame::OnMenuSaveAllSelected(wxCommandEvent& event)
+void MainFrame::OnMenuSaveAllSelected(wxCommandEvent& event)
 {
     wxRibbonButtonBarEvent uselessEvent;
     OnRibbonSaveAllClicked(uselessEvent);
 }
 
-////////////////////////////////////////////////////////////
-/// Enregistrer sous
-////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::OnMenuSaveAsSelected( wxCommandEvent& event )
+void MainFrame::OnMenuSaveAsSelected( wxCommandEvent& event )
 {
     SaveAs();
 }
 
-////////////////////////////////////////////////////////////
-/// La véritable fonction Enregistrer sous
-////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::SaveAs()
+void MainFrame::SaveAs()
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
     if ( !CurrentGameIsValid() ) return;
 
     //Affichage de la boite de dialogue
-    wxFileDialog fileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Game (*.gdg)|*.gdg|All files|*.*", wxFD_SAVE );
+    wxFileDialog fileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
     fileDialog.ShowModal();
 
     std::string path = ToString(fileDialog.GetPath());
@@ -312,11 +302,7 @@ void Game_Develop_EditorFrame::SaveAs()
     }
 }
 
-
-////////////////////////////////////////////////////////////
-/// Ouverture de la fenêtre de compilation
-////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event )
+void MainFrame::OnMenuCompilationSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
@@ -324,10 +310,10 @@ void Game_Develop_EditorFrame::OnMenuCompilationSelected( wxCommandEvent& event 
     Dialog.ShowModal();
 }
 
-////////////////////////////////////////////////////////////
-/// Ouverture de la fenêtre d'enregistrement en version portable
-////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::OnMenuPortableSelected( wxCommandEvent& event )
+/**
+ * Open the window to gather a project and its resources.
+ */
+void MainFrame::OnMenuPortableSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
@@ -335,10 +321,7 @@ void Game_Develop_EditorFrame::OnMenuPortableSelected( wxCommandEvent& event )
     dialog.ShowModal();
 }
 
-////////////////////////////////////////////////////////////
-/// Fichier récemment ouverts
-////////////////////////////////////////////////////////////
-void Game_Develop_EditorFrame::OnRecentClicked( wxCommandEvent& event )
+void MainFrame::OnRecentClicked( wxCommandEvent& event )
 {
     wxString last;
 
@@ -382,7 +365,7 @@ void Game_Develop_EditorFrame::OnRecentClicked( wxCommandEvent& event )
 /**
  * Open import file dialog
  */
-void Game_Develop_EditorFrame::OnMenuFusionSelected(wxCommandEvent& event)
+void MainFrame::OnMenuFusionSelected(wxCommandEvent& event)
 {
     if ( !CurrentGameIsValid() ) return;
 

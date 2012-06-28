@@ -3,7 +3,7 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-//(*InternalHeaders(Game_Develop_EditorFrame)
+//(*InternalHeaders(MainFrame)
 #include <wx/bitmap.h>
 #include <wx/icon.h>
 #include <wx/intl.h>
@@ -37,7 +37,7 @@
 #include <wx/msw/winundef.h>
 #endif
 
-#include "Game_Develop_EditorMain.h"
+#include "MainFrame.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
@@ -55,66 +55,68 @@
 #include "LogFileManager.h"
 #include "StartHerePage.h"
 #include "BuildToolsPnl.h"
+#include "Preferences.h"
 #include "ExternalEventsEditor.h"
 #include "Dialogs/HtmlViewerPnl.h"
+#include "Dialogs/ProjectPropertiesPnl.h"
 
-//(*IdInit(Game_Develop_EditorFrame)
-const long Game_Develop_EditorFrame::ID_CUSTOM1 = wxNewId();
-const long Game_Develop_EditorFrame::ID_AUINOTEBOOK1 = wxNewId();
-const long Game_Develop_EditorFrame::ID_PANEL1 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM1 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM8 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM2 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM3 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM4 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM5 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM6 = wxNewId();
-const long Game_Develop_EditorFrame::ID_TIMER1 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM7 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM9 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM10 = wxNewId();
-const long Game_Develop_EditorFrame::toBeDeletedMenuItem = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM26 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM11 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM12 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM13 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM16 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM15 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM18 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM28 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM19 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM17 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM27 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM14 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM20 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM23 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM22 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM25 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM24 = wxNewId();
-const long Game_Develop_EditorFrame::ID_MENUITEM21 = wxNewId();
+//(*IdInit(MainFrame)
+const long MainFrame::ID_CUSTOM1 = wxNewId();
+const long MainFrame::ID_AUINOTEBOOK1 = wxNewId();
+const long MainFrame::ID_PANEL1 = wxNewId();
+const long MainFrame::ID_MENUITEM1 = wxNewId();
+const long MainFrame::ID_MENUITEM8 = wxNewId();
+const long MainFrame::ID_MENUITEM2 = wxNewId();
+const long MainFrame::ID_MENUITEM3 = wxNewId();
+const long MainFrame::ID_MENUITEM4 = wxNewId();
+const long MainFrame::ID_MENUITEM5 = wxNewId();
+const long MainFrame::ID_MENUITEM6 = wxNewId();
+const long MainFrame::ID_TIMER1 = wxNewId();
+const long MainFrame::ID_MENUITEM7 = wxNewId();
+const long MainFrame::ID_MENUITEM9 = wxNewId();
+const long MainFrame::ID_MENUITEM10 = wxNewId();
+const long MainFrame::toBeDeletedMenuItem = wxNewId();
+const long MainFrame::ID_MENUITEM26 = wxNewId();
+const long MainFrame::ID_MENUITEM11 = wxNewId();
+const long MainFrame::ID_MENUITEM12 = wxNewId();
+const long MainFrame::ID_MENUITEM13 = wxNewId();
+const long MainFrame::ID_MENUITEM16 = wxNewId();
+const long MainFrame::ID_MENUITEM15 = wxNewId();
+const long MainFrame::ID_MENUITEM18 = wxNewId();
+const long MainFrame::ID_MENUITEM28 = wxNewId();
+const long MainFrame::ID_MENUITEM19 = wxNewId();
+const long MainFrame::ID_MENUITEM17 = wxNewId();
+const long MainFrame::ID_MENUITEM27 = wxNewId();
+const long MainFrame::ID_MENUITEM14 = wxNewId();
+const long MainFrame::ID_MENUITEM20 = wxNewId();
+const long MainFrame::ID_MENUITEM23 = wxNewId();
+const long MainFrame::ID_MENUITEM22 = wxNewId();
+const long MainFrame::ID_MENUITEM25 = wxNewId();
+const long MainFrame::ID_MENUITEM24 = wxNewId();
+const long MainFrame::ID_MENUITEM21 = wxNewId();
 //*)
-const long Game_Develop_EditorFrame::IDM_RECENTS = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonNew = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonOpen = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonSave = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonSaveAs = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonSaveAll = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonPortable = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonCompil = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonOptions = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonHelp = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonTuto = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonWiki = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonForum = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonUpdate = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonWebSite = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonCredits = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonFileBt = wxNewId();
-const long Game_Develop_EditorFrame::idRibbonHelpBt = wxNewId();
+const long MainFrame::IDM_RECENTS = wxNewId();
+const long MainFrame::idRibbonNew = wxNewId();
+const long MainFrame::idRibbonOpen = wxNewId();
+const long MainFrame::idRibbonSave = wxNewId();
+const long MainFrame::idRibbonSaveAs = wxNewId();
+const long MainFrame::idRibbonSaveAll = wxNewId();
+const long MainFrame::idRibbonPortable = wxNewId();
+const long MainFrame::idRibbonCompil = wxNewId();
+const long MainFrame::idRibbonOptions = wxNewId();
+const long MainFrame::idRibbonHelp = wxNewId();
+const long MainFrame::idRibbonTuto = wxNewId();
+const long MainFrame::idRibbonWiki = wxNewId();
+const long MainFrame::idRibbonForum = wxNewId();
+const long MainFrame::idRibbonUpdate = wxNewId();
+const long MainFrame::idRibbonWebSite = wxNewId();
+const long MainFrame::idRibbonCredits = wxNewId();
+const long MainFrame::idRibbonFileBt = wxNewId();
+const long MainFrame::idRibbonHelpBt = wxNewId();
 
 
-BEGIN_EVENT_TABLE( Game_Develop_EditorFrame, wxFrame )
-    //(*EventTable(Game_Develop_EditorFrame)
+BEGIN_EVENT_TABLE( MainFrame, wxFrame )
+    //(*EventTable(MainFrame)
     //*)
 END_EVENT_TABLE()
 
@@ -122,19 +124,19 @@ END_EVENT_TABLE()
 /**
  * Constructor of the main frame.
  */
-Game_Develop_EditorFrame::Game_Develop_EditorFrame( wxWindow* parent, bool createEmptyProject) :
-gameCurrentlyEdited(0),
-m_ribbon(NULL),
-ribbonFileBt(NULL),
-ribbonHelpBt(NULL),
-ribbonSceneEditorButtonBar(NULL),
-buildToolsPnl(NULL),
-mainEditorCommand(NULL, NULL, this, NULL, NULL, NULL, NULL, &scenesLockingShortcuts, wxGetCwd()),
-startPage(NULL),
-projectManager(NULL)
+MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
+    gameCurrentlyEdited(0),
+    m_ribbon(NULL),
+    ribbonFileBt(NULL),
+    ribbonHelpBt(NULL),
+    ribbonSceneEditorButtonBar(NULL),
+    buildToolsPnl(NULL),
+    mainEditorCommand(NULL, NULL, this, NULL, NULL, NULL, NULL, &scenesLockingShortcuts, wxGetCwd()),
+    startPage(NULL),
+    projectManager(NULL)
 {
 
-    //(*Initialize(Game_Develop_EditorFrame)
+    //(*Initialize(MainFrame)
     wxBoxSizer* ribbonSizer;
     wxMenuItem* MenuItem1;
     wxMenuItem* MenuItem11;
@@ -262,54 +264,54 @@ projectManager(NULL)
     FlexGridSizer1->SetSizeHints(this);
     Center();
 
-    Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE,(wxObjectEventFunction)&Game_Develop_EditorFrame::OneditorsNotebookPageClose);
-    Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnNotebook1PageChanged);
-    Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnOpenExampleSelected);
-    Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuFusionSelected);
-    Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuSaveAsSelected);
-    Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuPortableSelected);
-    Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnDecomposeGIFSelected);
-    Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnDecomposeRPGSelected);
-    Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnDecomposeSSSelected);
-    Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnautoSaveTimerTrigger);
-    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuNewSelected);
-    Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuOpenSelected);
-    Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnOpenExampleSelected);
-    Connect(ID_MENUITEM11,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuFusionSelected);
-    Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuSaveSelected);
-    Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuSaveAsSelected);
-    Connect(ID_MENUITEM16,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuSaveAllSelected);
-    Connect(ID_MENUITEM15,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuCompilationSelected);
-    Connect(ID_MENUITEM18,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuPortableSelected);
-    Connect(ID_MENUITEM19,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnCloseCurrentProjectSelected);
-    Connect(ID_MENUITEM17,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuPrefSelected);
-    Connect(ID_MENUITEM27,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuAideSelected);
-    Connect(ID_MENUITEM14,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnQuit);
-    Connect(ID_MENUITEM20,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuAideSelected);
-    Connect(ID_MENUITEM23,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuTutoSelected);
-    Connect(ID_MENUITEM22,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuWikiSelected);
-    Connect(ID_MENUITEM25,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuItem36Selected);
-    Connect(ID_MENUITEM24,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnMenuSiteSelected);
-    Connect(ID_MENUITEM21,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnAbout);
-    Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnClose);
-    Connect(wxEVT_SIZE,(wxObjectEventFunction)&Game_Develop_EditorFrame::OnResize);
+    Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE,(wxObjectEventFunction)&MainFrame::OneditorsNotebookPageClose);
+    Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&MainFrame::OnNotebook1PageChanged);
+    Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnOpenExampleSelected);
+    Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuFusionSelected);
+    Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAsSelected);
+    Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuPortableSelected);
+    Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnDecomposeGIFSelected);
+    Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnDecomposeRPGSelected);
+    Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnDecomposeSSSelected);
+    Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&MainFrame::OnautoSaveTimerTrigger);
+    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuNewSelected);
+    Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuOpenSelected);
+    Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnOpenExampleSelected);
+    Connect(ID_MENUITEM11,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuFusionSelected);
+    Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveSelected);
+    Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAsSelected);
+    Connect(ID_MENUITEM16,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAllSelected);
+    Connect(ID_MENUITEM15,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuCompilationSelected);
+    Connect(ID_MENUITEM18,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuPortableSelected);
+    Connect(ID_MENUITEM19,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnCloseCurrentProjectSelected);
+    Connect(ID_MENUITEM17,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuPrefSelected);
+    Connect(ID_MENUITEM27,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuAideSelected);
+    Connect(ID_MENUITEM14,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnQuit);
+    Connect(ID_MENUITEM20,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuAideSelected);
+    Connect(ID_MENUITEM23,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuTutoSelected);
+    Connect(ID_MENUITEM22,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuWikiSelected);
+    Connect(ID_MENUITEM25,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuItem36Selected);
+    Connect(ID_MENUITEM24,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSiteSelected);
+    Connect(ID_MENUITEM21,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnAbout);
+    Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&MainFrame::OnClose);
+    Connect(wxEVT_SIZE,(wxObjectEventFunction)&MainFrame::OnResize);
     //*)
-    Connect( wxID_FILE1, wxID_FILE9, wxEVT_COMMAND_MENU_SELECTED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRecentClicked );
-    Connect( idRibbonNew, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuNewSelected );
-    Connect( idRibbonOpen, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuOpenSelected );
-    Connect( idRibbonOpen, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonOpenDropDownClicked );
-    Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuSaveSelected );
-    Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonSaveDropDownClicked );
-    Connect( idRibbonSaveAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonSaveAllClicked );
-    Connect( idRibbonCompil, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuCompilationSelected );
-    Connect( idRibbonOptions, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuPrefSelected );
-    Connect( idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuAideSelected );
-    Connect( idRibbonTuto, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuTutoSelected );
-    Connect( idRibbonWiki, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuWikiSelected );
-    Connect( idRibbonForum, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuForumSelected );
-    Connect( idRibbonUpdate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuItem36Selected );
-    Connect( idRibbonWebSite, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuSiteSelected );
-    Connect( idRibbonCredits, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnAbout );
+    Connect( wxID_FILE1, wxID_FILE9, wxEVT_COMMAND_MENU_SELECTED, ( wxObjectEventFunction )&MainFrame::OnRecentClicked );
+    Connect( idRibbonNew, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuNewSelected );
+    Connect( idRibbonOpen, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuOpenSelected );
+    Connect( idRibbonOpen, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonOpenDropDownClicked );
+    Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuSaveSelected );
+    Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonSaveDropDownClicked );
+    Connect( idRibbonSaveAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonSaveAllClicked );
+    Connect( idRibbonCompil, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuCompilationSelected );
+    Connect( idRibbonOptions, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuPrefSelected );
+    Connect( idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuAideSelected );
+    Connect( idRibbonTuto, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuTutoSelected );
+    Connect( idRibbonWiki, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuWikiSelected );
+    Connect( idRibbonForum, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuForumSelected );
+    Connect( idRibbonUpdate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuItem36Selected );
+    Connect( idRibbonWebSite, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuSiteSelected );
+    Connect( idRibbonCredits, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnAbout );
 
 
     wxIconBundle icons;
@@ -428,15 +430,15 @@ projectManager(NULL)
 
     //Create ribbon "File" custom button
     ribbonFileBt = new wxStaticBitmap(m_ribbon, idRibbonFileBt, wxNullBitmap);
-    ribbonFileBt->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(Game_Develop_EditorFrame::OnRibbonFileBtLeave), NULL, this);
-    ribbonFileBt->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(Game_Develop_EditorFrame::OnRibbonFileBtEnter), NULL, this);
-    ribbonFileBt->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(Game_Develop_EditorFrame::OnRibbonFileBtClick), NULL, this);
+    ribbonFileBt->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrame::OnRibbonFileBtLeave), NULL, this);
+    ribbonFileBt->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(MainFrame::OnRibbonFileBtEnter), NULL, this);
+    ribbonFileBt->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::OnRibbonFileBtClick), NULL, this);
 
     //Create ribbon "Help" custom button
     ribbonHelpBt = new wxStaticBitmap(m_ribbon, idRibbonHelpBt, wxNullBitmap);
-    ribbonHelpBt->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(Game_Develop_EditorFrame::OnRibbonHelpBtLeave), NULL, this);
-    ribbonHelpBt->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(Game_Develop_EditorFrame::OnRibbonHelpBtEnter), NULL, this);
-    ribbonHelpBt->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(Game_Develop_EditorFrame::OnRibbonHelpBtClick), NULL, this);
+    ribbonHelpBt->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrame::OnRibbonHelpBtLeave), NULL, this);
+    ribbonHelpBt->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(MainFrame::OnRibbonHelpBtEnter), NULL, this);
+    ribbonHelpBt->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::OnRibbonHelpBtClick), NULL, this);
 
     //Load wxAUI
     m_mgr.SetManagedWindow( this );
@@ -454,6 +456,9 @@ projectManager(NULL)
     projectManager = new ProjectManager(this, *this);
     projectManager->ConnectEvents();
 
+    //Create project properties panel
+    projectPropertiesPnl = new ProjectPropertiesPnl(this);
+
     //Create build tools panel
     buildToolsPnl = new BuildToolsPnl(this, projectManager);
 
@@ -462,6 +467,7 @@ projectManager(NULL)
     m_mgr.AddPane( Panel1, wxAuiPaneInfo().Name( wxT( "EP" ) ).Caption( _( "Editeur principal" ) ).Center().CaptionVisible(false).CloseButton( false ).MaximizeButton( true ).MinimizeButton( false ) );
     m_mgr.AddPane( m_ribbon, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ruban" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).Resizable(false) );
     m_mgr.AddPane( buildToolsPnl, wxAuiPaneInfo().Name( wxT( "CT" ) ).Caption( _( "Outils de compilations" ) ).Bottom().MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(120,130));
+    m_mgr.AddPane( projectPropertiesPnl, wxAuiPaneInfo().Name( wxT( "PP" ) ).Caption( _( "Propriétés du projet" ) ).Show(false) );
 
     wxString result;
     pConfig->Read( _T( "/Workspace/Actuel" ), &result );
@@ -471,6 +477,7 @@ projectManager(NULL)
     //Ensure that names are corrected ( Useful in particular to ensure that these name are in the selected language ).
     m_mgr.GetPane(projectManager).Caption(_( "Gestionnaire de projets" ));
     m_mgr.GetPane(buildToolsPnl).Caption(_( "Outils de compilations" ));
+    m_mgr.GetPane(projectPropertiesPnl).Caption(_( "Propriétés du projet" ));
 
     //Change ribbon pane height.
     m_mgr.GetPane(m_ribbon).MinSize(1, m_ribbon->GetBestSize().GetHeight()+4);
@@ -493,6 +500,7 @@ projectManager(NULL)
     if ( createEmptyProject )
     {
         games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
+        SetCurrentGame(0);
         projectManager->Refresh();
     }
 
@@ -500,7 +508,7 @@ projectManager(NULL)
     editorsNotebook->AddPage(htmlViewerPnl, _("Aide en ligne"));
 }
 
-void Game_Develop_EditorFrame::OnResize(wxSizeEvent& event)
+void MainFrame::OnResize(wxSizeEvent& event)
 {
     Layout();
     if ( ribbonHelpBt != NULL ) ribbonHelpBt->SetPosition(wxPoint(m_ribbon->GetSize().GetWidth()-ribbonHelpBt->GetSize().GetWidth()-2, 2));
@@ -510,18 +518,18 @@ void Game_Develop_EditorFrame::OnResize(wxSizeEvent& event)
 /**
  * Destructor : Uninit
  */
-Game_Develop_EditorFrame::~Game_Develop_EditorFrame()
+MainFrame::~MainFrame()
 {
-    //(*Destroy(Game_Develop_EditorFrame)
+    //(*Destroy(MainFrame)
     //*)
 
     //Deinitialize the frame manager
     m_mgr.UnInit();
 }
 
-/** Change current game
+/** Change current project
   */
-void Game_Develop_EditorFrame::SetCurrentGame(unsigned int i)
+void MainFrame::SetCurrentGame(unsigned int i)
 {
     gameCurrentlyEdited = i;
     if ( i >= games.size())
@@ -535,10 +543,13 @@ void Game_Develop_EditorFrame::SetCurrentGame(unsigned int i)
         SetTitle( GD + " - [" + games[i]->GetName() + "] "+games[i]->GetProjectFile() );
     }
 
+    //Update editors displaying current project properties
+    projectPropertiesPnl->SetProject(games[i].get());
+
     return;
 }
 
-void Game_Develop_EditorFrame::UpdateNotebook()
+void MainFrame::UpdateNotebook()
 {
     editorsNotebook->SetWindowStyleFlag(wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS | wxNO_BORDER );
 }
@@ -546,7 +557,7 @@ void Game_Develop_EditorFrame::UpdateNotebook()
 /**
  * Show project manager
  */
-void Game_Develop_EditorFrame::OnProjectsManagerClicked(wxRibbonButtonBarEvent& evt)
+void MainFrame::OnProjectsManagerClicked(wxRibbonButtonBarEvent& evt)
 {
     m_mgr.GetPane(projectManager).Show(true);
     m_mgr.Update();
@@ -555,7 +566,7 @@ void Game_Develop_EditorFrame::OnProjectsManagerClicked(wxRibbonButtonBarEvent& 
 /**
  * Show project manager
  */
-void Game_Develop_EditorFrame::OnRibbonCppToolsClicked(wxRibbonButtonBarEvent& evt)
+void MainFrame::OnRibbonCppToolsClicked(wxRibbonButtonBarEvent& evt)
 {
     m_mgr.GetPane(buildToolsPnl).Show(true);
     m_mgr.Update();
@@ -564,7 +575,7 @@ void Game_Develop_EditorFrame::OnRibbonCppToolsClicked(wxRibbonButtonBarEvent& e
 /**
  * Show the start page
  */
-void Game_Develop_EditorFrame::OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt)
+void MainFrame::OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt)
 {
     for (unsigned int i = 0;i<editorsNotebook->GetPageCount();++i)
     {
@@ -582,7 +593,7 @@ void Game_Develop_EditorFrame::OnRibbonStartPageClicked(wxRibbonButtonBarEvent& 
 /**
  * Want to close Game Develop
  */
-void Game_Develop_EditorFrame::OnClose( wxCloseEvent& event )
+void MainFrame::OnClose( wxCloseEvent& event )
 {
     if (wxMessageBox(_("Etes-vous sûr de vouloir quitter Game Develop ?"), _("Quitter Game Develop"), wxYES_NO ) == wxNO)
         return;
@@ -601,7 +612,7 @@ void Game_Develop_EditorFrame::OnClose( wxCloseEvent& event )
 /**
  * Add or remove the close button on tab
  */
-void Game_Develop_EditorFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
+void MainFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
 {
     if ( false ) //All editors are closable currently
     {
@@ -638,7 +649,7 @@ void Game_Develop_EditorFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
     }
 }
 
-void Game_Develop_EditorFrame::LoadSkin(wxRibbonBar * bar)
+void MainFrame::LoadSkin(wxRibbonBar * bar)
 {
     wxConfigBase *pConfig = wxConfigBase::Get();
     wxString result;
@@ -684,7 +695,7 @@ void Game_Develop_EditorFrame::LoadSkin(wxRibbonBar * bar)
     }
 }
 
-void Game_Develop_EditorFrame::LoadSkin(wxAuiManager * auiManager, wxAuiNotebook * notebook)
+void MainFrame::LoadSkin(wxAuiManager * auiManager, wxAuiNotebook * notebook)
 {
     wxConfigBase *pConfig = wxConfigBase::Get();
     wxString result;
@@ -764,7 +775,7 @@ void Game_Develop_EditorFrame::LoadSkin(wxAuiManager * auiManager, wxAuiNotebook
     if (notebook) notebook->SetArtProvider(tabArt);
 }
 
-void Game_Develop_EditorFrame::RealizeRibbonCustomButtons()
+void MainFrame::RealizeRibbonCustomButtons()
 {
     wxRibbonArtProvider * artProvider = m_ribbon->GetArtProvider();
     if ( artProvider == NULL ) return;
@@ -849,7 +860,7 @@ void Game_Develop_EditorFrame::RealizeRibbonCustomButtons()
     m_ribbon->SetTabCtrlMargins(bitmapLabel.GetSize().GetWidth()+3+3, ribbonHelpBt->GetSize().GetWidth()+2+3);
 }
 
-void Game_Develop_EditorFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& event)
+void MainFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& event)
 {
     if ( dynamic_cast<StartHerePage*>(editorsNotebook->GetPage(event.GetSelection())) != NULL )
         startPage = NULL;
@@ -874,7 +885,7 @@ void Game_Develop_EditorFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& ev
 /**
  * Configure autosaving according to preferences
  */
-void Game_Develop_EditorFrame::PrepareAutosave()
+void MainFrame::PrepareAutosave()
 {
     bool activated = true;
     wxConfigBase::Get()->Read( "/Autosave/Activated", &activated );
@@ -891,7 +902,7 @@ void Game_Develop_EditorFrame::PrepareAutosave()
 /**
  * Autosave projects
  */
-void Game_Develop_EditorFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
+void MainFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
 {
     for (unsigned int i = 0;i<games.size();++i)
     {
@@ -905,7 +916,7 @@ void Game_Develop_EditorFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
     }
 }
 
-void Game_Develop_EditorFrame::OnKeyDown(wxKeyEvent& event)
+void MainFrame::OnKeyDown(wxKeyEvent& event)
 {
     if ( !scenesLockingShortcuts.empty() )
     {
@@ -985,40 +996,57 @@ void Game_Develop_EditorFrame::OnKeyDown(wxKeyEvent& event)
     event.Skip();
 }
 
-void Game_Develop_EditorFrame::OnRibbonFileBtLeave(wxMouseEvent& event)
+void MainFrame::OnRibbonFileBtLeave(wxMouseEvent& event)
 {
     ribbonFileBt->SetBitmap(ribbonFileNormalBitmap);
     ribbonFileBt->Refresh();
     ribbonFileBt->Update();
 }
 
-void Game_Develop_EditorFrame::OnRibbonFileBtEnter(wxMouseEvent& event)
+void MainFrame::OnRibbonFileBtEnter(wxMouseEvent& event)
 {
     ribbonFileBt->SetBitmap(ribbonFileHoveredBitmap);
     ribbonFileBt->Refresh();
     ribbonFileBt->Update();
 }
 
-void Game_Develop_EditorFrame::OnRibbonFileBtClick(wxMouseEvent& event)
+void MainFrame::OnRibbonFileBtClick(wxMouseEvent& event)
 {
     PopupMenu(&fileMenu, ribbonFileBt->GetPosition().x, ribbonFileBt->GetPosition().y+ribbonFileBt->GetSize().GetHeight());
 }
 
-void Game_Develop_EditorFrame::OnRibbonHelpBtLeave(wxMouseEvent& event)
+void MainFrame::OnRibbonHelpBtLeave(wxMouseEvent& event)
 {
     ribbonHelpBt->SetBitmap(ribbonHelpNormalBitmap);
     ribbonHelpBt->Refresh();
     ribbonHelpBt->Update();
 }
 
-void Game_Develop_EditorFrame::OnRibbonHelpBtEnter(wxMouseEvent& event)
+void MainFrame::OnRibbonHelpBtEnter(wxMouseEvent& event)
 {
     ribbonHelpBt->SetBitmap(ribbonHelpHoveredBitmap);
     ribbonHelpBt->Refresh();
     ribbonHelpBt->Update();
 }
 
-void Game_Develop_EditorFrame::OnRibbonHelpBtClick(wxMouseEvent& event)
+void MainFrame::OnRibbonHelpBtClick(wxMouseEvent& event)
 {
     PopupMenu(&helpMenu, ribbonHelpBt->GetPosition().x, ribbonHelpBt->GetPosition().y+ribbonHelpBt->GetSize().GetHeight());
+}
+
+void MainFrame::OnMenuPrefSelected( wxCommandEvent& event )
+{
+    Preferences Dialog( this );
+    Dialog.ShowModal();
+
+    //Reload skins and update controls
+    LoadSkin(&m_mgr, editorsNotebook);
+    LoadSkin(m_ribbon);
+
+    PrepareAutosave();
+
+    UpdateNotebook();
+    RealizeRibbonCustomButtons();
+    m_ribbon->Realize();
+    m_mgr.Update();
 }

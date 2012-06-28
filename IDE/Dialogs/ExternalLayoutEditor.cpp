@@ -16,7 +16,7 @@
 #include "../EditorLayers.h"
 #include "../EditorObjets.h"
 #include "../SceneCanvas.h"
-#include "../Game_Develop_EditorMain.h"
+#include "../MainFrame.h"
 
 //(*IdInit(ExternalLayoutEditor)
 const long ExternalLayoutEditor::ID_STATICTEXT1 = wxNewId();
@@ -138,7 +138,7 @@ mainEditorCommand(mainEditorCommand_)
 
     m_mgr.AddPane( corePanel, wxAuiPaneInfo().Name( wxT( "LayoutPanel" ) ).Center().CloseButton( false ).Caption( _( "Editeur de scène" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
 
-    Game_Develop_EditorFrame::LoadSkin(&m_mgr, NULL);
+    MainFrame::LoadSkin(&m_mgr, NULL);
 
     //If the
     vector< boost::shared_ptr<Scene> >::iterator sceneFound =

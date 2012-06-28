@@ -47,7 +47,7 @@
 #include "TrueOrFalse.h"
 #include "ChoiceJoyAxis.h"
 #include "ChoiceFile.h"
-#include "Extensions.h"
+#include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "SigneTest.h"
 #include "ChoixBouton.h"
 #include "ChoixClavier.h"
@@ -1013,7 +1013,7 @@ void ChoixCondition::OnobjSortCheckClick(wxCommandEvent& event)
 
 void ChoixCondition::OnmoreBtClick(wxCommandEvent& event)
 {
-    Extensions dialog(this, game);
+    gd::ProjectExtensionsDialog dialog(this, game);
     dialog.ShowModal();
 
     RefreshList();

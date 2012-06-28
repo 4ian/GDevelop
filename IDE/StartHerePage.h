@@ -9,13 +9,13 @@
 #include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 //*)
-class Game_Develop_EditorFrame;
+class MainFrame;
 
 class StartHerePage: public wxPanel
 {
 	public:
 
-		StartHerePage(wxWindow* parent, Game_Develop_EditorFrame & mainEditor_);
+		StartHerePage(wxWindow* parent, MainFrame & mainEditor_);
 		virtual ~StartHerePage();
 
 		//(*Declarations(StartHerePage)
@@ -109,7 +109,7 @@ class StartHerePage: public wxPanel
 		void OnTutorial2BtClick(wxCommandEvent& event);
 		//*)
 
-		Game_Develop_EditorFrame & mainEditor;
+		MainFrame & mainEditor;
 
 		DECLARE_EVENT_TABLE()
 };

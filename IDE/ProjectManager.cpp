@@ -20,7 +20,7 @@
 #include <fstream>
 #include "LogFileManager.h"
 #include "Clipboard.h"
-#include "Game_Develop_EditorMain.h"
+#include "MainFrame.h"
 #include "gdTreeItemGameData.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/StandardEvent.h"
@@ -28,13 +28,12 @@
 #include "GDL/SourceFile.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "CodeEditor.h"
-#include "Extensions.h"
+#include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "ExternalEventsEditor.h"
 #include "Dialogs/ExternalLayoutEditor.h"
-#include "EditPropJeu.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "EditPropScene.h"
-
+#include "Dialogs/ProjectPropertiesPnl.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
@@ -111,7 +110,7 @@ BEGIN_EVENT_TABLE(ProjectManager,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-ProjectManager::ProjectManager(wxWindow* parent, Game_Develop_EditorFrame & mainEditor_) :
+ProjectManager::ProjectManager(wxWindow* parent, MainFrame & mainEditor_) :
 mainEditor(mainEditor_)
 {
 	//(*Initialize(ProjectManager)
@@ -369,24 +368,24 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
 
 void ProjectManager::ConnectEvents()
 {
-    mainEditor.Connect( idRibbonNew, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuNewSelected, NULL, &mainEditor );
-    mainEditor.Connect( idRibbonOpen, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuOpenSelected, NULL, &mainEditor );
-    mainEditor.Connect( idRibbonSaveAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonSaveAllClicked, NULL, &mainEditor );
-    mainEditor.Connect( idRibbonOpen, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonOpenDropDownClicked, NULL, &mainEditor );
-    mainEditor.Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuSaveSelected, NULL, &mainEditor );
-    mainEditor.Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonSaveDropDownClicked, NULL, &mainEditor );
-    mainEditor.Connect( idRibbonCompil, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuCompilationSelected, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonNew, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuNewSelected, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonOpen, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuOpenSelected, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonSaveAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonSaveAllClicked, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonOpen, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonOpenDropDownClicked, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuSaveSelected, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonSaveDropDownClicked, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonCompil, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuCompilationSelected, NULL, &mainEditor );
     mainEditor.Connect( idRibbonClose, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonCloseSelected, NULL, this );
     mainEditor.Connect( idRibbonExtensions, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonExtensionsSelected, NULL, this );
     mainEditor.Connect( idRibbonEditImages, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditImagesSelected, NULL, this );
     mainEditor.Connect( idRibbonAddScene, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonAddSceneSelected, NULL, this );
     mainEditor.Connect( idRibbonAddExternalEvents, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonAddExternalEventsSelected, NULL, this );
     mainEditor.Connect( idRibbonEditSelected, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditSelectionSelected, NULL, this );
-    mainEditor.Connect( idRibbonStartPage, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonStartPageClicked, NULL, &mainEditor );
-    mainEditor.Connect( idRibbonCppTools, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonCppToolsClicked, NULL, &mainEditor );
-    mainEditor.Connect( idRibbonProjectsManager, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnProjectsManagerClicked, NULL, &mainEditor );
-    mainEditor.Connect( idRibbonEncoder, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnMenuItem23Selected, NULL, &mainEditor );
-    mainEditor.Connect( idRibbonImporter, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&Game_Develop_EditorFrame::OnRibbonDecomposerDropDownClicked, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonStartPage, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonStartPageClicked, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonCppTools, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonCppToolsClicked, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonProjectsManager, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnProjectsManagerClicked, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonEncoder, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuItem23Selected, NULL, &mainEditor );
+    mainEditor.Connect( idRibbonImporter, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonDecomposerDropDownClicked, NULL, &mainEditor );
     mainEditor.Connect( idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonHelpSelected, NULL, &mainEditor );
 
 }
@@ -1174,13 +1173,10 @@ void ProjectManager::OneditPropGameMenuItemSelected(wxCommandEvent& event)
     gdTreeItemGameData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    bool oldExternalSourcesFileUse = game->useExternalSourceFiles;
-    EditPropJeu Dialog( this, *game );
-    if ( Dialog.ShowModal() )
-
-    projectsTree->SetItemText(selectedItem, game->GetName()); //The name can have been changed
-    if ( oldExternalSourcesFileUse != game->useExternalSourceFiles )
-        Refresh();
+    mainEditor.GetProjectPropertiesPanel()->SetProject(game);
+    mainEditor.GetProjectPropertiesPanel()->SetAssociatedTreeCtrlProjectItem(projectsTree, selectedItem);
+    mainEditor.GetAUIPaneManger()->GetPane("PP").Show(true);
+    mainEditor.GetAUIPaneManger()->Update();
 }
 
 /**
@@ -1188,7 +1184,7 @@ void ProjectManager::OneditPropGameMenuItemSelected(wxCommandEvent& event)
  */
 void ProjectManager::EditExtensionsOfGame(gd::Project & project)
 {
-    Extensions dialog(this, project);
+    gd::ProjectExtensionsDialog dialog(this, project);
     dialog.ShowModal();
 }
 
@@ -1196,7 +1192,6 @@ void ProjectManager::OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event)
 {
     if ( !mainEditor.CurrentGameIsValid() ) return;
     EditExtensionsOfGame(*mainEditor.GetCurrentGame());
-
 
     Refresh();
 }
@@ -1269,6 +1264,7 @@ void ProjectManager::CloseGame(Game * game)
             }
         }
     }
+    if ( mainEditor.GetProjectPropertiesPanel()->GetProject() == game ) mainEditor.GetProjectPropertiesPanel()->SetProject(NULL);
 
     //Ensure we're not destroying a scene with events being built
     wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements de la scène\ndoit être menée à terme avant de fermer le jeu...") : NULL;

@@ -10,7 +10,7 @@
 #include <wx/log.h>
 #include <wx/snglinst.h>
 #include "GDL/Game.h"
-#include "Game_Develop_EditorMain.h"
+#include "MainFrame.h"
 
 /**
  * Class managing the application, e.g. its initialization, creation of the main window...
@@ -26,7 +26,7 @@ class Game_Develop_EditorApp : public wxApp
         virtual bool    OnExceptionInMainLoop();
         virtual void    OnKeyPressed(wxKeyEvent& event) { if (mainEditor) mainEditor->OnKeyDown(event);};
 
-        Game_Develop_EditorFrame * mainEditor;
+        MainFrame * mainEditor;
         wxSingleInstanceChecker * singleInstanceChecker;
 };
 

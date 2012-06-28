@@ -36,7 +36,7 @@
 #include "GDCore/IDE/ActionSentenceFormatter.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/IDE/ExpressionsCorrectnessTesting.h"
-#include "Extensions.h"
+#include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 
 #include "GDL/IDE/Dialogs/ChooseObject.h"
 #include "GDL/IDE/Dialogs/EditExpression.h"
@@ -1051,7 +1051,7 @@ void ChoixAction::OnobjSortCheckClick(wxCommandEvent& event)
 
 void ChoixAction::OnmoreBtClick(wxCommandEvent& event)
 {
-    Extensions dialog(this, game);
+    gd::ProjectExtensionsDialog dialog(this, game);
     dialog.ShowModal();
 
     RefreshList();

@@ -3,7 +3,7 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "Game_Develop_EditorMain.h"
+#include "MainFrame.h"
 #include <wx/string.h>
 #include <wx/mimetype.h> // mimetype support
 #include "GDCore/Tools/HelpFileAccess.h"
@@ -13,7 +13,7 @@
 /**
  * Display help
  */
-void Game_Develop_EditorFrame::OnMenuAideSelected( wxCommandEvent& event )
+void MainFrame::OnMenuAideSelected( wxCommandEvent& event )
 {
     if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplayContents();
@@ -24,7 +24,7 @@ void Game_Develop_EditorFrame::OnMenuAideSelected( wxCommandEvent& event )
 /**
  * Display about dialogs
  */
-void Game_Develop_EditorFrame::OnAbout( wxCommandEvent& event )
+void MainFrame::OnAbout( wxCommandEvent& event )
 {
     Credits Dialog( this );
     Dialog.ShowModal();
@@ -33,7 +33,7 @@ void Game_Develop_EditorFrame::OnAbout( wxCommandEvent& event )
 /**
  * Access forum
  */
-void Game_Develop_EditorFrame::OnMenuForumSelected(wxCommandEvent& event)
+void MainFrame::OnMenuForumSelected(wxCommandEvent& event)
 {
     wxString link = "http://www.forum.compilgames.net";
 
@@ -62,7 +62,7 @@ void Game_Develop_EditorFrame::OnMenuForumSelected(wxCommandEvent& event)
 /**
  * Access official web site
  */
-void Game_Develop_EditorFrame::OnMenuSiteSelected(wxCommandEvent& event)
+void MainFrame::OnMenuSiteSelected(wxCommandEvent& event)
 {
     wxString link = "http://www.compilgames.net";
 
@@ -90,7 +90,7 @@ void Game_Develop_EditorFrame::OnMenuSiteSelected(wxCommandEvent& event)
 /**
  * Open update dialog
  */
-void Game_Develop_EditorFrame::OnMenuItem36Selected(wxCommandEvent& event)
+void MainFrame::OnMenuItem36Selected(wxCommandEvent& event)
 {
     MAJ dialog(this);
     if ( dialog.ShowModal() == 2)
@@ -103,7 +103,7 @@ void Game_Develop_EditorFrame::OnMenuItem36Selected(wxCommandEvent& event)
 /**
  * Display tutorial
  */
-void Game_Develop_EditorFrame::OnMenuTutoSelected(wxCommandEvent& event)
+void MainFrame::OnMenuTutoSelected(wxCommandEvent& event)
 {
     wxString link = wxGetCwd() + "/Tutorial/"+_("Tutoriel.pdf");
 
@@ -121,7 +121,7 @@ void Game_Develop_EditorFrame::OnMenuTutoSelected(wxCommandEvent& event)
 /**
  * Access wiki
  */
-void Game_Develop_EditorFrame::OnMenuWikiSelected(wxCommandEvent& event)
+void MainFrame::OnMenuWikiSelected(wxCommandEvent& event)
 {
     wxString link = "http://www.wiki.compilgames.net";
 

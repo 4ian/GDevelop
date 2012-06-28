@@ -1,5 +1,5 @@
 #include "DnDFileEditor.h"
-#include "Game_Develop_EditorMain.h"
+#include "MainFrame.h"
 
 bool DnDFileEditor::OnDropFiles(wxCoord x, wxCoord y,
                              const wxArrayString& filenames)

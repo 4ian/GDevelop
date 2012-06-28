@@ -12907,7 +12907,7 @@
 	<string>
 	<vector>
 
-1339933776 d:\florian\programmation\gamedevelop2\gdl\\gdl\game.h
+1340791791 d:\florian\programmation\gamedevelop2\gdl\\gdl\game.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
@@ -14464,7 +14464,7 @@
 	"GDL/GDMathParser.h"
 	<iostream>
 
-1340141059 source:d:\florian\programmation\gamedevelop2\gdl\gdl\game.cpp
+1340812651 source:d:\florian\programmation\gamedevelop2\gdl\gdl\game.cpp
 	"GDL/Game.h"
 	"GDL/ExtensionsManager.h"
 	"GDL/ExternalEvents.h"
@@ -14473,10 +14473,12 @@
 	"GDL/Scene.h"
 	"GDL/Object.h"
 	"GDL/ObjectHelpers.h"
+	"GDL/FontManager.h"
 	<wx/intl.h>
 	<wx/propgrid/propgrid.h>
 	<wx/propgrid/advprops.h>
 	"PlatformDefinition/Platform.h"
+	"GDL/Events/CodeCompilationHelpers.h"
 	"GDCore/PlatformDefinition/Layout.h"
 	"GDCore/CommonTools.h"
 
@@ -14965,7 +14967,7 @@
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\compilertoolchainpathmanager.h
 
-1337108423 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
+1340890391 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
 	"GDL/Sprite.h"
 	<SFML/Graphics.hpp>
 	"GDL/ImageManager.h"
@@ -14995,7 +14997,7 @@
 	<wx/panel.h>
 	<wx/combobox.h>
 
-1339789601 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
+1340890828 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
 	<wx/wx.h>
 	<SFML/Graphics.hpp>
 	"GDL/SpriteObject.h"
@@ -33900,7 +33902,7 @@
 1337095419 d:\florian\programmation\gamedevelop2\gdl\\gdl\builtinextensions\mathematicaltoolsextension.h
 	"GDL/ExtensionBase.h"
 
-1338638329 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\maineditorcommand.h
+1340642118 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\maineditorcommand.h
 	<algorithm>
 	<vector>
 	<wx/infobar.h>
@@ -34170,7 +34172,7 @@
 	<wx/dialog.h>
 	"GDL/ResourcesManager.h"
 
-1340554840 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\resourceseditor.cpp
+1340570771 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\resourceseditor.cpp
 	"GDL/IDE/Dialogs/ResourcesEditor.h"
 	<wx/msw/winundef.h>
 	<wx/bitmap.h>
@@ -34211,7 +34213,7 @@
 	"GDL/IDE/gdTreeItemStringData.h"
 	<gtk/gtk.h>
 
-1340570216 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\resourceseditor.h
+1340643393 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\resourceseditor.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -34240,7 +34242,7 @@
 	<boost/shared_ptr.hpp>
 	"GDL/IDE/ArbitraryResourceWorker.h"
 
-1339341611 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
+1340827915 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
 	"GDL/IDE/Dialogs/SpriteObjectEditor.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -34310,7 +34312,7 @@
 	"GDL/Scene.h"
 	"GDL/Game.h"
 
-1338745233 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\fullprojectcompiler.cpp
+1340815007 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\fullprojectcompiler.cpp
 	"FullProjectCompiler.h"
 	<fstream>
 	<iostream>
@@ -35288,7 +35290,7 @@
 	<boost/weak_ptr.hpp>
 	"GDCore/Events/Instruction.h"
 
-1340478601 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\commonbitmapmanager.h
+1340887912 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\commonbitmapmanager.h
 	<wx/bitmap.h>
 
 1337021284 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\eventsrenderinghelper.h
@@ -35406,7 +35408,7 @@
 	"GDCore/PlatformDefinition/Platform.h"
 	"GDL/Game.h"
 
-1339933776 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\project.h
+1340791290 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\project.h
 	<string>
 	<vector>
 	"GDCore/PlatformDefinition/ObjectGroup.h"

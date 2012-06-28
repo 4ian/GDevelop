@@ -11,12 +11,14 @@
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
+#include "GDL/FontManager.h"
 
 #if defined(GD_IDE_ONLY)
 #include <wx/intl.h>
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/advprops.h>
 #include "PlatformDefinition/Platform.h"
+#include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/CommonTools.h"
 #elif !defined(_)
@@ -55,6 +57,7 @@ useExternalSourceFiles(false)
     extensionsUsed.push_back("BuiltinCommonConversions");
     extensionsUsed.push_back("BuiltinStringInstructions");
     extensionsUsed.push_back("BuiltinMathematicalTools");
+    extensionsUsed.push_back("BuiltinExternalLayouts");
 
     platform = new Platform; //For now, Platform is automatically created
     #endif
@@ -67,27 +70,42 @@ Game::~Game()
 #if defined(GD_IDE_ONLY)
 void Game::PopulatePropertyGrid(wxPropertyGrid * grid)
 {
-    grid->Append( new wxPropertyCategory("Génération") );
+    gd::Project::PopulatePropertyGrid(grid);
+
+    grid->Append( new wxPropertyCategory(_("Génération")) );
     grid->Append( new wxStringProperty(_("Nom de l'executable Windows"), wxPG_LABEL, winExecutableFilename) );
     grid->Append( new wxImageFileProperty(_("Icone de l'executable Windows"), wxPG_LABEL, winExecutableIconFile) );
     grid->Append( new wxStringProperty(_("Nom de l'executable Linux"), wxPG_LABEL, linuxExecutableFilename) );
     grid->Append( new wxStringProperty(_("Nom de l'executable Mac OS"), wxPG_LABEL, macExecutableFilename) );
-    grid->Append( new wxPropertyCategory("Ecran de chargement") );
+
+    grid->Append( new wxPropertyCategory(_("Fonctionnalités C++")) );
+    grid->Append( new wxBoolProperty(_("Activer l'utilisation de sources C++"), wxPG_LABEL, useExternalSourceFiles) );
+
+    grid->Append( new wxPropertyCategory(_("Ecran de chargement")) );
     grid->Append( new wxBoolProperty(_("Afficher l'écran"), wxPG_LABEL, loadingScreen.afficher) );
+    grid->AppendIn( _("Ecran de chargement"), new wxPropertyCategory(_("Configuration")) );
     grid->Append( new wxBoolProperty(_("Afficher la bordure de la fenêtre"), wxPG_LABEL, loadingScreen.border) );
-    grid->Append( new wxUIntProperty(_("Largeur"), wxPG_LABEL, loadingScreen.width) );
-    grid->Append( new wxUIntProperty(_("Hauteur"), wxPG_LABEL, loadingScreen.height) );
+    grid->Append( new wxUIntProperty(_("Largeur"), "LoadingScreenWidth", loadingScreen.width) );
+    grid->Append( new wxUIntProperty(_("Hauteur"), "LoadingScreenHeight", loadingScreen.height) );
     grid->Append( new wxBoolProperty(_("Afficher un texte"), wxPG_LABEL, loadingScreen.texte) );
-    grid->Append( new wxIntProperty(_("Position X du test"), wxPG_LABEL, loadingScreen.texteXPos) );
-    grid->Append( new wxIntProperty(_("Position Y du test"), wxPG_LABEL, loadingScreen.texteYPos) );
+    grid->Append( new wxIntProperty(_("Position X du texte"), wxPG_LABEL, loadingScreen.texteXPos) );
+    grid->Append( new wxIntProperty(_("Position Y du texte"), wxPG_LABEL, loadingScreen.texteYPos) );
     grid->Append( new wxStringProperty(_("Texte à afficher"), wxPG_LABEL, loadingScreen.texteChargement) );
     grid->Append( new wxBoolProperty(_("Afficher une image"), wxPG_LABEL, loadingScreen.image) );
     grid->Append( new wxImageFileProperty(_("Fichier de l'image"), wxPG_LABEL, loadingScreen.imageFichier) );
     grid->Append( new wxBoolProperty(_("Lisser l'image"), wxPG_LABEL, loadingScreen.smooth) );
+    grid->Append( new wxStringProperty(_("Aperçu"), "Preview", _("Cliquez pour prévisualiser...")) );
+
+    grid->SetPropertyCell("Preview", 1, _("Cliquez pour prévisualiser..."), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
+    grid->SetPropertyReadOnly(_("Variables globales"));
+
+    grid->EnableProperty(_("Configuration"), grid->GetProperty(_("Afficher l'écran"))->GetValue().GetBool());
 }
 
 void Game::UpdateFromPropertyGrid(wxPropertyGrid * grid)
 {
+    gd::Project::UpdateFromPropertyGrid(grid);
+
     if ( grid->GetProperty(_("Nom de l'executable Windows")) != NULL)
         winExecutableFilename = gd::ToString(grid->GetProperty(_("Nom de l'executable Windows"))->GetValueAsString());
     if ( grid->GetProperty(_("Icone de l'executable Windows")) != NULL)
@@ -100,16 +118,16 @@ void Game::UpdateFromPropertyGrid(wxPropertyGrid * grid)
         loadingScreen.afficher = grid->GetProperty(_("Afficher l'écran"))->GetValue().GetBool();
     if ( grid->GetProperty(_("Afficher la bordure de la fenêtre")) != NULL)
         loadingScreen.border =grid->GetProperty(_("Afficher la bordure de la fenêtre"))->GetValue().GetBool();
-    if ( grid->GetProperty(_("Largeur")) != NULL)
-        loadingScreen.width = wxANY_AS(wxAny(grid->GetProperty(_("Largeur"))->GetValue()), int);
-    if ( grid->GetProperty(_("Hauteur")) != NULL)
-        loadingScreen.height = wxANY_AS(wxAny(grid->GetProperty(_("Hauteur"))->GetValue()), int);
+    if ( grid->GetProperty("LoadingScreenWidth") != NULL)
+        loadingScreen.width = grid->GetProperty("LoadingScreenWidth")->GetValue().GetInteger();
+    if ( grid->GetProperty("LoadingScreenHeight") != NULL)
+        loadingScreen.height = grid->GetProperty("LoadingScreenHeight")->GetValue().GetInteger();
     if ( grid->GetProperty(_("Afficher un texte")) != NULL)
         loadingScreen.texte =grid->GetProperty(_("Afficher un texte"))->GetValue().GetBool();
-    if ( grid->GetProperty(_("Position X du test")) != NULL)
-        loadingScreen.texteXPos = wxANY_AS(wxAny(grid->GetProperty(_("Position X du test"))->GetValue()), int);
-    if ( grid->GetProperty(_("Position Y du test")) != NULL)
-        loadingScreen.texteYPos = wxANY_AS(wxAny(grid->GetProperty(_("Position Y du test"))->GetValue()), int);
+    if ( grid->GetProperty(_("Position X du texte")) != NULL)
+        loadingScreen.texteXPos = grid->GetProperty(_("Position X du texte"))->GetValue().GetInteger();
+    if ( grid->GetProperty(_("Position Y du texte")) != NULL)
+        loadingScreen.texteYPos = grid->GetProperty(_("Position Y du texte"))->GetValue().GetInteger();
     if ( grid->GetProperty(_("Texte à afficher")) != NULL)
         loadingScreen.texteChargement = gd::ToString(grid->GetProperty(_("Texte à afficher"))->GetValueAsString());
     if ( grid->GetProperty(_("Afficher une image")) != NULL)
@@ -120,6 +138,84 @@ void Game::UpdateFromPropertyGrid(wxPropertyGrid * grid)
         loadingScreen.smooth =grid->GetProperty(_("Lisser l'image"))->GetValue().GetBool();
 }
 
+void Game::OnChangeInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event)
+{
+    gd::Project::OnChangeInPropertyGrid(grid, event);
+
+    if ( event.GetPropertyName() == _("Afficher l'écran") )
+        grid->EnableProperty(_("Configuration"), grid->GetProperty(_("Afficher l'écran"))->GetValue().GetBool());
+
+    UpdateFromPropertyGrid(grid);
+}
+
+void Game::OnSelectionInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event)
+{
+    gd::Project::OnSelectionInPropertyGrid(grid, event);
+
+    if ( event.GetPropertyName() == _("Variables globales") )
+    {
+        //Our implementation need to do a full recompilation when global variables have been edited
+        for (unsigned int i = 0;i<GetLayouts().size();++i)
+        {
+            GetLayouts()[i]->wasModified = true;
+            CodeCompilationHelpers::CreateSceneEventsCompilationTask(*this, *GetLayouts()[i]);
+        }
+    }
+    else if ( event.GetPropertyName() == "Preview" )
+    {
+        int width =  grid->GetProperty("LoadingScreenWidth")->GetValue().GetInteger();
+        int height = grid->GetProperty("LoadingScreenHeight")->GetValue().GetInteger();
+        int texteXPos = grid->GetProperty(_("Position X du texte"))->GetValue().GetInteger();
+        int texteYPos = grid->GetProperty(_("Position Y du texte"))->GetValue().GetInteger();
+
+        // Fenêtre
+        unsigned long style = 0;
+        if ( grid->GetProperty(_("Afficher la bordure de la fenêtre"))->GetValue().GetBool() )
+        {
+            style |= sf::Style::Titlebar;
+            style |= sf::Style::Close;
+        }
+        sf::RenderWindow App( sf::VideoMode( width, height, 32 ), "Chargement en cours...", style );
+
+        sf::Texture image;
+        if ( grid->GetProperty(_("Afficher une image"))->GetValue().GetBool() )
+            image.LoadFromFile( gd::ToString(grid->GetProperty(_("Fichier de l'image"))->GetValueAsString()) );
+
+        image.SetSmooth(grid->GetProperty(_("Lisser l'image"))->GetValue().GetBool());
+
+        sf::Sprite sprite( image );
+
+        sf::Text Chargement( gd::ToString(grid->GetProperty(_("Texte à afficher"))->GetValueAsString()), *FontManager::GetInstance()->GetFont("") );
+        Chargement.SetPosition(texteXPos, texteYPos);
+        App.Draw( Chargement );
+
+        App.Clear( sf::Color( 100, 100, 100 ) );
+        App.SetFramerateLimit( 30 );
+        App.Display();
+
+        bool Running = true;
+        sf::Event Event;
+        while ( Running )
+        {
+            App.Clear( sf::Color( 100, 100, 100 ) );
+
+            // Process events
+            while ( App.PollEvent( Event ) )
+            {
+                // Close window : exit
+                if ( Event.Type == sf::Event::Closed || Event.Type == sf::Event::KeyPressed )
+                    Running = false;
+            }
+
+            if ( grid->GetProperty(_("Afficher une image"))->GetValue().GetBool() )
+                App.Draw( sprite );
+            if ( grid->GetProperty(_("Afficher un texte"))->GetValue().GetBool() )
+                App.Draw(Chargement);
+
+            App.Display();
+        }
+    }
+}
 
 bool Game::HasLayoutNamed(const std::string & name) const
 {

@@ -14,7 +14,7 @@ class wxTopLevelWindow;
 class wxRibbonBar;
 class wxRibbonButtonBar;
 class BuildToolsPnl;
-class Game_Develop_EditorFrame;
+class MainFrame;
 class BuildToolsPnl;
 class wxAuiManager;
 class wxAuiNotebook;

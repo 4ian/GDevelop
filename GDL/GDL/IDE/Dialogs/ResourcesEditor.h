@@ -76,7 +76,7 @@ class GD_API ResourcesEditor: public wxPanel
 		wxMenu folderMenu;
 		//*)
 
-		//static void CreateRibbonPage(wxRibbonPage * page); //Creation is made inside Game_Develop_EditorMain.
+		//static void CreateRibbonPage(wxRibbonPage * page); //Creation is made inside MainFrame.
 
         /**
          * Can be called by parent so as to refresh ribbon for this editor.

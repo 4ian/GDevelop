@@ -1754,8 +1754,10 @@ void EditorObjet::OnModifyMaskRectangleSelected(wxCommandEvent& event)
         std::vector<RotatedRectangle> boxes = GetEditedSprite().GetCollisionMask();
         if ( selectedBox < boxes.size())
         {
-            boxes[selectedBox].halfSize.x = ToFloat(string(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.x*2.0f)).mb_str()))/2.0f;
-            boxes[selectedBox].halfSize.y = ToFloat(string(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.y*2.0f)).mb_str()))/2.0f;
+            float width = ToFloat(string(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.x*2.0f)).mb_str()));
+            if ( width != 0 ) boxes[selectedBox].halfSize.x = width/2.0f;
+            float height = ToFloat(string(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Edition d'un rectangle"), ToString(boxes[selectedBox].halfSize.y*2.0f)).mb_str()));
+            if ( height != 0 ) boxes[selectedBox].halfSize.y = height/2.0f;
         }
         GetEditedSprite().SetCollisionMaskAutomatic(false);
         GetEditedSprite().SetCustomCollisionMask(boxes);

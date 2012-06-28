@@ -516,6 +516,12 @@ const Sprite & SpriteObject::GetCurrentSprite() const
  */
 std::vector<RotatedRectangle> SpriteObject::GetHitBoxes() const
 {
+    if ( currentAnimation >= GetAnimationsNumber() )
+    {
+        std::vector<RotatedRectangle> boxes; //Invalid animation, bail out.
+        return boxes;
+    }
+
     std::vector<RotatedRectangle> boxes = GetCurrentSprite().GetCollisionMask();
     for (unsigned int i = 0;i<boxes.size();++i)
     {
@@ -528,7 +534,8 @@ std::vector<RotatedRectangle> SpriteObject::GetHitBoxes() const
         boxes[i].center = newCenter;
         boxes[i].halfSize.x *= scaleX;
         boxes[i].halfSize.y *= scaleY;
-        boxes[i].angle += GetAngle()*3.14159f/180.0f;
+        if ( !GetAnimation( currentAnimation ).useMultipleDirections )
+            boxes[i].angle += GetAngle()*3.14159f/180.0f;
     }
 
     return boxes;

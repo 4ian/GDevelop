@@ -93,7 +93,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         wxStopWatch yieldClock;
         while (CodeCompiler::GetInstance()->CompilationInProcess())
         {
-            if ( yieldClock.Time() > 50 )
+            if ( yieldClock.Time() > 150 )
             {
                 wxSafeYield(NULL, true);
                 yieldClock.Start();
@@ -160,7 +160,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         wxStopWatch yieldClock;
         while (CodeCompiler::GetInstance()->CompilationInProcess())
         {
-            if ( yieldClock.Time() > 50 )
+            if ( yieldClock.Time() > 150 )
             {
                 wxSafeYield(NULL, true);
                 yieldClock.Start();

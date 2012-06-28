@@ -18,6 +18,7 @@ class ExternalEvents;
 class ExternalLayout;
 #if defined(GD_IDE_ONLY)
 class wxPropertyGrid;
+class wxPropertyGridEvent;
 #include "GDCore/PlatformDefinition/Project.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
@@ -203,6 +204,8 @@ public:
 
     virtual void PopulatePropertyGrid(wxPropertyGrid * grid);
     virtual void UpdateFromPropertyGrid(wxPropertyGrid * grid);
+    virtual void OnSelectionInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event);
+    virtual void OnChangeInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event);
 
     virtual bool HasLayoutNamed(const std::string & name) const;
     virtual gd::Layout & GetLayout(const std::string & name);

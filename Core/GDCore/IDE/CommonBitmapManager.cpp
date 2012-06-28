@@ -49,6 +49,7 @@ CommonBitmapManager::CommonBitmapManager()
     noProtection.LoadFile("res/noProtection.png", wxBITMAP_TYPE_ANY);
     folder40.LoadFile("res/folder40.png", wxBITMAP_TYPE_ANY);
     parentFolder40.LoadFile("res/parentFolder40.png", wxBITMAP_TYPE_ANY);
+    invertedCondition.LoadFile("res/contraire.png", wxBITMAP_TYPE_ANY);
 
     layers24.LoadFile("res/layers24.png", wxBITMAP_TYPE_ANY);
     undo24.LoadFile("res/undo24.png", wxBITMAP_TYPE_ANY);

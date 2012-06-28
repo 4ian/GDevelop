@@ -40,6 +40,7 @@
 					<Add option="-lwxmsw29ud_stc" />
 					<Add option="-lwxmsw29ud_richtext" />
 					<Add option="-lwxmsw29ud_ribbon" />
+					<Add option="-lwxmsw29ud_propgrid" />
 					<Add option="-lwxmsw29ud_aui" />
 					<Add option="-lwxmsw29ud_adv" />
 					<Add option="-lwxmsw29ud_html" />
@@ -90,6 +91,7 @@
 					<Add option="-lwxmsw29u_stc" />
 					<Add option="-lwxmsw29u_richtext" />
 					<Add option="-lwxmsw29u_ribbon" />
+					<Add option="-lwxmsw29u_propgrid" />
 					<Add option="-lwxmsw29u_aui" />
 					<Add option="-lwxmsw29u_adv" />
 					<Add option="-lwxmsw29u_html" />
@@ -140,6 +142,7 @@
 					<Add option="-lwxmsw29u_stc" />
 					<Add option="-lwxmsw29u_richtext" />
 					<Add option="-lwxmsw29u_ribbon" />
+					<Add option="-lwxmsw29u_propgrid" />
 					<Add option="-lwxmsw29u_aui" />
 					<Add option="-lwxmsw29u_adv" />
 					<Add option="-lwxmsw29u_html" />
@@ -235,6 +238,8 @@
 		<Unit filename="GDCore\IDE\ConditionSentenceFormatter.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseVariableDialog.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseVariableDialog.h" />
+		<Unit filename="GDCore\IDE\Dialogs\ProjectExtensionsDialog.cpp" />
+		<Unit filename="GDCore\IDE\Dialogs\ProjectExtensionsDialog.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ResourceLibraryDialog.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\ResourceLibraryDialog.h" />
 		<Unit filename="GDCore\IDE\EventsEditorItemsAreas.cpp" />
@@ -285,6 +290,7 @@
 		<Unit filename="GDCore\Tools\Locale\LocaleManager.cpp" />
 		<Unit filename="GDCore\Tools\Locale\LocaleManager.h" />
 		<Unit filename="wxsmith\ChooseVariableDialog.wxs" />
+		<Unit filename="wxsmith\ProjectExtensionsDialog.wxs" />
 		<Unit filename="wxsmith\ResourceLibraryDialog.wxs" />
 		<Extensions>
 			<code_completion />
@@ -303,6 +309,7 @@
 				<resources>
 					<wxDialog wxs="wxsmith/ChooseVariableDialog.wxs" src="GDCore\IDE\Dialogs\ChooseVariableDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseVariableDialog.h" fwddecl="0" i18n="1" name="ChooseVariableDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ResourceLibraryDialog.wxs" src="GDCore\IDE\Dialogs\ResourceLibraryDialog.cpp" hdr="GDCore\IDE\Dialogs\ResourceLibraryDialog.h" fwddecl="0" i18n="1" name="ResourceLibraryDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ProjectExtensionsDialog.wxs" src="GDCore\IDE\Dialogs\ProjectExtensionsDialog.cpp" hdr="GDCore\IDE\Dialogs\ProjectExtensionsDialog.h" fwddecl="0" i18n="1" name="ProjectExtensionsDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 class wxPropertyGrid;
+class wxPropertyGridEvent;
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
@@ -136,15 +137,49 @@ public:
      */
     virtual Platform & GetPlatform() const =0;
 
+    ///@}
+
+    /** \name GUI property grid management
+     * Members functions related to managing the wxWidgets property grid used to display the properties of the project.
+     */
+    ///@{
     /**
      * IDE calls this function so as to let the project populate a wxPropertyGrid with its properties.
+     *
+     * The default implementation take care of managing the common properties.
+     * If you redefine this method, do not forget to also call the base class method:
+     * \code
+     * void MyProjectClass::PopulatePropertyGrid(wxPropertyGrid * grid)
+     * {
+     *     gd::Project::PopulatePropertyGrid(grid);
+     *     //...
+     * \endcode
      */
-    virtual void PopulatePropertyGrid(wxPropertyGrid * grid) =0;
+    virtual void PopulatePropertyGrid(wxPropertyGrid * grid);
 
     /**
      * IDE calls this function so that the project update its properties from the values stored in the wxPropertyGrid.
+     *
+     * The default implementation take care of managing the common properties.
+     * If you redefine this method, do not forget to also call the base class method ( See PopulatePropertyGrid for an example )
      */
-    virtual void UpdateFromPropertyGrid(wxPropertyGrid * grid) =0;
+    virtual void UpdateFromPropertyGrid(wxPropertyGrid * grid);
+
+    /**
+     * IDE calls this function when a property is selected in the property grid.
+     *
+     * The default implementation take care of managing the common properties.
+     * If you redefine this method, do not forget to also call the base class method ( See PopulatePropertyGrid for an example )
+     */
+    virtual void OnSelectionInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event);
+
+    /**
+     * IDE calls this function when a property was changed in the property grid.
+     *
+     * The default implementation take care of managing the common properties.
+     * If you redefine this method, do not forget to also call the base class method ( See PopulatePropertyGrid for an example )
+     */
+    virtual void OnChangeInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event);
     ///@}
 
     /** \name Layouts management

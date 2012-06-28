@@ -16,6 +16,7 @@
 #include "GDCore/IDE/ConditionSentenceFormatter.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/Events/Event.h"
 
 using namespace std;
@@ -215,7 +216,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
         //Draw needed icons
         if ( conditions[j].IsInverted() )
         {
-            dc.DrawBitmap( wxBitmap( "res/contraire.png", wxBITMAP_TYPE_ANY ), x + 1, y, true );
+            dc.DrawBitmap( gd::CommonBitmapManager::GetInstance()->invertedCondition, x + 1, y, true );
             if ( InstructionMetadata.smallicon.IsOk() ) dc.DrawBitmap( InstructionMetadata.smallicon, x + iconWidth + 1, y, true );
         }
         else if ( InstructionMetadata.smallicon.IsOk() ) dc.DrawBitmap( InstructionMetadata.smallicon, x + 1, y, true );

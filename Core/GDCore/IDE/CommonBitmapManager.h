@@ -49,6 +49,7 @@ public:
     wxBitmap noProtection;
     wxBitmap folder40;
     wxBitmap parentFolder40;
+    wxBitmap invertedCondition;
 
     /** \name 24x24 bitmaps
      * wxBitmap which can be used for ribbons.

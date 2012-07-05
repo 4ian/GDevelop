@@ -111,6 +111,8 @@ ResourceLibraryDialog::~ResourceLibraryDialog()
 	//*)
 }
 
+namespace { //Some private tools functions
+
 wxBitmap Rescale(wxBitmap bmp, int max_width, int max_height) {
 
     float xFactor = max_width/static_cast<float>(bmp.GetWidth());
@@ -138,6 +140,8 @@ void PasteBitmap(wxBitmap & srcBmp, wxBitmap pastedBmp, int x, int y)
     wxMemoryDC dc;
     dc.SelectObject(srcBmp);
     dc.DrawBitmap(pastedBmp, x,y, true);
+}
+
 }
 
 void ResourceLibraryDialog::ConstructList()

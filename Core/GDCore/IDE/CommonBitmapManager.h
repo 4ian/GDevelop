@@ -38,6 +38,7 @@ public:
     wxBitmap transparentBg;
     wxBitmap trueOrFalseBt;
     wxBitmap point;
+    wxBitmap add16;
     wxBitmap add24;
     wxBitmap unknown24;
     wxBitmap scene;
@@ -50,6 +51,8 @@ public:
     wxBitmap folder40;
     wxBitmap parentFolder40;
     wxBitmap invertedCondition;
+    wxBitmap left16;
+    wxBitmap right16;
 
     /** \name 24x24 bitmaps
      * wxBitmap which can be used for ribbons.

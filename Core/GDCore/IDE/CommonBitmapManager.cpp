@@ -38,6 +38,7 @@ CommonBitmapManager::CommonBitmapManager()
     trueOrFalseBt.LoadFile("res/yesnoicon.png", wxBITMAP_TYPE_ANY);
     point.LoadFile("res/point.png", wxBITMAP_TYPE_ANY);
     objects24.LoadFile("res/objeticon24.png", wxBITMAP_TYPE_ANY);
+    add16.LoadFile("res/addicon.png", wxBITMAP_TYPE_ANY);
     add24.LoadFile("res/add24.png", wxBITMAP_TYPE_ANY);
     scene.LoadFile("res/sceneeditor.png", wxBITMAP_TYPE_ANY);
     layerBt.LoadFile("res/layers16.png", wxBITMAP_TYPE_ANY);
@@ -50,6 +51,8 @@ CommonBitmapManager::CommonBitmapManager()
     folder40.LoadFile("res/folder40.png", wxBITMAP_TYPE_ANY);
     parentFolder40.LoadFile("res/parentFolder40.png", wxBITMAP_TYPE_ANY);
     invertedCondition.LoadFile("res/contraire.png", wxBITMAP_TYPE_ANY);
+    left16.LoadFile("res/left16.png", wxBITMAP_TYPE_ANY);
+    right16.LoadFile("res/right16.png", wxBITMAP_TYPE_ANY);
 
     layers24.LoadFile("res/layers24.png", wxBITMAP_TYPE_ANY);
     undo24.LoadFile("res/undo24.png", wxBITMAP_TYPE_ANY);

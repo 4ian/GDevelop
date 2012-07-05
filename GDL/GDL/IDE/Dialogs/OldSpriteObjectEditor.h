@@ -1,9 +1,9 @@
-#if defined(GD_IDE_ONLY)
+#if defined(FILETOBEDELETED)
 
 #ifndef EDITOROBJET_H
 #define EDITOROBJET_H
 
-//(*Headers(EditorObjet)
+//(*Headers(OldSpriteObjectEditor)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/menu.h>
@@ -34,12 +34,12 @@
 
 using namespace std;
 
-class EditorObjet: public wxDialog
+class OldSpriteObjectEditor: public wxDialog
 {
 	public:
 
-		EditorObjet( wxWindow* parent, Game & game_, SpriteObject & object_, MainEditorCommand & mainEditorCommand_ );
-		virtual ~EditorObjet();
+		OldSpriteObjectEditor( wxWindow* parent, Game & game_, SpriteObject & object_, MainEditorCommand & mainEditorCommand_ );
+		virtual ~OldSpriteObjectEditor();
 		void RefreshFromObjet();
         void RefreshImages();
 
@@ -49,7 +49,7 @@ class EditorObjet: public wxDialog
 		//Scrollbar
 		int position;
 
-		//(*Declarations(EditorObjet)
+		//(*Declarations(OldSpriteObjectEditor)
 		wxAuiManager* AuiManager1;
 		wxPanel* Core;
 		wxButton* OkBt;
@@ -135,7 +135,7 @@ class EditorObjet: public wxDialog
 
 	protected:
 
-		//(*Identifiers(EditorObjet)
+		//(*Identifiers(OldSpriteObjectEditor)
 		static const long ID_STATICTEXT6;
 		static const long ID_STATICTEXT1;
 		static const long ID_PANEL2;
@@ -212,7 +212,7 @@ class EditorObjet: public wxDialog
 
 	private:
 
-		//(*Handlers(EditorObjet)
+		//(*Handlers(OldSpriteObjectEditor)
 		void OnScrollBar1Scroll(wxScrollEvent& event);
 		void OnBt0Toggle(wxCommandEvent& event);
 		void OnBt1Toggle(wxCommandEvent& event);

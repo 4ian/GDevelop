@@ -44,8 +44,8 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_ACTION("ChangeAnimation",
-                       _("Changer le numéro de l'animation d'un objet"),
-                       _("Modifie le numéro de l'animation de l'objet."),
+                       _("Changer l'animation"),
+                       _("Modifie l'animation jouée par l'objet Sprite."),
                        _("Faire _PARAM2__PARAM1_ au numéro de l'animation de _PARAM0_"),
                        _("Animations et images"),
                        "res/actions/animation24.png",
@@ -56,13 +56,13 @@ SpriteExtension::SpriteExtension()
             instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
 
 
-            instrInfo.cppCallingInformation.SetFunctionName("SetAnimation").SetAssociatedGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            instrInfo.cppCallingInformation.SetFunctionName("SetCurrentAnimation").SetAssociatedGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_ACTION("ChangeDirection",
-                       _("Changer le numéro de la direction d'un objet"),
-                       _("Modifie la direction de l'objet"),
+                       _("Changer la direction"),
+                       _("Modifie la direction de l'objet.\nSi l'objet est en rotation automatique, la direction correspond à son angle.\nSi l'objet est en mode 8 directions, les numéros de direction vont de 0 à 7"),
                        _("Faire _PARAM2__PARAM1_ à la direction de _PARAM0_"),
                        _("Direction"),
                        "res/actions/direction24.png",
@@ -78,8 +78,8 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_ACTION("ChangeSprite",
-                       _("Changer le numéro de l'image d'un objet"),
-                       _("Modifie le numéro de l'image actuelle de l'objet"),
+                       _("Numéro de l'image actuelle"),
+                       _("Modifie le numéro de l'image actuellement affichée de l'objet"),
                        _("Faire _PARAM2__PARAM1_ au numéro de l'image de _PARAM0_"),
                        _("Animations et images"),
                        "res/actions/sprite24.png",
@@ -95,7 +95,7 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_ACTION("PauseAnimation",
-                       _("Mettre en pause l'animation de l'objet"),
+                       _("Mettre en pause l'animation"),
                        _("Met en pause l'animation actuelle de l'objet"),
                        _("Mettre en pause l'animation actuelle de _PARAM0_"),
                        _("Animations et images"),
@@ -110,7 +110,7 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_ACTION("PlayAnimation",
-                       _("Jouer l'animation de l'objet"),
+                       _("Jouer l'animation"),
                        _("Joue l'animation actuelle de l'objet"),
                        _("Jouer l'animation actuelle de _PARAM0_"),
                        _("Animations et images"),
@@ -126,7 +126,7 @@ SpriteExtension::SpriteExtension()
 
         DECLARE_OBJECT_ACTION("TourneVersPos",
                        _("Tourner un objet vers une position"),
-                       _("Tourne un objet vers une position.\n( Si la direction est normale, l'objet prendra la direction la plus appropriée.\nSi c'est une rotation automatique, il sera tourné vers l'objet. )"),
+                       _("Tourne un objet vers une position.\n(  En mode 8 directions, l'objet prendra la direction la plus appropriée.\nSi c'est une rotation automatique, il sera tourné vers l'objet. )"),
                        _("Tourner _PARAM0_ vers _PARAM1_;_PARAM2_"),
                        _("Direction"),
                        "res/actions/direction24.png",
@@ -160,7 +160,7 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_ACTION("ChangeScaleWidth",
-                       _("Modifier l'échelle en largeur d'un objet"),
+                       _("Modifier l'échelle en largeur"),
                        _("Modifie l'échelle de la taille de l'objet indiqué en largeur."),
                        _("Faire _PARAM2__PARAM1_ à l'échelle de la taille de _PARAM0_ en largeur"),
                        _("Taille"),
@@ -177,7 +177,7 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_ACTION("ChangeScaleHeight",
-                       _("Modifier l'échelle en hauteur d'un objet"),
+                       _("Modifier l'échelle en hauteur"),
                        _("Modifie l'échelle de la taille de l'objet indiqué en hauteur."),
                        _("Faire _PARAM2__PARAM1_ à l'échelle de la taille de _PARAM0_ en hauteur"),
                        _("Taille"),
@@ -194,7 +194,7 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_CONDITION("Animation",
-                       _("Numéro de l'animation d'un objet"),
+                       _("Animation actuelle"),
                        _("Teste si le numéro de l'animation de l'objet correspond."),
                        _("Le numéro de l'animation de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                        _("Animations et images"),
@@ -211,7 +211,7 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_CONDITION()
 
         DECLARE_OBJECT_CONDITION("Direction",
-                       _("Numéro de la direction de l'objet"),
+                       _("Direction actuelle"),
                        _("Teste si le numéro de la direction de l'objet correspond au test effectué."),
                        _("La direction de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                        _("Direction"),
@@ -228,7 +228,7 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_CONDITION()
 
         DECLARE_OBJECT_CONDITION("Sprite",
-                       _("Numéro de l'image de l'objet"),
+                       _("Numéro de l'image actuelle"),
                        _("Teste si le numéro de l'image de l'objet correspond."),
                        _("L'image de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                        _("Animations et images"),
@@ -245,7 +245,7 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_CONDITION()
 
         DECLARE_OBJECT_CONDITION("AnimStopped",
-                       _("L'animation est en pause"),
+                       _("Animation en pause"),
                        _("Teste si l'animation de l'objet est en pause."),
                        _("L'animation de _PARAM0_ est en pause"),
                        _("Animations et images"),
@@ -260,7 +260,7 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_CONDITION()
 
         DECLARE_OBJECT_CONDITION("ScaleWidth",
-                       _("Echelle de la taille d'un objet en largeur"),
+                       _("Echelle de la taille en largeur"),
                        _("Teste l'échelle de la taille de l'objet en largeur."),
                        _("L'échelle de la taille de l'objet _PARAM0_ en largeur est _PARAM2_ à _PARAM1_"),
                        _("Taille"),
@@ -277,7 +277,7 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_CONDITION()
 
         DECLARE_OBJECT_CONDITION("ScaleHeight",
-                       _("Echelle de la taille d'un objet en hauteur"),
+                       _("Echelle de la taille en hauteur"),
                        _("Teste l'échelle de la taille de l'objet en hauteur."),
                        _("L'échelle de la taille de l'objet _PARAM0_ en hauteur est _PARAM2_ à _PARAM1_"),
                        _("Taille"),
@@ -294,7 +294,7 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_CONDITION()
 
         DECLARE_OBJECT_CONDITION("Opacity",
-                       _("Opacité d'un objet"),
+                       _("Opacité"),
                        _("Teste la valeur de l'opacité ( transparence ) d'un objet."),
                        _("L'opacité de _PARAM0_ est _PARAM2_ à _PARAM1_"),
                        _("Visibilité"),
@@ -365,8 +365,8 @@ SpriteExtension::SpriteExtension()
         DECLARE_END_OBJECT_ACTION()
 
         DECLARE_OBJECT_ACTION("ChangeColor",
-                       _("Changer la couleur globale d'un objet"),
-                       _("Change la couleur globale de l'objet. Par défaut, la couleur d'un Sprite est le blanc."),
+                       _("Changer la couleur globale"),
+                       _("Change la couleur globale de l'objet. Par défaut, la couleur globale d'un Sprite est le blanc."),
                        _("Changer la couleur de _PARAM0_ en _PARAM1_"),
                        _("Effets"),
                        "res/actions/color24.png",

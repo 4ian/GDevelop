@@ -1,8 +1,8 @@
-#if defined(GD_IDE_ONLY)
+#if defined(FILETOBEDELETED)
 
-#include "GDL/IDE/Dialogs/SpriteObjectEditor.h"
+#include "GDL/IDE/Dialogs/OldSpriteObjectEditor.h"
 
-//(*InternalHeaders(EditorObjet)
+//(*InternalHeaders(OldSpriteObjectEditor)
 #include <wx/bitmap.h>
 #include <wx/settings.h>
 #include <wx/font.h>
@@ -43,87 +43,87 @@
 
 using namespace std;
 
-//(*IdInit(EditorObjet)
-const long EditorObjet::ID_STATICTEXT6 = wxNewId();
-const long EditorObjet::ID_STATICTEXT1 = wxNewId();
-const long EditorObjet::ID_PANEL2 = wxNewId();
-const long EditorObjet::ID_STATICLINE1 = wxNewId();
-const long EditorObjet::ID_CHOICE1 = wxNewId();
-const long EditorObjet::ID_BUTTON1 = wxNewId();
-const long EditorObjet::ID_BUTTON2 = wxNewId();
-const long EditorObjet::ID_CHECKBOX1 = wxNewId();
-const long EditorObjet::ID_TOGGLEBUTTON8 = wxNewId();
-const long EditorObjet::ID_TOGGLEBUTTON7 = wxNewId();
-const long EditorObjet::ID_TOGGLEBUTTON6 = wxNewId();
-const long EditorObjet::ID_TOGGLEBUTTON5 = wxNewId();
-const long EditorObjet::ID_STATICBITMAP2 = wxNewId();
-const long EditorObjet::ID_TOGGLEBUTTON1 = wxNewId();
-const long EditorObjet::ID_TOGGLEBUTTON2 = wxNewId();
-const long EditorObjet::ID_TOGGLEBUTTON3 = wxNewId();
-const long EditorObjet::ID_TOGGLEBUTTON4 = wxNewId();
-const long EditorObjet::ID_CHECKBOX2 = wxNewId();
-const long EditorObjet::ID_AUITOOLBAR1 = wxNewId();
-const long EditorObjet::ID_PANEL6 = wxNewId();
-const long EditorObjet::ID_STATICLINE3 = wxNewId();
-const long EditorObjet::ID_PANEL3 = wxNewId();
-const long EditorObjet::ID_SCROLLBAR1 = wxNewId();
-const long EditorObjet::ID_SCROLLBAR3 = wxNewId();
-const long EditorObjet::ID_PANEL4 = wxNewId();
-const long EditorObjet::ID_SCROLLBAR2 = wxNewId();
-const long EditorObjet::ID_PANEL5 = wxNewId();
-const long EditorObjet::ID_STATICBITMAP1 = wxNewId();
-const long EditorObjet::ID_STATICTEXT2 = wxNewId();
-const long EditorObjet::ID_TEXTCTRL2 = wxNewId();
-const long EditorObjet::ID_STATICTEXT3 = wxNewId();
-const long EditorObjet::ID_STATICTEXT4 = wxNewId();
-const long EditorObjet::ID_RADIOBUTTON3 = wxNewId();
-const long EditorObjet::ID_RADIOBUTTON4 = wxNewId();
-const long EditorObjet::ID_STATICLINE2 = wxNewId();
-const long EditorObjet::ID_BUTTON3 = wxNewId();
-const long EditorObjet::ID_BUTTON5 = wxNewId();
-const long EditorObjet::ID_BUTTON4 = wxNewId();
-const long EditorObjet::ID_PANEL1 = wxNewId();
-const long EditorObjet::idMenuAddFromEnd = wxNewId();
-const long EditorObjet::idMenuAddFromAfter = wxNewId();
-const long EditorObjet::idMenuAddFromBefore = wxNewId();
-const long EditorObjet::ID_MENUITEM1 = wxNewId();
-const long EditorObjet::idMenuAddMoreEnd = wxNewId();
-const long EditorObjet::idMenuAddMoreAfter = wxNewId();
-const long EditorObjet::idMenuAddMoreBefore = wxNewId();
-const long EditorObjet::idMenuAddMulti = wxNewId();
-const long EditorObjet::idMenuDel = wxNewId();
-const long EditorObjet::idMenuDelAll = wxNewId();
-const long EditorObjet::idMenuCopyFrom = wxNewId();
-const long EditorObjet::idPosPoint = wxNewId();
-const long EditorObjet::ID_MENUITEM3 = wxNewId();
-const long EditorObjet::ID_MENUITEM5 = wxNewId();
-const long EditorObjet::ID_MENUITEM8 = wxNewId();
-const long EditorObjet::ID_MENUITEM9 = wxNewId();
-const long EditorObjet::ID_MENUITEM6 = wxNewId();
-const long EditorObjet::idMenuPosEverywhere2 = wxNewId();
-const long EditorObjet::ID_MENUITEM4 = wxNewId();
-const long EditorObjet::ID_MENUITEM13 = wxNewId();
-const long EditorObjet::ID_MENUITEM12 = wxNewId();
-const long EditorObjet::ID_MENUITEM10 = wxNewId();
-const long EditorObjet::ID_MENUITEM11 = wxNewId();
-const long EditorObjet::ID_MENUITEM2 = wxNewId();
-const long EditorObjet::ID_MENUITEM7 = wxNewId();
-const long EditorObjet::idMenuPosEverywhere = wxNewId();
-const long EditorObjet::ID_MENUITEM14 = wxNewId();
-const long EditorObjet::idAddPoint = wxNewId();
-const long EditorObjet::idDelPoint = wxNewId();
+//(*IdInit(OldSpriteObjectEditor)
+const long OldSpriteObjectEditor::ID_STATICTEXT6 = wxNewId();
+const long OldSpriteObjectEditor::ID_STATICTEXT1 = wxNewId();
+const long OldSpriteObjectEditor::ID_PANEL2 = wxNewId();
+const long OldSpriteObjectEditor::ID_STATICLINE1 = wxNewId();
+const long OldSpriteObjectEditor::ID_CHOICE1 = wxNewId();
+const long OldSpriteObjectEditor::ID_BUTTON1 = wxNewId();
+const long OldSpriteObjectEditor::ID_BUTTON2 = wxNewId();
+const long OldSpriteObjectEditor::ID_CHECKBOX1 = wxNewId();
+const long OldSpriteObjectEditor::ID_TOGGLEBUTTON8 = wxNewId();
+const long OldSpriteObjectEditor::ID_TOGGLEBUTTON7 = wxNewId();
+const long OldSpriteObjectEditor::ID_TOGGLEBUTTON6 = wxNewId();
+const long OldSpriteObjectEditor::ID_TOGGLEBUTTON5 = wxNewId();
+const long OldSpriteObjectEditor::ID_STATICBITMAP2 = wxNewId();
+const long OldSpriteObjectEditor::ID_TOGGLEBUTTON1 = wxNewId();
+const long OldSpriteObjectEditor::ID_TOGGLEBUTTON2 = wxNewId();
+const long OldSpriteObjectEditor::ID_TOGGLEBUTTON3 = wxNewId();
+const long OldSpriteObjectEditor::ID_TOGGLEBUTTON4 = wxNewId();
+const long OldSpriteObjectEditor::ID_CHECKBOX2 = wxNewId();
+const long OldSpriteObjectEditor::ID_AUITOOLBAR1 = wxNewId();
+const long OldSpriteObjectEditor::ID_PANEL6 = wxNewId();
+const long OldSpriteObjectEditor::ID_STATICLINE3 = wxNewId();
+const long OldSpriteObjectEditor::ID_PANEL3 = wxNewId();
+const long OldSpriteObjectEditor::ID_SCROLLBAR1 = wxNewId();
+const long OldSpriteObjectEditor::ID_SCROLLBAR3 = wxNewId();
+const long OldSpriteObjectEditor::ID_PANEL4 = wxNewId();
+const long OldSpriteObjectEditor::ID_SCROLLBAR2 = wxNewId();
+const long OldSpriteObjectEditor::ID_PANEL5 = wxNewId();
+const long OldSpriteObjectEditor::ID_STATICBITMAP1 = wxNewId();
+const long OldSpriteObjectEditor::ID_STATICTEXT2 = wxNewId();
+const long OldSpriteObjectEditor::ID_TEXTCTRL2 = wxNewId();
+const long OldSpriteObjectEditor::ID_STATICTEXT3 = wxNewId();
+const long OldSpriteObjectEditor::ID_STATICTEXT4 = wxNewId();
+const long OldSpriteObjectEditor::ID_RADIOBUTTON3 = wxNewId();
+const long OldSpriteObjectEditor::ID_RADIOBUTTON4 = wxNewId();
+const long OldSpriteObjectEditor::ID_STATICLINE2 = wxNewId();
+const long OldSpriteObjectEditor::ID_BUTTON3 = wxNewId();
+const long OldSpriteObjectEditor::ID_BUTTON5 = wxNewId();
+const long OldSpriteObjectEditor::ID_BUTTON4 = wxNewId();
+const long OldSpriteObjectEditor::ID_PANEL1 = wxNewId();
+const long OldSpriteObjectEditor::idMenuAddFromEnd = wxNewId();
+const long OldSpriteObjectEditor::idMenuAddFromAfter = wxNewId();
+const long OldSpriteObjectEditor::idMenuAddFromBefore = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM1 = wxNewId();
+const long OldSpriteObjectEditor::idMenuAddMoreEnd = wxNewId();
+const long OldSpriteObjectEditor::idMenuAddMoreAfter = wxNewId();
+const long OldSpriteObjectEditor::idMenuAddMoreBefore = wxNewId();
+const long OldSpriteObjectEditor::idMenuAddMulti = wxNewId();
+const long OldSpriteObjectEditor::idMenuDel = wxNewId();
+const long OldSpriteObjectEditor::idMenuDelAll = wxNewId();
+const long OldSpriteObjectEditor::idMenuCopyFrom = wxNewId();
+const long OldSpriteObjectEditor::idPosPoint = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM3 = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM5 = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM8 = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM9 = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM6 = wxNewId();
+const long OldSpriteObjectEditor::idMenuPosEverywhere2 = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM4 = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM13 = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM12 = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM10 = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM11 = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM2 = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM7 = wxNewId();
+const long OldSpriteObjectEditor::idMenuPosEverywhere = wxNewId();
+const long OldSpriteObjectEditor::ID_MENUITEM14 = wxNewId();
+const long OldSpriteObjectEditor::idAddPoint = wxNewId();
+const long OldSpriteObjectEditor::idDelPoint = wxNewId();
 //*)
 
-const long EditorObjet::ID_BUTTONARRAY = wxNewId();
-const long EditorObjet::ID_BITMAPARRAY = wxNewId();
-const long EditorObjet::ID_EDITARRAY = wxNewId();
+const long OldSpriteObjectEditor::ID_BUTTONARRAY = wxNewId();
+const long OldSpriteObjectEditor::ID_BITMAPARRAY = wxNewId();
+const long OldSpriteObjectEditor::ID_EDITARRAY = wxNewId();
 
-BEGIN_EVENT_TABLE( EditorObjet, wxDialog )
-    //(*EventTable(EditorObjet)
+BEGIN_EVENT_TABLE( OldSpriteObjectEditor, wxDialog )
+    //(*EventTable(OldSpriteObjectEditor)
     //*)
 END_EVENT_TABLE()
 
-EditorObjet::EditorObjet( wxWindow* parent, Game & game_, SpriteObject & object_, MainEditorCommand & mainEditorCommand_ ) :
+OldSpriteObjectEditor::OldSpriteObjectEditor( wxWindow* parent, Game & game_, SpriteObject & object_, MainEditorCommand & mainEditorCommand_ ) :
 animation(0),
 direction(0),
 position(0),
@@ -140,7 +140,7 @@ selectedBox(0),
 xSelectionOffset(0),
 ySelectionOffset(0)
 {
-    //(*Initialize(EditorObjet)
+    //(*Initialize(OldSpriteObjectEditor)
     wxFlexGridSizer* FlexGridSizer16;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
@@ -425,62 +425,62 @@ ySelectionOffset(0)
     FlexGridSizer1->SetSizeHints(this);
     Center();
 
-    Connect(ID_CHOICE1,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAnimationsBoxSelect);
-    Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnAddAnimBtClick);
-    Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnDelAnimBtClick);
-    Connect(ID_CHECKBOX1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&EditorObjet::OnNormalCheckSelect);
-    Connect(ID_TOGGLEBUTTON8,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnBt5Toggle);
-    Connect(ID_TOGGLEBUTTON7,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnBt6Toggle);
-    Connect(ID_TOGGLEBUTTON6,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnBt7Toggle);
-    Connect(ID_TOGGLEBUTTON5,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnBt4Toggle);
-    Connect(ID_TOGGLEBUTTON1,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnBt0Toggle);
-    Connect(ID_TOGGLEBUTTON2,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnBt3Toggle);
-    Connect(ID_TOGGLEBUTTON3,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnBt2Toggle);
-    Connect(ID_TOGGLEBUTTON4,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnBt1Toggle);
-    Connect(ID_CHECKBOX2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&EditorObjet::OnRotationCheckSelect);
-    toolbarPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorObjet::OntoolbarPanelResize,0,this);
-    imagePanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EditorObjet::OnimagePanelPaint,0,this);
-    imagePanel->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&EditorObjet::OnimagePanelLeftDown,0,this);
-    imagePanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&EditorObjet::OnimagePanelLeftUp,0,this);
-    imagePanel->Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&EditorObjet::OnimagePanelRightUp,0,this);
-    imagePanel->Connect(wxEVT_MOTION,(wxObjectEventFunction)&EditorObjet::OnimagePanelMouseMove,0,this);
-    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorObjet::OnscrollHeightScroll);
-    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorObjet::OnscrollHeightScroll);
-    Connect(ID_SCROLLBAR3,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorObjet::OnscrollWidthScroll);
-    Connect(ID_SCROLLBAR3,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorObjet::OnscrollWidthScroll);
-    thumbsPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&EditorObjet::OnthumbsPanelPaint,0,this);
-    thumbsPanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&EditorObjet::OnthumbsPanelLeftUp,0,this);
-    thumbsPanel->Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&EditorObjet::OnthumbsPanelRightUp,0,this);
-    thumbsPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorObjet::OnthumbsPanelResize,0,this);
-    Connect(ID_SCROLLBAR2,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorObjet::OnthumbsScrollScroll);
-    Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorObjet::OnthumbsScrollScroll);
-    Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditorObjet::OnTempsEditText);
-    Connect(ID_RADIOBUTTON3,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&EditorObjet::OnBoucleOuiCheckSelect);
-    Connect(ID_RADIOBUTTON4,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&EditorObjet::OnBoucleNonCheckSelect);
-    Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnButton1Click);
-    Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnOkBtClick);
-    Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditorObjet::OnAideBtClick);
-    Connect(idMenuAddFromEnd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddFromEndSelected);
-    Connect(idMenuAddFromAfter,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddFromAfterSelected);
-    Connect(idMenuAddFromBefore,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddFromBeforeSelected);
-    Connect(idMenuAddMoreEnd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMoreEndSelected);
-    Connect(idMenuAddMoreAfter,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMoreAfterSelected);
-    Connect(idMenuAddMoreBefore,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMoreBeforeSelected);
-    Connect(idMenuDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDeleteSelected);
-    Connect(idMenuDelAll,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDeleteAllBtClick);
-    Connect(idMenuCopyFrom,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnCopyBtClick);
-    Connect(idPosPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnModPointSelected);
-    Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnEditMaskSelected);
-    Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnEditMaskSelected);
-    Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddMaskRectangleSelected);
-    Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDelMaskRectangleSelected);
-    Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnModifyMaskRectangleSelected);
-    Connect(idMenuPosEverywhere2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnEnterMaskRectanglePositionSelected);
-    Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnautomaticMaskSelected);
-    Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnModPointSelected);
-    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnModPointPrecisSelected);
-    Connect(idAddPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnAddPointSelected);
-    Connect(idDelPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjet::OnDelPointSelected);
+    Connect(ID_CHOICE1,wxEVT_COMMAND_CHOICE_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnAnimationsBoxSelect);
+    Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnAddAnimBtClick);
+    Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnDelAnimBtClick);
+    Connect(ID_CHECKBOX1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnNormalCheckSelect);
+    Connect(ID_TOGGLEBUTTON8,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnBt5Toggle);
+    Connect(ID_TOGGLEBUTTON7,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnBt6Toggle);
+    Connect(ID_TOGGLEBUTTON6,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnBt7Toggle);
+    Connect(ID_TOGGLEBUTTON5,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnBt4Toggle);
+    Connect(ID_TOGGLEBUTTON1,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnBt0Toggle);
+    Connect(ID_TOGGLEBUTTON2,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnBt3Toggle);
+    Connect(ID_TOGGLEBUTTON3,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnBt2Toggle);
+    Connect(ID_TOGGLEBUTTON4,wxEVT_COMMAND_TOGGLEBUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnBt1Toggle);
+    Connect(ID_CHECKBOX2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnRotationCheckSelect);
+    toolbarPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&OldSpriteObjectEditor::OntoolbarPanelResize,0,this);
+    imagePanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&OldSpriteObjectEditor::OnimagePanelPaint,0,this);
+    imagePanel->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&OldSpriteObjectEditor::OnimagePanelLeftDown,0,this);
+    imagePanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&OldSpriteObjectEditor::OnimagePanelLeftUp,0,this);
+    imagePanel->Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&OldSpriteObjectEditor::OnimagePanelRightUp,0,this);
+    imagePanel->Connect(wxEVT_MOTION,(wxObjectEventFunction)&OldSpriteObjectEditor::OnimagePanelMouseMove,0,this);
+    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnscrollHeightScroll);
+    Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnscrollHeightScroll);
+    Connect(ID_SCROLLBAR3,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnscrollWidthScroll);
+    Connect(ID_SCROLLBAR3,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnscrollWidthScroll);
+    thumbsPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&OldSpriteObjectEditor::OnthumbsPanelPaint,0,this);
+    thumbsPanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&OldSpriteObjectEditor::OnthumbsPanelLeftUp,0,this);
+    thumbsPanel->Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&OldSpriteObjectEditor::OnthumbsPanelRightUp,0,this);
+    thumbsPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&OldSpriteObjectEditor::OnthumbsPanelResize,0,this);
+    Connect(ID_SCROLLBAR2,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnthumbsScrollScroll);
+    Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnthumbsScrollScroll);
+    Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnTempsEditText);
+    Connect(ID_RADIOBUTTON3,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnBoucleOuiCheckSelect);
+    Connect(ID_RADIOBUTTON4,wxEVT_COMMAND_RADIOBUTTON_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnBoucleNonCheckSelect);
+    Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnButton1Click);
+    Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnOkBtClick);
+    Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnAideBtClick);
+    Connect(idMenuAddFromEnd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnAddFromEndSelected);
+    Connect(idMenuAddFromAfter,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnAddFromAfterSelected);
+    Connect(idMenuAddFromBefore,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnAddFromBeforeSelected);
+    Connect(idMenuAddMoreEnd,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnAddMoreEndSelected);
+    Connect(idMenuAddMoreAfter,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnAddMoreAfterSelected);
+    Connect(idMenuAddMoreBefore,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnAddMoreBeforeSelected);
+    Connect(idMenuDel,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnDeleteSelected);
+    Connect(idMenuDelAll,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnDeleteAllBtClick);
+    Connect(idMenuCopyFrom,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnCopyBtClick);
+    Connect(idPosPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnModPointSelected);
+    Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnEditMaskSelected);
+    Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnEditMaskSelected);
+    Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnAddMaskRectangleSelected);
+    Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnDelMaskRectangleSelected);
+    Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnModifyMaskRectangleSelected);
+    Connect(idMenuPosEverywhere2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnEnterMaskRectanglePositionSelected);
+    Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnautomaticMaskSelected);
+    Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnModPointSelected);
+    Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnModPointPrecisSelected);
+    Connect(idAddPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnAddPointSelected);
+    Connect(idDelPoint,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&OldSpriteObjectEditor::OnDelPointSelected);
     //*)
 
     toolbar->ClearTools();
@@ -524,9 +524,9 @@ ySelectionOffset(0)
     Center();
 }
 
-EditorObjet::~EditorObjet()
+OldSpriteObjectEditor::~OldSpriteObjectEditor()
 {
-    //(*Destroy(EditorObjet)
+    //(*Destroy(OldSpriteObjectEditor)
     //*)
 
     m_mgr.UnInit();
@@ -538,11 +538,11 @@ EditorObjet::~EditorObjet()
 ///
 /// Rafraichit les controles ( Animation, type de direction ) en fonction de l'objet
 ////////////////////////////////////////////////////////////
-void EditorObjet::RefreshFromObjet()
+void OldSpriteObjectEditor::RefreshFromObjet()
 {
     //Les animations
     AnimationsBox->Clear();
-    for ( unsigned int i = 0;i < object.GetAnimationsNumber();i++ )
+    for ( unsigned int i = 0;i < object.GetAnimationCount();i++ )
     {
         AnimationsBox->Append( ToString( i ) );
     }
@@ -573,7 +573,7 @@ void EditorObjet::RefreshFromObjet()
     RefreshImages();
 }
 
-void EditorObjet::OnScrollBar1Scroll( wxScrollEvent& event )
+void OldSpriteObjectEditor::OnScrollBar1Scroll( wxScrollEvent& event )
 {
     position = event.GetPosition();
 
@@ -586,9 +586,9 @@ void EditorObjet::OnScrollBar1Scroll( wxScrollEvent& event )
 ///
 /// Rafraichit la liste des images en fonction de la position
 ////////////////////////////////////////////////////////////
-void EditorObjet::RefreshImages()
+void OldSpriteObjectEditor::RefreshImages()
 {
-    if ( animation >= object.GetAnimationsNumber() || direction >= object.GetAnimation( animation ).GetDirectionsNumber())
+    if ( animation >= object.GetAnimationCount() || direction >= object.GetAnimation( animation ).GetDirectionsNumber())
         return;
 
     //Type de directions
@@ -634,7 +634,7 @@ void EditorObjet::RefreshImages()
     Core->Layout();
 }
 
-void EditorObjet::OnBt0Toggle( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnBt0Toggle( wxCommandEvent& event )
 {
     Bt1->SetValue( false );
     Bt2->SetValue( false );
@@ -648,7 +648,7 @@ void EditorObjet::OnBt0Toggle( wxCommandEvent& event )
     RefreshImages();
 }
 
-void EditorObjet::OnBt1Toggle( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnBt1Toggle( wxCommandEvent& event )
 {
     Bt0->SetValue( false );
     Bt2->SetValue( false );
@@ -661,7 +661,7 @@ void EditorObjet::OnBt1Toggle( wxCommandEvent& event )
     RefreshImages();
 }
 
-void EditorObjet::OnBt2Toggle( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnBt2Toggle( wxCommandEvent& event )
 {
     Bt0->SetValue( false );
     Bt1->SetValue( false );
@@ -674,7 +674,7 @@ void EditorObjet::OnBt2Toggle( wxCommandEvent& event )
     RefreshImages();
 }
 
-void EditorObjet::OnBt3Toggle( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnBt3Toggle( wxCommandEvent& event )
 {
     Bt0->SetValue( false );
     Bt1->SetValue( false );
@@ -687,7 +687,7 @@ void EditorObjet::OnBt3Toggle( wxCommandEvent& event )
     RefreshImages();
 }
 
-void EditorObjet::OnBt4Toggle( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnBt4Toggle( wxCommandEvent& event )
 {
     Bt1->SetValue( false );
     Bt2->SetValue( false );
@@ -700,7 +700,7 @@ void EditorObjet::OnBt4Toggle( wxCommandEvent& event )
     RefreshImages();
 }
 
-void EditorObjet::OnBt5Toggle( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnBt5Toggle( wxCommandEvent& event )
 {
     Bt1->SetValue( false );
     Bt2->SetValue( false );
@@ -713,7 +713,7 @@ void EditorObjet::OnBt5Toggle( wxCommandEvent& event )
     RefreshImages();
 }
 
-void EditorObjet::OnBt6Toggle( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnBt6Toggle( wxCommandEvent& event )
 {
     Bt1->SetValue( false );
     Bt2->SetValue( false );
@@ -726,7 +726,7 @@ void EditorObjet::OnBt6Toggle( wxCommandEvent& event )
     RefreshImages();
 }
 
-void EditorObjet::OnBt7Toggle( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnBt7Toggle( wxCommandEvent& event )
 {
     Bt1->SetValue( false );
     Bt2->SetValue( false );
@@ -739,15 +739,15 @@ void EditorObjet::OnBt7Toggle( wxCommandEvent& event )
     RefreshImages();
 }
 
-bool EditorObjet::AnimationAndDirectionValid()
+bool OldSpriteObjectEditor::AnimationAndDirectionValid()
 {
-    if ( animation < object.GetAnimationsNumber() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
+    if ( animation < object.GetAnimationCount() && direction < object.GetAnimation( animation ).GetDirectionsNumber())
         return true;
 
     return false;
 }
 
-bool EditorObjet::SpriteValid()
+bool OldSpriteObjectEditor::SpriteValid()
 {
     if ( AnimationAndDirectionValid() && selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesToModify().size() )
         return true;
@@ -755,38 +755,38 @@ bool EditorObjet::SpriteValid()
     return false;
 }
 
-Sprite & EditorObjet::GetEditedSprite()
+Sprite & OldSpriteObjectEditor::GetEditedSprite()
 {
     return object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(selectedImage);
 }
 
-Animation & EditorObjet::GetEditedAnimation()
+Animation & OldSpriteObjectEditor::GetEditedAnimation()
 {
     return object.GetAnimation( animation );
 }
 
-Direction & EditorObjet::GetEditedDirection()
+Direction & OldSpriteObjectEditor::GetEditedDirection()
 {
     return object.GetAnimation( animation ).GetDirectionToModify( direction );
 }
 
-void EditorObjet::OnAddAnimBtClick( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnAddAnimBtClick( wxCommandEvent& event )
 {
     Animation newAnimation;
     newAnimation.SetDirectionsNumber(8);
     object.AddAnimation( newAnimation );
 
-    AnimationsBox->Append( ToString( object.GetAnimationsNumber() - 1 ) );
+    AnimationsBox->Append( ToString( object.GetAnimationCount() - 1 ) );
 
     RefreshFromObjet();
 }
 
-void EditorObjet::OnDelAnimBtClick( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnDelAnimBtClick( wxCommandEvent& event )
 {
     int animNb = AnimationsBox->GetSelection();
     if ( animNb == wxNOT_FOUND ) return;
 
-    if ( animNb >= 0 && static_cast<unsigned>(animNb) < object.GetAnimationsNumber() )
+    if ( animNb >= 0 && static_cast<unsigned>(animNb) < object.GetAnimationCount() )
         object.RemoveAnimation( animNb );
 
     animation--;
@@ -794,7 +794,7 @@ void EditorObjet::OnDelAnimBtClick( wxCommandEvent& event )
     RefreshFromObjet();
 }
 
-void EditorObjet::OnAnimationsBoxSelect( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnAnimationsBoxSelect( wxCommandEvent& event )
 {
     animation = AnimationsBox->GetSelection();
 
@@ -806,7 +806,7 @@ void EditorObjet::OnAnimationsBoxSelect( wxCommandEvent& event )
 ///
 /// Changement de la valeur du temps entre les images
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnTempsEditText( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnTempsEditText( wxCommandEvent& event )
 {
     if ( AnimationAndDirectionValid() ) GetEditedDirection().SetTimeBetweenFrames( ToFloat(string(TempsEdit->GetValue().mb_str())) );
 }
@@ -816,7 +816,7 @@ void EditorObjet::OnTempsEditText( wxCommandEvent& event )
 ///
 /// Change le bouclage de la direction en true
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnBoucleOuiCheckSelect( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnBoucleOuiCheckSelect( wxCommandEvent& event )
 {
    if ( AnimationAndDirectionValid() ) GetEditedDirection().SetLoop( true );
 }
@@ -826,7 +826,7 @@ void EditorObjet::OnBoucleOuiCheckSelect( wxCommandEvent& event )
 ///
 /// Change le bouclage de la direction en false
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnBoucleNonCheckSelect( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnBoucleNonCheckSelect( wxCommandEvent& event )
 {
     if ( AnimationAndDirectionValid() ) GetEditedDirection().SetLoop( false );
 }
@@ -834,7 +834,7 @@ void EditorObjet::OnBoucleNonCheckSelect( wxCommandEvent& event )
 /**
  * Display Image Bank Editor
  */
-void EditorObjet::OnButton1Click( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnButton1Click( wxCommandEvent& event )
 {
     //Update the window size
     if ( !m_mgr.GetPane( editorImagesPnl ).IsShown() )
@@ -844,7 +844,7 @@ void EditorObjet::OnButton1Click( wxCommandEvent& event )
     m_mgr.Update();
 }
 
-void EditorObjet::OnRotationCheckSelect( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnRotationCheckSelect( wxCommandEvent& event )
 {
     if ( !RotationCheck->GetValue() ) //Imitation d'un radio button
     {
@@ -866,7 +866,7 @@ void EditorObjet::OnRotationCheckSelect( wxCommandEvent& event )
     Bt7->Enable( false );
 }
 
-void EditorObjet::OnNormalCheckSelect( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnNormalCheckSelect( wxCommandEvent& event )
 {
     if ( !NormalCheck->GetValue() ) //Imitation d'un radio button
     {
@@ -888,7 +888,7 @@ void EditorObjet::OnNormalCheckSelect( wxCommandEvent& event )
     Bt7->Enable( true );
 }
 
-void EditorObjet::OnAideBtClick( wxCommandEvent& event )
+void OldSpriteObjectEditor::OnAideBtClick( wxCommandEvent& event )
 {
     if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(47);
@@ -896,7 +896,7 @@ void EditorObjet::OnAideBtClick( wxCommandEvent& event )
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"));
 }
 
-void EditorObjet::OnOkBtClick(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnOkBtClick(wxCommandEvent& event)
 {
     EndModal(0);
 }
@@ -905,7 +905,7 @@ void EditorObjet::OnOkBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Suppression de toutes les images
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnDeleteAllBtClick(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnDeleteAllBtClick(wxCommandEvent& event)
 {
     if ( !AnimationAndDirectionValid() ) return;
 
@@ -918,7 +918,7 @@ void EditorObjet::OnDeleteAllBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Ajout rapide de plusieurs images
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnAjoutPlusBtClick(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnAjoutPlusBtClick(wxCommandEvent& event)
 {
     if ( !AnimationAndDirectionValid() ) return;
 
@@ -939,12 +939,12 @@ void EditorObjet::OnAjoutPlusBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Copier les images d'une animation/direction à la place de celle ci
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnCopyBtClick(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnCopyBtClick(wxCommandEvent& event)
 {
     if ( !AnimationAndDirectionValid() ) return;
 
-    int animToCopy = wxGetNumberFromUser( "Animation à copier", "", "Entrez le numéro de l'animation dans laquelle se trouve la direction à copier", 0, 0, object.GetAnimationsNumber()-1, this);
-    if (animToCopy < 0 || static_cast<unsigned int>(animToCopy) >= object.GetAnimationsNumber()) return;
+    int animToCopy = wxGetNumberFromUser( "Animation à copier", "", "Entrez le numéro de l'animation dans laquelle se trouve la direction à copier", 0, 0, object.GetAnimationCount()-1, this);
+    if (animToCopy < 0 || static_cast<unsigned int>(animToCopy) >= object.GetAnimationCount()) return;
 
     int directionToCopy = 0;
 
@@ -962,7 +962,7 @@ void EditorObjet::OnCopyBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Mise à jour de la barre de miniatures si redimensionnement
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnthumbsPanelResize(wxSizeEvent& event)
+void OldSpriteObjectEditor::OnthumbsPanelResize(wxSizeEvent& event)
 {
     thumbsPanel->Refresh();
     thumbsPanel->Update(); //Immédiatement
@@ -971,7 +971,7 @@ void EditorObjet::OnthumbsPanelResize(wxSizeEvent& event)
 ////////////////////////////////////////////////////////////
 /// Mise à jour de la barre de miniatures
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
+void OldSpriteObjectEditor::OnthumbsPanelPaint(wxPaintEvent& event)
 {
     thumbsPanel->SetBackgroundStyle( wxBG_STYLE_PAINT );
     wxPaintDC dc( thumbsPanel ); //Création obligatoire du wxBufferedPaintDC
@@ -994,7 +994,7 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
     if ( !AnimationAndDirectionValid() ) return;
     const Direction & directionToDisplay = object.GetAnimation( animation ).GetDirection( direction );
 
-    for (unsigned int i = 0;i<directionToDisplay.GetSpritesNumber();++i)
+    for (unsigned int i = 0;i<directionToDisplay.GetSpriteCount();++i)
     {
         dc.SetPen(*wxBLACK_PEN);
 
@@ -1039,14 +1039,14 @@ void EditorObjet::OnthumbsPanelPaint(wxPaintEvent& event)
     //Rafraichissement de la scrollbar
     thumbsScroll->SetScrollbar(thumbsScroll->GetThumbPosition(),
                                thumbsPanel->GetSize().GetWidth(),
-                               (directionToDisplay.GetSpritesNumber())*48+(directionToDisplay.GetSpritesNumber())*3,
+                               (directionToDisplay.GetSpriteCount())*48+(directionToDisplay.GetSpriteCount())*3,
                                thumbsPanel->GetSize().GetWidth());
 }
 
 ////////////////////////////////////////////////////////////
 /// Scroll de la barre de miniatures
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnthumbsScrollScroll(wxScrollEvent& event)
+void OldSpriteObjectEditor::OnthumbsScrollScroll(wxScrollEvent& event)
 {
     thumbsPanel->Refresh();
     thumbsPanel->Update(); //Immédiatement
@@ -1055,7 +1055,7 @@ void EditorObjet::OnthumbsScrollScroll(wxScrollEvent& event)
 ////////////////////////////////////////////////////////////
 /// Clic sur la barre de miniatures
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnthumbsPanelLeftUp(wxMouseEvent& event)
+void OldSpriteObjectEditor::OnthumbsPanelLeftUp(wxMouseEvent& event)
 {
     int X = event.GetX() + thumbsScroll->GetThumbPosition()-2;
     selectedImage = X/(48+3);
@@ -1070,7 +1070,7 @@ void EditorObjet::OnthumbsPanelLeftUp(wxMouseEvent& event)
 ////////////////////////////////////////////////////////////
 /// Affichage de l'image selectionnée
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
+void OldSpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
 {
     imagePanel->SetBackgroundStyle( wxBG_STYLE_PAINT );
     wxPaintDC dc( imagePanel ); //Création obligatoire du wxBufferedPaintDC
@@ -1085,7 +1085,7 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
 
     if ( !AnimationAndDirectionValid() ) return;
 
-    if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirection( direction ).GetSpritesNumber() )
+    if ( selectedImage >= 0 && static_cast<unsigned>(selectedImage) < object.GetAnimation( animation ).GetDirection( direction ).GetSpriteCount() )
     {
         const Sprite & sprite = object.GetAnimation( animation ).GetDirection( direction ).GetSprite(selectedImage);
         try
@@ -1143,7 +1143,7 @@ void EditorObjet::OnimagePanelPaint(wxPaintEvent& event)
 ////////////////////////////////////////////////////////////
 /// Clic droit sur la barre de miniatures
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnthumbsPanelRightUp(wxMouseEvent& event)
+void OldSpriteObjectEditor::OnthumbsPanelRightUp(wxMouseEvent& event)
 {
     //On vérifie que la banque d'image est affichée
     if ( m_mgr.GetPane( editorImagesPnl ).IsShown() )
@@ -1162,7 +1162,7 @@ void EditorObjet::OnthumbsPanelRightUp(wxMouseEvent& event)
     PopupMenu(&contextMenu);
 }
 
-void EditorObjet::OnAddMoreEndSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnAddMoreEndSelected(wxCommandEvent& event)
 {
     if ( !AnimationAndDirectionValid() ) return;
 
@@ -1182,7 +1182,7 @@ void EditorObjet::OnAddMoreEndSelected(wxCommandEvent& event)
     thumbsPanel->Update(); //Immédiatement
 }
 
-void EditorObjet::OnAddMoreAfterSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnAddMoreAfterSelected(wxCommandEvent& event)
 {
     if ( !AnimationAndDirectionValid() ) return;
 
@@ -1208,7 +1208,7 @@ void EditorObjet::OnAddMoreAfterSelected(wxCommandEvent& event)
     thumbsPanel->Update(); //Immédiatement
 }
 
-void EditorObjet::OnAddMoreBeforeSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnAddMoreBeforeSelected(wxCommandEvent& event)
 {
     if ( !AnimationAndDirectionValid() ) return;
 
@@ -1234,7 +1234,7 @@ void EditorObjet::OnAddMoreBeforeSelected(wxCommandEvent& event)
     thumbsPanel->Update(); //Immédiatement
 }
 
-void EditorObjet::OnAddFromEndSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnAddFromEndSelected(wxCommandEvent& event)
 {
     if ( !AnimationAndDirectionValid() )
     {
@@ -1261,7 +1261,7 @@ void EditorObjet::OnAddFromEndSelected(wxCommandEvent& event)
     thumbsPanel->Update(); //Immédiatement
 }
 
-void EditorObjet::OnAddFromAfterSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnAddFromAfterSelected(wxCommandEvent& event)
 {
     if ( !AnimationAndDirectionValid() ) return;
 
@@ -1295,7 +1295,7 @@ void EditorObjet::OnAddFromAfterSelected(wxCommandEvent& event)
     thumbsPanel->Update(); //Immédiatement
 }
 
-void EditorObjet::OnAddFromBeforeSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnAddFromBeforeSelected(wxCommandEvent& event)
 {
     if ( !AnimationAndDirectionValid() ) return;
 
@@ -1329,7 +1329,7 @@ void EditorObjet::OnAddFromBeforeSelected(wxCommandEvent& event)
     thumbsPanel->Update(); //Immédiatement
 }
 
-void EditorObjet::OnDeleteSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnDeleteSelected(wxCommandEvent& event)
 {
     if ( !AnimationAndDirectionValid() ) return;
 
@@ -1349,7 +1349,7 @@ void EditorObjet::OnDeleteSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Redimensionnement de la toolbar : Mise à jour
 ////////////////////////////////////////////////////////////
-void EditorObjet::OntoolbarPanelResize(wxSizeEvent& event)
+void OldSpriteObjectEditor::OntoolbarPanelResize(wxSizeEvent& event)
 {
     toolbar->SetSize(toolbarPanel->GetSize().x, -1);
 }
@@ -1357,7 +1357,7 @@ void EditorObjet::OntoolbarPanelResize(wxSizeEvent& event)
 ////////////////////////////////////////////////////////////
 /// Rafraichissement de l'aperçu quand on se déplace avec la scrollbar
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnscrollHeightScroll(wxScrollEvent& event)
+void OldSpriteObjectEditor::OnscrollHeightScroll(wxScrollEvent& event)
 {
     imagePanel->Refresh();
     imagePanel->Update(); //Immédiatement
@@ -1366,7 +1366,7 @@ void EditorObjet::OnscrollHeightScroll(wxScrollEvent& event)
 ////////////////////////////////////////////////////////////
 /// Rafraichissement de l'aperçu quand on se déplace avec la scrollbar
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnscrollWidthScroll(wxScrollEvent& event)
+void OldSpriteObjectEditor::OnscrollWidthScroll(wxScrollEvent& event)
 {
     imagePanel->Refresh();
     imagePanel->Update(); //Immédiatement
@@ -1375,7 +1375,7 @@ void EditorObjet::OnscrollWidthScroll(wxScrollEvent& event)
 ////////////////////////////////////////////////////////////
 /// Clic droit sur l'aperçu
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnimagePanelRightUp(wxMouseEvent& event)
+void OldSpriteObjectEditor::OnimagePanelRightUp(wxMouseEvent& event)
 {
     if ( !SpriteValid() )return;
 
@@ -1391,7 +1391,7 @@ void EditorObjet::OnimagePanelRightUp(wxMouseEvent& event)
 ////////////////////////////////////////////////////////////
 /// Clic gauche
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
+void OldSpriteObjectEditor::OnimagePanelLeftUp(wxMouseEvent& event)
 {
     if ( !SpriteValid() ) return;
 
@@ -1418,7 +1418,7 @@ void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
             //Repositionnement pour les autres sprites si besoin
             if ( posEverywhereMenuItem->IsChecked() )
             {
-                for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesNumber();++i)
+                for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpriteCount();++i)
                 {
                     MovePoint(object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i),
                               selectedPoint, event.GetX() - SpritePosX, event.GetY() - SpritePosY);
@@ -1437,7 +1437,7 @@ void EditorObjet::OnimagePanelLeftUp(wxMouseEvent& event)
 ////////////////////////////////////////////////////////////
 /// Choisir le point à placer
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnModPointSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnModPointSelected(wxCommandEvent& event)
 {
     if ( !SpriteValid() ) return;
 
@@ -1482,7 +1482,7 @@ void EditorObjet::OnModPointSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Placer un point de façon précise
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnModPointPrecisSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnModPointPrecisSelected(wxCommandEvent& event)
 {
     if ( !SpriteValid() ) return;
 
@@ -1522,7 +1522,7 @@ void EditorObjet::OnModPointPrecisSelected(wxCommandEvent& event)
     //Repositionnement pour les autres sprites si besoin
     if ( posEverywhereMenuItem->IsChecked() )
     {
-        for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpritesNumber();++i)
+        for (unsigned int i =0;i<object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSpriteCount();++i)
         {
             MovePoint(object.GetAnimation( animation ).GetDirectionToModify( direction ).GetSprite(i),
                       name, ToInt(x_str), ToInt(y_str));
@@ -1533,7 +1533,7 @@ void EditorObjet::OnModPointPrecisSelected(wxCommandEvent& event)
     imagePanel->Update(); //Immédiatement
 }
 
-void EditorObjet::MovePoint(Sprite & sprite, string pointName, int X, int Y)
+void OldSpriteObjectEditor::MovePoint(Sprite & sprite, string pointName, int X, int Y)
 {
     //Vérification de la validité
     if ( !sprite.HasPoint(pointName) )
@@ -1548,7 +1548,7 @@ void EditorObjet::MovePoint(Sprite & sprite, string pointName, int X, int Y)
 ////////////////////////////////////////////////////////////
 /// Ajouter un point
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnAddPointSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnAddPointSelected(wxCommandEvent& event)
 {
     if ( !SpriteValid() ) return;
 
@@ -1578,7 +1578,7 @@ void EditorObjet::OnAddPointSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 /// Supprimer un point
 ////////////////////////////////////////////////////////////
-void EditorObjet::OnDelPointSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnDelPointSelected(wxCommandEvent& event)
 {
     if ( !SpriteValid() ) return;
 
@@ -1609,7 +1609,7 @@ void EditorObjet::OnDelPointSelected(wxCommandEvent& event)
     }
 }
 
-void EditorObjet::OnautomaticMaskSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnautomaticMaskSelected(wxCommandEvent& event)
 {
     if ( !SpriteValid() ) return;
 
@@ -1622,7 +1622,7 @@ void EditorObjet::OnautomaticMaskSelected(wxCommandEvent& event)
     imagePanel->Update(); //Immédiatement
 }
 
-void EditorObjet::OnimagePanelLeftDown(wxMouseEvent& event)
+void OldSpriteObjectEditor::OnimagePanelLeftDown(wxMouseEvent& event)
 {
     if ( editingMask && SpriteValid())
     {
@@ -1643,7 +1643,7 @@ void EditorObjet::OnimagePanelLeftDown(wxMouseEvent& event)
     }
 }
 
-void EditorObjet::OnimagePanelMouseMove(wxMouseEvent& event)
+void OldSpriteObjectEditor::OnimagePanelMouseMove(wxMouseEvent& event)
 {
     if ( editingMask && movingBox && SpriteValid())
     {
@@ -1670,7 +1670,7 @@ void EditorObjet::OnimagePanelMouseMove(wxMouseEvent& event)
     }
 }
 
-void EditorObjet::OnDelMaskRectangleSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnDelMaskRectangleSelected(wxCommandEvent& event)
 {
     if ( editingMask && SpriteValid())
     {
@@ -1695,7 +1695,7 @@ void EditorObjet::OnDelMaskRectangleSelected(wxCommandEvent& event)
     }
 }
 
-void EditorObjet::OnAddMaskRectangleSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnAddMaskRectangleSelected(wxCommandEvent& event)
 {
     if ( editingMask && SpriteValid())
     {
@@ -1724,7 +1724,7 @@ void EditorObjet::OnAddMaskRectangleSelected(wxCommandEvent& event)
     }
 }
 
-void EditorObjet::OnEditMaskSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnEditMaskSelected(wxCommandEvent& event)
 {
     editingMask = !editingMask;
 
@@ -1747,7 +1747,7 @@ void EditorObjet::OnEditMaskSelected(wxCommandEvent& event)
     imagePanel->Update(); //Immédiatement
 }
 
-void EditorObjet::OnModifyMaskRectangleSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnModifyMaskRectangleSelected(wxCommandEvent& event)
 {
     if ( editingMask && SpriteValid())
     {
@@ -1777,7 +1777,7 @@ void EditorObjet::OnModifyMaskRectangleSelected(wxCommandEvent& event)
 }
 
 
-void EditorObjet::OnEnterMaskRectanglePositionSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnEnterMaskRectanglePositionSelected(wxCommandEvent& event)
 {
     if ( editingMask && SpriteValid())
     {
@@ -1807,7 +1807,7 @@ void EditorObjet::OnEnterMaskRectanglePositionSelected(wxCommandEvent& event)
 /**
  * Exit point editing
  */
-void EditorObjet::OnEditPointsSelected(wxCommandEvent& event)
+void OldSpriteObjectEditor::OnEditPointsSelected(wxCommandEvent& event)
 {
     placingPoint = false;
 

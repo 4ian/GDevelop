@@ -100,7 +100,7 @@ void ImageResource::RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Pr
         return;
 
     wxBitmap bmp( fullFilename, wxBITMAP_TYPE_ANY);
-    if ( bmp.GetWidth() > previewPanel.GetSize().x || bmp.GetHeight() > previewPanel.GetSize().y )
+    if ( bmp.GetWidth() != 0 && bmp.GetHeight() != 0 && (bmp.GetWidth() > previewPanel.GetSize().x || bmp.GetHeight() > previewPanel.GetSize().y) )
     {
         //Rescale to fit in previewPanel
         float xFactor = static_cast<float>(previewPanel.GetSize().x)/static_cast<float>(bmp.GetWidth());
@@ -108,7 +108,8 @@ void ImageResource::RenderPreview(wxPaintDC & dc, wxPanel & previewPanel, gd::Pr
         float factor = std::min(xFactor, yFactor);
 
         wxImage image = bmp.ConvertToImage();
-        bmp = wxBitmap(image.Scale(bmp.GetWidth()*factor, bmp.GetHeight()*factor));
+        if ( bmp.GetWidth()*factor >= 5 && bmp.GetHeight()*factor >= 5)
+            bmp = wxBitmap(image.Scale(bmp.GetWidth()*factor, bmp.GetHeight()*factor));
     }
 
     //Display image in the center

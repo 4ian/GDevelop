@@ -90,34 +90,32 @@ public :
 
     void UpdateCurrentSprite() const;
     const sf::Sprite & GetCurrentSFMLSprite() const;
-    bool IsValid(int anim, int direc, int sprite) const;
     const Sprite & GetCurrentSprite() const;
 
+    /** \name Current animation
+     * Managing the animation being played
+     */
+    ///@{
     void StopAnimation() { animationStopped = true; };
     void PlayAnimation() { animationStopped = false; };
     bool IsAnimationStopped() const { return animationStopped; }
 
     inline unsigned int GetCurrentAnimation() const { return currentAnimation; }
-    bool SetAnimation(unsigned int nb);
-    inline const Animation & GetAnimation(unsigned int nb) const
-    {
-        if ( nb >= GetAnimationsNumber() )
-            return badAnimation;
+    bool SetCurrentAnimation(unsigned int nb);
+    ///@}
 
-        return animations[nb].Get();
-    }
-    inline Animation & GetAnimation(unsigned int nb)
-    {
-        if ( nb >= GetAnimationsNumber() )
-            return badAnimation;
-
-        return animations[nb].Get();
-    }
-    unsigned int GetAnimationsNumber() const;
+    /** \name Animations
+     * Methods related to animations management
+     */
+    ///@{
+    inline const Animation & GetAnimation(unsigned int nb) const { if ( nb >= GetAnimationCount() ) return badAnimation; else return animations[nb].Get(); }
+    inline Animation & GetAnimation(unsigned int nb) { if ( nb >= GetAnimationCount() ) return badAnimation; else return animations[nb].Get(); }
+    unsigned int GetAnimationCount() const;
     void AddAnimation(const Animation & animation);
     bool RemoveAnimation(unsigned int nb);
     inline void RemoveAllAnimation() { animations.clear(); cacheAnimationSizeNeedUpdate = true;}
     inline bool HasNoAnimations() { return animations.empty(); }
+    ///@}
 
     bool CursorOnObject( RuntimeScene & scene, bool accurate );
 

@@ -64,9 +64,19 @@
 										<growablerows>0</growablerows>
 										<object class="sizeritem">
 											<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="resourcesTree" member="yes">
+												<image_list></image_list>
+												<tree_items>
+													<item>resourcesTree</item>
+													<item></item>
+												</tree_items>
+												<items_text>
+													<item2>resourcesTree</item2>
+													<item2></item2>
+												</items_text>
 												<size>200,170</size>
 												<tooltip>Clic droit sur une image pour accéder aux options</tooltip>
 												<style>wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE</style>
+												<handler function="OnresourcesTreeBeginDrag" entry="EVT_TREE_BEGIN_DRAG" />
 												<handler function="OnresourcesTreeBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
 												<handler function="OnresourcesTreeEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
 												<handler function="OnresourcesTreeItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />

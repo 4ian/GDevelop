@@ -154,6 +154,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     SplitterWindow1 = new wxSplitterWindow(Core, ID_SPLITTERWINDOW1, wxDefaultPosition, wxSize(239,271), wxSP_3D, _T("ID_SPLITTERWINDOW1"));
     SplitterWindow1->SetMinSize(wxSize(10,10));
     SplitterWindow1->SetMinimumPaneSize(10);
+    SplitterWindow1->SetSashGravity(0.5);
     treePanel = new wxPanel(SplitterWindow1, ID_PANEL4, wxPoint(24,64), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL4"));
     FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer3->AddGrowableCol(0);
@@ -229,6 +230,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     FlexGridSizer2->Fit(this);
     FlexGridSizer2->SetSizeHints(this);
 
+    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_DRAG,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeBeginDrag);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeBeginLabelEdit);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_END_LABEL_EDIT,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeEndLabelEdit);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeItemActivated);
@@ -1181,19 +1183,6 @@ void ResourcesEditor::OnMoveDownSelected(wxCommandEvent& event)
     }
 }
 
-/**
- * Begin dragging image ( can be dropped in a Objects Editor so as to create easily an object )
- */
-void ResourcesEditor::OnresourcesTreeBeginDrag(wxTreeEvent& event)
-{
-    if ( event.GetItem().IsOk() && event.GetItem() != resourcesTree->GetRootItem() )
-    {
-        wxTextDataObject name(resourcesTree->GetItemText(event.GetItem()));
-        wxDropSource dragSource( this );
-        dragSource.SetData( name );
-        dragSource.DoDragDrop( true );
-    }
-}
 
 /**
  * Show appropriate ribbon page when get focus.
@@ -1236,4 +1225,20 @@ void ResourcesEditor::OnsearchCtrlText(wxCommandEvent& event)
 {
     Refresh();
 }
+
+void ResourcesEditor::OnresourcesTreeBeginDrag(wxTreeEvent& event)
+{
+    gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
+    if ( !data ) return;
+
+    //Move an image
+    if ( data->GetString() == "Image" )
+    {
+        wxTextDataObject name(ToString( resourcesTree->GetItemText( event.GetItem() )));
+        wxDropSource dragSource( this );
+        dragSource.SetData( name );
+        dragSource.DoDragDrop( true );
+    }
+}
+
 #endif

@@ -177,8 +177,8 @@ class GD_API ResourcesEditor: public wxPanel
 		void OnresourcesTreeItemActivated(wxTreeEvent& event);
 		void OnresourcesTreeSelectionChanged(wxTreeEvent& event);
 		void OnresourcesTreeItemMenu(wxTreeEvent& event);
-		void OnresourcesTreeBeginDrag(wxTreeEvent& event);
 		void OnapercuPanelResize(wxSizeEvent& event);
+		void OnresourcesTreeBeginDrag(wxTreeEvent& event);
 		//*)
         void OnMoreOptions( wxCommandEvent& event );
 		void OnAddFromLibraryBtClick(wxCommandEvent& event);

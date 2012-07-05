@@ -1165,6 +1165,8 @@
 		<Unit filename="GDL\IDE\Dialogs\EditTextDialog.h" />
 		<Unit filename="GDL\IDE\Dialogs\ObjectListDialogsHelper.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\ObjectListDialogsHelper.h" />
+		<Unit filename="GDL\IDE\Dialogs\OldSpriteObjectEditor.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\OldSpriteObjectEditor.h" />
 		<Unit filename="GDL\IDE\Dialogs\ProjectUpdateDlg.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\ProjectUpdateDlg.h" />
 		<Unit filename="GDL\IDE\Dialogs\PropImage.cpp" />
@@ -1293,6 +1295,7 @@
 		<Unit filename="GDL\tinyxml\tinyxmlparser.cpp" />
 		<Unit filename="PlatformDefinition\Platform.cpp" />
 		<Unit filename="PlatformDefinition\Platform.h" />
+		<Unit filename="wxsmith\SpriteObjectEditor.wxs" />
 		<Extensions>
 			<code_completion />
 			<envvars />
@@ -1314,7 +1317,7 @@
 					<wxDialog wxs="wxsmith/EditForEachEvent.wxs" src="GDL/IDE/Dialogs/EditForEachEvent.cpp" hdr="GDL/IDE/Dialogs/EditForEachEvent.h" fwddecl="0" i18n="1" name="EditForEachEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditRepeatEvent.wxs" src="GDL/IDE/Dialogs/EditRepeatEvent.cpp" hdr="GDL/IDE/Dialogs/EditRepeatEvent.h" fwddecl="0" i18n="1" name="EditRepeatEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/EditExpression.wxs" src="GDL/IDE/Dialogs/EditExpression.cpp" hdr="GDL/IDE/Dialogs/EditExpression.h" fwddecl="0" i18n="1" name="EditExpression" language="CPP" />
-					<wxDialog wxs="wxsmith/SpriteObjectEditor.wxs" src="GDL/IDE/Dialogs/SpriteObjectEditor.cpp" hdr="GDL/IDE/Dialogs/SpriteObjectEditor.h" fwddecl="0" i18n="1" name="SpriteObjectEditor" language="CPP" />
+					<wxDialog wxs="wxsmith/OldSpriteObjectEditor.wxs" src="GDL/IDE/Dialogs/OldSpriteObjectEditor.cpp" hdr="GDL/IDE/Dialogs/OldSpriteObjectEditor.h" fwddecl="0" i18n="1" name="OldSpriteObjectEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/EditTextDialog.wxs" src="GDL/IDE/Dialogs/EditTextDialog.cpp" hdr="GDL/IDE/Dialogs/EditTextDialog.h" fwddecl="0" i18n="1" name="EditTextDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseAutomatismDlg.wxs" src="GDL/IDE/Dialogs/ChooseAutomatismDlg.cpp" hdr="GDL/IDE/Dialogs/ChooseAutomatismDlg.h" fwddecl="0" i18n="1" name="ChooseAutomatismDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/PropImage.wxs" src="GDL/IDE/Dialogs/PropImage.cpp" hdr="GDL/IDE/Dialogs/PropImage.h" fwddecl="0" i18n="1" name="PropImage" language="CPP" />
@@ -1322,6 +1325,7 @@
 					<wxDialog wxs="wxsmith/AdvancedTextEntryDlg.wxs" src="GDL/IDE/Dialogs/AdvancedTextEntryDlg.cpp" hdr="GDL/IDE/Dialogs/AdvancedTextEntryDlg.h" fwddecl="0" i18n="1" name="AdvancedTextEntryDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/EditCppCodeEvent.wxs" src="GDL\IDE\Dialogs\EditCppCodeEvent.cpp" hdr="GDL\IDE\Dialogs\EditCppCodeEvent.h" fwddecl="0" i18n="1" name="EditCppCodeEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/ProjectUpdateDlg.wxs" src="GDL\IDE\Dialogs\ProjectUpdateDlg.cpp" hdr="GDL\IDE\Dialogs\ProjectUpdateDlg.h" fwddecl="0" i18n="1" name="ProjectUpdateDlg" language="CPP" />
+					<wxDialog wxs="wxsmith/SpriteObjectEditor.wxs" src="GDL\IDE\Dialogs\SpriteObjectEditor.cpp" hdr="GDL\IDE\Dialogs\SpriteObjectEditor.h" fwddecl="0" i18n="1" name="SpriteObjectEditor" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

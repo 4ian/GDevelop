@@ -1,0 +1,709 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="EditorObjet">
+		<title>Editer l&apos;objet</title>
+		<centered>1</centered>
+		<size>356,215</size>
+		<extra_code>wxIcon FrameIcon;&#x0A;FrameIcon.CopyFromBitmap(wxBitmap(wxImage(__T(&quot;res/objeticon.png&quot;))));&#x0A;SetIcon(FrameIcon);</extra_code>
+		<id_arg>0</id_arg>
+		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX</style>
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<rows>1</rows>
+			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
+			<object class="sizeritem">
+				<object class="wxPanel" name="ID_PANEL1" variable="Core" member="yes">
+					<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+						<cols>1</cols>
+						<growablecols>0</growablecols>
+						<growablerows>0</growablerows>
+						<object class="sizeritem">
+							<object class="wxBoxSizer" variable="BoxSizer2" member="no">
+								<orient>wxVERTICAL</orient>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+										<cols>3</cols>
+										<growablecols>0</growablecols>
+										<growablerows>0</growablerows>
+										<object class="sizeritem">
+											<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
+												<bg>wxSYS_COLOUR_WINDOW</bg>
+												<object class="wxFlexGridSizer" variable="FlexGridSizer12" member="no">
+													<cols>3</cols>
+													<object class="sizeritem">
+														<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText4" member="yes">
+															<label>Objet :</label>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+													<object class="sizeritem">
+														<object class="wxStaticText" name="ID_STATICTEXT1" variable="NomObjetTxt" member="yes">
+															<label>Sans nom</label>
+															<font>
+																<weight>bold</weight>
+															</font>
+														</object>
+														<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+														<border>5</border>
+														<option>1</option>
+													</object>
+												</object>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
+										<size>10,-1</size>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								</object>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="yes">
+										<cols>1</cols>
+										<growablecols>0</growablecols>
+										<growablerows>1</growablerows>
+										<object class="sizeritem">
+											<object class="wxStaticBoxSizer" variable="animationSizer" member="no">
+												<label>Animation</label>
+												<object class="sizeritem">
+													<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+														<cols>3</cols>
+														<rows>1</rows>
+														<object class="sizeritem">
+															<object class="wxChoice" name="ID_CHOICE1" variable="AnimationsBox" member="yes">
+																<content>
+																	<item>Pas d&apos;animations</item>
+																</content>
+																<size>139,21</size>
+																<handler function="OnAnimationsBoxSelect" entry="EVT_CHOICE" />
+															</object>
+															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+														<object class="sizeritem">
+															<object class="wxButton" name="ID_BUTTON1" variable="AddAnimBt" member="yes">
+																<label>Ajouter une animation</label>
+																<tooltip>Ajoutez des animations à l&apos;objet avec ce bouton.</tooltip>
+																<handler function="OnAddAnimBtClick" entry="EVT_BUTTON" />
+															</object>
+															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+														<object class="sizeritem">
+															<object class="wxButton" name="ID_BUTTON2" variable="DelAnimBt" member="yes">
+																<label>Supprimer l&apos;animation</label>
+																<tooltip>Supprime l&apos;animation actuelle.</tooltip>
+																<handler function="OnDelAnimBtClick" entry="EVT_BUTTON" />
+															</object>
+															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxFlexGridSizer" variable="FlexGridSizer10" member="yes">
+												<cols>1</cols>
+												<growablecols>0</growablecols>
+												<growablerows>0</growablerows>
+												<object class="sizeritem">
+													<object class="wxFlexGridSizer" variable="animAndDirecSizer" member="yes">
+														<cols>2</cols>
+														<growablecols>1</growablecols>
+														<growablerows>0</growablerows>
+														<object class="sizeritem">
+															<object class="wxStaticBoxSizer" variable="directionSizer" member="yes">
+																<label>Direction</label>
+																<object class="sizeritem">
+																	<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+																		<cols>1</cols>
+																		<object class="sizeritem">
+																			<object class="wxCheckBox" name="ID_CHECKBOX1" variable="NormalCheck" member="yes">
+																				<label>Normal</label>
+																				<tooltip>En mode normal, 8 directions sont disponibles.&#x0A;Vous pouvez changer la direction de l&apos;objet en cours de jeu grâce aux actions du thème &quot;Direction&quot;.</tooltip>
+																				<handler function="OnNormalCheckSelect" entry="EVT_CHECKBOX" />
+																			</object>
+																			<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+																			<border>5</border>
+																			<option>1</option>
+																		</object>
+																		<object class="sizeritem">
+																			<object class="wxGridSizer" variable="GridSizer3" member="yes">
+																				<cols>3</cols>
+																				<rows>3</rows>
+																				<object class="sizeritem">
+																					<object class="wxToggleButton" name="ID_TOGGLEBUTTON8" variable="Bt5" member="yes">
+																						<label>5</label>
+																						<size>26,23</size>
+																						<handler function="OnBt5Toggle" entry="EVT_TOGGLEBUTTON" />
+																					</object>
+																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																				<object class="sizeritem">
+																					<object class="wxToggleButton" name="ID_TOGGLEBUTTON7" variable="Bt6" member="yes">
+																						<label>6</label>
+																						<size>26,23</size>
+																						<handler function="OnBt6Toggle" entry="EVT_TOGGLEBUTTON" />
+																					</object>
+																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																				<object class="sizeritem">
+																					<object class="wxToggleButton" name="ID_TOGGLEBUTTON6" variable="Bt7" member="yes">
+																						<label>7</label>
+																						<size>26,23</size>
+																						<handler function="OnBt7Toggle" entry="EVT_TOGGLEBUTTON" />
+																					</object>
+																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<border>5</border>
+																					<option>1</option>
+																				</object>
+																				<object class="sizeritem">
+																					<object class="wxToggleButton" name="ID_TOGGLEBUTTON5" variable="Bt4" member="yes">
+																						<label>4</label>
+																						<size>26,23</size>
+																						<handler function="OnBt4Toggle" entry="EVT_TOGGLEBUTTON" />
+																					</object>
+																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																				<object class="sizeritem">
+																					<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap1" member="yes">
+																						<bitmap>res/direction.png</bitmap>
+																						<size>25,25</size>
+																						<style>wxNO_BORDER</style>
+																					</object>
+																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																				<object class="sizeritem">
+																					<object class="wxToggleButton" name="ID_TOGGLEBUTTON1" variable="Bt0" member="yes">
+																						<label>0</label>
+																						<checked>1</checked>
+																						<size>26,23</size>
+																						<handler function="OnBt0Toggle" entry="EVT_TOGGLEBUTTON" />
+																					</object>
+																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																				<object class="sizeritem">
+																					<object class="wxToggleButton" name="ID_TOGGLEBUTTON2" variable="Bt3" member="yes">
+																						<label>3</label>
+																						<size>26,23</size>
+																						<handler function="OnBt3Toggle" entry="EVT_TOGGLEBUTTON" />
+																					</object>
+																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																				<object class="sizeritem">
+																					<object class="wxToggleButton" name="ID_TOGGLEBUTTON3" variable="Bt2" member="yes">
+																						<label>2</label>
+																						<size>26,23</size>
+																						<handler function="OnBt2Toggle" entry="EVT_TOGGLEBUTTON" />
+																					</object>
+																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																				<object class="sizeritem">
+																					<object class="wxToggleButton" name="ID_TOGGLEBUTTON4" variable="Bt1" member="yes">
+																						<label>1</label>
+																						<size>26,23</size>
+																						<handler function="OnBt1Toggle" entry="EVT_TOGGLEBUTTON" />
+																					</object>
+																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																			</object>
+																			<flag>wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+																			<option>1</option>
+																		</object>
+																		<object class="sizeritem">
+																			<object class="wxCheckBox" name="ID_CHECKBOX2" variable="RotationCheck" member="yes">
+																				<label>Rotation automatique</label>
+																				<tooltip>En mode Rotation automatique, Game Develop fera tourner l&apos;objet suivant sa direction, de 0 à 360.&#x0A;Vous pouvez changer la direction de l&apos;objet en cours de jeu grâce aux actions du thème &quot;Direction&quot;.</tooltip>
+																				<handler function="OnRotationCheckSelect" entry="EVT_CHECKBOX" />
+																			</object>
+																			<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																			<border>5</border>
+																			<option>1</option>
+																		</object>
+																	</object>
+																	<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																	<border>5</border>
+																	<option>1</option>
+																</object>
+															</object>
+															<flag>wxALL|wxALIGN_TOP|wxALIGN_CENTER_HORIZONTAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+														<object class="sizeritem">
+															<object class="wxStaticBoxSizer" variable="imagesSizer" member="yes">
+																<label>Images</label>
+																<object class="sizeritem">
+																	<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
+																		<cols>1</cols>
+																		<growablecols>0</growablecols>
+																		<growablerows>2</growablerows>
+																		<object class="sizeritem">
+																			<object class="wxFlexGridSizer" variable="FlexGridSizer13" member="no">
+																				<cols>3</cols>
+																				<growablecols>0</growablecols>
+																				<growablerows>0</growablerows>
+																				<object class="sizeritem">
+																					<object class="wxPanel" name="ID_PANEL6" variable="toolbarPanel" member="yes">
+																						<size>-1,25</size>
+																						<handler function="OntoolbarPanelResize" entry="EVT_SIZE" />
+																						<object class="wxAuiManager" variable="AuiManager1" member="yes">
+																							<object class="AuiManagerItem">
+																								<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes">
+																									<size>139,35</size>
+																								</object>
+																								<name>PaneName</name>
+																								<standardpanetype>Toolbar</standardpanetype>
+																								<caption>Pane caption</caption>
+																								<captionvisible>0</captionvisible>
+																								<minimizebutton>0</minimizebutton>
+																								<maximizebutton>0</maximizebutton>
+																								<pinbutton>0</pinbutton>
+																								<layer>10</layer>
+																								<dockabledirection>.Dockable(false)</dockabledirection>
+																								<resizable>0</resizable>
+																								<movable>0</movable>
+																								<destroyonclose>0</destroyonclose>
+																								<firstadd>0</firstadd>
+																							</object>
+																						</object>
+																					</object>
+																					<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																			</object>
+																			<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																			<option>1</option>
+																		</object>
+																		<object class="sizeritem">
+																			<object class="wxStaticLine" name="ID_STATICLINE3" variable="StaticLine3" member="yes">
+																				<size>10,-1</size>
+																			</object>
+																			<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																			<option>1</option>
+																		</object>
+																		<object class="sizeritem">
+																			<object class="wxFlexGridSizer" variable="FlexGridSizer15" member="no">
+																				<cols>1</cols>
+																				<growablecols>0</growablecols>
+																				<growablerows>0</growablerows>
+																				<object class="sizeritem">
+																					<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
+																						<cols>2</cols>
+																						<growablecols>0</growablecols>
+																						<growablerows>0</growablerows>
+																						<object class="sizeritem">
+																							<object class="wxPanel" name="ID_PANEL3" variable="imagePanel" member="yes">
+																								<size>307,160</size>
+																								<bg>#808080</bg>
+																								<tooltip>Aperçu de l&apos;image</tooltip>
+																								<style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
+																								<handler function="OnimagePanelPaint" entry="EVT_PAINT" />
+																								<handler function="OnimagePanelLeftDown" entry="EVT_LEFT_DOWN" />
+																								<handler function="OnimagePanelLeftUp" entry="EVT_LEFT_UP" />
+																								<handler function="OnimagePanelRightUp" entry="EVT_RIGHT_UP" />
+																								<handler function="OnimagePanelMouseMove" entry="EVT_MOTION" />
+																							</object>
+																							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																							<option>1</option>
+																						</object>
+																						<object class="sizeritem">
+																							<object class="wxScrollBar" name="ID_SCROLLBAR1" variable="scrollHeight" member="yes">
+																								<thumbsize>1</thumbsize>
+																								<range>10</range>
+																								<pagesize>1</pagesize>
+																								<style>wxSB_VERTICAL</style>
+																								<handler function="OnscrollHeightScroll" entry="EVT_COMMAND_SCROLL" />
+																								<handler function="OnscrollHeightScroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
+																							</object>
+																							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																							<option>1</option>
+																						</object>
+																						<object class="sizeritem">
+																							<object class="wxScrollBar" name="ID_SCROLLBAR3" variable="scrollWidth" member="yes">
+																								<thumbsize>1</thumbsize>
+																								<range>10</range>
+																								<pagesize>1</pagesize>
+																								<style>wxSB_HORIZONTAL</style>
+																								<handler function="OnscrollWidthScroll" entry="EVT_COMMAND_SCROLL" />
+																								<handler function="OnscrollWidthScroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
+																							</object>
+																							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																							<option>1</option>
+																						</object>
+																					</object>
+																					<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																			</object>
+																			<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																			<option>1</option>
+																		</object>
+																		<object class="sizeritem">
+																			<object class="wxFlexGridSizer" variable="thumbsSizer" member="no">
+																				<cols>1</cols>
+																				<growablecols>0</growablecols>
+																				<object class="sizeritem">
+																					<object class="wxPanel" name="ID_PANEL5" variable="Panel1" member="yes">
+																						<style>wxRAISED_BORDER|wxTAB_TRAVERSAL</style>
+																						<object class="wxFlexGridSizer" variable="FlexGridSizer16" member="no">
+																							<cols>1</cols>
+																							<growablecols>0</growablecols>
+																							<object class="sizeritem">
+																								<object class="wxPanel" name="ID_PANEL4" variable="thumbsPanel" member="yes">
+																									<size>296,54</size>
+																									<bg>wxSYS_COLOUR_WINDOWFRAME</bg>
+																									<tooltip>Liste des images de la direction.&#x0A;Utilisez le clic droit ou la barre d&apos;outils pour modifier les images.</tooltip>
+																									<style>wxNO_BORDER|wxTAB_TRAVERSAL</style>
+																									<handler function="OnthumbsPanelPaint" entry="EVT_PAINT" />
+																									<handler function="OnthumbsPanelLeftUp" entry="EVT_LEFT_UP" />
+																									<handler function="OnthumbsPanelRightUp" entry="EVT_RIGHT_UP" />
+																									<handler function="OnthumbsPanelResize" entry="EVT_SIZE" />
+																								</object>
+																								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																								<option>1</option>
+																							</object>
+																							<object class="sizeritem">
+																								<object class="wxScrollBar" name="ID_SCROLLBAR2" variable="thumbsScroll" member="yes">
+																									<thumbsize>1</thumbsize>
+																									<range>10</range>
+																									<pagesize>1</pagesize>
+																									<size>296,17</size>
+																									<style>wxSB_HORIZONTAL</style>
+																									<handler function="OnthumbsScrollScroll" entry="EVT_COMMAND_SCROLL" />
+																									<handler function="OnthumbsScrollScroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
+																								</object>
+																								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																								<option>1</option>
+																							</object>
+																						</object>
+																					</object>
+																					<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																			</object>
+																			<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																			<option>1</option>
+																		</object>
+																		<object class="sizeritem">
+																			<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
+																				<cols>1</cols>
+																				<object class="sizeritem">
+																					<object class="wxFlexGridSizer" variable="FlexGridSizer9" member="no">
+																						<cols>4</cols>
+																						<object class="sizeritem">
+																							<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="CheckTempsEntreImg" member="yes">
+																								<size>16,16</size>
+																								<style>0</style>
+																							</object>
+																							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																							<border>5</border>
+																							<option>1</option>
+																						</object>
+																						<object class="sizeritem">
+																							<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
+																								<label>Temps entre chaque image :</label>
+																							</object>
+																							<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+																							<border>5</border>
+																							<option>1</option>
+																						</object>
+																						<object class="sizeritem">
+																							<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="TempsEdit" member="yes">
+																								<value>1</value>
+																								<size>68,21</size>
+																								<tooltip>Utilisez le point ( . ) pour entrer des valeurs intermédiaires :&#x0A;0.35, 1.75...</tooltip>
+																								<handler function="OnTempsEditText" entry="EVT_TEXT" />
+																							</object>
+																							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																							<border>5</border>
+																							<option>1</option>
+																						</object>
+																						<object class="sizeritem">
+																							<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
+																								<label>secondes</label>
+																							</object>
+																							<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+																							<border>5</border>
+																							<option>1</option>
+																						</object>
+																					</object>
+																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																				<object class="sizeritem">
+																					<object class="wxFlexGridSizer" variable="FlexGridSizer11" member="no">
+																						<cols>3</cols>
+																						<object class="sizeritem">
+																							<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText1" member="yes">
+																								<label>Répéter les images :</label>
+																							</object>
+																							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																							<border>5</border>
+																							<option>1</option>
+																						</object>
+																						<object class="sizeritem">
+																							<object class="wxRadioButton" name="ID_RADIOBUTTON3" variable="BoucleOuiCheck" member="yes">
+																								<label>Oui</label>
+																								<tooltip>Après la dernière image, l&apos;animation reprendra du départ.</tooltip>
+																								<style>wxRB_GROUP</style>
+																								<handler function="OnBoucleOuiCheckSelect" entry="EVT_RADIOBUTTON" />
+																							</object>
+																							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																							<border>5</border>
+																							<option>1</option>
+																						</object>
+																						<object class="sizeritem">
+																							<object class="wxRadioButton" name="ID_RADIOBUTTON4" variable="BoucleNonCheck" member="yes">
+																								<label>Non</label>
+																								<selected>1</selected>
+																								<tooltip>Une fois l&apos;animation arrivée à la dernière image, elle s&apos;arrêtera à celle ci.</tooltip>
+																								<handler function="OnBoucleNonCheckSelect" entry="EVT_RADIOBUTTON" />
+																							</object>
+																							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																							<border>5</border>
+																							<option>1</option>
+																						</object>
+																					</object>
+																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																					<option>1</option>
+																				</object>
+																			</object>
+																			<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																			<option>1</option>
+																		</object>
+																	</object>
+																	<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+																	<border>5</border>
+																	<option>1</option>
+																</object>
+															</object>
+															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+															<option>1</option>
+														</object>
+													</object>
+													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticLine" name="ID_STATICLINE2" variable="StaticLine2" member="yes">
+										<size>10,-1</size>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								</object>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer14" member="no">
+										<cols>3</cols>
+										<growablecols>0</growablecols>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON3" variable="ListImageBt" member="yes">
+												<label>Afficher la banque d&apos;images</label>
+												<tooltip>Consulter et/ou éditer la banque d&apos;image.</tooltip>
+												<handler function="OnButton1Click" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON5" variable="OkBt" member="yes">
+												<label>Ok</label>
+												<handler function="OnOkBtClick" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxButton" name="ID_BUTTON4" variable="AideBt" member="yes">
+												<label>Aide</label>
+												<handler function="OnAideBtClick" entry="EVT_BUTTON" />
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>5</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								</object>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<option>1</option>
+						</object>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+		<object class="wxMenu" variable="contextMenu" member="yes">
+			<object class="wxMenu" name="ID_MENUITEM1" variable="MenuItem6" member="yes">
+				<label>Ajouter l&apos;image selectionnée dans la banque d&apos;image</label>
+				<object class="wxMenuItem" name="idMenuAddFromEnd" variable="MenuItem11" member="yes">
+					<label>...à la fin</label>
+					<bitmap>res/2rightarrow.png</bitmap>
+					<handler function="OnAddFromEndSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="idMenuAddFromAfter" variable="MenuItem12" member="yes">
+					<label>...après celle-ci</label>
+					<bitmap>res/1rightarrow.png</bitmap>
+					<handler function="OnAddFromAfterSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="idMenuAddFromBefore" variable="MenuItem13" member="yes">
+					<label>...avant celle-ci</label>
+					<bitmap>res/1leftarrow.png</bitmap>
+					<handler function="OnAddFromBeforeSelected" entry="EVT_MENU" />
+				</object>
+			</object>
+			<object class="wxMenu" name="idMenuAddMulti" variable="MenuItem5" member="yes">
+				<label>Ajouter plusieurs images</label>
+				<object class="wxMenuItem" name="idMenuAddMoreEnd" variable="MenuItem8" member="yes">
+					<label>...à la fin</label>
+					<bitmap>res/2rightarrow.png</bitmap>
+					<handler function="OnAddMoreEndSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="idMenuAddMoreAfter" variable="MenuItem9" member="yes">
+					<label>...après celle-ci</label>
+					<bitmap>res/1rightarrow.png</bitmap>
+					<handler function="OnAddMoreAfterSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="idMenuAddMoreBefore" variable="MenuItem10" member="yes">
+					<label>...avant celle-ci</label>
+					<bitmap>res/1leftarrow.png</bitmap>
+					<handler function="OnAddMoreBeforeSelected" entry="EVT_MENU" />
+				</object>
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="idMenuDel" variable="MenuItem7" member="yes">
+				<label>Supprimer l&apos;image</label>
+				<bitmap>res/deleteicon.png</bitmap>
+				<handler function="OnDeleteSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMenuDelAll" variable="MenuItem14" member="yes">
+				<label>Supprimer toutes les images</label>
+				<handler function="OnDeleteAllBtClick" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="idMenuCopyFrom" variable="MenuItem15" member="yes">
+				<label>Copier toutes les images depuis...</label>
+				<bitmap>res/copyicon.png</bitmap>
+				<handler function="OnCopyBtClick" entry="EVT_MENU" />
+			</object>
+		</object>
+		<object class="wxMenu" variable="imageContextMenu" member="yes">
+			<object class="wxMenuItem" name="idPosPoint" variable="MenuItem1" member="yes">
+				<label>Editer les points</label>
+				<bitmap>res/pointmod.png</bitmap>
+				<handler function="OnModPointSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem2" member="yes">
+				<label>Editer le masque de collision</label>
+				<bitmap>res/maskEdit16.png</bitmap>
+				<handler function="OnEditMaskSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+		<object class="wxMenu" variable="maskContextMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM5" variable="MenuItem3" member="yes">
+				<label>Arrêter l&apos;édition du masque</label>
+				<handler function="OnEditMaskSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM8" variable="MenuItem4" member="yes">
+				<label>Ajouter un rectangle de collision</label>
+				<bitmap>res/maskAdd16.png</bitmap>
+				<handler function="OnAddMaskRectangleSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenu" name="ID_MENUITEM4" variable="MenuItem22" member="yes">
+				<label>Rectangle sélectionné</label>
+				<object class="wxMenuItem" name="ID_MENUITEM9" variable="MenuItem23" member="yes">
+					<label>Supprimer</label>
+					<bitmap>res/maskRemove16.png</bitmap>
+					<handler function="OnDelMaskRectangleSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="ID_MENUITEM6" variable="MenuItem20" member="yes">
+					<label>Modifier</label>
+					<handler function="OnModifyMaskRectangleSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="idMenuPosEverywhere2" variable="MenuItem25" member="yes">
+					<label>Positionner précisement</label>
+					<handler function="OnEnterMaskRectanglePositionSelected" entry="EVT_MENU" />
+				</object>
+			</object>
+			<object class="wxMenu" name="ID_MENUITEM12" variable="MenuItem16" member="yes">
+				<label>Options</label>
+				<object class="wxMenuItem" name="ID_MENUITEM13" variable="applyMaskToAllDirectionSprites" member="yes">
+					<label>Appliquer à toutes les images de la direction</label>
+					<checkable>1</checkable>
+				</object>
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem24" member="yes">
+				<label>Retourner au masque par défaut</label>
+				<handler function="OnautomaticMaskSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+		<object class="wxMenu" variable="pointsContextMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem26" member="yes">
+				<label>Arrêter de positionner les points</label>
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem27" member="yes">
+				<label>Choisir le point</label>
+				<handler function="OnModPointSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem28" member="yes">
+				<label>Positionner précisement</label>
+				<handler function="OnModPointPrecisSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenu" name="ID_MENUITEM14" variable="MenuItem29" member="yes">
+				<label>Options</label>
+				<object class="wxMenuItem" name="idMenuPosEverywhere" variable="posEverywhereMenuItem" member="yes">
+					<label>Positionner en même temps sur les autres images</label>
+					<checkable>1</checkable>
+				</object>
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="idAddPoint" variable="MenuItem31" member="yes">
+				<label>Ajouter un point</label>
+				<handler function="OnAddPointSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idDelPoint" variable="MenuItem32" member="yes">
+				<label>Supprimer un point</label>
+				<handler function="OnDelPointSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+	</object>
+</wxsmith>

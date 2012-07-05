@@ -56,11 +56,11 @@ colorB( 255 )
 
 bool SpriteObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
 {
-    for ( unsigned int j = 0; j < GetAnimationsNumber();j++ )
+    for ( unsigned int j = 0; j < GetAnimationCount();j++ )
     {
         for ( unsigned int k = 0;k < GetAnimation( j ).GetDirectionsNumber();k++ )
         {
-            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpritesNumber();l++ )
+            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpriteCount();l++ )
             {
                 Sprite & sprite = GetAnimation( j ).GetDirectionToModify(k).GetSprite(l);
 
@@ -86,7 +86,7 @@ bool SpriteObject::LoadResources(const RuntimeScene & scene, const ImageManager 
 bool SpriteObject::InitializeFromInitialPosition(const InitialPosition & position)
 {
     if ( position.floatInfos.find("animation") != position.floatInfos.end() )
-        SetAnimation(position.floatInfos.find("animation")->second);
+        SetCurrentAnimation(position.floatInfos.find("animation")->second);
 
     return true;
 }
@@ -137,11 +137,11 @@ bool SpriteObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
 
 void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
-    for ( unsigned int j = 0; j < GetAnimationsNumber();j++ )
+    for ( unsigned int j = 0; j < GetAnimationCount();j++ )
     {
         for ( unsigned int k = 0;k < GetAnimation( j ).GetDirectionsNumber();k++ )
         {
-            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpritesNumber();l++ )
+            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpriteCount();l++ )
                 worker.ExposeImage(GetAnimation( j ).GetDirectionToModify(k).GetSprite(l).GetImageName());
         }
     }
@@ -149,7 +149,7 @@ void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 void SpriteObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand & mainEditorCommand )
 {
-    EditorObjet dialog( parent, game, *this, mainEditorCommand );
+    SpriteObjectEditor dialog( parent, game, *this, mainEditorCommand );
     dialog.ShowModal();
 }
 
@@ -159,7 +159,7 @@ wxPanel * SpriteObject::CreateInitialPositionPanel( wxWindow* parent, const Game
 
     panel->DirectionEdit->ChangeValue(ToString( position.GetAngle() ));
 
-    for (unsigned int i = 0;i<GetAnimationsNumber();i++ )
+    for (unsigned int i = 0;i<GetAnimationCount();i++ )
         panel->AnimationCombo->Append(ToString(i));
 
     if ( position.floatInfos.find("animation") != position.floatInfos.end())
@@ -195,7 +195,7 @@ void SpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name
 
 bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
-    if ( propertyNb == 0 ) { return SetAnimation(ToInt(newValue)); }
+    if ( propertyNb == 0 ) { return SetCurrentAnimation(ToInt(newValue)); }
     else if ( propertyNb == 1 ) {return GetAnimation( currentAnimation ).useMultipleDirections ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue)); }
     else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
     else if ( propertyNb == 3 ) { SetOpacity(ToFloat(newValue)); }
@@ -409,7 +409,7 @@ void SpriteObject::TurnTowardPosition(float Xposition, float Yposition)
  */
 void SpriteObject::UpdateCurrentSprite() const
 {
-    if ( currentAnimation >= GetAnimationsNumber() )
+    if ( currentAnimation >= GetAnimationCount() )
         ptrToCurrentSprite = &badSpriteDatas;
     else
     {
@@ -418,7 +418,7 @@ void SpriteObject::UpdateCurrentSprite() const
         if ( currentAnim.useMultipleDirections )
         {
             //Update sprite pointer
-            if ( currentDirection >= currentAnim.GetDirectionsNumber() || currentSprite >= currentAnim.GetDirection(currentDirection).GetSpritesNumber() )
+            if ( currentDirection >= currentAnim.GetDirectionsNumber() || currentSprite >= currentAnim.GetDirection(currentDirection).GetSpriteCount() )
                 ptrToCurrentSprite = &badSpriteDatas;
             else
                 ptrToCurrentSprite = &currentAnim.GetDirectionToModify( currentDirection ).GetSprite( currentSprite );
@@ -429,7 +429,7 @@ void SpriteObject::UpdateCurrentSprite() const
         else
         {
             //Update sprite pointer
-            if ( currentAnim.HasNoDirections() || currentSprite >= currentAnim.GetDirection(0).GetSpritesNumber() )
+            if ( currentAnim.HasNoDirections() || currentSprite >= currentAnim.GetDirection(0).GetSpriteCount() )
                 ptrToCurrentSprite = &badSpriteDatas;
             else
                 ptrToCurrentSprite = &currentAnim.GetDirectionToModify(0).GetSprite( currentSprite );
@@ -466,7 +466,10 @@ void SpriteObject::UpdateTime(float elapsedTime)
     if ( animationStopped ) return;
 
     timeElapsedOnCurrentSprite += elapsedTime;
-    float delay = GetAnimation(currentAnimation).GetDirection( currentDirection ).GetTimeBetweenFrames();
+
+    const Direction & direction = GetAnimation(currentAnimation).GetDirection( currentDirection );
+
+    float delay = direction.GetTimeBetweenFrames();
 
     //On gère l'avancement du sprite actuel suivant le temps entre chaque sprite
     if ( timeElapsedOnCurrentSprite > delay )
@@ -480,12 +483,10 @@ void SpriteObject::UpdateTime(float elapsedTime)
 
         timeElapsedOnCurrentSprite = 0;
     }
-    if ( currentSprite >= GetAnimation(currentAnimation).GetDirection( currentDirection ).GetSpritesNumber() )
+    if ( currentSprite >= direction.GetSpriteCount() )
     {
-        if ( GetAnimation(currentAnimation).GetDirection( currentDirection ).IsLooping() )
-            currentSprite = 0;
-        else
-            currentSprite = GetAnimation(currentAnimation).GetDirection( currentDirection ).GetSpritesNumber() - 1;
+        if ( direction.IsLooping() )  currentSprite = 0;
+        else  currentSprite = direction.GetSpriteCount() - 1;
     }
 
     needUpdateCurrentSprite = true;
@@ -516,7 +517,7 @@ const Sprite & SpriteObject::GetCurrentSprite() const
  */
 std::vector<RotatedRectangle> SpriteObject::GetHitBoxes() const
 {
-    if ( currentAnimation >= GetAnimationsNumber() )
+    if ( currentAnimation >= GetAnimationCount() )
     {
         std::vector<RotatedRectangle> boxes; //Invalid animation, bail out.
         return boxes;
@@ -546,9 +547,9 @@ std::vector<RotatedRectangle> SpriteObject::GetHitBoxes() const
  */
 bool SpriteObject::SetSprite( unsigned int nb )
 {
-    if ( currentAnimation >= GetAnimationsNumber() ||
+    if ( currentAnimation >= GetAnimationCount() ||
         currentDirection >= GetAnimation( currentAnimation ).GetDirectionsNumber() ||
-        nb >= GetAnimation( currentAnimation ).GetDirection( currentDirection ).GetSpritesNumber() ) return false;
+        nb >= GetAnimation( currentAnimation ).GetDirection( currentDirection ).GetSpriteCount() ) return false;
 
     currentSprite = nb;
     timeElapsedOnCurrentSprite = 0;
@@ -560,9 +561,9 @@ bool SpriteObject::SetSprite( unsigned int nb )
 /**
  * Change the number of the current animation
  */
-bool SpriteObject::SetAnimation( unsigned int nb )
+bool SpriteObject::SetCurrentAnimation( unsigned int nb )
 {
-    if ( nb >= GetAnimationsNumber() ) return false;
+    if ( nb >= GetAnimationCount() ) return false;
 
     if ( nb == currentAnimation ) return true;
 
@@ -580,7 +581,7 @@ bool SpriteObject::SetAnimation( unsigned int nb )
  */
 bool SpriteObject::SetDirection( float nb )
 {
-    if ( currentAnimation >= GetAnimationsNumber() ) return false;
+    if ( currentAnimation >= GetAnimationCount() ) return false;
 
     if ( !GetAnimation( currentAnimation ).useMultipleDirections )
     {
@@ -611,7 +612,7 @@ bool SpriteObject::SetDirection( float nb )
  */
 bool SpriteObject::SetAngle(float newAngle)
 {
-    if ( currentAnimation >= GetAnimationsNumber() ) return false;
+    if ( currentAnimation >= GetAnimationCount() ) return false;
 
     if ( !GetAnimation( currentAnimation ).useMultipleDirections )
     {
@@ -643,7 +644,7 @@ float SpriteObject::GetAngle() const
 
 float SpriteObject::GetCurrentDirectionOrAngle() const
 {
-    if ( currentAnimation >= GetAnimationsNumber() ) return 0;
+    if ( currentAnimation >= GetAnimationCount() ) return 0;
 
     if ( GetAnimation( currentAnimation ).useMultipleDirections )
         return GetCurrentDirection();
@@ -665,7 +666,7 @@ void SpriteObject::AddAnimation(const Animation & animation)
  */
 bool SpriteObject::RemoveAnimation(unsigned int nb)
 {
-    if ( nb >= GetAnimationsNumber() )
+    if ( nb >= GetAnimationCount() )
         return false;
 
     cacheAnimationSizeNeedUpdate = true;
@@ -677,7 +678,7 @@ bool SpriteObject::RemoveAnimation(unsigned int nb)
 /**
  * Return the number of animations the object has.
  */
-unsigned int SpriteObject::GetAnimationsNumber() const
+unsigned int SpriteObject::GetAnimationCount() const
 {
     if ( cacheAnimationSizeNeedUpdate )
     {
@@ -751,252 +752,35 @@ void SpriteObject::TurnTowardObject( const std::string &, Object * object )
 }
 
 
-void OpenPoint(Point & point, const TiXmlElement * elemPoint)
-{
-    if ( elemPoint->Attribute( "nom" ) != NULL ) { point.SetName(elemPoint->Attribute( "nom" ));}
-    else { cout <<( "Les informations concernant le nom d'un point d'un sprite manquent." ); }
-
-    if ( elemPoint->Attribute( "X" ) != NULL ) { int value; elemPoint->QueryIntAttribute("X", &value); point.SetX(value);}
-    else { cout <<( "Les informations concernant la coordonnée X d'un point d'un sprite manquent." ); }
-
-    if ( elemPoint->Attribute( "Y" ) != NULL ) { int value; elemPoint->QueryIntAttribute("Y", &value); point.SetY(value);}
-    else { cout <<( "Les informations concernant la coordonnée Y d'un point d'un sprite manquent." ); }
-
-}
-
-void OpenPointsSprites(vector < Point > & points, const TiXmlElement * elem)
-{
-    const TiXmlElement * elemPoint = elem->FirstChildElement("Point");
-    while ( elemPoint )
-    {
-        Point point("");
-
-        OpenPoint(point, elemPoint);
-
-        points.push_back(point);
-        elemPoint = elemPoint->NextSiblingElement();
-    }
-}
-
-void OpenSpritesDirection(vector < Sprite > & sprites, const TiXmlElement * elem)
-{
-    const TiXmlElement * elemSprite = elem->FirstChildElement("Sprite");
-    while ( elemSprite )
-    {
-        Sprite sprite;
-        if ( elemSprite->Attribute( "image" ) != NULL ) { sprite.SetImageName(elemSprite->Attribute( "image" ));}
-        else { cout <<( "Les informations concernant l'image d'un sprite manquent." ); }
-
-        const TiXmlElement * elemPoints = elemSprite->FirstChildElement("Points");
-        if ( elemPoints != NULL )
-            OpenPointsSprites(sprite.GetAllNonDefaultPoints(), elemPoints);
-        else
-            cout <<( "Les points d'un sprite manque." );
-
-        const TiXmlElement * elemPointOrigine = elemSprite->FirstChildElement("PointOrigine");
-        if ( elemPointOrigine != NULL )
-            OpenPoint(sprite.GetOrigine(), elemPointOrigine);
-        else
-            cout <<( "Le point origine d'un sprite manque." );
-
-        const TiXmlElement * elemPointCentre = elemSprite->FirstChildElement("PointCentre");
-        if ( elemPointCentre != NULL )
-        {
-            OpenPoint(sprite.GetCentre(), elemPointCentre);
-
-            if (    elemPointCentre->Attribute( "automatic" ) != NULL &&
-                    string (elemPointCentre->Attribute( "automatic" )) == "false" )
-            {
-                sprite.SetCentreAutomatic(false);
-            }
-            else
-            {
-                sprite.SetCentreAutomatic(true);
-            }
-        }
-
-        const TiXmlElement * customCollisionMaskElem= elemSprite->FirstChildElement("CustomCollisionMask");
-        if ( customCollisionMaskElem )
-        {
-            bool customCollisionMask = false;
-            if ( customCollisionMaskElem->Attribute("custom") && string (customCollisionMaskElem->Attribute("custom")) == "true")
-                customCollisionMask = true;
-
-            sprite.SetCollisionMaskAutomatic(!customCollisionMask);
-
-            if ( customCollisionMask )
-            {
-                std::vector<RotatedRectangle> boxes;
-                const TiXmlElement * rectangleElem = customCollisionMaskElem->FirstChildElement("Rectangle");
-                while ( rectangleElem )
-                {
-                    RotatedRectangle rectangle;
-                    rectangle.angle = 0;
-
-                    if ( rectangleElem->Attribute("centerX") ) rectangleElem->QueryFloatAttribute("centerX", &rectangle.center.x);
-                    if ( rectangleElem->Attribute("centerY") ) rectangleElem->QueryFloatAttribute("centerY", &rectangle.center.y);
-                    if ( rectangleElem->Attribute("halfSizeX") ) rectangleElem->QueryFloatAttribute("halfSizeX", &rectangle.halfSize.x);
-                    if ( rectangleElem->Attribute("halfSizeY") ) rectangleElem->QueryFloatAttribute("halfSizeY", &rectangle.halfSize.y);
-                    if ( rectangleElem->Attribute("angle") ) rectangleElem->QueryFloatAttribute("angle", &rectangle.angle);
-
-                    boxes.push_back(rectangle);
-                    rectangleElem = rectangleElem->NextSiblingElement();
-                }
-                sprite.SetCustomCollisionMask(boxes);
-            }
-
-        }
-
-        sprites.push_back(sprite);
-        elemSprite = elemSprite->NextSiblingElement();
-    }
-}
-
 void SpriteObject::LoadFromXml(const TiXmlElement * elemScene)
 {
-    if ( elemScene->FirstChildElement( "Animations" ) == NULL )
-    {
-        cout << "Les informations concernant les animations de l'objet manquent.";
-    }
-    else
-    {
-        const TiXmlElement * elemObjetScene = elemScene->FirstChildElement( "Animations" )->FirstChildElement();
+    if ( elemScene->FirstChildElement( "Animations" ) == NULL ) return;
 
-        //Pour chaque animation
-        while ( elemObjetScene )
+    const TiXmlElement * elemObjetScene = elemScene->FirstChildElement( "Animations" )->FirstChildElement();
+
+    //Pour chaque animation
+    while ( elemObjetScene )
+    {
+        Animation newAnimation;
+        newAnimation.useMultipleDirections = (elemObjetScene->Attribute( "typeNormal" )  != NULL && ToString(elemObjetScene->Attribute( "typeNormal" )) == "true");
+
+        const TiXmlElement *elemObjetDirecScene = elemObjetScene->FirstChildElement();
+        while ( elemObjetDirecScene )
         {
-            Animation AnimToAdd;
+            Direction direction;
+            direction.LoadFromXml(elemObjetDirecScene);
 
-            //Direction
-            const TiXmlElement *elemObjetDirecScene = elemObjetScene->FirstChildElement();
-
-            if ( elemObjetScene->Attribute( "typeNormal" )  != NULL )
-            {
-                if ( strcmp( elemObjetScene->Attribute( "typeNormal" ), "false" ) == 0 )
-                {
-                    AnimToAdd.useMultipleDirections = false;
-                }
-                else {  AnimToAdd.useMultipleDirections = true ; }
-            }
-            else { cout << "Les informations sur le type des directions manquent"; }
-
-            //Passage en revue de chaque direction
-            unsigned int directionNb = 0;
-            while ( elemObjetDirecScene )
-            {
-                AnimToAdd.SetDirectionsNumber(AnimToAdd.GetDirectionsNumber()+1);
-                Direction direction;
-
-                //Compatibilité avec Game Develop 1.0.4599 et inférieur
-                if ( elemObjetDirecScene->Attribute( "Images" )  != NULL )
-                {
-                    string sprites = elemObjetDirecScene->Attribute("Images");
-                    vector < string > imgs = SplitString<string>(sprites, ';'); //Imgs contiendra toutes les images de la direction de l'animation.
-                    for (unsigned int spriteID = 0;spriteID < imgs.size() ;++spriteID)
-                    {
-                        Sprite sprite;
-                        sprite.SetImageName(imgs.at(spriteID));
-                        direction.AddSprite(sprite);
-                    }
-                }
-
-                const TiXmlElement * elemSprites = elemObjetDirecScene;
-                elemSprites = elemObjetDirecScene->FirstChildElement("Sprites");
-
-                if ( elemSprites != NULL ) { OpenSpritesDirection(direction.GetSpritesToModify(), elemSprites); }
-
-                float value = 0;
-                if ( elemObjetDirecScene->Attribute( "tempsEntre" )  != NULL ) { elemObjetDirecScene->QueryFloatAttribute( "tempsEntre" , &value );  }
-                else { cout << ( "Les informations le \"temps entre\" de la direction manquent" ); }
-                direction.SetTimeBetweenFrames( value );
-
-                direction.SetLoop( false );
-                if ( elemObjetDirecScene->Attribute( "boucle" )  != NULL )
-                {
-                    if ( strcmp( elemObjetDirecScene->Attribute( "boucle" ), "true" ) == 0 )
-                        direction.SetLoop( true );
-                }
-                else { cout << ( "Les informations sur le bouclage de la direction manquent" ); }
-
-                AnimToAdd.SetDirection(direction, directionNb);
-
-                directionNb++;
-                elemObjetDirecScene = elemObjetDirecScene->NextSiblingElement();
-            }
-
-            AddAnimation( AnimToAdd );
-
-            elemObjetScene = elemObjetScene->NextSiblingElement();
+            newAnimation.SetDirectionsNumber(newAnimation.GetDirectionsNumber()+1);
+            newAnimation.SetDirection(direction, newAnimation.GetDirectionsNumber()-1);
+            elemObjetDirecScene = elemObjetDirecScene->NextSiblingElement();
         }
+
+        AddAnimation( newAnimation );
+
+        elemObjetScene = elemObjetScene->NextSiblingElement();
     }
 }
 
-void SavePoint(const Point & point, TiXmlElement * elem)
-{
-    if ( elem == NULL ) return;
-
-    elem->SetAttribute("nom", point.GetName().c_str());
-    elem->SetDoubleAttribute("X", point.GetX());
-    elem->SetDoubleAttribute("Y", point.GetY());
-}
-
-void SavePointsSprites(const vector < Point > & points, TiXmlElement * elem)
-{
-    for (unsigned int i = 0;i<points.size();++i)
-    {
-        TiXmlElement * point = new TiXmlElement( "Point" );
-        elem->LinkEndChild( point );
-
-        SavePoint(points.at(i), point);
-    }
-}
-
-void SaveSpritesDirection(const vector < Sprite > & sprites, TiXmlElement * elemSprites)
-{
-    for (unsigned int i = 0;i<sprites.size();++i)
-    {
-        TiXmlElement * sprite = new TiXmlElement( "Sprite" );
-        elemSprites->LinkEndChild( sprite );
-
-        sprite->SetAttribute("image", sprites.at(i).GetImageName().c_str());
-
-        TiXmlElement * points = new TiXmlElement( "Points" );
-        sprite->LinkEndChild( points );
-        SavePointsSprites(sprites.at(i).GetAllNonDefaultPoints(), points);
-
-        TiXmlElement * pointOrigine = new TiXmlElement( "PointOrigine" );
-        sprite->LinkEndChild( pointOrigine );
-        SavePoint(sprites.at(i).GetOrigine(), pointOrigine);
-
-        TiXmlElement * pointCentre = new TiXmlElement( "PointCentre" );
-        sprite->LinkEndChild( pointCentre );
-        SavePoint(sprites.at(i).GetCentre(), pointCentre);
-        if ( sprites.at(i).IsCentreAutomatic() )
-            pointCentre->SetAttribute("automatic", "true");
-        else
-            pointCentre->SetAttribute("automatic", "false");
-
-        TiXmlElement * customCollisionMask = new TiXmlElement( "CustomCollisionMask" );
-        sprite->LinkEndChild( customCollisionMask );
-
-        customCollisionMask->SetAttribute("custom", "false");
-        if ( !sprites.at(i).IsCollisionMaskAutomatic() )
-        {
-            customCollisionMask->SetAttribute("custom", "true");
-            std::vector<RotatedRectangle> boxes = sprites.at(i).GetCollisionMask();
-            for (unsigned int i = 0;i<boxes.size();++i)
-            {
-                TiXmlElement * box = new TiXmlElement( "Rectangle" );
-                box->SetDoubleAttribute("centerX", boxes[i].center.x);
-                box->SetDoubleAttribute("centerY", boxes[i].center.y);
-                box->SetDoubleAttribute("halfSizeX", boxes[i].halfSize.x);
-                box->SetDoubleAttribute("halfSizeY", boxes[i].halfSize.y);
-                box->SetDoubleAttribute("angle", boxes[i].angle);
-                customCollisionMask->LinkEndChild( box );
-            }
-        }
-    }
-}
 #if defined(GD_IDE_ONLY)
 void SpriteObject::SaveToXml(TiXmlElement * objet)
 {
@@ -1005,17 +789,12 @@ void SpriteObject::SaveToXml(TiXmlElement * objet)
     objet->LinkEndChild( animations );
     TiXmlElement * animation;
 
-    for ( unsigned int k = 0;k < GetAnimationsNumber();k++ )
+    for ( unsigned int k = 0;k < GetAnimationCount();k++ )
     {
         animation = new TiXmlElement( "Animation" );
         animations->LinkEndChild( animation );
 
-
-        if ( GetAnimation( k ).useMultipleDirections )
-        {
-            animation->SetAttribute( "typeNormal", "true" );
-        }
-        else { animation->SetAttribute( "typeNormal", "false" ); }
+        animation->SetAttribute( "typeNormal", GetAnimation( k ).useMultipleDirections ? "true" : "false" );
 
         TiXmlElement * direction;
         for ( unsigned int l = 0;l < GetAnimation( k ).GetDirectionsNumber();l++ )
@@ -1023,19 +802,7 @@ void SpriteObject::SaveToXml(TiXmlElement * objet)
             direction = new TiXmlElement( "Direction" );
             animation->LinkEndChild( direction );
 
-            //Paramètres de la direction
-            if ( GetAnimation( k ).GetDirection( l ).IsLooping() )
-            {
-                direction->SetAttribute( "boucle", "true" );
-            }
-            else { direction->SetAttribute( "boucle", "false" ); }
-
-            direction->SetDoubleAttribute( "tempsEntre", GetAnimation( k ).GetDirection( l ).GetTimeBetweenFrames() );
-
-            //Sprites de la direction
-            TiXmlElement* sprites = new TiXmlElement( "Sprites" );
-            direction->LinkEndChild( sprites );
-            SaveSpritesDirection(GetAnimation( k ).GetDirection( l ).GetSprites(),sprites);
+            GetAnimation(k).GetDirection(l).SaveToXml(direction);
 
         }
     }

@@ -9,6 +9,7 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "GDL/Sprite.h"
+class TiXmlElement;
 
 using namespace std;
 
@@ -24,7 +25,7 @@ class GD_API Direction
 {
 public:
     Direction();
-    virtual ~Direction();
+    virtual ~Direction() {};
 
     /**
      * Return true if sprites looping is activated
@@ -71,7 +72,13 @@ public:
      * Return the number of sprite used in the direction
      * \return The number of sprite used in the direction
      */
-    inline unsigned int GetSpritesNumber() const { return sprites.size(); }
+    inline unsigned int GetSpriteCount() const { return sprites.size(); }
+
+    /**
+     * Remove the sprite at the specified position.
+     * Bound-checking is made.
+     */
+    void RemoveSprite(unsigned int index);
 
     /**
      * Clear the direction from all of its sprites
@@ -84,20 +91,14 @@ public:
     void AddSprite( const Sprite & sprite );
 
     /**
-     * Provide raw read-only access to the sprite list.
+     * Swap the position of two sprites
      */
-    inline const vector < Sprite > & GetSprites() const { return sprites; }
+    void SwapSprites(unsigned int firstSpriteIndex, unsigned int secondSpriteIndex);
 
-    /**
-     * Provide raw access to the sprite list.
-     */
-    inline vector < Sprite > & GetSpritesToModify() { return sprites; }
-
-    /**
-     * Replace the entire sprite list by a new one.
-     */
-    inline void SetSprites(const vector < Sprite > & sprites_) { sprites = sprites_; }
-
+    void LoadFromXml(const TiXmlElement * element);
+    #if defined(GD_IDE_ONLY)
+    void SaveToXml(TiXmlElement * element) const;
+    #endif
 
 private:
     bool loop;

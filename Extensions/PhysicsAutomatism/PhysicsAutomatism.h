@@ -97,6 +97,9 @@ public:
     void ApplyForce(double xCoordinate, double yCoordinate, RuntimeScene & scene );
     void ApplyForceUsingPolarCoordinates( float angle, float length, RuntimeScene & scene );
     void ApplyForceTowardPosition(float xPosition, float yPosition, float length, RuntimeScene & scene );
+    void ApplyImpulse(double xCoordinate, double yCoordinate, RuntimeScene & scene );
+    void ApplyImpulseUsingPolarCoordinates( float angle, float length, RuntimeScene & scene );
+    void ApplyImpulseTowardPosition(float xPosition, float yPosition, float length, RuntimeScene & scene );
     void ApplyTorque( double torque, RuntimeScene & scene );
     void SetLinearVelocity( double xVelocity, double yVelocity, RuntimeScene & scene );
     void SetAngularVelocity( double angularVelocity, RuntimeScene & scene );
@@ -105,12 +108,13 @@ public:
     void AddRevoluteJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene );
     void AddRevoluteJoint( float xPosition, float yPosition, RuntimeScene & scene);
     void SetGravity( float xGravity, float yGravity, RuntimeScene & scene);
-    void AddGearJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene );
+    void AddGearJointBetweenObjects( const std::string &, float ratio, Object * object, RuntimeScene & scene );
 
     void SetLinearVelocityX( double xVelocity, RuntimeScene & scene );
     void SetLinearVelocityY( double yVelocity, RuntimeScene & scene );
     float GetLinearVelocityX( RuntimeScene & scene );
     float GetLinearVelocityY( RuntimeScene & scene );
+    float GetLinearVelocity( RuntimeScene & scene );
     double GetAngularVelocity( const RuntimeScene & scene );
     double GetLinearDamping( const RuntimeScene & scene);
     double GetAngularDamping( const RuntimeScene & scene);

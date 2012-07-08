@@ -135,6 +135,7 @@ class CustomPolygonDialog: public wxDialog
 		void OnButton4Click(wxCommandEvent& event);
 		void OncancelBtClick(wxCommandEvent& event);
 		void OnpointsEditText(wxCommandEvent& event);
+		void OnpreviewPnlLeftUp(wxMouseEvent& event);
 		//*)
 
 		/**

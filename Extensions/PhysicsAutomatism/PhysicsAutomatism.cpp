@@ -301,6 +301,37 @@ void PhysicsAutomatism::DontSetAsBullet(RuntimeScene & scene )
 }
 
 /**
+ * Apply an impulse
+ */
+void PhysicsAutomatism::ApplyImpulse(double xCoordinate, double yCoordinate, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+    body->ApplyLinearImpulse(b2Vec2(xCoordinate, -yCoordinate),body->GetPosition());
+}
+
+/**
+ * Apply a impulse
+ */
+void PhysicsAutomatism::ApplyImpulseUsingPolarCoordinates( float angle, float length, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+    body->ApplyLinearImpulse(b2Vec2(cos(angle*b2_pi/180.0f)*length,-sin(angle*b2_pi/180.0f)*length), body->GetPosition());
+}
+
+/**
+ * Apply a impulse
+ */
+void PhysicsAutomatism::ApplyImpulseTowardPosition(float xPosition, float yPosition, float length, RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+
+    float angle = atan2(yPosition*runtimeScenesPhysicsDatas->GetInvScaleY()+body->GetPosition().y,
+                        xPosition*runtimeScenesPhysicsDatas->GetInvScaleX()-body->GetPosition().x);
+
+    body->ApplyLinearImpulse(b2Vec2(cos(angle)*length, -sin(angle)*length), body->GetPosition());
+}
+
+/**
  * Apply a force
  */
 void PhysicsAutomatism::ApplyForce(double xCoordinate, double yCoordinate, RuntimeScene & scene )
@@ -423,7 +454,7 @@ void PhysicsAutomatism::SetGravity( float xGravity, float yGravity, RuntimeScene
 /**
  * Add a gear joint between two objects
  */
-void PhysicsAutomatism::AddGearJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene )
+void PhysicsAutomatism::AddGearJointBetweenObjects( const std::string &, float ratio, Object * object, RuntimeScene & scene )
 {
     if ( !body ) CreateBody(scene);
 
@@ -444,7 +475,7 @@ void PhysicsAutomatism::AddGearJointBetweenObjects( const std::string & , Object
     jointDef.bodyB = otherBody;
     jointDef.joint1 = runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef1);
     jointDef.joint2 = runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef2);
-    jointDef.ratio = 2.0f * b2_pi / 1.0f; //TODO : Ratio parameter ?
+    jointDef.ratio = ratio * b2_pi;
 
 
     runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef);
@@ -475,6 +506,12 @@ float PhysicsAutomatism::GetLinearVelocityY( RuntimeScene & scene )
     if ( !body ) CreateBody(scene);
 
     return -body->GetLinearVelocity().y;
+}
+float PhysicsAutomatism::GetLinearVelocity( RuntimeScene & scene )
+{
+    if ( !body ) CreateBody(scene);
+
+    return sqrt(body->GetLinearVelocity().x*body->GetLinearVelocity().x+body->GetLinearVelocity().y*body->GetLinearVelocity().y);
 }
 double PhysicsAutomatism::GetAngularVelocity( const RuntimeScene & scene )
 {

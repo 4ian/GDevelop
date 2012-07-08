@@ -253,7 +253,7 @@ mainEditorCommand(mainEditorCommand_)
     //Setup shared datas
 	if ( !scene || scene->automatismsInitialSharedDatas.find(automatism.GetName()) == scene->automatismsInitialSharedDatas.end())
 	{
-	    wxLogError(_T("Impossible d'accéder aux données partagées."));
+	    wxLogError(_("Impossible d'accéder aux données partagées."));
 	    return;
 	}
 
@@ -261,7 +261,7 @@ mainEditorCommand(mainEditorCommand_)
 
     if ( sharedDatas == boost::shared_ptr<ScenePhysicsDatas>() )
     {
-	    wxLogError(_T("Impossible d'accéder aux données partagées : Données de mauvais type"));
+	    wxLogError(_("Impossible d'accéder aux données partagées : Données de mauvais type"));
 	    return;
     }
 

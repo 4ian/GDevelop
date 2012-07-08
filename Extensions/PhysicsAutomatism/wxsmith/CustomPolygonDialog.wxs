@@ -2,7 +2,6 @@
 <wxsmith>
 	<object class="wxDialog" name="CustomPolygonDialog">
 		<title>Coordonnées du polygone de collision</title>
-		<size>256,279</size>
 		<id_arg>0</id_arg>
 		<handler function="OnClose" entry="EVT_CLOSE" />
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -254,6 +253,7 @@
 															<size>440,348</size>
 															<style>wxSIMPLE_BORDER|wxTAB_TRAVERSAL</style>
 															<handler function="OnpreviewPnlPaint" entry="EVT_PAINT" />
+															<handler function="OnpreviewPnlLeftUp" entry="EVT_LEFT_UP" />
 															<handler function="OnpreviewPnlMouseMove" entry="EVT_MOTION" />
 														</object>
 														<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

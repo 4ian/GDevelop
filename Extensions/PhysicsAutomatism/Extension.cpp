@@ -179,6 +179,7 @@ class Extension : public ExtensionBase
                         instrInfo.AddParameter("object", _("Objet"), "", false);
                         instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
                         instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("expression", _("Ratio"), "", true).SetDefaultValue("1");
                         instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "2");
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
@@ -267,18 +268,73 @@ class Extension : public ExtensionBase
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
-                    DECLARE_AUTOMATISM_ACTION("ApplyForce",
-                                   _("Appliquer une force"),
-                                   _("Applique une force à l'objet."),
-                                   _("Appliquer à _PARAM0_ une force _PARAM2_;_PARAM3_"),
+                    DECLARE_AUTOMATISM_ACTION("ApplyImpulse",
+                                   _("Appliquer une impulsion"),
+                                   _("Applique une impulsion à l'objet."),
+                                   _("Appliquer à _PARAM0_ une impulsion de coordonnées _PARAM2_;_PARAM3_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
                                    "res/physics16.png");
 
                         instrInfo.AddParameter("object", _("Objet"), "", false);
                         instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Composante X"), "", false);
-                        instrInfo.AddParameter("expression", _("Composante Y"), "", false);
+                        instrInfo.AddParameter("expression", _("Composante X ( Newtons/Secondes )"), "", false);
+                        instrInfo.AddParameter("expression", _("Composante Y ( Newtons/Secondes )"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("ApplyImpulse").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("ApplyImpulseUsingPolarCoordinates",
+                                   _("Appliquer une impulsion ( angle )"),
+                                   _("Applique une impulsion à l'objet, en utilisant un angle et une longueur comme coordonnées de cette force."),
+                                   _("Appliquer à _PARAM0_ une impulsion d'angle _PARAM2_ et de longueur _PARAM3_"),
+                                   _("Déplacement"),
+                                   "res/physics24.png",
+                                   "res/physics16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Angle"), "", false);
+                        instrInfo.AddParameter("expression", _("Valeur de l'impulsion ( Newtons/Secondes )"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("ApplyImpulseUsingPolarCoordinates").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("ApplyImpulseTowardPosition",
+                                   _("Appliquer une impulsion vers une position"),
+                                   _("Applique une impulsion, dirigée vers une position, à l'objet."),
+                                   _("Appliquer à _PARAM0_ une impulsion vers la position _PARAM2_;_PARAM3_ de longueur _PARAM4_"),
+                                   _("Déplacement"),
+                                   "res/physics24.png",
+                                   "res/physics16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Position X"), "", false);
+                        instrInfo.AddParameter("expression", _("Position Y"), "", false);
+                        instrInfo.AddParameter("expression", _("Valeur de l'impulsion ( Newtons/Secondes )"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("ApplyImpulseTowardPosition").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
+                    DECLARE_END_AUTOMATISM_ACTION()
+
+                    DECLARE_AUTOMATISM_ACTION("ApplyForce",
+                                   _("Appliquer une force"),
+                                   _("Applique une force à l'objet."),
+                                   _("Appliquer à _PARAM0_ une force de coordonnées _PARAM2_;_PARAM3_"),
+                                   _("Déplacement"),
+                                   "res/physics24.png",
+                                   "res/physics16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Composante X ( Newtons )"), "", false);
+                        instrInfo.AddParameter("expression", _("Composante Y ( Newtons )"), "", false);
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                         instrInfo.cppCallingInformation.SetFunctionName("ApplyForce").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
@@ -287,8 +343,8 @@ class Extension : public ExtensionBase
 
                     DECLARE_AUTOMATISM_ACTION("ApplyForceUsingPolarCoordinates",
                                    _("Appliquer une force ( angle )"),
-                                   _("Applique une force à l'objet, en utilisant un angle et une longueur comme coordonnées de cette force."),
-                                   _("Appliquer à _PARAM0_ une force d'angle _PARAM2_ et de longueur _PARAM3_"),
+                                   _("Applique une force à l'objet, en utilisant un angle et une valeur comme coordonnées de cette force."),
+                                   _("Appliquer à _PARAM0_ une force d'angle _PARAM2_ et de valeur _PARAM3_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
                                    "res/physics16.png");
@@ -296,7 +352,7 @@ class Extension : public ExtensionBase
                         instrInfo.AddParameter("object", _("Objet"), "", false);
                         instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
                         instrInfo.AddParameter("expression", _("Angle"), "", false);
-                        instrInfo.AddParameter("expression", _("Longueur"), "", false);
+                        instrInfo.AddParameter("expression", _("Valeur de la force ( Newtons )"), "", false);
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                         instrInfo.cppCallingInformation.SetFunctionName("ApplyForceUsingPolarCoordinates").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
@@ -306,7 +362,7 @@ class Extension : public ExtensionBase
                     DECLARE_AUTOMATISM_ACTION("ApplyForceTowardPosition",
                                    _("Appliquer une force vers une position"),
                                    _("Applique une force, dirigée vers une position, à l'objet."),
-                                   _("Appliquer à _PARAM0_ une force vers la position _PARAM2_;_PARAM3_ de longeur _PARAM4_"),
+                                   _("Appliquer à _PARAM0_ une force vers la position _PARAM2_;_PARAM3_ de valeur _PARAM4_"),
                                    _("Déplacement"),
                                    "res/physics24.png",
                                    "res/physics16.png");
@@ -315,7 +371,7 @@ class Extension : public ExtensionBase
                         instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
                         instrInfo.AddParameter("expression", _("Position X"), "", false);
                         instrInfo.AddParameter("expression", _("Position Y"), "", false);
-                        instrInfo.AddParameter("expression", _("Longueur de la force"), "", false);
+                        instrInfo.AddParameter("expression", _("Valeur de la force ( Newtons )"), "", false);
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                         instrInfo.cppCallingInformation.SetFunctionName("ApplyForceTowardPosition").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
@@ -392,6 +448,24 @@ class Extension : public ExtensionBase
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetLinearVelocityY").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
+
+                    DECLARE_END_AUTOMATISM_CONDITION()
+
+                    DECLARE_AUTOMATISM_CONDITION("LinearVelocity",
+                                   _("Vitesse linéaire"),
+                                   _("Teste la vitesse linéaire de l'objet."),
+                                   _("La vitesse linéaire de _PARAM0_ est _PARAM3_ à _PARAM2_"),
+                                   _("Déplacement"),
+                                   "res/physics24.png",
+                                   "res/physics16.png");
+
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Signe de la comparaison"), "", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetLinearVelocity").SetManipulatedType("number").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
@@ -622,6 +696,14 @@ class Extension : public ExtensionBase
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetPolygonScaleY").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 
+                    DECLARE_END_AUTOMATISM_EXPRESSION()
+
+                    DECLARE_AUTOMATISM_EXPRESSION("LinearVelocity", _("Vitesse linéaire"), _("Vitesse linéaire"), _("Déplacement"), "res/physics16.png")
+                        instrInfo.AddParameter("object", _("Objet"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatisme"), "PhysicsAutomatism", false);
+                        instrInfo.AddCodeOnlyParameter("currentScene", "");
+
+                        instrInfo.cppCallingInformation.SetFunctionName("GetLinearVelocity").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
                     DECLARE_AUTOMATISM_EXPRESSION("LinearVelocityX", _("Vitesse linéaire en X"), _("Vitesse linéaire en X"), _("Déplacement"), "res/physics16.png")

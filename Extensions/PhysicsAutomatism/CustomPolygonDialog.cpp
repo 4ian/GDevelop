@@ -103,7 +103,6 @@ CustomPolygonDialog::CustomPolygonDialog(wxWindow* parent, std::vector<sf::Vecto
 	wxFlexGridSizer* FlexGridSizer11;
 
 	Create(parent, wxID_ANY, _("Coordonnées du polygone de collision"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
-	SetClientSize(wxSize(256,279));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
@@ -211,6 +210,7 @@ CustomPolygonDialog::CustomPolygonDialog(wxWindow* parent, std::vector<sf::Vecto
 	FlexGridSizer2->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
+	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&CustomPolygonDialog::OnpointsEditText);
@@ -224,6 +224,7 @@ CustomPolygonDialog::CustomPolygonDialog(wxWindow* parent, std::vector<sf::Vecto
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&CustomPolygonDialog::OnButton3Click);
 	Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&CustomPolygonDialog::OnButton4Click);
 	previewPnl->Connect(wxEVT_PAINT,(wxObjectEventFunction)&CustomPolygonDialog::OnpreviewPnlPaint,0,this);
+	previewPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&CustomPolygonDialog::OnpreviewPnlLeftUp,0,this);
 	previewPnl->Connect(wxEVT_MOTION,(wxObjectEventFunction)&CustomPolygonDialog::OnpreviewPnlMouseMove,0,this);
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&CustomPolygonDialog::OnpreviewScrollChanged);
 	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&CustomPolygonDialog::OnpreviewScrollChanged);
@@ -348,6 +349,15 @@ void CustomPolygonDialog::OnpreviewPnlPaint(wxPaintEvent& event)
                   (0-point.GetWidth()/2)    -xOffset,
                   (0-point.GetHeight()/2)   -yOffset,
                   true /* use mask */);
+}
+
+
+void CustomPolygonDialog::OnpreviewPnlLeftUp(wxMouseEvent& event)
+{
+    float xOffset = (previewPnlHorizontalScroll->GetThumbPosition() - previewPnlHorizontalScroll->GetRange()/2);
+    float yOffset = (previewPnlVerticalScroll->GetThumbPosition() - previewPnlVerticalScroll->GetRange()/2);
+
+    pointsEdit->AppendText("\n"+ToString(event.GetX()+xOffset)+";"+ToString(event.GetY()+yOffset));
 }
 
 void CustomPolygonDialog::OnpointsEditText(wxCommandEvent& event)

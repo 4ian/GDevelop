@@ -13059,7 +13059,7 @@
 	<string>
 	<vector>
 
-1339013734 source:d:\florian\programmation\gamedevelop2\gdl\gdl\animation.cpp
+1341607997 source:d:\florian\programmation\gamedevelop2\gdl\gdl\animation.cpp
 	"GDL/Animation.h"
 	<iostream>
 	<string>
@@ -13078,7 +13078,7 @@
 	<SFML/Graphics.hpp>
 	"GDL/Sprite.h"
 
-1337096177 d:\florian\programmation\gamedevelop2\gdl\\gdl\sprite.h
+1341837005 d:\florian\programmation\gamedevelop2\gdl\\gdl\sprite.h
 	<SFML/Graphics.hpp>
 	<boost/shared_ptr.hpp>
 	"GDL/Point.h"
@@ -14969,7 +14969,7 @@
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\compilertoolchainpathmanager.h
 
-1340890391 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
+1341780014 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
 	"GDL/Sprite.h"
 	<SFML/Graphics.hpp>
 	"GDL/ImageManager.h"
@@ -34244,7 +34244,7 @@
 	<boost/shared_ptr.hpp>
 	"GDL/IDE/ArbitraryResourceWorker.h"
 
-1341431911 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
+1341952446 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
 	"SpriteObjectEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -34254,6 +34254,9 @@
 	<wx/dcmemory.h>
 	<wx/dcbuffer.h>
 	<wx/richtooltip.h>
+	<wx/textdlg.h>
+	<wx/msgdlg.h>
+	<vector>
 	"GDCore/IDE/CommonBitmapManager.h"
 	"GDL/IDE/Dialogs/ResourcesEditor.h"
 	"GDL/CommonTools.h"
@@ -34266,16 +34269,18 @@
 	<wx/msw/winundef.h>
 	<wx/msw/uxtheme.h>
 
-1341420796 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\spriteobjecteditor.h
+1341950622 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\spriteobjecteditor.h
 	<wx/listctrl.h>
 	<wx/treectrl.h>
 	<wx/sizer.h>
+	<wx/stattext.h>
 	<wx/menu.h>
 	<wx/aui/aui.h>
 	<wx/panel.h>
 	<wx/scrolbar.h>
 	<wx/dialog.h>
 	<wx/dnd.h>
+	<vector>
 
 1337001877 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\expressionscorrectnesstesting.cpp
 	"GDL/IDE/ExpressionsCorrectnessTesting.h"
@@ -35263,7 +35268,7 @@
 	<boost/weak_ptr.hpp>
 	"GDCore/Events/Instruction.h"
 
-1341420427 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\commonbitmapmanager.h
+1341940919 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\commonbitmapmanager.h
 	<wx/bitmap.h>
 
 1337021284 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\eventsrenderinghelper.h
@@ -35786,16 +35791,18 @@
 1340533670 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dndresourceseditor.h
 	<wx/dnd.h>
 
-1341420796 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.h
+1341950622 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.h
 	<wx/listctrl.h>
 	<wx/treectrl.h>
 	<wx/sizer.h>
+	<wx/stattext.h>
 	<wx/menu.h>
 	<wx/aui/aui.h>
 	<wx/panel.h>
 	<wx/scrolbar.h>
 	<wx/dialog.h>
 	<wx/dnd.h>
+	<vector>
 
 1341431214 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\oldspriteobjecteditor.cpp
 	"GDL/IDE/Dialogs/OldSpriteObjectEditor.h"

@@ -27,7 +27,7 @@ void Animation::SetDirectionsNumber(unsigned int nb)
 {
     directionsNumber = nb;
 
-    while ( nb >= directions.size() )
+    while ( directions.size() < nb )
     {
         Direction direction;
         directions.push_back(direction);

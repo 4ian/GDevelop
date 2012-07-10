@@ -1,0 +1,221 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+#if defined(GD_IDE_ONLY)
+#ifndef SPRITEOBJECTEDITOR_H
+#define SPRITEOBJECTEDITOR_H
+
+//(*Headers(SpriteObjectEditor)
+#include <wx/listctrl.h>
+#include <wx/treectrl.h>
+#include <wx/sizer.h>
+#include <wx/stattext.h>
+#include <wx/menu.h>
+#include <wx/aui/aui.h>
+#include <wx/panel.h>
+#include <wx/scrolbar.h>
+#include <wx/dialog.h>
+//*)
+#include <wx/dnd.h>
+#include <vector>
+class MainEditorCommand;
+class ResourcesEditor;
+class SpriteObject;
+class Resource;
+class Game;
+class Sprite;
+
+class SpriteObjectEditor: public wxDialog
+{
+public:
+
+    SpriteObjectEditor(wxWindow* parent, Game & game, SpriteObject & object, MainEditorCommand & mainEditorCommand_ );
+    virtual ~SpriteObjectEditor();
+
+    /**
+     * Used by DndTextSpriteObjectEditor so as to as a dragged image
+     */
+    void AddImageToCurrentAnimation(wxString image);
+
+    //(*Declarations(SpriteObjectEditor)
+    wxListCtrl* maskList;
+    wxAuiManager* AuiManager1;
+    wxMenu* MenuItem2;
+    wxTreeCtrl* animationsTree;
+    wxListCtrl* pointsList;
+    wxPanel* toolbarPanel;
+    wxAuiToolBar* toolbar;
+    wxAuiToolBar* pointToolbar;
+    wxAuiManager* mgr;
+    wxStaticText* statusTxt;
+    wxMenuItem* MenuItem5;
+    wxPanel* centerPanel;
+    wxMenuItem* deleteItem;
+    wxMenuItem* MenuItem1;
+    wxMenuItem* MenuItem4;
+    wxPanel* Panel1;
+    wxMenu animationsMenu;
+    wxAuiManager* AuiManager2;
+    wxMenuItem* removeImageItem;
+    wxPanel* Panel3;
+    wxAuiToolBar* maskToolbar;
+    wxPanel* animationsPanel;
+    wxScrollBar* xScrollBar;
+    wxMenuItem* MenuItem3;
+    wxAuiManager* AuiManager3;
+    wxPanel* imagePanel;
+    wxScrollBar* yScrollBar;
+    wxMenuItem* moveLeftItem;
+    wxMenuItem* MenuItem6;
+    wxPanel* maskPanel;
+    wxMenuItem* moveRightItem;
+    wxMenuItem* automaticRotationItem;
+    wxPanel* pointsPanel;
+    wxMenuItem* multipleDirectionsItem;
+    wxListCtrl* imagesList;
+    wxMenu imagesMenu;
+    wxMenu maskMenu;
+    wxPanel* imagesPanel;
+    //*)
+    ResourcesEditor * resourcesEditorPnl;
+
+protected:
+
+    //(*Identifiers(SpriteObjectEditor)
+    static const long ID_PANEL4;
+    static const long ID_SCROLLBAR1;
+    static const long ID_SCROLLBAR2;
+    static const long ID_MASKITEM;
+    static const long ID_POINTSITEM;
+    static const long ID_AUITOOLBAR1;
+    static const long ID_PANEL6;
+    static const long ID_STATICTEXT1;
+    static const long ID_PANEL1;
+    static const long ID_TREECTRL1;
+    static const long ID_PANEL3;
+    static const long ID_LISTCTRL1;
+    static const long ID_PANEL2;
+    static const long ID_AUITOOLBARITEM6;
+    static const long ID_AUITOOLBARITEM7;
+    static const long ID_AUITOOLBARITEM1;
+    static const long ID_MASKAPPLYWHOLEANIMITEM;
+    static const long ID_AUITOOLBAR3;
+    static const long ID_PANEL9;
+    static const long ID_LISTCTRL2;
+    static const long ID_PANEL8;
+    static const long ID_AUITOOLBARITEM3;
+    static const long ID_DELETEPOINTITEM;
+    static const long ID_POINTAPPLYWHOLEANIMITEM;
+    static const long ID_AUITOOLBAR2;
+    static const long ID_PANEL7;
+    static const long ID_LISTCTRL3;
+    static const long ID_PANEL5;
+    static const long ID_MENUITEM5;
+    static const long ID_MENUITEM6;
+    static const long ID_MENUITEM4;
+    static const long ID_MENUITEM1;
+    static const long ID_MENUITEM2;
+    static const long ID_MENUITEM3;
+    static const long ID_MENUITEM7;
+    static const long ID_MENUITEM8;
+    static const long ID_MENUITEM9;
+    static const long ID_MENUITEM10;
+    static const long ID_POSITIONMASKITEM;
+    static const long ID_RESIZEMASKITEM;
+    //*)
+
+private:
+
+    //(*Handlers(SpriteObjectEditor)
+    void OnimagePanelPaint(wxPaintEvent& event);
+    void OnimagePanelEraseBackground(wxEraseEvent& event);
+    void OnimagesListItemSelect(wxListEvent& event);
+    void OnimagePanelResize(wxSizeEvent& event);
+    void OnanimationsTreeSelectionChanged(wxTreeEvent& event);
+    void OnAddAnimationSelected(wxCommandEvent& event);
+    void OnDeleteAnimationSelected(wxCommandEvent& event);
+    void OnanimationsTreeItemRightClick(wxTreeEvent& event);
+    void OnautomaticRotationItemSelected(wxCommandEvent& event);
+    void OnmultipleDirectionsItemSelected(wxCommandEvent& event);
+    void OnimagesListItemRClick(wxListEvent& event);
+    void OnremoveImageItemSelected(wxCommandEvent& event);
+    void OnMoveLeftSelected(wxCommandEvent& event);
+    void OnMoveRightSelected(wxCommandEvent& event);
+    void OnMaskEditClick(wxCommandEvent& event);
+    void OnPointEditClick(wxCommandEvent& event);
+    void OnmgrPaneClose(wxAuiManagerEvent& event);
+    void OnpointsListBeginLabelEdit(wxListEvent& event);
+    void OnpointsListEndLabelEdit(wxListEvent& event);
+    void OnimagePanelLeftUp(wxMouseEvent& event);
+    void OnpointsListItemSelect(wxListEvent& event);
+    void OnDeletePointClick(wxCommandEvent& event);
+    void OnAddPointClick(wxCommandEvent& event);
+    void OnpointsListItemActivated(wxListEvent& event);
+    void OnimagePanelLeftDown(wxMouseEvent& event);
+    void OnimagePanelMouseMove(wxMouseEvent& event);
+    void OnAddMaskClick(wxCommandEvent& event);
+    void OnDeleteMaskClick(wxCommandEvent& event);
+    void OnDefaultMaskClick(wxCommandEvent& event);
+    void OnPositionMaskSelected(wxCommandEvent& event);
+    void OnResizeMaskSelected(wxCommandEvent& event);
+    void OnmaskListItemActivated(wxListEvent& event);
+    void OnmaskListItemRClick(wxListEvent& event);
+    //*)
+    void RefreshAll();
+    void RefreshAnimationTree();
+    void RefreshImagesList();
+    void RefreshImageAndControls();
+    void RefreshPoints();
+    void RefreshCollisionMasks();
+    wxBitmap GetwxBitmapFromImageResource(Resource & resource);
+
+    /**
+     * Return a vector containing the sprites which must be modified when editing a point
+     * or collision masks:
+     * When buttons "Apply the changes to the whole animation" are checked, the vector contains
+     * all the sprites of the animation. If the buttons are unchecked, the vector contains only
+     * the sprite currently modified
+     */
+    std::vector < Sprite * > GetSpritesToModify();
+
+    DECLARE_EVENT_TABLE()
+
+    Game & game;
+    SpriteObject & object;
+    unsigned int selectedAnimation;
+    unsigned int selectedDirection;
+    unsigned int selectedImage;
+    std::string selectedPoint;
+    float spritePosX; ///< Used to remember the position where the sprite have been drawn.
+    float spritePosY; ///< Used to remember the position where the sprite have been drawn.
+
+    bool editingMask;
+    bool editingPoint;
+
+    std::string renamedPointOldName;
+
+    bool movingBox;
+    unsigned int selectedBox;
+    float xSelectionOffset;
+    float ySelectionOffset;
+
+    MainEditorCommand & mainEditorCommand;
+};
+
+/**
+ * \brief Tool class used by SpriteObjectEditor to enable inserting images using drag'n'drop
+ */
+class DndTextSpriteObjectEditor : public wxTextDropTarget
+{
+public:
+    DndTextSpriteObjectEditor(SpriteObjectEditor & editor_) : editor(editor_) {}
+
+    virtual bool OnDropText(wxCoord x, wxCoord y, const wxString& text);
+
+private:
+
+    SpriteObjectEditor & editor;
+};
+#endif
+#endif

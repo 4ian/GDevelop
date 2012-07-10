@@ -5,59 +5,14 @@
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
 		<object class="wxAuiManager" variable="mgr" member="yes">
+			<handler function="OnmgrPaneClose" entry="EVT_AUI_PANE_CLOSE" />
 			<object class="AuiManagerItem">
 				<object class="wxPanel" name="ID_PANEL1" variable="centerPanel" member="yes">
 					<pos>107,155</pos>
 					<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 						<cols>1</cols>
 						<growablecols>0</growablecols>
-						<growablerows>1</growablerows>
-						<object class="sizeritem">
-							<object class="wxPanel" name="ID_PANEL6" variable="toolbarPanel" member="yes">
-								<size>-1,25</size>
-								<object class="wxAuiManager" variable="AuiManager1" member="yes">
-									<object class="AuiManagerItem">
-										<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes">
-											<object class="AuiToolBarItem">
-												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM1" variable="AuiToolBarItem1" member="yes">
-													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
-												</object>
-												<label>Item label</label>
-											</object>
-											<object class="AuiToolBarItem">
-												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM2" variable="AuiToolBarItem2" member="yes">
-													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
-												</object>
-												<label>Item label</label>
-											</object>
-											<object class="AuiToolBarItem">
-												<object class="wxAuiToolBarSeparator" />
-												<label>Item label</label>
-											</object>
-											<object class="AuiToolBarItem">
-												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM3" variable="AuiToolBarItem3" member="yes" />
-												<label>Item label</label>
-											</object>
-										</object>
-										<name>PaneName</name>
-										<standardpanetype>Toolbar</standardpanetype>
-										<caption>Pane caption</caption>
-										<captionvisible>0</captionvisible>
-										<minimizebutton>0</minimizebutton>
-										<maximizebutton>0</maximizebutton>
-										<pinbutton>0</pinbutton>
-										<layer>10</layer>
-										<dockabledirection>.Dockable(false)</dockabledirection>
-										<resizable>0</resizable>
-										<movable>0</movable>
-										<destroyonclose>0</destroyonclose>
-										<firstadd>0</firstadd>
-									</object>
-								</object>
-							</object>
-							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-							<option>1</option>
-						</object>
+						<growablerows>0</growablerows>
 						<object class="sizeritem">
 							<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
 								<cols>2</cols>
@@ -67,6 +22,9 @@
 									<object class="wxPanel" name="ID_PANEL4" variable="imagePanel" member="yes">
 										<handler function="OnimagePanelPaint" entry="EVT_PAINT" />
 										<handler function="OnimagePanelEraseBackground" entry="EVT_ERASE_BACKGROUND" />
+										<handler function="OnimagePanelLeftDown" entry="EVT_LEFT_DOWN" />
+										<handler function="OnimagePanelLeftUp" entry="EVT_LEFT_UP" />
+										<handler function="OnimagePanelMouseMove" entry="EVT_MOTION" />
 										<handler function="OnimagePanelResize" entry="EVT_SIZE" />
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -89,6 +47,65 @@
 										<style>wxSB_HORIZONTAL</style>
 									</object>
 									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
+								<cols>3</cols>
+								<growablecols>1</growablecols>
+								<object class="sizeritem">
+									<object class="wxPanel" name="ID_PANEL6" variable="toolbarPanel" member="yes">
+										<size>-1,25</size>
+										<object class="wxAuiManager" variable="AuiManager1" member="yes">
+											<object class="AuiManagerItem">
+												<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes">
+													<object class="AuiToolBarItem">
+														<object class="wxAuiToolBarItem" name="ID_MASKITEM" variable="maskItem_" member="yes">
+															<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;maskEdit16" />
+															<itemkind>Check</itemkind>
+															<handler function="OnMaskEditClick" entry="EVT_TOOL" />
+														</object>
+														<label>Item label</label>
+													</object>
+													<object class="AuiToolBarItem">
+														<object class="wxAuiToolBarItem" name="ID_POINTSITEM" variable="pointsItem_" member="yes">
+															<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;pointEdit16" />
+															<itemkind>Check</itemkind>
+															<handler function="OnPointEditClick" entry="EVT_TOOL" />
+														</object>
+														<label>Item label</label>
+													</object>
+												</object>
+												<name>PaneName</name>
+												<standardpanetype>Toolbar</standardpanetype>
+												<caption>Pane caption</caption>
+												<captionvisible>0</captionvisible>
+												<minimizebutton>0</minimizebutton>
+												<maximizebutton>0</maximizebutton>
+												<pinbutton>0</pinbutton>
+												<layer>10</layer>
+												<dockabledirection>.Dockable(false)</dockabledirection>
+												<resizable>0</resizable>
+												<movable>0</movable>
+												<destroyonclose>0</destroyonclose>
+												<firstadd>0</firstadd>
+											</object>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxStaticText" name="ID_STATICTEXT1" variable="statusTxt" member="yes">
+										<label></label>
+										<style>wxALIGN_RIGHT</style>
+									</object>
+									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
 									<option>1</option>
 								</object>
 							</object>
@@ -141,6 +158,7 @@
 				<minimizebutton>0</minimizebutton>
 				<maximizebutton>0</maximizebutton>
 				<pinbutton>0</pinbutton>
+				<closebutton>0</closebutton>
 				<dockdirection>Left</dockdirection>
 				<dockfixed>0</dockfixed>
 				<dockabledirection></dockabledirection>
@@ -165,12 +183,187 @@
 						</object>
 					</object>
 				</object>
-				<name>PaneName</name>
+				<name>imagePane</name>
 				<caption>Images</caption>
 				<minimizebutton>0</minimizebutton>
 				<maximizebutton>0</maximizebutton>
 				<pinbutton>0</pinbutton>
+				<closebutton>0</closebutton>
 				<dockdirection>Bottom</dockdirection>
+				<dockfixed>0</dockfixed>
+				<dockabledirection></dockabledirection>
+				<destroyonclose>0</destroyonclose>
+				<firstadd>0</firstadd>
+			</object>
+			<object class="AuiManagerItem">
+				<object class="wxPanel" name="ID_PANEL8" variable="maskPanel" member="yes">
+					<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+						<cols>1</cols>
+						<growablecols>0</growablecols>
+						<growablerows>1</growablerows>
+						<object class="sizeritem">
+							<object class="wxPanel" name="ID_PANEL9" variable="Panel3" member="yes">
+								<size>-1,25</size>
+								<object class="wxAuiManager" variable="AuiManager3" member="yes">
+									<object class="AuiManagerItem">
+										<object class="wxAuiToolBar" name="ID_AUITOOLBAR3" variable="maskToolbar" member="yes">
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM6" variable="AuiToolBarItem6" member="yes">
+													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
+													<handler function="OnAddMaskClick" entry="EVT_TOOL" />
+												</object>
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM7" variable="AuiToolBarItem7" member="yes">
+													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;remove16" />
+													<handler function="OnDeleteMaskClick" entry="EVT_TOOL" />
+												</object>
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarSeparator" />
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM1" variable="AuiToolBarItem1" member="yes">
+													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;defaultMask16" />
+													<shorthelp>Revenir au masque par défaut</shorthelp>
+													<handler function="OnDefaultMaskClick" entry="EVT_TOOL" />
+												</object>
+												<label>Revenir au masque par défaut</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarSeparator" />
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_MASKAPPLYWHOLEANIMITEM" variable="AuiToolBarItem8" member="yes">
+													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;copy16" />
+													<itemkind>Check</itemkind>
+													<handler function="OnPointEditClick" entry="EVT_TOOL" />
+												</object>
+												<label>Item label</label>
+											</object>
+										</object>
+										<name>PaneName</name>
+										<standardpanetype>Toolbar</standardpanetype>
+										<caption>Pane caption</caption>
+										<captionvisible>0</captionvisible>
+										<minimizebutton>0</minimizebutton>
+										<maximizebutton>0</maximizebutton>
+										<pinbutton>0</pinbutton>
+										<layer>10</layer>
+										<dockabledirection>.Dockable(false)</dockabledirection>
+										<resizable>0</resizable>
+										<movable>0</movable>
+										<destroyonclose>0</destroyonclose>
+										<firstadd>0</firstadd>
+									</object>
+								</object>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxListCtrl" name="ID_LISTCTRL2" variable="maskList" member="yes">
+								<style>wxLC_REPORT</style>
+								<handler function="OnmaskListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
+								<handler function="OnmaskListItemRClick" entry="EVT_LIST_ITEM_RIGHT_CLICK" />
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<option>1</option>
+						</object>
+					</object>
+				</object>
+				<name>maskPane</name>
+				<caption>Masques de collision</caption>
+				<minimizebutton>0</minimizebutton>
+				<maximizebutton>0</maximizebutton>
+				<pinbutton>0</pinbutton>
+				<dockdirection>Right</dockdirection>
+				<dockfixed>0</dockfixed>
+				<dockabledirection></dockabledirection>
+				<destroyonclose>0</destroyonclose>
+				<firstadd>0</firstadd>
+			</object>
+			<object class="AuiManagerItem">
+				<object class="wxPanel" name="ID_PANEL5" variable="pointsPanel" member="yes">
+					<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+						<cols>1</cols>
+						<growablecols>0</growablecols>
+						<growablerows>1</growablerows>
+						<object class="sizeritem">
+							<object class="wxPanel" name="ID_PANEL7" variable="Panel1" member="yes">
+								<size>-1,25</size>
+								<object class="wxAuiManager" variable="AuiManager2" member="yes">
+									<object class="AuiManagerItem">
+										<object class="wxAuiToolBar" name="ID_AUITOOLBAR2" variable="pointToolbar" member="yes">
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM3" variable="AuiToolBarItem3" member="yes">
+													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
+													<handler function="OnAddPointClick" entry="EVT_TOOL" />
+												</object>
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_DELETEPOINTITEM" variable="AuiToolBarItem5" member="yes">
+													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;remove16" />
+													<handler function="OnDeletePointClick" entry="EVT_TOOL" />
+												</object>
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarSeparator" />
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_POINTAPPLYWHOLEANIMITEM" variable="AuiToolBarItem4" member="yes">
+													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;copy16" />
+													<shorthelp>Appliquer les changements à toutes les images de l&apos;animation</shorthelp>
+													<itemkind>Check</itemkind>
+												</object>
+												<label>Appliquer à toutes les images de l&apos;animation</label>
+											</object>
+										</object>
+										<name>PaneName</name>
+										<standardpanetype>Toolbar</standardpanetype>
+										<caption>Pane caption</caption>
+										<captionvisible>0</captionvisible>
+										<minimizebutton>0</minimizebutton>
+										<maximizebutton>0</maximizebutton>
+										<pinbutton>0</pinbutton>
+										<layer>10</layer>
+										<dockabledirection>.Dockable(false)</dockabledirection>
+										<resizable>0</resizable>
+										<movable>0</movable>
+										<destroyonclose>0</destroyonclose>
+										<firstadd>0</firstadd>
+									</object>
+								</object>
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<option>1</option>
+						</object>
+						<object class="sizeritem">
+							<object class="wxListCtrl" name="ID_LISTCTRL3" variable="pointsList" member="yes">
+								<style>wxLC_REPORT|wxLC_EDIT_LABELS</style>
+								<handler function="OnpointsListBeginLabelEdit" entry="EVT_LIST_BEGIN_LABEL_EDIT" />
+								<handler function="OnpointsListEndLabelEdit" entry="EVT_LIST_END_LABEL_EDIT" />
+								<handler function="OnpointsListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
+								<handler function="OnpointsListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<option>1</option>
+						</object>
+					</object>
+				</object>
+				<name>pointsPane</name>
+				<caption>Points</caption>
+				<minimizebutton>0</minimizebutton>
+				<maximizebutton>0</maximizebutton>
+				<pinbutton>0</pinbutton>
+				<dockdirection>Right</dockdirection>
 				<dockfixed>0</dockfixed>
 				<dockabledirection></dockabledirection>
 				<destroyonclose>0</destroyonclose>
@@ -218,13 +411,25 @@
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM9" variable="moveLeftItem" member="yes">
 				<label>Déplacer vers la gauche</label>
+				<accel>Ctrl-Left</accel>
 				<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;left16" />
 				<handler function="OnMoveLeftSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM10" variable="moveRightItem" member="yes">
 				<label>Déplacer vers la droite</label>
+				<accel>Ctrl-Right</accel>
 				<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;right16" />
 				<handler function="OnMoveRightSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+		<object class="wxMenu" variable="maskMenu" member="yes">
+			<object class="wxMenuItem" name="ID_POSITIONMASKITEM" variable="MenuItem5" member="yes">
+				<label>Positionner</label>
+				<handler function="OnPositionMaskSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_RESIZEMASKITEM" variable="MenuItem6" member="yes">
+				<label>Changer la taille</label>
+				<handler function="OnResizeMaskSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 	</object>

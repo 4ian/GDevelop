@@ -70,6 +70,9 @@ public:
 
     /**
      * Get the collision mask ( custom or automatically generated owing to IsCollisionMaskAutomatic() )
+     *
+     * \warning If the image has not been loaded ( using LoadImage ) and the collision mask is set as automatic,
+     * the returned mask won't be correct.
      */
     std::vector<RotatedRectangle> GetCollisionMask() const;
 
@@ -80,7 +83,7 @@ public:
     void SetCustomCollisionMask(const std::vector<RotatedRectangle> & collisionMask) {customCollisionMask = collisionMask;};
 
     /**
-     * Return true if a custom collision mask is used.
+     * Return true if the collision mask is a bounding box, false if a custom collision mask is used.
      */
     inline bool IsCollisionMaskAutomatic() const { return automaticCollisionMask; }
 
@@ -136,11 +139,17 @@ public:
 
     /**
      * Return Centre point.
+     *
+     * \warning If the image has not been loaded ( using LoadImage ) and the center point is set as automatic,
+     * the returned point won't be correct.
      */
     inline const Point & GetCentre() const { return centre; }
 
     /**
      * Return Centre point.
+     *
+     * \warning If the image has not been loaded ( using LoadImage ) and the center point is set as automatic,
+     * the returned point won't be correct.
      */
     inline Point & GetCentre() { automaticCentre = false; return centre; }
 

@@ -14,7 +14,7 @@
 namespace gd
 {
 
-CommonBitmapManager *CommonBitmapManager::_singleton = NULL;
+CommonBitmapManager * CommonBitmapManager::_singleton = NULL;
 
 CommonBitmapManager::CommonBitmapManager()
 {
@@ -53,6 +53,20 @@ CommonBitmapManager::CommonBitmapManager()
     invertedCondition.LoadFile("res/contraire.png", wxBITMAP_TYPE_ANY);
     left16.LoadFile("res/left16.png", wxBITMAP_TYPE_ANY);
     right16.LoadFile("res/right16.png", wxBITMAP_TYPE_ANY);
+    animation16.LoadFile("res/animation16.png", wxBITMAP_TYPE_ANY);
+    leftdir16.LoadFile("res/leftdir.png", wxBITMAP_TYPE_ANY);
+    leftdowndir16.LoadFile("res/leftdowndir.png", wxBITMAP_TYPE_ANY);
+    downdir16.LoadFile("res/downdir.png", wxBITMAP_TYPE_ANY);
+    rightdowndir16.LoadFile("res/rightdowndir.png", wxBITMAP_TYPE_ANY);
+    rightdir16.LoadFile("res/rightdir.png", wxBITMAP_TYPE_ANY);
+    rightupdir16.LoadFile("res/rightupdir.png", wxBITMAP_TYPE_ANY);
+    updir16.LoadFile("res/updir.png", wxBITMAP_TYPE_ANY);
+    leftupdir16.LoadFile("res/leftupdir.png", wxBITMAP_TYPE_ANY);
+    maskEdit16.LoadFile("res/maskEdit16.png", wxBITMAP_TYPE_ANY);
+    pointEdit16.LoadFile("res/pointEdit16.png", wxBITMAP_TYPE_ANY);
+    remove16.LoadFile("res/deleteicon.png", wxBITMAP_TYPE_ANY);
+    copy16.LoadFile("res/copyicon.png", wxBITMAP_TYPE_ANY);
+    defaultMask16.LoadFile("res/defaultMask16.png", wxBITMAP_TYPE_ANY);
 
     layers24.LoadFile("res/layers24.png", wxBITMAP_TYPE_ANY);
     undo24.LoadFile("res/undo24.png", wxBITMAP_TYPE_ANY);

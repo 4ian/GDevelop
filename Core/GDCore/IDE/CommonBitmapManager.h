@@ -40,6 +40,7 @@ public:
     wxBitmap point;
     wxBitmap add16;
     wxBitmap add24;
+    wxBitmap remove16;
     wxBitmap unknown24;
     wxBitmap scene;
     wxBitmap layerBt;
@@ -53,6 +54,19 @@ public:
     wxBitmap invertedCondition;
     wxBitmap left16;
     wxBitmap right16;
+    wxBitmap animation16;
+    wxBitmap leftdir16;
+    wxBitmap leftdowndir16;
+    wxBitmap downdir16;
+    wxBitmap rightdowndir16;
+    wxBitmap rightdir16;
+    wxBitmap rightupdir16;
+    wxBitmap updir16;
+    wxBitmap leftupdir16;
+    wxBitmap maskEdit16;
+    wxBitmap pointEdit16;
+    wxBitmap copy16;
+    wxBitmap defaultMask16;
 
     /** \name 24x24 bitmaps
      * wxBitmap which can be used for ribbons.

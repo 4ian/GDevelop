@@ -8,10 +8,6 @@
 #include <vector>
 #include <string>
 #include <utility>
-#if defined(GD_IDE_ONLY)
-#include "GDCore/PlatformDefinition/ObjectGroup.h"
-#endif
-
 
 namespace gd
 {

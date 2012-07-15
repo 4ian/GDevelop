@@ -67,6 +67,8 @@ CommonBitmapManager::CommonBitmapManager()
     remove16.LoadFile("res/deleteicon.png", wxBITMAP_TYPE_ANY);
     copy16.LoadFile("res/copyicon.png", wxBITMAP_TYPE_ANY);
     defaultMask16.LoadFile("res/defaultMask16.png", wxBITMAP_TYPE_ANY);
+    preview16.LoadFile("res/preview16.png", wxBITMAP_TYPE_ANY);
+    objectGroup16.LoadFile("res/groupeobjeticon.png", wxBITMAP_TYPE_ANY);
 
     layers24.LoadFile("res/layers24.png", wxBITMAP_TYPE_ANY);
     undo24.LoadFile("res/undo24.png", wxBITMAP_TYPE_ANY);

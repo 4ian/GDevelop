@@ -47,9 +47,7 @@
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
-				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
-					<size>10,-1</size>
-				</object>
+				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes" />
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
 			</object>

@@ -85,7 +85,7 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
 	FlexGridSizer12->SetSizeHints(Panel2);
 	FlexGridSizer3->Add(Panel2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
+	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	toolbarPanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(-1,26), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
@@ -129,7 +129,7 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
 	Connect(idFindUndeclared,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ChooseVariableDialog::OnFindUndeclaredSelected);
 
 	variablesList->InsertColumn(0, _("Variable"));
-	variablesList->InsertColumn(1, _("Valeur initiale"));;
+	variablesList->InsertColumn(1, _("Valeur initiale"));
 	variablesList->SetColumnWidth(0, 150);
 	variablesList->SetColumnWidth(1, 130);
 
@@ -152,6 +152,9 @@ ChooseVariableDialog::ChooseVariableDialog(wxWindow* parent, gd::VariablesContai
         SetTitle(_("Edition des variables"));
         okBt->SetLabel(_("Ok"));
     }
+
+    //Offer nice background color to toolbar area.
+    AuiManager1->GetArtProvider()->SetColour(wxAUI_DOCKART_BACKGROUND_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
 
     Refresh();
 }

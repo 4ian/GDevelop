@@ -67,6 +67,8 @@ public:
     wxBitmap pointEdit16;
     wxBitmap copy16;
     wxBitmap defaultMask16;
+    wxBitmap preview16;
+    wxBitmap objectGroup16;
 
     /** \name 24x24 bitmaps
      * wxBitmap which can be used for ribbons.

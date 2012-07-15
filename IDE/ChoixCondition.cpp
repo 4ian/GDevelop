@@ -34,14 +34,14 @@
 #include "GDL/IDE/gdTreeItemStringData.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/ConditionSentenceFormatter.h"
-#include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
+#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
+#include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDL/IDE/ExpressionsCorrectnessTesting.h"
 
 #include "GDL/IDE/Dialogs/EditExpression.h"
 #include "GDL/IDE/Dialogs/EditTextDialog.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDL/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "TrueOrFalse.h"
@@ -104,7 +104,8 @@ END_EVENT_TABLE()
 ////////////////////////////////////////////////////////////
 ChoixCondition::ChoixCondition( wxWindow* parent, Game & game_, Scene & scene_) :
 game(game_),
-scene(scene_)
+scene(scene_),
+conditionInverted(false)
 {
     //(*Initialize(ChoixCondition)
     wxBoxSizer* BoxSizer4;
@@ -262,10 +263,6 @@ scene(scene_)
     imageList->Add(( wxBitmap( "res/conditions/unecond.png", wxBITMAP_TYPE_ANY ) ) );
     ConditionsTree->AssignImageList( imageList );
     objectConditionsTree->SetImageList( imageList );
-
-    Type = "";
-    Loc = true;
-    Contraire = false;
 
     searchCtrl->SetFocus();
 
@@ -440,7 +437,7 @@ void ChoixCondition::RefreshList()
 
 void ChoixCondition::RefreshObjectsLists()
 {
-    ObjectListDialogsHelper objectListsHelper(game, scene);
+    gd::ObjectListDialogsHelper objectListsHelper(game, scene);
     objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, "", string(objectsSearchCtrl->GetValue().mb_str()));
 }
 
@@ -711,7 +708,7 @@ void ChoixCondition::RefreshFromCondition()
     Layout();
     GridSizer1->Layout();
 
-    ContraireCheck->SetValue(Contraire);
+    ContraireCheck->SetValue(conditionInverted);
 
     Layout();
 }
@@ -759,25 +756,25 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
     {
         if ( instructionMetadata.parameters[i].type == "object" )
         {
-            ChooseObject dialog(this, game, scene, true, instructionMetadata.parameters[i].supplementaryInformation);
+            gd::ChooseObjectDialog dialog(this, game, scene, true, instructionMetadata.parameters[i].supplementaryInformation);
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->ChangeValue(dialog.objectChosen);
+                ParaEdit.at(i)->ChangeValue(dialog.GetChosenObject());
             }
             return;
         }
         else if ( instructionMetadata.parameters[i].type == "automatism" )
         {
             std::string object = ParaEdit.empty() ? "" : ParaEdit[0]->GetValue().mb_str();
-            ChooseAutomatismDlg dialog(this, game, scene, object, instructionMetadata.parameters[i].supplementaryInformation);
+            gd::ChooseAutomatismDialog dialog(this, game, scene, object, instructionMetadata.parameters[i].supplementaryInformation);
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.automatismChosen);
+                ParaEdit.at(i)->ChangeValue(dialog.GetChosenAutomatism());
 
             return;
         }
         else if (  instructionMetadata.parameters[i].type == "expression" )
         {
-            EditExpression dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
+            EditExpression dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( dialog.ShowModal() == 1 )
             {
                 ParaEdit.at(i)->ChangeValue(dialog.expression);
@@ -786,7 +783,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionMetadata.parameters[i].type == "mouse" )
         {
-            ChoixBouton dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ));
+            ChoixBouton dialog(this, ToString( ParaEdit.at(i)->GetValue() ));
             if ( dialog.ShowModal() == 1 )
             {
                 ParaEdit.at(i)->ChangeValue(dialog.bouton);
@@ -795,7 +792,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionMetadata.parameters[i].type == "key" )
         {
-            ChoixClavier dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ));
+            ChoixClavier dialog(this, ToString( ParaEdit.at(i)->GetValue() ));
             if ( dialog.ShowModal() == 1 )
             {
                 ParaEdit.at(i)->ChangeValue(dialog.touche);
@@ -804,7 +801,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionMetadata.parameters[i].type == "file" )
         {
-            ChoiceFile dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene, true);
+            ChoiceFile dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
 
             if ( dialog.ShowModal() == 1 )
                 ParaEdit[i]->ChangeValue(dialog.file);
@@ -813,7 +810,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionMetadata.parameters[i].type == "string" )
         {
-            EditTextDialog dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
+            EditTextDialog dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( dialog.ShowModal() == 1 )
             {
                 ParaEdit.at(i)->ChangeValue(dialog.returnedText);
@@ -867,7 +864,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionMetadata.parameters[i].type == "joyaxis" )
         {
-            ChoiceJoyAxis dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true);
+            ChoiceJoyAxis dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
             if( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.joyaxis);
 
@@ -976,14 +973,10 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 
     for ( unsigned int i = 0;i < instructionMetadata.parameters.size();i++ )
     {
-        Param.push_back( gd::Expression(string(ParaEdit.at(i)->GetValue().mb_str())) );
+        Param.push_back( gd::Expression(ToString(ParaEdit.at(i)->GetValue())) );
     }
 
-    if ( ContraireCheck->GetValue() )
-    {
-        Contraire = true;
-    } else { Contraire = false; }
-
+    conditionInverted = ContraireCheck->GetValue();
 
     EndModal( 0 );
 }

@@ -677,12 +677,6 @@
 		<Unit filename="EditOptionsPosition.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\" />
 		</Unit>
-		<Unit filename="EditPropJeu.cpp">
-			<Option virtualFolder="Editeur principal\Autres\" />
-		</Unit>
-		<Unit filename="EditPropJeu.h">
-			<Option virtualFolder="Editeur principal\Autres\" />
-		</Unit>
 		<Unit filename="EditPropScene.cpp">
 			<Option virtualFolder="Editeur principal\Autres\" />
 		</Unit>

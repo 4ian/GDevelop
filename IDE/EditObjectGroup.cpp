@@ -19,7 +19,7 @@
 #include "GDL/Scene.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDL/CommonTools.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -133,6 +133,8 @@ modificationCount(0)
     toolbar->AddTool( ID_Help, wxT( "Aide de l'éditeur de groupes d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur de groupes d'objets") );
     toolbar->Realize();
 
+    //Offer nice background color to toolbar area.
+    AuiManager1->GetArtProvider()->SetColour(wxAUI_DOCKART_BACKGROUND_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
 
     Refresh();
 }
@@ -211,20 +213,20 @@ void EditObjectGroup::OnObjetsListItemRightClick(wxTreeEvent& event)
 
 void EditObjectGroup::OnAddObjetSelected(wxCommandEvent& event)
 {
-    ChooseObject dialog(this, game, scene, false /*No groups*/, "" /*All objects types*/, true /*Allow multiple selection*/ );
+    gd::ChooseObjectDialog dialog(this, game, scene, false /*No groups*/, "" /*All objects types*/, true /*Allow multiple selection*/ );
     if ( dialog.ShowModal() == 1 )
     {
-        for (unsigned int i = 0;i<dialog.objectsChosen.size();++i)
+        for (unsigned int i = 0;i<dialog.GetChosenObjects().size();++i)
         {
             //On l'ajoute si il n'est pas déjà dans le groupe
-            if ( !group.Find( dialog.objectsChosen[i] ) )
+            if ( !group.Find( dialog.GetChosenObjects()[i] ) )
             {
-                group.AddObject( dialog.objectsChosen[i] );
-                ObjetsList->AppendItem( ObjetsList->GetRootItem(), dialog.objectsChosen[i] );
-            } else { wxLogWarning(_("L'objet ")+dialog.objectsChosen[i]+_(" est déjà dans ce groupe."));}
+                group.AddObject( dialog.GetChosenObjects()[i] );
+                ObjetsList->AppendItem( ObjetsList->GetRootItem(), dialog.GetChosenObjects()[i] );
+            } else { wxLogWarning(_("L'objet ")+dialog.GetChosenObjects()[i]+_(" est déjà dans ce groupe."));}
         }
 
-        modificationCount += dialog.objectsChosen.size();
+        modificationCount += dialog.GetChosenObjects().size();
     }
 }
 

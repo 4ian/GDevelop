@@ -33,7 +33,7 @@
 #include "InitialPositionBrowserDlg.h"
 #include "ProfileDlg.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "EventsEditor.h"
 #include "GridSetup.h"

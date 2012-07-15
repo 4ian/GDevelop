@@ -34,16 +34,16 @@
 #include "GDL/IDE/gdTreeItemStringData.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/ActionSentenceFormatter.h"
+#include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDL/IDE/Dialogs/EditExpression.h"
 #include "GDL/IDE/Dialogs/EditTextDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
-#include "GDL/IDE/Dialogs/ObjectListDialogsHelper.h"
+#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "ChoixClavier.h"
 #include "SigneModification.h"
@@ -431,7 +431,7 @@ void ChoixAction::RefreshList()
 
 void ChoixAction::RefreshObjectsLists()
 {
-    ObjectListDialogsHelper objectListsHelper(game, scene);
+    gd::ObjectListDialogsHelper objectListsHelper(game, scene);
     objectListsHelper.RefreshLists(ObjetsList, GroupesList, globalObjectsList, globalObjectGroups, "", string(objectsSearchCtrl->GetValue().mb_str()));
 }
 
@@ -729,37 +729,37 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
     {
         if ( instructionMetadata.parameters[i].type == "object" )
         {
-            ChooseObject Dialog(this, game, scene, true, instructionMetadata.parameters[i].supplementaryInformation);
-            if ( Dialog.ShowModal() == 1 )
+            gd::ChooseObjectDialog dialog(this, game, scene, true, instructionMetadata.parameters[i].supplementaryInformation);
+            if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->ChangeValue(Dialog.objectChosen);
+                ParaEdit.at(i)->ChangeValue(dialog.GetChosenObject());
             }
             return;
         }
         else if ( instructionMetadata.parameters[i].type == "automatism" )
         {
             std::string object = ParaEdit.empty() ? "" : ParaEdit[0]->GetValue().mb_str();
-            ChooseAutomatismDlg dialog(this, game, scene, object, instructionMetadata.parameters[i].supplementaryInformation);
+            gd::ChooseAutomatismDialog dialog(this, game, scene, object, instructionMetadata.parameters[i].supplementaryInformation);
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.automatismChosen);
+                ParaEdit.at(i)->ChangeValue(dialog.GetChosenAutomatism());
 
             return;
         }
         else if ( instructionMetadata.parameters[i].type == "expression" )
         {
-            EditExpression Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
-            if ( Dialog.ShowModal() == 1 )
+            EditExpression dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
+            if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->ChangeValue(Dialog.expression);
+                ParaEdit.at(i)->ChangeValue(dialog.expression);
             }
             return;
         }
         else if ( instructionMetadata.parameters[i].type == "string" )
         {
-            EditTextDialog Dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
-            if ( Dialog.ShowModal() == 1 )
+            EditTextDialog dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
+            if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->ChangeValue(Dialog.returnedText);
+                ParaEdit.at(i)->ChangeValue(dialog.returnedText);
             }
             return;
         }
@@ -868,7 +868,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         }
         else if ( instructionMetadata.parameters[i].type == "joyaxis" )
         {
-            ChoiceJoyAxis dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene, true);
+            ChoiceJoyAxis dialog(this, static_cast<string>( ParaEdit.at(i)->GetValue() ), game, scene);
             if( dialog.ShowModal() == 1 )
                 ParaEdit.at(i)->ChangeValue(dialog.joyaxis);
 
@@ -876,7 +876,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         }
         else if ( instructionMetadata.parameters[i].type == "file" )
         {
-            ChoiceFile dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene, true);
+            ChoiceFile dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
 
             if ( dialog.ShowModal() == 1 )
                 ParaEdit[i]->ChangeValue(dialog.file);
@@ -887,7 +887,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         {
             if ( ParaEdit.empty() ) return;
 
-            string objectWanted = string(ParaEdit[0]->GetValue().mb_str());
+            std::string objectWanted = ToString(ParaEdit[0]->GetValue());
             std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
             std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 

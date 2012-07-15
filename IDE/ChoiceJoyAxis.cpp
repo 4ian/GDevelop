@@ -31,11 +31,10 @@ BEGIN_EVENT_TABLE(ChoiceJoyAxis,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoiceJoyAxis::ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, Scene & scene_, bool canSelectGroup_) :
+ChoiceJoyAxis::ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, Scene & scene_) :
 joyaxis(joyaxis_),
 game(game_),
-scene(scene_),
-canSelectGroup(canSelectGroup_)
+scene(scene_)
 {
 	//(*Initialize(ChoiceJoyAxis)
 	wxFlexGridSizer* FlexGridSizer3;

@@ -792,7 +792,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
             ChoixCondition dialog(this, game, scene);
             dialog.Type = item.instruction->GetType();
             dialog.Param = item.instruction->GetParameters();
-            dialog.Contraire = item.instruction->IsInverted();
+            dialog.conditionInverted = item.instruction->IsInverted();
             dialog.RefreshFromCondition();
             dialog.Fit();
 
@@ -800,7 +800,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
             {
                 item.instruction->SetType( dialog.Type );
                 item.instruction->SetParameters( dialog.Param );
-                item.instruction->SetInverted( dialog.Contraire );
+                item.instruction->SetInverted( dialog.conditionInverted );
 
                 item.event->eventHeightNeedUpdate = true;
                 Refresh();
@@ -840,7 +840,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
                 gd::Instruction instruction;
                 instruction.SetType( dialog.Type );
                 instruction.SetParameters( dialog.Param );
-                instruction.SetInverted( dialog.Contraire );
+                instruction.SetInverted( dialog.conditionInverted );
 
                 item.instructionList->push_back(instruction);
                 item.event->eventHeightNeedUpdate = true;
@@ -1171,7 +1171,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
             gd::Instruction instruction;
             instruction.SetType(dialog.Type);
             instruction.SetParameters(dialog.Param);
-            instruction.SetInverted(dialog.Contraire);
+            instruction.SetInverted(dialog.conditionInverted);
 
             listHighlighted.instructionList->push_back(instruction);
             listHighlighted.event->eventHeightNeedUpdate = true;
@@ -1660,7 +1660,7 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
         ChoixCondition dialog(this, game, scene);
         dialog.Type = item.instruction->GetType();
         dialog.Param = item.instruction->GetParameters();
-        dialog.Contraire = item.instruction->IsInverted();
+        dialog.conditionInverted = item.instruction->IsInverted();
         dialog.RefreshFromCondition();
         dialog.Fit();
 
@@ -1668,7 +1668,7 @@ void EventsEditor::OnparameterEditBtClick(wxCommandEvent& event)
         {
             item.instruction->SetType( dialog.Type );
             item.instruction->SetParameters( dialog.Param );
-            item.instruction->SetInverted( dialog.Contraire );
+            item.instruction->SetInverted( dialog.conditionInverted );
 
             item.event->eventHeightNeedUpdate = true;
             Refresh();

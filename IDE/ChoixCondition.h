@@ -40,11 +40,10 @@ class ChoixCondition: public wxDialog
         void RefreshFromCondition();
 
         //Les données de la condition à modifier
-        string Type;
-        bool Loc;
-        bool Contraire;
         Game & game;
         Scene & scene;
+        string Type;
+        bool conditionInverted;
         vector < gd::Expression > Param;
 
         unsigned static const int MaxPara = 8;

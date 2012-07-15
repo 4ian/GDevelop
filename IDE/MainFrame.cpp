@@ -42,7 +42,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "MyStatusBar.h"
 #include "EditorObjets.h"
 #include "EventsEditor.h"

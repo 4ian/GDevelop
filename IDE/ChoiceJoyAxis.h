@@ -28,7 +28,7 @@ class ChoiceJoyAxis: public wxDialog
 {
 	public:
 
-		ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, Scene & scene_, bool canSelectedGroup);
+		ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, Scene & scene_);
 		virtual ~ChoiceJoyAxis();
 
 		//(*Declarations(ChoiceJoyAxis)

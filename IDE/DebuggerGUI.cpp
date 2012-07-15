@@ -22,7 +22,7 @@
 #include "GDL/RuntimeGame.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "ConsoleManager.h"
 
@@ -736,10 +736,10 @@ void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
 
 void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
 {
-    ChooseObject dialog( this, *scene.game, scene, false );
+    gd::ChooseObjectDialog dialog( this, *scene.game, scene, false );
     if ( dialog.ShowModal() != 1 ) return;
 
-    string objectWanted = dialog.objectChosen;
+    string objectWanted = dialog.GetChosenObject();
     std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
     std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->GetGlobalObjects().begin(), scene.game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 

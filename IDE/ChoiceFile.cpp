@@ -11,6 +11,7 @@
 //*)
 #include <wx/filedlg.h>
 #include <wx/filename.h>
+#include "GDL/CommonTools.h"
 #include "GDL/IDE/Dialogs/EditTextDialog.h"
 #include "GDL/Game.h"
 class Scene;
@@ -31,11 +32,10 @@ BEGIN_EVENT_TABLE(ChoiceFile,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoiceFile::ChoiceFile(wxWindow* parent, string file_, Game & game_, Scene & scene_, bool canSelectGroup_) :
+ChoiceFile::ChoiceFile(wxWindow* parent, string file_, Game & game_, Scene & scene_) :
 file(file_),
 game(game_),
-scene(scene_),
-canSelectGroup(canSelectGroup_)
+scene(scene_)
 {
 	//(*Initialize(ChoiceFile)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -104,7 +104,7 @@ void ChoiceFile::OnadvancedBtClick(wxCommandEvent& event)
 
 void ChoiceFile::OnokBtClick(wxCommandEvent& event)
 {
-    file = static_cast<string>(fileEdit->GetValue());
+    file = ToString(fileEdit->GetValue());
     EndModal(1);
 }
 

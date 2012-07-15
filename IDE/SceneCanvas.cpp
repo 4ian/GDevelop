@@ -24,7 +24,7 @@
 #include "GDL/ObjectHelpers.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
 #include "GDL/IDE/SceneCanvasSettings.h"
 #include "GDL/Events/CodeCompilationHelpers.h"

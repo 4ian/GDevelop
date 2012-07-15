@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "EditorLayers.h"
 
 //(*InternalHeaders(EditorLayers)
@@ -65,7 +69,7 @@ mainEditorCommand(mainEditorCommand_)
 	layersList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxSize(191,198), wxLC_REPORT, wxDefaultValidator, _T("ID_LISTCTRL1"));
 	FlexGridSizer1->Add(layersList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	MenuItem1 = new wxMenuItem((&contextMenu), idMenuEdit, _("Editer les paramÃ¨tres du calque"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem1 = new wxMenuItem((&contextMenu), idMenuEdit, _("Editer les paramètres du calque"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	contextMenu.Append(MenuItem1);
 	contextMenu.AppendSeparator();
@@ -76,10 +80,10 @@ mainEditorCommand(mainEditorCommand_)
 	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	contextMenu.Append(MenuItem3);
 	contextMenu.AppendSeparator();
-	MenuItem4 = new wxMenuItem((&contextMenu), idMenuUp, _("DÃ©placer au dessus"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem4 = new wxMenuItem((&contextMenu), idMenuUp, _("Déplacer au dessus"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
 	contextMenu.Append(MenuItem4);
-	MenuItem5 = new wxMenuItem((&contextMenu), idMenuDown, _("DÃ©placer au dessous"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem5 = new wxMenuItem((&contextMenu), idMenuDown, _("Déplacer au dessous"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
 	contextMenu.Append(MenuItem5);
 	imageList = new wxImageList(16, 16, 1);
@@ -116,21 +120,21 @@ mainEditorCommand(mainEditorCommand_)
 }
 
 ////////////////////////////////////////////////////////////
-/// Mise Ã  jour de la barre d'outils
+/// Mise à jour de la barre d'outils
 ////////////////////////////////////////////////////////////
 void EditorLayers::CreateToolbar()
 {
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( ID_BITMAPBUTTON1, wxT( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Rafraichir la liste des calques") );
+    toolbar->AddTool( ID_BITMAPBUTTON1, _( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Rafraichir la liste des calques") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idMenuAdd, wxT( "Ajouter un calque" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un calque") );
-    toolbar->AddTool( idMenuDel, wxT( "Supprimer le calque sÃ©lectionnÃ©" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer le calque sÃ©lectionnÃ©") );
+    toolbar->AddTool( idMenuAdd, _( "Ajouter un calque" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un calque") );
+    toolbar->AddTool( idMenuDel, _( "Supprimer le calque sélectionné" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer le calque sélectionné") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idMenuUp, wxT( "DÃ©placer le calque au dessus" ), wxBitmap( wxImage( "res/up.png" ) ), _("DÃ©placer le calque au dessus") );
-    toolbar->AddTool( idMenuDown, wxT( "DÃ©placer le calque au dessous" ), wxBitmap( wxImage( "res/down.png" ) ), _("DÃ©placer le calque au dessous") );
-    toolbar->AddTool( ID_BITMAPBUTTON6, wxT( "Plus d'options d'Ã©dition ( clic droit sur la liste )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _("Plus d'options d'Ã©dition ( clic droit sur la liste )") );
+    toolbar->AddTool( idMenuUp, _( "Déplacer le calque au dessus" ), wxBitmap( wxImage( "res/up.png" ) ), _("Déplacer le calque au dessus") );
+    toolbar->AddTool( idMenuDown, _( "Déplacer le calque au dessous" ), wxBitmap( wxImage( "res/down.png" ) ), _("Déplacer le calque au dessous") );
+    toolbar->AddTool( ID_BITMAPBUTTON6, _( "Plus d'options d'édition ( clic droit sur la liste )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _("Plus d'options d'édition ( clic droit sur la liste )") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON3, wxT( "Aide de l'Ã©diteur d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'Ã©diteur d'objets") );
+    toolbar->AddTool( ID_BITMAPBUTTON3, _( "Aide de l'éditeur d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur d'objets") );
     toolbar->Realize();
 }
 
@@ -257,7 +261,7 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
     {
     	if ( &layers->at(i) == selectedLayer )
     	{
-    	    //Liste de calques sans celui Ã  supprimer
+    	    //Liste de calques sans celui à supprimer
     	    vector < Layer > layersWithoutLayerToDelete = *layers;
     	    layersWithoutLayerToDelete.erase(layersWithoutLayerToDelete.begin() + i );
 
@@ -293,7 +297,7 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
     	    return;
     	}
     }
-    wxLogWarning(_("Impossible de trouver le calque Ã  supprimer !"));
+    wxLogWarning(_("Impossible de trouver le calque à supprimer !"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -311,7 +315,7 @@ void EditorLayers::OnUpSelected(wxCommandEvent& event)
     	{
     	    if ( i <= layers->size()-1-1 )
     	    {
-    	        //On dÃ©place le calque
+    	        //On déplace le calque
     	        Layer layer = layers->at(i);
                 layers->erase(layers->begin() + i );
                 layers->insert(layers->begin()+i+1, layer);
@@ -325,7 +329,7 @@ void EditorLayers::OnUpSelected(wxCommandEvent& event)
     	    return;
     	}
     }
-    wxLogWarning(_("Impossible de trouver le calque Ã  dÃ©placer !"));
+    wxLogWarning(_("Impossible de trouver le calque à déplacer !"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -343,7 +347,7 @@ void EditorLayers::OnDownSelected(wxCommandEvent& event)
     	{
     	    if ( i >= 1 )
     	    {
-    	        //On dÃ©place le calque
+    	        //On déplace le calque
     	        Layer layer = layers->at(i);
                 layers->erase(layers->begin() + i );
                 layers->insert(layers->begin()+i-1, layer);
@@ -357,11 +361,11 @@ void EditorLayers::OnDownSelected(wxCommandEvent& event)
     	    return;
     	}
     }
-    wxLogWarning(_("Impossible de trouver le calque Ã  dÃ©placer !"));
+    wxLogWarning(_("Impossible de trouver le calque à déplacer !"));
 }
 
 ////////////////////////////////////////////////////////////
-/// Clic droit : Mise Ã  jour du calque selectionnÃ© et menu contextuel
+/// Clic droit : Mise à jour du calque selectionné et menu contextuel
 ////////////////////////////////////////////////////////////
 void EditorLayers::OnlayersListItemRClick(wxListEvent& event)
 {
@@ -369,7 +373,7 @@ void EditorLayers::OnlayersListItemRClick(wxListEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-/// Connaitre le numÃ©ro de l'item selectionnÃ© dans la liste
+/// Connaitre le numéro de l'item selectionné dans la liste
 ////////////////////////////////////////////////////////////
 Layer* EditorLayers::GetSelectedLayer()
 {
@@ -392,7 +396,7 @@ Layer* EditorLayers::GetSelectedLayer()
 }
 
 ////////////////////////////////////////////////////////////
-/// Selection d'un item : Mise Ã  jour du calque selectionnÃ©
+/// Selection d'un item : Mise à jour du calque selectionné
 ////////////////////////////////////////////////////////////
 void EditorLayers::OnlayersListItemActivated(wxListEvent& event)
 {
@@ -460,7 +464,7 @@ void EditorLayers::EditSelectedLayer()
 }
 
 ////////////////////////////////////////////////////////////
-/// Clic sur le bouton d'Ã©dition
+/// Clic sur le bouton d'édition
 ////////////////////////////////////////////////////////////
 void EditorLayers::OnEditSelected1(wxCommandEvent& event)
 {
@@ -468,7 +472,7 @@ void EditorLayers::OnEditSelected1(wxCommandEvent& event)
 }
 
 ////////////////////////////////////////////////////////////
-/// Selection d'un item :Mise Ã  jour du calque selectionnÃ©
+/// Selection d'un item :Mise à jour du calque selectionné
 ////////////////////////////////////////////////////////////
 void EditorLayers::OnlayersListItemSelect1(wxListEvent& event)
 {

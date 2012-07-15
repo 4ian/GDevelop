@@ -29,7 +29,7 @@ class ChoiceFile: public wxDialog
 {
 	public:
 
-		ChoiceFile(wxWindow* parent, string file_, Game & game_, Scene & scene_, bool canSelectGroup_);
+		ChoiceFile(wxWindow* parent, string file_, Game & game_, Scene & scene_);
 		virtual ~ChoiceFile();
 
 		//(*Declarations(ChoiceFile)

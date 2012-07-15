@@ -26,10 +26,10 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/TreeItemExpressionInfoData.h"
 #include "GDL/IDE/ExpressionsCorrectnessTesting.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
+#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDL/IDE/Dialogs/AdvancedTextEntryDlg.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 
@@ -648,7 +648,7 @@ string EditExpression::ShowParameterDialog(const gd::ParameterMetadata & paramet
 {
     if ( parameterMetadata.type == "expression" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterMetadata.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, ToString(_("Paramètre")), parameterMetadata.description, "0", AdvancedTextEntryDlg::MathExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -656,7 +656,7 @@ string EditExpression::ShowParameterDialog(const gd::ParameterMetadata & paramet
     }
     else if ( parameterMetadata.type == "string" )
     {
-        AdvancedTextEntryDlg dialog(this, string(_("Paramètre").mb_str()), parameterMetadata.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
+        AdvancedTextEntryDlg dialog(this, ToString(_("Paramètre")), parameterMetadata.description, "\"\"", AdvancedTextEntryDlg::TextExpression, &game, &scene);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -664,10 +664,10 @@ string EditExpression::ShowParameterDialog(const gd::ParameterMetadata & paramet
     }
     else if ( parameterMetadata.type == "object" )
     {
-        ChooseObject Dialog(this, game, scene, true, parameterMetadata.supplementaryInformation);
-        if ( Dialog.ShowModal() == 0 ) return "";
+        gd::ChooseObjectDialog dialog(this, game, scene, true, parameterMetadata.supplementaryInformation);
+        if ( dialog.ShowModal() == 0 ) return "";
 
-        return Dialog.objectChosen;
+        return dialog.GetChosenObject();
     }
     else if ( parameterMetadata.type == "layer" )
     {
@@ -727,9 +727,9 @@ void EditExpression::OnAddPropBtClick(wxCommandEvent& event)
 
             if ( i == 1 && infos->GetExpressionMetadata().parameters[i].type == "automatism" )
             {
-                ChooseAutomatismDlg dialog(this, game, scene, object, infos->GetExpressionMetadata().parameters[i].supplementaryInformation);
+                gd::ChooseAutomatismDialog dialog(this, game, scene, object, infos->GetExpressionMetadata().parameters[i].supplementaryInformation);
                 if ( dialog.ShowModal() == 1 )
-                    automatismStr = dialog.automatismChosen+"::";
+                    automatismStr = dialog.GetChosenAutomatism()+"::";
             }
             else
             {

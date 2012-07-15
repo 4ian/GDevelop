@@ -498,6 +498,8 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
         }
     }
 
+    resourcesTree->ExpandAll();
+
     if ( !alreadyExistingResources.empty() )
         wxLogMessage(wxString(_("Des images portant le même nom sont déjà présentes, et n'ont pas été ajoutées à la liste de toutes les images :")+alreadyExistingResources));
 }

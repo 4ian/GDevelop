@@ -34174,7 +34174,7 @@
 	<wx/dialog.h>
 	"GDL/ResourcesManager.h"
 
-1341263271 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\resourceseditor.cpp
+1342043423 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\resourceseditor.cpp
 	"GDL/IDE/Dialogs/ResourcesEditor.h"
 	<wx/msw/winundef.h>
 	<wx/bitmap.h>
@@ -34244,7 +34244,7 @@
 	<boost/shared_ptr.hpp>
 	"GDL/IDE/ArbitraryResourceWorker.h"
 
-1341952446 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
+1342199300 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
 	"SpriteObjectEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -34269,7 +34269,7 @@
 	<wx/msw/winundef.h>
 	<wx/msw/uxtheme.h>
 
-1341950622 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\spriteobjecteditor.h
+1342022151 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\spriteobjecteditor.h
 	<wx/listctrl.h>
 	<wx/treectrl.h>
 	<wx/sizer.h>
@@ -34279,6 +34279,7 @@
 	<wx/panel.h>
 	<wx/scrolbar.h>
 	<wx/dialog.h>
+	<wx/timer.h>
 	<wx/dnd.h>
 	<vector>
 
@@ -34629,7 +34630,7 @@
 1337097711 d:\florian\programmation\gamedevelop2\gdl\gdl\events\eventscodenamemangler.h
 	<string>
 
-1294511659 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editforeachevent.h
+1342299091 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editforeachevent.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -34683,7 +34684,7 @@
 	<wx/dialog.h>
 	"GDL/CommentEvent.h"
 
-1337199495 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editexpression.cpp
+1342298938 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editexpression.cpp
 	"EditExpression.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -34702,10 +34703,10 @@
 	"GDL/ExtensionsManager.h"
 	"GDL/IDE/TreeItemExpressionInfoData.h"
 	"GDL/IDE/ExpressionsCorrectnessTesting.h"
-	"GDL/IDE/Dialogs/ChooseObject.h"
+	"GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 	"GDL/IDE/Dialogs/ChooseLayer.h"
 	"GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-	"GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
+	"GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 	"GDL/IDE/Dialogs/AdvancedTextEntryDlg.h"
 	"GDCore/Tools/HelpFileAccess.h"
 	<string>
@@ -34726,7 +34727,7 @@
 	<string>
 	<vector>
 
-1326061999 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editforeachevent.cpp
+1342299431 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editforeachevent.cpp
 	"EditForEachEvent.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -34734,10 +34735,12 @@
 	<wx/image.h>
 	<wx/string.h>
 	"GDL/ForEachEvent.h"
-	"GDL/IDE/Dialogs/ChooseObject.h"
+	"GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 	"GDL/CommonTools.h"
+	"GDL/Game.h"
+	"GDL/Scene.h"
 
-1294511659 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editforeachevent.h
+1342299091 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editforeachevent.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -34799,7 +34802,7 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1337199495 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\edittextdialog.cpp
+1342298938 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\edittextdialog.cpp
 	"EditTextDialog.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -34807,7 +34810,7 @@
 	<wx/stc/stc.h>
 	"GDL/ExtensionBase.h"
 	"GDL/IDE/Dialogs/EditExpression.h"
-	"GDL/IDE/Dialogs/ChooseObject.h"
+	"GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 	"GDL/IDE/Dialogs/ChooseLayer.h"
 	"GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 	<wx/textdlg.h>
@@ -34819,7 +34822,7 @@
 	"GDL/ExtensionsManager.h"
 	"GDL/IDE/gdTreeItemStringData.h"
 	"GDL/IDE/TreeItemStrExpressionInfoData.h"
-	"GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
+	"GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 	"GDL/IDE/Dialogs/AdvancedTextEntryDlg.h"
 	"GDCore/Tools/HelpFileAccess.h"
 	"GDL/IDE/ExpressionsCorrectnessTesting.h"
@@ -34919,7 +34922,7 @@
 	<wx/dialog.h>
 	<wx/stc/stc.h>
 
-1329347475 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editcppcodeevent.cpp
+1342297688 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editcppcodeevent.cpp
 	"EditCppCodeEvent.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -34936,7 +34939,7 @@
 	"GDL/CppCodeEvent.h"
 	"GDL/CommonTools.h"
 	"GDL/IDE/CodeCompiler.h"
-	"GDL/IDE/Dialogs/ChooseObject.h"
+	"GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 
 1329263268 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editcppcodeevent.h
 	<wx/sizer.h>
@@ -35210,7 +35213,7 @@
 	<SFML/System.hpp>
 	"GDL/IDE/CodeCompiler.h"
 
-1329350532 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\projectupdatedlg.cpp
+1342009526 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\projectupdatedlg.cpp
 	"ProjectUpdateDlg.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -35219,7 +35222,7 @@
 	<wx/string.h>
 	<string>
 
-1329350532 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\projectupdatedlg.h
+1342009525 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\projectupdatedlg.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -35230,7 +35233,7 @@
 	<wx/dialog.h>
 	<string>
 
-1329350532 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\projectupdatedlg.h
+1342009525 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\projectupdatedlg.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
@@ -35268,7 +35271,7 @@
 	<boost/weak_ptr.hpp>
 	"GDCore/Events/Instruction.h"
 
-1341940919 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\commonbitmapmanager.h
+1342295282 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\commonbitmapmanager.h
 	<wx/bitmap.h>
 
 1337021284 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\eventsrenderinghelper.h
@@ -35791,7 +35794,7 @@
 1340533670 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dndresourceseditor.h
 	<wx/dnd.h>
 
-1341950622 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.h
+1342022151 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.h
 	<wx/listctrl.h>
 	<wx/treectrl.h>
 	<wx/sizer.h>
@@ -35801,6 +35804,7 @@
 	<wx/panel.h>
 	<wx/scrolbar.h>
 	<wx/dialog.h>
+	<wx/timer.h>
 	<wx/dnd.h>
 	<vector>
 
@@ -35901,4 +35905,34 @@
 	<dlfcn.h>
 	<dl.h>
 	<CodeFragments.h>
+
+1342298821 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\dialogs\chooseobjectdialog.h
+	<string>
+	<vector>
+	<wx/treectrl.h>
+	<wx/notebook.h>
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/menu.h>
+	<wx/textctrl.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<wx/imaglist.h>
+	<wx/srchctrl.h>
+
+1342298660 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\dialogs\chooseautomatismdialog.h
+	<wx/sizer.h>
+	<wx/stattext.h>
+	<wx/textctrl.h>
+	<wx/listbox.h>
+	<wx/statline.h>
+	<wx/panel.h>
+	<wx/statbmp.h>
+	<wx/button.h>
+	<wx/dialog.h>
+	<wx/srchctrl.h>
+	<string>
 

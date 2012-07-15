@@ -18,7 +18,7 @@
 #include "GDL/CppCodeEvent.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/CodeCompiler.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 
 //(*IdInit(EditCppCodeEvent)
 const long EditCppCodeEvent::ID_STATICBITMAP3 = wxNewId();
@@ -286,9 +286,9 @@ void EditCppCodeEvent::OncancelBtClick(wxCommandEvent& event)
 
 void EditCppCodeEvent::OnobjectBtClick(wxCommandEvent& event)
 {
-    ChooseObject dialog(this, game, scene, true);
+    gd::ChooseObjectDialog dialog(this, game, scene, true);
     if ( dialog.ShowModal() == 1 )
-        objectPassedAsParameterEdit->ChangeValue(dialog.objectChosen);
+        objectPassedAsParameterEdit->ChangeValue(dialog.GetChosenObject());
 
     return;
 }

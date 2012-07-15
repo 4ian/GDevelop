@@ -59,13 +59,14 @@ wxBitmap Rescale(wxBitmap bmp, int max_width, int max_height) {
 }
 
 //(*IdInit(SpriteObjectEditor)
+const long SpriteObjectEditor::ID_MASKITEM = wxNewId();
+const long SpriteObjectEditor::ID_POINTSITEM = wxNewId();
+const long SpriteObjectEditor::ID_AUITOOLBARITEM2 = wxNewId();
+const long SpriteObjectEditor::ID_AUITOOLBAR1 = wxNewId();
+const long SpriteObjectEditor::ID_PANEL6 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL4 = wxNewId();
 const long SpriteObjectEditor::ID_SCROLLBAR1 = wxNewId();
 const long SpriteObjectEditor::ID_SCROLLBAR2 = wxNewId();
-const long SpriteObjectEditor::ID_MASKITEM = wxNewId();
-const long SpriteObjectEditor::ID_POINTSITEM = wxNewId();
-const long SpriteObjectEditor::ID_AUITOOLBAR1 = wxNewId();
-const long SpriteObjectEditor::ID_PANEL6 = wxNewId();
 const long SpriteObjectEditor::ID_STATICTEXT1 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL1 = wxNewId();
 const long SpriteObjectEditor::ID_TREECTRL1 = wxNewId();
@@ -87,9 +88,12 @@ const long SpriteObjectEditor::ID_AUITOOLBAR2 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL7 = wxNewId();
 const long SpriteObjectEditor::ID_LISTCTRL3 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL5 = wxNewId();
+const long SpriteObjectEditor::ID_PANEL10 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM5 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM6 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM4 = wxNewId();
+const long SpriteObjectEditor::ID_MENUTIMEBETWEENFRAMES = wxNewId();
+const long SpriteObjectEditor::ID_MENULOOP = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM1 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM2 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM3 = wxNewId();
@@ -99,6 +103,7 @@ const long SpriteObjectEditor::ID_MENUITEM9 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM10 = wxNewId();
 const long SpriteObjectEditor::ID_POSITIONMASKITEM = wxNewId();
 const long SpriteObjectEditor::ID_RESIZEMASKITEM = wxNewId();
+const long SpriteObjectEditor::ID_TIMER1 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SpriteObjectEditor,wxDialog)
@@ -120,6 +125,8 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
     selectedBox(0),
     xSelectionOffset(0),
     ySelectionOffset(0),
+    previewElapsedTime(0),
+    previewCurrentSprite(0),
     mainEditorCommand(mainEditorCommand_)
 {
 	//(*Initialize(SpriteObjectEditor)
@@ -128,6 +135,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
+	wxFlexGridSizer* FlexGridSizer8;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
 
@@ -136,7 +144,22 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	centerPanel = new wxPanel(this, ID_PANEL1, wxPoint(107,155), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
-	FlexGridSizer3->AddGrowableRow(0);
+	FlexGridSizer3->AddGrowableRow(1);
+	FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer8->AddGrowableCol(0);
+	FlexGridSizer8->AddGrowableRow(0);
+	toolbarPanel = new wxPanel(centerPanel, ID_PANEL6, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL6"));
+	AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
+	toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	toolbar->AddTool(ID_MASKITEM, _("Editer les masques de collision"), gd::CommonBitmapManager::GetInstance()->maskEdit16, wxNullBitmap, wxITEM_CHECK, _("Editer les masques de collision"), wxEmptyString, NULL);
+	toolbar->AddTool(ID_POINTSITEM, _("Editer les points de l\'image"), gd::CommonBitmapManager::GetInstance()->pointEdit16, wxNullBitmap, wxITEM_CHECK, _("Editer les points de l\'image"), wxEmptyString, NULL);
+	toolbar->AddSeparator();
+	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Aperçu"), gd::CommonBitmapManager::GetInstance()->preview16, wxNullBitmap, wxITEM_NORMAL, _("Aperçu"), wxEmptyString, NULL);
+	toolbar->Realize();
+	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
+	AuiManager1->Update();
+	FlexGridSizer8->Add(toolbarPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer3->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer4->AddGrowableRow(0);
@@ -151,18 +174,9 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	FlexGridSizer4->Add(xScrollBar, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
-	FlexGridSizer7->AddGrowableCol(1);
-	toolbarPanel = new wxPanel(centerPanel, ID_PANEL6, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL6"));
-	AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
-	toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	toolbar->AddTool(ID_MASKITEM, _("Item label"), gd::CommonBitmapManager::GetInstance()->maskEdit16, wxNullBitmap, wxITEM_CHECK, wxEmptyString, wxEmptyString, NULL);
-	toolbar->AddTool(ID_POINTSITEM, _("Item label"), gd::CommonBitmapManager::GetInstance()->pointEdit16, wxNullBitmap, wxITEM_CHECK, wxEmptyString, wxEmptyString, NULL);
-	toolbar->Realize();
-	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
-	AuiManager1->Update();
-	FlexGridSizer7->Add(toolbarPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	statusTxt = new wxStaticText(centerPanel, ID_STATICTEXT1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_RIGHT, _T("ID_STATICTEXT1"));
-	FlexGridSizer7->Add(statusTxt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer7->AddGrowableCol(0);
+	statusTxt = new wxStaticText(centerPanel, ID_STATICTEXT1, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxALIGN_LEFT, _T("ID_STATICTEXT1"));
+	FlexGridSizer7->Add(statusTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	centerPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(centerPanel);
@@ -233,6 +247,8 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	FlexGridSizer5->Fit(pointsPanel);
 	FlexGridSizer5->SetSizeHints(pointsPanel);
 	mgr->AddPane(pointsPanel, wxAuiPaneInfo().Name(_T("pointsPane")).Caption(_("Points")).CaptionVisible().Right());
+	previewPanel = new wxPanel(this, ID_PANEL10, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL10"));
+	mgr->AddPane(previewPanel, wxAuiPaneInfo().Name(_T("previewPane")).Caption(_("Aperçu")).CaptionVisible().Left());
 	mgr->Update();
 	MenuItem2 = new wxMenu();
 	automaticRotationItem = new wxMenuItem(MenuItem2, ID_MENUITEM5, _("Rotation automatique"), wxEmptyString, wxITEM_RADIO);
@@ -240,12 +256,17 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	multipleDirectionsItem = new wxMenuItem(MenuItem2, ID_MENUITEM6, _("8 directions"), wxEmptyString, wxITEM_RADIO);
 	MenuItem2->Append(multipleDirectionsItem);
 	animationsMenu.Append(ID_MENUITEM4, _("Type"), MenuItem2, wxEmptyString);
+	MenuItem7 = new wxMenuItem((&animationsMenu), ID_MENUTIMEBETWEENFRAMES, _("Temps entre chaque image :"), wxEmptyString, wxITEM_NORMAL);
+	animationsMenu.Append(MenuItem7);
+	MenuItem8 = new wxMenuItem((&animationsMenu), ID_MENULOOP, _("Boucler l\'animation"), wxEmptyString, wxITEM_CHECK);
+	animationsMenu.Append(MenuItem8);
 	animationsMenu.AppendSeparator();
 	MenuItem1 = new wxMenuItem((&animationsMenu), ID_MENUITEM1, _("Ajouter une animation"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem1->SetBitmap(gd::CommonBitmapManager::GetInstance()->add16);
 	animationsMenu.Append(MenuItem1);
 	animationsMenu.AppendSeparator();
 	deleteItem = new wxMenuItem((&animationsMenu), ID_MENUITEM2, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+	deleteItem->SetBitmap(gd::CommonBitmapManager::GetInstance()->remove16);
 	animationsMenu.Append(deleteItem);
 	MenuItem3 = new wxMenuItem((&animationsMenu), ID_MENUITEM3, _("Renommer"), wxEmptyString, wxITEM_NORMAL);
 	animationsMenu.Append(MenuItem3);
@@ -265,15 +286,18 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	maskMenu.Append(MenuItem5);
 	MenuItem6 = new wxMenuItem((&maskMenu), ID_RESIZEMASKITEM, _("Changer la taille"), wxEmptyString, wxITEM_NORMAL);
 	maskMenu.Append(MenuItem6);
+	previewTimer.SetOwner(this, ID_TIMER1);
+	previewTimer.Start(50, false);
 
+	Connect(ID_MASKITEM,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnMaskEditClick);
+	Connect(ID_POINTSITEM,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnPointEditClick);
+	Connect(ID_AUITOOLBARITEM2,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnPreviewClick);
 	imagePanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelPaint,0,this);
 	imagePanel->Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelEraseBackground,0,this);
 	imagePanel->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelLeftDown,0,this);
 	imagePanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelLeftUp,0,this);
 	imagePanel->Connect(wxEVT_MOTION,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelMouseMove,0,this);
 	imagePanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelResize,0,this);
-	Connect(ID_MASKITEM,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnMaskEditClick);
-	Connect(ID_POINTSITEM,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnPointEditClick);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&SpriteObjectEditor::OnanimationsTreeItemRightClick);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&SpriteObjectEditor::OnanimationsTreeSelectionChanged);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListItemSelect);
@@ -290,9 +314,14 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	Connect(ID_LISTCTRL3,wxEVT_COMMAND_LIST_END_LABEL_EDIT,(wxObjectEventFunction)&SpriteObjectEditor::OnpointsListEndLabelEdit);
 	Connect(ID_LISTCTRL3,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnpointsListItemSelect);
 	Connect(ID_LISTCTRL3,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&SpriteObjectEditor::OnpointsListItemActivated);
+	previewPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&SpriteObjectEditor::OnpreviewPanelPaint,0,this);
+	previewPanel->Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&SpriteObjectEditor::OnpreviewPanelEraseBackground,0,this);
+	previewPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&SpriteObjectEditor::OnpreviewPanelResize,0,this);
 	mgr->Connect(wxEVT_AUI_PANE_CLOSE,(wxObjectEventFunction)&SpriteObjectEditor::OnmgrPaneClose,0,this);
 	Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnautomaticRotationItemSelected);
 	Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnmultipleDirectionsItemSelected);
+	Connect(ID_MENUTIMEBETWEENFRAMES,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnTimeBetweenFramesSelected);
+	Connect(ID_MENULOOP,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMenuLoopSelected);
 	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddAnimationSelected);
 	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnDeleteAnimationSelected);
 	Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnremoveImageItemSelected);
@@ -300,6 +329,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMoveRightSelected);
 	Connect(ID_POSITIONMASKITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnPositionMaskSelected);
 	Connect(ID_RESIZEMASKITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnResizeMaskSelected);
+	Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&SpriteObjectEditor::OnpreviewTimerTrigger);
 	//*)
 
     wxImageList * iconList = new wxImageList(16,16);
@@ -320,7 +350,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 
     resourcesEditorPnl = new ResourcesEditor( this, game, mainEditorCommand );
     resourcesEditorPnl->Refresh();
-    mgr->AddPane( resourcesEditorPnl, wxAuiPaneInfo().Name( "ResourcesEditor" ).Right().CloseButton( true ).Caption( _( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(true) );
+    mgr->AddPane( resourcesEditorPnl, wxAuiPaneInfo().Name( "ResourcesEditor" ).Right().CloseButton( false ).Caption( _( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(true) );
 
     #if defined(__WXMSW__) //Offer nice look to controls
     wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
@@ -332,12 +362,24 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 
     imagesList->SetDropTarget(new DndTextSpriteObjectEditor(*this));
 
+    //Add a default animation if the object has none.
+    if ( object.HasNoAnimations() )
+    {
+        Animation newAnimation;
+        newAnimation.SetDirectionsNumber(1);
+        object.AddAnimation(newAnimation);
+    }
+
+    //Offer nice background color to toolbar area.
+    AuiManager1->GetArtProvider()->SetColour(wxAUI_DOCKART_BACKGROUND_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
+
 	RefreshAll();
 	mgr->GetPane(imagesPanel).MinSize(400,150);
 	mgr->GetPane(resourcesEditorPnl).MinSize(200,150);
 	mgr->GetPane(animationsPanel).MinSize(200,75);
 	mgr->GetPane(maskPanel).MinSize(200,150).Show(false).Float();
 	mgr->GetPane(pointsPanel).MinSize(200,150).Show(false).Float();
+	mgr->GetPane(previewPanel).MinSize(150,150).Show(false).Float();
 	mgr->Update();
 	Layout();
 	SetSize(900,600);
@@ -369,7 +411,7 @@ void SpriteObjectEditor::RefreshAnimationTree()
     for (unsigned int i = 0;i<object.GetAnimationCount();++i)
     {
         Animation & animation = object.GetAnimation(i);
-        wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1, new gdTreeItemStringData(ToString(i), "0"));
+        wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1, new gdTreeItemStringData(ToString(i), ""));
 
         if ( animation.useMultipleDirections )
         {
@@ -453,10 +495,20 @@ void SpriteObjectEditor::OnimagePanelEraseBackground(wxEraseEvent& event)
 {
     //Prevent flickering
 }
+void SpriteObjectEditor::OnpreviewPanelEraseBackground(wxEraseEvent& event)
+{
+    //Prevent flickering
+}
+
 void SpriteObjectEditor::OnimagePanelResize(wxSizeEvent& event)
 {
     imagePanel->Refresh();
     imagePanel->Update();
+}
+void SpriteObjectEditor::OnpreviewPanelResize(wxSizeEvent& event)
+{
+    previewPanel->Refresh();
+    previewPanel->Update();
 }
 
 
@@ -541,6 +593,33 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
     }
 
 }
+
+void SpriteObjectEditor::OnpreviewPanelPaint(wxPaintEvent& event)
+{
+    previewPanel->SetBackgroundStyle( wxBG_STYLE_PAINT );
+    wxBufferedPaintDC dc( previewPanel );
+    wxSize size = previewPanel->GetSize();
+
+    //Checkerboard background
+    dc.SetBrush(gd::CommonBitmapManager::GetInstance()->transparentBg);
+    dc.DrawRectangle(0,0, previewPanel->GetSize().GetWidth(), previewPanel->GetSize().GetHeight());
+
+    if ( selectedAnimation < object.GetAnimationCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() &&
+         previewCurrentSprite < object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSpriteCount() )
+    {
+        //Draw the sprite
+        const Sprite & sprite = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSprite(previewCurrentSprite);
+        wxBitmap bmp = GetwxBitmapFromImageResource(game.resourceManager.GetResource(sprite.GetImageName()));
+
+        spritePosX = (size.GetWidth() - bmp.GetWidth()) / 2;
+        spritePosY = (size.GetHeight() - bmp.GetHeight()) / 2;
+
+        //Draw border rectangle and the sprite
+        dc.DrawBitmap(bmp, spritePosX, spritePosY, /*useMask=*/true);
+    }
+}
+
 
 void SpriteObjectEditor::RefreshPoints()
 {
@@ -631,7 +710,7 @@ void SpriteObjectEditor::OnanimationsTreeSelectionChanged(wxTreeEvent& event)
     if ( gdTreeItemStringData * itemData = dynamic_cast<gdTreeItemStringData*>(animationsTree->GetItemData(event.GetItem())) )
     {
         unsigned int newAnimation = ToInt(itemData->GetString());
-        unsigned int newDirection = ToInt(itemData->GetSecondString());
+        unsigned int newDirection = itemData->GetSecondString().empty() ? 0 : ToInt(itemData->GetSecondString());
 
         if ( newAnimation != selectedAnimation || newDirection != selectedDirection )
         {
@@ -641,6 +720,7 @@ void SpriteObjectEditor::OnanimationsTreeSelectionChanged(wxTreeEvent& event)
 
             RefreshImagesList();
             RefreshImageAndControls();
+            ResetPreview();
         }
     }
 }
@@ -676,8 +756,32 @@ void SpriteObjectEditor::OnanimationsTreeItemRightClick(wxTreeEvent& event)
         automaticRotationItem->Check(!object.GetAnimation(selectedAnimation).useMultipleDirections);
         multipleDirectionsItem->Check(object.GetAnimation(selectedAnimation).useMultipleDirections);
     }
-
     animationsMenu.Enable(deleteItem->GetId(), object.GetAnimationCount() > 1);
+
+    if ( selectedAnimation < object.GetAnimationCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    {
+        Direction & direction = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection);
+
+        if ( gdTreeItemStringData * itemData = dynamic_cast<gdTreeItemStringData*>(animationsTree->GetItemData(event.GetItem())) )
+        {
+            //Deactivate some buttons when no direction is selected
+            if (itemData->GetSecondString().empty() && object.GetAnimation(selectedAnimation).useMultipleDirections)
+            {
+                animationsMenu.Enable(ID_MENULOOP, false);
+                animationsMenu.Enable(ID_MENUTIMEBETWEENFRAMES, false);
+                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Temps entre chaque image"));
+            }
+            else
+            {
+                animationsMenu.Enable(ID_MENULOOP, true);
+                animationsMenu.Enable(ID_MENUTIMEBETWEENFRAMES, true);
+                animationsMenu.Check(ID_MENULOOP, direction.IsLooping());
+                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Temps entre chaque image : ")+ToString(direction.GetTimeBetweenFrames())+_("s"));
+            }
+        }
+    }
+
     PopupMenu(&animationsMenu);
 }
 
@@ -1193,4 +1297,67 @@ void SpriteObjectEditor::OnmaskListItemRClick(wxListEvent& event)
     maskMenu.Enable(ID_RESIZEMASKITEM, !sprites.empty() && !sprites[0]->IsCollisionMaskAutomatic());
 
     PopupMenu(&maskMenu);
+}
+
+void SpriteObjectEditor::OnMenuLoopSelected(wxCommandEvent& event)
+{
+    if ( selectedAnimation < object.GetAnimationCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    {
+        Direction & direction = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection);
+        direction.SetLoop(animationsMenu.IsChecked(ID_MENULOOP));
+    }
+}
+
+void SpriteObjectEditor::OnTimeBetweenFramesSelected(wxCommandEvent& event)
+{
+    if ( selectedAnimation < object.GetAnimationCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    {
+        Direction & direction = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection);
+        direction.SetTimeBetweenFrames(ToFloat(ToString(wxGetTextFromUser(_("Entrez le temps entre chaque image ( en secondes )"),
+                                                                          _("Temps entre chaque image"),
+                                                                          ToString(direction.GetTimeBetweenFrames())))));
+    }
+}
+
+void SpriteObjectEditor::OnpreviewTimerTrigger(wxTimerEvent& event)
+{
+    previewElapsedTime += previewTimer.GetInterval();
+    if ( selectedAnimation < object.GetAnimationCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    {
+        const Direction & direction = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection);
+        if ( previewElapsedTime > direction.GetTimeBetweenFrames()*1000.0f )
+        {
+            previewElapsedTime = 0;
+            previewCurrentSprite++;
+            if ( previewCurrentSprite >= direction.GetSpriteCount() )
+            {
+                if (direction.IsLooping())
+                    previewCurrentSprite = 0;
+                else
+                    previewCurrentSprite = direction.GetSpriteCount()-1;
+            }
+
+            previewPanel->Refresh();
+            previewPanel->Update();
+        }
+    }
+}
+
+void SpriteObjectEditor::ResetPreview()
+{
+    previewElapsedTime = 0;
+    previewCurrentSprite = 0;
+
+    previewPanel->Refresh();
+    previewPanel->Update();
+}
+
+void SpriteObjectEditor::OnPreviewClick(wxCommandEvent& event)
+{
+    ResetPreview();
+    mgr->GetPane(previewPanel).Show(true);
+    mgr->Update();
 }

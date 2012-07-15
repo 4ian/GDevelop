@@ -14,7 +14,7 @@
 #include <wx/stc/stc.h>
 #include "GDL/ExtensionBase.h"
 #include "GDL/IDE/Dialogs/EditExpression.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDL/IDE/Dialogs/ChooseLayer.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include <wx/textdlg.h>
@@ -26,7 +26,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/gdTreeItemStringData.h"
 #include "GDL/IDE/TreeItemStrExpressionInfoData.h"
-#include "GDL/IDE/Dialogs/ChooseAutomatismDlg.h"
+#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDL/IDE/Dialogs/AdvancedTextEntryDlg.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/IDE/ExpressionsCorrectnessTesting.h"
@@ -420,10 +420,10 @@ string EditTextDialog::ShowParameterDialog(const gd::ParameterMetadata & paramet
     }
     else if ( parameterMetadata.type == "object" )
     {
-        ChooseObject Dialog(this, game, scene, true, parameterMetadata.supplementaryInformation);
-        if ( Dialog.ShowModal() == 0 ) return "";
+        gd::ChooseObjectDialog dialog(this, game, scene, true, parameterMetadata.supplementaryInformation);
+        if ( dialog.ShowModal() == 0 ) return "";
 
-        return Dialog.objectChosen;
+        return dialog.GetChosenObject();
     }
     else if ( parameterMetadata.type == "string" )
     {
@@ -545,9 +545,9 @@ void EditTextDialog::OnAddPropBtClick(wxCommandEvent& event)
         {
             if ( i == 1 && infos->GetStrExpressionMetadata().parameters[i].type == "automatism")
             {
-                ChooseAutomatismDlg dialog(this, game, scene, object, infos->GetStrExpressionMetadata().parameters[i].supplementaryInformation);
+                gd::ChooseAutomatismDialog dialog(this, game, scene, object, infos->GetStrExpressionMetadata().parameters[i].supplementaryInformation);
                 if ( dialog.ShowModal() == 1 )
-                    automatismStr = dialog.automatismChosen+"::";
+                    automatismStr = dialog.GetChosenAutomatism()+"::";
             }
             else
             {

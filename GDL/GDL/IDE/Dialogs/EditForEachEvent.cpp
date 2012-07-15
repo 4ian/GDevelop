@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #if defined(GD_IDE_ONLY)
 #include "EditForEachEvent.h"
 
@@ -9,10 +14,10 @@
 #include <wx/string.h>
 //*)
 #include "GDL/ForEachEvent.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDL/CommonTools.h"
-class Game;
-class Scene;
+#include "GDL/Game.h"
+#include "GDL/Scene.h"
 
 //(*IdInit(EditForEachEvent)
 const long EditForEachEvent::ID_STATICBITMAP3 = wxNewId();
@@ -115,9 +120,9 @@ void EditForEachEvent::OncancelBtClick(wxCommandEvent& event)
 
 void EditForEachEvent::OnobjectBtClick(wxCommandEvent& event)
 {
-    ChooseObject dialog(this, game, scene, true);
+    gd::ChooseObjectDialog dialog(this, game, scene, true);
     if ( dialog.ShowModal() == 1 )
-        objectEdit->ChangeValue(dialog.objectChosen);
+        objectEdit->ChangeValue(dialog.GetChosenObject());
 
     return;
 }

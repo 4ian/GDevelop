@@ -16,6 +16,7 @@
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
 #include <wx/dialog.h>
+#include <wx/timer.h>
 //*)
 #include <wx/dnd.h>
 #include <vector>
@@ -43,9 +44,11 @@ public:
     wxAuiManager* AuiManager1;
     wxMenu* MenuItem2;
     wxTreeCtrl* animationsTree;
+    wxMenuItem* MenuItem8;
     wxListCtrl* pointsList;
     wxPanel* toolbarPanel;
     wxAuiToolBar* toolbar;
+    wxMenuItem* MenuItem7;
     wxAuiToolBar* pointToolbar;
     wxAuiManager* mgr;
     wxStaticText* statusTxt;
@@ -62,12 +65,14 @@ public:
     wxAuiToolBar* maskToolbar;
     wxPanel* animationsPanel;
     wxScrollBar* xScrollBar;
+    wxTimer previewTimer;
     wxMenuItem* MenuItem3;
     wxAuiManager* AuiManager3;
     wxPanel* imagePanel;
     wxScrollBar* yScrollBar;
     wxMenuItem* moveLeftItem;
     wxMenuItem* MenuItem6;
+    wxPanel* previewPanel;
     wxPanel* maskPanel;
     wxMenuItem* moveRightItem;
     wxMenuItem* automaticRotationItem;
@@ -83,13 +88,14 @@ public:
 protected:
 
     //(*Identifiers(SpriteObjectEditor)
+    static const long ID_MASKITEM;
+    static const long ID_POINTSITEM;
+    static const long ID_AUITOOLBARITEM2;
+    static const long ID_AUITOOLBAR1;
+    static const long ID_PANEL6;
     static const long ID_PANEL4;
     static const long ID_SCROLLBAR1;
     static const long ID_SCROLLBAR2;
-    static const long ID_MASKITEM;
-    static const long ID_POINTSITEM;
-    static const long ID_AUITOOLBAR1;
-    static const long ID_PANEL6;
     static const long ID_STATICTEXT1;
     static const long ID_PANEL1;
     static const long ID_TREECTRL1;
@@ -111,9 +117,12 @@ protected:
     static const long ID_PANEL7;
     static const long ID_LISTCTRL3;
     static const long ID_PANEL5;
+    static const long ID_PANEL10;
     static const long ID_MENUITEM5;
     static const long ID_MENUITEM6;
     static const long ID_MENUITEM4;
+    static const long ID_MENUTIMEBETWEENFRAMES;
+    static const long ID_MENULOOP;
     static const long ID_MENUITEM1;
     static const long ID_MENUITEM2;
     static const long ID_MENUITEM3;
@@ -123,6 +132,7 @@ protected:
     static const long ID_MENUITEM10;
     static const long ID_POSITIONMASKITEM;
     static const long ID_RESIZEMASKITEM;
+    static const long ID_TIMER1;
     //*)
 
 private:
@@ -161,6 +171,14 @@ private:
     void OnResizeMaskSelected(wxCommandEvent& event);
     void OnmaskListItemActivated(wxListEvent& event);
     void OnmaskListItemRClick(wxListEvent& event);
+    void OnMenuLoopSelected(wxCommandEvent& event);
+    void OnTimeBetweenFramesSelected(wxCommandEvent& event);
+    void OnpreviewPanelEraseBackground(wxEraseEvent& event);
+    void OnpreviewPanelResize(wxSizeEvent& event);
+    void OnpreviewPanelPaint(wxPaintEvent& event);
+    void OnTimer1Trigger(wxTimerEvent& event);
+    void OnpreviewTimerTrigger(wxTimerEvent& event);
+    void OnPreviewClick(wxCommandEvent& event);
     //*)
     void RefreshAll();
     void RefreshAnimationTree();
@@ -168,6 +186,7 @@ private:
     void RefreshImageAndControls();
     void RefreshPoints();
     void RefreshCollisionMasks();
+    void ResetPreview();
     wxBitmap GetwxBitmapFromImageResource(Resource & resource);
 
     /**
@@ -199,6 +218,9 @@ private:
     unsigned int selectedBox;
     float xSelectionOffset;
     float ySelectionOffset;
+
+    float previewElapsedTime;
+    int previewCurrentSprite;
 
     MainEditorCommand & mainEditorCommand;
 };

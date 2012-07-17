@@ -33,19 +33,16 @@
 
 //(*IdInit(EditTextDialog)
 const long EditTextDialog::ID_CUSTOM1 = wxNewId();
-const long EditTextDialog::ID_HYPERLINKCTRL1 = wxNewId();
 const long EditTextDialog::ID_BUTTON2 = wxNewId();
-const long EditTextDialog::ID_BUTTON1 = wxNewId();
+const long EditTextDialog::ID_HYPERLINKCTRL1 = wxNewId();
 const long EditTextDialog::ID_BUTTON4 = wxNewId();
-const long EditTextDialog::ID_STATICTEXT1 = wxNewId();
+const long EditTextDialog::ID_PANEL1 = wxNewId();
 const long EditTextDialog::ID_TREECTRL1 = wxNewId();
 const long EditTextDialog::ID_BUTTON10 = wxNewId();
-const long EditTextDialog::ID_STATICTEXT4 = wxNewId();
+const long EditTextDialog::ID_PANEL2 = wxNewId();
 const long EditTextDialog::ID_TREECTRL2 = wxNewId();
 const long EditTextDialog::ID_BUTTON7 = wxNewId();
-const long EditTextDialog::ID_STATICTEXT2 = wxNewId();
-const long EditTextDialog::ID_BUTTON3 = wxNewId();
-const long EditTextDialog::ID_STATICLINE2 = wxNewId();
+const long EditTextDialog::ID_PANEL3 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(EditTextDialog,wxDialog)
@@ -59,95 +56,71 @@ scene(scene_),
 lastErrorPos(std::string::npos)
 {
 	//(*Initialize(EditTextDialog)
-	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer10;
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer9;
-	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
-	wxFlexGridSizer* FlexGridSizer8;
-	wxBoxSizer* BoxSizer1;
-	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
-	wxFlexGridSizer* FlexGridSizer11;
 
 	Create(parent, wxID_ANY, _("Editer le texte"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/texteicon.png"))));
 	SetIcon(FrameIcon);
+	mgr = new wxAuiManager(this, wxAUI_MGR_DEFAULT);
+	centerPanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
 	FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer9->AddGrowableCol(0);
 	FlexGridSizer9->AddGrowableRow(0);
-	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
 	FlexGridSizer3->AddGrowableRow(0);
-	TexteEdit = new wxStyledTextCtrl(this,ID_CUSTOM1,wxDefaultPosition,wxSize(460,110),0,_T("ID_CUSTOM1"));
+	TexteEdit = new wxStyledTextCtrl(centerPanel,ID_CUSTOM1,wxDefaultPosition,wxSize(300,28),0,_T("ID_CUSTOM1"));
 	FlexGridSizer3->Add(TexteEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	errorTxt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Pas d\'erreurs."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	OkBt = new wxButton(centerPanel, ID_BUTTON2, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	FlexGridSizer3->Add(OkBt, 1, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
+	errorTxt = new wxHyperlinkCtrl(centerPanel, ID_HYPERLINKCTRL1, _("Pas d\'erreurs."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	errorTxt->SetToolTip(_("Cliquer pour positionner le curseur sur l\'erreur."));
 	FlexGridSizer3->Add(errorTxt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	helpBt = new wxButton(centerPanel, ID_BUTTON4, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	FlexGridSizer3->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer8->AddGrowableCol(0);
-	OkBt = new wxButton(this, ID_BUTTON2, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
-	FlexGridSizer8->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	AnnulerBt = new wxButton(this, ID_BUTTON1, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
-	FlexGridSizer8->Add(AnnulerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	helpBt = new wxButton(this, ID_BUTTON4, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
-	FlexGridSizer8->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer9->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer2->AddGrowableCol(0);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Editer le texte"));
-	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer4->AddGrowableCol(0);
-	FlexGridSizer4->AddGrowableRow(0);
-	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
+	centerPanel->SetSizer(FlexGridSizer1);
+	FlexGridSizer1->Fit(centerPanel);
+	FlexGridSizer1->SetSizeHints(centerPanel);
+	mgr->AddPane(centerPanel, wxAuiPaneInfo().Name(_T("centerPane")).Caption(_("Pane caption")).CaptionVisible(false).CloseButton(false).Center().DockFixed().Floatable(false).Movable(false).PaneBorder(false));
+	objectsFunctionsPanel = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
 	FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer7->AddGrowableCol(0);
-	FlexGridSizer7->AddGrowableRow(1);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Propriétés des objets"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
-	FlexGridSizer7->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ObjList = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
-	FlexGridSizer7->Add(ObjList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AddPropBt = new wxButton(this, ID_BUTTON10, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
+	FlexGridSizer7->AddGrowableRow(0);
+	ObjList = new wxTreeCtrl(objectsFunctionsPanel, ID_TREECTRL1, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+	FlexGridSizer7->Add(ObjList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	AddPropBt = new wxButton(objectsFunctionsPanel, ID_BUTTON10, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
 	FlexGridSizer7->Add(AddPropBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BoxSizer1->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	objectsFunctionsPanel->SetSizer(FlexGridSizer7);
+	FlexGridSizer7->Fit(objectsFunctionsPanel);
+	FlexGridSizer7->SetSizeHints(objectsFunctionsPanel);
+	mgr->AddPane(objectsFunctionsPanel, wxAuiPaneInfo().Name(_T("objectsFunctionsPane")).Caption(_("Fonctions d'objets")).CaptionVisible().Bottom());
+	freeFunctionsPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	FlexGridSizer10 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer10->AddGrowableCol(0);
-	FlexGridSizer10->AddGrowableRow(1);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Valeurs spéciales"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
-	FlexGridSizer10->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	ValList = new wxTreeCtrl(this, ID_TREECTRL2, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
-	FlexGridSizer10->Add(ValList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AddFunctionBt = new wxButton(this, ID_BUTTON7, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
+	FlexGridSizer10->AddGrowableRow(0);
+	ValList = new wxTreeCtrl(freeFunctionsPanel, ID_TREECTRL2, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
+	FlexGridSizer10->Add(ValList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	AddFunctionBt = new wxButton(freeFunctionsPanel, ID_BUTTON7, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
 	FlexGridSizer10->Add(AddFunctionBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BoxSizer1->Add(FlexGridSizer10, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer4->Add(BoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Expression numérique :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	FlexGridSizer11->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	InsertBt = new wxButton(this, ID_BUTTON3, _("Insérer une expression numérique"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
-	InsertBt->SetToolTip(_("Permet d\'insérer un calcul, ou la valeur d\'une variable"));
-	FlexGridSizer11->Add(InsertBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer4->Add(FlexGridSizer11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer2->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
-	FlexGridSizer2->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	SetSizer(FlexGridSizer1);
-	FlexGridSizer1->Fit(this);
-	FlexGridSizer1->SetSizeHints(this);
+	freeFunctionsPanel->SetSizer(FlexGridSizer10);
+	FlexGridSizer10->Fit(freeFunctionsPanel);
+	FlexGridSizer10->SetSizeHints(freeFunctionsPanel);
+	mgr->AddPane(freeFunctionsPanel, wxAuiPaneInfo().Name(_T("freeFunctionsPane")).Caption(_("Autres fonctions")).CaptionVisible().Bottom());
+	mgr->Update();
 	Center();
 
-	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditTextDialog::OnerrorTxtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnOkBtClick);
-	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnAnnulerBtClick);
+	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditTextDialog::OnerrorTxtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnhelpBtClick);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&EditTextDialog::OnObjListItemActivated);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&EditTextDialog::OnObjListSelectionChanged);
@@ -155,7 +128,6 @@ lastErrorPos(std::string::npos)
 	Connect(ID_TREECTRL2,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&EditTextDialog::OnTreeCtrl1ItemActivated);
 	Connect(ID_TREECTRL2,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&EditTextDialog::OnTreeCtrl1SelectionChanged);
 	Connect(ID_BUTTON7,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnAddFunctionBtClick);
-	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditTextDialog::OnInsertBtClick);
 	//*)
 	Connect(ID_CUSTOM1, wxEVT_STC_MODIFIED, (wxObjectEventFunction)&EditTextDialog::TextModified);
 	Connect(ID_CUSTOM1, wxEVT_STC_UPDATEUI, (wxObjectEventFunction)&EditTextDialog::UpdateTextCtrl);
@@ -298,6 +270,14 @@ lastErrorPos(std::string::npos)
     ValList->Expand(ValList->GetRootItem());
 
 	TexteEdit->SetLexer(wxSTC_LEX_CPP);
+    #if defined(WINDOWS)
+    wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, "Consolas");
+    #else
+	wxFont font(9, wxFONTFAMILY_TELETYPE, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	#endif
+	TexteEdit->StyleSetFont(wxSTC_STYLE_DEFAULT, font);
+	TexteEdit->StyleClearAll();
+
 	TexteEdit->StyleSetForeground(4, *wxBLACK); //Numbers
 	TexteEdit->StyleSetForeground(10, *wxRED); //Operators
 	TexteEdit->StyleSetForeground(6, *wxBLUE); //String
@@ -354,6 +334,18 @@ lastErrorPos(std::string::npos)
     TexteEdit->SetWrapMode(wxSTC_WRAP_WORD);
     TexteEdit->SetMarginLeft(1);
 
+    mgr->GetArtProvider()->SetColor(wxAUI_DOCKART_SASH_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
+    mgr->GetArtProvider()->SetColor(wxAUI_DOCKART_BACKGROUND_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
+	mgr->GetPane(centerPanel).MinSize(450,50).BestSize(450,50);
+	mgr->GetPane(objectsFunctionsPanel).MinSize(200,300);
+	mgr->GetPane(freeFunctionsPanel).MinSize(200,300);
+	mgr->Update();
+	#if defined(WINDOWS)
+	SetSize(580,500); //Values tuned for looking best on Windows
+	#else
+	SetSize(580,500);
+	#endif
+
 	TexteEdit->SetText(texte);
 	if ( texte.empty() ) TexteEdit->SetText("\"\"");
 }
@@ -362,6 +354,7 @@ EditTextDialog::~EditTextDialog()
 {
 	//(*Destroy(EditTextDialog)
 	//*)
+	mgr->UnInit();
 }
 
 /**
@@ -391,7 +384,7 @@ void EditTextDialog::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditTextDialog::OnOkBtClick(wxCommandEvent& event)
 {
-    returnedText = string(TexteEdit->GetValue().mb_str());
+    returnedText = ToString(TexteEdit->GetValue());
 
     CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
     gd::ExpressionParser expressionParser(returnedText);

@@ -11,6 +11,8 @@
 #include <wx/treectrl.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
+#include <wx/aui/aui.h>
+#include <wx/panel.h>
 #include <wx/hyperlink.h>
 #include <wx/bmpbuttn.h>
 #include <wx/button.h>
@@ -37,13 +39,17 @@ class GD_API EditExpression: public wxDialog
 
 		//(*Declarations(EditExpression)
 		wxButton* SinBt;
+		wxPanel* mathPanel;
 		wxButton* OkBt;
 		wxButton* Button20;
 		wxButton* helpBt;
 		wxButton* Button4;
 		wxButton* DivBt;
+		wxAuiManager* mgr;
+		wxPanel* objectsPanel;
 		wxStaticText* StaticText2;
 		wxButton* AddValBt;
+		wxPanel* centerPanel;
 		wxButton* Button1;
 		wxButton* ceilBt;
 		wxTreeCtrl* ValList;
@@ -51,8 +57,8 @@ class GD_API EditExpression: public wxDialog
 		wxButton* Button14;
 		wxBitmapButton* BitmapButton2;
 		wxStaticText* StaticText1;
-		wxStaticText* StaticText3;
 		wxBitmapButton* BitmapButton1;
+		wxPanel* freeFunctionsPanel;
 		wxTreeCtrl* ObjList;
 		wxButton* Button2;
 		wxButton* Button6;
@@ -75,7 +81,6 @@ class GD_API EditExpression: public wxDialog
 		wxButton* MultBt;
 		wxButton* Button18;
 		wxButton* Button15;
-		wxStaticText* StaticText4;
 		wxButton* Button16;
 		wxButton* PFBt;
 		wxButton* Button8;
@@ -96,6 +101,7 @@ class GD_API EditExpression: public wxDialog
 		static const long ID_BUTTON1;
 		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON34;
+		static const long ID_PANEL1;
 		static const long ID_STATICTEXT1;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON3;
@@ -130,12 +136,13 @@ class GD_API EditExpression: public wxDialog
 		static const long ID_BUTTON31;
 		static const long ID_BUTTON32;
 		static const long ID_BUTTON17;
-		static const long ID_STATICTEXT3;
+		static const long ID_PANEL2;
 		static const long ID_TREECTRL1;
 		static const long ID_BUTTON10;
-		static const long ID_STATICTEXT4;
+		static const long ID_PANEL3;
 		static const long ID_TREECTRL2;
 		static const long ID_BUTTON11;
+		static const long ID_PANEL4;
 		//*)
 
 	private:

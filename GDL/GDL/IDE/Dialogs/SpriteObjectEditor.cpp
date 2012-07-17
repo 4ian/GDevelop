@@ -197,7 +197,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	imagesList = new wxListCtrl(imagesPanel, ID_LISTCTRL1, wxDefaultPosition, wxDefaultSize, wxLC_ICON, wxDefaultValidator, _T("ID_LISTCTRL1"));
+	imagesList = new wxListCtrl(imagesPanel, ID_LISTCTRL1, wxDefaultPosition, wxDefaultSize, wxLC_ICON|wxLC_SINGLE_SEL, wxDefaultValidator, _T("ID_LISTCTRL1"));
 	FlexGridSizer1->Add(imagesList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	imagesPanel->SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(imagesPanel);
@@ -274,12 +274,12 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	MenuItem4->SetBitmap(gd::CommonBitmapManager::GetInstance()->add16);
 	imagesMenu.Append(MenuItem4);
 	imagesMenu.AppendSeparator();
-	removeImageItem = new wxMenuItem((&imagesMenu), ID_MENUITEM8, _("Retirer"), wxEmptyString, wxITEM_NORMAL);
+	removeImageItem = new wxMenuItem((&imagesMenu), ID_MENUITEM8, _("Retirer\tDEL"), wxEmptyString, wxITEM_NORMAL);
 	imagesMenu.Append(removeImageItem);
-	moveLeftItem = new wxMenuItem((&imagesMenu), ID_MENUITEM9, _("Déplacer vers la gauche\tCtrl-Left"), wxEmptyString, wxITEM_NORMAL);
+	moveLeftItem = new wxMenuItem((&imagesMenu), ID_MENUITEM9, _("Déplacer vers la gauche\tJ"), wxEmptyString, wxITEM_NORMAL);
 	moveLeftItem->SetBitmap(gd::CommonBitmapManager::GetInstance()->left16);
 	imagesMenu.Append(moveLeftItem);
-	moveRightItem = new wxMenuItem((&imagesMenu), ID_MENUITEM10, _("Déplacer vers la droite\tCtrl-Right"), wxEmptyString, wxITEM_NORMAL);
+	moveRightItem = new wxMenuItem((&imagesMenu), ID_MENUITEM10, _("Déplacer vers la droite\tK"), wxEmptyString, wxITEM_NORMAL);
 	moveRightItem->SetBitmap(gd::CommonBitmapManager::GetInstance()->right16);
 	imagesMenu.Append(moveRightItem);
 	MenuItem5 = new wxMenuItem((&maskMenu), ID_POSITIONMASKITEM, _("Positionner"), wxEmptyString, wxITEM_NORMAL);
@@ -302,6 +302,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&SpriteObjectEditor::OnanimationsTreeSelectionChanged);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListItemSelect);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListItemRClick);
+	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_KEY_DOWN,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListKeyDown);
 	Connect(ID_AUITOOLBARITEM6,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddMaskClick);
 	Connect(ID_AUITOOLBARITEM7,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnDeleteMaskClick);
 	Connect(ID_AUITOOLBARITEM1,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnDefaultMaskClick);
@@ -1360,4 +1361,30 @@ void SpriteObjectEditor::OnPreviewClick(wxCommandEvent& event)
     ResetPreview();
     mgr->GetPane(previewPanel).Show(true);
     mgr->Update();
+}
+
+void SpriteObjectEditor::OnimagesListKeyDown(wxListEvent& event)
+{
+    switch(event.GetKeyCode()) {
+        case 'J':
+        {
+            wxCommandEvent useless;
+            OnMoveLeftSelected(useless);
+            break;
+        }
+        case 'K':
+        {
+            wxCommandEvent useless;
+            OnMoveRightSelected(useless);
+            break;
+        }
+        case WXK_DELETE:
+        {
+            wxCommandEvent useless;
+            OnremoveImageItemSelected(useless);
+            break;
+        }
+        default:
+            break;
+    }
 }

@@ -10,8 +10,8 @@
 //(*Headers(EditTextDialog)
 #include <wx/treectrl.h>
 #include <wx/sizer.h>
-#include <wx/stattext.h>
-#include <wx/statline.h>
+#include <wx/aui/aui.h>
+#include <wx/panel.h>
 #include <wx/hyperlink.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -33,20 +33,18 @@ class GD_API EditTextDialog: public wxDialog
 		virtual ~EditTextDialog();
 
 		//(*Declarations(EditTextDialog)
+		wxPanel* objectsFunctionsPanel;
 		wxButton* OkBt;
 		wxButton* helpBt;
+		wxAuiManager* mgr;
 		wxButton* AddFunctionBt;
-		wxStaticText* StaticText2;
+		wxPanel* centerPanel;
 		wxTreeCtrl* ValList;
 		wxHyperlinkCtrl* errorTxt;
 		wxStyledTextCtrl* TexteEdit;
-		wxStaticText* StaticText1;
+		wxPanel* freeFunctionsPanel;
 		wxTreeCtrl* ObjList;
-		wxStaticLine* StaticLine2;
 		wxButton* AddPropBt;
-		wxButton* InsertBt;
-		wxButton* AnnulerBt;
-		wxStaticText* StaticText4;
 		//*)
 		string returnedText;
 
@@ -54,19 +52,16 @@ class GD_API EditTextDialog: public wxDialog
 
 		//(*Identifiers(EditTextDialog)
 		static const long ID_CUSTOM1;
-		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON2;
-		static const long ID_BUTTON1;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON4;
-		static const long ID_STATICTEXT1;
+		static const long ID_PANEL1;
 		static const long ID_TREECTRL1;
 		static const long ID_BUTTON10;
-		static const long ID_STATICTEXT4;
+		static const long ID_PANEL2;
 		static const long ID_TREECTRL2;
 		static const long ID_BUTTON7;
-		static const long ID_STATICTEXT2;
-		static const long ID_BUTTON3;
-		static const long ID_STATICLINE2;
+		static const long ID_PANEL3;
 		//*)
 
 	private:

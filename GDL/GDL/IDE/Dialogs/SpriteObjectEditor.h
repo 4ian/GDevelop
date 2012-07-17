@@ -179,6 +179,7 @@ private:
     void OnTimer1Trigger(wxTimerEvent& event);
     void OnpreviewTimerTrigger(wxTimerEvent& event);
     void OnPreviewClick(wxCommandEvent& event);
+    void OnimagesListKeyDown(wxListEvent& event);
     //*)
     void RefreshAll();
     void RefreshAnimationTree();

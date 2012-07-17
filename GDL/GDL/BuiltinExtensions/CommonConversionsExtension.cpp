@@ -10,8 +10,8 @@ CommonConversionsExtension::CommonConversionsExtension()
     #if defined(GD_IDE_ONLY)
 
     DECLARE_EXPRESSION("ToNumber",
-                       _("Convertir en un nombre"),
-                       _("Converti le texte en un nombre"),
+                       _("Texte > Nombre"),
+                       _("Convertit le texte en un nombre"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
 
@@ -22,7 +22,7 @@ CommonConversionsExtension::CommonConversionsExtension()
     DECLARE_END_EXPRESSION()
 
     DECLARE_STR_EXPRESSION("ToString",
-                       _("Convertir en un texte"),
+                       _("Nombre > Texte"),
                        _("Convertit le résultat de l'expression en un texte"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
@@ -34,7 +34,7 @@ CommonConversionsExtension::CommonConversionsExtension()
     DECLARE_END_STR_EXPRESSION()
 
     DECLARE_STR_EXPRESSION("LargeNumberToString",
-                       _("Convertir un grand nombre en un texte"),
+                       _("Nombre > Texte ( sans notation scientifique )"),
                        _("Convertit le résultat de l'expression en un texte, sans utiliser la notation scientifique"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
@@ -46,7 +46,7 @@ CommonConversionsExtension::CommonConversionsExtension()
     DECLARE_END_STR_EXPRESSION()
 
     DECLARE_EXPRESSION("ToRad",
-                       _("Convertir en radians"),
+                       _("Degrés > Radians"),
                        _("Convertit l'angle, exprimé en degrés, en radians"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")
@@ -57,8 +57,8 @@ CommonConversionsExtension::CommonConversionsExtension()
 
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("ToRad",
-                       _("Convertir en radians"),
+    DECLARE_EXPRESSION("ToDeg",
+                       _("Radians > Degrés"),
                        _("Convertit l'angle, exprimé en radians, en degrés"),
                        _("Conversion"),
                        "res/conditions/toujours24.png")

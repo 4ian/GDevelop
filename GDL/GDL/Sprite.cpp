@@ -121,7 +121,6 @@ std::vector<RotatedRectangle> Sprite::GetCollisionMask() const
         rectangle.halfSize.x = sfmlSprite.GetSize().x/2;
         rectangle.halfSize.y = sfmlSprite.GetSize().y/2;
         rectangle.angle = 0;
-        std::cout << "Automatic :" << sfmlSprite.GetSize().x << std::endl;
 
         boxes.push_back(rectangle);
         return boxes;

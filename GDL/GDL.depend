@@ -14969,7 +14969,7 @@
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\compilertoolchainpathmanager.h
 
-1341780014 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
+1342550887 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
 	"GDL/Sprite.h"
 	<SFML/Graphics.hpp>
 	"GDL/ImageManager.h"
@@ -33544,7 +33544,7 @@
 1337095438 d:\florian\programmation\gamedevelop2\gdl\\gdl\builtinextensions\cameraextension.h
 	"GDL/ExtensionBase.h"
 
-1339883375 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\commonconversionsextension.cpp
+1342541218 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\commonconversionsextension.cpp
 	"GDL/BuiltinExtensions/CommonConversionsExtension.h"
 
 1337095355 d:\florian\programmation\gamedevelop2\gdl\\gdl\builtinextensions\commonconversionsextension.h
@@ -34244,7 +34244,7 @@
 	<boost/shared_ptr.hpp>
 	"GDL/IDE/ArbitraryResourceWorker.h"
 
-1342199300 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
+1342552603 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
 	"SpriteObjectEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -34269,7 +34269,7 @@
 	<wx/msw/winundef.h>
 	<wx/msw/uxtheme.h>
 
-1342022151 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\spriteobjecteditor.h
+1342552536 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\spriteobjecteditor.h
 	<wx/listctrl.h>
 	<wx/treectrl.h>
 	<wx/sizer.h>
@@ -34642,10 +34642,12 @@
 	<wx/dialog.h>
 	"GDL/ForEachEvent.h"
 
-1336938326 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editexpression.h
+1342519092 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editexpression.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
+	<wx/aui/aui.h>
+	<wx/panel.h>
 	<wx/hyperlink.h>
 	<wx/bmpbuttn.h>
 	<wx/button.h>
@@ -34657,11 +34659,11 @@
 	<string>
 	<vector>
 
-1336938326 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\edittextdialog.h
+1342547841 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\edittextdialog.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/statline.h>
+	<wx/aui/aui.h>
+	<wx/panel.h>
 	<wx/hyperlink.h>
 	<wx/button.h>
 	<wx/dialog.h>
@@ -34684,7 +34686,7 @@
 	<wx/dialog.h>
 	"GDL/CommentEvent.h"
 
-1342298938 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editexpression.cpp
+1342541562 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editexpression.cpp
 	"EditExpression.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -34712,10 +34714,12 @@
 	<string>
 	<vector>
 
-1336938326 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editexpression.h
+1342519092 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editexpression.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
+	<wx/aui/aui.h>
+	<wx/panel.h>
 	<wx/hyperlink.h>
 	<wx/bmpbuttn.h>
 	<wx/button.h>
@@ -34802,7 +34806,7 @@
 	<wx/button.h>
 	<wx/dialog.h>
 
-1342298938 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\edittextdialog.cpp
+1342547871 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\edittextdialog.cpp
 	"EditTextDialog.h"
 	<wx/intl.h>
 	<wx/string.h>
@@ -34827,11 +34831,11 @@
 	"GDCore/Tools/HelpFileAccess.h"
 	"GDL/IDE/ExpressionsCorrectnessTesting.h"
 
-1336938326 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\edittextdialog.h
+1342547841 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\edittextdialog.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
-	<wx/stattext.h>
-	<wx/statline.h>
+	<wx/aui/aui.h>
+	<wx/panel.h>
 	<wx/hyperlink.h>
 	<wx/button.h>
 	<wx/dialog.h>
@@ -35213,7 +35217,7 @@
 	<SFML/System.hpp>
 	"GDL/IDE/CodeCompiler.h"
 
-1342009526 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\projectupdatedlg.cpp
+1342540616 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\projectupdatedlg.cpp
 	"ProjectUpdateDlg.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -35417,11 +35421,10 @@
 	<string>
 	<vector>
 
-1337092423 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\objectgroup.h
+1342348848 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\objectgroup.h
 	<vector>
 	<string>
 	<utility>
-	"GDCore/PlatformDefinition/ObjectGroup.h"
 
 1337092423 d:\florian\programmation\gamedevelop2\core\\gdcore\platformdefinition\automatism.h
 	<string>
@@ -35794,7 +35797,7 @@
 1340533670 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dndresourceseditor.h
 	<wx/dnd.h>
 
-1342022151 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.h
+1342552536 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.h
 	<wx/listctrl.h>
 	<wx/treectrl.h>
 	<wx/sizer.h>

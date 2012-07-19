@@ -15,6 +15,7 @@ namespace gd { class Object; }
 namespace gd { class Project; }
 namespace gd { class VariablesContainer; }
 namespace gd { class InitialInstancesContainer; }
+namespace gd { class Layer; }
 #undef GetObject //Disable an annoying macro
 
 namespace gd
@@ -207,6 +208,70 @@ public:
      * \see gd::VariablesContainer
      */
     virtual gd::VariablesContainer & GetVariables() =0;
+    ///@}
+
+    /** \name Layout layers management
+     * Members functions related to layout layers management.
+     */
+    ///@{
+
+    /**
+     * Must return true if the layer called "name" exists.
+     */
+    virtual bool HasLayerNamed(const std::string & name) const =0;
+
+    /**
+     * Must return a reference to the layer called "name".
+     */
+    virtual Layer & GetLayer(const std::string & name) =0;
+
+    /**
+     * Must return a reference to the layer called "name".
+     */
+    virtual const Layer & GetLayer(const std::string & name) const =0;
+
+    /**
+     * Must return a reference to the layer at position "index" in the layers list
+     */
+    virtual Layer & GetLayer(unsigned int index) =0;
+
+    /**
+     * Must return a reference to the layer at position "index" in the layers list
+     */
+    virtual const Layer & GetLayer (unsigned int index) const =0;
+
+    /**
+     * Must return the position of the layer called "name" in the layers list
+     */
+    virtual unsigned int GetLayerPosition(const std::string & name) const =0;
+
+    /**
+     * Must return the number of layers.
+     */
+    virtual unsigned int GetLayersCount() const =0;
+
+    /**
+     * Must add a new empty the layer sheet called "name" at the specified position in the layout list.
+     */
+    virtual void InsertNewLayer(std::string & name, unsigned int position) =0;
+
+    /**
+     * Must add a new the layer constructed from the layout passed as parameter.
+     * \note No pointer or reference must be kept on the layer passed as parameter.
+     * \param theLayer The the layer that must be copied and inserted into the project
+     * \param position Insertion position. Even if the position is invalid, the layer must be inserted at the end of the layers list.
+     */
+    virtual void InsertLayer(const Layer & theLayer, unsigned int position) =0;
+
+    /**
+     * Must delete the layer named "name".
+     */
+    virtual void RemoveLayer(const std::string & name) =0;
+
+    /**
+     * Must swap the position of the specified layers.
+     */
+    virtual void SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex) =0;
     ///@}
 
     /** \name Saving and loading

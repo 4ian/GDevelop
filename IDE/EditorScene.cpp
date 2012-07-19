@@ -32,7 +32,7 @@
 #include "EditorLayers.h"
 #include "InitialPositionBrowserDlg.h"
 #include "ProfileDlg.h"
-#include "GDL/IDE/Dialogs/ChooseLayer.h"
+#include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "EventsEditor.h"
@@ -124,7 +124,7 @@ mainEditorCommand(mainEditorCommand_)
 
     //Create all editors linked to scene canvas.
     sceneCanvas->SetOwnedObjectsEditor( boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainEditorCommand) ));
-    sceneCanvas->SetOwnedLayersEditor( boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, &scene.initialLayers, mainEditorCommand) ));
+    sceneCanvas->SetOwnedLayersEditor( boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, mainEditorCommand) ));
     sceneCanvas->SetOwnedDebugger( boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(this, sceneCanvas->GetRuntimeScene()) ));
     sceneCanvas->SetOwnedExternalWindow( boost::shared_ptr<RenderDialog>(new RenderDialog(this, sceneCanvas) ));
     sceneCanvas->SetOwnedInitialPositionBrowser( boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, scene.GetInitialInstances(), *sceneCanvas) ));
@@ -136,7 +136,7 @@ mainEditorCommand(mainEditorCommand_)
     eventsEditor->SetAssociatedSceneCanvas(sceneCanvas);
 
     //Display editors in panes
-    m_mgr.AddPane( notebook, wxAuiPaneInfo().Name( wxT( "ESCenter" ) ).Center().CloseButton( false ).Caption( _( "Editeur de scène" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
+    m_mgr.AddPane( notebook, wxAuiPaneInfo().Name( wxT( "ESCenter" ) ).PaneBorder(false).Center().CloseButton( false ).Caption( _( "Editeur de scène" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
     m_mgr.AddPane( sceneCanvas->GetOwnedObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Editeur d'objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
     m_mgr.AddPane( sceneCanvas->GetOwnedLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Float().CloseButton( true ).Caption( _( "Editeur de calques" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
     m_mgr.AddPane( sceneCanvas->GetOwnedDebugger().get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );

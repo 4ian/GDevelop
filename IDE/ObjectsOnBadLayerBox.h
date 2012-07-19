@@ -14,13 +14,14 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include "GDL/Layer.h"
+#include <string>
+#include <vector>
 
 class ObjectsOnBadLayerBox: public wxDialog
 {
 	public:
 
-		ObjectsOnBadLayerBox(wxWindow* parent, const vector < Layer > & layers);
+		ObjectsOnBadLayerBox(wxWindow* parent, const std::vector < std::string > & availableLayers);
 		virtual ~ObjectsOnBadLayerBox();
 
 		//(*Declarations(ObjectsOnBadLayerBox)
@@ -35,7 +36,7 @@ class ObjectsOnBadLayerBox: public wxDialog
 		wxChoice* Choice1;
 		//*)
 
-		string moveOnLayerNamed;
+		std::string moveOnLayerNamed;
 
 	protected:
 

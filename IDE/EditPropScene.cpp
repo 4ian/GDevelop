@@ -214,9 +214,9 @@ void EditPropScene::OnOkBtClick(wxCommandEvent& event)
     {
         Scene & scene = dynamic_cast<Scene&>(layout);
 
-        scene.oglFOV = ToFloat(string(fovEdit->GetValue().mb_str()));
-        scene.oglZNear = ToFloat(string(zNearEdit->GetValue().mb_str()));
-        scene.oglZFar = ToFloat(string(zFarEdit->GetValue().mb_str()));
+        scene.oglFOV = ToFloat(ToString(fovEdit->GetValue()));
+        scene.oglZNear = ToFloat(ToString(zNearEdit->GetValue()));
+        scene.oglZFar = ToFloat(ToString(zFarEdit->GetValue()));
         scene.stopSoundsOnStartup = stopSoundsCheck->GetValue();
 
         if ( TriBox->GetSelection() == 0 )

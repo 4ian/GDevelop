@@ -23,7 +23,7 @@
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/Dialogs/ChooseLayer.h"
+#include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
 #include "GDL/IDE/SceneCanvasSettings.h"
@@ -390,9 +390,9 @@ void SceneCanvas::EdittimeRender()
 
     std::vector < sf::Shape > GUIelements;
 
-    for (unsigned int layerIndex =0;layerIndex<previewData.scene.GetAllLayers().size();++layerIndex)
+    for (unsigned int layerIndex =0;layerIndex<previewData.scene.GetLayersCount();++layerIndex)
     {
-        if ( previewData.scene.GetAllLayers()[layerIndex].GetVisibility() )
+        if ( previewData.scene.GetLayer(layerIndex).GetVisibility() )
         {
             //Prepare OpenGL rendering
             RestoreGLStates();
@@ -408,7 +408,7 @@ void SceneCanvas::EdittimeRender()
             //Render all objects
             for (unsigned int id = 0;id < allObjects.size();++id)
             {
-                if ( allObjects[id]->GetLayer() == previewData.scene.GetAllLayers()[layerIndex].GetName())
+                if ( allObjects[id]->GetLayer() == previewData.scene.GetLayer(layerIndex).GetName())
                 {
                     allObjects[id]->DrawEdittime(*previewData.scene.renderWindow);
 
@@ -972,10 +972,10 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
 void SceneCanvas::OnLayerUpSelected(wxCommandEvent & event)
 {
     int lowestLayer = GetObjectsSelectedLowestLayer();
-    if ( lowestLayer+1 < 0 || static_cast<unsigned>(lowestLayer+1) >= previewData.scene.initialLayers.size() )
+    if ( lowestLayer+1 < 0 || static_cast<unsigned>(lowestLayer+1) >= previewData.scene.GetLayersCount() )
         return;
 
-    string layerName = previewData.scene.initialLayers.at(lowestLayer+1).GetName();
+    string layerName = previewData.scene.GetLayer(lowestLayer+1).GetName();
 
     for (unsigned int i =0;i<editionData.objectsSelected.size();++i)
     {
@@ -1103,10 +1103,10 @@ void SceneCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
 void SceneCanvas::OnLayerDownSelected(wxCommandEvent & event)
 {
     int highestLayer = GetObjectsSelectedLowestLayer();
-    if ( highestLayer-1 < 0 || static_cast<unsigned>(highestLayer-1) >= previewData.scene.initialLayers.size() )
+    if ( highestLayer-1 < 0 || static_cast<unsigned>(highestLayer-1) >= previewData.scene.GetLayersCount() )
         return;
 
-    string layerName = previewData.scene.initialLayers.at(highestLayer-1).GetName();
+    string layerName = previewData.scene.GetLayer(highestLayer-1).GetName();
 
     for (unsigned int i =0;i<editionData.objectsSelected.size();++i)
     {
@@ -1233,9 +1233,9 @@ int SceneCanvas::GetObjectsSelectedHighestLayer()
 
         int layerObjId = 0;
         //On cherche le numéro du calque de l'objet
-        for (unsigned int layerId = 0;layerId<previewData.scene.initialLayers.size();++layerId)
+        for (unsigned int layerId = 0;layerId<previewData.scene.GetLayersCount();++layerId)
         {
-            if ( previewData.scene.initialLayers[layerId].GetName() == initialInstance.GetLayer() )
+            if ( previewData.scene.GetLayer(layerId).GetName() == initialInstance.GetLayer() )
                layerObjId = layerId;
         }
 
@@ -1248,16 +1248,16 @@ int SceneCanvas::GetObjectsSelectedHighestLayer()
 
 int SceneCanvas::GetObjectsSelectedLowestLayer()
 {
-    int lowestLayer = previewData.scene.initialLayers.size()-1;
+    int lowestLayer = previewData.scene.GetLayersCount()-1;
     for (unsigned int i =0;i<editionData.objectsSelected.size();++i)
     {
         gd::InitialInstance & initialInstance = GetInitialPositionFromObject(editionData.objectsSelected[i]);
 
         int layerObjId = 0;
         //On cherche le numéro du calque de l'objet
-        for (unsigned int layerId = 0;layerId<previewData.scene.initialLayers.size();++layerId)
+        for (unsigned int layerId = 0;layerId<previewData.scene.GetLayersCount();++layerId)
         {
-            if ( previewData.scene.initialLayers[layerId].GetName() == initialInstance.GetLayer() )
+            if ( previewData.scene.GetLayer(layerId).GetName() == initialInstance.GetLayer() )
                layerObjId = layerId;
         }
 

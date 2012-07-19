@@ -244,12 +244,12 @@ scene(scene_)
         heightEdit->Enable(true);
     }
 
-    for (unsigned int i = 0;i<scene.initialLayers.size();++i)
+    for (unsigned int i = 0;i<scene.GetLayersCount();++i)
     {
-        if ( scene.initialLayers[i].GetName() == "" )
+        if ( scene.GetLayer(i).GetName() == "" )
             layerChoice->Insert(_("Calque de base"), 0);
         else
-            layerChoice->Insert(scene.initialLayers[i].GetName(), 0);
+            layerChoice->Insert(scene.GetLayer(i).GetName(), 0);
     }
 
     layerChoice->SetStringSelection(position.GetLayer());

@@ -253,9 +253,9 @@ void SceneCanvas::UpdateContextMenu()
     int lowestLayer = GetObjectsSelectedLowestLayer();
 
     contextMenu.FindItem(ID_LAYERUPMENU)->Enable(false);
-    if ( static_cast<unsigned>(lowestLayer+1) < previewData.scene.initialLayers.size() )
+    if ( static_cast<unsigned>(lowestLayer+1) < previewData.scene.GetLayersCount() )
     {
-        string name = previewData.scene.initialLayers[lowestLayer+1].GetName();
+        string name = previewData.scene.GetLayer(lowestLayer+1).GetName();
         if ( name == "" ) name = _("Calque de base");
         contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
         contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(string(_("Passer le(s) objet(s) sur le calque \"")) + name +"\"");
@@ -267,7 +267,7 @@ void SceneCanvas::UpdateContextMenu()
     contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(false);
     if ( highestLayer-1 >= 0 )
     {
-        string name = previewData.scene.initialLayers[highestLayer-1].GetName();
+        string name = previewData.scene.GetLayer(highestLayer-1).GetName();
         if ( name == "" ) name = _("Calque de base");
 
         contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);

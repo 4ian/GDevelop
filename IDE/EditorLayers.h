@@ -23,7 +23,7 @@ class EditorLayers: public wxPanel
 {
 	public:
 
-		EditorLayers(wxWindow* parent, Game & game_, Scene & scene_, vector < Layer > * layers_, MainEditorCommand & mainEditorCommand_);
+		EditorLayers(wxWindow* parent, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
 		virtual ~EditorLayers();
 
 		//(*Declarations(EditorLayers)
@@ -91,17 +91,8 @@ class EditorLayers: public wxPanel
         Layer* GetSelectedLayer();
         void OnHelp(wxCommandEvent& event);
 
-        /**
-         * Reference to game containing the datas to edit
-         */
 		Game & game;
-        /**
-         * Pointer to scene containing the datas to edit
-         * Use a pointer instead of a reference because scene pointer/reference can change
-         * @see EditorScene
-         */
 		Scene & scene;
-		vector < Layer > * layers;
 
 		SceneCanvas * sceneCanvas;
 

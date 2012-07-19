@@ -7,7 +7,9 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include "GDL/Layer.h"
+#include <string>
+#include <vector>
+#include "GDL/CommonTools.h"
 
 //(*IdInit(ObjectsOnBadLayerBox)
 const long ObjectsOnBadLayerBox::ID_STATICBITMAP1 = wxNewId();
@@ -26,7 +28,7 @@ BEGIN_EVENT_TABLE(ObjectsOnBadLayerBox,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ObjectsOnBadLayerBox::ObjectsOnBadLayerBox(wxWindow* parent, const vector < Layer > & layers)
+ObjectsOnBadLayerBox::ObjectsOnBadLayerBox(wxWindow* parent, const std::vector < std::string > & availableLayers)
 {
 	//(*Initialize(ObjectsOnBadLayerBox)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -73,9 +75,9 @@ ObjectsOnBadLayerBox::ObjectsOnBadLayerBox(wxWindow* parent, const vector < Laye
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ObjectsOnBadLayerBox::OnCancelClick);
 	//*)
 
-	for (unsigned int i =0;i<layers.size();++i)
+	for (unsigned int i =0;i<availableLayers.size();++i)
 	{
-	    string name = layers[i].GetName();
+	    std::string name = availableLayers[i];
 	    if ( name == "" ) name = _("Calque de base");
 		Choice1->Insert(name, 0);
 	}
@@ -98,8 +100,8 @@ void ObjectsOnBadLayerBox::OnMoveClick(wxCommandEvent& event)
 {
     if ( Choice1->GetStringSelection() != "" )
     {
-        moveOnLayerNamed = static_cast<string>(Choice1->GetStringSelection());
-        if ( moveOnLayerNamed == string(_("Calque de base")) ) moveOnLayerNamed = "";
+        moveOnLayerNamed = ToString(Choice1->GetStringSelection());
+        if ( moveOnLayerNamed == ToString(_("Calque de base")) ) moveOnLayerNamed = "";
         EndModal(2);
     }
 }

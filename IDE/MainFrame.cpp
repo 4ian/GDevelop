@@ -504,8 +504,9 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
         projectManager->Refresh();
     }
 
-    HtmlViewerPnl * htmlViewerPnl = new HtmlViewerPnl(editorsNotebook);
-    editorsNotebook->AddPage(htmlViewerPnl, _("Aide en ligne"));
+    //TODO
+    /*HtmlViewerPnl * htmlViewerPnl = new HtmlViewerPnl(editorsNotebook);
+    editorsNotebook->AddPage(htmlViewerPnl, _("Aide en ligne"));*/
 }
 
 void MainFrame::OnResize(wxSizeEvent& event)

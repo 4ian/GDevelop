@@ -167,7 +167,7 @@ tempLayer(layer_)
         nameEdit->SetEditable(false);
 
 
-    for (unsigned int i = 0;i<layer.GetCamerasNumber();++i)
+    for (unsigned int i = 0;i<layer.GetCameraCount();++i)
     	cameraChoice->Append(ToString(i));
 
     cameraChoice->SetSelection(0);
@@ -195,7 +195,7 @@ void EditLayer::OnokBtClick(wxCommandEvent& event)
         return;
     }
 
-    tempLayer.SetName(static_cast<string>(nameEdit->GetValue()));
+    tempLayer.SetName(ToString(nameEdit->GetValue()));
     tempLayer.SetVisibility(visibilityCheck->GetValue());
 
     layer = tempLayer;
@@ -204,8 +204,8 @@ void EditLayer::OnokBtClick(wxCommandEvent& event)
 
 void EditLayer::OnaddCameraBtClick(wxCommandEvent& event)
 {
-    cameraChoice->Append(ToString(tempLayer.GetCamerasNumber()));
-    tempLayer.SetCamerasNumber(tempLayer.GetCamerasNumber()+1);
+    cameraChoice->Append(ToString(tempLayer.GetCameraCount()));
+    tempLayer.SetCameraCount(tempLayer.GetCameraCount()+1);
 }
 
 void EditLayer::OncameraChoiceSelect(wxCommandEvent& event)
@@ -216,11 +216,11 @@ void EditLayer::OncameraChoiceSelect(wxCommandEvent& event)
 void EditLayer::RefreshCameraSettings()
 {
     unsigned int selection = cameraChoice->GetSelection();
-    if (selection >= tempLayer.GetCamerasNumber()) return;
+    if (selection >= tempLayer.GetCameraCount()) return;
 
     const Camera & camera = tempLayer.GetCamera(selection);
 
-    if ( camera.defaultSize )
+    if ( camera.UseDefaultSize() )
     {
         sizeCheck->SetValue(false);
         cameraWidthEdit->Enable(false);
@@ -235,15 +235,15 @@ void EditLayer::RefreshCameraSettings()
         cameraWidthEdit->Enable(true);
         cameraHeightEdit->Enable(true);
 
-        cameraWidthEdit->ChangeValue(ToString(camera.size.x));
-        cameraHeightEdit->ChangeValue(ToString(camera.size.y));
+        cameraWidthEdit->ChangeValue(ToString(camera.GetSize().x));
+        cameraHeightEdit->ChangeValue(ToString(camera.GetSize().y));
     }
 
     viewportX1Edit->SetBackgroundColour(wxColour(255,255,255));
     viewportY1Edit->SetBackgroundColour(wxColour(255,255,255));
     viewportX2Edit->SetBackgroundColour(wxColour(255,255,255));
     viewportY2Edit->SetBackgroundColour(wxColour(255,255,255));
-    if ( camera.defaultViewport )
+    if ( camera.UseDefaultViewport() )
     {
         viewportCheck->SetValue(false);
         viewportX1Edit->Enable(false);
@@ -264,20 +264,20 @@ void EditLayer::RefreshCameraSettings()
         viewportY1Edit->Enable(true);
         viewportY2Edit->Enable(true);
 
-        viewportX1Edit->ChangeValue(ToString(camera.viewport.Left));
-        viewportY1Edit->ChangeValue(ToString(camera.viewport.Top));
-        viewportX2Edit->ChangeValue(ToString(camera.viewport.Left+camera.viewport.Width));
-        viewportY2Edit->ChangeValue(ToString(camera.viewport.Top+camera.viewport.Height));
+        viewportX1Edit->ChangeValue(ToString(camera.GetViewport().Left));
+        viewportY1Edit->ChangeValue(ToString(camera.GetViewport().Top));
+        viewportX2Edit->ChangeValue(ToString(camera.GetViewport().Left+camera.GetViewport().Width));
+        viewportY2Edit->ChangeValue(ToString(camera.GetViewport().Top+camera.GetViewport().Height));
     }
 }
 
 void EditLayer::OnsizeCheckClick(wxCommandEvent& event)
 {
     unsigned int selection = cameraChoice->GetSelection();
-    if (selection >= tempLayer.GetCamerasNumber()) return;
+    if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
-    camera.defaultSize = !sizeCheck->GetValue();
+    camera.SetUseDefaultSize(!sizeCheck->GetValue());
 
     RefreshCameraSettings();
 }
@@ -285,28 +285,28 @@ void EditLayer::OnsizeCheckClick(wxCommandEvent& event)
 void EditLayer::OncameraWidthEditText(wxCommandEvent& event)
 {
     unsigned int selection = cameraChoice->GetSelection();
-    if (selection >= tempLayer.GetCamerasNumber()) return;
+    if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
-    camera.size.x = atof(cameraWidthEdit->GetValue().c_str());
+    camera.SetSize(sf::Vector2f(ToFloat(ToString(cameraWidthEdit->GetValue())), camera.GetSize().y));
 }
 
 void EditLayer::OncameraHeightEditText(wxCommandEvent& event)
 {
     unsigned int selection = cameraChoice->GetSelection();
-    if (selection >= tempLayer.GetCamerasNumber()) return;
+    if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
-    camera.size.y = atof(cameraHeightEdit->GetValue().c_str());
+    camera.SetSize(sf::Vector2f(camera.GetSize().x, ToFloat(ToString(cameraHeightEdit->GetValue()))));
 }
 
 void EditLayer::OnviewportCheckClick(wxCommandEvent& event)
 {
     unsigned int selection = cameraChoice->GetSelection();
-    if (selection >= tempLayer.GetCamerasNumber()) return;
+    if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
-    camera.defaultViewport = !viewportCheck->GetValue();
+    camera.SetUseDefaultViewport(!viewportCheck->GetValue());
 
     RefreshCameraSettings();
 }
@@ -317,15 +317,16 @@ void EditLayer::OnviewportCheckClick(wxCommandEvent& event)
 void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
 {
     unsigned int selection = cameraChoice->GetSelection();
-    if (selection >= tempLayer.GetCamerasNumber()) return;
+    if (selection >= tempLayer.GetCameraCount()) return;
 
     Camera & camera = tempLayer.GetCamera(selection);
+    sf::FloatRect newViewport = camera.GetViewport();
 
     {
-        float newValue = ToFloat(string(viewportX1Edit->GetValue().mb_str()));
+        float newValue = ToFloat(ToString(viewportX1Edit->GetValue()));
         if ( newValue >= 0 && newValue <= 1)
         {
-            camera.viewport.Left = newValue;
+            newViewport.Left = newValue;
             viewportX1Edit->SetBackgroundColour(wxColour(255,255,255));
         }
         else
@@ -333,10 +334,10 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue = ToFloat(string(viewportY1Edit->GetValue().mb_str()));
+        float newValue =  ToFloat(ToString(viewportY1Edit->GetValue()));
         if ( newValue >= 0 && newValue <= 1)
         {
-            camera.viewport.Top = newValue;
+            newViewport.Top = newValue;
             viewportY1Edit->SetBackgroundColour(wxColour(255,255,255));
         }
         else
@@ -344,10 +345,10 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue = ToFloat(string(viewportX2Edit->GetValue().mb_str()));
+        float newValue = ToFloat(ToString(viewportX2Edit->GetValue()));
         if ( newValue >= 0 && newValue <= 1)
         {
-            camera.viewport.Width = newValue-camera.viewport.Left;
+            newViewport.Width = newValue-newViewport.Left;
             viewportX2Edit->SetBackgroundColour(wxColour(255,255,255));
         }
         else
@@ -355,23 +356,25 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
     }
 
     {
-        float newValue = ToFloat(string(viewportY2Edit->GetValue().mb_str()));
+        float newValue = ToFloat(ToString(viewportY2Edit->GetValue()));
         if ( newValue >= 0 && newValue <= 1)
         {
-            camera.viewport.Height = newValue-camera.viewport.Top;
+            newViewport.Height = newValue-newViewport.Top;
             viewportY2Edit->SetBackgroundColour(wxColour(255,255,255));
         }
         else
             viewportY2Edit->SetBackgroundColour(wxColour(254,231,231));
     }
+
+    camera.SetViewport(newViewport);
 }
 
 void EditLayer::OndeleteCameraBtClick(wxCommandEvent& event)
 {
     unsigned int selection = cameraChoice->GetSelection();
-    if (selection >= tempLayer.GetCamerasNumber()) return;
+    if (selection >= tempLayer.GetCameraCount()) return;
 
-    if ( tempLayer.GetCamerasNumber() == 1 )
+    if ( tempLayer.GetCameraCount() == 1 )
     {
         wxLogMessage(_("Impossible d'enlever l'unique camera du calque."));
         return;
@@ -379,7 +382,7 @@ void EditLayer::OndeleteCameraBtClick(wxCommandEvent& event)
 
     tempLayer.DeleteCamera(selection);
     cameraChoice->Delete(cameraChoice->GetSelection());
-    cameraChoice->SetSelection(tempLayer.GetCamerasNumber());
+    cameraChoice->SetSelection(tempLayer.GetCameraCount());
 
     RefreshCameraSettings();
 }

@@ -242,7 +242,7 @@ void ExternalLayoutEditor::SetupForScene(Scene & scene)
 
             //Creating external editors and linking them to the scene canvas
             boost::shared_ptr<EditorObjets> objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainEditorCommand));
-            boost::shared_ptr<EditorLayers> layersEditor = boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, &scene.initialLayers, mainEditorCommand) );
+            boost::shared_ptr<EditorLayers> layersEditor = boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, mainEditorCommand) );
             boost::shared_ptr<InitialPositionBrowserDlg> browserEditor = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *sceneCanvas) );
             sceneCanvas->SetOwnedObjectsEditor(objectsEditor);
             sceneCanvas->SetOwnedLayersEditor(layersEditor);

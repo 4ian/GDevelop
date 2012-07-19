@@ -23,7 +23,7 @@
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDL/IDE/Dialogs/ChooseLayer.h"
+#include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "ConsoleManager.h"
 
 
@@ -761,9 +761,9 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     newObject->SetX( x );
     newObject->SetY( y );
 
-    ChooseLayer layerDialog(this, scene.initialLayers, false);
+    gd::ChooseLayerDialog layerDialog(this, scene, false);
     layerDialog.ShowModal();
-    newObject->SetLayer( layerDialog.layerChosen );
+    newObject->SetLayer( layerDialog.GetChosenLayer() );
 
     newObject->LoadRuntimeResources(scene, *scene.game->imageManager);
 

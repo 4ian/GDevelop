@@ -36,14 +36,13 @@
 #include "GDCore/IDE/ConditionSentenceFormatter.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
-#include "GDL/IDE/ExpressionsCorrectnessTesting.h"
-
-#include "GDL/IDE/Dialogs/EditExpression.h"
-#include "GDL/IDE/Dialogs/EditTextDialog.h"
+#include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
-#include "GDL/IDE/Dialogs/ChooseLayer.h"
+#include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
+#include "GDL/IDE/Dialogs/EditExpression.h"
+#include "GDL/IDE/Dialogs/EditTextDialog.h"
 #include "TrueOrFalse.h"
 #include "ChoiceJoyAxis.h"
 #include "ChoiceFile.h"
@@ -856,9 +855,9 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionMetadata.parameters[i].type == "layer" )
         {
-            ChooseLayer dialog(this, scene.initialLayers);
+            gd::ChooseLayerDialog dialog(this, scene);
             if( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(dialog.layerChosen);
+                ParaEdit.at(i)->ChangeValue(dialog.GetChosenLayer());
 
             return;
         }
@@ -939,8 +938,8 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
         //Do not check optional parameters which are desactivated
         if ( !ParaFac.at(i)->IsShown() || (ParaFac.at(i)->IsShown() && ParaFac.at(i)->GetValue()))
         {
-            CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
-            gd::ExpressionParser expressionParser(string(ParaEdit.at(i)->GetValue().mb_str())) ;
+            gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
+            gd::ExpressionParser expressionParser(ToString(ParaEdit[i]->GetValue()));
 
             if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game, scene, callbacks))
                 ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game, scene, callbacks))

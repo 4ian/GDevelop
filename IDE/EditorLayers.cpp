@@ -41,10 +41,9 @@ BEGIN_EVENT_TABLE(EditorLayers,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorLayers::EditorLayers(wxWindow* parent, Game & game_, Scene & scene_, vector < Layer > * layers_, MainEditorCommand & mainEditorCommand_) :
+EditorLayers::EditorLayers(wxWindow* parent, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_) :
 game(game_),
 scene(scene_),
-layers(layers_),
 sceneCanvas(NULL),
 mainEditorCommand(mainEditorCommand_)
 {
@@ -178,13 +177,13 @@ void EditorLayers::Refresh()
 {
     layersList->DeleteAllItems();
 
-    for (unsigned int i =0;i<layers->size();++i)
+    for (unsigned int i =0;i<scene.GetLayersCount();++i)
     {
-        string name = layers->at(i).GetName();
+        string name = scene.GetLayer(i).GetName();
         if ( name == "" ) name = _("Calque de base");
     	layersList->InsertItem(0, name);
 
-    	if ( layers->at(i).GetVisibility() )
+    	if ( scene.GetLayer(i).GetVisibility() )
             layersList->SetItemColumnImage(0, 1, 2);
         else
             layersList->SetItemColumnImage(0, 1, 3);
@@ -201,12 +200,12 @@ void EditorLayers::UpdateSelectedLayerIcon()
 {
     if ( !sceneCanvas ) return;
 
-    for (unsigned int i =0;i<layers->size();++i)
+    for (unsigned int i =0;i<scene.GetLayersCount();++i)
     {
-    	if ( layers->at(i).GetName() == sceneCanvas->GetCurrentLayer() )
-            layersList->SetItemImage(layers->size()-i-1,1,1);
+    	if ( scene.GetLayer(i).GetName() == sceneCanvas->GetCurrentLayer() )
+            layersList->SetItemImage(scene.GetLayersCount()-i-1,1,1);
         else
-            layersList->SetItemImage(layers->size()-i-1,-1,-1);
+            layersList->SetItemImage(scene.GetLayersCount()-i-1,-1,-1);
     }
 }
 
@@ -219,9 +218,9 @@ void EditorLayers::OnAddSelected(wxCommandEvent& event)
 
     bool alreadyExist = false;
     int nb = 0;
-    for (unsigned int i = 0;i<layers->size();++i)
+    for (unsigned int i = 0;i<scene.GetLayersCount();++i)
     {
-    	if ( layers->at(i).GetName() == name )
+    	if ( scene.GetLayer(i).GetName() == name )
             alreadyExist = true;
     }
     while ( alreadyExist )
@@ -230,17 +229,17 @@ void EditorLayers::OnAddSelected(wxCommandEvent& event)
         name = _("Nouveau calque ") + ToString(nb);
 
         alreadyExist = false;
-        for (unsigned int i = 0;i<layers->size();++i)
+        for (unsigned int i = 0;i<scene.GetLayersCount();++i)
         {
-            if ( layers->at(i).GetName() == name )
+            if ( scene.GetLayer(i).GetName() == name )
                 alreadyExist = true;
         }
     }
 
     Layer layer;
     layer.SetName(static_cast<string>(name));
-    layer.SetCamerasNumber(1);
-    layers->push_back(layer);
+    layer.SetCameraCount(1);
+    scene.InsertLayer(layer, scene.GetLayersCount()-1);
 
     Refresh();
     if ( sceneCanvas ) sceneCanvas->Reload();
@@ -257,14 +256,10 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
 
     std::string name = selectedLayer->GetName();
 
-    for (unsigned int i = 0;i<layers->size();++i)
+    for (unsigned int i = 0;i<scene.GetLayersCount();++i)
     {
-    	if ( &layers->at(i) == selectedLayer )
+    	if ( &scene.GetLayer(i) == selectedLayer )
     	{
-    	    //Liste de calques sans celui à supprimer
-    	    vector < Layer > layersWithoutLayerToDelete = *layers;
-    	    layersWithoutLayerToDelete.erase(layersWithoutLayerToDelete.begin() + i );
-
             //Verifying if there are objects on this layer
             bool objectsOnThisLayer = false;
             for (unsigned int j =0;j<scene.GetInitialInstances().GetInstancesCount();++j)
@@ -276,7 +271,13 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
     	    //Confirmation de la suppression et choix du sort des objets dessus
     	    if ( objectsOnThisLayer )
     	    {
-                ObjectsOnBadLayerBox dialog(this, layersWithoutLayerToDelete);
+    	        std::vector<std::string> availableLayers;
+    	        for (unsigned int j = 0;j<scene.GetLayersCount();++j)
+    	        {
+    	            if (i!=j) availableLayers.push_back(scene.GetLayer(j).GetName());
+    	        }
+
+                ObjectsOnBadLayerBox dialog(this, availableLayers);
                 int choice = dialog.ShowModal();
 
                 if ( choice == 0 ) return; //Annulation
@@ -287,7 +288,7 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
     	    }
 
             //Delete the layer and select base layer
-    	    layers->erase(layers->begin() + i );
+    	    scene.RemoveLayer(name);
             if ( sceneCanvas )
             {
                 sceneCanvas->SetCurrentLayer("");
@@ -309,22 +310,19 @@ void EditorLayers::OnUpSelected(wxCommandEvent& event)
     Layer * selectedLayer = GetSelectedLayer();
     if ( !selectedLayer ) return;
 
-    for (unsigned int i = 0;i<layers->size();++i)
+    for (unsigned int i = 0;i<scene.GetLayersCount();++i)
     {
-    	if ( &layers->at(i) == selectedLayer )
+    	if ( &scene.GetLayer(i) == selectedLayer )
     	{
-    	    if ( i <= layers->size()-1-1 )
+    	    if ( i <= scene.GetLayersCount()-1-1 )
     	    {
-    	        //On déplace le calque
-    	        Layer layer = layers->at(i);
-                layers->erase(layers->begin() + i );
-                layers->insert(layers->begin()+i+1, layer);
+    	        scene.SwapLayers(i,i+1);
 
                 Refresh();
                 if ( sceneCanvas ) sceneCanvas->Reload();
 
                 //On reslectionne le calque
-                layersList->SetItemState(layers->size()-i-1-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+                layersList->SetItemState(scene.GetLayersCount()-i-1-1, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     	    }
     	    return;
     	}
@@ -341,22 +339,20 @@ void EditorLayers::OnDownSelected(wxCommandEvent& event)
     Layer * selectedLayer = GetSelectedLayer();
     if ( !selectedLayer ) return;
 
-    for (unsigned int i = 0;i<layers->size();++i)
+    for (unsigned int i = 0;i<scene.GetLayersCount();++i)
     {
-    	if ( &layers->at(i) == selectedLayer )
+    	if ( &scene.GetLayer(i) == selectedLayer )
     	{
     	    if ( i >= 1 )
     	    {
     	        //On déplace le calque
-    	        Layer layer = layers->at(i);
-                layers->erase(layers->begin() + i );
-                layers->insert(layers->begin()+i-1, layer);
+    	        scene.SwapLayers(i,i-1);
 
                 Refresh();
                 if ( sceneCanvas ) sceneCanvas->Reload();
 
                 //On reslectionne le calque
-                layersList->SetItemState(layers->size()-i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+                layersList->SetItemState(scene.GetLayersCount()-i, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
     	    }
     	    return;
     	}
@@ -385,10 +381,10 @@ Layer* EditorLayers::GetSelectedLayer()
         if (itemIndex == -1) break;
 
         // Got the selected item index
-        unsigned int layerId = layers->size()-itemIndex-1;
-        if ( layerId < layers->size() )
+        unsigned int layerId = scene.GetLayersCount()-itemIndex-1;
+        if ( layerId < scene.GetLayersCount() )
         {
-            return &layers->at(layerId);
+            return &scene.GetLayer(layerId);
         }
     }
 
@@ -427,10 +423,10 @@ void EditorLayers::OnlayersListItemActivated(wxListEvent& event)
         //Changes without reloading
         if ( sceneCanvas )
         {
-            for (unsigned int i = 0;i<sceneCanvas->GetRuntimeScene().GetAllLayers().size();++i)
+            for (unsigned int i = 0;i<sceneCanvas->GetRuntimeScene().GetLayersCount();++i)
             {
-                if ( sceneCanvas->GetRuntimeScene().GetAllLayers()[i].GetName() == selectedLayer->GetName() )
-                    sceneCanvas->GetRuntimeScene().GetAllLayers()[i].SetVisibility(selectedLayer->GetVisibility());
+                if ( sceneCanvas->GetRuntimeScene().GetLayer(i).GetName() == selectedLayer->GetName() )
+                    sceneCanvas->GetRuntimeScene().GetLayer(i).SetVisibility(selectedLayer->GetVisibility());
             }
         }
         return;

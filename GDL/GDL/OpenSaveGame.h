@@ -42,6 +42,10 @@ public:
     static void SaveActions(const vector < gd::Instruction > & list, TiXmlElement * elem);
 
     static void OpenGroupesObjets( vector < gd::ObjectGroup > & list, const TiXmlElement * elem );
+    static void SaveGroupesObjets( const vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets );
+
+    static void SaveObjects( const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects );
+    static void SaveLayers( const vector < Layer > & list, TiXmlElement * layers );
 
     //Compatibility code --- with Game Develop 1
     static void AdaptEventsFromGD1x(vector < gd::BaseEventSPtr > & list);
@@ -49,7 +53,6 @@ public:
     #endif
 
     static void OpenObjects(vector < boost::shared_ptr<Object> > & objects, const TiXmlElement * elem);
-    static void OpenPositions( vector < InitialPosition > & list, const TiXmlElement * elem );
     static void OpenLayers( vector < Layer > & list, const TiXmlElement * elem );
 
 private:
@@ -63,9 +66,6 @@ private:
     void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, const TiXmlElement * elem );
     void OpenImagesFromGD2010498( const TiXmlElement * elem, TiXmlElement * dossierElem );
 
-    void SaveObjects( const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects );
-    void SaveGroupesObjets( const vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets );
-    void SaveLayers( const vector < Layer > & list, TiXmlElement * layers );
     void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
 
     static void AdaptConditionFromGD1x(gd::Instruction & instruction, const gd::InstructionMetadata & instrInfos);

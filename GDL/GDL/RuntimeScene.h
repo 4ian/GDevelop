@@ -70,16 +70,6 @@ public:
     inline ListVariable & GetVariables() { return variables; }
 
     /**
-     * Get the list of all layers of the scene
-     */
-    const std::vector < RuntimeLayer > & GetAllLayers() const { return layers; }
-
-    /**
-     * Get the list of all layers of the scene
-     */
-    std::vector < RuntimeLayer > & GetAllLayers() { return layers; }
-
-    /**
      * Add a text to be displayed on the scene
      * \deprecated
      */
@@ -92,7 +82,8 @@ public:
     const boost::shared_ptr<AutomatismsRuntimeSharedDatas> & GetAutomatismSharedDatas(const std::string & automatismName) const { return automatismsSharedDatas.find(automatismName)->second; }
 
     /**
-     * Set up the Runtime Scene using a Scene
+     * Set up the RuntimeScene using a Scene.
+     * Typically called automatically by the IDE or by the game executable.
      *
      * \note Similar to calling LoadFromSceneAndCustomInstances(scene, scene.GetInitialInstances());
      * \see LoadFromSceneAndCustomInstances
@@ -137,6 +128,7 @@ public:
 
     /**
      * Render and play the scene one frame.
+     * \return -1 for doing nothing, -2 to quit the game, another number to change the scene
      */
     int RenderAndStep(unsigned int nbStep);
 
@@ -144,16 +136,6 @@ public:
      * Just render a frame.
      */
     void RenderWithoutStep();
-
-    /**
-     * Return the layer with the name passed in argument
-     */
-    const RuntimeLayer & GetLayer(const string & name) const;
-
-    /**
-     * Return the layer with the name passed in argument
-     */
-    RuntimeLayer & GetLayer(const string & name);
 
     /**
      * Change scene time scale.
@@ -229,7 +211,6 @@ protected:
     unsigned int                            pauseTime;
     int                                     specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
     ListVariable                            variables; ///<List of the scene variables
-    std::vector < RuntimeLayer >            layers; ///<List of the layers
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
 
     std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
@@ -238,8 +219,6 @@ protected:
     bool DisplayLegacyTexts(string layer = "");
 
     void Init(const RuntimeScene & scene);
-
-    static RuntimeLayer badLayer;
 };
 
 #endif // RUNTIMESCENE_H

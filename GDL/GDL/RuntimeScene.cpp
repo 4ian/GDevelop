@@ -41,8 +41,6 @@
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
 
-RuntimeLayer RuntimeScene::badLayer;
-
 RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
 renderWindow(renderWindow_),
 game(game_),
@@ -59,13 +57,6 @@ timeFromStart(0),
 pauseTime(0),
 specialAction(-1)
 {
-    //Calque par défaut
-    sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight() ) );
-    Layer layer;
-    layer.SetCamerasNumber(1);
-
-    layers.push_back(RuntimeLayer(layer, defaultView));
-
     ChangeRenderWindow(renderWindow);
 }
 
@@ -314,23 +305,23 @@ void RuntimeScene::Render()
     renderWindow->SetActive();
 
     //Draw layer by layer
-    for (unsigned int layerIndex =0;layerIndex<layers.size();++layerIndex)
+    for (unsigned int layerIndex =0;layerIndex<GetLayersCount();++layerIndex)
     {
-        if ( layers.at(layerIndex).GetVisibility() )
+        if ( GetLayer(layerIndex).GetVisibility() )
         {
-            for (unsigned int cameraIndex = 0;cameraIndex < layers[layerIndex].GetCamerasNumber();++cameraIndex)
+            for (unsigned int cameraIndex = 0;cameraIndex < GetLayer(layerIndex).GetCameraCount();++cameraIndex)
             {
-                RuntimeCamera & camera = layers[layerIndex].GetCamera(cameraIndex);
+                Camera & camera = GetLayer(layerIndex).GetCamera(cameraIndex);
 
                 //Prepare OpenGL rendering
                 renderWindow->RestoreGLStates();
 
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
-                gluPerspective(oglFOV, camera.GetSFMLView().GetSize().x
-                                    /camera.GetSFMLView().GetSize().y, oglZNear, oglZFar);
+                gluPerspective(oglFOV, camera.GetSize().x
+                                    /camera.GetSize().y, oglZNear, oglZFar);
 
-                const sf::FloatRect & viewport = camera.GetSFMLView().GetViewport();
+                const sf::FloatRect & viewport = camera.GetViewport();
                 glViewport(viewport.Left*renderWindow->GetWidth(),
                            renderWindow->GetHeight()-(viewport.Top+viewport.Height)*renderWindow->GetHeight(), //Y start from bottom
                            viewport.Width*renderWindow->GetWidth(),
@@ -345,12 +336,12 @@ void RuntimeScene::Render()
                 for (unsigned int id = 0;id < allObjects.size();++id)
                 {
                     //Affichage de l'objet si il appartient au calque
-                    if ( allObjects[id]->GetLayer() == layers[layerIndex].GetName() )
+                    if ( allObjects[id]->GetLayer() == GetLayer(layerIndex).GetName() )
                         allObjects[id]->Draw( *renderWindow );
                 }
 
                 //Texts
-                DisplayLegacyTexts(layers.at(layerIndex).GetName());
+                DisplayLegacyTexts(GetLayer(layerIndex).GetName());
             }
         }
     }
@@ -371,24 +362,6 @@ void RuntimeScene::Render()
     // Display window contents on screen
     renderWindow->RestoreGLStates();
     renderWindow->Display();
-}
-
-RuntimeLayer & RuntimeScene::GetLayer(const string & name)
-{
-    std::vector<RuntimeLayer>::iterator layer = std::find_if(layers.begin(), layers.end(), std::bind2nd(RuntimeLayerHasName(), name));
-
-    if ( layer != layers.end() ) return *layer;
-
-    return badLayer;
-}
-
-const RuntimeLayer & RuntimeScene::GetLayer(const string & name) const
-{
-    std::vector<RuntimeLayer>::const_iterator layer = std::find_if(layers.begin(), layers.end(), std::bind2nd(RuntimeLayerHasName(), name));
-
-    if ( layer != layers.end() ) return *layer;
-
-    return badLayer;
 }
 
 bool RuntimeScene::UpdateTime()
@@ -546,7 +519,6 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const I
     objectsInstances.Clear();
     textes.clear();
     timers.clear();
-    layers.clear();
     firstLoop = true;
     elapsedTime = 0;
     realElapsedTime = 0;
@@ -561,11 +533,12 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const I
     //Initialize variables
     variables = scene.GetVariables();
 
-    //Initialize runtime layers
+    //Initialize layers
     sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight() ) );
-    for (unsigned int i = 0;i<initialLayers.size();++i)
+    for (unsigned int i = 0;i<GetLayersCount();++i)
     {
-        layers.push_back(RuntimeLayer(initialLayers[i], defaultView));
+        for (unsigned int j = 0;j<GetLayer(i).GetCameraCount();++j)
+            GetLayer(i).GetCamera(i).InitializeSFMLView(defaultView);
     }
 
     //Load resources of initial objects

@@ -12,12 +12,15 @@
 //*)
 #include <wx/msgdlg.h>
 #include <wx/stc/stc.h>
+#include <wx/textdlg.h>
 #include "GDL/ExtensionBase.h"
 #include "GDL/IDE/Dialogs/EditExpression.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDL/IDE/Dialogs/ChooseLayer.h"
+#include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include <wx/textdlg.h>
+#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
+#include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/ObjectHelpers.h"
@@ -26,10 +29,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/gdTreeItemStringData.h"
 #include "GDL/IDE/TreeItemStrExpressionInfoData.h"
-#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDL/IDE/Dialogs/AdvancedTextEntryDlg.h"
-#include "GDCore/Tools/HelpFileAccess.h"
-#include "GDL/IDE/ExpressionsCorrectnessTesting.h"
 
 //(*IdInit(EditTextDialog)
 const long EditTextDialog::ID_CUSTOM1 = wxNewId();
@@ -386,7 +386,7 @@ void EditTextDialog::OnOkBtClick(wxCommandEvent& event)
 {
     returnedText = ToString(TexteEdit->GetValue());
 
-    CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
+    gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
     gd::ExpressionParser expressionParser(returnedText);
 
     if ( !expressionParser.ParseStringExpression(game, scene, callbacks) )
@@ -428,10 +428,10 @@ string EditTextDialog::ShowParameterDialog(const gd::ParameterMetadata & paramet
     }
     else if ( parameterMetadata.type == "layer" )
     {
-        ChooseLayer dialog(this, scene.initialLayers);
+        gd::ChooseLayerDialog dialog(this, scene);
         if ( dialog.ShowModal() == 0 ) return "";
 
-        return dialog.layerChosen;
+        return dialog.GetChosenLayer();
     }
     else if ( parameterMetadata.type == "scenevar" )
     {
@@ -503,7 +503,7 @@ void EditTextDialog::TextModified(wxStyledTextEvent& event)
 {
     string text = string(TexteEdit->GetValue().mb_str());
 
-    CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
+    gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
     gd::ExpressionParser expressionParser(text);
     if ( !expressionParser.ParseStringExpression(game, scene, callbacks) )
     {

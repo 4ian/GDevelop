@@ -580,31 +580,30 @@ void OpenSaveGame::OpenLayers(vector < Layer > & list, const TiXmlElement * elem
         const TiXmlElement * elemCamera = elemScene->FirstChildElement("Camera");
 
         //Compatibility with Game Develop 1.2.8699 and inferior
-        if ( !elemCamera ) layer.SetCamerasNumber(1);
+        if ( !elemCamera ) layer.SetCameraCount(1);
 
         while (elemCamera)
         {
-            layer.SetCamerasNumber(layer.GetCamerasNumber()+1);
+            layer.SetCameraCount(layer.GetCameraCount()+1);
 
-            string defaultSize = elemCamera->Attribute("DefaultSize");
-            layer.GetCamera(layer.GetCamerasNumber()-1).defaultSize = true;
-            if ( defaultSize == "false") layer.GetCamera(layer.GetCamerasNumber()-1).defaultSize = false;
+            if ( elemCamera->Attribute("DefaultSize") && elemCamera->Attribute("Width") && elemCamera->Attribute("Height") )
+            {
+                string defaultSize = elemCamera->Attribute("DefaultSize");
+                layer.GetCamera(layer.GetCameraCount()-1).SetUseDefaultSize(!(defaultSize == "false"));
+                layer.GetCamera(layer.GetCameraCount()-1).SetSize(sf::Vector2f(ToFloat(elemCamera->Attribute("Width")), ToFloat(elemCamera->Attribute("Height"))));
+            }
 
-            elemCamera->QueryFloatAttribute("Width", &layer.GetCamera(layer.GetCamerasNumber()-1).size.x);
-            elemCamera->QueryFloatAttribute("Height", &layer.GetCamera(layer.GetCamerasNumber()-1).size.y);
-
-            string defaultViewport = elemCamera->Attribute("DefaultViewport");
-            layer.GetCamera(layer.GetCamerasNumber()-1).defaultViewport = true;
-            if ( defaultViewport == "false") layer.GetCamera(layer.GetCamerasNumber()-1).defaultViewport = false;
-
-            elemCamera->QueryFloatAttribute("ViewportLeft", &layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Left);
-            elemCamera->QueryFloatAttribute("ViewportTop", &layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Top);
-
-            float value;
-            elemCamera->QueryFloatAttribute("ViewportRight", &value); //sf::Rect used Right and Bottom instead of Width and Height before.
-            layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Width = value - layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Left;
-            elemCamera->QueryFloatAttribute("ViewportBottom", &value);
-            layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Height = value - layer.GetCamera(layer.GetCamerasNumber()-1).viewport.Top;
+            if ( elemCamera->Attribute("DefaultViewport") && elemCamera->Attribute("ViewportLeft") && elemCamera->Attribute("ViewportTop") &&
+                 elemCamera->Attribute("ViewportRight") && elemCamera->Attribute("ViewportBottom") )
+            {
+                string defaultViewport = elemCamera->Attribute("DefaultViewport");
+                layer.GetCamera(layer.GetCameraCount()-1).SetUseDefaultViewport(!(defaultViewport == "false"));
+                layer.GetCamera(layer.GetCameraCount()-1).SetViewport(sf::FloatRect(ToFloat(elemCamera->Attribute("ViewportLeft")),
+                                                                                    ToFloat(elemCamera->Attribute("ViewportTop")),
+                                                                                    ToFloat(elemCamera->Attribute("ViewportRight"))-ToFloat(elemCamera->Attribute("ViewportLeft")),
+                                                                                    ToFloat(elemCamera->Attribute("ViewportBottom"))-ToFloat(elemCamera->Attribute("ViewportTop"))
+                                                                                    )); // (sf::Rect used Right and Bottom instead of Width and Height before. )
+            }
 
             elemCamera = elemCamera->NextSiblingElement();
         }
@@ -745,76 +744,7 @@ bool OpenSaveGame::SaveToFile(string file)
     {
         scene = new TiXmlElement( "Scene" );
         scenes->LinkEndChild( scene );
-        scene->SetAttribute( "nom", game.GetLayout(i).GetName().c_str() );
-        scene->SetDoubleAttribute( "r", game.GetLayout(i).GetBackgroundColorRed() );
-        scene->SetDoubleAttribute( "v", game.GetLayout(i).GetBackgroundColorGreen() );
-        scene->SetDoubleAttribute( "b", game.GetLayout(i).GetBackgroundColorBlue() );
-        scene->SetAttribute( "titre", game.GetLayout(i).GetWindowDefaultTitle().c_str() );
-        scene->SetDoubleAttribute( "oglFOV", game.GetLayouts()[i]->oglFOV );
-        scene->SetDoubleAttribute( "oglZNear", game.GetLayouts()[i]->oglZNear );
-        scene->SetDoubleAttribute( "oglZFar", game.GetLayouts()[i]->oglZFar );
-        if ( game.GetLayouts()[i]->standardSortMethod ) scene->SetAttribute( "standardSortMethod", "true" ); else scene->SetAttribute( "standardSortMethod", "false" );
-        if ( game.GetLayouts()[i]->stopSoundsOnStartup ) scene->SetAttribute( "stopSoundsOnStartup", "true" ); else scene->SetAttribute( "stopSoundsOnStartup", "false" );
-        #if defined(GD_IDE_ONLY)
-        TiXmlElement * settings = new TiXmlElement( "UISettings" );
-        scene->LinkEndChild( settings );
-        game.GetLayouts()[i]->GetAssociatedSceneCanvasSettings().SaveToXml(settings);
-        #endif
-
-        TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
-        scene->LinkEndChild( grpsobjets );
-        SaveGroupesObjets(game.GetLayouts()[i]->GetObjectGroups(), grpsobjets);
-
-        TiXmlElement * objets = new TiXmlElement( "Objets" );
-        scene->LinkEndChild( objets );
-        SaveObjects(game.GetLayouts()[i]->GetInitialObjects(), objets);
-
-        TiXmlElement * layers = new TiXmlElement( "Layers" );
-        scene->LinkEndChild( layers );
-        SaveLayers(game.GetLayouts()[i]->initialLayers, layers);
-
-        TiXmlElement * variables = new TiXmlElement( "Variables" );
-        scene->LinkEndChild( variables );
-        game.GetLayout(i).GetVariables().SaveToXml(variables);
-
-        TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedDatas" );
-        scene->LinkEndChild( autosSharedDatas );
-        for (std::map<std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = game.GetLayouts()[i]->automatismsInitialSharedDatas.begin();
-             it != game.GetLayouts()[i]->automatismsInitialSharedDatas.end();++it)
-        {
-            TiXmlElement * autoSharedDatas = new TiXmlElement( "AutomatismSharedDatas" );
-            autosSharedDatas->LinkEndChild( autoSharedDatas );
-
-            autoSharedDatas->SetAttribute("Type", it->second->GetTypeName().c_str());
-            autoSharedDatas->SetAttribute("Name", it->second->GetName().c_str());
-            it->second->SaveToXml(autoSharedDatas);
-        }
-
-        TiXmlElement * dependenciesElem = new TiXmlElement( "Dependencies" );
-        scene->LinkEndChild( dependenciesElem );
-        for ( unsigned int j = 0;j < game.GetLayouts()[i]->externalSourcesDependList.size();++j)
-        {
-            TiXmlElement * dependencyElem = new TiXmlElement( "Dependency" );
-            dependenciesElem->LinkEndChild( dependencyElem );
-
-            dependencyElem->SetAttribute("sourceFile", game.GetLayouts()[i]->externalSourcesDependList[j].c_str());
-        }
-
-        {
-            TiXmlElement * positions = new TiXmlElement( "Positions" );
-            scene->LinkEndChild( positions );
-            game.GetLayout(i).GetInitialInstances().SaveToXml(positions);
-        }
-
-        //Evènements
-        if ( !game.GetLayout(i).GetEvents().empty() )
-        {
-            TiXmlElement * events = new TiXmlElement( "Events" );
-            scene->LinkEndChild( events );
-
-            SaveEvents(game.GetLayout(i).GetEvents(), events);
-        }
-
+        game.GetLayout(i).SaveToXml(scene);
     }
 
     //External events
@@ -1008,26 +938,22 @@ void OpenSaveGame::SaveLayers(const vector < Layer > & list, TiXmlElement * laye
         else
             layer->SetAttribute("Visibility", "false");
 
-        for (unsigned int c = 0;c<list.at(j).GetCamerasNumber();++c)
+        for (unsigned int c = 0;c<list.at(j).GetCameraCount();++c)
         {
             TiXmlElement * camera = new TiXmlElement( "Camera" );
             layer->LinkEndChild( camera );
 
-            camera->SetAttribute("DefaultSize", "true");
-            if ( !list.at(j).GetCamera(c).defaultSize )
-                camera->SetAttribute("DefaultSize", "false");
+            camera->SetAttribute("DefaultSize", list.at(j).GetCamera(c).UseDefaultSize() ? "true" : "false");
 
-            camera->SetDoubleAttribute("Width", list.at(j).GetCamera(c).size.x);
-            camera->SetDoubleAttribute("Height", list.at(j).GetCamera(c).size.y);
+            camera->SetDoubleAttribute("Width", list.at(j).GetCamera(c).GetSize().x);
+            camera->SetDoubleAttribute("Height", list.at(j).GetCamera(c).GetSize().y);
 
-            camera->SetAttribute("DefaultViewport", "true");
-            if ( !list.at(j).GetCamera(c).defaultViewport )
-                camera->SetAttribute("DefaultViewport", "false");
+            camera->SetAttribute("DefaultViewport", list.at(j).GetCamera(c).UseDefaultViewport() ? "true" : "false");
 
-            camera->SetDoubleAttribute("ViewportLeft", list.at(j).GetCamera(c).viewport.Left);
-            camera->SetDoubleAttribute("ViewportTop", list.at(j).GetCamera(c).viewport.Top);
-            camera->SetDoubleAttribute("ViewportRight", list.at(j).GetCamera(c).viewport.Left+list.at(j).GetCamera(c).viewport.Width);
-            camera->SetDoubleAttribute("ViewportBottom", list.at(j).GetCamera(c).viewport.Top+list.at(j).GetCamera(c).viewport.Height);
+            camera->SetDoubleAttribute("ViewportLeft", list.at(j).GetCamera(c).GetViewport().Left);
+            camera->SetDoubleAttribute("ViewportTop", list.at(j).GetCamera(c).GetViewport().Top);
+            camera->SetDoubleAttribute("ViewportRight", list.at(j).GetCamera(c).GetViewport().Left+list.at(j).GetCamera(c).GetViewport().Width);
+            camera->SetDoubleAttribute("ViewportBottom", list.at(j).GetCamera(c).GetViewport().Top+list.at(j).GetCamera(c).GetViewport().Height);
         }
     }
 }

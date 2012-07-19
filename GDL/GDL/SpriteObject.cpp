@@ -717,7 +717,7 @@ void SpriteObject::SetColor( unsigned int r, unsigned int v, unsigned int b )
 
 bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
 {
-    for (unsigned int cameraIndex = 0;cameraIndex < scene.GetLayer(layer).GetCamerasNumber();++cameraIndex)
+    for (unsigned int cameraIndex = 0;cameraIndex < scene.GetLayer(layer).GetCameraCount();++cameraIndex)
     {
         int mouseXInTheLayer = scene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*scene.renderWindow).x, sf::Mouse::GetPosition(*scene.renderWindow).y, scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).x;
         int mouseYInTheLayer = scene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*scene.renderWindow).x, sf::Mouse::GetPosition(*scene.renderWindow).y, scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).y;

@@ -34,14 +34,14 @@ void GD_API ShowCursor( RuntimeScene & scene )
 double GD_API GetCursorXPosition( RuntimeScene & scene, const std::string & layer, unsigned int camera )
 {
     //Get view, and compute mouse position
-    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
+    const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
     return scene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*scene.renderWindow).x, sf::Mouse::GetPosition(*scene.renderWindow).y, view).x;
 }
 
 double GD_API GetCursorYPosition( RuntimeScene & scene, const std::string & layer, unsigned int camera )
 {
     //Get view, and compute mouse position
-    sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
+    const sf::View & view = scene.GetLayer(layer).GetCamera(camera).GetSFMLView();
     return scene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*scene.renderWindow).x, sf::Mouse::GetPosition(*scene.renderWindow).y, view).y;
 }
 

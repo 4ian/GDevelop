@@ -103,6 +103,31 @@ public:
     inline std::vector < boost::shared_ptr<Object> > & GetInitialObjects() { return initialObjects; }
 
     /**
+     * Return a reference to the specified layer
+     */
+    virtual Layer & GetLayer(const std::string & name);
+
+    /**
+     * Return a reference to the specified layer
+     */
+    virtual const Layer & GetLayer(const std::string & name) const;
+
+    /**
+     * Return a reference to the specified layer
+     */
+    virtual Layer & GetLayer(unsigned int index);
+
+    /**
+     * Return a reference to the specified layer
+     */
+    virtual const Layer & GetLayer (unsigned int index) const;
+
+    /**
+     * Return the number of layers
+     */
+    virtual unsigned int GetLayersCount() const;
+
+    /**
      * Provide access to the ListVariable member containing the layout variables
      */
     inline const ListVariable & GetVariables() const { return variables; }
@@ -143,6 +168,13 @@ public:
     virtual void InsertObject(const gd::Object & theObject, unsigned int position);
     virtual void RemoveObject(const std::string & name);
 
+    virtual bool HasLayerNamed(const std::string & name) const;
+    virtual unsigned int GetLayerPosition(const std::string & name) const;
+    virtual void InsertNewLayer(std::string & name, unsigned int position);
+    virtual void InsertLayer(const gd::Layer & theLayer, unsigned int position);
+    virtual void RemoveLayer(const std::string & name);
+    virtual void SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex);
+
     virtual void OnEventsModified() { eventsModified = true; };
     ///@}
 
@@ -165,7 +197,6 @@ public:
     #if defined(GD_IDE_ONLY)
     BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
     #endif
-    vector < Layer >                        initialLayers; ///< Initial layers
     std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
 
     mutable std::vector<std::string>        externalSourcesDependList; ///< List of source files the scene code depends on.
@@ -187,19 +218,20 @@ public:
 
 private:
 
-    std::string                             name; ///< Scene name
-    unsigned int                            backgroundColorR; ///< Background color Red component
-    unsigned int                            backgroundColorG; ///< Background color Green component
-    unsigned int                            backgroundColorB; ///< Background color Blue component
-    std::string                             title; ///< Title displayed in the window
-    vector < boost::shared_ptr<Object> >    initialObjects; ///< Objects available.
-    ListVariable                            variables; ///< Variables list
-    InitialInstancesContainer               initialInstances; ///< Initial instances
+    std::string                                 name; ///< Scene name
+    unsigned int                                backgroundColorR; ///< Background color Red component
+    unsigned int                                backgroundColorG; ///< Background color Green component
+    unsigned int                                backgroundColorB; ///< Background color Blue component
+    std::string                                 title; ///< Title displayed in the window
+    std::vector < boost::shared_ptr<Object> >   initialObjects; ///< Objects available.
+    ListVariable                                variables; ///< Variables list
+    InitialInstancesContainer                   initialInstances; ///< Initial instances
+    std::vector < Layer >                       layers; ///< Initial layers
 
     #if defined(GD_IDE_ONLY)
-    vector < gd::BaseEventSPtr >            events; ///< Scene events
-    bool                                    eventsModified;
-    SceneCanvasSettings                     associatedSettings;
+    std::vector < gd::BaseEventSPtr >            events; ///< Scene events
+    bool                                        eventsModified;
+    SceneCanvasSettings                         associatedSettings;
     #endif
 
     /**
@@ -207,6 +239,8 @@ private:
      * Don't forget to update me if members were changed !
      */
     void Init(const Scene & scene);
+
+    static Layer badLayer;
 };
 
 //"Tool" Functions

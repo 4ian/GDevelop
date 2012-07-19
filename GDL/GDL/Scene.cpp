@@ -23,6 +23,8 @@
 #endif
 #undef GetObject //Disable an annoying macro
 
+Layer Scene::badLayer;
+
 Scene::Scene() :
 backgroundColorR(209),
 backgroundColorG(209),
@@ -43,8 +45,8 @@ eventsModified(true)
 {
     //ctor
     Layer layer;
-    layer.SetCamerasNumber(1);
-    initialLayers.push_back(layer);
+    layer.SetCameraCount(1);
+    layers.push_back(layer);
 }
 
 Scene::~Scene()
@@ -54,6 +56,37 @@ Scene::~Scene()
     while ( CodeCompiler::GetInstance()->HasTaskRelatedTo(*this) )
         ;
     #endif
+}
+
+Layer & Scene::GetLayer(const std::string & name)
+{
+    std::vector<Layer>::iterator layer = find_if(layers.begin(), layers.end(), bind2nd(LayerHasName(), name));
+
+    if ( layer != layers.end())
+        return *layer;
+
+    return badLayer;
+}
+const Layer & Scene::GetLayer(const std::string & name) const
+{
+    std::vector<Layer>::const_iterator layer = find_if(layers.begin(), layers.end(), bind2nd(LayerHasName(), name));
+
+    if ( layer != layers.end())
+        return *layer;
+
+    return badLayer;
+}
+Layer & Scene::GetLayer(unsigned int index)
+{
+    return layers[index];
+}
+const Layer & Scene::GetLayer (unsigned int index) const
+{
+    return layers[index];
+}
+unsigned int Scene::GetLayersCount() const
+{
+    return layers.size();
 }
 
 #if defined(GD_IDE_ONLY)
@@ -99,12 +132,12 @@ void Scene::InsertNewObject(std::string & name, unsigned int position)
         GetInitialObjects().push_back(newObject);
 }
 
-void Scene::InsertObject(const gd::Object & events, unsigned int position)
+void Scene::InsertObject(const gd::Object & object, unsigned int position)
 {
     try
     {
-        const Object & castedEvents = dynamic_cast<const Object&>(events);
-        boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(new Object(castedEvents));
+        const Object & castedObject = dynamic_cast<const Object&>(object);
+        boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(new Object(castedObject));
         if (position<GetInitialObjects().size())
             GetInitialObjects().insert(GetInitialObjects().begin()+position, newObject);
         else
@@ -115,15 +148,131 @@ void Scene::InsertObject(const gd::Object & events, unsigned int position)
 
 void Scene::RemoveObject(const std::string & name)
 {
-    std::vector< boost::shared_ptr<Object> >::iterator events = find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name));
-    if ( events == GetInitialObjects().end() ) return;
+    std::vector< boost::shared_ptr<Object> >::iterator object = find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name));
+    if ( object == GetInitialObjects().end() ) return;
 
-    GetInitialObjects().erase(events);
+    GetInitialObjects().erase(object);
+}
+bool Scene::HasLayerNamed(const std::string & name) const
+{
+    return ( find_if(layers.begin(), layers.end(), bind2nd(LayerHasName(), name)) != layers.end() );
+}
+unsigned int Scene::GetLayerPosition(const std::string & name) const
+{
+    for (unsigned int i = 0;i<layers.size();++i)
+    {
+        if ( layers[i].GetName() == name ) return i;
+    }
+    return std::string::npos;
 }
 
-void Scene::SaveToXml(TiXmlElement * elem) const
+void Scene::InsertNewLayer(std::string & name, unsigned int position)
 {
-    //TODO: For now, everything is still managed by OpenSaveGame
+    Layer newLayer;
+    newLayer.SetName(name);
+    if (position<layers.size())
+        layers.insert(layers.begin()+position, newLayer);
+    else
+        layers.push_back(newLayer);
+}
+
+void Scene::InsertLayer(const gd::Layer & layer, unsigned int position)
+{
+    try
+    {
+        const Layer & castedLayer = dynamic_cast<const Layer&>(layer);
+        if (position<layers.size())
+            layers.insert(layers.begin()+position, castedLayer);
+        else
+            layers.push_back(castedLayer);
+    }
+    catch(...) { std::cout << "WARNING: Tried to add an layer which is not a GD C++ Platform Layer to a GD C++ Platform project"; }
+}
+
+void Scene::RemoveLayer(const std::string & name)
+{
+    std::vector< Layer >::iterator layer = find_if(layers.begin(), layers.end(), bind2nd(LayerHasName(), name));
+    if ( layer == layers.end() ) return;
+
+    layers.erase(layer);
+}
+
+void Scene::SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex)
+{
+    if ( firstLayerIndex >= layers.size() || secondLayerIndex >= layers.size() )
+        return;
+
+    Layer temp = layers[firstLayerIndex];
+    layers[firstLayerIndex] = layers[secondLayerIndex];
+    layers[secondLayerIndex] = temp;
+}
+
+void Scene::SaveToXml(TiXmlElement * scene) const
+{
+    if ( scene == NULL ) return;
+
+    scene->SetAttribute( "nom", GetName().c_str() );
+    scene->SetDoubleAttribute( "r", GetBackgroundColorRed() );
+    scene->SetDoubleAttribute( "v", GetBackgroundColorGreen() );
+    scene->SetDoubleAttribute( "b", GetBackgroundColorBlue() );
+    scene->SetAttribute( "titre", GetWindowDefaultTitle().c_str() );
+    scene->SetDoubleAttribute( "oglFOV", oglFOV );
+    scene->SetDoubleAttribute( "oglZNear", oglZNear );
+    scene->SetDoubleAttribute( "oglZFar", oglZFar );
+    scene->SetAttribute( "standardSortMethod", standardSortMethod ? "true" : "false" );
+    scene->SetAttribute( "stopSoundsOnStartup", stopSoundsOnStartup ? "true" : "false" );
+    #if defined(GD_IDE_ONLY)
+    TiXmlElement * settings = new TiXmlElement( "UISettings" );
+    scene->LinkEndChild( settings );
+    GetAssociatedSceneCanvasSettings().SaveToXml(settings);
+    #endif
+
+    TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
+    scene->LinkEndChild( grpsobjets );
+    OpenSaveGame::SaveGroupesObjets(GetObjectGroups(), grpsobjets);
+
+    TiXmlElement * objets = new TiXmlElement( "Objets" );
+    scene->LinkEndChild( objets );
+    OpenSaveGame::SaveObjects(GetInitialObjects(), objets);
+
+    TiXmlElement * layersElem = new TiXmlElement( "Layers" );
+    scene->LinkEndChild( layersElem );
+    OpenSaveGame::SaveLayers(layers, layersElem);
+
+    TiXmlElement * variables = new TiXmlElement( "Variables" );
+    scene->LinkEndChild( variables );
+    GetVariables().SaveToXml(variables);
+
+    TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedDatas" );
+    scene->LinkEndChild( autosSharedDatas );
+    for (std::map<std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = automatismsInitialSharedDatas.begin();
+         it != automatismsInitialSharedDatas.end();++it)
+    {
+        TiXmlElement * autoSharedDatas = new TiXmlElement( "AutomatismSharedDatas" );
+        autosSharedDatas->LinkEndChild( autoSharedDatas );
+
+        autoSharedDatas->SetAttribute("Type", it->second->GetTypeName().c_str());
+        autoSharedDatas->SetAttribute("Name", it->second->GetName().c_str());
+        it->second->SaveToXml(autoSharedDatas);
+    }
+
+    TiXmlElement * dependenciesElem = new TiXmlElement( "Dependencies" );
+    scene->LinkEndChild( dependenciesElem );
+    for ( unsigned int j = 0;j < externalSourcesDependList.size();++j)
+    {
+        TiXmlElement * dependencyElem = new TiXmlElement( "Dependency" );
+        dependenciesElem->LinkEndChild( dependencyElem );
+
+        dependencyElem->SetAttribute("sourceFile", externalSourcesDependList[j].c_str());
+    }
+
+    TiXmlElement * positions = new TiXmlElement( "Positions" );
+    scene->LinkEndChild( positions );
+    GetInitialInstances().SaveToXml(positions);
+
+    TiXmlElement * eventsElem = new TiXmlElement( "Events" );
+    scene->LinkEndChild( eventsElem );
+    OpenSaveGame::SaveEvents(GetEvents(), eventsElem);
 }
 #endif
 
@@ -155,7 +304,7 @@ void Scene::LoadFromXml(const TiXmlElement * elem)
         initialInstances.LoadFromXml(elem->FirstChildElement( "Positions" ));
 
     if ( elem->FirstChildElement( "Layers" ) != NULL )
-        OpenSaveGame::OpenLayers(initialLayers, elem->FirstChildElement( "Layers" ));
+        OpenSaveGame::OpenLayers(layers, elem->FirstChildElement( "Layers" ));
 
     #if defined(GD_IDE_ONLY)
     if ( elem->FirstChildElement( "Events" ) != NULL )
@@ -227,7 +376,7 @@ void Scene::Init(const Scene & scene)
     	GetInitialObjects().push_back( boost::shared_ptr<Object>(scene.GetInitialObjects()[i]->Clone()) );
 
     initialInstances = scene.initialInstances;
-    initialLayers = scene.initialLayers;
+    layers = scene.layers;
     variables = scene.GetVariables();
 
     automatismsInitialSharedDatas.clear();

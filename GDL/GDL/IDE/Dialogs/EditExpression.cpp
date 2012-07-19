@@ -25,9 +25,9 @@
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/TreeItemExpressionInfoData.h"
-#include "GDL/IDE/ExpressionsCorrectnessTesting.h"
+#include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDL/IDE/Dialogs/ChooseLayer.h"
+#include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDL/IDE/Dialogs/AdvancedTextEntryDlg.h"
@@ -462,8 +462,7 @@ void EditExpression::TextModified(wxStyledTextEvent& event)
     //Syntax checking
     expression = ToString( ExpressionEdit->GetText() );
 
-    CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
-
+    gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
     gd::ExpressionParser expressionParser(expression);
     if ( !expressionParser.ParseMathExpression(game, scene, callbacks) )
     {
@@ -481,7 +480,7 @@ void EditExpression::TextModified(wxStyledTextEvent& event)
 
 void EditExpression::OnOkBtClick(wxCommandEvent& event)
 {
-    CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
+    gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
     gd::ExpressionParser expressionParser(expression);
 
     if ( !expressionParser.ParseMathExpression(game, scene, callbacks) )
@@ -693,10 +692,10 @@ string EditExpression::ShowParameterDialog(const gd::ParameterMetadata & paramet
     }
     else if ( parameterMetadata.type == "layer" )
     {
-        ChooseLayer dialog(this, scene.initialLayers);
+        gd::ChooseLayerDialog dialog(this, scene);
         if ( dialog.ShowModal() == 0 ) return "";
 
-        return dialog.layerChosen;
+        return dialog.GetChosenLayer();
     }
     else if ( parameterMetadata.type == "scenevar" )
     {

@@ -11,9 +11,9 @@
 //*)
 #include <string>
 #include <vector>
-class Game;
-class Scene;
-#include "GDL/IDE/Dialogs/EditTextDialog.h"
+#include "GDL/Game.h"
+#include "GDL/Scene.h"
+#include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
 
 using namespace std;
 
@@ -95,9 +95,9 @@ ChoiceJoyAxis::~ChoiceJoyAxis()
 
 void ChoiceJoyAxis::OnadvancedBtClick(wxCommandEvent& event)
 {
-    EditTextDialog dialog(this, joyaxis, game, scene);
+    gd::EditStrExpressionDialog dialog(this, joyaxis, game, scene);
     if ( dialog.ShowModal() == 1 )
-        joyaxis = dialog.returnedText;
+        joyaxis = dialog.GetExpression();
 }
 
 void ChoiceJoyAxis::OnaxisRadioSelect(wxCommandEvent& event)

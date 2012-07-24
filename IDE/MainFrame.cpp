@@ -505,11 +505,11 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     }
 
     //TODO
-    /*HtmlViewerPnl * htmlViewerPnl = new HtmlViewerPnl(editorsNotebook);
-    editorsNotebook->AddPage(htmlViewerPnl, _("Aide en ligne"));*/
+    HtmlViewerPnl * htmlViewerPnl = new HtmlViewerPnl(editorsNotebook);
+    editorsNotebook->AddPage(htmlViewerPnl, _("Aide en ligne"));
 }
-
 void MainFrame::OnResize(wxSizeEvent& event)
+
 {
     Layout();
     if ( ribbonHelpBt != NULL ) ribbonHelpBt->SetPosition(wxPoint(m_ribbon->GetSize().GetWidth()-ribbonHelpBt->GetSize().GetWidth()-2, 2));

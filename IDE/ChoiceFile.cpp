@@ -12,7 +12,7 @@
 #include <wx/filedlg.h>
 #include <wx/filename.h>
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/Dialogs/EditTextDialog.h"
+#include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
 #include "GDL/Game.h"
 class Scene;
 
@@ -94,10 +94,10 @@ ChoiceFile::~ChoiceFile()
 
 void ChoiceFile::OnadvancedBtClick(wxCommandEvent& event)
 {
-    EditTextDialog dialog(this, file, game, scene);
+    gd::EditStrExpressionDialog dialog(this, file, game, scene);
     if ( dialog.ShowModal() == 1 )
     {
-        file = dialog.returnedText;
+        file = dialog.GetExpression();
         fileEdit->ChangeValue(file);
     }
 }

@@ -12,7 +12,6 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-
 #include "wx/image.h"
 #include "wx/icon.h"
 #include <wx/log.h>
@@ -24,6 +23,20 @@
 #include <wx/config.h>
 #include <boost/algorithm/string.hpp>
 #include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/ActionSentenceFormatter.h"
+#include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
+#include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
+#include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
+#include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
@@ -32,19 +45,6 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/IDE/gdTreeItemStringData.h"
-#include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/ActionSentenceFormatter.h"
-#include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
-#include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
-#include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
-
-#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDL/IDE/Dialogs/EditExpression.h"
-#include "GDL/IDE/Dialogs/EditTextDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
-#include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "ChoixClavier.h"
 #include "SigneModification.h"
 #include "GeneratePassword.h"
@@ -290,10 +290,8 @@ void ChoixAction::RefreshList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
-
     //Insert extension objects actions
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -318,7 +316,7 @@ void ChoixAction::RefreshList()
 	    {
             wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                         ActionsTree->AppendItem(extensionItem,
-                                                                _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,
+                                                                _("Objet") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each object actions
@@ -327,18 +325,18 @@ void ChoixAction::RefreshList()
             {
                 //Verify if the action match the search
                 if ( searching &&
-                    boost::to_upper_copy(it->second.group).find(search) == string::npos &&
-                    boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
+                    boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
+                    boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                     continue;
 
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = ActionsTree->GetFirstChild(objectTypeItem, cookie);
-                while ( groupItem.IsOk() && ActionsTree->GetItemText(groupItem) != it->second.group )
+                while ( groupItem.IsOk() && ActionsTree->GetItemText(groupItem) != it->second.GetGroup() )
                 {
                     groupItem = ActionsTree->GetNextSibling(groupItem);
                 }
-                if ( !groupItem.IsOk() ) groupItem = ActionsTree->AppendItem(objectTypeItem, it->second.group, 0);
+                if ( !groupItem.IsOk() ) groupItem = ActionsTree->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
 
                 //Add action item
                 int IDimage = 0;
@@ -349,7 +347,7 @@ void ChoixAction::RefreshList()
                 }
 
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
-                ActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+                ActionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
 	    }
 
@@ -357,7 +355,7 @@ void ChoixAction::RefreshList()
 	    {
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         ActionsTree->AppendItem(extensionItem,
-                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname,
+                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each automatism actions
@@ -366,18 +364,18 @@ void ChoixAction::RefreshList()
             {
                 //Verify if the action match the search
                 if ( searching
-                    && boost::to_upper_copy(it->second.group).find(search) == string::npos
-                    && boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
+                    && boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos
+                    && boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                     continue;
 
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = ActionsTree->GetFirstChild(automatismTypeItem, cookie);
-                while ( groupItem.IsOk() && ActionsTree->GetItemText(groupItem) != it->second.group )
+                while ( groupItem.IsOk() && ActionsTree->GetItemText(groupItem) != it->second.GetGroup() )
                 {
                     groupItem = ActionsTree->GetNextSibling(groupItem);
                 }
-                if ( !groupItem.IsOk() ) groupItem = ActionsTree->AppendItem(automatismTypeItem, it->second.group, 0);
+                if ( !groupItem.IsOk() ) groupItem = ActionsTree->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
 
                 //Add action item
                 int IDimage = 0;
@@ -388,7 +386,7 @@ void ChoixAction::RefreshList()
                 }
 
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
-                ActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+                ActionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
 	    }
 
@@ -398,18 +396,18 @@ void ChoixAction::RefreshList()
         {
             //Verify if the action match the search
             if ( searching &&
-                boost::to_upper_copy(it->second.group).find(search) == string::npos &&
-                boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
+                boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
+                boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                 continue;
 
             //Search and/or add group item
             wxTreeItemIdValue cookie;
             wxTreeItemId groupItem = ActionsTree->GetFirstChild(extensionItem, cookie);
-            while ( groupItem.IsOk() && ActionsTree->GetItemText(groupItem) != it->second.group )
+            while ( groupItem.IsOk() && ActionsTree->GetItemText(groupItem) != it->second.GetGroup() )
             {
                 groupItem = ActionsTree->GetNextSibling(groupItem);
             }
-            if ( !groupItem.IsOk() ) groupItem = ActionsTree->AppendItem(extensionItem, it->second.group, 0);
+            if ( !groupItem.IsOk() ) groupItem = ActionsTree->AppendItem(extensionItem, it->second.GetGroup(), 0);
 
             //Add action item
             int IDimage = 0;
@@ -420,7 +418,7 @@ void ChoixAction::RefreshList()
             }
 
             gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
-            ActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+            ActionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
         }
 
         if ( !ActionsTree->HasChildren(extensionItem) ) ActionsTree->Delete(extensionItem);
@@ -443,11 +441,10 @@ void ChoixAction::RefreshObjectActionsList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
     std::string selectedObjectType = gd::GetTypeOfObject(game, scene, selectedObject);
 
     //Insert extension objects actions
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -468,7 +465,7 @@ void ChoixAction::RefreshObjectActionsList()
 
         wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                     objectActionsTree->AppendItem(extensionItem,
-                                                            _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectType).fullname,
+                                                            _("Objet") + wxString(" ") + extensions[i]->GetObjectMetadata(objectType).GetFullName(),
                                                             0) :
                                     extensionItem;
 
@@ -478,18 +475,18 @@ void ChoixAction::RefreshObjectActionsList()
         {
             //Verify if the action match the search
             if ( searching &&
-                boost::to_upper_copy(it->second.group).find(search) == string::npos &&
-                boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
+                boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
+                boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                 continue;
 
             //Search and/or add group item
             wxTreeItemIdValue cookie;
             wxTreeItemId groupItem = objectActionsTree->GetFirstChild(objectTypeItem, cookie);
-            while ( groupItem.IsOk() && objectActionsTree->GetItemText(groupItem) != it->second.group )
+            while ( groupItem.IsOk() && objectActionsTree->GetItemText(groupItem) != it->second.GetGroup() )
             {
                 groupItem = objectActionsTree->GetNextSibling(groupItem);
             }
-            if ( !groupItem.IsOk() ) groupItem = objectActionsTree->AppendItem(objectTypeItem, it->second.group, 0);
+            if ( !groupItem.IsOk() ) groupItem = objectActionsTree->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
 
             //Add action item
             int IDimage = 0;
@@ -500,7 +497,7 @@ void ChoixAction::RefreshObjectActionsList()
             }
 
             gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
-            objectActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+            objectActionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
         }
 
 	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
@@ -515,7 +512,7 @@ void ChoixAction::RefreshObjectActionsList()
 
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         objectActionsTree->AppendItem(extensionItem,
-                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismType).fullname,
+                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismType).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each automatism actions
@@ -524,18 +521,18 @@ void ChoixAction::RefreshObjectActionsList()
             {
                 //Verify if the action match the search
                 if ( searching &&
-                    boost::to_upper_copy(it->second.group).find(search) == string::npos &&
-                    boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
+                    boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
+                    boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                     continue;
 
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = objectActionsTree->GetFirstChild(automatismTypeItem, cookie);
-                while ( groupItem.IsOk() && objectActionsTree->GetItemText(groupItem) != it->second.group )
+                while ( groupItem.IsOk() && objectActionsTree->GetItemText(groupItem) != it->second.GetGroup() )
                 {
                     groupItem = objectActionsTree->GetNextSibling(groupItem);
                 }
-                if ( !groupItem.IsOk() ) groupItem = objectActionsTree->AppendItem(automatismTypeItem, it->second.group, 0);
+                if ( !groupItem.IsOk() ) groupItem = objectActionsTree->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
 
                 //Add action item
                 int IDimage = 0;
@@ -546,7 +543,7 @@ void ChoixAction::RefreshObjectActionsList()
                 }
 
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
-                objectActionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+                objectActionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
 	    }
 
@@ -599,7 +596,7 @@ void ChoixAction::RefreshFromAction()
     const gd::InstructionMetadata & instructionMetadata = ExtensionsManager::GetInstance()->GetActionMetadata(Type);
 
     //Display action main properties
-    NomActionTxt->SetLabel( instructionMetadata.fullname );
+    NomActionTxt->SetLabel( instructionMetadata.GetFullName() );
     NomActionTxt->Wrap( 450 );
     ActionTextTxt->SetLabel( instructionMetadata.description );
     ActionTextTxt->Wrap( 450 );
@@ -747,19 +744,19 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         }
         else if ( instructionMetadata.parameters[i].type == "expression" )
         {
-            EditExpression dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
+            gd::EditExpressionDialog dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->ChangeValue(dialog.expression);
+                ParaEdit.at(i)->ChangeValue(dialog.GetExpression());
             }
             return;
         }
         else if ( instructionMetadata.parameters[i].type == "string" )
         {
-            EditTextDialog dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
+            gd::EditStrExpressionDialog dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->ChangeValue(dialog.returnedText);
+                ParaEdit.at(i)->ChangeValue(dialog.GetExpression());
             }
             return;
         }

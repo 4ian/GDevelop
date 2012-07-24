@@ -133,11 +133,11 @@ void AutomatismTypeChoice::RefreshList()
 	    {
 	        if ( !automatismsTypes[j].empty() )
 	        {
-                imageList->Add(extensions[i]->GetAutomatismInfo(automatismsTypes[j]).icon);
+                imageList->Add(extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetBitmapIcon());
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(automatismsTypes[j]);
 
                 wxListItem automatismItem;
-                automatismItem.SetText(extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname);
+                automatismItem.SetText(extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName());
                 automatismItem.SetImage(imageList->GetImageCount()-1);
                 automatismItem.SetData(associatedData);
 
@@ -186,8 +186,8 @@ void AutomatismTypeChoice::OnautomatismsListItemSelect(wxListEvent& event)
     if ( extension == boost::shared_ptr<ExtensionBase> () )
         return;
 
-    infoEdit->ChangeValue(extension->GetAutomatismInfo(selectedAutomatismType).description);
-    iconBmp->SetBitmap(extension->GetAutomatismInfo(selectedAutomatismType).icon);
+    infoEdit->ChangeValue(extension->GetAutomatismMetadata(selectedAutomatismType).GetDescription());
+    iconBmp->SetBitmap(extension->GetAutomatismMetadata(selectedAutomatismType).GetBitmapIcon());
 }
 
 void AutomatismTypeChoice::OnokBtClick(wxCommandEvent& event)

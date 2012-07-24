@@ -34,6 +34,8 @@
 #include "GDL/IDE/gdTreeItemStringData.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/ConditionSentenceFormatter.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDCore/IDE/Dialogs/ObjectListDialogsHelper.h"
 #include "GDCore/IDE/ExpressionsCorrectnessTesting.h"
@@ -41,8 +43,8 @@
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
-#include "GDL/IDE/Dialogs/EditExpression.h"
-#include "GDL/IDE/Dialogs/EditTextDialog.h"
+#include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
+#include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
 #include "TrueOrFalse.h"
 #include "ChoiceJoyAxis.h"
 #include "ChoiceFile.h"
@@ -94,13 +96,6 @@ BEGIN_EVENT_TABLE( ChoixCondition, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-
-////////////////////////////////////////////////////////////
-/// Constructeur
-///
-/// Paramètre pScene : pour passer en argument pour ouvrir par exemple l'éditeur d'objet
-/// Paramètre pEvent : pour analyser l'event et savoir si il faut le mettre global/local
-////////////////////////////////////////////////////////////
 ChoixCondition::ChoixCondition( wxWindow* parent, Game & game_, Scene & scene_) :
 game(game_),
 scene(scene_),
@@ -293,10 +288,8 @@ void ChoixCondition::RefreshList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
-
     //Insert extension objects conditions
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -323,7 +316,7 @@ void ChoixCondition::RefreshList()
 
             wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                         ConditionsTree->AppendItem(extensionItem,
-                                                                _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectsTypes[j]).fullname,
+                                                                _("Objet") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each object conditions
@@ -354,7 +347,7 @@ void ChoixCondition::RefreshList()
                 }
 
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
-                ConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+                ConditionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
 	    }
 
@@ -362,7 +355,7 @@ void ChoixCondition::RefreshList()
 	    {
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         ConditionsTree->AppendItem(extensionItem,
-                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismsTypes[j]).fullname,
+                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each automatism conditions
@@ -371,18 +364,18 @@ void ChoixCondition::RefreshList()
             {
                 //Verify if the condition match the search
                 if ( searching &&
-                    boost::to_upper_copy(it->second.group).find(search) == string::npos &&
-                    boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
+                    boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
+                    boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                     continue;
 
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = ConditionsTree->GetFirstChild(automatismTypeItem, cookie);
-                while ( groupItem.IsOk() && ConditionsTree->GetItemText(groupItem) != it->second.group )
+                while ( groupItem.IsOk() && ConditionsTree->GetItemText(groupItem) != it->second.GetGroup() )
                 {
                     groupItem = ConditionsTree->GetNextSibling(groupItem);
                 }
-                if ( !groupItem.IsOk() ) groupItem = ConditionsTree->AppendItem(automatismTypeItem, it->second.group, 0);
+                if ( !groupItem.IsOk() ) groupItem = ConditionsTree->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
 
                 //Add condition item
                 int IDimage = 0;
@@ -448,11 +441,10 @@ void ChoixCondition::RefreshObjectConditionsList()
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
 
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
     std::string selectedObjectType = gd::GetTypeOfObject(game, scene, selectedObject);
 
     //Insert extension objects conditions
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -473,7 +465,7 @@ void ChoixCondition::RefreshObjectConditionsList()
 
         wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                     objectConditionsTree->AppendItem(extensionItem,
-                                                            _("Objet") + wxString(" ") + extensions[i]->GetObjectInfo(objectType).fullname,
+                                                            _("Objet") + wxString(" ") + extensions[i]->GetObjectMetadata(objectType).GetFullName(),
                                                             0) :
                                     extensionItem;
 
@@ -483,18 +475,18 @@ void ChoixCondition::RefreshObjectConditionsList()
         {
             //Verify if the condition match the search
             if ( searching &&
-                boost::to_upper_copy(it->second.group).find(search) == string::npos &&
-                boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
+                boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
+                boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                 continue;
 
             //Search and/or add group item
             wxTreeItemIdValue cookie;
             wxTreeItemId groupItem = objectConditionsTree->GetFirstChild(objectTypeItem, cookie);
-            while ( groupItem.IsOk() && objectConditionsTree->GetItemText(groupItem) != it->second.group )
+            while ( groupItem.IsOk() && objectConditionsTree->GetItemText(groupItem) != it->second.GetGroup() )
             {
                 groupItem = objectConditionsTree->GetNextSibling(groupItem);
             }
-            if ( !groupItem.IsOk() ) groupItem = objectConditionsTree->AppendItem(objectTypeItem, it->second.group, 0);
+            if ( !groupItem.IsOk() ) groupItem = objectConditionsTree->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
 
             //Add condition item
             int IDimage = 0;
@@ -520,7 +512,7 @@ void ChoixCondition::RefreshObjectConditionsList()
 
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         objectConditionsTree->AppendItem(extensionItem,
-                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismInfo(automatismType).fullname,
+                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismType).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each automatism conditions
@@ -773,10 +765,10 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if (  instructionMetadata.parameters[i].type == "expression" )
         {
-            EditExpression dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
+            gd::EditExpressionDialog dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->ChangeValue(dialog.expression);
+                ParaEdit.at(i)->ChangeValue(dialog.GetExpression());
             }
             return;
         }
@@ -809,10 +801,10 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionMetadata.parameters[i].type == "string" )
         {
-            EditTextDialog dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
+            gd::EditStrExpressionDialog dialog(this, ToString( ParaEdit.at(i)->GetValue() ), game, scene);
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->ChangeValue(dialog.returnedText);
+                ParaEdit.at(i)->ChangeValue(dialog.GetExpression());
             }
             return;
         }

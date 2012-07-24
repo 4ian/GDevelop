@@ -147,15 +147,15 @@ void ObjectTypeChoice::RefreshList()
 	    {
 	        if ( objectsTypes[j] != "" ) //Cannot use directly a base object
 	        {
-                if ( extensions[i]->GetObjectInfo(objectsTypes[j]).icon.IsOk() )
-                    imageList->Add(extensions[i]->GetObjectInfo(objectsTypes[j]).icon);
+                if ( extensions[i]->GetObjectMetadata(objectsTypes[j]).GetBitmapIcon().IsOk() )
+                    imageList->Add(extensions[i]->GetObjectMetadata(objectsTypes[j]).GetBitmapIcon());
                 else
                     imageList->Add(wxBitmap(wxImage(_T("res/unknown32.png"))));
 
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(objectsTypes[j]);
 
                 wxListItem objectItem;
-                objectItem.SetText(extensions[i]->GetObjectInfo(objectsTypes[j]).fullname);
+                objectItem.SetText(extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName());
                 objectItem.SetImage(imageList->GetImageCount()-1);
                 objectItem.SetData(associatedData);
 
@@ -190,8 +190,8 @@ void ObjectTypeChoice::OnobjectsListItemSelect(wxListEvent& event)
     if ( extension == boost::shared_ptr<ExtensionBase> () )
         return;
 
-    infoEdit->ChangeValue(extension->GetObjectInfo(selectedObjectType).informations);
-    iconBmp->SetBitmap(extension->GetObjectInfo(selectedObjectType).icon);
+    infoEdit->ChangeValue(extension->GetObjectMetadata(selectedObjectType).GetDescription());
+    iconBmp->SetBitmap(extension->GetObjectMetadata(selectedObjectType).GetBitmapIcon());
 }
 
 void ObjectTypeChoice::OnobjectsListItemActivated(wxListEvent& event)

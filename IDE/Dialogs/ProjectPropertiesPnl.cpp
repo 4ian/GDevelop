@@ -10,6 +10,7 @@
 //*)
 #include <wx/treectrl.h>
 #include "GDCore/PlatformDefinition/Project.h"
+#include "../ProjectManager.h"
 
 //(*IdInit(ProjectPropertiesPnl)
 const long ProjectPropertiesPnl::ID_PROPGRID = wxNewId();
@@ -22,6 +23,7 @@ END_EVENT_TABLE()
 
 ProjectPropertiesPnl::ProjectPropertiesPnl(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size) :
     project(NULL),
+    associatedProjectManager(NULL),
     associatedTree(NULL)
 {
 	//(*Initialize(ProjectPropertiesPnl)
@@ -75,10 +77,18 @@ void ProjectPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
 
     if ( event.GetPropertyName() == _("Nom du projet") && associatedTree != NULL)
         associatedTree->SetItemText(associatedTreeItem, event.GetProperty()->GetValue());
+
+    if ( event.GetPropertyName() == _("Activer l'utilisation de sources C++") && associatedProjectManager != NULL)
+        associatedProjectManager->Refresh();
 }
 
 void ProjectPropertiesPnl::SetAssociatedTreeCtrlProjectItem(wxTreeCtrl * tree, wxTreeItemId item)
 {
     associatedTree = tree;
     associatedTreeItem = item;
+}
+
+void ProjectPropertiesPnl::SetAssociatedProjectManager(ProjectManager * associatedProjectManager_)
+{
+    associatedProjectManager = associatedProjectManager_;
 }

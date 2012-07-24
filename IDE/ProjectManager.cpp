@@ -1175,6 +1175,7 @@ void ProjectManager::OneditPropGameMenuItemSelected(wxCommandEvent& event)
 
     mainEditor.GetProjectPropertiesPanel()->SetProject(game);
     mainEditor.GetProjectPropertiesPanel()->SetAssociatedTreeCtrlProjectItem(projectsTree, selectedItem);
+    mainEditor.GetProjectPropertiesPanel()->SetAssociatedProjectManager(this);
     mainEditor.GetAUIPaneManger()->GetPane("PP").Show(true);
     mainEditor.GetAUIPaneManger()->Update();
 }

@@ -700,7 +700,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
 {
     if ( event.IsEditCancelled() ) return;
 
-    string newName = string(event.GetLabel().mb_str());
+    string newName = ToString(event.GetLabel());
 
     //Be sure there is not already another object with this name
     if ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), newName)) != objects->end() )
@@ -712,10 +712,9 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     }
 
     //Be sure the name is valid
-    if ( !CheckObjectName(newName) )
+    if ( !game.ValidateObjectName(newName) )
     {
-        wxRichToolTip tip("Nom invalide",
-                          "Utilisez uniquement des lettres,\nchiffres et underscores ( _ ).\nLes noms réservés par des\nexpressions sont aussi interdits.");
+        wxRichToolTip tip(_("Nom invalide"), game.GetBadObjectNameWarning());
         tip.SetIcon(wxICON_INFORMATION);
         tip.ShowFor(this);
 
@@ -748,50 +747,12 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     return;
 }
 
-/**
- * Check if an object name is valid
- */
-bool EditorObjectList::CheckObjectName(std::string name)
-{
-    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionsManager->GetExtensions();
-
-    string allowedCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-
-    //Check for invalid names
-    bool nameUsedByExpression = extensionsManager->HasExpression(name) || extensionsManager->HasStrExpression(name);
-    for (unsigned int i = 0;i<extensions.size();++i)
-    {
-        //Verify if that extension is enabled
-        if ( find(game.GetUsedPlatformExtensions().begin(),
-                  game.GetUsedPlatformExtensions().end(),
-                  extensions[i]->GetName()) == game.GetUsedPlatformExtensions().end() )
-            continue;
-
-        vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
-
-        for(unsigned int j = 0;j<objectsTypes.size();++j)
-        {
-            //Add each object expression
-            std::map<string, gd::ExpressionMetadata > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
-            for(std::map<string, gd::ExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
-            {
-                if ( name == it->first )
-                    nameUsedByExpression = true;
-            }
-        }
-    }
-
-    //Display warning or errors for invalid names
-    return !(name.find_first_not_of(allowedCharacter) != string::npos || nameUsedByExpression);
-}
-
 ////////////////////////////////////////////////////////////
 /// Rechercher un objet
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OnChercherBtClick( wxCommandEvent& event )
 {
-    string name = static_cast<string> (wxGetTextFromUser( _( "Entrez l'objet à rechercher" ), _( "Chercher un objet" ) ));
+    string name = ToString(wxGetTextFromUser( _( "Entrez l'objet à rechercher" ), _( "Chercher un objet" ) ));
     if ( name.empty() ) return;
 
     std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
@@ -1086,12 +1047,12 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
             return;
         }
 
-        AutomatismInfo infos = extensionManager->GetAutomatismInfo(dialog.selectedAutomatismType);
+        AutomatismInfo infos = extensionManager->GetAutomatismMetadata(dialog.selectedAutomatismType);
 
         //Add automatism to object
-        automatism->SetName(infos.defaultName);
+        automatism->SetName(infos.GetDefaultName());
         for (unsigned int j = 0;(*object)->HasAutomatismNamed(automatism->GetName());++j)
-            automatism->SetName(infos.defaultName+ToString(j));
+            automatism->SetName(infos.GetDefaultName()+ToString(j));
 
         (*object)->AddAutomatism(automatism);
 

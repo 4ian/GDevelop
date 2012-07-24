@@ -3,12 +3,18 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "Project.h"
+#include <map>
+#include <vector>
+#include <string>
 #include <wx/propgrid/propgrid.h>
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/Events/ExpressionMetadata.h"
+#include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
 #include "GDCore/CommonTools.h"
+#include "Project.h"
 
 namespace gd
 {
@@ -98,6 +104,45 @@ void Project::OnChangeInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent 
         grid->EnableProperty(_("FPS maximum"), grid->GetProperty(_("Limiter le framerate"))->GetValue().GetBool());
 
     UpdateFromPropertyGrid(grid);
+}
+
+bool Project::ValidateObjectName(const std::string & name)
+{
+    const std::vector < boost::shared_ptr<PlatformExtension> > extensions = GetPlatform().GetAllPlatformExtensions();
+
+    //Check if name is not an expression
+    bool nameUsedByExpression = (GetPlatform().GetInstructionsMetadataHolder().HasExpression(name) ||
+                                 GetPlatform().GetInstructionsMetadataHolder().HasStrExpression(name));
+
+    //Check if name is not an object expression
+    for (unsigned int i = 0;i<extensions.size();++i)
+    {
+        if ( find(GetUsedPlatformExtensions().begin(),
+                  GetUsedPlatformExtensions().end(),
+                  extensions[i]->GetName()) == GetUsedPlatformExtensions().end() )
+            continue; //Do not take care of unused extensions
+
+        std::vector<std::string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+
+        for(unsigned int j = 0;j<objectsTypes.size();++j)
+        {
+            std::map<std::string, gd::ExpressionMetadata > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
+            for(std::map<std::string, gd::ExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
+            {
+                if ( name == it->first )
+                    nameUsedByExpression = true;
+            }
+        }
+    }
+
+    //Finally check if the name has only allowed characters
+    std::string allowedCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
+    return !(name.find_first_not_of(allowedCharacter) != std::string::npos || nameUsedByExpression);
+}
+
+std::string Project::GetBadObjectNameWarning()
+{
+    return gd::ToString(_("Utilisez uniquement des lettres,\nchiffres et underscores ( _ ).\nLes noms réservés par des\nexpressions sont aussi interdits."));
 }
 
 }

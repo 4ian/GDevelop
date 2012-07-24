@@ -216,6 +216,8 @@
 		<Unit filename="GDCore\CommonTools.cpp" />
 		<Unit filename="GDCore\CommonTools.h" />
 		<Unit filename="GDCore\DocMainPage.h" />
+		<Unit filename="GDCore\Events\AutomatismMetadata.cpp" />
+		<Unit filename="GDCore\Events\AutomatismMetadata.h" />
 		<Unit filename="GDCore\Events\Event.cpp" />
 		<Unit filename="GDCore\Events\Event.h" />
 		<Unit filename="GDCore\Events\Expression.h" />
@@ -223,11 +225,12 @@
 		<Unit filename="GDCore\Events\ExpressionMetadata.h" />
 		<Unit filename="GDCore\Events\ExpressionParser.cpp" />
 		<Unit filename="GDCore\Events\ExpressionParser.h" />
-		<Unit filename="GDCore\Events\GDExpression.h" />
 		<Unit filename="GDCore\Events\Instruction.cpp" />
 		<Unit filename="GDCore\Events\Instruction.h" />
 		<Unit filename="GDCore\Events\InstructionMetadata.cpp" />
 		<Unit filename="GDCore\Events\InstructionMetadata.h" />
+		<Unit filename="GDCore\Events\ObjectMetadata.cpp" />
+		<Unit filename="GDCore\Events\ObjectMetadata.h" />
 		<Unit filename="GDCore\IDE\ActionSentenceFormatter.cpp" />
 		<Unit filename="GDCore\IDE\ActionSentenceFormatter.h" />
 		<Unit filename="GDCore\IDE\ArbitraryResourceWorker.cpp" />
@@ -236,12 +239,20 @@
 		<Unit filename="GDCore\IDE\CommonBitmapManager.h" />
 		<Unit filename="GDCore\IDE\ConditionSentenceFormatter.cpp" />
 		<Unit filename="GDCore\IDE\ConditionSentenceFormatter.h" />
+		<Unit filename="GDCore\IDE\Dialogs\AdvancedEntryDialog.cpp" />
+		<Unit filename="GDCore\IDE\Dialogs\AdvancedEntryDialog.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseAutomatismDialog.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseAutomatismDialog.h" />
+		<Unit filename="GDCore\IDE\Dialogs\ChooseLayerDialog.cpp" />
+		<Unit filename="GDCore\IDE\Dialogs\ChooseLayerDialog.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseObjectDialog.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseObjectDialog.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseVariableDialog.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseVariableDialog.h" />
+		<Unit filename="GDCore\IDE\Dialogs\EditExpressionDialog.cpp" />
+		<Unit filename="GDCore\IDE\Dialogs\EditExpressionDialog.h" />
+		<Unit filename="GDCore\IDE\Dialogs\EditStrExpressionDialog.cpp" />
+		<Unit filename="GDCore\IDE\Dialogs\EditStrExpressionDialog.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ObjectListDialogsHelper.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\ObjectListDialogsHelper.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ProjectExtensionsDialog.cpp" />
@@ -256,6 +267,8 @@
 		<Unit filename="GDCore\IDE\EventsRenderingHelper.h" />
 		<Unit filename="GDCore\IDE\EventsVariablesFinder.cpp" />
 		<Unit filename="GDCore\IDE\EventsVariablesFinder.h" />
+		<Unit filename="GDCore\IDE\ExpressionsCorrectnessTesting.cpp" />
+		<Unit filename="GDCore\IDE\ExpressionsCorrectnessTesting.h" />
 		<Unit filename="GDCore\IDE\ImagesUsedInventorizer.cpp" />
 		<Unit filename="GDCore\IDE\ImagesUsedInventorizer.h" />
 		<Unit filename="GDCore\IDE\ResourcesMergingHelper.cpp" />
@@ -275,6 +288,8 @@
 		<Unit filename="GDCore\PlatformDefinition\InitialInstancesContainer.h" />
 		<Unit filename="GDCore\PlatformDefinition\InstructionsMetadataHolder.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\InstructionsMetadataHolder.h" />
+		<Unit filename="GDCore\PlatformDefinition\Layer.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\Layer.h" />
 		<Unit filename="GDCore\PlatformDefinition\Layout.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\Layout.h" />
 		<Unit filename="GDCore\PlatformDefinition\Object.cpp" />
@@ -295,9 +310,13 @@
 		<Unit filename="GDCore\Tools\HelpFileAccess.h" />
 		<Unit filename="GDCore\Tools\Locale\LocaleManager.cpp" />
 		<Unit filename="GDCore\Tools\Locale\LocaleManager.h" />
+		<Unit filename="wxsmith\AdvancedEntryDialog.wxs" />
 		<Unit filename="wxsmith\ChooseAutomatismDialog.wxs" />
+		<Unit filename="wxsmith\ChooseLayerDialog.wxs" />
 		<Unit filename="wxsmith\ChooseObjectDialog.wxs" />
 		<Unit filename="wxsmith\ChooseVariableDialog.wxs" />
+		<Unit filename="wxsmith\EditExpressionDialog.wxs" />
+		<Unit filename="wxsmith\EditStrExpressionDialog.wxs" />
 		<Unit filename="wxsmith\ProjectExtensionsDialog.wxs" />
 		<Unit filename="wxsmith\ResourceLibraryDialog.wxs" />
 		<Extensions>
@@ -320,6 +339,10 @@
 					<wxDialog wxs="wxsmith/ProjectExtensionsDialog.wxs" src="GDCore\IDE\Dialogs\ProjectExtensionsDialog.cpp" hdr="GDCore\IDE\Dialogs\ProjectExtensionsDialog.h" fwddecl="0" i18n="1" name="ProjectExtensionsDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseObjectDialog.wxs" src="GDCore\IDE\Dialogs\ChooseObjectDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseObjectDialog.h" fwddecl="0" i18n="1" name="ChooseObjectDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseAutomatismDialog.wxs" src="GDCore\IDE\Dialogs\ChooseAutomatismDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseAutomatismDialog.h" fwddecl="0" i18n="1" name="ChooseAutomatismDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseLayerDialog.wxs" src="GDCore\IDE\Dialogs\ChooseLayerDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseLayerDialog.h" fwddecl="0" i18n="1" name="ChooseLayerDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditExpressionDialog.wxs" src="GDCore\IDE\Dialogs\EditExpressionDialog.cpp" hdr="GDCore\IDE\Dialogs\EditExpressionDialog.h" fwddecl="0" i18n="1" name="EditExpressionDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditStrExpressionDialog.wxs" src="GDCore\IDE\Dialogs\EditStrExpressionDialog.cpp" hdr="GDCore\IDE\Dialogs\EditStrExpressionDialog.h" fwddecl="0" i18n="1" name="EditStrExpressionDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/AdvancedEntryDialog.wxs" src="GDCore\IDE\Dialogs\AdvancedEntryDialog.cpp" hdr="GDCore\IDE\Dialogs\AdvancedEntryDialog.h" fwddecl="0" i18n="1" name="AdvancedEntryDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

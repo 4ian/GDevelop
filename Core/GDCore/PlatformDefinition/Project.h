@@ -451,6 +451,27 @@ public:
     virtual gd::VariablesContainer & GetVariables() =0;
     ///@}
 
+    /** \name Other
+     */
+    ///@{
+
+    /**
+     * Must return true if \a objectName can be used as name for an object.
+     *
+     * Default implementation check if objectName is only composed of a-z,A-Z,0-9 or _ characters an
+     * if does not conflict with an expression.
+     */
+    bool ValidateObjectName(const std::string & objectName);
+
+    /**
+     * Must return a message that will be displayed when an invalid object name has been entered.
+     *
+     * \note This message will be displayed by the IDE into a tooltip.
+     */
+    std::string GetBadObjectNameWarning();
+
+    ///@}
+
 private:
 
     std::vector<ObjectGroup> objectGroups; ///< Global objects groups

@@ -57,6 +57,13 @@ public:
     InstructionMetadata(std::string extensionNamespace);
     virtual ~InstructionMetadata() {};
 
+    const std::string & GetFullName() const { return fullname; }
+    const std::string & GetDescription() const { return description; }
+    const std::string & GetSentence() const { return sentence; }
+    const std::string & GetGroup() const { return group; }
+    const wxBitmap & GetBitmapIcon() const { return icon; }
+    const wxBitmap & GetSmallBitmapIcon() const { return smallicon; }
+
     std::string fullname;
     std::string description;
     std::string sentence;

@@ -8,11 +8,13 @@
 #include <map>
 #include <string>
 #include <vector>
+#include "GDCore/Events/ObjectMetadata.h"
+#include "GDCore/Events/AutomatismMetadata.h"
 namespace gd { class Instruction; }
-namespace gd { class InstructionMetadata;}
+namespace gd { class InstructionMetadata; }
 namespace gd { class ExpressionMetadata; }
 namespace gd { class StrExpressionMetadata; }
-namespace gd {class ArbitraryResourceWorker;}
+namespace gd { class ArbitraryResourceWorker; }
 
 namespace gd
 {
@@ -69,6 +71,16 @@ public:
      * Must return a vector containing all the automatism types provided by the extension
      */
     virtual std::vector < std::string > GetAutomatismsTypes() const = 0;
+
+    /**
+     * Must return a reference to the ObjectMetadata object associated to @ objectType
+     */
+    virtual const ObjectMetadata & GetObjectMetadata(const std::string & objectType) const =0;
+
+    /**
+     * Must return a reference to the AutomatismMetadata object associated to @ automatismType
+     */
+    virtual const AutomatismMetadata & GetAutomatismMetadata(const std::string & automatismType) const =0;
 
     /**
      * Must return a reference to a map containing the names of the actions (in the first members) and the metadata associated with (in the second members).
@@ -154,6 +166,9 @@ private:
     static std::map<std::string, gd::InstructionMetadata > badActionsMetadata;  ///< Used when an action is not found in the extension
     static std::map<std::string, gd::ExpressionMetadata > badExpressionsMetadata; ///< Used when an expression is not found in the extension
     static std::map<std::string, gd::StrExpressionMetadata > badStrExpressionsMetadata;///< Used when an expression is not found in the extension
+
+    ObjectMetadata badObjectMetadata;
+    AutomatismMetadata badAutomatismMetadata;
 };
 
 }

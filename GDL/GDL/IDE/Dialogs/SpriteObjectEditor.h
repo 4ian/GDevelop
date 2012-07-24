@@ -180,6 +180,7 @@ private:
     void OnpreviewTimerTrigger(wxTimerEvent& event);
     void OnPreviewClick(wxCommandEvent& event);
     void OnimagesListKeyDown(wxListEvent& event);
+    void OnAddImageFromFileSelected(wxCommandEvent& event);
     //*)
     void RefreshAll();
     void RefreshAnimationTree();

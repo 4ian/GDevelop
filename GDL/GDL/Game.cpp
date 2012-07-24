@@ -114,6 +114,8 @@ void Game::UpdateFromPropertyGrid(wxPropertyGrid * grid)
         linuxExecutableFilename = gd::ToString(grid->GetProperty(_("Nom de l'executable Linux"))->GetValueAsString());
     if ( grid->GetProperty(_("Nom de l'executable Mac OS")) != NULL)
         macExecutableFilename = gd::ToString(grid->GetProperty(_("Nom de l'executable Mac OS"))->GetValueAsString());
+    if ( grid->GetProperty(_("Activer l'utilisation de sources C++")) != NULL)
+        useExternalSourceFiles =grid->GetProperty(_("Activer l'utilisation de sources C++"))->GetValue().GetBool();
     if ( grid->GetProperty(_("Afficher l'écran")) != NULL)
         loadingScreen.afficher = grid->GetProperty(_("Afficher l'écran"))->GetValue().GetBool();
     if ( grid->GetProperty(_("Afficher la bordure de la fenêtre")) != NULL)

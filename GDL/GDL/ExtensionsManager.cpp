@@ -213,13 +213,13 @@ boost::shared_ptr<AutomatismsSharedDatas> ExtensionsManager::CreateAutomatismSha
 }
 
 #if defined(GD_IDE_ONLY)
-const AutomatismInfo& ExtensionsManager::GetAutomatismInfo(std::string automatism) const
+const AutomatismInfo& ExtensionsManager::GetAutomatismMetadata(std::string automatism) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
         vector < string > automatismsTypes = extensionsLoaded[i]->GetAutomatismsTypes();
         if ( find(automatismsTypes.begin(), automatismsTypes.end(), automatism) != automatismsTypes.end())
-            return extensionsLoaded[i]->GetAutomatismInfo(automatism);
+            return extensionsLoaded[i]->GetAutomatismMetadata(automatism);
     }
 
     return badAutomatismInfo;
@@ -634,7 +634,7 @@ bool ExtensionsManager::HasAutomatismStrExpression(std::string automatismType, s
 /**
  * Get information about an object
  */
-const ExtensionObjectInfos & ExtensionsManager::GetObjectInfo(std::string objectType)
+const ExtensionObjectInfos & ExtensionsManager::GetObjectMetadata(std::string objectType)
 {
 	for (unsigned int i = 0;i<extensionsLoaded.size();++i)
 	{
@@ -642,7 +642,7 @@ const ExtensionObjectInfos & ExtensionsManager::GetObjectInfo(std::string object
 	    for(unsigned int j = 0;j<objectsTypes.size();++j)
 	    {
 	        if ( objectsTypes[j] == objectType )
-                return extensionsLoaded[i]->GetObjectInfo(objectType);
+                return extensionsLoaded[i]->GetObjectMetadata(objectType);
 	    }
 	}
 

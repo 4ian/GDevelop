@@ -1,3 +1,7 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #if defined(GD_IDE_ONLY)
 
 #include "EditRepeatEvent.h"
@@ -9,8 +13,11 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include "GDL/IDE/Dialogs/EditExpression.h"
+#include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
 #include "GDL/RepeatEvent.h"
+#include "GDL/Game.h"
+#include "GDL/Scene.h"
+#include "GDL/CommonTools.h"
 
 //(*IdInit(EditRepeatEvent)
 const long EditRepeatEvent::ID_STATICBITMAP3 = wxNewId();
@@ -102,16 +109,16 @@ EditRepeatEvent::~EditRepeatEvent()
 
 void EditRepeatEvent::OnexpressionBtClick(wxCommandEvent& )
 {
-    EditExpression dialog(this, string( expressionEdit->GetValue().mb_str() ), game, scene);
+    gd::EditExpressionDialog dialog(this, ToString( expressionEdit->GetValue() ), game, scene);
     if ( dialog.ShowModal() == 1 )
-        expressionEdit->ChangeValue(dialog.expression);
+        expressionEdit->ChangeValue(dialog.GetExpression());
 
     return;
 }
 
 void EditRepeatEvent::OnokBtClick(wxCommandEvent&)
 {
-    event.SetRepeatExpression(string( expressionEdit->GetValue().mb_str() ));
+    event.SetRepeatExpression(ToString( expressionEdit->GetValue() ));
     EndModal(1);
 }
 

@@ -139,7 +139,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
 
         //Cast the object if needed
         string objectType = gd::GetTypeOfObject(game, scene, realObjects[i]);
-        const ExtensionObjectInfos & objInfo = ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
+        const ExtensionObjectInfos & objInfo = ExtensionsManager::GetInstance()->GetObjectMetadata(objectType);
         bool castNeeded = !objInfo.cppClassName.empty();
 
         //Build string to access the object
@@ -207,7 +207,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectFunction(string functionName,
 
         //Cast the object if needed
         string objectType = gd::GetTypeOfObject(game, scene, realObjects[i]);
-        const ExtensionObjectInfos & objInfo = ExtensionsManager::GetInstance()->GetObjectInfo(objectType);
+        const ExtensionObjectInfos & objInfo = ExtensionsManager::GetInstance()->GetObjectMetadata(objectType);
         bool castNeeded = !objInfo.cppClassName.empty();
 
         //Build string to access the object
@@ -275,7 +275,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 
         //Cast the object if needed
         string automatismType = gd::GetTypeOfAutomatism(game, scene, parameters[1].GetPlainString());
-        const AutomatismInfo & autoInfo = ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
+        const AutomatismInfo & autoInfo = ExtensionsManager::GetInstance()->GetAutomatismMetadata(automatismType);
         bool castNeeded = !autoInfo.cppClassName.empty();
 
         //Build string to access the automatism
@@ -343,7 +343,7 @@ void CallbacksForGeneratingExpressionCode::OnObjectAutomatismFunction(string fun
 
         //Cast the object if needed
         string automatismType = gd::GetTypeOfAutomatism(game, scene, parameters[1].GetPlainString());
-        const AutomatismInfo & autoInfo = ExtensionsManager::GetInstance()->GetAutomatismInfo(automatismType);
+        const AutomatismInfo & autoInfo = ExtensionsManager::GetInstance()->GetAutomatismMetadata(automatismType);
         bool castNeeded = !autoInfo.cppClassName.empty();
 
         //Build string to access the automatism

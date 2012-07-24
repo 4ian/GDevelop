@@ -16,6 +16,7 @@
 #include <wx/richtooltip.h>
 #include <wx/textdlg.h>
 #include <wx/msgdlg.h>
+#include <wx/filedlg.h>
 #include <vector>
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
@@ -325,6 +326,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	Connect(ID_MENULOOP,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMenuLoopSelected);
 	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddAnimationSelected);
 	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnDeleteAnimationSelected);
+	Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddImageFromFileSelected);
 	Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnremoveImageItemSelected);
 	Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMoveLeftSelected);
 	Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMoveRightSelected);
@@ -1386,5 +1388,59 @@ void SpriteObjectEditor::OnimagesListKeyDown(wxListEvent& event)
         }
         default:
             break;
+    }
+}
+
+void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
+{
+    if ( selectedAnimation < object.GetAnimationCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    {
+        Direction & direction = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection);
+        wxFileDialog FileDialog( this, _("Choisissez une ou plusieurs images à ajouter"), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_MULTIPLE );
+        wxString projectDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
+
+        if ( FileDialog.ShowModal() == wxID_OK )
+        {
+            wxArrayString files;
+            FileDialog.GetPaths( files );
+
+            //Add each image to images list and to folder if any
+            std::vector < std::string > filenames;
+            for ( unsigned int i = 0; i < files.GetCount();++i )
+                filenames.push_back(ToString(files[i]));
+
+            for ( unsigned int i = 0; i < filenames.size();++i )
+            {
+                wxFileName file = wxFileName::FileName(filenames[i]);
+                if (!projectDirectory.empty())  //If game is not saved, we keep absolute filenames
+                    file.MakeRelativeTo(projectDirectory);
+
+                std::string name = ToString(file.GetFullName());
+
+                //Find a new unique name for the resource
+                unsigned int uniqueID = 2;
+                while ( game.resourceManager.HasResource(name) )
+                {
+                    name = ToString(file.GetFullName())+ToString(uniqueID);
+                    uniqueID++;
+                }
+
+                boost::shared_ptr<ImageResource> image(new ImageResource);
+                image->file = file.GetFullPath();
+                image->name = name;
+                image->userAdded = false;
+
+                game.resourceManager.resources.push_back(image);
+                game.imagesChanged.push_back(name);
+
+                Sprite sprite;
+                sprite.SetImageName(name);
+                direction.AddSprite(sprite);
+            }
+        }
+
+        RefreshImagesList();
+        resourcesEditorPnl->Refresh();
     }
 }

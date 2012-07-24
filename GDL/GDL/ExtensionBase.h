@@ -24,6 +24,8 @@ class MainEditorCommand;
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
+#include "GDCore/Events/ObjectMetadata.h"
+#include "GDCore/Events/AutomatismMetadata.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #endif
 class RuntimeScene;
@@ -188,9 +190,9 @@ typedef Object * (*CreateFunPtr)(std::string name);
 #define DECLARE_OBJECT(name_, fullname_, informations_, icon24x24_, createFunPtrP, destroyFunPtrP, cppClassName_) { \
             ExtensionObjectInfos objInfos; \
             std::string currentObjectDeclarationName = name_; \
-            objInfos.fullname = std::string(fullname_.mb_str());\
-            objInfos.informations = std::string(informations_.mb_str());\
-            objInfos.icon = wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY); \
+            objInfos.SetFullName(std::string(fullname_.mb_str()));\
+            objInfos.SetDescription(std::string(informations_.mb_str()));\
+            objInfos.SetBitmapIcon(wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY)); \
             objInfos.createFunPtr = createFunPtrP;\
             objInfos.destroyFunPtr = destroyFunPtrP;\
             objInfos.cppClassName = cppClassName_;
@@ -349,15 +351,15 @@ typedef Object * (*CreateFunPtr)(std::string name);
 #define DECLARE_AUTOMATISM(name_, fullname_, defaultName_, description_, group_, icon24x24_, className_, sharedDatasClassName_) { \
             AutomatismInfo automatismInfo; \
             std::string currentAutomatismDeclarationName = name_;\
-            automatismInfo.fullname = fullname_; \
-            automatismInfo.description = description_; \
-            automatismInfo.defaultName = defaultName_;\
-            automatismInfo.group = group_; \
+            automatismInfo.SetFullName(std::string(fullname_.mb_str())); \
+            automatismInfo.SetDescription(std::string(description_.mb_str())); \
+            automatismInfo.SetDefaultName(std::string(defaultName_.mb_str()));\
+            automatismInfo.SetGroup(group_); \
             automatismInfo.cppClassName = #className_;\
             if ( wxFile::Exists(icon24x24_) )\
             {\
-                automatismInfo.icon = wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY); \
-            } else { automatismInfo.icon = wxBitmap(24,24);} \
+                automatismInfo.SetBitmapIcon(wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY)); \
+            } else { automatismInfo.SetBitmapIcon(wxBitmap(24,24));} \
             automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName));\
             automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
 
@@ -504,8 +506,11 @@ class GD_API EventInfos
  * \brief Contains user-friendly infos about an automatism, only at edittime, and members needed to create the automatism
  */
 class GD_API AutomatismInfo
+#if defined(GD_IDE_ONLY)
+: public gd::AutomatismMetadata
+#endif
 {
-    public:
+public:
 
     AutomatismInfo();
     virtual ~AutomatismInfo();
@@ -515,12 +520,6 @@ class GD_API AutomatismInfo
      * Set that the automatism is located in a specific include file
      */
     AutomatismInfo & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
-
-    std::string fullname;
-    std::string defaultName;
-    std::string description;
-    std::string group;
-    wxBitmap icon;
 
     std::map<std::string, gd::InstructionMetadata > conditionsInfos;
     std::map<std::string, gd::InstructionMetadata > actionsInfos;
@@ -539,8 +538,11 @@ class GD_API AutomatismInfo
  * \brief Struct for getting user-friendly infos about objects, only at edittime
  */
 class GD_API ExtensionObjectInfos
+#if defined(GD_IDE_ONLY)
+: public gd::ObjectMetadata
+#endif
 {
-    public:
+public:
 
     ExtensionObjectInfos();
     virtual ~ExtensionObjectInfos() {};
@@ -550,10 +552,6 @@ class GD_API ExtensionObjectInfos
      * Set that the object is located in a specific include file
      */
     ExtensionObjectInfos & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
-
-    std::string fullname;
-    std::string informations;
-    wxBitmap icon;
 
     std::map<std::string, gd::InstructionMetadata > conditionsInfos;
     std::map<std::string, gd::InstructionMetadata > actionsInfos;
@@ -619,7 +617,7 @@ class GD_API ExtensionBase
 : public gd::PlatformExtension
 #endif
 {
-    public :
+public :
 
     ExtensionBase() {};
     virtual ~ExtensionBase() {};
@@ -678,47 +676,44 @@ class GD_API ExtensionBase
      */
     virtual void ObjectDeletedFromScene(RuntimeScene & scene, Object * objectDeleted) {};
 
-    /**
-     * Get objects types provided by the extension
-     */
-    virtual std::vector < std::string > GetExtensionObjectsTypes() const;
 
     #if defined(GD_IDE_ONLY)
-    /**
-     * Get automatism types provided by the extension
+    /** \name Specializations of gd::PlatformExtension members
+     * See gd::PlatformExtension documentation for more information about what these members functions should do.
      */
-    virtual std::vector < std::string > GetAutomatismsTypes() const;
-
-    //Specializations of gd::PlatformExtension methods
+    ///@{
     virtual const std::string & GetDescription() const { return informations; }
     virtual const std::string & GetAuthor() const { return author; }
     virtual const std::string & GetLicense() const { return license; }
     virtual const std::string & GetFullName() const { return fullname; }
     virtual bool IsBuiltin() const { return nameSpace.empty(); }
 
-    const std::map<std::string, gd::InstructionMetadata > & GetAllActions() const;
-    const std::map<std::string, gd::InstructionMetadata > & GetAllConditions() const;
-    const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressions() const;
-    const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressions() const;
-    const std::map<std::string, gd::InstructionMetadata > & GetAllActionsForObject(std::string objectType) const;
-    const std::map<std::string, gd::InstructionMetadata > & GetAllConditionsForObject(std::string objectType) const;
-    const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressionsForObject(std::string objectType) const;
-    const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressionsForObject(std::string objectType) const;
-    const std::map<std::string, EventInfos > & GetAllEvents() const;
-    const std::map<std::string, AutomatismInfo > & GetAllAutomatisms() const;
-    const std::map<std::string, gd::InstructionMetadata > & GetAllActionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, gd::InstructionMetadata > & GetAllConditionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressionsForAutomatism(std::string autoType) const;
-    const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType) const;
+    virtual std::vector < std::string > GetExtensionObjectsTypes() const;
+    virtual std::vector < std::string > GetAutomatismsTypes() const;
+    virtual const ExtensionObjectInfos & GetObjectMetadata(const std::string & objectType) const;
+    virtual const AutomatismInfo & GetAutomatismMetadata(const std::string & automatismType) const;
+
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllActions() const;
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllConditions() const;
+    virtual const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressions() const;
+    virtual const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressions() const;
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllActionsForObject(std::string objectType) const;
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllConditionsForObject(std::string objectType) const;
+    virtual const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressionsForObject(std::string objectType) const;
+    virtual const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressionsForObject(std::string objectType) const;
+    virtual const std::map<std::string, EventInfos > & GetAllEvents() const;
+    virtual const std::map<std::string, AutomatismInfo > & GetAllAutomatisms() const;
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllActionsForAutomatism(std::string autoType) const;
+    virtual const std::map<std::string, gd::InstructionMetadata > & GetAllConditionsForAutomatism(std::string autoType) const;
+    virtual const std::map<std::string, gd::ExpressionMetadata > & GetAllExpressionsForAutomatism(std::string autoType) const;
+    virtual const std::map<std::string, gd::StrExpressionMetadata > & GetAllStrExpressionsForAutomatism(std::string autoType) const;
+    ///@}
 
     const std::vector < std::pair<std::string, std::string> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
     const std::vector < std::string > & GetSupplementaryIncludeDirectories() const { return supplementaryIncludeDirectories; };
 
-    const ExtensionObjectInfos & GetObjectInfo(std::string objectType) const;
-    const AutomatismInfo & GetAutomatismInfo(std::string objectType) const;
-
     /**
-     * Create an custom event.
+     * Create a custom event.
      * Return NULL if eventType is not provided by the extension.
      */
     boost::shared_ptr<gd::BaseEvent> CreateEvent(std::string eventType) const;
@@ -760,7 +755,7 @@ class GD_API ExtensionBase
     virtual unsigned int GetNumberOfProperties(RuntimeScene & scene) const { return 0; };
     #endif
 
-    protected :
+protected :
 
     /**
      * Set the namespace ( the string each actions/conditions/expressions start with )
@@ -795,7 +790,7 @@ class GD_API ExtensionBase
     static std::map<std::string, gd::StrExpressionMetadata > badStrExpressionsInfos;///< Used when an expression is not found in the extension
     #endif
 
-    private:
+private:
 
     /**
      * Automatically set from the name of the extension, and added

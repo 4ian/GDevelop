@@ -14,7 +14,6 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include "GDL/CommonTools.h"
-#include "GDL/RuntimeLayer.h"
 #include "GDL/Text.h"
 #include "GDL/Layer.h"
 #include "GDL/ManualTimer.h"

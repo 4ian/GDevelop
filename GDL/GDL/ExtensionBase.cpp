@@ -197,7 +197,7 @@ const std::map<std::string, gd::StrExpressionMetadata > & ExtensionBase::GetAllS
     return badStrExpressionsInfos;
 }
 
-const ExtensionObjectInfos & ExtensionBase::GetObjectInfo(std::string objectType) const
+const ExtensionObjectInfos & ExtensionBase::GetObjectMetadata(const std::string & objectType) const
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second;
@@ -205,10 +205,10 @@ const ExtensionObjectInfos & ExtensionBase::GetObjectInfo(std::string objectType
     return badObjectsInfos[""];
 }
 
-const AutomatismInfo & ExtensionBase::GetAutomatismInfo(std::string objectType) const
+const AutomatismInfo & ExtensionBase::GetAutomatismMetadata(const std::string & automatismType) const
 {
-    if ( automatismsInfo.find(objectType) != automatismsInfo.end())
-        return automatismsInfo.find(objectType)->second;
+    if ( automatismsInfo.find(automatismType) != automatismsInfo.end())
+        return automatismsInfo.find(automatismType)->second;
 
     return badAutomatismsInfo[""];
 }

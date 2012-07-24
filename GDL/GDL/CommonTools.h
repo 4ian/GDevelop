@@ -78,11 +78,6 @@ std::string GD_API ToString( const wxString & value );
 #endif
 
 /**
- * \brief Replace all spaces by tildes in a std::string
- */
-std::string ReplaceSpacesByTildes(std::string text);
-
-/**
  * Split a string into tokens stored in a vector, using the specified separator.
  * \param str String to split
  * \param separator Separator to use

@@ -5,7 +5,7 @@
 
 #include "RuntimeSceneCameraTools.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/RuntimeCamera.h"
+#include "GDL/Camera.h"
 #include "GDL/Object.h"
 
 float GD_API GetCameraX(RuntimeScene & scene, const std::string & layer, unsigned int camera)

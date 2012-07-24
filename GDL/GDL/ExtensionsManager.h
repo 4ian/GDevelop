@@ -223,12 +223,12 @@ class GD_API ExtensionsManager
         /**
          * Get information about an automatism
          */
-        const AutomatismInfo & GetAutomatismInfo(std::string automatismType) const;
+        const AutomatismInfo & GetAutomatismMetadata(std::string automatismType) const;
 
         /**
          * Get information about an object
          */
-        const ExtensionObjectInfos & GetObjectInfo(std::string type);
+        const ExtensionObjectInfos & GetObjectMetadata(std::string type);
         #endif
 
         static ExtensionsManager *GetInstance()

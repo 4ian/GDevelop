@@ -294,7 +294,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             vector<string> arguments = EventsCodeGenerator::GenerateParametersCodes(game, scene, condition.GetParameters(), instrInfos.parameters, context);
 
             //Add a static_cast if necessary
-            const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
+            const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectMetadata(objectType);
             AddIncludeFile(objInfo.optionalIncludeFile);
             string objectFunctionCallNamePart =
             ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ?
@@ -363,7 +363,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
             vector<string> arguments = GenerateParametersCodes(game, scene, condition.GetParameters(), instrInfos.parameters, context);
 
             //Add a static_cast if necessary
-            const AutomatismInfo & autoInfo = extensionsManager->GetAutomatismInfo(automatismType);
+            const AutomatismInfo & autoInfo = extensionsManager->GetAutomatismMetadata(automatismType);
             AddIncludeFile(autoInfo.optionalIncludeFile);
             string objectFunctionCallNamePart =
             ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
@@ -552,7 +552,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             vector<string> arguments = GenerateParametersCodes(game, scene, action.GetParameters(), instrInfos.parameters, context);
 
             //Add a static_cast if necessary
-            const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectInfo(objectType);
+            const ExtensionObjectInfos & objInfo = extensionsManager->GetObjectMetadata(objectType);
             AddIncludeFile(objInfo.optionalIncludeFile);
             string objectPart = ( !instrInfos.parameters[0].supplementaryInformation.empty() ) ? "static_cast<"+objInfo.cppClassName+"*>("+ManObjListName(realObjectName)+"[i])->" : ManObjListName(realObjectName)+"[i]->" ;
 
@@ -611,7 +611,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
             vector<string> arguments = GenerateParametersCodes(game, scene, action.GetParameters(), instrInfos.parameters, context);
 
             //Add a static_cast if necessary
-            const AutomatismInfo & autoInfo = extensionsManager->GetAutomatismInfo(automatismType);
+            const AutomatismInfo & autoInfo = extensionsManager->GetAutomatismMetadata(automatismType);
             AddIncludeFile(autoInfo.optionalIncludeFile);
             string objectPart =
             ( !instrInfos.parameters[1].supplementaryInformation.empty() ) ?
@@ -804,7 +804,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 for (unsigned int i = 0;i<realObjects.size();++i)
                 {
                     context.ObjectsListNeeded(realObjects[i]);
-                    argOutput += ".AddObjectListToMap(\""+realObjects[i]+"\", "+ManObjListName(realObjects[i])+")";
+                    argOutput += ".AddObjectListToMap(\""+ConvertToCppString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
                 }
                 argOutput += ".ReturnObjectListsMap()";
             }
@@ -836,7 +836,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
                 for (unsigned int i = 0;i<realObjects.size();++i)
                 {
                     context.EmptyObjectsListNeeded(realObjects[i]);
-                    argOutput += ".AddObjectListToMap(\""+realObjects[i]+"\", "+ManObjListName(realObjects[i])+")";
+                    argOutput += ".AddObjectListToMap(\""+ConvertToCppString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
                 }
                 argOutput += ".ReturnObjectListsMap()";
             }

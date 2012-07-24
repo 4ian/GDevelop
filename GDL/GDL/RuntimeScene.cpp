@@ -42,20 +42,20 @@ void MessageLoading( string message, float avancement ); //Prototype de la fonct
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
 
 RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
-renderWindow(renderWindow_),
-game(game_),
-#if defined(GD_IDE_ONLY)
-debugger(NULL),
-#endif
-running(true),
-firstLoop(true),
-isFullScreen(false),
-realElapsedTime(0),
-elapsedTime(0),
-timeScale(1),
-timeFromStart(0),
-pauseTime(0),
-specialAction(-1)
+    renderWindow(renderWindow_),
+    game(game_),
+    #if defined(GD_IDE_ONLY)
+    debugger(NULL),
+    #endif
+    running(true),
+    firstLoop(true),
+    isFullScreen(false),
+    realElapsedTime(0),
+    elapsedTime(0),
+    timeScale(1),
+    timeFromStart(0),
+    pauseTime(0),
+    specialAction(-1)
 {
     ChangeRenderWindow(renderWindow);
 }

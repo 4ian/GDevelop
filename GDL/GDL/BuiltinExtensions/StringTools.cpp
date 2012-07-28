@@ -6,6 +6,8 @@
 #include <string>
 #include "GDL/RuntimeScene.h"
 
+using namespace std;
+
 namespace GDpriv
 {
 namespace StringTools

@@ -18,7 +18,7 @@
 #include "GDL/ResourcesManager.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/ImageManager.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/IDE/ImageFilesWatcher.h"
 namespace gd { class ResourceLibraryDialog; }
 
@@ -26,7 +26,7 @@ class GD_API ResourcesEditor: public wxPanel
 {
 	public:
 
-		ResourcesEditor(wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_, bool useRibbon_ = false );
+		ResourcesEditor(wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_, bool useRibbon_ = false );
 		virtual ~ResourcesEditor();
 
 		Game & game;
@@ -196,7 +196,7 @@ class GD_API ResourcesEditor: public wxPanel
 
         ImageFilesWatcher filesWatcher;
 
-		MainEditorCommand mainEditorCommand;
+		gd::MainFrameWrapper mainFrameWrapper;
 		bool useRibbon;
 
 		string renamedItemOldName;

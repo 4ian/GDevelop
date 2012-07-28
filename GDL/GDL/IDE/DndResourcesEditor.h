@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY)
 #ifndef DNDRESOURCESEDITOR_H
 #define DNDRESOURCESEDITOR_H
 #include <wx/dnd.h>
@@ -27,3 +28,4 @@ private:
 };
 
 #endif // DNDRESOURCESEDITOR_H
+#endif

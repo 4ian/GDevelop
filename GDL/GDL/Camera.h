@@ -5,7 +5,6 @@
 
 #ifndef CAMERA_H
 #define CAMERA_H
-#include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 
 /**

@@ -456,6 +456,10 @@
 				<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
 				<handler function="OnAddImageFromFileSelected" entry="EVT_MENU" />
 			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem9" member="yes">
+				<label>Ajouter depuis la banque d&apos;image du jeu</label>
+				<handler function="OnAddFromImageBankSelected" entry="EVT_MENU" />
+			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM8" variable="removeImageItem" member="yes">
 				<label>Retirer</label>
@@ -488,6 +492,17 @@
 		<object class="wxTimer" name="ID_TIMER1" variable="previewTimer" member="yes">
 			<interval>50</interval>
 			<handler function="OnpreviewTimerTrigger" entry="EVT_TIMER" />
+		</object>
+		<object class="wxMenu" variable="emptyImagesMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM12" variable="MenuItem10" member="yes">
+				<label>Ajouter une image depuis un fichier</label>
+				<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
+				<handler function="OnAddImageFromFileSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM13" variable="MenuItem11" member="yes">
+				<label>Ajouter depuis la banque d&apos;image du jeu</label>
+				<handler function="OnAddFromImageBankSelected" entry="EVT_MENU" />
+			</object>
 		</object>
 	</object>
 </wxsmith>

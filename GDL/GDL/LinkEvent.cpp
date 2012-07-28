@@ -26,26 +26,28 @@ void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
     eventElem->LinkEndChild( type );
     type->SetAttribute( "value", "Link" );
 
-    TiXmlElement * couleur;
-    couleur = new TiXmlElement( "Limites" );
-    eventElem->LinkEndChild( couleur );
+    TiXmlElement * limitsElem;
+    limitsElem = new TiXmlElement( "Limites" );
+    eventElem->LinkEndChild( limitsElem );
 
-    couleur->SetDoubleAttribute( "start", start );
-    couleur->SetDoubleAttribute( "end", end );
+    limitsElem->SetDoubleAttribute( "start", GetIncludeStart() );
+    limitsElem->SetDoubleAttribute( "end", GetIncludeEnd() );
 
     TiXmlElement * com1;
     com1 = new TiXmlElement( "Scene" );
     eventElem->LinkEndChild( com1 );
-    com1->SetAttribute( "value", sceneLinked.c_str() );
+    com1->SetAttribute( "value", GetTarget().c_str() );
 }
 
 void LinkEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
-    if ( eventElem->FirstChildElement( "Limites" )->Attribute( "start" ) != NULL ) { int value;eventElem->FirstChildElement( "Limites" )->QueryIntAttribute( "start", &value ); start = value;}
-    else { cout <<"Les informations concernant le départ d'un lien manquent."; }
-    if ( eventElem->FirstChildElement( "Limites" )->Attribute( "end" ) != NULL ) { int value;eventElem->FirstChildElement( "Limites" )->QueryIntAttribute( "end", &value ); end = value;}
-    else { cout <<"Les informations concernant la fin d'un lien manquent."; }
-    if ( eventElem->FirstChildElement( "Scene" )->Attribute( "value" ) != NULL ) { sceneLinked = eventElem->FirstChildElement( "Scene" )->Attribute( "value" );}
+    if ( eventElem->FirstChildElement( "Limites" )->Attribute( "start" ) != NULL && eventElem->FirstChildElement( "Limites" )->Attribute( "end" ) != NULL )
+    {
+        SetIncludeStartAndEnd(ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "start" )),
+                              ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "end" )));
+    }
+
+    if ( eventElem->FirstChildElement( "Scene" )->Attribute( "value" ) != NULL ) { SetTarget(eventElem->FirstChildElement( "Scene" )->Attribute( "value" ));}
     else { cout <<"Les informations concernant le nom de la scène liée."; }
 }
 
@@ -55,8 +57,8 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
 
     //Finding events to include
     const vector< gd::BaseEventSPtr > * eventsToInclude = NULL;
-    if ( game.HasExternalEventsNamed(sceneLinked) ) eventsToInclude = &game.GetExternalEvents(sceneLinked).GetEvents();
-    else if ( game.HasLayoutNamed(sceneLinked) ) eventsToInclude = &game.GetLayout(sceneLinked).GetEvents();
+    if ( game.HasExternalEventsNamed(GetTarget()) ) eventsToInclude = &game.GetExternalEvents(GetTarget()).GetEvents();
+    else if ( game.HasLayoutNamed(GetTarget()) ) eventsToInclude = &game.GetLayout(GetTarget()).GetEvents();
 
     if ( eventsToInclude == NULL )
     {
@@ -64,19 +66,8 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
         return;
     }
 
-    unsigned int firstEvent = start;
-    unsigned int lastEvent = end;
-
-    if ( firstEvent == std::string::npos && lastEvent == std::string::npos ) //Do we need to include all events ?
-    {
-        firstEvent = 0;
-        lastEvent = eventsToInclude->size() - 1;
-    }
-    else
-    {
-        firstEvent--; //The numbers start at 1 in the events editor
-        lastEvent--;
-    }
+    unsigned int firstEvent = IncludeAllEvents() ? 0 : GetIncludeStart();
+    unsigned int lastEvent = IncludeAllEvents() ? eventsToInclude->size() - 1 : GetIncludeEnd();
 
     //Check bounds
     if ( firstEvent >= eventsToInclude->size() )
@@ -112,7 +103,7 @@ void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector <
     eventList.erase( eventList.begin() + indexOfTheEventInThisList + 1 + static_cast<unsigned>(lastEvent-firstEvent)+1 );
 }
 
-gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game & game, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game & game, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditLink dialog(parent_, *this, game);
     if ( dialog.ShowModal() == 0 ) return Cancelled;
@@ -135,14 +126,14 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditor
     dc.SetTextForeground( wxColour( 0, 0, 0 ) );
     dc.SetTextBackground( wxColour( 255, 255, 255 ) );
     dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    dc.DrawText( _("Lien vers ")+sceneLinked, x+56, y + 16 );
-    wxRect lien = dc.GetTextExtent(_("Lien vers ")+sceneLinked);
+    dc.DrawText( _("Lien vers ")+GetTarget(), x+56, y + 16 );
+    wxRect lien = dc.GetTextExtent(_("Lien vers ")+GetTarget());
 
     dc.SetFont( wxFont( 10, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    if ( start == -1 && end == -1 )
+    if ( IncludeAllEvents() )
         dc.DrawText( _("Inclure tous les évènements"), x+lien.GetWidth()+56+10, y + 18 );
     else
-        dc.DrawText( _("Inclure les évènements ")+ToString(start)+_(" à ")+ToString(end), x+lien.GetWidth()+56+10, y + 18 );
+        dc.DrawText( _("Inclure les évènements ")+ToString(GetIncludeStart()+1)+_(" à ")+ToString(GetIncludeEnd()+1), x+lien.GetWidth()+56+10, y + 18 );
 }
 
 /**

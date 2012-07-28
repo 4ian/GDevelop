@@ -8,7 +8,7 @@
 
 #if defined(GD_IDE_ONLY)
 class Game;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -676,6 +676,10 @@ public :
      */
     virtual void ObjectDeletedFromScene(RuntimeScene & scene, Object * objectDeleted) {};
 
+    /**
+     * Return a vector containing all the object types provided by the extension
+     */
+    virtual std::vector < std::string > GetExtensionObjectsTypes() const;
 
     #if defined(GD_IDE_ONLY)
     /** \name Specializations of gd::PlatformExtension members
@@ -688,7 +692,6 @@ public :
     virtual const std::string & GetFullName() const { return fullname; }
     virtual bool IsBuiltin() const { return nameSpace.empty(); }
 
-    virtual std::vector < std::string > GetExtensionObjectsTypes() const;
     virtual std::vector < std::string > GetAutomatismsTypes() const;
     virtual const ExtensionObjectInfos & GetObjectMetadata(const std::string & objectType) const;
     virtual const AutomatismInfo & GetAutomatismMetadata(const std::string & automatismType) const;

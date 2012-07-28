@@ -19,10 +19,15 @@
 #include <wx/propgrid/advprops.h>
 #include "PlatformDefinition/Platform.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
+#include "GDL/IDE/ChangesNotifier.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/CommonTools.h"
 #elif !defined(_)
 #define _(x) x
+#endif
+
+#if defined(GD_IDE_ONLY)
+ChangesNotifier Game::changesNotifier;
 #endif
 
 Game::Game() :
@@ -261,6 +266,7 @@ void Game::InsertNewLayout(std::string & name, unsigned int position)
         scenes.push_back(newScene);
 
     newScene->SetName(name);
+    newScene->UpdateAutomatismsSharedData(*this);
 }
 
 void Game::InsertLayout(const gd::Layout & layout, unsigned int position)
@@ -273,6 +279,8 @@ void Game::InsertLayout(const gd::Layout & layout, unsigned int position)
             scenes.insert(scenes.begin()+position, newScene);
         else
             scenes.push_back(newScene);
+
+        newScene->UpdateAutomatismsSharedData(*this);
     }
     catch(...) { std::cout << "WARNING: Tried to add a layout which is not a GD C++ Platform layout to a GD C++ Platform project"; }
 }
@@ -451,9 +459,9 @@ unsigned int Game::GetObjectsCount() const
     return GetGlobalObjects().size();
 }
 
-void Game::InsertNewObject(std::string & name, unsigned int position)
+void Game::InsertNewObject(const std::string & objectType, const std::string & name, unsigned int position)
 {
-    boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(new Object(name));
+    boost::shared_ptr<Object> newObject = ExtensionsManager::GetInstance()->CreateObject(objectType, name);
     if (position<GetGlobalObjects().size())
         GetGlobalObjects().insert(GetGlobalObjects().begin()+position, newObject);
     else
@@ -480,6 +488,16 @@ void Game::RemoveObject(const std::string & name)
     if ( events == GetGlobalObjects().end() ) return;
 
     GetGlobalObjects().erase(events);
+}
+
+void Game::SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex)
+{
+    if ( firstObjectIndex >= GetGlobalObjects().size() || secondObjectIndex >= GetGlobalObjects().size() )
+        return;
+
+    boost::shared_ptr<Object> temp = GetGlobalObjects()[firstObjectIndex];
+    GetGlobalObjects()[firstObjectIndex] = GetGlobalObjects()[secondObjectIndex];
+    GetGlobalObjects()[secondObjectIndex] = temp;
 }
 #endif
 

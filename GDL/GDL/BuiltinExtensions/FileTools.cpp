@@ -3,12 +3,16 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "FileTools.h"
 #include <boost/shared_ptr.hpp>
 #include <string>
+#include <iostream>
+#include <sstream>
 #include "GDL/RuntimeScene.h"
 #include "GDL/CommonTools.h"
 #include "GDL/XmlFilesHelper.h"
+#include "FileTools.h"
+
+using namespace std;
 
 bool GD_API FileExists( const std::string & file )
 {

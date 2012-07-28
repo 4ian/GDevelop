@@ -194,7 +194,7 @@ unsigned int RepeatEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-gd::BaseEvent::EditEventReturnType RepeatEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_)
+gd::BaseEvent::EditEventReturnType RepeatEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditRepeatEvent dialog(parent_, *this, game_, scene_);
     if ( dialog.ShowModal() == 0 ) return Cancelled;

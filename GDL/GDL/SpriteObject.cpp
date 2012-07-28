@@ -22,7 +22,7 @@
 #if defined(GD_IDE_ONLY)
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/IDE/Dialogs/SpriteObjectEditor.h"
 #include "GDL/SpriteInitialPositionPanel.h"
 #endif
@@ -114,22 +114,31 @@ bool SpriteObject::DrawEdittime( sf::RenderTarget & renderTarget )
     return true;
 }
 
-bool SpriteObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
+bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
-    //Generate a thumbnail from the first animation
-    if ( !HasNoAnimations() && !GetAnimation(0).HasNoDirections() && !GetAnimation(0).GetDirection(0).HasNoSprites() )
+    try
     {
-        std::string imageName = GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName();
+        const Game & game = dynamic_cast<const Game &>(project);
 
-        if ( game.resourceManager.HasResource(imageName) && wxFileExists(game.resourceManager.GetResource(imageName).GetAbsoluteFile(game)) )
+        //Generate a thumbnail from the first animation
+        if ( !HasNoAnimations() && !GetAnimation(0).HasNoDirections() && !GetAnimation(0).GetDirection(0).HasNoSprites() )
         {
-            thumbnail = wxBitmap( game.resourceManager.GetResource(imageName).GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
+            std::string imageName = GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName();
 
-            wxImage thumbImage = thumbnail.ConvertToImage();
-            thumbnail = wxBitmap(thumbImage.Scale(24, 24));
+            if ( game.resourceManager.HasResource(imageName) && wxFileExists(game.resourceManager.GetResource(imageName).GetAbsoluteFile(game)) )
+            {
+                thumbnail = wxBitmap( game.resourceManager.GetResource(imageName).GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
 
-            return true;
+                wxImage thumbImage = thumbnail.ConvertToImage();
+                thumbnail = wxBitmap(thumbImage.Scale(24, 24));
+
+                return true;
+            }
         }
+    }
+    catch(...)
+    {
+        std::cout << "Error during thumbnail generation: Probably the project passed in argument is not a GD C++ Platform project" << std::endl;
     }
 
     return false;
@@ -147,9 +156,9 @@ void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
     }
 }
 
-void SpriteObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand & mainEditorCommand )
+void SpriteObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
-    SpriteObjectEditor dialog( parent, game, *this, mainEditorCommand );
+    SpriteObjectEditor dialog( parent, game, *this, mainFrameWrapper );
     dialog.ShowModal();
 }
 

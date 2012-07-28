@@ -28,7 +28,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
 class Game;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 #endif
 
 using namespace std;

@@ -26,7 +26,7 @@ class GD_API Resource
 public:
     Resource() {};
     ~Resource() {};
-    virtual boost::shared_ptr<Resource> Clone() { return boost::shared_ptr<Resource>(new Resource(*this));}
+    virtual boost::shared_ptr<Resource> Clone() const { return boost::shared_ptr<Resource>(new Resource(*this));}
 
     std::string kind;
     std::string name;
@@ -115,7 +115,7 @@ class GD_API ImageResource : public Resource
 public:
     ImageResource() : Resource(), smooth(true), alwaysLoaded(false) {kind = "image"; };
     ~ImageResource() {};
-    virtual boost::shared_ptr<Resource> Clone() { return boost::shared_ptr<ImageResource>(new ImageResource(*this));}
+    virtual boost::shared_ptr<Resource> Clone() const { return boost::shared_ptr<ImageResource>(new ImageResource(*this));}
 
     std::string file;
     bool smooth; ///< True if smoothing filter is applied

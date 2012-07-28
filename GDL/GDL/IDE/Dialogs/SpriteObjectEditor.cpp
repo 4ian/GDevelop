@@ -2,6 +2,7 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
+#if defined(GD_IDE_ONLY)
 #include "SpriteObjectEditor.h"
 
 //(*InternalHeaders(SpriteObjectEditor)
@@ -10,10 +11,12 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <wx/settings.h>
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
 #include <wx/dcbuffer.h>
 #include <wx/richtooltip.h>
+#include <wx/log.h>
 #include <wx/textdlg.h>
 #include <wx/msgdlg.h>
 #include <wx/filedlg.h>
@@ -31,7 +34,7 @@
 #include <wx/msw/winundef.h>
 #include <wx/msw/uxtheme.h>
 #endif
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 
 namespace { //Some private tools functions
 
@@ -99,12 +102,15 @@ const long SpriteObjectEditor::ID_MENUITEM1 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM2 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM3 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM7 = wxNewId();
+const long SpriteObjectEditor::ID_MENUITEM11 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM8 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM9 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM10 = wxNewId();
 const long SpriteObjectEditor::ID_POSITIONMASKITEM = wxNewId();
 const long SpriteObjectEditor::ID_RESIZEMASKITEM = wxNewId();
 const long SpriteObjectEditor::ID_TIMER1 = wxNewId();
+const long SpriteObjectEditor::ID_MENUITEM12 = wxNewId();
+const long SpriteObjectEditor::ID_MENUITEM13 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(SpriteObjectEditor,wxDialog)
@@ -112,7 +118,7 @@ BEGIN_EVENT_TABLE(SpriteObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObject & object_, MainEditorCommand & mainEditorCommand_) :
+SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObject & object_, gd::MainFrameWrapper & mainFrameWrapper_) :
     game(game_),
     object(object_),
     selectedAnimation(0),
@@ -128,7 +134,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
     ySelectionOffset(0),
     previewElapsedTime(0),
     previewCurrentSprite(0),
-    mainEditorCommand(mainEditorCommand_)
+    mainFrameWrapper(mainFrameWrapper_)
 {
 	//(*Initialize(SpriteObjectEditor)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -274,6 +280,8 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	MenuItem4 = new wxMenuItem((&imagesMenu), ID_MENUITEM7, _("Ajouter une image depuis un fichier"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem4->SetBitmap(gd::CommonBitmapManager::GetInstance()->add16);
 	imagesMenu.Append(MenuItem4);
+	MenuItem9 = new wxMenuItem((&imagesMenu), ID_MENUITEM11, _("Ajouter depuis la banque d\'image du jeu"), wxEmptyString, wxITEM_NORMAL);
+	imagesMenu.Append(MenuItem9);
 	imagesMenu.AppendSeparator();
 	removeImageItem = new wxMenuItem((&imagesMenu), ID_MENUITEM8, _("Retirer\tDEL"), wxEmptyString, wxITEM_NORMAL);
 	imagesMenu.Append(removeImageItem);
@@ -289,6 +297,11 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	maskMenu.Append(MenuItem6);
 	previewTimer.SetOwner(this, ID_TIMER1);
 	previewTimer.Start(50, false);
+	MenuItem10 = new wxMenuItem((&emptyImagesMenu), ID_MENUITEM12, _("Ajouter une image depuis un fichier"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem10->SetBitmap(gd::CommonBitmapManager::GetInstance()->add16);
+	emptyImagesMenu.Append(MenuItem10);
+	MenuItem11 = new wxMenuItem((&emptyImagesMenu), ID_MENUITEM13, _("Ajouter depuis la banque d\'image du jeu"), wxEmptyString, wxITEM_NORMAL);
+	emptyImagesMenu.Append(MenuItem11);
 
 	Connect(ID_MASKITEM,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnMaskEditClick);
 	Connect(ID_POINTSITEM,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnPointEditClick);
@@ -327,13 +340,17 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddAnimationSelected);
 	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnDeleteAnimationSelected);
 	Connect(ID_MENUITEM7,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddImageFromFileSelected);
+	Connect(ID_MENUITEM11,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddFromImageBankSelected);
 	Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnremoveImageItemSelected);
 	Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMoveLeftSelected);
 	Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMoveRightSelected);
 	Connect(ID_POSITIONMASKITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnPositionMaskSelected);
 	Connect(ID_RESIZEMASKITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnResizeMaskSelected);
 	Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&SpriteObjectEditor::OnpreviewTimerTrigger);
+	Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddImageFromFileSelected);
+	Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddFromImageBankSelected);
 	//*)
+	imagesList->Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListRightClick,0,this);
 
     wxImageList * iconList = new wxImageList(16,16);
     iconList->Add(gd::CommonBitmapManager::GetInstance()->pointEdit16);
@@ -351,7 +368,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
     maskToolbar->ToggleTool(ID_MASKAPPLYWHOLEANIMITEM, true);
     pointToolbar->ToggleTool(ID_POINTAPPLYWHOLEANIMITEM, true);
 
-    resourcesEditorPnl = new ResourcesEditor( this, game, mainEditorCommand );
+    resourcesEditorPnl = new ResourcesEditor( this, game, mainFrameWrapper );
     resourcesEditorPnl->Refresh();
     mgr->AddPane( resourcesEditorPnl, wxAuiPaneInfo().Name( "ResourcesEditor" ).Right().CloseButton( false ).Caption( _( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(true) );
 
@@ -386,6 +403,11 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	mgr->Update();
 	Layout();
 	SetSize(900,600);
+}
+
+void SpriteObjectEditor::OnimagesListRightClick(wxMouseEvent& event)
+{
+    PopupMenu(&emptyImagesMenu);
 }
 
 void SpriteObjectEditor::RefreshAll()
@@ -1418,21 +1440,25 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
 
                 std::string name = ToString(file.GetFullName());
 
-                //Find a new unique name for the resource
-                unsigned int uniqueID = 2;
-                while ( game.resourceManager.HasResource(name) )
+                //Add the resource if it does not exist or if it is not the same resource
+                if ( !game.resourceManager.HasResource(name) || !(game.resourceManager.GetResource(name).GetFile() == file.GetFullPath()) )
                 {
-                    name = ToString(file.GetFullName())+ToString(uniqueID);
-                    uniqueID++;
+                    //Find a new unique name for the resource
+                    unsigned int uniqueID = 2;
+                    while ( game.resourceManager.HasResource(name) )
+                    {
+                        name = ToString(file.GetFullName())+ToString(uniqueID);
+                        uniqueID++;
+                    }
+
+                    boost::shared_ptr<ImageResource> image(new ImageResource);
+                    image->file = file.GetFullPath();
+                    image->name = name;
+                    image->userAdded = false;
+
+                    game.resourceManager.resources.push_back(image);
+                    game.imagesChanged.push_back(name);
                 }
-
-                boost::shared_ptr<ImageResource> image(new ImageResource);
-                image->file = file.GetFullPath();
-                image->name = name;
-                image->userAdded = false;
-
-                game.resourceManager.resources.push_back(image);
-                game.imagesChanged.push_back(name);
 
                 Sprite sprite;
                 sprite.SetImageName(name);
@@ -1444,3 +1470,9 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
         resourcesEditorPnl->Refresh();
     }
 }
+
+void SpriteObjectEditor::OnAddFromImageBankSelected(wxCommandEvent& event)
+{
+    wxLogMessage(_("Glissez déposez les images depuis la banque d'images pour les ajouter à l'animation."));
+}
+#endif

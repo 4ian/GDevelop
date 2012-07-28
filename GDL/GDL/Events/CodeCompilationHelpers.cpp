@@ -256,7 +256,7 @@ bool EventsCodeCompilerPostWork::Execute()
         wxRemoveFile(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(scene)+"events.cpp");
     }
 
-    scene->UnsetEventsModified();
+    scene->SetCompilationNotNeeded();
     return true;
 }
 

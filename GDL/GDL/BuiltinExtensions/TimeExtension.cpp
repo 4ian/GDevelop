@@ -5,6 +5,8 @@
 
 #include "GDL/BuiltinExtensions/TimeExtension.h"
 #include "GDL/RuntimeScene.h"
+#include "GDL/ManualTimer.h"
+#include "GDL/CommonTools.h"
 
 TimeExtension::TimeExtension()
 {

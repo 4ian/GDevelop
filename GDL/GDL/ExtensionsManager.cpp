@@ -32,7 +32,7 @@
 
 #if defined(GD_IDE_ONLY)
 #include "GDL/Game.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #endif
 
 ExtensionsManager *ExtensionsManager::_singleton = NULL;

@@ -17,7 +17,9 @@
 #include "GDL/CommonTools.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Automatism.h"
+#include "GDL/Game.h"
 #include "GDL/RotatedRectangle.h"
+#include "GDL/ExtensionsManager.h"
 #if defined(GD_IDE_ONLY)
 #include <wx/panel.h>
 #endif
@@ -204,6 +206,14 @@ void Object::RemoveAutomatism(const std::string & name)
 
     automatisms.erase(name);
 }
+
+void Object::AddNewAutomatism(const std::string & type, const std::string & name)
+{
+    Automatism * automatism = ExtensionsManager::GetInstance()->CreateAutomatism(type);
+    automatism->SetName(name);
+    automatisms[automatism->GetName()] = automatism;
+    automatisms[automatism->GetName()]->SetOwner(this);
+}
 #endif
 
 double Object::GetVariableValue( const std::string & variable )
@@ -217,6 +227,18 @@ const std::string & Object::GetVariableString( const std::string & variable )
 }
 
 #if defined(GD_IDE_ONLY)
+void Object::EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ )
+{
+    try
+    {
+        EditObject(parent, dynamic_cast<Game &>(project), mainFrameWrapper_);
+    }
+    catch(...)
+    {
+        std::cout << "Unable to edit object: IDE probably passed a gd::Project which is not a GD C++ Platform project" << std::endl;
+    }
+}
+
 void Object::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Position");      value = ToString(GetX())+";"+ToString(GetY());}

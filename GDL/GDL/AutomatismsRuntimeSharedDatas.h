@@ -25,7 +25,7 @@ class AutomatismsRuntimeSharedDatas
     public:
         AutomatismsRuntimeSharedDatas() {};
         virtual ~AutomatismsRuntimeSharedDatas() {};
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new AutomatismsRuntimeSharedDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new AutomatismsRuntimeSharedDatas(*this));}
 
 };
 

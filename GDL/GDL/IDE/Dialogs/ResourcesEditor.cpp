@@ -111,11 +111,11 @@ BEGIN_EVENT_TABLE( ResourcesEditor, wxPanel )
     //*)
 END_EVENT_TABLE()
 
-ResourcesEditor::ResourcesEditor( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_, bool useRibbon_ ) :
+ResourcesEditor::ResourcesEditor( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_, bool useRibbon_ ) :
 game(game_),
 toolbar(NULL),
 filesWatcher(game),
-mainEditorCommand(mainEditorCommand_),
+mainFrameWrapper(mainFrameWrapper_),
 useRibbon(useRibbon_),
 resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
 {
@@ -328,21 +328,21 @@ void ResourcesEditor::ConnectEvents()
 {
     if ( !useRibbon ) return;
 
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonAdd, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnAddImageBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonAddFromLibrary, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnAddFromLibraryBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDel, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnDelImageBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonModProp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnModPropSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonMod, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnModNameImageBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonModFile, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnModFileImage, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonAddDossier, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnAddFolderSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonUp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnMoveUpSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDown, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnMoveDownSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDirectories, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::DossierBt, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonPaintProgram, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnOpenPaintProgramClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonSearch, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnChercherBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnAideBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnRefreshBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDeleteUnused, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnDeleteUnusedFiles, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonAdd, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnAddImageBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonAddFromLibrary, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnAddFromLibraryBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDel, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnDelImageBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonModProp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnModPropSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonMod, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnModNameImageBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonModFile, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnModFileImage, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonAddDossier, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnAddFolderSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonUp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnMoveUpSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDown, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnMoveDownSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDirectories, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::DossierBt, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonPaintProgram, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnOpenPaintProgramClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonSearch, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnChercherBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnAideBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnRefreshBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDeleteUnused, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&ResourcesEditor::OnDeleteUnusedFiles, NULL, this);
 }
 
 /*void ResourcesEditor::CreateRibbonPage(wxRibbonPage * page)
@@ -1198,7 +1198,7 @@ void ResourcesEditor::ForceRefreshRibbonAndConnect()
 {
     if ( useRibbon )
     {
-        mainEditorCommand.GetRibbon()->SetActivePage(1);
+        mainFrameWrapper.GetRibbon()->SetActivePage(1);
         ConnectEvents();
     }
 }

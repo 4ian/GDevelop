@@ -7,7 +7,6 @@
 #define LAYER_H
 #include <string>
 #include <vector>
-#include <SFML/Graphics.hpp>
 #include "GDL/Camera.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/Layer.h"

@@ -29,7 +29,7 @@ class GD_API StandardEvent : public gd::BaseEvent
         virtual ~StandardEvent() {};
 
         StandardEvent& operator=(const StandardEvent & event);
-        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new StandardEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new StandardEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
         virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);

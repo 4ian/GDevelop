@@ -29,18 +29,18 @@ Scene::Scene() :
 backgroundColorR(209),
 backgroundColorG(209),
 backgroundColorB(209),
-standardSortMethod(true),
-oglFOV(90.0f),
-oglZNear(1.0f),
-oglZFar(500.0f),
-stopSoundsOnStartup(true),
 #if defined(GD_IDE_ONLY)
 profiler(NULL),
 #endif
-codeExecutionEngine(boost::shared_ptr<CodeExecutionEngine>(new CodeExecutionEngine))
+codeExecutionEngine(boost::shared_ptr<CodeExecutionEngine>(new CodeExecutionEngine)),
+stopSoundsOnStartup(true),
+standardSortMethod(true),
+oglFOV(90.0f),
+oglZNear(1.0f),
+oglZFar(500.0f)
 #if defined(GD_IDE_ONLY)
 ,wasModified(false),
-eventsModified(true)
+compilationNeeded(true)
 #endif
 {
     //ctor
@@ -90,6 +90,61 @@ unsigned int Scene::GetLayersCount() const
 }
 
 #if defined(GD_IDE_ONLY)
+void Scene::UpdateAutomatismsSharedData(Game & game)
+{
+    std::vector < std::string > allAutomatismsTypes;
+    std::vector < std::string > allAutomatismsNames;
+
+    //Search in objects for the type and the name of every automatisms.
+    for (unsigned int i = 0;i<GetInitialObjects().size();++i)
+    {
+        std::vector < std::string > objectAutomatisms = GetInitialObjects()[i]->GetAllAutomatismNames();
+        for (unsigned int j = 0;j<objectAutomatisms.size();++j)
+        {
+            gd::Automatism & automatism = GetInitialObjects()[i]->GetAutomatism(objectAutomatisms[j]);
+            allAutomatismsTypes.push_back(automatism.GetTypeName());
+            allAutomatismsNames.push_back(automatism.GetName());
+        }
+    }
+    for (unsigned int i = 0;i<game.GetGlobalObjects().size();++i)
+    {
+        std::vector < std::string > objectAutomatisms = game.GetGlobalObjects()[i]->GetAllAutomatismNames();
+        for (unsigned int j = 0;j<objectAutomatisms.size();++j)
+        {
+            gd::Automatism & automatism = game.GetGlobalObjects()[i]->GetAutomatism(objectAutomatisms[j]);
+            allAutomatismsTypes.push_back(automatism.GetTypeName());
+            allAutomatismsNames.push_back(automatism.GetName());
+        }
+    }
+
+    //Create non existing shared data
+    for (unsigned int i = 0;i<allAutomatismsTypes.size() && i < allAutomatismsNames.size();++i)
+    {
+        if ( automatismsInitialSharedDatas.find(allAutomatismsNames[i]) == automatismsInitialSharedDatas.end() )
+        {
+            boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = ExtensionsManager::GetInstance()->CreateAutomatismSharedDatas(allAutomatismsTypes[i]);
+            automatismsSharedDatas->SetName(allAutomatismsNames[i]);
+            automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
+        }
+    }
+
+    //Remove useless shared data:
+    //First construct the list of existing shared data.
+    std::vector < std::string > allSharedData;
+    for (std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = automatismsInitialSharedDatas.begin();
+         it != automatismsInitialSharedDatas.end();++it)
+    {
+        allSharedData.push_back(it->first);
+    }
+
+    //Then delete shared data not linked to an automatism
+    for (unsigned int i = 0;i<allSharedData.size();++i)
+    {
+        if ( std::find(allAutomatismsNames.begin(), allAutomatismsNames.end(), allSharedData[i]) == allAutomatismsNames.end() )
+            automatismsInitialSharedDatas.erase(allSharedData[i]);
+    }
+}
+
 bool Scene::HasObjectNamed(const std::string & name) const
 {
     return ( find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name)) != GetInitialObjects().end() );
@@ -123,9 +178,9 @@ unsigned int Scene::GetObjectsCount() const
     return GetInitialObjects().size();
 }
 
-void Scene::InsertNewObject(std::string & name, unsigned int position)
+void Scene::InsertNewObject(const std::string & objectType, const std::string & name, unsigned int position)
 {
-    boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(new Object(name));
+    boost::shared_ptr<Object> newObject = ExtensionsManager::GetInstance()->CreateObject(objectType, name);
     if (position<GetInitialObjects().size())
         GetInitialObjects().insert(GetInitialObjects().begin()+position, newObject);
     else
@@ -144,6 +199,16 @@ void Scene::InsertObject(const gd::Object & object, unsigned int position)
             GetInitialObjects().push_back(newObject);
     }
     catch(...) { std::cout << "WARNING: Tried to add an object which is not a GD C++ Platform Object to a GD C++ Platform project"; }
+}
+
+void Scene::SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex)
+{
+    if ( firstObjectIndex >= GetInitialObjects().size() || secondObjectIndex >= GetInitialObjects().size() )
+        return;
+
+    boost::shared_ptr<Object> temp = GetInitialObjects()[firstObjectIndex];
+    GetInitialObjects()[firstObjectIndex] = GetInitialObjects()[secondObjectIndex];
+    GetInitialObjects()[secondObjectIndex] = temp;
 }
 
 void Scene::RemoveObject(const std::string & name)
@@ -387,7 +452,7 @@ void Scene::Init(const Scene & scene)
     }
 
     #if defined(GD_IDE_ONLY)
-    eventsModified = true; //Force recompilation/refreshing
+    compilationNeeded = true; //Force recompilation/refreshing
     wasModified = true;
 
     associatedSettings = scene.associatedSettings;

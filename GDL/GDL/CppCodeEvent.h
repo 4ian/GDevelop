@@ -14,7 +14,7 @@ class TiXmlElement;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
 class Scene;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 class wxWindow;
 
 /**
@@ -28,7 +28,7 @@ class CppCodeEvent : public gd::BaseEvent
         virtual ~CppCodeEvent() {};
 
         CppCodeEvent& operator=(const CppCodeEvent & event);
-        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new CppCodeEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new CppCodeEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
         virtual bool CanHaveSubEvents() const {return false;}
@@ -83,7 +83,7 @@ class CppCodeEvent : public gd::BaseEvent
         /**
          * Called when the user want to edit the event
          */
-        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
+        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
     private:
         void Init(const CppCodeEvent & event);

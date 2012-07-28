@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
 #ifndef AUTOMATISM_H
 #define AUTOMATISM_H
 #include <string>
@@ -14,7 +13,7 @@ class TiXmlElement;
 #include "GDCore/PlatformDefinition/Automatism.h"
 class wxWindow;
 class Game;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 #endif
 
 /**
@@ -28,101 +27,108 @@ class GD_API Automatism
 : public gd::Automatism
 #endif
 {
-    public:
-        Automatism(std::string automatismTypeName);
-        virtual ~Automatism() {};
-        virtual Automatism* Clone() { return new Automatism(*this);}
+public:
+    Automatism(std::string automatismTypeName);
+    virtual ~Automatism() {};
+    virtual Automatism* Clone() const { return new Automatism(*this);}
 
-        /**
-         * Change the name identifying the automatism.
-         */
-        virtual void SetName(const std::string & name_);
+    /**
+     * Change the name identifying the automatism.
+     */
+    virtual void SetName(const std::string & name_);
 
-        /**
-         * Return the name identifying the automatism
-         */
-        virtual const std::string & GetName() const { return name; }
+    /**
+     * Return the name identifying the automatism
+     */
+    virtual const std::string & GetName() const { return name; }
 
-        /**
-         * Return the name identifying the type of the automatism
-         */
-        virtual const std::string & GetTypeName() const { return type; }
+    /**
+     * Return the name identifying the type of the automatism
+     */
+    virtual const std::string & GetTypeName() const { return type; }
 
-        /**
-         * Set the object owning this automatism
-         */
-        void SetOwner(Object* owner_) { object = owner_; OnOwnerChanged(); };
+    /**
+     * Set the object owning this automatism
+     */
+    void SetOwner(Object* owner_) { object = owner_; OnOwnerChanged(); };
 
-        /**
-         * Called at each frame before events. Call DoStepPreEvents.
-         */
-        inline void StepPreEvents(RuntimeScene & scene) { if (activated) DoStepPreEvents(scene); };
+    /**
+     * Called at each frame before events. Call DoStepPreEvents.
+     */
+    inline void StepPreEvents(RuntimeScene & scene) { if (activated) DoStepPreEvents(scene); };
 
-        /**
-         * Called at each frame after events. Call DoStepPostEvents.
-         */
-        inline void StepPostEvents(RuntimeScene & scene) { if (activated) DoStepPostEvents(scene); };
+    /**
+     * Called at each frame after events. Call DoStepPostEvents.
+     */
+    inline void StepPostEvents(RuntimeScene & scene) { if (activated) DoStepPostEvents(scene); };
 
-        /**
-         * De/Activate the automatism
-         */
-        inline void Activate(bool enable = true) { if ( !activated && enable ) { activated = true; OnActivate(); } else if ( activated && !enable ) { activated = false; OnDeActivate(); } };
+    /**
+     * De/Activate the automatism
+     */
+    inline void Activate(bool enable = true) { if ( !activated && enable ) { activated = true; OnActivate(); } else if ( activated && !enable ) { activated = false; OnDeActivate(); } };
 
-        /**
-         * Return true if the automatism is activated
-         */
-        inline bool Activated() const { return activated; };
+    /**
+     * Return true if the automatism is activated
+     */
+    inline bool Activated() const { return activated; };
 
-        /**
-         * Reimplement this method to do extra work when the automatism is activated
-         */
-        virtual void OnActivate() {};
-        /**
-         * Reimplement this method to do extra work when the automatism is deactivated
-         */
-        virtual void OnDeActivate() {};
+    /**
+     * Reimplement this method to do extra work when the automatism is activated
+     */
+    virtual void OnActivate() {};
+    /**
+     * Reimplement this method to do extra work when the automatism is deactivated
+     */
+    virtual void OnDeActivate() {};
 
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Save Automatism to XML
-         */
-        virtual void SaveToXml(TiXmlElement * eventElem) const {}
-        #endif
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Called when user wants to edit the automatism.
+     *
+     * \warning Extensions writers: Redefine the other EditAutomatism method (taking Game and Scene in parameters) instead of this one.
+     */
+    void EditAutomatism( wxWindow* parent, gd::Project & project, gd::Layout * optionalLayout, gd::MainFrameWrapper & mainFrameWrapper_ );
 
-        /**
-         * Load Automatism from XML
-         */
-        virtual void LoadFromXml(const TiXmlElement * eventElem) {}
+    /**
+     * Save Automatism to XML
+     */
+    virtual void SaveToXml(TiXmlElement * eventElem) const {}
+    #endif
 
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Called when user wants to edit the automatism.
-         */
-        virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ ) {};
-        #endif
+    /**
+     * Load Automatism from XML
+     */
+    virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 
-    protected:
+protected:
 
-        /**
-         * Called at each frame before events
-         */
-        virtual void DoStepPreEvents(RuntimeScene & scene) {};
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Called when user wants to edit the automatism.
+     */
+    virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ ) {};
+    #endif
 
-        /**
-         * Called at each frame after events
-         */
-        virtual void DoStepPostEvents(RuntimeScene & scene) {};
+    /**
+     * Called at each frame before events
+     */
+    virtual void DoStepPreEvents(RuntimeScene & scene) {};
 
-        /**
-         * Redefine this method so as to do special works when owner is set.
-         */
-        virtual void OnOwnerChanged() {};
+    /**
+     * Called at each frame after events
+     */
+    virtual void DoStepPostEvents(RuntimeScene & scene) {};
 
-        Object* object; ///< Object owning the automatism
-        bool activated; ///< True if automatism is running
+    /**
+     * Redefine this method so as to do special works when owner is set.
+     */
+    virtual void OnOwnerChanged() {};
 
-        std::string name; ///< Name of the automatism
-        std::string type; ///< The type indicate of which type is the automatism. ( To test if we can do something, like actions, reserved to specific automatism with it )
+    Object* object; ///< Object owning the automatism
+    bool activated; ///< True if automatism is running
+
+    std::string name; ///< Name of the automatism
+    std::string type; ///< The type indicate of which type is the automatism. ( To test if we can do something, like actions, reserved to specific automatism with it )
 };
 
 #endif // AUTOMATISM_H

@@ -128,12 +128,12 @@ game(game_)
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditLink::OnAideBtClick);
 	//*)
 
-	linkedNameEdit->ChangeValue(editedEvent.sceneLinked);
-	if ( editedEvent.start != -1 && editedEvent.end != -1 )
+	linkedNameEdit->ChangeValue(editedEvent.GetTarget());
+	if ( !editedEvent.IncludeAllEvents() )
 	{
 	    OnlyEventsCheck->SetValue(true);
-	    StartEdit->ChangeValue(ToString(editedEvent.start));
-	    EndEdit->ChangeValue(ToString(editedEvent.end));
+	    StartEdit->ChangeValue(ToString(editedEvent.GetIncludeStart()+1));
+	    EndEdit->ChangeValue(ToString(editedEvent.GetIncludeEnd()+1));
 	}
 
 	for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
@@ -171,16 +171,13 @@ void EditLink::OnAnnulerBtClick(wxCommandEvent& event)
  */
 void EditLink::OnOkBtClick(wxCommandEvent& event)
 {
-    editedEvent.sceneLinked = ToString(linkedNameEdit->GetValue());
+    editedEvent.SetTarget(ToString(linkedNameEdit->GetValue()));
     if ( AllEventsCheck->GetValue() == true )
-    {
-        editedEvent.start = -1;
-        editedEvent.end = -1;
-    }
+        editedEvent.SetIncludeAllEvents(true);
     else
     {
-        editedEvent.start = ToInt(ToString(StartEdit->GetValue()));
-        editedEvent.end = ToInt(ToString(EndEdit->GetValue()));
+        editedEvent.SetIncludeAllEvents(false);
+        editedEvent.SetIncludeStartAndEnd(ToInt(ToString(StartEdit->GetValue()))-1, ToInt(ToString(EndEdit->GetValue()))-1);
     }
     EndModal(1);
 }

@@ -7,21 +7,15 @@
 #define RUNTIMESCENE_H
 
 #include "GDL/Scene.h" //This include must be placed first
-#include <iostream>
-#include <sstream>
 #include <vector>
 #include <string>
 #include <map>
 #include <boost/shared_ptr.hpp>
-#include "GDL/CommonTools.h"
-#include "GDL/Text.h"
-#include "GDL/Layer.h"
-#include "GDL/ManualTimer.h"
 #include "GDL/ObjInstancesHolder.h"
+class Text;
+class ManualTimer;
 class RuntimeGame;
-class CodeExecutionEngine;
 class Object;
-class SoundManager;
 class AutomatismsRuntimeSharedDatas;
 class ExtensionBase;
 #undef GetObject //Disable an annoying macro
@@ -72,7 +66,7 @@ public:
      * Add a text to be displayed on the scene
      * \deprecated
      */
-    void DisplayText(Text & text) { textes.push_back(text); };
+    void DisplayText(Text & text);
 
     /**
      * Get the AutomatismsRuntimeSharedData associated with automatism.
@@ -214,8 +208,8 @@ protected:
 
     std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
 
-    vector < Text > textes; ///<Deprecated way of displaying a text
-    bool DisplayLegacyTexts(string layer = "");
+    std::vector < Text >                    textes; ///<Deprecated way of displaying a text
+    bool DisplayLegacyTexts(std::string layer = "");
 
     void Init(const RuntimeScene & scene);
 };

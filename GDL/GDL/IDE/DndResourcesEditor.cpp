@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+#if defined(GD_IDE_ONLY)
 #include "DndResourcesEditor.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCore/CommonTools.h"
@@ -20,3 +25,4 @@ bool DndTextResourcesEditor::OnDropText(wxCoord x, wxCoord y, const wxString& te
 
     return true;
 }
+#endif

@@ -27,7 +27,7 @@ class wxPanel;
 class Game;
 class Scene;
 class wxWindow;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 namespace gd {class ArbitraryResourceWorker;}
 #endif
 
@@ -82,7 +82,7 @@ public:
      * return new MyObject(*this);
      * \endcode
      */
-    virtual Object * Clone() { return new Object(*this);}
+    virtual Object * Clone() const { return new Object(*this);}
 
     /**
      * Called by RuntimeScene at loading. The object is not necessarily used on the scene.
@@ -360,6 +360,11 @@ public:
      * Remove an automatism
      */
     virtual void RemoveAutomatism(const std::string & name);
+
+    /**
+     * Add a new automatism to the object
+     */
+    virtual void AddNewAutomatism(const std::string & type, const std::string & name);
     #endif
     ///@}
 
@@ -385,12 +390,14 @@ public:
     /**
      * Generate thumbnail for editor
      */
-    virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail) {return false;};
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) {return false;};
 
     /**
      * Called when user wants to edit the object.
+     *
+     * \warning Extensions writers: Redefine the other EditObject method (taking Game in parameter) instead of this one.
      */
-    virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ ) {};
+    virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ );
 
     /**
      * Called when user edit an object on scene.
@@ -468,6 +475,13 @@ public:
     ///@}
 
 protected:
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Called when user wants to edit the object.
+     */
+    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ ) {};
+    #endif
 
     std::string                                             name; ///< The full name of the object
     std::string                                             type; ///< Which type is the object. ( To test if we can do something reserved to some objects with it )

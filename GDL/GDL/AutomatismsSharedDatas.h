@@ -24,7 +24,7 @@ class GD_API AutomatismsSharedDatas
     public:
         AutomatismsSharedDatas(std::string typeName);
         virtual ~AutomatismsSharedDatas() {};
-        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() { return boost::shared_ptr<AutomatismsSharedDatas>(new AutomatismsSharedDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsSharedDatas>(new AutomatismsSharedDatas(*this));}
 
         /**
          * Change the name identifying the automatism. Change also AutomatismId.

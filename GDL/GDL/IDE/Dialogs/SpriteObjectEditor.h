@@ -20,7 +20,7 @@
 //*)
 #include <wx/dnd.h>
 #include <vector>
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 class ResourcesEditor;
 class SpriteObject;
 class Resource;
@@ -31,7 +31,7 @@ class SpriteObjectEditor: public wxDialog
 {
 public:
 
-    SpriteObjectEditor(wxWindow* parent, Game & game, SpriteObject & object, MainEditorCommand & mainEditorCommand_ );
+    SpriteObjectEditor(wxWindow* parent, Game & game, SpriteObject & object, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual ~SpriteObjectEditor();
 
     /**
@@ -57,8 +57,10 @@ public:
     wxMenuItem* deleteItem;
     wxMenuItem* MenuItem1;
     wxMenuItem* MenuItem4;
+    wxMenuItem* MenuItem11;
     wxPanel* Panel1;
     wxMenu animationsMenu;
+    wxMenuItem* MenuItem10;
     wxAuiManager* AuiManager2;
     wxMenuItem* removeImageItem;
     wxPanel* Panel3;
@@ -70,6 +72,7 @@ public:
     wxAuiManager* AuiManager3;
     wxPanel* imagePanel;
     wxScrollBar* yScrollBar;
+    wxMenu emptyImagesMenu;
     wxMenuItem* moveLeftItem;
     wxMenuItem* MenuItem6;
     wxPanel* previewPanel;
@@ -77,6 +80,7 @@ public:
     wxMenuItem* moveRightItem;
     wxMenuItem* automaticRotationItem;
     wxPanel* pointsPanel;
+    wxMenuItem* MenuItem9;
     wxMenuItem* multipleDirectionsItem;
     wxListCtrl* imagesList;
     wxMenu imagesMenu;
@@ -127,12 +131,15 @@ protected:
     static const long ID_MENUITEM2;
     static const long ID_MENUITEM3;
     static const long ID_MENUITEM7;
+    static const long ID_MENUITEM11;
     static const long ID_MENUITEM8;
     static const long ID_MENUITEM9;
     static const long ID_MENUITEM10;
     static const long ID_POSITIONMASKITEM;
     static const long ID_RESIZEMASKITEM;
     static const long ID_TIMER1;
+    static const long ID_MENUITEM12;
+    static const long ID_MENUITEM13;
     //*)
 
 private:
@@ -181,7 +188,9 @@ private:
     void OnPreviewClick(wxCommandEvent& event);
     void OnimagesListKeyDown(wxListEvent& event);
     void OnAddImageFromFileSelected(wxCommandEvent& event);
+    void OnAddFromImageBankSelected(wxCommandEvent& event);
     //*)
+    void OnimagesListRightClick(wxMouseEvent& event);
     void RefreshAll();
     void RefreshAnimationTree();
     void RefreshImagesList();
@@ -224,7 +233,7 @@ private:
     float previewElapsedTime;
     int previewCurrentSprite;
 
-    MainEditorCommand & mainEditorCommand;
+    gd::MainFrameWrapper & mainFrameWrapper;
 };
 
 /**

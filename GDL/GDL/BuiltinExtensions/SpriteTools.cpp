@@ -11,6 +11,8 @@
 #include "GDL/Collisions.h"
 #include "GDL/profile.h"
 
+using namespace std;
+
 bool GD_API SpriteTurnedToward( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
     const bool sameObjectLists = firstObjName == secondObjName;

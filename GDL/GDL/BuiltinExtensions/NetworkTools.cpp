@@ -3,11 +3,14 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "GDL/BuiltinExtensions/NetworkTools.h"
 #include <fstream>
+#include <string>
 #include <SFML/Network.hpp>
+#include "GDL/BuiltinExtensions/NetworkTools.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Tools/md5.h"
+
+using namespace std;
 
 /**
  * Send data to a php web page.

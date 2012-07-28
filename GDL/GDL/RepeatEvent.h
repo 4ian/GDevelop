@@ -25,7 +25,7 @@ class RepeatEvent : public gd::BaseEvent
         virtual ~RepeatEvent() {};
 
         RepeatEvent& operator=(const RepeatEvent & event);
-        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new RepeatEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new RepeatEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
         virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
@@ -67,7 +67,7 @@ class RepeatEvent : public gd::BaseEvent
         /**
          * Called when the user want to edit the event
          */
-        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
+        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
     private:
         void Init(const RepeatEvent & event);

@@ -5,9 +5,9 @@
 
 #if defined(GD_IDE_ONLY)
 #include <wx/aui/aui.h>
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
-void MainEditorCommand::DisableControlsForScenePreviewing()
+void gd::MainFrameWrapper::DisableControlsForScenePreviewing()
 {
     unsigned int notebookCurrentPage =  editorsNotebook ? editorsNotebook->GetSelection() : 0;
     for (unsigned int i = 0;i<disableOnPreview.size();++i) disableOnPreview[i]->Disable();

@@ -28,6 +28,8 @@
 #include "GDL/RuntimeContext.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/RuntimeGame.h"
+#include "GDL/Text.h"
+#include "GDL/ManualTimer.h"
 
 #include "GDL/CodeExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
@@ -144,7 +146,7 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
     glLoadIdentity();
 
     double windowRatio = static_cast<double>(renderWindow->GetWidth())/static_cast<double>(renderWindow->GetHeight());
-    gluPerspective(oglFOV, windowRatio, oglZNear, oglZFar);
+    gluPerspective(GetOpenGLFOV(), windowRatio, GetOpenGLZNear(), GetOpenGLZFar());
 }
 
 #ifndef RELEASE
@@ -273,7 +275,7 @@ void RuntimeScene::ManageRenderTargetEvents()
             glLoadIdentity();
 
             double windowRatio = static_cast<double>(event.Size.Width)/static_cast<double>(event.Size.Height);
-            gluPerspective(oglFOV, windowRatio, oglZNear, oglZFar);
+            gluPerspective(GetOpenGLFOV(), windowRatio, GetOpenGLZNear(), GetOpenGLZFar());
         }
     }
 }
@@ -318,8 +320,7 @@ void RuntimeScene::Render()
 
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
-                gluPerspective(oglFOV, camera.GetSize().x
-                                    /camera.GetSize().y, oglZNear, oglZFar);
+                gluPerspective(GetOpenGLFOV(), camera.GetSize().x/camera.GetSize().y, GetOpenGLZNear(), GetOpenGLZFar());
 
                 const sf::FloatRect & viewport = camera.GetViewport();
                 glViewport(viewport.Left*renderWindow->GetWidth(),
@@ -390,7 +391,7 @@ bool RuntimeScene::UpdateTime()
 ////////////////////////////////////////////////////////////
 bool RuntimeScene::OrderObjectsByZOrder( ObjList & objList )
 {
-    if ( standardSortMethod )
+    if ( StandardSortMethod() )
         std::sort( objList.begin(), objList.end(), SortByZOrder() );
     else
         std::stable_sort( objList.begin(), objList.end(), SortByZOrder() );
@@ -398,9 +399,10 @@ bool RuntimeScene::OrderObjectsByZOrder( ObjList & objList )
     return true;
 }
 
-////////////////////////////////////////////////////////////
-/// Affiche le texte
-////////////////////////////////////////////////////////////
+void RuntimeScene::DisplayText(Text & text)
+{
+    textes.push_back(text);
+}
 bool RuntimeScene::DisplayLegacyTexts(string layer)
 {
     for ( unsigned int i = 0;i < textes.size();i++ )
@@ -538,7 +540,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const I
     for (unsigned int i = 0;i<GetLayersCount();++i)
     {
         for (unsigned int j = 0;j<GetLayer(i).GetCameraCount();++j)
-            GetLayer(i).GetCamera(i).InitializeSFMLView(defaultView);
+            GetLayer(i).GetCamera(j).InitializeSFMLView(defaultView);
     }
 
     //Load resources of initial objects
@@ -575,7 +577,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const I
         }
     }
 
-    if ( stopSoundsOnStartup ) {SoundManager::GetInstance()->ClearAllSoundsAndMusics(); }
+    if ( StopSoundsOnStartup() ) {SoundManager::GetInstance()->ClearAllSoundsAndMusics(); }
     if ( renderWindow ) renderWindow->SetTitle(GetWindowDefaultTitle());
 
     MessageLoading( "Loading finished", 100 );

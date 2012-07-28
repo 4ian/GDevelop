@@ -24,7 +24,7 @@ class GD_API ProfileEvent : public gd::BaseEvent
         virtual ~ProfileEvent();
 
         ProfileEvent& operator=(const ProfileEvent & event);
-        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new ProfileEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new ProfileEvent(*this));}
 
         void SetPreviousProfileEvent( boost::shared_ptr<ProfileEvent> previousProfileEvent_ ) { previousProfileEvent = previousProfileEvent_; }
 

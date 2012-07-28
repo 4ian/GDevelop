@@ -24,6 +24,7 @@ namespace gd { class Platform; }
 namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
 namespace GDpriv { class SourceFile; }
+#include "GDL/IDE/ChangesNotifier.h"
 #endif
 
 /**
@@ -226,8 +227,8 @@ public:
     virtual unsigned int GetExternalEventsPosition(const std::string & name) const;
     virtual unsigned int GetExternalEventsCount() const;
     virtual void InsertNewExternalEvents(std::string & name, unsigned int position);
-    virtual void InsertExternalEvents(const gd::ExternalEvents & externalEvents, unsigned int position);
     virtual void RemoveExternalEvents(const std::string & name);
+    virtual void InsertExternalEvents(const gd::ExternalEvents & externalEvents, unsigned int position);
 
     virtual bool HasObjectNamed(const std::string & name) const;
     virtual gd::Object & GetObject(const std::string & name);
@@ -236,9 +237,10 @@ public:
     virtual const gd::Object & GetObject (unsigned int index) const;
     virtual unsigned int GetObjectPosition(const std::string & name) const;
     virtual unsigned int GetObjectsCount() const;
-    virtual void InsertNewObject(std::string & name, unsigned int position);
+    virtual void InsertNewObject(const std::string & objectType, const std::string & name, unsigned int position);
     virtual void InsertObject(const gd::Object & theObject, unsigned int position);
     virtual void RemoveObject(const std::string & name);
+    virtual void SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex);
 
     virtual bool HasExternalLayoutNamed(const std::string & name) const;
     virtual gd::ExternalLayout & GetExternalLayout(const std::string & name);
@@ -250,6 +252,8 @@ public:
     virtual void InsertNewExternalLayout(std::string & name, unsigned int position);
     virtual void InsertExternalLayout(const gd::ExternalLayout & externalEvents, unsigned int position);
     virtual void RemoveExternalLayout(const std::string & name);
+
+    virtual gd::ChangesNotifier & GetChangesNotifier() { return changesNotifier; };
 
     virtual std::vector < std::string > & GetUsedPlatformExtensions() { return extensionsUsed; };
     virtual const std::vector < std::string > & GetUsedPlatformExtensions() const { return extensionsUsed; };
@@ -281,6 +285,7 @@ private:
     vector < std::string >                              extensionsUsed; ///< List of extensions used
     gd::Platform *                                      platform; ///< Pointer to the platform owning the project
     std::vector < boost::shared_ptr<ExternalEvents> >   externalEvents; ///< List of all externals events
+    static ChangesNotifier                              changesNotifier; ///< IDE related object
     #endif
 
 };

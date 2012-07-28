@@ -177,16 +177,7 @@ int main( int argc, char *p_argv[] )
 
     window.Create( sf::VideoMode( game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32 ), scenePlayed.GetWindowDefaultTitle(), sf::Style::Close );
     window.SetActive(true);
-
-    glEnable(GL_DEPTH_TEST);
-    glDepthMask(GL_TRUE);
-    glClearDepth(1.f);
-
-    // Setup a perspective projection
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    double windowRatio = static_cast<double>(window.GetWidth())/static_cast<double>(window.GetHeight());
-    gluPerspective(scenePlayed.oglFOV, windowRatio, scenePlayed.oglZNear, scenePlayed.oglZFar);
+    scenePlayed.ChangeRenderWindow(&window);
 
     //Boucle de jeu
     while ( scenePlayed.running )

@@ -105,8 +105,8 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
 
     //Let the IDE go into to preview state
     //Note: Working directory is changed later, just before loading the scene
-    mainEditorCommand.LockShortcuts(this);
-    mainEditorCommand.DisableControlsForScenePreviewing();
+    mainFrameWrapper.LockShortcuts(this);
+    mainFrameWrapper.DisableControlsForScenePreviewing();
     if ( objectsEditor ) objectsEditor->Disable();
     if ( layersEditor ) layersEditor->Disable();
     if ( initialPositionsBrowser ) initialPositionsBrowser->Disable();
@@ -124,8 +124,8 @@ void SceneCanvas::OnPreviewBtClick( wxCommandEvent & event )
     SetFocus();
 
     if ( debugger ) debugger->Play();
-    CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), false);
-    mainEditorCommand.GetRibbonSceneEditorButtonBar()->Refresh();
+    CreateToolsBar(mainFrameWrapper.GetRibbonSceneEditorButtonBar(), false);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->Refresh();
 }
 
 /**
@@ -137,9 +137,9 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
     cout << "Switching to edition mode..." << endl;
 
     //Let the IDE go back to edition state
-    wxSetWorkingDirectory(mainEditorCommand.GetIDEWorkingDirectory());
-    mainEditorCommand.UnLockShortcuts(this);
-    mainEditorCommand.EnableControlsAfterScenePreviewing();
+    wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
+    mainFrameWrapper.UnLockShortcuts(this);
+    mainFrameWrapper.EnableControlsAfterScenePreviewing();
     if ( objectsEditor ) objectsEditor->Enable(true);
     if ( layersEditor ) layersEditor->Enable(true);
     if ( initialPositionsBrowser ) initialPositionsBrowser->Enable(true);
@@ -163,8 +163,8 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
     UpdateScrollbars();
 
     if ( debugger ) debugger->Pause();
-    CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), true);
-    mainEditorCommand.GetRibbonSceneEditorButtonBar()->Refresh();
+    CreateToolsBar(mainFrameWrapper.GetRibbonSceneEditorButtonBar(), true);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->Refresh();
 }
 
 
@@ -250,12 +250,12 @@ void SceneCanvas::ReloadFirstPart()
 
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
     //Useful when opening a scene for the first time for example.
-    if ( sceneEdited.EventsModified() && !CodeCompiler::GetInstance()->HasTaskRelatedTo(sceneEdited) )
+    if ( sceneEdited.CompilationNeeded() && !CodeCompiler::GetInstance()->HasTaskRelatedTo(sceneEdited) )
     {
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(gameEdited, sceneEdited);
 
         if ( !editing )
-            mainEditorCommand.GetInfoBar()->ShowMessage(_("Les modifications apportées aux évènements seront prises en compte lors du retour au mode édition."));
+            mainFrameWrapper.GetInfoBar()->ShowMessage(_("Les modifications apportées aux évènements seront prises en compte lors du retour au mode édition."));
     }
 
     return; //Reload second par will be called by Refresh when appropriate
@@ -274,7 +274,7 @@ void SceneCanvas::ReloadSecondPart()
     sceneEdited.wasModified = false;
 
     //If a preview is not going to be made, switch back to the IDE working directory
-    if ( editing ) wxSetWorkingDirectory(mainEditorCommand.GetIDEWorkingDirectory());
+    if ( editing ) wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
 
     if ( gameEdited.imageManager ) gameEdited.imageManager->EnableImagesUnloading(); //We were preventing images unloading so as to be sure not to waste time unloading and reloading just after scenes images.
 
@@ -347,7 +347,7 @@ void SceneCanvas::Refresh()
                 gameEdited.imagesChanged.clear();
                 sceneEdited.wasModified = true;
 
-                wxSetWorkingDirectory(mainEditorCommand.GetIDEWorkingDirectory()); //Go back to the IDE cwd.
+                wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory()); //Go back to the IDE cwd.
             }
 
             if ( sceneEdited.wasModified ) //Reload scene if necessary
@@ -360,11 +360,11 @@ void SceneCanvas::Refresh()
             int retourEvent = previewData.scene.RenderAndStep(1);
 
             if ( retourEvent == -2 )
-                mainEditorCommand.GetInfoBar()->ShowMessage(_( "Dans le jeu final, le jeu se terminera." ));
+                mainFrameWrapper.GetInfoBar()->ShowMessage(_( "Dans le jeu final, le jeu se terminera." ));
             else if ( retourEvent != -1 )
             {
                 if (retourEvent < gameEdited.GetLayouts().size())
-                    mainEditorCommand.GetInfoBar()->ShowMessage(_( "Dans le jeu final, un changement de scène s'effectuera vers la scène " ) + "\"" + gameEdited.GetLayouts()[retourEvent]->GetName() + "\"");
+                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "Dans le jeu final, un changement de scène s'effectuera vers la scène " ) + "\"" + gameEdited.GetLayouts()[retourEvent]->GetName() + "\"");
             }
         }
         else if ( !previewData.scene.running && !editing ) //Runtime paused
@@ -399,7 +399,7 @@ void SceneCanvas::EdittimeRender()
 
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            gluPerspective(previewData.scene.oglFOV, static_cast<double>(GetWidth())/static_cast<double>(GetHeight()), previewData.scene.oglZNear, previewData.scene.oglZFar);
+            gluPerspective(previewData.scene.GetOpenGLFOV(), static_cast<double>(GetWidth())/static_cast<double>(GetHeight()), previewData.scene.GetOpenGLZNear(), previewData.scene.GetOpenGLZFar());
 
             glViewport(0,0, GetWidth(), GetHeight());
 

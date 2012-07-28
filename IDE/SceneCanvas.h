@@ -22,7 +22,7 @@
 #include "GDL/Game.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeGame.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/InitialInstancesContainer.h"
 #include "SceneCanvasEditionData.h"
 #include "SceneCanvasPreviewData.h"
@@ -50,10 +50,10 @@ public :
      * \param scene Scene associated with the instances.
      * \param instances Instances to be edited. Note that the instances do not necessarily belong to the scene.
      * \param settings A reference to the class where settings must be stored.
-     * \param mainEditorCommand A MainEditorCommand object to be used to communicate with the IDE.
+     * \param gd::MainFrameWrapper A gd::MainFrameWrapper object to be used to communicate with the IDE.
      * \param allowPreview If set to false, preview mode will be deactivated ( Useful when editing an external layout )
      */
-    SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances, SceneCanvasSettings & settings, MainEditorCommand & mainEditorCommand_, bool allowPreview = true);
+    SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances, SceneCanvasSettings & settings, gd::MainFrameWrapper & mainFrameWrapper_, bool allowPreview = true);
 
     /**
      * \brief Default destructor
@@ -383,7 +383,7 @@ private :
     SceneCanvasEditionData editionData; ///< Contains all the data relevant to the edition mode
     SceneCanvasPreviewData previewData; ///< Contains all the data relevant to the preview mode
 
-    MainEditorCommand & mainEditorCommand; ///< Provide a link to the main editor
+    gd::MainFrameWrapper & mainFrameWrapper; ///< Provide a link to the main editor
 
     wxScrollBar * scrollBar1; ///< Link to the scrollbar used by the sceneCanvas.
     wxScrollBar * scrollBar2; ///< Link to the scrollbar used by the sceneCanvas.

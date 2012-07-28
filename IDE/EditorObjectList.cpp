@@ -4,6 +4,10 @@
  */
 #include "EditorObjectList.h"
 
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <numeric>
 //(*InternalHeaders(EditorObjectList)
 #include <wx/bitmap.h>
 #include <wx/intl.h>
@@ -23,10 +27,12 @@
 #include <wx/choicdlg.h>
 #include <wx/imaglist.h>
 #include <wx/richtooltip.h>
-#include <string>
-#include <vector>
+#include <boost/algorithm/string.hpp>
 
-#include "MainFrame.h"
+#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
+#include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
@@ -34,21 +40,17 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
-#include "Clipboard.h"
-#include <algorithm>
-#include <numeric>
-#include "EditorObjetsGroups.h"
-#include "LogFileManager.h"
-#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/Automatism.h"
 #include "GDL/CommonTools.h"
+#include "Clipboard.h"
+#include "EditorObjetsGroups.h"
+#include "LogFileManager.h"
 #include "DndTextObjectsEditor.h"
 #include "ObjectTypeChoice.h"
-#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "GDCore/Tools/HelpFileAccess.h"
-#include "GDL/AutomatismsSharedDatas.h"
 #include "AutomatismTypeChoice.h"
-#include "EventsRefactorer.h"
+#include "GDCore/IDE/EventsRefactorer.h"
+#include "MainFrame.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -60,8 +62,8 @@
 #endif
 
 //(*IdInit(EditorObjectList)
-const long EditorObjectList::ID_PANEL4 = wxNewId();
 const long EditorObjectList::ID_TREECTRL1 = wxNewId();
+const long EditorObjectList::ID_TEXTCTRL1 = wxNewId();
 const long EditorObjectList::idMenuModObj = wxNewId();
 const long EditorObjectList::idMenuModVar = wxNewId();
 const long EditorObjectList::ID_MENUITEM2 = wxNewId();
@@ -90,7 +92,6 @@ const long EditorObjectList::idRibbonAdd = wxNewId();
 const long EditorObjectList::idRibbonDel = wxNewId();
 const long EditorObjectList::idRibbonUp = wxNewId();
 const long EditorObjectList::idRibbonDown = wxNewId();
-const long EditorObjectList::idRibbonSearch = wxNewId();
 const long EditorObjectList::idRibbonModProp = wxNewId();
 const long EditorObjectList::idRibbonModName = wxNewId();
 const long EditorObjectList::idRibbonCopy = wxNewId();
@@ -104,11 +105,11 @@ BEGIN_EVENT_TABLE(EditorObjectList,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorObjectList::EditorObjectList(wxWindow* parent, Game & game_, vector < boost::shared_ptr<Object> > * objects_, MainEditorCommand & mainEditorCommand_, Scene * scene_) :
+EditorObjectList::EditorObjectList(wxWindow* parent, Game & game_, gd::ClassWithObjects & objects_, gd::MainFrameWrapper & mainFrameWrapper_, Scene * scene_) :
 objects(objects_),
 game(game_),
 scene(scene_),
-mainEditorCommand(mainEditorCommand_)
+mainFrameWrapper(mainFrameWrapper_)
 {
 	//(*Initialize(EditorObjectList)
 	wxMenuItem* delObjMenuI;
@@ -121,11 +122,11 @@ mainEditorCommand(mainEditorCommand_)
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
-	FlexGridSizer1->AddGrowableRow(1);
-	toolbarPanel = new wxPanel(this, ID_PANEL4, wxDefaultPosition, wxSize(-1,0), wxTAB_TRAVERSAL, _T("ID_PANEL4"));
-	FlexGridSizer1->Add(toolbarPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	objectsList = new wxTreeCtrl(this, ID_TREECTRL1, wxPoint(-72,-72), wxSize(179,170), wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+	FlexGridSizer1->AddGrowableRow(0);
+	objectsList = new wxTreeCtrl(this, ID_TREECTRL1, wxPoint(-72,-72), wxSize(179,170), wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer1->Add(objectsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	FlexGridSizer1->Add(searchCtrl, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	SetSizer(FlexGridSizer1);
 	editMenuI = new wxMenuItem((&ContextMenu), idMenuModObj, _("Modifier les propriétés de l\'objet"), wxEmptyString, wxITEM_NORMAL);
 	editMenuI->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
@@ -187,7 +188,6 @@ mainEditorCommand(mainEditorCommand_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
-	toolbarPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorObjectList::OntoolbarPanelResize,0,this);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_DRAG,(wxObjectEventFunction)&EditorObjectList::OnobjectsListBeginDrag);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT,(wxObjectEventFunction)&EditorObjectList::OnobjectsListBeginLabelEdit);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_END_LABEL_EDIT,(wxObjectEventFunction)&EditorObjectList::OnobjectsListEndLabelEdit);
@@ -196,6 +196,7 @@ mainEditorCommand(mainEditorCommand_)
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&EditorObjectList::OnobjectsListSelectionChanged);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_KEY_DOWN,(wxObjectEventFunction)&EditorObjectList::OnobjectsListKeyDown);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&EditorObjectList::OnobjectsListItemMenu);
+	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&EditorObjectList::OnsearchCtrlText);
 	Connect(idMenuModObj,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OneditMenuISelected);
 	Connect(idMenuModVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OneditVarMenuISelected);
 	Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnaddAutomatismItemSelected);
@@ -220,13 +221,10 @@ mainEditorCommand(mainEditorCommand_)
     if(theme) theme->SetWindowTheme((HWND) objectsList->GetHWND(), L"EXPLORER", NULL);
     #endif
 
-    CreateToolbar();
-
     objectsImagesList = new wxImageList(24,24, true);
     objectsList->AssignImageList(objectsImagesList);
 
     Connect(ID_BITMAPBUTTON1,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorObjectList::OnRefreshBtClick);
-    Connect(ID_BITMAPBUTTON2,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorObjectList::OnChercherBtClick);
     Connect(ID_BITMAPBUTTON3,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorObjectList::OnAideBtClick);
     Connect(ID_BITMAPBUTTON6,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorObjectList::OnMoreOptions);
 
@@ -257,7 +255,6 @@ void EditorObjectList::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Supprimer") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Déplacer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Déplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonSearch, !hideLabels ? _("Rechercher") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonRefresh, !hideLabels ? _("Rafraichir") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
     }
     {
@@ -283,78 +280,17 @@ void EditorObjectList::CreateRibbonPage(wxRibbonPage * page)
 
 void EditorObjectList::ConnectEvents()
 {
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonAdd, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnaddObjMenuISelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDel, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OndelObjMenuISelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonUp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnMoveUpSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDown, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnMoveDownSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonSearch, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnChercherBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonModProp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OneditMenuISelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonModName, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OneditNameMenuISelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCopy, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnCopySelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCut, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnCutSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnPasteSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnAideBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::Refresh, NULL, this);
-}
-
-////////////////////////////////////////////////////////////
-/// Création de la toolbar
-////////////////////////////////////////////////////////////
-void EditorObjectList::CreateToolbar()
-{
-    toolbar = new wxToolBar( toolbarPanel, -1, wxDefaultPosition, wxDefaultSize,
-                                   wxTB_FLAT | wxTB_NODIVIDER );
-
-    toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( ID_BITMAPBUTTON1, _( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Rafraichir la liste d'images") );
-    toolbar->AddSeparator();
-    toolbar->AddTool( idMenuAddObj, _( "Ajouter un objet" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un objet") );
-    toolbar->AddTool( idMenuDelObj, _( "Supprimer l'objet selectionné" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer l'objet selectionné") );
-    toolbar->AddTool( idMenuModObj, _( "Modifier les propriétés de l'objet" ), wxBitmap( wxImage( "res/editpropicon.png" ) ), _("Modifier les propriétés de l'objet") );
-    toolbar->AddTool( ID_BITMAPBUTTON6, _( "Plus d'options d'édition ( clic droit sur la liste )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _("Plus d'options d'édition ( clic droit sur la liste )") );
-    toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON2, _( "Rechercher un objet" ), wxBitmap( wxImage( "res/searchicon.png" ) ), _("Rechercher un objet") );
-    toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON3, _( "Aide de l'éditeur d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur d'objets") );
-    toolbar->Realize();
-
-    //Obligatoire avec wxGTK, sinon la toolbar ne s'affiche pas
-#ifdef __WXGTK__
-    wxSize tbSize = toolbar->GetSize();
-    gtk_widget_set_usize( toolbar->m_widget, tbSize.GetWidth(), tbSize.GetHeight() );
-#endif
-}
-
-////////////////////////////////////////////////////////////
-/// Redimensionement de la toolbar
-////////////////////////////////////////////////////////////
-void EditorObjectList::OntoolbarPanelResize(wxSizeEvent& event)
-{
-    toolbar->SetSize(toolbarPanel->GetSize().x, -1);
-}
-
-void EditorObjectList::EnableAll()
-{
-    wxMenuItemList list = ContextMenu.GetMenuItems();
-    wxMenuItemList::iterator iter;
-    for (iter = list.begin(); iter != list.end(); ++iter)
-    {
-        (*iter)->Enable(true);
-    }
-
-    toolbar->Enable(true);
-}
-
-void EditorObjectList::DisableAll()
-{
-    wxMenuItemList list = ContextMenu.GetMenuItems();
-    wxMenuItemList::iterator iter;
-    for (iter = list.begin(); iter != list.end(); ++iter)
-    {
-        (*iter)->Enable(false);
-    }
-
-    toolbar->Enable(false);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonAdd, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnaddObjMenuISelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDel, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OndelObjMenuISelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonUp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnMoveUpSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDown, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnMoveDownSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonModProp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OneditMenuISelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonModName, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OneditNameMenuISelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonCopy, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnCopySelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonCut, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnCutSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnPasteSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::OnAideBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjectList::Refresh, NULL, this);
 }
 
 ////////////////////////////////////////////////////////////
@@ -386,8 +322,7 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
     {
         //Find object so as to update automatisms list
         string name = ToString(objectsList->GetItemText( item ));
-        std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
-        if ( object == objects->end() ) return;
+        if ( !objects.HasObjectNamed(name) ) return;
 
         //Remove already present automatisms from menu
         for (vector < std::pair<long, std::string> >::iterator idIter = idForAutomatism.begin();
@@ -399,7 +334,7 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
         idForAutomatism.clear();
 
         //Add each automatism of the object
-        vector < std::string > allObjectAutomatisms = (*object)->GetAllAutomatismNames();
+        vector < std::string > allObjectAutomatisms = objects.GetObject(name).GetAllAutomatismNames();
         for(unsigned int j = 0;j<allObjectAutomatisms.size();++j)
         {
             //Find an identifier for the menu item
@@ -407,12 +342,13 @@ void EditorObjectList::OnobjectsListItemMenu(wxTreeEvent& event)
 
             idForAutomatism.push_back(std::make_pair(id, allObjectAutomatisms[j]));
             wxMenuItem * menuItem = new wxMenuItem(automatismsMenu, id,
-                                                   (*object)->GetAutomatism(allObjectAutomatisms[j]).GetName());
+                                                   objects.GetObject(name).GetAutomatism(allObjectAutomatisms[j]).GetName());
             automatismsMenu->Insert(0, menuItem);
             Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EditorObjectList::OnAutomatismSelected);
         }
 
-        ContextMenu.Enable(idMenuEffects, (*object)->SupportShaders());
+        //TODO
+        ContextMenu.Enable(idMenuEffects, false);
 
 
         //Popup menu
@@ -450,26 +386,32 @@ void EditorObjectList::OnobjectsListSelectionChanged(wxTreeEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjectList::Refresh()
 {
+    std::string searchText = boost::to_upper_copy(ToString(searchCtrl->GetValue()));
+    bool searching = searchText.empty() ? false : true;
+
     objectsList->DeleteAllItems();
     objectsImagesList->RemoveAll();
-
     objectsImagesList->Add(gd::CommonBitmapManager::GetInstance()->objects24);
 
     objectsList->AddRoot( _( "Tous les objets" ), 0 );
 
-    //Generate thumbnails
-    for ( unsigned int i = 0;i < objects->size();i++ )
+    for ( unsigned int i = 0;i < objects.GetObjectsCount();i++ )
     {
-        int thumbnailID = -1;
-        wxBitmap thumbnail;
-        if ( objects->at(i)->GenerateThumbnail(game, thumbnail)  && thumbnail.IsOk() )
+        std::string name = objects.GetObject(i).GetName();
+
+        //Only add objects if they match the search criteria
+        if ( ( !searching || (searching && boost::to_upper_copy(name).find(searchText) != std::string::npos)) )
         {
-            objectsImagesList->Add(thumbnail);
-            thumbnailID = objectsImagesList->GetImageCount()-1;
+            int thumbnailID = -1;
+            wxBitmap thumbnail;
+            if ( objects.GetObject(i).GenerateThumbnail(game, thumbnail)  && thumbnail.IsOk() )
+            {
+                objectsImagesList->Add(thumbnail);
+                thumbnailID = objectsImagesList->GetImageCount()-1;
+            }
+
+            objectsList->AppendItem( objectsList->GetRootItem(), objects.GetObject(i).GetName(), thumbnailID );
         }
-
-        objectsList->AppendItem( objectsList->GetRootItem(), objects->at( i )->GetName(), thumbnailID );
-
     }
 
     objectsList->ExpandAll();
@@ -487,8 +429,7 @@ void EditorObjectList::OnRefreshBtClick( wxCommandEvent& event )
 void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
 {
     string name = ToString(objectsList->GetItemText( item ));
-    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
-    if ( object == objects->end() ) return;
+    if ( !objects.HasObjectNamed(name) ) return;
 
     std::string autoType;
     for (unsigned int i = 0;i<idForAutomatism.size();++i)
@@ -497,9 +438,11 @@ void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
             autoType = idForAutomatism[i].second;
     }
 
-    (*object)->GetAutomatismRawPointer(autoType)->EditAutomatism(this, game, scene, mainEditorCommand);
-    if ( scene )
-        scene->wasModified = true;
+    gd::Object & object = objects.GetObject(name);
+    gd::Automatism & automatism = object.GetAutomatism(autoType);
+
+    automatism.EditAutomatism(this, game, scene, mainFrameWrapper);
+    game.GetChangesNotifier().OnAutomatismEdited(game, scene, object, automatism);
 }
 
 /**
@@ -508,16 +451,15 @@ void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
 void EditorObjectList::OneditMenuISelected(wxCommandEvent& event)
 {
     string name = ToString(objectsList->GetItemText( item ));
-    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
-    if ( object == objects->end() ) return;
+    if ( !objects.HasObjectNamed(name) ) return;
 
-    (*object)->EditObject(this, game, mainEditorCommand);
-    if ( scene ) scene->wasModified = true;
+    objects.GetObject(name).EditObject(this, game, mainFrameWrapper);
+    game.GetChangesNotifier().OnObjectEdited(game, scene, objects.GetObject(name));
 
     //Reload thumbnail
     int thumbnailID = -1;
     wxBitmap thumbnail;
-    if ( (*object)->GenerateThumbnail(game, thumbnail) )
+    if ( objects.GetObject(name).GenerateThumbnail(game, thumbnail) )
     {
         objectsImagesList->Add(thumbnail);
         thumbnailID = objectsImagesList->GetImageCount()-1;
@@ -548,15 +490,10 @@ void EditorObjectList::OneditNameMenuISelected(wxCommandEvent& event)
     wxFocusEvent unusedEvent;
     OnSetFocus(unusedEvent);
 
-    wxTreeItemId ItemNul = NULL;
-    if ( item != ItemNul && objectsList->GetItemText( item ) != _( "Tous les objets" ) )
-    {
+    if ( item.IsOk() && item != objectsList->GetRootItem() )
         objectsList->EditLabel( item );
-    }
     else
-    {
         wxLogStatus( _( "Aucun objet sélectionné" ) );
-    }
 }
 
 ////////////////////////////////////////////////////////////
@@ -568,19 +505,18 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     if ( chooseTypeDialog.ShowModal() == 0 )
         return;
 
-    std::string name = ToString(_("Nouvel_objet"));
+    std::string name = ToString(_("NouvelObjet"));
 
     //Tant qu'un objet avec le même nom existe, on ajoute un chiffre
     unsigned int i = 0;
-    while ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name)) != objects->end() )
+    while ( objects.HasObjectNamed(name) )
     {
         ++i;
-        name =  _("Nouvel_objet")+"_"+ToString(i);
+        name =  _("NouvelObjet")+ToString(i);
     }
 
     //Add a new object of selected type to objects list
-    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
-    objects->push_back( extensionsManager->CreateObject(chooseTypeDialog.selectedObjectType, ToString(name)));
+    objects.InsertNewObject(chooseTypeDialog.selectedObjectType, ToString(name), objects.GetObjectsCount());
 
     //And to the TreeCtrl
     wxTreeItemId rootId = objectsList->GetRootItem();
@@ -590,21 +526,16 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     //Reload thumbnail
     int thumbnailID = -1;
     wxBitmap thumbnail;
-    if ( objects->back()->GenerateThumbnail(game, thumbnail) )
+    if ( objects.GetObject(objects.GetObjectsCount()-1).GenerateThumbnail(game, thumbnail) )
     {
         objectsImagesList->Add(thumbnail);
         thumbnailID = objectsImagesList->GetImageCount()-1;
     }
-
     objectsList->SetItemImage( itemAdded, thumbnailID );
 
-    objectsList->EditLabel(itemAdded);
+    game.GetChangesNotifier().OnObjectAdded(game, scene, objects.GetObject(name));
 
-    if ( scene )
-    {
-        scene->wasModified = true;
-        CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, *scene);
-    }
+    objectsList->EditLabel(itemAdded);
 
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
 }
@@ -632,19 +563,16 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
 
         if ( selection[i].IsOk() && objectsList->GetRootItem() != selection[i] )
         {
-            std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), objectName));
-            if ( object != objects->end() )
+            if ( objects.HasObjectNamed(objectName) )
             {
-                vector <std::string> automatisms = (*object)->GetAllAutomatismNames();
-
                 //Remove objects
-                objects->erase( object );
+                objects.RemoveObject(objectName);
 
                 if ( scene )
                 {
                     if ( answer == wxYES )
                     {
-                        EventsRefactorer::RemoveObjectInEvents(game, *scene, scene->GetEvents(), objectName);
+                        gd::EventsRefactorer::RemoveObjectInEvents(game, *scene, scene->GetEvents(), objectName);
                         for (unsigned int g = 0;g<scene->GetObjectGroups().size();++g)
                         {
                             if ( scene->GetObjectGroups()[g].Find(objectName)) scene->GetObjectGroups()[g].RemoveObject(objectName);
@@ -652,26 +580,18 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
                     }
                     scene->GetInitialInstances().RemoveInitialInstancesOfObject(objectName);
                 }
-
-                //Remove automatisms shared datas if necessary
-                for (unsigned int i = 0;i<automatisms.size();++i)
-                    RemoveSharedDatasIfNecessary(automatisms[i]);
-            }
-
-            if ( scene )
-            {
-                scene->wasModified = true;
-                CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, *scene);
             }
         }
     }
+
+    game.GetChangesNotifier().OnObjectsDeleted(game, scene, objectsDeleted);
 
     //Removing items
     void * nothing;
     wxTreeItemId item = objectsList->GetFirstChild( objectsList->GetRootItem(), nothing);
     while( item.IsOk() )
     {
-        if ( find(objectsDeleted.begin(), objectsDeleted.end(), string(objectsList->GetItemText( item ).mb_str())) != objectsDeleted.end() )
+        if ( find(objectsDeleted.begin(), objectsDeleted.end(), ToString(objectsList->GetItemText( item ))) != objectsDeleted.end() )
         {
             objectsList->Delete(item);
             item = objectsList->GetFirstChild(objectsList->GetRootItem(), nothing);
@@ -703,7 +623,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     string newName = ToString(event.GetLabel());
 
     //Be sure there is not already another object with this name
-    if ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), newName)) != objects->end() )
+    if ( objects.HasObjectNamed(newName) )
     {
         wxLogWarning( _( "Impossible de renommer l'objet : un autre objet porte déjà ce nom." ) );
 
@@ -722,14 +642,13 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
         return;
     }
 
-    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ancienNom));
-    if ( object == objects->end() ) return;
+    if ( !objects.HasObjectNamed(ancienNom) ) return;
 
-    (*object)->SetName( newName );
+    objects.GetObject(ancienNom).SetName( newName );
 
     if ( scene ) //Change the object name in the scene.
     {
-        EventsRefactorer::RenameObjectInEvents(game, *scene, scene->GetEvents(), ancienNom, newName);
+        gd::EventsRefactorer::RenameObjectInEvents(game, *scene, scene->GetEvents(), ancienNom, newName);
         scene->GetInitialInstances().RenameInstancesOfObject(ancienNom, newName);
         for (unsigned int g = 0;g<scene->GetObjectGroups().size();++g)
         {
@@ -739,64 +658,25 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
                 scene->GetObjectGroups()[g].AddObject(newName);
             }
         }
-
-        scene->wasModified = true;
-        CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, *scene);
     }
+    game.GetChangesNotifier().OnObjectRenamed(game, scene, objects.GetObject(newName), ancienNom);
+
     objectsList->SetItemText( event.GetItem(), event.GetLabel() );
     return;
 }
 
-////////////////////////////////////////////////////////////
-/// Rechercher un objet
-////////////////////////////////////////////////////////////
-void EditorObjectList::OnChercherBtClick( wxCommandEvent& event )
-{
-    string name = ToString(wxGetTextFromUser( _( "Entrez l'objet à rechercher" ), _( "Chercher un objet" ) ));
-    if ( name.empty() ) return;
-
-    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
-    if ( object != objects->end() )
-    {
-        //On en a trouvé un, on le sélectionne.
-        void * rien;
-        wxTreeItemId item = objectsList->GetFirstChild( objectsList->GetRootItem(), rien);
-        while( objectsList->GetItemText(item) != name )
-        {
-            item = objectsList->GetNextSibling( item);
-        }
-
-        objectsList->SelectItem(item);
-
-        return;
-    } else { wxLogMessage("Aucun objet de ce nom trouvé !"); }
-}
-
-////////////////////////////////////////////////////////////
-/// Aide
-////////////////////////////////////////////////////////////
-void EditorObjectList::OnAideBtClick( wxCommandEvent& event )
-{
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(10);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object")); //TODO
-}
-
-
-////////////////////////////////////////////////////////////
-/// Copier
-////////////////////////////////////////////////////////////
+/**
+ * Copy
+ */
 void EditorObjectList::OnCopySelected(wxCommandEvent& event)
 {
-    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ToString(objectsList->GetItemText( item ))));
-    if ( object == objects->end() )
+    if ( !objects.HasObjectNamed(ToString(objectsList->GetItemText( item ))) )
     {
         wxLogWarning(_("Impossible de trouver l'objet à copier"));
         return;
     }
 
-    Clipboard::GetInstance()->SetObject(*object);
+    Clipboard::GetInstance()->SetObject(objects.GetObject(ToString(objectsList->GetItemText( item ))));
 }
 
 /**
@@ -807,35 +687,28 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
     if ( !item.IsOk() || objectsList->GetRootItem() == item )
         return;
 
-    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ToString(objectsList->GetItemText( item ))));
-    if ( object == objects->end() )
+    std::string name = ToString(objectsList->GetItemText( item ));
+    if ( !objects.HasObjectNamed(name) )
     {
         wxLogWarning(_("Impossible de trouver l'objet à couper"));
         return;
     }
 
     objectsList->Delete( item );
-    if ( scene )
-    {
-        scene->wasModified = true;
-        CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, *scene);
-    }
 
-    Clipboard::GetInstance()->SetObject(*object);
-
-    //Remove automatisms shared datas if necessary. /!\ Be careful, order is important here : Do not delete the object before getting its automatisms
-    vector <std::string> automatisms = (*object)->GetAllAutomatismNames();
+    Clipboard::GetInstance()->SetObject(objects.GetObject(name));
 
     //Remove object
-    objects->erase(object);
+    objects.RemoveObject(name);
 
-    for (unsigned int j = 0;j<automatisms.size();++j)
-        RemoveSharedDatasIfNecessary(automatisms[j]);
+    std::vector<std::string> objectsDeleted;
+    objectsDeleted.push_back(name);
+    game.GetChangesNotifier().OnObjectsDeleted(game, scene, objectsDeleted);
 }
 
-////////////////////////////////////////////////////////////
-/// Coller
-////////////////////////////////////////////////////////////
+/**
+ * Paste
+ */
 void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
 {
     Clipboard * clipboard = Clipboard::GetInstance();
@@ -847,15 +720,15 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     }
 
     //Add a new object of selected type to objects list
-    ObjSPtr object = boost::shared_ptr<Object>(clipboard->GetObject()->Clone());
+    gd::Object * object = clipboard->GetObject()->Clone();
 
     wxString name = object->GetName();
 
     //Add a number to the new name if necessary
     unsigned int i = 2;
-    while ( std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), ToString(name))) != objects->end() )
+    while ( objects.HasObjectNamed(ToString(name)) )
     {
-        name =  _( "Copie_de_" ) + object->GetName()+"_"+ToString(i);
+        name =  _( "CopieDe" ) + object->GetName()+ToString(i);
         i++;
     }
 
@@ -863,19 +736,24 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     object->SetName( ToString(name) );
 
     //Add it to the list
-    objects->push_back( object );
-    objectsList->AppendItem( objectsList->GetRootItem(), name );
+    objects.InsertObject(*object, objects.GetObjectsCount());
+    game.GetChangesNotifier().OnObjectAdded(game, scene, *object);
 
-    //Add object's automatism's shared datas to scene if necessary
-    vector <std::string> automatisms = object->GetAllAutomatismNames();
-    for (unsigned int j = 0;j<automatisms.size();++j)
-        CreateSharedDatasIfNecessary(object->GetAutomatism(automatisms[j]));
+    //Refresh the list and select the newly added item
+    searchCtrl->Clear();
+    Refresh();
 
-    if ( scene )
+    wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
+    while ( item.IsOk() )
     {
-        scene->wasModified = true;
-        CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, *scene);
+        if ( objectsList->GetItemText( item ) == name )
+        {
+            objectsList->SelectItem(item);
+            return;
+        }
+        item = objectsList->GetPrevSibling(item);
     }
+
     wxLogStatus( _( "L'objet a été correctement ajouté" ) );
 }
 
@@ -885,17 +763,9 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
 void EditorObjectList::OnMoveUpSelected(wxCommandEvent& event)
 {
     string name = ToString( objectsList->GetItemText( item ));
-    int index = -1;
-    for (unsigned int i = 0;i<objects->size();++i)
-    {
-        if ( objects->at(i)->GetName() == name )
-        {
-            index = i;
-            break;
-        }
-    }
+    unsigned int index = objects.GetObjectPosition(name);
 
-    if ( index == -1 )
+    if ( index >= objects.GetObjectsCount() )
     {
         wxLogStatus( _( "L'objet à déplacer n'a pas été trouvé." ) );
         return;
@@ -904,16 +774,8 @@ void EditorObjectList::OnMoveUpSelected(wxCommandEvent& event)
     if ( index-1 >= 0 )
     {
         //On déplace l'image
-        boost::shared_ptr<Object> object = objects->at(index);
-        objects->erase(objects->begin() + index );
-        objects->insert(objects->begin()+index-1, object);
-
+        objects.SwapObjects(index, index-1);
         Refresh();
-        if ( scene )
-        {
-            scene->wasModified = true;
-            CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, *scene);
-        }
 
         //On la reselectionne
         wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
@@ -935,36 +797,20 @@ void EditorObjectList::OnMoveUpSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OnMoveDownSelected(wxCommandEvent& event)
 {
-    string name = static_cast< string > ( objectsList->GetItemText( item ));
-    int index = -1;
-    for (unsigned int i = 0;i<objects->size();++i)
-    {
-        if ( objects->at(i)->GetName() == name )
-        {
-            index = i;
-            break;
-        }
-    }
+    std::string name = ToString( objectsList->GetItemText( item ));
+    unsigned int index = objects.GetObjectPosition(name);
 
-    if ( index == -1 )
+    if ( index >= objects.GetObjectsCount() )
     {
         wxLogStatus( _( "L'objet à déplacer n'a pas été trouvé." ) );
         return;
     }
 
-    if ( static_cast<unsigned>(index+1) < objects->size() )
+    if ( static_cast<unsigned>(index+1) < objects.GetObjectsCount() )
     {
         //On déplace l'image
-        boost::shared_ptr<Object> object = objects->at(index);
-        objects->erase(objects->begin() + index );
-        objects->insert(objects->begin()+index+1, object);
-
+        objects.SwapObjects(index, index+1);
         Refresh();
-        if ( scene )
-        {
-            scene->wasModified = true;
-            CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, *scene);
-        }
 
         //On la reselectionne
         wxTreeItemId item = objectsList->GetLastChild(objectsList->GetRootItem());
@@ -1000,7 +846,7 @@ void EditorObjectList::OnobjectsListBeginDrag(wxTreeEvent& event)
  */
 void EditorObjectList::OnSetFocus(wxFocusEvent& event)
 {
-    mainEditorCommand.GetRibbon()->SetActivePage(4);
+    mainFrameWrapper.GetRibbon()->SetActivePage(4);
     ConnectEvents();
 }
 
@@ -1009,17 +855,16 @@ void EditorObjectList::OnSetFocus(wxFocusEvent& event)
  */
 void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
 {
-    string name = ToString( objectsList->GetItemText( item ));
-    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
-    if ( object == objects->end() )
+    std::string name = ToString( objectsList->GetItemText( item ));
+    if ( !objects.HasObjectNamed(name) )
     {
         wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
         return;
     }
 
-    gd::ChooseVariableDialog dialog(this, (*object)->GetVariables(), /*editingOnly=*/true);
+    gd::ChooseVariableDialog dialog(this, objects.GetObject(name).GetVariables(), /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
-        if ( scene ) scene->wasModified = true;
+        game.GetChangesNotifier().OnObjectVariablesChanged(game, scene, objects.GetObject(name));
 }
 
 /**
@@ -1027,9 +872,8 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
  */
 void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
 {
-    string name = ToString( objectsList->GetItemText( item ));
-    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
-    if ( object == objects->end() )
+    std::string name = ToString( objectsList->GetItemText( item ));
+    if ( !objects.HasObjectNamed(name) )
     {
         wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
         return;
@@ -1038,40 +882,32 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
     AutomatismTypeChoice dialog(this, game);
     if ( dialog.ShowModal() == 1)
     {
-        ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-        Automatism* automatism = extensionManager->CreateAutomatism(dialog.selectedAutomatismType);
-
-        if (automatism == NULL)
+        //Find automatism metadata
+        boost::shared_ptr<gd::PlatformExtension> extension = boost::shared_ptr<gd::PlatformExtension> ();
+        std::vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
+        for (unsigned int i = 0;i<extensions.size();++i)
         {
-            wxLogError( _( "Impossible de créer l'automatisme." ) );
-            return;
+            std::vector<std::string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
+            if ( find(automatismsTypes.begin(), automatismsTypes.end(), dialog.selectedAutomatismType) != automatismsTypes.end() )
+                extension = extensions[i];
         }
-
-        AutomatismInfo infos = extensionManager->GetAutomatismMetadata(dialog.selectedAutomatismType);
+        gd::AutomatismMetadata metadata = extension->GetAutomatismMetadata(dialog.selectedAutomatismType);
 
         //Add automatism to object
-        automatism->SetName(infos.GetDefaultName());
-        for (unsigned int j = 0;(*object)->HasAutomatismNamed(automatism->GetName());++j)
-            automatism->SetName(infos.GetDefaultName()+ToString(j));
+        std::string autoName = metadata.GetDefaultName();
+        for (unsigned int j = 0;objects.GetObject(name).HasAutomatismNamed(autoName);++j)
+            autoName = metadata.GetDefaultName()+ToString(j);
 
-        (*object)->AddAutomatism(automatism);
-
-        //Add shared datas to scene if necessary
-        CreateSharedDatasIfNecessary(*automatism);
-
-        if ( scene )
-        {
-            scene->wasModified = true;
-            CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, *scene);
-        }
+        gd::Object & object = objects.GetObject(name);
+        object.AddNewAutomatism(dialog.selectedAutomatismType, autoName);
+        game.GetChangesNotifier().OnAutomatismAdded(game, scene, object, object.GetAutomatism(autoName));
     }
 }
 
 void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
 {
-    string name = ToString( objectsList->GetItemText( item ));
-    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
-    if ( object == objects->end() )
+    std::string name = ToString( objectsList->GetItemText( item ));
+    if ( !objects.HasObjectNamed(name) )
     {
         wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
         return;
@@ -1081,23 +917,16 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
     wxArrayString automatismsStr;
 
     //Fill array
-    vector <std::string> automatisms = (*object)->GetAllAutomatismNames();
+    std::vector <std::string> automatisms = objects.GetObject(name).GetAllAutomatismNames();
     for (unsigned int i = 0;i<automatisms.size();++i)
-        automatismsStr.Add((*object)->GetAutomatism(automatisms[i]).GetName());
+        automatismsStr.Add(objects.GetObject(name).GetAutomatism(automatisms[i]).GetName());
 
     int selection = wxGetSingleChoiceIndex(_("Choisissez l'automatisme à supprimer"), _("Choisir l'automatisme à supprimer"), automatismsStr);
     if ( selection == -1 ) return;
 
-    (*object)->RemoveAutomatism(automatisms[selection]);
+    objects.GetObject(name).RemoveAutomatism(automatisms[selection]);
 
-    //Remove shared datas if necessary
-    RemoveSharedDatasIfNecessary(automatisms[selection]);
-
-    if ( scene )
-    {
-        scene->wasModified = true;
-        CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, *scene);
-    }
+    game.GetChangesNotifier().OnAutomatismDeleted(game, scene, objects.GetObject(name), automatisms[selection]);
 }
 
 /**
@@ -1105,9 +934,8 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
  */
 void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
 {
-    string name = ToString(objectsList->GetItemText( item ));
-    std::vector<ObjSPtr>::iterator object = std::find_if(objects->begin(), objects->end(), std::bind2nd(ObjectHasName(), name));
-    if ( object == objects->end() )
+    std::string name = ToString( objectsList->GetItemText( item ));
+    if ( !objects.HasObjectNamed(name) )
     {
         wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
         return;
@@ -1117,81 +945,23 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
     wxArrayString automatismsStr;
 
     //Fill array
-    vector <std::string> automatisms = (*object)->GetAllAutomatismNames();
+    vector <std::string> automatisms = objects.GetObject(name).GetAllAutomatismNames();
     for (unsigned int i = 0;i<automatisms.size();++i)
-        automatismsStr.Add((*object)->GetAutomatism(automatisms[i]).GetName());
+        automatismsStr.Add(objects.GetObject(name).GetAutomatism(automatisms[i]).GetName());
 
     int selection = wxGetSingleChoiceIndex(_("Choisissez l'automatisme à renommer"), _("Choisir l'automatisme à renommer"), automatismsStr);
     if ( selection == -1 ) return;
 
-    gd::Automatism & automatism = (*object)->GetAutomatism(automatisms[selection]);
+    gd::Object & object = objects.GetObject(name);
+    gd::Automatism & automatism = object.GetAutomatism(automatisms[selection]);
 
-    std::string newName = string(wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism.GetName()).mb_str());
+    std::string newName = ToString(wxGetTextFromUser("Entrez le nouveau nom de l'automatisme", "Renommer un automatisme", automatism.GetName()));
     if ( newName == automatism.GetName() || newName.empty() ) return;
 
-    //Remove shared datas if necessary
-    RemoveSharedDatasIfNecessary(automatism.GetName());
-
+    std::string oldName = automatism.GetName();
     automatism.SetName(newName);
-    CreateSharedDatasIfNecessary(automatism);
 
-    if ( scene )
-    {
-        scene->wasModified = true;
-        CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, *scene);
-    }
-}
-
-
-/**
- * Remove shared datas of an automatism if this automatism is not used anymore
- */
-void EditorObjectList::RemoveSharedDatasIfNecessary(std::string name)
-{
-    if ( scene != NULL && scene->automatismsInitialSharedDatas.find(name) != scene->automatismsInitialSharedDatas.end() )
-    {
-        //Check no object use this automatism anymore
-        for (unsigned int i = 0;i<scene->GetInitialObjects().size();++i)
-        {
-        	if (scene->GetInitialObjects()[i]->HasAutomatismNamed(name))
-                return;
-        }
-        for (unsigned int i = 0;i<game.GetGlobalObjects().size();++i)
-        {
-        	if (game.GetGlobalObjects()[i]->HasAutomatismNamed(name))
-                return;
-        }
-
-        scene->automatismsInitialSharedDatas.erase(name);
-    }
-}
-
-/**
- * Create datas shared by an automatism type if these data don't yet exist.
- */
-void EditorObjectList::CreateSharedDatasIfNecessary(gd::Automatism & automatism)
-{
-    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
-
-    if ( scene == NULL || objects != &scene->GetInitialObjects() ) //We're editing global objects : Add automatism data to all scenes.
-    {
-        for (unsigned int i = 0;i<game.GetLayouts().size();++i)
-        {
-        	if ( game.GetLayouts()[i]->automatismsInitialSharedDatas.find(automatism.GetName()) == game.GetLayouts()[i]->automatismsInitialSharedDatas.end() )
-            {
-                boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism.GetTypeName());
-                automatismsSharedDatas->SetName(automatism.GetName());
-                game.GetLayouts()[i]->automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
-            }
-        }
-    }
-    //We're editing an object from a scene : Add the data if necessary
-    else if ( scene->automatismsInitialSharedDatas.find(automatism.GetName()) == scene->automatismsInitialSharedDatas.end() )
-    {
-        boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = extensionsManager->CreateAutomatismSharedDatas(automatism.GetTypeName());
-        automatismsSharedDatas->SetName(automatism.GetName());
-        scene->automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
-    }
+    game.GetChangesNotifier().OnAutomatismRenamed(game, scene, object, automatism, oldName);
 }
 
 /**
@@ -1242,4 +1012,17 @@ void EditorObjectList::OnobjectsListKeyDown(wxTreeEvent& event)
                 break;
         }
     }
+}
+
+void EditorObjectList::OnAideBtClick( wxCommandEvent& event )
+{
+    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        gd::HelpFileAccess::GetInstance()->DisplaySection(10);
+    else
+        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object")); //TODO
+}
+
+void EditorObjectList::OnsearchCtrlText(wxCommandEvent& event)
+{
+    Refresh();
 }

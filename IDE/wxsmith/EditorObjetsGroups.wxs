@@ -17,9 +17,18 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="ObjetsGroupsList" member="yes">
+					<image_list></image_list>
+					<tree_items>
+						<item>ObjetsGroupsList</item>
+						<item></item>
+					</tree_items>
+					<items_text>
+						<item2>ObjetsGroupsList</item2>
+						<item2></item2>
+					</items_text>
 					<pos>-72,-72</pos>
 					<size>179,170</size>
-					<style>wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE</style>
+					<style>wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 					<handler function="OnObjetsGroupsListBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
 					<handler function="OnObjetsGroupsListEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
 					<handler function="OnObjetsGroupsListItemDoubleClicked" entry="EVT_TREE_ITEM_ACTIVATED" />

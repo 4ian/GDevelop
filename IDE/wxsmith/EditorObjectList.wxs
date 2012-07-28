@@ -6,20 +6,21 @@
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<growablecols>0</growablecols>
-			<growablerows>1</growablerows>
-			<object class="sizeritem">
-				<object class="wxPanel" name="ID_PANEL4" variable="toolbarPanel" member="yes">
-					<size>-1,0</size>
-					<handler function="OntoolbarPanelResize" entry="EVT_SIZE" />
-				</object>
-				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<option>1</option>
-			</object>
+			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="objectsList" member="yes">
+					<image_list></image_list>
+					<tree_items>
+						<item>objectsList</item>
+						<item></item>
+					</tree_items>
+					<items_text>
+						<item2>objectsList</item2>
+						<item2></item2>
+					</items_text>
 					<pos>-72,-72</pos>
 					<size>179,170</size>
-					<style>wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE</style>
+					<style>wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 					<handler function="OnobjectsListBeginDrag" entry="EVT_TREE_BEGIN_DRAG" />
 					<handler function="OnobjectsListBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
 					<handler function="OnobjectsListEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
@@ -30,6 +31,14 @@
 					<handler function="OnobjectsListItemMenu" entry="EVT_TREE_ITEM_MENU" />
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxTextCtrl" name="ID_TEXTCTRL1" subclass="wxSearchCtrl" variable="searchCtrl" member="yes">
+					<handler function="OnsearchCtrlText" entry="EVT_TEXT" />
+				</object>
+				<flag>wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<border>5</border>
 				<option>1</option>
 			</object>
 		</object>

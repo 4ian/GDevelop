@@ -17,7 +17,7 @@
 #undef GetObject
 
 Clipboard::Clipboard() :
-objectCopied(boost::shared_ptr<Object>()),
+objectCopied(NULL),
 hasObject(false),
 hasEvents(false),
 hasExternalEvents(false),
@@ -53,14 +53,14 @@ void Clipboard::DestroySingleton()
     }
 }
 
-void Clipboard::SetObject( ObjSPtr object )
+void Clipboard::SetObject( const gd::Object & object )
 {
-    objectCopied = boost::shared_ptr<Object>(object->Clone());
+    objectCopied = object.Clone();
 
     hasObject = true;
 }
 
-ObjSPtr Clipboard::GetObject()
+gd::Object * Clipboard::GetObject()
 {
     return objectCopied;
 }

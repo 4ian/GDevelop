@@ -23,7 +23,7 @@
 namespace gd {class Layout;}
 class RuntimeGame;
 class EventsEditor;
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "RenderDialog.h"
 #include "SceneCanvas.h"
 
@@ -36,7 +36,7 @@ class EditorScene: public wxPanel
 {
 	public:
 
-		EditorScene(wxWindow* parent, RuntimeGame & game_, gd::Layout & layout_, const MainEditorCommand & mainEditorCommand_);
+		EditorScene(wxWindow* parent, RuntimeGame & game_, gd::Layout & layout_, const gd::MainFrameWrapper & mainFrameWrapper_);
 		virtual ~EditorScene();
 
 		//(*Declarations(EditorScene)
@@ -96,7 +96,7 @@ class EditorScene: public wxPanel
 
 		RuntimeGame & game;
 		gd::Layout & layout;
-		MainEditorCommand mainEditorCommand;
+		gd::MainFrameWrapper mainFrameWrapper;
 
         wxAuiManager m_mgr;
 

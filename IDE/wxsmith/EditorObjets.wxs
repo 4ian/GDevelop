@@ -9,7 +9,7 @@
 				<object class="wxNotebook" name="ID_NOTEBOOK2" variable="sceneNotebook" member="yes">
 					<object class="notebookpage">
 						<object class="Custom" name="ID_CUSTOM3" subclass="EditorObjectList" variable="sceneObjectsEditor" member="yes">
-							<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, &amp;scene.GetInitialObjects(), mainEditorCommand, &amp;scene);</creating_code>
+							<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, mainFrameWrapper, &amp;scene);</creating_code>
 							<include_file>EditorObjectList.h</include_file>
 							<local_include>1</local_include>
 							<style></style>
@@ -18,7 +18,7 @@
 					</object>
 					<object class="notebookpage">
 						<object class="Custom" name="ID_CUSTOM1" subclass="EditorObjetsGroups" variable="ObjetsGroups" member="yes">
-							<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, &amp;scene.GetObjectGroups(), mainEditorCommand);</creating_code>
+							<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, &amp;scene.GetObjectGroups(), mainFrameWrapper);</creating_code>
 							<style></style>
 							<pos>71,14</pos>
 						</object>
@@ -31,7 +31,7 @@
 				<object class="wxNotebook" name="ID_NOTEBOOK3" variable="globalNotebook" member="yes">
 					<object class="notebookpage">
 						<object class="Custom" name="ID_CUSTOM2" subclass="EditorObjectList" variable="globalObjectsEditor" member="yes">
-							<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, &amp;game.GetGlobalObjects(), mainEditorCommand, &amp;scene);</creating_code>
+							<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, game, mainFrameWrapper, NULL);</creating_code>
 							<include_file>EditorObjectList.h</include_file>
 							<local_include>1</local_include>
 							<style></style>
@@ -40,7 +40,7 @@
 					</object>
 					<object class="notebookpage">
 						<object class="Custom" name="ID_CUSTOM4" subclass="EditorObjetsGroups" variable="globalObjectsGroups" member="yes">
-							<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, &amp;game.GetObjectGroups(), mainEditorCommand);</creating_code>
+							<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, &amp;game.GetObjectGroups(), mainFrameWrapper);</creating_code>
 							<style></style>
 							<pos>71,14</pos>
 						</object>

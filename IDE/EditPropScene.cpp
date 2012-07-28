@@ -181,15 +181,11 @@ EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
     {
         Scene & scene = dynamic_cast<Scene&>(layout);
 
-        if ( scene.standardSortMethod )
-            TriBox->SetSelection(0);
-        else
-            TriBox->SetSelection(1);
-
-        fovEdit->SetValue(ToString(scene.oglFOV));
-        zNearEdit->SetValue(ToString(scene.oglZNear));
-        zFarEdit->SetValue(ToString(scene.oglZFar));
-        stopSoundsCheck->SetValue(scene.stopSoundsOnStartup);
+        TriBox->SetSelection(scene.StandardSortMethod() ? 0 : 1);
+        fovEdit->SetValue(ToString(scene.GetOpenGLFOV()));
+        zNearEdit->SetValue(ToString(scene.GetOpenGLZNear()));
+        zFarEdit->SetValue(ToString(scene.GetOpenGLZFar()));
+        stopSoundsCheck->SetValue(scene.StopSoundsOnStartup());
     }
     catch (...) { /*Not a GD C++ Platform scene*/ }
 }
@@ -214,15 +210,11 @@ void EditPropScene::OnOkBtClick(wxCommandEvent& event)
     {
         Scene & scene = dynamic_cast<Scene&>(layout);
 
-        scene.oglFOV = ToFloat(ToString(fovEdit->GetValue()));
-        scene.oglZNear = ToFloat(ToString(zNearEdit->GetValue()));
-        scene.oglZFar = ToFloat(ToString(zFarEdit->GetValue()));
-        scene.stopSoundsOnStartup = stopSoundsCheck->GetValue();
-
-        if ( TriBox->GetSelection() == 0 )
-            scene.standardSortMethod = true;
-        else
-            scene.standardSortMethod = false;
+        scene.SetOpenGLFOV(ToFloat(ToString(fovEdit->GetValue())));
+        scene.SetOpenGLZNear(ToFloat(ToString(zNearEdit->GetValue())));
+        scene.SetOpenGLZFar(ToFloat(ToString(zFarEdit->GetValue())));
+        scene.SetStopSoundsOnStartup(stopSoundsCheck->GetValue());
+        scene.SetStandardSortMethod(TriBox->GetSelection() == 0);
     }
     catch (...) { /*Not a GD C++ Platform scene*/ }
 

@@ -74,7 +74,7 @@
 											<handler function="OnscrollBar1Scroll" entry="EVT_COMMAND_SCROLL" />
 										</object>
 										<object class="Custom" name="ID_CUSTOM1" subclass="SceneCanvas" variable="sceneCanvas" member="yes">
-											<creating_code>sceneCanvas = new SceneCanvas(scenePanel, game, emptyScene, instanceContainer, externalLayout.GetAssociatedSettings(), mainEditorCommand, false);</creating_code>
+											<creating_code>sceneCanvas = new SceneCanvas(scenePanel, game, emptyScene, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper, false);</creating_code>
 											<style>wxWANTS__CHARS | wxBORDER__SIMPLE</style>
 											<pos>0,0</pos>
 											<size>800,600</size>

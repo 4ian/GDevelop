@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
 #ifndef CLIPBOARD_H
 #define CLIPBOARD_H
 
@@ -12,20 +11,21 @@ namespace gd { class ExternalLayout; }
 #include "GDCore/Events/Event.h"
 #include "GDCore/Events/Instruction.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
-#include "GDL/Object.h"
-#include "GDL/ObjectHelpers.h"
+#include "GDCore/PlatformDefinition/Object.h"
+#include "GDL/Position.h"
+#undef GetObject //Undefining an annoying macro changing GetObject in GetObjectA or GetObjectW
 
-//Undefining an annoying macro changing GetObject in GetObjectA
-#undef GetObject
-
+/**
+ * \brief The IDE singleton class managing the clipboard.
+ */
 class Clipboard
 {
 public:
     static Clipboard * GetInstance();
     static void DestroySingleton();
 
-    void SetObject( ObjSPtr object );
-    ObjSPtr GetObject();
+    void SetObject( const gd::Object & object );
+    gd::Object * GetObject();
     bool HasObject() { return hasObject; };
 
     void SetEvents( const std::vector<gd::BaseEventSPtr> & event );
@@ -63,7 +63,7 @@ private:
     Clipboard();
     virtual ~Clipboard();
 
-    ObjSPtr objectCopied;
+    gd::Object * objectCopied;
     bool hasObject;
 
     std::vector<gd::BaseEventSPtr> eventsCopied;

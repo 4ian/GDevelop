@@ -305,9 +305,8 @@ void ProfileDlg::OnactivateCheckClick(wxCommandEvent& event)
     profilingActivated = activateCheck->GetValue();
     if ( sceneCanvas )
     {
-        sceneCanvas->GetEditedScene().wasModified = true;
-        sceneCanvas->GetEditedScene().OnEventsModified();
-        CodeCompilationHelpers::CreateSceneEventsCompilationTask(sceneCanvas->GetEditedGame(), sceneCanvas->GetEditedScene());
+        gd::Project & project = sceneCanvas->GetEditedGame();
+        project.GetChangesNotifier().OnEventsModified(project, sceneCanvas->GetEditedScene());
         sceneCanvas->Reload();
     }
 }

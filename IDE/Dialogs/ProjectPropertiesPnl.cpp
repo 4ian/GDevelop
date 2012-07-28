@@ -8,6 +8,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
+#include <wx/settings.h>
 #include <wx/treectrl.h>
 #include "GDCore/PlatformDefinition/Project.h"
 #include "../ProjectManager.h"

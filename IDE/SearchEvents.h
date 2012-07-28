@@ -14,10 +14,10 @@
 #include <string>
 #include <vector>
 #include "GDCore/Events/Event.h"
-class Game;
-class Scene;
+namespace gd { class Project; };
+namespace gd { class Layout; };
 class EventsEditor;
-class EventsSearchResult;
+namespace gd { class EventsSearchResult; };
 
 /**
  * Search/Replace dialogs for events.
@@ -27,7 +27,7 @@ class SearchEvents: public wxDialog
 {
 	public:
 
-		SearchEvents(EventsEditor * parent_, Game & game_, Scene & scene_, std::vector < gd::BaseEventSPtr > * events_);
+		SearchEvents(EventsEditor * parent_, gd::Project & project_, gd::Layout & layout_, std::vector < gd::BaseEventSPtr > * events_);
 		virtual ~SearchEvents();
 
 		//(*Declarations(SearchEvents)
@@ -96,11 +96,11 @@ class SearchEvents: public wxDialog
 		//*)
 
         EventsEditor * parent;
-		Game & game;
-		Scene & scene;
+		gd::Project & project;
+		gd::Layout & layout;
 
 		std::vector < gd::BaseEventSPtr > * events;
-		std::vector < EventsSearchResult > searchResults;
+		std::vector < gd::EventsSearchResult > searchResults;
 		size_t currentResult;
 
 		DECLARE_EVENT_TABLE()

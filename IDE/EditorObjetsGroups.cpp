@@ -23,7 +23,7 @@
 #include "Clipboard.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
-#include "EventsRefactorer.h"
+#include "GDCore/IDE/EventsRefactorer.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -64,11 +64,11 @@ BEGIN_EVENT_TABLE(EditorObjetsGroups,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorObjetsGroups::EditorObjetsGroups( wxWindow* parent,  Game & game_, Scene & scene_, vector < gd::ObjectGroup > * objectsGroups_, MainEditorCommand & mainEditorCommand_) :
+EditorObjetsGroups::EditorObjetsGroups( wxWindow* parent,  Game & game_, Scene & scene_, vector < gd::ObjectGroup > * objectsGroups_, gd::MainFrameWrapper & mainFrameWrapper_) :
 game(game_),
 scene(scene_),
 objectsGroups(objectsGroups_),
-mainEditorCommand(mainEditorCommand_)
+mainFrameWrapper(mainFrameWrapper_)
 {
 	//(*Initialize(EditorObjetsGroups)
 	wxMenuItem* editMenuItem;
@@ -80,7 +80,7 @@ mainEditorCommand(mainEditorCommand_)
 	FlexGridSizer1->AddGrowableRow(1);
 	Panel3 = new wxPanel(this, ID_PANEL4, wxDefaultPosition, wxSize(-1,0), wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer1->Add(Panel3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	ObjetsGroupsList = new wxTreeCtrl(this, ID_TREECTRL1, wxPoint(-72,-72), wxSize(179,170), wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
+	ObjetsGroupsList = new wxTreeCtrl(this, ID_TREECTRL1, wxPoint(-72,-72), wxSize(179,170), wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer1->Add(ObjetsGroupsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	editMenuItem = new wxMenuItem((&ContextMenu), IdGroupEdit, _("Editer le groupe"), wxEmptyString, wxITEM_NORMAL);
@@ -199,13 +199,13 @@ void EditorObjetsGroups::CreateRibbonPage(wxRibbonPage * page)
 
 void EditorObjetsGroups::ConnectEvents()
 {
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonAdd, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnAddGroupSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDel, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnDelGroupSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonUp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnMoveUpSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDown, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnMoveDownSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonEdit, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnEditGroupSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonModName, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnModNameSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnHelp, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonAdd, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnAddGroupSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDel, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnDelGroupSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonUp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnMoveUpSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDown, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnMoveDownSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonEdit, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnEditGroupSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonModName, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnModNameSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EditorObjetsGroups::OnHelp, NULL, this);
 }
 
 ////////////////////////////////////////////////////////////
@@ -286,36 +286,6 @@ void EditorObjetsGroups::OnMoveDownSelected(wxCommandEvent& event)
 
         }
     }
-}
-
-////////////////////////////////////////////////////////////
-/// Active l'éditeur
-////////////////////////////////////////////////////////////
-void EditorObjetsGroups::EnableAll()
-{
-    toolbar->Enable(true);
-    wxMenuItemList list = ContextMenu.GetMenuItems();
-    wxMenuItemList::iterator iter;
-    for (iter = list.begin(); iter != list.end(); ++iter)
-    {
-        (*iter)->Enable(true);
-    }
-
-}
-
-////////////////////////////////////////////////////////////
-/// Désactive l'éditeur
-////////////////////////////////////////////////////////////
-void EditorObjetsGroups::DisableAll()
-{
-    toolbar->Enable(false);
-    wxMenuItemList list = ContextMenu.GetMenuItems();
-    wxMenuItemList::iterator iter;
-    for (iter = list.begin(); iter != list.end(); ++iter)
-    {
-        (*iter)->Enable(false);
-    }
-
 }
 
 ////////////////////////////////////////////////////////////
@@ -441,7 +411,7 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
 
             if ( answer == wxYES )
             {
-                EventsRefactorer::RemoveObjectInEvents(game, scene, scene.GetEvents(), groupName);
+                gd::EventsRefactorer::RemoveObjectInEvents(game, scene, scene.GetEvents(), groupName);
             }
 
             scene.wasModified = true;
@@ -552,7 +522,7 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
         {
             i->SetName( newName );
 
-            EventsRefactorer::RenameObjectInEvents(game, scene, scene.GetEvents(), ancienNom, newName);
+            gd::EventsRefactorer::RenameObjectInEvents(game, scene, scene.GetEvents(), ancienNom, newName);
 
             scene.wasModified = true;
             CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
@@ -588,7 +558,7 @@ void EditorObjetsGroups::OnObjetsGroupsListItemDoubleClicked(wxTreeEvent& event)
  */
 void EditorObjetsGroups::OnSetFocus(wxFocusEvent& event)
 {
-    mainEditorCommand.GetRibbon()->SetActivePage(5);
+    mainFrameWrapper.GetRibbon()->SetActivePage(5);
     ConnectEvents();
 }
 

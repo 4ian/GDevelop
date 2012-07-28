@@ -15,13 +15,13 @@ namespace gd { class ExternalEvents; };
 class Game;
 class EventsEditor;
 #include "GDL/Scene.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
 class ExternalEventsEditor: public wxPanel
 {
 public:
 
-    ExternalEventsEditor(wxWindow* parent, Game & game_, gd::ExternalEvents & events_, const MainEditorCommand & mainEditorCommand_);
+    ExternalEventsEditor(wxWindow* parent, Game & game_, gd::ExternalEvents & events_, const gd::MainFrameWrapper & mainFrameWrapper_);
     virtual ~ExternalEventsEditor();
 
     //(*Declarations(ExternalEventsEditor)
@@ -57,7 +57,7 @@ private:
     void OnparentSceneComboBoxDropDown(wxCommandEvent& event);
 
     Scene emptyScene;
-    MainEditorCommand mainEditorCommand;
+    gd::MainFrameWrapper mainFrameWrapper;
 
     DECLARE_EVENT_TABLE()
 };

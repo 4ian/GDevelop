@@ -54,22 +54,22 @@ BEGIN_EVENT_TABLE( EditorObjets, wxPanel )
     //*)
 END_EVENT_TABLE()
 
-EditorObjets::EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_) :
+EditorObjets::EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_) :
 game(game_),
 scene(scene_),
-mainEditorCommand(mainEditorCommand_)
+mainFrameWrapper(mainFrameWrapper_)
 {
     //(*Initialize(EditorObjets)
     Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
     Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(128,168), 0, _T("ID_NOTEBOOK1"));
     sceneNotebook = new wxNotebook(Notebook1, ID_NOTEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK2"));
-    sceneObjectsEditor = new EditorObjectList(sceneNotebook, game, &scene.GetInitialObjects(), mainEditorCommand, &scene);
-    ObjetsGroups = new EditorObjetsGroups(sceneNotebook, game, scene, &scene.GetObjectGroups(), mainEditorCommand);
+    sceneObjectsEditor = new EditorObjectList(sceneNotebook, game, scene, mainFrameWrapper, &scene);
+    ObjetsGroups = new EditorObjetsGroups(sceneNotebook, game, scene, &scene.GetObjectGroups(), mainFrameWrapper);
     sceneNotebook->AddPage(sceneObjectsEditor, _("Objets"), false);
     sceneNotebook->AddPage(ObjetsGroups, _("Groupes d\'objets"), false);
     globalNotebook = new wxNotebook(Notebook1, ID_NOTEBOOK3, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK3"));
-    globalObjectsEditor = new EditorObjectList(globalNotebook, game, &game.GetGlobalObjects(), mainEditorCommand, &scene);
-    globalObjectsGroups = new EditorObjetsGroups(globalNotebook, game, scene, &game.GetObjectGroups(), mainEditorCommand);
+    globalObjectsEditor = new EditorObjectList(globalNotebook, game, game, mainFrameWrapper, NULL);
+    globalObjectsGroups = new EditorObjetsGroups(globalNotebook, game, scene, &game.GetObjectGroups(), mainFrameWrapper);
     globalNotebook->AddPage(globalObjectsEditor, _("Objets globaux"), false);
     globalNotebook->AddPage(globalObjectsGroups, _("Groupes globaux"), false);
     Notebook1->AddPage(sceneNotebook, _("Scène"), false);

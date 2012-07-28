@@ -25,7 +25,7 @@
 #include "GDL/Game.h"
 #include "GDL/RuntimeGame.h"
 #include "MainFrame.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "SceneCanvas.h"
 #include "DebuggerGUI.h"
 #include "EditorObjets.h"
@@ -59,10 +59,10 @@ BEGIN_EVENT_TABLE(EditorScene,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorScene::EditorScene(wxWindow* parent, RuntimeGame & game_, gd::Layout & layout_, const MainEditorCommand & mainEditorCommand_) :
+EditorScene::EditorScene(wxWindow* parent, RuntimeGame & game_, gd::Layout & layout_, const gd::MainFrameWrapper & mainFrameWrapper_) :
 layout(layout_),
 game(game_),
-mainEditorCommand(mainEditorCommand_)
+mainFrameWrapper(mainFrameWrapper_)
 {
     //TODO: GD C++ Platform specific code
     try
@@ -90,13 +90,13 @@ mainEditorCommand(mainEditorCommand_)
 	scrollBar2->SetScrollbar(2500, 10, 5000, 10);
 	scrollBar1 = new wxScrollBar(scenePanel, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
 	scrollBar1->SetScrollbar(2500, 10, 5000, 10);
-	sceneCanvas = new SceneCanvas(scenePanel, game, scene, scene.GetInitialInstances(), scene.GetAssociatedSceneCanvasSettings(), mainEditorCommand);
+	sceneCanvas = new SceneCanvas(scenePanel, game, scene, scene.GetInitialInstances(), scene.GetAssociatedSceneCanvasSettings(), mainFrameWrapper);
 	eventsPanel = new wxPanel(notebook, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
 	eventsPanel->SetBackgroundColour(wxColour(255,255,255));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
 	FlexGridSizer3->AddGrowableRow(0);
-	eventsEditor = new EventsEditor(eventsPanel, game, scene, &scene.GetEvents(), mainEditorCommand);
+	eventsEditor = new EventsEditor(eventsPanel, game, scene, &scene.GetEvents(), mainFrameWrapper);
 	FlexGridSizer3->Add(eventsEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	eventsPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(eventsPanel);
@@ -123,8 +123,8 @@ mainEditorCommand(mainEditorCommand_)
     m_mgr.SetManagedWindow( this );
 
     //Create all editors linked to scene canvas.
-    sceneCanvas->SetOwnedObjectsEditor( boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainEditorCommand) ));
-    sceneCanvas->SetOwnedLayersEditor( boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, mainEditorCommand) ));
+    sceneCanvas->SetOwnedObjectsEditor( boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainFrameWrapper) ));
+    sceneCanvas->SetOwnedLayersEditor( boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, mainFrameWrapper) ));
     sceneCanvas->SetOwnedDebugger( boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(this, sceneCanvas->GetRuntimeScene()) ));
     sceneCanvas->SetOwnedExternalWindow( boost::shared_ptr<RenderDialog>(new RenderDialog(this, sceneCanvas) ));
     sceneCanvas->SetOwnedInitialPositionBrowser( boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, scene.GetInitialInstances(), *sceneCanvas) ));
@@ -158,7 +158,7 @@ mainEditorCommand(mainEditorCommand_)
 
     MainFrame::LoadSkin(&m_mgr, notebook);
 
-    mainEditorCommand.GetRibbon()->SetActivePage(2);
+    mainFrameWrapper.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();
 
     wxString perspective;
@@ -218,13 +218,13 @@ void EditorScene::ForceRefreshRibbonAndConnect()
 {
     if ( notebook->GetPageText(notebook->GetSelection()) == _("Scène") )
     {
-        sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
-        mainEditorCommand.GetRibbon()->SetActivePage(2);
+        sceneCanvas->CreateToolsBar(mainFrameWrapper.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
+        mainFrameWrapper.GetRibbon()->SetActivePage(2);
         sceneCanvas->ConnectEvents();
     }
     else if ( notebook->GetPageText(notebook->GetSelection()) == _("Evènements") )
     {
-        mainEditorCommand.GetRibbon()->SetActivePage(3);
+        mainFrameWrapper.GetRibbon()->SetActivePage(3);
         eventsEditor->ConnectEvents();
     }
 }
@@ -249,7 +249,7 @@ void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)
 
 void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
-    sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
-    mainEditorCommand.GetRibbon()->SetActivePage(2);
+    sceneCanvas->CreateToolsBar(mainFrameWrapper.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
+    mainFrameWrapper.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();
 }

@@ -12,7 +12,7 @@
 #include <wx/ribbon/toolbar.h>
 #include <string>
 #include <vector>
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 class Game;
 class Scene;
 
@@ -20,7 +20,7 @@ class CodeEditor: public wxPanel
 {
 	public:
 
-		CodeEditor(wxWindow* parent, std::string filename, Game * game_, const MainEditorCommand & mainEditorCommand_);
+		CodeEditor(wxWindow* parent, std::string filename, Game * game_, const gd::MainFrameWrapper & mainFrameWrapper_);
 		virtual ~CodeEditor();
 
 		//(*Declarations(CodeEditor)
@@ -102,7 +102,7 @@ class CodeEditor: public wxPanel
 		void OnGotoLineSelected(wxRibbonButtonBarEvent &event);
 		void OpenLink(wxString link);
 
-		MainEditorCommand mainEditorCommand;
+		gd::MainFrameWrapper mainFrameWrapper;
 
         char lastCharEntered;
         long lastCharEnteredPos;

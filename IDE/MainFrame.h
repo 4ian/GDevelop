@@ -111,9 +111,9 @@ class MainFrame: public wxFrame
 
         /**
          * Get a lightweight interface to this class.
-         * \see MainEditorCommand
+         * \see gd::MainFrameWrapper
          */
-        MainEditorCommand & GetMainEditorCommand() { return mainEditorCommand; };
+        gd::MainFrameWrapper & GetMainFrameWrapper() { return mainFrameWrapper; };
 
         /**
          * Get a pointer to the ribbon
@@ -131,11 +131,6 @@ class MainFrame: public wxFrame
         inline wxRibbonButtonBar * GetRibbonSceneEditorButtonBar() const { return ribbonSceneEditorButtonBar; };
 
         /**
-         * Get a pointer to the build tools panel
-         */
-        inline BuildToolsPnl * GetBuildToolsPanel() const { return buildToolsPnl; }
-
-        /**
          * Get a pointer to the wxAUI pane manager
          */
         inline const wxAuiManager * GetAUIPaneManger() const { return &m_mgr; }
@@ -150,9 +145,9 @@ class MainFrame: public wxFrame
         inline ProjectPropertiesPnl * GetProjectPropertiesPanel() const { return projectPropertiesPnl; }
 
         /**
-         * Get a pointer to scene locking shortcuts list.
+         * Get a pointer to windows locking shortcuts list.
          */
-        inline std::vector<SceneCanvas*> * GetScenesLockingShortcutsList() { return &scenesLockingShortcuts; };
+        inline std::vector<wxWindow*> * GetScenesLockingShortcutsList() { return &scenesLockingShortcuts; };
 
         //(*Handlers(MainFrame)
         void OnQuit(wxCommandEvent& event);
@@ -326,8 +321,8 @@ class MainFrame: public wxFrame
         wxStaticBitmap * ribbonHelpBt; ///< Pointer to the ribbon file custom button
         wxRibbonButtonBar * ribbonSceneEditorButtonBar; ///Pointer to the ribbon bar which can be changed by scene editors
         BuildToolsPnl * buildToolsPnl;
-        std::vector<SceneCanvas*> scenesLockingShortcuts;
-        MainEditorCommand mainEditorCommand;
+        std::vector<wxWindow*> scenesLockingShortcuts;
+        gd::MainFrameWrapper mainFrameWrapper;
 
         StartHerePage * startPage;
         ProjectManager * projectManager;

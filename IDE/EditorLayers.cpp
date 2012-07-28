@@ -41,11 +41,11 @@ BEGIN_EVENT_TABLE(EditorLayers,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorLayers::EditorLayers(wxWindow* parent, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_) :
+EditorLayers::EditorLayers(wxWindow* parent, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_) :
 game(game_),
 scene(scene_),
 sceneCanvas(NULL),
-mainEditorCommand(mainEditorCommand_)
+mainFrameWrapper(mainFrameWrapper_)
 {
 
 	//(*Initialize(EditorLayers)

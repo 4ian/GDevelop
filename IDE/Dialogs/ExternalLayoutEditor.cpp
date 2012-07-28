@@ -37,11 +37,11 @@ BEGIN_EVENT_TABLE(ExternalLayoutEditor,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-ExternalLayoutEditor::ExternalLayoutEditor(wxWindow* parent, RuntimeGame & game_, gd::ExternalLayout & externalLayout_, const MainEditorCommand & mainEditorCommand_) :
+ExternalLayoutEditor::ExternalLayoutEditor(wxWindow* parent, RuntimeGame & game_, gd::ExternalLayout & externalLayout_, const gd::MainFrameWrapper & mainFrameWrapper_) :
 sceneCanvas(NULL),
 externalLayout(externalLayout_),
 game(game_),
-mainEditorCommand(mainEditorCommand_)
+mainFrameWrapper(mainFrameWrapper_)
 {
     //TODO
     try
@@ -99,7 +99,7 @@ mainEditorCommand(mainEditorCommand_)
 	scrollBar2->SetScrollbar(2500, 10, 5000, 10);
 	scrollBar1 = new wxScrollBar(scenePanel, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
 	scrollBar1->SetScrollbar(2500, 10, 5000, 10);
-	sceneCanvas = new SceneCanvas(scenePanel, game, emptyScene, instanceContainer, externalLayout.GetAssociatedSettings(), mainEditorCommand, false);
+	sceneCanvas = new SceneCanvas(scenePanel, game, emptyScene, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper, false);
 	FlexGridSizer3->Add(scenePanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	helpPanel = new wxPanel(corePanel, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	helpPanel->SetBackgroundColour(wxColour(255,255,255));
@@ -201,15 +201,15 @@ void ExternalLayoutEditor::OnscrollBar1Scroll(wxScrollEvent& event)
 
 void ExternalLayoutEditor::ForceRefreshRibbonAndConnect()
 {
-    sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
-    mainEditorCommand.GetRibbon()->SetActivePage(2);
+    sceneCanvas->CreateToolsBar(mainFrameWrapper.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
+    mainFrameWrapper.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();
 }
 
 void ExternalLayoutEditor::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
-    sceneCanvas->CreateToolsBar(mainEditorCommand.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
-    mainEditorCommand.GetRibbon()->SetActivePage(2);
+    sceneCanvas->CreateToolsBar(mainFrameWrapper.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
+    mainFrameWrapper.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();
 }
 
@@ -236,13 +236,13 @@ void ExternalLayoutEditor::SetupForScene(Scene & scene)
 
             //(Re)create scene canvas
             if ( sceneCanvas ) delete sceneCanvas;
-            sceneCanvas = new SceneCanvas(scenePanel, game, scene, instanceContainer, externalLayout.GetAssociatedSettings(), mainEditorCommand, false);
+            sceneCanvas = new SceneCanvas(scenePanel, game, scene, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper, false);
             sceneCanvas->SetParentPanelAndDockManager( scenePanel, &m_mgr );
             sceneCanvas->SetScrollbars(scrollBar1, scrollBar2);
 
             //Creating external editors and linking them to the scene canvas
-            boost::shared_ptr<EditorObjets> objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainEditorCommand));
-            boost::shared_ptr<EditorLayers> layersEditor = boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, mainEditorCommand) );
+            boost::shared_ptr<EditorObjets> objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainFrameWrapper));
+            boost::shared_ptr<EditorLayers> layersEditor = boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, mainFrameWrapper) );
             boost::shared_ptr<InitialPositionBrowserDlg> browserEditor = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *sceneCanvas) );
             sceneCanvas->SetOwnedObjectsEditor(objectsEditor);
             sceneCanvas->SetOwnedLayersEditor(layersEditor);

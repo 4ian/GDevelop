@@ -655,7 +655,7 @@ void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t li
         }
     }
 
-    CodeEditor * editorScene = new CodeEditor(mainEditor.GetEditorsNotebook(), filename, associatedGame, mainEditor.GetMainEditorCommand());
+    CodeEditor * editorScene = new CodeEditor(mainEditor.GetEditorsNotebook(), filename, associatedGame, mainEditor.GetMainFrameWrapper());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, wxFileName(filename).GetFullName(), true, wxBitmap("res/source_cpp16.png", wxBITMAP_TYPE_ANY)) )
     {
         wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
@@ -709,7 +709,7 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
             prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
-    EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), *game, layout, mainEditor.GetMainEditorCommand());
+    EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), *game, layout, mainEditor.GetMainFrameWrapper());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+data->GetSecondString(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY)) )
     {
         wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
@@ -986,7 +986,7 @@ void ProjectManager::EditImagesOfGame(Game * game)
             prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
-    ResourcesEditor * editorImages = new ResourcesEditor(&mainEditor, *game, mainEditor.GetMainEditorCommand(), true);
+    ResourcesEditor * editorImages = new ResourcesEditor(&mainEditor, *game, mainEditor.GetMainFrameWrapper(), true);
     mainEditor.GetEditorsNotebook()->AddPage(editorImages, prefix+_("Banque d'images"), true, wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY));
 }
 
@@ -1368,7 +1368,7 @@ void ProjectManager::OnEditExternalEventsSelected(wxCommandEvent& event)
             prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
-    ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalEvents(data->GetSecondString()), mainEditor.GetMainEditorCommand());
+    ExternalEventsEditor * editor = new ExternalEventsEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalEvents(data->GetSecondString()), mainEditor.GetMainFrameWrapper());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, wxBitmap("res/events16.png", wxBITMAP_TYPE_ANY)) )
     {
         wxLogError(_("Impossible d'ajouter le nouvel onglet !"));
@@ -1609,7 +1609,7 @@ void ProjectManager::OnEditExternalLayoutSelected(wxCommandEvent& event)
             prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
-    ExternalLayoutEditor * editor = new ExternalLayoutEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalLayout(data->GetSecondString()), mainEditor.GetMainEditorCommand());
+    ExternalLayoutEditor * editor = new ExternalLayoutEditor(mainEditor.GetEditorsNotebook(), *game, game->GetExternalLayout(data->GetSecondString()), mainEditor.GetMainFrameWrapper());
     if ( !mainEditor.GetEditorsNotebook()->AddPage(editor, prefix+data->GetSecondString(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY)) )
     {
         wxLogError(_("Impossible d'ajouter le nouvel onglet !"));

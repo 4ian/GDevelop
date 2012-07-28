@@ -10,7 +10,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "EventsRefactorer.h"
+#include "GDCore/IDE/EventsRefactorer.h"
 #include "EventsEditor.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
@@ -48,10 +48,10 @@ BEGIN_EVENT_TABLE(SearchEvents,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-SearchEvents::SearchEvents(EventsEditor * parent_, Game & game_, Scene & scene_, vector < gd::BaseEventSPtr > * events_) :
+SearchEvents::SearchEvents(EventsEditor * parent_, gd::Project & project_, gd::Layout & layout_, vector < gd::BaseEventSPtr > * events_) :
 parent(parent_),
-game(game_),
-scene(scene_),
+project(project_),
+layout(layout_),
 events(events_)
 {
 	//(*Initialize(SearchEvents)
@@ -233,7 +233,7 @@ void SearchEvents::OnreplaceBtClick(wxCommandEvent& event)
         }
     }
 
-    EventsRefactorer::ReplaceStringInEvents(game, scene,
+    gd::EventsRefactorer::ReplaceStringInEvents(project, layout,
                                             onlySelectedEventCheck->GetValue() ? eventsToInspect : *events,
                                             string(searchToReplaceEdit->GetValue().mb_str()),
                                             string(replaceEdit->GetValue().mb_str()),
@@ -249,7 +249,7 @@ void SearchEvents::OnsearchBtClick(wxCommandEvent& event)
 {
     if ( events == NULL ) return;
 
-    searchResults = EventsRefactorer::SearchInEvents(game, scene, *events,
+    searchResults = gd::EventsRefactorer::SearchInEvents(project, layout, *events,
                                             string(searchEdit->GetValue().mb_str()),
                                             caseCheck->GetValue(),
                                             conditionsCheck->GetValue(),

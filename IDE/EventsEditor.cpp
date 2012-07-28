@@ -22,7 +22,9 @@
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/IDE/EventsRefactorer.h"
+#include "GDCore/IDE/EventsChangesNotifier.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
@@ -30,7 +32,6 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
-#include "EventsRefactorer.h"
 #include "SceneCanvas.h"
 #include "LogFileManager.h"
 #include "ProfileDlg.h"
@@ -104,12 +105,12 @@ BEGIN_EVENT_TABLE(EventsEditor,wxPanel)
 END_EVENT_TABLE()
 
 
-EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vector < gd::BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ ) :
+EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
     game(game_),
     scene(scene_),
     externalEvents(NULL),
     events(events_),
-    mainEditorCommand(mainEditorCommand_),
+    mainFrameWrapper(mainFrameWrapper_),
     sceneCanvas(NULL),
     conditionColumnWidth(350),
     isResizingColumns(false),
@@ -316,7 +317,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
             menuItem->SetBitmap(it->second.smallicon);
             eventTypesMenu.Append(menuItem);
             Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OnAddCustomEventFromMenuSelected);
-            mainEditorCommand.GetMainEditor()->Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&EventsEditor::OnAddCustomEventFromMenuSelected, NULL, this);
+            mainFrameWrapper.GetMainEditor()->Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&EventsEditor::OnAddCustomEventFromMenuSelected, NULL, this);
         }
 	}
 
@@ -412,23 +413,23 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
 
 void EventsEditor::ConnectEvents()
 {
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonAddEventBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCom, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonAddCommentBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonSomeEvent, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonAddCustomEventFromMenu, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonSubEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonAddSubEventSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDelEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::DeleteSelection, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnundoMenuSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnredoMenuSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCopy, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OneventCopyMenuSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCut, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OneventCutMenuSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OneventPasteMenuSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnTemplateBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCreateTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnCreateTemplateBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idSearchReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnSearchBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonProfiling, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnProfilingBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnHelpBtClick, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonFoldAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonFoldAll, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonUnFoldAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonUnFoldAll, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonAddEventBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonCom, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonAddCommentBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonSomeEvent, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonAddCustomEventFromMenu, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonSubEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonAddSubEventSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDelEvent, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::DeleteSelection, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnundoMenuSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonRedo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnredoMenuSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonCopy, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OneventCopyMenuSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonCut, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OneventCutMenuSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OneventPasteMenuSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnTemplateBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonCreateTemplate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnCreateTemplateBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idSearchReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnSearchBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonProfiling, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnProfilingBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnHelpBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonFoldAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonFoldAll, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonUnFoldAll, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&EventsEditor::OnRibbonUnFoldAll, NULL, this);
 }
 void InternalEventsEditorRefreshCallbacks::Refresh()
 {
@@ -871,7 +872,7 @@ void EventsEditor::OneventsPanelLeftDClick(wxMouseEvent& event)
 
         if ( evt == boost::shared_ptr<gd::BaseEvent>() ) return;
 
-        gd::BaseEvent::EditEventReturnType returned = evt->EditEvent(this, game, scene, mainEditorCommand);
+        gd::BaseEvent::EditEventReturnType returned = evt->EditEvent(this, game, scene, mainFrameWrapper);
 
         if (returned != gd::BaseEvent::Cancelled)
         {
@@ -1086,12 +1087,8 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory, bool noNeedForSceneRe
 
     if ( !noNeedForSceneRecompilation )
     {
-        EventsRefactorer::NotifyChangesInEventsOfScene(game, scene);
-        if ( externalEvents != NULL ) EventsRefactorer::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
-
-        scene.wasModified = true;
-        scene.OnEventsModified();
-        CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+        gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(game, scene);
+        if ( externalEvents != NULL ) gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
     }
 }
 
@@ -1205,7 +1202,7 @@ void EventsEditor::AddEvent(EventItem & previousEventItem)
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
         //Edit the event
-        eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
+        eventToAdd->EditEvent(this, game, scene, mainFrameWrapper);
 
         //Adding event
         if ( previousEventItem.eventsList != NULL )
@@ -1257,7 +1254,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
     gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Comment");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
-        if ( eventToAdd->EditEvent(this, game, scene, mainEditorCommand) == gd::BaseEvent::Cancelled ) return;
+        if ( eventToAdd->EditEvent(this, game, scene, mainFrameWrapper) == gd::BaseEvent::Cancelled ) return;
 
         //Adding event
         if ( previousEventItem.eventsList != NULL )
@@ -1285,7 +1282,7 @@ void EventsEditor::AddSubEvent(EventItem & parentEventItem)
     gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Standard");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
-        eventToAdd->EditEvent(this, game, scene, mainEditorCommand);
+        eventToAdd->EditEvent(this, game, scene, mainFrameWrapper);
 
         //Adding event
         parentEventItem.event->GetSubEvents().insert( parentEventItem.event->GetSubEvents().begin(), eventToAdd );
@@ -1328,7 +1325,7 @@ void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, EventItem & previ
     //Create event
     if ( !ExtensionsManager::GetInstance()->HasEventType(eventType) ) return;
     gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent(eventType);
-    if ( eventToAdd->EditEvent(this, game, scene, mainEditorCommand) == gd::BaseEvent::Cancelled ) return;
+    if ( eventToAdd->EditEvent(this, game, scene, mainFrameWrapper) == gd::BaseEvent::Cancelled ) return;
 
     //Adding event
     if ( previousEventItem.eventsList != NULL )

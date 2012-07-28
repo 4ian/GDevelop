@@ -20,7 +20,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <vector>
 #include <boost/shared_ptr.hpp>
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
@@ -28,6 +28,7 @@ namespace gd { class ExternalEvents; }
 class SearchEvents;
 class Game;
 class Scene;
+class SceneCanvas;
 namespace gd { class BaseEvent; }
 class EventsEditor;
 
@@ -59,9 +60,9 @@ public:
      * \param game Game the events belongs to
      * \param scene Scene to be used to get objects, variables... The events are not necessarily the events of this scene
      * \param events The events to be edited
-     * \param mainEditorCommand MainEditorCommand object to be used so as to communicate with the editor.
+     * \param gd::MainFrameWrapper gd::MainFrameWrapper object to be used so as to communicate with the editor.
      */
-    EventsEditor(wxWindow* parent, Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > * events_, MainEditorCommand & mainEditorCommand_ );
+    EventsEditor(wxWindow* parent, Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual ~EventsEditor();
 
     /**
@@ -283,7 +284,7 @@ private:
     gd::ExternalEvents * externalEvents; ///< Events editor can be used to edit external events
 
     std::vector < gd::BaseEventSPtr > * events; ///< Events modified are not necessarily the events of the scene
-    MainEditorCommand & mainEditorCommand;
+    gd::MainFrameWrapper & mainFrameWrapper;
     SceneCanvas * sceneCanvas;
 
     EventsEditorItemsAreas itemsAreas; ///< Areas management

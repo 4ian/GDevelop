@@ -17,7 +17,7 @@
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDL/Object.h"
 #include "GDL/Game.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -28,7 +28,7 @@ class EditorObjetsGroups: public wxPanel
 {
 	public:
 
-		EditorObjetsGroups(wxWindow* parent, Game & game_, Scene & scene_, vector < gd::ObjectGroup > * objectsGroups_, MainEditorCommand & mainEditorCommand);
+		EditorObjetsGroups(wxWindow* parent, Game & game_, Scene & scene_, vector < gd::ObjectGroup > * objectsGroups_, gd::MainFrameWrapper & mainFrameWrapper);
 		virtual ~EditorObjetsGroups();
 
 		//(*Declarations(EditorObjetsGroups)
@@ -99,8 +99,6 @@ class EditorObjetsGroups: public wxPanel
 		void OnHelp(wxCommandEvent& event);
 		void OnMoveUpSelected(wxCommandEvent& event);
 		void OnMoveDownSelected(wxCommandEvent& event);
-		void DisableAll();
-		void EnableAll();
 
 		string ancienNom;
 
@@ -118,7 +116,7 @@ class EditorObjetsGroups: public wxPanel
 
 		vector < gd::ObjectGroup > * objectsGroups;
 
-		MainEditorCommand & mainEditorCommand;
+		gd::MainFrameWrapper & mainFrameWrapper;
 
 		DECLARE_EVENT_TABLE()
 };

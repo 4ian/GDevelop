@@ -15,7 +15,7 @@
 #include <wx/config.h>
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include <wx/fontdlg.h>
 
 //(*IdInit(CodeEditor)
@@ -45,10 +45,10 @@ BEGIN_EVENT_TABLE(CodeEditor,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-CodeEditor::CodeEditor(wxWindow* parent, std::string filename_, Game * game_, const MainEditorCommand & mainEditorCommand_) :
+CodeEditor::CodeEditor(wxWindow* parent, std::string filename_, Game * game_, const gd::MainFrameWrapper & mainFrameWrapper_) :
 filename(filename_),
 game(game_),
-mainEditorCommand(mainEditorCommand_)
+mainFrameWrapper(mainFrameWrapper_)
 {
 	//(*Initialize(CodeEditor)
 	wxFlexGridSizer* FlexGridSizer1;
@@ -156,19 +156,19 @@ void CodeEditor::CreateRibbonPage(wxRibbonPage * page)
 
 void CodeEditor::ConnectEvents()
 {
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnSaveSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCopy, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuCopySelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonCut, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuCutSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuPasteSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuUndoSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonRedo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuRedoSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDocGDL, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocGDLSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDocSFML, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocSFMLSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDocWxWidgets, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocWxWidgetsSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonDocBoost, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocBoostSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonOptions, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnOptionsSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonFindReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnFindReplaceSelected, NULL, this);
-    mainEditorCommand.GetMainEditor()->Connect(idRibbonGotoLine, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnGotoLineSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonSave, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnSaveSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonCopy, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuCopySelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonCut, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuCutSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonPaste, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuPasteSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonUndo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuUndoSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonRedo, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnMenuRedoSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDocGDL, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocGDLSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDocSFML, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocSFMLSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDocWxWidgets, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocWxWidgetsSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonDocBoost, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnDocBoostSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonOptions, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnOptionsSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonFindReplace, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnFindReplaceSelected, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonGotoLine, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&CodeEditor::OnGotoLineSelected, NULL, this);
 }
 
 void CodeEditor::SelectLine(size_t line)
@@ -264,7 +264,7 @@ void CodeEditor::OnResize(wxSizeEvent& event)
 
 void CodeEditor::ForceRefreshRibbonAndConnect()
 {
-    mainEditorCommand.GetRibbon()->SetActivePage(6);
+    mainFrameWrapper.GetRibbon()->SetActivePage(6);
     ConnectEvents();
 }
 

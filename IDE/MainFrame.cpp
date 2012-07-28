@@ -131,7 +131,7 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     ribbonHelpBt(NULL),
     ribbonSceneEditorButtonBar(NULL),
     buildToolsPnl(NULL),
-    mainEditorCommand(NULL, NULL, this, NULL, NULL, NULL, NULL, &scenesLockingShortcuts, wxGetCwd()),
+    mainFrameWrapper(NULL, NULL, this, NULL, NULL, NULL, &scenesLockingShortcuts, wxGetCwd()),
     startPage(NULL),
     projectManager(NULL)
 {
@@ -490,8 +490,8 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
 
     infoBar->SetShowHideEffects(wxSHOW_EFFECT_SLIDE_TO_BOTTOM, wxSHOW_EFFECT_BLEND);
 
-    mainEditorCommand = MainEditorCommand(m_ribbon, ribbonSceneEditorButtonBar, this, buildToolsPnl, &m_mgr, editorsNotebook, infoBar, &scenesLockingShortcuts, wxGetCwd());
-    mainEditorCommand.AddControlToBeDisabledOnPreview(projectManager);
+    mainFrameWrapper = gd::MainFrameWrapper(m_ribbon, ribbonSceneEditorButtonBar, this, &m_mgr, editorsNotebook, infoBar, &scenesLockingShortcuts, wxGetCwd());
+    mainFrameWrapper.AddControlToBeDisabledOnPreview(projectManager);
 
     SetSize(900,740);
     Center();
@@ -505,8 +505,8 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     }
 
     //TODO
-    HtmlViewerPnl * htmlViewerPnl = new HtmlViewerPnl(editorsNotebook);
-    editorsNotebook->AddPage(htmlViewerPnl, _("Aide en ligne"));
+    /*HtmlViewerPnl * htmlViewerPnl = new HtmlViewerPnl(editorsNotebook);
+    editorsNotebook->AddPage(htmlViewerPnl, _("Aide en ligne"));*/
 }
 void MainFrame::OnResize(wxSizeEvent& event)
 

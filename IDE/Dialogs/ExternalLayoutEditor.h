@@ -15,15 +15,16 @@
 //*)
 #include <wx/aui/aui.h>
 class RuntimeGame;
+class SceneCanvas;
 namespace gd { class ExternalLayout; }
 #include "GDL/Scene.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
 class ExternalLayoutEditor: public wxPanel
 {
 public:
 
-    ExternalLayoutEditor(wxWindow* parent, RuntimeGame & game_, gd::ExternalLayout & externalLayout, const MainEditorCommand & mainEditorCommand_);
+    ExternalLayoutEditor(wxWindow* parent, RuntimeGame & game_, gd::ExternalLayout & externalLayout, const gd::MainFrameWrapper & mainFrameWrapper_);
     virtual ~ExternalLayoutEditor();
 
     //(*Declarations(ExternalLayoutEditor)
@@ -86,7 +87,7 @@ private:
     void SetupForScene(Scene & scene);
 
     Scene emptyScene;
-    MainEditorCommand mainEditorCommand;
+    gd::MainFrameWrapper mainFrameWrapper;
 
     wxAuiManager m_mgr;
 };

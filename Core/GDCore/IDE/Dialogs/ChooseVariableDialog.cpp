@@ -13,6 +13,7 @@
 //*)
 #include <wx/bitmap.h>
 #include <wx/image.h>
+#include <wx/settings.h>
 #include <wx/log.h>
 #include <wx/textdlg.h>
 #include <wx/choicdlg.h>

@@ -10,6 +10,8 @@
 class wxPropertyGrid;
 class wxPropertyGridEvent;
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
+#include "GDCore/PlatformDefinition/ClassWithObjects.h"
+#include "GDCore/PlatformDefinition/ChangesNotifier.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
@@ -25,7 +27,7 @@ namespace gd
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API Project
+class GD_CORE_API Project : public ClassWithObjects
 {
 public:
     Project();
@@ -362,63 +364,10 @@ public:
 
     ///@}
 
-    /** \name Global objects management
-     * Members functions related to global objects management.
+    /** \name Global objects groups management
+     * Members functions related to global objects groups management.
      */
     ///@{
-
-    /**
-     * Must return true if global object called "name" exists.
-     */
-    virtual bool HasObjectNamed(const std::string & name) const =0;
-
-    /**
-     * Must return a reference to the global object called "name".
-     */
-    virtual Object & GetObject(const std::string & name) =0;
-
-    /**
-     * Must return a reference to the global object called "name".
-     */
-    virtual const Object & GetObject(const std::string & name) const =0;
-
-    /**
-     * Must return a reference to the global object at position "index" in the global objects list
-     */
-    virtual Object & GetObject(unsigned int index) =0;
-
-    /**
-     * Must return a reference to the global object at position "index" in the global objects list
-     */
-    virtual const Object & GetObject (unsigned int index) const =0;
-
-    /**
-     * Must return the position of the global object called "name" in the global objects list
-     */
-    virtual unsigned int GetObjectPosition(const std::string & name) const =0;
-
-    /**
-     * Must return the number of global object.
-     */
-    virtual unsigned int GetObjectsCount() const =0;
-
-    /**
-     * Must add a new empty global object sheet called "name" at the specified position in the layout list.
-     */
-    virtual void InsertNewObject(std::string & name, unsigned int position) =0;
-
-    /**
-     * Must add a new global object constructed from the layout passed as parameter.
-     * \note No pointer or reference must be kept on the global object passed as parameter.
-     * \param globalObject The global object that must be copied and inserted into the project
-     * \param position Insertion position. Even if the position is invalid, the global object must be inserted at the end of the global objects list.
-     */
-    virtual void InsertObject(const Object & globalObject, unsigned int position) =0;
-
-    /**
-     * Must delete the global object named "name".
-     */
-    virtual void RemoveObject(const std::string & name) =0;
 
     /**
      * Return a reference to the vector containing the project's objects groups.
@@ -451,6 +400,20 @@ public:
     virtual gd::VariablesContainer & GetVariables() =0;
     ///@}
 
+    /** \name Notification of changes
+     *
+     */
+    ///@{
+
+    /**
+     * Must provide a ChangesNotifier object that will be called by the IDE if needed.
+     * The IDE is not supposed to store the returned object.
+     *
+     * The default implementation simply return a ChangesNotifier object doing nothing.
+     */
+    virtual ChangesNotifier & GetChangesNotifier() { return defaultEmptyChangesNotifier; };
+    ///@}
+
     /** \name Other
      */
     ///@{
@@ -476,6 +439,7 @@ private:
 
     std::vector<ObjectGroup> objectGroups; ///< Global objects groups
     static std::vector < std::string > noPlatformExtensionsUsed;
+    static ChangesNotifier defaultEmptyChangesNotifier;
 };
 
 }

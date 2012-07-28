@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
 #ifndef GDCORE_EVENT_H
 #define GDCORE_EVENT_H
 
@@ -14,7 +13,7 @@
 #include <boost/weak_ptr.hpp>
 #include "GDCore/Events/Instruction.h"
 class Game;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 class wxWindow;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
@@ -54,7 +53,7 @@ public:
      * return boost::shared_ptr<gd::BaseEvent>(new MyEventClass(*this));
      * \endcode
      */
-    virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new BaseEvent(*this));}
+    virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new BaseEvent(*this));}
 
     /** \name Event properties
      * Members functions to be overridden by derived classes to expose the event properties
@@ -234,7 +233,7 @@ public:
     /**
      * Called when the user want to edit the event.
      */
-    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_) { return ChangesMade; };
+    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_) { return ChangesMade; };
 
     ///@}
 

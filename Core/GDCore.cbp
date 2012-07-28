@@ -253,6 +253,8 @@
 		<Unit filename="GDCore\IDE\Dialogs\EditExpressionDialog.h" />
 		<Unit filename="GDCore\IDE\Dialogs\EditStrExpressionDialog.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\EditStrExpressionDialog.h" />
+		<Unit filename="GDCore\IDE\Dialogs\MainFrameWrapper.cpp" />
+		<Unit filename="GDCore\IDE\Dialogs\MainFrameWrapper.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ObjectListDialogsHelper.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\ObjectListDialogsHelper.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ProjectExtensionsDialog.cpp" />
@@ -278,6 +280,10 @@
 		<Unit filename="GDCore\IDE\TextFormatting.h" />
 		<Unit filename="GDCore\PlatformDefinition\Automatism.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\Automatism.h" />
+		<Unit filename="GDCore\PlatformDefinition\ChangesNotifier.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\ChangesNotifier.h" />
+		<Unit filename="GDCore\PlatformDefinition\ClassWithObjects.cpp" />
+		<Unit filename="GDCore\PlatformDefinition\ClassWithObjects.h" />
 		<Unit filename="GDCore\PlatformDefinition\ExternalEvents.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\ExternalEvents.h" />
 		<Unit filename="GDCore\PlatformDefinition\ExternalLayout.cpp" />

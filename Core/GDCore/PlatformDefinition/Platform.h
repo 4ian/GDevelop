@@ -51,7 +51,7 @@ public:
      * Must return a reference to the InstructionsMetadataHolder of the platform
      * \see gd::InstructionsMetadataHolder
      */
-    virtual gd::InstructionsMetadataHolder & GetInstructionsMetadataHolder() const = 0;
+    virtual gd::InstructionsMetadataHolder & GetInstructionsMetadataHolder() const =0;
 
 private:
 };

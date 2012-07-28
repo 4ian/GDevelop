@@ -8,6 +8,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/msgdlg.h>
+#include <wx/settings.h>
 #include <wx/stc/stc.h>
 #include <wx/textdlg.h>
 #include "GDCore/PlatformDefinition/Platform.h"

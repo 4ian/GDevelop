@@ -11,6 +11,7 @@
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/PlatformDefinition/ChangesNotifier.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
 #include "GDCore/CommonTools.h"
@@ -20,6 +21,7 @@ namespace gd
 {
 
 std::vector < std::string > Project::noPlatformExtensionsUsed;
+ChangesNotifier Project::defaultEmptyChangesNotifier;
 
 Project::Project()
 {

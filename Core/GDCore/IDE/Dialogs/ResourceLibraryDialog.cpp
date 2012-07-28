@@ -168,23 +168,31 @@ void ResourceLibraryDialog::ConstructList()
     {
         if ( wxDirExists(currentDir+"/"+filename) )
         {
-            wxBitmap folderBmp = gd::CommonBitmapManager::GetInstance()->folder40;
-            if ( wxFileExists(currentDir+"/"+filename+"/GDLibraryIcon.png") )
-                PasteBitmap(folderBmp, wxBitmap(currentDir+"/"+filename+"/GDLibraryIcon.png", wxBITMAP_TYPE_ANY), 20,20 );
+            //Only add a directory if there is a GDLibrary.txt file inside it.
+            if ( wxFileExists(currentDir+"/"+filename+"/GDLibrary.txt") )
+            {
+                wxBitmap folderBmp = gd::CommonBitmapManager::GetInstance()->folder40;
+                if ( wxFileExists(currentDir+"/"+filename+"/GDLibraryIcon.png") )
+                    PasteBitmap(folderBmp, wxBitmap(currentDir+"/"+filename+"/GDLibraryIcon.png", wxBITMAP_TYPE_ANY), 20,20 );
 
-            imageList->Add(folderBmp);
-            listCtrl->InsertItem(1, filename, imageList->GetImageCount()-1);
+                imageList->Add(folderBmp);
+                listCtrl->InsertItem(1, filename, imageList->GetImageCount()-1);
+            }
         }
         else
         {
-            wxLogNull noLogPlease;
-
-            wxBitmap bmp(currentDir+"/"+filename, wxBITMAP_TYPE_ANY);
-            if ( bmp.IsOk() )
+            //Do not display the library icon
+            if ( filename != "GDLibraryIcon.png" )
             {
-                wxBitmap resizedBmp = Rescale(bmp,40,40);
-                imageList->Add(resizedBmp);
-                listCtrl->InsertItem(listCtrl->GetItemCount(), filename, imageList->GetImageCount()-1);
+                wxLogNull noLogPlease;
+
+                wxBitmap bmp(currentDir+"/"+filename, wxBITMAP_TYPE_ANY);
+                if ( bmp.IsOk() )
+                {
+                    wxBitmap resizedBmp = Rescale(bmp,40,40);
+                    imageList->Add(resizedBmp);
+                    listCtrl->InsertItem(listCtrl->GetItemCount(), filename, imageList->GetImageCount()-1);
+                }
             }
         }
 

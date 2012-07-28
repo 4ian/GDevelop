@@ -1,7 +1,14 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #ifndef GDCORE_AUTOMATISM_H
 #define GDCORE_AUTOMATISM_H
 #include <string>
-
+namespace gd { class MainFrameWrapper; }
+namespace gd { class Project; }
+namespace gd { class Layout; }
+class wxWindow;
 
 namespace gd
 {
@@ -32,6 +39,10 @@ public:
      */
     virtual const std::string & GetTypeName() const =0;
 
+    /**
+     * Called when user wants to edit the automatism.
+     */
+    virtual void EditAutomatism( wxWindow* parent, gd::Project & project, gd::Layout * layout, gd::MainFrameWrapper & mainFrameWrapper ) {};
 };
 
 }

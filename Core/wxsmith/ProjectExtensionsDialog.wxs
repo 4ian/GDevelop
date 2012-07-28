@@ -9,7 +9,6 @@
 			<growablecols>0</growablecols>
 			<object class="sizeritem">
 				<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
-					<size>420,54</size>
 					<bg>wxSYS_COLOUR_WINDOW</bg>
 					<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
 						<cols>2</cols>
@@ -57,6 +56,7 @@
 									<object class="sizeritem">
 										<object class="wxCheckListBox" name="ID_CHECKLISTBOX1" variable="ExtensionsList" member="yes">
 											<size>352,264</size>
+											<handler function="OnExtensionsListSelect" entry="EVT_LISTBOX" />
 										</object>
 										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>

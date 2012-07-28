@@ -10,6 +10,7 @@
 #include <boost/shared_ptr.hpp>
 class TiXmlElement;
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
+#include "GDCore/PlatformDefinition/ClassWithObjects.h"
 namespace gd { class BaseEvent; }
 namespace gd { class Object; }
 namespace gd { class Project; }
@@ -26,7 +27,7 @@ namespace gd
  *
  * \ingroup PlatformDefinition
  */
-class GD_CORE_API Layout
+class GD_CORE_API Layout : public ClassWithObjects
 {
 public:
     Layout() {};
@@ -122,63 +123,10 @@ public:
 
     ///@}
 
-    /** \name Layout objects management
-     * Members functions related to layout objects management.
+    /** \name Layout objects groups management
+     * Members functions related to layout objects groups management.
      */
     ///@{
-
-    /**
-     * Must return true if the object called "name" exists.
-     */
-    virtual bool HasObjectNamed(const std::string & name) const =0;
-
-    /**
-     * Must return a reference to the object called "name".
-     */
-    virtual Object & GetObject(const std::string & name) =0;
-
-    /**
-     * Must return a reference to the object called "name".
-     */
-    virtual const Object & GetObject(const std::string & name) const =0;
-
-    /**
-     * Must return a reference to the object at position "index" in the objects list
-     */
-    virtual Object & GetObject(unsigned int index) =0;
-
-    /**
-     * Must return a reference to the object at position "index" in the objects list
-     */
-    virtual const Object & GetObject (unsigned int index) const =0;
-
-    /**
-     * Must return the position of the object called "name" in the objects list
-     */
-    virtual unsigned int GetObjectPosition(const std::string & name) const =0;
-
-    /**
-     * Must return the number of the object.
-     */
-    virtual unsigned int GetObjectsCount() const =0;
-
-    /**
-     * Must add a new empty the object sheet called "name" at the specified position in the layout list.
-     */
-    virtual void InsertNewObject(std::string & name, unsigned int position) =0;
-
-    /**
-     * Must add a new the object constructed from the layout passed as parameter.
-     * \note No pointer or reference must be kept on the object passed as parameter.
-     * \param theObject The the object that must be copied and inserted into the project
-     * \param position Insertion position. Even if the position is invalid, the object must be inserted at the end of the objects list.
-     */
-    virtual void InsertObject(const Object & theObject, unsigned int position) =0;
-
-    /**
-     * Must delete the object named "name".
-     */
-    virtual void RemoveObject(const std::string & name) =0;
 
     /**
      * Return a reference to the vector containing the layout's objects groups.

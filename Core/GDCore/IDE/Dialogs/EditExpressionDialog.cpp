@@ -12,6 +12,7 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include <wx/settings.h>
 #include <wx/msgdlg.h>
 #include <wx/image.h>
 #include <wx/icon.h>

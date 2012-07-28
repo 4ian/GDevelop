@@ -2,13 +2,16 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
 #ifndef GDCORE_OBJECT_H
 #define GDCORE_OBJECT_H
 #include <string>
 #include <vector>
 namespace gd { class Automatism; }
+namespace gd { class Project; }
 namespace gd { class VariablesContainer; }
+namespace gd { class MainFrameWrapper; }
+class wxWindow;
+class wxBitmap;
 
 namespace gd
 {
@@ -23,6 +26,17 @@ class Object
 public:
     Object() {};
     virtual ~Object() {};
+
+    /**
+     * Must return a pointer to a copy of the object.
+     * A such method is needed as the IDE may want to store copies of some objects and so need a way to do polymorphic copies.
+     *
+     * Typical implementation example:
+     * \code
+     * return new MyObject(*this);
+     * \endcode
+     */
+    virtual Object * Clone() const =0;
 
     /** \name Common properties
      * Members functions related to common properties
@@ -76,6 +90,11 @@ public:
      * Must remove automatism called "name"
      */
     virtual void RemoveAutomatism(const std::string & name) =0;
+
+    /**
+     * Must add the automatism of the specified \a type with the specified \a name.
+     */
+    virtual void AddNewAutomatism(const std::string & type, const std::string & name) =0;
     ///@}
 
     /** \name Variable management
@@ -94,6 +113,23 @@ public:
      * \see gd::VariablesContainer
      */
     virtual gd::VariablesContainer & GetVariables() =0;
+    ///@}
+
+    /** \name GUI related
+     * Members functions related to generating thumbnails and other wxWidgets related tasks
+     */
+    ///@{
+    /**
+     * Called when user wants to edit the object.
+     */
+    virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ ) {};
+
+    /**
+     * Must update \a thumbnail bitmap with a 24*24 bitmap.
+     *
+     * \return true if thumbnail was successfully updated.
+     */
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) {return false;};
     ///@}
 };
 

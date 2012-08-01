@@ -163,6 +163,8 @@ class Extension : public ExtensionBase
                         instrInfo.AddParameter("object", _("Objet"), "", false);
                         instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "2");
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
+                        instrInfo.AddParameter("expression", _("Position X de la charnière vis à vis du centre de masse du 1er objet"), "", true).SetDefaultValue("0");
+                        instrInfo.AddParameter("expression", _("Position Y de la charnière vis à vis du centre de masse du 1er objet"), "", true).SetDefaultValue("0");
 
                         instrInfo.cppCallingInformation.SetFunctionName("AddRevoluteJointBetweenObjects").SetIncludeFile("PhysicsAutomatism/PhysicsAutomatism.h");
 

@@ -398,7 +398,7 @@
 	<Box2D/Dynamics/Joints/b2RevoluteJoint.h>
 	<Box2D/Dynamics/Joints/b2WeldJoint.h>
 
-1339862373 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.h
+1343771499 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.h
 	"GDL/Automatism.h"
 	"GDL/Object.h"
 	"SFML/Config.hpp"
@@ -407,7 +407,7 @@
 	<set>
 	<vector>
 
-1337104465 d:\florian\programmation\gamedevelop2\gdl\gdl\automatism.h
+1343243305 d:\florian\programmation\gamedevelop2\gdl\gdl\automatism.h
 	<string>
 	"GDCore/PlatformDefinition/Automatism.h"
 
@@ -1651,7 +1651,7 @@
 
 1236015922 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\smart_ptr\detail\operator_bool.hpp
 
-1337104465 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
+1343246329 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
 	"GDL/Force.h"
 	<string>
 	<vector>
@@ -1689,19 +1689,19 @@
 	<boost/shared_ptr.hpp>
 	<vector>
 
-1336916458 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\scenephysicsdatas.h
+1343243305 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\scenephysicsdatas.h
 	"GDL/AutomatismsSharedDatas.h"
 	"RuntimeScenePhysicsDatas.h"
 
-1337098736 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsshareddatas.h
+1343243305 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsshareddatas.h
 	"GDL/AutomatismsRuntimeSharedDatas.h"
 	<boost/shared_ptr.hpp>
 	<string>
 
-1337098736 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsruntimeshareddatas.h
+1343243305 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsruntimeshareddatas.h
 	<boost/shared_ptr.hpp>
 
-1336916171 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\runtimescenephysicsdatas.h
+1343243305 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\runtimescenephysicsdatas.h
 	"GDL/AutomatismsRuntimeSharedDatas.h"
 
 1236014536 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\weak_ptr.hpp
@@ -1714,7 +1714,7 @@
 
 1314044653 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\system\vector2.inl
 
-1337024579 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.cpp
+1341766831 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\custompolygondialog.cpp
 	"CustomPolygonDialog.h"
 	"PhysicsAutomatism.h"
 	<wx/font.h>
@@ -3643,7 +3643,7 @@
 	"wx/defs.h"
 	"wx/dialog.h"
 
-1337108369 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
+1342787803 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
 	<string>
 	<sstream>
 	<vector>
@@ -3657,14 +3657,14 @@
 	<wx/bitmap.h>
 	<string>
 
-1339862433 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\extension.cpp
+1343771800 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"PhysicsAutomatism.h"
 	"ScenePhysicsDatas.h"
 	<boost/version.hpp>
 
-1337000291 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
+1343505319 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
 	<wx/msw/winundef.h>
 	<wx/bitmap.h>
 	<wx/file.h>
@@ -3675,6 +3675,8 @@
 	<boost/shared_ptr.hpp>
 	"GDCore/Events/InstructionMetadata.h"
 	"GDCore/Events/ExpressionMetadata.h"
+	"GDCore/Events/ObjectMetadata.h"
+	"GDCore/Events/AutomatismMetadata.h"
 	"GDCore/PlatformDefinition/PlatformExtension.h"
 
 1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\file.h
@@ -4838,11 +4840,11 @@
 1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\mdi.h
 	"wx/frame.h"
 
-1340922585 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1342710137 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299115781 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 
-1339862373 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.cpp
+1343816362 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatism.cpp
 	"PhysicsAutomatism.h"
 	<string>
 	"Box2D/Box2D.h"
@@ -4859,22 +4861,15 @@
 	"SFML/System/Vector2.hpp"
 	<vector>
 
-1339237050 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
+1343479278 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
 	"GDL/Scene.h"
-	<iostream>
-	<sstream>
 	<vector>
 	<string>
 	<map>
 	<boost/shared_ptr.hpp>
-	"GDL/CommonTools.h"
-	"GDL/RuntimeLayer.h"
-	"GDL/Text.h"
-	"GDL/Layer.h"
-	"GDL/ManualTimer.h"
 	"GDL/ObjInstancesHolder.h"
 
-1337947455 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
+1343479154 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
 	<vector>
 	<map>
 	<string>
@@ -4896,11 +4891,11 @@
 	"GDL/VariableList.h"
 	"GDCore/PlatformDefinition/InitialInstance.h"
 
-1337099492 d:\florian\programmation\gamedevelop2\gdl\gdl\layer.h
+1343476915 d:\florian\programmation\gamedevelop2\gdl\gdl\layer.h
 	<string>
 	<vector>
-	<SFML/Graphics.hpp>
 	"GDL/Camera.h"
+	"GDCore/PlatformDefinition/Layer.h"
 
 1314044652 d:\florian\programmation\gamedevelop2\extlibs\sfml\include\sfml\graphics.hpp
 	<SFML/Window.hpp>
@@ -5175,11 +5170,10 @@
 	<SFML/Graphics/Rect.hpp>
 	<string>
 
-1337098736 d:\florian\programmation\gamedevelop2\gdl\gdl\camera.h
-	<SFML/System.hpp>
+1343476915 d:\florian\programmation\gamedevelop2\gdl\gdl\camera.h
 	<SFML/Graphics.hpp>
 
-1337099962 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimelayer.h
+1342556670 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimelayer.h
 	<SFML/Graphics.hpp>
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
@@ -5217,7 +5211,7 @@
 
 1334167483 d:\florian\programmation\gamedevelop2\gdl\gdl\xmlmacros.h
 
-1328048438 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.h
+1343249195 d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.h
 	<wx/msw/winundef.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
@@ -5262,7 +5256,7 @@
 
 1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\statline.h
 
-1339320891 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp
+1343249221 source:d:\florian\programmation\gamedevelop2\extensions\physicsautomatism\physicsautomatismeditor.cpp
 	"PhysicsAutomatismEditor.h"
 	<wx/msw/winundef.h>
 	<wx/intl.h>
@@ -5270,14 +5264,14 @@
 	<wx/log.h>
 	<wx/msw/winundef.h>
 	"GDL/Game.h"
-	"GDL/IDE/MainEditorCommand.h"
+	"GDCore/IDE/Dialogs/MainFrameWrapper.h"
 	"GDL/CommonTools.h"
 	"GDL/Scene.h"
 	"PhysicsAutomatism.h"
 	"ScenePhysicsDatas.h"
 	"CustomPolygonDialog.h"
 
-1340791791 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
+1343342971 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
@@ -5285,12 +5279,13 @@
 	"GDL/LoadingScreen.h"
 	"GDL/ResourcesManager.h"
 	"GDCore/PlatformDefinition/Project.h"
+	"GDL/IDE/ChangesNotifier.h"
 
 1337099492 d:\florian\programmation\gamedevelop2\gdl\gdl\loadingscreen.h
 	<string>
 	<vector>
 
-1339007134 d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.h
+1343243305 d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.h
 	<boost/shared_ptr.hpp>
 	<vector>
 	<string>
@@ -5331,7 +5326,7 @@
 	<assert.h>
 	"triangulate.h"
 
-1336937930 d:\florian\programmation\gamedevelop2\core\gdcore\events\instructionmetadata.h
+1342785926 d:\florian\programmation\gamedevelop2\core\gdcore\events\instructionmetadata.h
 	<string>
 	"GDCore/Events/Instruction.h"
 	<boost/shared_ptr.hpp>
@@ -5352,37 +5347,41 @@
 	<boost/shared_ptr.hpp>
 	<wx/bitmap.h>
 
-1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\platformextension.h
+1342788529 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\platformextension.h
 	<map>
 	<string>
 	<vector>
+	"GDCore/Events/ObjectMetadata.h"
+	"GDCore/Events/AutomatismMetadata.h"
 
-1341753491 d:\florian\programmation\gamedevelop2\core\gdcore\ide\commonbitmapmanager.h
+1342295282 d:\florian\programmation\gamedevelop2\core\gdcore\ide\commonbitmapmanager.h
 	<wx/bitmap.h>
 
-1340791290 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.h
+1343342971 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.h
 	<string>
 	<vector>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
+	"GDCore/PlatformDefinition/ClassWithObjects.h"
+	"GDCore/PlatformDefinition/ChangesNotifier.h"
 
-1337793903 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\layout.h
+1343146642 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\layout.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
+	"GDCore/PlatformDefinition/ClassWithObjects.h"
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswd\wx\setup.h
 
-1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\objectgroup.h
+1342348848 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\objectgroup.h
 	<vector>
 	<string>
 	<utility>
-	"GDCore/PlatformDefinition/ObjectGroup.h"
 
-1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\automatism.h
+1343157596 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\automatism.h
 	<string>
 
-1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\object.h
+1343246394 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\object.h
 	<string>
 	<vector>
 
@@ -5441,4 +5440,31 @@
 1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\nonownedwnd.h
 
 1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswud\wx\setup.h
+
+1342556596 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\layer.h
+	<string>
+
+1342785548 d:\florian\programmation\gamedevelop2\core\gdcore\events\objectmetadata.h
+	<string>
+	<wx/bitmap.h>
+
+1342785497 d:\florian\programmation\gamedevelop2\core\gdcore\events\automatismmetadata.h
+	<string>
+	<wx/bitmap.h>
+
+1343242665 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\classwithobjects.h
+	<string>
+
+1343339434 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\changesnotifier.h
+	<string>
+	<vector>
+	<iostream>
+
+1343340036 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\changesnotifier.h
+	"GDCore/PlatformDefinition/ChangesNotifier.h"
+
+1343157845 d:\florian\programmation\gamedevelop2\core\gdcore\ide\dialogs\mainframewrapper.h
+	<algorithm>
+	<vector>
+	<wx/infobar.h>
 

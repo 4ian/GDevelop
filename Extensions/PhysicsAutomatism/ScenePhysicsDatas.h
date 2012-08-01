@@ -40,7 +40,7 @@ class ScenePhysicsDatas : public AutomatismsSharedDatas
         {
         };
         virtual ~ScenePhysicsDatas() {};
-        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() { return boost::shared_ptr<AutomatismsSharedDatas>(new ScenePhysicsDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsSharedDatas>(new ScenePhysicsDatas(*this));}
 
         float gravityX;
         float gravityY;

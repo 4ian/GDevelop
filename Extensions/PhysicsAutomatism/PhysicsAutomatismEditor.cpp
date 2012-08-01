@@ -39,7 +39,7 @@ freely, subject to the following restrictions:
 #include <wx/msw/winundef.h>
 #endif
 #include "GDL/Game.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 #include "PhysicsAutomatism.h"
@@ -86,11 +86,10 @@ BEGIN_EVENT_TABLE(PhysicsAutomatismEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-PhysicsAutomatismEditor::PhysicsAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, PhysicsAutomatism & automatism_, MainEditorCommand & mainEditorCommand_ ) :
+PhysicsAutomatismEditor::PhysicsAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, PhysicsAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 automatism(automatism_),
 game(game_),
-scene(scene_),
-mainEditorCommand(mainEditorCommand_)
+scene(scene_)
 {
 	//(*Initialize(PhysicsAutomatismEditor)
 	wxStaticBoxSizer* StaticBoxSizer2;

@@ -50,7 +50,7 @@ freely, subject to the following restrictions:
 #endif
 #include <boost/shared_ptr.hpp>
 class Game;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 class PhysicsAutomatism;
 class Scene;
 class ScenePhysicsDatas;
@@ -59,7 +59,7 @@ class PhysicsAutomatismEditor: public wxDialog
 {
 	public:
 
-		PhysicsAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, PhysicsAutomatism & automatism_, MainEditorCommand & mainEditorCommand_ );
+		PhysicsAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, PhysicsAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ );
 		virtual ~PhysicsAutomatismEditor();
 
 		//(*Declarations(PhysicsAutomatismEditor)
@@ -148,7 +148,6 @@ class PhysicsAutomatismEditor: public wxDialog
 		Game & game;
         Scene * scene;
         boost::shared_ptr<ScenePhysicsDatas> sharedDatas;
-		MainEditorCommand & mainEditorCommand;
 
 		std::vector<sf::Vector2f> coordsVector;
 		unsigned int positioning;

@@ -66,9 +66,9 @@ PhysicsAutomatism::~PhysicsAutomatism()
 }
 
 #if defined(GD_IDE_ONLY)
-void PhysicsAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ )
+void PhysicsAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
-    PhysicsAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
+    PhysicsAutomatismEditor editor(parent, game_, scene, *this, mainFrameWrapper_);
     editor.ShowModal();
 }
 #endif
@@ -410,7 +410,7 @@ void PhysicsAutomatism::SetAngularDamping( float angularDamping_ , RuntimeScene 
 /**
  * Add an hinge between two objects
  */
-void PhysicsAutomatism::AddRevoluteJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene )
+void PhysicsAutomatism::AddRevoluteJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene, float xPosRelativeToMassCenter, float yPosRelativeToMassCenter )
 {
     if ( !body ) CreateBody(scene);
 
@@ -420,7 +420,10 @@ void PhysicsAutomatism::AddRevoluteJointBetweenObjects( const std::string & , Ob
     if ( body == otherBody ) return;
 
     b2RevoluteJointDef jointDef;
-    jointDef.Initialize(otherBody, body, otherBody->GetWorldCenter());
+    jointDef.Initialize(body,
+                        otherBody,
+                        body->GetWorldCenter()+b2Vec2(xPosRelativeToMassCenter*runtimeScenesPhysicsDatas->GetInvScaleX(),
+                                                      yPosRelativeToMassCenter*runtimeScenesPhysicsDatas->GetInvScaleY()));
     runtimeScenesPhysicsDatas->world->CreateJoint(&jointDef);
 }
 
@@ -540,7 +543,7 @@ bool PhysicsAutomatism::CollisionWith( const std::string & , std::map <std::stri
     if ( !body ) CreateBody(scene);
 
     //Getting a list of all objects which are tested
-    vector<Object*> objects;
+    std::vector<Object*> objects;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = otherObjectsLists.begin();it!=otherObjectsLists.end();++it)
     {
         if ( it->second != NULL )
@@ -554,8 +557,8 @@ bool PhysicsAutomatism::CollisionWith( const std::string & , std::map <std::stri
 	std::vector<Object*>::const_iterator obj_end = objects.end();
     for (std::vector<Object*>::iterator obj = objects.begin(); obj != obj_end; ++obj )
     {
-        set<PhysicsAutomatism*>::const_iterator it = currentContacts.begin();
-        set<PhysicsAutomatism*>::const_iterator end = currentContacts.end();
+        std::set<PhysicsAutomatism*>::const_iterator it = currentContacts.begin();
+        std::set<PhysicsAutomatism*>::const_iterator end = currentContacts.end();
         for (;it != end;++it)
         {
             if ( (*it)->GetObject()->GetName() == (*obj)->GetName() )

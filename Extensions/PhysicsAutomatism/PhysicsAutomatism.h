@@ -52,7 +52,7 @@ friend class PhysicsAutomatismEditor;
 public:
     PhysicsAutomatism(std::string automatismTypeName);
     virtual ~PhysicsAutomatism();
-    virtual Automatism * Clone() { return new PhysicsAutomatism(*this);}
+    virtual Automatism * Clone() const { return new PhysicsAutomatism(*this);}
 
     enum Positioning {OnOrigin = 0, OnCenter = 2};
 
@@ -72,7 +72,7 @@ public:
     /**
      * Called when user wants to edit the automatism.
      */
-    virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ );
+    virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
     #endif
 
     /**
@@ -105,7 +105,7 @@ public:
     void SetAngularVelocity( double angularVelocity, RuntimeScene & scene );
     void SetLinearDamping( float linearDamping_ , RuntimeScene & scene );
     void SetAngularDamping( float angularDamping_ , RuntimeScene & scene );
-    void AddRevoluteJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene );
+    void AddRevoluteJointBetweenObjects( const std::string & , Object * object, RuntimeScene & scene, float xPosRelativeToMassCenter, float yPosRelativeToMassCenter );
     void AddRevoluteJoint( float xPosition, float yPosition, RuntimeScene & scene);
     void SetGravity( float xGravity, float yGravity, RuntimeScene & scene);
     void AddGearJointBetweenObjects( const std::string &, float ratio, Object * object, RuntimeScene & scene );

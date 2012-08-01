@@ -47,14 +47,14 @@ freely, subject to the following restrictions:
 #include <wx/aui/aui.h>
 class Game;
 class ParticleEmitterObject;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 class ResourcesEditor;
 
 class ParticleEmitterObjectEditor: public wxDialog
 {
 	public:
 
-		ParticleEmitterObjectEditor( wxWindow* parent, Game & game_, ParticleEmitterObject & object_, MainEditorCommand & mainEditorCommand_ );
+		ParticleEmitterObjectEditor( wxWindow* parent, Game & game_, ParticleEmitterObject & object_, gd::MainFrameWrapper & mainFrameWrapper );
 		virtual ~ParticleEmitterObjectEditor();
 
 		//(*Declarations(ParticleEmitterObjectEditor)
@@ -366,7 +366,6 @@ class ParticleEmitterObjectEditor: public wxDialog
 		void PrepareControlsForLineRenderer();
 
 		Game & game;
-		MainEditorCommand & mainEditorCommand;
 		ParticleEmitterObject & object;
 
 		wxAuiManager m_mgr; ///< Used to display the image bank editor

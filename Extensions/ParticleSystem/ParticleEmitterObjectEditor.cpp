@@ -42,7 +42,7 @@ freely, subject to the following restrictions:
 #include "GDL/Game.h"
 #include "GDL/CommonTools.h"
 #include "ParticleEmitterObject.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
 
 //(*IdInit(ParticleEmitterObjectEditor)
@@ -181,9 +181,8 @@ BEGIN_EVENT_TABLE(ParticleEmitterObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ParticleEmitterObjectEditor::ParticleEmitterObjectEditor( wxWindow* parent, Game & game_, ParticleEmitterObject & object_, MainEditorCommand & mainEditorCommand_ ) :
+ParticleEmitterObjectEditor::ParticleEmitterObjectEditor( wxWindow* parent, Game & game_, ParticleEmitterObject & object_, gd::MainFrameWrapper & mainFrameWrapper ) :
 game(game_),
-mainEditorCommand(mainEditorCommand_),
 object(object_)
 {
 	//(*Initialize(ParticleEmitterObjectEditor)
@@ -909,7 +908,7 @@ object(object_)
 
 
     //Init the image bank editor
-    editorImagesPnl = new ResourcesEditor( this, game, mainEditorCommand );
+    editorImagesPnl = new ResourcesEditor( this, game, mainFrameWrapper );
     editorImagesPnl->Refresh();
 
 	//Init wxAuiManager with two pane : the editor and the image bank editor

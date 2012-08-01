@@ -24,6 +24,9 @@ freely, subject to the following restrictions:
 
 */
 
+#if defined(GD_IDE_ONLY)
+#include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
+#endif
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "GDL/Object.h"
@@ -35,16 +38,16 @@ freely, subject to the following restrictions:
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/RotatedRectangle.h"
+#include "GDL/CommonTools.h"
 #include "ParticleEmitterObject.h"
 #include "ParticleSystemWrapper.h"
 #include <SPK.h>
 #include <SPK_GL.h>
 
 #if defined(GD_IDE_ONLY)
-#include <wx/wx.h>
 #include "GDL/CommonTools.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "ParticleEmitterObjectEditor.h"
 #endif
 
@@ -614,16 +617,16 @@ void ParticleEmitterObject::ExposeResources(gd::ArbitraryResourceWorker & worker
     worker.ExposeImage(textureParticleName);
 }
 
-bool ParticleEmitterObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
+bool ParticleEmitterObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
     thumbnail = wxBitmap("Extensions/particleSystemicon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void ParticleEmitterObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand & mainEditorCommand )
+void ParticleEmitterObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
-    ParticleEmitterObjectEditor dialog(parent, game, *this, mainEditorCommand);
+    ParticleEmitterObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
 }
 
@@ -902,6 +905,7 @@ void ParticleEmitterObject::Init(const ParticleEmitterObject & other)
     particleAngleRandomness1 = other.particleAngleRandomness1;
     particleAngleRandomness2 = other.particleAngleRandomness2;
     maxParticleNb = other.maxParticleNb;
+    hasSomeParticles = other.hasSomeParticles;
     opacity = other.opacity;
     colorR = other.colorR;
     colorG = other.colorG;

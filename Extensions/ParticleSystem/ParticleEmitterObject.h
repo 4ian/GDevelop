@@ -43,7 +43,7 @@ class InitialPosition;
 class wxBitmap;
 class Game;
 class wxWindow;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 namespace gd {class ResourcesMergingHelper;}
 #endif
 
@@ -56,7 +56,7 @@ public :
 
     ParticleEmitterObject(std::string name_);
     virtual ~ParticleEmitterObject();
-    virtual Object * Clone() { return new ParticleEmitterObject(*this);}
+    virtual Object * Clone() const { return new ParticleEmitterObject(*this);}
     ParticleEmitterObject(const ParticleEmitterObject & other) : Object(other), particleSystem(NULL) { Init(other); };
     ParticleEmitterObject & operator=(const ParticleEmitterObject & other) {  if ( &other != this ) Init(other); return *this; }
 
@@ -69,9 +69,9 @@ public :
     #if defined(GD_IDE_ONLY)
     virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
-    virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
 
-    virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
+    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
     virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 

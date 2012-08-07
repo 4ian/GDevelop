@@ -1,3 +1,4 @@
+#if defined(DEACTIVATED)
 #include "HtmlViewerPnl.h"
 
 //(*InternalHeaders(HtmlViewerPnl)
@@ -37,3 +38,4 @@ HtmlViewerPnl::~HtmlViewerPnl()
 	//*)
 }
 
+#endif

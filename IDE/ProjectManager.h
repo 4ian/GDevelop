@@ -146,6 +146,7 @@ class ProjectManager: public wxPanel
         static const long idRibbonEditImages;
         static const long idRibbonCompil;
         static const long idRibbonAddExternalEvents;
+        static const long idRibbonAddExternalLayout;
         static const long idRibbonProjectsManager;
         static const long idRibbonStartPage;
         static const long idRibbonCppTools;

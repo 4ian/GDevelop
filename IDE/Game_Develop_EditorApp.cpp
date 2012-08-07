@@ -321,24 +321,6 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "* Extensions loading ended." << endl;
     wxFileSystem::AddHandler( new wxZipFSHandler );
 
-    //Welcome window
-    {
-        wxString result;
-        Config->Read( "Startup/GettingStartedWindow", &result );
-        if ( result != "false" )
-        {
-            Demarrage bienvenue( NULL );
-            if ( bienvenue.ShowModal() == 1 )
-            {
-                wxFileDialog open( NULL, _( "Ouvrir un exemple" ), wxGetCwd()+"/Examples/", "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
-                open.ShowModal();
-
-                if ( !open.GetPath().empty() ) filesToOpen.push_back( string(open.GetPath().mb_str()) );
-            }
-            Config->Write( "Startup/GettingStartedWindow", "false" );
-        }
-    }
-
     //Creating main window
     cout << "* Creating main window" << endl;
     mainEditor = new MainFrame( 0, filesToOpen.empty() && !openRecupFiles );
@@ -399,8 +381,6 @@ bool Game_Develop_EditorApp::OnInit()
             }
         }
     }
-
-    wxLogWarning(_("Cette version de Game Develop n'est pas finalisée et n'est utilisable qu'à des fins de tests. Merci de ne pas la redistribuer et d'utiliser la version disponible sur notre site pour toute autre utilisation."));
 
 #ifndef RELEASE
     TestResult tr;

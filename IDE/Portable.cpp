@@ -171,7 +171,7 @@ void Portable::OnButton1Click(wxCommandEvent& event)
             std::string destination = rep + "/" + it->second;
 
             if ( !wxDirExists(wxFileName::FileName(destination).GetPath()) )
-                wxMkDir(wxFileName::FileName(destination).GetPath());
+                wxMkDir(wxFileName::FileName(destination).GetPath(), 0777);
 
             bool copySucceeded = false;
             {

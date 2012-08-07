@@ -24,7 +24,7 @@ public:
     static Clipboard * GetInstance();
     static void DestroySingleton();
 
-    void SetObject( const gd::Object & object );
+    void SetObject( const gd::Object * object );
     gd::Object * GetObject();
     bool HasObject() { return hasObject; };
 

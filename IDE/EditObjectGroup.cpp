@@ -79,7 +79,7 @@ modificationCount(0)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/groupeobjet48.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Les groupes d\'objets permettent d\'utiliser le nom\ndu groupe pour se rÃ©fÃ©rer Ã  tous les objets qu\'il\ncontient."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Les groupes d\'objets permettent d\'utiliser le nom\ndu groupe pour se référer à tous les objets qu\'il\ncontient."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT3"));
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
@@ -128,10 +128,10 @@ modificationCount(0)
 	Connect(ID_Help,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditObjectGroup::OnHelp);
 
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( idAddObjet, wxT( "Ajouter un objet" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un objet") );
-    toolbar->AddTool( idDelObjet, wxT( "Supprimer l'objet selectionnÃ©" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer l'objet selectionnÃ©") );
+    toolbar->AddTool( idAddObjet, _( "Ajouter un objet" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un objet") );
+    toolbar->AddTool( idDelObjet, _( "Supprimer l'objet selectionné" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer l'objet selectionné") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_Help, wxT( "Aide de l'Ã©diteur de groupes d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'Ã©diteur de groupes d'objets") );
+    toolbar->AddTool( ID_Help, _( "Aide de l'éditeur de groupes d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur de groupes d'objets") );
     toolbar->Realize();
 
     //Offer nice background color to toolbar area.
@@ -165,7 +165,7 @@ void EditObjectGroup::OnAnnulerBtClick(wxCommandEvent& event)
 {
     if ( modificationCount > 7 )
     {
-        wxMessageDialog msgDlg(this, _("Vous avez apportÃ© ")+ToString(modificationCount)+_(" modifications. ÃŠtes vous sÃ»r d'annuler tous les changements ?"), _("Beaucoup de modifications ont Ã©tÃ© apportÃ©es."), wxYES_NO | wxICON_QUESTION);
+        wxMessageDialog msgDlg(this, _("Vous avez apporté ")+ToString(modificationCount)+_(" modifications. Êtes vous sûr d'annuler tous les changements ?"), _("Beaucoup de modifications ont été apportées."), wxYES_NO | wxICON_QUESTION);
         if ( msgDlg.ShowModal() == wxID_NO )
             return;
     }
@@ -186,7 +186,7 @@ void EditObjectGroup::Refresh()
 }
 
 ////////////////////////////////////////////////////////////
-/// Mise Ã  jour de la toolbar
+/// Mise à jour de la toolbar
 ////////////////////////////////////////////////////////////
 void EditObjectGroup::OnPanel2Resize(wxSizeEvent& event)
 {
@@ -219,12 +219,12 @@ void EditObjectGroup::OnAddObjetSelected(wxCommandEvent& event)
     {
         for (unsigned int i = 0;i<dialog.GetChosenObjects().size();++i)
         {
-            //On l'ajoute si il n'est pas dÃ©jÃ  dans le groupe
+            //On l'ajoute si il n'est pas déjà dans le groupe
             if ( !group.Find( dialog.GetChosenObjects()[i] ) )
             {
                 group.AddObject( dialog.GetChosenObjects()[i] );
                 ObjetsList->AppendItem( ObjetsList->GetRootItem(), dialog.GetChosenObjects()[i] );
-            } else { wxLogWarning(_("L'objet ")+dialog.GetChosenObjects()[i]+_(" est dÃ©jÃ  dans ce groupe."));}
+            } else { wxLogWarning(_("L'objet ")+dialog.GetChosenObjects()[i]+_(" est déjà dans ce groupe."));}
         }
 
         modificationCount += dialog.GetChosenObjects().size();

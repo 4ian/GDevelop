@@ -53,16 +53,16 @@ void Clipboard::DestroySingleton()
     }
 }
 
-void Clipboard::SetObject( const gd::Object & object )
+void Clipboard::SetObject( const gd::Object * object )
 {
-    objectCopied = object.Clone();
+    objectCopied = object->Clone();
 
     hasObject = true;
 }
 
 gd::Object * Clipboard::GetObject()
 {
-    return objectCopied;
+    return objectCopied->Clone();
 }
 
 void Clipboard::SetEvents( const std::vector<gd::BaseEventSPtr> & events )

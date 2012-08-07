@@ -676,7 +676,7 @@ void EditorObjectList::OnCopySelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetObject(objects.GetObject(ToString(objectsList->GetItemText( item ))));
+    Clipboard::GetInstance()->SetObject(&objects.GetObject(ToString(objectsList->GetItemText( item ))));
 }
 
 /**
@@ -696,7 +696,7 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
 
     objectsList->Delete( item );
 
-    Clipboard::GetInstance()->SetObject(objects.GetObject(name));
+    Clipboard::GetInstance()->SetObject(&objects.GetObject(name));
 
     //Remove object
     objects.RemoveObject(name);

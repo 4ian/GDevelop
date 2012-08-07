@@ -1,3 +1,4 @@
+#if defined(DEACTIVATED)
 #ifndef HTMLVIEWERPNL_H
 #define HTMLVIEWERPNL_H
 
@@ -32,4 +33,5 @@ class HtmlViewerPnl: public wxPanel
 		DECLARE_EVENT_TABLE()
 };
 
+#endif
 #endif

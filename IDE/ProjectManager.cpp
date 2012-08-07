@@ -98,6 +98,7 @@ const long ProjectManager::idRibbonAddScene = wxNewId();
 const long ProjectManager::idRibbonEditImages = wxNewId();
 const long ProjectManager::idRibbonEditSelected = wxNewId();
 const long ProjectManager::idRibbonAddExternalEvents = wxNewId();
+const long ProjectManager::idRibbonAddExternalLayout = wxNewId();
 const long ProjectManager::idRibbonStartPage = wxNewId();
 const long ProjectManager::idRibbonCppTools = wxNewId();
 const long ProjectManager::idRibbonImporter = wxNewId();
@@ -341,9 +342,8 @@ void ProjectManager::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonEditImages, !hideLabels ? _("Images") : "", wxBitmap("res/imageicon24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Ajouter une scène") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonAddExternalEvents, !hideLabels ? _("Ajouter des évènements externes") : "", wxBitmap("res/eventsadd24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonAddScene, !hideLabels ? _("Ajouter un agencement externe") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonAddExternalLayout, !hideLabels ? _("Ajouter un agencement externe") : "", wxBitmap("res/sceneadd24.png", wxBITMAP_TYPE_ANY));
         ribbonBar->AddButton(idRibbonExtensions, !hideLabels ? _("Extensions") : "", wxBitmap("res/extension24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonEditSelected, !hideLabels ? _("Editer l'élement selectionné") : "", wxBitmap("res/sceneedit24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *affichagePanel = new wxRibbonPanel(page, wxID_ANY, _("Affichage"), wxBitmap("res/imageicon.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -380,7 +380,7 @@ void ProjectManager::ConnectEvents()
     mainEditor.Connect( idRibbonEditImages, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditImagesSelected, NULL, this );
     mainEditor.Connect( idRibbonAddScene, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonAddSceneSelected, NULL, this );
     mainEditor.Connect( idRibbonAddExternalEvents, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonAddExternalEventsSelected, NULL, this );
-    mainEditor.Connect( idRibbonEditSelected, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonEditSelectionSelected, NULL, this );
+    mainEditor.Connect( idRibbonAddExternalLayout, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&ProjectManager::OnRibbonAddExternalLayoutSelected, NULL, this );
     mainEditor.Connect( idRibbonStartPage, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonStartPageClicked, NULL, &mainEditor );
     mainEditor.Connect( idRibbonCppTools, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonCppToolsClicked, NULL, &mainEditor );
     mainEditor.Connect( idRibbonProjectsManager, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnProjectsManagerClicked, NULL, &mainEditor );
@@ -1727,9 +1727,9 @@ void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
     //Insert in tree
     gdTreeItemGameData * eventsItemData = new gdTreeItemGameData("ExternalLayout", newName, game);
     if ( projectsTree->GetPrevSibling(selectedItem).IsOk() )
-        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), newName, 4, 4, eventsItemData);
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), newName, 6, 6, eventsItemData);
     else
-        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, newName, 4, 4, eventsItemData);
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, newName, 6, 6, eventsItemData);
 }
 
 void ProjectManager::OnAddCppSourceFileSelected(wxCommandEvent& event)

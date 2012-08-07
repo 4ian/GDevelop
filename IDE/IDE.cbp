@@ -725,8 +725,6 @@
 		</Unit>
 		<Unit filename="EventsEditor.cpp" />
 		<Unit filename="EventsEditor.h" />
-		<Unit filename="EventsRefactorer.cpp" />
-		<Unit filename="EventsRefactorer.h" />
 		<Unit filename="ExtensionBugReportDlg.cpp" />
 		<Unit filename="ExtensionBugReportDlg.h" />
 		<Unit filename="ExternalEventsEditor.cpp" />

@@ -82,6 +82,7 @@ class GD_API PropImage: public wxDialog
 		void OnscrollWidthScroll(wxScrollEvent& event);
 		void OnscrollHeightScroll(wxScrollEvent& event);
 		void OnBrowseBtClick(wxCommandEvent& event);
+		void OnapercuPanelResize(wxSizeEvent& event);
 		//*)
         void OnSize(wxSizeEvent& event);
 

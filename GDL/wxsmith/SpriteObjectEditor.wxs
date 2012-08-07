@@ -47,12 +47,24 @@
 														<label>Item label</label>
 													</object>
 													<object class="AuiToolBarItem">
-														<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM2" variable="AuiToolBarItem2" member="yes">
+														<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM4" variable="AuiToolBarItem9" member="yes">
 															<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;preview16" />
 															<shorthelp>Aperçu</shorthelp>
 															<handler function="OnPreviewClick" entry="EVT_TOOL" />
 														</object>
-														<label>Aperçu</label>
+														<label>Item label</label>
+													</object>
+													<object class="AuiToolBarItem">
+														<object class="wxAuiToolBarSeparator" />
+														<label>Item label</label>
+													</object>
+													<object class="AuiToolBarItem">
+														<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM2" variable="AuiToolBarItem2" member="yes">
+															<bitmap>res/helpicon.png</bitmap>
+															<shorthelp>Aperçu</shorthelp>
+															<handler function="OnHelpClick" entry="EVT_TOOL" />
+														</object>
+														<label>Aide</label>
 													</object>
 												</object>
 												<name>PaneName</name>
@@ -152,9 +164,73 @@
 				<object class="wxPanel" name="ID_PANEL3" variable="animationsPanel" member="yes">
 					<pos>352,456</pos>
 					<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
-						<cols>3</cols>
+						<cols>1</cols>
+						<rows>2</rows>
 						<growablecols>0</growablecols>
-						<growablerows>0</growablerows>
+						<growablerows>1</growablerows>
+						<object class="sizeritem">
+							<object class="wxPanel" name="ID_PANEL11" variable="Panel2" member="yes">
+								<size>-1,25</size>
+								<object class="wxAuiManager" variable="AuiManager4" member="yes">
+									<object class="AuiManagerItem">
+										<object class="wxAuiToolBar" name="ID_AUITOOLBAR4" variable="animationToolbar" member="yes">
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM5" variable="AuiToolBarItem10" member="yes">
+													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
+													<shorthelp>Ajouter une animation</shorthelp>
+													<handler function="OnAddAnimationSelected" entry="EVT_TOOL" />
+												</object>
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM8" variable="AuiToolBarItem11" member="yes">
+													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;remove16" />
+													<shorthelp>Supprimer une animation</shorthelp>
+													<handler function="OnDeleteAnimationSelected" entry="EVT_TOOL" />
+												</object>
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarSeparator" />
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_TOOLLOOP" variable="AuiToolBarItem12" member="yes">
+													<bitmap>res/repeat.png</bitmap>
+													<shorthelp>De/activer le bouclage de l&apos;animation</shorthelp>
+													<itemkind>Check</itemkind>
+													<handler function="OnToolLoopClick" entry="EVT_TOOL" />
+												</object>
+												<label>De/activer le bouclage de l&apos;animation</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM10" variable="AuiToolBarItem13" member="yes">
+													<bitmap>res/time16.png</bitmap>
+													<shorthelp>Temps entre chaque image</shorthelp>
+													<handler function="OnTimeBetweenFramesSelected" entry="EVT_TOOL" />
+												</object>
+												<label>Item label</label>
+											</object>
+										</object>
+										<name>PaneName</name>
+										<standardpanetype>Toolbar</standardpanetype>
+										<caption>Pane caption</caption>
+										<captionvisible>0</captionvisible>
+										<minimizebutton>0</minimizebutton>
+										<maximizebutton>0</maximizebutton>
+										<pinbutton>0</pinbutton>
+										<layer>10</layer>
+										<dockabledirection>.Dockable(false)</dockabledirection>
+										<resizable>0</resizable>
+										<movable>0</movable>
+										<destroyonclose>0</destroyonclose>
+										<firstadd>0</firstadd>
+									</object>
+								</object>
+							</object>
+							<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+							<option>1</option>
+						</object>
 						<object class="sizeritem">
 							<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="animationsTree" member="yes">
 								<image_list>&lt;none&gt;</image_list>

@@ -192,7 +192,7 @@ void Scene::InsertObject(const gd::Object & object, unsigned int position)
     try
     {
         const Object & castedObject = dynamic_cast<const Object&>(object);
-        boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(new Object(castedObject));
+        boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(castedObject.Clone());
         if (position<GetInitialObjects().size())
             GetInitialObjects().insert(GetInitialObjects().begin()+position, newObject);
         else

@@ -13,7 +13,7 @@ ExternalLayoutsExtension::ExternalLayoutsExtension()
     DECLARE_ACTION("CreateObjectsFromExternalLayout",
                    _("Créer des objets depuis un agencement externe"),
                    _("Créer les objets de l'agencement externe spécifié."),
-                   _("Créer les objets de l'agencement externe _PARAM0_"),
+                   _("Créer les objets de l'agencement externe _PARAM1_"),
                    _("Agencements externes"),
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png");

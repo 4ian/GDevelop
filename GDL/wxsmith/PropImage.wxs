@@ -210,6 +210,7 @@
 									<size>285,255</size>
 									<style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
 									<handler function="OnapercuPanelPaint" entry="EVT_PAINT" />
+									<handler function="OnapercuPanelResize" entry="EVT_SIZE" />
 								</object>
 								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<option>1</option>

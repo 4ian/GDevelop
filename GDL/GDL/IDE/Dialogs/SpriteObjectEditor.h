@@ -35,7 +35,7 @@ public:
     virtual ~SpriteObjectEditor();
 
     /**
-     * Used by DndTextSpriteObjectEditor so as to as a dragged image
+     * Used by DndTextSpriteObjectEditor so as to add a dragged image
      */
     void AddImageToCurrentAnimation(wxString image);
 
@@ -51,6 +51,7 @@ public:
     wxMenuItem* MenuItem7;
     wxAuiToolBar* pointToolbar;
     wxAuiManager* mgr;
+    wxAuiManager* AuiManager4;
     wxStaticText* statusTxt;
     wxMenuItem* MenuItem5;
     wxPanel* centerPanel;
@@ -78,6 +79,7 @@ public:
     wxPanel* previewPanel;
     wxPanel* maskPanel;
     wxMenuItem* moveRightItem;
+    wxPanel* Panel2;
     wxMenuItem* automaticRotationItem;
     wxPanel* pointsPanel;
     wxMenuItem* MenuItem9;
@@ -86,6 +88,7 @@ public:
     wxMenu imagesMenu;
     wxMenu maskMenu;
     wxPanel* imagesPanel;
+    wxAuiToolBar* animationToolbar;
     //*)
     ResourcesEditor * resourcesEditorPnl;
 
@@ -94,6 +97,7 @@ protected:
     //(*Identifiers(SpriteObjectEditor)
     static const long ID_MASKITEM;
     static const long ID_POINTSITEM;
+    static const long ID_AUITOOLBARITEM4;
     static const long ID_AUITOOLBARITEM2;
     static const long ID_AUITOOLBAR1;
     static const long ID_PANEL6;
@@ -102,6 +106,12 @@ protected:
     static const long ID_SCROLLBAR2;
     static const long ID_STATICTEXT1;
     static const long ID_PANEL1;
+    static const long ID_AUITOOLBARITEM5;
+    static const long ID_AUITOOLBARITEM8;
+    static const long ID_TOOLLOOP;
+    static const long ID_AUITOOLBARITEM10;
+    static const long ID_AUITOOLBAR4;
+    static const long ID_PANEL11;
     static const long ID_TREECTRL1;
     static const long ID_PANEL3;
     static const long ID_LISTCTRL1;
@@ -189,10 +199,13 @@ private:
     void OnimagesListKeyDown(wxListEvent& event);
     void OnAddImageFromFileSelected(wxCommandEvent& event);
     void OnAddFromImageBankSelected(wxCommandEvent& event);
+    void OnHelpClick(wxCommandEvent& event);
+    void OnToolLoopClick(wxCommandEvent& event);
     //*)
     void OnimagesListRightClick(wxMouseEvent& event);
     void RefreshAll();
     void RefreshAnimationTree();
+    void RefreshAnimationToolbar();
     void RefreshImagesList();
     void RefreshImageAndControls();
     void RefreshPoints();

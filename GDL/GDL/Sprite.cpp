@@ -86,7 +86,7 @@ void Sprite::LoadImage(boost::shared_ptr<SFMLTextureWrapper> image_)
     hasItsOwnImage = false;
 
     if ( automaticCentre )
-        centre.SetXY(sfmlSprite.GetSize().x/2, sfmlSprite.GetSize().y/2);
+        centre.SetXY(sfmlSprite.GetSubRect().Width/2, sfmlSprite.GetSubRect().Height/2);
 }
 
 bool Sprite::SetCentreAutomatic(bool enabled)
@@ -94,7 +94,7 @@ bool Sprite::SetCentreAutomatic(bool enabled)
     automaticCentre = enabled;
 
     if ( automaticCentre )
-        centre.SetXY(sfmlSprite.GetSize().x/2, sfmlSprite.GetSize().y/2);
+        centre.SetXY(sfmlSprite.GetSubRect().Width/2, sfmlSprite.GetSubRect().Height/2);
 
     return true;
 }
@@ -116,10 +116,10 @@ std::vector<RotatedRectangle> Sprite::GetCollisionMask() const
         std::vector<RotatedRectangle> boxes;
 
         RotatedRectangle rectangle;
-        rectangle.center.x = sfmlSprite.GetSize().x/2;
-        rectangle.center.y = sfmlSprite.GetSize().y/2;
-        rectangle.halfSize.x = sfmlSprite.GetSize().x/2;
-        rectangle.halfSize.y = sfmlSprite.GetSize().y/2;
+        rectangle.center.x = sfmlSprite.GetSubRect().Width/2;
+        rectangle.center.y = sfmlSprite.GetSubRect().Height/2;
+        rectangle.halfSize.x = sfmlSprite.GetSubRect().Width/2;
+        rectangle.halfSize.y = sfmlSprite.GetSubRect().Height/2;
         rectangle.angle = 0;
 
         boxes.push_back(rectangle);

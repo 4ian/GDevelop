@@ -22,6 +22,7 @@
 #include <wx/filedlg.h>
 #include <vector>
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
 #include "GDL/CommonTools.h"
 #include "GDL/SpriteObject.h"
@@ -65,6 +66,7 @@ wxBitmap Rescale(wxBitmap bmp, int max_width, int max_height) {
 //(*IdInit(SpriteObjectEditor)
 const long SpriteObjectEditor::ID_MASKITEM = wxNewId();
 const long SpriteObjectEditor::ID_POINTSITEM = wxNewId();
+const long SpriteObjectEditor::ID_AUITOOLBARITEM4 = wxNewId();
 const long SpriteObjectEditor::ID_AUITOOLBARITEM2 = wxNewId();
 const long SpriteObjectEditor::ID_AUITOOLBAR1 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL6 = wxNewId();
@@ -73,6 +75,12 @@ const long SpriteObjectEditor::ID_SCROLLBAR1 = wxNewId();
 const long SpriteObjectEditor::ID_SCROLLBAR2 = wxNewId();
 const long SpriteObjectEditor::ID_STATICTEXT1 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL1 = wxNewId();
+const long SpriteObjectEditor::ID_AUITOOLBARITEM5 = wxNewId();
+const long SpriteObjectEditor::ID_AUITOOLBARITEM8 = wxNewId();
+const long SpriteObjectEditor::ID_TOOLLOOP = wxNewId();
+const long SpriteObjectEditor::ID_AUITOOLBARITEM10 = wxNewId();
+const long SpriteObjectEditor::ID_AUITOOLBAR4 = wxNewId();
+const long SpriteObjectEditor::ID_PANEL11 = wxNewId();
 const long SpriteObjectEditor::ID_TREECTRL1 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL3 = wxNewId();
 const long SpriteObjectEditor::ID_LISTCTRL1 = wxNewId();
@@ -161,7 +169,9 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	toolbar->AddTool(ID_MASKITEM, _("Editer les masques de collision"), gd::CommonBitmapManager::GetInstance()->maskEdit16, wxNullBitmap, wxITEM_CHECK, _("Editer les masques de collision"), wxEmptyString, NULL);
 	toolbar->AddTool(ID_POINTSITEM, _("Editer les points de l\'image"), gd::CommonBitmapManager::GetInstance()->pointEdit16, wxNullBitmap, wxITEM_CHECK, _("Editer les points de l\'image"), wxEmptyString, NULL);
 	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Aperçu"), gd::CommonBitmapManager::GetInstance()->preview16, wxNullBitmap, wxITEM_NORMAL, _("Aperçu"), wxEmptyString, NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Item label"), gd::CommonBitmapManager::GetInstance()->preview16, wxNullBitmap, wxITEM_NORMAL, _("Aperçu"), wxEmptyString, NULL);
+	toolbar->AddSeparator();
+	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Aide"), wxBitmap(wxImage(_T("res/helpicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Aperçu"), wxEmptyString, NULL);
 	toolbar->Realize();
 	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager1->Update();
@@ -190,9 +200,21 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	FlexGridSizer3->SetSizeHints(centerPanel);
 	mgr->AddPane(centerPanel, wxAuiPaneInfo().Name(_T("centerPane")).Caption(_("Pane caption")).CaptionVisible(false).Center().DockFixed());
 	animationsPanel = new wxPanel(this, ID_PANEL3, wxPoint(352,456), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer2 = new wxFlexGridSizer(2, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
-	FlexGridSizer2->AddGrowableRow(0);
+	FlexGridSizer2->AddGrowableRow(1);
+	Panel2 = new wxPanel(animationsPanel, ID_PANEL11, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL11"));
+	AuiManager4 = new wxAuiManager(Panel2, wxAUI_MGR_DEFAULT);
+	animationToolbar = new wxAuiToolBar(Panel2, ID_AUITOOLBAR4, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+	animationToolbar->AddTool(ID_AUITOOLBARITEM5, _("Item label"), gd::CommonBitmapManager::GetInstance()->add16, wxNullBitmap, wxITEM_NORMAL, _("Ajouter une animation"), wxEmptyString, NULL);
+	animationToolbar->AddTool(ID_AUITOOLBARITEM8, _("Item label"), gd::CommonBitmapManager::GetInstance()->remove16, wxNullBitmap, wxITEM_NORMAL, _("Supprimer une animation"), wxEmptyString, NULL);
+	animationToolbar->AddSeparator();
+	animationToolbar->AddTool(ID_TOOLLOOP, _("De/activer le bouclage de l\'animation"), wxBitmap(wxImage(_T("res/repeat.png"))), wxNullBitmap, wxITEM_CHECK, _("De/activer le bouclage de l\'animation"), wxEmptyString, NULL);
+	animationToolbar->AddTool(ID_AUITOOLBARITEM10, _("Item label"), wxBitmap(wxImage(_T("res/time16.png"))), wxNullBitmap, wxITEM_NORMAL, _("Temps entre chaque image"), wxEmptyString, NULL);
+	animationToolbar->Realize();
+	AuiManager4->AddPane(animationToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
+	AuiManager4->Update();
+	FlexGridSizer2->Add(Panel2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	animationsTree = new wxTreeCtrl(animationsPanel, ID_TREECTRL1, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
 	animationsTree->SetMinSize(wxSize(200,-1));
 	FlexGridSizer2->Add(animationsTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -305,13 +327,18 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 
 	Connect(ID_MASKITEM,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnMaskEditClick);
 	Connect(ID_POINTSITEM,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnPointEditClick);
-	Connect(ID_AUITOOLBARITEM2,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnPreviewClick);
+	Connect(ID_AUITOOLBARITEM4,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnPreviewClick);
+	Connect(ID_AUITOOLBARITEM2,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnHelpClick);
 	imagePanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelPaint,0,this);
 	imagePanel->Connect(wxEVT_ERASE_BACKGROUND,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelEraseBackground,0,this);
 	imagePanel->Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelLeftDown,0,this);
 	imagePanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelLeftUp,0,this);
 	imagePanel->Connect(wxEVT_MOTION,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelMouseMove,0,this);
 	imagePanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&SpriteObjectEditor::OnimagePanelResize,0,this);
+	Connect(ID_AUITOOLBARITEM5,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddAnimationSelected);
+	Connect(ID_AUITOOLBARITEM8,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnDeleteAnimationSelected);
+	Connect(ID_TOOLLOOP,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnToolLoopClick);
+	Connect(ID_AUITOOLBARITEM10,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnTimeBetweenFramesSelected);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&SpriteObjectEditor::OnanimationsTreeItemRightClick);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&SpriteObjectEditor::OnanimationsTreeSelectionChanged);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListItemSelect);
@@ -413,6 +440,7 @@ void SpriteObjectEditor::OnimagesListRightClick(wxMouseEvent& event)
 void SpriteObjectEditor::RefreshAll()
 {
     RefreshAnimationTree();
+    RefreshAnimationToolbar();
     RefreshImagesList();
     RefreshImageAndControls();
 }
@@ -514,6 +542,7 @@ SpriteObjectEditor::~SpriteObjectEditor()
 	AuiManager1->UnInit();
 	AuiManager2->UnInit();
 	AuiManager3->UnInit();
+	AuiManager4->UnInit();
 	mgr->UnInit();
 }
 void SpriteObjectEditor::OnimagePanelEraseBackground(wxEraseEvent& event)
@@ -745,8 +774,22 @@ void SpriteObjectEditor::OnanimationsTreeSelectionChanged(wxTreeEvent& event)
 
             RefreshImagesList();
             RefreshImageAndControls();
+            RefreshAnimationToolbar();
             ResetPreview();
+
         }
+    }
+}
+
+void SpriteObjectEditor::RefreshAnimationToolbar()
+{
+    //Refresh also the toolbar
+    if ( selectedAnimation < object.GetAnimationCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    {
+        animationToolbar->ToggleTool(ID_TOOLLOOP, object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).IsLooping());
+        animationToolbar->Refresh();
+        animationToolbar->Update();
     }
 }
 
@@ -1331,6 +1374,17 @@ void SpriteObjectEditor::OnMenuLoopSelected(wxCommandEvent& event)
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection);
         direction.SetLoop(animationsMenu.IsChecked(ID_MENULOOP));
+        RefreshAnimationToolbar();
+    }
+}
+
+void SpriteObjectEditor::OnToolLoopClick(wxCommandEvent& event)
+{
+    if ( selectedAnimation < object.GetAnimationCount() &&
+         selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
+    {
+        Direction & direction = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection);
+        direction.SetLoop(animationToolbar->GetToolToggled(ID_TOOLLOOP));
     }
 }
 
@@ -1427,7 +1481,6 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
             wxArrayString files;
             FileDialog.GetPaths( files );
 
-            //Add each image to images list and to folder if any
             std::vector < std::string > filenames;
             for ( unsigned int i = 0; i < files.GetCount();++i )
                 filenames.push_back(ToString(files[i]));
@@ -1467,6 +1520,7 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
         }
 
         RefreshImagesList();
+        RefreshImageAndControls();
         resourcesEditorPnl->Refresh();
     }
 }
@@ -1475,4 +1529,10 @@ void SpriteObjectEditor::OnAddFromImageBankSelected(wxCommandEvent& event)
 {
     wxLogMessage(_("Glissez déposez les images depuis la banque d'images pour les ajouter à l'animation."));
 }
+
+void SpriteObjectEditor::OnHelpClick(wxCommandEvent& event)
+{
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/built_sprite"));
+}
+
 #endif

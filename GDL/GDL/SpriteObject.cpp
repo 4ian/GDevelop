@@ -100,6 +100,19 @@ bool SpriteObject::Draw( sf::RenderTarget & renderTarget )
     if ( hidden ) return true;
 
     renderTarget.Draw( GetCurrentSFMLSprite() );
+
+    /* Debug code to display hitboxes
+    std::vector<RotatedRectangle> boxes = GetHitBoxes();
+    for (unsigned int i = 0;i<boxes.size();++i)
+    {
+        sf::Shape rect = sf::Shape::Rectangle(0,0, boxes[i].halfSize.x*2, boxes[i].halfSize.y*2, sf::Color(255,30,30));
+        rect.SetRotation(boxes[i].angle*180.0f/3.14159f);
+        rect.SetOrigin(boxes[i].halfSize.x, boxes[i].halfSize.y);
+        rect.SetPosition(boxes[i].center.x, boxes[i].center.y);
+
+        renderTarget.Draw(rect);
+    }*/
+
     return true;
 }
 

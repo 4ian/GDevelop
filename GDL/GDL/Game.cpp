@@ -17,6 +17,7 @@
 #include <wx/intl.h>
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/advprops.h>
+#include <wx/settings.h>
 #include "PlatformDefinition/Platform.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/IDE/ChangesNotifier.h"
@@ -468,12 +469,12 @@ void Game::InsertNewObject(const std::string & objectType, const std::string & n
         GetGlobalObjects().push_back(newObject);
 }
 
-void Game::InsertObject(const gd::Object & events, unsigned int position)
+void Game::InsertObject(const gd::Object & object, unsigned int position)
 {
     try
     {
-        const Object & castedEvents = dynamic_cast<const Object&>(events);
-        boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(new Object(castedEvents));
+        const Object & castedObject = dynamic_cast<const Object&>(object);
+        boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(castedObject.Clone());
         if (position<GetGlobalObjects().size())
             GetGlobalObjects().insert(GetGlobalObjects().begin()+position, newObject);
         else

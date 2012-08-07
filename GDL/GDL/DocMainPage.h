@@ -122,7 +122,7 @@
  * Just extract the archive inside the folder ExtLibs ( located at the root of the SDK ).
  * \subsection wxWidgets wxWidgets
 
- * wxWidgets version used by %Game Develop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/wxWidgets.7z <br>
+ * wxWidgets version used by %Game Develop can be downloaded here: http://www.compilgames.net/code/GameDevelopSDK/wxWidgetslinux.7z <br>
  * First extract the archive inside the folder ExtLibs. <br>
  * You then have to build and install the library: Open a terminal, go to the ExtLibs/wxWidgets directory and follow the classical configure/make/make install process:
  * \code

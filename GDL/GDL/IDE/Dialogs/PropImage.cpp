@@ -41,7 +41,6 @@ const long PropImage::ID_SCROLLBAR2 = wxNewId();
 BEGIN_EVENT_TABLE(PropImage,wxDialog)
 	//(*EventTable(PropImage)
 	//*)
-	EVT_SIZE    (PropImage::OnSize)
 END_EVENT_TABLE()
 
 PropImage::PropImage(wxWindow* parent, ImageResource & image_, gd::Project & project_) :
@@ -140,6 +139,7 @@ project(project_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PropImage::OnOkBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PropImage::OnAnnulerBtClick);
 	apercuPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&PropImage::OnapercuPanelPaint,0,this);
+	apercuPanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&PropImage::OnapercuPanelResize,0,this);
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&PropImage::OnscrollHeightScroll);
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&PropImage::OnscrollHeightScroll);
 	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&PropImage::OnscrollWidthScroll);
@@ -172,13 +172,6 @@ void PropImage::OnOkBtClick(wxCommandEvent& event)
 void PropImage::OnAnnulerBtClick(wxCommandEvent& event)
 {
     EndModal(0);
-}
-
-void PropImage::OnSize(wxSizeEvent& event)
-{
-    Layout();
-    apercuPanel->Refresh();
-    apercuPanel->Update(); //Immédiatement
 }
 
 void PropImage::OnFichierEditText(wxCommandEvent& event)
@@ -244,6 +237,11 @@ void PropImage::OnscrollHeightScroll(wxScrollEvent& event)
     apercuPanel->Update(); //Immédiatement
 }
 
+void PropImage::OnapercuPanelResize(wxSizeEvent& event)
+{
+    apercuPanel->Refresh();
+    apercuPanel->Update(); //Immédiatement
+}
 
 ////////////////////////////////////////////////////////////
 /// Parcourir pour modifier l'image

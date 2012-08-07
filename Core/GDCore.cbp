@@ -229,6 +229,8 @@
 		<Unit filename="GDCore\Events\Instruction.h" />
 		<Unit filename="GDCore\Events\InstructionMetadata.cpp" />
 		<Unit filename="GDCore\Events\InstructionMetadata.h" />
+		<Unit filename="GDCore\Events\LinkEvent.cpp" />
+		<Unit filename="GDCore\Events\LinkEvent.h" />
 		<Unit filename="GDCore\Events\ObjectMetadata.cpp" />
 		<Unit filename="GDCore\Events\ObjectMetadata.h" />
 		<Unit filename="GDCore\IDE\ActionSentenceFormatter.cpp" />
@@ -261,10 +263,14 @@
 		<Unit filename="GDCore\IDE\Dialogs\ProjectExtensionsDialog.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ResourceLibraryDialog.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\ResourceLibraryDialog.h" />
+		<Unit filename="GDCore\IDE\EventsChangesNotifier.cpp" />
+		<Unit filename="GDCore\IDE\EventsChangesNotifier.h" />
 		<Unit filename="GDCore\IDE\EventsEditorItemsAreas.cpp" />
 		<Unit filename="GDCore\IDE\EventsEditorItemsAreas.h" />
 		<Unit filename="GDCore\IDE\EventsEditorSelection.cpp" />
 		<Unit filename="GDCore\IDE\EventsEditorSelection.h" />
+		<Unit filename="GDCore\IDE\EventsRefactorer.cpp" />
+		<Unit filename="GDCore\IDE\EventsRefactorer.h" />
 		<Unit filename="GDCore\IDE\EventsRenderingHelper.cpp" />
 		<Unit filename="GDCore\IDE\EventsRenderingHelper.h" />
 		<Unit filename="GDCore\IDE\EventsVariablesFinder.cpp" />

@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <wx/propgrid/propgrid.h>
+#include <wx/settings.h>
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/PlatformDefinition/Platform.h"

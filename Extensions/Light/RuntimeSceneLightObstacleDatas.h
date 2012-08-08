@@ -39,7 +39,7 @@ class GD_EXTENSION_API RuntimeSceneLightObstacleDatas : public AutomatismsRuntim
 public:
     RuntimeSceneLightObstacleDatas(const SceneLightObstacleDatas & automatismSharedDatas);
     virtual ~RuntimeSceneLightObstacleDatas();
-    virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneLightObstacleDatas(*this));}
+    virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneLightObstacleDatas(*this));}
 
     float gridWidth;
     float gridHeight;

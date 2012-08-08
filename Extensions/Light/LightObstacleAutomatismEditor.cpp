@@ -33,7 +33,7 @@ freely, subject to the following restrictions:
 //*)
 #include "GDL/Game.h"
 #include "LightObstacleAutomatism.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 
@@ -45,11 +45,10 @@ BEGIN_EVENT_TABLE(LightObstacleAutomatismEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-LightObstacleAutomatismEditor::LightObstacleAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, LightObstacleAutomatism & automatism_, MainEditorCommand & mainEditorCommand_ ) :
+LightObstacleAutomatismEditor::LightObstacleAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, LightObstacleAutomatism & automatism_ ) :
 automatism(automatism_),
 game(game_),
-scene(scene_),
-mainEditorCommand(mainEditorCommand_)
+scene(scene_)
 {
 	//(*Initialize(LightObstacleAutomatismEditor)
 	wxFlexGridSizer* FlexGridSizer1;

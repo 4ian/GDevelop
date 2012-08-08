@@ -34,7 +34,7 @@ freely, subject to the following restrictions:
 //*)
 #include <wx/colordlg.h>
 #include <wx/filedlg.h>
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "LightObject.h"
@@ -63,9 +63,8 @@ BEGIN_EVENT_TABLE(LightObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-LightObjectEditor::LightObjectEditor( wxWindow* parent, Game & game_, LightObject & object_, MainEditorCommand & mainEditorCommand_ ) :
+LightObjectEditor::LightObjectEditor( wxWindow* parent, Game & game_, LightObject & object_ ) :
 game(game_),
-mainEditorCommand(mainEditorCommand_),
 object(object_)
 {
 	//(*Initialize(LightObjectEditor)

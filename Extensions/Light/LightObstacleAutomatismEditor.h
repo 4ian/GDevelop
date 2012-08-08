@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 //*)
 #include <boost/shared_ptr.hpp>
 class Game;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 class LightObstacleAutomatism;
 class Scene;
 class SceneLightObstacleDatas;
@@ -46,7 +46,7 @@ class LightObstacleAutomatismEditor: public wxDialog
 {
 	public:
 
-		LightObstacleAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, LightObstacleAutomatism & automatism_, MainEditorCommand & mainEditorCommand_ );
+		LightObstacleAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, LightObstacleAutomatism & automatism_ );
 		virtual ~LightObstacleAutomatismEditor();
 
 		//(*Declarations(LightObstacleAutomatismEditor)
@@ -69,7 +69,6 @@ class LightObstacleAutomatismEditor: public wxDialog
 		Game & game;
         Scene * scene;
         boost::shared_ptr<SceneLightObstacleDatas> sharedDatas;
-		MainEditorCommand & mainEditorCommand;
 
 		DECLARE_EVENT_TABLE()
 };

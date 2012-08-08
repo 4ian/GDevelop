@@ -24,6 +24,9 @@ freely, subject to the following restrictions:
 
 */
 
+#if defined(GD_IDE_ONLY)
+#include <wx/wx.h> //Must be placed first, otherwise we get nice errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
+#endif
 #include <SFML/Graphics.hpp>
 #include "GDL/Object.h"
 #include "GDL/RuntimeScene.h"
@@ -33,14 +36,14 @@ freely, subject to the following restrictions:
 #include "GDL/XmlMacros.h"
 #include "GDL/Position.h"
 #include "GDL/RotatedRectangle.h"
+#include "GDL/CommonTools.h"
 #include "LightObject.h"
 #include "LightManager.h"
 
 #if defined(GD_IDE_ONLY)
-#include <wx/wx.h>
 #include "GDL/CommonTools.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "LightObjectEditor.h"
 #endif
 
@@ -66,7 +69,7 @@ void LightObject::LoadFromXml(const TiXmlElement * elem)
     {
         float intensity = 255;
         GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("intensity", intensity);
-        SetRadius(intensity);
+        SetIntensity(intensity);
     }
     {
         float radius = 180;
@@ -253,16 +256,16 @@ void LightObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
 }
 
-bool LightObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
+bool LightObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
     thumbnail = wxBitmap("Extensions/lightIcon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void LightObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand & mainEditorCommand )
+void LightObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
-    LightObjectEditor dialog(parent, game, *this, mainEditorCommand);
+    LightObjectEditor dialog(parent, game, *this);
     dialog.ShowModal();
 }
 

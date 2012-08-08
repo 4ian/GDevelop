@@ -48,7 +48,7 @@ class GD_EXTENSION_API LightObstacleAutomatism : public Automatism
     public:
         LightObstacleAutomatism(std::string automatismTypeName);
         virtual ~LightObstacleAutomatism();
-        virtual Automatism* Clone() { return new LightObstacleAutomatism(*this);}
+        virtual Automatism* Clone() const { return new LightObstacleAutomatism(*this);}
 
         #if defined(GD_IDE_ONLY)
         /**
@@ -61,13 +61,6 @@ class GD_EXTENSION_API LightObstacleAutomatism : public Automatism
          * Load Automatism from XML
          */
         virtual void LoadFromXml(const TiXmlElement * elem);
-
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Called when user wants to edit the automatism.
-         */
-        virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ );
-        #endif
 
         /**
          * Access to the object owning the automatism
@@ -83,6 +76,13 @@ class GD_EXTENSION_API LightObstacleAutomatism : public Automatism
         virtual void OnActivate();
 
     private:
+
+        #if defined(GD_IDE_ONLY)
+        /**
+         * Called when user wants to edit the automatism.
+         */
+        virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
+        #endif
 
         virtual void DoStepPostEvents(RuntimeScene & scene);
 

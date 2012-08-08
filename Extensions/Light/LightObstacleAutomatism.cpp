@@ -52,9 +52,9 @@ LightObstacleAutomatism::~LightObstacleAutomatism()
 }
 
 #if defined(GD_IDE_ONLY)
-void LightObstacleAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ )
+void LightObstacleAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
-    /*LightObstacleAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
+    /*LightObstacleAutomatismEditor editor(parent, game_, scene, *this, gd::MainFrameWrapper_);
     editor.ShowModal();*/
 }
 #endif

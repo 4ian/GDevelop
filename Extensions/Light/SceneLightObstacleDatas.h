@@ -38,7 +38,7 @@ class GD_EXTENSION_API SceneLightObstacleDatas : public AutomatismsSharedDatas
     public:
         SceneLightObstacleDatas(std::string typeName) : AutomatismsSharedDatas(typeName), gridWidth(20), gridHeight(20), diagonalMove(true) {};
         virtual ~SceneLightObstacleDatas() {};
-        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() { return boost::shared_ptr<AutomatismsSharedDatas>(new SceneLightObstacleDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsSharedDatas>(new SceneLightObstacleDatas(*this));}
 
         virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> CreateRuntimeSharedDatas()
         {

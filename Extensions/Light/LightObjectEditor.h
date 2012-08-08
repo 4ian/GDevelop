@@ -42,13 +42,13 @@ freely, subject to the following restrictions:
 //*)
 class Game;
 class LightObject;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 
 class LightObjectEditor: public wxDialog
 {
 	public:
 
-		LightObjectEditor( wxWindow* parent, Game & game_, LightObject & object_, MainEditorCommand & mainEditorCommand_ );
+		LightObjectEditor( wxWindow* parent, Game & game_, LightObject & object_ );
 		virtual ~LightObjectEditor();
 
 		//(*Declarations(LightObjectEditor)
@@ -97,7 +97,6 @@ class LightObjectEditor: public wxDialog
 		//*)
 
 		Game & game;
-		MainEditorCommand & mainEditorCommand;
 		LightObject & object;
 
 		DECLARE_EVENT_TABLE()

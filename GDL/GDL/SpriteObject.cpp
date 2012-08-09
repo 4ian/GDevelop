@@ -319,8 +319,8 @@ float SpriteObject::GetPointX(const std::string & point) const
     {
         return GetCurrentSFMLSprite().TransformToGlobal(
                     sf::Vector2f(
-                        !isFlippedX ? GetCurrentSprite().GetPoint(point).GetX() : GetCurrentSprite().GetSFMLSprite().GetSize().x/2-GetCurrentSprite().GetPoint(point).GetX(),
-                        !isFlippedY ? GetCurrentSprite().GetPoint(point).GetY() : GetCurrentSprite().GetSFMLSprite().GetSize().y/2-GetCurrentSprite().GetPoint(point).GetY()
+                        !isFlippedX ? GetCurrentSprite().GetPoint(point).GetX() : GetCurrentSprite().GetSFMLSprite().GetSize().x-GetCurrentSprite().GetPoint(point).GetX(),
+                        !isFlippedY ? GetCurrentSprite().GetPoint(point).GetY() : GetCurrentSprite().GetSFMLSprite().GetSize().y-GetCurrentSprite().GetPoint(point).GetY()
                     )).x;
     }
 
@@ -333,8 +333,8 @@ float SpriteObject::GetPointY(const std::string & point) const
     {
         return GetCurrentSFMLSprite().TransformToGlobal(
                     sf::Vector2f(
-                        !isFlippedX ? GetCurrentSprite().GetPoint(point).GetX() : GetCurrentSprite().GetSFMLSprite().GetSize().x/2-GetCurrentSprite().GetPoint(point).GetX(),
-                        !isFlippedY ? GetCurrentSprite().GetPoint(point).GetY() : GetCurrentSprite().GetSFMLSprite().GetSize().y/2-GetCurrentSprite().GetPoint(point).GetY()
+                        !isFlippedX ? GetCurrentSprite().GetPoint(point).GetX() : GetCurrentSprite().GetSFMLSprite().GetSize().x-GetCurrentSprite().GetPoint(point).GetX(),
+                        !isFlippedY ? GetCurrentSprite().GetPoint(point).GetY() : GetCurrentSprite().GetSFMLSprite().GetSize().y-GetCurrentSprite().GetPoint(point).GetY()
                     )).y;
     }
 

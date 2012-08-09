@@ -96,7 +96,7 @@ void ChangesNotifier::OnObjectVariablesChanged(gd::Project & project, gd::Layout
 
         if ( scene )
             scene->wasModified = true;
-        else //Scene pointer is not NULL: Update shared data of all scenes
+        else //Scene pointer is NULL: Update shared data of all scenes
         {
             for (unsigned int i = 0;i<game.GetLayouts().size();++i)
                 game.GetLayouts()[i]->wasModified = true;
@@ -153,7 +153,7 @@ void ChangesNotifier::RequestAutomatismsSharedDataUpdate(gd::Project & project, 
 
         if ( scene )
             scene->UpdateAutomatismsSharedData(game);
-        else //Scene pointer is not NULL: Update shared data of all scenes
+        else //Scene pointer is NULL: Update shared data of all scenes
         {
             for (unsigned int i = 0;i<game.GetLayouts().size();++i)
                 game.GetLayouts()[i]->UpdateAutomatismsSharedData(game);

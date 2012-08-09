@@ -31,7 +31,7 @@
 				<object class="wxNotebook" name="ID_NOTEBOOK3" variable="globalNotebook" member="yes">
 					<object class="notebookpage">
 						<object class="Custom" name="ID_CUSTOM2" subclass="EditorObjectList" variable="globalObjectsEditor" member="yes">
-							<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, game, mainFrameWrapper, NULL);</creating_code>
+							<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, game, mainFrameWrapper, &amp;scene);</creating_code>
 							<include_file>EditorObjectList.h</include_file>
 							<local_include>1</local_include>
 							<style></style>

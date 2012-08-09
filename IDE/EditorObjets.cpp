@@ -68,7 +68,7 @@ mainFrameWrapper(mainFrameWrapper_)
     sceneNotebook->AddPage(sceneObjectsEditor, _("Objets"), false);
     sceneNotebook->AddPage(ObjetsGroups, _("Groupes d\'objets"), false);
     globalNotebook = new wxNotebook(Notebook1, ID_NOTEBOOK3, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK3"));
-    globalObjectsEditor = new EditorObjectList(globalNotebook, game, game, mainFrameWrapper, NULL);
+    globalObjectsEditor = new EditorObjectList(globalNotebook, game, game, mainFrameWrapper, &scene);
     globalObjectsGroups = new EditorObjetsGroups(globalNotebook, game, scene, &game.GetObjectGroups(), mainFrameWrapper);
     globalNotebook->AddPage(globalObjectsEditor, _("Objets globaux"), false);
     globalNotebook->AddPage(globalObjectsGroups, _("Groupes globaux"), false);

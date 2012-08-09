@@ -109,7 +109,8 @@ EditorObjectList::EditorObjectList(wxWindow* parent, Game & game_, gd::ClassWith
 objects(objects_),
 game(game_),
 scene(scene_),
-mainFrameWrapper(mainFrameWrapper_)
+mainFrameWrapper(mainFrameWrapper_),
+globalObjects(&objects == &game)
 {
 	//(*Initialize(EditorObjectList)
 	wxMenuItem* delObjMenuI;
@@ -442,7 +443,7 @@ void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
     gd::Automatism & automatism = object.GetAutomatism(autoType);
 
     automatism.EditAutomatism(this, game, scene, mainFrameWrapper);
-    game.GetChangesNotifier().OnAutomatismEdited(game, scene, object, automatism);
+    game.GetChangesNotifier().OnAutomatismEdited(game, globalObjects ? NULL : scene, object, automatism);
 }
 
 /**
@@ -454,7 +455,7 @@ void EditorObjectList::OneditMenuISelected(wxCommandEvent& event)
     if ( !objects.HasObjectNamed(name) ) return;
 
     objects.GetObject(name).EditObject(this, game, mainFrameWrapper);
-    game.GetChangesNotifier().OnObjectEdited(game, scene, objects.GetObject(name));
+    game.GetChangesNotifier().OnObjectEdited(game, globalObjects ? NULL : scene, objects.GetObject(name));
 
     //Reload thumbnail
     int thumbnailID = -1;
@@ -533,7 +534,7 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     }
     objectsList->SetItemImage( itemAdded, thumbnailID );
 
-    game.GetChangesNotifier().OnObjectAdded(game, scene, objects.GetObject(name));
+    game.GetChangesNotifier().OnObjectAdded(game, globalObjects ? NULL : scene, objects.GetObject(name));
 
     objectsList->EditLabel(itemAdded);
 
@@ -584,7 +585,7 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
         }
     }
 
-    game.GetChangesNotifier().OnObjectsDeleted(game, scene, objectsDeleted);
+    game.GetChangesNotifier().OnObjectsDeleted(game, globalObjects ? NULL : scene, objectsDeleted);
 
     //Removing items
     void * nothing;
@@ -659,7 +660,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
             }
         }
     }
-    game.GetChangesNotifier().OnObjectRenamed(game, scene, objects.GetObject(newName), ancienNom);
+    game.GetChangesNotifier().OnObjectRenamed(game, globalObjects ? NULL : scene, objects.GetObject(newName), ancienNom);
 
     objectsList->SetItemText( event.GetItem(), event.GetLabel() );
     return;
@@ -703,7 +704,7 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
 
     std::vector<std::string> objectsDeleted;
     objectsDeleted.push_back(name);
-    game.GetChangesNotifier().OnObjectsDeleted(game, scene, objectsDeleted);
+    game.GetChangesNotifier().OnObjectsDeleted(game, globalObjects ? NULL : scene, objectsDeleted);
 }
 
 /**
@@ -737,7 +738,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
 
     //Add it to the list
     objects.InsertObject(*object, objects.GetObjectsCount());
-    game.GetChangesNotifier().OnObjectAdded(game, scene, *object);
+    game.GetChangesNotifier().OnObjectAdded(game, globalObjects ? NULL : scene, *object);
 
     //Refresh the list and select the newly added item
     searchCtrl->Clear();
@@ -864,7 +865,7 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
 
     gd::ChooseVariableDialog dialog(this, objects.GetObject(name).GetVariables(), /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
-        game.GetChangesNotifier().OnObjectVariablesChanged(game, scene, objects.GetObject(name));
+        game.GetChangesNotifier().OnObjectVariablesChanged(game, globalObjects ? NULL : scene, objects.GetObject(name));
 }
 
 /**
@@ -900,7 +901,7 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
 
         gd::Object & object = objects.GetObject(name);
         object.AddNewAutomatism(dialog.selectedAutomatismType, autoName);
-        game.GetChangesNotifier().OnAutomatismAdded(game, scene, object, object.GetAutomatism(autoName));
+        game.GetChangesNotifier().OnAutomatismAdded(game, globalObjects ? NULL : scene, object, object.GetAutomatism(autoName));
     }
 }
 
@@ -926,7 +927,7 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
 
     objects.GetObject(name).RemoveAutomatism(automatisms[selection]);
 
-    game.GetChangesNotifier().OnAutomatismDeleted(game, scene, objects.GetObject(name), automatisms[selection]);
+    game.GetChangesNotifier().OnAutomatismDeleted(game, globalObjects ? NULL : scene, objects.GetObject(name), automatisms[selection]);
 }
 
 /**
@@ -961,7 +962,7 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
     std::string oldName = automatism.GetName();
     automatism.SetName(newName);
 
-    game.GetChangesNotifier().OnAutomatismRenamed(game, scene, object, automatism, oldName);
+    game.GetChangesNotifier().OnAutomatismRenamed(game, globalObjects ? NULL : scene, object, automatism, oldName);
 }
 
 /**

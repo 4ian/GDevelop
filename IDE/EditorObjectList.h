@@ -37,7 +37,7 @@ public:
      * \param game Project the objects belong to
      * \param objects The class with the objects to edit ( i.e. The project or a layout )
      * \param mainFrameWrapper gd::MainFrameWrapper object
-     * \param scene optional pointer to the layout the objects belong to. If scene is NULL, the objects are assumed to be global.
+     * \param scene optional pointer to the layout the objects belong to. Can be NULL.
      */
     EditorObjectList(wxWindow* parent, Game & game_, gd::ClassWithObjects & objects, gd::MainFrameWrapper & mainFrameWrapper, Scene * scene_);
     virtual ~EditorObjectList();
@@ -152,6 +152,7 @@ private:
 
     Game & game;
     Scene * scene; ///< Scene edited. Can be NULL, in which case objects are considered to be global.
+    bool globalObjects; ///< If true, the objects edited are global. Automatically deduced (in the constructor) by checking if &game == &objects.
 
     gd::MainFrameWrapper & mainFrameWrapper;
 

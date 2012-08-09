@@ -537,15 +537,14 @@ void MainFrame::SetCurrentGame(unsigned int i)
     {
         wxString GD = "Game Develop";
         SetTitle( GD );
+        projectPropertiesPnl->SetProject(NULL); //Update editors displaying current project properties
     }
     else
     {
         wxString GD = "Game Develop";
         SetTitle( GD + " - [" + games[i]->GetName() + "] "+games[i]->GetProjectFile() );
+        projectPropertiesPnl->SetProject(games[i].get()); //Update editors displaying current project properties
     }
-
-    //Update editors displaying current project properties
-    projectPropertiesPnl->SetProject(games[i].get());
 
     return;
 }

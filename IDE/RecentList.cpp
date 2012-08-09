@@ -1,9 +1,4 @@
-
 #include "RecentList.h"
-
-#ifdef DEBUG
-
-#endif
 
 RecentList::RecentList()
 {
@@ -103,7 +98,7 @@ void RecentList::SetAssociatedMenu(wxMenu *Menu)
     imax=p_iMax;
     if ((int)sEntry.Count()<imax) imax=sEntry.Count();
     // On crée la première entrée du menu ici
-    p_Menu->Append(wxID_FILE1,_T("Liste vide"));
+    p_Menu->Append(wxID_FILE1,_("Liste vide"));
     p_Menu->Enable(wxID_FILE1,false);
     UpdateMenu();
 }
@@ -138,7 +133,7 @@ void RecentList::UpdateMenu()
     // Mise à jour des entrées du menu
     for (i=0;i<immax;i++)
     {
-        sTxt.Printf("Ouvrir le fichier \"%s\"",sEntry[i].c_str());
+        sTxt.Printf(_("Ouvrir le fichier \"%s\""),sEntry[i].c_str());
         p_Menu->SetLabel(wxID_FILE1+i,sEntry[i]);
         p_Menu->SetHelpString(wxID_FILE1+i,sTxt);
     }

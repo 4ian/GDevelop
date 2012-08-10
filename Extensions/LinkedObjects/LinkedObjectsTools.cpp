@@ -42,26 +42,33 @@ namespace LinkedObjects
 
 std::map < RuntimeScene* , ObjectsLinksManager > ObjectsLinksManager::managers;
 
-bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectsLists, int useless, const std::string &, Object * object, std::string linkedName)
+bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectsLists, int , const std::string &, Object * object, const std::string &)
 {
-    //Get a list of all objects with the desired name linked to our object
-    std::vector<Object*> linkedObjects = ObjectsLinksManager::managers[&scene].GetRawPointersToObjectsLinkedWith(object, linkedName);
+    bool objectsHaveBeenPicked = false;;
 
-    //Then pick all of these objects
-    for (unsigned int j = 0;j<linkedObjects.size();++j)
+    //We use pickedObjectsLists to find the name of the objects to be picked ( We could use the last argument, but it can be a group name )
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = pickedObjectsLists.begin();it!=pickedObjectsLists.end();++it)
     {
-        const std::string & linkedObjectName = linkedObjects[j]->GetName();
+        //Get a list of all objects with the desired name linked to our object
+        std::vector<Object*> linkedObjects = ObjectsLinksManager::managers[&scene].GetRawPointersToObjectsLinkedWith(object, it->first);
+        if ( !objectsHaveBeenPicked && !linkedObjects.empty() ) objectsHaveBeenPicked = true;
 
-        //Add linked object to appropriate picked object list
-        if ( pickedObjectsLists.find(linkedObjectName) != pickedObjectsLists.end() )
+        //Then pick all of these objects
+        for (unsigned int j = 0;j<linkedObjects.size();++j)
         {
-            if ( find(pickedObjectsLists[linkedObjectName]->begin(), pickedObjectsLists[linkedObjectName]->end(), linkedObjects[j]) == pickedObjectsLists[linkedObjectName]->end() )
-                pickedObjectsLists[linkedObjectName]->push_back(linkedObjects[j]);
-        }
+            const std::string & linkedObjectName = linkedObjects[j]->GetName();
 
+            //Add linked object to appropriate picked object list
+            if ( pickedObjectsLists.find(linkedObjectName) != pickedObjectsLists.end() )
+            {
+                if ( find(pickedObjectsLists[linkedObjectName]->begin(), pickedObjectsLists[linkedObjectName]->end(), linkedObjects[j]) == pickedObjectsLists[linkedObjectName]->end() )
+                    pickedObjectsLists[linkedObjectName]->push_back(linkedObjects[j]);
+            }
+
+        }
     }
 
-    return !linkedObjects.empty();
+    return objectsHaveBeenPicked;
 }
 
 void GD_EXTENSION_API LinkObjects(RuntimeScene & scene, Object * a, Object * b, const std::string & ,const std::string & )

@@ -41,7 +41,7 @@ namespace LinkedObjects
 void GD_EXTENSION_API LinkObjects(RuntimeScene & scene, Object * a, Object * b, const std::string & ,const std::string & );
 void GD_EXTENSION_API RemoveLinkBetween(RuntimeScene & scene, Object * a, Object * b, const std::string & ,const std::string & );
 void GD_EXTENSION_API RemoveAllLinksOf(RuntimeScene & scene, Object * object);
-bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectsLists, int useless, const std::string &, Object * object, std::string linkedName);
+bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectsLists, int useless, const std::string &, Object * object, const std::string &);
 
 }
 

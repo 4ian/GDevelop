@@ -1,4 +1,4 @@
-#if defined(DEBUG) || defined(DEV)
+#if defined(GD_IDE_ONLY) || defined(DEBUG) || defined(DEV)
 /*
 
 ****************************************************************************************************

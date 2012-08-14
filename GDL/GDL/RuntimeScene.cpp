@@ -183,16 +183,31 @@ void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, in
 
 int RuntimeScene::RenderAndStep(unsigned int nbStep)
 {
-#if defined(DEV) || defined(DEBUG)
+#if !defined(RELEASE)
     BT_PROFILE("RenderAndStep");
 #endif
 
     for (unsigned int step = 0;step<nbStep;++step)
     {
         //Gestion pré-évènements
-        ManageRenderTargetEvents();
-        UpdateTime();
-        ManageObjectsBeforeEvents();
+        {
+#if !defined(RELEASE)
+            BT_PROFILE("ManageRenderTargetEvents");
+#endif
+            ManageRenderTargetEvents();
+        }
+        {
+#if !defined(RELEASE)
+            BT_PROFILE("UpdateTime");
+#endif
+            UpdateTime();
+        }
+        {
+#if !defined(RELEASE)
+            BT_PROFILE("ManageObjectsBeforeEvents");
+#endif
+            ManageObjectsBeforeEvents();
+        }
         SoundManager::GetInstance()->ManageGarbage();
 
         #if defined(GD_IDE_ONLY)
@@ -204,7 +219,7 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         #endif
 
         {
-#if defined(DEV) || defined(DEBUG)
+#if !defined(RELEASE)
             BT_PROFILE("Events");
 #endif
             codeExecutionEngine->Execute();
@@ -218,17 +233,30 @@ int RuntimeScene::RenderAndStep(unsigned int nbStep)
         }
         #endif
 
-        //Gestions post-évènements
-        ManageObjectsAfterEvents();
+        //Gestions post-évènement
+        {
+#if !defined(RELEASE)
+            BT_PROFILE("ManageObjectsAfterEvents");
+#endif
+            ManageObjectsAfterEvents();
+        }
 
         #if defined(GD_IDE_ONLY)
         if( debugger )
+        {
+            BT_PROFILE("Debugger");
             debugger->Update();
+        }
         #endif
 
         //Rendering
-        Render();
-        textes.clear(); //Legacy texts
+        {
+#if !defined(RELEASE)
+            BT_PROFILE("Rendering");
+#endif
+            Render();
+            textes.clear(); //Legacy texts
+        }
 
         #if defined(GD_IDE_ONLY)
         if( profiler && profiler->profilingActivated )

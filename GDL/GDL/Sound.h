@@ -54,7 +54,13 @@ class GD_API Sound : sf::NonCopyable
         /**
          * Return the current playing position of the music, in milliseconds.
          */
-        unsigned int GetPlayingOffset() const { return sound.GetPlayingOffset(); };
+        unsigned int GetPlayingOffset() const
+        {
+            if ( buffer.GetChannelsCount() == 0 || buffer.GetSampleRate() == 0 )
+                return 0; //Avoid a bug in GetPlayingOffset.
+
+            return sound.GetPlayingOffset();
+        };
 
         //Order is important :
         sf::SoundBuffer buffer;

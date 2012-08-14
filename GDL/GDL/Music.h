@@ -100,7 +100,13 @@ class GD_API Music
         /**
          * Return the current playing position of the music, in milliseconds.
          */
-        unsigned int GetPlayingOffset() const { return music.GetPlayingOffset(); };
+        unsigned int GetPlayingOffset() const
+        {
+            if ( music.GetChannelsCount() == 0 || music.GetSampleRate() == 0 )
+                return 0; //Avoid a bug in GetPlayingOffset.
+
+            return music.GetPlayingOffset();
+        };
 
         /**
          * Internal member functions to update music volume according to global volume.

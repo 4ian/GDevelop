@@ -13131,7 +13131,7 @@
 	<string>
 	<vector>
 
-1337099492 d:\florian\programmation\gamedevelop2\gdl\\gdl\music.h
+1344893772 d:\florian\programmation\gamedevelop2\gdl\\gdl\music.h
 	<SFML/Audio.hpp>
 	<string>
 
@@ -14853,7 +14853,7 @@
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1343479529 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
+1344613685 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
 	<wx/wx.h>
 	<sstream>
 	<fstream>
@@ -15828,7 +15828,7 @@
 	<string>
 	<iostream>
 
-1337101012 source:d:\florian\programmation\gamedevelop2\gdl\gdl\profile.cpp
+1344618923 source:d:\florian\programmation\gamedevelop2\gdl\gdl\profile.cpp
 	"GDL/profile.h"
 	<stdio.h>
 
@@ -32910,7 +32910,7 @@
 1325335073 d:\florian\programmation\gamedevelop2\gdl\gdl\keyboardtools.h
 	<string>
 
-1337100215 d:\florian\programmation\gamedevelop2\gdl\\gdl\sound.h
+1344893772 d:\florian\programmation\gamedevelop2\gdl\\gdl\sound.h
 	<SFML/Audio.hpp>
 	<string>
 	<vector>
@@ -34256,7 +34256,7 @@
 	<boost/shared_ptr.hpp>
 	"GDL/IDE/ArbitraryResourceWorker.h"
 
-1344013596 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
+1344888348 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
 	"SpriteObjectEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>

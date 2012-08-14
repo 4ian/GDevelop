@@ -1394,9 +1394,11 @@ void SpriteObjectEditor::OnTimeBetweenFramesSelected(wxCommandEvent& event)
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection);
-        direction.SetTimeBetweenFrames(ToFloat(ToString(wxGetTextFromUser(_("Entrez le temps entre chaque image ( en secondes )"),
-                                                                          _("Temps entre chaque image"),
-                                                                          ToString(direction.GetTimeBetweenFrames())))));
+        std::string newTime = ToString(wxGetTextFromUser(_("Entrez le temps entre chaque image ( en secondes )"),
+                                                         _("Temps entre chaque image"),
+                                                         ToString(direction.GetTimeBetweenFrames())));
+        if ( newTime.empty() ) return;
+        direction.SetTimeBetweenFrames(ToFloat(newTime));
     }
 }
 

@@ -328,7 +328,6 @@ void ChooseObjectDialog::OnglobalObjectGroupsItemRightClick(wxTreeEvent& event)
 void ChooseObjectDialog::OnsearchCtrlText(wxCommandEvent& event)
 {
     Refresh();
-    searchCtrl->SetFocus();
 }
 
 }

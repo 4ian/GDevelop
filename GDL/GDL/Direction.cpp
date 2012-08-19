@@ -143,23 +143,49 @@ void Direction::LoadFromXml(const TiXmlElement * element)
 
                 if ( customCollisionMask )
                 {
-                    std::vector<RotatedRectangle> boxes;
+                    std::vector<Polygon2d> mask;
+                    //-- Compatibility code with Game Develop 2.1.10904 and inferior
                     const TiXmlElement * rectangleElem = customCollisionMaskElem->FirstChildElement("Rectangle");
                     while ( rectangleElem )
                     {
-                        RotatedRectangle rectangle;
-                        rectangle.angle = 0;
+                        if ( rectangleElem->Attribute("centerX") && rectangleElem->Attribute("centerY") && rectangleElem->Attribute("halfSizeX") && rectangleElem->Attribute("halfSizeY") )
+                        {
+                            float centerX = ToFloat(rectangleElem->Attribute("centerX"));
+                            float centerY = ToFloat(rectangleElem->Attribute("centerY"));
+                            float halfSizeX = ToFloat(rectangleElem->Attribute("halfSizeX"));
+                            float halfSizeY = ToFloat(rectangleElem->Attribute("halfSizeY"));
 
-                        if ( rectangleElem->Attribute("centerX") ) rectangleElem->QueryFloatAttribute("centerX", &rectangle.center.x);
-                        if ( rectangleElem->Attribute("centerY") ) rectangleElem->QueryFloatAttribute("centerY", &rectangle.center.y);
-                        if ( rectangleElem->Attribute("halfSizeX") ) rectangleElem->QueryFloatAttribute("halfSizeX", &rectangle.halfSize.x);
-                        if ( rectangleElem->Attribute("halfSizeY") ) rectangleElem->QueryFloatAttribute("halfSizeY", &rectangle.halfSize.y);
-                        if ( rectangleElem->Attribute("angle") ) rectangleElem->QueryFloatAttribute("angle", &rectangle.angle);
+                            Polygon2d polygon;
+                            polygon.vertices.push_back(sf::Vector2f(centerX-halfSizeX, centerY-halfSizeY));
+                            polygon.vertices.push_back(sf::Vector2f(centerX+halfSizeX, centerY-halfSizeY));
+                            polygon.vertices.push_back(sf::Vector2f(centerX+halfSizeX, centerY+halfSizeY));
+                            polygon.vertices.push_back(sf::Vector2f(centerX-halfSizeX, centerY+halfSizeY));
+                            mask.push_back(polygon);
+                        }
 
-                        boxes.push_back(rectangle);
                         rectangleElem = rectangleElem->NextSiblingElement();
                     }
-                    sprite.SetCustomCollisionMask(boxes);
+                    //-- End of compatibility code
+
+                    const TiXmlElement * polygonElem = customCollisionMaskElem->FirstChildElement("Polygon");
+                    while ( polygonElem )
+                    {
+                        Polygon2d polygon;
+
+                        const TiXmlElement * pointElem = polygonElem->FirstChildElement("Point");
+                        while ( pointElem )
+                        {
+                            if ( pointElem->Attribute("x") && pointElem->Attribute("y") )
+                                polygon.vertices.push_back(sf::Vector2f(ToFloat(pointElem->Attribute("x")),ToFloat(pointElem->Attribute("y"))));
+
+                            pointElem = pointElem->NextSiblingElement();
+                        }
+
+                        mask.push_back(polygon);
+                        polygonElem = polygonElem->NextSiblingElement();
+                    }
+
+                    sprite.SetCustomCollisionMask(mask);
                 }
 
             }
@@ -224,16 +250,20 @@ void SaveSpritesDirection(const vector < Sprite > & sprites, TiXmlElement * elem
         if ( !sprites.at(i).IsCollisionMaskAutomatic() )
         {
             customCollisionMask->SetAttribute("custom", "true");
-            std::vector<RotatedRectangle> boxes = sprites.at(i).GetCollisionMask();
-            for (unsigned int i = 0;i<boxes.size();++i)
+            std::vector<Polygon2d> polygons = sprites.at(i).GetCollisionMask();
+            for (unsigned int i = 0;i<polygons.size();++i)
             {
-                TiXmlElement * box = new TiXmlElement( "Rectangle" );
-                box->SetDoubleAttribute("centerX", boxes[i].center.x);
-                box->SetDoubleAttribute("centerY", boxes[i].center.y);
-                box->SetDoubleAttribute("halfSizeX", boxes[i].halfSize.x);
-                box->SetDoubleAttribute("halfSizeY", boxes[i].halfSize.y);
-                box->SetDoubleAttribute("angle", boxes[i].angle);
-                customCollisionMask->LinkEndChild( box );
+                TiXmlElement * polygon = new TiXmlElement( "Polygon" );
+                customCollisionMask->LinkEndChild(polygon);
+
+                for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
+                {
+                    TiXmlElement * point = new TiXmlElement( "Point" );
+                    polygon->LinkEndChild(point);
+
+                    point->SetAttribute("x", ToString(polygons[i].vertices[j].x).c_str());
+                    point->SetAttribute("y", ToString(polygons[i].vertices[j].y).c_str());
+                }
             }
         }
     }

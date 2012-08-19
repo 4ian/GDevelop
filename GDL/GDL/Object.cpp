@@ -18,7 +18,7 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/Automatism.h"
 #include "GDL/Game.h"
-#include "GDL/RotatedRectangle.h"
+#include "GDL/Polygon.h"
 #include "GDL/ExtensionsManager.h"
 #if defined(GD_IDE_ONLY)
 #include <wx/panel.h>
@@ -606,9 +606,9 @@ void Object::SetXY( float xValue, const char* xOperator, float yValue, const cha
         SetY( GetY() / yValue );
 }
 
-std::vector<RotatedRectangle> Object::GetHitBoxes() const
+std::vector<Polygon2d> Object::GetHitBoxes() const
 {
-    return std::vector<RotatedRectangle>();
+    return std::vector<Polygon2d>();
 }
 
 Automatism* Object::GetAutomatismRawPointer(const std::string & name)

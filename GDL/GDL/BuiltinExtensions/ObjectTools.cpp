@@ -1,7 +1,7 @@
 #include "ObjectTools.h"
 #include "GDL/Object.h"
-#include "GDL/RotatedRectangle.h"
-#include "GDL/RotatedRectangleCollision.h"
+#include "GDL/Polygon.h"
+#include "GDL/PolygonCollision.h"
 #include <cmath>
 
 using namespace std;
@@ -64,13 +64,13 @@ bool GD_API HitBoxesCollision( const std::string & firstObjName, const std::stri
             {
                 bool collision = false;
 
-                vector<RotatedRectangle> objHitboxes = objects1[i]->GetHitBoxes();
-                vector<RotatedRectangle> obj2Hitboxes = objects2[j]->GetHitBoxes();
+                vector<Polygon2d> objHitboxes = objects1[i]->GetHitBoxes();
+                vector<Polygon2d> obj2Hitboxes = objects2[j]->GetHitBoxes();
                 for (unsigned int k = 0;k<objHitboxes.size();++k)
                 {
                     for (unsigned int l = 0;l<obj2Hitboxes.size();++l)
                     {
-                        if ( RotatedRectanglesCollisionTest(&objHitboxes[k], &obj2Hitboxes[l]) != 0 )
+                        if ( PolygonCollisionTest(objHitboxes[k], obj2Hitboxes[l]).collision )
                             collision = true;
                     }
 

@@ -5,8 +5,7 @@
 #ifndef POLYGONCOLLISION_H
 #define POLYGONCOLLISION_H
 #include <SFML/System.hpp>
-
-class Polygon;
+class Polygon2d;
 
 /**
  * \brief Contains the result of PolygonCollisionTest.
@@ -31,6 +30,6 @@ struct CollisionResult
  *
  * \ingroup GameEngine
  */
-CollisionResult PolygonCollisionTest(const Polygon & p1, const Polygon & p2);
+CollisionResult PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2);
 
 #endif // POLYGONCOLLISION_H

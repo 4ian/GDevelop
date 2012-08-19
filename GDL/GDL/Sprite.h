@@ -5,11 +5,11 @@
 
 #ifndef SPRITE_H
 #define SPRITE_H
-#include <SFML/Graphics.hpp>
-#include <boost/shared_ptr.hpp>
-#include "GDL/Point.h"
 #include <string>
-#include "GDL/RotatedRectangle.h"
+#include <boost/shared_ptr.hpp>
+#include <SFML/Graphics.hpp>
+#include "GDL/Point.h"
+#include "GDL/Polygon.h"
 class SFMLTextureWrapper;
 #undef LoadImage //prevent windows.h to be polluting everything
 
@@ -74,13 +74,13 @@ public:
      * \warning If the image has not been loaded ( using LoadImage ) and the collision mask is set as automatic,
      * the returned mask won't be correct.
      */
-    std::vector<RotatedRectangle> GetCollisionMask() const;
+    std::vector<Polygon2d> GetCollisionMask() const;
 
     /**
      * Set the custom collision mask.
      * Call then SetCollisionMaskAutomatic() to use it.
      */
-    void SetCustomCollisionMask(const std::vector<RotatedRectangle> & collisionMask) {customCollisionMask = collisionMask;};
+    void SetCustomCollisionMask(const std::vector<Polygon2d> & collisionMask) {customCollisionMask = collisionMask;};
 
     /**
      * Return true if the collision mask is a bounding box, false if a custom collision mask is used.
@@ -177,7 +177,7 @@ private:
     std::string image; ///< Name of the image to be loaded in Image Manager.
 
     bool automaticCollisionMask; ///< True to use the custom collision mask. Otherwise, a basic bounding box is returned by GetCollisionMask()
-    std::vector<RotatedRectangle> customCollisionMask; ///< Custom collision mask
+    std::vector<Polygon2d> customCollisionMask; ///< Custom collision mask
 
     std::vector < Point > points; ///< List of the points used by the sprite
     Point origine; ///< Origin point

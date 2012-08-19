@@ -2,7 +2,10 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-#include "PolygonCollision.h"
+#include "GDL/PolygonCollision.h"
+#include "GDL/Polygon.h"
+#include <cmath>
+#include <cfloat>
 
 namespace
 {
@@ -26,7 +29,7 @@ float dotProduct(const sf::Vector2f a, const sf::Vector2f b)
     return dp;
 }
 
-void project(const sf::Vector2f axis, const Polygon2d& p, float& min, float& max)
+void project(const sf::Vector2f axis, const Polygon2d & p, float& min, float& max)
 {
     float dp = dotProduct(axis, p.vertices[0]);
 
@@ -52,8 +55,11 @@ float distance(float minA, float maxA, float minB, float maxB)
 
 }
 
-CollisionResult PolygonCollisionTest(const Polygon & p1, const Polygon & p2)
+CollisionResult PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2)
 {
+    p1.ComputeEdges();
+    p2.ComputeEdges();
+
     sf::Vector2f edge;
     sf::Vector2f move_axis(0,0);
     sf::Vector2f mtd(0,0);
@@ -106,7 +112,7 @@ CollisionResult PolygonCollisionTest(const Polygon & p1, const Polygon & p2)
 
     result.collision = true;
 
-    sf::Vector2f d = p1.center - p2.center;
+    sf::Vector2f d = p1.ComputeCenter() - p2.ComputeCenter();
     if (dotProduct(d, move_axis) < 0.0f) move_axis = -move_axis;
     result.move_axis = move_axis * min_dist;
 

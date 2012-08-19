@@ -85,13 +85,15 @@ const long SpriteObjectEditor::ID_TREECTRL1 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL3 = wxNewId();
 const long SpriteObjectEditor::ID_LISTCTRL1 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL2 = wxNewId();
+const long SpriteObjectEditor::ID_AUITOOLBARITEM9 = wxNewId();
 const long SpriteObjectEditor::ID_AUITOOLBARITEM6 = wxNewId();
+const long SpriteObjectEditor::ID_AUITOOLBARITEM11 = wxNewId();
 const long SpriteObjectEditor::ID_AUITOOLBARITEM7 = wxNewId();
 const long SpriteObjectEditor::ID_AUITOOLBARITEM1 = wxNewId();
 const long SpriteObjectEditor::ID_MASKAPPLYWHOLEANIMITEM = wxNewId();
 const long SpriteObjectEditor::ID_AUITOOLBAR3 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL9 = wxNewId();
-const long SpriteObjectEditor::ID_LISTCTRL2 = wxNewId();
+const long SpriteObjectEditor::ID_TREELISTCTRL1 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL8 = wxNewId();
 const long SpriteObjectEditor::ID_AUITOOLBARITEM3 = wxNewId();
 const long SpriteObjectEditor::ID_DELETEPOINTITEM = wxNewId();
@@ -115,7 +117,7 @@ const long SpriteObjectEditor::ID_MENUITEM8 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM9 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM10 = wxNewId();
 const long SpriteObjectEditor::ID_POSITIONMASKITEM = wxNewId();
-const long SpriteObjectEditor::ID_RESIZEMASKITEM = wxNewId();
+const long SpriteObjectEditor::ID_MOVEPOLYGONITEM = wxNewId();
 const long SpriteObjectEditor::ID_TIMER1 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM12 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM13 = wxNewId();
@@ -136,8 +138,10 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
     spritePosY(0),
     editingMask(false),
     editingPoint(false),
-    movingBox(false),
-    selectedBox(0),
+    movingPolygon(false),
+    selectedPolygon(0),
+    movingPolygonPoint(false),
+    selectedPolygonPoint(0),
     xSelectionOffset(0),
     ySelectionOffset(0),
     previewElapsedTime(0),
@@ -239,7 +243,11 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	Panel3 = new wxPanel(maskPanel, ID_PANEL9, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL9"));
 	AuiManager3 = new wxAuiManager(Panel3, wxAUI_MGR_DEFAULT);
 	maskToolbar = new wxAuiToolBar(Panel3, ID_AUITOOLBAR3, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	maskToolbar->AddTool(ID_AUITOOLBARITEM6, _("Item label"), gd::CommonBitmapManager::GetInstance()->add16, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
+	maskToolbar->AddTool(ID_AUITOOLBARITEM9, _("Item label"), wxBitmap(wxImage(_T("res/addquad.png"))), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
+	maskToolbar->AddTool(ID_AUITOOLBARITEM6, _("Item label"), wxBitmap(wxImage(_T("res/addpolygon.png"))), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
+	maskToolbar->AddSeparator();
+	maskToolbar->AddTool(ID_AUITOOLBARITEM11, _("Item label"), wxBitmap(wxImage(_T("res/addvertice.png"))), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
+	maskToolbar->AddSeparator();
 	maskToolbar->AddTool(ID_AUITOOLBARITEM7, _("Item label"), gd::CommonBitmapManager::GetInstance()->remove16, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->AddSeparator();
 	maskToolbar->AddTool(ID_AUITOOLBARITEM1, _("Revenir au masque par défaut"), gd::CommonBitmapManager::GetInstance()->defaultMask16, wxNullBitmap, wxITEM_NORMAL, _("Revenir au masque par défaut"), wxEmptyString, NULL);
@@ -249,8 +257,8 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	AuiManager3->AddPane(maskToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager3->Update();
 	FlexGridSizer6->Add(Panel3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	maskList = new wxListCtrl(maskPanel, ID_LISTCTRL2, wxDefaultPosition, wxDefaultSize, wxLC_REPORT, wxDefaultValidator, _T("ID_LISTCTRL2"));
-	FlexGridSizer6->Add(maskList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	maskTree = new wxTreeListCtrl(maskPanel,ID_TREELISTCTRL1,wxDefaultPosition,wxDefaultSize,0,_T("ID_TREELISTCTRL1"));
+	FlexGridSizer6->Add(maskTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	maskPanel->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->Fit(maskPanel);
 	FlexGridSizer6->SetSizeHints(maskPanel);
@@ -315,7 +323,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	imagesMenu.Append(moveRightItem);
 	MenuItem5 = new wxMenuItem((&maskMenu), ID_POSITIONMASKITEM, _("Positionner"), wxEmptyString, wxITEM_NORMAL);
 	maskMenu.Append(MenuItem5);
-	MenuItem6 = new wxMenuItem((&maskMenu), ID_RESIZEMASKITEM, _("Changer la taille"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem6 = new wxMenuItem((&maskMenu), ID_MOVEPOLYGONITEM, _("Déplacer le polygone entier"), wxEmptyString, wxITEM_NORMAL);
 	maskMenu.Append(MenuItem6);
 	previewTimer.SetOwner(this, ID_TIMER1);
 	previewTimer.Start(50, false);
@@ -344,12 +352,12 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListItemSelect);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListItemRClick);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_KEY_DOWN,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListKeyDown);
-	Connect(ID_AUITOOLBARITEM6,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddMaskClick);
+	Connect(ID_AUITOOLBARITEM9,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddMaskClick);
+	Connect(ID_AUITOOLBARITEM6,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddPolygonMaskClick);
+	Connect(ID_AUITOOLBARITEM11,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddVerticeClick);
 	Connect(ID_AUITOOLBARITEM7,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnDeleteMaskClick);
 	Connect(ID_AUITOOLBARITEM1,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnDefaultMaskClick);
 	Connect(ID_MASKAPPLYWHOLEANIMITEM,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnPointEditClick);
-	Connect(ID_LISTCTRL2,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&SpriteObjectEditor::OnmaskListItemActivated);
-	Connect(ID_LISTCTRL2,wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&SpriteObjectEditor::OnmaskListItemRClick);
 	Connect(ID_AUITOOLBARITEM3,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddPointClick);
 	Connect(ID_DELETEPOINTITEM,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnDeletePointClick);
 	Connect(ID_LISTCTRL3,wxEVT_COMMAND_LIST_BEGIN_LABEL_EDIT,(wxObjectEventFunction)&SpriteObjectEditor::OnpointsListBeginLabelEdit);
@@ -372,12 +380,15 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	Connect(ID_MENUITEM9,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMoveLeftSelected);
 	Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMoveRightSelected);
 	Connect(ID_POSITIONMASKITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnPositionMaskSelected);
-	Connect(ID_RESIZEMASKITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnResizeMaskSelected);
+	Connect(ID_MOVEPOLYGONITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMovePolygonSelected);
 	Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&SpriteObjectEditor::OnpreviewTimerTrigger);
 	Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddImageFromFileSelected);
 	Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddFromImageBankSelected);
 	//*)
 	imagesList->Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListRightClick,0,this);
+	Connect(ID_TREELISTCTRL1,wxEVT_COMMAND_TREELIST_ITEM_ACTIVATED,(wxObjectEventFunction)&SpriteObjectEditor::OnmaskTreeItemActivated);
+	Connect(ID_TREELISTCTRL1,wxEVT_COMMAND_TREELIST_ITEM_CONTEXT_MENU,(wxObjectEventFunction)&SpriteObjectEditor::OnmaskTreeItemRClick);
+	Connect(ID_TREELISTCTRL1,wxEVT_COMMAND_TREELIST_SELECTION_CHANGED,(wxObjectEventFunction)&SpriteObjectEditor::OnmaskTreeSelectionChanged);
 
     wxImageList * iconList = new wxImageList(16,16);
     iconList->Add(gd::CommonBitmapManager::GetInstance()->pointEdit16);
@@ -386,11 +397,9 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
     pointsList->InsertColumn(1, _("X"), wxLIST_FORMAT_LEFT, 35);
     pointsList->InsertColumn(2, _("Y"), wxLIST_FORMAT_LEFT, 35);
 
-    maskList->InsertColumn(0, _("Forme"));
-    maskList->InsertColumn(1, _("X"), wxLIST_FORMAT_LEFT, 35);
-    maskList->InsertColumn(2, _("Y"), wxLIST_FORMAT_LEFT, 35);
-    maskList->InsertColumn(3, _("Largeur"), wxLIST_FORMAT_LEFT, 65);
-    maskList->InsertColumn(4, _("Hauteur"), wxLIST_FORMAT_LEFT, 65);
+    maskTree->AppendColumn(_("Forme"));
+    maskTree->AppendColumn(_("X"), 35);
+    maskTree->AppendColumn(_("Y"), 35);
 
     maskToolbar->ToggleTool(ID_MASKAPPLYWHOLEANIMITEM, true);
     pointToolbar->ToggleTool(ID_POINTAPPLYWHOLEANIMITEM, true);
@@ -626,16 +635,25 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
         {
             if ( !sprite.IsCollisionMaskAutomatic() )
             {
-                std::vector<RotatedRectangle> boxes = sprite.GetCollisionMask();
+                std::vector<Polygon2d> mask = sprite.GetCollisionMask();
 
-                for (unsigned int i = 0;i<boxes.size();++i)
+                for (unsigned int i = 0;i<mask.size();++i)
                 {
+                    wxPointList list;
+                    for (unsigned int j = 0;j<mask[i].vertices.size();++j)
+                        list.push_back(new wxPoint(mask[i].vertices[j].x, mask[i].vertices[j].y));
+
                     dc.SetBrush(wxBrush(wxColour(128,128,128), wxBRUSHSTYLE_FDIAGONAL_HATCH));
-                    if ( i == selectedBox ) dc.SetBrush(wxBrush(wxColour(255,255,255), wxBRUSHSTYLE_FDIAGONAL_HATCH));
-                    dc.DrawRectangle(spritePosX+boxes[i].center.x-boxes[i].halfSize.x,
-                                     spritePosY+boxes[i].center.y-boxes[i].halfSize.y,
-                                     boxes[i].halfSize.x*2,
-                                     boxes[i].halfSize.y*2);
+                    dc.SetPen(wxPen(wxColour(100,100,100)));
+                    if ( i == selectedPolygon ) dc.SetBrush(wxBrush(wxColour(255,255,255), wxBRUSHSTYLE_FDIAGONAL_HATCH));
+
+                    dc.DrawPolygon(&list, spritePosX, spritePosY);
+                    for (unsigned int j = 0;j<mask[i].vertices.size();++j)
+                    {
+                        dc.SetBrush(wxBrush(wxColour(128,128,228), wxBRUSHSTYLE_SOLID));
+                        dc.SetPen(wxPen(wxColour(j == selectedPolygonPoint ? 180 : 100,100,100)));
+                        dc.DrawRectangle(spritePosX+mask[i].vertices[j].x-3, spritePosY+mask[i].vertices[j].y-3, 5, 5);
+                    }
                 }
             }
             else //When no custom mask is set, the mask is a bounding box.
@@ -719,7 +737,7 @@ void SpriteObjectEditor::RefreshPoints()
 
 void SpriteObjectEditor::RefreshCollisionMasks()
 {
-    maskList->DeleteAllItems();
+    maskTree->DeleteAllItems();
 
     if ( selectedAnimation < object.GetAnimationCount() &&
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() &&
@@ -729,19 +747,36 @@ void SpriteObjectEditor::RefreshCollisionMasks()
 
         if ( !sprite.IsCollisionMaskAutomatic() )
         {
-            std::vector<RotatedRectangle> masks = sprite.GetCollisionMask();
-            for (unsigned int i = 0;i<masks.size();++i)
+            std::vector<Polygon2d> mask = sprite.GetCollisionMask();
+            for (unsigned int i = 0;i<mask.size();++i)
             {
-                maskList->InsertItem(maskList->GetItemCount(), _("Rectangle"), 0);
-                maskList->SetItem(maskList->GetItemCount()-1, 1, ToString(masks[i].center.x));
-                maskList->SetItem(maskList->GetItemCount()-1, 2, ToString(masks[i].center.y));
-                maskList->SetItem(maskList->GetItemCount()-1, 3, ToString(masks[i].halfSize.x*2));
-                maskList->SetItem(maskList->GetItemCount()-1, 4, ToString(masks[i].halfSize.y*2));
+                wxTreeListItem polygonItem;
+                if ( mask[i].vertices.size() == 3)
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Triangle"));
+                else if ( mask[i].vertices.size() == 4)
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Quadrilatère"));
+                else
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Polygone"));
+
+                //Associate with the item the polygon #
+                maskTree->SetItemData(polygonItem, new wxStringClientData(ToString(i)));
+
+                for (unsigned int j = 0;j<mask[i].vertices.size();++j)
+                {
+                    wxTreeListItem pointItem = maskTree->AppendItem(polygonItem, _("Point"), 0);
+                    maskTree->SetItemText(pointItem, 1, ToString(mask[i].vertices[j].x));
+                    maskTree->SetItemText(pointItem, 2, ToString(mask[i].vertices[j].y));
+
+                    //Associate with the item the point #
+                    maskTree->SetItemData(pointItem, new wxStringClientData(ToString(j)));
+                }
+
+                maskTree->Expand(polygonItem);
             }
         }
         else
         {
-            maskList->InsertItem(maskList->GetItemCount(), _("Par défaut"), 0);
+            maskTree->AppendItem(maskTree->GetRootItem(), _("Par défaut"));
         }
 
     }
@@ -1066,7 +1101,8 @@ void SpriteObjectEditor::OnimagePanelLeftUp(wxMouseEvent& event)
     }
     if ( editingPoint ) RefreshPoints();
 
-    movingBox = false;
+    movingPolygon = false;
+    movingPolygonPoint = false;
 
     imagePanel->Refresh();
     imagePanel->Update();
@@ -1191,19 +1227,44 @@ void SpriteObjectEditor::OnimagePanelLeftDown(wxMouseEvent& event)
 
     if ( editingMask )
     {
-        std::vector<RotatedRectangle> boxes = sprites[0]->GetCollisionMask();
-        for (unsigned int i = 0;i<boxes.size();++i)
+        std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+        for (unsigned int i = 0;i<mask.size();++i)
         {
-            if ( spritePosX+boxes[i].center.x-boxes[i].halfSize.x < event.GetX() &&
-                             spritePosY+boxes[i].center.y-boxes[i].halfSize.y <  event.GetY() &&
-                             spritePosX+boxes[i].center.x+boxes[i].halfSize.x >  event.GetY()&&
-                             spritePosY+boxes[i].center.y+boxes[i].halfSize.y >  event.GetY() )
-             {
-                movingBox = true;
-                selectedBox = i;
-                xSelectionOffset = boxes[i].center.x-event.GetX()+spritePosX;
-                ySelectionOffset = boxes[i].center.y-event.GetY()+spritePosY;
-             }
+            for (unsigned int j = 0;j<mask[i].vertices.size();++j)
+            {
+                if ( spritePosX+mask[i].vertices[j].x-2 <= event.GetX() &&
+                                 spritePosY+mask[i].vertices[j].y-2 <=  event.GetY() &&
+                                 spritePosX+mask[i].vertices[j].x+2 >=  event.GetX() &&
+                                 spritePosY+mask[i].vertices[j].y+2 >=  event.GetY() )
+                 {
+                    movingPolygonPoint = true;
+                    selectedPolygon = i;
+                    selectedPolygonPoint = j;
+                    xSelectionOffset = spritePosX+mask[i].vertices[j].x-event.GetX();
+                    ySelectionOffset = spritePosY+mask[i].vertices[j].y-event.GetY();
+
+                    //Also select the point in the tree
+                    wxTreeListItem polygonItem = maskTree->GetFirstChild(maskTree->GetRootItem());
+                    unsigned int polyId = 0;
+                    while ( polygonItem.IsOk() && polyId != i )
+                    {
+                        polygonItem = maskTree->GetNextSibling(polygonItem);
+                        polyId++;
+                    }
+                    if ( polygonItem.IsOk() )
+                    {
+                        wxTreeListItem verticeItem = maskTree->GetFirstChild(polygonItem);
+                        unsigned int verticeId = 0;
+                        while ( verticeItem.IsOk() && verticeId != j )
+                        {
+                            verticeItem = maskTree->GetNextSibling(verticeItem);
+                            verticeId++;
+                        }
+
+                        if ( verticeItem.IsOk()) maskTree->Select(verticeItem);
+                    }
+                 }
+            }
         }
     }
 }
@@ -1213,22 +1274,25 @@ void SpriteObjectEditor::OnimagePanelMouseMove(wxMouseEvent& event)
     std::vector < Sprite * > sprites = GetSpritesToModify();
     if ( sprites.empty() ) return;
 
-    if ( editingMask && movingBox )
+    if ( editingMask && movingPolygonPoint )
     {
-        std::vector<RotatedRectangle> boxes = sprites[0]->GetCollisionMask();
-        if ( selectedBox < boxes.size())
+        std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+        if ( selectedPolygon < mask.size())
         {
-            boxes[selectedBox].center.x = event.GetX()-spritePosX+xSelectionOffset;
-            boxes[selectedBox].center.y = event.GetY()-spritePosY+ySelectionOffset;
+            if ( selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
+            {
+                mask[selectedPolygon].vertices[selectedPolygonPoint].x = event.GetX()-spritePosX+xSelectionOffset;
+                mask[selectedPolygon].vertices[selectedPolygonPoint].y = event.GetY()-spritePosY+ySelectionOffset;
+            }
         }
         sprites[0]->SetCollisionMaskAutomatic(false);
-        sprites[0]->SetCustomCollisionMask(boxes);
+        sprites[0]->SetCustomCollisionMask(mask);
 
         //Apply changes to other sprites if necessary
         for (unsigned int i = 0;i<sprites.size();++i)
         {
             sprites[i]->SetCollisionMaskAutomatic(false);
-            sprites[i]->SetCustomCollisionMask(boxes);
+            sprites[i]->SetCustomCollisionMask(mask);
         }
 
         imagePanel->Refresh();
@@ -1242,22 +1306,89 @@ void SpriteObjectEditor::OnAddMaskClick(wxCommandEvent& event)
     std::vector < Sprite * > sprites = GetSpritesToModify();
     if ( sprites.empty() ) return;
 
-    std::vector<RotatedRectangle> boxes = sprites[0]->GetCollisionMask();
-    if ( sprites[0]->IsCollisionMaskAutomatic() ) boxes.clear();
+    std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+    if ( sprites[0]->IsCollisionMaskAutomatic() ) mask.clear();
 
-    RotatedRectangle newRectangle;
-    newRectangle.halfSize.x = ToFloat(string(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Nouveau rectangle"), "32").mb_str()))/2.0f;
-    newRectangle.halfSize.y = ToFloat(string(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Nouveau rectangle"), "32").mb_str()))/2.0f;
-    newRectangle.angle = 0;
-    boxes.push_back(newRectangle);
+    float width = ToFloat(string(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Nouveau rectangle"), "32").mb_str()));
+    float height = ToFloat(string(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Nouveau rectangle"), "32").mb_str()));
+    float angle = ToFloat(string(wxGetTextFromUser(_("Entrez l'angle de rotation du rectangle ( en degrés )"), _("Nouveau rectangle"), "0").mb_str()));
+
+    Polygon2d newRectangle = Polygon2d::CreateRectangle(width, height);
+    newRectangle.Rotate(angle*3.14159/180);
+    mask.push_back(newRectangle);
 
     for (unsigned int i = 0;i<sprites.size();++i)
     {
         sprites[i]->SetCollisionMaskAutomatic(false);
-        sprites[i]->SetCustomCollisionMask(boxes);
+        sprites[i]->SetCustomCollisionMask(mask);
     }
 
     RefreshImageAndControls();
+}
+
+void SpriteObjectEditor::OnAddPolygonMaskClick(wxCommandEvent& event)
+{
+}
+
+void SpriteObjectEditor::OnAddVerticeClick(wxCommandEvent& event)
+{
+    std::vector < Sprite * > sprites = GetSpritesToModify();
+    if ( sprites.empty() ) return;
+
+    std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+    if ( selectedPolygon < mask.size() )
+    {
+        if ( selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
+        {
+            if ( selectedPolygonPoint < 1 ) selectedPolygonPoint = 1;
+            if ( selectedPolygonPoint >= mask[selectedPolygon].vertices.size() ) selectedPolygonPoint = mask[selectedPolygon].vertices.size()-1;
+            if ( mask[selectedPolygon].vertices.size() < 2 ) return;
+
+            sf::Vector2f newPoint = (mask[selectedPolygon].vertices[selectedPolygonPoint]+mask[selectedPolygon].vertices[selectedPolygonPoint-1]);
+            newPoint.x /= 2.0f;
+            newPoint.y /= 2.0f;
+            mask[selectedPolygon].vertices.insert(mask[selectedPolygon].vertices.begin()+selectedPolygonPoint, newPoint);
+        }
+        else
+        {
+            size_t verticeCount = mask[selectedPolygon].vertices.size();
+            sf::Vector2f newPoint = mask[selectedPolygon].vertices[verticeCount-1]+mask[selectedPolygon].vertices[verticeCount-2];
+            newPoint.x /= 2.0f;
+            newPoint.y /= 2.0f;
+            mask[selectedPolygon].vertices.insert(mask[selectedPolygon].vertices.begin()+verticeCount-1, newPoint);
+        }
+    }
+
+    for (unsigned int i = 0;i<sprites.size();++i)
+    {
+        sprites[i]->SetCollisionMaskAutomatic(false);
+        sprites[i]->SetCustomCollisionMask(mask);
+    }
+
+    RefreshImageAndControls();
+}
+
+void SpriteObjectEditor::OnmaskTreeSelectionChanged(wxTreeListEvent& event)
+{
+    wxTreeListItem selectedItem = maskTree->GetSelection();
+    if ( maskTree->GetItemParent(selectedItem) == maskTree->GetRootItem() )
+    {
+        //A polygon is selected
+        wxStringClientData * data = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(selectedItem));
+        selectedPolygon = data ? ToInt(ToString(data->GetData())) : std::string::npos;
+        selectedPolygonPoint = std::string::npos;
+    }
+    else
+    {
+        //A point is selected
+        wxStringClientData * data = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(selectedItem));
+        selectedPolygonPoint = data ? ToInt(ToString(data->GetData())) : std::string::npos;
+        wxStringClientData * parentData = dynamic_cast<wxStringClientData *>(maskTree->GetItemData(maskTree->GetItemParent(selectedItem)));
+        selectedPolygon = parentData ? ToInt(ToString(parentData->GetData())) : std::string::npos;
+    }
+
+    imagePanel->Refresh();
+    imagePanel->Update();
 }
 
 void SpriteObjectEditor::OnDeleteMaskClick(wxCommandEvent& event)
@@ -1265,17 +1396,21 @@ void SpriteObjectEditor::OnDeleteMaskClick(wxCommandEvent& event)
     std::vector < Sprite * > sprites = GetSpritesToModify();
     if ( sprites.empty() ) return;
 
-    std::vector<RotatedRectangle> boxes = sprites[0]->GetCollisionMask();
-
-    long maskIndex = maskList->GetNextItem(-1,wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    if ( maskIndex < 0 ) return;
-    if ( maskIndex < boxes.size() )
-        boxes.erase(boxes.begin()+maskIndex);
+    std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+    if ( selectedPolygon < mask.size() )
+    {
+        if ( selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
+        {
+            mask[selectedPolygon].vertices.erase(mask[selectedPolygon].vertices.begin()+selectedPolygonPoint);
+        }
+        else
+            mask.erase(mask.begin()+selectedPolygon);
+    }
 
     for (unsigned int i = 0;i<sprites.size();++i)
     {
         sprites[i]->SetCollisionMaskAutomatic(false);
-        sprites[i]->SetCustomCollisionMask(boxes);
+        sprites[i]->SetCustomCollisionMask(mask);
     }
 
     RefreshImageAndControls();
@@ -1303,50 +1438,47 @@ void SpriteObjectEditor::OnPositionMaskSelected(wxCommandEvent& event)
     std::vector < Sprite * > sprites = GetSpritesToModify();
     if ( sprites.empty() ) return;
 
-    std::vector<RotatedRectangle> boxes = sprites[0]->GetCollisionMask();
-
-    long maskIndex = maskList->GetNextItem(-1,wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    if ( maskIndex < 0 ) return;
-    if ( maskIndex < boxes.size() )
+    std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+    if ( selectedPolygon < mask.size() && selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
     {
-        boxes[maskIndex].center.x = ToFloat(ToString(wxGetTextFromUser(_("Entrez la position X du centre du rectangle"), _("Repositionnement"), ToString(boxes[maskIndex].center.x))));
-        boxes[maskIndex].center.y = ToFloat(ToString(wxGetTextFromUser(_("Entrez la position Y du centre  du rectangle"), _("Repositionnement"), ToString(boxes[maskIndex].center.y))));
+        mask[selectedPolygon].vertices[selectedPolygonPoint].x = ToFloat(ToString(wxGetTextFromUser(_("Entrez la position X du sommet"), _("Repositionnement"), ToString(mask[selectedPolygon].vertices[selectedPolygonPoint].x))));
+        mask[selectedPolygon].vertices[selectedPolygonPoint].y = ToFloat(ToString(wxGetTextFromUser(_("Entrez la position Y du sommet"), _("Repositionnement"), ToString(mask[selectedPolygon].vertices[selectedPolygonPoint].y))));
     }
 
     for (unsigned int i = 0;i<sprites.size();++i)
     {
         sprites[i]->SetCollisionMaskAutomatic(false);
-        sprites[i]->SetCustomCollisionMask(boxes);
+        sprites[i]->SetCustomCollisionMask(mask);
     }
 
     RefreshImageAndControls();
 }
 
-void SpriteObjectEditor::OnResizeMaskSelected(wxCommandEvent& event)
+
+void SpriteObjectEditor::OnMovePolygonSelected(wxCommandEvent& event)
 {
     std::vector < Sprite * > sprites = GetSpritesToModify();
     if ( sprites.empty() ) return;
 
-    std::vector<RotatedRectangle> boxes = sprites[0]->GetCollisionMask();
-
-    long maskIndex = maskList->GetNextItem(-1,wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
-    if ( maskIndex < 0 ) return;
-    if ( maskIndex < boxes.size() )
+    std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+    if ( selectedPolygon < mask.size() )
     {
-        boxes[maskIndex].halfSize.x = ToFloat(ToString(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Redimensionnement"), ToString(boxes[maskIndex].halfSize.x))))/2.0f;
-        boxes[maskIndex].halfSize.y = ToFloat(ToString(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Redimensionnement"), ToString(boxes[maskIndex].halfSize.y))))/2.0f;
+        float xOffset = ToFloat(ToString(wxGetTextFromUser(_("Entrez le déplacement sur l'axe X"), _("Déplacement"), "0")));
+        float yOffset = ToFloat(ToString(wxGetTextFromUser(_("Entrez le déplacement sur l'axe Y"), _("Déplacement"), "0")));
+
+        mask[selectedPolygon].Move(xOffset, yOffset);
     }
 
     for (unsigned int i = 0;i<sprites.size();++i)
     {
         sprites[i]->SetCollisionMaskAutomatic(false);
-        sprites[i]->SetCustomCollisionMask(boxes);
+        sprites[i]->SetCustomCollisionMask(mask);
     }
 
     RefreshImageAndControls();
 }
 
-void SpriteObjectEditor::OnmaskListItemActivated(wxListEvent& event)
+void SpriteObjectEditor::OnmaskTreeItemActivated(wxTreeListEvent& event)
 {
     std::vector < Sprite * > sprites = GetSpritesToModify();
 
@@ -1357,12 +1489,11 @@ void SpriteObjectEditor::OnmaskListItemActivated(wxListEvent& event)
     }
 }
 
-void SpriteObjectEditor::OnmaskListItemRClick(wxListEvent& event)
+void SpriteObjectEditor::OnmaskTreeItemRClick(wxTreeListEvent& event)
 {
     std::vector < Sprite * > sprites = GetSpritesToModify();
 
     maskMenu.Enable(ID_POSITIONMASKITEM, !sprites.empty() && !sprites[0]->IsCollisionMaskAutomatic());
-    maskMenu.Enable(ID_RESIZEMASKITEM, !sprites.empty() && !sprites[0]->IsCollisionMaskAutomatic());
 
     PopupMenu(&maskMenu);
 }

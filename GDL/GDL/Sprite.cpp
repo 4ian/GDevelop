@@ -109,21 +109,20 @@ void Sprite::MakeSpriteOwnsItsImage()
     }
 }
 
-std::vector<RotatedRectangle> Sprite::GetCollisionMask() const
+std::vector<Polygon2d> Sprite::GetCollisionMask() const
 {
     if ( automaticCollisionMask )
     {
-        std::vector<RotatedRectangle> boxes;
+        std::vector<Polygon2d> mask;
 
-        RotatedRectangle rectangle;
-        rectangle.center.x = sfmlSprite.GetSubRect().Width/2;
-        rectangle.center.y = sfmlSprite.GetSubRect().Height/2;
-        rectangle.halfSize.x = sfmlSprite.GetSubRect().Width/2;
-        rectangle.halfSize.y = sfmlSprite.GetSubRect().Height/2;
-        rectangle.angle = 0;
+        Polygon2d rectangle;
+        rectangle.vertices.push_back(sf::Vector2f(-sfmlSprite.GetSubRect().Width/2, -sfmlSprite.GetSubRect().Height/2));
+        rectangle.vertices.push_back(sf::Vector2f(+sfmlSprite.GetSubRect().Width/2, -sfmlSprite.GetSubRect().Height/2));
+        rectangle.vertices.push_back(sf::Vector2f(+sfmlSprite.GetSubRect().Width/2, +sfmlSprite.GetSubRect().Height/2));
+        rectangle.vertices.push_back(sf::Vector2f(-sfmlSprite.GetSubRect().Width/2, +sfmlSprite.GetSubRect().Height/2));
 
-        boxes.push_back(rectangle);
-        return boxes;
+        mask.push_back(rectangle);
+        return mask;
     }
 
     return customCollisionMask;

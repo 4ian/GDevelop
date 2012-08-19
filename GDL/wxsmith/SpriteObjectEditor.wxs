@@ -308,10 +308,32 @@
 									<object class="AuiManagerItem">
 										<object class="wxAuiToolBar" name="ID_AUITOOLBAR3" variable="maskToolbar" member="yes">
 											<object class="AuiToolBarItem">
-												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM6" variable="AuiToolBarItem6" member="yes">
-													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM9" variable="AuiToolBarItem14" member="yes">
+													<bitmap>res/addquad.png</bitmap>
 													<handler function="OnAddMaskClick" entry="EVT_TOOL" />
 												</object>
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM6" variable="AuiToolBarItem6" member="yes">
+													<bitmap>res/addpolygon.png</bitmap>
+													<handler function="OnAddPolygonMaskClick" entry="EVT_TOOL" />
+												</object>
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarSeparator" />
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM11" variable="AuiToolBarItem15" member="yes">
+													<bitmap>res/addvertice.png</bitmap>
+													<handler function="OnAddVerticeClick" entry="EVT_TOOL" />
+												</object>
+												<label>Item label</label>
+											</object>
+											<object class="AuiToolBarItem">
+												<object class="wxAuiToolBarSeparator" />
 												<label>Item label</label>
 											</object>
 											<object class="AuiToolBarItem">
@@ -366,10 +388,10 @@
 							<option>1</option>
 						</object>
 						<object class="sizeritem">
-							<object class="wxListCtrl" name="ID_LISTCTRL2" variable="maskList" member="yes">
-								<style>wxLC_REPORT</style>
-								<handler function="OnmaskListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
-								<handler function="OnmaskListItemRClick" entry="EVT_LIST_ITEM_RIGHT_CLICK" />
+							<object class="Custom" name="ID_TREELISTCTRL1" subclass="wxTreeListCtrl" variable="maskTree" member="yes">
+								<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),$(STYLE),$(NAME));</creating_code>
+								<include_file>wx/treelist.h</include_file>
+								<style></style>
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<option>1</option>
@@ -560,9 +582,9 @@
 				<label>Positionner</label>
 				<handler function="OnPositionMaskSelected" entry="EVT_MENU" />
 			</object>
-			<object class="wxMenuItem" name="ID_RESIZEMASKITEM" variable="MenuItem6" member="yes">
-				<label>Changer la taille</label>
-				<handler function="OnResizeMaskSelected" entry="EVT_MENU" />
+			<object class="wxMenuItem" name="ID_MOVEPOLYGONITEM" variable="MenuItem6" member="yes">
+				<label>Déplacer le polygone entier</label>
+				<handler function="OnMovePolygonSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxTimer" name="ID_TIMER1" variable="previewTimer" member="yes">

@@ -7,7 +7,7 @@
 #define SPRITEOBJECT_H
 
 #include "GDL/Object.h"
-#include "GDL/Animation.h"
+class Animation;
 class Sprite;
 class ImageManager;
 class RuntimeScene;
@@ -149,7 +149,7 @@ public :
     unsigned int GetColorV() const;
     unsigned int GetColorB() const;
 
-    virtual std::vector<RotatedRectangle> GetHitBoxes() const;
+    virtual std::vector<Polygon2d> GetHitBoxes() const;
 
     void FlipX(bool flip = true) { isFlippedX = flip; };
     void FlipY(bool flip = true) { isFlippedY = flip; };

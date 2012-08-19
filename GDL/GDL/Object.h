@@ -13,7 +13,7 @@
 #include "GDL/VariableList.h"
 namespace sf {class RenderTarget;}
 namespace sf {class Shader;}
-class RotatedRectangle;
+class Polygon2d;
 class RuntimeScene;
 class Object;
 class ImageManager;
@@ -291,7 +291,7 @@ public:
     /**
      * Get object hit box(es)
      */
-    virtual std::vector<RotatedRectangle> GetHitBoxes() const;
+    virtual std::vector<Polygon2d> GetHitBoxes() const;
 
     /**
      * Provide access to the ListVariable member containing the layout variables

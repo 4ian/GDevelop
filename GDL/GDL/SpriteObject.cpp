@@ -8,6 +8,7 @@
 #endif
 #include <SFML/Graphics.hpp>
 #include "GDL/SpriteObject.h"
+#include "GDL/Animation.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/Object.h"
 #include "GDL/ImageManager.h"
@@ -537,31 +538,30 @@ const Sprite & SpriteObject::GetCurrentSprite() const
 /**
  * Get object hit box(es)
  */
-std::vector<RotatedRectangle> SpriteObject::GetHitBoxes() const
+std::vector<Polygon2d> SpriteObject::GetHitBoxes() const
 {
     if ( currentAnimation >= GetAnimationCount() )
     {
-        std::vector<RotatedRectangle> boxes; //Invalid animation, bail out.
-        return boxes;
+        std::vector<Polygon2d> hitboxes; //Invalid animation, bail out.
+        return hitboxes;
     }
+    const sf::Sprite & currentSFMLSprite = GetCurrentSFMLSprite();
 
-    std::vector<RotatedRectangle> boxes = GetCurrentSprite().GetCollisionMask();
-    for (unsigned int i = 0;i<boxes.size();++i)
+    std::vector<Polygon2d> polygons = GetCurrentSprite().GetCollisionMask();
+    for (unsigned int i = 0;i<polygons.size();++i)
     {
-        sf::Vector2f newCenter = GetCurrentSFMLSprite().TransformToGlobal(
-                    sf::Vector2f(
-                        !isFlippedX ? boxes[i].center.x : GetCurrentSprite().GetSFMLSprite().GetSize().x/2-boxes[i].center.x,
-                        !isFlippedY ? boxes[i].center.y : GetCurrentSprite().GetSFMLSprite().GetSize().y/2-boxes[i].center.y
-                    ));
-
-        boxes[i].center = newCenter;
-        boxes[i].halfSize.x *= scaleX;
-        boxes[i].halfSize.y *= scaleY;
-        if ( !GetAnimation( currentAnimation ).useMultipleDirections )
-            boxes[i].angle += GetAngle()*3.14159f/180.0f;
+        for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
+        {
+            sf::Vector2f newVertice = currentSFMLSprite.TransformToGlobal(
+                        sf::Vector2f(
+                            !isFlippedX ? polygons[i].vertices[j].x : GetCurrentSprite().GetSFMLSprite().GetSize().x-polygons[i].vertices[j].x,
+                            !isFlippedY ? polygons[i].vertices[j].y : GetCurrentSprite().GetSFMLSprite().GetSize().y-polygons[i].vertices[j].y
+                        ));
+            polygons[i].vertices[j] = newVertice;
+        }
     }
 
-    return boxes;
+    return polygons;
 }
 
 /**

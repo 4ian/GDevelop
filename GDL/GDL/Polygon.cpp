@@ -2,9 +2,25 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
+#include <cmath>
+#include <SFML/System.hpp>
 #include "Polygon.h"
 
-void Polygon::Move(float x, float y)
+void Polygon2d::Rotate(float angle)
+{
+    float t,
+          cosa = cos(angle),
+          sina = sin(angle);
+
+    for (unsigned int i = 0;i<vertices.size();++i)
+    {
+        t = vertices[i].x;
+        vertices[i].x = t*cosa + vertices[i].y*sina;
+        vertices[i].y = -t*sina + vertices[i].y*cosa;
+    }
+}
+
+void Polygon2d::Move(float x, float y)
 {
     for (unsigned int i = 0; i < vertices.size(); i++)
     {
@@ -14,7 +30,7 @@ void Polygon::Move(float x, float y)
     ComputeEdges();
 }
 
-void Polygon::ComputeEdges()
+void Polygon2d::ComputeEdges()
 {
     sf::Vector2f v1, v2;
     edges.clear();
@@ -29,7 +45,7 @@ void Polygon::ComputeEdges()
     }
 }
 
-sf::Vector2f Polygon::ComputeCenter()
+sf::Vector2f Polygon2d::ComputeCenter() const
 {
     sf::Vector2f center;
 
@@ -42,4 +58,15 @@ sf::Vector2f Polygon::ComputeCenter()
     center.y /= vertices.size();
 
     return center;
+}
+
+Polygon2d Polygon2d::CreateRectangle(float width, float height)
+{
+    Polygon2d rect;
+    rect.vertices.push_back(sf::Vector2f(-width/2.0f, -height/2.0f));
+    rect.vertices.push_back(sf::Vector2f(+width/2.0f, -height/2.0f));
+    rect.vertices.push_back(sf::Vector2f(+width/2.0f, +height/2.0f));
+    rect.vertices.push_back(sf::Vector2f(-width/2.0f, +height/2.0f));
+
+    return rect;
 }

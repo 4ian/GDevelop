@@ -12,6 +12,7 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/menu.h>
+#include <wx/treelist.h>
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
@@ -40,10 +41,10 @@ public:
     void AddImageToCurrentAnimation(wxString image);
 
     //(*Declarations(SpriteObjectEditor)
-    wxListCtrl* maskList;
     wxAuiManager* AuiManager1;
     wxMenu* MenuItem2;
     wxTreeCtrl* animationsTree;
+    wxTreeListCtrl* maskTree;
     wxMenuItem* MenuItem8;
     wxListCtrl* pointsList;
     wxPanel* toolbarPanel;
@@ -116,13 +117,15 @@ protected:
     static const long ID_PANEL3;
     static const long ID_LISTCTRL1;
     static const long ID_PANEL2;
+    static const long ID_AUITOOLBARITEM9;
     static const long ID_AUITOOLBARITEM6;
+    static const long ID_AUITOOLBARITEM11;
     static const long ID_AUITOOLBARITEM7;
     static const long ID_AUITOOLBARITEM1;
     static const long ID_MASKAPPLYWHOLEANIMITEM;
     static const long ID_AUITOOLBAR3;
     static const long ID_PANEL9;
-    static const long ID_LISTCTRL2;
+    static const long ID_TREELISTCTRL1;
     static const long ID_PANEL8;
     static const long ID_AUITOOLBARITEM3;
     static const long ID_DELETEPOINTITEM;
@@ -146,7 +149,7 @@ protected:
     static const long ID_MENUITEM9;
     static const long ID_MENUITEM10;
     static const long ID_POSITIONMASKITEM;
-    static const long ID_RESIZEMASKITEM;
+    static const long ID_MOVEPOLYGONITEM;
     static const long ID_TIMER1;
     static const long ID_MENUITEM12;
     static const long ID_MENUITEM13;
@@ -186,8 +189,6 @@ private:
     void OnDefaultMaskClick(wxCommandEvent& event);
     void OnPositionMaskSelected(wxCommandEvent& event);
     void OnResizeMaskSelected(wxCommandEvent& event);
-    void OnmaskListItemActivated(wxListEvent& event);
-    void OnmaskListItemRClick(wxListEvent& event);
     void OnMenuLoopSelected(wxCommandEvent& event);
     void OnTimeBetweenFramesSelected(wxCommandEvent& event);
     void OnpreviewPanelEraseBackground(wxEraseEvent& event);
@@ -201,7 +202,13 @@ private:
     void OnAddFromImageBankSelected(wxCommandEvent& event);
     void OnHelpClick(wxCommandEvent& event);
     void OnToolLoopClick(wxCommandEvent& event);
+    void OnMovePolygonSelected(wxCommandEvent& event);
+    void OnAddPolygonMaskClick(wxCommandEvent& event);
+    void OnAddVerticeClick(wxCommandEvent& event);
     //*)
+    void OnmaskTreeItemRClick(wxTreeListEvent& event);
+    void OnmaskTreeItemActivated(wxTreeListEvent& event);
+    void OnmaskTreeSelectionChanged(wxTreeListEvent& event);
     void OnimagesListRightClick(wxMouseEvent& event);
     void RefreshAll();
     void RefreshAnimationTree();
@@ -238,8 +245,10 @@ private:
 
     std::string renamedPointOldName;
 
-    bool movingBox;
-    unsigned int selectedBox;
+    bool movingPolygon;
+    unsigned int selectedPolygon;
+    bool movingPolygonPoint;
+    unsigned int selectedPolygonPoint;
     float xSelectionOffset;
     float ySelectionOffset;
 

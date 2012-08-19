@@ -12919,7 +12919,7 @@
 	"GDCore/PlatformDefinition/Project.h"
 	"GDL/IDE/ChangesNotifier.h"
 
-1343246329 d:\florian\programmation\gamedevelop2\gdl\\gdl\object.h
+1345144210 d:\florian\programmation\gamedevelop2\gdl\\gdl\object.h
 	"GDL/Force.h"
 	<string>
 	<vector>
@@ -13080,12 +13080,12 @@
 	<SFML/Graphics.hpp>
 	"GDL/Sprite.h"
 
-1341837005 d:\florian\programmation\gamedevelop2\gdl\\gdl\sprite.h
-	<SFML/Graphics.hpp>
-	<boost/shared_ptr.hpp>
-	"GDL/Point.h"
+1345146180 d:\florian\programmation\gamedevelop2\gdl\\gdl\sprite.h
 	<string>
-	"GDL/RotatedRectangle.h"
+	<boost/shared_ptr.hpp>
+	<SFML/Graphics.hpp>
+	"GDL/Point.h"
+	"GDL/Polygon.h"
 
 1337100353 d:\florian\programmation\gamedevelop2\gdl\\gdl\point.h
 	<string>
@@ -13485,9 +13485,8 @@
 	"GDL/SpriteObject.h"
 	"GDL/Collisions.h"
 
-1343243305 d:\florian\programmation\gamedevelop2\gdl\\gdl\spriteobject.h
+1345312445 d:\florian\programmation\gamedevelop2\gdl\\gdl\spriteobject.h
 	"GDL/Object.h"
-	"GDL/Animation.h"
 
 1337098134 d:\florian\programmation\gamedevelop2\gdl\\gdl\collisions.h
 	<iostream>
@@ -13726,7 +13725,7 @@
 	<string>
 	<vector>
 
-1341433157 source:d:\florian\programmation\gamedevelop2\gdl\gdl\direction.cpp
+1345152744 source:d:\florian\programmation\gamedevelop2\gdl\gdl\direction.cpp
 	"GDL/Direction.h"
 	<SFML/Graphics.hpp>
 	<string>
@@ -14612,7 +14611,7 @@
 	"GDL/Object.h"
 	"GDL/profile.h"
 
-1343246524 source:d:\florian\programmation\gamedevelop2\gdl\gdl\object.cpp
+1345144210 source:d:\florian\programmation\gamedevelop2\gdl\gdl\object.cpp
 	"GDL/Object.h"
 	<iostream>
 	<string>
@@ -14628,7 +14627,7 @@
 	"GDL/RuntimeScene.h"
 	"GDL/Automatism.h"
 	"GDL/Game.h"
-	"GDL/RotatedRectangle.h"
+	"GDL/Polygon.h"
 	"GDL/ExtensionsManager.h"
 	<wx/panel.h>
 
@@ -14973,7 +14972,7 @@
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\compilertoolchainpathmanager.h
 
-1343919499 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
+1345146180 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
 	"GDL/Sprite.h"
 	<SFML/Graphics.hpp>
 	"GDL/ImageManager.h"
@@ -15003,10 +15002,11 @@
 	<wx/panel.h>
 	<wx/combobox.h>
 
-1344426688 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
+1345313221 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
 	<wx/wx.h>
 	<SFML/Graphics.hpp>
 	"GDL/SpriteObject.h"
+	"GDL/Animation.h"
 	"GDL/RuntimeGame.h"
 	"GDL/Object.h"
 	"GDL/ImageManager.h"
@@ -15860,7 +15860,7 @@
 	<wx/filename.h>
 	"GDL/IDE/CodeCompiler.h"
 
-1344357480 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1345154671 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -33678,11 +33678,11 @@
 1325338673 d:\florian\programmation\gamedevelop2\gdl\\gdl\builtinextensions\networktools.h
 	<string>
 
-1326147920 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\objecttools.cpp
+1345144210 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\objecttools.cpp
 	"ObjectTools.h"
 	"GDL/Object.h"
-	"GDL/RotatedRectangle.h"
-	"GDL/RotatedRectangleCollision.h"
+	"GDL/Polygon.h"
+	"GDL/PolygonCollision.h"
 	<cmath>
 
 1319832304 d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\objecttools.h
@@ -34256,7 +34256,7 @@
 	<boost/shared_ptr.hpp>
 	"GDL/IDE/ArbitraryResourceWorker.h"
 
-1344888348 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
+1345411532 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
 	"SpriteObjectEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -34285,12 +34285,13 @@
 	<wx/msw/winundef.h>
 	<wx/msw/uxtheme.h>
 
-1343946505 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\spriteobjecteditor.h
+1345408610 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\spriteobjecteditor.h
 	<wx/listctrl.h>
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/menu.h>
+	<wx/treelist.h>
 	<wx/aui/aui.h>
 	<wx/panel.h>
 	<wx/scrolbar.h>
@@ -35821,12 +35822,13 @@
 1343505154 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dndresourceseditor.h
 	<wx/dnd.h>
 
-1343946505 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.h
+1345408610 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.h
 	<wx/listctrl.h>
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/menu.h>
+	<wx/treelist.h>
 	<wx/aui/aui.h>
 	<wx/panel.h>
 	<wx/scrolbar.h>
@@ -36039,4 +36041,26 @@
 1343773018 d:\florian\programmation\gamedevelop2\core\\gdcore\events\linkevent.h
 	"GDCore/Events/Event.h"
 	<string>
+
+1345313394 source:d:\florian\programmation\gamedevelop2\gdl\gdl\polygon.cpp
+	<cmath>
+	<SFML/System.hpp>
+	"Polygon.h"
+
+1345315858 d:\florian\programmation\gamedevelop2\gdl\gdl\polygon.h
+	<vector>
+	<SFML/System.hpp>
+
+1345318378 source:d:\florian\programmation\gamedevelop2\gdl\gdl\polygoncollision.cpp
+	"GDL/PolygonCollision.h"
+	"GDL/Polygon.h"
+	<cmath>
+	<cfloat>
+
+1345318378 d:\florian\programmation\gamedevelop2\gdl\\gdl\polygoncollision.h
+	<SFML/System.hpp>
+
+1345315858 d:\florian\programmation\gamedevelop2\gdl\\gdl\polygon.h
+	<vector>
+	<SFML/System.hpp>
 

@@ -11,3 +11,18 @@ void gd::MainFrameWrapper::DisableControlsForScenePreviewing()
     for (unsigned int i = 0;i<disableOnPreview.size();++i) disableOnPreview[i]->Disable();
     if ( editorsNotebook ) editorsNotebook->SetSelection(notebookCurrentPage);
 };
+
+/**
+ * Remove a control to the list of controls to be disabled on preview
+ */
+void gd::MainFrameWrapper::RemoveControlToBeDisabledOnPreview(wxWindow * control)
+{
+    for (unsigned int i = 0;i<disableOnPreview.size();++i)
+    {
+        if ( disableOnPreview[i] == control )
+        {
+            disableOnPreview.erase(disableOnPreview.begin()+i);
+            return;
+        }
+    }
+}

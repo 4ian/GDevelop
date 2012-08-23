@@ -108,7 +108,12 @@ public:
     /**
      * Used by the IDE to setup controls to be disabled when a scene is previewed.
      */
-    void AddControlToBeDisabledOnPreview(wxWindow * control) { disableOnPreview.push_back(control); }
+    void AddControlToBeDisabledOnPreview(wxWindow * control) { if ( find(disableOnPreview.begin(), disableOnPreview.end(), control) == disableOnPreview.end() ) disableOnPreview.push_back(control); }
+
+    /**
+     * Remove a control to the list of controls to be disabled on preview
+     */
+    void RemoveControlToBeDisabledOnPreview(wxWindow * control);
 
 private:
 

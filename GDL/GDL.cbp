@@ -1203,6 +1203,10 @@
 		<Unit filename="GDL\OpenSaveLoadingScreen.h" />
 		<Unit filename="GDL\Point.cpp" />
 		<Unit filename="GDL\Point.h" />
+		<Unit filename="GDL\Polygon.cpp" />
+		<Unit filename="GDL\Polygon.h" />
+		<Unit filename="GDL\PolygonCollision.cpp" />
+		<Unit filename="GDL\PolygonCollision.h" />
 		<Unit filename="GDL\Position.cpp" />
 		<Unit filename="GDL\Position.h" />
 		<Unit filename="GDL\ProfileEvent.cpp" />
@@ -1213,10 +1217,6 @@
 		<Unit filename="GDL\ResourcesManager.h" />
 		<Unit filename="GDL\RessourcesLoader.cpp" />
 		<Unit filename="GDL\RessourcesLoader.h" />
-		<Unit filename="GDL\RotatedRectangle.cpp" />
-		<Unit filename="GDL\RotatedRectangle.h" />
-		<Unit filename="GDL\RotatedRectangleCollision.cpp" />
-		<Unit filename="GDL\RotatedRectangleCollision.h" />
 		<Unit filename="GDL\RuntimeContext.cpp" />
 		<Unit filename="GDL\RuntimeContext.h" />
 		<Unit filename="GDL\RuntimeGame.cpp" />

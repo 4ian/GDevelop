@@ -118,7 +118,6 @@ protected:
     static const long ID_LISTCTRL1;
     static const long ID_PANEL2;
     static const long ID_AUITOOLBARITEM9;
-    static const long ID_AUITOOLBARITEM6;
     static const long ID_AUITOOLBARITEM11;
     static const long ID_AUITOOLBARITEM7;
     static const long ID_AUITOOLBARITEM1;

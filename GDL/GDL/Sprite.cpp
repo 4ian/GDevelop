@@ -116,10 +116,10 @@ std::vector<Polygon2d> Sprite::GetCollisionMask() const
         std::vector<Polygon2d> mask;
 
         Polygon2d rectangle;
-        rectangle.vertices.push_back(sf::Vector2f(-sfmlSprite.GetSubRect().Width/2, -sfmlSprite.GetSubRect().Height/2));
-        rectangle.vertices.push_back(sf::Vector2f(+sfmlSprite.GetSubRect().Width/2, -sfmlSprite.GetSubRect().Height/2));
-        rectangle.vertices.push_back(sf::Vector2f(+sfmlSprite.GetSubRect().Width/2, +sfmlSprite.GetSubRect().Height/2));
-        rectangle.vertices.push_back(sf::Vector2f(-sfmlSprite.GetSubRect().Width/2, +sfmlSprite.GetSubRect().Height/2));
+        rectangle.vertices.push_back(sf::Vector2f(0, 0));
+        rectangle.vertices.push_back(sf::Vector2f(sfmlSprite.GetSubRect().Width, 0));
+        rectangle.vertices.push_back(sf::Vector2f(sfmlSprite.GetSubRect().Width, sfmlSprite.GetSubRect().Height));
+        rectangle.vertices.push_back(sf::Vector2f(0, sfmlSprite.GetSubRect().Height));
 
         mask.push_back(rectangle);
         return mask;

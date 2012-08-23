@@ -315,13 +315,6 @@
 												<label>Item label</label>
 											</object>
 											<object class="AuiToolBarItem">
-												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM6" variable="AuiToolBarItem6" member="yes">
-													<bitmap>res/addpolygon.png</bitmap>
-													<handler function="OnAddPolygonMaskClick" entry="EVT_TOOL" />
-												</object>
-												<label>Item label</label>
-											</object>
-											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarSeparator" />
 												<label>Item label</label>
 											</object>

@@ -14972,7 +14972,7 @@
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\compilertoolchainpathmanager.h
 
-1345146180 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
+1345724295 source:d:\florian\programmation\gamedevelop2\gdl\gdl\sprite.cpp
 	"GDL/Sprite.h"
 	<SFML/Graphics.hpp>
 	"GDL/ImageManager.h"
@@ -15002,7 +15002,7 @@
 	<wx/panel.h>
 	<wx/combobox.h>
 
-1345313221 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
+1345724517 source:d:\florian\programmation\gamedevelop2\gdl\gdl\spriteobject.cpp
 	<wx/wx.h>
 	<SFML/Graphics.hpp>
 	"GDL/SpriteObject.h"
@@ -15860,7 +15860,7 @@
 	<wx/filename.h>
 	"GDL/IDE/CodeCompiler.h"
 
-1345154671 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
+1345470600 d:\florian\programmation\gamedevelop2\gdl\\gdl\version.h
 
 1325335071 d:\florian\programmation\gamedevelop2\gdl\\gdl\localemanager.h
 	<wx/intl.h>
@@ -34256,7 +34256,7 @@
 	<boost/shared_ptr.hpp>
 	"GDL/IDE/ArbitraryResourceWorker.h"
 
-1345411532 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
+1345724810 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.cpp
 	"SpriteObjectEditor.h"
 	<wx/bitmap.h>
 	<wx/intl.h>
@@ -34285,7 +34285,7 @@
 	<wx/msw/winundef.h>
 	<wx/msw/uxtheme.h>
 
-1345408610 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\spriteobjecteditor.h
+1345724667 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\spriteobjecteditor.h
 	<wx/listctrl.h>
 	<wx/treectrl.h>
 	<wx/sizer.h>
@@ -35822,7 +35822,7 @@
 1343505154 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dndresourceseditor.h
 	<wx/dnd.h>
 
-1345408610 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.h
+1345724667 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\spriteobjecteditor.h
 	<wx/listctrl.h>
 	<wx/treectrl.h>
 	<wx/sizer.h>
@@ -36042,12 +36042,13 @@
 	"GDCore/Events/Event.h"
 	<string>
 
-1345313394 source:d:\florian\programmation\gamedevelop2\gdl\gdl\polygon.cpp
+1345469104 source:d:\florian\programmation\gamedevelop2\gdl\gdl\polygon.cpp
 	<cmath>
+	<iostream>
 	<SFML/System.hpp>
 	"Polygon.h"
 
-1345315858 d:\florian\programmation\gamedevelop2\gdl\gdl\polygon.h
+1345469090 d:\florian\programmation\gamedevelop2\gdl\gdl\polygon.h
 	<vector>
 	<SFML/System.hpp>
 
@@ -36060,7 +36061,7 @@
 1345318378 d:\florian\programmation\gamedevelop2\gdl\\gdl\polygoncollision.h
 	<SFML/System.hpp>
 
-1345315858 d:\florian\programmation\gamedevelop2\gdl\\gdl\polygon.h
+1345469090 d:\florian\programmation\gamedevelop2\gdl\\gdl\polygon.h
 	<vector>
 	<SFML/System.hpp>
 

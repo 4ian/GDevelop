@@ -21,6 +21,9 @@ public:
     Polygon2d() {};
     virtual ~Polygon2d() {};
 
+    std::vector<sf::Vector2f> vertices; ///< The vertices composing the polygon
+    mutable std::vector<sf::Vector2f> edges; ///< Can be computed from vertices using ComputeEdges()
+
     /**
      * Moves each vertices from the given amount.
      *
@@ -40,21 +43,23 @@ public:
     /**
      * Automatically fill edges vector using vertices.
      */
-    void ComputeEdges();
+    void ComputeEdges() const;
+
+    /**
+     * Check if the polygon is convex.
+     * \return true if the polygon is convex
+     */
+    bool IsConvex() const;
 
     /**
      * Return the position of the center of the polygon
      */
     sf::Vector2f ComputeCenter() const;
 
-    std::vector<sf::Vector2f> vertices;
-    std::vector<sf::Vector2f> edges; ///< Can be computed from vertices using ComputeEdges()
-
     /** \name Tools
-     * Tools function
+     * Tool functions
      */
     ///@{
-
     /**
      * Create a rectangle
      */

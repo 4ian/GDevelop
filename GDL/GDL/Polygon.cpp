@@ -3,6 +3,7 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 #include <cmath>
+#include <iostream>
 #include <SFML/System.hpp>
 #include "Polygon.h"
 
@@ -30,7 +31,7 @@ void Polygon2d::Move(float x, float y)
     ComputeEdges();
 }
 
-void Polygon2d::ComputeEdges()
+void Polygon2d::ComputeEdges() const
 {
     sf::Vector2f v1, v2;
     edges.clear();
@@ -43,6 +44,25 @@ void Polygon2d::ComputeEdges()
 
         edges.push_back(v2 - v1);
     }
+}
+
+bool Polygon2d::IsConvex() const
+{
+    ComputeEdges();
+    if ( edges.size() < 3 ) return false;
+
+    bool zProductIsPositive = (edges[0].x*edges[0+1].y - edges[0].y*edges[0+1].x) > 0;
+
+    for (unsigned int i = 1;i<edges.size()-1;++i)
+    {
+        float zCrossProduct = edges[i].x*edges[i+1].y - edges[i].y*edges[i+1].x;
+        if ( (zCrossProduct > 0) != zProductIsPositive ) return false;
+    }
+
+    float lastZCrossProduct = edges[edges.size()-1].x*edges[0].y - edges[edges.size()-1].y*edges[0].x;
+    if ( (lastZCrossProduct > 0) != zProductIsPositive ) return false;
+
+    return true;
 }
 
 sf::Vector2f Polygon2d::ComputeCenter() const

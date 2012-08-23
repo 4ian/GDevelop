@@ -86,7 +86,6 @@ const long SpriteObjectEditor::ID_PANEL3 = wxNewId();
 const long SpriteObjectEditor::ID_LISTCTRL1 = wxNewId();
 const long SpriteObjectEditor::ID_PANEL2 = wxNewId();
 const long SpriteObjectEditor::ID_AUITOOLBARITEM9 = wxNewId();
-const long SpriteObjectEditor::ID_AUITOOLBARITEM6 = wxNewId();
 const long SpriteObjectEditor::ID_AUITOOLBARITEM11 = wxNewId();
 const long SpriteObjectEditor::ID_AUITOOLBARITEM7 = wxNewId();
 const long SpriteObjectEditor::ID_AUITOOLBARITEM1 = wxNewId();
@@ -244,7 +243,6 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	AuiManager3 = new wxAuiManager(Panel3, wxAUI_MGR_DEFAULT);
 	maskToolbar = new wxAuiToolBar(Panel3, ID_AUITOOLBAR3, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
 	maskToolbar->AddTool(ID_AUITOOLBARITEM9, _("Item label"), wxBitmap(wxImage(_T("res/addquad.png"))), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
-	maskToolbar->AddTool(ID_AUITOOLBARITEM6, _("Item label"), wxBitmap(wxImage(_T("res/addpolygon.png"))), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->AddSeparator();
 	maskToolbar->AddTool(ID_AUITOOLBARITEM11, _("Item label"), wxBitmap(wxImage(_T("res/addvertice.png"))), wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->AddSeparator();
@@ -353,7 +351,6 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListItemRClick);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_KEY_DOWN,(wxObjectEventFunction)&SpriteObjectEditor::OnimagesListKeyDown);
 	Connect(ID_AUITOOLBARITEM9,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddMaskClick);
-	Connect(ID_AUITOOLBARITEM6,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddPolygonMaskClick);
 	Connect(ID_AUITOOLBARITEM11,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddVerticeClick);
 	Connect(ID_AUITOOLBARITEM7,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnDeleteMaskClick);
 	Connect(ID_AUITOOLBARITEM1,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnDefaultMaskClick);
@@ -397,6 +394,13 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
     pointsList->InsertColumn(1, _("X"), wxLIST_FORMAT_LEFT, 35);
     pointsList->InsertColumn(2, _("Y"), wxLIST_FORMAT_LEFT, 35);
 
+    wxImageList * maskIconList = new wxImageList(16,16);
+    maskIconList->Add(wxBitmap("res/triangle.png",wxBITMAP_TYPE_ANY));
+    maskIconList->Add(wxBitmap("res/rectangle.png",wxBITMAP_TYPE_ANY));
+    maskIconList->Add(wxBitmap("res/polygon.png",wxBITMAP_TYPE_ANY));
+    maskIconList->Add(wxBitmap("res/vertice.png",wxBITMAP_TYPE_ANY));
+    maskIconList->Add(wxBitmap("res/warning.png",wxBITMAP_TYPE_ANY));
+    maskTree->AssignImageList(maskIconList);
     maskTree->AppendColumn(_("Forme"));
     maskTree->AppendColumn(_("X"), 35);
     maskTree->AppendColumn(_("Y"), 35);
@@ -752,18 +756,24 @@ void SpriteObjectEditor::RefreshCollisionMasks()
             {
                 wxTreeListItem polygonItem;
                 if ( mask[i].vertices.size() == 3)
-                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Triangle"));
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Triangle"), 0, 0);
                 else if ( mask[i].vertices.size() == 4)
-                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Quadrilatère"));
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Quadrilatère"), 1, 1);
                 else
-                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Polygone"));
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Polygone"), 2, 2);
 
                 //Associate with the item the polygon #
                 maskTree->SetItemData(polygonItem, new wxStringClientData(ToString(i)));
 
+                if ( !mask[i].IsConvex() )
+                {
+                    maskTree->SetItemImage(polygonItem, 4, 4);
+                    maskTree->SetItemText(polygonItem, maskTree->GetItemText(polygonItem)+" "+_("( INVALIDE : Le polygone n'est pas convexe )"));
+                }
+
                 for (unsigned int j = 0;j<mask[i].vertices.size();++j)
                 {
-                    wxTreeListItem pointItem = maskTree->AppendItem(polygonItem, _("Point"), 0);
+                    wxTreeListItem pointItem = maskTree->AppendItem(polygonItem, _("Sommet"), 3,3);
                     maskTree->SetItemText(pointItem, 1, ToString(mask[i].vertices[j].x));
                     maskTree->SetItemText(pointItem, 2, ToString(mask[i].vertices[j].y));
 
@@ -1031,9 +1041,36 @@ void SpriteObjectEditor::OnmgrPaneClose(wxAuiManagerEvent& event)
     }
     else if ( event.GetPane()->window == maskPanel )
     {
-        toolbar->ToggleTool(ID_MASKITEM, false);
-        toolbar->Update();
-        editingMask = false;
+        //Check that all polygons of the collision mask are convex
+        bool aPolygonIsNotConvex = false;
+        if ( selectedAnimation < object.GetAnimationCount() &&
+             selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() &&
+             selectedImage < object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection).GetSpriteCount() )
+        {
+            const Sprite & sprite = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection).GetSprite(selectedImage);
+
+            if ( !sprite.IsCollisionMaskAutomatic() )
+            {
+                std::vector<Polygon2d> mask = sprite.GetCollisionMask();
+                for (unsigned int i = 0;i<mask.size();++i)
+                {
+                    if ( !mask[i].IsConvex() ) aPolygonIsNotConvex = true;
+                }
+            }
+        }
+
+        if ( !aPolygonIsNotConvex )
+        {
+            toolbar->ToggleTool(ID_MASKITEM, false);
+            toolbar->Update();
+            editingMask = false;
+        }
+        else
+        {
+            wxLogMessage(_("Un ou plusieurs polygones du masque de collision ne sont pas convexes ( C'est à dire qu'ils contiennent un creux ).\nVeuillez modifier ces polygones avant de poursuivre."));
+            event.Veto();
+        }
+
     }
 }
 
@@ -1401,6 +1438,17 @@ void SpriteObjectEditor::OnDeleteMaskClick(wxCommandEvent& event)
     {
         if ( selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
         {
+            //Make sure not to delete a vertice if the polygon has 3 vertices
+            if ( mask[selectedPolygon].vertices.size() <= 3 )
+            {
+                if (wxMessageBox(_("Un polygone ne peut pas avoir moins de 3 sommets.\nVoulez vous supprimer le polygone entier ?"), _("Supprimer le polygone ?"), wxYES_NO|wxICON_EXCLAMATION ) == wxYES)
+                {
+                    mask.erase(mask.begin()+selectedPolygon);
+                }
+                else
+                    return;
+            }
+
             mask[selectedPolygon].vertices.erase(mask[selectedPolygon].vertices.begin()+selectedPolygonPoint);
         }
         else

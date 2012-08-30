@@ -68,6 +68,7 @@ public:
     wxPanel* Panel3;
     wxAuiToolBar* maskToolbar;
     wxPanel* animationsPanel;
+    wxMenuItem* MenuItem12;
     wxScrollBar* xScrollBar;
     wxTimer previewTimer;
     wxMenuItem* MenuItem3;
@@ -149,6 +150,7 @@ protected:
     static const long ID_MENUITEM10;
     static const long ID_POSITIONMASKITEM;
     static const long ID_MOVEPOLYGONITEM;
+    static const long ID_MENUITEM14;
     static const long ID_TIMER1;
     static const long ID_MENUITEM12;
     static const long ID_MENUITEM13;
@@ -204,6 +206,7 @@ private:
     void OnMovePolygonSelected(wxCommandEvent& event);
     void OnAddPolygonMaskClick(wxCommandEvent& event);
     void OnAddVerticeClick(wxCommandEvent& event);
+    void OnRotatePolygonSelected(wxCommandEvent& event);
     //*)
     void OnmaskTreeItemRClick(wxTreeListEvent& event);
     void OnmaskTreeItemActivated(wxTreeListEvent& event);

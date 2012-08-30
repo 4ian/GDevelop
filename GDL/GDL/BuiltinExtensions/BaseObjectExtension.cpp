@@ -622,6 +622,22 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         DECLARE_END_OBJECT_ACTION()
 
+        DECLARE_OBJECT_ACTION("SeparateFromObjects",
+                       _("Séparer deux objets"),
+                       _("Ecarte un objet d'un autre sans utiliser les forces."),
+                       _("Ecarter _PARAM0_ de _PARAM2_ ( seul _PARAM0_ bougera )"),
+                       _("Position"),
+                       "res/actions/ecarter24.png",
+                       "res/actions/ecarter.png");
+
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+            instrInfo.AddParameter("object", _("Objets"), "", false);
+            instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1");
+
+            instrInfo.cppCallingInformation.SetFunctionName("SeparateFromObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+
+        DECLARE_END_OBJECT_ACTION()
+
         DECLARE_OBJECT_EXPRESSION("X", _("Position X"), _("Position X de l'objet"), _("Position"), "res/actions/position.png")
             instrInfo.AddParameter("object", _("Objet"), "", false);
 

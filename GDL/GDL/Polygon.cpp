@@ -10,8 +10,8 @@
 void Polygon2d::Rotate(float angle)
 {
     float t,
-          cosa = cos(angle),
-          sina = sin(angle);
+          cosa = cos(-angle),
+          sina = sin(-angle); //We want a clockwise rotation
 
     for (unsigned int i = 0;i<vertices.size();++i)
     {

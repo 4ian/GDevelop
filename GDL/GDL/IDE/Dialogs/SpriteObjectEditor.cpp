@@ -117,6 +117,7 @@ const long SpriteObjectEditor::ID_MENUITEM9 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM10 = wxNewId();
 const long SpriteObjectEditor::ID_POSITIONMASKITEM = wxNewId();
 const long SpriteObjectEditor::ID_MOVEPOLYGONITEM = wxNewId();
+const long SpriteObjectEditor::ID_MENUITEM14 = wxNewId();
 const long SpriteObjectEditor::ID_TIMER1 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM12 = wxNewId();
 const long SpriteObjectEditor::ID_MENUITEM13 = wxNewId();
@@ -321,8 +322,11 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	imagesMenu.Append(moveRightItem);
 	MenuItem5 = new wxMenuItem((&maskMenu), ID_POSITIONMASKITEM, _("Positionner"), wxEmptyString, wxITEM_NORMAL);
 	maskMenu.Append(MenuItem5);
+	maskMenu.AppendSeparator();
 	MenuItem6 = new wxMenuItem((&maskMenu), ID_MOVEPOLYGONITEM, _("Déplacer le polygone entier"), wxEmptyString, wxITEM_NORMAL);
 	maskMenu.Append(MenuItem6);
+	MenuItem12 = new wxMenuItem((&maskMenu), ID_MENUITEM14, _("Tourner le polygone entier"), wxEmptyString, wxITEM_NORMAL);
+	maskMenu.Append(MenuItem12);
 	previewTimer.SetOwner(this, ID_TIMER1);
 	previewTimer.Start(50, false);
 	MenuItem10 = new wxMenuItem((&emptyImagesMenu), ID_MENUITEM12, _("Ajouter une image depuis un fichier"), wxEmptyString, wxITEM_NORMAL);
@@ -378,6 +382,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	Connect(ID_MENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMoveRightSelected);
 	Connect(ID_POSITIONMASKITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnPositionMaskSelected);
 	Connect(ID_MOVEPOLYGONITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnMovePolygonSelected);
+	Connect(ID_MENUITEM14,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnRotatePolygonSelected);
 	Connect(ID_TIMER1,wxEVT_TIMER,(wxObjectEventFunction)&SpriteObjectEditor::OnpreviewTimerTrigger);
 	Connect(ID_MENUITEM12,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddImageFromFileSelected);
 	Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SpriteObjectEditor::OnAddFromImageBankSelected);
@@ -443,6 +448,11 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	mgr->Update();
 	Layout();
 	SetSize(900,600);
+
+	toolbar->Realize(); //Toolbars need to be realized again under Linux.
+	animationToolbar->Realize();
+	maskToolbar->Realize();
+	pointToolbar->Realize();
 }
 
 void SpriteObjectEditor::OnimagesListRightClick(wxMouseEvent& event)
@@ -1525,6 +1535,29 @@ void SpriteObjectEditor::OnMovePolygonSelected(wxCommandEvent& event)
 
     RefreshImageAndControls();
 }
+
+void SpriteObjectEditor::OnRotatePolygonSelected(wxCommandEvent& event)
+{
+    std::vector < Sprite * > sprites = GetSpritesToModify();
+    if ( sprites.empty() ) return;
+
+    std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
+    if ( selectedPolygon < mask.size() )
+    {
+        float angle = ToFloat(ToString(wxGetTextFromUser(_("Entrez l'angle de rotation en degrés"), _("Rotation du polygone"), "0")))*3.14159/180;
+
+        mask[selectedPolygon].Rotate(angle);
+    }
+
+    for (unsigned int i = 0;i<sprites.size();++i)
+    {
+        sprites[i]->SetCollisionMaskAutomatic(false);
+        sprites[i]->SetCustomCollisionMask(mask);
+    }
+
+    RefreshImageAndControls();
+}
+
 
 void SpriteObjectEditor::OnmaskTreeItemActivated(wxTreeListEvent& event)
 {

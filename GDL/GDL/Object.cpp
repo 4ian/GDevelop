@@ -16,6 +16,7 @@
 #include "GDL/Force.h"
 #include "GDL/CommonTools.h"
 #include "GDL/RuntimeScene.h"
+#include "GDL/PolygonCollision.h"
 #include "GDL/Automatism.h"
 #include "GDL/Game.h"
 #include "GDL/Polygon.h"
@@ -436,6 +437,40 @@ double Object::GetDistanceWithObject( const std::string & unused, Object * other
     return sqrt(GetSqDistanceWithObject(unused, other));
 }
 
+void Object::SeparateFromObjects(const std::string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists)
+{
+    vector<Object*> objects;
+    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    {
+        if ( it->second != NULL )
+        {
+            objects.reserve(objects.size()+it->second->size());
+            std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects));
+        }
+    }
+
+    sf::Vector2f moveVector;
+    vector<Polygon2d> hitBoxes = GetHitBoxes();
+    for (unsigned int j = 0;j<objects.size(); ++j)
+    {
+        if ( objects[j] != this )
+        {
+            vector<Polygon2d> otherHitBoxes = objects[j]->GetHitBoxes();
+            for (unsigned int k = 0;k<hitBoxes.size();++k)
+            {
+                for (unsigned int l = 0;l<otherHitBoxes.size();++l)
+                {
+                    CollisionResult result = PolygonCollisionTest(hitBoxes[k], otherHitBoxes[l]);
+                    if ( result.collision ) moveVector += result.move_axis;
+                }
+            }
+
+        }
+    }
+    SetX(GetX()+moveVector.x);
+    SetY(GetY()+moveVector.y);
+}
+
 void Object::SeparateObjectsWithoutForces( const string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists)
 {
     vector<Object*> objects2;
@@ -445,7 +480,6 @@ void Object::SeparateObjectsWithoutForces( const string & , std::map <std::strin
         {
             objects2.reserve(objects2.size()+it->second->size());
             std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
-            it->second->clear();
         }
     }
 
@@ -492,7 +526,6 @@ void Object::SeparateObjectsWithForces( const string & , std::map <std::string, 
         {
             objects2.reserve(objects2.size()+it->second->size());
             std::copy(it->second->begin(), it->second->end(), std::back_inserter(objects2));
-            it->second->clear();
         }
     }
 

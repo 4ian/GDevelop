@@ -575,9 +575,14 @@
 				<label>Positionner</label>
 				<handler function="OnPositionMaskSelected" entry="EVT_MENU" />
 			</object>
+			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MOVEPOLYGONITEM" variable="MenuItem6" member="yes">
 				<label>Déplacer le polygone entier</label>
 				<handler function="OnMovePolygonSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="ID_MENUITEM14" variable="MenuItem12" member="yes">
+				<label>Tourner le polygone entier</label>
+				<handler function="OnRotatePolygonSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxTimer" name="ID_TIMER1" variable="previewTimer" member="yes">

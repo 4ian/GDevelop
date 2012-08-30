@@ -465,6 +465,8 @@ public:
     double GetVariableValue( const std::string & variable ); /** Only used internally by GD events generated code. */
     const std::string & GetVariableString( const std::string & variable ); /** Only used internally by GD events generated code. */
 
+    void SeparateFromObjects(const std::string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists);
+
     /** To be deprecated
      */
     void SeparateObjectsWithoutForces( const std::string & , std::map <std::string, std::vector<Object*> *> pickedObjectLists);

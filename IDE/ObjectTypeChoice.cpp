@@ -7,6 +7,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/imaglist.h>
+#include <wx/settings.h>
 #include <string>
 #include <vector>
 #include "GDL/IDE/gdTreeItemStringData.h"
@@ -114,12 +115,28 @@ game(game_)
     #endif
 
     RefreshList();
+
+    int x;
+    int y;
+    int width;
+    int height;
+    wxConfigBase::Get()->Read("ChooseObjectTypeDialog/x", &x, wxDefaultCoord);
+    wxConfigBase::Get()->Read("ChooseObjectTypeDialog/y", &y, wxDefaultCoord);
+    wxConfigBase::Get()->Read("ChooseObjectTypeDialog/Width", &width, wxDefaultCoord);
+    wxConfigBase::Get()->Read("ChooseObjectTypeDialog/Height", &height, wxDefaultCoord);
+
+    if ( x <= wxSystemSettings::GetMetric(wxSYS_SCREEN_X) && y <= wxSystemSettings::GetMetric(wxSYS_SCREEN_Y) )
+        SetSize(x,y,width, height);
 }
 
 ObjectTypeChoice::~ObjectTypeChoice()
 {
 	//(*Destroy(ObjectTypeChoice)
 	//*)
+    wxConfigBase::Get()->Write("ChooseObjectTypeDialog/x", GetPosition().x);
+    wxConfigBase::Get()->Write("ChooseObjectTypeDialog/y", GetPosition().y);
+    wxConfigBase::Get()->Write("ChooseObjectTypeDialog/Width", GetSize().GetWidth());
+    wxConfigBase::Get()->Write("ChooseObjectTypeDialog/Height", GetSize().GetHeight());
 }
 
 void ObjectTypeChoice::RefreshList()
@@ -154,12 +171,11 @@ void ObjectTypeChoice::RefreshList()
 
                 gdTreeItemStringData * associatedData = new gdTreeItemStringData(objectsTypes[j]);
 
-                wxListItem objectItem;
-                objectItem.SetText(extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName());
-                objectItem.SetImage(imageList->GetImageCount()-1);
-                objectItem.SetData(associatedData);
+                long insertedItem = objectsList->InsertItem(0,
+                                                            extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),
+                                                            imageList->GetImageCount()-1);
+                objectsList->SetItemPtrData(insertedItem, wxPtrToUInt(associatedData));
 
-                objectsList->InsertItem(objectItem);
 	        }
 	    }
 	}
@@ -200,8 +216,8 @@ void ObjectTypeChoice::OnobjectsListItemActivated(wxListEvent& event)
     wxListItem item = event.GetItem();
     gdTreeItemStringData * associatedData = reinterpret_cast<gdTreeItemStringData*>(item.GetData()); //Why GetData return long ?
     if ( associatedData != NULL )
-    {
         selectedObjectType = associatedData->GetString();
+    {
     }
 
     EndModal(1);

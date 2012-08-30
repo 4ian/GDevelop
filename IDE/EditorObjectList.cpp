@@ -460,7 +460,7 @@ void EditorObjectList::OneditMenuISelected(wxCommandEvent& event)
     //Reload thumbnail
     int thumbnailID = -1;
     wxBitmap thumbnail;
-    if ( objects.GetObject(name).GenerateThumbnail(game, thumbnail) )
+    if ( objects.GetObject(name).GenerateThumbnail(game, thumbnail) && thumbnail.IsOk() )
     {
         objectsImagesList->Add(thumbnail);
         thumbnailID = objectsImagesList->GetImageCount()-1;

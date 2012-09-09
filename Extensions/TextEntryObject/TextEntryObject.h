@@ -34,15 +34,20 @@ class Object;
 class ImageManager;
 class InitialPosition;
 #if defined(GD_IDE_ONLY)
+namespace sf
+{
+    class Texture;
+    class Sprite;
+};
 class wxBitmap;
 class Game;
 class wxWindow;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 namespace gd {class ResourcesMergingHelper;}
 #endif
 
 /**
- * \brief Simple object which store user keyboard input.
+ * \brief Simple object which stores user keyboard input.
  */
 class GD_EXTENSION_API TextEntryObject : public Object
 {
@@ -50,7 +55,7 @@ public :
 
     TextEntryObject(std::string name_);
     virtual ~TextEntryObject() {};
-    virtual Object * Clone() { return new TextEntryObject(*this); }
+    virtual Object * Clone() const { return new TextEntryObject(*this); }
 
     virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
     virtual bool InitializeFromInitialPosition(const InitialPosition & position);
@@ -61,21 +66,16 @@ public :
 
     #if defined(GD_IDE_ONLY)
     virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
-    virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
+    static void LoadEdittimeIcon();
 
-    virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
+    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
     virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
     virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
     virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
     virtual unsigned int GetNumberOfProperties() const;
-    #endif
-
-    virtual void LoadFromXml(const TiXmlElement * elemScene);
-    #if defined(GD_IDE_ONLY)
-    virtual void SaveToXml(TiXmlElement * elemScene);
     #endif
 
     virtual float GetWidth() const;
@@ -98,6 +98,11 @@ private:
     std::string text;
     const RuntimeScene * scene; ///< Pointer to the scene. Initialized during LoadRuntimeResources call.
     bool activated;
+
+    #if defined(GD_IDE_ONLY)
+    static sf::Texture edittimeIconImage;
+    static sf::Sprite edittimeIcon;
+    #endif
 };
 
 void DestroyTextEntryObject(Object * object);

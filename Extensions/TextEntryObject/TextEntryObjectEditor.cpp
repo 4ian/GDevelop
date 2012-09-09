@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 
 #include "GDL/Game.h"
 #include "TextEntryObject.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
 //(*IdInit(TextEntryObjectEditor)
 const long TextEntryObjectEditor::ID_STATICLINE1 = wxNewId();
@@ -49,9 +49,8 @@ BEGIN_EVENT_TABLE(TextEntryObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-TextEntryObjectEditor::TextEntryObjectEditor( wxWindow* parent, Game & game_, TextEntryObject & object_, MainEditorCommand & mainEditorCommand_ ) :
+TextEntryObjectEditor::TextEntryObjectEditor( wxWindow* parent, Game & game_, TextEntryObject & object_ ) :
 game(game_),
-mainEditorCommand(mainEditorCommand_),
 object(object_)
 {
 	//(*Initialize(TextEntryObjectEditor)

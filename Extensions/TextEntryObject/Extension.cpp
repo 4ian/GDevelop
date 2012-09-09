@@ -57,7 +57,7 @@ class Extension : public ExtensionBase
                            "TextEntryObject");
 
             #if defined(GD_IDE_ONLY)
-
+                TextEntryObject::LoadEdittimeIcon();
                 objInfos.SetIncludeFile("TextEntryObject/TextEntryObject.h");
 
                 DECLARE_OBJECT_ACTION("String",

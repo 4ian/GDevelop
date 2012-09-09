@@ -24,22 +24,27 @@ freely, subject to the following restrictions:
 
 */
 
+#if defined(GD_IDE_ONLY)
+#include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
+#endif
 #include <SFML/Graphics.hpp>
 #include <string>
 #include "GDL/Object.h"
-
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/Position.h"
 #include "GDL/RuntimeScene.h"
 #include "TextEntryObject.h"
+#if defined(GD_IDE_ONLY)
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDL/CommonTools.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "TextEntryObjectEditor.h"
+#endif
 
 #if defined(GD_IDE_ONLY)
-#include <wx/wx.h>
-#include "GDL/CommonTools.h"
-#include "GDCore/IDE/ArbitraryResourceWorker.h"
-#include "GDL/IDE/MainEditorCommand.h"
-#include "TextEntryObjectEditor.h"
+sf::Texture TextEntryObject::edittimeIconImage;
+sf::Sprite TextEntryObject::edittimeIcon;
 #endif
 
 TextEntryObject::TextEntryObject(std::string name_) :
@@ -48,16 +53,6 @@ TextEntryObject::TextEntryObject(std::string name_) :
     activated(true)
 {
 }
-
-void TextEntryObject::LoadFromXml(const TiXmlElement * object)
-{
-}
-
-#if defined(GD_IDE_ONLY)
-void TextEntryObject::SaveToXml(TiXmlElement * object)
-{
-}
-#endif
 
 bool TextEntryObject::LoadRuntimeResources(const RuntimeScene & scene_, const ImageManager & imageMgr )
 {
@@ -109,23 +104,28 @@ void TextEntryObject::UpdateTime(float)
  */
 bool TextEntryObject::DrawEdittime( sf::RenderTarget& renderTarget )
 {
+    edittimeIcon.SetPosition(GetX(), GetY());
+    renderTarget.Draw(edittimeIcon);
+
     return true;
 }
 
-void TextEntryObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
+void TextEntryObject::LoadEdittimeIcon()
 {
+    edittimeIconImage.LoadFromFile("Extensions/textentry.png");
+    edittimeIcon.SetTexture(edittimeIconImage);
 }
 
-bool TextEntryObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
+bool TextEntryObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
     thumbnail = wxBitmap("Extensions/textentry.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void TextEntryObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand & mainEditorCommand )
+void TextEntryObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
-    /*TextEntryObjectEditor dialog(parent, game, *this, mainEditorCommand);
+    /*TextEntryObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();*/
 }
 

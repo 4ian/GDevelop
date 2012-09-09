@@ -37,13 +37,13 @@ freely, subject to the following restrictions:
 //*)
 class Game;
 class TextEntryObject;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 
 class TextEntryObjectEditor: public wxDialog
 {
 	public:
 
-		TextEntryObjectEditor( wxWindow* parent, Game & game_, TextEntryObject & object_, MainEditorCommand & mainEditorCommand_ );
+		TextEntryObjectEditor( wxWindow* parent, Game & game_, TextEntryObject & object_ );
 		virtual ~TextEntryObjectEditor();
 
 		//(*Declarations(TextEntryObjectEditor)
@@ -69,7 +69,6 @@ class TextEntryObjectEditor: public wxDialog
 		//*)
 
 		Game & game;
-		MainEditorCommand & mainEditorCommand;
 		TextEntryObject & object;
 
 		DECLARE_EVENT_TABLE()

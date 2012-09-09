@@ -10,7 +10,7 @@
 #include "GDL/Game.h"
 #include "GDL/Automatism.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/IDE/gdTreeItemStringData.h"
+#include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDL/ExtensionBase.h"
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 
@@ -134,7 +134,7 @@ void AutomatismTypeChoice::RefreshList()
 	        if ( !automatismsTypes[j].empty() )
 	        {
                 imageList->Add(extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetBitmapIcon());
-                gdTreeItemStringData * associatedData = new gdTreeItemStringData(automatismsTypes[j]);
+                gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(automatismsTypes[j]);
 
                 wxListItem automatismItem;
                 automatismItem.SetText(extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName());
@@ -151,7 +151,7 @@ void AutomatismTypeChoice::OnautomatismsListItemActivated(wxListEvent& event)
 {
     //Get the automatism type associated with the item
     wxListItem item = event.GetItem();
-    gdTreeItemStringData * associatedData = reinterpret_cast<gdTreeItemStringData*>(item.GetData()); //Why GetData return long ?
+    gd::TreeItemStringData * associatedData = reinterpret_cast<gd::TreeItemStringData*>(item.GetData()); //Why GetData return long ?
     if ( associatedData != NULL )
     {
         selectedAutomatismType = associatedData->GetString();
@@ -165,7 +165,7 @@ void AutomatismTypeChoice::OnautomatismsListItemSelect(wxListEvent& event)
 {
     //Get the automatism type associated with the item
     wxListItem item = event.GetItem();
-    gdTreeItemStringData * associatedData = reinterpret_cast<gdTreeItemStringData*>(item.GetData()); //Why GetData return long ?
+    gd::TreeItemStringData * associatedData = reinterpret_cast<gd::TreeItemStringData*>(item.GetData()); //Why GetData return long ?
     if ( associatedData != NULL )
     {
         selectedAutomatismType = associatedData->GetString();

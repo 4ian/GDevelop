@@ -44,7 +44,7 @@
 #include "GDL/ObjectHelpers.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/IDE/gdTreeItemStringData.h"
+#include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "ChoixClavier.h"
 #include "SigneModification.h"
 #include "GeneratePassword.h"
@@ -346,7 +346,7 @@ void ChoixAction::RefreshList()
                     IDimage = imageList->GetImageCount()-1;
                 }
 
-                gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
                 ActionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
 	    }
@@ -385,7 +385,7 @@ void ChoixAction::RefreshList()
                     IDimage = imageList->GetImageCount()-1;
                 }
 
-                gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
                 ActionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
 	    }
@@ -417,7 +417,7 @@ void ChoixAction::RefreshList()
                 IDimage = imageList->GetImageCount()-1;
             }
 
-            gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+            gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
             ActionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
         }
 
@@ -496,7 +496,7 @@ void ChoixAction::RefreshObjectActionsList()
                 IDimage = imageList->GetImageCount()-1;
             }
 
-            gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+            gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
             objectActionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
         }
 
@@ -542,7 +542,7 @@ void ChoixAction::RefreshObjectActionsList()
                     IDimage = imageList->GetImageCount()-1;
                 }
 
-                gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
                 objectActionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
 	    }
@@ -558,7 +558,7 @@ void ChoixAction::RefreshObjectActionsList()
  */
 void ChoixAction::OnActionsTreeSelectionChanged(wxTreeEvent& event)
 {
-    gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(ActionsTree->GetItemData(event.GetItem()));
+    gd::TreeItemStringData * associatedData = dynamic_cast<gd::TreeItemStringData*>(ActionsTree->GetItemData(event.GetItem()));
     if ( associatedData != NULL )
     {
         Type = associatedData->GetString();
@@ -573,7 +573,7 @@ void ChoixAction::OnActionsTreeSelectionChanged(wxTreeEvent& event)
  */
 void ChoixAction::OnobjectActionsTreeSelectionChanged(wxTreeEvent& event)
 {
-    gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(objectActionsTree->GetItemData(event.GetItem()));
+    gd::TreeItemStringData * associatedData = dynamic_cast<gd::TreeItemStringData*>(objectActionsTree->GetItemData(event.GetItem()));
     if ( associatedData != NULL )
     {
         Type = associatedData->GetString();

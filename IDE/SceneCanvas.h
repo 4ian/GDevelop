@@ -293,6 +293,8 @@ private :
     void OnUndo20Selected(wxCommandEvent& event);
     void OnClearHistorySelected(wxCommandEvent& event);
     void OnFullScreenBtClick(wxCommandEvent& event);
+    void OnCreateObjectSelected(wxCommandEvent& event);
+
 
     int GetObjectsSelectedHighestLayer();
     int GetObjectsSelectedLowestLayer();
@@ -306,6 +308,7 @@ private :
     static const long ID_CUTMENU;
     static const long ID_PASTEMENU;
     static const long ID_PASTESPECIALMENU;
+    static const long ID_CREATEOBJECTMENU;
     //Identifiers for changing mode
     static const long idRibbonEditMode;
     static const long idRibbonPreviewMode;

@@ -31,7 +31,7 @@
 #include "GDL/ObjectHelpers.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/IDE/gdTreeItemStringData.h"
+#include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/ConditionSentenceFormatter.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
@@ -346,7 +346,7 @@ void ChoixCondition::RefreshList()
                     IDimage = imageList->GetImageCount()-1;
                 }
 
-                gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
                 ConditionsTree->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
 	    }
@@ -385,7 +385,7 @@ void ChoixCondition::RefreshList()
                     IDimage = imageList->GetImageCount()-1;
                 }
 
-                gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
                 ConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
             }
 	    }
@@ -417,7 +417,7 @@ void ChoixCondition::RefreshList()
                 IDimage = imageList->GetImageCount()-1;
             }
 
-            gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+            gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
             ConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
         }
 
@@ -496,7 +496,7 @@ void ChoixCondition::RefreshObjectConditionsList()
                 IDimage = imageList->GetImageCount()-1;
             }
 
-            gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+            gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
             objectConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
         }
 
@@ -542,7 +542,7 @@ void ChoixCondition::RefreshObjectConditionsList()
                     IDimage = imageList->GetImageCount()-1;
                 }
 
-                gdTreeItemStringData * associatedData = new gdTreeItemStringData(it->first);
+                gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(it->first);
                 objectConditionsTree->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
             }
 	    }
@@ -557,7 +557,7 @@ void ChoixCondition::OnConditionsTreeSelectionChanged( wxTreeEvent& event )
 {
     wxTreeItemId item = event.GetItem();
 
-    gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(ConditionsTree->GetItemData(item));
+    gd::TreeItemStringData * associatedData = dynamic_cast<gd::TreeItemStringData*>(ConditionsTree->GetItemData(item));
     if ( associatedData != NULL )
     {
         Type = associatedData->GetString();
@@ -571,7 +571,7 @@ void ChoixCondition::OnobjectConditionsTreeSelectionChanged(wxTreeEvent& event)
 {
     wxTreeItemId item = event.GetItem();
 
-    gdTreeItemStringData * associatedData = dynamic_cast<gdTreeItemStringData*>(objectConditionsTree->GetItemData(item));
+    gd::TreeItemStringData * associatedData = dynamic_cast<gd::TreeItemStringData*>(objectConditionsTree->GetItemData(item));
     if ( associatedData != NULL )
     {
         Type = associatedData->GetString();

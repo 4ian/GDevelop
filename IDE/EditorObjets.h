@@ -30,6 +30,10 @@ public:
     EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
     virtual ~EditorObjets();
 
+    /**
+     * Refresh the objects and groups lists
+     */
+    void Refresh();
 
     //(*Declarations(EditorObjets)
     wxNotebook* sceneNotebook;

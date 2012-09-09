@@ -47,7 +47,7 @@
 #include "EditorObjetsGroups.h"
 #include "LogFileManager.h"
 #include "DndTextObjectsEditor.h"
-#include "ObjectTypeChoice.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
 #include "AutomatismTypeChoice.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "MainFrame.h"
@@ -502,7 +502,7 @@ void EditorObjectList::OneditNameMenuISelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
 {
-    ObjectTypeChoice chooseTypeDialog(this, game);
+    gd::ChooseObjectTypeDialog chooseTypeDialog(this, game);
     if ( chooseTypeDialog.ShowModal() == 0 )
         return;
 
@@ -517,7 +517,7 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     }
 
     //Add a new object of selected type to objects list
-    objects.InsertNewObject(chooseTypeDialog.selectedObjectType, ToString(name), objects.GetObjectsCount());
+    objects.InsertNewObject(chooseTypeDialog.GetSelectedObjectType(), ToString(name), objects.GetObjectsCount());
 
     //And to the TreeCtrl
     wxTreeItemId rootId = objectsList->GetRootItem();

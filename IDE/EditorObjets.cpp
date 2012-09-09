@@ -107,6 +107,14 @@ EditorObjets::~EditorObjets()
     //*)
 }
 
+void EditorObjets::Refresh()
+{
+    sceneObjectsEditor->Refresh();
+    ObjetsGroups->Refresh();
+    globalObjectsEditor->Refresh();
+    globalObjectsGroups->Refresh();
+}
+
 /**
  * Need to resize manually notebook
  */

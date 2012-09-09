@@ -16,6 +16,7 @@
 #include <wx/scrolbar.h>
 #include <wx/infobar.h>
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ImageManager.h"
@@ -54,6 +55,7 @@ const long SceneCanvas::ID_COPYMENU = wxNewId();
 const long SceneCanvas::ID_CUTMENU = wxNewId();
 const long SceneCanvas::ID_PASTEMENU = wxNewId();
 const long SceneCanvas::ID_PASTESPECIALMENU = wxNewId();
+const long SceneCanvas::ID_CREATEOBJECTMENU = wxNewId();
 const long SceneCanvas::idRibbonEditMode = wxNewId();
 const long SceneCanvas::idRibbonPreviewMode = wxNewId();
 const long SceneCanvas::idRibbonObjectsEditor = wxNewId();
@@ -531,6 +533,32 @@ void SceneCanvas::ChangesMade()
     latestState = instances;
 }
 
+void SceneCanvas::OnCreateObjectSelected(wxCommandEvent & event)
+{
+    gd::ChooseObjectTypeDialog chooseTypeDialog(this, gameEdited);
+    if ( chooseTypeDialog.ShowModal() == 0 )
+        return;
+
+    //Find a new unique name for the object
+    std::string name = ToString(_("NouvelObjet"));
+    for (unsigned int i = 0;sceneEdited.HasObjectNamed(name);)
+    {
+        ++i;
+        name =  _("NouvelObjet")+ToString(i);
+    }
+
+    //Add a new object of selected type to objects list
+    sceneEdited.InsertNewObject(chooseTypeDialog.GetSelectedObjectType(), name, sceneEdited.GetObjectsCount());
+    if ( objectsEditor ) objectsEditor->Refresh();
+
+    //Add it on the scene ( Use editionData.oldMouseX/Y as the cursor has moved since the right click )
+    AddObject(name, editionData.oldMouseX, editionData.oldMouseY);
+
+    //Edit now the object
+    sceneEdited.GetObject(name).EditObject(this, gameEdited, mainFrameWrapper);
+    gameEdited.GetChangesNotifier().OnObjectEdited(gameEdited, &sceneEdited, sceneEdited.GetObject(name));
+}
+
 void SceneCanvas::ClearSelection()
 {
     editionData.objectsSelected.clear();
@@ -565,8 +593,8 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
 
     ObjSPtr object = FindSmallestObjectUnderCursor();
 
-    int mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
-    int mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
+    float mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
+    float mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
 
     //Suppress selection
     if ( (!sf::Keyboard::IsKeyPressed(sf::Keyboard::LShift) && !sf::Keyboard::IsKeyPressed(sf::Keyboard::RShift)) && //Check that shift is not pressed
@@ -936,14 +964,18 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
 
     ObjSPtr object = FindSmallestObjectUnderCursor();
 
-    //Suppress selection if
-    if ( object == boost::shared_ptr<Object> () || /*Not clicked on an object*/
+    //Suppress selection if the user
+    if ( object == boost::shared_ptr<Object> () || /*Did not click on an object*/
         (( !sf::Keyboard::IsKeyPressed(sf::Keyboard::LShift) && !sf::Keyboard::IsKeyPressed(sf::Keyboard::RShift) ) && /*Clicked without using shift*/
          find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), object) == editionData.objectsSelected.end() ))
     {
         ClearSelection();
         if ( initialPositionsBrowser ) initialPositionsBrowser->DeselectAll();
     }
+
+    //Remember now the position of the mouse for latter use
+    editionData.oldMouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
+    editionData.oldMouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
 
     if ( object == boost::shared_ptr<Object> () ) //Popup "no object" context menu
     {
@@ -1220,7 +1252,8 @@ void SceneCanvas::OnMouseWheel( wxMouseEvent &event )
 
     float rotation = event.GetWheelRotation()*3;
     float newheight = editionData.view.GetSize().y + ( rotation / 25 );
-    settings.zoomFactor = static_cast<float>(GetHeight())/newheight;
+    float newZoomFactor = static_cast<float>(GetHeight())/newheight;
+    if ( newZoomFactor > 0 ) settings.zoomFactor = newZoomFactor;
     UpdateAccordingToZoomFactor();
 }
 

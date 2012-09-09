@@ -43,8 +43,8 @@ public:
     float yEndRectangleSelection;
 
     //Remember cursor old position
-    int oldMouseX;
-    int oldMouseY;
+    float oldMouseX;
+    float oldMouseY;
 
     //Déplacement avec la souris ( clic molette )
     bool isMoving;

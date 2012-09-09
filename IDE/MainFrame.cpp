@@ -503,10 +503,6 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
         SetCurrentGame(0);
         projectManager->Refresh();
     }
-
-    //TODO
-    /*HtmlViewerPnl * htmlViewerPnl = new HtmlViewerPnl(editorsNotebook);
-    editorsNotebook->AddPage(htmlViewerPnl, _("Aide en ligne"));*/
 }
 void MainFrame::OnResize(wxSizeEvent& event)
 

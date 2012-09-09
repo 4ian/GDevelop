@@ -61,6 +61,7 @@ SceneCanvas::SceneCanvas( wxWindow* parent, RuntimeGame & game_, Scene & scene_,
     Connect(ID_CUTMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnCutSelected);
     Connect(ID_PASTEMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnPasteSelected);
     Connect(ID_PASTESPECIALMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnPasteSpecialSelected);
+    Connect(ID_CREATEOBJECTMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnCreateObjectSelected);
 
     CreateMenus();
 
@@ -409,6 +410,8 @@ void SceneCanvas::CreateMenus()
 
     contextMenu.Append(ID_PROPMENU, _("Propriétés"));
     contextMenu.AppendSeparator();
+    contextMenu.Append(ID_CREATEOBJECTMENU, _("Insérer un nouvel objet"));
+    contextMenu.AppendSeparator();
     contextMenu.Append(deleteItem);
     contextMenu.AppendSeparator();
     contextMenu.Append(layerUpItem);
@@ -430,6 +433,8 @@ void SceneCanvas::CreateMenus()
 
     //Generate "no object" context menu
     {
+        noObjectContextMenu.Append(ID_CREATEOBJECTMENU, _("Insérer un nouvel objet"));
+        noObjectContextMenu.AppendSeparator();
         wxMenuItem * pasteItem = new wxMenuItem((&noObjectContextMenu), ID_PASTEMENU, _("Coller"), wxEmptyString, wxITEM_NORMAL);
         pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
         noObjectContextMenu.Append(pasteItem);

@@ -614,7 +614,7 @@ void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t li
 {
     if ( !wxFileExists(filename) )
     {
-        wxLogWarning(_("Impossible d'ouvrir "+filename+", le fichier n'existe pas"));
+        wxLogWarning(_("Impossible d'ouvrir ")+filename+_(", le fichier n'existe pas"));
         return;
     }
 

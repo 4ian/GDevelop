@@ -64,7 +64,11 @@ void ProjectPropertiesPnl::SetProject(gd::Project * project_)
     project = project_;
     propertyGrid->Clear();
 
-    if ( project != NULL ) project->PopulatePropertyGrid(propertyGrid);
+    if ( project != NULL )
+    {
+        project->PopulatePropertyGrid(propertyGrid);
+        propertyGrid->SetPropertyAttributeAll(wxPG_BOOL_USE_CHECKBOX, true);
+    }
 }
 
 void ProjectPropertiesPnl::OnPropertySelected(wxPropertyGridEvent& event)

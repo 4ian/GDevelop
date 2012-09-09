@@ -289,9 +289,7 @@ void MainFrame::SaveAs()
         {
             wxRichMessageDialog dlg(this, _("Le projet a été enregistré dans un nouveau répertoire.\nPensez à copier dans ce repertoire les ressources utilisées par le jeu, si nécessaire."), _("Enregistrement dans un nouveau répertoire"), wxOK|wxICON_INFORMATION );
             dlg.ShowCheckBox(_("Ne plus afficher ce message"));
-            dlg.ShowDetailedText(_("Depuis les dernières versions de Game Develop, les ressources sont enregistrées relativement\n"
-                                   "au dossier du jeu, permettant de copier ou déplacer un projet en déplacant simplement le répertoire\n"
-                                   "de celui ci, pour peu que les ressources soit enregistrées dans celui ci."));
+            dlg.ShowDetailedText(_("Depuis les dernières versions de Game Develop, les ressources sont enregistrées relativement\nau dossier du jeu, permettant de copier ou déplacer un projet en déplacant simplement le répertoire\nde celui ci, pour peu que les ressources soit enregistrées dans celui ci."));
 
             dlg.ShowModal();
             if ( dlg.IsCheckBoxChecked() )

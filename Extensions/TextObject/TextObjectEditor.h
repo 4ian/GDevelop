@@ -42,13 +42,13 @@ freely, subject to the following restrictions:
 //*)
 class Game;
 class TextObject;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 
 class TextObjectEditor: public wxDialog
 {
 	public:
 
-		TextObjectEditor( wxWindow* parent, Game & game_, TextObject & object_, MainEditorCommand & mainEditorCommand_ );
+		TextObjectEditor( wxWindow* parent, Game & game_, TextObject & object_, gd::MainFrameWrapper & mainFrameWrapper_);
 		virtual ~TextObjectEditor();
 
 		void AdaptFontColor(wxButton *button);
@@ -102,8 +102,8 @@ class TextObjectEditor: public wxDialog
 		//*)
 
 		Game & game;
-		MainEditorCommand & mainEditorCommand;
 		TextObject & object;
+		gd::MainFrameWrapper & mainFrameWrapper;
 
 		DECLARE_EVENT_TABLE()
 };

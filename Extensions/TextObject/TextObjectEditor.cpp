@@ -38,7 +38,7 @@ freely, subject to the following restrictions:
 #include <wx/filedlg.h>
 
 #include "GDL/Game.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "TextObject.h"
 
 //(*IdInit(TextObjectEditor)
@@ -64,10 +64,10 @@ BEGIN_EVENT_TABLE(TextObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-TextObjectEditor::TextObjectEditor( wxWindow* parent, Game & game_, TextObject & object_, MainEditorCommand & mainEditorCommand_ ) :
+TextObjectEditor::TextObjectEditor( wxWindow* parent, Game & game_, TextObject & object_, gd::MainFrameWrapper & mainFrameWrapper_) :
 game(game_),
-mainEditorCommand(mainEditorCommand_),
-object(object_)
+object(object_),
+mainFrameWrapper(mainFrameWrapper_)
 {
 	//(*Initialize(TextObjectEditor)
 	wxStaticBoxSizer* StaticBoxSizer2;
@@ -189,12 +189,13 @@ void TextObjectEditor::OnokBtClick(wxCommandEvent& event)
                         (underlineToggleButton->GetValue() ? sf::Text::Underlined : 0) );
 
     //Text object is going to reload its font: Switch the working directory
-    wxSetWorkingDirectory(wxFileName::FileName(game.GetProjectFile()).GetPath());
+    if ( wxDirExists(wxFileName::FileName(game.GetProjectFile()).GetPath()))
+        wxSetWorkingDirectory(wxFileName::FileName(game.GetProjectFile()).GetPath());
 
     object.ChangeFont(string(fontEdit->GetValue().mb_str()));
 
     //Switch back to IDE working directory
-    wxSetWorkingDirectory(mainEditorCommand.GetIDEWorkingDirectory());
+    wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
 
     EndModal(1);
 }

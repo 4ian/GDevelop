@@ -70,6 +70,17 @@ public:
     virtual const std::string & GetProjectFile() const =0;
 
     /**
+     * Called when project file has changed.
+     */
+    virtual void SetLastCompilationDirectory(const std::string & dir) =0;
+
+    /**
+     * Must return the latest directory used to compile the game
+     * \see gd::Project::SetLastCompilationDirectory
+     */
+    virtual const std::string & GetLastCompilationDirectory() const =0;
+
+    /**
      * Must change the default width of the project main window
      */
     virtual void SetMainWindowDefaultWidth(unsigned int width) =0;

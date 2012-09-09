@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
 #ifndef CHOIXLAYER_H
 #define CHOIXLAYER_H
 

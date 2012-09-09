@@ -25,6 +25,7 @@ freely, subject to the following restrictions:
 */
 
 #include <iostream>
+#include <vector>
 #include <SFML/Network.hpp>
 #include "GDL/Scene.h"
 #include "GDL/tinyxml/tinyxml.h"
@@ -53,9 +54,9 @@ NetworkAutomatism::~NetworkAutomatism()
 }
 
 #if defined(GD_IDE_ONLY)
-void NetworkAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ )
+void NetworkAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
-    NetworkAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
+    NetworkAutomatismEditor editor(parent, game_, scene, *this);
     editor.ShowModal();
 }
 #endif
@@ -134,7 +135,7 @@ void NetworkAutomatism::DoStepPostEvents(RuntimeScene & scene)
  */
 void NetworkAutomatism::GenerateObjectNetworkIdentifier( const std::string &, const std::string & automatismName, std::map <std::string, std::vector<Object*> *> objectsLists1)
 {
-    vector<Object*> objects1;
+    std::vector<Object*> objects1;
     for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
         if ( it->second != NULL )

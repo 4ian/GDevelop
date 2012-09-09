@@ -42,7 +42,7 @@ class GD_EXTENSION_API NetworkAutomatism : public Automatism
     public:
         NetworkAutomatism(std::string automatismTypeName);
         virtual ~NetworkAutomatism();
-        virtual Automatism * Clone() { return (new NetworkAutomatism(*this));}
+        virtual Automatism * Clone() const { return (new NetworkAutomatism(*this));}
 
         #if defined(GD_IDE_ONLY)
         /**
@@ -60,7 +60,7 @@ class GD_EXTENSION_API NetworkAutomatism : public Automatism
         /**
          * Called when user wants to edit the automatism.
          */
-        virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ );
+        virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
         #endif
 
         static std::map < const Scene* , SceneNetworkDatas > scenesNetworkDatas; ///< Static map associating scene to datas

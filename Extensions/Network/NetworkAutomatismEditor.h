@@ -39,7 +39,7 @@ freely, subject to the following restrictions:
 //*)
 #include <boost/shared_ptr.hpp>
 class Game;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 class NetworkAutomatism;
 class Scene;
 class ScenePhysicsDatas;
@@ -48,7 +48,7 @@ class NetworkAutomatismEditor: public wxDialog
 {
 	public:
 
-		NetworkAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, NetworkAutomatism & automatism_, MainEditorCommand & mainEditorCommand_ );
+		NetworkAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, NetworkAutomatism & automatism_ );
 		virtual ~NetworkAutomatismEditor();
 
 		//(*Declarations(NetworkAutomatismEditor)
@@ -94,7 +94,6 @@ class NetworkAutomatismEditor: public wxDialog
 
 		Game & game;
         Scene * scene;
-		MainEditorCommand & mainEditorCommand;
 
 		DECLARE_EVENT_TABLE()
 };

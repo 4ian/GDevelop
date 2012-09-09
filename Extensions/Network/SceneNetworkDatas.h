@@ -40,7 +40,7 @@ class GD_EXTENSION_API SceneNetworkDatas : public AutomatismsSharedDatas
         {
         };
         virtual ~SceneNetworkDatas() {};
-        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() { return boost::shared_ptr<AutomatismsSharedDatas>(new SceneNetworkDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsSharedDatas>(new SceneNetworkDatas(*this));}
 
         virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> CreateRuntimeSharedDatas()
         {

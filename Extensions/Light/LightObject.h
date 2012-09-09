@@ -76,6 +76,7 @@ public :
     virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
+    static void LoadEdittimeIcon();
 
     virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
@@ -134,7 +135,7 @@ public :
      */
     void SetColor(const std::string & color);
 
-    virtual std::vector<RotatedRectangle> GetHitBoxes() const;
+    virtual std::vector<Polygon2d> GetHitBoxes() const;
 
     static std::map<const Scene*, boost::weak_ptr<Light_Manager> > lightManagersList;
 

@@ -58,7 +58,7 @@ class Extension : public ExtensionBase
                                "LightObject");
 
                     #if defined(GD_IDE_ONLY)
-
+                    LightObject::LoadEdittimeIcon();
                     objInfos.SetIncludeFile("Light/LightObject.h");
 
                     DECLARE_OBJECT_ACTION("ChangeColor",

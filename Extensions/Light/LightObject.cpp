@@ -35,7 +35,7 @@ freely, subject to the following restrictions:
 #include "GDL/FontManager.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/Position.h"
-#include "GDL/RotatedRectangle.h"
+#include "GDL/Polygon.h"
 #include "GDL/CommonTools.h"
 #include "LightObject.h"
 #include "LightManager.h"
@@ -129,12 +129,6 @@ void LightObject::SaveToXml(TiXmlElement * elem)
 
 bool LightObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr)
 {
-    #if defined(GD_IDE_ONLY)
-    edittimeIconImage.LoadFromFile("Extensions/lightIcon32.png");
-    edittimeIconImage.SetSmooth(false);
-    edittimeIcon.SetTexture(edittimeIconImage);
-    #endif
-
     return true;
 }
 
@@ -252,6 +246,13 @@ bool LightObject::DrawEdittime(sf::RenderTarget& renderWindow)
     return true;
 }
 
+void LightObject::LoadEdittimeIcon()
+{
+    edittimeIconImage.LoadFromFile("Extensions/lightIcon32.png");
+    edittimeIconImage.SetSmooth(false);
+    edittimeIcon.SetTexture(edittimeIconImage);
+}
+
 void LightObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 {
 }
@@ -352,18 +353,15 @@ void LightObject::SetGlobalColor(const std::string & colorStr)
 /**
  * LightObject provides a basic bounding box.
  */
-std::vector<RotatedRectangle> LightObject::GetHitBoxes() const
+std::vector<Polygon2d> LightObject::GetHitBoxes() const
 {
-    std::vector<RotatedRectangle> boxes;
-    RotatedRectangle rectangle;
-    rectangle.angle = GetAngle()*3.14/180.0f;
-    rectangle.center.x = GetX()+GetCenterX();
-    rectangle.center.y = GetY()+GetCenterY();
-    rectangle.halfSize.x = GetWidth()/2;
-    rectangle.halfSize.y = GetHeight()/2;
+    std::vector<Polygon2d> mask;
+    Polygon2d rectangle = Polygon2d::CreateRectangle(GetWidth(), GetHeight());
+    rectangle.Rotate(GetAngle()/180*3.14159);
+    rectangle.Move(GetX()+GetCenterX(), GetY()+GetCenterY());
 
-    boxes.push_back(rectangle);
-    return boxes;
+    mask.push_back(rectangle);
+    return mask;
 }
 
 /**

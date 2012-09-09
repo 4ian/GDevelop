@@ -2775,7 +2775,7 @@
 1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\dialog.h
 	"wx/panel.h"
 
-1343342971 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
+1346861560 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
@@ -2804,7 +2804,7 @@
 	<vector>
 	<string>
 
-1343342971 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.h
+1346861505 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.h
 	<string>
 	<vector>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
@@ -2831,7 +2831,7 @@
 	<string>
 	"GDCore/PlatformDefinition/Automatism.h"
 
-1343246329 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
+1346256066 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
 	"GDL/Force.h"
 	<string>
 	<vector>
@@ -3290,7 +3290,7 @@
 	<SFML/Graphics.hpp>
 	<iostream>
 
-1343243305 d:\florian\programmation\gamedevelop2\extensions\light\lightobject.h
+1345311656 d:\florian\programmation\gamedevelop2\extensions\light\lightobject.h
 	"GDL/Object.h"
 	"LightManager.h"
 	<boost/weak_ptr.hpp>
@@ -3849,7 +3849,7 @@
 
 1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\filedlg.h
 
-1344438559 source:d:\florian\programmation\gamedevelop2\extensions\light\lightobject.cpp
+1345315810 source:d:\florian\programmation\gamedevelop2\extensions\light\lightobject.cpp
 	<wx/wx.h>
 	<SFML/Graphics.hpp>
 	"GDL/Object.h"
@@ -3859,7 +3859,7 @@
 	"GDL/FontManager.h"
 	"GDL/XmlMacros.h"
 	"GDL/Position.h"
-	"GDL/RotatedRectangle.h"
+	"GDL/Polygon.h"
 	"GDL/CommonTools.h"
 	"LightObject.h"
 	"LightManager.h"
@@ -5067,7 +5067,7 @@
 	<SFML/Graphics.hpp>
 	"Light.h"
 
-1337527167 source:d:\florian\programmation\gamedevelop2\extensions\light\extension.cpp
+1345047766 source:d:\florian\programmation\gamedevelop2\extensions\light\extension.cpp
 	"GDL/ExtensionBase.h"
 	"GDL/Version.h"
 	"LightObstacleAutomatism.h"
@@ -5118,7 +5118,7 @@
 	"GDCore/Events/ObjectMetadata.h"
 	"GDCore/Events/AutomatismMetadata.h"
 
-1344357480 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1346181423 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299115781 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 
@@ -5224,7 +5224,7 @@
 1343242665 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\classwithobjects.h
 	<string>
 
-1343157845 d:\florian\programmation\gamedevelop2\core\gdcore\ide\dialogs\mainframewrapper.h
+1345043698 d:\florian\programmation\gamedevelop2\core\gdcore\ide\dialogs\mainframewrapper.h
 	<algorithm>
 	<vector>
 	<wx/infobar.h>
@@ -5236,4 +5236,8 @@
 
 1343340036 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\changesnotifier.h
 	"GDCore/PlatformDefinition/ChangesNotifier.h"
+
+1345469090 d:\florian\programmation\gamedevelop2\gdl\gdl\polygon.h
+	<vector>
+	<SFML/System.hpp>
 

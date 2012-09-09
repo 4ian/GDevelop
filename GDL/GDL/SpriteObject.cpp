@@ -711,6 +711,11 @@ unsigned int SpriteObject::GetAnimationCount() const
     return cacheAnimationsSize;
 }
 
+bool SpriteObject::AnimationEnded() const
+{
+    const Direction & direction = GetAnimation( currentAnimation ).GetDirection( currentDirection );
+    return ( !direction.IsLooping() && currentSprite == direction.GetSpriteCount()-1 );
+}
 
 /**
  * Change the opacity of the object

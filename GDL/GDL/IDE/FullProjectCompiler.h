@@ -19,42 +19,42 @@ class FullProjectCompilerDiagnosticManager; //Definition below
  */
 class GD_API FullProjectCompiler
 {
-    public:
-        FullProjectCompiler(Game & game_, FullProjectCompilerDiagnosticManager & diagnosticManager_, std::string outDir_) :
-            gameToCompile(game_),
-            diagnosticManager(diagnosticManager_),
-            outDir(outDir_),
-            windowsTarget(false),
-            linuxTarget(false),
-            macTarget(false)
-            {};
-        virtual ~FullProjectCompiler() {};
+public:
+    FullProjectCompiler(Game & game_, FullProjectCompilerDiagnosticManager & diagnosticManager_, std::string outDir_) :
+        gameToCompile(game_),
+        diagnosticManager(diagnosticManager_),
+        outDir(outDir_),
+        windowsTarget(false),
+        linuxTarget(false),
+        macTarget(false)
+        {};
+    virtual ~FullProjectCompiler() {};
 
-        void LaunchProjectCompilation();
+    void LaunchProjectCompilation();
 
-        void ClearDirectory(std::string directory);
-        std::string GetTempDir();
-        void SetForcedTempDir(const std::string & dir) { forcedTempDir = dir; };
+    void ClearDirectory(std::string directory);
+    std::string GetTempDir();
+    void SetForcedTempDir(const std::string & dir) { forcedTempDir = dir; };
 
-        //Cross compilation is not available
-        /*void TargetWindows(bool enable = true) { windowsTarget = enable; };
-        void TargetLinux(bool enable = true) { linuxTarget = enable; };
-        void TargetMac(bool enable = true) { macTarget = enable; };*/
-        void CompressIfPossible(bool enable = true) { compressIfPossible = enable; };
-        void Optimize(bool enable = true) { optimize = enable; };
+    //Cross compilation is not available
+    /*void TargetWindows(bool enable = true) { windowsTarget = enable; };
+    void TargetLinux(bool enable = true) { linuxTarget = enable; };
+    void TargetMac(bool enable = true) { macTarget = enable; };*/
+    void CompressIfPossible(bool enable = true) { compressIfPossible = enable; };
+    void Optimize(bool enable = true) { optimize = enable; };
 
-    private:
+private:
 
-        Game & gameToCompile;
-        FullProjectCompilerDiagnosticManager & diagnosticManager;
-        std::string outDir;
-        std::string forcedTempDir;
+    Game & gameToCompile;
+    FullProjectCompilerDiagnosticManager & diagnosticManager;
+    std::string outDir;
+    std::string forcedTempDir;
 
-        bool windowsTarget;
-        bool linuxTarget;
-        bool macTarget;
-        bool compressIfPossible;
-        bool optimize;
+    bool windowsTarget;
+    bool linuxTarget;
+    bool macTarget;
+    bool compressIfPossible;
+    bool optimize;
 };
 
 /**

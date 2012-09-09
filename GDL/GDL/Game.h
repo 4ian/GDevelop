@@ -202,6 +202,8 @@ public:
     virtual const std::string & GetAuthor() {return author;}
     virtual void SetProjectFile(const std::string & file) { gameFile = file; }
     virtual const std::string & GetProjectFile() const { return gameFile; }
+    virtual void SetLastCompilationDirectory(const std::string & dir){ latestCompilationDirectory = dir; }
+    virtual const std::string & GetLastCompilationDirectory() const {return latestCompilationDirectory;}
 
     virtual void PopulatePropertyGrid(wxPropertyGrid * grid);
     virtual void UpdateFromPropertyGrid(wxPropertyGrid * grid);
@@ -282,6 +284,7 @@ private:
     #if defined(GD_IDE_ONLY)
     std::string                                         author; ///< Game author name
     std::string                                         gameFile; ///< File of the game
+    std::string                                         latestCompilationDirectory; ///< File of the game
     vector < std::string >                              extensionsUsed; ///< List of extensions used
     gd::Platform *                                      platform; ///< Pointer to the platform owning the project
     std::vector < boost::shared_ptr<ExternalEvents> >   externalEvents; ///< List of all externals events

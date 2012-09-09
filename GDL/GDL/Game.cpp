@@ -514,6 +514,7 @@ void Game::Init(const Game & game)
 
     #if defined(GD_IDE_ONLY)
     author = game.author;
+    latestCompilationDirectory = game.latestCompilationDirectory;
     extensionsUsed = game.GetUsedPlatformExtensions();
     #endif
 

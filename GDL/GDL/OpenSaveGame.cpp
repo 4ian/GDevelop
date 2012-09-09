@@ -310,6 +310,8 @@ void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
     #if defined(GD_IDE_ONLY)
     if ( elem->FirstChildElement( "Auteur" ) != NULL ) { game.SetAuthor( elem->FirstChildElement( "Auteur" )->Attribute( "value" ) ); }
     else { MSG( "Les informations concernant l'auteur manquent." ); }
+    if ( elem->FirstChildElement( "LatestCompilationDirectory" ) != NULL && elem->FirstChildElement( "LatestCompilationDirectory" )->Attribute( "value" ) != NULL )
+        game.SetLastCompilationDirectory( elem->FirstChildElement( "LatestCompilationDirectory" )->Attribute( "value" ) );
 
     if ( elem->FirstChildElement( "Extensions" ) != NULL )
     {
@@ -679,6 +681,9 @@ bool OpenSaveGame::SaveToFile(string file)
         info->SetAttribute( "value", game.GetMainWindowDefaultHeight() );
         info = new TiXmlElement( "Portable" );
         infos->LinkEndChild( info );
+        info = new TiXmlElement( "LatestCompilationDirectory" );
+        infos->LinkEndChild( info );
+        info->SetAttribute( "value", game.GetLastCompilationDirectory().c_str() );
     }
     {
         TiXmlElement * elem = infos;

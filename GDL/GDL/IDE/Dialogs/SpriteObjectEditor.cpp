@@ -30,7 +30,7 @@
 #include "GDL/Direction.h"
 #include "GDL/Game.h"
 #include "GDL/ResourcesManager.h"
-#include "GDL/IDE/gdTreeItemStringData.h"
+#include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #include <wx/msw/uxtheme.h>
@@ -487,13 +487,13 @@ void SpriteObjectEditor::RefreshAnimationTree()
     for (unsigned int i = 0;i<object.GetAnimationCount();++i)
     {
         Animation & animation = object.GetAnimation(i);
-        wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1, new gdTreeItemStringData(ToString(i), ""));
+        wxTreeItemId animationItem = animationsTree->AppendItem(root, _("Animation ")+ToString(i), 0, -1, new gd::TreeItemStringData(ToString(i), ""));
 
         if ( animation.useMultipleDirections )
         {
             for (unsigned int j = 0;j<animation.GetDirectionsNumber();++j)
             {
-                animationsTree->AppendItem(animationItem, _("Direction ")+ToString(j), j+1, -1, new gdTreeItemStringData(ToString(i), ToString(j)));
+                animationsTree->AppendItem(animationItem, _("Direction ")+ToString(j), j+1, -1, new gd::TreeItemStringData(ToString(i), ToString(j)));
 
             }
         }
@@ -816,7 +816,7 @@ void SpriteObjectEditor::OnimagesListItemSelect(wxListEvent& event)
 
 void SpriteObjectEditor::OnanimationsTreeSelectionChanged(wxTreeEvent& event)
 {
-    if ( gdTreeItemStringData * itemData = dynamic_cast<gdTreeItemStringData*>(animationsTree->GetItemData(event.GetItem())) )
+    if ( gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(animationsTree->GetItemData(event.GetItem())) )
     {
         unsigned int newAnimation = ToInt(itemData->GetString());
         unsigned int newDirection = itemData->GetSecondString().empty() ? 0 : ToInt(itemData->GetSecondString());
@@ -886,7 +886,7 @@ void SpriteObjectEditor::OnanimationsTreeItemRightClick(wxTreeEvent& event)
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection);
 
-        if ( gdTreeItemStringData * itemData = dynamic_cast<gdTreeItemStringData*>(animationsTree->GetItemData(event.GetItem())) )
+        if ( gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(animationsTree->GetItemData(event.GetItem())) )
         {
             //Deactivate some buttons when no direction is selected
             if (itemData->GetSecondString().empty() && object.GetAnimation(selectedAnimation).useMultipleDirections)

@@ -254,8 +254,21 @@ SpriteExtension::SpriteExtension()
 
             instrInfo.AddParameter("object", _("Objet"), "Sprite", false);
 
-
             instrInfo.cppCallingInformation.SetFunctionName("IsAnimationStopped").SetIncludeFile("GDL/SpriteObject.h");
+
+        DECLARE_END_OBJECT_CONDITION()
+
+        DECLARE_OBJECT_CONDITION("AnimationEnded",
+                       _("Animation terminée"),
+                       _("Vérifie si l'animation jouée par l'objet Sprite est terminée."),
+                       _("L'animation actuelle de _PARAM0_ est terminée"),
+                       _("Animations et images"),
+                       "res/conditions/animation24.png",
+                       "res/conditions/animation.png");
+
+            instrInfo.AddParameter("object", _("Objet"), "", false);
+
+            instrInfo.cppCallingInformation.SetFunctionName("AnimationEnded").SetIncludeFile("GDL/SpriteObject.h");
 
         DECLARE_END_OBJECT_CONDITION()
 

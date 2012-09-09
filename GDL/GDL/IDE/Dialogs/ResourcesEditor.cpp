@@ -48,7 +48,7 @@
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/DndResourcesEditor.h"
 #include "PlatformDefinition/Platform.h"
-#include "GDL/IDE/gdTreeItemStringData.h"
+#include "GDCore/IDE/wxTools/TreeItemStringData.h"
 
 
 #ifdef __WXGTK__
@@ -376,11 +376,11 @@ wxTreeItemId ResourcesEditor::GetSelectedFolderItem()
 
     if ( !item.IsOk() ) return resourcesTree->GetRootItem();
 
-    gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(item));
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(item));
     while ( item.IsOk() && data && data->GetString() != "Folder" && data->GetString() != "BaseFolder" )
     {
         item = resourcesTree->GetItemParent(item);
-        data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(item));
+        data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(item));
     }
 
     return item.IsOk() ? item : resourcesTree->GetRootItem();
@@ -404,7 +404,7 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
         //Find current folder, if any.
         ResourceFolder * currentFolder = NULL;
         wxTreeItemId currentFolderItem = GetSelectedFolderItem();
-        gdTreeItemStringData * currentFolderData = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData( currentFolderItem ));
+        gd::TreeItemStringData * currentFolderData = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData( currentFolderItem ));
         if ( currentFolderData && currentFolderData->GetString() == "Folder" )
         {
             if ( game.resourceManager.HasFolder(currentFolderData->GetSecondString()) )
@@ -455,7 +455,7 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
     //Find current folder, if any.
     ResourceFolder * currentFolder = NULL;
     wxTreeItemId currentFolderItem = GetSelectedFolderItem();
-    gdTreeItemStringData * currentFolderData = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData( currentFolderItem ));
+    gd::TreeItemStringData * currentFolderData = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData( currentFolderItem ));
     if ( currentFolderData && currentFolderData->GetString() == "Folder" )
     {
         if ( game.resourceManager.HasFolder(currentFolderData->GetSecondString()) )
@@ -485,7 +485,7 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
             game.resourceManager.resources.push_back(image);
             game.imagesChanged.push_back(name);
 
-            resourcesTree->AppendItem( allImagesItem, name, -1, -1, new gdTreeItemStringData("Image", name));
+            resourcesTree->AppendItem( allImagesItem, name, -1, -1, new gd::TreeItemStringData("Image", name));
         }
         else
             alreadyExistingResources += "\n"+name;
@@ -494,7 +494,7 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
         if ( currentFolder && !currentFolder->HasResource(name) )
         {
             currentFolder->resources.push_back(image);
-            resourcesTree->AppendItem( currentFolderItem, name, -1, -1, new gdTreeItemStringData("Image", name));
+            resourcesTree->AppendItem( currentFolderItem, name, -1, -1, new gd::TreeItemStringData("Image", name));
         }
     }
 
@@ -511,10 +511,10 @@ void ResourcesEditor::OnAddFromLibraryBtClick( wxCommandEvent& event )
 
 void ResourcesEditor::OnremoveFolderOnlySelected(wxCommandEvent& event)
 {
-    gdTreeItemStringData * itemData = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
+    gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
 
     wxTreeItemId folderItem = GetSelectedFolderItem();
-    gdTreeItemStringData * folderData = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(folderItem));
+    gd::TreeItemStringData * folderData = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(folderItem));
 
     if ( itemData && folderItem.IsOk() && itemData->GetString() == "Image" && folderData && folderData->GetString() == "Folder" )
     {
@@ -543,7 +543,7 @@ void ResourcesEditor::RemoveImageFromTree(wxTreeItemId parent, std::string image
             RemoveImageFromTree(item, imageName);
 
         //Delete item if needed
-        gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(item));
+        gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(item));
         if ( data && data->GetSecondString() == imageName && data->GetString() == "Image")
         {
             wxTreeItemId next = resourcesTree->GetNextSibling( item );
@@ -560,7 +560,7 @@ void ResourcesEditor::RemoveImageFromTree(wxTreeItemId parent, std::string image
  */
 void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
 {
-    gdTreeItemStringData * itemData = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
+    gd::TreeItemStringData * itemData = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
     if ( itemData && itemData->GetString() == "Image" )
     {
         std::string imageName = ToString(resourcesTree->GetItemText( m_itemSelected ));
@@ -636,7 +636,7 @@ void ResourcesEditor::OnresourcesTreeItemMenu( wxTreeEvent& event )
 
     m_itemSelected = event.GetItem();
 
-    gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
     if ( data && data->GetString() == "Image" )
         PopupMenu( &ContextMenu );
     else if ( data && data->GetString() == "Folder" )
@@ -674,7 +674,7 @@ void ResourcesEditor::OnresourcesTreeSelectionChanged( wxTreeEvent& event )
     //Changement de l'item sélectionné
     m_itemSelected = event.GetItem();
 
-    gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
     if ( data && data->GetString() == "Image" )
     {
         //Update resource preview
@@ -702,7 +702,7 @@ void ResourcesEditor::RenameInTree(wxTreeItemId parent, std::string oldName, std
             RenameInTree(item, oldName, newName, type);
 
         //Delete item if needed
-        gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(item));
+        gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(item));
         if ( data && data->GetSecondString() == oldName && data->GetString() == type)
         {
             resourcesTree->SetItemText(item, newName);
@@ -718,7 +718,7 @@ void ResourcesEditor::RenameInTree(wxTreeItemId parent, std::string oldName, std
  */
 void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
 {
-    gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
     if ( !event.IsEditCancelled() && data )
     {
         std::string newName = string(event.GetLabel().mb_str());
@@ -763,7 +763,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
  */
 void ResourcesEditor::OnresourcesTreeBeginLabelEdit( wxTreeEvent& event )
 {
-    if ( gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(event.GetItem())) )
+    if ( gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(event.GetItem())) )
     {
         if ( data->GetString() == "BaseFolder" )
             resourcesTree->EndEditLabel( event.GetItem(), true );
@@ -789,7 +789,7 @@ void ResourcesEditor::Refresh()
     //Folders
     for (unsigned int i = 0;i< game.resourceManager.folders.size() ;++i)
     {
-        wxTreeItemId folderItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), game.resourceManager.folders[i].name, -1, -1, new gdTreeItemStringData("Folder", game.resourceManager.folders[i].name ));
+        wxTreeItemId folderItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), game.resourceManager.folders[i].name, -1, -1, new gd::TreeItemStringData("Folder", game.resourceManager.folders[i].name ));
         for (unsigned int j=0;j<game.resourceManager.folders[i].resources.size();++j)
         {
             if ( game.resourceManager.folders[i].resources[j] != boost::shared_ptr<Resource>())
@@ -797,13 +797,13 @@ void ResourcesEditor::Refresh()
                 if ( searching && boost::to_upper_copy(game.resourceManager.folders[i].resources[j]->name).find(search) == string::npos)
                     continue;
 
-                resourcesTree->AppendItem( folderItem, game.resourceManager.folders[i].resources[j]->name, -1,-1, new gdTreeItemStringData("Image", game.resourceManager.folders[i].resources[j]->name ));
+                resourcesTree->AppendItem( folderItem, game.resourceManager.folders[i].resources[j]->name, -1,-1, new gd::TreeItemStringData("Image", game.resourceManager.folders[i].resources[j]->name ));
             }
         }
     }
 
     //All images
-    allImagesItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), _("Toutes les images"), -1,-1, new gdTreeItemStringData("BaseFolder", "" ));
+    allImagesItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), _("Toutes les images"), -1,-1, new gd::TreeItemStringData("BaseFolder", "" ));
     for ( unsigned int i = 0;i < game.resourceManager.resources.size();i++ )
     {
         if ( game.resourceManager.resources[i] != boost::shared_ptr<Resource>())
@@ -811,7 +811,7 @@ void ResourcesEditor::Refresh()
             if ( searching && boost::to_upper_copy(game.resourceManager.resources[i]->name).find(search) == string::npos)
                 continue;
 
-            resourcesTree->AppendItem( allImagesItem, game.resourceManager.resources[i]->name, -1, -1, new gdTreeItemStringData("Image", game.resourceManager.resources[i]->name ));
+            resourcesTree->AppendItem( allImagesItem, game.resourceManager.resources[i]->name, -1, -1, new gd::TreeItemStringData("Image", game.resourceManager.resources[i]->name ));
         }
     }
 
@@ -892,7 +892,7 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
 ////////////////////////////////////////////////////////////
 void ResourcesEditor::OnModFileImage( wxCommandEvent& event )
 {
-    gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
     if ( !data || data->GetString() != "Image" ) return;
 
     if ( !game.resourceManager.HasResource(data->GetSecondString()) )
@@ -926,7 +926,7 @@ void ResourcesEditor::DossierBt( wxCommandEvent& event )
  */
 void ResourcesEditor::OnModPropSelected(wxCommandEvent& event)
 {
-    gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
     if ( !data || data->GetString() != "Image" ) return;
 
     if ( !game.resourceManager.HasResource(data->GetSecondString()) )
@@ -954,7 +954,7 @@ void ResourcesEditor::OnresourcesTreeItemActivated(wxTreeEvent& event)
  */
 void ResourcesEditor::OnOpenPaintProgramClick(wxCommandEvent& event)
 {
-    gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
     if ( !data || data->GetString() != "Image" || !game.resourceManager.HasResource(data->GetSecondString()) ) return;
 
     Resource & resource = game.resourceManager.GetResource(data->GetSecondString());
@@ -1020,13 +1020,13 @@ void ResourcesEditor::ShiftUpElementOfTree()
 void ResourcesEditor::OnMoveUpSelected(wxCommandEvent& event)
 {
     string name = static_cast< string > ( resourcesTree->GetItemText( m_itemSelected ));
-    gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
     if ( !data ) return;
 
     //Move an image
     if ( data->GetString() == "Image" )
     {
-        gdTreeItemStringData * parentFolderData = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(GetSelectedFolderItem()));
+        gd::TreeItemStringData * parentFolderData = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(GetSelectedFolderItem()));
 
         //Move image from base folder
         if ( !parentFolderData || parentFolderData->GetString() == "BaseFolder" )
@@ -1113,13 +1113,13 @@ void ResourcesEditor::ShiftDownElementOfTree()
 void ResourcesEditor::OnMoveDownSelected(wxCommandEvent& event)
 {
     string name = static_cast< string > ( resourcesTree->GetItemText( m_itemSelected ));
-    gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
     if ( !data ) return;
 
     //Move an image
     if ( data->GetString() == "Image" )
     {
-        gdTreeItemStringData * parentFolderData = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(GetSelectedFolderItem()));
+        gd::TreeItemStringData * parentFolderData = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(GetSelectedFolderItem()));
 
         //Move image from base folder
         if ( !parentFolderData || parentFolderData->GetString() == "BaseFolder" )
@@ -1215,7 +1215,7 @@ void ResourcesEditor::OnAddFolderSelected(wxCommandEvent& event)
 
     game.resourceManager.CreateFolder(newName);
 
-    wxTreeItemId newFolderItem = resourcesTree->AppendItem(resourcesTree->GetRootItem(), newName, -1, -1, new gdTreeItemStringData("Folder", newName));
+    wxTreeItemId newFolderItem = resourcesTree->AppendItem(resourcesTree->GetRootItem(), newName, -1, -1, new gd::TreeItemStringData("Folder", newName));
     resourcesTree->EditLabel(newFolderItem);
 }
 
@@ -1230,7 +1230,7 @@ void ResourcesEditor::OnsearchCtrlText(wxCommandEvent& event)
 
 void ResourcesEditor::OnresourcesTreeBeginDrag(wxTreeEvent& event)
 {
-    gdTreeItemStringData * data = dynamic_cast<gdTreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
+    gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
     if ( !data ) return;
 
     //Move an image

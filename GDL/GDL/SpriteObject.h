@@ -99,6 +99,7 @@ public :
     void StopAnimation() { animationStopped = true; };
     void PlayAnimation() { animationStopped = false; };
     bool IsAnimationStopped() const { return animationStopped; }
+    bool AnimationEnded() const;
 
     inline unsigned int GetCurrentAnimation() const { return currentAnimation; }
     bool SetCurrentAnimation(unsigned int nb);

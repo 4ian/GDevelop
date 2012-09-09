@@ -36,7 +36,7 @@ freely, subject to the following restrictions:
 #include <wx/log.h>
 #include "GDL/Game.h"
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
 
 #include "Box3DObject.h"
@@ -78,9 +78,9 @@ BEGIN_EVENT_TABLE(Box3DObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-Box3DObjectEditor::Box3DObjectEditor( wxWindow* parent, Game & game_, Box3DObject & object_, MainEditorCommand & mainEditorCommand_ ) :
+Box3DObjectEditor::Box3DObjectEditor( wxWindow* parent, Game & game_, Box3DObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 game(game_),
-mainEditorCommand(mainEditorCommand_),
+mainFrameWrapper(mainFrameWrapper_),
 object(object_)
 {
 	//(*Initialize(Box3DObjectEditor)
@@ -207,7 +207,7 @@ object(object_)
 	depthEdit->ChangeValue(ToString(object.GetDepth()));
 
     //Init the image bank editor
-    resourcesEditor = new ResourcesEditor( this, game, mainEditorCommand );
+    resourcesEditor = new ResourcesEditor( this, game, mainFrameWrapper );
     resourcesEditor->Refresh();
 
 	//Init wxAuiManager with two pane : the editor and the image bank editor
@@ -259,7 +259,7 @@ void Box3DObjectEditor::OnfrontAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
@@ -270,7 +270,7 @@ void Box3DObjectEditor::OntopAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
@@ -282,7 +282,7 @@ void Box3DObjectEditor::OnbottomAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
@@ -293,7 +293,7 @@ void Box3DObjectEditor::OnleftAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
@@ -304,7 +304,7 @@ void Box3DObjectEditor::OnrightAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 
@@ -315,7 +315,7 @@ void Box3DObjectEditor::OnbackAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_T("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
         return;
     }
 

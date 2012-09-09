@@ -39,7 +39,7 @@ class InitialPosition;
 class wxBitmap;
 class Game;
 class wxWindow;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 #endif
 
 /**
@@ -51,7 +51,7 @@ public :
 
     Box3DObject(std::string name_);
     virtual ~Box3DObject();
-    virtual Object * Clone() { return new Box3DObject(*this);}
+    virtual Object * Clone() const { return new Box3DObject(*this);}
 
     virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
     virtual bool InitializeFromInitialPosition(const InitialPosition & position);
@@ -60,10 +60,10 @@ public :
 
     #if defined(GD_IDE_ONLY)
     virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-    virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
-    virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
+    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
     virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
@@ -104,7 +104,7 @@ public :
     float GetDepth() const { return depth; }
     void SetDepth(float depth_) { depth = depth_; }
 
-    virtual std::vector<RotatedRectangle> GetHitBoxes() const;
+    virtual std::vector<Polygon2d> GetHitBoxes() const;
 
     std::string frontTextureName;
     std::string topTextureName;

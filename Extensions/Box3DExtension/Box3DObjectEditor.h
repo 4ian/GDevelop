@@ -41,14 +41,14 @@ freely, subject to the following restrictions:
 #include <wx/aui/aui.h>
 class Game;
 class Box3DObject;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 class ResourcesEditor;
 
 class Box3DObjectEditor: public wxDialog
 {
 	public:
 
-		Box3DObjectEditor( wxWindow* parent, Game & game_, Box3DObject & object_, MainEditorCommand & mainEditorCommand_ );
+		Box3DObjectEditor( wxWindow* parent, Game & game_, Box3DObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ );
 		virtual ~Box3DObjectEditor();
 
 		//(*Declarations(Box3DObjectEditor)
@@ -133,7 +133,7 @@ class Box3DObjectEditor: public wxDialog
 		//*)
 
 		Game & game;
-		MainEditorCommand & mainEditorCommand;
+		gd::MainFrameWrapper & mainFrameWrapper;
 		Box3DObject & object;
 
 		wxAuiManager m_mgr; ///< Used to display the image bank editor

@@ -395,7 +395,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             wxFileName fileName(file);
             if ( !wxCopyFile( file, outDir + "/" + fileName.GetFullName(), true ) )
-                diagnosticManager.AddError(gd::ToString(_( "Impossible de copier le fichier " + file + " depuis le répertoire de compilation vers le répertoire final.\n" )));
+                diagnosticManager.AddError(gd::ToString(_( "Impossible de copier le fichier ") + file + _(" depuis le répertoire de compilation vers le répertoire final.\n" )));
 
             file = wxFindNextFile();
         }

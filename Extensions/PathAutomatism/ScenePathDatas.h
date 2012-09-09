@@ -41,7 +41,7 @@ class GD_EXTENSION_API ScenePathDatas : public AutomatismsSharedDatas
     public:
         ScenePathDatas(std::string typeName) : AutomatismsSharedDatas(typeName) {};
         virtual ~ScenePathDatas() {};
-        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() { return boost::shared_ptr<AutomatismsSharedDatas>(new ScenePathDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsSharedDatas>(new ScenePathDatas(*this));}
 
         virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> CreateRuntimeSharedDatas()
         {

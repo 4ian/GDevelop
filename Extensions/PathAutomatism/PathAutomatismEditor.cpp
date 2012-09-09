@@ -48,7 +48,7 @@ freely, subject to the following restrictions:
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 #include "ScenePathDatas.h"
@@ -102,11 +102,11 @@ BEGIN_EVENT_TABLE(PathAutomatismEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, PathAutomatism & automatism_, MainEditorCommand & mainEditorCommand_ ) :
+PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, PathAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
     automatism(automatism_),
     game(game_),
     scene(scene_),
-    mainEditorCommand(mainEditorCommand_),
+    mainFrameWrapper(mainFrameWrapper_),
     haveDeletedAGlobalPath(false)
 {
 	//(*Initialize(PathAutomatismEditor)
@@ -341,7 +341,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
     //Setup shared datas
 	if ( !scene || scene->automatismsInitialSharedDatas.find(automatism.GetName()) == scene->automatismsInitialSharedDatas.end())
 	{
-	    wxLogError(_T("Impossible d'accéder aux données partagées."));
+	    wxLogError(_("Impossible d'accéder aux données partagées."));
 	    return;
 	}
 
@@ -349,7 +349,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
 
     if ( sharedDatas == boost::shared_ptr<ScenePathDatas>() )
     {
-	    wxLogError(_T("Impossible d'accéder aux données partagées : Données de mauvais type"));
+	    wxLogError(_("Impossible d'accéder aux données partagées : Données de mauvais type"));
 	    return;
     }
 
@@ -579,7 +579,7 @@ void PathAutomatismEditor::OnokBtClick(wxCommandEvent& event)
     automatism.SetFollowAngle(followAngleCheck->GetValue());
 
     if(haveDeletedAGlobalPath)
-        mainEditorCommand.GetInfoBar()->ShowMessage(_("Vous venez de supprimer un chemin global. Vérifiez bien qu'aucun autre objet ne l'utilisait."), wxICON_WARNING);
+        mainFrameWrapper.GetInfoBar()->ShowMessage(_("Vous venez de supprimer un chemin global. Vérifiez bien qu'aucun autre objet ne l'utilisait."), wxICON_WARNING);
 
     EndModal(1);
 }

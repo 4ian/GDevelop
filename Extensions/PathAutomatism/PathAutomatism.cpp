@@ -31,6 +31,7 @@ freely, subject to the following restrictions:
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/XmlMacros.h"
 #include "GDL/RuntimeScene.h"
+#include "GDL/CommonTools.h"
 #include "RuntimeScenePathDatas.h"
 
 PathAutomatism::PathAutomatism(std::string automatismTypeName) :
@@ -115,9 +116,9 @@ PathAutomatism::~PathAutomatism()
 }
 
 #if defined(GD_IDE_ONLY)
-void PathAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ )
+void PathAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
-    PathAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
+    PathAutomatismEditor editor(parent, game_, scene, *this, mainFrameWrapper_);
     editor.ShowModal();
 }
 #endif

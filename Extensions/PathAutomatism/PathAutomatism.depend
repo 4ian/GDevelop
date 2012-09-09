@@ -8790,7 +8790,7 @@
 1264364230 d:\florian\programmation\gamedevelop\gdl\gdl\btalignedallocator.h
 	"GDL/btScalar.h"
 
-1337527124 source:d:\florian\programmation\gamedevelop2\extensions\pathautomatism\pathautomatism.cpp
+1343480243 source:d:\florian\programmation\gamedevelop2\extensions\pathautomatism\pathautomatism.cpp
 	<boost/shared_ptr.hpp>
 	"PathAutomatism.h"
 	"PathAutomatismEditor.h"
@@ -8798,15 +8798,16 @@
 	"GDL/tinyxml/tinyxml.h"
 	"GDL/XmlMacros.h"
 	"GDL/RuntimeScene.h"
+	"GDL/CommonTools.h"
 	"RuntimeScenePathDatas.h"
 
-1337525846 d:\florian\programmation\gamedevelop2\extensions\pathautomatism\pathautomatism.h
+1343243306 d:\florian\programmation\gamedevelop2\extensions\pathautomatism\pathautomatism.h
 	"GDL/Automatism.h"
 	"GDL/Object.h"
 	<SFML/System/Vector2.hpp>
 	<map>
 
-1337104465 d:\florian\programmation\gamedevelop2\gdl\gdl\automatism.h
+1343243305 d:\florian\programmation\gamedevelop2\gdl\gdl\automatism.h
 	<string>
 	"GDCore/PlatformDefinition/Automatism.h"
 
@@ -10050,7 +10051,7 @@
 
 1236015922 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\smart_ptr\detail\operator_bool.hpp
 
-1337104465 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
+1346256066 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
 	"GDL/Force.h"
 	<string>
 	<vector>
@@ -10139,7 +10140,7 @@
 	"wx/validate.h"
 	"wx/valtext.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\defs.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\defs.h
 	"wx/platform.h"
 	"wx/version.h"
 	"wx/dlimpexp.h"
@@ -10152,7 +10153,7 @@
 	"wx/msw/winundef.h"
 	"wx/features.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\platform.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\platform.h
 	<stddef.h>
 	<unistd.h>
 	<TargetConditionals.h>
@@ -10168,21 +10169,21 @@
 	"wx/chkconf.h"
 	"wx/palmos/missing.h"
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\config_xcode.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\config_xcode.h
 
 1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\msw\wx\setup.h
 
-1253308518 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\setup_gccxml.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\setup_gccxml.h
 
-1253308461 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wince\libraries.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wince\libraries.h
 
-1253308462 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\libraries.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\libraries.h
 
-1253308462 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\gccpriv.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\gccpriv.h
 	<_mingw.h>
 	<w32api.h>
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\chkconf.h
 	"wx/palmos/chkconf.h"
 	"wx/msw/wince/chkconf.h"
 	"wx/msw/chkconf.h"
@@ -10197,42 +10198,42 @@
 	"wx/unix/chkconf.h"
 	"wx/univ/chkconf.h"
 
-1307990272 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\chkconf.h
 
-1253308461 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wince\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wince\chkconf.h
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\chkconf.h
 
-1253308493 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\chkconf.h
 
-1307990303 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\chkconf.h
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\chkconf.h
 	"wx/osx/iphone/chkconf.h"
 	"wx/osx/carbon/chkconf.h"
 	"wx/osx/cocoa/chkconf.h"
 
-1307990288 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\iphone\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\iphone\chkconf.h
 
-1253308486 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\carbon\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\carbon\chkconf.h
 
-1307990289 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\cocoa\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\cocoa\chkconf.h
 
-1253308473 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\chkconf.h
 
-1253308482 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\chkconf.h
 
-1253308456 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\chkconf.h
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\chkconf.h
 
-1253308467 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\chkconf.h
 
-1307990265 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\unix\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\unix\chkconf.h
 
-1307990264 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\chkconf.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\chkconf.h
 
-1307990272 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\missing.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\missing.h
 	<stdarg.h>
 	<stdio.h>
 	<stdlib.h>
@@ -10253,21 +10254,21 @@
 	"sections.h"
 	"pfall.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\version.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\version.h
 	"wx/cpp.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cpp.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cpp.h
 
-1253308523 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dlimpexp.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dlimpexp.h
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\debug.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\debug.h
 	<assert.h>
 	<limits.h>
 	"wx/chartype.h"
 	"wx/cpp.h"
 	"wx/dlimpexp.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\chartype.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\chartype.h
 	"wx/platform.h"
 	<sys/types.h>
 	<wchar.h>
@@ -10282,26 +10283,26 @@
 	<tchar.h>
 	<ctype.h>
 
-1253308521 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\windowid.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\windowid.h
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\winundef.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\winundef.h
 
-1253308513 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\features.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\features.h
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\object.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\object.h
 	"wx/memory.h"
 	"wx/xti.h"
 	"wx/rtti.h"
 	"wx/xti2.h"
 	"wx/msw/msvcrt.h"
 
-1253308518 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\memory.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\memory.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/msgout.h"
 	<stddef.h>
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\string.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\string.h
 	"wx/defs.h"
 	<ctype.h>
 	<stdio.h>
@@ -10325,7 +10326,7 @@
 	"wx/iosfwrap.h"
 	"wx/crt.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\wxcrtbase.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\wxcrtbase.h
 	"wx/chartype.h"
 	<stdio.h>
 	<string.h>
@@ -10335,7 +10336,7 @@
 	<time.h>
 	<io.h>
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\strvararg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\strvararg.h
 	"wx/platform.h"
 	"wx/cpp.h"
 	"wx/chartype.h"
@@ -10347,7 +10348,7 @@
 	<tr1/type_traits>
 	"wx/stringimpl.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\strconv.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\strconv.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/buffer.h"
@@ -10355,24 +10356,24 @@
 	<stdlib.h>
 	"wx/fontenc.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\buffer.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\buffer.h
 	"wx/chartype.h"
 	"wx/wxcrtbase.h"
 	<stdlib.h>
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\typeinfo.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\typeinfo.h
 	"wx/defs.h"
 	<typeinfo>
 	<string.h>
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\fontenc.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\fontenc.h
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\unichar.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\unichar.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/stringimpl.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stringimpl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stringimpl.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/wxcrtbase.h"
@@ -10381,39 +10382,39 @@
 	<string>
 	"wx/afterstd.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\beforestd.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\beforestd.h
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\afterstd.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\afterstd.h
 	"wx/msw/winundef.h"
 
-1253308524 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stringops.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stringops.h
 	"wx/chartype.h"
 	"wx/stringimpl.h"
 	"wx/unichar.h"
 	"wx/buffer.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\tls.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\tls.h
 	"wx/defs.h"
 	"wx/msw/tls.h"
 	"wx/os2/tls.h"
 	"wx/unix/tls.h"
 	<stdlib.h>
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\tls.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\tls.h
 	"wx/msw/wrapwin.h"
 	"wx/thread.h"
 	"wx/vector.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wrapwin.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wrapwin.h
 	"wx/platform.h"
 	<winsock2.h>
 	<windows.h>
 	"wx/msw/winundef.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\thread.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\thread.h
 	"wx/defs.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\vector.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\vector.h
 	"wx/defs.h"
 	<vector>
 	<algorithm>
@@ -10425,7 +10426,7 @@
 	<new>
 	"wx/afterstd.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\utils.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\utils.h
 	"wx/object.h"
 	"wx/list.h"
 	"wx/filefn.h"
@@ -10441,7 +10442,7 @@
 	<unistd.h>
 	<stdio.h>
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\list.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\list.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
@@ -10451,7 +10452,7 @@
 	<list>
 	"wx/afterstd.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\filefn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\filefn.h
 	"wx/list.h"
 	"wx/arrstr.h"
 	"wx/msw/wince/time.h"
@@ -10485,7 +10486,7 @@
 	<fcntl.h>
 	<sys/types.h>
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\arrstr.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\arrstr.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/dynarray.h"
@@ -10493,16 +10494,16 @@
 	<iterator>
 	"wx/afterstd.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dynarray.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dynarray.h
 	"wx/defs.h"
 	"wx/beforestd.h"
 	<vector>
 	<algorithm>
 	"wx/afterstd.h"
 
-1253308461 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wince\time.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wince\time.h
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\private.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\private.h
 	"wx/msw/wrapwin.h"
 	"wx/msw/microwin.h"
 	"wx/log.h"
@@ -10510,9 +10511,9 @@
 	"wx/gdicmn.h"
 	"wx/colour.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\microwin.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\microwin.h
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\log.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\log.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/strvararg.h"
@@ -10525,7 +10526,7 @@
 	"wx/generic/logg.h"
 	"wx/cocoa/log.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\hashmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\hashmap.h
 	"wx/string.h"
 	"wx/wxcrt.h"
 	<unordered_map>
@@ -10534,21 +10535,21 @@
 	<hash_map>
 	<stddef.h>
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\wxcrt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\wxcrt.h
 	"wx/wxcrtbase.h"
 	"wx/string.h"
 	<string.h>
 
-1253308526 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\iosfwrap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\iosfwrap.h
 	<iostream.h>
 	<iosfwd>
 	"wx/msw/winundef.h"
 
-1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\logg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\logg.h
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\log.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\log.h
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\window.h
 	"wx/event.h"
 	"wx/list.h"
 	"wx/cursor.h"
@@ -10574,7 +10575,7 @@
 	"wx/os2/window.h"
 	"wx/univ/window.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\event.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\event.h
 	"wx/defs.h"
 	"wx/cpp.h"
 	"wx/object.h"
@@ -10589,12 +10590,12 @@
 	"wx/any.h"
 	"wx/meta/convertible.h"
 
-1253308520 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\clntdata.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\clntdata.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/hashmap.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gdicmn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gdicmn.h
 	"wx/defs.h"
 	"wx/list.h"
 	"wx/string.h"
@@ -10602,13 +10603,13 @@
 	"wx/hashmap.h"
 	"wx/math.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\math.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\math.h
 	"wx/defs.h"
 	<math.h>
 	<float.h>
 	<ieeefp.h>
 
-1253308515 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cursor.h
 	"wx/defs.h"
 	"wx/palmos/cursor.h"
 	"wx/msw/cursor.h"
@@ -10623,39 +10624,39 @@
 	"wx/os2/cursor.h"
 	"wx/utils.h"
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\cursor.h
 	"wx/palmos/gdiimage.h"
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\gdiimage.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\gdiimage.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/list.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gdiobj.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gdiobj.h
 	"wx/object.h"
 
-1253308463 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\cursor.h
 	"wx/msw/gdiimage.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\gdiimage.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\gdiimage.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/list.h"
 
-1253308444 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\cursor.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\cursor.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\cursor.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/image.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\image.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\image.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
@@ -10675,14 +10676,14 @@
 	"wx/imagxpm.h"
 	"wx/imagiff.h"
 
-1253308527 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stream.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stream.h
 	"wx/defs.h"
 	<stdio.h>
 	"wx/object.h"
 	"wx/string.h"
 	"wx/filefn.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\variant.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\variant.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
@@ -10694,7 +10695,7 @@
 	"wx/iosfwrap.h"
 	"wx/any.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\longlong.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\longlong.h
 	"wx/defs.h"
 	"wx/string.h"
 	<limits.h>
@@ -10702,7 +10703,7 @@
 	<limits>
 	"wx/strvararg.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\datetime.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\datetime.h
 	"wx/defs.h"
 	"wx/msw/wince/time.h"
 	<time.h>
@@ -10711,10 +10712,10 @@
 	"wx/anystr.h"
 	"wx/dynarray.h"
 
-1253308523 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\anystr.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\anystr.h
 	"wx/string.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\any.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\any.h
 	"wx/defs.h"
 	<new>
 	"wx/string.h"
@@ -10724,54 +10725,54 @@
 	"wx/datetime.h"
 	"wx/variant.h"
 
-1253308441 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\if.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\if.h
 	"wx/defs.h"
 
-1253308518 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagbmp.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagbmp.h
 	"wx/image.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagpng.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagpng.h
 	"wx/defs.h"
 	"wx/image.h"
 	"wx/versioninfo.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\versioninfo.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\versioninfo.h
 	"wx/string.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imaggif.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imaggif.h
 	"wx/image.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagpcx.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagpcx.h
 	"wx/image.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagjpeg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagjpeg.h
 	"wx/defs.h"
 	"wx/image.h"
 	"wx/versioninfo.h"
 
-1253308524 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagtga.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagtga.h
 	"wx/image.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagtiff.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagtiff.h
 	"wx/defs.h"
 	"wx/image.h"
 	"wx/versioninfo.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagpnm.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagpnm.h
 	"wx/image.h"
 
-1253308513 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagxpm.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagxpm.h
 	"wx/image.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagiff.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\imagiff.h
 	"wx/image.h"
 
-1253308467 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\cursor.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/colour.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\colour.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\colour.h
 	"wx/defs.h"
 	"wx/gdiobj.h"
 	"wx/variant.h"
@@ -10787,26 +10788,26 @@
 	"wx/cocoa/colour.h"
 	"wx/os2/colour.h"
 
-1253308506 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\colour.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\colour.h
 	"wx/object.h"
 
-1253308463 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\colour.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\colour.h
 	"wx/object.h"
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\colour.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\colour.h
 	"wx/object.h"
 	"wx/string.h"
 
-1253308494 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\colour.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\colour.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\colour.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\colour.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/palette.h"
 
-1253308520 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palette.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palette.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdiobj.h"
@@ -10818,35 +10819,35 @@
 	"wx/osx/palette.h"
 	"wx/os2/palette.h"
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\palette.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\palette.h
 	"wx/gdiobj.h"
 
-1253308462 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\palette.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\palette.h
 	"wx/gdiobj.h"
 
-1253308467 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\palette.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\palette.h
 	"wx/list.h"
 
-1253308505 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\paletteg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\paletteg.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1253308482 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\palette.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\palette.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\palette.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\palette.h
 	"wx/gdiobj.h"
 
-1253308473 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\palette.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\palette.h
 	"wx/gdiobj.h"
 	"wx/os2/private.h"
 
-1253308476 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\private.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\private.h
 	<os2.h>
 	<os2def.h>
 	<X11/Xmd.h>
@@ -10858,44 +10859,44 @@
 	"wx/fontenc.h"
 	"wx/thread.h"
 
-1253308467 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\colour.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\colour.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/palette.h"
 
-1253308487 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\colour.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\colour.h
 	"wx/osx/core/colour.h"
 
-1307990290 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\core\colour.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\core\colour.h
 	"wx/object.h"
 	"wx/string.h"
 	"wx/osx/core/cfref.h"
 
-1307990290 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\core\cfref.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\core\cfref.h
 	<unistd.h>
 	<AvailabilityMacros.h>
 
-1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\colour.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\colour.h
 	"wx/object.h"
 	"wx/string.h"
 
-1253308474 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\colour.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\colour.h
 	"wx/object.h"
 
-1307990287 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\cursor.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1253308457 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\cursor.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\cursor.h
 	"wx/bitmap.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\bitmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\bitmap.h
 	"wx/string.h"
 	"wx/gdicmn.h"
 	"wx/colour.h"
@@ -10914,76 +10915,76 @@
 	"wx/os2/bitmap.h"
 	"wx/generic/mask.h"
 
-1307990272 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\bitmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\bitmap.h
 	"wx/palmos/gdiimage.h"
 	"wx/gdicmn.h"
 	"wx/palette.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\bitmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\bitmap.h
 	"wx/msw/gdiimage.h"
 	"wx/palette.h"
 
-1307990279 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\bitmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\bitmap.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/palette.h"
 	"wx/gdiobj.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\bitmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\bitmap.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\bitmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\bitmap.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/palette.h"
 	"wx/gdiobj.h"
 
-1307990287 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\bitmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\bitmap.h
 
-1253308456 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\bitmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\bitmap.h
 	"wx/dfb/dfbptr.h"
 
-1253308457 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\dfbptr.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\dfbptr.h
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\bitmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\bitmap.h
 	"wx/palette.h"
 
-1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\bitmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\bitmap.h
 	"wx/palette.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\bitmap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\bitmap.h
 	"wx/os2/private.h"
 	"wx/os2/gdiimage.h"
 	"wx/gdicmn.h"
 	"wx/palette.h"
 
-1253308473 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\gdiimage.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\gdiimage.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/list.h"
 
-1253308505 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\mask.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\mask.h
 
-1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\cursor.h
 	"wx/bitmap.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\cursor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\cursor.h
 	"wx/bitmap.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mousestate.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mousestate.h
 	"wx/gdicmn.h"
 	"wx/kbdstate.h"
 
-1253308524 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\kbdstate.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\kbdstate.h
 	"wx/defs.h"
 
-1253308524 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\tracker.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\tracker.h
 	"wx/defs.h"
 
-1253308441 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\convertible.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\convertible.h
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\font.h
 	"wx/defs.h"
 	"wx/fontenc.h"
 	"wx/gdiobj.h"
@@ -11000,41 +11001,41 @@
 	"wx/cocoa/font.h"
 	"wx/os2/font.h"
 
-1307990272 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\font.h
 	"wx/gdicmn.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\font.h
 	"wx/gdicmn.h"
 
-1307990266 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\font.h
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\font.h
 
-1307990268 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\font.h
 	"wx/hash.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\hash.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\hash.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/object.h"
 
-1307990279 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\font.h
 
-1307990286 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\font.h
 	"wx/hash.h"
 
-1307990273 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\font.h
 	"wx/dfb/dfbptr.h"
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\font.h
 
-1307990303 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\font.h
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\font.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\font.h
 	"wx/gdiobj.h"
 	"wx/os2/private.h"
 
-1253308516 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\region.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/palmos/region.h"
@@ -11048,47 +11049,47 @@
 	"wx/cocoa/region.h"
 	"wx/os2/region.h"
 
-1253308454 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\region.h
 
-1253308463 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\region.h
 
-1253308495 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\region.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\region.h
 	"wx/list.h"
 
-1253308467 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\region.h
 	"wx/list.h"
 
-1253308482 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\region.h
 	"wx/list.h"
 
-1253308457 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\region.h
 
-1253308488 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\region.h
 	"wx/osx/carbon/region.h"
 	"wx/generic/region.h"
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\carbon\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\carbon\region.h
 	"wx/list.h"
 
-1253308506 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\region.h
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\region.h
 	"wx/generic/region.h"
 
-1253308476 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\region.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\region.h
 	"wx/list.h"
 	"wx/os2/private.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\intl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\intl.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/translation.h"
 	"wx/fontenc.h"
 	"wx/language.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\translation.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\translation.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/buffer.h"
@@ -11097,20 +11098,20 @@
 	"wx/strconv.h"
 	"wx/scopedptr.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\language.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\language.h
 	"wx/defs.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\scopedptr.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\scopedptr.h
 	"wx/defs.h"
 	"wx/checkeddelete.h"
 
-1253308520 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\checkeddelete.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\checkeddelete.h
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\validate.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\validate.h
 	"wx/defs.h"
 	"wx/event.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\accel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\accel.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/generic/accel.h"
@@ -11122,67 +11123,67 @@
 	"wx/generic/accel.h"
 	"wx/os2/accel.h"
 
-1253308506 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\accel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\accel.h
 
-1253308463 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\accel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\accel.h
 
-1307990266 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\accel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\accel.h
 	"wx/object.h"
 	"wx/string.h"
 	"wx/event.h"
 
-1253308495 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\accel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\accel.h
 	"wx/generic/accel.h"
 
-1253308446 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\accel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\accel.h
 	"wx/generic/accel.h"
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\accel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\accel.h
 	"wx/string.h"
 	"wx/event.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\accel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\accel.h
 	"wx/object.h"
 
-1253308514 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\access.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\access.h
 	"wx/defs.h"
 	"wx/variant.h"
 	"wx/msw/ole/access.h"
 
-1307990276 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\ole\access.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\ole\access.h
 
-1253308454 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\window.h
 	"wx/hash.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\window.h
 	"wx/settings.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\settings.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\settings.h
 	"wx/colour.h"
 	"wx/font.h"
 
-1307990267 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\window.h
 	"wx/region.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\window.h
 	"wx/dynarray.h"
 
-1307990268 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\window.h
 
-1307990279 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\window.h
 	"wx/region.h"
 
-1307990286 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\window.h
 	"wx/font.h"
 
-1307990273 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\window.h
 	"wx/dfb/dfbptr.h"
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\window.h
 	"wx/brush.h"
 	"wx/dc.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\brush.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\brush.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/gdiobj.h"
@@ -11198,53 +11199,53 @@
 	"wx/cocoa/brush.h"
 	"wx/os2/brush.h"
 
-1253308454 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\brush.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\brush.h
 	"wx/gdicmn.h"
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 
-1253308465 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\brush.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\brush.h
 
-1253308467 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\brush.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\brush.h
 	"wx/gdiobj.h"
 
-1253308495 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\brush.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\brush.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\brush.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\brush.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 
-1253308482 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\brush.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\brush.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 
-1253308457 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\brush.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\brush.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 
-1253308488 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\brush.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\brush.h
 	"wx/gdicmn.h"
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\brush.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\brush.h
 	"wx/gdicmn.h"
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 
-1253308476 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\brush.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\brush.h
 	"wx/bitmap.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dc.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dc.h
 	"wx/object.h"
 	"wx/intl.h"
 	"wx/cursor.h"
@@ -11260,7 +11261,7 @@
 	"wx/region.h"
 	"wx/affinematrix2d.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\pen.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\pen.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/palmos/pen.h"
@@ -11274,136 +11275,137 @@
 	"wx/cocoa/pen.h"
 	"wx/os2/pen.h"
 
-1253308454 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\pen.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\pen.h
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 	"wx/colour.h"
 
-1253308465 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\pen.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\pen.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1253308468 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\pen.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\pen.h
 	"wx/gdicmn.h"
 	"wx/gdiobj.h"
 
-1253308495 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\pen.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\pen.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\pen.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\pen.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1253308482 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\pen.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\pen.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1253308457 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\pen.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\pen.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/string.h"
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1253308489 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\pen.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\pen.h
 	"wx/gdiobj.h"
 	"wx/colour.h"
 	"wx/bitmap.h"
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\pen.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\pen.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 
-1253308478 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\pen.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\pen.h
 	"wx/gdiobj.h"
 	"wx/bitmap.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\affinematrix2d.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\affinematrix2d.h
+	"wx/defs.h"
 	"wx/affinematrix2dbase.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\affinematrix2dbase.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\affinematrix2dbase.h
 	"wx/defs.h"
 	"wx/geometry.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\geometry.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\geometry.h
 	"wx/defs.h"
 	"wx/utils.h"
 	"wx/gdicmn.h"
 	"wx/math.h"
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\window.h
 	"wx/cocoa/NSView.h"
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nsview.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nsview.h
 	"wx/hashmap.h"
 	"wx/cocoa/ObjcAssociate.h"
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\objcassociate.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\objcassociate.h
 
-1253308477 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\window.h
 	<os2.h>
 	"wx/hash.h"
 
-1307990264 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\window.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\window.h
 	"wx/bitmap.h"
 
-1307990266 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\implicitconversion.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\implicitconversion.h
 	"wx/defs.h"
 	"wx/meta/if.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\platinfo.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\platinfo.h
 	"wx/string.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\scopeguard.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\scopeguard.h
 	"wx/defs.h"
 	"wx/except.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\except.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\except.h
 	"wx/defs.h"
 
-1307990266 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\movable.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\movable.h
 	"wx/meta/pod.h"
 	"wx/string.h"
 
-1307990266 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\pod.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\pod.h
 	"wx/defs.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\tls.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\tls.h
 	"wx/os2/private.h"
 	"wx/thread.h"
 	"wx/vector.h"
 
-1307990265 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\unix\tls.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\unix\tls.h
 	<pthread.h>
 
-1253308520 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\crt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\crt.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/wxcrt.h"
 	"wx/wxcrtvararg.h"
 
-1253308520 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\wxcrtvararg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\wxcrtvararg.h
 	"wx/wxcrt.h"
 	"wx/strvararg.h"
 	"wx/string.h"
 	<stdarg.h>
 
-1253308522 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msgout.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msgout.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/strvararg.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xti.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xti.h
 	"wx/defs.h"
 	"wx/xtitypes.h"
 	"wx/xtihandler.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xtitypes.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xtitypes.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/hashmap.h"
@@ -11413,30 +11415,30 @@
 	"wx/log.h"
 	<typeinfo>
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\flags.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\flags.h
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xtihandler.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xtihandler.h
 	"wx/defs.h"
 	"wx/xti.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\rtti.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\rtti.h
 	"wx/memory.h"
 	"wx/flags.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xti2.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xti2.h
 	"wx/xtiprop.h"
 	"wx/xtictor.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xtiprop.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xtiprop.h
 	"wx/defs.h"
 	"wx/xti.h"
 	"wx/any.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xtictor.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\xtictor.h
 	"wx/defs.h"
 	"wx/xti.h"
 
-1253308464 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\msvcrt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\msvcrt.h
 	<stdlib.h>
 	<crtdbg.h>
 
@@ -11478,7 +11480,7 @@
 	"wx/event.h"
 	"wx/icon.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\icon.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\icon.h
 	"wx/iconloc.h"
 	"wx/generic/icon.h"
 	"wx/msw/icon.h"
@@ -11494,26 +11496,26 @@
 	"wx/os2/icon.h"
 	"wx/variant.h"
 
-1253308522 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\iconloc.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\iconloc.h
 	"wx/string.h"
 
-1253308506 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\icon.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\icon.h
 	"wx/bitmap.h"
 
-1253308463 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\icon.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\icon.h
 	"wx/msw/gdiimage.h"
 
-1253308444 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\icon.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\icon.h
 	"wx/bitmap.h"
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\icon.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\icon.h
 	"wx/bitmap.h"
 
-1307990303 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\icon.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\icon.h
 	"wx/gdicmn.h"
 	"wx/gdiobj.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\icon.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\icon.h
 	"wx/bitmap.h"
 	"wx/os2/gdiimage.h"
 
@@ -11544,7 +11546,7 @@
 	"wx/cocoa/frame.h"
 	"wx/os2/frame.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\toplevel.h
 	"wx/nonownedwnd.h"
 	"wx/iconbndl.h"
 	"wx/containr.h"
@@ -11562,72 +11564,76 @@
 	"wx/motif/toplevel.h"
 	"wx/univ/toplevel.h"
 
-1253308515 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\nonownedwnd.h
-	"wx/dfb/nonownedwnd.h"
-	"wx/osx/nonownedwnd.h"
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\nonownedwnd.h
 	"wx/window.h"
+	"wx/dfb/nonownedwnd.h"
+	"wx/gtk/nonownedwnd.h"
+	"wx/osx/nonownedwnd.h"
+	"wx/msw/nonownedwnd.h"
 
-1307990273 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\nonownedwnd.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\nonownedwnd.h
 	"wx/window.h"
 	"wx/dfb/dfbptr.h"
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\nonownedwnd.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\nonownedwnd.h
 	"wx/window.h"
+	"wx/graphics.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\iconbndl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\iconbndl.h
 	"wx/gdiobj.h"
 	"wx/gdicmn.h"
 	"wx/icon.h"
 	"wx/dynarray.h"
 
-1253308515 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\containr.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\containr.h
 	"wx/defs.h"
+	"wx/event.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\weakref.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\weakref.h
 	"wx/tracker.h"
 	"wx/meta/convertible.h"
 	"wx/meta/int2type.h"
 
-1253308441 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\int2type.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\meta\int2type.h
 
-1253308454 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\toplevel.h
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\toplevel.h
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\toplevel.h
 
-1253308446 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\toplevel.h
 
-1253308466 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\toplevel.h
 
-1253308482 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mgl\toplevel.h
 
-1253308456 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dfb\toplevel.h
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\toplevel.h
 
-1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\toplevel.h
 	"wx/hashmap.h"
 	"wx/cocoa/NSWindow.h"
 
-1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nswindow.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nswindow.h
 	"wx/hashmap.h"
 	"wx/cocoa/ObjcAssociate.h"
 
-1253308475 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\toplevel.h
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\toplevel.h
 
-1307990264 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\toplevel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\toplevel.h
 	"wx/univ/inpcons.h"
 	"wx/univ/inphand.h"
 	"wx/icon.h"
 
-1253308439 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\inpcons.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\inpcons.h
 	"wx/object.h"
 	"wx/event.h"
 
-1253308439 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\inphand.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\inphand.h
 	"wx/univ/inpcons.h"
 
 1307986705 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\statusbr.h
@@ -11642,7 +11648,7 @@
 	"wx/osx/statusbr.h"
 	"wx/generic/statusbr.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\control.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\control.h
 	"wx/defs.h"
 	"wx/window.h"
 	"wx/univ/control.h"
@@ -11655,39 +11661,39 @@
 	"wx/cocoa/control.h"
 	"wx/os2/control.h"
 
-1253308438 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\control.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\control.h
 	"wx/univ/inphand.h"
 	"wx/univ/inpcons.h"
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\control.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\control.h
 	"wx/dynarray.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\control.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\control.h
 	"wx/dynarray.h"
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\control.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\control.h
 	"wx/window.h"
 	"wx/list.h"
 	"wx/validate.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\control.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\control.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\control.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\control.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/list.h"
 	"wx/window.h"
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\control.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\control.h
 
-1253308509 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\control.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\control.h
 	"wx/cocoa/NSControl.h"
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nscontrol.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nscontrol.h
 	"wx/hashmap.h"
 	"wx/cocoa/ObjcAssociate.h"
 
-1253308473 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\control.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\control.h
 	"wx/dynarray.h"
 
 1307986664 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\statusbr.h
@@ -11778,10 +11784,9 @@
 1253304838 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\toolbar.h
 	"wx/button.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\button.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\button.h
 	"wx/defs.h"
-	"wx/bitmap.h"
-	"wx/control.h"
+	"wx/anybutton.h"
 	"wx/univ/button.h"
 	"wx/msw/button.h"
 	"wx/motif/button.h"
@@ -11792,39 +11797,39 @@
 	"wx/os2/button.h"
 	"wx/palmos/button.h"
 
-1253308438 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\button.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\button.h
 	"wx/bitmap.h"
 
-1307990277 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\button.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\button.h
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\button.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\button.h
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\button.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\button.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\button.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\button.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/list.h"
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\button.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\button.h
 	"wx/control.h"
 	"wx/gdicmn.h"
 
-1253308509 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\button.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\button.h
 	"wx/cocoa/NSButton.h"
 
-1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nsbutton.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nsbutton.h
 	"wx/hashmap.h"
 	"wx/cocoa/ObjcAssociate.h"
 	"wx/cocoa/ObjcRef.h"
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\objcref.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\objcref.h
 	"wx/osx/core/cfref.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\button.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\button.h
 	"wx/control.h"
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\button.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\button.h
 
 1253304853 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\toolbar.h
 	"wx/dynarray.h"
@@ -11874,7 +11879,7 @@
 	"wx/timer.h"
 	"wx/tbarbase.h"
 
-1253308527 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\timer.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\timer.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/longlong.h"
@@ -11882,9 +11887,10 @@
 	"wx/stopwatch.h"
 	"wx/utils.h"
 
-1253308517 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stopwatch.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stopwatch.h
 	"wx/defs.h"
 	"wx/longlong.h"
+	"wx/time.h"
 
 1253304910 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\frame.h
 
@@ -11940,24 +11946,24 @@
 	"wx/arrstr.h"
 	"wx/dynarray.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\panel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\panel.h
 	"wx/window.h"
 	"wx/containr.h"
 	"wx/univ/panel.h"
 	"wx/msw/panel.h"
 	"wx/generic/panelg.h"
 
-1307990264 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\panel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\panel.h
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\panel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\panel.h
 
-1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\panelg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\panelg.h
 	"wx/bitmap.h"
 
-1253308521 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dcclient.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dcclient.h
 	"wx/dc.h"
 
-1253308520 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dcmemory.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dcmemory.h
 	"wx/dc.h"
 	"wx/bitmap.h"
 
@@ -11969,7 +11975,7 @@
 	"wx/defs.h"
 	"wx/dc.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\menuitem.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\menuitem.h
 	"wx/defs.h"
 	"wx/object.h"
 	"wx/univ/menuitem.h"
@@ -11982,51 +11988,51 @@
 	"wx/cocoa/menuitem.h"
 	"wx/os2/menuitem.h"
 
-1253308438 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\menuitem.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\menuitem.h
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\menuitem.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\menuitem.h
 	"wx/ownerdrw.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\ownerdrw.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\ownerdrw.h
 	"wx/defs.h"
 	"wx/font.h"
 	"wx/colour.h"
 	"wx/msw/ownerdrw.h"
 	"wx/os2/ownerdrw.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\ownerdrw.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\ownerdrw.h
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\ownerdrw.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\ownerdrw.h
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\menuitem.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\menuitem.h
 	"wx/ownerdrw.h"
 	"wx/bitmap.h"
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\menuitem.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\menuitem.h
 	"wx/bitmap.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\menuitem.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\menuitem.h
 	"wx/bitmap.h"
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\menuitem.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\menuitem.h
 	"wx/bitmap.h"
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\menuitem.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\menuitem.h
 	"wx/defs.h"
 	"wx/bitmap.h"
 
-1253308509 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\menuitem.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\menuitem.h
 	"wx/hashmap.h"
 	"wx/bitmap.h"
 	"wx/cocoa/ObjcRef.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\menuitem.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\menuitem.h
 	"wx/defs.h"
 	"wx/os2/private.h"
 	"wx/ownerdrw.h"
 	"wx/bitmap.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\menu.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\menu.h
 	"wx/defs.h"
 	"wx/list.h"
 	"wx/window.h"
@@ -12041,46 +12047,46 @@
 	"wx/cocoa/menu.h"
 	"wx/os2/menu.h"
 
-1253308439 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\menu.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\menu.h
 	"wx/accel.h"
 	"wx/dynarray.h"
 
-1307990272 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\menu.h
-	"wx/accel.h"
-	"wx/dynarray.h"
-	"wx/arrstr.h"
-
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\menu.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\menu.h
 	"wx/accel.h"
 	"wx/dynarray.h"
 	"wx/arrstr.h"
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\menu.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\menu.h
+	"wx/accel.h"
+	"wx/dynarray.h"
+	"wx/arrstr.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\menu.h
 	"wx/colour.h"
 	"wx/font.h"
 	"wx/arrstr.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\menu.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\menu.h
 
-1307990268 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\menu.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\menu.h
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\menu.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\menu.h
 	"wx/arrstr.h"
 
-1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\menu.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\menu.h
 	"wx/cocoa/NSMenu.h"
 	"wx/accel.h"
 
-1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nsmenu.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nsmenu.h
 	"wx/hashmap.h"
 	"wx/cocoa/ObjcAssociate.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\menu.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\menu.h
 	"wx/accel.h"
 	"wx/list.h"
 	"wx/dynarray.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dialog.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dialog.h
 	"wx/defs.h"
 	"wx/toplevel.h"
 	"wx/univ/dialog.h"
@@ -12093,36 +12099,36 @@
 	"wx/cocoa/dialog.h"
 	"wx/os2/dialog.h"
 
-1307990264 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\dialog.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\dialog.h
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\dialog.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\dialog.h
 	"wx/panel.h"
 
-1307990277 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\dialog.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\dialog.h
 	"wx/panel.h"
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\dialog.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\dialog.h
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\dialog.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\dialog.h
 
-1253308446 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\dialog.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\dialog.h
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\dialog.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\dialog.h
 	"wx/panel.h"
 
-1253308509 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\dialog.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\dialog.h
 	"wx/defs.h"
 	"wx/panel.h"
 	"wx/cocoa/NSPanel.h"
 
-1253308509 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nspanel.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nspanel.h
 	"wx/hashmap.h"
 	"wx/cocoa/ObjcAssociate.h"
 
-1253308473 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\dialog.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\dialog.h
 	"wx/panel.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msgdlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msgdlg.h
 	"wx/defs.h"
 	"wx/dialog.h"
 	"wx/stockitem.h"
@@ -12135,29 +12141,29 @@
 	"wx/osx/msgdlg.h"
 	"wx/os2/msgdlg.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stockitem.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stockitem.h
 	"wx/defs.h"
 	"wx/chartype.h"
 	"wx/string.h"
 	"wx/accel.h"
 
-1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\msgdlgg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\msgdlgg.h
 
-1307990303 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\msgdlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\msgdlg.h
 	"wx/msgdlg.h"
 	"wx/generic/msgdlgg.h"
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\msgdlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\msgdlg.h
 
-1307990277 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\msgdlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\msgdlg.h
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\msgdlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\msgdlg.h
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\msgdlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\msgdlg.h
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\msgdlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\msgdlg.h
 
-1253308473 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\msgdlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\msgdlg.h
 
 1307986704 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dataobj.h
 	"wx/defs.h"
@@ -12238,23 +12244,23 @@
 
 1253304875 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\dataobj2.h
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\ctrlsub.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\ctrlsub.h
 	"wx/defs.h"
 	"wx/arrstr.h"
 	"wx/control.h"
 	"wx/msw/ctrlsub.h"
 	"wx/motif/ctrlsub.h"
 
-1253308465 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\ctrlsub.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\ctrlsub.h
 
-1253308444 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\ctrlsub.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\ctrlsub.h
 	"wx/dynarray.h"
 	"wx/generic/ctrlsub.h"
 
-1253308506 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\ctrlsub.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\ctrlsub.h
 	"wx/dynarray.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\bmpbuttn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\bmpbuttn.h
 	"wx/defs.h"
 	"wx/button.h"
 	"wx/univ/bmpbuttn.h"
@@ -12267,39 +12273,39 @@
 	"wx/os2/bmpbuttn.h"
 	"wx/palmos/bmpbuttn.h"
 
-1253308439 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\bmpbuttn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\bmpbuttn.h
 
-1253308464 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\bmpbuttn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\bmpbuttn.h
 	"wx/button.h"
 	"wx/bitmap.h"
 	"wx/brush.h"
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\bmpbuttn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\bmpbuttn.h
 	"wx/motif/bmpmotif.h"
 
-1253308444 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\bmpmotif.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\bmpmotif.h
 	"wx/defs.h"
 	"wx/bitmap.h"
 
-1253308494 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\bmpbuttn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\bmpbuttn.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\bmpbuttn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\bmpbuttn.h
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\bmpbuttn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\bmpbuttn.h
 	"wx/button.h"
 
-1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\bmpbuttn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\bmpbuttn.h
 	"wx/cocoa/NSButton.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\bmpbuttn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\bmpbuttn.h
 	"wx/button.h"
 	"wx/dcclient.h"
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\bmpbuttn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\bmpbuttn.h
 	"wx/button.h"
 	"wx/bitmap.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\checkbox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\checkbox.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/checkbox.h"
@@ -12312,26 +12318,26 @@
 	"wx/os2/checkbox.h"
 	"wx/palmos/checkbox.h"
 
-1253308439 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\checkbox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\checkbox.h
 	"wx/button.h"
 
-1253308462 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\checkbox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\checkbox.h
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\checkbox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\checkbox.h
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\checkbox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\checkbox.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\checkbox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\checkbox.h
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\checkbox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\checkbox.h
 
-1253308509 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\checkbox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\checkbox.h
 	"wx/cocoa/NSButton.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\checkbox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\checkbox.h
 	"wx/control.h"
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\checkbox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\checkbox.h
 
 1307986705 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\checklst.h
 	"wx/defs.h"
@@ -12363,17 +12369,17 @@
 	"wx/dynarray.h"
 	"wx/arrstr.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\scrolwin.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\scrolwin.h
 	"wx/panel.h"
 	"wx/gtk/scrolwin.h"
 	"wx/gtk1/scrolwin.h"
 	"wx/generic/scrolwin.h"
 
-1253308493 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\scrolwin.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\scrolwin.h
 
-1253308446 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\scrolwin.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\scrolwin.h
 
-1253308505 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\scrolwin.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\scrolwin.h
 
 1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\listbox.h
 	"wx/dynarray.h"
@@ -12423,7 +12429,7 @@
 	<stddef.h>
 	"wx/defs.h"
 
-1253308525 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\choice.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\choice.h
 	"wx/defs.h"
 	"wx/ctrlsub.h"
 	"wx/univ/choice.h"
@@ -12437,10 +12443,10 @@
 	"wx/os2/choice.h"
 	"wx/palmos/choice.h"
 
-1253308439 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\choice.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\choice.h
 	"wx/combobox.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\combobox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\combobox.h
 	"wx/defs.h"
 	"wx/ctrlsub.h"
 	"wx/textentry.h"
@@ -12453,7 +12459,8 @@
 	"wx/cocoa/combobox.h"
 	"wx/os2/combobox.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\textentry.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\textentry.h
+	"wx/filefn.h"
 	"wx/gdicmn.h"
 	"wx/gtk/textentry.h"
 	"wx/osx/textentry.h"
@@ -12461,21 +12468,21 @@
 	"wx/motif/textentry.h"
 	"wx/os2/textentry.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\textentry.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\textentry.h
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\textentry.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\textentry.h
 	"wx/control.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\textentry.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\textentry.h
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\textentry.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\textentry.h
 
-1253308477 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\textentry.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\textentry.h
 
-1307990264 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\combobox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\combobox.h
 	"wx/combo.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\combo.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\combo.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/renderer.h"
@@ -12484,45 +12491,45 @@
 	"wx/msw/combo.h"
 	"wx/generic/combo.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\renderer.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\renderer.h
 	"wx/gdicmn.h"
 	"wx/colour.h"
 	"wx/font.h"
 	"wx/bitmap.h"
 	"wx/string.h"
 
-1307990277 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\combo.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\combo.h
 	"wx/timer.h"
 
-1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\combo.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\combo.h
 	"wx/dcbuffer.h"
 
-1253308525 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dcbuffer.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\dcbuffer.h
 	"wx/dcmemory.h"
 	"wx/dcclient.h"
 	"wx/window.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\combobox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\combobox.h
 	"wx/choice.h"
 	"wx/textentry.h"
 
-1253308444 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\combobox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\combobox.h
 	"wx/choice.h"
 	"wx/textentry.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\combobox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\combobox.h
 	"wx/choice.h"
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\combobox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\combobox.h
 	"wx/defs.h"
 	"wx/object.h"
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\combobox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\combobox.h
 	"wx/containr.h"
 	"wx/choice.h"
 	"wx/textctrl.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\textctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\textctrl.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/textentry.h"
@@ -12541,83 +12548,83 @@
 	"wx/os2/textctrl.h"
 	"wx/palmos/textctrl.h"
 
-1253308524 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\ioswrap.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\ioswrap.h
 	"wx/beforestd.h"
 	<iostream.h>
 	<iostream>
 	"wx/afterstd.h"
 	"wx/msw/winundef.h"
 
-1253308467 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\textctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\x11\textctrl.h
 	"wx/univ/textctrl.h"
 	"wx/scrolwin.h"
 	"wx/arrstr.h"
 
-1253308439 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\textctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\textctrl.h
 	"wx/scrolwin.h"
 	"wx/univ/inphand.h"
 
-1307990277 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wince\textctrlce.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wince\textctrlce.h
 	"wx/dynarray.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\textctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\textctrl.h
 
-1253308444 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\textctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\textctrl.h
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\textctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\textctrl.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\textctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\textctrl.h
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\textctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\textctrl.h
 	"wx/control.h"
 	"wx/textctrl.h"
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\textctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\textctrl.h
 	"wx/cocoa/NSTextField.h"
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nstextfield.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\nstextfield.h
 	"wx/hashmap.h"
 	"wx/cocoa/ObjcAssociate.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\textctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\textctrl.h
 
-1253308454 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\textctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\textctrl.h
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\combobox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\combobox.h
 	"wx/hashmap.h"
 	"wx/cocoa/ObjcAssociate.h"
 	"wx/textctrl.h"
 	"wx/dynarray.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\combobox.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\combobox.h
 	"wx/choice.h"
 	"wx/textentry.h"
 
-1307990277 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wince\choicece.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\wince\choicece.h
 	"wx/defs.h"
 	"wx/dynarray.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\choice.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\choice.h
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\choice.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\choice.h
 	"wx/clntdata.h"
 	"wx/dynarray.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\choice.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\choice.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\choice.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\choice.h
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\choice.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\choice.h
 	"wx/control.h"
 	"wx/dynarray.h"
 	"wx/arrstr.h"
 
-1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\choice.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\choice.h
 	"wx/cocoa/NSMenu.h"
 
-1253308474 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\choice.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\choice.h
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\choice.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\choice.h
 
 1307986705 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\scrolbar.h
 	"wx/defs.h"
@@ -12635,7 +12642,7 @@
 	"wx/univ/scrarrow.h"
 	"wx/renderer.h"
 
-1253308438 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\scrarrow.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\scrarrow.h
 
 1307986678 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\scrolbar.h
 
@@ -12659,7 +12666,7 @@
 1307986684 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\scrolbar.h
 	"wx/scrolbar.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stattext.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\stattext.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/stattext.h"
@@ -12672,29 +12679,29 @@
 	"wx/os2/stattext.h"
 	"wx/palmos/stattext.h"
 
-1307990264 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\stattext.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\stattext.h
 	"wx/generic/stattextg.h"
 
-1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\stattextg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\stattextg.h
 	"wx/stattext.h"
 
-1253308462 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\stattext.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\stattext.h
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\stattext.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\stattext.h
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\stattext.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\stattext.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\stattext.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\stattext.h
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\stattext.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\stattext.h
 
-1253308509 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\stattext.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\stattext.h
 	"wx/cocoa/NSTextField.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\stattext.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\stattext.h
 	"wx/control.h"
 
-1253308453 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\stattext.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\stattext.h
 
 1307986705 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\statbmp.h
 	"wx/defs.h"
@@ -12954,7 +12961,7 @@
 1253304915 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\layout.h
 	"wx/object.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\sizer.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\sizer.h
 	"wx/defs.h"
 	"wx/window.h"
 
@@ -12965,20 +12972,20 @@
 	"wx/dynarray.h"
 	"wx/dialog.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\textdlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\textdlg.h
 	"wx/generic/textdlgg.h"
 
-1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\textdlgg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\textdlgg.h
 	"wx/defs.h"
 	"wx/dialog.h"
 	"wx/valtext.h"
 	"wx/textctrl.h"
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\valtext.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\valtext.h
 	"wx/defs.h"
 	"wx/validate.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\filedlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\filedlg.h
 	"wx/defs.h"
 	"wx/dialog.h"
 	"wx/arrstr.h"
@@ -12992,7 +12999,7 @@
 	"wx/os2/filedlg.h"
 	"wx/generic/filedlgg.h"
 
-1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\filedlgg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\filedlgg.h
 	"wx/listctrl.h"
 	"wx/datetime.h"
 	"wx/filefn.h"
@@ -13000,56 +13007,56 @@
 	"wx/filedlg.h"
 	"wx/generic/filectrlg.h"
 
-1253308524 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\listctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\listctrl.h
 	"wx/defs.h"
 	"wx/listbase.h"
 	"wx/msw/listctrl.h"
 	"wx/osx/listctrl.h"
 	"wx/generic/listctrl.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\listbase.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\listbase.h
 	"wx/colour.h"
 	"wx/font.h"
 	"wx/gdicmn.h"
 	"wx/event.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\listctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\listctrl.h
 	"wx/textctrl.h"
 	"wx/dynarray.h"
 	"wx/vector.h"
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\listctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\listctrl.h
 	"wx/defs.h"
 	"wx/generic/listctrl.h"
 
-1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\listctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\listctrl.h
 	"wx/scrolwin.h"
 	"wx/textctrl.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\artprov.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\artprov.h
 	"wx/string.h"
 	"wx/bitmap.h"
 	"wx/icon.h"
 	"wx/iconbndl.h"
 
-1253308506 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\filectrlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\filectrlg.h
 	"wx/panel.h"
 	"wx/listctrl.h"
 	"wx/filectrl.h"
 	"wx/filename.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\filectrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\filectrl.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/event.h"
 	"wx/gtk/filectrl.h"
 	"wx/generic/filectrlg.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\filectrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\filectrl.h
 	"wx/control.h"
 	"wx/filectrl.h"
 
-1307990305 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\filename.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\filename.h
 	"wx/arrstr.h"
 	"wx/filefn.h"
 	"wx/datetime.h"
@@ -13057,27 +13064,27 @@
 	"wx/longlong.h"
 	"wx/file.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\file.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\file.h
 	"wx/defs.h"
 	"wx/string.h"
 	"wx/filefn.h"
 	"wx/strconv.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\filedlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\filedlg.h
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\filedlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\filedlg.h
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\filedlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\filedlg.h
 	"wx/gtk/filectrl.h"
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\filedlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\filedlg.h
 	"wx/generic/filedlgg.h"
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\filedlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\filedlg.h
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\filedlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\filedlg.h
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\filedlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\filedlg.h
 
 1253304927 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\mdi.h
 	"wx/defs.h"
@@ -15616,43 +15623,36 @@
 1309119157 d:\florian\programmation\gamedevelop2\gdl\gdl\rotatedrectangle.h
 	<SFML/System.hpp>
 
-1337525297 d:\florian\programmation\gamedevelop2\extensions\pathautomatism\scenepathdatas.h
+1343243306 d:\florian\programmation\gamedevelop2\extensions\pathautomatism\scenepathdatas.h
 	"GDL/AutomatismsSharedDatas.h"
 	"RuntimeScenePathDatas.h"
 	<SFML/System/Vector2.hpp>
 	<map>
 	<vector>
 
-1337098736 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsshareddatas.h
+1343243305 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsshareddatas.h
 	"GDL/AutomatismsRuntimeSharedDatas.h"
 	<boost/shared_ptr.hpp>
 	<string>
 
-1337098736 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsruntimeshareddatas.h
+1343243305 d:\florian\programmation\gamedevelop2\gdl\gdl\automatismsruntimeshareddatas.h
 	<boost/shared_ptr.hpp>
 
-1337525297 d:\florian\programmation\gamedevelop2\extensions\pathautomatism\runtimescenepathdatas.h
+1343243306 d:\florian\programmation\gamedevelop2\extensions\pathautomatism\runtimescenepathdatas.h
 	"GDL/AutomatismsRuntimeSharedDatas.h"
 	<map>
 	<vector>
 	<SFML/System/Vector2.hpp>
 
-1339237050 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
+1343479278 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.h
 	"GDL/Scene.h"
-	<iostream>
-	<sstream>
 	<vector>
 	<string>
 	<map>
 	<boost/shared_ptr.hpp>
-	"GDL/CommonTools.h"
-	"GDL/RuntimeLayer.h"
-	"GDL/Text.h"
-	"GDL/Layer.h"
-	"GDL/ManualTimer.h"
 	"GDL/ObjInstancesHolder.h"
 
-1337947455 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
+1343479154 d:\florian\programmation\gamedevelop2\gdl\gdl\scene.h
 	<vector>
 	<map>
 	<string>
@@ -15674,14 +15674,13 @@
 	"GDL/VariableList.h"
 	"GDCore/PlatformDefinition/InitialInstance.h"
 
-1337099492 d:\florian\programmation\gamedevelop2\gdl\gdl\layer.h
+1343476915 d:\florian\programmation\gamedevelop2\gdl\gdl\layer.h
 	<string>
 	<vector>
-	<SFML/Graphics.hpp>
 	"GDL/Camera.h"
+	"GDCore/PlatformDefinition/Layer.h"
 
-1337098736 d:\florian\programmation\gamedevelop2\gdl\gdl\camera.h
-	<SFML/System.hpp>
+1343476915 d:\florian\programmation\gamedevelop2\gdl\gdl\camera.h
 	<SFML/Graphics.hpp>
 
 1316280104 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimegame.h
@@ -15689,7 +15688,7 @@
 	"GDL/Game.h"
 	"GDL/ImageManager.h"
 
-1338661923 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
+1346861560 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
@@ -15697,6 +15696,7 @@
 	"GDL/LoadingScreen.h"
 	"GDL/ResourcesManager.h"
 	"GDCore/PlatformDefinition/Project.h"
+	"GDL/IDE/ChangesNotifier.h"
 
 1297520342 d:\florian\programmation\gamedevelop2\gdl\gdl\dossier.h
 	<string>
@@ -15730,13 +15730,13 @@
 	<OpenGL/gl.h>
 	<OpenGL/glu.h>
 
-1337108369 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
+1342787803 d:\florian\programmation\gamedevelop2\gdl\gdl\commontools.h
 	<string>
 	<sstream>
 	<vector>
 	<cmath>
 
-1337099962 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimelayer.h
+1342556670 d:\florian\programmation\gamedevelop2\gdl\gdl\runtimelayer.h
 	<SFML/Graphics.hpp>
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
@@ -15757,7 +15757,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1337030487 d:\florian\programmation\gamedevelop2\extensions\pathautomatism\pathautomatismeditor.h
+1343249509 d:\florian\programmation\gamedevelop2\extensions\pathautomatism\pathautomatismeditor.h
 	<vector>
 	<map>
 	<string>
@@ -15778,7 +15778,7 @@
 	<wx/menu.h>
 	<boost/shared_ptr.hpp>
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\statline.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\statline.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/univ/statline.h"
@@ -15790,23 +15790,23 @@
 	"wx/cocoa/statline.h"
 	"wx/generic/statline.h"
 
-1253308439 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\statline.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\statline.h
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\statline.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\statline.h
 
-1253308495 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\statline.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\statline.h
 	"wx/defs.h"
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\statline.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\statline.h
 	"wx/defs.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\statline.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\statline.h
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\statline.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\statline.h
 
-1253308511 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\statline.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\statline.h
 
-1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\statline.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\statline.h
 
 1303904068 d:\florian\programmation\gamedevelop2\gdl\gdl\tinyxml.h
 	<ctype.h>
@@ -15869,7 +15869,7 @@
 	"PathAutomatism.h"
 	"GDL/RuntimeScene.h"
 
-1337526001 source:d:\florian\programmation\gamedevelop2\extensions\pathautomatism\pathautomatismeditor.cpp
+1343249509 source:d:\florian\programmation\gamedevelop2\extensions\pathautomatism\pathautomatismeditor.cpp
 	"PathAutomatismEditor.h"
 	<wx/bitmap.h>
 	<wx/font.h>
@@ -15890,7 +15890,7 @@
 	"GDCore/IDE/CommonBitmapManager.h"
 	"GDL/CommonTools.h"
 	"GDL/Game.h"
-	"GDL/IDE/MainEditorCommand.h"
+	"GDCore/IDE/Dialogs/MainFrameWrapper.h"
 	"GDL/CommonTools.h"
 	"GDL/Scene.h"
 	"ScenePathDatas.h"
@@ -15960,7 +15960,7 @@
 	"ScenePathDatas.h"
 	<boost/version.hpp>
 
-1337000291 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
+1343505319 d:\florian\programmation\gamedevelop2\gdl\gdl\extensionbase.h
 	<wx/msw/winundef.h>
 	<wx/bitmap.h>
 	<wx/file.h>
@@ -15971,9 +15971,11 @@
 	<boost/shared_ptr.hpp>
 	"GDCore/Events/InstructionMetadata.h"
 	"GDCore/Events/ExpressionMetadata.h"
+	"GDCore/Events/ObjectMetadata.h"
+	"GDCore/Events/AutomatismMetadata.h"
 	"GDCore/PlatformDefinition/PlatformExtension.h"
 
-1339013749 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1346181423 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1299115781 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\version.hpp
 
@@ -16005,7 +16007,7 @@
 	<SFML/Graphics/Texture.hpp>
 	<SFML/Graphics/RenderTarget.hpp>
 
-1339007134 d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.h
+1343243305 d:\florian\programmation\gamedevelop2\gdl\gdl\resourcesmanager.h
 	<boost/shared_ptr.hpp>
 	<vector>
 	<string>
@@ -21138,7 +21140,7 @@
 	"GDL/Variable.h"
 	"GDCore/PlatformDefinition/VariablesContainer.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\spinctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\spinctrl.h
 	"wx/defs.h"
 	"wx/spinbutt.h"
 	"wx/msw/spinctrl.h"
@@ -21148,7 +21150,7 @@
 	"wx/osx/spinctrl.h"
 	"wx/generic/spinctlg.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\spinbutt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\spinbutt.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/event.h"
@@ -21162,57 +21164,57 @@
 	"wx/cocoa/spinbutt.h"
 	"wx/os2/spinbutt.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\range.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\range.h
 	"wx/defs.h"
 
-1253308438 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\spinbutt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\spinbutt.h
 	"wx/univ/scrarrow.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\spinbutt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\spinbutt.h
 	"wx/control.h"
 	"wx/event.h"
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\spinbutt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\spinbutt.h
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\spinbutt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\spinbutt.h
 
-1253308446 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\spinbutt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\spinbutt.h
 
-1307990292 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\spinbutt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\spinbutt.h
 	"wx/control.h"
 	"wx/event.h"
 
-1253308510 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\spinbutt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\cocoa\spinbutt.h
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\spinbutt.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\spinbutt.h
 	"wx/control.h"
 	"wx/event.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\spinctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\spinctrl.h
 	"wx/spinbutt.h"
 	"wx/dynarray.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\spinctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\spinctrl.h
 	"wx/spinbutt.h"
 	"wx/dynarray.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\spinctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\spinctrl.h
 
-1253308447 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\spinctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\spinctrl.h
 	"wx/defs.h"
 	"wx/control.h"
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\spinctrl.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\spinctrl.h
 	"wx/containr.h"
 	"wx/textctrl.h"
 
-1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\spinctlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\spinctlg.h
 	"wx/textctrl.h"
 
-1307990306 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\tglbtn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\tglbtn.h
 	"wx/defs.h"
 	"wx/event.h"
-	"wx/control.h"
+	"wx/anybutton.h"
 	"wx/univ/tglbtn.h"
 	"wx/msw/tglbtn.h"
 	"wx/gtk/tglbtn.h"
@@ -21222,51 +21224,51 @@
 	"wx/palmos/tglbtn.h"
 	"wx/os2/tglbtn.h"
 
-1307990264 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\tglbtn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\tglbtn.h
 	"wx/button.h"
 
-1307990278 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\tglbtn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\tglbtn.h
 	"wx/bitmap.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\tglbtn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\tglbtn.h
 	"wx/bitmap.h"
 
-1307990268 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\tglbtn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk1\tglbtn.h
 	"wx/bitmap.h"
 
-1253308443 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\tglbtn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\motif\tglbtn.h
 	"wx/checkbox.h"
 
-1307990291 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\tglbtn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\tglbtn.h
 
-1307990272 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\tglbtn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\palmos\tglbtn.h
 	"wx/checkbox.h"
 
-1307990284 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\tglbtn.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\os2\tglbtn.h
 
-1253308522 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\numdlg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\numdlg.h
 	"wx/defs.h"
 	"wx/generic/numdlgg.h"
 
-1253308506 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\numdlgg.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\numdlgg.h
 	"wx/defs.h"
 	"wx/dialog.h"
 
-1338638329 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\maineditorcommand.h
+1340642118 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\maineditorcommand.h
 	<algorithm>
 	<vector>
 	<wx/infobar.h>
 
-1307990304 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\infobar.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\infobar.h
 	"wx/defs.h"
 	"wx/control.h"
 	"wx/gtk/infobar.h"
 	"wx/generic/infobar.h"
 
-1307990296 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\infobar.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\infobar.h
 	"wx/generic/infobar.h"
 
-1307990301 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\infobar.h
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\generic\infobar.h
 
 1326145263 d:\florian\programmation\gamedevelop2\gdl\gdl\tinyxml\tinyxml.h
 	<ctype.h>
@@ -21283,7 +21285,7 @@
 	<assert.h>
 	<string.h>
 
-1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\automatism.h
+1343157596 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\automatism.h
 	<string>
 
 1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\variable.h
@@ -21292,23 +21294,23 @@
 1337793382 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\variablescontainer.h
 	<string>
 
-1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\object.h
+1343246394 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\object.h
 	<string>
 	<vector>
 
-1337793903 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\layout.h
+1343146642 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\layout.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
+	"GDCore/PlatformDefinition/ClassWithObjects.h"
 
-1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\objectgroup.h
+1342348848 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\objectgroup.h
 	<vector>
 	<string>
 	<utility>
-	"GDCore/PlatformDefinition/ObjectGroup.h"
 
-1336937930 d:\florian\programmation\gamedevelop2\core\gdcore\events\instructionmetadata.h
+1342785926 d:\florian\programmation\gamedevelop2\core\gdcore\events\instructionmetadata.h
 	<string>
 	"GDCore/Events/Instruction.h"
 	<boost/shared_ptr.hpp>
@@ -21329,18 +21331,22 @@
 	<boost/shared_ptr.hpp>
 	<wx/bitmap.h>
 
-1337092423 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\platformextension.h
+1342788529 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\platformextension.h
 	<map>
 	<string>
 	<vector>
+	"GDCore/Events/ObjectMetadata.h"
+	"GDCore/Events/AutomatismMetadata.h"
 
-1338580796 d:\florian\programmation\gamedevelop2\core\gdcore\ide\commonbitmapmanager.h
+1342295282 d:\florian\programmation\gamedevelop2\core\gdcore\ide\commonbitmapmanager.h
 	<wx/bitmap.h>
 
-1338661923 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.h
+1346861505 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.h
 	<string>
 	<vector>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
+	"GDCore/PlatformDefinition/ClassWithObjects.h"
+	"GDCore/PlatformDefinition/ChangesNotifier.h"
 
 1338214257 d:\florian\programmation\gamedevelop2\gdl\gdl\initialinstancescontainer.h
 	"GDCore/PlatformDefinition/InitialInstancesContainer.h"
@@ -21353,6 +21359,69 @@
 	<string>
 	"GDCore/PlatformDefinition/VariablesContainer.h"
 
-1339188475 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\scenecanvassettings.h
+1339879119 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\scenecanvassettings.h
 	<string>
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswu\wx\setup.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\anybutton.h
+	"wx/defs.h"
+	"wx/bitmap.h"
+	"wx/control.h"
+	"wx/univ/anybutton.h"
+	"wx/msw/anybutton.h"
+	"wx/gtk/anybutton.h"
+	"wx/osx/anybutton.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\univ\anybutton.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\anybutton.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\anybutton.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\osx\anybutton.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\time.h
+	"wx/longlong.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\gtk\nonownedwnd.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\graphics.h
+	"wx/defs.h"
+	"wx/geometry.h"
+	"wx/dynarray.h"
+	"wx/dc.h"
+	"wx/image.h"
+	"wx/vector.h"
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\include\wx\msw\nonownedwnd.h
+
+1323891840 d:\florian\programmation\gamedevelop2\extlibs\wxwidgets\lib\gcc_dll\mswud\wx\setup.h
+
+1342556596 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\layer.h
+	<string>
+
+1342785548 d:\florian\programmation\gamedevelop2\core\gdcore\events\objectmetadata.h
+	<string>
+	<wx/bitmap.h>
+
+1342785497 d:\florian\programmation\gamedevelop2\core\gdcore\events\automatismmetadata.h
+	<string>
+	<wx/bitmap.h>
+
+1343242665 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\classwithobjects.h
+	<string>
+
+1343339434 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\changesnotifier.h
+	<string>
+	<vector>
+	<iostream>
+
+1343340036 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\changesnotifier.h
+	"GDCore/PlatformDefinition/ChangesNotifier.h"
+
+1345043698 d:\florian\programmation\gamedevelop2\core\gdcore\ide\dialogs\mainframewrapper.h
+	<algorithm>
+	<vector>
+	<wx/infobar.h>
 

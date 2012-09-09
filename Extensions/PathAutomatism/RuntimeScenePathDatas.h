@@ -42,7 +42,7 @@ class GD_EXTENSION_API RuntimeScenePathDatas : public AutomatismsRuntimeSharedDa
     public:
         RuntimeScenePathDatas(const ScenePathDatas & automatismSharedDatas);
         virtual ~RuntimeScenePathDatas();
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeScenePathDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeScenePathDatas(*this));}
 
         std::map<std::string, std::vector<sf::Vector2f> > globalPaths; ///< Map containing all the global paths
 

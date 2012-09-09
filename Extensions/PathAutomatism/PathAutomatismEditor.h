@@ -51,7 +51,7 @@ freely, subject to the following restrictions:
 #include <wx/menu.h>
 #include <boost/shared_ptr.hpp>
 class Game;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 class PathAutomatism;
 class Scene;
 class ScenePathDatas;
@@ -68,7 +68,7 @@ class PathAutomatismEditor: public wxDialog
 {
 	public:
 
-		PathAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, PathAutomatism & automatism_, MainEditorCommand & mainEditorCommand_ );
+		PathAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, PathAutomatism & automatism_, gd::MainFrameWrapper & mainFrameWrapper_ );
 		virtual ~PathAutomatismEditor();
 
 		//(*Declarations(PathAutomatismEditor)
@@ -198,7 +198,7 @@ class PathAutomatismEditor: public wxDialog
 		Game & game;
         Scene * scene;
         boost::shared_ptr<ScenePathDatas> sharedDatas;
-		MainEditorCommand & mainEditorCommand;
+		gd::MainFrameWrapper & mainFrameWrapper;
 
         PathInfo *pathInfo;
 		std::vector<sf::Vector2f> *path; ///< Pointer to the path edited, making it more easy and fast to be accessed

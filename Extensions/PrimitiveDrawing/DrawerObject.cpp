@@ -24,21 +24,24 @@ freely, subject to the following restrictions:
 
 */
 
+#if defined(GD_IDE_ONLY)
+#include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
+#endif
 #include "DrawerObject.h"
 #include <SFML/Graphics.hpp>
 #include "GDL/Object.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/ImageManager.h"
-#include "GDL/RotatedRectangle.h"
+#include "GDL/Polygon.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
+#include "GDL/CommonTools.h"
 
 #if defined(GD_IDE_ONLY)
-#include <wx/wx.h>
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "DrawerObjectEditor.h"
 #endif
 
@@ -182,16 +185,6 @@ void DrawerObject::SaveToXml(TiXmlElement * object)
 }
 #endif
 
-bool DrawerObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
-{
-    #if defined(GD_IDE_ONLY)
-    edittimeIconImage.LoadFromFile("Extensions/primitivedrawingicon.png");
-    edittimeIcon.SetTexture(edittimeIconImage);
-    #endif
-
-    return true;
-}
-
 /**
  * Update animation and direction from the inital position
  */
@@ -232,16 +225,22 @@ bool DrawerObject::DrawEdittime(sf::RenderTarget& renderTarget)
     return true;
 }
 
-bool DrawerObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
+void DrawerObject::LoadEdittimeIcon()
+{
+    edittimeIconImage.LoadFromFile("Extensions/primitivedrawingicon.png");
+    edittimeIcon.SetTexture(edittimeIconImage);
+}
+
+bool DrawerObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
     thumbnail = wxBitmap("Extensions/primitivedrawingicon.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void DrawerObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand & mainEditorCommand )
+void DrawerObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
-    DrawerObjectEditor dialog(parent, game, *this, mainEditorCommand);
+    DrawerObjectEditor dialog(parent, game, *this);
     dialog.ShowModal();
 }
 

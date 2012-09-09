@@ -27,6 +27,7 @@ freely, subject to the following restrictions:
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/ImageManager.h"
+#include "GDL/CommonTools.h"
 #include "PrimitiveDrawingTools.h"
 
 namespace GDpriv
@@ -80,7 +81,7 @@ void GD_EXTENSION_API CreateSFMLTexture( RuntimeScene & scene, const std::string
     //Get the color
     sf::Color color;
     bool colorIsOk = false;
-    vector < string > colors = SplitString<string>(colorStr, ';');
+    std::vector < string > colors = SplitString<string>(colorStr, ';');
     if ( colors.size() == 3 )
     {
         colorIsOk = true;

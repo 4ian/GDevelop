@@ -44,7 +44,7 @@ class InitialPosition;
 class wxBitmap;
 class Game;
 class wxWindow;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 #endif
 
 /**
@@ -56,18 +56,18 @@ public :
 
     DrawerObject(std::string name_);
     virtual ~DrawerObject() {};
-    virtual Object * Clone() { return new DrawerObject(*this); }
+    virtual Object * Clone() const { return new DrawerObject(*this); }
 
-    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
     virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 
     #if defined(GD_IDE_ONLY)
     virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-    virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
+    static void LoadEdittimeIcon();
 
-    virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
+    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
     virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 

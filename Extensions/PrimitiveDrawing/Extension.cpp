@@ -57,7 +57,7 @@ class Extension : public ExtensionBase
                            "DrawerObject");
 
                 #if defined(GD_IDE_ONLY)
-
+                DrawerObject::LoadEdittimeIcon();
                 objInfos.SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
 
                 DECLARE_OBJECT_ACTION("Rectangle",

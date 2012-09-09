@@ -36,7 +36,7 @@ freely, subject to the following restrictions:
 
 #include "GDL/Game.h"
 #include "DrawerObject.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
 //(*IdInit(DrawerObjectEditor)
 const long DrawerObjectEditor::ID_STATICTEXT3 = wxNewId();
@@ -60,9 +60,8 @@ BEGIN_EVENT_TABLE(DrawerObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-DrawerObjectEditor::DrawerObjectEditor( wxWindow* parent, Game & game_, DrawerObject & object_, MainEditorCommand & mainEditorCommand_ ) :
+DrawerObjectEditor::DrawerObjectEditor( wxWindow* parent, Game & game_, DrawerObject & object_ ) :
 game(game_),
-mainEditorCommand(mainEditorCommand_),
 object(object_)
 {
 	//(*Initialize(DrawerObjectEditor)

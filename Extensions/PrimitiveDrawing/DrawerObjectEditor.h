@@ -40,7 +40,7 @@ freely, subject to the following restrictions:
 //*)
 class Game;
 class DrawerObject;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 
 /**
  * The editor dialog for drawer objects
@@ -49,7 +49,7 @@ class DrawerObjectEditor: public wxDialog
 {
 	public:
 
-		DrawerObjectEditor( wxWindow* parent, Game & game_, DrawerObject & object_, MainEditorCommand & mainEditorCommand_ );
+		DrawerObjectEditor( wxWindow* parent, Game & game_, DrawerObject & object_ );
 		virtual ~DrawerObjectEditor();
 
 		//(*Declarations(DrawerObjectEditor)
@@ -98,7 +98,6 @@ class DrawerObjectEditor: public wxDialog
 		//*)
 
 		Game & game;
-		MainEditorCommand & mainEditorCommand;
 		DrawerObject & object;
 
 		DECLARE_EVENT_TABLE()

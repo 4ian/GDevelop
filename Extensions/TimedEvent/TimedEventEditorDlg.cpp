@@ -27,7 +27,7 @@ freely, subject to the following restrictions:
 #if defined(GD_IDE_ONLY)
 
 #include "TimedEventEditorDlg.h"
-#include "GDL/IDE/Dialogs/EditExpression.h"
+#include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
 
 //(*InternalHeaders(TimedEventEditorDlg)
 #include <wx/bitmap.h>
@@ -36,6 +36,9 @@ freely, subject to the following restrictions:
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include "GDL/Game.h"
+#include "GDL/Scene.h"
+#include "GDL/CommonTools.h"
 
 //(*IdInit(TimedEventEditorDlg)
 const long TimedEventEditorDlg::ID_STATICBITMAP3 = wxNewId();
@@ -154,8 +157,8 @@ void TimedEventEditorDlg::OncancelBtClick(wxCommandEvent& event)
 
 void TimedEventEditorDlg::OnexpressionBtClick(wxCommandEvent& event)
 {
-    EditExpression dialog(this, string( timeoutEdit->GetValue().mb_str() ), game, scene);
-    if ( dialog.ShowModal() == 1 ) timeoutEdit->ChangeValue(dialog.expression);
+    gd::EditExpressionDialog dialog(this, ToString( timeoutEdit->GetValue() ), game, scene);
+    if ( dialog.ShowModal() == 1 ) timeoutEdit->ChangeValue(dialog.GetExpression());
 }
 
 #endif

@@ -206,7 +206,7 @@ void TimedEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     dc.SetTextForeground(wxColour(0,0,0));
     std::string nameTxt;
     if ( !name.empty() ) nameTxt = _T(" (Nom : "+name + ")");
-    dc.DrawText( _T("Déclenchement retardé au bout de "+timeout.GetPlainString()+" secondes.")+" "+nameTxt, x + 4, y + 3 );
+    dc.DrawText( _("Déclenchement retardé au bout de "+timeout.GetPlainString()+" secondes.")+" "+nameTxt, x + 4, y + 3 );
 
     //Draw conditions rectangle
     wxRect rect(x, y+functionTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-functionTextHeight);
@@ -242,7 +242,7 @@ unsigned int TimedEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-gd::BaseEvent::EditEventReturnType TimedEvent::EditEvent(wxWindow* parent, Game & game, Scene & scene, MainEditorCommand & mainEditorCommand)
+gd::BaseEvent::EditEventReturnType TimedEvent::EditEvent(wxWindow* parent, Game & game, Scene & scene, gd::MainFrameWrapper & mainFrameWrapper)
 {
     TimedEventEditorDlg dialog(parent, *this, game, scene);
     if ( dialog.ShowModal() == 0 ) return Cancelled;

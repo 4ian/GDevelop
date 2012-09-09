@@ -39,7 +39,7 @@ freely, subject to the following restrictions:
 
 #include "GDL/Game.h"
 #include "SoundObject.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/CommonTools.h"
 
 //(*IdInit(SoundObjectEditor)
@@ -72,9 +72,8 @@ BEGIN_EVENT_TABLE(SoundObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-SoundObjectEditor::SoundObjectEditor( wxWindow* parent, Game & game_, SoundObject & object_, MainEditorCommand & mainEditorCommand_ ) :
+SoundObjectEditor::SoundObjectEditor( wxWindow* parent, Game & game_, SoundObject & object_ ) :
 game(game_),
-mainEditorCommand(mainEditorCommand_),
 object(object_)
 {
 	//(*Initialize(SoundObjectEditor)

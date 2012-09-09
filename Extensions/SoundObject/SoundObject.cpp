@@ -24,6 +24,9 @@ freely, subject to the following restrictions:
 
 */
 
+#if defined(GD_IDE_ONLY)
+#include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
+#endif
 #include <SFML/Graphics.hpp>
 #include "GDL/Object.h"
 
@@ -37,9 +40,8 @@ freely, subject to the following restrictions:
 #include "SoundInitialPositionPanel.h"
 
 #if defined(GD_IDE_ONLY)
-#include <wx/wx.h>
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "SoundObjectEditor.h"
 #endif
 
@@ -232,16 +234,6 @@ void SoundObject::SaveToXml(TiXmlElement * elem)
 }
 #endif
 
-bool SoundObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
-{
-    #if defined(GD_IDE_ONLY)
-    soundIcon.LoadFromFile("Extensions/soundicon32.png");
-    soundSprite.SetTexture(soundIcon);
-    #endif
-
-    return true;
-}
-
 bool SoundObject::LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr )
 {
     return ReloadSound(scene);
@@ -275,6 +267,12 @@ bool SoundObject::DrawEdittime( sf::RenderTarget& renderTarget )
     return true;
 }
 
+void SoundObject::LoadEdittimeIcon()
+{
+    soundIcon.LoadFromFile("Extensions/soundicon32.png");
+    soundSprite.SetTexture(soundIcon);
+}
+
 wxPanel * SoundObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
 {
     SoundInitialPositionPanel * panel = new SoundInitialPositionPanel(parent);
@@ -298,15 +296,15 @@ void SoundObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
     worker.ExposeResource(fileName);
 }
 
-bool SoundObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
+bool SoundObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
     thumbnail = wxBitmap("Extensions/soundicon24.png", wxBITMAP_TYPE_ANY);
     return true;
 }
 
-void SoundObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand & mainEditorCommand )
+void SoundObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
-    SoundObjectEditor dialog(parent, game, *this, mainEditorCommand);
+    SoundObjectEditor dialog(parent, game, *this);
     dialog.ShowModal();
 }
 

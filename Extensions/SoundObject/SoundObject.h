@@ -45,114 +45,113 @@ namespace sf
 class wxBitmap;
 class Game;
 class wxWindow;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 namespace gd { class ArbitraryResourceWorker; }
 #endif
 
 class GD_EXTENSION_API SoundObject : public Object
 {
-    public :
+public :
 
-        enum SoundType
-        {
-            Sound,
-            Music
-        };
+    enum SoundType
+    {
+        Sound,
+        Music
+    };
 
-        SoundObject(std::string name_);
-        virtual ~SoundObject();
+    SoundObject(std::string name_);
+    virtual ~SoundObject();
 
-        void Init(const SoundObject &other);
-        SoundObject(const SoundObject &other);
-        SoundObject& operator=(const SoundObject &other);
+    void Init(const SoundObject &other);
+    SoundObject(const SoundObject &other);
+    SoundObject& operator=(const SoundObject &other);
 
-        virtual Object * Clone() { return new SoundObject(*this);}
+    virtual Object * Clone() const { return new SoundObject(*this);}
 
-        virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-        virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-        virtual bool InitializeFromInitialPosition(const InitialPosition & position);
+    virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
+    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
-        virtual bool Draw(sf::RenderTarget & renderTarget);
+    virtual bool Draw(sf::RenderTarget & renderTarget);
 
-        #if defined(GD_IDE_ONLY)
-        virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
-        virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
-        virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+    #if defined(GD_IDE_ONLY)
+    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
+    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
+    static void LoadEdittimeIcon();
 
-        virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-        virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
+    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
+    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
-        virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
+    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
 
-        virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-        virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-        virtual unsigned int GetNumberOfProperties() const;
-        #endif
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
+    #endif
 
-        virtual void LoadFromXml(const TiXmlElement * elemScene);
-        #if defined(GD_IDE_ONLY)
-        virtual void SaveToXml(TiXmlElement * elemScene);
-        #endif
+    virtual void LoadFromXml(const TiXmlElement * elemScene);
+    #if defined(GD_IDE_ONLY)
+    virtual void SaveToXml(TiXmlElement * elemScene);
+    #endif
 
-        virtual void UpdateTime(float timeElapsed);
+    virtual void UpdateTime(float timeElapsed);
 
-        virtual void OnPositionChanged();
+    virtual void OnPositionChanged();
 
-        float GetZPos() const;
-        void SetZPos(float zpos);
+    float GetZPos() const;
+    void SetZPos(float zpos);
 
-        virtual float GetWidth() const;
-        virtual float GetHeight() const;
-        virtual void SetWidth(float ) {};
-        virtual void SetHeight(float ) {};
+    virtual float GetWidth() const;
+    virtual float GetHeight() const;
+    virtual void SetWidth(float ) {};
+    virtual void SetHeight(float ) {};
 
-        virtual float GetDrawableX() const;
-        virtual float GetDrawableY() const;
+    virtual float GetDrawableX() const;
+    virtual float GetDrawableY() const;
 
-        virtual float GetCenterX() const;
-        virtual float GetCenterY() const;
+    virtual float GetCenterX() const;
+    virtual float GetCenterY() const;
 
-        void SetSoundFileName(const std::string & soundfilename);
-        std::string GetSoundFileName() const;
+    void SetSoundFileName(const std::string & soundfilename);
+    std::string GetSoundFileName() const;
 
-        void SetSoundType(const std::string &type);
-        std::string GetSoundType() const;
-        bool ReloadSound(const RuntimeScene &scene);
+    void SetSoundType(const std::string &type);
+    std::string GetSoundType() const;
+    bool ReloadSound(const RuntimeScene &scene);
 
-        bool IsPlaying() const;
-        bool IsPaused() const;
-        bool IsStopped() const;
+    bool IsPlaying() const;
+    bool IsPaused() const;
+    bool IsStopped() const;
 
-        void Play();
-        void Pause();
-        void Stop();
+    void Play();
+    void Pause();
+    void Stop();
 
-        void SetVolume(float volume);
-        float GetVolume() const;
+    void SetVolume(float volume);
+    float GetVolume() const;
 
-        void SetAttenuation(float attenuation);
-        float GetAttenuation() const;
+    void SetAttenuation(float attenuation);
+    float GetAttenuation() const;
 
-        void SetMinDistance(float minDist);
-        float GetMinDistance() const;
+    void SetMinDistance(float minDist);
+    float GetMinDistance() const;
 
-        void SetLooping(bool is);
-        bool IsLooping() const;
+    void SetLooping(bool is);
+    bool IsLooping() const;
 
-        void SetPitch(float pitch);
-        float GetPitch() const;
+    void SetPitch(float pitch);
+    float GetPitch() const;
 
-    private:
-        std::string fileName;
+private:
+    std::string fileName;
 
-        std::string m_type;
-        SoundWrapperBase *m_sound;
+    std::string m_type;
+    SoundWrapperBase *m_sound;
 
-        #if defined(GD_IDE_ONLY)
-        static sf::Texture soundIcon;
-        static sf::Sprite soundSprite;
-        #endif
-
+    #if defined(GD_IDE_ONLY)
+    static sf::Texture soundIcon;
+    static sf::Sprite soundSprite;
+    #endif
 };
 
 void DestroySoundObject(Object * object);

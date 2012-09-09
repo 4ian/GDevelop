@@ -63,7 +63,7 @@ class Extension : public ExtensionBase
                            "SoundObject");
 
                 #if defined(GD_IDE_ONLY)
-
+                SoundObject::LoadEdittimeIcon();
                 objInfos.SetIncludeFile("SoundObject/SoundObject.h");
 
                 DECLARE_OBJECT_ACTION("Volume",

@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 #include "GDL/XmlMacros.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeGame.h"
-#include "GDL/RotatedRectangle.h"
+#include "GDL/Polygon.h"
 #include "GDL/CommonTools.h"
 #include "ParticleEmitterObject.h"
 #include "ParticleSystemWrapper.h"

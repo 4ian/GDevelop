@@ -4317,14 +4317,14 @@
 
 1236015922 d:\florian\programmation\gamedevelop2\extlibs\boost\boost\smart_ptr\detail\operator_bool.hpp
 
-1342710137 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
+1346181423 d:\florian\programmation\gamedevelop2\gdl\gdl\version.h
 
 1337075187 d:\florian\programmation\gamedevelop2\extensions\particlesystem\extension.h
 
 1343243305 d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleemitterobject.h
 	"GDL/Object.h"
 
-1343246329 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
+1346256066 d:\florian\programmation\gamedevelop2\gdl\gdl\object.h
 	"GDL/Force.h"
 	<string>
 	<vector>
@@ -4387,7 +4387,7 @@
 	<wx/textctrl.h>
 	<wx/panel.h>
 
-1343505459 source:d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleemitterobject.cpp
+1345315811 source:d:\florian\programmation\gamedevelop2\extensions\particlesystem\particleemitterobject.cpp
 	<wx/wx.h>
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
@@ -4399,7 +4399,7 @@
 	"GDL/XmlMacros.h"
 	"GDL/RuntimeScene.h"
 	"GDL/RuntimeGame.h"
-	"GDL/RotatedRectangle.h"
+	"GDL/Polygon.h"
 	"GDL/CommonTools.h"
 	"ParticleEmitterObject.h"
 	"ParticleSystemWrapper.h"
@@ -4700,7 +4700,7 @@
 	<SFML/Graphics.hpp>
 	<SFML/OpenGL.hpp>
 
-1343342971 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
+1346861560 d:\florian\programmation\gamedevelop2\gdl\gdl\game.h
 	<string>
 	<vector>
 	<boost/shared_ptr.hpp>
@@ -8026,7 +8026,7 @@
 	<map>
 	<boost/shared_ptr.hpp>
 
-1343342971 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.h
+1346861505 d:\florian\programmation\gamedevelop2\core\gdcore\platformdefinition\project.h
 	<string>
 	<vector>
 	"GDCore/PlatformDefinition/ObjectGroup.h"
@@ -8147,8 +8147,12 @@
 1343340036 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\changesnotifier.h
 	"GDCore/PlatformDefinition/ChangesNotifier.h"
 
-1343157845 d:\florian\programmation\gamedevelop2\core\gdcore\ide\dialogs\mainframewrapper.h
+1345043698 d:\florian\programmation\gamedevelop2\core\gdcore\ide\dialogs\mainframewrapper.h
 	<algorithm>
 	<vector>
 	<wx/infobar.h>
+
+1345469090 d:\florian\programmation\gamedevelop2\gdl\gdl\polygon.h
+	<vector>
+	<SFML/System.hpp>
 

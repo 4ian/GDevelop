@@ -41,7 +41,7 @@ class GD_EXTENSION_API RuntimeSceneAStarDatas : public AutomatismsRuntimeSharedD
     public:
         RuntimeSceneAStarDatas(const SceneAStarDatas & automatismSharedDatas);
         virtual ~RuntimeSceneAStarDatas();
-        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneAStarDatas(*this));}
+        virtual boost::shared_ptr<AutomatismsRuntimeSharedDatas> Clone() const { return boost::shared_ptr<AutomatismsRuntimeSharedDatas>(new RuntimeSceneAStarDatas(*this));}
 
         std::vector < AStarAutomatism* > objects; ///< Each object using the automatism add itself to this list, used to compute obstacles
 

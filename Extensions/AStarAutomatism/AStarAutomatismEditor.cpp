@@ -37,7 +37,7 @@ freely, subject to the following restrictions:
 #include "AStarAutomatism.h"
 #include "SceneAStarDatas.h"
 #include "RuntimeSceneAStarDatas.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
 
@@ -65,11 +65,10 @@ BEGIN_EVENT_TABLE(AStarAutomatismEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-AStarAutomatismEditor::AStarAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, AStarAutomatism & automatism_, MainEditorCommand & mainEditorCommand_ ) :
+AStarAutomatismEditor::AStarAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene_, AStarAutomatism & automatism_ ) :
 automatism(automatism_),
 game(game_),
-scene(scene_),
-mainEditorCommand(mainEditorCommand_)
+scene(scene_)
 {
 	//(*Initialize(AStarAutomatismEditor)
 	wxStaticBoxSizer* StaticBoxSizer2;
@@ -165,7 +164,7 @@ mainEditorCommand(mainEditorCommand_)
     //Setup shared datas
 	if ( !scene || scene->automatismsInitialSharedDatas.find(automatism.GetName()) == scene->automatismsInitialSharedDatas.end())
 	{
-	    wxLogError(_T("Impossible d'accéder aux données partagées."));
+	    wxLogError(_("Impossible d'accéder aux données partagées."));
 	    return;
 	}
 
@@ -173,7 +172,7 @@ mainEditorCommand(mainEditorCommand_)
 
     if ( sharedDatas == boost::shared_ptr<SceneAStarDatas>() )
     {
-	    wxLogError(_T("Impossible d'accéder aux données partagées : Données de mauvais type"));
+	    wxLogError(_("Impossible d'accéder aux données partagées : Données de mauvais type"));
 	    return;
     }
 

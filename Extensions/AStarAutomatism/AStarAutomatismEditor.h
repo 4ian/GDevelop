@@ -39,7 +39,7 @@ freely, subject to the following restrictions:
 //*)
 #include <boost/shared_ptr.hpp>
 class Game;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 class AStarAutomatism;
 class Scene;
 class SceneAStarDatas;
@@ -48,7 +48,7 @@ class AStarAutomatismEditor: public wxDialog
 {
 	public:
 
-		AStarAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, AStarAutomatism & automatism_, MainEditorCommand & mainEditorCommand_ );
+		AStarAutomatismEditor(wxWindow* parent, Game & game_, Scene * scene, AStarAutomatism & automatism_ );
 		virtual ~AStarAutomatismEditor();
 
 		//(*Declarations(AStarAutomatismEditor)
@@ -103,7 +103,6 @@ class AStarAutomatismEditor: public wxDialog
 		Game & game;
         Scene * scene;
         boost::shared_ptr<SceneAStarDatas> sharedDatas;
-		MainEditorCommand & mainEditorCommand;
 
 		DECLARE_EVENT_TABLE()
 };

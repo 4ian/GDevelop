@@ -48,7 +48,7 @@ friend class AStarAutomatismEditor;
 public:
     AStarAutomatism(std::string automatismTypeName);
     virtual ~AStarAutomatism();
-    virtual Automatism* Clone() { return new AStarAutomatism(*this);}
+    virtual Automatism* Clone() const { return new AStarAutomatism(*this);}
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -66,7 +66,7 @@ public:
     /**
      * Called when user wants to edit the automatism.
      */
-    virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ );
+    virtual void EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ );
     #endif
 
     /**

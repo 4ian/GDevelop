@@ -74,9 +74,9 @@ void AStarAutomatism::EnterSegment(unsigned int segmentNumber)
 }
 
 #if defined(GD_IDE_ONLY)
-void AStarAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, MainEditorCommand & mainEditorCommand_ )
+void AStarAutomatism::EditAutomatism( wxWindow* parent, Game & game_, Scene * scene, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
-    AStarAutomatismEditor editor(parent, game_, scene, *this, mainEditorCommand_);
+    AStarAutomatismEditor editor(parent, game_, scene, *this);
     editor.ShowModal();
 }
 #endif

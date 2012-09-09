@@ -40,7 +40,7 @@ freely, subject to the following restrictions:
 
 #include "GDL/Game.h"
 #include "VideoObject.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include <wx/progdlg.h>
 
 //(*IdInit(VideoObjectEditor)
@@ -61,9 +61,8 @@ BEGIN_EVENT_TABLE(VideoObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-VideoObjectEditor::VideoObjectEditor( wxWindow* parent, Game & game_, VideoObject & object_, MainEditorCommand & mainEditorCommand_ ) :
+VideoObjectEditor::VideoObjectEditor( wxWindow* parent, Game & game_, VideoObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
 game(game_),
-mainEditorCommand(mainEditorCommand_),
 object(object_)
 {
 	//(*Initialize(VideoObjectEditor)
@@ -158,7 +157,7 @@ void VideoObjectEditor::OncancelBtClick(wxCommandEvent& event)
 void VideoObjectEditor::OnbrowseBtClick(wxCommandEvent& event)
 {
     wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-    wxFileDialog fileDialog( this, _T("Choisissez le fichier vidéo"), gameDirectory, "", _T("Vidéo Ogg Theora|*.ogg;*.ogv|Tous les fichiers|*.*"));
+    wxFileDialog fileDialog( this, _("Choisissez le fichier vidéo"), gameDirectory, "", _("Vidéo Ogg Theora|*.ogg;*.ogv|Tous les fichiers|*.*"));
 
     if ( fileDialog.ShowModal() == wxID_OK )
     {
@@ -172,21 +171,21 @@ void VideoObjectEditor::OnconverterBtClick(wxCommandEvent& event)
 {
     if ( !wxFileExists(wxGetCwd()+"/Extensions/ffmpeg2theora.exe"))
     {
-        wxLogError(_T("L'executable ffmpeg2theora.exe n'a pas été trouvé dans le répertoire Extensions de Game Develop."));
+        wxLogError(_("L'executable ffmpeg2theora.exe n'a pas été trouvé dans le répertoire Extensions de Game Develop."));
         return;
     }
 
-    wxFileDialog fileDialog( this, _("Choisissez le fichier vidéo à convertir au format Ogg Theora"), "", "", _T("Vidéo|*.*"));
+    wxFileDialog fileDialog( this, _("Choisissez le fichier vidéo à convertir au format Ogg Theora"), "", "", _("Vidéo|*.*"));
 
     if ( fileDialog.ShowModal() == wxID_OK )
     {
         string parameters;
-        if ( wxMessageBox(_T("Voulez vous enlever le son de la vidéo ?"), _T("Suppression de l'audio"), wxYES_NO | wxICON_QUESTION, this) == wxYES )
+        if ( wxMessageBox(_("Voulez vous enlever le son de la vidéo ?"), _("Suppression de l'audio"), wxYES_NO | wxICON_QUESTION, this) == wxYES )
             parameters += " --noaudio";
 
-        wxProgressDialog dialog(_T("Conversion en cours"), _T("Veuillez patienter pendant la durée de la conversion"));
+        wxProgressDialog dialog(_("Conversion en cours"), _("Veuillez patienter pendant la durée de la conversion"));
         wxExecute(wxGetCwd()+"/Extensions/ffmpeg2theora.exe "+fileDialog.GetPath()+parameters, wxEXEC_SYNC);;
-        wxLogMessage(_T("Conversion terminée."));
+        wxLogMessage(_("Conversion terminée."));
     }
 }
 

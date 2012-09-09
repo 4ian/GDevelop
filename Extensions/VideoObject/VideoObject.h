@@ -39,7 +39,7 @@ class InitialPosition;
 class wxBitmap;
 class Game;
 class wxWindow;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 namespace gd {class ResourcesMergingHelper;}
 #endif
 
@@ -52,7 +52,7 @@ public :
 
     VideoObject(std::string name_);
     virtual ~VideoObject();
-    virtual Object * Clone() { return new VideoObject(*this);}
+    virtual Object * Clone() const { return new VideoObject(*this);}
 
     virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
     virtual bool LoadRuntimeResources(const RuntimeScene & scene, const ImageManager & imageMgr );
@@ -63,9 +63,9 @@ public :
     #if defined(GD_IDE_ONLY)
     virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
-    virtual bool GenerateThumbnail(const Game & game, wxBitmap & thumbnail);
+    virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
 
-    virtual void EditObject( wxWindow* parent, Game & game_, MainEditorCommand & mainEditorCommand_ );
+    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
     virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
@@ -140,7 +140,7 @@ public :
      */
     void SetColor(const std::string & colorStr);
 
-    virtual std::vector<RotatedRectangle> GetHitBoxes() const;
+    virtual std::vector<Polygon2d> GetHitBoxes() const;
 
     void LoadAndPlayVideo( const std::string & videoFile );
 

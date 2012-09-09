@@ -41,13 +41,13 @@ freely, subject to the following restrictions:
 //*)
 class Game;
 class VideoObject;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 
 class VideoObjectEditor: public wxDialog
 {
 	public:
 
-		VideoObjectEditor( wxWindow* parent, Game & game_, VideoObject & object_, MainEditorCommand & mainEditorCommand_ );
+		VideoObjectEditor( wxWindow* parent, Game & game_, VideoObject & object_, gd::MainFrameWrapper & mainFrameWrapper_ );
 		virtual ~VideoObjectEditor();
 
 		//(*Declarations(VideoObjectEditor)
@@ -92,7 +92,6 @@ class VideoObjectEditor: public wxDialog
 		//*)
 
 		Game & game;
-		MainEditorCommand & mainEditorCommand;
 		VideoObject & object;
 
 		DECLARE_EVENT_TABLE()

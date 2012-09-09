@@ -24,6 +24,9 @@ freely, subject to the following restrictions:
 
 */
 
+#if defined(GD_IDE_ONLY)
+#include <wx/wx.h> //Must be placed first, otherwise we get errors relative to "cannot convert 'const TCHAR*'..." in wx/msw/winundef.h
+#endif
 #include <SFML/Graphics.hpp>
 #include "GDL/Object.h"
 
@@ -32,14 +35,13 @@ freely, subject to the following restrictions:
 #include "GDL/FontManager.h"
 #include "GDL/Position.h"
 #include "GDL/XmlMacros.h"
-#include "GDL/RotatedRectangle.h"
+#include "GDL/Polygon.h"
 #include "GDL/CommonTools.h"
 #include "VideoObject.h"
 
 #if defined(GD_IDE_ONLY)
-#include <wx/wx.h>
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
-#include "GDL/IDE/MainEditorCommand.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "VideoObjectEditor.h"
 #endif
 
@@ -226,16 +228,16 @@ void VideoObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
     worker.ExposeResource(videoFile);
 }
 
-bool VideoObject::GenerateThumbnail(const Game & game, wxBitmap & thumbnail)
+bool VideoObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
     thumbnail = wxBitmap("Extensions/videoicon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
 
-void VideoObject::EditObject( wxWindow* parent, Game & game, MainEditorCommand & mainEditorCommand )
+void VideoObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
 {
-    VideoObjectEditor dialog(parent, game, *this, mainEditorCommand);
+    VideoObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
 }
 
@@ -311,18 +313,15 @@ void VideoObject::OnPositionChanged()
 /**
  * VideoObject provides a basic bounding box.
  */
-std::vector<RotatedRectangle> VideoObject::GetHitBoxes() const
+std::vector<Polygon2d> VideoObject::GetHitBoxes() const
 {
-    std::vector<RotatedRectangle> boxes;
-    RotatedRectangle rectangle;
-    rectangle.angle = GetAngle()*3.14/180.0f;
-    rectangle.center.x = GetX()+GetCenterX();
-    rectangle.center.y = GetY()+GetCenterY();
-    rectangle.halfSize.x = GetWidth()/2;
-    rectangle.halfSize.y = GetHeight()/2;
+    std::vector<Polygon2d> mask;
+    Polygon2d rectangle = Polygon2d::CreateRectangle(GetWidth(), GetHeight());
+    rectangle.Rotate(GetAngle()/180*3.14159);
+    rectangle.Move(GetX()+GetCenterX(), GetY()+GetCenterY());
 
-    boxes.push_back(rectangle);
-    return boxes;
+    mask.push_back(rectangle);
+    return mask;
 }
 
 /**

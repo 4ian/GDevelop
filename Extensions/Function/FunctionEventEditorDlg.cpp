@@ -9,8 +9,10 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDL/CommonTools.h"
-#include "GDL/IDE/Dialogs/ChooseObject.h"
+#include "GDL/Game.h"
+#include "GDL/Scene.h"
 #include "FunctionEvent.h"
 
 //(*IdInit(FunctionEventEditorDlg)
@@ -143,9 +145,9 @@ void FunctionEventEditorDlg::OncancelBtClick(wxCommandEvent& event)
 
 void FunctionEventEditorDlg::OnobjectBtClick(wxCommandEvent& event)
 {
-    ChooseObject dialog(this, game, scene, true);
+    gd::ChooseObjectDialog dialog(this, game, scene, true);
     if ( dialog.ShowModal() == 1 )
-        objectEdit->ChangeValue(dialog.objectChosen);
+        objectEdit->ChangeValue(dialog.GetChosenObject());
 
     return;
 }

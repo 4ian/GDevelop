@@ -111,7 +111,7 @@ class Extension : public ExtensionBase
                         for (unsigned int i = 0;i<realObjects.size();++i)
                         {
                             context.EmptyObjectsListNeeded(realObjects[i]);
-                            objectsAsArgumentCode += ".AddObjectListToMap(\""+realObjects[i]+"\", "+ManObjListName(realObjects[i])+")";
+                            objectsAsArgumentCode += ".AddObjectListToMap(\""+EventsCodeGenerator::ConvertToCppString(realObjects[i])+"\", "+ManObjListName(realObjects[i])+")";
                         }
                         objectsAsArgumentCode += ".ReturnObjectListsMap()";
                     }

@@ -36,7 +36,7 @@ class TiXmlElement;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
 class Scene;
-class MainEditorCommand;
+namespace gd { class MainFrameWrapper; }
 class wxWindow;
 
 /**
@@ -51,7 +51,7 @@ class GD_EXTENSION_API FunctionEvent : public gd::BaseEvent
         virtual ~FunctionEvent() {};
 
         FunctionEvent& operator=(const FunctionEvent & event);
-        virtual gd::BaseEventSPtr Clone() { return boost::shared_ptr<gd::BaseEvent>(new FunctionEvent(*this));}
+        virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new FunctionEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
         virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & callerContext);
@@ -94,7 +94,7 @@ class GD_EXTENSION_API FunctionEvent : public gd::BaseEvent
         /**
          * Called when the user want to edit the event
          */
-        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, MainEditorCommand & mainEditorCommand_);
+        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
         /**
          * Tool function to generate an unique C++ name for a function.

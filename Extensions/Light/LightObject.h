@@ -167,3 +167,4 @@ void DestroyLightObject(Object * object);
 Object * CreateLightObject(std::string name);
 
 #endif // LightObject_H
+

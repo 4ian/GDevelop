@@ -104,3 +104,4 @@ class GD_EXTENSION_API LightObstacleAutomatism : public Automatism
 };
 
 #endif // LIGHTOBSTACLEAUTOMATISM_H
+

@@ -27,3 +27,4 @@ class Directional_light : public Light
 };
 
 #endif // DIRECTIONNAL_LIGHT_H
+

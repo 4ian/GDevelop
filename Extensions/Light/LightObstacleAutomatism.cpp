@@ -153,3 +153,4 @@ void LightObstacleAutomatism::SaveToXml(TiXmlElement * elem) const
 void LightObstacleAutomatism::LoadFromXml(const TiXmlElement * elem)
 {
 }
+

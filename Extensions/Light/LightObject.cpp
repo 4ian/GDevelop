@@ -281,10 +281,10 @@ void LightObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
 
 void LightObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if ( propertyNb == 0 ) {name = _("Couleur");       value = ToString(GetColor().r)+";"+ToString(GetColor().g)+";"+ToString(GetColor().b);}
-    else if ( propertyNb == 1 ) {name = _("Intensité");       value = ToString(GetIntensity());}
-    else if ( propertyNb == 2 ) {name = _("Rayon");       value = ToString(GetRadius());}
-    else if ( propertyNb == 2 ) {name = _("Qualité");       value = ToString(GetQuality());}
+    if ( propertyNb == 0 ) {name = _("Color");       value = ToString(GetColor().r)+";"+ToString(GetColor().g)+";"+ToString(GetColor().b);}
+    else if ( propertyNb == 1 ) {name = _("Intensity");       value = ToString(GetIntensity());}
+    else if ( propertyNb == 2 ) {name = _("Radius");       value = ToString(GetRadius());}
+    else if ( propertyNb == 2 ) {name = _("Quality");       value = ToString(GetQuality());}
 }
 
 bool LightObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -437,4 +437,5 @@ Object * CreateLightObject(std::string name)
 {
     return new LightObject(name);
 }
+
 

@@ -44,3 +44,4 @@ void SceneLightObstacleDatas::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("gridHeight", gridHeight);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("diagonalMove", diagonalMove);
 }
+

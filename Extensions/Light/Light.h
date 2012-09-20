@@ -78,3 +78,4 @@ class GD_EXTENSION_API Light
 
 #endif
 
+

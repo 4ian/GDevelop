@@ -50,3 +50,4 @@ void Directional_light::SetOtherParameter(unsigned n, float v)
     else if(n == OPENING_ANGLE)
         SetOpeningAngle(v);
 }
+

@@ -182,3 +182,4 @@ void Light::Generate(std::vector <Wall*> &m_wall)
                                 ,(float)((float)m_radius*sin((float)(i+1)*buf))),0,m_wall);
     }
 }
+

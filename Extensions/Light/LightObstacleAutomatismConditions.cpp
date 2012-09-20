@@ -28,3 +28,10 @@ freely, subject to the following restrictions:
 #include "GDL/RuntimeScene.h"
 #include "GDL/ObjectsConcerned.h"
 #include "GDL/Instruction.h"
+
+
+
+
+
+
+

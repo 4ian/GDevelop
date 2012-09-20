@@ -75,3 +75,4 @@ class LightObstacleAutomatismEditor: public wxDialog
 
 #endif
 #endif
+

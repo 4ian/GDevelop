@@ -104,3 +104,4 @@ class LightObjectEditor: public wxDialog
 
 #endif
 #endif
+

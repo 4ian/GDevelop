@@ -57,3 +57,4 @@ class GD_EXTENSION_API SceneLightObstacleDatas : public AutomatismsSharedDatas
 };
 
 #endif // SCENELIGHTOBSTACLEPHYSICSDATAS_H
+

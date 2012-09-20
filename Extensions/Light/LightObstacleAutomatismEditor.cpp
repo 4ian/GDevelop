@@ -77,3 +77,4 @@ void LightObstacleAutomatismEditor::OnokBtClick(wxCommandEvent& event)
 {
 }
 #endif
+

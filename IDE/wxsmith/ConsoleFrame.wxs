@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxFrame" name="ConsoleFrame">
-		<title>Console Game Develop</title>
+		<title>Game Develop Console</title>
 		<pos_arg>1</pos_arg>
 		<size_arg>1</size_arg>
 		<handler function="OnClose" entry="EVT_CLOSE" />
@@ -28,7 +28,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-										<label>Notez que les informations affichées par la console ne sont pas&#x0A;destinées à être forcément exploitable directement par l&apos;utilisateur.</label>
+										<label>Note that the information displayed by the console are not&#x0A;necessarily intended to be used directly by the user.</label>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -49,7 +49,7 @@
 						</object>
 						<object class="sizeritem">
 							<object class="wxButton" name="ID_BUTTON1" variable="closeBt" member="yes">
-								<label>Fermer</label>
+								<label>Close</label>
 								<handler function="OncloseBtClick" entry="EVT_BUTTON" />
 							</object>
 							<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -64,3 +64,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

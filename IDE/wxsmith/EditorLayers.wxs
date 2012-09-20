@@ -47,29 +47,29 @@
 		</object>
 		<object class="wxMenu" variable="contextMenu" member="yes">
 			<object class="wxMenuItem" name="idMenuEdit" variable="MenuItem1" member="yes">
-				<label>Editer les paramètres du calque</label>
+				<label>Edit the layer properties</label>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OnEditSelected1" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuAdd" variable="MenuItem2" member="yes">
-				<label>Ajouter un calque</label>
+				<label>Add a layer</label>
 				<bitmap>res/addicon.png</bitmap>
 				<handler function="OnAddSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuDel" variable="MenuItem3" member="no">
-				<label>Supprimer le calque</label>
+				<label>Delete the layer</label>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDelSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuUp" variable="MenuItem4" member="no">
-				<label>Déplacer au dessus</label>
+				<label>Move over</label>
 				<bitmap>res/up.png</bitmap>
 				<handler function="OnUpSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuDown" variable="MenuItem5" member="no">
-				<label>Déplacer au dessous</label>
+				<label>Move below</label>
 				<bitmap>res/down.png</bitmap>
 				<handler function="OnDownSelected" entry="EVT_MENU" />
 			</object>
@@ -86,3 +86,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

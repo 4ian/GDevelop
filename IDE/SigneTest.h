@@ -37,3 +37,4 @@ class SigneTest: public wxDialog
 };
 
 #endif
+

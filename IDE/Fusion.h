@@ -72,3 +72,4 @@ class Fusion: public wxDialog
 };
 
 #endif
+

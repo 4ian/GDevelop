@@ -845,3 +845,4 @@ typedef void (wxEvtHandler::*wxSTEditorEventFunction)(wxSTEditorEvent&);
 #include "wx/stedit/stefindr.h"
 
 #endif  // _STEDIT_H_
+

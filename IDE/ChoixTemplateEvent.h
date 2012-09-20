@@ -110,3 +110,4 @@ class ChoixTemplateEvent: public wxDialog
 };
 
 #endif
+

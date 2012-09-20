@@ -340,3 +340,4 @@ bool name::UpdatePos( Tkey pos, Tkey numPos )     \
 }
 
 #endif  // __WX_PAIRARR_H__
+

@@ -57,7 +57,7 @@ parent(parent_)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
-	Create(parent, wxID_ANY, _("Vérifier les mises à jour"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Check for updates"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17->AddGrowableCol(0);
@@ -66,7 +66,7 @@ parent(parent_)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/maj.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Game Develop peut vérifier si une nouvelle version est\ndisponible. Les nouvelles versions apportent des corrections de \nbugs, ainsi que des améliorations et nouvelles fonctionnalités."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Game Develop can verify if a new version is\navailable. The new versions bring bugs' fixes,\nimprovements and new features."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
@@ -75,39 +75,39 @@ parent(parent_)
 	FlexGridSizer17->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Version actuelle :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Actual version :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer2->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	versionTxt = new wxStaticText(this, ID_STATICTEXT3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	wxFont versionTxtFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	versionTxt->SetFont(versionTxtFont);
 	FlexGridSizer2->Add(versionTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Version disponible :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Available version :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer2->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	versionMAJTxt = new wxStaticText(this, ID_STATICTEXT5, _("Aucune information disponible"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	versionMAJTxt = new wxStaticText(this, ID_STATICTEXT5, _("No informations available"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	wxFont versionMAJTxtFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	versionMAJTxt->SetFont(versionMAJTxtFont);
 	FlexGridSizer2->Add(versionMAJTxt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	infoEdit = new wxTextCtrl(this, ID_TEXTCTRL1, _("Pas d\'informations complémentaire à propos de la nouvelle version"), wxDefaultPosition, wxSize(365,130), wxTE_AUTO_SCROLL|wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	infoEdit = new wxTextCtrl(this, ID_TEXTCTRL1, _("No informations about the new version"), wxDefaultPosition, wxSize(365,130), wxTE_AUTO_SCROLL|wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer1->Add(infoEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticText5 = new wxStaticText(this, ID_STATICTEXT7, _("Téléchargement automatique :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT7, _("Automatic download :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	FlexGridSizer4->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	downloadAndInstallBt = new wxButton(this, ID_BUTTON4, _("Installer la nouvelle version"), wxDefaultPosition, wxSize(234,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	downloadAndInstallBt = new wxButton(this, ID_BUTTON4, _("Install the new version"), wxDefaultPosition, wxSize(234,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	downloadAndInstallBt->Disable();
 	FlexGridSizer4->Add(downloadAndInstallBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT6, _("Téléchargement manuel :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT6, _("Manual download :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	FlexGridSizer4->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	linkCtrl = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Pas de lien"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	linkCtrl = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("No link"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	FlexGridSizer4->Add(linkCtrl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
-	VerifMAJBt = new wxButton(this, ID_BUTTON2, _("Revérifier les mises à jour"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	VerifMAJBt = new wxButton(this, ID_BUTTON2, _("Check for updates again"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	VerifMAJBt->SetDefault();
 	FlexGridSizer3->Add(VerifMAJBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FermerBt = new wxButton(this, ID_BUTTON1, _("Fermer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	FermerBt = new wxButton(this, ID_BUTTON1, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer3->Add(FermerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -124,7 +124,7 @@ parent(parent_)
 
 	if ( wasAutomaticallyOpened )
     {
-        StaticText1->SetLabel(_("Une nouvelle version de Game Develop est disponible !"));
+        StaticText1->SetLabel(_("A new version of Game Develop is available !"));
         VerifMAJBt->Show(false);
     }
 
@@ -145,10 +145,10 @@ void MAJ::CheckForUpdate()
 
     versionMAJTxt->SetLabel(ToString(checker.newMajor)+"."+ToString(checker.newMinor)+"."+ToString(checker.newBuild)+"."+ToString(checker.newRevision));
 
-    wxString info = _("Pas d'informations complémentaires sur la nouvelle version.");
+    wxString info = _("No informations about the new version.");
     if ( !checker.info.empty() ) info = checker.info;
 
-    wxString link = _("Pas de lien");
+    wxString link = _("No link");
     if ( !checker.link.empty() ) link = checker.link;
 
     infoEdit->ChangeValue(info);
@@ -169,9 +169,9 @@ void MAJ::OnVerifMAJBtClick(wxCommandEvent& event)
 
 void MAJ::OnLienBtClick(wxCommandEvent& event)
 {
-    if ( linkCtrl->GetLabel() == _("Pas de lien"))
+    if ( linkCtrl->GetLabel() == _("No link"))
     {
-        wxLogMessage(_("Aucun lien de téléchargement n'est disponible.\nRendez vous sur notre site pour télécharger la denière version de Game Develop."));
+        wxLogMessage(_("No download link is available.\nGo on our web site so as to download the last version of Game Develop."));
         return;
     }
 
@@ -205,7 +205,7 @@ void MAJ::OnFermerBtClick(wxCommandEvent& event)
 void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
 {
     //Warn the user his work can be lost
-    if ( wxMessageBox(_("Attention, Game Develop sera fermé à la fin du téléchargement afin d'installer la nouvelle version. Pensez à sauvegarder votre travail.\nContinuer ?"), _("Installation de la nouvelle version"), wxYES_NO | wxICON_QUESTION, this) == wxNO )
+    if ( wxMessageBox(_("Game Develop will be closed at the end of the download so as to install the new version. Don't forget to save your work.\nDownload and install the new version \?"), _("Installation of the new version"), wxYES_NO | wxICON_QUESTION, this) == wxNO )
         return;
 
     wxString tempDir = wxFileName::GetHomeDir()+"/.Game Develop";
@@ -219,7 +219,7 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
         unsigned int current_progress = 0;
         char buffer[1024];
 
-        wxProgressDialog progress(_("Téléchargement"),_("Progression du téléchargement"),(int)input->GetSize(), NULL, wxPD_CAN_ABORT | wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME);
+        wxProgressDialog progress(_("Download"),_("Progress"),(int)input->GetSize(), NULL, wxPD_CAN_ABORT | wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_ELAPSED_TIME | wxPD_REMAINING_TIME);
         wxFileOutputStream outputfile(tempDir+"/newgd.exe");
         while(!input->Eof() && current_progress!=input->GetSize()) { //Download part as long we haven't reached the end
             input->Read((void *)buffer,1024);
@@ -227,7 +227,7 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
             current_progress+=input->LastRead();
             if ( !progress.Update(current_progress) ) //Enable the user to stop downloading
             {
-                if ( wxMessageBox(_("Arrêter le téléchargement de la nouvelle version ?\n\nVous pouvez également obtenir la nouvelle version en la téléchargeant sur notre site."), _("Arrêter le téléchargement"), wxYES_NO | wxICON_QUESTION, this) == wxYES )
+                if ( wxMessageBox(_("Stop the download \?\n\nYou can also get the new version by downloading it on our website."), _("Stop the download"), wxYES_NO | wxICON_QUESTION, this) == wxYES )
                 {
                     wxRemoveFile(tempDir+"/newgd.exe");
                     return;
@@ -241,10 +241,11 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
     }
     else
     {
-        wxLogWarning( _( "Impossible de se connecter au serveur de vérification des mises à jour de Compil Games.\nVérifiez :\n-Votre connexion internet\n-Votre pare-feu\n-Si il vous est possible d'accéder à notre site.\n\nVous pouvez désactiver la vérification des mises à jour dans les préférences." ) );
+        wxLogWarning( _( "Unable to connect to the server so as to check for updates.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access  our site.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
         return;
     }
 
-    wxExecute(tempDir+"/newgd.exe /SILENT /LANG="+GDpriv::LocaleManager::GetInstance()->locale->GetLocale(), wxEXEC_ASYNC);
+    wxExecute(tempDir+"/newgd.exe /SILENT /LANG="+gd::LocaleManager::GetInstance()->locale->GetLocale(), wxEXEC_ASYNC);
     EndModal(2);
 }
+

@@ -42,3 +42,4 @@ void MainFrame::OnRibbonDecomposerDropDownClicked(wxRibbonButtonBarEvent& evt)
 {
     evt.PopupMenu(&decomposerContextMenu);
 }
+

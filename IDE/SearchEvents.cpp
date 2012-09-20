@@ -78,7 +78,7 @@ events(events_)
 	wxFlexGridSizer* FlexGridSizer11;
 	wxFlexGridSizer* FlexGridSizer17;
 
-	Create(parent, wxID_ANY, _("Chercher dans les évènements"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Search in events"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
@@ -89,7 +89,7 @@ events(events_)
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer4->AddGrowableCol(1);
 	FlexGridSizer4->AddGrowableRow(0);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Rechercher"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Search"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer4->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	searchEdit = new wxTextCtrl(Panel1, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(178,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer4->Add(searchEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -104,17 +104,17 @@ events(events_)
 	FlexGridSizer6->AddGrowableCol(0);
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Options"));
 	FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
-	caseCheck = new wxCheckBox(Panel1, ID_CHECKBOX6, _("Prendre en compte la casse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
+	caseCheck = new wxCheckBox(Panel1, ID_CHECKBOX6, _("Match case"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX6"));
 	caseCheck->SetValue(false);
 	FlexGridSizer7->Add(caseCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Où"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Panel1, _("Where"));
 	FlexGridSizer5 = new wxFlexGridSizer(0, 2, 0, 0);
-	conditionsCheck = new wxCheckBox(Panel1, ID_CHECKBOX1, _("Les conditions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	conditionsCheck = new wxCheckBox(Panel1, ID_CHECKBOX1, _("The conditions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	conditionsCheck->SetValue(true);
 	FlexGridSizer5->Add(conditionsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	actionsCheck = new wxCheckBox(Panel1, ID_CHECKBOX2, _("Les actions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+	actionsCheck = new wxCheckBox(Panel1, ID_CHECKBOX2, _("The actions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	actionsCheck->SetValue(true);
 	FlexGridSizer5->Add(actionsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -123,16 +123,16 @@ events(events_)
 	FlexGridSizer15 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer15->AddGrowableCol(0);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
-	searchBt = new wxButton(Panel1, ID_BUTTON1, _("Chercher"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	searchBt = new wxButton(Panel1, ID_BUTTON1, _("Search"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer8->Add(searchBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	nextBt = new wxButton(Panel1, ID_BUTTON2, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	nextBt = new wxButton(Panel1, ID_BUTTON2, _("Next"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	nextBt->Disable();
 	FlexGridSizer8->Add(nextBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	previousBt = new wxButton(Panel1, ID_BUTTON3, _("Précédent"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	previousBt = new wxButton(Panel1, ID_BUTTON3, _("Previous"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	previousBt->Disable();
 	FlexGridSizer8->Add(previousBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer15->Add(FlexGridSizer8, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
-	helpBt = new wxButton(Panel1, ID_BUTTON5, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+	helpBt = new wxButton(Panel1, ID_BUTTON5, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
 	FlexGridSizer15->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel1->SetSizer(FlexGridSizer2);
@@ -145,7 +145,7 @@ events(events_)
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer11->AddGrowableCol(1);
 	FlexGridSizer11->AddGrowableRow(0);
-	StaticText2 = new wxStaticText(Panel2, ID_STATICTEXT2, _("Remplacer"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(Panel2, ID_STATICTEXT2, _("Replace"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer11->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	searchToReplaceEdit = new wxTextCtrl(Panel2, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(178,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	FlexGridSizer11->Add(searchToReplaceEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -153,7 +153,7 @@ events(events_)
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer3->AddGrowableCol(1);
 	FlexGridSizer3->AddGrowableRow(0);
-	StaticText3 = new wxStaticText(Panel2, ID_STATICTEXT3, _("par"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel2, ID_STATICTEXT3, _("by"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer3->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	replaceEdit = new wxTextCtrl(Panel2, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxSize(178,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
 	FlexGridSizer3->Add(replaceEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -163,21 +163,21 @@ events(events_)
 	FlexGridSizer12->AddGrowableCol(0);
 	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Options"));
 	FlexGridSizer13 = new wxFlexGridSizer(0, 1, 0, 0);
-	replaceCaseCheck = new wxCheckBox(Panel2, ID_CHECKBOX8, _("Prendre en compte la casse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX8"));
+	replaceCaseCheck = new wxCheckBox(Panel2, ID_CHECKBOX8, _("Match case"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX8"));
 	replaceCaseCheck->SetValue(false);
 	FlexGridSizer13->Add(replaceCaseCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer3->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Où"));
+	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Where"));
 	FlexGridSizer14 = new wxFlexGridSizer(0, 1, 0, 0);
-	onlySelectedEventCheck = new wxCheckBox(Panel2, ID_CHECKBOX7, _("Seulement l\'évènement selectionné"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
+	onlySelectedEventCheck = new wxCheckBox(Panel2, ID_CHECKBOX7, _("Only the selected event"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
 	onlySelectedEventCheck->SetValue(false);
 	FlexGridSizer14->Add(onlySelectedEventCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
-	replaceConditionsCheck = new wxCheckBox(Panel2, ID_CHECKBOX9, _("Les conditions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX9"));
+	replaceConditionsCheck = new wxCheckBox(Panel2, ID_CHECKBOX9, _("The conditions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX9"));
 	replaceConditionsCheck->SetValue(true);
 	FlexGridSizer17->Add(replaceConditionsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	replaceActionsCheck = new wxCheckBox(Panel2, ID_CHECKBOX10, _("Les actions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX10"));
+	replaceActionsCheck = new wxCheckBox(Panel2, ID_CHECKBOX10, _("The actions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX10"));
 	replaceActionsCheck->SetValue(true);
 	FlexGridSizer17->Add(replaceActionsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer14->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -186,16 +186,16 @@ events(events_)
 	FlexGridSizer10->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer16 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer16->AddGrowableCol(1);
-	replaceBt = new wxButton(Panel2, ID_BUTTON4, _("Remplacer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	replaceBt = new wxButton(Panel2, ID_BUTTON4, _("Replace"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer16->Add(replaceBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	help2Bt = new wxButton(Panel2, ID_BUTTON6, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+	help2Bt = new wxButton(Panel2, ID_BUTTON6, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
 	FlexGridSizer16->Add(help2Bt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10->Add(FlexGridSizer16, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel2->SetSizer(FlexGridSizer10);
 	FlexGridSizer10->Fit(Panel2);
 	FlexGridSizer10->SetSizeHints(Panel2);
-	Notebook1->AddPage(Panel1, _("Chercher"), false);
-	Notebook1->AddPage(Panel2, _("Remplacer"), false);
+	Notebook1->AddPage(Panel1, _("Search"), false);
+	Notebook1->AddPage(Panel2, _("Replace"), false);
 	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
@@ -255,7 +255,7 @@ void SearchEvents::OnsearchBtClick(wxCommandEvent& event)
                                             conditionsCheck->GetValue(),
                                             actionsCheck->GetValue());
 
-    resultsCountTxt->SetLabel(wxString::Format(_("%i résultats."), searchResults.size()));
+    resultsCountTxt->SetLabel(wxString::Format(_("%i results."), searchResults.size()));
     nextBt->Enable(true);
     previousBt->Enable(true);
     currentResult = 0;
@@ -306,8 +306,9 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
 
 void SearchEvents::OnhelpBtClick(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(58);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/search")); //TODO
 }
+

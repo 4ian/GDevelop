@@ -98,7 +98,7 @@ void RecentList::SetAssociatedMenu(wxMenu *Menu)
     imax=p_iMax;
     if ((int)sEntry.Count()<imax) imax=sEntry.Count();
     // On crée la première entrée du menu ici
-    p_Menu->Append(wxID_FILE1,_("Liste vide"));
+    p_Menu->Append(wxID_FILE1,_("Empty list"));
     p_Menu->Enable(wxID_FILE1,false);
     UpdateMenu();
 }
@@ -133,10 +133,11 @@ void RecentList::UpdateMenu()
     // Mise à jour des entrées du menu
     for (i=0;i<immax;i++)
     {
-        sTxt.Printf(_("Ouvrir le fichier \"%s\""),sEntry[i].c_str());
+        sTxt.Printf(_("Open file \"%s\""),sEntry[i].c_str());
         p_Menu->SetLabel(wxID_FILE1+i,sEntry[i]);
         p_Menu->SetHelpString(wxID_FILE1+i,sTxt);
     }
     // Activation de la première entrée, si ce n'étais pas déjà fait
     p_Menu->Enable(wxID_FILE1,true);
 }
+

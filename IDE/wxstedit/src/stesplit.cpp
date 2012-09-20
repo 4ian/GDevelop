@@ -703,3 +703,4 @@ void wxSTEditorSplitter::OnMouse(wxMouseEvent& event)
 
     event.Skip(skip);
 }
+

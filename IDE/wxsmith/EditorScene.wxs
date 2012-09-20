@@ -47,7 +47,7 @@
 								<handler function="OnsceneCanvasSetFocus" entry="EVT_SET_FOCUS" />
 							</object>
 						</object>
-						<label>Scène</label>
+						<label>Scene</label>
 						<icon>res/sceneeditor.png</icon>
 					</object>
 					<object class="AuiNotebookPage">
@@ -69,7 +69,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Evènements</label>
+						<label>Events</label>
 						<icon>res/events16.png</icon>
 					</object>
 				</object>
@@ -79,3 +79,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

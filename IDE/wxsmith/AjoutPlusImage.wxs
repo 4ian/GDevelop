@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="AjoutPlusImage">
-		<title>Ajouter plusieurs images</title>
+		<title>Add several images</title>
 		<centered>1</centered>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -26,7 +26,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-										<label>Ecrivez les noms des images à ajouter.&#x0A;Mettez un nom d&apos;image par ligne.</label>
+										<label>Type the name of the images to add.&#x0A;( One name by line )</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -73,7 +73,7 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON1" variable="AddImageBt" member="yes">
-							<label>Ajouter</label>
+							<label>Add</label>
 							<handler function="OnAddImageBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -82,7 +82,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="AnnulerBt" member="yes">
-							<label>Annuler</label>
+							<label>Cancel</label>
 							<handler function="OnAnnulerBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -96,3 +96,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

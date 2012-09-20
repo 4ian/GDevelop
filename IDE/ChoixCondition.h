@@ -144,3 +144,4 @@ class ChoixCondition: public wxDialog
 };
 
 #endif
+

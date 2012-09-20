@@ -257,7 +257,7 @@ void SceneCanvas::ReloadFirstPart()
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(gameEdited, sceneEdited);
 
         if ( !editing )
-            mainFrameWrapper.GetInfoBar()->ShowMessage(_("Les modifications apportées aux évènements seront prises en compte lors du retour au mode édition."));
+            mainFrameWrapper.GetInfoBar()->ShowMessage(_("Changes made to events will be taken ino account when you switch to Edition mode"));
     }
 
     return; //Reload second par will be called by Refresh when appropriate
@@ -322,7 +322,7 @@ void SceneCanvas::Refresh()
             //But be sure that no error occured.
             if ( !editing && !sceneEdited.codeExecutionEngine->Ready() )
             {
-                wxLogError(_("La compilation des évènements a échouée, et la scène ne peut être testée. Afin que le problème soit corrigé, veuillez le rapporter au développeur de Game Develop, en joignant le fichier suivant :\n")+CodeCompiler::GetInstance()->GetOutputDirectory()+"compilationErrors.txt");
+                wxLogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")+CodeCompiler::GetInstance()->GetOutputDirectory()+"compilationErrors.txt");
                 wxCommandEvent useless;
                 OnEditionBtClick(useless);
             }
@@ -362,11 +362,11 @@ void SceneCanvas::Refresh()
             int retourEvent = previewData.scene.RenderAndStep(1);
 
             if ( retourEvent == -2 )
-                mainFrameWrapper.GetInfoBar()->ShowMessage(_( "Dans le jeu final, le jeu se terminera." ));
+                mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the game will quit." ));
             else if ( retourEvent != -1 )
             {
                 if (retourEvent < gameEdited.GetLayouts().size())
-                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "Dans le jeu final, un changement de scène s'effectuera vers la scène " ) + "\"" + gameEdited.GetLayouts()[retourEvent]->GetName() + "\"");
+                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + "\"" + gameEdited.GetLayouts()[retourEvent]->GetName() + "\"");
             }
         }
         else if ( !previewData.scene.running && !editing ) //Runtime paused
@@ -417,13 +417,14 @@ void SceneCanvas::EdittimeRender()
                     //Selection rectangle
                     if ( find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), allObjects[id]) != editionData.objectsSelected.end() )
                     {
-                        sf::Shape selection = sf::Shape::Rectangle( 0, 0,
-                                                                   allObjects[id]->GetWidth(),
-                                                                   allObjects[id]->GetHeight(),
-                                                                   sf::Color( 0, 0, 200, 40 ), 1, sf::Color( 0, 0, 255, 128 ) );
+                        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX(), allObjects[id]->GetDrawableY(), editionData.view);
+                        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth(),
+                                                                               allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight(), editionData.view);
 
-                        selection.SetPosition( allObjects[id]->GetDrawableX(),
-                                              allObjects[id]->GetDrawableY() );
+                        sf::Shape selection = sf::Shape::Rectangle(rectangleOrigin.x, rectangleOrigin.y,
+                                                                   rectangleEnd.x-rectangleOrigin.x,
+                                                                   rectangleEnd.y-rectangleOrigin.y,
+                                                                   sf::Color( 0, 0, 200, 40 ), 1, sf::Color( 0, 0, 255, 128 ));
                         GUIelements.push_back( selection );
 
                         if ( editionData.objectsSelected.size() == 1)
@@ -432,32 +433,39 @@ void SceneCanvas::EdittimeRender()
                             sf::Shape resizeYBt = sf::Shape::Rectangle( 0, 0, 4, 4, sf::Color( 255, 255, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
                             sf::Shape angleBt = sf::Shape::Rectangle( 0, 0, 4, 4, sf::Color( 255, 255, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
                             sf::Shape center = sf::Shape::Circle( 0, 0, 2, sf::Color( 0, 0, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
-                            sf::Shape centerToAngle = sf::Shape::Line(0,0, 20, 0, 1, sf::Color( 0, 0, 255, 255 ), 0, sf::Color( 0, 0, 255, 255 ) );
 
-                            resizeXBt.SetPosition(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()-4,
-                                                  allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2-2 );
+                            resizeXBt.SetPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth(),
+                                                                             allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2,
+                                                                             editionData.view ));
+                            resizeXBt.Move(-4,-2);
 
-                            resizeYBt.SetPosition(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2-2,
-                                                  allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()-4 );
+                            resizeYBt.SetPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
+                                                                             allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight(),
+                                                                             editionData.view ));
+                            resizeYBt.Move(-2,-4);
 
-                            center.SetPosition(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
-                                               allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2);
+                            center.SetPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
+                                                                          allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2,
+                                                                          editionData.view ));
+                            center.Move(-2,-2);
 
-                            angleBt.SetPosition(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2-2
-                                                +20*cos(allObjects[id]->GetAngle()/180.f*3.14159),
-                                                allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2-2
-                                                +20*sin(allObjects[id]->GetAngle()/180.f*3.14159) );
+                            angleBt.SetPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2
+                                                                           +20*cos(allObjects[id]->GetAngle()/180.f*3.14159),
+                                                                           allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2
+                                                                           +20*sin(allObjects[id]->GetAngle()/180.f*3.14159),
+                                                                          editionData.view ));
+                            resizeXBt.Move(-2,-2);
 
-                            centerToAngle.Rotate(allObjects[id]->GetAngle());
-                            centerToAngle.SetPosition(  allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
-                                                        allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2);
+                            sf::Shape centerToAngle = sf::Shape::Line(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
+                                                                                 allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2,
+                                                                                 editionData.view ),
+                                                                      angleBt.GetPosition(), 1, sf::Color( 0, 0, 255, 255 ), 0, sf::Color( 0, 0, 255, 255 ) );
 
                             GUIelements.push_back( centerToAngle );
                             GUIelements.push_back( center );
                             GUIelements.push_back( angleBt );
                             GUIelements.push_back( resizeXBt );
                             GUIelements.push_back( resizeYBt );
-
                         }
                     }
                 }
@@ -465,56 +473,81 @@ void SceneCanvas::EdittimeRender()
         }
     }
 
-    //Affichage de la grille
-    if ( settings.grid )
-        RenderGrid();
+    //Go back to "window" view before drawing GUI elements
+    SetView(sf::View(sf::Vector2f(GetWidth()/2,GetHeight()/2), sf::Vector2f(GetWidth(),GetHeight())));
 
-    //Draw GUI Elements
+    if ( settings.grid ) RenderGrid();
+
     for (unsigned int i = 0;i<GUIelements.size();++i)
     	Draw(GUIelements[i]);
 
     if ( editionData.isSelecting )
     {
-        sf::Shape selection = sf::Shape::Rectangle(editionData.xRectangleSelection, editionData.yRectangleSelection,
-                                                   editionData.xEndRectangleSelection-editionData.xRectangleSelection, editionData.yEndRectangleSelection-editionData.yRectangleSelection,
+        sf::Vector2f rectangleOrigin = sf::Vector2f(editionData.xRectangleSelection,
+                                                    editionData.yRectangleSelection);
+        rectangleOrigin = ConvertToWindowCoordinates(rectangleOrigin.x, rectangleOrigin.y, editionData.view);
+
+        sf::Vector2f rectangleEnd = sf::Vector2f(editionData.xEndRectangleSelection,
+                                                 editionData.yEndRectangleSelection);
+        rectangleEnd = ConvertToWindowCoordinates(rectangleEnd.x, rectangleEnd.y, editionData.view);
+
+        sf::Shape selection = sf::Shape::Rectangle(rectangleOrigin.x, rectangleOrigin.y,
+                                                   rectangleEnd.x-rectangleOrigin.x, rectangleEnd.y-rectangleOrigin.y,
                                                    sf::Color( 0, 0, 200, 40 ), 1, sf::Color( 0, 0, 255, 128 ) );
         Draw(selection);
     }
 
     if ( settings.windowMask )
     {
-        sf::Shape windowMaskShape = sf::Shape::Rectangle(editionData.view.GetCenter().x-previewData.scene.game->GetMainWindowDefaultWidth()/2, editionData.view.GetCenter().y-previewData.scene.game->GetMainWindowDefaultHeight()/2,
-                                                         previewData.scene.game->GetMainWindowDefaultWidth(), previewData.scene.game->GetMainWindowDefaultHeight(), sf::Color( 0, 0, 0, 0 ), 1, sf::Color( 255, 255, 255, 128 ) );
+        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(editionData.view.GetCenter().x-previewData.scene.game->GetMainWindowDefaultWidth()/2,
+                                                                  editionData.view.GetCenter().y-previewData.scene.game->GetMainWindowDefaultHeight()/2,
+                                                                  editionData.view);
 
-        Draw(windowMaskShape);
+        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(editionData.view.GetCenter().x+previewData.scene.game->GetMainWindowDefaultWidth()/2,
+                                                                  editionData.view.GetCenter().y+previewData.scene.game->GetMainWindowDefaultHeight()/2,
+                                                                  editionData.view);
+
+        Draw(sf::Shape::Rectangle(rectangleOrigin.x, rectangleOrigin.y,
+                                  rectangleEnd.x-rectangleOrigin.x, rectangleEnd.y-rectangleOrigin.y,
+                                  sf::Color( 0, 0, 0, 0 ), 1, sf::Color( 255, 255, 255, 128 ) ));
     }
 
+    SetView(editionData.view);
     RestoreGLStates();
     Display();
 }
 
 void SceneCanvas::RenderGrid()
 {
-    int departX = static_cast<int>((editionData.view.GetCenter().x-editionData.view.GetSize().x/2) / settings.gridWidth)-settings.gridWidth;
-    departX *= settings.gridWidth;
-    int positionX = departX;
-    int departY = static_cast<int>((editionData.view.GetCenter().y-editionData.view.GetSize().y/2) / settings.gridHeight)-settings.gridHeight;
-    departY *= settings.gridHeight;
-    int positionY = departY;
+    int initialXPos = floor((editionData.view.GetCenter().x-editionData.view.GetSize().x/2) / settings.gridWidth)-settings.gridWidth;
+    initialXPos *= settings.gridWidth;
+    int initialYPos = floor((editionData.view.GetCenter().y-editionData.view.GetSize().y/2) / settings.gridHeight)-settings.gridHeight;
+    initialYPos *= settings.gridHeight;
 
-    for ( positionX = departX;positionX < (editionData.view.GetCenter().x+editionData.view.GetSize().x/2) ; positionX += settings.gridWidth )
+    for ( int Xpos = initialXPos;Xpos < (editionData.view.GetCenter().x+editionData.view.GetSize().x/2) ; Xpos += settings.gridWidth )
     {
-        sf::Shape line = sf::Shape::Line( positionX, departY, positionX, (editionData.view.GetCenter().y+editionData.view.GetSize().y/2), 1, sf::Color( settings.gridR, settings.gridG, settings.gridB ));
-
-        Draw( line );
+        Draw (sf::Shape::Line(ConvertToWindowCoordinates(Xpos, initialYPos, editionData.view),
+                              ConvertToWindowCoordinates(Xpos, editionData.view.GetCenter().y+editionData.view.GetSize().y/2, editionData.view),
+                              1, sf::Color( settings.gridR, settings.gridG, settings.gridB )));
     }
 
-    for ( positionY = departY;positionY < (editionData.view.GetCenter().y+editionData.view.GetSize().y/2) ; positionY += settings.gridHeight )
+    for ( int Ypos = initialYPos;Ypos < (editionData.view.GetCenter().y+editionData.view.GetSize().y/2) ; Ypos += settings.gridHeight )
     {
-        sf::Shape line = sf::Shape::Line( departX, positionY, (editionData.view.GetCenter().x+editionData.view.GetSize().x/2), positionY, 1, sf::Color( settings.gridR, settings.gridG, settings.gridB ));
-
-        Draw( line );
+        Draw (sf::Shape::Line(ConvertToWindowCoordinates(initialXPos, Ypos, editionData.view),
+                              ConvertToWindowCoordinates(editionData.view.GetCenter().x+editionData.view.GetSize().x/2, Ypos, editionData.view),
+                              1, sf::Color( settings.gridR, settings.gridG, settings.gridB )));
     }
+}
+
+sf::Vector2f SceneCanvas::ConvertToWindowCoordinates(float x, float y, const sf::View & view)
+{
+    //Transform by the view matrix
+    sf::Vector2f hCoords = view.GetMatrix().Transform(sf::Vector2f(x,y));
+
+    //Go back from homogeneous coordinates to viewport ones.
+    sf::IntRect viewport = GetViewport(view);
+    return sf::Vector2f(( hCoords.x + 1.f ) / 2.f * viewport.Width + viewport.Left,
+                        (-hCoords.y + 1.f ) / 2.f * viewport.Height + viewport.Top);
 }
 
 void SceneCanvas::OnUpdate()
@@ -540,11 +573,11 @@ void SceneCanvas::OnCreateObjectSelected(wxCommandEvent & event)
         return;
 
     //Find a new unique name for the object
-    std::string name = ToString(_("NouvelObjet"));
+    std::string name = ToString(_("NewObject"));
     for (unsigned int i = 0;sceneEdited.HasObjectNamed(name);)
     {
         ++i;
-        name =  _("NouvelObjet")+ToString(i);
+        name =  _("NewObject")+ToString(i);
     }
 
     //Add a new object of selected type to objects list
@@ -781,9 +814,9 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
     float mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
 
     if ( !editing )
-        wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". ( Calque de base, Caméra 0 )" ) ) );
+        wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". ( Base layer, camera 0 )" ) ) );
     else
-        wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". SHIFT pour sélection multiple, clic droit pour plus d'options." ) ) );
+        wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". SHIFT for multiple selection, right click for more options." ) ) );
 
     //The rest is for edittime
     if ( previewData.scene.running )
@@ -906,7 +939,7 @@ void SceneCanvas::AddObject(const std::string & objectName, float x, float y)
 
     if ( newObject == boost::shared_ptr<Object> () )
     {
-        wxLogMessage(_("L'objet à ajouter n'existe pas ou plus dans la liste des objets.\nGlissez-déposez les objets depuis la liste des objets."));
+        wxLogMessage(_("The object to add does not exist ( anymore ) in the object list.\nDrag and drop objects on the scene from the objects list."));
         return;
     }
 
@@ -1414,7 +1447,5 @@ void SceneCanvas::OnRedoBtClick( wxCommandEvent & event )
 
     Reload();
 }
-
-
-
 //The rest of the implementation is available in SceneCanvas2.cpp
+

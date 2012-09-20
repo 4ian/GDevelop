@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="ChoixBouton">
-		<title>Choisir un bouton de la souris</title>
+		<title>Choose a mouse button</title>
 		<size>333,249</size>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -11,13 +11,13 @@
 					<cols>2</cols>
 					<object class="sizeritem">
 						<object class="wxRadioBox" name="ID_RADIOBOX1" variable="RadioBox1" member="yes">
-							<label>Choisissez le bouton :</label>
+							<label>Choose the button :</label>
 							<content>
-								<item>Bouton gauche</item>
-								<item>Bouton droit</item>
-								<item>Bouton central</item>
-								<item>Bouton spécial 1</item>
-								<item>Bouton spécial 2</item>
+								<item>Left button</item>
+								<item>Right button</item>
+								<item>Center button</item>
+								<item>Special button 1</item>
+								<item>Special button 2</item>
 							</content>
 							<default>-1</default>
 							<handler function="OnRadioBox1Select" entry="EVT_RADIOBOX" />
@@ -30,7 +30,7 @@
 						<object class="wxPanel" name="ID_PANEL1" variable="TestPanel" member="yes">
 							<size>123,117</size>
 							<bg>#808080</bg>
-							<tooltip>Cliquez avec le bouton pour le sélectionner automatiquement dans la liste</tooltip>
+							<tooltip>Click with a button to automatically select this latter from the list</tooltip>
 							<style>wxRAISED_BORDER|wxTAB_TRAVERSAL</style>
 							<handler function="OnTestPanelLeftUp" entry="EVT_LEFT_UP" />
 							<handler function="OnTestPanelMiddleUp" entry="EVT_MIDDLE_UP" />
@@ -60,7 +60,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON1" variable="CancelBt" member="yes">
-							<label>Annuler</label>
+							<label>Cancel</label>
 							<handler function="OnCancelBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -74,3 +74,9 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+

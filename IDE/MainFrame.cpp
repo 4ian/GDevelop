@@ -146,7 +146,7 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     wxFlexGridSizer* FlexGridSizer1;
     wxMenuItem* MenuItem45;
 
-    Create(parent, wxID_ANY, _("Game Develop - Nouveau jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("Game Develop - New game"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_FRAME_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(850,700));
     {
     	wxIcon FrameIcon;
@@ -170,95 +170,95 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     FlexGridSizer2->SetSizeHints(Panel1);
     FlexGridSizer1->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer1);
-    MenuItem1 = new wxMenuItem((&openContextMenu), ID_MENUITEM1, _("Ouvrir un exemple"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1 = new wxMenuItem((&openContextMenu), ID_MENUITEM1, _("Open an example"), wxEmptyString, wxITEM_NORMAL);
     openContextMenu.Append(MenuItem1);
-    MenuItem45 = new wxMenuItem((&openContextMenu), ID_MENUITEM8, _("Importer un jeu"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem45 = new wxMenuItem((&openContextMenu), ID_MENUITEM8, _("Import a game"), wxEmptyString, wxITEM_NORMAL);
     MenuItem45->SetBitmap(wxBitmap(wxImage(_T("res/fusionicon.png"))));
     openContextMenu.Append(MenuItem45);
-    MenuItem10 = new wxMenuItem((&saveContextMenu), ID_MENUITEM2, _("Enregistrer sous..."), wxEmptyString, wxITEM_NORMAL);
+    MenuItem10 = new wxMenuItem((&saveContextMenu), ID_MENUITEM2, _("Save as..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/saveasicon.png"))));
     saveContextMenu.Append(MenuItem10);
-    MenuItem11 = new wxMenuItem((&saveContextMenu), ID_MENUITEM3, _("Enregistrer en version portable"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem11 = new wxMenuItem((&saveContextMenu), ID_MENUITEM3, _("Save in portable version"), wxEmptyString, wxITEM_NORMAL);
     MenuItem11->SetBitmap(wxBitmap(wxImage(_T("res/portableicon.png"))));
     saveContextMenu.Append(MenuItem11);
-    MenuItem41 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM4, _("Décomposer un GIF animé"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem41 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM4, _("Decompose an animated GIF"), wxEmptyString, wxITEM_NORMAL);
     MenuItem41->SetBitmap(wxBitmap(wxImage(_T("res/importgif.png"))));
     decomposerContextMenu.Append(MenuItem41);
-    MenuItem42 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM5, _("Décomposer un personnage RPG Maker"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem42 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM5, _("Decompose a RPG Maker character"), wxEmptyString, wxITEM_NORMAL);
     MenuItem42->SetBitmap(wxBitmap(wxImage(_T("res/importrpgmaker.png"))));
     decomposerContextMenu.Append(MenuItem42);
-    MenuItem43 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM6, _("Décomposer une feuille de sprite"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem43 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM6, _("Decompose a spritesheet"), wxEmptyString, wxITEM_NORMAL);
     MenuItem43->SetBitmap(wxBitmap(wxImage(_T("res/spritesheet16.png"))));
     decomposerContextMenu.Append(MenuItem43);
     autoSaveTimer.SetOwner(this, ID_TIMER1);
     autoSaveTimer.Start(180000, false);
-    MenuItem2 = new wxMenuItem((&fileMenu), ID_MENUITEM7, _("Nouveau\tCtrl+N"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem2 = new wxMenuItem((&fileMenu), ID_MENUITEM7, _("New\tCtrl+N"), wxEmptyString, wxITEM_NORMAL);
     MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/newicon.png"))));
     fileMenu.Append(MenuItem2);
     fileMenu.AppendSeparator();
-    MenuItem3 = new wxMenuItem((&fileMenu), ID_MENUITEM9, _("Ouvrir\tCtrl+O"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem3 = new wxMenuItem((&fileMenu), ID_MENUITEM9, _("Open\tCtrl-O"), wxEmptyString, wxITEM_NORMAL);
     MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/openicon.png"))));
     fileMenu.Append(MenuItem3);
-    MenuItem4 = new wxMenuItem((&fileMenu), ID_MENUITEM10, _("Ouvrir un jeu d\'exemple"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem4 = new wxMenuItem((&fileMenu), ID_MENUITEM10, _("Open an example"), wxEmptyString, wxITEM_NORMAL);
     fileMenu.Append(MenuItem4);
     menuRecentFiles = new wxMenu();
     MenuItem23 = new wxMenuItem(menuRecentFiles, toBeDeletedMenuItem, _("useless"), wxEmptyString, wxITEM_NORMAL);
     menuRecentFiles->Append(MenuItem23);
-    fileMenu.Append(ID_MENUITEM26, _("Fichiers récemments ouverts"), menuRecentFiles, wxEmptyString);
-    MenuItem5 = new wxMenuItem((&fileMenu), ID_MENUITEM11, _("Importer un jeu"), wxEmptyString, wxITEM_NORMAL);
+    fileMenu.Append(ID_MENUITEM26, _("Recently opened"), menuRecentFiles, wxEmptyString);
+    MenuItem5 = new wxMenuItem((&fileMenu), ID_MENUITEM11, _("Import a game"), wxEmptyString, wxITEM_NORMAL);
     MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     fileMenu.Append(MenuItem5);
     fileMenu.AppendSeparator();
-    MenuItem6 = new wxMenuItem((&fileMenu), ID_MENUITEM12, _("Enregistrer\tCtrl+S"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem6 = new wxMenuItem((&fileMenu), ID_MENUITEM12, _("Save\tCtrl+S"), wxEmptyString, wxITEM_NORMAL);
     MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/saveicon.png"))));
     fileMenu.Append(MenuItem6);
-    MenuItem7 = new wxMenuItem((&fileMenu), ID_MENUITEM13, _("Enregistrer sous..."), wxEmptyString, wxITEM_NORMAL);
+    MenuItem7 = new wxMenuItem((&fileMenu), ID_MENUITEM13, _("Save as..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/saveasicon.png"))));
     fileMenu.Append(MenuItem7);
-    MenuItem12 = new wxMenuItem((&fileMenu), ID_MENUITEM16, _("Enregistrer tous les projets ouverts\tCtrl+Shift+S"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem12 = new wxMenuItem((&fileMenu), ID_MENUITEM16, _("Save all opened projects\tCtrl+Shift+S"), wxEmptyString, wxITEM_NORMAL);
     MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/save_all16.png"))));
     fileMenu.Append(MenuItem12);
     fileMenu.AppendSeparator();
-    MenuItem9 = new wxMenuItem((&fileMenu), ID_MENUITEM15, _("Compiler le projet en exécutable"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem9 = new wxMenuItem((&fileMenu), ID_MENUITEM15, _("Compile to a standalone game."), wxEmptyString, wxITEM_NORMAL);
     MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/compilationicon.png"))));
     fileMenu.Append(MenuItem9);
     MenuItem24 = new wxMenu();
-    MenuItem14 = new wxMenuItem(MenuItem24, ID_MENUITEM18, _("Rassembler projet et ressources dans un dossier"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem14 = new wxMenuItem(MenuItem24, ID_MENUITEM18, _("Gather the project and its resources in a folder"), wxEmptyString, wxITEM_NORMAL);
     MenuItem24->Append(MenuItem14);
-    fileMenu.Append(ID_MENUITEM28, _("Autre"), MenuItem24, wxEmptyString);
+    fileMenu.Append(ID_MENUITEM28, _("Other"), MenuItem24, wxEmptyString);
     fileMenu.AppendSeparator();
-    MenuItem15 = new wxMenuItem((&fileMenu), ID_MENUITEM19, _("Fermer le projet"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem15 = new wxMenuItem((&fileMenu), ID_MENUITEM19, _("Close the current project"), wxEmptyString, wxITEM_NORMAL);
     fileMenu.Append(MenuItem15);
     fileMenu.AppendSeparator();
-    MenuItem13 = new wxMenuItem((&fileMenu), ID_MENUITEM17, _("Préférences"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem13 = new wxMenuItem((&fileMenu), ID_MENUITEM17, _("Options"), wxEmptyString, wxITEM_NORMAL);
     MenuItem13->SetBitmap(wxBitmap(wxImage(_T("res/preficon.png"))));
     fileMenu.Append(MenuItem13);
     fileMenu.AppendSeparator();
-    MenuItem22 = new wxMenuItem((&fileMenu), ID_MENUITEM27, _("Aide\tF1"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem22 = new wxMenuItem((&fileMenu), ID_MENUITEM27, _("Help\tF1"), wxEmptyString, wxITEM_NORMAL);
     MenuItem22->SetBitmap(wxBitmap(wxImage(_T("res/helpicon.png"))));
     fileMenu.Append(MenuItem22);
     fileMenu.AppendSeparator();
-    MenuItem8 = new wxMenuItem((&fileMenu), ID_MENUITEM14, _("Quitter"), _("Quitter Game develop"), wxITEM_NORMAL);
+    MenuItem8 = new wxMenuItem((&fileMenu), ID_MENUITEM14, _("Quit"), _("Quit Game Develop"), wxITEM_NORMAL);
     fileMenu.Append(MenuItem8);
     menuRecentFiles->Delete(toBeDeletedMenuItem);
-    MenuItem16 = new wxMenuItem((&helpMenu), ID_MENUITEM20, _("Aide"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem16 = new wxMenuItem((&helpMenu), ID_MENUITEM20, _("Help"), wxEmptyString, wxITEM_NORMAL);
     MenuItem16->SetBitmap(wxBitmap(wxImage(_T("res/helpicon.png"))));
     helpMenu.Append(MenuItem16);
-    MenuItem19 = new wxMenuItem((&helpMenu), ID_MENUITEM23, _("Tutoriel"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem19 = new wxMenuItem((&helpMenu), ID_MENUITEM23, _("Tutorial"), wxEmptyString, wxITEM_NORMAL);
     MenuItem19->SetBitmap(wxBitmap(wxImage(_T("res/tutoicon.png"))));
     helpMenu.Append(MenuItem19);
     MenuItem18 = new wxMenuItem((&helpMenu), ID_MENUITEM22, _("Wiki"), wxEmptyString, wxITEM_NORMAL);
     MenuItem18->SetBitmap(wxBitmap(wxImage(_T("res/wikiicon.png"))));
     helpMenu.Append(MenuItem18);
     helpMenu.AppendSeparator();
-    MenuItem21 = new wxMenuItem((&helpMenu), ID_MENUITEM25, _("Vérifier les mises à jour"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem21 = new wxMenuItem((&helpMenu), ID_MENUITEM25, _("Check for updates"), wxEmptyString, wxITEM_NORMAL);
     MenuItem21->SetBitmap(wxBitmap(wxImage(_T("res/update16.png"))));
     helpMenu.Append(MenuItem21);
     helpMenu.AppendSeparator();
-    MenuItem20 = new wxMenuItem((&helpMenu), ID_MENUITEM24, _("Site officiel"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem20 = new wxMenuItem((&helpMenu), ID_MENUITEM24, _("Official web site"), wxEmptyString, wxITEM_NORMAL);
     MenuItem20->SetBitmap(wxBitmap(wxImage(_T("res/siteicon.png"))));
     helpMenu.Append(MenuItem20);
-    MenuItem17 = new wxMenuItem((&helpMenu), ID_MENUITEM21, _("A propos..."), wxEmptyString, wxITEM_NORMAL);
+    MenuItem17 = new wxMenuItem((&helpMenu), ID_MENUITEM21, _("About..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem17->SetBitmap(wxBitmap(wxImage(_T("res/icon16.png"))));
     helpMenu.Append(MenuItem17);
     FlexGridSizer1->SetSizeHints(this);
@@ -368,57 +368,57 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     bool hideLabels = false;
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Projets"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Projects"));
         ProjectManager::CreateRibbonPage(ribbonEditorPage);
     }
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Banque d'images"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Images bank"));
         //
         {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Ajout de ressources"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Adding resources"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAdd, !hideLabels ? _("Ajouter une image") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAddFromLibrary, !hideLabels ? _("Ajouter depuis la bibliothèque") : "", wxBitmap("res/addFromLibrary24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonAddDossier, !hideLabels ? _("Ajouter un dossier virtuel") : "", wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAdd, !hideLabels ? _("Add an image") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAddFromLibrary, !hideLabels ? _("Add from the library") : "", wxBitmap("res/addFromLibrary24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonAddDossier, !hideLabels ? _("Add a virtual folder") : "", wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY));
         }
         {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Gestion de la liste"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("List management"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDel, !hideLabels ? _("Supprimer") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDeleteUnused, !hideLabels ? _("Supprimer les res. superflues") : "", wxBitmap("res/deleteunknown24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonUp, !hideLabels ? _("Déplacer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonDown, !hideLabels ? _("Déplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Rafraichir la liste") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDel, !hideLabels ? _("Delete") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDeleteUnused, !hideLabels ? _("Remove useless resources") : "", wxBitmap("res/deleteunknown24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonUp, !hideLabels ? _("Move up") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonDown, !hideLabels ? _("Move down") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Refresh the list") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
         }
 
         {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Ressource sélectionnée"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Selected resource"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonMod, !hideLabels ? _("Nom") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonModFile, !hideLabels ? _("Modifier le fichier") : "", wxBitmap("res/openicon24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonModProp, !hideLabels ? _("Propriétés") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonPaintProgram, !hideLabels ? _("Editer") : "", wxBitmap("res/paint24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonMod, !hideLabels ? _("Name") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonModFile, !hideLabels ? _("Change the file") : "", wxBitmap("res/openicon24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonModProp, !hideLabels ? _("Properties") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonPaintProgram, !hideLabels ? _("Edit") : "", wxBitmap("res/paint24.png", wxBITMAP_TYPE_ANY));
         }
         {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
         }
     }
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Scène"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Scene"));
         ribbonSceneEditorButtonBar = SceneCanvas::CreateRibbonPage(ribbonEditorPage);
     }
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Evènements"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Events"));
         EventsEditor::CreateRibbonPage(ribbonEditorPage);
     }
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Objets"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Objects"));
         EditorObjectList::CreateRibbonPage(ribbonEditorPage);
     }
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Groupes"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Groups"));
         EditorObjetsGroups::CreateRibbonPage(ribbonEditorPage);
     }
     {
@@ -450,7 +450,7 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
 
     //Create start page
     startPage = new StartHerePage(editorsNotebook, *this);
-    editorsNotebook->AddPage(startPage, _("Page de démarrage"));
+    editorsNotebook->AddPage(startPage, _("Start page"));
 
     //Create project manager
     projectManager = new ProjectManager(this, *this);
@@ -463,11 +463,11 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     buildToolsPnl = new BuildToolsPnl(this, projectManager);
 
     //Setup panes and load user configuration
-    m_mgr.AddPane( projectManager, wxAuiPaneInfo().Name( wxT( "PM" ) ).Caption( _( "Gestionnaire de projets" ) ).Left().MaximizeButton( true ).MinimizeButton( false ).MinSize(170,100) );
-    m_mgr.AddPane( Panel1, wxAuiPaneInfo().Name( wxT( "EP" ) ).Caption( _( "Editeur principal" ) ).Center().CaptionVisible(false).CloseButton( false ).MaximizeButton( true ).MinimizeButton( false ) );
-    m_mgr.AddPane( m_ribbon, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ruban" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).Resizable(false) );
-    m_mgr.AddPane( buildToolsPnl, wxAuiPaneInfo().Name( wxT( "CT" ) ).Caption( _( "Outils de compilations" ) ).Bottom().MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(120,130));
-    m_mgr.AddPane( projectPropertiesPnl, wxAuiPaneInfo().Name( wxT( "PP" ) ).Caption( _( "Propriétés du projet" ) ).Show(false) );
+    m_mgr.AddPane( projectManager, wxAuiPaneInfo().Name( wxT( "PM" ) ).Caption( _( "Project manager" ) ).Left().MaximizeButton( true ).MinimizeButton( false ).MinSize(170,100) );
+    m_mgr.AddPane( Panel1, wxAuiPaneInfo().Name( wxT( "EP" ) ).Caption( _( "Main editor" ) ).Center().CaptionVisible(false).CloseButton( false ).MaximizeButton( true ).MinimizeButton( false ) );
+    m_mgr.AddPane( m_ribbon, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ribbon" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).Resizable(false) );
+    m_mgr.AddPane( buildToolsPnl, wxAuiPaneInfo().Name( wxT( "CT" ) ).Caption( _( "Compilation tools" ) ).Bottom().MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(120,130));
+    m_mgr.AddPane( projectPropertiesPnl, wxAuiPaneInfo().Name( wxT( "PP" ) ).Caption( _( "Project properties" ) ).Show(false) );
 
     wxString result;
     pConfig->Read( _T( "/Workspace/Actuel" ), &result );
@@ -475,9 +475,9 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
         m_mgr.LoadPerspective( result , true );
 
     //Ensure that names are corrected ( Useful in particular to ensure that these name are in the selected language ).
-    m_mgr.GetPane(projectManager).Caption(_( "Gestionnaire de projets" ));
-    m_mgr.GetPane(buildToolsPnl).Caption(_( "Outils de compilations" ));
-    m_mgr.GetPane(projectPropertiesPnl).Caption(_( "Propriétés du projet" ));
+    m_mgr.GetPane(projectManager).Caption(_( "Project manager" ));
+    m_mgr.GetPane(buildToolsPnl).Caption(_( "Compilation tools" ));
+    m_mgr.GetPane(projectPropertiesPnl).Caption(_( "Project properties" ));
 
     //Change ribbon pane height.
     m_mgr.GetPane(m_ribbon).MinSize(1, m_ribbon->GetBestSize().GetHeight()+4);
@@ -583,7 +583,7 @@ void MainFrame::OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt)
     }
 
     startPage = new StartHerePage(this, *this);
-    editorsNotebook->AddPage(startPage, _("Page de démarrage"), true);
+    editorsNotebook->AddPage(startPage, _("Start page"), true);
 }
 
 /**
@@ -591,7 +591,7 @@ void MainFrame::OnRibbonStartPageClicked(wxRibbonButtonBarEvent& evt)
  */
 void MainFrame::OnClose( wxCloseEvent& event )
 {
-    if (wxMessageBox(_("Etes-vous sûr de vouloir quitter Game Develop ?"), _("Quitter Game Develop"), wxYES_NO ) == wxNO)
+    if (wxMessageBox(_("Are you sure you want to quit Game Develop \?"), _("Quit Game Develop"), wxYES_NO ) == wxNO)
         return;
 
     wxConfigBase::Get()->Write( _T( "/Workspace/Actuel" ), m_mgr.SavePerspective() );
@@ -789,10 +789,10 @@ void MainFrame::RealizeRibbonCustomButtons()
     wxMemoryDC dc;
 
     //Compute width of the bitmap button
-    int width; artProvider->GetBarTabWidth(dc, fakeRibbon, _("Fichier"), wxNullBitmap, &width, NULL, NULL, NULL);
+    int width; artProvider->GetBarTabWidth(dc, fakeRibbon, _("File"), wxNullBitmap, &width, NULL, NULL, NULL);
 
     //Create a fake ribbon page...
-    wxRibbonPage *page = new wxRibbonPage(fakeRibbon, wxID_ANY, _("Fichier"));
+    wxRibbonPage *page = new wxRibbonPage(fakeRibbon, wxID_ANY, _("File"));
     //...and the associated wxRibbonPageTabInfo
     wxRibbonPageTabInfo tabInfo;
     tabInfo.rect = wxRect(0,0, width, 16 /*Will be changed later*/);
@@ -870,7 +870,7 @@ void MainFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& event)
         if ( !editor->CanBeClosed() )
         {
             event.Veto();
-            infoBar->ShowMessage(_("Fermez l'aperçu de la scène avant de fermer l'éditeur."));
+            infoBar->ShowMessage(_("Please close the preview before closing the editor."));
         }
 
         //Save the event to log file
@@ -1046,3 +1046,4 @@ void MainFrame::OnMenuPrefSelected( wxCommandEvent& event )
     m_ribbon->Realize();
     m_mgr.Update();
 }
+

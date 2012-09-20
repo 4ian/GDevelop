@@ -65,3 +65,4 @@ class EditorJeu: public wxPanel
 };
 
 #endif
+

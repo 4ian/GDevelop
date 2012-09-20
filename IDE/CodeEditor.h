@@ -111,3 +111,4 @@ class CodeEditor: public wxPanel
 };
 
 #endif
+

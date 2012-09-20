@@ -76,3 +76,4 @@ class MAJ: public wxDialog
 };
 
 #endif
+

@@ -104,3 +104,4 @@ class EditorScene: public wxPanel
 };
 
 #endif
+

@@ -56,7 +56,7 @@ sceneCanvas(NULL)
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
 	FlexGridSizer2->AddGrowableRow(1);
-	activateCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Activer le suivi des performances ( Relance la scène )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	activateCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Activate profiling ( Relaunch the scene )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	activateCheck->SetValue(false);
 	FlexGridSizer2->Add(activateCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -102,19 +102,19 @@ sceneCanvas(NULL)
 	FlexGridSizer2->Add(FlexGridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer2);
 	MenuItem3 = new wxMenu();
-	MenuItem1 = new wxMenuItem(MenuItem3, ID_MENUITEM1, _("Changer le nombre de mesures"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem1 = new wxMenuItem(MenuItem3, ID_MENUITEM1, _("Change the number of measure"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem3->Append(MenuItem1);
-	infiniteDataCheck = new wxMenuItem(MenuItem3, wxID_ANY, _("Nombre infini"), wxEmptyString, wxITEM_CHECK);
+	infiniteDataCheck = new wxMenuItem(MenuItem3, wxID_ANY, _("Infinity number"), wxEmptyString, wxITEM_CHECK);
 	MenuItem3->Append(infiniteDataCheck);
-	contextMenu.Append(ID_MENUITEM3, _("Nombre de mesures"), MenuItem3, wxEmptyString);
-	MenuItem2 = new wxMenuItem((&contextMenu), ID_MENUITEM2, _("Changer l\'intervalle des mesures"), wxEmptyString, wxITEM_NORMAL);
+	contextMenu.Append(ID_MENUITEM3, _("Number of measures"), MenuItem3, wxEmptyString);
+	MenuItem2 = new wxMenuItem((&contextMenu), ID_MENUITEM2, _("Change the interval between each measures."), wxEmptyString, wxITEM_NORMAL);
 	contextMenu.Append(MenuItem2);
 	contextMenu.AppendSeparator();
-	totalTimeCheck = new wxMenuItem((&contextMenu), wxID_ANY, _("Afficher le temps total"), wxEmptyString, wxITEM_CHECK);
+	totalTimeCheck = new wxMenuItem((&contextMenu), wxID_ANY, _("Display total time"), wxEmptyString, wxITEM_CHECK);
 	contextMenu.Append(totalTimeCheck);
-	eventsTimeCheck = new wxMenuItem((&contextMenu), wxID_ANY, _("Afficher le temps des évènements"), wxEmptyString, wxITEM_CHECK);
+	eventsTimeCheck = new wxMenuItem((&contextMenu), wxID_ANY, _("Display time used by events"), wxEmptyString, wxITEM_CHECK);
 	contextMenu.Append(eventsTimeCheck);
-	objectsCountCheck = new wxMenuItem((&contextMenu), wxID_ANY, _("Afficher le nombre d\'objets"), wxEmptyString, wxITEM_CHECK);
+	objectsCountCheck = new wxMenuItem((&contextMenu), wxID_ANY, _("Display the number of objects"), wxEmptyString, wxITEM_CHECK);
 	contextMenu.Append(objectsCountCheck);
 	FlexGridSizer2->Fit(this);
 	FlexGridSizer2->SetSizeHints(this);
@@ -144,22 +144,22 @@ void ProfileDlg::UpdateGUI()
 {
     if ( !sceneCanvas || !profilingActivated )
     {
-        eventsTimeTxt->SetLabel(_("Evenements"));
-        totalTimeTxt->SetLabel(_("Temps de rendu total ( Affichage + Evenements )"));
-        objectsCountTxt->SetLabel(_("Nombre d'objets"));
+        eventsTimeTxt->SetLabel(_("Events"));
+        totalTimeTxt->SetLabel(_("Total rendering time ( Display + Events )"));
+        objectsCountTxt->SetLabel(_("Number of objects"));
 
         return;
     }
 
-    eventsTimeTxt->SetLabel(_("Evenements : ")+ToString(static_cast<double>(lastEventsTime)/1000.0f)+("ms")
-                            +_(" / Pourcentage de temps utilisé par les évenements : ")
+    eventsTimeTxt->SetLabel(_("Events:")+ToString(static_cast<double>(lastEventsTime)/1000.0f)+("ms")
+                            +_("/ Percent of time used by events:")
                                      +ToString(static_cast<double>(lastEventsTime)/static_cast<double>((lastEventsTime+lastRenderingTime))*100.0f)
                                      +("%"));
 
-    totalTimeTxt->SetLabel(_("Temps de rendu total ( Affichage + Evenements )  : ")+ToString(static_cast<double>((lastRenderingTime+lastEventsTime))/1000.0f)+("ms"));
+    totalTimeTxt->SetLabel(_("Total rendering time ( Display + Events ):")+ToString(static_cast<double>((lastRenderingTime+lastEventsTime))/1000.0f)+("ms"));
 
     unsigned int currentObjectCount = sceneCanvas->GetRuntimeScene().objectsInstances.GetAllObjects().size();
-    objectsCountTxt->SetLabel(_("Nombre d'objets : ")+ToString(currentObjectCount));
+    objectsCountTxt->SetLabel(_("Number of objects:")+ToString(currentObjectCount));
 
     //Update events data
     eventsData.push_front(lastEventsTime/1000.0f);
@@ -196,16 +196,16 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
 
     if ( !profilingActivated || totalTimeData.empty() )
     {
-        scaleMaxTxt->SetLabel(ToString(50)+"ms\n("+ToString(1.0f/50*1000.0f)+" "+_("i/s")+")");
-        scaleMidTxt->SetLabel(ToString(50/2.0f)+"ms\n("+ToString(1.0f/(50/2.0f)*1000.0f)+" "+_("i/s")+")");
+        scaleMaxTxt->SetLabel(ToString(50)+"ms\n("+ToString(1.0f/50*1000.0f)+" "+_("fps")+")");
+        scaleMidTxt->SetLabel(ToString(50/2.0f)+"ms\n("+ToString(1.0f/(50/2.0f)*1000.0f)+" "+_("fps")+")");
 
         return;
     }
 
     unsigned int maximumTime = 50;
 
-    scaleMaxTxt->SetLabel(ToString(maximumTime)+"ms\n("+ToString(1.0f/maximumTime*1000.0f)+" "+_("i/s")+")");
-    scaleMidTxt->SetLabel(ToString(maximumTime/2.0f)+"ms\n("+ToString(1.0f/(maximumTime/2.0f)*1000.0f)+" "+_("i/s")+")");
+    scaleMaxTxt->SetLabel(ToString(maximumTime)+"ms\n("+ToString(1.0f/maximumTime*1000.0f)+" "+_("fps")+")");
+    scaleMidTxt->SetLabel(ToString(maximumTime/2.0f)+"ms\n("+ToString(1.0f/(maximumTime/2.0f)*1000.0f)+" "+_("fps")+")");
 
     //FPS curve
     if ( totalTimeCheck->IsChecked() )
@@ -290,13 +290,13 @@ void ProfileDlg::OnratioGraphicsRightUp(wxMouseEvent& event)
 
 void ProfileDlg::OnChangeDurationSelected(wxCommandEvent& event)
 {
-    std::string newMaxData = string(wxGetTextFromUser(_("Entrez le nombre de mesure à conserver"), _("Nombre de mesures"), ToString(maxData)).mb_str());
+    std::string newMaxData = string(wxGetTextFromUser(_("Enter the number of measure to memorize"), _("Number of measures"), ToString(maxData)).mb_str());
     maxData = ToInt(newMaxData);
 }
 
 void ProfileDlg::OnStepTimeSelected(wxCommandEvent& event)
 {
-    std::string newStepTime = string(wxGetTextFromUser(_("Entrez le temps entre chaque relevé ( en millisecondes )"), _("Temps entre chaque relevé"), ToString(static_cast<double>(stepTime)*1000.0f)).mb_str());
+    std::string newStepTime = string(wxGetTextFromUser(_("Enter time between each measure ( milliseconds )"), _("Time between each measure"), ToString(static_cast<double>(stepTime)*1000.0f)).mb_str());
     stepTime = ToFloat(newStepTime)/1000.0f;
 }
 
@@ -310,3 +310,4 @@ void ProfileDlg::OnactivateCheckClick(wxCommandEvent& event)
         sceneCanvas->Reload();
     }
 }
+

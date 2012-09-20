@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="ChoixClavier">
-		<title>Choisir une touche du clavier</title>
+		<title>Choose a key</title>
 		<size>234,179</size>
 		<id_arg>0</id_arg>
 		<handler function="OnKeyDown" entry="EVT_KEY_DOWN" />
@@ -9,7 +9,7 @@
 			<cols>1</cols>
 			<object class="sizeritem">
 				<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText2" member="yes">
-					<label>Cliquez sur la zone, puis appuyez sur une touche du clavier</label>
+					<label>Click on the area, and press a key</label>
 				</object>
 				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
@@ -31,7 +31,7 @@
 					<cols>3</cols>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-							<label>Touche choisie :</label>
+							<label>Chosen key :</label>
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -52,7 +52,7 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxButton" name="ID_BUTTON1" variable="Button1" member="yes">
-					<label>Fermer</label>
+					<label>Close</label>
 					<handler function="OnButton1Click" entry="EVT_BUTTON" />
 				</object>
 				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -62,3 +62,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

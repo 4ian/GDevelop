@@ -58,20 +58,20 @@ mainFrameWrapper(mainFrameWrapper_)
 	textEditor = new wxSTEditor(this,ID_CUSTOM1,wxDefaultPosition,wxDefaultSize,0,_T("ID_CUSTOM1"));
 	FlexGridSizer1->Add(textEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	MenuItem1 = new wxMenuItem((&contextMenu), ID_MENUITEM1, _("Copier"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem1 = new wxMenuItem((&contextMenu), ID_MENUITEM1, _("Copy"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	contextMenu.Append(MenuItem1);
-	MenuItem2 = new wxMenuItem((&contextMenu), ID_MENUITEM2, _("Couper"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem2 = new wxMenuItem((&contextMenu), ID_MENUITEM2, _("Cut"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
 	contextMenu.Append(MenuItem2);
-	MenuItem3 = new wxMenuItem((&contextMenu), ID_MENUITEM3, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem3 = new wxMenuItem((&contextMenu), ID_MENUITEM3, _("Paste"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	contextMenu.Append(MenuItem3);
 	contextMenu.AppendSeparator();
-	MenuItem4 = new wxMenuItem((&contextMenu), ID_MENUITEM4, _("Annuler"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem4 = new wxMenuItem((&contextMenu), ID_MENUITEM4, _("Cancel"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/undo.png"))));
 	contextMenu.Append(MenuItem4);
-	MenuItem5 = new wxMenuItem((&contextMenu), ID_MENUITEM5, _("Refaire"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem5 = new wxMenuItem((&contextMenu), ID_MENUITEM5, _("Redo"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/redo.png"))));
 	contextMenu.Append(MenuItem5);
 	FlexGridSizer1->Fit(this);
@@ -116,28 +116,28 @@ void CodeEditor::CreateRibbonPage(wxRibbonPage * page)
     wxConfigBase::Get()->Read( _T( "/Skin/HideLabels" ), &hideLabels, false );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Fichier"), wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("File"), wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonSave, !hideLabels ? _("Enregistrer") : "", wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonSave, !hideLabels ? _("Save") : "", wxBitmap("res/saveicon24.png", wxBITMAP_TYPE_ANY));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Presse papiers"), wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copier") : "", wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonCut, !hideLabels ? _("Couper") : "", wxBitmap("res/cut24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Coller") : "", wxBitmap("res/paste24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", wxBitmap("res/cut24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", wxBitmap("res/paste24.png", wxBITMAP_TYPE_ANY));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Annulation"), wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Cancelling"), wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonUndo, !hideLabels ? _("Cancel") : "", wxBitmap("res/undo24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", wxBitmap("res/redo24.png", wxBITMAP_TYPE_ANY));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Outils"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonFindReplace, !hideLabels ? _("Chercher / Remplacer") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonGotoLine, !hideLabels ? _("Aller à...") : "", wxBitmap("res/gotoline24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonFindReplace, !hideLabels ? _("Search / Replace") : "", wxBitmap("res/search24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonGotoLine, !hideLabels ? _("Go to...") : "", wxBitmap("res/gotoline24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Options"), wxBitmap("res/pref24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -145,12 +145,12 @@ void CodeEditor::CreateRibbonPage(wxRibbonPage * page)
         ribbonBar->AddButton(idRibbonOptions, !hideLabels ? _("Options") : "", wxBitmap("res/pref24.png", wxBITMAP_TYPE_ANY));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonDocGDL, !hideLabels ? _("Doc. GDL") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDocSFML, !hideLabels ? _("Doc. SFML") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDocWxWidgets, !hideLabels ? _("Doc. wxWidgets") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDocBoost, !hideLabels ? _("Doc. Boost") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDocGDL, !hideLabels ? _("GDL doc.") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDocSFML, !hideLabels ? _("SFML doc.") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDocWxWidgets, !hideLabels ? _("wxWidgets doc.") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDocBoost, !hideLabels ? _("Boost doc.") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
     }
 }
 
@@ -323,3 +323,4 @@ void CodeEditor::OnDocBoostSelected(wxRibbonButtonBarEvent &event)
 {
     OpenLink("http://www.boost.org/doc/libs/1_43_0/");
 }
+

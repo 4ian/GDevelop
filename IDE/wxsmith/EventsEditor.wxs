@@ -61,7 +61,7 @@
 							<object class="sizeritem">
 								<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="addEventIcon" member="yes">
 									<bitmap>res/eventaddicon.png</bitmap>
-									<tooltip>Ajouter un évènement</tooltip>
+									<tooltip>Add an event</tooltip>
 									<style>wxNO_BORDER</style>
 								</object>
 								<flag>wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -70,7 +70,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT1" variable="addEventBt" member="yes">
-									<label>Ajouter un évènement</label>
+									<label>Add an event</label>
 								</object>
 								<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 								<border>2</border>
@@ -78,7 +78,7 @@
 							<object class="sizeritem">
 								<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="addSubEventIcon" member="yes">
 									<bitmap>res/subeventaddicon.png</bitmap>
-									<tooltip>Ajouter un sous évènement</tooltip>
+									<tooltip>Add a sub event</tooltip>
 									<style>wxNO_BORDER</style>
 								</object>
 								<flag>wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -87,7 +87,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT2" variable="addSubEventBt" member="yes">
-									<label>Un sous évènement</label>
+									<label>A sub event</label>
 								</object>
 								<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>2</border>
@@ -96,7 +96,7 @@
 							<object class="sizeritem">
 								<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="addMoreIcon" member="yes">
 									<bitmap>res/addicon.png</bitmap>
-									<tooltip>Ajouter un autre type d&apos;évènement</tooltip>
+									<tooltip>Another event type</tooltip>
 									<style>wxNO_BORDER</style>
 								</object>
 								<flag>wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -105,7 +105,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT3" variable="addMoreBt" member="yes">
-									<label>Autre</label>
+									<label>Other</label>
 								</object>
 								<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>2</border>
@@ -124,7 +124,7 @@
 							<object class="sizeritem">
 								<object class="wxStaticBitmap" name="ID_STATICBITMAP4" variable="addInstrIcon" member="yes">
 									<bitmap>res/addicon.png</bitmap>
-									<tooltip>Ajouter une condition</tooltip>
+									<tooltip>Add a condition</tooltip>
 									<style>wxNO_BORDER</style>
 								</object>
 								<flag>wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -133,7 +133,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT4" variable="addInstrBt" member="yes">
-									<label>Ajouter une condition</label>
+									<label>Add a condition</label>
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>2</border>
@@ -162,43 +162,43 @@
 		<object class="wxMenu" variable="eventTypesMenu" member="yes" />
 		<object class="wxMenu" variable="eventsContextMenu" member="yes">
 			<object class="wxMenuItem" name="deleteMenuItem" variable="deleteMenu" member="yes">
-				<label>Supprimer</label>
+				<label>Delete</label>
 				<accel>DEL</accel>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OndeleteMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="toggleActivationMenuItem" variable="toggleActivation" member="yes">
-				<label>Dés/activer</label>
+				<label>De/activate</label>
 				<handler function="OntoggleActivationSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="copyMenuItem" variable="eventCopyMenu" member="yes">
-				<label>Copier</label>
+				<label>Copy</label>
 				<accel>Ctrl-C</accel>
 				<bitmap>res/copyicon.png</bitmap>
 				<handler function="OneventCopyMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="cutMenuItem" variable="eventCutMenu" member="yes">
-				<label>Couper</label>
+				<label>Cut</label>
 				<accel>Ctrl-X</accel>
 				<bitmap>res/cuticon.png</bitmap>
 				<handler function="OneventCutMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="eventPasteMenu" member="yes">
-				<label>Coller</label>
+				<label>Paste</label>
 				<accel>Ctrl-V</accel>
 				<bitmap>res/pasteicon.png</bitmap>
 				<handler function="OneventPasteMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM5" variable="undoMenu" member="yes">
-				<label>Annuler</label>
+				<label>Cancel</label>
 				<accel>Ctrl-Z</accel>
 				<bitmap>res/undo.png</bitmap>
 				<handler function="OnundoMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM6" variable="redoMenu" member="yes">
-				<label>Refaire</label>
+				<label>Redo</label>
 				<accel>Ctrl-Y</accel>
 				<bitmap>res/redo.png</bitmap>
 				<handler function="OnredoMenuSelected" entry="EVT_MENU" />
@@ -206,19 +206,26 @@
 		</object>
 		<object class="wxMenu" variable="multipleContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem1" member="yes">
-				<label>Supprimer</label>
+				<label>Delete</label>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OndeleteMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem5" member="yes">
-				<label>Annuler</label>
+				<label>Cancel</label>
 				<handler function="OnundoMenuSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM12" variable="MenuItem6" member="yes">
-				<label>Refaire</label>
+				<label>Redo</label>
 				<handler function="OnredoMenuSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

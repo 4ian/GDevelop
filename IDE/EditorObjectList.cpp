@@ -129,61 +129,61 @@ globalObjects(&objects == &game)
 	searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer1->Add(searchCtrl, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	SetSizer(FlexGridSizer1);
-	editMenuI = new wxMenuItem((&ContextMenu), idMenuModObj, _("Modifier les propriétés de l\'objet"), wxEmptyString, wxITEM_NORMAL);
+	editMenuI = new wxMenuItem((&ContextMenu), idMenuModObj, _("Change the object properties"), wxEmptyString, wxITEM_NORMAL);
 	editMenuI->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
 	ContextMenu.Append(editMenuI);
-	editVarMenuI = new wxMenuItem((&ContextMenu), idMenuModVar, _("Variables initiales"), wxEmptyString, wxITEM_NORMAL);
+	editVarMenuI = new wxMenuItem((&ContextMenu), idMenuModVar, _("Initial variables"), wxEmptyString, wxITEM_NORMAL);
 	editVarMenuI->SetBitmap(wxBitmap(wxImage(_T("res/var.png"))));
 	ContextMenu.Append(editVarMenuI);
 	automatismsMenu = new wxMenu();
 	automatismsMenu->AppendSeparator();
-	addAutomatismItem = new wxMenuItem(automatismsMenu, ID_MENUITEM2, _("Ajouter un automatisme"), wxEmptyString, wxITEM_NORMAL);
+	addAutomatismItem = new wxMenuItem(automatismsMenu, ID_MENUITEM2, _("Add an automatism"), wxEmptyString, wxITEM_NORMAL);
 	addAutomatismItem->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	automatismsMenu->Append(addAutomatismItem);
-	renameAutomatism = new wxMenuItem(automatismsMenu, ID_MENUITEM5, _("Renommer un automatisme"), wxEmptyString, wxITEM_NORMAL);
+	renameAutomatism = new wxMenuItem(automatismsMenu, ID_MENUITEM5, _("Rename an automatism"), wxEmptyString, wxITEM_NORMAL);
 	renameAutomatism->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	automatismsMenu->Append(renameAutomatism);
-	deleteAutomatismItem = new wxMenuItem(automatismsMenu, ID_MENUITEM3, _("Supprimer un automatisme"), wxEmptyString, wxITEM_NORMAL);
+	deleteAutomatismItem = new wxMenuItem(automatismsMenu, ID_MENUITEM3, _("Delete an automatism"), wxEmptyString, wxITEM_NORMAL);
 	deleteAutomatismItem->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	automatismsMenu->Append(deleteAutomatismItem);
-	ContextMenu.Append(ID_MENUITEM1, _("Automatismes"), automatismsMenu, wxEmptyString);
-	effectsMenuI = new wxMenuItem((&ContextMenu), idMenuEffects, _("Effets"), wxEmptyString, wxITEM_NORMAL);
+	ContextMenu.Append(ID_MENUITEM1, _("Automatisms"), automatismsMenu, wxEmptyString);
+	effectsMenuI = new wxMenuItem((&ContextMenu), idMenuEffects, _("Effects"), wxEmptyString, wxITEM_NORMAL);
 	ContextMenu.Append(effectsMenuI);
-	editNameMenuI = new wxMenuItem((&ContextMenu), idMenuModName, _("Modifier le nom de l\'objet"), wxEmptyString, wxITEM_NORMAL);
+	editNameMenuI = new wxMenuItem((&ContextMenu), idMenuModName, _("Change the name of the object"), wxEmptyString, wxITEM_NORMAL);
 	editNameMenuI->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	ContextMenu.Append(editNameMenuI);
 	ContextMenu.AppendSeparator();
-	addObjMenuI = new wxMenuItem((&ContextMenu), idMenuAddObj, _("Ajouter un objet"), wxEmptyString, wxITEM_NORMAL);
+	addObjMenuI = new wxMenuItem((&ContextMenu), idMenuAddObj, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
 	addObjMenuI->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	ContextMenu.Append(addObjMenuI);
-	delObjMenuI = new wxMenuItem((&ContextMenu), idMenuDelObj, _("Supprimer l\'objet\tDel"), wxEmptyString, wxITEM_NORMAL);
+	delObjMenuI = new wxMenuItem((&ContextMenu), idMenuDelObj, _("Delete the object\tDel"), wxEmptyString, wxITEM_NORMAL);
 	delObjMenuI->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	ContextMenu.Append(delObjMenuI);
 	ContextMenu.AppendSeparator();
-	moveUpMenuI = new wxMenuItem((&ContextMenu), idMoveUp, _("Déplacer vers le haut\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
+	moveUpMenuI = new wxMenuItem((&ContextMenu), idMoveUp, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
 	moveUpMenuI->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
 	ContextMenu.Append(moveUpMenuI);
-	moveDownMenuI = new wxMenuItem((&ContextMenu), idMoveDown, _("Déplacer vers le bas\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
+	moveDownMenuI = new wxMenuItem((&ContextMenu), idMoveDown, _("Move up\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
 	moveDownMenuI->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
 	ContextMenu.Append(moveDownMenuI);
 	ContextMenu.AppendSeparator();
-	copyMenuI = new wxMenuItem((&ContextMenu), idMenuCopy, _("Copier\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
+	copyMenuI = new wxMenuItem((&ContextMenu), idMenuCopy, _("Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
 	copyMenuI->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	ContextMenu.Append(copyMenuI);
-	cutMenuI = new wxMenuItem((&ContextMenu), idMenuCut, _("Couper\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
+	cutMenuI = new wxMenuItem((&ContextMenu), idMenuCut, _("Cut\tCtrl+X"), wxEmptyString, wxITEM_NORMAL);
 	cutMenuI->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
 	ContextMenu.Append(cutMenuI);
-	pasteMenuI = new wxMenuItem((&ContextMenu), idMenuPaste, _("Coller\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
+	pasteMenuI = new wxMenuItem((&ContextMenu), idMenuPaste, _("Paste\tCtrl+V"), wxEmptyString, wxITEM_NORMAL);
 	pasteMenuI->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	ContextMenu.Append(pasteMenuI);
-	MenuItem1 = new wxMenuItem((&rootContextMenu), ID_MENUITEM4, _("Ajouter un objet"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem1 = new wxMenuItem((&rootContextMenu), ID_MENUITEM4, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	rootContextMenu.Append(MenuItem1);
 	rootContextMenu.AppendSeparator();
-	MenuItem3 = new wxMenuItem((&rootContextMenu), ID_MENUITEM6, _("Coller\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem3 = new wxMenuItem((&rootContextMenu), ID_MENUITEM6, _("Paste\tCtrl+V"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	rootContextMenu.Append(MenuItem3);
-	MenuItem2 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Supprimer les objets\tDEL"), _("Supprimer tous les objets selectionnés"), wxITEM_NORMAL);
+	MenuItem2 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Delete objects"), _("Delete all selected objects"), wxITEM_NORMAL);
 	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	multipleContextMenu.Append(MenuItem2);
 	FlexGridSizer1->Fit(this);
@@ -250,31 +250,31 @@ void EditorObjectList::CreateRibbonPage(wxRibbonPage * page)
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Liste d'objets"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objects list"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Ajouter un objet") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Supprimer") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Déplacer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Déplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonRefresh, !hideLabels ? _("Rafraichir") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add an object") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonRefresh, !hideLabels ? _("Refresh") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objet sélectionné"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selected object"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonModProp, !hideLabels ? _("Edition") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonModName, !hideLabels ? _("Editer le nom") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonModName, !hideLabels ? _("Edit the name") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Presse papiers"), wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Clipboard"), wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copier") : "", wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonCut, !hideLabels ? _("Couper") : "", wxBitmap("res/cut24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Coller") : "", wxBitmap("res/paste24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonCopy, !hideLabels ? _("Copy") : "", wxBitmap("res/copy24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonCut, !hideLabels ? _("Cut") : "", wxBitmap("res/cut24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonPaste, !hideLabels ? _("Paste") : "", wxBitmap("res/paste24.png", wxBITMAP_TYPE_ANY));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
     }
 
 }
@@ -394,7 +394,7 @@ void EditorObjectList::Refresh()
     objectsImagesList->RemoveAll();
     objectsImagesList->Add(gd::CommonBitmapManager::GetInstance()->objects24);
 
-    objectsList->AddRoot( _( "Tous les objets" ), 0 );
+    objectsList->AddRoot( _( "All objects" ), 0 );
 
     for ( unsigned int i = 0;i < objects.GetObjectsCount();i++ )
     {
@@ -494,7 +494,7 @@ void EditorObjectList::OneditNameMenuISelected(wxCommandEvent& event)
     if ( item.IsOk() && item != objectsList->GetRootItem() )
         objectsList->EditLabel( item );
     else
-        wxLogStatus( _( "Aucun objet sélectionné" ) );
+        wxLogStatus( _( "No object selected" ) );
 }
 
 ////////////////////////////////////////////////////////////
@@ -506,14 +506,14 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     if ( chooseTypeDialog.ShowModal() == 0 )
         return;
 
-    std::string name = ToString(_("NouvelObjet"));
+    std::string name = ToString(_("NewObject"));
 
     //Tant qu'un objet avec le même nom existe, on ajoute un chiffre
     unsigned int i = 0;
     while ( objects.HasObjectNamed(name) )
     {
         ++i;
-        name =  _("NouvelObjet")+ToString(i);
+        name =  _("NewObject")+ToString(i);
     }
 
     //Add a new object of selected type to objects list
@@ -538,7 +538,7 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
 
     objectsList->EditLabel(itemAdded);
 
-    wxLogStatus( _( "L'objet a été correctement ajouté" ) );
+    wxLogStatus( _( "The object was correctly added" ) );
 }
 
 ////////////////////////////////////////////////////////////
@@ -550,9 +550,9 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
     objectsList->GetSelections(selection);
     std::vector < string > objectsDeleted;
 
-    int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Supprimer également toutes les références à l'objet dans les groupes et les évènements ( Soit les actions et conditions utilisant l'objet ) ?") :
-                                                             wxString::Format(_("Supprimer également toutes les références aux %i objets dans les groupes et les évènements ( Soit les actions et conditions utilisant l'objet ) ?"), selection.GetCount()),
-                              _("Confirmation de la suppression"), wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT);
+    int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Delete also all references to the object in groups and events ( i.e. Actions and conditions using the object )\?") :
+                                                             wxString::Format(_("Delete also all references to these %i objects in groups and events ( i.e. Actions and conditions using the objects )\?"), selection.GetCount()),
+                              _("Confirm deletion"), wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT);
 
     if ( answer == wxCANCEL ) return;
 
@@ -607,7 +607,7 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OnobjectsListBeginLabelEdit(wxTreeEvent& event)
 {
-    if ( objectsList->GetItemText( event.GetItem() ) != _( "Tous les objets" ) )
+    if ( objectsList->GetItemText( event.GetItem() ) != _( "All objects" ) )
     {
         ancienNom = objectsList->GetItemText( event.GetItem() );
         return;
@@ -626,7 +626,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     //Be sure there is not already another object with this name
     if ( objects.HasObjectNamed(newName) )
     {
-        wxLogWarning( _( "Impossible de renommer l'objet : un autre objet porte déjà ce nom." ) );
+        wxLogWarning( _( "Unable to rename the object : another object has already this name." ) );
 
         event.Veto();
         return;
@@ -635,7 +635,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     //Be sure the name is valid
     if ( !game.ValidateObjectName(newName) )
     {
-        wxRichToolTip tip(_("Nom invalide"), game.GetBadObjectNameWarning());
+        wxRichToolTip tip(_("Invalid name"), game.GetBadObjectNameWarning());
         tip.SetIcon(wxICON_INFORMATION);
         tip.ShowFor(this);
 
@@ -673,7 +673,7 @@ void EditorObjectList::OnCopySelected(wxCommandEvent& event)
 {
     if ( !objects.HasObjectNamed(ToString(objectsList->GetItemText( item ))) )
     {
-        wxLogWarning(_("Impossible de trouver l'objet à copier"));
+        wxLogWarning(_("Unable to find the object to copy"));
         return;
     }
 
@@ -691,7 +691,7 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
     std::string name = ToString(objectsList->GetItemText( item ));
     if ( !objects.HasObjectNamed(name) )
     {
-        wxLogWarning(_("Impossible de trouver l'objet à couper"));
+        wxLogWarning(_("Unable to find the object to cut"));
         return;
     }
 
@@ -716,7 +716,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
 
     if ( !clipboard->HasObject() )
     {
-        wxLogWarning(_("Pas d'objet à coller."));
+        wxLogWarning(_("No object to paste"));
         return;
     }
 
@@ -729,7 +729,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
     unsigned int i = 2;
     while ( objects.HasObjectNamed(ToString(name)) )
     {
-        name =  _( "CopieDe" ) + object->GetName()+ToString(i);
+        name =  _( "CopyOf" ) + object->GetName()+ToString(i);
         i++;
     }
 
@@ -755,7 +755,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
         item = objectsList->GetPrevSibling(item);
     }
 
-    wxLogStatus( _( "L'objet a été correctement ajouté" ) );
+    wxLogStatus( _( "The object was correctly added" ) );
 }
 
 ////////////////////////////////////////////////////////////
@@ -768,7 +768,7 @@ void EditorObjectList::OnMoveUpSelected(wxCommandEvent& event)
 
     if ( index >= objects.GetObjectsCount() )
     {
-        wxLogStatus( _( "L'objet à déplacer n'a pas été trouvé." ) );
+        wxLogStatus( _( "The object to move was not found." ) );
         return;
     }
 
@@ -803,7 +803,7 @@ void EditorObjectList::OnMoveDownSelected(wxCommandEvent& event)
 
     if ( index >= objects.GetObjectsCount() )
     {
-        wxLogStatus( _( "L'objet à déplacer n'a pas été trouvé." ) );
+        wxLogStatus( _( "The object to move was not found." ) );
         return;
     }
 
@@ -859,7 +859,7 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
     std::string name = ToString( objectsList->GetItemText( item ));
     if ( !objects.HasObjectNamed(name) )
     {
-        wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
+        wxLogStatus( _( "Can't find the object to edit" ) );
         return;
     }
 
@@ -876,7 +876,7 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
     std::string name = ToString( objectsList->GetItemText( item ));
     if ( !objects.HasObjectNamed(name) )
     {
-        wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
+        wxLogStatus( _( "Can't find the object to edit" ) );
         return;
     }
 
@@ -910,7 +910,7 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
     std::string name = ToString( objectsList->GetItemText( item ));
     if ( !objects.HasObjectNamed(name) )
     {
-        wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
+        wxLogStatus( _( "Can't find the object to edit" ) );
         return;
     }
 
@@ -922,7 +922,7 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
     for (unsigned int i = 0;i<automatisms.size();++i)
         automatismsStr.Add(objects.GetObject(name).GetAutomatism(automatisms[i]).GetName());
 
-    int selection = wxGetSingleChoiceIndex(_("Choisissez l'automatisme à supprimer"), _("Choisir l'automatisme à supprimer"), automatismsStr);
+    int selection = wxGetSingleChoiceIndex(_("Choose the automatism to delete"), _("Choose the automatism to delete"), automatismsStr);
     if ( selection == -1 ) return;
 
     objects.GetObject(name).RemoveAutomatism(automatisms[selection]);
@@ -938,7 +938,7 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
     std::string name = ToString( objectsList->GetItemText( item ));
     if ( !objects.HasObjectNamed(name) )
     {
-        wxLogStatus( _( "L'objet à éditer n'a pas été trouvé." ) );
+        wxLogStatus( _( "Can't find the object to edit" ) );
         return;
     }
 
@@ -950,7 +950,7 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
     for (unsigned int i = 0;i<automatisms.size();++i)
         automatismsStr.Add(objects.GetObject(name).GetAutomatism(automatisms[i]).GetName());
 
-    int selection = wxGetSingleChoiceIndex(_("Choisissez l'automatisme à renommer"), _("Choisir l'automatisme à renommer"), automatismsStr);
+    int selection = wxGetSingleChoiceIndex(_("Choose the automatism to rename"), _("Choose the automatism to rename"), automatismsStr);
     if ( selection == -1 ) return;
 
     gd::Object & object = objects.GetObject(name);
@@ -1017,7 +1017,7 @@ void EditorObjectList::OnobjectsListKeyDown(wxTreeEvent& event)
 
 void EditorObjectList::OnAideBtClick( wxCommandEvent& event )
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(10);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object")); //TODO
@@ -1027,3 +1027,4 @@ void EditorObjectList::OnsearchCtrlText(wxCommandEvent& event)
 {
     Refresh();
 }
+

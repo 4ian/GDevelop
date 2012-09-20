@@ -49,3 +49,4 @@ private:
 };
 
 #endif // CONSOLEMANAGER_H
+

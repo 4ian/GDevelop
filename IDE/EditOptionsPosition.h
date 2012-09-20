@@ -107,3 +107,4 @@ class EditOptionsPosition: public wxDialog
 };
 
 #endif
+

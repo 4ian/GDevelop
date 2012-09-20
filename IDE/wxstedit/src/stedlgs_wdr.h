@@ -193,3 +193,4 @@ wxBitmap wxSTEBitmapsFunc( size_t index );
 #endif
 
 // End of generated file
+

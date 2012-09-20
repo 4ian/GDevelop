@@ -12,3 +12,4 @@ SceneCanvasPreviewData::SceneCanvasPreviewData(SceneCanvas & parent, RuntimeGame
 {
 
 }
+

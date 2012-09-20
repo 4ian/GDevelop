@@ -23,3 +23,4 @@ private:
 };
 
 #endif // SCENECANVASPREVIEWDATA_H
+

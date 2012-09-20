@@ -128,3 +128,4 @@ class DebuggerGUI: public wxPanel, public BaseDebugger
 };
 
 #endif
+

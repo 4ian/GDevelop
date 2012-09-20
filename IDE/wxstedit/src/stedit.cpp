@@ -2209,8 +2209,8 @@ bool wxSTEditor::LoadInputStream(wxInputStream& stream,
 
                 if (unicode && (flags == STE_LOAD_QUERY_UNICODE))
                 {
-                    int ret = wxMessageBox(_("Unicode text file. Convert to Ansi text?"),
-                                           _("Load Unicode?"),
+                    int ret = wxMessageBox(_("Unicode text file. Convert to Ansi text\?"),
+                                           _("Load Unicode\?"),
                                            wxYES_NO | wxCANCEL | wxCENTRE | wxICON_QUESTION,
                                            parent);
                     switch (ret)
@@ -2489,7 +2489,7 @@ int wxSTEditor::QuerySaveIfModified(bool save_file, int style)
     bool sendEvents = m_sendEvents;
     m_sendEvents = false; // block focus when dialog closes
 
-    int ret = wxMessageBox(GetFileName()+_("\nHas unsaved changes.\nWould you like to save your file before closing?"),
+    int ret = wxMessageBox(GetFileName()+_("\nHas unsaved changes.\nWould you like to save your file before closing\?"),
                            _("Unsaved changes"),
                            style|wxCENTRE|wxICON_QUESTION, this);
 
@@ -2538,7 +2538,7 @@ bool wxSTEditor::IsAlteredOnDisk(bool show_reload_dialog)
 
     if (altered && show_reload_dialog)
     {
-        int ret = wxMessageBox( _("The file '")+GetFileName()+_("' has been modified externally.\nWould you like to reload the file?"),
+        int ret = wxMessageBox( _("The file '")+GetFileName()+_("' has been modified externally.\nWould you like to reload the file\?"),
                                 _("File changed on disk"),
                                 wxYES_NO | wxICON_QUESTION, this);
         if (ret == wxYES)
@@ -3597,7 +3597,7 @@ bool wxSTEditor::ShowPrintDialog()
     {
         if (wxPrinter::GetLastError() == wxPRINTER_ERROR)
         {
-            wxMessageBox( _("A print error occurred, perhaps your printer is not correctly setup?"),
+            wxMessageBox( _("A print error occurred, perhaps your printer is not correctly setup\?"),
                           _("Print error"), wxOK|wxICON_ERROR, this);
             return false;
         }
@@ -3634,7 +3634,7 @@ bool wxSTEditor::ShowPrintPreviewDialog()
     {
         delete preview;
 
-        wxMessageBox(_("A print error occurred, perhaps your printer is not correctly setup?"),
+        wxMessageBox(_("A print error occurred, perhaps your printer is not correctly setup\?"),
                      _("Print preview error"), wxOK|wxICON_ERROR, this);
         return false;
     }
@@ -4069,9 +4069,6 @@ wxString stc2wx(const char* str, size_t len)
     size_t actualLen = UTF16FromUTF8(str, len, buffer.data(), wclen+1);
     return wxString(buffer.data(), actualLen);
 }
-
-
-
 wxString stc2wx(const char* str)
 {
     return stc2wx(str, strlen(str));
@@ -4092,3 +4089,4 @@ const wxWX2MBbuf wx2stc(const wxString& str)
     return buffer;
 }
 #endif
+

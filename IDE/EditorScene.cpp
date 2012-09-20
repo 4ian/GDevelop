@@ -101,8 +101,8 @@ mainFrameWrapper(mainFrameWrapper_)
 	eventsPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(eventsPanel);
 	FlexGridSizer3->SetSizeHints(eventsPanel);
-	notebook->AddPage(scenePanel, _("Scène"), false, wxBitmap(wxImage(_T("res/sceneeditor.png"))));
-	notebook->AddPage(eventsPanel, _("Evènements"), false, wxBitmap(wxImage(_T("res/events16.png"))));
+	notebook->AddPage(scenePanel, _("Scene"), false, wxBitmap(wxImage(_T("res/sceneeditor.png"))));
+	notebook->AddPage(eventsPanel, _("Events"), false, wxBitmap(wxImage(_T("res/events16.png"))));
 	FlexGridSizer1->Add(notebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
@@ -136,12 +136,12 @@ mainFrameWrapper(mainFrameWrapper_)
     eventsEditor->SetAssociatedSceneCanvas(sceneCanvas);
 
     //Display editors in panes
-    m_mgr.AddPane( notebook, wxAuiPaneInfo().Name( wxT( "ESCenter" ) ).PaneBorder(false).Center().CloseButton( false ).Caption( _( "Editeur de scène" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
-    m_mgr.AddPane( sceneCanvas->GetOwnedObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Editeur d'objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-    m_mgr.AddPane( sceneCanvas->GetOwnedLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Float().CloseButton( true ).Caption( _( "Editeur de calques" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+    m_mgr.AddPane( notebook, wxAuiPaneInfo().Name( wxT( "ESCenter" ) ).PaneBorder(false).Center().CloseButton( false ).Caption( _( "Scene's editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
+    m_mgr.AddPane( sceneCanvas->GetOwnedObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+    m_mgr.AddPane( sceneCanvas->GetOwnedLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Float().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
     m_mgr.AddPane( sceneCanvas->GetOwnedDebugger().get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-    m_mgr.AddPane( sceneCanvas->GetOwnedInitialPositionBrowser().get(), wxAuiPaneInfo().Name( wxT( "IPB" ) ).Float().CloseButton( true ).Caption( _( "Positions initiales des objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-    m_mgr.AddPane( sceneCanvas->GetOwnedProfileDialog().get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Performances" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );
+    m_mgr.AddPane( sceneCanvas->GetOwnedInitialPositionBrowser().get(), wxAuiPaneInfo().Name( wxT( "IPB" ) ).Float().CloseButton( true ).Caption( _( "Initial positions of objects" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+    m_mgr.AddPane( sceneCanvas->GetOwnedProfileDialog().get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Profiling" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );
 
     //Load preferences
     {
@@ -167,9 +167,6 @@ mainFrameWrapper(mainFrameWrapper_)
 
     m_mgr.Update();
 }
-
-
-
 void EditorScene::OnscenePanelResize(wxSizeEvent& event)
 {
     //Manual resizing of scene's panel
@@ -216,13 +213,13 @@ void EditorScene::OnScrollBar1Scroll(wxScrollEvent& event)
 
 void EditorScene::ForceRefreshRibbonAndConnect()
 {
-    if ( notebook->GetPageText(notebook->GetSelection()) == _("Scène") )
+    if ( notebook->GetPageText(notebook->GetSelection()) == _("Scene") )
     {
         sceneCanvas->CreateToolsBar(mainFrameWrapper.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
         mainFrameWrapper.GetRibbon()->SetActivePage(2);
         sceneCanvas->ConnectEvents();
     }
-    else if ( notebook->GetPageText(notebook->GetSelection()) == _("Evènements") )
+    else if ( notebook->GetPageText(notebook->GetSelection()) == _("Events") )
     {
         mainFrameWrapper.GetRibbon()->SetActivePage(3);
         eventsEditor->ConnectEvents();
@@ -253,3 +250,4 @@ void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
     mainFrameWrapper.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();
 }
+

@@ -63,3 +63,4 @@ class BuildProgressPnl: public wxPanel
 };
 
 #endif
+

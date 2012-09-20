@@ -49,7 +49,7 @@ mp3ogg::mp3ogg(wxWindow* parent)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
-	Create(parent, wxID_ANY, _("Convertir Mp3 vers OGG Vorbis"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Convert MP3 to OGG Vorbis"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17->AddGrowableCol(0);
@@ -58,7 +58,7 @@ mp3ogg::mp3ogg(wxWindow* parent)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/mp3ogg.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Game Develop ne pouvant lire le format MP3 ( license et\nalgorithmes brevetés par Fraunhofer-Gesellschaft ), vous pouvez \nconvertir une musique MP3 au format libre OGG Vorbis ou WAV."), wxDefaultPosition, wxSize(336,54), wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Game Develop can not read the MP3 format ( owing to license\nand algorithms patented by Fraunhofer-Gesellschaft ), you can\nconvert a MP3 file to the free OGG Vobris format or WAV."), wxDefaultPosition, wxSize(336,54), wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
@@ -69,24 +69,24 @@ mp3ogg::mp3ogg(wxWindow* parent)
 	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Conversion"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Le fichier MP3 est une musique, ou est destiné à être joué en tant\nque musique :"), wxDefaultPosition, wxSize(317,36), 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("A MP3 file is a music, or is meant to be played as a music :"), wxDefaultPosition, wxSize(317,36), 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer3->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	EncoderBt = new wxButton(this, ID_BUTTON1, _("Choisir un fichier MP3 et l\'encoder en OGG Vorbis"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	EncoderBt = new wxButton(this, ID_BUTTON1, _("Choose a MP3 file and encode in OGG Vorbis"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer3->Add(EncoderBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Le fichier WAV est un son, un bruitage, ou est destiné à être joué en\ntant que son :"), wxDefaultPosition, wxSize(331,35), 0, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("A WAV file is a sound, an effect, or is meant to be played as a sound :"), wxDefaultPosition, wxSize(331,35), 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer3->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	EncoderWAVBt = new wxButton(this, ID_BUTTON3, _("Choisir un fichier MP3 et l\'encoder en WAV"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	EncoderWAVBt = new wxButton(this, ID_BUTTON3, _("Choose a MP3 file and encode in WAV"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer3->Add(EncoderWAVBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2->Add(FlexGridSizer3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Note"));
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Cet utilitaire fait appel à LAME.EXE ( De/encodeur MP3 libre )\net à OGGENC.EXE ( Encodeur OGG Vorbis libre ).\nIls sont inclus dans le répertoire de Game Develop à l\'installation."), wxDefaultPosition, wxSize(331,61), 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("This utility uses lame.exe ( free MP3 Encoder )\nand OGGENC.EXE (free OGG Vorbis Encoder ).\nThese latter are included in the Game Develop directory."), wxDefaultPosition, wxSize(331,61), 0, _T("ID_STATICTEXT2"));
 	StaticBoxSizer1->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
-	FermerBt = new wxButton(this, ID_BUTTON2, _("Fermer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	FermerBt = new wxButton(this, ID_BUTTON2, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer2->Add(FermerBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -100,7 +100,7 @@ mp3ogg::mp3ogg(wxWindow* parent)
 
 	if ( !wxFileExists("oggenc.exe") || !wxFileExists("lame.exe") )
 	{
-	    StaticText2->SetLabel(_("Cet utilitaire fait appel à LAME.EXE ( De/encodeur MP3 libre )\net à OGGENC.EXE ( Encodeur OGG Vorbis libre ).\nCes derniers n'ont pas été détectés dans le répertoire\nde Game Develop. Téléchargez les, ou utilisez l'installateur\n de Game Develop."));
+	    StaticText2->SetLabel(_("This utility uses lame.exe ( free MP3 Encoder )\nand OGGENC.EXE (free OGG Vorbis Encoder ).\nThese latter were not detected in\nGame Develop directory. Download them or use the installer\nof Game Develop."));
 	    StaticText2->Layout();
 	    Layout();
 	}
@@ -126,7 +126,7 @@ void mp3ogg::OnFermerBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void mp3ogg::OnEncoderBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Choisissez le fichier MP3 à encoder en OGG Vorbis"), "", "", "Fichier audio MP3 ( *.mp3)|*.mp3");
+    wxFileDialog dialog(this, _("Choose the MP3 file to encode in OGG Vorbis"), "", "", "Fichier audio MP3 ( *.mp3)|*.mp3");
     dialog.ShowModal();
 
     string originalFile = ToString( dialog.GetPath() );
@@ -143,7 +143,7 @@ void mp3ogg::OnEncoderBtClick(wxCommandEvent& event)
     filename.SetExt("ogg");
     wxRenameFile(originalFile+".ogg", filename.GetFullPath());
 
-    wxLogMessage(_("L'encodage est terminé. Le fichier OGG se trouve dans le même répertoire que le fichier MP3."));
+    wxLogMessage(_("The encoding is finished. The OGG  file is located in the same directory as the MP3 file."));
 
 }
 
@@ -154,7 +154,7 @@ void mp3ogg::OnEncoderBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void mp3ogg::OnEncoderWAVBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Choisissez le fichier MP3 à encoder en OGG Vorbis"), "", "", "Fichier audio MP3 ( *.mp3)|*.mp3");
+    wxFileDialog dialog(this, _("Choose the MP3 file to encode in OGG Vorbis"), "", "", "Fichier audio MP3 ( *.mp3)|*.mp3");
     dialog.ShowModal();
 
     string rep = static_cast<string> ( dialog.GetPath() );
@@ -167,5 +167,6 @@ void mp3ogg::OnEncoderWAVBtClick(wxCommandEvent& event)
     filename.SetExt("wav");
     wxRenameFile(rep+".wav", filename.GetFullPath());
 
-    wxLogMessage(_("L'encodage est terminé. Le fichier WAV se trouve dans le même répertoire que le fichier MP3."));
+    wxLogMessage(_("The encoding is finished. The WAV file is located in the same directory as the MP3 file."));
 }
+

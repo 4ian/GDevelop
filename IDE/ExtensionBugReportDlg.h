@@ -65,3 +65,4 @@ class ExtensionBugReportDlg: public wxDialog
 };
 
 #endif
+

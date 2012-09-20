@@ -27,3 +27,4 @@ private:
 };
 
 #endif // RECENTLIST_H_INCLUDED
+

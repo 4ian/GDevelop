@@ -195,9 +195,6 @@ public:
 private:
     int m_last_id;
 };
-
-
-
 GDAuiTabArt::GDAuiTabArt()
 {
     m_normal_font = *wxNORMAL_FONT;
@@ -864,3 +861,4 @@ void GDAuiTabArt::SetMeasuringFont(const wxFont& font)
 {
     m_measuring_font = font;
 }
+

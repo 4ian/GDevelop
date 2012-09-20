@@ -49,3 +49,4 @@ class TrueOrFalse: public wxDialog
 };
 
 #endif
+

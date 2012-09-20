@@ -126,3 +126,4 @@ void wxSFMLCanvas::OnMiddleDown(wxMouseEvent &event) {}
 void wxSFMLCanvas::OnMiddleUp(wxMouseEvent &event) {}
 void wxSFMLCanvas::OnAnyMouseEvent(wxMouseEvent & event) {}
 void wxSFMLCanvas::OnMouseWheel(wxMouseEvent& event) {}
+

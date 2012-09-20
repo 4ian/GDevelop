@@ -32,3 +32,4 @@ class SplashScreen : public wxFrame
 };
 
 #endif // SPLASHSCREEN_H
+

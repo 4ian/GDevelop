@@ -13,7 +13,8 @@
 //*)
 #include <wx/help.h>
 #include <wx/fs_zip.h>
-#include <wx/config.h>#include <wx/log.h>
+#include <wx/config.h>
+#include <wx/log.h>
 #include <wx/mimetype.h> // mimetype support
 #include <string>
 #include <vector>
@@ -78,7 +79,7 @@ Demarrage::Demarrage(wxWindow* parent)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
 
-	Create(parent, wxID_ANY, _("Premier démarrage de Game Develop"), wxDefaultPosition, wxDefaultSize, wxCAPTION|wxSYSTEM_MENU, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("First startup of Game Develop"), wxDefaultPosition, wxDefaultSize, wxCAPTION|wxSYSTEM_MENU, _T("wxID_ANY"));
 	SetClientSize(wxSize(662,325));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	Panel4 = new wxPanel(this, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL4"));
@@ -103,15 +104,15 @@ Demarrage::Demarrage(wxWindow* parent)
 	FlexGridSizer7->AddGrowableCol(0);
 	FlexGridSizer7->AddGrowableRow(0);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticText6 = new wxStaticText(Panel1, ID_STATICTEXT6, _("Cet écran s\'affiche au premier démarrage"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	StaticText6 = new wxStaticText(Panel1, ID_STATICTEXT6, _("This window is displayed at first startup"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	wxFont StaticText6Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText6->SetFont(StaticText6Font);
 	FlexGridSizer5->Add(StaticText6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("Game Develop permet la création de jeux de façon simple et rapide,\npour le développeur débutant ou confirmé."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("Game Develop allows easy and fast game creation,\nfor beginners and advanced users."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("Vous allez pouvoir régler quelques paramétrages et accéder aux\nconseils pour démarrer au mieux avec Game Develop.\n\nCliquez sur suivant pour continuer."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("You can setup some parameters and read\nsome advices to get started with Game Develop.\n\nClick on Next to continue."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer5->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBitmap2 = new wxStaticBitmap(Panel1, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/presentation.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP2"));
@@ -120,11 +121,11 @@ Demarrage::Demarrage(wxWindow* parent)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer6->AddGrowableCol(0);
 	FlexGridSizer6->AddGrowableRow(0);
-	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Game Develop est un freeware.  Si vous l\'avez payé autrement que par un don\nà l\'auteur, nous vous recommandons d\'obtenir un remboursement."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Game Develop is a freeware. If you paid for it ( other than by a donation to the author )\nthen we recommend that you get a refund !"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	wxFont StaticText3Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText3->SetFont(StaticText3Font);
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	Button1 = new wxButton(Panel1, ID_BUTTON6, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+	Button1 = new wxButton(Panel1, ID_BUTTON6, _("Next"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
 	FlexGridSizer6->Add(Button1, 1, wxALL|wxALIGN_LEFT|wxALIGN_BOTTOM, 5);
 	FlexGridSizer2->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel1->SetSizer(FlexGridSizer2);
@@ -137,16 +138,16 @@ Demarrage::Demarrage(wxWindow* parent)
 	FlexGridSizer9 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer9->AddGrowableCol(1);
 	FlexGridSizer10 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticText1 = new wxStaticText(Panel2, ID_STATICTEXT1, _("Game Develop vérifie par défaut au démarrage si de nouvelles mises à jour sont\ndisponibles. Si vous possédez un pare feu, il est possible que celui ci  vous demande\nsi le logiciel peut accéder à internet. Dans ce cas, répondez par l\'affirmative."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel2, ID_STATICTEXT1, _("Game Develop checks by default at startup if new updates are\navailable. If you have a firewall, it is possible that it will ask\nif the software can access the internet. In this case, answer by yes."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer10->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	majCheck = new wxCheckBox(Panel2, ID_CHECKBOX1, _("Vérifier les mises à jour au démarrage"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	majCheck = new wxCheckBox(Panel2, ID_CHECKBOX1, _("Check for updates at startup"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	majCheck->SetValue(true);
 	FlexGridSizer10->Add(majCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel2, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/maj.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP3"));
 	FlexGridSizer9->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer8->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Button2 = new wxButton(Panel2, ID_BUTTON7, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
+	Button2 = new wxButton(Panel2, ID_BUTTON7, _("Next"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
 	FlexGridSizer8->Add(Button2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
 	Panel2->SetSizer(FlexGridSizer8);
 	FlexGridSizer8->Fit(Panel2);
@@ -158,49 +159,49 @@ Demarrage::Demarrage(wxWindow* parent)
 	FlexGridSizer11 = new wxFlexGridSizer(0, 2, 0, 0);
 	StaticBitmap4 = new wxStaticBitmap(Panel3, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/modesimpleicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP4"));
 	FlexGridSizer11->Add(StaticBitmap4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl1 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL1, _("Pour commencer, lisez le guide de démarrage qui explique les principaux concepts."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	HyperlinkCtrl1 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL1, _("To get started with Game Develop, read the \"Getting started manual\",\navailable in Help."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	FlexGridSizer11->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText4 = new wxStaticText(Panel3, ID_STATICTEXT4, _("Vous pouvez ensuite :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(Panel3, ID_STATICTEXT4, _("You can then:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer3->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer13 = new wxFlexGridSizer(0, 2, 0, 0);
 	StaticBitmap5 = new wxStaticBitmap(Panel3, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/tutoicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
 	FlexGridSizer13->Add(StaticBitmap5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
-	HyperlinkCtrl2 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL2, _("Lire le tutoriel"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
+	HyperlinkCtrl2 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL2, _("Read the tutorial"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	FlexGridSizer12->Add(HyperlinkCtrl2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	secondTutoLink = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL17, _("(-Insert the name of the second tutorial or a blank text-)"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL17"));
+	secondTutoLink = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL17, _("( Spanish tutorial also available )"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL17"));
 	FlexGridSizer12->Add(secondTutoLink, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer13->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBitmap11 = new wxStaticBitmap(Panel3, ID_STATICBITMAP11, wxBitmap(wxImage(_T("res/openicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP11"));
 	FlexGridSizer13->Add(StaticBitmap11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl8 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL8, _("Ouvrir les exemples"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL8"));
+	HyperlinkCtrl8 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL8, _("Open examples"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL8"));
 	FlexGridSizer13->Add(HyperlinkCtrl8, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap12 = new wxStaticBitmap(Panel3, ID_STATICBITMAP12, wxBitmap(wxImage(_T("res/wikiicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP12"));
 	FlexGridSizer13->Add(StaticBitmap12, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl9 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL9, _("Accéder au wiki ( Base d\'articles et de connaissance )"), _("http://www.wiki.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL9"));
+	HyperlinkCtrl9 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL9, _("Access to wiki ( Knowledge base )"), _("http://www.wiki.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL9"));
 	FlexGridSizer13->Add(HyperlinkCtrl9, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap13 = new wxStaticBitmap(Panel3, ID_STATICBITMAP13, wxBitmap(wxImage(_T("res/community.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP13"));
 	FlexGridSizer13->Add(StaticBitmap13, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl10 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL10, _("Accéder au forum"), _("http://www.forum.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL10"));
+	HyperlinkCtrl10 = new wxHyperlinkCtrl(Panel3, ID_HYPERLINKCTRL10, _("Access to forum"), _("http://www.forum.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL10"));
 	FlexGridSizer13->Add(HyperlinkCtrl10, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer14 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer14->AddGrowableCol(1);
 	FlexGridSizer14->AddGrowableRow(0);
-	StaticText7 = new wxStaticText(Panel3, ID_STATICTEXT7, _("Vous pouvez aussi accéder à ces liens depuis la page qui s\'affiche\nau démarrage de Game Develop."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	StaticText7 = new wxStaticText(Panel3, ID_STATICTEXT7, _("You can also access to this links from the Start Page which is\ndisplayed when Game Develop is launched."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	wxFont StaticText7Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText7->SetFont(StaticText7Font);
 	FlexGridSizer14->Add(StaticText7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FermerBt = new wxButton(Panel3, ID_BUTTON4, _("Fermer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	FermerBt = new wxButton(Panel3, ID_BUTTON4, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer14->Add(FermerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
 	FlexGridSizer3->Add(FlexGridSizer14, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel3->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(Panel3);
 	FlexGridSizer3->SetSizeHints(Panel3);
-	Notebook1->AddPage(Panel1, _("Bienvenue"), false);
-	Notebook1->AddPage(Panel2, _("Paramétrage"), false);
-	Notebook1->AddPage(Panel3, _("Débuter avec Game Develop"), false);
+	Notebook1->AddPage(Panel1, _("Welcome"), false);
+	Notebook1->AddPage(Panel2, _("Setup"), false);
+	Notebook1->AddPage(Panel3, _("Getting started with Game Develop"), false);
 	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	SetSizer(FlexGridSizer1);
 	SetSizer(FlexGridSizer1);
@@ -216,7 +217,7 @@ Demarrage::Demarrage(wxWindow* parent)
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Demarrage::OnFermerBtClick);
 	//*)
 
-    if ( _("(-Insert the name of the second tutorial or a blank text-)") == "(-Insert the name of the second tutorial or a blank text-)" )
+    if ( _("( Spanish tutorial also available )") == "(-Insert the name of the second tutorial or a blank text-)" )
         secondTutoLink->SetLabel("");
 }
 
@@ -228,7 +229,7 @@ Demarrage::~Demarrage()
 
 void Demarrage::OnGuideBtClick(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(16);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_getstart"));
@@ -284,7 +285,7 @@ void Demarrage::OnFermerBtClick(wxCommandEvent& event)
 
 void Demarrage::OnTutorielBtClick(wxCommandEvent& event)
 {
-    wxString link = wxGetCwd() + "/Tutorial/"+_("Tutoriel.pdf");
+    wxString link = wxGetCwd() + "/Tutorial/"+_("Tutorial.pdf");
     wxString mimetype = "application/pdf";
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {
@@ -333,9 +334,9 @@ void Demarrage::OnButton2Click(wxCommandEvent& event)
 
 void Demarrage::OnsecondTutoLinkClick(wxCommandEvent& event)
 {
-    if ( _("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)") == "" ) return;
+    if ( _("Spanish Tutorial.pdf") == "" ) return;
 
-    wxString link = wxGetCwd() + "/Tutorial/"+_("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)");
+    wxString link = wxGetCwd() + "/Tutorial/"+_("Spanish Tutorial.pdf");
     wxString mimetype = "application/pdf";
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {
@@ -347,5 +348,6 @@ void Demarrage::OnsecondTutoLinkClick(wxCommandEvent& event)
         delete filetype;
     }
     else
-        wxLogMessage(_("Impossible de lancer le tutoriel. Vous pouvez le consulter en allant dans le dossier Game Develop, puis dans le répertoire Tutoriel et en ouvrant le fichier Tutoriel.pdf"));
+        wxLogMessage(_("Unable to launch the tutorial. Tutorials can be found in the directoy called \"Tutorial\", inside Game Develop directory."));
 }
+

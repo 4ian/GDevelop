@@ -687,3 +687,4 @@ void wxSTEditorPrefs::SaveConfig( wxConfigBase &config,
 
 // global precreated wxSTEditorPrefs
 wxSTEditorPrefs  s_wxSTEditorPrefs(true);
+

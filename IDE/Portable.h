@@ -64,3 +64,4 @@ class Portable: public wxDialog
 };
 
 #endif
+

@@ -54,3 +54,4 @@ public:
 };
 
 #endif // SCENECANVASEDITIONDATA_H
+

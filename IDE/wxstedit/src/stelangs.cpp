@@ -1808,9 +1808,6 @@ static const char* STE_WordList1_STE_LANG_PLSQL =
        "trigger true type uid union unique update use user validate values varchar "
        "varchar2 variance view when whenever where while with work write year zone";
 #endif //STE_USE_LANG_PLSQL
-
-
-
 #define STE_LexerWords_STE_LANG_CONTAINER_COUNT 0
 #define DefSTE_LexerWords_STE_LANG_CONTAINER \
     STE_LexerWords* STE_LexerWords_STE_LANG_CONTAINER   = NULL;
@@ -5523,3 +5520,4 @@ void LangConfig()
 
     config->Flush();
 }
+

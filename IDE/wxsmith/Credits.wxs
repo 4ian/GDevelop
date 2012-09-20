@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="Credits">
-		<title>A propos de Game Develop</title>
+		<title>About Game Develop</title>
 		<centered>1</centered>
 		<size>271,351</size>
 		<id_arg>0</id_arg>
@@ -10,6 +10,7 @@
 			<object class="sizeritem">
 				<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="StaticBitmap1" member="yes">
 					<bitmap>res/GD-logo.png</bitmap>
+					<style>wxNO_BORDER</style>
 				</object>
 				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
@@ -42,7 +43,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-														<label>a été créé par</label>
+														<label>was created by</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -82,7 +83,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
-														<label>Support, aide, réponses aux suggestions sur</label>
+														<label>Support, assistance, answers to the suggestions on:</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -114,7 +115,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-														<label>Vous appréciez Game Develop ?</label>
+														<label>You like Game Develop?</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -122,8 +123,8 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL16" variable="HyperlinkCtrl5" member="yes">
-														<label>Aidez l&apos;auteur en faisant un don.</label>
-														<url>http://www.compilgames.net/?file=kop8.php</url>
+														<label>You can make a donation to the author.</label>
+														<url>http://www.en.compilgames.net/?file=kop8.php</url>
 														<style>wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER</style>
 													</object>
 													<flag>wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL</flag>
@@ -136,7 +137,7 @@
 										</object>
 									</object>
 								</object>
-								<label>A propos</label>
+								<label>About</label>
 							</object>
 							<object class="notebookpage">
 								<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
@@ -147,7 +148,7 @@
 										<growablerows>0</growablerows>
 										<object class="sizeritem">
 											<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="TextCtrl1" member="yes">
-												<value>·Game Develop&#x0A;&#x0A;Game Develop est un freeware, il est donc totalement gratuit.&#x0A;&#x0A;-Vous pouvez utiliser le logiciel pour n&apos;importe quelle utilisation, personnelle ou commerciale.&#x0A;-Le logiciel est livré &quot;tel quel&quot;, sans aucune garantie.&#x0A;-Vous pouvez distribuer le logiciel tant que vous ne demandez pas d&apos;argent pour, que vous ne dites pas que vous en êtes l&apos;auteur, et tant que vous distribuez le logiciel entier avec son programme d&apos;installation.&#x0A;-Vous ne devez pas tenter de décompiler le programme.&#x0A;&#x0A;·Jeux créés avec Game Develop&#x0A;&#x0A;-L&apos;auteur de Game Develop n&apos;est aucunement lié aux jeux créés avec Game Develop.&#x0A;-Vous n&apos;êtes pas obligé de mentionner l&apos;utilisation de Game Develop dans votre jeu. Une mention sera appréciée, mais n&apos;est pas obligatoire.&#x0A;&#x0A;·Si vous avez des questions&#x0A;&#x0A;Contactez l&apos;auteur : CompilGames@gmail.com&#x0A;Aller sur le site officiel : http://www.compilgames.net</value>
+												<value>·Game DevelopGame Develop is a freeware, meaning it is totally free.-You can use the software, for personal or commercial use.-The software is provided &apos;as-is&apos;, without any express or implied warranty.-You can distribute the software to anybody provided you don&apos;t require money for it, you don&apos;t claim to be the author and you distribute the entire software with its installer.-You must not try to decompile the software.·Games created with Game Develop-The author of Game Develop is not liable for games made with the software.-If you create a game with Game Develop, an acknowledgment in the game documentation would be appreciated but is not required.·If you have any questionsContact the author : CompilGames@gmail.com&#x0A;Go on our website : http://www.compilgames.net</value>
 												<size>272,51</size>
 												<style>wxTE_MULTILINE|wxTE_READONLY</style>
 											</object>
@@ -175,7 +176,7 @@
 										</object>
 									</object>
 								</object>
-								<label>Remerciements</label>
+								<label>Thanks</label>
 							</object>
 							<object class="notebookpage">
 								<object class="wxPanel" name="ID_PANEL4" variable="Panel4" member="yes">
@@ -184,7 +185,7 @@
 										<growablecols>0</growablecols>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-												<label>Programmé en C++, compilé avec TDM-GCC, avec l&apos;aide de Code::Blocks</label>
+												<label>Programmed in C++, compiled with TDM-GCC, with the help of Code:: Blocks</label>
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -238,7 +239,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
-												<label>Game Develop utilise les bibliothèques SFML, LLVM, Boost, wxWidgets et TinyXml.</label>
+												<label>Use SFML, LLVM, Boost, wxWidgets and TinyXml libraries.</label>
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -293,7 +294,7 @@
 										</object>
 									</object>
 								</object>
-								<label>Technologies utilisées</label>
+								<label>Used technologies</label>
 							</object>
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

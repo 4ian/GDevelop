@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="MAJ">
-		<title>Vérifier les mises à jour</title>
+		<title>Check for updates</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
@@ -26,7 +26,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-										<label>Game Develop peut vérifier si une nouvelle version est&#x0A;disponible. Les nouvelles versions apportent des corrections de &#x0A;bugs, ainsi que des améliorations et nouvelles fonctionnalités.</label>
+										<label>Game Develop can verify if a new version is&#x0A;available. The new versions bring bugs&apos; fixes,&#x0A;improvements and new features.</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -54,7 +54,7 @@
 					<cols>2</cols>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-							<label>Version actuelle :</label>
+							<label>Actual version :</label>
 						</object>
 						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -73,7 +73,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-							<label>Version disponible :</label>
+							<label>Available version :</label>
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -81,7 +81,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT5" variable="versionMAJTxt" member="yes">
-							<label>Aucune information disponible</label>
+							<label>No informations available</label>
 							<font>
 								<weight>bold</weight>
 							</font>
@@ -96,7 +96,7 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="infoEdit" member="yes">
-					<value>Pas d&apos;informations complémentaire à propos de la nouvelle version</value>
+					<value>No informations about the new version</value>
 					<size>365,130</size>
 					<style>wxTE_AUTO_SCROLL|wxTE_MULTILINE|wxTE_READONLY</style>
 				</object>
@@ -109,7 +109,7 @@
 					<cols>2</cols>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText5" member="yes">
-							<label>Téléchargement automatique :</label>
+							<label>Automatic download :</label>
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -117,7 +117,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON4" variable="downloadAndInstallBt" member="yes">
-							<label>Installer la nouvelle version</label>
+							<label>Install the new version</label>
 							<size>234,23</size>
 							<enabled>0</enabled>
 							<handler function="OndownloadAndInstallBtClick" entry="EVT_BUTTON" />
@@ -128,7 +128,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText3" member="yes">
-							<label>Téléchargement manuel :</label>
+							<label>Manual download :</label>
 						</object>
 						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -136,7 +136,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="linkCtrl" member="yes">
-							<label>Pas de lien</label>
+							<label>No link</label>
 							<handler function="OnLienBtClick" entry="EVT_HYPERLINK" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -159,7 +159,7 @@
 					<cols>3</cols>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="VerifMAJBt" member="yes">
-							<label>Revérifier les mises à jour</label>
+							<label>Check for updates again</label>
 							<default>1</default>
 							<handler function="OnVerifMAJBtClick" entry="EVT_BUTTON" />
 						</object>
@@ -169,7 +169,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON1" variable="FermerBt" member="yes">
-							<label>Fermer</label>
+							<label>Close</label>
 							<handler function="OnFermerBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -183,3 +183,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

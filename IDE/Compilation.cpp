@@ -72,7 +72,7 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     wxStaticBoxSizer* StaticBoxSizer1;
     wxFlexGridSizer* FlexGridSizer1;
 
-    Create(parent, wxID_ANY, _("Compilation du jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("Game compilation"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
     wxIcon FrameIcon;
     FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/compilationicon.png"))));
     SetIcon(FrameIcon);
@@ -86,7 +86,7 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     FlexGridSizer10->AddGrowableRow(0);
     AvancementGauge = new wxGauge(this, ID_GAUGE1, 100, wxDefaultPosition, wxSize(238,16), 0, wxDefaultValidator, _T("ID_GAUGE1"));
     FlexGridSizer10->Add(AvancementGauge, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    CompilBt = new wxButton(this, ID_BUTTON1, _("Lancer la compilation"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    CompilBt = new wxButton(this, ID_BUTTON1, _("Compile"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     FlexGridSizer10->Add(CompilBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer7->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     statusTxt = new wxStaticText(this, ID_STATICTEXT2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
@@ -96,7 +96,7 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Options"));
     FlexGridSizer5 = new wxFlexGridSizer(0, 2, 0, 0);
     FlexGridSizer5->AddGrowableCol(1);
-    StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Dossier d\'export :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Export folder:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     FlexGridSizer5->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer8->AddGrowableCol(0);
@@ -107,11 +107,11 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     FlexGridSizer8->Add(browseBt, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer5->Add(20,7,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    compressCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Compresser en un fichier unique"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+    compressCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Compress in a single file"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
     compressCheck->SetValue(false);
     FlexGridSizer5->Add(compressCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(20,10,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    optimizationCheck = new wxCheckBox(this, ID_CHECKBOX4, _("Activer les optimisations ( ralentit la compilation )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
+    optimizationCheck = new wxCheckBox(this, ID_CHECKBOX4, _("Activate optimizations ( slow down compilation )"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
     optimizationCheck->SetValue(false);
     FlexGridSizer5->Add(optimizationCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -121,9 +121,9 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer3->AddGrowableCol(0);
-    AideBt = new wxButton(this, ID_BUTTON4, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+    AideBt = new wxButton(this, ID_BUTTON4, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
     FlexGridSizer3->Add(AideBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    FermerBt = new wxButton(this, ID_BUTTON2, _("Fermer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    FermerBt = new wxButton(this, ID_BUTTON2, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     FlexGridSizer3->Add(FermerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer1);
@@ -141,6 +141,7 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     compressCheck->Disable();
     #endif
 
+    dirEdit->AutoCompleteDirectories();
     if ( wxDirExists(gameToCompile.GetLastCompilationDirectory()) )
         dirEdit->SetValue(gameToCompile.GetLastCompilationDirectory());
     else
@@ -191,8 +192,8 @@ public:
 
     virtual void OnCompilationSuccessed()
     {
-        staticText1->SetLabel(_("Compilation terminée")); staticText2->SetLabel(_("Le projet compilé est disponible dans le dossier d'export."));
-        if ( wxMessageBox(_("Compilation achevée avec succès. Voulez vous ouvrir le dossier où le projet a été compilé ?"), _("Compilation terminée"), wxYES_NO) == wxYES )
+        staticText1->SetLabel(_("Compilation finished")); staticText2->SetLabel(_("Compiled project is now available in the export folder."));
+        if ( wxMessageBox(_("Compilation achieved. Do you want to open the folder where the project has been compiled\?"), _("Compilation finished"), wxYES_NO) == wxYES )
         {
             #if defined(WINDOWS)
             wxExecute("explorer.exe \""+string(destinationDirectory.mb_str())+"\"");
@@ -217,12 +218,12 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 {
     if ( dirEdit->GetValue().empty() )
     {
-        wxMessageBox(_("Vous devez choisir un répertoire valide où créer le jeu."), _("Compilation annulée"));
+        wxMessageBox(_("You must choose a directory where the project must be exported."), _("Compilation canceled"));
         return;
     }
     if ( !wxDirExists( dirEdit->GetValue() ) && !wxMkdir( dirEdit->GetValue() ) )
     {
-        wxMessageBox(_("Impossible de créer le répertoire où le jeu doit être compilé.\nVérifiez que vous possédez les droits d'écritures dans cet espace."), _("Compilation annulée"), wxICON_ERROR);
+        wxMessageBox(_("Unable to create the folder where the project must be compiled. \nPlease ensure that you have sufficient rights to write in this folder."), _("Compilation canceled"), wxICON_ERROR);
         return;
     }
 
@@ -243,7 +244,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
 void Compilation::OnAideBtClick( wxCommandEvent& event )
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(125);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/distribution/compilation"));
@@ -251,7 +252,7 @@ void Compilation::OnAideBtClick( wxCommandEvent& event )
 
 void Compilation::OnbrowseBtClick(wxCommandEvent& event)
 {
-    wxDirDialog dialog(this, _("Choisissez un dossier, vierge de préférence, où créer le jeu."));
+    wxDirDialog dialog(this, _("Choose a folder, empty if possible, where create your game."));
     if ( dialog.ShowModal() == wxID_OK )
         dirEdit->SetValue(dialog.GetPath());
 }

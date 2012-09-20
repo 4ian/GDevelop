@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="EditPropJeu">
-		<title>Editer les propriétés du jeu</title>
+		<title>Edit the property of the game</title>
 		<centered>1</centered>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
@@ -22,7 +22,7 @@
 									<growablecols>1</growablecols>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-											<label>Nom :</label>
+											<label>Name :</label>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -44,7 +44,7 @@
 									<growablecols>1</growablecols>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-											<label>Auteur :</label>
+											<label>Author :</label>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -171,7 +171,7 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
-					<label>Avancé</label>
+					<label>Advanced</label>
 					<object class="sizeritem">
 						<object class="Custom" name="ID_PROPGRID" subclass="wxPropertyGrid" variable="propertyGrid" member="yes">
 							<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),0,$(NAME));</creating_code>
@@ -217,7 +217,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON6" variable="cancelBt" member="yes">
-							<label>Annuler</label>
+							<label>Cancel</label>
 							<handler function="OncancelBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -226,7 +226,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="AideBt" member="yes">
-							<label>Aide</label>
+							<label>Help</label>
 							<handler function="OnAideBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -240,3 +240,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

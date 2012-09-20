@@ -80,14 +80,14 @@ BugReport::BugReport( wxWindow* parent )
     wxFlexGridSizer* FlexGridSizer1;
     wxFlexGridSizer* FlexGridSizer11;
 
-    Create(parent, wxID_ANY, _("Rapport de bug"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("Bug's report"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
     Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
     FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBitmap1 = new wxStaticBitmap(Panel1, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/bigbug.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
     FlexGridSizer2->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Game Develop semble avoir rencontré\nune erreur lors de sa dernière utilisation."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+    StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("An error seems to have occured during\nlast session."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
     wxFont StaticText1Font(11,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText1->SetFont(StaticText1Font);
     FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -106,25 +106,25 @@ BugReport::BugReport( wxWindow* parent )
     FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBitmap3 = new wxStaticBitmap(Panel2, ID_STATICBITMAP3, wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_INFORMATION")),wxART_OTHER), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
     FlexGridSizer9->Add(StaticBitmap3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText2 = new wxStaticText(Panel2, ID_STATICTEXT2, _("Il semble que Game Develop se soit fermé brusquement suite à une\nerreur. Si ceci s\'avère exact, nous nous excusons pour le dérangement\nencouru. Il ne s\'agit pas de votre faute, mais d\'un problème interne\nau programme.\nVous pouvez néanmoins nous aider à corriger le problème en\ncomplétant le rapport d\'erreur."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    StaticText2 = new wxStaticText(Panel2, ID_STATICTEXT2, _("It seems that Game Develop has closed abruptly after an\nerror. If this proves to be right, we apologize for the inconvenience\nincurred. This is not your fault, Game Develop should not \nabruptly quit whatever the user make.You can help us correct the problem\nby filling the error report."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     FlexGridSizer9->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer1->Add(FlexGridSizer9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Bugs connus sur cette version de Game Develop"));
+    StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Known bugs for this version of Game Develop"));
     FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer11->AddGrowableCol(1);
     FlexGridSizer11->AddGrowableRow(0);
     StaticBitmap4 = new wxStaticBitmap(Panel2, ID_STATICBITMAP4, wxBitmap(wxImage(_T("res/internet32.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP4"));
     FlexGridSizer11->Add(StaticBitmap4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
-    StaticText8 = new wxStaticText(Panel2, ID_STATICTEXT8, _("Vous pouvez consulter sur notre site une liste qui peut\néventuellement contenir des problèmes qui ont été rapporté\nà propos de cette version de Game Develop :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+    StaticText8 = new wxStaticText(Panel2, ID_STATICTEXT8, _("You can visit a page on our website which can\ncontain known bugs for this version of Game Develop:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
     FlexGridSizer12->Add(StaticText8, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-    bugListBt = new wxHyperlinkCtrl(Panel2, ID_HYPERLINKCTRL1, _("Consulter les problèmes connus pour cette version"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+    bugListBt = new wxHyperlinkCtrl(Panel2, ID_HYPERLINKCTRL1, _("View the known bugs for this version"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
     FlexGridSizer12->Add(bugListBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer11->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     StaticBoxSizer2->Add(FlexGridSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Button1 = new wxButton(Panel2, ID_BUTTON4, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+    Button1 = new wxButton(Panel2, ID_BUTTON4, _("Next"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
     FlexGridSizer3->Add(Button1, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
     Panel2->SetSizer(FlexGridSizer3);
     FlexGridSizer3->Fit(Panel2);
@@ -133,19 +133,19 @@ BugReport::BugReport( wxWindow* parent )
     FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer4->AddGrowableCol(0);
     FlexGridSizer4->AddGrowableRow(3);
-    StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("Afin de nous aider à résoudre le problème, essayez de décrire comment est survenue\nl\'erreur. Indiquez, dans la mesure du possible :\n-Comment le bug s\'est déclenché ( clic sur un bouton... )\n-Où s\'est il déclenché ( éditeur de scènes, choix actions... )"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("To help us solve the problem, try to describe the error\nas precisely as you can. Indicate if possible:\n-How error has happened (Click on a button ...)\n-In which part of program (Scene editor, Choosing actions ...)"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     FlexGridSizer4->Add(StaticText3, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     UserReportEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(408,71), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     FlexGridSizer4->Add(UserReportEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer7->AddGrowableCol(1);
     FlexGridSizer7->AddGrowableRow(0);
-    StaticText6 = new wxStaticText(Panel3, ID_STATICTEXT6, _("Une fois que vous aurez complété le rapport d\'erreur,\ncliquez sur le bouton  \"Créer le rapport\". Envoyez\nensuite le fichier à notre adresse mail.\n\nMerci !"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+    StaticText6 = new wxStaticText(Panel3, ID_STATICTEXT6, _("Once you complete the error report\nclick on \"Create Report \". Send\nthen the file to our e-mail adress.\n\nThank you!"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
     FlexGridSizer7->Add(StaticText6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    CreateRapportBt = new wxButton(Panel3, ID_BUTTON1, _("Créer le rapport d\'erreur"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    CreateRapportBt = new wxButton(Panel3, ID_BUTTON1, _("Create the error report"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     FlexGridSizer7->Add(CreateRapportBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer4->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    Button2 = new wxButton(Panel3, ID_BUTTON5, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+    Button2 = new wxButton(Panel3, ID_BUTTON5, _("Next"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
     FlexGridSizer4->Add(Button2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
     Panel3->SetSizer(FlexGridSizer4);
     FlexGridSizer4->Fit(Panel3);
@@ -157,41 +157,41 @@ BugReport::BugReport( wxWindow* parent )
     FlexGridSizer10 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer10->AddGrowableCol(0);
     FlexGridSizer10->AddGrowableRow(0);
-    StaticText7 = new wxStaticText(Panel4, ID_STATICTEXT7, _("Les jeux en cours d\'édition on peut être pû etre sauvegardés, sous le nom de gameDumpX.gdg ( où X représente un numéro ).\n\nGame Develop peut les réouvrir automatiquement une fois la fenêtre fermée."), wxDefaultPosition, wxSize(424,68), 0, _T("ID_STATICTEXT7"));
+    StaticText7 = new wxStaticText(Panel4, ID_STATICTEXT7, _("Games which were edited can have been saved, under the name of gameDumpX.gdg ( where X is a number ).\n\nGame Develop can reopen these games."), wxDefaultPosition, wxSize(424,68), 0, _T("ID_STATICTEXT7"));
     FlexGridSizer10->Add(StaticText7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Sauvegarde automatiques"));
+    StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Automatic saves"));
     FlexGridSizer13 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBitmap5 = new wxStaticBitmap(Panel4, ID_STATICBITMAP5, wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_INFORMATION")),wxART_OTHER), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
     FlexGridSizer13->Add(StaticBitmap5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText4 = new wxStaticText(Panel4, ID_STATICTEXT4, _("Si votre jeu n\'a pas pû être sauvegardé avant le crash ou qu\'il\nest corrompu, vous pouvez aussi essayer de charger une sauvegarde\nautomatique présente dans le dossier de votre jeu."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    StaticText4 = new wxStaticText(Panel4, ID_STATICTEXT4, _("If your game could not be saved before the crash or is corrupted\nyou can try to open an auto-save made by Game Develop. If this\noption is activated, autosave are made inside the game folder."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     FlexGridSizer13->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer4->Add(FlexGridSizer13, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer5->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Attention !"));
+    StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Attention!"));
     FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer6->AddGrowableCol(1);
     FlexGridSizer6->AddGrowableRow(0);
     StaticBitmap2 = new wxStaticBitmap(Panel4, ID_STATICBITMAP2, wxArtProvider::GetBitmap(wxART_MAKE_ART_ID_FROM_STR(_T("wxART_WARNING")),wxART_OTHER), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
     FlexGridSizer6->Add(StaticBitmap2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText5 = new wxStaticText(Panel4, ID_STATICTEXT5, _("Si vous réouvrez les jeux qui ont peut être pu être sauvegardés\navant que Game Develop ne crashe, prenez garde à bien vérifier\nque votre jeu est au complet avant de le réengistrer par dessus\nvotre jeu original."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+    StaticText5 = new wxStaticText(Panel4, ID_STATICTEXT5, _("If you open the games that could be saved before the crash\nmake sure that the games are complete and not corrupted before\nsaving them on the original files."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
     wxFont StaticText5Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText5->SetFont(StaticText5Font);
     FlexGridSizer6->Add(StaticText5, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer3->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer5->Add(StaticBoxSizer3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
-    CloseBt = new wxButton(Panel4, ID_BUTTON2, _("Fermer et ouvrir le(s) jeu(x)"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    CloseBt = new wxButton(Panel4, ID_BUTTON2, _("Close and open the game(s)"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     FlexGridSizer8->Add(CloseBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    CloseNoOpenBt = new wxButton(Panel4, ID_BUTTON3, _("Fermer sans ouvrir le(s) jeu(x)"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+    CloseNoOpenBt = new wxButton(Panel4, ID_BUTTON3, _("Close but don't open the game(s)"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
     FlexGridSizer8->Add(CloseNoOpenBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer5->Add(FlexGridSizer8, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 0);
     Panel4->SetSizer(FlexGridSizer5);
     FlexGridSizer5->Fit(Panel4);
     FlexGridSizer5->SetSizeHints(Panel4);
-    Notebook1->AddPage(Panel2, _("Explication"), false);
-    Notebook1->AddPage(Panel3, _("Rapport d\'erreur"), false);
-    Notebook1->AddPage(Panel4, _("Votre jeu"), false);
+    Notebook1->AddPage(Panel2, _("Explaination"), false);
+    Notebook1->AddPage(Panel3, _("Error's report"), false);
+    Notebook1->AddPage(Panel4, _("Your game"), false);
     FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     SetSizer(FlexGridSizer1);
     FlexGridSizer1->Fit(this);
@@ -205,7 +205,7 @@ BugReport::BugReport( wxWindow* parent )
     Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&BugReport::OnCloseNoOpenBtClick);
     //*)
 
-    bugListBt->SetURL(_("http://www.wiki.compilgames.net/doku.php/game_develop/knownbugs/gd")+gd::ToString(GDLVersionWrapper::Major())+gd::ToString(GDLVersionWrapper::Minor())+gd::ToString(GDLVersionWrapper::Build()));
+    bugListBt->SetURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/knownbugs/gd")+gd::ToString(GDLVersionWrapper::Major())+gd::ToString(GDLVersionWrapper::Minor())+gd::ToString(GDLVersionWrapper::Build()));
 }
 
 BugReport::~BugReport()
@@ -285,3 +285,4 @@ void BugReport::OnButton2Click(wxCommandEvent& event)
 {
     Notebook1->SetSelection(2);
 }
+

@@ -41,11 +41,11 @@ sceneCanvas(sceneCanvas_)
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&InitialPositionBrowserDlg::OninitialPositionsListItemActivated);
 	//*)
 
-	initialPositionsList->InsertColumn(0, _("Objet"));
+	initialPositionsList->InsertColumn(0, _("Object"));
 	initialPositionsList->InsertColumn(1, _("X"));
 	initialPositionsList->InsertColumn(2, _("Y"));
 	initialPositionsList->InsertColumn(3, _("Angle"));
-	initialPositionsList->InsertColumn(4, _("Plan"));
+	initialPositionsList->InsertColumn(4, _("Z order"));
 
 	Refresh();
 }
@@ -122,3 +122,4 @@ void InitialPositionBrowserDlg::SelectInitialPosition(const gd::InitialInstance 
         }
     }
 }
+

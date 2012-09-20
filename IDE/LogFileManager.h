@@ -61,3 +61,4 @@ private:
 };
 
 #endif // LOGFILEMANAGER_H
+

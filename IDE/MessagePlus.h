@@ -60,3 +60,4 @@ class MessagePlus: public wxDialog
 };
 
 #endif
+

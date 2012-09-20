@@ -106,12 +106,12 @@ objectChanged(true)
 	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer5->AddGrowableCol(2);
 	FlexGridSizer5->AddGrowableRow(0);
-	StaticText1 = new wxStaticText(Panel2, ID_STATICTEXT1, _("Objet :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel2, ID_STATICTEXT1, _("Object :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer5->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	objectName = new wxStaticText(Panel2, ID_STATICTEXT2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer5->Add(objectName, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	deleteBt = new wxBitmapButton(Panel2, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/deleteicon.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
-	deleteBt->SetToolTip(_("Supprimer cet objet"));
+	deleteBt->SetToolTip(_("Delete this object"));
 	FlexGridSizer5->Add(deleteBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 2);
 	FlexGridSizer4->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	objectList = new wxListCtrl(Panel2, ID_LISTCTRL1, wxDefaultPosition, wxSize(249,203), wxLC_REPORT|wxLC_EDIT_LABELS, wxDefaultValidator, _T("ID_LISTCTRL1"));
@@ -120,8 +120,8 @@ objectChanged(true)
 	Panel2->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(Panel2);
 	FlexGridSizer2->SetSizeHints(Panel2);
-	Notebook1->AddPage(Panel1, _("Général"), false);
-	Notebook1->AddPage(Panel2, _("Objets"), false);
+	Notebook1->AddPage(Panel1, _("General"), false);
+	Notebook1->AddPage(Panel2, _("Objects"), false);
 	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
@@ -137,16 +137,16 @@ objectChanged(true)
 
     toolbar->ClearTools();
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( ID_PLAYBT, _( "Jouer la scène" ), wxBitmap( wxImage( "res/starticon.png" ) ), _("Jouer la scène") );
-    toolbar->AddTool( ID_PAUSEBT, _( "Mettre en pause" ), wxBitmap( wxImage( "res/pauseicon.png" ) ), _("Mettre en pause la scène") );
+    toolbar->AddTool( ID_PLAYBT, _( "Play the scene" ), wxBitmap( wxImage( "res/starticon.png" ) ), _("Play the scene") );
+    toolbar->AddTool( ID_PAUSEBT, _( "Pause" ), wxBitmap( wxImage( "res/pauseicon.png" ) ), _("Pause the scene") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_STEPBT, _( "Avancer d'une étape" ), wxBitmap( wxImage( "res/stepicon.png" ) ), _("Avancer d'une étape") );
+    toolbar->AddTool( ID_STEPBT, _( "Step" ), wxBitmap( wxImage( "res/stepicon.png" ) ), _("Step") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_ADDOBJBT, _( "Ajouter un objet" ), wxBitmap( wxImage( "res/addobjetdbg.png" ) ), _("Ajouter un objet") );
-    toolbar->AddTool( ID_VARSCENEBT, _( "Ajouter une variable de la scène" ), wxBitmap( wxImage( "res/addvaricon.png" ) ), _("Ajouter une variable de la scène") );
-    toolbar->AddTool( ID_VARGLOBALBT, _( "Ajouter une variable globale" ), wxBitmap( wxImage( "res/addvargicon.png" ) ), _("Ajouter une variable globale") );
+    toolbar->AddTool( ID_ADDOBJBT, _( "Add an object" ), wxBitmap( wxImage( "res/addobjetdbg.png" ) ), _("Add an object") );
+    toolbar->AddTool( ID_VARSCENEBT, _( "Add a scene variable" ), wxBitmap( wxImage( "res/addvaricon.png" ) ), _("Add a scene variable") );
+    toolbar->AddTool( ID_VARGLOBALBT, _( "Add a global variable" ), wxBitmap( wxImage( "res/addvargicon.png" ) ), _("Add a global variable") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_CONSOLEBT, _( "Console Game Develop" ), wxBitmap( wxImage( "res/console.png" ) ), _("Console Game Develop") );
+    toolbar->AddTool( ID_CONSOLEBT, _( "Game Develop Console" ), wxBitmap( wxImage( "res/console.png" ) ), _("Game Develop Console") );
     toolbar->Realize();
 
     Connect(ID_PLAYBT,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnPlayBtClick);
@@ -166,15 +166,15 @@ objectChanged(true)
     generalList->SetColumnWidth(0, 225);
     generalList->SetColumnWidth(1, 165);
 
-    generalList->InsertItem(0, _("Images par secondes ( FPS )"));
-    generalList->InsertItem(1, _("Temps depuis la dernière image"));
-    generalList->InsertItem(2, _("Nombres d'objets"));
-    generalList->InsertItem(3, _("Nombres de ressources"));
-    generalList->InsertItem(4, _("Taille de la fenêtre"));
-    generalList->InsertItem(5, _("Position de la souris sur la fenêtre"));
-    generalList->InsertItem(6, _("Temps depuis le début de la scène"));
+    generalList->InsertItem(0, _("Frame per seconds ( FPS )"));
+    generalList->InsertItem(1, _("Time elapsed since the last image"));
+    generalList->InsertItem(2, _("Number of objects"));
+    generalList->InsertItem(3, _("Resources count"));
+    generalList->InsertItem(4, _("Window's size"));
+    generalList->InsertItem(5, _("Position of the mouse over the window"));
+    generalList->InsertItem(6, _("Time elapsed since the beginning of the scene"));
     generalList->InsertItem(7, "");
-    generalList->InsertItem(8, _("Variables de la scène"));
+    generalList->InsertItem(8, _("Scene variables"));
     generalList->SetItemFont(8, font);
     generalBaseItemCount = generalList->GetItemCount();
 
@@ -183,7 +183,7 @@ objectChanged(true)
     objectList->SetColumnWidth(0, 175);
     objectList->SetColumnWidth(1, 100);
 
-    objectsTree->AddRoot(_("Objets"));
+    objectsTree->AddRoot(_("Objects"));
 
     std::set<std::string> alreadyCreatedPanels; //Just to be sure not to create a panel twice ( extensionsUsed can contains the same extension name twice )
     for (unsigned int i = 0;i<scene.game->GetUsedPlatformExtensions().size();++i)
@@ -283,7 +283,7 @@ void DebuggerGUI::UpdateGUI()
         return;
 
     //General tab
-    generalList->SetItem(0, 1, ToString(1000.0/scene.GetElapsedTime())+_(" i/s"));
+    generalList->SetItem(0, 1, ToString(1000.0/scene.GetElapsedTime())+_(" fps"));
     generalList->SetItem(1, 1, ToString(static_cast<double>(scene.GetElapsedTime())/1000.0)+"s");
     generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
     //TODO //generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
@@ -315,7 +315,7 @@ void DebuggerGUI::UpdateGUI()
     generalList->SetItem(generalBaseItemCount+sceneVariables.size(), 1, "");
 
     //Global variable title
-    generalList->SetItem(generalBaseItemCount+sceneVariables.size()+1, 0, _("Variables globales"));
+    generalList->SetItem(generalBaseItemCount+sceneVariables.size()+1, 0, _("Globals variables"));
     generalList->SetItem(generalBaseItemCount+sceneVariables.size()+1, 1, "");
     generalList->SetItemFont(generalBaseItemCount+sceneVariables.size()+1, font);
     generalBaseAndVariablesItemCount = generalBaseItemCount+sceneVariables.size()+2;
@@ -359,7 +359,7 @@ void DebuggerGUI::UpdateGUI()
     if ( mustRecreateTree )
     {
         objectsTree->DeleteAllItems();
-        objectsTree->AddRoot(_("objets"));
+        objectsTree->AddRoot(_("objects"));
         objectsInTree.clear();
         initialObjects.clear();
         mustRecreateTree = false;
@@ -500,7 +500,7 @@ void DebuggerGUI::RecreateListForObject(const ObjSPtr & object)
     unsigned int currentLine = 0;
     string name, uselessValue;
 
-    objectList->InsertItem(0, _("Général"));
+    objectList->InsertItem(0, _("General"));
     objectList->SetItemFont(0, font);
     currentLine++;
 
@@ -514,7 +514,7 @@ void DebuggerGUI::RecreateListForObject(const ObjSPtr & object)
     }
 
     objectList->InsertItem(objectList->GetItemCount(), "");
-    objectList->InsertItem(objectList->GetItemCount(), _("Spécifique"));
+    objectList->InsertItem(objectList->GetItemCount(), _("Specific"));
     objectList->SetItemFont(objectList->GetItemCount()-1, font);
     currentLine += 2;
 
@@ -573,11 +573,11 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         string uselessName, oldValue;
         object->Object::GetPropertyForDebugger(propNb, uselessName, oldValue);
-        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), oldValue).mb_str());
+        string newValue = string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue).mb_str());
 
         if ( !object->Object::ChangeProperty(propNb, newValue) )
         {
-            wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entrée peut être incorrecte, ou la propriété en lecture seule."));
+            wxLogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
         }
     }
     //A specific property
@@ -588,11 +588,11 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         string uselessName, oldValue;
         object->GetPropertyForDebugger(propNb, uselessName, oldValue);
-        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), oldValue).mb_str());
+        string newValue = string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue).mb_str());
 
         if ( !object->ChangeProperty(propNb, newValue) )
         {
-            wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entrée peut être incorrecte, ou la propriété en lecture seule."));
+            wxLogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
         }
     }
     else //Or a variable
@@ -604,7 +604,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
 
         if ( idVariable >= 0 && static_cast<unsigned int>(idVariable) < objectVariables.size() )
         {
-            string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une variable"), objectVariables[idVariable].GetString()).mb_str());
+            string newValue = string(wxGetTextFromUser(_("Enter the new value"), _("Editing a variable"), objectVariables[idVariable].GetString()).mb_str());
 
             object->GetVariables().ObtainVariable(objectVariables[idVariable].GetName()) = newValue;
         }
@@ -626,7 +626,7 @@ void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
         if (id < 0 || static_cast<unsigned int>(id) > sceneVariables.size())
             return;
 
-        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), sceneVariables[id].GetString()).mb_str());
+        string newValue = string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), sceneVariables[id].GetString()).mb_str());
         scene.GetVariables().ObtainVariable(sceneVariables[id].GetName()).SetString(newValue);
     }
     else if ( event.GetIndex() < ( generalBaseAndVariablesItemCount + gameVariables.size()) )
@@ -635,7 +635,7 @@ void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
         if (id < 0 || static_cast<unsigned int>(id) > gameVariables.size())
             return;
 
-        string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"),gameVariables[id].GetString()).mb_str());
+        string newValue = string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"),gameVariables[id].GetString()).mb_str());
         scene.game->GetVariables().ObtainVariable(gameVariables[id].GetName()).SetString(newValue);
     }
 }
@@ -662,11 +662,11 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
     int propNb = event.GetIndex();
     string uselessName, oldValue;
     extension->GetPropertyForDebugger(scene, propNb, uselessName, oldValue);
-    string newValue = string(wxGetTextFromUser(_("Entrez la nouvelle valeur"), _("Edition d'une valeur"), oldValue).mb_str());
+    string newValue = string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue).mb_str());
 
     if ( !extension->ChangeProperty(scene, propNb, newValue) )
     {
-        wxLogWarning(_("Impossible de modifier la valeur.\nLa valeur entrée peut être incorrecte, ou la propriété en lecture seule."));
+        wxLogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
     }
 }
 
@@ -701,16 +701,16 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
  */
 void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
 {
-    string variableName = string(wxGetTextFromUser(_("Entrez le nom de la nouvelle variable"), _("Ajout d'une variable de la scène")).mb_str());
+    string variableName = string(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a scene variable")).mb_str());
 
     if ( variableName == "" ) return;
     if ( scene.GetVariables().HasVariableNamed(variableName) )
     {
-        wxLogMessage(_("Une variable avec ce nom existe déjà"));
+        wxLogMessage(_("A variable with this name already exists!"));
         return;
     }
 
-    string variableValue = string(wxGetTextFromUser(_("Entrez la valeur de la variable"), _("Ajout d'une variable de la scène")).mb_str());
+    string variableValue = string(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a scene variable")).mb_str());
 
     scene.GetVariables().ObtainVariable(variableName) = variableValue;
 }
@@ -720,16 +720,16 @@ void DebuggerGUI::OnAddVarSceneBtClick( wxCommandEvent & event )
  */
 void DebuggerGUI::OnAddVarGlobalBtClick( wxCommandEvent & event )
 {
-    string variableName = string(wxGetTextFromUser(_("Entrez le nom de la nouvelle variable"), _("Ajout d'une variable globale")).mb_str());
+    string variableName = string(wxGetTextFromUser(_("Type the name of the new variable"), _("Adding a global variable")).mb_str());
 
     if ( variableName == "" ) return;
     if ( scene.game->GetVariables().HasVariableNamed(variableName) )
     {
-        wxLogMessage(_("Une variable avec ce nom existe déjà"));
+        wxLogMessage(_("A variable with this name already exists!"));
         return;
     }
 
-    string variableValue = string(wxGetTextFromUser(_("Entrez la valeur de la variable"), _("Ajout d'une variable globale")).mb_str());
+    string variableValue = string(wxGetTextFromUser(_("Enter the value of the variable"), _("Adding a global variable")).mb_str());
 
     scene.game->GetVariables().ObtainVariable(variableName) = variableValue;
 }
@@ -752,12 +752,12 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
         newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
     else
     {
-        wxLogWarning(_("Impossible de créer l'objet."));
+        wxLogWarning(_("Unable to create object."));
         return;
     }
 
-    int x = ToInt(string(wxGetTextFromUser(_("Entrez la position X de l'objet"), _("Ajout d'un objet")).mb_str()));
-    int y = ToInt(string(wxGetTextFromUser(_("Entrez la position Y de l'objet"), _("Ajout d'un objet")).mb_str()));
+    int x = ToInt(string(wxGetTextFromUser(_("Enter the X position of the object"), _("Adding an object")).mb_str()));
+    int y = ToInt(string(wxGetTextFromUser(_("Enter the object's Y position"), _("Adding an object")).mb_str()));
     newObject->SetX( x );
     newObject->SetY( y );
 
@@ -785,3 +785,4 @@ void DebuggerGUI::UpdateListCtrlColumnsWidth()
     for (unsigned int i = 0;i<extensionsListCtrls.size();++i)
         extensionsListCtrls[i]->SetColumnWidth(1, extensionsListCtrls[i]->GetSize().GetWidth()-extensionsListCtrls[i]->GetColumnWidth(0)-15);
 }
+

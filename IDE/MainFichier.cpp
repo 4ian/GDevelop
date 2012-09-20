@@ -13,6 +13,7 @@
 #include "GDL/IDE/CompilerMessagesParser.h"
 #include "GDL/IDE/CodeCompiler.h"
 #include "GDL/CommonTools.h"
+#include "Dialogs/NewProjectDialog.h"
 #include "BuildMessagesPnl.h"
 #include "MainFrame.h"
 #include "BuildToolsPnl.h"
@@ -43,15 +44,21 @@ void MainFrame::OnCloseCurrentProjectSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void MainFrame::OnMenuNewSelected( wxCommandEvent& event )
 {
-    games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
-    wxString GD = "Game Develop - "+_( "Nouveau jeu" );
-    SetTitle( GD );
+    NewProjectDialog dialog(this);
+    if ( dialog.ShowModal() == 1 )
+    {
 
-    gameCurrentlyEdited = games.size()-1;
+        games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
+        wxString GD = "Game Develop - "+_( "New game" );
+        SetTitle( GD );
 
-    //Mise à jour des éditeurs
-    projectManager->Refresh();
-    if ( startPage ) startPage->Refresh();
+        gameCurrentlyEdited = games.size()-1;
+
+        //Mise à jour des éditeurs
+        projectManager->Refresh();
+        if ( startPage ) startPage->Refresh();
+
+    }
 }
 
 /**
@@ -70,7 +77,7 @@ void MainFrame::OnMenuOpenSelected( wxCommandEvent& event )
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-    wxFileDialog openFileDialog( this, _( "Choisissez le projet à ouvrir" ), "", "", "\"Game Develop\" Project(*.gdg)|*.gdg|\"Game Develop\" Project Autosave (*.gdg.autosave)|*.gdg.autosave" );
+    wxFileDialog openFileDialog( this, _( "Choose the project to open" ), "", "", "\"Game Develop\" Project(*.gdg)|*.gdg|\"Game Develop\" Project Autosave (*.gdg.autosave)|*.gdg.autosave" );
 
     if (openFileDialog.ShowModal() != wxID_CANCEL && !openFileDialog.GetPath().empty() )
         Open( ToString(openFileDialog.GetPath()) );
@@ -90,7 +97,7 @@ void MainFrame::OnOpenExampleSelected(wxCommandEvent& event)
     wxString examplesDir = wxGetCwd()+"/Examples/";
     #endif
 
-    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), examplesDir, "", "\"Game Develop\" Project (*.gdg)|*.gdg" );
+    wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "\"Game Develop\" Project (*.gdg)|*.gdg" );
 
     if ( open.ShowModal() != wxID_CANCEL && !open.GetPath().empty() )
         Open(ToString(open.GetPath()));
@@ -149,9 +156,9 @@ void MainFrame::Open( string file )
 
         if (unknownExtensions != "")
         {
-            wxString errorMsg = _("Une ou plusieurs extensions sont utilisées par le jeu mais ne sont pas installées :\n")
+            wxString errorMsg = _("One or ore extensions are used by the game but are not installed :\n")
                                 + unknownExtensions
-                                + _("\nCertains objets, actions, conditions ou expressions peuvent manquer ou être inconnues.");
+                                + _("\nSome objects, actions, conditions or expressions can be unavailable or be unknown.");
             wxLogWarning(errorMsg);
         }
     }
@@ -169,7 +176,7 @@ void MainFrame::OnMenuSaveSelected( wxCommandEvent& event )
         if ( !saveGame.SaveToFile(GetCurrentGame()->GetProjectFile()) )
             wxLogError( "L'enregistrement a échoué." );
         else
-            wxLogStatus(_("Enregistrement du fichier terminé."));
+            wxLogStatus(_("Save ended."));
 
         SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
 
@@ -200,7 +207,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
         {
             sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-            wxFileDialog FileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+            wxFileDialog FileDialog( this, _( "Choose where save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
             FileDialog.ShowModal();
 
             std::string path = ToString(FileDialog.GetPath());
@@ -235,7 +242,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
         }
     }
 
-    wxLogStatus(_("Enregistrements des fichiers terminés."));
+    wxLogStatus(_("Saves ended."));
 }
 void MainFrame::OnMenuSaveAllSelected(wxCommandEvent& event)
 {
@@ -255,7 +262,7 @@ void MainFrame::SaveAs()
     if ( !CurrentGameIsValid() ) return;
 
     //Affichage de la boite de dialogue
-    wxFileDialog fileDialog( this, _( "Choisissez où enregistrer le projet" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+    wxFileDialog fileDialog( this, _( "Choose where save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
     fileDialog.ShowModal();
 
     std::string path = ToString(fileDialog.GetPath());
@@ -287,9 +294,9 @@ void MainFrame::SaveAs()
         wxString newPath = wxFileName::FileName(GetCurrentGame()->GetProjectFile()).GetPath();
         if ( avertOnSaveCheck && newPath != oldPath && oldPath != "" )
         {
-            wxRichMessageDialog dlg(this, _("Le projet a été enregistré dans un nouveau répertoire.\nPensez à copier dans ce repertoire les ressources utilisées par le jeu, si nécessaire."), _("Enregistrement dans un nouveau répertoire"), wxOK|wxICON_INFORMATION );
-            dlg.ShowCheckBox(_("Ne plus afficher ce message"));
-            dlg.ShowDetailedText(_("Depuis les dernières versions de Game Develop, les ressources sont enregistrées relativement\nau dossier du jeu, permettant de copier ou déplacer un projet en déplacant simplement le répertoire\nde celui ci, pour peu que les ressources soit enregistrées dans celui ci."));
+            wxRichMessageDialog dlg(this, _("Project has been saved in a new folder.\nBe sure to also copy resources used by the game into this folder if needed."), _("Saving in a new directory"), wxOK|wxICON_INFORMATION );
+            dlg.ShowCheckBox(_("Do not show again"));
+            dlg.ShowDetailedText(_("Since the last versions of Game Develop, resources filenames are relative\nto the project folder, allowing to copy or move a project simply by moving the directory\nof the project, provided that resources are also in this directory."));
 
             dlg.ShowModal();
             if ( dlg.IsCheckBoxChecked() )
@@ -373,3 +380,4 @@ void MainFrame::OnMenuFusionSelected(wxCommandEvent& event)
     projectManager->Refresh();
     if ( startPage ) startPage->Refresh();
 }
+

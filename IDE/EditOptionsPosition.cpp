@@ -87,7 +87,7 @@ scene(scene_)
 	wxFlexGridSizer* FlexGridSizer11;
 	wxStaticBoxSizer* StaticBoxSizer5;
 
-	Create(parent, wxID_ANY, _("Editer les options avancées d\'un objet sur la scène"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edit the properties of the object on the scene"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	SetClientSize(wxSize(397,260));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
@@ -97,9 +97,9 @@ scene(scene_)
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer2->AddGrowableCol(1);
 	FlexGridSizer2->AddGrowableRow(0);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Objet concerné :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Concerned object :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	objectNameTxt = new wxStaticText(Panel1, ID_STATICTEXT2, _("Sans Nom"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	objectNameTxt = new wxStaticText(Panel1, ID_STATICTEXT2, _("Noname"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	wxFont objectNameTxtFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	objectNameTxt->SetFont(objectNameTxtFont);
 	FlexGridSizer2->Add(objectNameTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -123,30 +123,30 @@ scene(scene_)
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT3, _("X :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	XEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	XEdit->SetToolTip(_("Coordonnée X de l\'objet sur la scène"));
+	XEdit->SetToolTip(_("X coordinate of the object on the scene"));
 	FlexGridSizer3->Add(XEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText3 = new wxStaticText(this, ID_STATICTEXT4, _("Y :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer3->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	YEdit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
-	YEdit->SetToolTip(_("Coordonnée Y de l\'objet sur la scène."));
+	YEdit->SetToolTip(_("Y coordinate of the object on the scene"));
 	FlexGridSizer3->Add(YEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer13->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Taille"));
+	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Size"));
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
 	FlexGridSizer5->AddGrowableRow(1);
-	sizeCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Taille personnalisée"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	sizeCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Custom size"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	sizeCheck->SetValue(false);
 	FlexGridSizer5->Add(sizeCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer10->AddGrowableCol(1);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT5, _("Largeur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT5, _("Width :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer10->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	widthEdit = new wxTextCtrl(this, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
 	widthEdit->Disable();
 	FlexGridSizer10->Add(widthEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText5 = new wxStaticText(this, ID_STATICTEXT6, _("Hauteur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT6, _("Height :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	FlexGridSizer10->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	heightEdit = new wxTextCtrl(this, ID_TEXTCTRL5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
 	heightEdit->Disable();
@@ -154,29 +154,29 @@ scene(scene_)
 	FlexGridSizer5->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer2->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer13->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Calque"));
+	StaticBoxSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Layer"));
 	FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer12->AddGrowableCol(0);
 	FlexGridSizer14 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer14->AddGrowableCol(1);
-	StaticText8 = new wxStaticText(this, ID_STATICTEXT11, _("Calque de l\'objet :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
+	StaticText8 = new wxStaticText(this, ID_STATICTEXT11, _("Object's layer :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
 	FlexGridSizer14->Add(StaticText8, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	layerChoice = new wxChoice(this, ID_CHOICE1, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
 	FlexGridSizer14->Add(layerChoice, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(FlexGridSizer14, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer5->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer13->Add(StaticBoxSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Plan"));
+	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Z order"));
 	FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer8->AddGrowableCol(1);
-	StaticText6 = new wxStaticText(this, ID_STATICTEXT7, _("Plan n° :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	StaticText6 = new wxStaticText(this, ID_STATICTEXT7, _("Z order :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	FlexGridSizer8->Add(StaticText6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	zOrderEdit = new wxTextCtrl(this, ID_TEXTCTRL4, _("0"), wxDefaultPosition, wxSize(72,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
-	zOrderEdit->SetToolTip(_("Plan initial de l\'objet sur la scène."));
+	zOrderEdit->SetToolTip(_("Initial Z order of the object on the scene."));
 	FlexGridSizer8->Add(zOrderEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText7 = new wxStaticText(this, ID_STATICTEXT8, _("0 par défaut. Plus le plan est grand,\nplus l\'objet sera au dessus des autres."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+	StaticText7 = new wxStaticText(this, ID_STATICTEXT8, _("0 by default. The object will be above otherif its z order is greater."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
 	wxFont StaticText7Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText7->SetFont(StaticText7Font);
 	FlexGridSizer7->Add(StaticText7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -186,13 +186,13 @@ scene(scene_)
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer11->AddGrowableCol(0);
 	FlexGridSizer11->AddGrowableRow(0);
-	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Variables initiales spécifiques à cette instance de l\'objet"));
+	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Initial variables specific to this object instance"));
 	FlexGridSizer16 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer16->AddGrowableCol(1);
 	FlexGridSizer16->AddGrowableRow(0);
-	editInitialVariables = new wxButton(this, ID_BUTTON4, _("Modifier"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	editInitialVariables = new wxButton(this, ID_BUTTON4, _("Modify"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer16->Add(editInitialVariables, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	variablesStatusTxt = new wxStaticText(this, ID_STATICTEXT9, _("Aucune variable spécifique à cette instance de définie."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+	variablesStatusTxt = new wxStaticText(this, ID_STATICTEXT9, _("No variable defined for this object instance."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
 	FlexGridSizer16->Add(variablesStatusTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer4->Add(FlexGridSizer16, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer11->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -213,9 +213,9 @@ scene(scene_)
 	BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	BoxSizer2->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	AnnulerBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	AnnulerBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	BoxSizer2->Add(AnnulerBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AideBt = new wxButton(this, ID_BUTTON3, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	AideBt = new wxButton(this, ID_BUTTON3, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	BoxSizer2->Add(AideBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(BoxSizer2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -247,14 +247,14 @@ scene(scene_)
     for (unsigned int i = 0;i<scene.GetLayersCount();++i)
     {
         if ( scene.GetLayer(i).GetName() == "" )
-            layerChoice->Insert(_("Calque de base"), 0);
+            layerChoice->Insert(_("Base layer"), 0);
         else
             layerChoice->Insert(scene.GetLayer(i).GetName(), 0);
     }
 
     layerChoice->SetStringSelection(position.GetLayer());
     if ( position.GetLayer() == "" )
-        layerChoice->SetStringSelection(_("Calque de base"));
+        layerChoice->SetStringSelection(_("Base layer"));
 
     zOrderEdit->ChangeValue(ToString(position.GetZOrder()) );
 
@@ -302,7 +302,7 @@ void EditOptionsPosition::OnOkBtClick(wxCommandEvent& event)
     position.SetZOrder(ToInt(ToString(zOrderEdit->GetValue())));
 
     position.SetLayer(ToString(layerChoice->GetStringSelection()));
-    if ( layerChoice->GetStringSelection() == _("Calque de base"))
+    if ( layerChoice->GetStringSelection() == _("Base layer"))
         position.SetLayer("");
 
     position.GetVariables().Create(initialVariables);
@@ -325,7 +325,7 @@ void EditOptionsPosition::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditOptionsPosition::OnAideBtClick(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(25);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_scene_edit"));
@@ -355,7 +355,8 @@ void EditOptionsPosition::OneditInitialVariablesClick(wxCommandEvent& event)
 void EditOptionsPosition::UpdateInitialVariablesStatus()
 {
     if ( initialVariables.GetVariablesVector().empty() )
-        variablesStatusTxt->SetLabel(_("Aucune variable spécifique à cette instance de définie."));
+        variablesStatusTxt->SetLabel(_("No variable defined for this object instance."));
     else
-        variablesStatusTxt->SetLabel(ToString(initialVariables.GetVariablesVector().size())+_(" variable(s) spécifiques à cette instance sont définie(s)."));
+        variablesStatusTxt->SetLabel(ToString(initialVariables.GetVariablesVector().size())+_(" variables are defined to this particular object instance."));
 }
+

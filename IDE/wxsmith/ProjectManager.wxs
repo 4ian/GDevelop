@@ -9,7 +9,7 @@
 			<object class="sizeritem">
 				<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="projectsTree" member="yes">
 					<size>209,197</size>
-					<tooltip>Double cliquez pour passer un projet en tant que projet actuel.&#x0A;Double cliquez sur un élement pour l&apos;éditer, ou utilisez le clic&#x0A;droit pour accéder à plus d&apos;options.</tooltip>
+					<tooltip>Double click to set the project as actual project.&#x0A;Double click on an item to edit it, or use right&#x0A;click to access to more options.</tooltip>
 					<style>wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE</style>
 					<handler function="OnprojectsTreeBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
 					<handler function="OnprojectsTreeEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
@@ -23,207 +23,214 @@
 		</object>
 		<object class="wxMenu" variable="sceneContextMenu" member="yes">
 			<object class="wxMenuItem" name="idMenuEditScene" variable="editSceneMenuItem" member="no">
-				<label>Editer cette scène</label>
+				<label>Edit this scene</label>
 				<bitmap>res/editicon.png</bitmap>
 				<handler function="OneditSceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuEditPropScene" variable="editScenePropMenuItem" member="yes">
-				<label>Modifier les propriétés</label>
+				<label>Edit the properties</label>
 				<bitmap>res/editpropicon.png</bitmap>
 				<handler function="OneditScenePropMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuModVar" variable="modVarSceneMenuI" member="yes">
-				<label>Modifier les variables initiales</label>
+				<label>Modify inital variables</label>
 				<bitmap>res/var.png</bitmap>
 				<handler function="OnmodVarSceneMenuISelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuModNameScene" variable="editSceneNameMenuItem" member="no">
-				<label>Modifier le nom</label>
+				<label>Change the name</label>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OneditSceneNameMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuAddScene" variable="addSceneMenuItem" member="no">
-				<label>Ajouter une scène</label>
+				<label>Add a scene</label>
 				<bitmap>res/addicon.png</bitmap>
 				<handler function="OnaddSceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuDelScene" variable="deleteSceneMenuItem" member="no">
-				<label>Supprimer la scène</label>
+				<label>Delete the scene</label>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OndeleteSceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuCopyScene" variable="copySceneMenuItem" member="yes">
-				<label>Copier la scène</label>
+				<label>Copy the scene</label>
 				<bitmap>res/copyicon.png</bitmap>
 				<handler function="OncopySceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuCutScene" variable="cutSceneMenuItem" member="yes">
-				<label>Couper la scène</label>
+				<label>Cut the scene</label>
 				<bitmap>res/cuticon.png</bitmap>
 				<handler function="OncutSceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuPasteScene" variable="pasteSceneMenuItem" member="yes">
-				<label>Coller la scène</label>
+				<label>Paste the scne</label>
 				<bitmap>res/pasteicon.png</bitmap>
 				<handler function="OnpasteSceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="scenesContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem1" member="yes">
-				<label>Ajouter une scène</label>
+				<label>Add a scene</label>
 				<bitmap>res/addicon.png</bitmap>
 				<handler function="OnaddSceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="gameContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="editPropGameMenuItem" member="yes">
-				<label>Editer les propriétés du jeu</label>
+				<label>Edit the property of the game</label>
 				<bitmap>res/editpropicon.png</bitmap>
 				<handler function="OneditPropGameMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM3" variable="editGblVarMenuItem" member="yes">
-				<label>Modifier les variables globales</label>
+				<label>Modify global variables</label>
 				<bitmap>res/var.png</bitmap>
 				<handler function="OneditGblVarMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="editNameGameMenuItem" member="yes">
-				<label>Modifier le nom</label>
+				<label>Change the name</label>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OneditNameGameMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM5" variable="closeGameBt" member="yes">
-				<label>Fermer ce projet</label>
+				<label>Close this project</label>
 				<handler function="OncloseGameBtSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="emptyExternalEventsContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM6" variable="MenuItem2" member="yes">
-				<label>Ajouter des évènements externes</label>
+				<label>Add external events</label>
 				<bitmap>res/eventsadd16.png</bitmap>
 				<handler function="OnAddExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="externalEventsContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem3" member="yes">
-				<label>Editer</label>
+				<label>Edit</label>
 				<bitmap>res/eventsedit16.png</bitmap>
 				<handler function="OnEditExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM13" variable="MenuItem9" member="yes">
-				<label>Renommer</label>
+				<label>Rename</label>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OnRenameExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM8" variable="MenuItem4" member="yes">
-				<label>Ajouter des évènements externes</label>
+				<label>Add external events</label>
 				<bitmap>res/eventsadd16.png</bitmap>
 				<handler function="OnAddExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM9" variable="MenuItem5" member="yes">
-				<label>Supprimer</label>
+				<label>Delete</label>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDeleteExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem6" member="yes">
-				<label>Copier</label>
+				<label>Copy</label>
 				<bitmap>res/copyicon.png</bitmap>
 				<handler function="OnCopyExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem7" member="yes">
-				<label>Couper</label>
+				<label>Cut</label>
 				<bitmap>res/cuticon.png</bitmap>
 				<handler function="OnCutExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM12" variable="MenuItem8" member="yes">
-				<label>Coller</label>
+				<label>Paste</label>
 				<bitmap>res/pasteicon.png</bitmap>
 				<handler function="OnPasteExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="sourceFilesContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM18" variable="MenuItem14" member="yes">
-				<label>Créer un nouveau fichier C++</label>
+				<label>Create a new C++ file</label>
 				<handler function="OnCreateNewCppFileSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM14" variable="MenuItem10" member="yes">
-				<label>Ajouter un fichier C++ déjà existant</label>
+				<label>Add an already existing C++ file</label>
 				<bitmap>res/addicon.png</bitmap>
 				<handler function="OnAddCppSourceFileSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="sourceFileContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM15" variable="MenuItem11" member="yes">
-				<label>Editer</label>
+				<label>Edit</label>
 				<bitmap>res/editicon.png</bitmap>
 				<handler function="OnEditSourceFileSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM16" variable="MenuItem12" member="yes">
-				<label>Supprimer</label>
+				<label>Delete</label>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDeleteSourceFileSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM19" variable="MenuItem15" member="yes">
-				<label>Créer un nouveau fichier C++</label>
+				<label>Create a new C++ file</label>
 				<handler function="OnCreateNewCppFileSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM17" variable="MenuItem13" member="yes">
-				<label>Ajouter un fichier C++ déjà existant</label>
+				<label>Add an already existing C++ file</label>
 				<bitmap>res/addicon.png</bitmap>
 				<handler function="OnAddCppSourceFileSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="emptyExternalLayoutsContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM20" variable="MenuItem16" member="yes">
-				<label>Ajouter un agencement externe</label>
+				<label>Add an external layout</label>
 				<bitmap>res/eventsadd16.png</bitmap>
 				<handler function="OnAddExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="externalLayoutContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM21" variable="MenuItem17" member="yes">
-				<label>Editer</label>
+				<label>Edit</label>
 				<bitmap>res/eventsedit16.png</bitmap>
 				<handler function="OnEditExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM22" variable="MenuItem18" member="yes">
-				<label>Renommer</label>
+				<label>Rename</label>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OnRenameExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM23" variable="MenuItem19" member="yes">
-				<label>Ajouter un agencement externe</label>
+				<label>Add an external layout</label>
 				<bitmap>res/eventsadd16.png</bitmap>
 				<handler function="OnAddExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM24" variable="MenuItem20" member="yes">
-				<label>Supprimer</label>
+				<label>Delete</label>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDeleteExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM25" variable="MenuItem21" member="yes">
-				<label>Copier</label>
+				<label>Copy</label>
 				<bitmap>res/copyicon.png</bitmap>
 				<handler function="OnCopyExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM26" variable="MenuItem22" member="yes">
-				<label>Couper</label>
+				<label>Cut</label>
 				<bitmap>res/cuticon.png</bitmap>
 				<handler function="OnCutExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM27" variable="MenuItem23" member="yes">
-				<label>Coller</label>
+				<label>Paste</label>
 				<bitmap>res/pasteicon.png</bitmap>
 				<handler function="OnPasteExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

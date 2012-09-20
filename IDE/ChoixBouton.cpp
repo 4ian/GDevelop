@@ -29,24 +29,24 @@ ChoixBouton::ChoixBouton( wxWindow* parent, string pBouton ) :
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer2;
     wxFlexGridSizer* FlexGridSizer1;
-    
-    Create(parent, wxID_ANY, _("Choisir un bouton de la souris"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+
+    Create(parent, wxID_ANY, _("Choose a mouse button"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(333,249));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
-    wxString __wxRadioBoxChoices_1[5] = 
+    wxString __wxRadioBoxChoices_1[5] =
     {
-    	_("Bouton gauche"),
-    	_("Bouton droit"),
-    	_("Bouton central"),
-    	_("Bouton spécial 1"),
-    	_("Bouton spécial 2")
+    	_("Left button"),
+    	_("Right button"),
+    	_("Center button"),
+    	_("Special button 1"),
+    	_("Special button 2")
     };
-    RadioBox1 = new wxRadioBox(this, ID_RADIOBOX1, _("Choisissez le bouton :"), wxDefaultPosition, wxDefaultSize, 5, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
+    RadioBox1 = new wxRadioBox(this, ID_RADIOBOX1, _("Choose the button :"), wxDefaultPosition, wxDefaultSize, 5, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
     FlexGridSizer2->Add(RadioBox1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     TestPanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(123,117), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     TestPanel->SetBackgroundColour(wxColour(128,128,128));
-    TestPanel->SetToolTip(_("Cliquez avec le bouton pour le sélectionner automatiquement dans la liste"));
+    TestPanel->SetToolTip(_("Click with a button to automatically select this latter from the list"));
     FlexGridSizer2->Add(TestPanel, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -54,12 +54,13 @@ ChoixBouton::ChoixBouton( wxWindow* parent, string pBouton ) :
     FlexGridSizer3->AddGrowableRow(0);
     OkBt = new wxButton(this, ID_BUTTON2, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     FlexGridSizer3->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    CancelBt = new wxButton(this, ID_BUTTON1, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    CancelBt = new wxButton(this, ID_BUTTON1, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     FlexGridSizer3->Add(CancelBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer1);
-    FlexGridSizer1->SetSizeHints(this);
-    
+    SetSizer(FlexGridSizer1);
+    Layout();
+
     Connect(ID_RADIOBOX1,wxEVT_COMMAND_RADIOBOX_SELECTED,(wxObjectEventFunction)&ChoixBouton::OnRadioBox1Select);
     TestPanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&ChoixBouton::OnTestPanelLeftUp,0,this);
     TestPanel->Connect(wxEVT_MIDDLE_UP,(wxObjectEventFunction)&ChoixBouton::OnTestPanelMiddleUp,0,this);
@@ -120,3 +121,4 @@ void ChoixBouton::OnTestPanelRightDown( wxMouseEvent& event )
     RadioBox1->SetSelection( 1 );
     bouton = "Right";
 }
+

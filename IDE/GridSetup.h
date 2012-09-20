@@ -69,3 +69,4 @@ class GridSetup: public wxDialog
 };
 
 #endif
+

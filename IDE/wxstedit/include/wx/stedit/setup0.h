@@ -100,3 +100,4 @@
 #define STE_USE_LANG_PLSQL       1 // 71
 
 #endif // _STESETUP_H_
+

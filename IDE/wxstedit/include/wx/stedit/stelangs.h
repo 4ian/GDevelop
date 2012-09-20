@@ -295,3 +295,4 @@ typedef struct STE_Language
 } STE_Language;
 
 #endif // _STELANGS_H_
+

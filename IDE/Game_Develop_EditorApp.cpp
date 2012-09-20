@@ -77,7 +77,7 @@ void MessageLoading( string message, float avancement )
     // renvoyer une string
     string pourcent =  oss.str();
 
-    wxLogStatus( wxString(pourcent + _( " pourcents du chargement (" ) + message + _(" ).")) );
+    wxLogStatus( wxString(pourcent + _( " percents of loading (" ) + message + _(" ).")) );
 }
 
 
@@ -194,7 +194,7 @@ bool Game_Develop_EditorApp::OnInit()
                 languageId = wxLocale::FindLanguageInfo(languagesAvailables[i])->Language;
         }
 
-        GDpriv::LocaleManager::GetInstance()->SetLanguage(languageId);
+        gd::LocaleManager::GetInstance()->SetLanguage(languageId);
 
     }
     cout << "* Language loaded" << endl;
@@ -207,7 +207,7 @@ bool Game_Develop_EditorApp::OnInit()
     singleInstanceChecker = new wxSingleInstanceChecker;
     if ( singleInstanceChecker->IsAnotherRunning() && !parser.Found( wxT("allowMultipleInstances") ) )
     {
-        wxLogMessage(_("Une autre instance de Game Develop est actuellement ouverte. Glissez-déposez dessus un fichier pour l'ouvrir."));
+        wxLogMessage(_("Another instance of Game Develop is already running. Drag and drop a file on it to open it."));
 
         delete singleInstanceChecker;
         singleInstanceChecker = NULL;
@@ -221,16 +221,16 @@ bool Game_Develop_EditorApp::OnInit()
     bool sameGDLdllAsDuringCompilation = CompilationChecker::EnsureCorrectGDLVersion();
     if ( !sameGDLdllAsDuringCompilation )
     {
-        wxLogError(_("La version du fichier GDL.dll ( ou GDL.so ) semble être incorrecte. Veuillez réinstaller Game Develop afin que le programme fonctionne correctement.\nSi le problème persiste, assurez vous qu'il n'existe pas une nouvelle version de Game Develop sur le site officiel : http://www.compilgames.net\nSi non, prenez contact avec l'auteur."));
+        wxLogError(_("The version of GDL.dll ( or GDL.so ) seems to be incorrect. Try to reinstall Game Develop.\nIf the problem is still present, check for new version of Game Develop : http://www.compilgames.net\nIf there isn't any new version available, contact the author."));
     }
     cout << "* GDL checked" << endl;
 
     //Set help file
     {
         gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-        if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_ENGLISH )
+        if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_ENGLISH )
             helpFileAccess->InitWithHelpFile("help.chm");
-        else if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+        else if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
             helpFileAccess->InitWithHelpFile("aide.chm");
     }
     cout << "* Help file set" << endl;
@@ -468,3 +468,4 @@ bool Game_Develop_EditorApp::OnExceptionInMainLoop()
     return false;
     #endif
 }
+

@@ -92,3 +92,4 @@ private:
 };
 
 #endif // CLIPBOARD_H
+

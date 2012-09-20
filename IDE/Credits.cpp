@@ -72,10 +72,10 @@ Credits::Credits(wxWindow* parent)
 	wxFlexGridSizer* FlexGridSizer11;
 	wxGridSizer* GridSizer2;
 
-	Create(parent, wxID_ANY, _("A propos de Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("About Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(271,351));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/GD-logo.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP1"));
+	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/GD-logo.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer1->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
@@ -89,7 +89,7 @@ Credits::Credits(wxWindow* parent)
 	wxFont StaticText1Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText1->SetFont(StaticText1Font);
 	FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText4 = new wxStaticText(Panel1, ID_STATICTEXT4, _("a été créé par"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(Panel1, ID_STATICTEXT4, _("was created by"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer3->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	florianRival = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL1, _("Florian \"4ian\" Rival"), _("http://www.florianrival.com"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
@@ -100,7 +100,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer7->AddGrowableRow(0);
 	StaticBitmap2 = new wxStaticBitmap(Panel1, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/website16.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
 	FlexGridSizer7->Add(StaticBitmap2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("Support, aide, réponses aux suggestions sur"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText5 = new wxStaticText(Panel1, ID_STATICTEXT5, _("Support, assistance, answers to the suggestions on:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer7->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl1 = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL2, _("www.compilgames.net"), _("http://www.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	FlexGridSizer7->Add(HyperlinkCtrl1, 1, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -109,9 +109,9 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer5->AddGrowableRow(0);
 	StaticBitmap8 = new wxStaticBitmap(Panel1, ID_STATICBITMAP8, wxBitmap(wxImage(_T("res/donateicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP8"));
 	FlexGridSizer5->Add(StaticBitmap8, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("Vous appréciez Game Develop \?"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(Panel1, ID_STATICTEXT2, _("You like Game Develop\?"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer5->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl5 = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL16, _("Aidez l\'auteur en faisant un don."), _("http://www.compilgames.net/\?file=kop8.php"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
+	HyperlinkCtrl5 = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL16, _("You can make a donation to the author."), _("http://www.en.compilgames.net/\?file=kop8.php"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
 	FlexGridSizer5->Add(HyperlinkCtrl5, 1, wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
 	FlexGridSizer10->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel1->SetSizer(FlexGridSizer10);
@@ -121,7 +121,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer11->AddGrowableCol(0);
 	FlexGridSizer11->AddGrowableRow(0);
-	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("·Game Develop\n\nGame Develop est un freeware, il est donc totalement gratuit.\n\n-Vous pouvez utiliser le logiciel pour n\'importe quelle utilisation, personnelle ou commerciale.\n-Le logiciel est livré \"tel quel\", sans aucune garantie.\n-Vous pouvez distribuer le logiciel tant que vous ne demandez pas d\'argent pour, que vous ne dites pas que vous en êtes l\'auteur, et tant que vous distribuez le logiciel entier avec son programme d\'installation.\n-Vous ne devez pas tenter de décompiler le programme.\n\n·Jeux créés avec Game Develop\n\n-L\'auteur de Game Develop n\'est aucunement lié aux jeux créés avec Game Develop.\n-Vous n\'êtes pas obligé de mentionner l\'utilisation de Game Develop dans votre jeu. Une mention sera appréciée, mais n\'est pas obligatoire.\n\n·Si vous avez des questions\n\nContactez l\'auteur : CompilGames@gmail.com\nAller sur le site officiel : http://www.compilgames.net"), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("·Game DevelopGame Develop is a freeware, meaning it is totally free.-You can use the software, for personal or commercial use.-The software is provided \'as-is\', without any express or implied warranty.-You can distribute the software to anybody provided you don\'t require money for it, you don\'t claim to be the author and you distribute the entire software with its installer.-You must not try to decompile the software.·Games created with Game Develop-The author of Game Develop is not liable for games made with the software.-If you create a game with Game Develop, an acknowledgment in the game documentation would be appreciated but is not required.·If you have any questionsContact the author : CompilGames@gmail.com\nGo on our website : http://www.compilgames.net"), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer11->Add(TextCtrl1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel2->SetSizer(FlexGridSizer11);
 	FlexGridSizer11->Fit(Panel2);
@@ -139,7 +139,7 @@ Credits::Credits(wxWindow* parent)
 	Panel4 = new wxPanel(Notebook1, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer12->AddGrowableCol(0);
-	StaticText3 = new wxStaticText(Panel4, ID_STATICTEXT3, _("Programmé en C++, compilé avec TDM-GCC, avec l\'aide de Code::Blocks"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel4, ID_STATICTEXT3, _("Programmed in C++, compiled with TDM-GCC, with the help of Code:: Blocks"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer12->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridSizer2 = new wxGridSizer(0, 4, 0, 0);
 	BitmapButton1 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON8, wxBitmap(wxImage(_T("res/powered-cpp.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON8"));
@@ -154,7 +154,7 @@ Credits::Credits(wxWindow* parent)
 	BitmapButton3->SetDefault();
 	GridSizer2->Add(BitmapButton3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(GridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText8 = new wxStaticText(Panel4, ID_STATICTEXT8, _("Game Develop utilise les bibliothèques SFML, LLVM, Boost, wxWidgets et TinyXml."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+	StaticText8 = new wxStaticText(Panel4, ID_STATICTEXT8, _("Use SFML, LLVM, Boost, wxWidgets and TinyXml libraries."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
 	FlexGridSizer12->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridSizer1 = new wxGridSizer(0, 4, 0, 0);
 	BitmapButton4 = new wxBitmapButton(Panel4, ID_BITMAPBUTTON11, wxBitmap(wxImage(_T("res/powered-sfml.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON11"));
@@ -173,16 +173,17 @@ Credits::Credits(wxWindow* parent)
 	Panel4->SetSizer(FlexGridSizer12);
 	FlexGridSizer12->Fit(Panel4);
 	FlexGridSizer12->SetSizeHints(Panel4);
-	Notebook1->AddPage(Panel1, _("A propos"), false);
+	Notebook1->AddPage(Panel1, _("About"), false);
 	Notebook1->AddPage(Panel2, _("Licence"), false);
-	Notebook1->AddPage(Panel3, _("Remerciements"), false);
-	Notebook1->AddPage(Panel4, _("Technologies utilisées"), false);
+	Notebook1->AddPage(Panel3, _("Thanks"), false);
+	Notebook1->AddPage(Panel4, _("Used technologies"), false);
 	FlexGridSizer2->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	FlexGridSizer1->SetSizeHints(this);
+	SetSizer(FlexGridSizer1);
+	Layout();
 	Center();
 
 	Connect(ID_BITMAPBUTTON8,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Credits::OnCppBtClick);
@@ -204,33 +205,33 @@ Credits::Credits(wxWindow* parent)
     string status = GDLVersionWrapper::Status();
     string version ="Game Develop "+nbversion+" "+status+"";
 	StaticText1->SetLabel(version);
-	HtmlWindow1->SetPage("<html>\n<body>\n<h5>"+_("Contributeurs : ( Sans ordre spécial )")+"</h5>\n"
+	HtmlWindow1->SetPage("<html>\n<body>\n<h5>"+_("Contributors: ( No special order)")+"</h5>\n"
                       +"<br>"
-                      +_("François Dumortier : Conception du logo et du site web de Game Develop")+"<br>"
+                      +_("François Dumortier : Game Deveop logo design and website conception.")+"<br>"
                       +"( <a href=http://www.fdumortier.com>http://www.fdumortier.com</a> )"+"<br>"
                       +"<br>"
-                      +_("Victor Levasseur : Extension Widgets, XML avancé et contributions aux extensions Automatisme Moteur physique, Objet texte, Objet vidéo, Automatisme Chemin, Objet son")+"<br>"
+                      +_("Victor Levasseur: Widgets and Advanced XML extensions and contributions to Physics Engine, Text object, Video object, Path automatism and Sound object extension.")+"<br>"
                       +"( <a href=http://www.levasseursoftware.net/>http://www.levasseursoftware.net</a> )"+"<br>"
                       +"<br>"
-                      +_("Diego Schiavon : Traduction anglaise du tutoriel")+"<br>"
+                      +_("Diego Schiavon : English translation of the tutorial")+"<br>"
                       +"<br>"
-                      +_("MillionthVector : Graphismes de l'exemple Shoot")+"<br>"
+                      +_("MillionthVector : Graphics of various examples.")+"<br>"
                       +"( <a href=http://pixelhoot.x10.mx/>http://pixelhoot.x10.mx</a> )"+"<br>"
                       +"<br>"
-                      +_("Thomas Flecy : Version originale de l'extension Objet son")+"<br>"
+                      +_("Thomas Flecy: Original Sound object extension")+"<br>"
                       +"<br>"
-                      +_("Fernando José Martínez López : Traduction espagnole du tutoriel")+"<br>"
+                      +_("Fernando José Martínez López : Spanish translation of the tutorial")+"<br>"
                       +"<br>"
-                      +"<h5>"+_("Images et icones :")+"</h5>\n"
+                      +"<h5>"+_("Images and icons:")+"</h5>\n"
                       +"<br>"
-                      +_("La plupart des icones proviennent de Crystal Project Icons par Everaldo Coelho")+"<br>"
+                      +_("Most icons came from Crystal Project Icons by Everaldo Coelho")+"<br>"
                       +"( <a href=http://www.everaldo.com>http://www.everaldo.com</a> )"+"<br>"
-                      +_("Des images des jeux d'exemples et des ressources sont issues des packs d'images de Daniel Cook")+"<br>"
+                      +_("Some images of examples came from images pack by Daniel Cook")+"<br>"
                       +"( <a href=http://www.lostgarden.com>http://www.lostgarden.com</a> )"+"<br>"
-                      +_("Des images des jeux d'exemples sont issues des packs d'images d'Ari Feldman")+"<br>"
+                      +_("Some images of examples came from images pack by Ari Feldman")+"<br>"
                       +"( <a href=http://www.widgetworx.com/widgetworx/portfolio/spritelib.html>http://www.widgetworx.com/widgetworx/portfolio/spritelib.html</a> )"+"<br>"
                       +"<br>"
-                      +"\n<center><h5>"+_("Merci à toute la communauté et utilisateurs de Game Develop")+"</h5><br></center>\n</body>\n</html>");
+                      +"\n<center><h5>"+_("Thanks to all the community and users of Game Develop")+"</h5><br></center>\n</body>\n</html>");
 
 	FlexGridSizer3->Layout();
 }
@@ -302,7 +303,7 @@ void Credits::OnCompilGamesBtClick(wxCommandEvent& event)
 
 void Credits::OnDonBtClick(wxCommandEvent& event)
 {
-    OpenLink(_("http://www.compilgames.net/\?file=kop8.php"));
+    OpenLink(_("http://www.en.compilgames.net/\?file=kop8.php"));
 }
 
 void Credits::OnLLVMBtClick(wxCommandEvent& event)
@@ -319,3 +320,4 @@ void Credits::OnBoostBtClick(wxCommandEvent& event)
 {
     OpenLink(_("http://www.boost.org/"));
 }
+

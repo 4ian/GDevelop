@@ -25,3 +25,4 @@ private:
 };
 
 #endif // DNDTEXTSCENEEDITOR_H
+

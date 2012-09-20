@@ -8,7 +8,7 @@
 			<growablerows>1</growablerows>
 			<object class="sizeritem">
 				<object class="wxCheckBox" name="ID_CHECKBOX1" variable="activateCheck" member="yes">
-					<label>Activer le suivi des performances ( Relance la scène )</label>
+					<label>Activate profiling ( Relaunch the scene )</label>
 					<handler function="OnactivateCheckClick" entry="EVT_CHECKBOX" />
 				</object>
 				<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -151,33 +151,40 @@
 		</object>
 		<object class="wxMenu" variable="contextMenu" member="yes">
 			<object class="wxMenu" name="ID_MENUITEM3" variable="MenuItem3" member="yes">
-				<label>Nombre de mesures</label>
+				<label>Number of measures</label>
 				<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem1" member="yes">
-					<label>Changer le nombre de mesures</label>
+					<label>Change the number of measure</label>
 					<handler function="OnChangeDurationSelected" entry="EVT_MENU" />
 				</object>
 				<object class="wxMenuItem" name="wxID_ANY" variable="infiniteDataCheck" member="yes">
-					<label>Nombre infini</label>
+					<label>Infinity number</label>
 					<checkable>1</checkable>
 				</object>
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem2" member="yes">
-				<label>Changer l&apos;intervalle des mesures</label>
+				<label>Change the interval between each measures.</label>
 				<handler function="OnStepTimeSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="wxID_ANY" variable="totalTimeCheck" member="yes">
-				<label>Afficher le temps total</label>
+				<label>Display total time</label>
 				<checkable>1</checkable>
 			</object>
 			<object class="wxMenuItem" name="wxID_ANY" variable="eventsTimeCheck" member="yes">
-				<label>Afficher le temps des évènements</label>
+				<label>Display time used by events</label>
 				<checkable>1</checkable>
 			</object>
 			<object class="wxMenuItem" name="wxID_ANY" variable="objectsCountCheck" member="yes">
-				<label>Afficher le nombre d&apos;objets</label>
+				<label>Display the number of objects</label>
 				<checkable>1</checkable>
 			</object>
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

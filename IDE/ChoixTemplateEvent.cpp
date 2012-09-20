@@ -66,7 +66,7 @@ ChoixTemplateEvent::ChoixTemplateEvent( wxWindow* parent )
     wxFlexGridSizer* FlexGridSizer2;
     wxFlexGridSizer* FlexGridSizer1;
 
-    Create(parent, wxID_ANY, _("Choisir un modèle d\'évènement"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("Choose a template"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer1->AddGrowableCol(0);
     FlexGridSizer1->AddGrowableRow(0);
@@ -81,7 +81,7 @@ ChoixTemplateEvent::ChoixTemplateEvent( wxWindow* parent )
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBitmap1 = new wxStaticBitmap(Panel1, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/template.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
     FlexGridSizer3->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Modèles d\'évènements"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Templates"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
     wxFont StaticText1Font(16,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText1->SetFont(StaticText1Font);
     FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -89,57 +89,57 @@ ChoixTemplateEvent::ChoixTemplateEvent( wxWindow* parent )
     FlexGridSizer3->Fit(Panel1);
     FlexGridSizer3->SetSizeHints(Panel1);
     FlexGridSizer2->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-    StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Les modèles d\'évènements permettent d\'ajouter rapidement un \nou plusieurs évènements, et de les adapter à votre scène."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Template allow you to add quickly one or several events\nand to adapt them to your scene."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
     FlexGridSizer2->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
     FlexGridSizer2->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    DesTxt = new wxStaticText(this, ID_STATICTEXT3, _("Selectionnez un modèle dans la liste"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    DesTxt = new wxStaticText(this, ID_STATICTEXT3, _("Select a template in the list"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     FlexGridSizer2->Add(DesTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     controlsSizer = new wxFlexGridSizer(0, 1, 0, 0);
     controlsSizer->AddGrowableCol(0);
-    Txt1 = new wxStaticText(this, ID_STATICTEXT4, _("Description paramètre 1"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    Txt1 = new wxStaticText(this, ID_STATICTEXT4, _("Parameter 1 description :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     Txt1->Hide();
     controlsSizer->Add(Txt1, 1, wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Param1Edit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     Param1Edit->Hide();
     controlsSizer->Add(Param1Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Txt2 = new wxStaticText(this, ID_STATICTEXT5, _("Description paramètre 2"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+    Txt2 = new wxStaticText(this, ID_STATICTEXT5, _("Parameter 2 description :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
     Txt2->Hide();
     controlsSizer->Add(Txt2, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param2Edit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
     Param2Edit->Hide();
     controlsSizer->Add(Param2Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Txt3 = new wxStaticText(this, ID_STATICTEXT6, _("Description paramètre 3"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+    Txt3 = new wxStaticText(this, ID_STATICTEXT6, _("Parameter 3 description :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
     Txt3->Hide();
     controlsSizer->Add(Txt3, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param3Edit = new wxTextCtrl(this, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
     Param3Edit->Hide();
     controlsSizer->Add(Param3Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Txt4 = new wxStaticText(this, ID_STATICTEXT8, _("Description paramètre 4"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+    Txt4 = new wxStaticText(this, ID_STATICTEXT8, _("Parameter 4 description :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
     Txt4->Hide();
     controlsSizer->Add(Txt4, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param4Edit = new wxTextCtrl(this, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
     Param4Edit->Hide();
     controlsSizer->Add(Param4Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Txt5 = new wxStaticText(this, ID_STATICTEXT7, _("Description paramètre 5"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+    Txt5 = new wxStaticText(this, ID_STATICTEXT7, _("Parameter 5 description :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
     Txt5->Hide();
     controlsSizer->Add(Txt5, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param5Edit = new wxTextCtrl(this, ID_TEXTCTRL5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
     Param5Edit->Hide();
     controlsSizer->Add(Param5Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Txt6 = new wxStaticText(this, ID_STATICTEXT9, _("Description paramètre 6"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+    Txt6 = new wxStaticText(this, ID_STATICTEXT9, _("Parameter 6 description :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
     Txt6->Hide();
     controlsSizer->Add(Txt6, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param6Edit = new wxTextCtrl(this, ID_TEXTCTRL6, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
     Param6Edit->Hide();
     controlsSizer->Add(Param6Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Txt7 = new wxStaticText(this, ID_STATICTEXT10, _("Description paramètre 7"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
+    Txt7 = new wxStaticText(this, ID_STATICTEXT10, _("Parameter 7 description :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
     Txt7->Hide();
     controlsSizer->Add(Txt7, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param7Edit = new wxTextCtrl(this, ID_TEXTCTRL7, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
     Param7Edit->Hide();
     controlsSizer->Add(Param7Edit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Txt8 = new wxStaticText(this, ID_STATICTEXT11, _("Description paramètre 8"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
+    Txt8 = new wxStaticText(this, ID_STATICTEXT11, _("Parameter 8 description :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
     Txt8->Hide();
     controlsSizer->Add(Txt8, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Param8Edit = new wxTextCtrl(this, ID_TEXTCTRL8, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
@@ -152,11 +152,11 @@ ChoixTemplateEvent::ChoixTemplateEvent( wxWindow* parent )
     FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer5->AddGrowableCol(0);
-    InsererBt = new wxButton(this, ID_BUTTON2, _("Insérer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    InsererBt = new wxButton(this, ID_BUTTON2, _("Insert"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     FlexGridSizer5->Add(InsererBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    AnnulerBt = new wxButton(this, ID_BUTTON1, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    AnnulerBt = new wxButton(this, ID_BUTTON1, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     FlexGridSizer5->Add(AnnulerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    AideBt = new wxButton(this, ID_BUTTON3, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+    AideBt = new wxButton(this, ID_BUTTON3, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
     FlexGridSizer5->Add(AideBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer1);
@@ -254,18 +254,18 @@ void ChoixTemplateEvent::OnAnnulerBtClick( wxCommandEvent& event )
 void ChoixTemplateEvent::Refresh()
 {
     if ( !item.IsOk()) return;
-    if ( TemplateTree->GetItemText( item ) == _( "Tous les modèles" ) || TemplateTree->GetItemText( item ) == "")
+    if ( TemplateTree->GetItemText( item ) == _( "All templates" ) || TemplateTree->GetItemText( item ) == "")
         return;
 
     templatesList.clear();
 
     //Ouverture du fichier selectionné
-    wxString fichier = "Template/" + TemplateTree->GetItemText( item );
+    wxString fichier = "Templates/" + TemplateTree->GetItemText( item );
     TiXmlDocument doc( fichier.c_str() );
     if ( !doc.LoadFile() )
     {
         wxString ErrorDescription = doc.ErrorDesc();
-        wxString Error = _( "Erreur lors du chargement : " ) + ErrorDescription;
+        wxString Error = _( "Error while loading :" ) + ErrorDescription;
         wxLogWarning( Error );
     }
 
@@ -296,7 +296,7 @@ void ChoixTemplateEvent::Refresh()
         if ( elem->FirstChildElement( "Events" ) != NULL )
             OpenSaveGame::OpenEvents(newTemplate.events, elem->FirstChildElement( "Events" ));
         else
-            wxLogWarning( _( "Les évènements du modèle d'évènement manquent." ) );
+            wxLogWarning( _( "The events of the template are missing." ) );
 
         templatesList.push_back( newTemplate );
         elem = elem->NextSiblingElement();
@@ -309,7 +309,7 @@ void ChoixTemplateEvent::Refresh()
 void ChoixTemplateEvent::RefreshTree()
 {
     TemplateTree->DeleteAllItems();
-    TemplateTree->AddRoot( _( "Tous les modèles" ) );
+    TemplateTree->AddRoot( _( "All templates" ) );
 
 
     struct dirent *lecture;
@@ -384,8 +384,9 @@ string ChoixTemplateEvent::ConvertParam( string parameter, const string & toRepl
 
 void ChoixTemplateEvent::OnAideBtClick(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(151);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/template")); //TODO
 }
+

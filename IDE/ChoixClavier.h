@@ -54,3 +54,4 @@ class ChoixClavier: public wxDialog
 };
 
 #endif
+

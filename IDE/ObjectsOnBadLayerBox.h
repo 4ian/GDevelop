@@ -64,3 +64,4 @@ class ObjectsOnBadLayerBox: public wxDialog
 };
 
 #endif
+

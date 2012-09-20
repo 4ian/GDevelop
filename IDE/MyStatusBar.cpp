@@ -118,3 +118,4 @@ void MyStatusBar::OnSize(wxSizeEvent& event)
 
     event.Skip();
 }
+

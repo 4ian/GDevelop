@@ -1177,3 +1177,4 @@ wxBitmap wxSTEditorArtProvider::CreateBitmap(const wxArtID& id,
 
     return bmp;
 }
+

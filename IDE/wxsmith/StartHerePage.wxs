@@ -39,7 +39,7 @@
 									<cols>1</cols>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-											<label>Commencer</label>
+											<label>Getting started</label>
 											<fg>#5F5F5F</fg>
 											<font>
 												<size>12</size>
@@ -51,7 +51,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-											<label>Pour commencer, utilisez le gestionnaire de projet, à gauche&#x0A;par défaut, pour ajouter une scène ( clic droit sur &quot;Scènes&quot; ).&#x0A;Double cliquez ensuite dessus pour l&apos;éditer.</label>
+											<label>To begin, use the project manager&#x0A;to add a scene ( right click on &quot;Scenes&quot; ).&#x0A;Double click then on the new scene to edit it.</label>
 										</object>
 										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -71,7 +71,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL18" variable="HyperlinkCtrl6" member="yes">
-													<label>Lire le guide de démarrage</label>
+													<label>Read Getting Started Guide</label>
 													<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 													<handler function="OnguideBtClick" entry="EVT_HYPERLINK" />
 												</object>
@@ -93,7 +93,7 @@
 													<cols>3</cols>
 													<object class="sizeritem">
 														<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL19" variable="HyperlinkCtrl7" member="yes">
-															<label>Lire le tutoriel</label>
+															<label>Read the tutorial</label>
 															<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 															<handler function="OntutoBtClick" entry="EVT_HYPERLINK" />
 														</object>
@@ -103,7 +103,7 @@
 													</object>
 													<object class="sizeritem">
 														<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL20" variable="secondTutoLink" member="yes">
-															<label>(-Insert the name of the second tutorial or a blank text-)</label>
+															<label>( Spanish tutorial also available )</label>
 															<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 															<handler function="OnTutorial2BtClick" entry="EVT_HYPERLINK" />
 														</object>
@@ -126,7 +126,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
-											<label>Liens</label>
+											<label>Links</label>
 											<fg>#5F5F5F</fg>
 											<font>
 												<size>12</size>
@@ -150,7 +150,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL3" variable="HyperlinkCtrl3" member="yes">
-													<label>Accéder au wiki ( Base d&apos;articles et de connaissance )</label>
+													<label>Access to wiki ( Knowledge base )</label>
 													<url>http://www.wiki.compilgames.net</url>
 													<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 												</object>
@@ -169,7 +169,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL4" variable="HyperlinkCtrl4" member="yes">
-													<label>Accéder au forum</label>
+													<label>Access to forum</label>
 													<url>http://www.forum.compilgames.net</url>
 													<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 												</object>
@@ -188,7 +188,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL15" variable="resourcesLink" member="yes">
-													<label>Accéder aux ressources pour jeux</label>
+													<label>Access to resources</label>
 													<style>wxHL_ALIGN_LEFT|wxNO_BORDER</style>
 													<handler function="OnresourcesLinkClick" entry="EVT_HYPERLINK" />
 												</object>
@@ -210,7 +210,7 @@
 													<cols>3</cols>
 													<object class="sizeritem">
 														<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="fbLink" member="yes">
-															<label>Page Facebook</label>
+															<label>Facebook page</label>
 															<style>wxHL_ALIGN_LEFT|wxNO_BORDER</style>
 															<handler function="OnfbLinkClick" entry="EVT_HYPERLINK" />
 														</object>
@@ -229,7 +229,7 @@
 													</object>
 													<object class="sizeritem">
 														<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL2" variable="googleplusLink" member="yes">
-															<label>Page Google+</label>
+															<label>Google+ page</label>
 															<style>wxHL_ALIGN_LEFT|wxNO_BORDER</style>
 															<handler function="OngoogleplusLinkClick" entry="EVT_HYPERLINK" />
 														</object>
@@ -256,7 +256,7 @@
 									<growablecols>0</growablecols>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-											<label>Projets récents</label>
+											<label>Recent projects</label>
 											<fg>#5F5F5F</fg>
 											<font>
 												<size>13</size>
@@ -413,7 +413,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-											<label>Exemples</label>
+											<label>Examples</label>
 											<fg>#5F5F5F</fg>
 											<font>
 												<size>12</size>
@@ -437,7 +437,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL21" variable="HyperlinkCtrl9" member="yes">
-													<label>Ouvrir les exemples</label>
+													<label>Open examples</label>
 													<style>wxHL_ALIGN_LEFT|wxNO_BORDER</style>
 													<handler function="OnopenExamplesLinkClick" entry="EVT_HYPERLINK" />
 												</object>
@@ -478,8 +478,8 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL16" variable="HyperlinkCtrl5" member="yes">
-							<label>Vous appréciez Game Develop ? Aidez l&apos;auteur en faisant un don.</label>
-							<url>http://www.compilgames.net/contact.html</url>
+							<label>If you like Game Develop, you can make a donation to the author.</label>
+							<url>http://www.compilgames.net/contactEN.html</url>
 							<style>wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER</style>
 						</object>
 						<flag>wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL</flag>

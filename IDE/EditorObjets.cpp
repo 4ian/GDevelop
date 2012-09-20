@@ -65,15 +65,15 @@ mainFrameWrapper(mainFrameWrapper_)
     sceneNotebook = new wxNotebook(Notebook1, ID_NOTEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK2"));
     sceneObjectsEditor = new EditorObjectList(sceneNotebook, game, scene, mainFrameWrapper, &scene);
     ObjetsGroups = new EditorObjetsGroups(sceneNotebook, game, scene, &scene.GetObjectGroups(), mainFrameWrapper);
-    sceneNotebook->AddPage(sceneObjectsEditor, _("Objets"), false);
-    sceneNotebook->AddPage(ObjetsGroups, _("Groupes d\'objets"), false);
+    sceneNotebook->AddPage(sceneObjectsEditor, _("Objects"), false);
+    sceneNotebook->AddPage(ObjetsGroups, _("Objects groups"), false);
     globalNotebook = new wxNotebook(Notebook1, ID_NOTEBOOK3, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK3"));
     globalObjectsEditor = new EditorObjectList(globalNotebook, game, game, mainFrameWrapper, &scene);
     globalObjectsGroups = new EditorObjetsGroups(globalNotebook, game, scene, &game.GetObjectGroups(), mainFrameWrapper);
-    globalNotebook->AddPage(globalObjectsEditor, _("Objets globaux"), false);
-    globalNotebook->AddPage(globalObjectsGroups, _("Groupes globaux"), false);
-    Notebook1->AddPage(sceneNotebook, _("Scène"), false);
-    Notebook1->AddPage(globalNotebook, _("Global à tout le jeu"), false);
+    globalNotebook->AddPage(globalObjectsEditor, _("Global objects"), false);
+    globalNotebook->AddPage(globalObjectsGroups, _("Global groups"), false);
+    Notebook1->AddPage(sceneNotebook, _("Scene"), false);
+    Notebook1->AddPage(globalNotebook, _("Global"), false);
 
     Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorObjets::OnResize);
     //*)
@@ -122,3 +122,4 @@ void EditorObjets::OnResize(wxSizeEvent& event)
 {
     Notebook1->SetSize(GetSize());
 }
+

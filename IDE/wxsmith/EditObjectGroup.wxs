@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="EditObjectGroup">
-		<title>Editer le groupe d&apos;objets</title>
+		<title>Edit the objects group</title>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -30,7 +30,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-										<label>Les groupes d&apos;objets permettent d&apos;utiliser le nom&#x0A;du groupe pour se référer à tous les objets qu&apos;il&#x0A;contient.</label>
+										<label>Objects group allow to use the name of the group&#x0A;to refer to all objects it contains.</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -110,7 +110,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxButton" name="ID_BUTTON2" variable="AnnulerBt" member="yes">
-									<label>Annuler</label>
+									<label>Cancel</label>
 									<handler function="OnAnnulerBtClick" entry="EVT_BUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -128,15 +128,22 @@
 		</object>
 		<object class="wxMenu" variable="ContextMenu" member="yes">
 			<object class="wxMenuItem" name="idAddObjet" variable="MenuItem1" member="yes">
-				<label>Ajouter un objet</label>
+				<label>Add an object</label>
 				<bitmap>res/addicon.png</bitmap>
 				<handler function="OnAddObjetSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idDelObjet" variable="MenuItem2" member="yes">
-				<label>Supprimer l&apos;objet</label>
+				<label>Delete the object</label>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDelObjetSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

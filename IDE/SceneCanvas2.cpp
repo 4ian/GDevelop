@@ -43,7 +43,7 @@ SceneCanvas::SceneCanvas( wxWindow* parent, RuntimeGame & game_, Scene & scene_,
     reloadingIconImage.LoadFromFile("res/compile128.png");
     reloadingIconSprite.SetTexture(reloadingIconImage);
     reloadingText.SetColor(sf::Color(0,0,0,128));
-    reloadingText.SetString(string(_("Compilation en cours...").mb_str()));
+    reloadingText.SetString(string(_("Compiling...").mb_str()));
     reloadingText.SetCharacterSize(40);
 
     SetView( editionData.view );
@@ -129,17 +129,17 @@ wxRibbonButtonBar* SceneCanvas::CreateRibbonPage(wxRibbonPage * page)
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Mode"), wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonEditMode, !hideLabels ? _("Edition") : "", wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Aperçu") : "", wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonPreviewMode, !hideLabels ? _("Preview") : "", wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY));
     }
 
-    wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Outils"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+    wxRibbonPanel *toolsPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/tools24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
     wxRibbonButtonBar *toolsBar = new wxRibbonButtonBar(toolsPanel, wxID_ANY);
     CreateToolsBar(toolsBar, true); //Create an initial tool bar
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
     }
 
     return toolsBar; //Returned to the mainEditor, and will then be passed to Scene Editors with mainFrameWrapper
@@ -156,26 +156,26 @@ void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
     gd::CommonBitmapManager * bitmapManager = gd::CommonBitmapManager::GetInstance();
     if ( editing )
     {
-        bar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Editeur d'objets") : "", bitmapManager->objects24);
-        bar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Editeur de calques") : "", bitmapManager->layers24);
-        bar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Annuler") : "", bitmapManager->undo24);
-        bar->AddButton(idRibbonRedo, !hideLabels ? _("Refaire") : "", bitmapManager->redo24);
-        bar->AddButton(idRibbonOrigine, !hideLabels ? _("Revenir à l'origine") : "", bitmapManager->center24);
-        bar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Zoom initial") : "", bitmapManager->zoom24);
-        bar->AddButton(idRibbonGrid, !hideLabels ? _("Grille") : "", bitmapManager->grid24);
-        bar->AddButton(idRibbonGridSetup, !hideLabels ? _("Editer la grille") : "", bitmapManager->gridedit24);
-        bar->AddButton(idRibbonWindowMask, !hideLabels ? _("Masque de la fen. de jeu") : "", bitmapManager->windowMask24);
-        bar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Liste des objets") : "", bitmapManager->objectsPositionsList24);
+        bar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Objects' editor") : "", bitmapManager->objects24);
+        bar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Layers' editor") : "", bitmapManager->layers24);
+        bar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Cancel") : "", bitmapManager->undo24);
+        bar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", bitmapManager->redo24);
+        bar->AddButton(idRibbonOrigine, !hideLabels ? _("Return to the initial position ( 0;0 )") : "", bitmapManager->center24);
+        bar->AddHybridButton(idRibbonOriginalZoom, !hideLabels ? _("Initial zoom") : "", bitmapManager->zoom24);
+        bar->AddButton(idRibbonGrid, !hideLabels ? _("Grid") : "", bitmapManager->grid24);
+        bar->AddButton(idRibbonGridSetup, !hideLabels ? _("Edit the grid") : "", bitmapManager->gridedit24);
+        bar->AddButton(idRibbonWindowMask, !hideLabels ? _("Window mask") : "", bitmapManager->windowMask24);
+        bar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Objects list") : "", bitmapManager->objectsPositionsList24);
     }
     else
     {
-        bar->AddButton(idRibbonRefresh, !hideLabels ? _("Rafraichir") : "", bitmapManager->refreshicon24);
-        bar->AddButton(idRibbonPlay, !hideLabels ? _("Jouer") : "", bitmapManager->starticon24);
-        bar->AddButton(idRibbonPlayWin, !hideLabels ? _("Jouer dans une fenêtre") : "", bitmapManager->startwindow24);
+        bar->AddButton(idRibbonRefresh, !hideLabels ? _("Refresh") : "", bitmapManager->refreshicon24);
+        bar->AddButton(idRibbonPlay, !hideLabels ? _("Play") : "", bitmapManager->starticon24);
+        bar->AddButton(idRibbonPlayWin, !hideLabels ? _("Play in a window") : "", bitmapManager->startwindow24);
         bar->AddButton(idRibbonPause, !hideLabels ? _("Pause") : "", bitmapManager->pauseicon24);
         bar->AddButton(idRibbonDebugger, !hideLabels ? _("Debugger") : "", bitmapManager->bug24);
-        bar->AddButton(idRibbonProfiler, !hideLabels ? _("Performances") : "", bitmapManager->profiler24);
-        bar->AddButton(idRibbonFullScreen, !hideLabels ? _("Afficher l'éditeur en plein écran") : "", bitmapManager->fullscreen24);
+        bar->AddButton(idRibbonProfiler, !hideLabels ? _("Profiling") : "", bitmapManager->profiler24);
+        bar->AddButton(idRibbonFullScreen, !hideLabels ? _("Display editor fullscreen") : "", bitmapManager->fullscreen24);
     }
 
     bar->Realize();
@@ -257,9 +257,9 @@ void SceneCanvas::UpdateContextMenu()
     if ( static_cast<unsigned>(lowestLayer+1) < previewData.scene.GetLayersCount() )
     {
         string name = previewData.scene.GetLayer(lowestLayer+1).GetName();
-        if ( name == "" ) name = _("Calque de base");
+        if ( name == "" ) name = _("Base layer");
         contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(string(_("Passer le(s) objet(s) sur le calque \"")) + name +"\"");
+        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(string(_("Put the object(s) on the layer \"")) + name +"\"");
     }
 
     //Peut on descendre les objets sur un calque plus bas ? ( pléonasme )
@@ -269,10 +269,10 @@ void SceneCanvas::UpdateContextMenu()
     if ( highestLayer-1 >= 0 )
     {
         string name = previewData.scene.GetLayer(highestLayer-1).GetName();
-        if ( name == "" ) name = _("Calque de base");
+        if ( name == "" ) name = _("Base layer");
 
         contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);
-        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(string(_("Passer le(s) objet(s) sur le calque \"")) + name +"\"");
+        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(string(_("Put the object(s) on the layer \"")) + name +"\"");
     }
 }
 
@@ -401,16 +401,16 @@ void SceneCanvas::OnAnyMouseEvent( wxMouseEvent & event )
 void SceneCanvas::CreateMenus()
 {
     //Generate context menu
-    wxMenuItem * layerUpItem = new wxMenuItem((&contextMenu), ID_LAYERUPMENU, _("Passer le(s) objet(s) sur le calque supérieur"), wxEmptyString, wxITEM_NORMAL);
+    wxMenuItem * layerUpItem = new wxMenuItem((&contextMenu), ID_LAYERUPMENU, _("Put the object(s) on the higher layer"), wxEmptyString, wxITEM_NORMAL);
     layerUpItem->SetBitmap(wxImage( "res/up.png" ) );
-    wxMenuItem * layerDownItem = new wxMenuItem((&contextMenu), ID_LAYERDOWNMENU, _("Passer le(s) objet(s) sur le calque inférieur"), wxEmptyString, wxITEM_NORMAL);
+    wxMenuItem * layerDownItem = new wxMenuItem((&contextMenu), ID_LAYERDOWNMENU, _("Put the object(s) on the lower layer"), wxEmptyString, wxITEM_NORMAL);
     layerDownItem->SetBitmap(wxImage( "res/down.png" ) );
-    wxMenuItem * deleteItem = new wxMenuItem((&contextMenu), ID_DELOBJMENU, _("Supprimer la sélection\tDEL"), wxEmptyString, wxITEM_NORMAL);
+    wxMenuItem * deleteItem = new wxMenuItem((&contextMenu), ID_DELOBJMENU, _("Delete the selection\tDEL"), wxEmptyString, wxITEM_NORMAL);
     deleteItem->SetBitmap(wxImage( "res/deleteicon.png" ) );
 
-    contextMenu.Append(ID_PROPMENU, _("Propriétés"));
+    contextMenu.Append(ID_PROPMENU, _("Properties"));
     contextMenu.AppendSeparator();
-    contextMenu.Append(ID_CREATEOBJECTMENU, _("Insérer un nouvel objet"));
+    contextMenu.Append(ID_CREATEOBJECTMENU, _("Insert a new object"));
     contextMenu.AppendSeparator();
     contextMenu.Append(deleteItem);
     contextMenu.AppendSeparator();
@@ -418,38 +418,38 @@ void SceneCanvas::CreateMenus()
     contextMenu.Append(layerDownItem);
     contextMenu.AppendSeparator();
     {
-        wxMenuItem * copyItem = new wxMenuItem((&contextMenu), ID_COPYMENU, _("Copier"), wxEmptyString, wxITEM_NORMAL);
+        wxMenuItem * copyItem = new wxMenuItem((&contextMenu), ID_COPYMENU, _("Copy"), wxEmptyString, wxITEM_NORMAL);
         copyItem->SetBitmap(wxImage( "res/copyicon.png" ) );
         contextMenu.Append(copyItem);
-        wxMenuItem * cutItem = new wxMenuItem((&contextMenu), ID_CUTMENU, _("Couper"), wxEmptyString, wxITEM_NORMAL);
+        wxMenuItem * cutItem = new wxMenuItem((&contextMenu), ID_CUTMENU, _("Cut"), wxEmptyString, wxITEM_NORMAL);
         cutItem->SetBitmap(wxImage( "res/cuticon.png" ) );
         contextMenu.Append(cutItem);
-        wxMenuItem * pasteItem = new wxMenuItem((&contextMenu), ID_PASTEMENU, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+        wxMenuItem * pasteItem = new wxMenuItem((&contextMenu), ID_PASTEMENU, _("Paste"), wxEmptyString, wxITEM_NORMAL);
         pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
         contextMenu.Append(pasteItem);
-        wxMenuItem * pasteSpecialItem = new wxMenuItem((&contextMenu), ID_PASTESPECIALMENU, _("Collage spécial"), wxEmptyString, wxITEM_NORMAL);
+        wxMenuItem * pasteSpecialItem = new wxMenuItem((&contextMenu), ID_PASTESPECIALMENU, _("Special paste"), wxEmptyString, wxITEM_NORMAL);
         contextMenu.Append(pasteSpecialItem);
     }
 
     //Generate "no object" context menu
     {
-        noObjectContextMenu.Append(ID_CREATEOBJECTMENU, _("Insérer un nouvel objet"));
+        noObjectContextMenu.Append(ID_CREATEOBJECTMENU, _("Insert a new object"));
         noObjectContextMenu.AppendSeparator();
-        wxMenuItem * pasteItem = new wxMenuItem((&noObjectContextMenu), ID_PASTEMENU, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+        wxMenuItem * pasteItem = new wxMenuItem((&noObjectContextMenu), ID_PASTEMENU, _("Paste"), wxEmptyString, wxITEM_NORMAL);
         pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
         noObjectContextMenu.Append(pasteItem);
-        wxMenuItem * pasteSpecialItem = new wxMenuItem((&noObjectContextMenu), ID_PASTESPECIALMENU, _("Collage spécial"), wxEmptyString, wxITEM_NORMAL);
+        wxMenuItem * pasteSpecialItem = new wxMenuItem((&noObjectContextMenu), ID_PASTESPECIALMENU, _("Special paste"), wxEmptyString, wxITEM_NORMAL);
         noObjectContextMenu.Append(pasteSpecialItem);
     }
 
     //Generate undo menu
     {
-        wxMenuItem * undo10item = new wxMenuItem(&undoMenu, idUndo10, _("Annuler les 10 précédentes actions"), wxEmptyString, wxITEM_NORMAL);
+        wxMenuItem * undo10item = new wxMenuItem(&undoMenu, idUndo10, _("Cancel 10 changes"), wxEmptyString, wxITEM_NORMAL);
         undoMenu.Append(undo10item);
-        wxMenuItem * undo20item = new wxMenuItem(&undoMenu, idUndo20, _("Annuler les 20 précédentes actions"), wxEmptyString, wxITEM_NORMAL);
+        wxMenuItem * undo20item = new wxMenuItem(&undoMenu, idUndo20, _("Cancel 20 changes"), wxEmptyString, wxITEM_NORMAL);
         undoMenu.Append(undo20item);
         undoMenu.AppendSeparator();
-        wxMenuItem * clearHistoryItem = new wxMenuItem(&undoMenu, idClearHistory, _("Supprimer l'historique des changements"), wxEmptyString, wxITEM_NORMAL);
+        wxMenuItem * clearHistoryItem = new wxMenuItem(&undoMenu, idClearHistory, _("Delete the historic"), wxEmptyString, wxITEM_NORMAL);
         clearHistoryItem->SetBitmap(wxImage( "res/history_clear16.png" ) );
         undoMenu.Append(clearHistoryItem);
     }
@@ -494,7 +494,7 @@ void SceneCanvas::OnDebugBtClick( wxCommandEvent & event )
 
 void SceneCanvas::OnHelpBtClick( wxCommandEvent & event )
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(12);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_scene"));
@@ -650,3 +650,4 @@ void SceneCanvas::OnFullScreenBtClick(wxCommandEvent & event)
     else
         mainFrameWrapper.GetMainEditor()->ShowFullScreen(false);
 }
+

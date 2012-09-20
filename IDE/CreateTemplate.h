@@ -129,3 +129,4 @@ class CreateTemplate: public wxDialog
 };
 
 #endif
+

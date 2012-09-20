@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="mp3ogg">
-		<title>Convertir Mp3 vers OGG Vorbis</title>
+		<title>Convert MP3 to OGG Vorbis</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
@@ -25,7 +25,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-										<label>Game Develop ne pouvant lire le format MP3 ( license et&#x0A;algorithmes brevetés par Fraunhofer-Gesellschaft ), vous pouvez &#x0A;convertir une musique MP3 au format libre OGG Vorbis ou WAV.</label>
+										<label>Game Develop can not read the MP3 format ( owing to license&#x0A;and algorithms patented by Fraunhofer-Gesellschaft ), you can&#x0A;convert a MP3 file to the free OGG Vobris format or WAV.</label>
 										<size>336,54</size>
 										<style>wxALIGN_CENTRE</style>
 									</object>
@@ -58,7 +58,7 @@
 							<growablecols>0</growablecols>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-									<label>Le fichier MP3 est une musique, ou est destiné à être joué en tant&#x0A;que musique :</label>
+									<label>A MP3 file is a music, or is meant to be played as a music :</label>
 									<size>317,36</size>
 								</object>
 								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -67,7 +67,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxButton" name="ID_BUTTON1" variable="EncoderBt" member="yes">
-									<label>Choisir un fichier MP3 et l&apos;encoder en OGG Vorbis</label>
+									<label>Choose a MP3 file and encode in OGG Vorbis</label>
 									<handler function="OnEncoderBtClick" entry="EVT_BUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -76,7 +76,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-									<label>Le fichier WAV est un son, un bruitage, ou est destiné à être joué en&#x0A;tant que son :</label>
+									<label>A WAV file is a sound, an effect, or is meant to be played as a sound :</label>
 									<size>331,35</size>
 								</object>
 								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -85,7 +85,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxButton" name="ID_BUTTON3" variable="EncoderWAVBt" member="yes">
-									<label>Choisir un fichier MP3 et l&apos;encoder en WAV</label>
+									<label>Choose a MP3 file and encode in WAV</label>
 									<handler function="OnEncoderWAVBtClick" entry="EVT_BUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -106,7 +106,7 @@
 					<label>Note</label>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-							<label>Cet utilitaire fait appel à LAME.EXE ( De/encodeur MP3 libre )&#x0A;et à OGGENC.EXE ( Encodeur OGG Vorbis libre ).&#x0A;Ils sont inclus dans le répertoire de Game Develop à l&apos;installation.</label>
+							<label>This utility uses lame.exe ( free MP3 Encoder )&#x0A;and OGGENC.EXE (free OGG Vorbis Encoder ).&#x0A;These latter are included in the Game Develop directory.</label>
 							<size>331,61</size>
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -130,7 +130,7 @@
 					<cols>2</cols>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="FermerBt" member="yes">
-							<label>Fermer</label>
+							<label>Close</label>
 							<handler function="OnFermerBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -144,3 +144,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

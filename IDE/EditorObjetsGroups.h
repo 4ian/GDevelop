@@ -122,3 +122,4 @@ class EditorObjetsGroups: public wxPanel
 };
 
 #endif
+

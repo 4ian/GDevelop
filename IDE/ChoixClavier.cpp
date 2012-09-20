@@ -30,21 +30,21 @@ ChoixClavier::ChoixClavier(wxWindow* parent, string pTouche)
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Choisir une touche du clavier"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Choose a key"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	SetClientSize(wxSize(234,179));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT3, _("Cliquez sur la zone, puis appuyez sur une touche du clavier"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT3, _("Click on the area, and press a key"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer1->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	AideTxt = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(285,85), wxSUNKEN_BORDER|wxWANTS_CHARS, _T("ID_PANEL1"));
 	AideTxt->SetBackgroundColour(wxColour(80,80,80));
 	FlexGridSizer1->Add(AideTxt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Touche choisie :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Chosen key :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	toucheTxt = new wxStaticText(this, ID_STATICTEXT2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer2->Add(toucheTxt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	Button1 = new wxButton(this, ID_BUTTON1, _("Fermer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	Button1 = new wxButton(this, ID_BUTTON1, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer1->Add(Button1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->SetSizeHints(this);
@@ -155,21 +155,21 @@ void ChoixClavier::OnPanel1KeyDown(wxKeyEvent& event)
 
     if ( event.ControlDown() )
     {
-        if ( wxMessageBox(_("Control droit : Oui\nControl gauche : non"), _("Choisissez la touche"), wxYES_NO) == wxYES)
+        if ( wxMessageBox(_("Right Control : Yes\nLeft Control : No"), _("Choose the key"), wxYES_NO) == wxYES)
             touche = "RControl";
         else
             touche = "LControl";
     }
     if ( event.AltDown() )
     {
-        if ( wxMessageBox(_("Alt droit : Oui\nAlt gauche : non"), _("Choisissez la touche"), wxYES_NO) == wxYES)
+        if ( wxMessageBox(_("Right Alt : Yes\nLeft alt : No"), _("Choose the key"), wxYES_NO) == wxYES)
             touche = "RAlt";
         else
             touche = "LAlt";
     }
     if ( event.ShiftDown() )
     {
-        if ( wxMessageBox(_("Shift droit : Oui\nShift gauche : non"), _("Choisissez la touche"), wxYES_NO) == wxYES)
+        if ( wxMessageBox(_("Right Shift : Yes\nLeft Shift : No"), _("Choose the key"), wxYES_NO) == wxYES)
             touche = "RShift";
         else
             touche = "LShift";
@@ -177,3 +177,4 @@ void ChoixClavier::OnPanel1KeyDown(wxKeyEvent& event)
 
     toucheTxt->SetLabel(touche);
 }
+

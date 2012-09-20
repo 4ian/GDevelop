@@ -748,7 +748,7 @@ wxString wxSTEditorStyles::LoadConfig( wxConfigBase &config,
 
     if (!errorMsg.IsEmpty())
     {
-        wxString msg = _("Error loading editor config data, would you like to repair it?\n\n") + errorMsg;
+        wxString msg = _("Error loading editor config data, would you like to repair it\?\n\n") + errorMsg;
 
         int ret = wxMessageBox( msg,
                                 _("Config load error"),
@@ -980,3 +980,4 @@ void wxSTEditorStyles::SaveConfig( wxConfigBase &config,
 
 // global precreated wxSTEditorStyles
 wxSTEditorStyles s_wxSTEditorStyles(true);
+

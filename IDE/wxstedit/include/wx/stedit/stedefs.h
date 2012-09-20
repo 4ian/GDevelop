@@ -944,3 +944,4 @@ enum STE_LangFlagsType
 };
 
 #endif // _STEDEFS_H_
+

@@ -83,30 +83,30 @@ mainFrameWrapper(mainFrameWrapper_)
 	ObjetsGroupsList = new wxTreeCtrl(this, ID_TREECTRL1, wxPoint(-72,-72), wxSize(179,170), wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer1->Add(ObjetsGroupsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	editMenuItem = new wxMenuItem((&ContextMenu), IdGroupEdit, _("Editer le groupe"), wxEmptyString, wxITEM_NORMAL);
+	editMenuItem = new wxMenuItem((&ContextMenu), IdGroupEdit, _("Edit the group"), wxEmptyString, wxITEM_NORMAL);
 	editMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editpropicon.png"))));
 	ContextMenu.Append(editMenuItem);
-	MenuItem4 = new wxMenuItem((&ContextMenu), idModName, _("Modifier le nom"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem4 = new wxMenuItem((&ContextMenu), idModName, _("Change the name"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	ContextMenu.Append(MenuItem4);
 	ContextMenu.AppendSeparator();
-	MenuItem2 = new wxMenuItem((&ContextMenu), idAddGroup, _("Ajouter un groupe"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem2 = new wxMenuItem((&ContextMenu), idAddGroup, _("Add a group"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	ContextMenu.Append(MenuItem2);
-	MenuItem3 = new wxMenuItem((&ContextMenu), idDelGroup, _("Supprimer le groupe"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem3 = new wxMenuItem((&ContextMenu), idDelGroup, _("Delete the group"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	ContextMenu.Append(MenuItem3);
 	ContextMenu.AppendSeparator();
-	MenuItem1 = new wxMenuItem((&ContextMenu), ID_MENUITEM1, _("Copier"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem1 = new wxMenuItem((&ContextMenu), ID_MENUITEM1, _("Copy"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	ContextMenu.Append(MenuItem1);
-	MenuItem5 = new wxMenuItem((&ContextMenu), ID_MENUITEM2, _("Couper"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem5 = new wxMenuItem((&ContextMenu), ID_MENUITEM2, _("Cut"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
 	ContextMenu.Append(MenuItem5);
-	MenuItem6 = new wxMenuItem((&ContextMenu), ID_MENUITEM3, _("Coller"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem6 = new wxMenuItem((&ContextMenu), ID_MENUITEM3, _("Paste"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	ContextMenu.Append(MenuItem6);
-	MenuItem7 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM4, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem7 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM4, _("Delete"), wxEmptyString, wxITEM_NORMAL);
 	multipleContextMenu.Append(MenuItem7);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
@@ -137,15 +137,15 @@ mainFrameWrapper(mainFrameWrapper_)
                                    wxTB_FLAT | wxTB_NODIVIDER );
 
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( ID_Refresh, _( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Rafraichir la liste d'images") );
+    toolbar->AddTool( ID_Refresh, _( "Refresh" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Refresh the image list") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idAddGroup, _( "Ajouter un groupe" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un groupe") );
-    toolbar->AddTool( idDelGroup, _( "Supprimer le groupe selectionné" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer le groupe selectionné") );
-    toolbar->AddTool( IdGroupEdit, _( "Modifier le groupe" ), wxBitmap( wxImage( "res/editpropicon.png" ) ), _("Modifier le groupe") );
-    toolbar->AddTool( idRibbonUp, _( "Déplacer le groupe vers le haut" ), wxBitmap( wxImage( "res/up24.png" ) ), _("Déplacer le groupe vers le haut") );
-    toolbar->AddTool( idRibbonDown, _( "Déplacer le groupe vers le bas" ), wxBitmap( wxImage( "res/down24.png" ) ), _("Déplacer le groupe vers le bas") );
+    toolbar->AddTool( idAddGroup, _( "Add a group" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Add a group") );
+    toolbar->AddTool( idDelGroup, _( "Delete the selected group" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Delete the selected group") );
+    toolbar->AddTool( IdGroupEdit, _( "Edit the group" ), wxBitmap( wxImage( "res/editpropicon.png" ) ), _("Edit the group") );
+    toolbar->AddTool( idRibbonUp, _( "Move up" ), wxBitmap( wxImage( "res/up24.png" ) ), _("Move up") );
+    toolbar->AddTool( idRibbonDown, _( "Move down" ), wxBitmap( wxImage( "res/down24.png" ) ), _("Move down") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_Help, _( "Aide de l'éditeur de groupes d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur de groupes d'objets") );
+    toolbar->AddTool( ID_Help, _( "Objects group editor help" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Objects group editor help") );
     toolbar->Realize();
 
     Connect(ID_Refresh,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditorObjetsGroups::Refresh);
@@ -176,23 +176,23 @@ void EditorObjetsGroups::CreateRibbonPage(wxRibbonPage * page)
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
 
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Liste de groupes"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Group's list"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Ajouter un groupe") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Supprimer") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Déplacer vers le haut") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Déplacer vers le bas") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonAdd, !hideLabels ? _("Add a group") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDel, !hideLabels ? _("Delete") : "", wxBitmap("res/delete24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonUp, !hideLabels ? _("Move up") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonDown, !hideLabels ? _("Move down") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Objet sélectionné"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Selected object"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonEdit, !hideLabels ? _("Editer le groupe") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonModName, !hideLabels ? _("Editer le nom") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonEdit, !hideLabels ? _("Edit the group") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonModName, !hideLabels ? _("Edit the name") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
     }
     {
-        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Aide"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+        wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Aide") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
     }
 
 }
@@ -214,7 +214,7 @@ void EditorObjetsGroups::ConnectEvents()
 void EditorObjetsGroups::Refresh()
 {
     ObjetsGroupsList->DeleteAllItems();
-    ObjetsGroupsList->AddRoot( _( "Tous les groupes d'objets de la scène" ) );
+    ObjetsGroupsList->AddRoot( _( "All group of objects of the scene" ) );
 
     for (unsigned int i = 0;i<objectsGroups->size();++i)
         ObjetsGroupsList->AppendItem( ObjetsGroupsList->GetRootItem(), objectsGroups->at( i ).GetName() );
@@ -293,7 +293,7 @@ void EditorObjetsGroups::OnMoveDownSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnHelp(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(180);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_group")); //TODO
@@ -353,7 +353,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     gd::ObjectGroup NewGroup;
     wxTreeItemId rootId = ObjetsGroupsList->GetRootItem();
 
-    wxString name =  _( "Nouveau_groupe" );
+    wxString name =  _( "New_group" );
     int i = 1;
 
     //Tant qu'un objet avec le même nom existe, on ajoute un chiffre
@@ -361,7 +361,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
             != objectsGroups->end() )
     {
         ++i;
-        name =  _( "Nouveau_groupe" )+"_"+ ToString(i);
+        name =  _( "New_group" )+"_"+ ToString(i);
     }
     NewGroup.SetName( string(name.mb_str()) );
 
@@ -371,7 +371,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
 
     scene.wasModified = true;
     CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
-    wxLogStatus( _( "Le groupe a été correctement ajouté" ) );
+    wxLogStatus( _( "The group was correctly added." ) );
 }
 
 ////////////////////////////////////////////////////////////
@@ -384,15 +384,15 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
     ObjetsGroupsList->GetSelections(selection);
     std::vector < string > groupsDeleted;
 
-    int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Supprimer également toutes les références au groupe dans les évènements ( Soit les actions et conditions utilisant le groupe ) ?") :
-                                                             wxString::Format(_("Supprimer également toutes les références aux %i groupes dans les évènements ( Soit les actions et conditions utilisant les groupes ) ?"), selection.GetCount()),
-                              _("Confirmation de la suppression"), wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT);
+    int answer = wxMessageBox(selection.GetCount() <= 1 ? _("Delete also all references to the group in events ( i.e. Actions and conditions using the object )\?") :
+                                                             wxString::Format(_("Delete also all references to these %i groups in events ( i.e. Actions and conditions using the object )\?"), selection.GetCount()),
+                              _("Confirm deletion"), wxYES_NO | wxCANCEL | wxCANCEL_DEFAULT);
 
     if ( answer == wxCANCEL ) return;
 
     if ( itemSelected == ObjetsGroupsList->GetRootItem() )
     {
-        wxLogStatus( _( "Aucun groupe sélectionné" ) );
+        wxLogStatus( _( "No group selected" ) );
         return;
     }
 
@@ -458,7 +458,7 @@ void EditorObjetsGroups::OnObjetsGroupsListItemActivated(wxTreeEvent& event)
     if ( i != objectsGroups->end() )
     {
         //Affichage du contenu du groupe
-        wxString tooltip = _("Contenu du groupe \"");
+        wxString tooltip = _("Contents of group \"");
         tooltip += nomItemSelected;
         tooltip += "\" :\n";
         vector < string > allObjects = i->GetAllObjectsNames();
@@ -507,7 +507,7 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
                         std::bind2nd(gd::GroupHasTheSameName(), event.GetLabel()))
         != objectsGroups->end())
     {
-        wxLogWarning( _( "Impossible de renommer le groupe : un autre groupe porte déjà ce nom." ) );
+        wxLogWarning( _( "Unable to rename the groupe : another group has already this name." ) );
 
         event.Veto();
         return;
@@ -536,10 +536,10 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnModNameSelected(wxCommandEvent& event)
 {
-    if ( ObjetsGroupsList->GetItemText( itemSelected ) != _( "Tous les groupes de de la scène" ) )
+    if ( ObjetsGroupsList->GetItemText( itemSelected ) != _( "All groups of the scene" ) )
         ObjetsGroupsList->EditLabel( itemSelected );
     else
-        wxLogStatus( _( "Aucun groupe sélectionné" ) );
+        wxLogStatus( _( "No group selected" ) );
 }
 
 ////////////////////////////////////////////////////////////
@@ -609,7 +609,7 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
             != objectsGroups->end() )
     {
         ++i;
-        groupPasted.SetName(ToString(_( "Copie_de_" )+groupPasted.GetName()+"_"+ToString(i)));
+        groupPasted.SetName(ToString(_( "Copy_of_" )+groupPasted.GetName()+"_"+ToString(i)));
     }
 
     //On l'ajoute
@@ -619,3 +619,4 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
     scene.wasModified = true;
     CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
 }
+

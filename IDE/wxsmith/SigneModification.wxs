@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="SigneModification">
-		<title>Choisir le signe de la modification</title>
+		<title>Choose the modification's sign</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<object class="sizeritem">
 				<object class="wxRadioBox" name="ID_RADIOBOX1" variable="SigneRadio" member="yes">
-					<label>Signe de la modification</label>
+					<label>Modification's sign</label>
 					<content>
-						<item>= ( Mettre à )</item>
-						<item>+ ( Ajouter )</item>
-						<item>- ( Soustraire )</item>
-						<item>* ( Multiplier par )</item>
-						<item>/ ( Division par )</item>
+						<item>= ( Set to )</item>
+						<item>+ ( Add )</item>
+						<item>- ( Subtract )</item>
+						<item>* ( Multiply by )</item>
+						<item>/ ( Divide by )</item>
 					</content>
 					<default>-1</default>
 				</object>
@@ -33,3 +33,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

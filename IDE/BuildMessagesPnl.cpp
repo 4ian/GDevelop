@@ -48,9 +48,9 @@ BuildMessagesPnl::BuildMessagesPnl(wxWindow* parent, ProjectManager * projectMan
     Connect(wxEVT_SIZE,(wxObjectEventFunction)&BuildMessagesPnl::OnResize);
     //*)
 
-    messagesList->InsertColumn(0, _("Fichier"));
-    messagesList->InsertColumn(1, _("Ligne"));
-    messagesList->InsertColumn(2, _("Colonne"));
+    messagesList->InsertColumn(0, _("File"));
+    messagesList->InsertColumn(1, _("Line"));
+    messagesList->InsertColumn(2, _("Column"));
     messagesList->InsertColumn(3, _("Message"));
 }
 
@@ -125,3 +125,4 @@ void BuildMessagesPnl::OnResize(wxSizeEvent& event)
     messagesList->SetColumnWidth(2, 35);
     messagesList->SetColumnWidth(3, messagesList->GetSize().GetWidth()-messagesList->GetColumnWidth(0)-messagesList->GetColumnWidth(1)-messagesList->GetColumnWidth(2));
 }
+

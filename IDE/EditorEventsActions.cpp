@@ -98,3 +98,10 @@ void OldEventsEditor::OnPasteActionMenuSelected(wxCommandEvent& event)
     GetLastSelectedEvent()->eventHeightNeedUpdate = true;
     ChangesMadeOnEvents();
 }
+
+
+
+
+
+
+

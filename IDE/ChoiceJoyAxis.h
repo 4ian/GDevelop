@@ -70,3 +70,4 @@ class ChoiceJoyAxis: public wxDialog
 };
 
 #endif
+

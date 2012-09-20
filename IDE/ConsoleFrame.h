@@ -53,3 +53,4 @@ class ConsoleFrame: public wxFrame
 };
 
 #endif
+

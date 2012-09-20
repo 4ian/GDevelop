@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="RenderDialog">
-		<title>Aperçu</title>
+		<title>Preview</title>
 		<id_arg>0</id_arg>
 		<handler function="OnClose" entry="EVT_CLOSE" />
 		<object class="Custom" name="ID_CUSTOM1" subclass="wxSFMLCanvas" variable="renderCanvas" member="yes">
@@ -13,3 +13,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

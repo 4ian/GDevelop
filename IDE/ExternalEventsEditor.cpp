@@ -44,10 +44,10 @@ mainFrameWrapper(mainFrameWrapper_)
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer2->AddGrowableCol(1);
 	FlexGridSizer2->AddGrowableRow(0);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Editer comme si les évènements étaient inclus à la scène :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Edit as if the events were included to scene :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	parentSceneComboBox = new wxComboBox(this, ID_COMBOBOX1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_COMBOBOX1"));
-	parentSceneComboBox->SetSelection( parentSceneComboBox->Append(_("Aucune scène")) );
+	parentSceneComboBox->SetSelection( parentSceneComboBox->Append(_("No scene")) );
 	FlexGridSizer2->Add(parentSceneComboBox, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -100,7 +100,7 @@ void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
         scene = &emptyScene;
     else
     {
-        wxLogWarning(_("Scène introuvable."));
+        wxLogWarning(_("Scene not found."));
         return;
     }
 
@@ -120,8 +120,9 @@ void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
 void ExternalEventsEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
 {
     parentSceneComboBox->Clear();
-    parentSceneComboBox->Append(_("Aucune scène"));
+    parentSceneComboBox->Append(_("No scene"));
 
     for (unsigned int i = 0;i<game.GetLayoutCount();++i)
     	parentSceneComboBox->Append(game.GetLayout(i).GetName());
 }
+

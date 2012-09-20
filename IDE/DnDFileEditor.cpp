@@ -12,3 +12,4 @@ bool DnDFileEditor::OnDropFiles(wxCoord x, wxCoord y,
 
     return true;
 }
+

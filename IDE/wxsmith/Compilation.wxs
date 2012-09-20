@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="Compilation">
-		<title>Compilation du jeu</title>
+		<title>Game compilation</title>
 		<centered>1</centered>
 		<extra_code>wxIcon FrameIcon;&#x0A;FrameIcon.CopyFromBitmap(wxBitmap(wxImage(__T(&quot;res/compilationicon.png&quot;))));&#x0A;SetIcon(FrameIcon);</extra_code>
 		<id_arg>0</id_arg>
@@ -28,7 +28,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxButton" name="ID_BUTTON1" variable="CompilBt" member="yes">
-									<label>Lancer la compilation</label>
+									<label>Compile</label>
 									<handler function="OnCompilBtClick" entry="EVT_BUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -64,7 +64,7 @@
 									<growablecols>1</growablecols>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-											<label>Dossier d&apos;export :</label>
+											<label>Export folder:</label>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -103,7 +103,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxCheckBox" name="ID_CHECKBOX1" variable="compressCheck" member="yes">
-											<label>Compresser en un fichier unique</label>
+											<label>Compress in a single file</label>
 										</object>
 										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -117,7 +117,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxCheckBox" name="ID_CHECKBOX4" variable="optimizationCheck" member="yes">
-											<label>Activer les optimisations ( ralentit la compilation )</label>
+											<label>Activate optimizations ( slow down compilation )</label>
 										</object>
 										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -149,7 +149,7 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON4" variable="AideBt" member="yes">
-							<label>Aide</label>
+							<label>Help</label>
 							<handler function="OnAideBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -158,7 +158,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="FermerBt" member="yes">
-							<label>Fermer</label>
+							<label>Close</label>
 							<handler function="OnFermerBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -172,3 +172,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

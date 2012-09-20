@@ -67,3 +67,4 @@ class GeneratePassword: public wxDialog
 };
 
 #endif
+

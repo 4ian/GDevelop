@@ -96,3 +96,4 @@ class EditObjectGroup: public wxDialog
 };
 
 #endif
+

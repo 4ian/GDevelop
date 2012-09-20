@@ -12,3 +12,10 @@ class LogManager
 };
 
 #endif // LOGMANAGER_H
+
+
+
+
+
+
+

@@ -67,7 +67,7 @@ modificationCount(0)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
-	Create(parent, wxID_ANY, _("Editer le groupe d\'objets"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edit the objects group"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
@@ -79,7 +79,7 @@ modificationCount(0)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/groupeobjet48.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Les groupes d\'objets permettent d\'utiliser le nom\ndu groupe pour se référer à tous les objets qu\'il\ncontient."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Objects group allow to use the name of the group\nto refer to all objects it contains."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT3"));
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
@@ -100,15 +100,15 @@ modificationCount(0)
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(OkBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AnnulerBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	AnnulerBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer2->Add(AnnulerBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer17->Add(FlexGridSizer2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	MenuItem1 = new wxMenuItem((&ContextMenu), idAddObjet, _("Ajouter un objet"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem1 = new wxMenuItem((&ContextMenu), idAddObjet, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	ContextMenu.Append(MenuItem1);
-	MenuItem2 = new wxMenuItem((&ContextMenu), idDelObjet, _("Supprimer l\'objet"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem2 = new wxMenuItem((&ContextMenu), idDelObjet, _("Delete the object"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	ContextMenu.Append(MenuItem2);
 	FlexGridSizer1->Fit(this);
@@ -128,10 +128,10 @@ modificationCount(0)
 	Connect(ID_Help,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&EditObjectGroup::OnHelp);
 
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( idAddObjet, _( "Ajouter un objet" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un objet") );
-    toolbar->AddTool( idDelObjet, _( "Supprimer l'objet selectionné" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer l'objet selectionné") );
+    toolbar->AddTool( idAddObjet, _( "Add an object" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Add an object") );
+    toolbar->AddTool( idDelObjet, _( "Delete the selected object" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Delete the selected object") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_Help, _( "Aide de l'éditeur de groupes d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur de groupes d'objets") );
+    toolbar->AddTool( ID_Help, _( "Objects group editor help" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Objects group editor help") );
     toolbar->Realize();
 
     //Offer nice background color to toolbar area.
@@ -149,7 +149,7 @@ EditObjectGroup::~EditObjectGroup()
 
 void EditObjectGroup::OnHelp(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(181);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_group"));
@@ -165,7 +165,7 @@ void EditObjectGroup::OnAnnulerBtClick(wxCommandEvent& event)
 {
     if ( modificationCount > 7 )
     {
-        wxMessageDialog msgDlg(this, _("Vous avez apporté ")+ToString(modificationCount)+_(" modifications. Êtes vous sûr d'annuler tous les changements ?"), _("Beaucoup de modifications ont été apportées."), wxYES_NO | wxICON_QUESTION);
+        wxMessageDialog msgDlg(this, _("You made ")+ToString(modificationCount)+_(" changes. Are you sure you want to cancel all changes\?"), _("Lot's of changes made."), wxYES_NO | wxICON_QUESTION);
         if ( msgDlg.ShowModal() == wxID_NO )
             return;
     }
@@ -176,7 +176,7 @@ void EditObjectGroup::OnAnnulerBtClick(wxCommandEvent& event)
 void EditObjectGroup::Refresh()
 {
     ObjetsList->DeleteAllItems();
-    ObjetsList->AddRoot( _( "Tous les objets du groupe" ) );
+    ObjetsList->AddRoot( _( "All objects of the group" ) );
 
     vector < string > allObjects = group.GetAllObjectsNames();
     for ( unsigned int i = 0;i < allObjects.size();i++ )
@@ -224,7 +224,7 @@ void EditObjectGroup::OnAddObjetSelected(wxCommandEvent& event)
             {
                 group.AddObject( dialog.GetChosenObjects()[i] );
                 ObjetsList->AppendItem( ObjetsList->GetRootItem(), dialog.GetChosenObjects()[i] );
-            } else { wxLogWarning(_("L'objet ")+dialog.GetChosenObjects()[i]+_(" est déjà dans ce groupe."));}
+            } else { wxLogWarning(_("Object ")+dialog.GetChosenObjects()[i]+_(" is already in this group."));}
         }
 
         modificationCount += dialog.GetChosenObjects().size();
@@ -251,3 +251,4 @@ void EditObjectGroup::OnDelObjetSelected(wxCommandEvent& event)
 
     Refresh();
 }
+

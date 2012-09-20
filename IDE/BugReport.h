@@ -95,3 +95,4 @@ class BugReport: public wxDialog
 };
 
 #endif
+

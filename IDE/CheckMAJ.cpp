@@ -46,19 +46,19 @@ void CheckMAJ::DownloadInformation()
         }
         else
         {
-            wxLogWarning( _( "Impossible d'écrire le fichier de mise à jour.\n\n( Vous pouvez désactiver la vérification des mises à jour dans les préférences. )" ) );
+            wxLogWarning( _( "Error while loading the update file.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access  our site.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
         }
 
         delete input;
     } else {
-        wxLogWarning( _( "Impossible de se connecter au serveur de vérification des mises à jour de Compil Games.\nVérifiez :\n-Votre connexion internet\n-Votre pare-feu\n-Si il vous est possible d'accéder à notre site.\n\n( Vous pouvez désactiver la vérification des mises à jour dans les préférences. )" ) );
+        wxLogWarning( _( "Unable to connect to the server so as to check for updates.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access  our site.\n\nYou can disable Check for updates in the preferences of Game Develop." ) );
         return;
     }
 
     TiXmlDocument doc( wxFileName::GetTempDir()+"/GDTemporaries/"+"news.txt" );
     if ( !doc.LoadFile() )
     {
-        wxLogWarning( _( "Erreur lors du chargement du fichier de mise à jour.\nVérifiez :\n-Votre connexion internet\n-Votre pare-feu\n-Si il vous est possible d'accéder à notre site.\n\n( Vous pouvez désactiver la vérification des mises à jour dans les préférences. )") );
+        wxLogWarning( _( "Error while loading the update file.\nCheck :\n-Your internet connection\n-Your firewall-If you can manually access  our site.\n\nYou can disable Check for updates in the preferences of Game Develop.") );
         return;
     }
 
@@ -95,3 +95,4 @@ void CheckMAJ::DownloadInformation()
 
     return;
 }
+

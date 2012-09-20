@@ -32,3 +32,4 @@ class CheckMAJ
 };
 
 #endif // CHECKMAJ_H
+

@@ -70,3 +70,4 @@ class AutomatismTypeChoice: public wxDialog
 };
 
 #endif
+

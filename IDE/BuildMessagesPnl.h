@@ -61,3 +61,4 @@ class BuildMessagesPnl: public wxPanel
 };
 
 #endif
+

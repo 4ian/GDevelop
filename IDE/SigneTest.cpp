@@ -20,18 +20,18 @@ SigneTest::SigneTest(wxWindow* parent)
 	//(*Initialize(SigneTest)
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Choisir le signe du test"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Choose the test's sign"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	wxString __wxRadioBoxChoices_1[6] =
 	{
-		_("= ( égal )"),
-		_("> ( supérieur à )"),
-		_("< ( inférieur à )"),
-		_(">= ( supérieur ou égal à )"),
-		_("<= ( inférieur ou égal à )"),
-		_("!= ( différent de )")
+		_("= ( equal to )"),
+		_("> ( greater than )"),
+		_("< ( lesser than )"),
+		_(">= ( greater than or equal to )"),
+		_("<= ( lesser than or equal to )"),
+		_("!= ( different of )")
 	};
-	SigneRadio = new wxRadioBox(this, ID_RADIOBOX1, _("Signe du test"), wxDefaultPosition, wxDefaultSize, 6, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
+	SigneRadio = new wxRadioBox(this, ID_RADIOBOX1, _("Sign of the test"), wxDefaultPosition, wxDefaultSize, 6, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
 	FlexGridSizer1->Add(SigneRadio, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer1->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
@@ -54,3 +54,4 @@ void SigneTest::OnOkBtClick(wxCommandEvent& event)
 {
     EndModal( 1+SigneRadio->GetSelection());
 }
+

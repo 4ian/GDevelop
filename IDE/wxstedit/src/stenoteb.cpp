@@ -607,7 +607,7 @@ bool wxSTEditorNotebook::HandleMenuEvent(wxCommandEvent &event)
     }
     else if (win_id == ID_STN_CLOSE_ALL)
     {
-        int ret = wxMessageBox(_("Close all pages?"), _("Confim closing"),
+        int ret = wxMessageBox(_("Close all pages\?"), _("Confim closing"),
                                wxICON_QUESTION|wxOK|wxCANCEL, this);
         if (ret == wxOK)
             CloseAllPages(true);
@@ -1250,3 +1250,4 @@ int wxSTEditorNotebook::ReplaceAllStrings(const wxString &findString,
 
     return count;
 }
+

@@ -60,3 +60,4 @@ class mp3ogg: public wxDialog
 };
 
 #endif
+

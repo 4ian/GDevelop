@@ -269,7 +269,7 @@ void wxSTEditorPrintout::GetPageInfo(int *minPage, int *maxPage,
     int lines  = m_editor->GetLineCount();
     int pages  = 1;
     m_pages.Clear();
-    wxProgressDialog progDialog(_("Formatting printout"), _("Page 1 of ?"));
+    wxProgressDialog progDialog(_("Formatting printout"), _("Page 1 of \?"));
 
     while (pos < length)
     {
@@ -447,3 +447,4 @@ int wxSTEditorPrintOptionsDialog::GetPrintLinenumbers()
 {
     return ((wxChoice*)FindWindow(ID_STEDLG_PRINT_LINENUMBERS_CHOICE))->GetSelection();
 }
+

@@ -62,7 +62,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Général</label>
+						<label>General</label>
 					</object>
 					<object class="notebookpage">
 						<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
@@ -91,7 +91,7 @@
 												<growablerows>0</growablerows>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-														<label>Objet :</label>
+														<label>Object :</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -108,7 +108,7 @@
 												<object class="sizeritem">
 													<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="deleteBt" member="yes">
 														<bitmap>res/deleteicon.png</bitmap>
-														<tooltip>Supprimer cet objet</tooltip>
+														<tooltip>Delete this object</tooltip>
 														<handler function="OndeleteBtClick" entry="EVT_BUTTON" />
 													</object>
 													<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -135,7 +135,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Objets</label>
+						<label>Objects</label>
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -144,3 +144,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

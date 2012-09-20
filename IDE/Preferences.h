@@ -243,3 +243,4 @@ class Preferences: public wxDialog
 };
 
 #endif
+

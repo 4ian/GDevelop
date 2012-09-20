@@ -967,3 +967,4 @@ void wxSTEditorFindReplaceDialog::OnSize(wxSizeEvent &event)
 
     //wxPrintf(wxT("wxSTEditorFindReplaceDialog::OnSize %d %d   %d %d\n"), GetSize().x, GetSize().y, event.GetSize().x, event.GetSize().y);
 }
+

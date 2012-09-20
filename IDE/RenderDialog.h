@@ -45,3 +45,4 @@ class RenderDialog: public wxDialog
 };
 
 #endif
+

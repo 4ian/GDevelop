@@ -38,3 +38,4 @@ bool CompilationChecker::EnsureCorrectGDLVersion()
 
     return true;
 }
+

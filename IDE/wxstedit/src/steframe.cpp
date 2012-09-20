@@ -982,3 +982,4 @@ void wxSTETreeCtrlHelper::SortChildren(const wxTreeItemId& item_)
     }
 }
 
+

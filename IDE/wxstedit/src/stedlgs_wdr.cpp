@@ -1548,3 +1548,4 @@ wxBitmap wxSTEBitmapsFunc( size_t index )
 
 
 // End of generated file
+

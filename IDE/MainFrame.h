@@ -339,3 +339,4 @@ class MainFrame: public wxFrame
 };
 
 #endif // GDIDE_MAINFRAME_H
+

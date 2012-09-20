@@ -39,3 +39,4 @@ TemplateEvents& TemplateEvents::operator=(const TemplateEvents & other)
 
     return *this;
 }
+

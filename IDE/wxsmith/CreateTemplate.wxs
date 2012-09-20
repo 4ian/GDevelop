@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="CreateTemplate">
-		<title>Créer un modèle d&apos;évènements</title>
+		<title>Create a template</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
@@ -26,7 +26,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-										<label>Vous pouvez créer un modèle d&apos;évènements à partir des &#x0A;évènements de la scène actuelle. Un modèle d&apos;évènement&#x0A;permet de créer automatiquement et rapidement des évènements,&#x0A;en remplissant juste quelques paramètres.</label>
+										<label>You can create a template from actual events of the scene&#x0A;A template allow to automatically and quickly create events,&#x0A;just filling in some parameters.</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -59,7 +59,7 @@
 								<growablerows>1</growablerows>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
-										<label>Nom du modèle :</label>
+										<label>Template name :</label>
 									</object>
 									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -73,7 +73,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-										<label>Description du modèle :</label>
+										<label>Template description :</label>
 									</object>
 									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_TOP</flag>
 									<border>5</border>
@@ -95,7 +95,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxButton" name="ID_BUTTON4" variable="Button1" member="yes">
-										<label>Suivant</label>
+										<label>Next</label>
 										<handler function="OnButton1Click" entry="EVT_BUTTON" />
 									</object>
 									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -104,7 +104,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Informations sur le modèle</label>
+						<label>Information on the template</label>
 					</object>
 					<object class="notebookpage">
 						<object class="wxPanel" name="ID_PANEL3" variable="Panel3" member="yes">
@@ -113,7 +113,7 @@
 								<growablecols>1</growablecols>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-										<label>Rechercher ceci&#x0A;dans les paramètres&#x0A;des actions et conditions</label>
+										<label>Search this&#x0A;in parameters of&#x0A;actions and conditions</label>
 										<font>
 											<weight>bold</weight>
 										</font>
@@ -125,7 +125,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-										<label>Description qui sera donnée à l&apos;insertion</label>
+										<label>Description that will be given</label>
 										<font>
 											<weight>bold</weight>
 										</font>
@@ -136,7 +136,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
-										<label>Exemple : MonObjet</label>
+										<label>Example : MyObject</label>
 										<font>
 											<style>italic</style>
 										</font>
@@ -147,7 +147,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
-										<label>Exemple : Entrez l&apos;objet servant de héros.</label>
+										<label>Example : Enter the name of the Hero object.</label>
 										<font>
 											<style>italic</style>
 										</font>
@@ -270,7 +270,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Paramètres</label>
+						<label>Parameters</label>
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -290,7 +290,7 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="CreateBt" member="yes">
-							<label>Créer</label>
+							<label>Create</label>
 							<handler function="OnCreateBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -299,7 +299,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON1" variable="AnnulerBt" member="yes">
-							<label>Fermer</label>
+							<label>Close</label>
 							<handler function="OnAnnulerBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -308,7 +308,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON3" variable="AideBt" member="yes">
-							<label>Aide</label>
+							<label>Help</label>
 							<handler function="OnAideBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -322,3 +322,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

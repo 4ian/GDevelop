@@ -99,29 +99,29 @@ mainEditor(mainEditor_)
 	FlexGridSizer9->AddGrowableRow(0);
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Commencer"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Getting started"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	StaticText2->SetForegroundColour(wxColour(95,95,95));
 	wxFont StaticText2Font(12,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer4->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Pour commencer, utilisez le gestionnaire de projet, à gauche\npar défaut, pour ajouter une scène ( clic droit sur \"Scènes\" ).\nDouble cliquez ensuite dessus pour l\'éditer."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("To begin, use the project manager\nto add a scene ( right click on \"Scenes\" ).\nDouble click then on the new scene to edit it."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer4->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
 	StaticBitmap9 = new wxStaticBitmap(this, ID_STATICBITMAP9, wxBitmap(wxImage(_T("res/modesimpleicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP9"));
 	FlexGridSizer3->Add(StaticBitmap9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl6 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL18, _("Lire le guide de démarrage"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL18"));
+	HyperlinkCtrl6 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL18, _("Read Getting Started Guide"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL18"));
 	FlexGridSizer3->Add(HyperlinkCtrl6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap10 = new wxStaticBitmap(this, ID_STATICBITMAP10, wxBitmap(wxImage(_T("res/tutoicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP10"));
 	FlexGridSizer3->Add(StaticBitmap10, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
-	HyperlinkCtrl7 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL19, _("Lire le tutoriel"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL19"));
+	HyperlinkCtrl7 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL19, _("Read the tutorial"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL19"));
 	FlexGridSizer11->Add(HyperlinkCtrl7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	secondTutoLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL20, _("(-Insert the name of the second tutorial or a blank text-)"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL20"));
+	secondTutoLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL20, _("( Spanish tutorial also available )"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL20"));
 	FlexGridSizer11->Add(secondTutoLink, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4->Add(384,9,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Liens"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Links"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	StaticText5->SetForegroundColour(wxColour(95,95,95));
 	wxFont StaticText5Font(12,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText5->SetFont(StaticText5Font);
@@ -129,31 +129,31 @@ mainEditor(mainEditor_)
 	FlexGridSizer7 = new wxFlexGridSizer(0, 2, 0, 0);
 	StaticBitmap5 = new wxStaticBitmap(this, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/wikiicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
 	FlexGridSizer7->Add(StaticBitmap5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl3 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL3, _("Accéder au wiki ( Base d\'articles et de connaissance )"), _("http://www.wiki.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL3"));
+	HyperlinkCtrl3 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL3, _("Access to wiki ( Knowledge base )"), _("http://www.wiki.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL3"));
 	FlexGridSizer7->Add(HyperlinkCtrl3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap6 = new wxStaticBitmap(this, ID_STATICBITMAP6, wxBitmap(wxImage(_T("res/community.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP6"));
 	FlexGridSizer7->Add(StaticBitmap6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl4 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL4, _("Accéder au forum"), _("http://www.forum.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL4"));
+	HyperlinkCtrl4 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL4, _("Access to forum"), _("http://www.forum.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL4"));
 	FlexGridSizer7->Add(HyperlinkCtrl4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap7 = new wxStaticBitmap(this, ID_STATICBITMAP7, wxBitmap(wxImage(_T("res/paint.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP7"));
 	FlexGridSizer7->Add(StaticBitmap7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	resourcesLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL15, _("Accéder aux ressources pour jeux"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL15"));
+	resourcesLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL15, _("Access to resources"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL15"));
 	FlexGridSizer7->Add(resourcesLink, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap16 = new wxStaticBitmap(this, ID_STATICBITMAP16, wxBitmap(wxImage(_T("res/fb16.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP16"));
 	FlexGridSizer7->Add(StaticBitmap16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
-	fbLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Page Facebook"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	fbLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Facebook page"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	FlexGridSizer12->Add(fbLink, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap17 = new wxStaticBitmap(this, ID_STATICBITMAP17, wxBitmap(wxImage(_T("res/gp16.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP17"));
 	FlexGridSizer12->Add(StaticBitmap17, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	googleplusLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL2, _("Page Google+"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
+	googleplusLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL2, _("Google+ page"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
 	FlexGridSizer12->Add(googleplusLink, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer7->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer1->Add(FlexGridSizer4, 7, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Projets récents"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Recent projects"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	StaticText1->SetForegroundColour(wxColour(95,95,95));
 	wxFont StaticText1Font(13,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText1->SetFont(StaticText1Font);
@@ -189,7 +189,7 @@ mainEditor(mainEditor_)
 	FlexGridSizer8->Add(recent7Bt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer5->Add(1,9,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Exemples"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Examples"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	StaticText4->SetForegroundColour(wxColour(95,95,95));
 	wxFont StaticText4Font(12,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText4->SetFont(StaticText4Font);
@@ -197,7 +197,7 @@ mainEditor(mainEditor_)
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap11 = new wxStaticBitmap(this, ID_STATICBITMAP11, wxBitmap(wxImage(_T("res/openicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP11"));
 	FlexGridSizer2->Add(StaticBitmap11, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl9 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL21, _("Ouvrir les exemples"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL21"));
+	HyperlinkCtrl9 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL21, _("Open examples"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL21"));
 	FlexGridSizer2->Add(HyperlinkCtrl9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5->Add(FlexGridSizer2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer1->Add(FlexGridSizer5, 3, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -208,7 +208,7 @@ mainEditor(mainEditor_)
 	FlexGridSizer6->AddGrowableRow(0);
 	StaticBitmap8 = new wxStaticBitmap(this, ID_STATICBITMAP8, wxBitmap(wxImage(_T("res/donateicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP8"));
 	FlexGridSizer6->Add(StaticBitmap8, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl5 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL16, _("Vous appréciez Game Develop \? Aidez l\'auteur en faisant un don."), _("http://www.compilgames.net/contact.html"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
+	HyperlinkCtrl5 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL16, _("If you like Game Develop, you can make a donation to the author."), _("http://www.compilgames.net/contactEN.html"), wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL16"));
 	FlexGridSizer6->Add(HyperlinkCtrl5, 1, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -231,7 +231,7 @@ mainEditor(mainEditor_)
 	Connect(ID_HYPERLINKCTRL21,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnopenExamplesLinkClick);
 	//*)
 
-    if ( _("(-Insert the name of the second tutorial or a blank text-)") == "(-Insert the name of the second tutorial or a blank text-)" )
+    if ( _("( Spanish tutorial also available )") == "(-Insert the name of the second tutorial or a blank text-)" )
         secondTutoLink->SetLabel("");
 
     Refresh();
@@ -333,7 +333,7 @@ void StartHerePage::Onrecent7BtClick(wxCommandEvent& event)
 
 void StartHerePage::OnguideBtClick(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(16);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_getstart"));
@@ -341,7 +341,7 @@ void StartHerePage::OnguideBtClick(wxCommandEvent& event)
 
 void StartHerePage::OntutoBtClick(wxCommandEvent& event)
 {
-    wxString link = wxGetCwd() + "/Tutorial/"+_("Tutoriel.pdf");
+    wxString link = wxGetCwd() + "/Tutorial/"+_("Tutorial.pdf");
     wxString mimetype = "application/pdf";
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {
@@ -353,14 +353,14 @@ void StartHerePage::OntutoBtClick(wxCommandEvent& event)
         delete filetype;
     }
     else
-        wxLogMessage(_("Impossible de lancer le tutoriel. Vous pouvez le consulter en allant dans le dossier Game Develop, puis dans le répertoire Tutoriel et en ouvrant le fichier Tutoriel.pdf"));
+        wxLogMessage(_("Unable to launch the tutorial. Tutorials can be found in the directoy called \"Tutorial\", inside Game Develop directory."));
 }
 
 void StartHerePage::OnTutorial2BtClick(wxCommandEvent& event)
 {
-    if ( _("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)") == "" ) return;
+    if ( _("Spanish Tutorial.pdf") == "" ) return;
 
-    wxString link = wxGetCwd() + "/Tutorial/"+_("(-Insert filename of the second tutorial or a blank text if there is no second tutorial-)");
+    wxString link = wxGetCwd() + "/Tutorial/"+_("Spanish Tutorial.pdf");
     wxString mimetype = "application/pdf";
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {
@@ -372,7 +372,7 @@ void StartHerePage::OnTutorial2BtClick(wxCommandEvent& event)
         delete filetype;
     }
     else
-        wxLogMessage(_("Impossible de lancer le tutoriel. Vous pouvez le consulter en allant dans le dossier Game Develop, puis dans le répertoire Tutoriel et en ouvrant le fichier Tutoriel.pdf"));
+        wxLogMessage(_("Unable to launch the tutorial. Tutorials can be found in the directoy called \"Tutorial\", inside Game Develop directory."));
 }
 
 void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)
@@ -384,7 +384,7 @@ void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)
     wxString examplesDir = wxGetCwd()+"/Examples/";
     #endif
 
-    wxFileDialog open( NULL, _( "Ouvrir un exemple" ), examplesDir, "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
+    wxFileDialog open( NULL, _( "Open an example" ), examplesDir, "", "\"Game Develop\" Game (*.gdg;*.jgd)|*.jgd;*.gdg" );
     open.ShowModal();
 
     if ( !open.GetPath().empty() ) mainEditor.Open(string(open.GetPath().mb_str()));
@@ -449,3 +449,4 @@ void StartHerePage::OngoogleplusLinkClick(wxCommandEvent& event)
         delete filetype;
     }
 }
+

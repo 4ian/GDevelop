@@ -20,3 +20,4 @@ private:
 };
 
 #endif // DNDTEXTOBJECTSEDITOR_H
+

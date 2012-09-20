@@ -346,3 +346,4 @@ private:
 };
 
 #endif // _STESTYLS_H_
+

@@ -66,3 +66,4 @@ class ErrorCompilation: public wxDialog
 };
 
 #endif
+

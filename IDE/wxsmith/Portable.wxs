@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="Portable">
-		<title>Enregistrer le jeu en version portable</title>
+		<title>Save the game in portable version</title>
 		<extra_code>wxIcon FrameIcon;&#x0A;FrameIcon.CopyFromBitmap(wxBitmap(wxImage(__T(&quot;res/portableicon.png&quot;))));&#x0A;SetIcon(FrameIcon);</extra_code>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -26,7 +26,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-										<label>Enregistrer le jeu en version portable permet de&#x0A;rassembler toutes les ressources du jeu dans un dossier&#x0A;et d&apos;ouvrir ce jeu depuis un autre ordinateur.</label>
+										<label>Save the game in portable version allow to&#x0A;gather every ressources used by the game in a folder&#x0A;and to open this game in another computer.</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -51,7 +51,7 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
-					<label>Avancement</label>
+					<label>Progress</label>
 					<object class="sizeritem">
 						<object class="wxGauge" name="ID_GAUGE1" variable="AvancementGauge" member="yes" />
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -75,7 +75,7 @@
 					<cols>3</cols>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-							<label>Il est préférable d&apos;utiliser un dossier vierge.</label>
+							<label>It is recommended to use an empty directory.</label>
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -83,7 +83,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON1" variable="FusionBt" member="yes">
-							<label>Choisir un dossier et enregistrer</label>
+							<label>Choose a folder and save</label>
 							<handler function="OnButton1Click" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -92,7 +92,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="FermerBt" member="yes">
-							<label>Fermer</label>
+							<label>Close</label>
 							<handler function="OnButton2Click" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -106,3 +106,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

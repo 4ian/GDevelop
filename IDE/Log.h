@@ -11,3 +11,10 @@ void EcrireLog(string localisation, string autreinfos);
 
 
 #endif // LOG_H_INCLUDED
+
+
+
+
+
+
+

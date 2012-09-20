@@ -14,7 +14,7 @@
 							<growablecols>0</growablecols>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText5" member="yes">
-									<label>Numéro de l&apos;animation&#x0A;initiale :</label>
+									<label>Initial animation :</label>
 									<style>wxALIGN_CENTRE</style>
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -23,7 +23,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxComboBox" name="ID_COMBOBOX2" variable="AnimationCombo" member="yes">
-									<tooltip>Numéro de l&apos;animation initiale de l&apos;objet</tooltip>
+									<tooltip>Initial animation of the object</tooltip>
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
@@ -86,3 +86,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

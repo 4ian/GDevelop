@@ -17,3 +17,4 @@ SceneCanvasEditionData::SceneCanvasEditionData() :
     isSelecting(false)
 {
 }
+

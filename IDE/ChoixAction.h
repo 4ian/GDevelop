@@ -143,3 +143,4 @@ class ChoixAction: public wxDialog
 };
 
 #endif
+

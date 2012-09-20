@@ -37,3 +37,4 @@ class SigneModification: public wxDialog
 };
 
 #endif
+

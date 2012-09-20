@@ -80,10 +80,10 @@ void ProjectPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
 {
     if (project != NULL) project->OnChangeInPropertyGrid(propertyGrid, event);
 
-    if ( event.GetPropertyName() == _("Nom du projet") && associatedTree != NULL)
+    if ( event.GetPropertyName() == _("Name of the project") && associatedTree != NULL)
         associatedTree->SetItemText(associatedTreeItem, event.GetProperty()->GetValue());
 
-    if ( event.GetPropertyName() == _("Activer l'utilisation de sources C++") && associatedProjectManager != NULL)
+    if ( event.GetPropertyName() == _("Activate the use of C++ source files") && associatedProjectManager != NULL)
         associatedProjectManager->Refresh();
 }
 
@@ -97,3 +97,4 @@ void ProjectPropertiesPnl::SetAssociatedProjectManager(ProjectManager * associat
 {
     associatedProjectManager = associatedProjectManager_;
 }
+

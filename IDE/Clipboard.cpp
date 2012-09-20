@@ -150,3 +150,4 @@ void Clipboard::SetPositionsSelection( std::vector < InitialPosition > positions
 }
 
 Clipboard * Clipboard::singleton = NULL;
+

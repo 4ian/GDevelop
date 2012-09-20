@@ -2146,3 +2146,4 @@ void wxSTEditorColumnizeDialog::OnText(wxCommandEvent& event)
     if (m_updateCheckBox->GetValue())
         FormatText();
 }
+

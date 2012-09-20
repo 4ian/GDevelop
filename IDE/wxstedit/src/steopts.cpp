@@ -395,3 +395,4 @@ void wxSTEditorOptions::SaveFileConfig(wxConfigBase &config)
     for (n = 0; n < count; n++)
         config.Write(configPath + wxString::Format(wxT("/file%d"), n+1), fileHistory->GetHistoryFile(n));
 }
+

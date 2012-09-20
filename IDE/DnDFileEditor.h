@@ -25,3 +25,4 @@ private:
 };
 
 #endif // DNDFILEEDITOR_H
+

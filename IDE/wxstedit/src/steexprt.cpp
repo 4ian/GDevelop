@@ -1463,7 +1463,7 @@ static char* texStyle(int style) {
 static void defineTexStyle(StyleDefinition &style, FILE* fp, int istyle) {
     int closing_brackets = 2;
     char rgb[200];
-    fprintf(fp, "\\newcommand{\\scite%s}[1]{\\noindent{\\ttfamily{", texStyle(istyle));
+    fprintf(fp, "\newcommand{\\scite%s}[1]{\noindent{\\ttfamily{", texStyle(istyle));
     if (style.italics) {
         fputs("\\textit{", fp);
         closing_brackets++;
@@ -1543,7 +1543,7 @@ bool wxSTEditorExporter::SaveToTEX(const wxString& saveName) {
         }
 
         fputs("\\begin{document}\n\n", fp);
-        fprintf(fp, "Source File: %s\n\n\\noindent\n\\tiny{\n",
+        fprintf(fp, "Source File: %s\n\n\noindent\n\\tiny{\n",
             static_cast<const char *>(wx2stc(saveName))); //FIXME titleFullPath ? filePath.AsFileSystem() : filePath.Name().AsFileSystem()));
 
         int styleCurrent = m_editor->GetStyleAt(0);
@@ -1593,7 +1593,7 @@ bool wxSTEditorExporter::SaveToTEX(const wxString& saveName) {
                 if (ch == '\r' && (char)m_editor->GetCharAt(i + 1) == '\n')
                     i++;    // Skip the LF
                 styleCurrent = m_editor->GetStyleAt(i + 1);
-                fprintf(fp, "} \\\\\n\\scite%s{", texStyle(styleCurrent) );
+                fprintf(fp, "} \\\\n\\scite%s{", texStyle(styleCurrent) );
                 break;
             case ' ':
                 if ((char)m_editor->GetCharAt(i + 1) == ' ') {
@@ -2064,3 +2064,4 @@ void wxSTEditorExportDialog::OnButton(wxCommandEvent& event)
 
     event.Skip();
 }
+

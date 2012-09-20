@@ -13,3 +13,4 @@ bool DndTextSceneEditor::OnDropText(wxCoord x, wxCoord y, const wxString& text)
 
     return true;
 }
+

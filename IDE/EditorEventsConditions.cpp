@@ -102,3 +102,10 @@ void OldEventsEditor::OnPasteConditionMenuSelected(wxCommandEvent& event)
     GetLastSelectedEvent()->eventHeightNeedUpdate = true;
     ChangesMadeOnEvents();
 }
+
+
+
+
+
+
+

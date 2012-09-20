@@ -21,3 +21,10 @@ class ObjectDataObject : public wxCustomDataObject
 };
 
 #endif // OBJECTDATAOBJECT_H
+
+
+
+
+
+
+

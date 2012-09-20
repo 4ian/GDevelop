@@ -113,7 +113,7 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	wxFlexGridSizer* FlexGridSizer17;
 	wxStaticBoxSizer* StaticBoxSizer5;
 
-	Create(parent, wxID_ANY, _("Importer des images"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Import images"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(1);
@@ -122,7 +122,7 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap1 = new wxStaticBitmap(Panel1, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/imagewizard.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP1"));
 	FlexGridSizer6->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("L\'importation d\'images permet de générer \nrapidement vos images ou objets à partir \nde fichiers animés ou spécifiques."), wxDefaultPosition, wxSize(295,53), wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Importing images allow to generate\nquickly your images or objects from\nanimated files or spritesheets."), wxDefaultPosition, wxSize(295,53), wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
@@ -137,28 +137,28 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	FlexGridSizer3->AddGrowableRow(3);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer4->AddGrowableCol(1);
-	StaticText3 = new wxStaticText(Panel2, ID_STATICTEXT3, _("Gif animé :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel2, ID_STATICTEXT3, _("Animated GIF :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer4->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FileGIFEdit = new wxTextCtrl(Panel2, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(138,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer4->Add(FileGIFEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BrowseGIFBt = new wxButton(Panel2, ID_BUTTON1, _("Parcourir..."), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	BrowseGIFBt = new wxButton(Panel2, ID_BUTTON1, _("Browse..."), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer4->Add(BrowseGIFBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText4 = new wxStaticText(Panel2, ID_STATICTEXT4, _("Décomposer en plusieurs images nommées :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(Panel2, ID_STATICTEXT4, _("Decomposed into several images named:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer5->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	DecomposeGIFEdit = new wxTextCtrl(Panel2, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	FlexGridSizer5->Add(DecomposeGIFEdit, 1, wxTOP|wxBOTTOM|wxLEFT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText5 = new wxStaticText(Panel2, ID_STATICTEXT5, _("X.png"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer5->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Aperçu"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Panel2, _("Preview"));
 	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
-	nbImageGIFBt = new wxStaticText(Panel2, ID_STATICTEXT2, _("Nombre d\'images :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	nbImageGIFBt = new wxStaticText(Panel2, ID_STATICTEXT2, _("Number of images:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer7->Add(nbImageGIFBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	DecomposeGIFBt = new wxButton(Panel2, ID_BUTTON2, _("Décomposer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	DecomposeGIFBt = new wxButton(Panel2, ID_BUTTON2, _("Decompose"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(DecomposeGIFBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
 	Panel2->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->SetSizeHints(Panel2);
@@ -166,7 +166,7 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	FlexGridSizer9 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer9->AddGrowableCol(0);
 	FlexGridSizer9->AddGrowableRow(4);
-	StaticText9 = new wxStaticText(Panel3, ID_STATICTEXT10, _("Game Develop décompose les feuilles de sprites de personnages\nayant 4 directions avec 4 images chacune."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
+	StaticText9 = new wxStaticText(Panel3, ID_STATICTEXT10, _("Game Develop decompose spritesheets of characters\nwith 4 directions with 4 images."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
 	FlexGridSizer9->Add(StaticText9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer10->AddGrowableCol(1);
@@ -174,24 +174,24 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	FlexGridSizer10->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	fileRPGEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxSize(138,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
 	FlexGridSizer10->Add(fileRPGEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	browseRPGBt = new wxButton(Panel3, ID_BUTTON4, _("Parcourir..."), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	browseRPGBt = new wxButton(Panel3, ID_BUTTON4, _("Browse..."), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer10->Add(browseRPGBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(FlexGridSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText6 = new wxStaticText(Panel3, ID_STATICTEXT7, _("Décomposer en plusieurs images nommées :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	StaticText6 = new wxStaticText(Panel3, ID_STATICTEXT7, _("Decomposed into several images named:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	FlexGridSizer11->Add(StaticText6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	decomposeRPGEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_RIGHT, wxDefaultValidator, _T("ID_TEXTCTRL4"));
 	FlexGridSizer11->Add(decomposeRPGEdit, 1, wxTOP|wxBOTTOM|wxLEFT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText7 = new wxStaticText(Panel3, ID_STATICTEXT8, _("X.png"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
 	FlexGridSizer11->Add(StaticText7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(FlexGridSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel3, _("Aperçu"));
+	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Panel3, _("Preview"));
 	FlexGridSizer12 = new wxFlexGridSizer(0, 3, 0, 0);
-	tailleImageRPGEdit = new wxStaticText(Panel3, ID_STATICTEXT9, _("Taille d\'une image :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+	tailleImageRPGEdit = new wxStaticText(Panel3, ID_STATICTEXT9, _("Size of an image :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
 	FlexGridSizer12->Add(tailleImageRPGEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2->Add(FlexGridSizer12, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer9->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	DecomposeRPGBt = new wxButton(Panel3, ID_BUTTON5, _("Décomposer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
+	DecomposeRPGBt = new wxButton(Panel3, ID_BUTTON5, _("Decompose"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
 	FlexGridSizer9->Add(DecomposeRPGBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
 	Panel3->SetSizer(FlexGridSizer9);
 	FlexGridSizer9->Fit(Panel3);
@@ -205,14 +205,14 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	FlexGridSizer14->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	fileSSEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
 	FlexGridSizer14->Add(fileSSEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BrowseSSBt = new wxButton(Panel4, ID_BUTTON6, _("Parcourir..."), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
+	BrowseSSBt = new wxButton(Panel4, ID_BUTTON6, _("Browse..."), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
 	FlexGridSizer14->Add(BrowseSSBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer13->Add(FlexGridSizer14, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer15 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Taille d\'une image"));
+	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Size of an image"));
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17->AddGrowableCol(0);
-	StaticText12 = new wxStaticText(Panel4, ID_STATICTEXT14, _("Taille ( pixels ):"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
+	StaticText12 = new wxStaticText(Panel4, ID_STATICTEXT14, _("Size (pixels):"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT14"));
 	FlexGridSizer17->Add(StaticText12, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer18 = new wxFlexGridSizer(0, 3, 0, 0);
 	widthSSEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL8, _("32"), wxDefaultPosition, wxSize(40,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
@@ -224,22 +224,22 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	FlexGridSizer17->Add(FlexGridSizer18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer4->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer15->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Nombre d\'images"));
+	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Number of images"));
 	FlexGridSizer16 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticText10 = new wxStaticText(Panel4, ID_STATICTEXT12, _("Nombre de colonnes d\'images :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT12"));
+	StaticText10 = new wxStaticText(Panel4, ID_STATICTEXT12, _("Number of columns of images:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT12"));
 	FlexGridSizer16->Add(StaticText10, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	columnsSSEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL6, _("0"), wxDefaultPosition, wxSize(47,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
 	FlexGridSizer16->Add(columnsSSEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText11 = new wxStaticText(Panel4, ID_STATICTEXT13, _("Nombre de lignes d\'images :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT13"));
+	StaticText11 = new wxStaticText(Panel4, ID_STATICTEXT13, _("Number of rows of images:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT13"));
 	FlexGridSizer16->Add(StaticText11, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	linesSSEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL7, _("1"), wxDefaultPosition, wxSize(47,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
 	FlexGridSizer16->Add(linesSSEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer3->Add(FlexGridSizer16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer15->Add(StaticBoxSizer3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Origine de la découpe"));
+	StaticBoxSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Origin of the decomposition"));
 	FlexGridSizer20 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer20->AddGrowableCol(0);
-	StaticText14 = new wxStaticText(Panel4, ID_STATICTEXT16, _("Origine ( pixels ):"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT16"));
+	StaticText14 = new wxStaticText(Panel4, ID_STATICTEXT16, _("Origin ( pixels):"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT16"));
 	FlexGridSizer20->Add(StaticText14, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer19 = new wxFlexGridSizer(0, 3, 0, 0);
 	origineXEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL10, _("0"), wxDefaultPosition, wxSize(40,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL10"));
@@ -251,15 +251,15 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	FlexGridSizer20->Add(FlexGridSizer19, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer5->Add(FlexGridSizer20, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer15->Add(StaticBoxSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer6 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Espacement entre chaque image"));
+	StaticBoxSizer6 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Spacing between each image"));
 	FlexGridSizer21 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer21->AddGrowableCol(0);
 	FlexGridSizer22 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticText16 = new wxStaticText(Panel4, ID_STATICTEXT18, _("Espace horizontal ( pixels ):"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT18"));
+	StaticText16 = new wxStaticText(Panel4, ID_STATICTEXT18, _("Horizontal spacing (pixels):"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT18"));
 	FlexGridSizer22->Add(StaticText16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	spaceHSSEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL12, _("0"), wxDefaultPosition, wxSize(47,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL12"));
 	FlexGridSizer22->Add(spaceHSSEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText17 = new wxStaticText(Panel4, ID_STATICTEXT19, _("Espace vertical ( pixels ):"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT19"));
+	StaticText17 = new wxStaticText(Panel4, ID_STATICTEXT19, _("Vertical spacing (pixels):"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT19"));
 	FlexGridSizer22->Add(StaticText17, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	spaceVSSEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL13, _("0"), wxDefaultPosition, wxSize(47,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL13"));
 	FlexGridSizer22->Add(spaceVSSEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -267,41 +267,41 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	StaticBoxSizer6->Add(FlexGridSizer21, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer15->Add(StaticBoxSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer13->Add(FlexGridSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer7 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Rendre une couleur transparente"));
+	StaticBoxSizer7 = new wxStaticBoxSizer(wxHORIZONTAL, Panel4, _("Make a color transparent"));
 	FlexGridSizer24 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer24->AddGrowableCol(0);
-	hasMaskSSCheck = new wxCheckBox(Panel4, ID_CHECKBOX1, _("Rendre une couleur transparente :"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	hasMaskSSCheck = new wxCheckBox(Panel4, ID_CHECKBOX1, _("Make a color transparent:"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	hasMaskSSCheck->SetValue(false);
 	FlexGridSizer24->Add(hasMaskSSCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	colorSSTxt = new wxStaticText(Panel4, ID_STATICTEXT22, _("( ; ; )"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT22"));
 	FlexGridSizer24->Add(colorSSTxt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	chooseColorMaskSSBt = new wxButton(Panel4, ID_BUTTON8, _("Choisir"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
+	chooseColorMaskSSBt = new wxButton(Panel4, ID_BUTTON8, _("Choose"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON8"));
 	FlexGridSizer24->Add(chooseColorMaskSSBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer7->Add(FlexGridSizer24, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer13->Add(StaticBoxSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer23 = new wxFlexGridSizer(0, 4, 0, 0);
-	StaticText18 = new wxStaticText(Panel4, ID_STATICTEXT20, _("Décomposer en :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT20"));
+	StaticText18 = new wxStaticText(Panel4, ID_STATICTEXT20, _("Decompose in :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT20"));
 	FlexGridSizer23->Add(StaticText18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	decomposeSSEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL14, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL14"));
 	FlexGridSizer23->Add(decomposeSSEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText19 = new wxStaticText(Panel4, ID_STATICTEXT21, _("X.png"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT21"));
 	FlexGridSizer23->Add(StaticText19, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	DecomposeSSBt = new wxButton(Panel4, ID_BUTTON7, _("Décomposer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
+	DecomposeSSBt = new wxButton(Panel4, ID_BUTTON7, _("Decompose"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
 	FlexGridSizer23->Add(DecomposeSSBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
 	FlexGridSizer13->Add(FlexGridSizer23, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 0);
 	Panel4->SetSizer(FlexGridSizer13);
 	FlexGridSizer13->Fit(Panel4);
 	FlexGridSizer13->SetSizeHints(Panel4);
-	Notebook1->AddPage(Panel2, _("Gif animé"), false);
-	Notebook1->AddPage(Panel3, _("Feuille de sprite RPG Maker"), false);
-	Notebook1->AddPage(Panel4, _("Feuille de sprite générique"), false);
+	Notebook1->AddPage(Panel2, _("Animated GIF"), false);
+	Notebook1->AddPage(Panel3, _("RPG Maker spritesheet"), false);
+	Notebook1->AddPage(Panel4, _("Generic spritesheet"), false);
 	FlexGridSizer2->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer8->AddGrowableCol(0);
-	FermerBt = new wxButton(this, ID_BUTTON3, _("Fermer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	FermerBt = new wxButton(this, ID_BUTTON3, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer8->Add(FermerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -345,7 +345,7 @@ void ImportImage::OnFermerBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void ImportImage::OnBrowseGIFBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Choisissez le GIF animé à décomposer"), "", "", "GIF animé (*.gif)|*.gif");
+    wxFileDialog dialog(this, _("Choose the animated GIF to decompose"), "", "", "GIF animé (*.gif)|*.gif");
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
@@ -360,9 +360,9 @@ void ImportImage::OnFileGIFEditText(wxCommandEvent& event)
 {
     wxAnimation animation;
     if ( animation.LoadFile(FileGIFEdit->GetValue()) )
-        nbImageGIFBt->SetLabel(_("Nombre d'images : ")+ToString(animation.GetFrameCount()));
+        nbImageGIFBt->SetLabel(_("Number of images : ")+ToString(animation.GetFrameCount()));
     else
-        nbImageGIFBt->SetLabel(_("Nombre d'images : ?"));
+        nbImageGIFBt->SetLabel(_("Number of images : \?"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -373,7 +373,7 @@ void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
     wxAnimation animation;
     if ( !animation.LoadFile(FileGIFEdit->GetValue()) )
     {
-        wxLogWarning(_("Impossible d'ouvrir le fichier GIF !"));
+        wxLogWarning(_("Unable to open the GIF file!"));
         return;
     }
 
@@ -386,7 +386,7 @@ void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
     	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+ToString(i)+".png", wxBITMAP_TYPE_PNG);
     }
 
-    wxLogMessage(_("Décomposition du GIF terminé !"));
+    wxLogMessage(_("Decomposition of the GIF completed!"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -394,7 +394,7 @@ void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void ImportImage::OnbrowseRPGBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Choisissez la feuille de sprite RPG Maker à décomposer"), "", "", "Feuille de sprites RPG Maker (*.*)|*.*");
+    wxFileDialog dialog(this, _("Choose the RPG Maker Spritesheet to decompose"), "", "", "Feuille de sprites RPG Maker (*.*)|*.*");
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
@@ -406,7 +406,7 @@ void ImportImage::OnbrowseRPGBtClick(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void ImportImage::OnBrowseSSBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog(this, _("Choisissez la feuille de sprite à décomposer"), "", "", "Image Feuille de sprites (*.*)|*.*");
+    wxFileDialog dialog(this, _("Choose the spritesheet to decompose"), "", "", "Image Feuille de sprites (*.*)|*.*");
     dialog.ShowModal();
 
     if ( dialog.GetPath() != "" )
@@ -420,9 +420,9 @@ void ImportImage::OnfileRPGEditText(wxCommandEvent& event)
 {
     wxImage image;
     if ( image.LoadFile(fileRPGEdit->GetValue()) )
-        tailleImageRPGEdit->SetLabel(_("Taille d'une image : ")+ToString(image.GetWidth()/4)+"x"+ToString(image.GetHeight()/4));
+        tailleImageRPGEdit->SetLabel(_("Size of an image : ")+ToString(image.GetWidth()/4)+"x"+ToString(image.GetHeight()/4));
     else
-        tailleImageRPGEdit->SetLabel(_("Taille d'une image : ?x?"));
+        tailleImageRPGEdit->SetLabel(_("Size of an image : \?x\?"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -433,7 +433,7 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
     wxImage image;
     if ( !image.LoadFile(fileRPGEdit->GetValue()) )
     {
-        wxLogWarning(_("Impossible d'ouvrir le fichier !"));
+        wxLogWarning(_("Unable to open the file !"));
         return;
     }
 
@@ -460,7 +460,7 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
         }
     }
 
-    wxLogMessage(_("La décomposition de l'image est terminée !"));
+    wxLogMessage(_("The decomposition of the image is completed !"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -471,7 +471,7 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
     wxImage image;
     if ( !image.LoadFile(fileSSEdit->GetValue()) )
     {
-        wxLogWarning(_("Impossible d'ouvrir le fichier !"));
+        wxLogWarning(_("Unable to open the file !"));
         return;
     }
 
@@ -487,14 +487,14 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
     int lineNb = ToInt(static_cast<string>(linesSSEdit->GetValue()));
     if ( lineNb <= 0 )
     {
-        wxLogWarning(_("Le nombre de ligne est invalide : Le minimum est une ligne."));
+        wxLogWarning(_("The number of lines is invalid: The minimum is one line."));
         return;
     }
 
     int columnNb = ToInt(static_cast<string>(columnsSSEdit->GetValue()));
     if ( columnNb <= 0 )
     {
-        wxLogWarning(_("Le nombre de colonnes est invalide : Le minimum est une colonne."));
+        wxLogWarning(_("The number of columns is invalid: The minimum is one column."));
         return;
     }
 
@@ -505,20 +505,20 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
     int height = ToInt(static_cast<string>(heightSSEdit->GetValue()));
     if ( width <= 0 || height <= 0)
     {
-        wxLogWarning(_("La taille d'un sprite est invalide."));
+        wxLogWarning(_("The size of a sprite is invalid."));
         return;
     }
 
     int spaceH = ToInt(static_cast<string>(spaceHSSEdit->GetValue()));
     if ( spaceH < 0 )
     {
-        wxLogWarning(_("L'espacement horizontal est invalide ( doit être supérieur ou égal à 0 )."));
+        wxLogWarning(_("The horizontal spacing is invalid (must be greater than or equal to 0)."));
         return;
     }
     int spaceV = ToInt(static_cast<string>(spaceVSSEdit->GetValue()));
     if ( spaceV < 0 )
     {
-        wxLogWarning(_("L'espacement vertical est invalide ( doit être supérieur ou égal à 0 )."));
+        wxLogWarning(_("The vertical spacing is invalid (must be greater than or equal to 0)."));
         return;
     }
 
@@ -564,3 +564,4 @@ void ImportImage::OnchooseColorMaskSSBtClick(wxCommandEvent& event)
         maskB = color.Blue();
     }
 }
+

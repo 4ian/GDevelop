@@ -161,3 +161,4 @@ class ImportImage: public wxDialog
 };
 
 #endif
+

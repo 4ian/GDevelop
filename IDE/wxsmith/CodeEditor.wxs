@@ -18,31 +18,38 @@
 		</object>
 		<object class="wxMenu" variable="contextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem1" member="yes">
-				<label>Copier</label>
+				<label>Copy</label>
 				<bitmap>res/copyicon.png</bitmap>
 				<handler function="OnMenuCopySelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem2" member="yes">
-				<label>Couper</label>
+				<label>Cut</label>
 				<bitmap>res/cuticon.png</bitmap>
 				<handler function="OnMenuCutSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem3" member="yes">
-				<label>Coller</label>
+				<label>Paste</label>
 				<bitmap>res/pasteicon.png</bitmap>
 				<handler function="OnMenuPasteSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItem4" member="yes">
-				<label>Annuler</label>
+				<label>Cancel</label>
 				<bitmap>res/undo.png</bitmap>
 				<handler function="OnMenuUndoSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM5" variable="MenuItem5" member="yes">
-				<label>Refaire</label>
+				<label>Redo</label>
 				<bitmap>res/redo.png</bitmap>
 				<handler function="OnMenuRedoSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

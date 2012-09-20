@@ -68,21 +68,21 @@ mainFrameWrapper(mainFrameWrapper_)
 	layersList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxSize(191,198), wxLC_REPORT, wxDefaultValidator, _T("ID_LISTCTRL1"));
 	FlexGridSizer1->Add(layersList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	MenuItem1 = new wxMenuItem((&contextMenu), idMenuEdit, _("Editer les paramètres du calque"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem1 = new wxMenuItem((&contextMenu), idMenuEdit, _("Edit the layer properties"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	contextMenu.Append(MenuItem1);
 	contextMenu.AppendSeparator();
-	MenuItem2 = new wxMenuItem((&contextMenu), idMenuAdd, _("Ajouter un calque"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem2 = new wxMenuItem((&contextMenu), idMenuAdd, _("Add a layer"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	contextMenu.Append(MenuItem2);
-	MenuItem3 = new wxMenuItem((&contextMenu), idMenuDel, _("Supprimer le calque"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem3 = new wxMenuItem((&contextMenu), idMenuDel, _("Delete the layer"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	contextMenu.Append(MenuItem3);
 	contextMenu.AppendSeparator();
-	MenuItem4 = new wxMenuItem((&contextMenu), idMenuUp, _("Déplacer au dessus"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem4 = new wxMenuItem((&contextMenu), idMenuUp, _("Move over"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
 	contextMenu.Append(MenuItem4);
-	MenuItem5 = new wxMenuItem((&contextMenu), idMenuDown, _("Déplacer au dessous"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem5 = new wxMenuItem((&contextMenu), idMenuDown, _("Move below"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
 	contextMenu.Append(MenuItem5);
 	imageList = new wxImageList(16, 16, 1);
@@ -110,7 +110,7 @@ mainFrameWrapper(mainFrameWrapper_)
     imageList->Add(wxBitmap("res/eyeGrey.png", wxBITMAP_TYPE_ANY));
     layersList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
-	layersList->InsertColumn(1, _("Calque"));
+	layersList->InsertColumn(1, _("Layer"));
 	layersList->InsertColumn(2, _("Visible"));
 
     CreateToolbar();
@@ -124,16 +124,16 @@ mainFrameWrapper(mainFrameWrapper_)
 void EditorLayers::CreateToolbar()
 {
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( ID_BITMAPBUTTON1, _( "Rafraichir" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Rafraichir la liste des calques") );
+    toolbar->AddTool( ID_BITMAPBUTTON1, _( "Refresh" ), wxBitmap( wxImage( "res/refreshicon.png" ) ), _("Refresh the layer list") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idMenuAdd, _( "Ajouter un calque" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter un calque") );
-    toolbar->AddTool( idMenuDel, _( "Supprimer le calque sélectionné" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer le calque sélectionné") );
+    toolbar->AddTool( idMenuAdd, _( "Add a layer" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Add a layer") );
+    toolbar->AddTool( idMenuDel, _( "Delete the selected layer" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Delete the selected layer") );
     toolbar->AddSeparator();
-    toolbar->AddTool( idMenuUp, _( "Déplacer le calque au dessus" ), wxBitmap( wxImage( "res/up.png" ) ), _("Déplacer le calque au dessus") );
-    toolbar->AddTool( idMenuDown, _( "Déplacer le calque au dessous" ), wxBitmap( wxImage( "res/down.png" ) ), _("Déplacer le calque au dessous") );
-    toolbar->AddTool( ID_BITMAPBUTTON6, _( "Plus d'options d'édition ( clic droit sur la liste )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _("Plus d'options d'édition ( clic droit sur la liste )") );
+    toolbar->AddTool( idMenuUp, _( "Move the layer over" ), wxBitmap( wxImage( "res/up.png" ) ), _("Move the layer over") );
+    toolbar->AddTool( idMenuDown, _( "Move the layer below" ), wxBitmap( wxImage( "res/down.png" ) ), _("Move the layer below") );
+    toolbar->AddTool( ID_BITMAPBUTTON6, _( "More edition options ( right click on the list )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _("More edition options ( right click on the list )") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON3, _( "Aide de l'éditeur d'objets" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur d'objets") );
+    toolbar->AddTool( ID_BITMAPBUTTON3, _( "Objects' editor help" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Objects' editor help") );
     toolbar->Realize();
 }
 
@@ -164,7 +164,7 @@ void EditorLayers::OnMoreOptions(wxCommandEvent& event)
 
 void EditorLayers::OnHelp(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(226);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
@@ -180,7 +180,7 @@ void EditorLayers::Refresh()
     for (unsigned int i =0;i<scene.GetLayersCount();++i)
     {
         string name = scene.GetLayer(i).GetName();
-        if ( name == "" ) name = _("Calque de base");
+        if ( name == "" ) name = _("Base layer");
     	layersList->InsertItem(0, name);
 
     	if ( scene.GetLayer(i).GetVisibility() )
@@ -214,7 +214,7 @@ void EditorLayers::UpdateSelectedLayerIcon()
 ////////////////////////////////////////////////////////////
 void EditorLayers::OnAddSelected(wxCommandEvent& event)
 {
-    wxString name = _("Nouveau calque");
+    wxString name = _("New layer");
 
     bool alreadyExist = false;
     int nb = 0;
@@ -226,7 +226,7 @@ void EditorLayers::OnAddSelected(wxCommandEvent& event)
     while ( alreadyExist )
     {
         ++nb;
-        name = _("Nouveau calque ") + ToString(nb);
+        name = _("New layer ") + ToString(nb);
 
         alreadyExist = false;
         for (unsigned int i = 0;i<scene.GetLayersCount();++i)
@@ -298,7 +298,7 @@ void EditorLayers::OnDelSelected(wxCommandEvent& event)
     	    return;
     	}
     }
-    wxLogWarning(_("Impossible de trouver le calque à supprimer !"));
+    wxLogWarning(_("Can't find the layer to delete !"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -327,7 +327,7 @@ void EditorLayers::OnUpSelected(wxCommandEvent& event)
     	    return;
     	}
     }
-    wxLogWarning(_("Impossible de trouver le calque à déplacer !"));
+    wxLogWarning(_("Can't find the layer to move  !"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -357,7 +357,7 @@ void EditorLayers::OnDownSelected(wxCommandEvent& event)
     	    return;
     	}
     }
-    wxLogWarning(_("Impossible de trouver le calque à déplacer !"));
+    wxLogWarning(_("Can't find the layer to move  !"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -489,3 +489,4 @@ void EditorLayers::OnlayersListItemFocused(wxListEvent& event)
     if ( sceneCanvas ) sceneCanvas->SetCurrentLayer(layer->GetName());
     UpdateSelectedLayerIcon();
 }
+

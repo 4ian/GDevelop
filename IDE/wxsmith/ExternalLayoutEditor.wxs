@@ -24,7 +24,7 @@
 									<growablerows>0</growablerows>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-											<label>Editer comme si les objets étaient inclus à la scène :</label>
+											<label>Edit as if the objects were included to scene :</label>
 										</object>
 										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -33,7 +33,7 @@
 									<object class="sizeritem">
 										<object class="wxComboBox" name="ID_COMBOBOX1" variable="parentSceneComboBox" member="yes">
 											<content>
-												<item>Aucune scène</item>
+												<item>No scene</item>
 											</content>
 											<selection>0</selection>
 											<handler function="OnparentSceneComboBoxSelected" entry="EVT_COMBOBOX" />
@@ -93,7 +93,7 @@
 											<growablerows>0</growablerows>
 											<object class="sizeritem">
 												<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-													<label>Choisissez la scène à utiliser comme base pour éditer l&apos;agencement externe</label>
+													<label>Choose the scene to be used as a base for editing the external layout</label>
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 												<border>5</border>
@@ -126,3 +126,4 @@
 		</object>
 	</object>
 </wxsmith>
+

@@ -70,13 +70,13 @@ void BuildProgressPnl::OnMustRefresh(wxCommandEvent&)
         {
             if (!CodeCompiler::GetInstance()->LastTaskFailed())
             {
-                statusTxt->SetLabel(_("Tâche en progression : ")+currentTasks[0].userFriendlyName);
-                AppendText(_("Tâche en progression : ")+currentTasks[0].userFriendlyName+("...")+"\n");
+                statusTxt->SetLabel(_("Task in progress:")+currentTasks[0].userFriendlyName);
+                AppendText(_("Task in progress:")+currentTasks[0].userFriendlyName+("...")+"\n");
             }
             else
             {
-                statusTxt->SetLabel(_("La tâche ")+currentTasks[0].userFriendlyName+_("a échouée."));
-                AppendText(_("La tâche ")+currentTasks[0].userFriendlyName+_("a échouée.")+"\n");
+                statusTxt->SetLabel(_("The task ")+currentTasks[0].userFriendlyName+_("failed."));
+                AppendText(_("The task ")+currentTasks[0].userFriendlyName+_("failed.")+"\n");
             }
         }
     }
@@ -84,22 +84,22 @@ void BuildProgressPnl::OnMustRefresh(wxCommandEvent&)
     {
         if (CodeCompiler::GetInstance()->LastTaskFailed())
         {
-            statusTxt->SetLabel(_("Compilation terminée, mais une ou plusieurs tâches ont échouées."));
-            AppendText(_("Compilation terminée, mais une ou plusieurs tâches ont échouées.")+"\n");
+            statusTxt->SetLabel(_("Some tasks failed."));
+            AppendText(_("Some tasks failed.")+"\n");
         }
         else
         {
-            wxString timeStr = wxString::Format(_("( %ld secondes )"), compilationTimer.Time()/1000);
+            wxString timeStr = wxString::Format(_("( %ld seconds )"), compilationTimer.Time()/1000);
             if (!currentTasks.empty())
             {
-                statusTxt->SetLabel(_("Compilation terminée ")+timeStr+_(", mais ")+ToString(currentTasks.size())+_(" tâche(s) sont encore en attente de pouvoir être lancées."));
-                AppendText(_("Les tâches ont été accomplies ")+timeStr+_(", mais ")+ToString(currentTasks.size())+_(" tâche(s) sont encore en attente de pouvoir être lancées.")+"\n");
+                statusTxt->SetLabel(_("Compilation finished")+timeStr+_(", but ")+ToString(currentTasks.size())+_(" task(s) are waiting."));
+                AppendText(_("Tasks finished ")+timeStr+_(", but ")+ToString(currentTasks.size())+_(" task(s) are waiting.")+"\n");
 
             }
             else
             {
-                statusTxt->SetLabel(_("Compilation terminée."));
-                AppendText(_("Toutes les tâches ont été accomplies.")+" "+timeStr+"\n");
+                statusTxt->SetLabel(_("Compilation finished."));
+                AppendText(_("All tasks have been completed.")+" "+timeStr+"\n");
             }
         }
         clearOnNextTextAdding = true;
@@ -128,3 +128,4 @@ void BuildProgressPnl::AppendText(wxString text)
 void BuildProgressPnl::OntasksLogEditText(wxCommandEvent& event)
 {
 }
+

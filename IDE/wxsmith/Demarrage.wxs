@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="Demarrage">
-		<title>Premier démarrage de Game Develop</title>
+		<title>First startup of Game Develop</title>
 		<centered>1</centered>
 		<size>662,325</size>
 		<id_arg>0</id_arg>
@@ -55,7 +55,7 @@
 												<cols>1</cols>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
-														<label>Cet écran s&apos;affiche au premier démarrage</label>
+														<label>This window is displayed at first startup</label>
 														<font>
 															<weight>bold</weight>
 														</font>
@@ -66,7 +66,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-														<label>Game Develop permet la création de jeux de façon simple et rapide,&#x0A;pour le développeur débutant ou confirmé.</label>
+														<label>Game Develop allows easy and fast game creation,&#x0A;for beginners and advanced users.</label>
 														<font />
 													</object>
 													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -75,7 +75,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
-														<label>Vous allez pouvoir régler quelques paramétrages et accéder aux&#x0A;conseils pour démarrer au mieux avec Game Develop.&#x0A;&#x0A;Cliquez sur suivant pour continuer.</label>
+														<label>You can setup some parameters and read&#x0A;some advices to get started with Game Develop.&#x0A;&#x0A;Click on Next to continue.</label>
 													</object>
 													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -104,7 +104,7 @@
 										<growablerows>0</growablerows>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-												<label>Game Develop est un freeware.  Si vous l&apos;avez payé autrement que par un don&#x0A;à l&apos;auteur, nous vous recommandons d&apos;obtenir un remboursement.</label>
+												<label>Game Develop is a freeware. If you paid for it ( other than by a donation to the author )&#x0A;then we recommend that you get a refund !</label>
 												<font>
 													<style>italic</style>
 												</font>
@@ -115,7 +115,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxButton" name="ID_BUTTON6" variable="Button1" member="yes">
-												<label>Suivant</label>
+												<label>Next</label>
 												<handler function="OnButton1Click" entry="EVT_BUTTON" />
 											</object>
 											<flag>wxALL|wxALIGN_LEFT|wxALIGN_BOTTOM</flag>
@@ -128,7 +128,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Bienvenue</label>
+						<label>Welcome</label>
 					</object>
 					<object class="notebookpage">
 						<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
@@ -146,7 +146,7 @@
 												<cols>1</cols>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-														<label>Game Develop vérifie par défaut au démarrage si de nouvelles mises à jour sont&#x0A;disponibles. Si vous possédez un pare feu, il est possible que celui ci  vous demande&#x0A;si le logiciel peut accéder à internet. Dans ce cas, répondez par l&apos;affirmative.</label>
+														<label>Game Develop checks by default at startup if new updates are&#x0A;available. If you have a firewall, it is possible that it will ask&#x0A;if the software can access the internet. In this case, answer by yes.</label>
 													</object>
 													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -154,7 +154,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxCheckBox" name="ID_CHECKBOX1" variable="majCheck" member="yes">
-														<label>Vérifier les mises à jour au démarrage</label>
+														<label>Check for updates at startup</label>
 														<checked>1</checked>
 													</object>
 													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -180,7 +180,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxButton" name="ID_BUTTON7" variable="Button2" member="yes">
-										<label>Suivant</label>
+										<label>Next</label>
 										<handler function="OnButton2Click" entry="EVT_BUTTON" />
 									</object>
 									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM</flag>
@@ -189,7 +189,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Paramétrage</label>
+						<label>Setup</label>
 					</object>
 					<object class="notebookpage">
 						<object class="wxPanel" name="ID_PANEL3" variable="Panel3" member="yes">
@@ -212,7 +212,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="HyperlinkCtrl1" member="yes">
-												<label>Pour commencer, lisez le guide de démarrage qui explique les principaux concepts.</label>
+												<label>To get started with Game Develop, read the \"Getting started manual\",\navailable in Help.</label>
 												<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 												<handler function="OnGuideBtClick" entry="EVT_HYPERLINK" />
 											</object>
@@ -226,7 +226,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-										<label>Vous pouvez ensuite :</label>
+										<label>You can then:</label>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -249,7 +249,7 @@
 												<cols>3</cols>
 												<object class="sizeritem">
 													<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL2" variable="HyperlinkCtrl2" member="yes">
-														<label>Lire le tutoriel</label>
+														<label>Read the tutorial</label>
 														<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 														<handler function="OnTutorielBtClick" entry="EVT_HYPERLINK" />
 													</object>
@@ -259,7 +259,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL17" variable="secondTutoLink" member="yes">
-														<label>(-Insert the name of the second tutorial or a blank text-)</label>
+														<label>( Spanish tutorial also available )</label>
 														<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 														<handler function="OnsecondTutoLinkClick" entry="EVT_HYPERLINK" />
 													</object>
@@ -282,7 +282,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL8" variable="HyperlinkCtrl8" member="yes">
-												<label>Ouvrir les exemples</label>
+												<label>Open examples</label>
 												<style>wxHL_ALIGN_LEFT|wxNO_BORDER</style>
 												<handler function="OnExempleBtClick" entry="EVT_HYPERLINK" />
 											</object>
@@ -301,7 +301,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL9" variable="HyperlinkCtrl9" member="yes">
-												<label>Accéder au wiki ( Base d&apos;articles et de connaissance )</label>
+												<label>Access to wiki ( Knowledge base )</label>
 												<url>http://www.wiki.compilgames.net</url>
 												<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 											</object>
@@ -320,7 +320,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL10" variable="HyperlinkCtrl10" member="yes">
-												<label>Accéder au forum</label>
+												<label>Access to forum</label>
 												<url>http://www.forum.compilgames.net</url>
 												<style>wxHL_ALIGN_CENTRE|wxNO_BORDER</style>
 											</object>
@@ -339,7 +339,7 @@
 										<growablerows>0</growablerows>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
-												<label>Vous pouvez aussi accéder à ces liens depuis la page qui s&apos;affiche&#x0A;au démarrage de Game Develop.</label>
+												<label>You can also access to this links from the Start Page which is&#x0A;displayed when Game Develop is launched.</label>
 												<font>
 													<style>italic</style>
 												</font>
@@ -350,7 +350,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxButton" name="ID_BUTTON4" variable="FermerBt" member="yes">
-												<label>Fermer</label>
+												<label>Close</label>
 												<handler function="OnFermerBtClick" entry="EVT_BUTTON" />
 											</object>
 											<flag>wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM</flag>
@@ -363,7 +363,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Débuter avec Game Develop</label>
+						<label>Getting started with Game Develop</label>
 					</object>
 				</object>
 				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -373,3 +373,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

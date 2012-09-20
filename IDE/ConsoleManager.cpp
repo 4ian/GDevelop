@@ -23,3 +23,4 @@ void ConsoleManager::ShowConsole()
 {
     console->Show();
 }
+

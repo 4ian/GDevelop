@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="ChoixTemplateEvent">
-		<title>Choisir un modèle d&apos;évènement</title>
+		<title>Choose a template</title>
 		<centered>1</centered>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
@@ -42,7 +42,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-												<label>Modèles d&apos;évènements</label>
+												<label>Templates</label>
 												<font>
 													<size>16</size>
 													<style>normal</style>
@@ -62,7 +62,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-									<label>Les modèles d&apos;évènements permettent d&apos;ajouter rapidement un &#x0A;ou plusieurs évènements, et de les adapter à votre scène.</label>
+									<label>Template allow you to add quickly one or several events&#x0A;and to adapt them to your scene.</label>
 								</object>
 								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
@@ -78,7 +78,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticText" name="ID_STATICTEXT3" variable="DesTxt" member="yes">
-									<label>Selectionnez un modèle dans la liste</label>
+									<label>Select a template in the list</label>
 								</object>
 								<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 								<border>5</border>
@@ -90,7 +90,7 @@
 									<growablecols>0</growablecols>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT4" variable="Txt1" member="yes">
-											<label>Description paramètre 1</label>
+											<label>Parameter 1 description :</label>
 											<hidden>1</hidden>
 										</object>
 										<flag>wxTOP|wxLEFT|wxRIGHT|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -107,7 +107,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT5" variable="Txt2" member="yes">
-											<label>Description paramètre 2</label>
+											<label>Parameter 2 description :</label>
 											<hidden>1</hidden>
 										</object>
 										<flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -124,7 +124,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT6" variable="Txt3" member="yes">
-											<label>Description paramètre 3</label>
+											<label>Parameter 3 description :</label>
 											<hidden>1</hidden>
 										</object>
 										<flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -141,7 +141,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT8" variable="Txt4" member="yes">
-											<label>Description paramètre 4</label>
+											<label>Parameter 4 description :</label>
 											<hidden>1</hidden>
 										</object>
 										<flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -158,7 +158,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT7" variable="Txt5" member="yes">
-											<label>Description paramètre 5</label>
+											<label>Parameter 5 description :</label>
 											<hidden>1</hidden>
 										</object>
 										<flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -175,7 +175,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT9" variable="Txt6" member="yes">
-											<label>Description paramètre 6</label>
+											<label>Parameter 6 description :</label>
 											<hidden>1</hidden>
 										</object>
 										<flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -192,7 +192,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT10" variable="Txt7" member="yes">
-											<label>Description paramètre 7</label>
+											<label>Parameter 7 description :</label>
 											<hidden>1</hidden>
 										</object>
 										<flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -209,7 +209,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT11" variable="Txt8" member="yes">
-											<label>Description paramètre 8</label>
+											<label>Parameter 8 description :</label>
 											<hidden>1</hidden>
 										</object>
 										<flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -250,7 +250,7 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="InsererBt" member="yes">
-							<label>Insérer</label>
+							<label>Insert</label>
 							<handler function="OnInsererBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -259,7 +259,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON1" variable="AnnulerBt" member="yes">
-							<label>Annuler</label>
+							<label>Cancel</label>
 							<handler function="OnAnnulerBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -268,7 +268,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON3" variable="AideBt" member="yes">
-							<label>Aide</label>
+							<label>Help</label>
 							<handler function="OnAideBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -282,3 +282,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

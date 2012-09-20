@@ -367,6 +367,17 @@ private :
      */
     void RenderGrid();
 
+    /**
+     * Inverse function of sf::RenderTarget::ConvertCoords. Convert from view coordinates to window coordinates.
+     *
+     * \param x X coordinate of the point to convert, relative to the view
+     * \param x Y coordinate of the point to convert, relative to the view
+     * \param view The view to use for converting the point
+     *
+     * \return The converted point, in "window" units
+     */
+    sf::Vector2f ConvertToWindowCoordinates(float x, float y, const sf::View & view);
+
     bool hasJustRightClicked;
     bool ctrlPressed;
 
@@ -412,3 +423,4 @@ private :
 
 
 #endif // SCENECANVAS_H
+

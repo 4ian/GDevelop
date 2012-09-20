@@ -94,3 +94,4 @@ class ProfileDlg: public wxPanel, public BaseProfiler
 };
 
 #endif
+

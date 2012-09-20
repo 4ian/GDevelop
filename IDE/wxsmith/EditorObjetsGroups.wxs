@@ -41,48 +41,55 @@
 		</object>
 		<object class="wxMenu" variable="ContextMenu" member="yes">
 			<object class="wxMenuItem" name="IdGroupEdit" variable="editMenuItem" member="no">
-				<label>Editer le groupe</label>
+				<label>Edit the group</label>
 				<bitmap>res/editpropicon.png</bitmap>
 				<handler function="OnEditGroupSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idModName" variable="MenuItem4" member="yes">
-				<label>Modifier le nom</label>
+				<label>Change the name</label>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OnModNameSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idAddGroup" variable="MenuItem2" member="yes">
-				<label>Ajouter un groupe</label>
+				<label>Add a group</label>
 				<bitmap>res/addicon.png</bitmap>
 				<handler function="OnAddGroupSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idDelGroup" variable="MenuItem3" member="yes">
-				<label>Supprimer le groupe</label>
+				<label>Delete the group</label>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDelGroupSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem1" member="yes">
-				<label>Copier</label>
+				<label>Copy</label>
 				<bitmap>res/copyicon.png</bitmap>
 				<handler function="OnCopyGroupSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem5" member="yes">
-				<label>Couper</label>
+				<label>Cut</label>
 				<bitmap>res/cuticon.png</bitmap>
 				<handler function="OnCutGroupSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem6" member="yes">
-				<label>Coller</label>
+				<label>Paste</label>
 				<bitmap>res/pasteicon.png</bitmap>
 				<handler function="OnPasteGroupSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="multipleContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItem7" member="yes">
-				<label>Supprimer</label>
+				<label>Delete</label>
 				<handler function="OnDelGroupSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

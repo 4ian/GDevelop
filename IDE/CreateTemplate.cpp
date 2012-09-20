@@ -76,7 +76,7 @@ events( events_ )
     wxFlexGridSizer* FlexGridSizer1;
     wxFlexGridSizer* FlexGridSizer17;
 
-    Create(parent, wxID_ANY, _("Créer un modèle d\'évènements"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("Create a template"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer17->AddGrowableCol(0);
@@ -85,7 +85,7 @@ events( events_ )
     FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
     StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/addtemplate.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
     FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Vous pouvez créer un modèle d\'évènements à partir des \névènements de la scène actuelle. Un modèle d\'évènement\npermet de créer automatiquement et rapidement des évènements,\nen remplissant juste quelques paramètres."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
+    StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("You can create a template from actual events of the scene\nA template allow to automatically and quickly create events,\njust filling in some parameters."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
     FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel1->SetSizer(FlexGridSizer6);
     FlexGridSizer6->SetSizeHints(Panel1);
@@ -98,16 +98,16 @@ events( events_ )
     FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
     FlexGridSizer4->AddGrowableCol(1);
     FlexGridSizer4->AddGrowableRow(1);
-    StaticText5 = new wxStaticText(Panel2, ID_STATICTEXT5, _("Nom du modèle :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+    StaticText5 = new wxStaticText(Panel2, ID_STATICTEXT5, _("Template name :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
     FlexGridSizer4->Add(StaticText5, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     nomEdit = new wxTextCtrl(Panel2, ID_TEXTCTRL18, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL18"));
     FlexGridSizer4->Add(nomEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText4 = new wxStaticText(Panel2, ID_STATICTEXT4, _("Description du modèle :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+    StaticText4 = new wxStaticText(Panel2, ID_STATICTEXT4, _("Template description :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
     FlexGridSizer4->Add(StaticText4, 1, wxALL|wxALIGN_RIGHT|wxALIGN_TOP, 5);
     descEdit = new wxTextCtrl(Panel2, ID_TEXTCTRL17, wxEmptyString, wxDefaultPosition, wxSize(201,64), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL17"));
     FlexGridSizer4->Add(descEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer4->Add(-1,-1,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    Button1 = new wxButton(Panel2, ID_BUTTON4, _("Suivant"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+    Button1 = new wxButton(Panel2, ID_BUTTON4, _("Next"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
     FlexGridSizer4->Add(Button1, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     Panel2->SetSizer(FlexGridSizer4);
     FlexGridSizer4->Fit(Panel2);
@@ -115,19 +115,19 @@ events( events_ )
     Panel3 = new wxPanel(Notebook1, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
     FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
     FlexGridSizer2->AddGrowableCol(1);
-    StaticText2 = new wxStaticText(Panel3, ID_STATICTEXT2, _("Rechercher ceci\ndans les paramètres\ndes actions et conditions"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT2"));
+    StaticText2 = new wxStaticText(Panel3, ID_STATICTEXT2, _("Search this\nin parameters of\nactions and conditions"), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT2"));
     wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText2->SetFont(StaticText2Font);
     FlexGridSizer2->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("Description qui sera donnée à l\'insertion"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+    StaticText3 = new wxStaticText(Panel3, ID_STATICTEXT3, _("Description that will be given"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
     wxFont StaticText3Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText3->SetFont(StaticText3Font);
     FlexGridSizer2->Add(StaticText3, 1, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
-    StaticText6 = new wxStaticText(Panel3, ID_STATICTEXT6, _("Exemple : MonObjet"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+    StaticText6 = new wxStaticText(Panel3, ID_STATICTEXT6, _("Example : MyObject"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
     wxFont StaticText6Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText6->SetFont(StaticText6Font);
     FlexGridSizer2->Add(StaticText6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    StaticText7 = new wxStaticText(Panel3, ID_STATICTEXT7, _("Exemple : Entrez l\'objet servant de héros."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+    StaticText7 = new wxStaticText(Panel3, ID_STATICTEXT7, _("Example : Enter the name of the Hero object."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
     wxFont StaticText7Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     StaticText7->SetFont(StaticText7Font);
     FlexGridSizer2->Add(StaticText7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -166,18 +166,18 @@ events( events_ )
     Panel3->SetSizer(FlexGridSizer2);
     FlexGridSizer2->Fit(Panel3);
     FlexGridSizer2->SetSizeHints(Panel3);
-    Notebook1->AddPage(Panel2, _("Informations sur le modèle"), false);
-    Notebook1->AddPage(Panel3, _("Paramètres"), false);
+    Notebook1->AddPage(Panel2, _("Information on the template"), false);
+    Notebook1->AddPage(Panel3, _("Parameters"), false);
     FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
     FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer3->AddGrowableCol(0);
-    CreateBt = new wxButton(this, ID_BUTTON2, _("Créer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    CreateBt = new wxButton(this, ID_BUTTON2, _("Create"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     FlexGridSizer3->Add(CreateBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    AnnulerBt = new wxButton(this, ID_BUTTON1, _("Fermer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+    AnnulerBt = new wxButton(this, ID_BUTTON1, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     FlexGridSizer3->Add(AnnulerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    AideBt = new wxButton(this, ID_BUTTON3, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+    AideBt = new wxButton(this, ID_BUTTON3, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
     FlexGridSizer3->Add(AideBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer1);
@@ -255,28 +255,21 @@ void CreateTemplate::OnCreateBtClick( wxCommandEvent& event )
 
     OpenSaveGame::SaveEvents(events, elemEvents);
 
-    if ( !doc.SaveFile( "/Template/" ) )
+    wxFileDialog dialog( this, _( "Choose where save the template" ), "Templates", "", "Template (*.mgd)|*.mgd", wxFD_SAVE );
+    ;
+
+    if ( dialog.ShowModal() != wxID_CANCEL )
     {
-        wxLogError( _( "Impossible d'enregistrer le fichier dans le dossier Template de Game Develop : Vérifiez que Game Develop est lancé avec les autorisations nécessaires. Il va vous être proposer d'enregistrer le fichier dans un emplacement de votre choix." ) );
+        string path = static_cast<string>( dialog.GetPath() );
 
-        wxFileDialog dialog( this, _( "Choisissez où enregistrer le modèle" ), "", "", "Modèle (*.mgd)|*.mgd", wxFD_SAVE );
-        dialog.ShowModal();
-
-        if ( dialog.GetPath() != "" )
+        if ( !doc.SaveFile( path.c_str() ) )
         {
-            string path = static_cast<string>( dialog.GetPath() );
-
-            if ( !doc.SaveFile( path.c_str() ) )
-            {
-                wxLogError( _( "Impossible d'enregistrer le fichier. Vérifiez que le disque comporte assez d'espace disque, qu'il n'est pas protégé en écriture, et que vous possèdez les autorisations nécessaires." ) );
-                return;
-            }
+            wxLogError( _( "Unable to save file. Check that the drive has enough free space, is not write-protected and you have read/write permissions." ) );
+            return;
         }
 
-        return;
+        wxLogMessage(_("The template was correctly created."));
     }
-
-    wxLogMessage(_("Le modèle a été correctement créé."));
 }
 
 ////////////////////////////////////////////////////////////
@@ -349,7 +342,7 @@ string CreateTemplate::ConvertParam( string Parametre, string ToReplace, string 
 
 void CreateTemplate::OnAideBtClick( wxCommandEvent& event )
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(151);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/create_template")); //TODO
@@ -359,3 +352,4 @@ void CreateTemplate::OnButton1Click(wxCommandEvent& event)
 {
     Notebook1->SetSelection(1);
 }
+

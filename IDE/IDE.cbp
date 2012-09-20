@@ -574,6 +574,8 @@
 		<Unit filename="Dialogs\ExternalLayoutEditor.h" />
 		<Unit filename="Dialogs\HtmlViewerPnl.cpp" />
 		<Unit filename="Dialogs\HtmlViewerPnl.h" />
+		<Unit filename="Dialogs\NewProjectDialog.cpp" />
+		<Unit filename="Dialogs\NewProjectDialog.h" />
 		<Unit filename="Dialogs\ProjectPropertiesPnl.cpp" />
 		<Unit filename="Dialogs\ProjectPropertiesPnl.h" />
 		<Unit filename="DnDFileEditor.cpp">
@@ -735,12 +737,6 @@
 		<Unit filename="MyStatusBar.h">
 			<Option virtualFolder="LIB MyStatusBar\" />
 		</Unit>
-		<Unit filename="ObjectTypeChoice.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\Editeur objets\" />
-		</Unit>
-		<Unit filename="ObjectTypeChoice.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\Editeur objets\" />
-		</Unit>
 		<Unit filename="ObjectsOnBadLayerBox.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur calques\" />
 		</Unit>
@@ -843,6 +839,7 @@
 		</Unit>
 		<Unit filename="wxsmith\ExternalLayoutEditor.wxs" />
 		<Unit filename="wxsmith\HtmlViewerPnl.wxs" />
+		<Unit filename="wxsmith\NewProjectDialog.wxs" />
 		<Unit filename="wxsmith\ProjectPropertiesPnl.wxs" />
 		<Unit filename="wxstedit\include\wx\stedit\pairarr.h" />
 		<Unit filename="wxstedit\include\wx\stedit\setup.h" />
@@ -930,7 +927,6 @@
 					<wxDialog wxs="wxsmith/ChoiceFile.wxs" src="ChoiceFile.cpp" hdr="ChoiceFile.h" fwddecl="0" i18n="1" name="ChoiceFile" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorObjectList.wxs" src="EditorObjectList.cpp" hdr="EditorObjectList.h" fwddecl="0" i18n="1" name="EditorObjectList" language="CPP" />
 					<wxFrame wxs="wxsmith/ConsoleFrame.wxs" src="ConsoleFrame.cpp" hdr="ConsoleFrame.h" fwddecl="0" i18n="1" name="ConsoleFrame" language="CPP" />
-					<wxDialog wxs="wxsmith/ObjectTypeChoice.wxs" src="ObjectTypeChoice.cpp" hdr="ObjectTypeChoice.h" fwddecl="0" i18n="1" name="ObjectTypeChoice" language="CPP" />
 					<wxPanel wxs="wxsmith/SpriteInitialPositionPanel.wxs" src="SpriteInitialPositionPanel.cpp" hdr="SpriteInitialPositionPanel.h" fwddecl="0" i18n="1" name="SpriteInitialPositionPanel" language="CPP" />
 					<wxDialog wxs="wxsmith/InitialVariablesDialog.wxs" src="InitialVariablesDialog.cpp" hdr="InitialVariablesDialog.h" fwddecl="0" i18n="1" name="InitialVariablesDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/TextObjectEditor.wxs" src="TextObjectEditor.cpp" hdr="TextObjectEditor.h" fwddecl="0" i18n="1" name="TextObjectEditor" language="CPP" />
@@ -952,6 +948,7 @@
 					<wxPanel wxs="wxsmith/ExternalLayoutEditor.wxs" src="Dialogs\ExternalLayoutEditor.cpp" hdr="Dialogs\ExternalLayoutEditor.h" fwddecl="0" i18n="1" name="ExternalLayoutEditor" language="CPP" />
 					<wxPanel wxs="wxsmith/HtmlViewerPnl.wxs" src="Dialogs\HtmlViewerPnl.cpp" hdr="Dialogs\HtmlViewerPnl.h" fwddecl="0" i18n="1" name="HtmlViewerPnl" language="CPP" />
 					<wxPanel wxs="wxsmith/ProjectPropertiesPnl.wxs" src="Dialogs\ProjectPropertiesPnl.cpp" hdr="Dialogs\ProjectPropertiesPnl.h" fwddecl="0" i18n="1" name="ProjectPropertiesPnl" language="CPP" />
+					<wxDialog wxs="wxsmith/NewProjectDialog.wxs" src="Dialogs\NewProjectDialog.cpp" hdr="Dialogs\NewProjectDialog.h" fwddecl="0" i18n="1" name="NewProjectDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

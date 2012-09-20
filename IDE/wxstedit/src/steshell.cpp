@@ -405,3 +405,4 @@ void wxSTEditorShell::OnKeyDown(wxKeyEvent &event)
 
     event.Skip();
 }
+

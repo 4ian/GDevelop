@@ -127,3 +127,4 @@ class Credits: public wxDialog
 };
 
 #endif
+

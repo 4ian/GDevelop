@@ -9,3 +9,10 @@ LogManager::~LogManager()
 {
     //dtor
 }
+
+
+
+
+
+
+

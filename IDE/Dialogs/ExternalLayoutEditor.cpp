@@ -80,10 +80,10 @@ mainFrameWrapper(mainFrameWrapper_)
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer2->AddGrowableCol(1);
 	FlexGridSizer2->AddGrowableRow(0);
-	StaticText1 = new wxStaticText(contextPanel, ID_STATICTEXT1, _("Editer comme si les objets étaient inclus à la scène :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(contextPanel, ID_STATICTEXT1, _("Edit as if the objects were included to scene :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	parentSceneComboBox = new wxComboBox(contextPanel, ID_COMBOBOX1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_COMBOBOX1"));
-	parentSceneComboBox->SetSelection( parentSceneComboBox->Append(_("Aucune scène")) );
+	parentSceneComboBox->SetSelection( parentSceneComboBox->Append(_("No scene")) );
 	FlexGridSizer2->Add(parentSceneComboBox, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
 	contextPanel->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(contextPanel);
@@ -105,7 +105,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	helpPanel->SetBackgroundColour(wxColour(255,255,255));
 	helpSizer = new wxFlexGridSizer(0, 3, 0, 0);
 	helpSizer->AddGrowableRow(0);
-	StaticText2 = new wxStaticText(helpPanel, ID_STATICTEXT2, _("Choisissez la scène à utiliser comme base pour éditer l\'agencement externe"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(helpPanel, ID_STATICTEXT2, _("Choose the scene to be used as a base for editing the external layout"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	helpSizer->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap1 = new wxStaticBitmap(helpPanel, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/up.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	helpSizer->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -136,7 +136,7 @@ mainFrameWrapper(mainFrameWrapper_)
     sceneCanvas->SetScrollbars(scrollBar1, scrollBar2);
     sceneCanvas->Reload();
 
-    m_mgr.AddPane( corePanel, wxAuiPaneInfo().Name( wxT( "LayoutPanel" ) ).Center().CloseButton( false ).Caption( _( "Editeur de scène" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
+    m_mgr.AddPane( corePanel, wxAuiPaneInfo().Name( wxT( "LayoutPanel" ) ).Center().CloseButton( false ).Caption( _( "Scene's editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
 
     MainFrame::LoadSkin(&m_mgr, NULL);
 
@@ -253,11 +253,11 @@ void ExternalLayoutEditor::SetupForScene(Scene & scene)
             if ( creatingEditorsForFirsttime )
             {
                 if ( !m_mgr.GetPane("ObjectsEditor").IsOk() )
-                    m_mgr.AddPane( sceneCanvas->GetOwnedObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "ObjectsEditor" ) ).Right().CloseButton( true ).Caption( _( "Editeur d'objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+                    m_mgr.AddPane( sceneCanvas->GetOwnedObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "ObjectsEditor" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
                 if ( !m_mgr.GetPane("LayersEditor").IsOk() )
-                    m_mgr.AddPane( sceneCanvas->GetOwnedLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "LayersEditor" ) ).Right().CloseButton( true ).Caption( _( "Editeur de calques" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+                    m_mgr.AddPane( sceneCanvas->GetOwnedLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "LayersEditor" ) ).Right().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
                 if ( !m_mgr.GetPane("InstancesBrowser").IsOk() )
-                    m_mgr.AddPane( sceneCanvas->GetOwnedInitialPositionBrowser().get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Positions initiales des objets" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+                    m_mgr.AddPane( sceneCanvas->GetOwnedInitialPositionBrowser().get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Initial positions of objects" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
 
                 wxString perspective;
                 wxConfigBase::Get()->Read("/ExternalLayoutEditor/LastWorkspace", &perspective);
@@ -297,7 +297,7 @@ void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
         scene = &emptyScene;
     else
     {
-        wxLogWarning(_("Scène introuvable."));
+        wxLogWarning(_("Scene not found."));
         return;
     }
 
@@ -310,7 +310,7 @@ void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
 void ExternalLayoutEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
 {
     parentSceneComboBox->Clear();
-    parentSceneComboBox->Append(_("Aucune scène"));
+    parentSceneComboBox->Append(_("No scene"));
 
     for (unsigned int i = 0;i<game.GetLayoutCount();++i)
     	parentSceneComboBox->Append(game.GetLayout(i).GetName());
@@ -320,3 +320,4 @@ gd::Layout & ExternalLayoutEditor::GetAssociatedLayout()
 {
     return sceneCanvas->GetEditedScene();
 }
+

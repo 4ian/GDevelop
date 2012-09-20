@@ -107,3 +107,4 @@ class SearchEvents: public wxDialog
 };
 
 #endif
+

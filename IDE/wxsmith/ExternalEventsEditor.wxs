@@ -15,7 +15,7 @@
 					<growablerows>0</growablerows>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-							<label>Editer comme si les évènements étaient inclus à la scène :</label>
+							<label>Edit as if the events were included to scene :</label>
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -24,7 +24,7 @@
 					<object class="sizeritem">
 						<object class="wxComboBox" name="ID_COMBOBOX1" variable="parentSceneComboBox" member="yes">
 							<content>
-								<item>Aucune scène</item>
+								<item>No scene</item>
 							</content>
 							<selection>0</selection>
 							<handler function="OnparentSceneComboBoxSelect" entry="EVT_COMBOBOX" />
@@ -68,3 +68,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

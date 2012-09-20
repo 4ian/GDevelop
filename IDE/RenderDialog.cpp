@@ -23,7 +23,7 @@ RenderDialog::RenderDialog(wxWindow* parent, SceneCanvas * sceneCanvasNotifiedOn
     toBeNotifiedOnClose(sceneCanvasNotifiedOnClose_)
 {
 	//(*Initialize(RenderDialog)
-	Create(parent, wxID_ANY, _("Aperçu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Preview"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	renderCanvas = new wxSFMLCanvas(this,ID_CUSTOM1,wxDefaultPosition,wxSize(800,600),wxWANTS_CHARS | wxNO_BORDER);
 
 	Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&RenderDialog::OnClose);
@@ -56,3 +56,4 @@ void RenderDialog::OnClose(wxCloseEvent& event)
     if ( toBeNotifiedOnClose != NULL ) toBeNotifiedOnClose->ExternalWindowClosed();
     Hide();
 }
+

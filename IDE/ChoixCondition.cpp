@@ -118,7 +118,7 @@ conditionInverted(false)
     wxFlexGridSizer* FlexGridSizer1;
     wxBoxSizer* BoxSizer3;
 
-    Create(parent, wxID_ANY, _("Editer la condition"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
+    Create(parent, wxID_ANY, _("Edit the condition"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
     SetClientSize(wxSize(650,236));
     SetMinSize(wxSize(640,480));
     wxIcon FrameIcon;
@@ -131,35 +131,35 @@ conditionInverted(false)
     FlexGridSizer4->AddGrowableRow(0);
     Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(270,500), 0, _T("ID_NOTEBOOK1"));
     ConditionsTree = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxDefaultPosition, wxSize(300,350), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
-    ConditionsTree->SetToolTip(_("Choisissez une condition à paramétrer."));
+    ConditionsTree->SetToolTip(_("Choose an condition to set up."));
     Panel1 = new wxPanel(Notebook1, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     BoxSizer10 = new wxBoxSizer(wxVERTICAL);
     BoxSizer11 = new wxBoxSizer(wxVERTICAL);
     objectsListsNotebook = new wxNotebook(Panel1, ID_NOTEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK2"));
     ObjetsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
-    ObjetsList->SetToolTip(_("Choisissez un objet dans la liste"));
+    ObjetsList->SetToolTip(_("Choose an object in the list"));
     GroupesList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
-    GroupesList->SetToolTip(_("Choisissez un objet dans la liste"));
+    GroupesList->SetToolTip(_("Choose an object in the list"));
     globalObjectsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL4, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
-    globalObjectsList->SetToolTip(_("Choisissez un objet dans la liste"));
+    globalObjectsList->SetToolTip(_("Choose an object in the list"));
     globalObjectGroups = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL5, wxPoint(-71,-11), wxSize(281,190), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL5"));
-    globalObjectGroups->SetToolTip(_("Choisissez un objet dans la liste"));
-    objectsListsNotebook->AddPage(ObjetsList, _("Objets"), false);
-    objectsListsNotebook->AddPage(GroupesList, _("Groupes d\'objets"), false);
-    objectsListsNotebook->AddPage(globalObjectsList, _("Objets globaux"), false);
-    objectsListsNotebook->AddPage(globalObjectGroups, _("Groupes globaux"), false);
+    globalObjectGroups->SetToolTip(_("Choose an object in the list"));
+    objectsListsNotebook->AddPage(ObjetsList, _("Objects"), false);
+    objectsListsNotebook->AddPage(GroupesList, _("Objects groups"), false);
+    objectsListsNotebook->AddPage(globalObjectsList, _("Global objects"), false);
+    objectsListsNotebook->AddPage(globalObjectGroups, _("Global groups"), false);
     BoxSizer11->Add(objectsListsNotebook, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     objectsSearchCtrl = new wxSearchCtrl(Panel1, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(10,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
     BoxSizer11->Add(objectsSearchCtrl, 0, wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer10->Add(BoxSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     objectConditionsTree = new wxTreeCtrl(Panel1, ID_TREECTRL6, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL6"));
-    objectConditionsTree->SetToolTip(_("Choisissez une action à paramétrer."));
+    objectConditionsTree->SetToolTip(_("Choose an action to set up."));
     BoxSizer10->Add(objectConditionsTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     Panel1->SetSizer(BoxSizer10);
     BoxSizer10->Fit(Panel1);
     BoxSizer10->SetSizeHints(Panel1);
-    Notebook1->AddPage(ConditionsTree, _("Toutes les conditions"), false);
-    Notebook1->AddPage(Panel1, _("Par objet"), false);
+    Notebook1->AddPage(ConditionsTree, _("All conditions"), false);
+    Notebook1->AddPage(Panel1, _("By object"), false);
     FlexGridSizer4->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     FlexGridSizer4->Add(searchCtrl, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -171,15 +171,15 @@ conditionInverted(false)
     ConditionImg = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/unknown24.png")).Rescale(wxSize(24,24).GetWidth(),wxSize(24,24).GetHeight())), wxDefaultPosition, wxSize(24,24), wxNO_BORDER, _T("ID_STATICBITMAP1"));
     FlexGridSizer3->Add(ConditionImg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
-    NomConditionTxt = new wxStaticText(this, ID_STATICTEXT1, _("Aucune condition choisie"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+    NomConditionTxt = new wxStaticText(this, ID_STATICTEXT1, _("No condition chosen"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
     wxFont NomConditionTxtFont(16,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
     NomConditionTxt->SetFont(NomConditionTxtFont);
     BoxSizer4->Add(NomConditionTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer3->Add(BoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     conditionSizer->Add(FlexGridSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
-    ConditionTextTxt = new wxStaticText(this, ID_STATICTEXT2, _("Choisissez une condition dans le menu de gauche"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-    ConditionTextTxt->SetToolTip(_("Pour plus d\'informations sur la condition, consultez l\'aide."));
+    ConditionTextTxt = new wxStaticText(this, ID_STATICTEXT2, _("Choose a condition in left menu"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+    ConditionTextTxt->SetToolTip(_("See Help for more information about the condition."));
     BoxSizer3->Add(ConditionTextTxt, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     conditionSizer->Add(BoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
@@ -193,9 +193,9 @@ conditionInverted(false)
     FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer7->AddGrowableCol(1);
     FlexGridSizer7->AddGrowableRow(0);
-    ContraireCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Inverser la condition"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+    ContraireCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Invert the condition"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
     ContraireCheck->SetValue(false);
-    ContraireCheck->SetToolTip(_("Cochez pour que la condition vérifie l\'inverse de ce qu\'elle devrait faire."));
+    ContraireCheck->SetToolTip(_("Check so as to that the condition verify the reverse of what it should do."));
     FlexGridSizer7->Add(ContraireCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer2->Add(FlexGridSizer7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     conditionSizer->Add(StaticBoxSizer2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -208,18 +208,18 @@ conditionInverted(false)
     FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
     FlexGridSizer2->AddGrowableCol(0);
     FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
-    moreBt = new wxButton(this, ID_BUTTON4, _("Plus de conditions"), wxDefaultPosition, wxSize(140,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
+    moreBt = new wxButton(this, ID_BUTTON4, _("More conditions"), wxDefaultPosition, wxSize(140,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
     FlexGridSizer1->Add(moreBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    objSortCheck = new wxCheckBox(this, ID_CHECKBOX3, _("Ranger par objets"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
+    objSortCheck = new wxCheckBox(this, ID_CHECKBOX3, _("Sort by objects"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
     objSortCheck->SetValue(false);
     FlexGridSizer1->Add(objSortCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer2->Add(FlexGridSizer1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer5 = new wxBoxSizer(wxHORIZONTAL);
     OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     BoxSizer5->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-    CancelBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+    CancelBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     BoxSizer5->Add(CancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    AideBt = new wxButton(this, ID_BUTTON3, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+    AideBt = new wxButton(this, ID_BUTTON3, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
     BoxSizer5->Add(AideBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer2->Add(BoxSizer5, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer6->Add(FlexGridSizer2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -283,7 +283,7 @@ void ChoixCondition::RefreshAllLists()
 void ChoixCondition::RefreshList()
 {
     ConditionsTree->DeleteAllItems();
-    ConditionsTree->AddRoot( _( "Toutes les conditions" ), 0 );
+    ConditionsTree->AddRoot( _( "All conditions" ), 0 );
 
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
@@ -306,7 +306,7 @@ void ChoixCondition::RefreshList()
         if ( !objectsTypes.empty() || !automatismsTypes.empty() )//Display the extension name only if it contains objects
         {
             if ( extensions[i]->GetName() == "BuiltinObject" )
-                extensionItem = ConditionsTree->AppendItem(ConditionsTree->GetRootItem(), _("Tous les objets"), 0);
+                extensionItem = ConditionsTree->AppendItem(ConditionsTree->GetRootItem(), _("All objects"), 0);
             else
                 extensionItem = ConditionsTree->AppendItem(ConditionsTree->GetRootItem(), extensions[i]->GetFullName(), 0);
         }
@@ -316,7 +316,7 @@ void ChoixCondition::RefreshList()
 
             wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                         ConditionsTree->AppendItem(extensionItem,
-                                                                _("Objet") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),
+                                                                _("Object") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each object conditions
@@ -328,6 +328,8 @@ void ChoixCondition::RefreshList()
                     boost::to_upper_copy(it->second.group).find(search) == string::npos &&
                     boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
                     continue;
+
+                if ( it->second.IsHidden() ) continue;
 
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
@@ -355,7 +357,7 @@ void ChoixCondition::RefreshList()
 	    {
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         ConditionsTree->AppendItem(extensionItem,
-                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),
+                                                                _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each automatism conditions
@@ -367,6 +369,8 @@ void ChoixCondition::RefreshList()
                     boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
                     boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                     continue;
+
+                if ( it->second.IsHidden() ) continue;
 
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
@@ -399,6 +403,8 @@ void ChoixCondition::RefreshList()
                 boost::to_upper_copy(it->second.group).find(search) == string::npos &&
                 boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
                 continue;
+
+            if ( it->second.IsHidden() ) continue;
 
             //Search and/or add group item
             wxTreeItemIdValue cookie;
@@ -436,7 +442,7 @@ void ChoixCondition::RefreshObjectsLists()
 void ChoixCondition::RefreshObjectConditionsList()
 {
     objectConditionsTree->DeleteAllItems();
-    objectConditionsTree->AddRoot( _( "Toutes les conditions" ), 0 );
+    objectConditionsTree->AddRoot( _( "All conditions" ), 0 );
 
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
@@ -458,14 +464,14 @@ void ChoixCondition::RefreshObjectConditionsList()
         if ( extensions[i]->GetName() == "BuiltinObject" )
         {
             objectType = "";
-            extensionItem = objectConditionsTree->AppendItem(objectConditionsTree->GetRootItem(), _("Tous les objets"), 0);
+            extensionItem = objectConditionsTree->AppendItem(objectConditionsTree->GetRootItem(), _("All objects"), 0);
         }
         else
             extensionItem = objectConditionsTree->AppendItem(objectConditionsTree->GetRootItem(), extensions[i]->GetFullName(), 0);
 
         wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                     objectConditionsTree->AppendItem(extensionItem,
-                                                            _("Objet") + wxString(" ") + extensions[i]->GetObjectMetadata(objectType).GetFullName(),
+                                                            _("Object") + wxString(" ") + extensions[i]->GetObjectMetadata(objectType).GetFullName(),
                                                             0) :
                                     extensionItem;
 
@@ -478,6 +484,8 @@ void ChoixCondition::RefreshObjectConditionsList()
                 boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
                 boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                 continue;
+
+            if ( it->second.IsHidden() ) continue;
 
             //Search and/or add group item
             wxTreeItemIdValue cookie;
@@ -512,7 +520,7 @@ void ChoixCondition::RefreshObjectConditionsList()
 
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         objectConditionsTree->AppendItem(extensionItem,
-                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismType).GetFullName(),
+                                                                _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismType).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each automatism conditions
@@ -524,6 +532,8 @@ void ChoixCondition::RefreshObjectConditionsList()
                     boost::to_upper_copy(it->second.group).find(search) == string::npos &&
                     boost::to_upper_copy(it->second.fullname).find(search) == string::npos)
                     continue;
+
+                if ( it->second.IsHidden() ) continue;
 
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
@@ -609,7 +619,7 @@ void ChoixCondition::RefreshFromCondition()
 
         //Addings controls
         ParaFac.push_back(new wxCheckBox( this, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num ));
-        ParaText.push_back(new wxStaticText( this, ID_TEXTARRAY, _( "Paramètre :" ), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num ) ));
+        ParaText.push_back(new wxStaticText( this, ID_TEXTARRAY, _( "Parameter :" ), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num ) ));
         ParaSpacer1.push_back( new wxPanel(this) );
         ParaSpacer2.push_back( new wxPanel(this) );
         ParaEdit.push_back( new wxTextCtrl( this, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num ) ));
@@ -661,7 +671,7 @@ void ChoixCondition::RefreshFromCondition()
             ParaFac.at(i)->Show(instructionMetadata.parameters[i].optional);
             ParaFac.at(i)->SetValue(!ParaEdit.at( i )->GetValue().empty());
 
-            ParaText.at(i)->SetLabel( instructionMetadata.parameters[i].description + _(" :") );
+            ParaText.at(i)->SetLabel( instructionMetadata.parameters[i].description + _(":") );
             ParaText.at( i )->Show();
 
             if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
@@ -830,18 +840,18 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
         }
         else if ( instructionMetadata.parameters[i].type == "trueorfalse" )
         {
-            TrueOrFalse dialog(this, _("Choisissez Vrai ou Faux pour remplir le paramètre"), _("Vrai ou Faux"));
+            TrueOrFalse dialog(this, _("Choose True or False to fill the parameter"), _("True or False"));
             if ( dialog.ShowModal() == 1 )
-                ParaEdit.at(i)->ChangeValue(_("Vrai"));
+                ParaEdit.at(i)->ChangeValue(_("True"));
             else
-                ParaEdit.at(i)->ChangeValue(_("Faux"));
+                ParaEdit.at(i)->ChangeValue(_("False"));
         }
         else if ( instructionMetadata.parameters[i].type == "yesorno" )
         {
             if (wxMessageBox("Choisissez Oui ou Non pour compléter ce paramètre :", "Oui ou non",wxYES_NO ) == wxYES)
-                ParaEdit.at(i)->ChangeValue(_("oui"));
+                ParaEdit.at(i)->ChangeValue(_("yes"));
             else
-                ParaEdit.at(i)->ChangeValue(_("non"));
+                ParaEdit.at(i)->ChangeValue(_("no"));
 
             return;
         }
@@ -915,7 +925,7 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 
     if (ParaEdit.size() < instructionMetadata.parameters.size())
     {
-        wxLogWarning(_("Trop peu de paramètres. Ceci peut être dû à un bug de Game Develop."));
+        wxLogWarning(_("The action has to many parameters. This can be a bug of Game Develop.\nRead Help to know how report a bug."));
         return;
     }
 
@@ -955,7 +965,7 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 
     if ( parametersHaveErrors )
     {
-        if ( wxMessageBox(wxString::Format(_("Erreur dans le paramètre n°%i : %s\n\nÊtes vous sûr de vouloir valider ce paramètre ?"), parameterDisplayedNb, message.c_str()), _("Un paramètre contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(wxString::Format(_("Error in parameter #%i : %s\n\nPlease correct it in order to validate the action."), parameterDisplayedNb, message.c_str()), _("The expression contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 
@@ -979,7 +989,7 @@ void ChoixCondition::OnCancelBtClick( wxCommandEvent& event )
 
 void ChoixCondition::OnAideBtClick(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(23);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition")); //TODO
@@ -1005,7 +1015,7 @@ void ChoixCondition::OnmoreBtClick(wxCommandEvent& event)
 
 void ChoixCondition::OnGlobalCheckSelect(wxCommandEvent& event)
 {
-    wxLogMessage(_("Attention. Cette option n'est présente que par compatibilité avec les anciennes versions de Game Develop.\nElle ne doit plus être utilisée dans les nouveaux jeux et pourrait être enlevée dans les prochaines versions."));
+    wxLogMessage(_("Warning. This option is only available for backward compatibility.\nIt must not be used anymore in new game, and it might be removed in a next version."));
 }
 
 void ChoixCondition::OnsearchCtrlText(wxCommandEvent& event)
@@ -1037,3 +1047,4 @@ void ChoixCondition::OnResize(wxSizeEvent& event)
 {
     Layout();
 }
+

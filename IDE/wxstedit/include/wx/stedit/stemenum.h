@@ -209,7 +209,7 @@ public:
     virtual ~wxSTEditorMenuManager() {}
 
     // ------------------------------------------------------------------------
-    // Convenience functions to call after using the default constructor 
+    // Convenience functions to call after using the default constructor
     //   to set up the flags    and before use
     void CreateForSinglePage();
     void CreateForNotebook();
@@ -403,3 +403,4 @@ public:
 };
 
 #endif  // _STEMENUM_H_
+

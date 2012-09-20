@@ -15,3 +15,4 @@ class CompilationChecker
 };
 
 #endif // COMPILATIONCHECKER_H
+

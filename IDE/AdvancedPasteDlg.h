@@ -90,3 +90,4 @@ class AdvancedPasteDlg: public wxDialog
 };
 
 #endif
+

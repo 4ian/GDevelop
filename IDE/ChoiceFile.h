@@ -77,3 +77,4 @@ class ChoiceFile: public wxDialog
 };
 
 #endif
+

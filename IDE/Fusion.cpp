@@ -60,7 +60,7 @@ game(game_)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
-	Create(parent, wxID_ANY, _("Importer les éléments d\'un jeu"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Import items from a game"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/fusionicon.png"))));
 	SetIcon(FrameIcon);
@@ -72,7 +72,7 @@ game(game_)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap1 = new wxStaticBitmap(Panel1, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/fusion.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer6->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("L\'importation permet de rajouter les éléments \nd\'un autre jeu à celui actuellement ouvert."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Importing allows you to add elements from\nanother game to the one currently open."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
@@ -80,31 +80,31 @@ game(game_)
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer17->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, this, _("Choisir les éléments à importer"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, this, _("Select items to import"));
 	ImageCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Images"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	ImageCheck->SetValue(true);
 	StaticBoxSizer1->Add(ImageCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	ScenesCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Scènes"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+	ScenesCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Scenes"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	ScenesCheck->SetValue(true);
 	StaticBoxSizer1->Add(ScenesCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	objectsCheck = new wxCheckBox(this, ID_CHECKBOX3, _("Objets globaux"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
+	objectsCheck = new wxCheckBox(this, ID_CHECKBOX3, _("Global objects"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
 	objectsCheck->SetValue(true);
 	StaticBoxSizer1->Add(objectsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	groupsCheck = new wxCheckBox(this, ID_CHECKBOX4, _("Groupes d\'objets globaux"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
+	groupsCheck = new wxCheckBox(this, ID_CHECKBOX4, _("Global object groups"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
 	groupsCheck->SetValue(true);
 	StaticBoxSizer1->Add(groupsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	externalEventsCheck = new wxCheckBox(this, ID_CHECKBOX5, _("Evenements externes"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
+	externalEventsCheck = new wxCheckBox(this, ID_CHECKBOX5, _("External events"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX5"));
 	externalEventsCheck->SetValue(true);
 	StaticBoxSizer1->Add(externalEventsCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Le jeu choisi ne sera pas modifié"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("The chosen game will not change"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer2->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FusionBt = new wxButton(this, ID_BUTTON1, _("Choisir un jeu et l\'importer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	FusionBt = new wxButton(this, ID_BUTTON1, _("Choose a game and import it"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(FusionBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FermerBt = new wxButton(this, ID_BUTTON2, _("Fermer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	FermerBt = new wxButton(this, ID_BUTTON2, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer2->Add(FermerBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -130,7 +130,7 @@ void Fusion::OnFermerBtClick(wxCommandEvent& event)
 
 void Fusion::OnFusionBtClick(wxCommandEvent& event)
 {
-    wxFileDialog dialog( this, _( "Choisissez le jeu à ouvrir" ), "", "", "*.gdg;*.jgd" );
+    wxFileDialog dialog( this, _( "Choose the game to open" ), "", "", "*.gdg;*.jgd" );
     dialog.ShowModal();
 
     if ( dialog.GetPath() == "" )
@@ -149,8 +149,8 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
 
             if ( game.resourceManager.HasResource(secondGame.resourceManager.resources[i]->name) )
             {
-                wxString depart = _("Une ressource nommé \"");
-                wxString fin = _("\" est déjà présente dans le jeu. Voulez vous la remplacer ?");
+                wxString depart = _("A resource named \"");
+                wxString fin = _("\" already exists in the game. Do you want to replace it \?");
                 if (wxMessageBox(depart+secondGame.resourceManager.resources[i]->name+fin, "Une ressource de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
@@ -169,8 +169,8 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
         {
             if ( game.HasLayoutNamed(secondGame.GetLayout(i).GetName() ))
             {
-                wxString depart = _("Une scène nommé \"");
-                wxString fin = _("\" est déjà présente dans le jeu. Voulez vous la remplacer ?");
+                wxString depart = _("A scene named \"");
+                wxString fin = _("\" already exists in the game. Do you want to replace it \?");
                 if (wxMessageBox(depart+secondGame.GetLayout(i).GetName()+fin, "Une scène de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Replace layout by the new one
@@ -192,8 +192,8 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
 
             if ( object != game.GetGlobalObjects().end())
             {
-                wxString depart = _("Un objet global nommé \"");
-                wxString fin = _("\" est déjà présent dans le jeu. Voulez vous le remplacer ?");
+                wxString depart = _("A global object named \"");
+                wxString fin = _("\" already exists in the game. Do you want to replace it \?");
                 if (wxMessageBox(depart+secondGame.GetGlobalObjects()[i]->GetName()+fin, "Un objet global de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
@@ -213,8 +213,8 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
 
             if ( group != game.GetObjectGroups().end())
             {
-                wxString depart = _("Un groupe global nommé \"");
-                wxString fin = _("\" est déjà présent dans le jeu. Voulez vous le remplacer ?");
+                wxString depart = _("A global group named \"");
+                wxString fin = _("\" already exists in the game. Do you want to replace it \?");
                 if (wxMessageBox(depart+secondGame.GetObjectGroups()[i].GetName()+fin, "Un groupe global de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
@@ -232,8 +232,8 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
             if ( game.HasExternalEventsNamed(secondGame.GetExternalEvents(i).GetName()) )
             {
                 //Ask for confirmation if we're about to replace already existing external events
-                wxString depart = _("Des évènements externes nommés \"");
-                wxString fin = _("\" sont déjà présent dans le jeu. Voulez vous les remplacer ?");
+                wxString depart = _("Externals events called \"");
+                wxString fin = _("\" already exists in the game. Do you want to replace it \?");
                 if (wxMessageBox(depart+secondGame.GetExternalEvents(i).GetName()+fin, "Evenements externes déjà existants",wxYES_NO ) == wxYES)
                 {
                     //Replace external events by the new ones
@@ -247,5 +247,6 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
         }
     }
 
-    wxLogMessage(_("Le jeu a été correctement fusionné."));
+    wxLogMessage(_("The game has been properly merged."));
 }
+

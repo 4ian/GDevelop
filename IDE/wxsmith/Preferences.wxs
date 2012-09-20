@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="Preferences">
-		<title>Préférences de Game Develop</title>
+		<title>Game Develop settings</title>
 		<centered>1</centered>
 		<size>467,330</size>
 		<id_arg>0</id_arg>
@@ -31,7 +31,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
-										<label>La fenêtre des préférences vous permet de personnaliser&#x0A;Game Develop. Chaque utilisateur de l&apos;ordinateur possède&#x0A;ses propres préférences.</label>
+										<label>The preference window allow you to personnalize&#x0A;Game Develop. Each user of the computer owns&#x0A;his own options.</label>
 										<size>417,48</size>
 										<style>wxALIGN_LEFT</style>
 									</object>
@@ -65,11 +65,11 @@
 								<growablecols>0</growablecols>
 								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
-										<label>Démarrage</label>
+										<label>Startup</label>
 										<orient>wxVERTICAL</orient>
 										<object class="sizeritem">
 											<object class="wxCheckBox" name="ID_CHECKBOX1" variable="GuideCheck" member="yes">
-												<label>Afficher le guide de démarrage</label>
+												<label>Show Getting Started Guide</label>
 											</object>
 											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -77,7 +77,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxCheckBox" name="ID_CHECKBOX4" variable="MAJCheck" member="yes">
-												<label>Vérification des mises à jour</label>
+												<label>Checking for updates</label>
 											</object>
 											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -90,7 +90,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer4" member="no">
-										<label>Autosauvegarde</label>
+										<label>Autosave</label>
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer10" member="no">
 												<cols>1</cols>
@@ -100,7 +100,7 @@
 														<growablecols>1</growablecols>
 														<object class="sizeritem">
 															<object class="wxCheckBox" name="ID_CHECKBOX3" variable="autosaveActivatedCheck" member="yes">
-																<label>Faire une copie de sauvegarde des projets ouverts toutes les</label>
+																<label>Make a backup of opened projects every</label>
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -129,7 +129,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT14" variable="StaticText14" member="yes">
-														<label>Les fichiers seront sauvegardés en ajoutant .gdg.autosave à leur nom</label>
+														<label>Files will be saved with .gdg.autosave at the end of their name</label>
 													</object>
 													<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -146,11 +146,11 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer12" member="no">
-										<label>Divers</label>
+										<label>Miscellaneous</label>
 										<orient>wxVERTICAL</orient>
 										<object class="sizeritem">
 											<object class="wxCheckBox" name="ID_CHECKBOX8" variable="logCheck" member="yes">
-												<label>Activer le suivi du déroulement du logiciel dans un fichier journal</label>
+												<label>Activate a log file</label>
 												<handler function="OnlogCheckClick" entry="EVT_CHECKBOX" />
 											</object>
 											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -159,8 +159,8 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxCheckBox" name="ID_CHECKBOX9" variable="avertOnSaveCheck" member="yes">
-												<label>Prévenir lors de l&apos;enregistrement d&apos;un fichier dans un nouveau répertoire</label>
-												<tooltip>Prévenir, quand un jeu est enregistré dans un nouveau répertoire, qu&apos;il faut sans doute copier également les ressources du jeu dedans.</tooltip>
+												<label>Warn when saving a project in a new directory</label>
+												<tooltip>Warn, when the project is saved in a new folder, that project resources should also be copied to the folder.</tooltip>
 											</object>
 											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -173,7 +173,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Général</label>
+						<label>General</label>
 					</object>
 					<object class="listbookpage">
 						<object class="wxPanel" name="ID_PANEL15" variable="Panel5" member="yes">
@@ -181,7 +181,7 @@
 								<cols>3</cols>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT13" variable="StaticText13" member="yes">
-										<label>Langue :</label>
+										<label>Language</label>
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -197,7 +197,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Langue</label>
+						<label>Language</label>
 					</object>
 					<object class="listbookpage">
 						<object class="wxPanel" name="ID_PANEL7" variable="Panel3" member="yes">
@@ -206,14 +206,14 @@
 								<growablecols>0</growablecols>
 								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer5" member="no">
-										<label>Programmes externes</label>
+										<label>External programs</label>
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer11" member="no">
 												<cols>3</cols>
 												<growablecols>1</growablecols>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
-														<label>Edition images :</label>
+														<label>Images' edition :</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -221,7 +221,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="EditeurImageEdit" member="yes">
-														<tooltip>Chemin vers le programme d&apos;édition d&apos;images.</tooltip>
+														<tooltip>Path to the image editing program.</tooltip>
 													</object>
 													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -229,7 +229,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxButton" name="ID_BUTTON5" variable="BrowseEditionImage" member="yes">
-														<label>Parcourir</label>
+														<label>Browse</label>
 														<handler function="OnBrowseEditionImageClick" entry="EVT_BUTTON" />
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -255,7 +255,7 @@
 												<growablecols>1</growablecols>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT8" variable="StaticText8" member="yes">
-														<label>Dossier temporaire de déploiement :</label>
+														<label>Temporary deployment directory:</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -271,7 +271,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxButton" name="ID_BUTTON4" variable="BrowseDossierTempBt" member="yes">
-														<label>Parcourir</label>
+														<label>Browse</label>
 														<handler function="OnBrowseDossierTempBtClick" entry="EVT_BUTTON" />
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -288,7 +288,7 @@
 												<growablecols>1</growablecols>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT21" variable="StaticText21" member="yes">
-														<label>Dossier temporaire de compilation :</label>
+														<label>Temporary folder for compilation :</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -305,7 +305,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxButton" name="ID_BUTTON12" variable="browseCompilationTempDir" member="yes">
-														<label>Parcourir</label>
+														<label>Browse</label>
 														<handler function="OnbrowseCompilationTempDirClick" entry="EVT_BUTTON" />
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -318,7 +318,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxCheckBox" name="ID_CHECKBOX7" variable="deleteTemporariesCheck" member="yes">
-												<label>Supprimer les fichiers temporaires de compilation dès que possible</label>
+												<label>Delete temporaries as soon as possible</label>
 												<checked>1</checked>
 											</object>
 											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -332,7 +332,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Répertoires</label>
+						<label>Folders</label>
 					</object>
 					<object class="listbookpage">
 						<object class="wxPanel" name="ID_PANEL16" variable="Panel6" member="yes">
@@ -341,7 +341,7 @@
 								<growablecols>0</growablecols>
 								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer11" member="no">
-										<label>Editeur de scènes</label>
+										<label>Scene editor</label>
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer21" member="no">
 												<cols>3</cols>
@@ -356,8 +356,8 @@
 												<object class="sizeritem">
 													<object class="wxChoice" name="ID_CHOICE1" variable="sceneEventsTabPosition" member="yes">
 														<content>
-															<item>En haut</item>
-															<item>En bas</item>
+															<item>Top</item>
+															<item>Bottom</item>
 														</content>
 														<selection>1</selection>
 													</object>
@@ -376,7 +376,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Positionnements par défaut</label>
+						<label>Default position</label>
 					</object>
 					<object class="listbookpage">
 						<object class="wxPanel" name="ID_PANEL8" variable="Panel4" member="yes">
@@ -385,13 +385,13 @@
 								<growablecols>0</growablecols>
 								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
-										<label>Apparence prédéfinie</label>
+										<label>Predefined appearance </label>
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 												<cols>5</cols>
 												<object class="sizeritem">
 													<object class="wxButton" name="ID_BUTTON6" variable="gdStyleBt" member="yes">
-														<label>Standard Game Develop</label>
+														<label>Game Develop Standard</label>
 														<handler function="OngdStyleBtClick" entry="EVT_BUTTON" />
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -449,7 +449,7 @@
 										<growablecols>2</growablecols>
 										<object class="sizeritem">
 											<object class="wxRadioBox" name="ID_RADIOBOX1" variable="ribbonStyleBox" member="yes">
-												<label>Style du ruban</label>
+												<label>Ribbon's style</label>
 												<content>
 													<item>Microsoft Office</item>
 													<item>wxAUI</item>
@@ -463,13 +463,13 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer7" member="no">
-												<label>Couleurs du ruban</label>
+												<label>Ribbon's colors</label>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
 														<cols>2</cols>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-																<label>Principale :</label>
+																<label>Primary :</label>
 															</object>
 															<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -487,7 +487,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-																<label>Secondaire :</label>
+																<label>Secondary :</label>
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -514,7 +514,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer10" member="no">
-												<label>Textes du ruban</label>
+												<label>Ribbon labels</label>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer22" member="no">
 														<cols>1</cols>
@@ -522,7 +522,7 @@
 														<growablecols>0</growablecols>
 														<object class="sizeritem">
 															<object class="wxCheckBox" name="ID_CHECKBOX2" variable="hideLabelsCheck" member="yes">
-																<label>Cacher les noms des boutons</label>
+																<label>Hide the button's labels</label>
 																<handler function="OnhideLabelsCheckClick" entry="EVT_CHECKBOX" />
 															</object>
 															<flag>wxALL|wxALIGN_LEFT|wxALIGN_TOP</flag>
@@ -531,7 +531,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxCheckBox" name="ID_CHECKBOX5" variable="hidePageTabsCheck" member="yes">
-																<label>Cacher les onglets des pages</label>
+																<label>Hide tabs of ribbon's pages</label>
 																<handler function="OnhideLabelsCheckClick" entry="EVT_CHECKBOX" />
 															</object>
 															<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -555,7 +555,7 @@
 														<cols>3</cols>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT22" variable="StaticText22" member="yes">
-																<label>Couleur</label>
+																<label>Color</label>
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -589,14 +589,14 @@
 										<cols>3</cols>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer3" member="no">
-												<label>Couleur des panneaux</label>
+												<label>Panes' color</label>
 												<orient>wxVERTICAL</orient>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
 														<cols>3</cols>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-																<label>Editeur actif :</label>
+																<label>Active editor :</label>
 															</object>
 															<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -623,7 +623,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-																<label>Editeur inactif :</label>
+																<label>Inactive editor :</label>
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -659,14 +659,14 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer8" member="no">
-												<label>Couleur des séparations</label>
+												<label>Sash's color</label>
 												<orient>wxVERTICAL</orient>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
 														<cols>2</cols>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT9" variable="StaticText9" member="yes">
-																<label>Arrière plan :</label>
+																<label>Background :</label>
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -684,7 +684,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT10" variable="StaticText10" member="yes">
-																<label>Bordures :</label>
+																<label>Borders :</label>
 															</object>
 															<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -711,14 +711,14 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer9" member="no">
-												<label>Couleur du texte</label>
+												<label>Text's color</label>
 												<orient>wxVERTICAL</orient>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
 														<cols>2</cols>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT11" variable="StaticText11" member="yes">
-																<label>Actif :</label>
+																<label>Active :</label>
 															</object>
 															<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -736,7 +736,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT12" variable="StaticText12" member="yes">
-																<label>Inactif :</label>
+																<label>Inactive :</label>
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -763,14 +763,14 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer14" member="no">
-												<label>Couleur des onglets</label>
+												<label>Tabs colors</label>
 												<orient>wxVERTICAL</orient>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer30" member="no">
 														<cols>2</cols>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT19" variable="StaticText19" member="yes">
-																<label>Actif :</label>
+																<label>Active :</label>
 															</object>
 															<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -788,7 +788,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT20" variable="StaticText20" member="yes">
-																<label>Inactif :</label>
+																<label>Inactive :</label>
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -819,7 +819,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Apparence</label>
+						<label>Appearance</label>
 					</object>
 					<object class="listbookpage">
 						<object class="wxPanel" name="ID_PANEL18" variable="Panel8" member="yes">
@@ -831,7 +831,7 @@
 										<cols>3</cols>
 										<object class="sizeritem">
 											<object class="wxStaticText" name="ID_STATICTEXT17" variable="StaticText17" member="yes">
-												<label>Taille par défaut de la colonnes des conditions :</label>
+												<label>Default width of the condition column:</label>
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
@@ -859,7 +859,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxCheckBox" name="ID_CHECKBOX6" variable="hideContextPanelsLabels" member="yes">
-										<label>Cacher les noms des boutons dans les panneaux contextuels</label>
+										<label>Hide the button's labels in context panels</label>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -867,7 +867,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer15" member="no">
-										<label>Couleurs des paramètres</label>
+										<label>Parameters colors</label>
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer29" member="no">
 												<cols>3</cols>
@@ -895,7 +895,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Editeur d&apos;évènements</label>
+						<label>Events editor</label>
 					</object>
 					<object class="listbookpage">
 						<object class="wxPanel" name="ID_PANEL17" variable="Panel7" member="yes">
@@ -905,14 +905,14 @@
 								<growablecols>0</growablecols>
 								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer13" member="no">
-										<label>Edition des sources</label>
+										<label>Edit sources</label>
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer25" member="no">
 												<cols>1</cols>
 												<growablecols>0</growablecols>
 												<object class="sizeritem">
 													<object class="wxRadioButton" name="ID_RADIOBUTTON2" variable="internalCodeEditorCheck" member="yes">
-														<label>Editer les sources avec l&apos;éditeur intégré à Game Develop</label>
+														<label>Edit sources using internal Game Develop code editor</label>
 														<selected>1</selected>
 														<style>wxRB_GROUP</style>
 													</object>
@@ -926,7 +926,7 @@
 														<growablecols>1</growablecols>
 														<object class="sizeritem">
 															<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="externalCodeEditorCheck" member="yes">
-																<label>Utiliser un programme externe :</label>
+																<label>Use an external program :</label>
 															</object>
 															<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -940,7 +940,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxButton" name="ID_BUTTON11" variable="browseCodeEditorBt" member="yes">
-																<label>Parcourir</label>
+																<label>Browse</label>
 																<handler function="OnbrowseCodeEditorBtClick" entry="EVT_BUTTON" />
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -962,7 +962,7 @@
 								</object>
 							</object>
 						</object>
-						<label>Compilation C++</label>
+						<label>C++ Compilation</label>
 					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -991,7 +991,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="AnnulerBt" member="yes">
-							<label>Annuler</label>
+							<label>Cancel</label>
 							<handler function="OnAnnulerBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -1000,7 +1000,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON3" variable="AideBt" member="yes">
-							<label>Aide</label>
+							<label>Help</label>
 							<handler function="OnAideBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -1014,3 +1014,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

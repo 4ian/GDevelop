@@ -113,7 +113,7 @@ scene(scene_)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxBoxSizer* BoxSizer3;
 
-	Create(parent, wxID_ANY, _("Editer l\'action"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edit the action"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	SetClientSize(wxSize(717,396));
 	SetMinSize(wxSize(640,480));
 	wxIcon FrameIcon;
@@ -126,35 +126,35 @@ scene(scene_)
 	FlexGridSizer1->AddGrowableRow(0);
 	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(270,500), 0, _T("ID_NOTEBOOK1"));
 	ActionsTree = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxDefaultPosition, wxSize(300,350), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
-	ActionsTree->SetToolTip(_("Choisissez une action à paramétrer."));
+	ActionsTree->SetToolTip(_("Choose an action to set up."));
 	Panel1 = new wxPanel(Notebook1, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	BoxSizer9 = new wxBoxSizer(wxVERTICAL);
 	BoxSizer10 = new wxBoxSizer(wxVERTICAL);
 	objectsListsNotebook = new wxNotebook(Panel1, ID_NOTEBOOK2, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK2"));
 	ObjetsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
-	ObjetsList->SetToolTip(_("Choisissez un objet dans la liste"));
+	ObjetsList->SetToolTip(_("Choose an object in the list"));
 	GroupesList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
-	GroupesList->SetToolTip(_("Choisissez un objet dans la liste"));
+	GroupesList->SetToolTip(_("Choose an object in the list"));
 	globalObjectsList = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL4, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
-	globalObjectsList->SetToolTip(_("Choisissez un objet dans la liste"));
+	globalObjectsList->SetToolTip(_("Choose an object in the list"));
 	globalObjectGroups = new wxTreeCtrl(objectsListsNotebook, ID_TREECTRL5, wxPoint(-71,-11), wxSize(281,190), wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL5"));
-	globalObjectGroups->SetToolTip(_("Choisissez un objet dans la liste"));
-	objectsListsNotebook->AddPage(ObjetsList, _("Objets"), false);
-	objectsListsNotebook->AddPage(GroupesList, _("Groupes d\'objets"), false);
-	objectsListsNotebook->AddPage(globalObjectsList, _("Objets globaux"), false);
-	objectsListsNotebook->AddPage(globalObjectGroups, _("Groupes globaux"), false);
+	globalObjectGroups->SetToolTip(_("Choose an object in the list"));
+	objectsListsNotebook->AddPage(ObjetsList, _("Objects"), false);
+	objectsListsNotebook->AddPage(GroupesList, _("Objects groups"), false);
+	objectsListsNotebook->AddPage(globalObjectsList, _("Global objects"), false);
+	objectsListsNotebook->AddPage(globalObjectGroups, _("Global groups"), false);
 	BoxSizer10->Add(objectsListsNotebook, 1, wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	objectsSearchCtrl = new wxSearchCtrl(Panel1, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(10,-1), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	BoxSizer10->Add(objectsSearchCtrl, 0, wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer9->Add(BoxSizer10, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	objectActionsTree = new wxTreeCtrl(Panel1, ID_TREECTRL6, wxDefaultPosition, wxDefaultSize, wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL6"));
-	objectActionsTree->SetToolTip(_("Choisissez une action à paramétrer."));
+	objectActionsTree->SetToolTip(_("Choose an action to set up."));
 	BoxSizer9->Add(objectActionsTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel1->SetSizer(BoxSizer9);
 	BoxSizer9->Fit(Panel1);
 	BoxSizer9->SetSizeHints(Panel1);
-	Notebook1->AddPage(ActionsTree, _("Toutes les actions"), false);
-	Notebook1->AddPage(Panel1, _("Par objet"), false);
+	Notebook1->AddPage(ActionsTree, _("All actions"), false);
+	Notebook1->AddPage(Panel1, _("By object"), false);
 	FlexGridSizer1->Add(Notebook1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	searchCtrl = new wxSearchCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer1->Add(searchCtrl, 1, wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -164,15 +164,15 @@ scene(scene_)
 	ActionImg = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/unknown24.png")).Rescale(wxSize(24,24).GetWidth(),wxSize(24,24).GetHeight())), wxDefaultPosition, wxSize(24,24), wxNO_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer3->Add(ActionImg, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer4 = new wxBoxSizer(wxHORIZONTAL);
-	NomActionTxt = new wxStaticText(this, ID_STATICTEXT1, _("Aucune action choisie"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	NomActionTxt = new wxStaticText(this, ID_STATICTEXT1, _("No action chosen"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	wxFont NomActionTxtFont(16,wxSWISS,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	NomActionTxt->SetFont(NomActionTxtFont);
 	BoxSizer4->Add(NomActionTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(BoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer8->Add(FlexGridSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer3 = new wxBoxSizer(wxHORIZONTAL);
-	ActionTextTxt = new wxStaticText(this, ID_STATICTEXT2, _("Choisissez une action dans le menu de gauche"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
-	ActionTextTxt->SetToolTip(_("Pour plus d\'informations sur la condition, consultez l\'aide."));
+	ActionTextTxt = new wxStaticText(this, ID_STATICTEXT2, _("Choose an action in left menu"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	ActionTextTxt->SetToolTip(_("See Help for more information about the condition."));
 	BoxSizer3->Add(ActionTextTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer8->Add(BoxSizer3, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
@@ -185,14 +185,14 @@ scene(scene_)
 	FlexGridSizer4 = new wxFlexGridSizer(0, 4, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer4->AddGrowableRow(0);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Sélection des objets"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Objects selection"));
 	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
-	LocaliseCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("Par défaut"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
+	LocaliseCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("Default"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
 	LocaliseCheck->SetValue(true);
-	LocaliseCheck->SetToolTip(_("Ne seront pris en compte que les objets concernés par les autres conditions et actions de l\'évènement."));
+	LocaliseCheck->SetToolTip(_("Only objects concerned by previous conditions and actions will be considered."));
 	FlexGridSizer5->Add(LocaliseCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	GlobalCheck = new wxRadioButton(this, ID_RADIOBUTTON2, _("Forcer en global"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
-	GlobalCheck->SetToolTip(_("Tous les objets de la scène seront concernés par cette action."));
+	GlobalCheck = new wxRadioButton(this, ID_RADIOBUTTON2, _("Force global"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
+	GlobalCheck->SetToolTip(_("All objects will be considered by this action."));
 	FlexGridSizer5->Add(GlobalCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer1->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -206,18 +206,18 @@ scene(scene_)
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-	moreBt = new wxButton(this, ID_BUTTON4, _("Plus d\'actions"), wxDefaultPosition, wxSize(119,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	moreBt = new wxButton(this, ID_BUTTON4, _("More actions"), wxDefaultPosition, wxSize(119,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer6->Add(moreBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	objSortCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Ranger par objets"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+	objSortCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Sort by objects"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	objSortCheck->SetValue(false);
 	FlexGridSizer6->Add(objSortCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer5 = new wxBoxSizer(wxHORIZONTAL);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	BoxSizer5->Add(OkBt, 1, wxALL|wxFIXED_MINSIZE|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	CancelBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	CancelBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	BoxSizer5->Add(CancelBt, 1, wxALL|wxFIXED_MINSIZE|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AideBt = new wxButton(this, ID_BUTTON3, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	AideBt = new wxButton(this, ID_BUTTON3, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	BoxSizer5->Add(AideBt, 1, wxALL|wxFIXED_MINSIZE|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(BoxSizer5, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer6->Add(FlexGridSizer2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -285,7 +285,7 @@ void ChoixAction::RefreshAllLists()
 void ChoixAction::RefreshList()
 {
     ActionsTree->DeleteAllItems();
-    ActionsTree->AddRoot( _( "Toutes les actions" ),0);
+    ActionsTree->AddRoot( _( "All actions" ),0);
 
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
@@ -307,7 +307,7 @@ void ChoixAction::RefreshList()
         if ( !objectsTypes.empty() || !automatismsTypes.empty() )//Display the extension name only if it contains objects/automatisms
         {
             if ( extensions[i]->GetName() == "BuiltinObject" )
-                extensionItem = ActionsTree->AppendItem(ActionsTree->GetRootItem(), _("Tous les objets"), 0);
+                extensionItem = ActionsTree->AppendItem(ActionsTree->GetRootItem(), _("All objects"), 0);
             else
                 extensionItem = ActionsTree->AppendItem(ActionsTree->GetRootItem(), extensions[i]->GetFullName(), 0);
         }
@@ -316,7 +316,7 @@ void ChoixAction::RefreshList()
 	    {
             wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                         ActionsTree->AppendItem(extensionItem,
-                                                                _("Objet") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),
+                                                                _("Object") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each object actions
@@ -328,6 +328,8 @@ void ChoixAction::RefreshList()
                     boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
                     boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                     continue;
+
+                if ( it->second.IsHidden() ) continue;
 
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
@@ -355,7 +357,7 @@ void ChoixAction::RefreshList()
 	    {
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         ActionsTree->AppendItem(extensionItem,
-                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),
+                                                                _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each automatism actions
@@ -367,6 +369,8 @@ void ChoixAction::RefreshList()
                     && boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos
                     && boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                     continue;
+
+                if ( it->second.IsHidden() ) continue;
 
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
@@ -399,6 +403,8 @@ void ChoixAction::RefreshList()
                 boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
                 boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                 continue;
+
+            if ( it->second.IsHidden() ) continue;
 
             //Search and/or add group item
             wxTreeItemIdValue cookie;
@@ -436,7 +442,7 @@ void ChoixAction::RefreshObjectsLists()
 void ChoixAction::RefreshObjectActionsList()
 {
     objectActionsTree->DeleteAllItems();
-    objectActionsTree->AddRoot( _( "Toutes les actions" ),0);
+    objectActionsTree->AddRoot( _( "All actions" ),0);
 
     std::string search = boost::to_upper_copy(string(searchCtrl->GetValue().mb_str()));
     bool searching = search.empty() ? false : true;
@@ -458,14 +464,14 @@ void ChoixAction::RefreshObjectActionsList()
         if ( extensions[i]->GetName() == "BuiltinObject" )
         {
             objectType = "";
-            extensionItem = objectActionsTree->AppendItem(objectActionsTree->GetRootItem(), _("Tous les objets"), 0);
+            extensionItem = objectActionsTree->AppendItem(objectActionsTree->GetRootItem(), _("All objects"), 0);
         }
         else
             extensionItem = objectActionsTree->AppendItem(objectActionsTree->GetRootItem(), extensions[i]->GetFullName(), 0);
 
         wxTreeItemId objectTypeItem = objSortCheck->GetValue() ?
                                     objectActionsTree->AppendItem(extensionItem,
-                                                            _("Objet") + wxString(" ") + extensions[i]->GetObjectMetadata(objectType).GetFullName(),
+                                                            _("Object") + wxString(" ") + extensions[i]->GetObjectMetadata(objectType).GetFullName(),
                                                             0) :
                                     extensionItem;
 
@@ -479,6 +485,8 @@ void ChoixAction::RefreshObjectActionsList()
                 boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                 continue;
 
+            if ( it->second.IsHidden() ) continue;
+
             //Search and/or add group item
             wxTreeItemIdValue cookie;
             wxTreeItemId groupItem = objectActionsTree->GetFirstChild(objectTypeItem, cookie);
@@ -488,7 +496,7 @@ void ChoixAction::RefreshObjectActionsList()
             }
             if ( !groupItem.IsOk() ) groupItem = objectActionsTree->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
 
-            //Add action item
+            //Add action item, if it is not hidden
             int IDimage = 0;
             if ( it->second.smallicon.IsOk() )
             {
@@ -512,7 +520,7 @@ void ChoixAction::RefreshObjectActionsList()
 
             wxTreeItemId automatismTypeItem = objSortCheck->GetValue() ?
                                         objectActionsTree->AppendItem(extensionItem,
-                                                                _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismType).GetFullName(),
+                                                                _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismType).GetFullName(),
                                                                 0) :
                                         extensionItem;
             //Add each automatism actions
@@ -524,6 +532,8 @@ void ChoixAction::RefreshObjectActionsList()
                     boost::to_upper_copy(it->second.GetGroup()).find(search) == string::npos &&
                     boost::to_upper_copy(it->second.GetFullName()).find(search) == string::npos)
                     continue;
+
+                if ( it->second.IsHidden() ) continue;
 
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
@@ -611,7 +621,7 @@ void ChoixAction::RefreshFromAction()
 
         //Addings controls
         ParaFac.push_back(new wxCheckBox( this, ID_CHECKARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, num ));
-        ParaText.push_back(new wxStaticText( this, ID_TEXTARRAY, _( "Paramètre :" ), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num ) ));
+        ParaText.push_back(new wxStaticText( this, ID_TEXTARRAY, _( "Parameter :" ), wxDefaultPosition, wxDefaultSize, 0, _T( "TxtPara" + num ) ));
         ParaSpacer1.push_back( new wxPanel(this) );
         ParaSpacer2.push_back( new wxPanel(this) );
         ParaEdit.push_back( new wxTextCtrl( this, ID_EDITARRAY, "", wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T( "EditPara" + num ) ));
@@ -663,7 +673,7 @@ void ChoixAction::RefreshFromAction()
             ParaFac.at(i)->Show(instructionMetadata.parameters[i].optional);
             ParaFac.at(i)->SetValue(!ParaEdit.at( i )->GetValue().empty());
 
-            ParaText.at(i)->SetLabel( instructionMetadata.parameters[i].description + _(" :") );
+            ParaText.at(i)->SetLabel( instructionMetadata.parameters[i].description + _(":") );
             ParaText.at(i)->Show();
 
             if ( i < Param.size() ) ParaEdit.at( i )->SetValue(Param[i].GetPlainString());
@@ -776,7 +786,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         else if ( instructionMetadata.parameters[i].type == "police" )
         {
             wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-            wxFileDialog dialog(this, _("Choisissez une police de caractère ( fichiers ttf, ttc )"), gameDirectory, "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
+            wxFileDialog dialog(this, _("Choose a font ( ttf/ttc files )"), gameDirectory, "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
             dialog.ShowModal();
 
             if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
@@ -790,7 +800,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         else if ( instructionMetadata.parameters[i].type == "musicfile" )
         {
             wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-            wxFileDialog dialog(this, _("Choisissez une musique ( fichiers ogg )"), gameDirectory, "", "Fichiers audio (*.ogg)|*.ogg");
+            wxFileDialog dialog(this, _("Choose a music ( ogg files )"), gameDirectory, "", "Fichiers audio (*.ogg)|*.ogg");
             dialog.ShowModal();
 
             if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
@@ -804,7 +814,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         else if ( instructionMetadata.parameters[i].type == "soundfile" )
         {
             wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-            wxFileDialog dialog(this, _("Choisissez un son ( fichiers wav )"), gameDirectory, "", "Fichiers audio (*.wav)|*.wav");
+            wxFileDialog dialog(this, _("Choose a sound ( wav file )"), gameDirectory, "", "Fichiers audio (*.wav)|*.wav");
             dialog.ShowModal();
 
             if ( dialog.GetPath() != "" ) //Note that path is relative to the project file:
@@ -846,11 +856,11 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
         {
             if (wxMessageBox("Choisissez Oui ou Non pour compléter ce paramètre :", "Oui ou non",wxYES_NO ) == wxYES)
             {
-                ParaEdit.at(i)->ChangeValue(_("oui"));
+                ParaEdit.at(i)->ChangeValue(_("yes"));
             }
             else
             {
-                ParaEdit.at(i)->ChangeValue(_("non"));
+                ParaEdit.at(i)->ChangeValue(_("no"));
             }
 
             return;
@@ -958,7 +968,7 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 
     if (ParaEdit.size() < instructionMetadata.parameters.size())
     {
-        wxLogWarning(_("Trop peu de paramètres. Ceci peut être dû à un bug de Game Develop."));
+        wxLogWarning(_("The action has to many parameters. This can be a bug of Game Develop.\nRead Help to know how report a bug."));
         return;
     }
 
@@ -998,7 +1008,7 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 
     if ( parametersHaveErrors )
     {
-        if ( wxMessageBox(wxString::Format(_("Erreur dans le paramètre n°%i : %s\n\nÊtes vous sûr de vouloir valider ce paramètre ?"), parameterDisplayedNb, message.c_str()), _("Un paramètre contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(wxString::Format(_("Error in parameter #%i : %s\n\nPlease correct it in order to validate the action."), parameterDisplayedNb, message.c_str()), _("The expression contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 
@@ -1030,7 +1040,7 @@ void ChoixAction::OnCancelBtClick(wxCommandEvent& event)
 
 void ChoixAction::OnAideBtClick(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(29);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action")); //TODO
@@ -1078,3 +1088,4 @@ void ChoixAction::OnsearchCtrlText(wxCommandEvent& event)
     RefreshList();
     RefreshObjectActionsList();
 }
+

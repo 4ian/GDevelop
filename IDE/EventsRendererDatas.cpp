@@ -29,3 +29,10 @@ italicSmallFont( 5, wxDEFAULT, wxFONTSTYLE_ITALIC, wxNORMAL )
 {
     //ctor
 }
+
+
+
+
+
+
+

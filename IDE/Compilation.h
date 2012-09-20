@@ -84,3 +84,4 @@ class Compilation: public wxDialog
 };
 
 #endif
+

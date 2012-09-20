@@ -36,3 +36,4 @@ class TemplateEvents
 };
 
 #endif // TEMPLATEEVENTS_H
+

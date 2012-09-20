@@ -92,3 +92,4 @@ class EditPropScene: public wxDialog
 };
 
 #endif
+

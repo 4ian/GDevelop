@@ -300,3 +300,4 @@ private:
 };
 
 #endif  // _STEFINDR_H_
+

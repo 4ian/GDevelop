@@ -99,3 +99,4 @@ class EditLayer: public wxDialog
 };
 
 #endif
+

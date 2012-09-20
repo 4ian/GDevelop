@@ -141,3 +141,4 @@ BEGIN_EVENT_TABLE( SplashScreen, wxFrame )
     EVT_CHAR( SplashScreen::OnChar )
     EVT_MOUSE_EVENTS( SplashScreen::OnMouseEvent )
 END_EVENT_TABLE()
+

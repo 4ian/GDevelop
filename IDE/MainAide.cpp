@@ -15,7 +15,7 @@
  */
 void MainFrame::OnMenuAideSelected( wxCommandEvent& event )
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplayContents();
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"));
@@ -105,7 +105,7 @@ void MainFrame::OnMenuItem36Selected(wxCommandEvent& event)
  */
 void MainFrame::OnMenuTutoSelected(wxCommandEvent& event)
 {
-    wxString link = wxGetCwd() + "/Tutorial/"+_("Tutoriel.pdf");
+    wxString link = wxGetCwd() + "/Tutorial/"+_("Tutorial.pdf");
 
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType ("application/pdf");
     if (filetype) {
@@ -145,3 +145,4 @@ void MainFrame::OnMenuWikiSelected(wxCommandEvent& event)
         delete filetype;
     }
 }
+

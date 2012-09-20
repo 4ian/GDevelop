@@ -14,7 +14,7 @@
 							<local_include>1</local_include>
 							<style></style>
 						</object>
-						<label>Objets</label>
+						<label>Objects</label>
 					</object>
 					<object class="notebookpage">
 						<object class="Custom" name="ID_CUSTOM1" subclass="EditorObjetsGroups" variable="ObjetsGroups" member="yes">
@@ -22,10 +22,10 @@
 							<style></style>
 							<pos>71,14</pos>
 						</object>
-						<label>Groupes d&apos;objets</label>
+						<label>Objects groups</label>
 					</object>
 				</object>
-				<label>Scène</label>
+				<label>Scene</label>
 			</object>
 			<object class="notebookpage">
 				<object class="wxNotebook" name="ID_NOTEBOOK3" variable="globalNotebook" member="yes">
@@ -36,7 +36,7 @@
 							<local_include>1</local_include>
 							<style></style>
 						</object>
-						<label>Objets globaux</label>
+						<label>Global objects</label>
 					</object>
 					<object class="notebookpage">
 						<object class="Custom" name="ID_CUSTOM4" subclass="EditorObjetsGroups" variable="globalObjectsGroups" member="yes">
@@ -44,11 +44,18 @@
 							<style></style>
 							<pos>71,14</pos>
 						</object>
-						<label>Groupes globaux</label>
+						<label>Global groups</label>
 					</object>
 				</object>
-				<label>Global à tout le jeu</label>
+				<label>Global</label>
 			</object>
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

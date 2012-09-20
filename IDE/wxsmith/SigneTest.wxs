@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="SigneTest">
-		<title>Choisir le signe du test</title>
+		<title>Choose the test's sign</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<object class="sizeritem">
 				<object class="wxRadioBox" name="ID_RADIOBOX1" variable="SigneRadio" member="yes">
-					<label>Signe du test</label>
+					<label>Sign of the test</label>
 					<content>
-						<item>= ( égal )</item>
-						<item>&gt; ( supérieur à )</item>
-						<item>&lt; ( inférieur à )</item>
-						<item>&gt;= ( supérieur ou égal à )</item>
-						<item>&lt;= ( inférieur ou égal à )</item>
-						<item>!= ( différent de )</item>
+						<item>= ( equal to )</item>
+						<item>&gt; ( greater than )</item>
+						<item>&lt; ( lesser than )</item>
+						<item>&gt;= ( greater than or equal to )</item>
+						<item>&lt;= ( lesser than or equal to )</item>
+						<item>!= ( different of )</item>
 					</content>
 					<default>-1</default>
 				</object>
@@ -34,3 +34,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

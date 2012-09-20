@@ -282,3 +282,4 @@ public:
 };
 
 #endif  // _STEFRAME_H_
+

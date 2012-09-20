@@ -54,3 +54,4 @@ class ChoixBouton: public wxDialog
 };
 
 #endif
+

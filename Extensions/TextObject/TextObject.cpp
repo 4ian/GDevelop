@@ -224,12 +224,12 @@ void TextObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition
 
 void TextObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Texte");                     value = GetString();}
-    else if ( propertyNb == 1 ) {name = _("Police");                    value = GetFontFilename();}
-    else if ( propertyNb == 2 ) {name = _("Taille de caractères");      value = ToString(GetCharacterSize());}
-    else if ( propertyNb == 3 ) {name = _("Couleur");       value = ToString(GetColorR())+";"+ToString(GetColorG())+";"+ToString(GetColorB());}
-    else if ( propertyNb == 4 ) {name = _("Opacité");       value = ToString(GetOpacity());}
-    else if ( propertyNb == 5 ) {name = _("Lissage");       value = smoothed ? _("Oui") : _("Non");}
+    if      ( propertyNb == 0 ) {name = _("Text");                     value = GetString();}
+    else if ( propertyNb == 1 ) {name = _("Font");                    value = GetFontFilename();}
+    else if ( propertyNb == 2 ) {name = _("Font Size");      value = ToString(GetCharacterSize());}
+    else if ( propertyNb == 3 ) {name = _("Color");       value = ToString(GetColorR())+";"+ToString(GetColorG())+";"+ToString(GetColorB());}
+    else if ( propertyNb == 4 ) {name = _("Opacity");       value = ToString(GetOpacity());}
+    else if ( propertyNb == 5 ) {name = _("Smoothing");       value = smoothed ? _("Yes") : _("No");}
 }
 
 bool TextObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -263,7 +263,7 @@ bool TextObject::ChangeProperty(unsigned int propertyNb, string newValue)
         SetColor(ToInt(r), ToInt(g), ToInt(b));
     }
     else if ( propertyNb == 4 ) { SetOpacity(ToFloat(newValue)); }
-    else if ( propertyNb == 5 ) { SetSmooth(!(newValue == _("Non"))); }
+    else if ( propertyNb == 5 ) { SetSmooth(!(newValue == _("No"))); }
 
     return true;
 }
@@ -475,4 +475,5 @@ Object * CreateTextObject(std::string name)
 {
     return new TextObject(name);
 }
+
 

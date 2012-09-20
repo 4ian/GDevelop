@@ -110,3 +110,4 @@ class TextObjectEditor: public wxDialog
 
 #endif
 #endif
+

@@ -170,3 +170,4 @@ void DestroyTextObject(Object * object);
 Object * CreateTextObject(std::string name);
 
 #endif // TEXTOBJECT_H
+

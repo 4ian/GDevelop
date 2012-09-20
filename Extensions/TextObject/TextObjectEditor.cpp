@@ -79,47 +79,47 @@ mainFrameWrapper(mainFrameWrapper_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Editer l\'objet texte"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edit the Text object"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Texte"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Text"));
 	textEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(332,142), wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	StaticBoxSizer1->Add(textEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Autres propriétés"));
+	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Others properties"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer3->AddGrowableCol(1);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Style :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Style:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer3->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridSizer1 = new wxGridSizer(1, 3, 0, 0);
-	boldToggleButton = new wxToggleButton(this, ID_TOGGLEBUTTON1, _("Gras"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON1"));
+	boldToggleButton = new wxToggleButton(this, ID_TOGGLEBUTTON1, _("Bold"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON1"));
 	wxFont boldToggleButtonFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	boldToggleButton->SetFont(boldToggleButtonFont);
 	GridSizer1->Add(boldToggleButton, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	italicToggleButton = new wxToggleButton(this, ID_TOGGLEBUTTON2, _("Italique"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON2"));
+	italicToggleButton = new wxToggleButton(this, ID_TOGGLEBUTTON2, _("Italic"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON2"));
 	wxFont italicToggleButtonFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	italicToggleButton->SetFont(italicToggleButtonFont);
 	GridSizer1->Add(italicToggleButton, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	underlineToggleButton = new wxToggleButton(this, ID_TOGGLEBUTTON3, _("Souligné"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON3"));
+	underlineToggleButton = new wxToggleButton(this, ID_TOGGLEBUTTON3, _("Underlined"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON3"));
 	wxFont underlineToggleButtonFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,true,wxEmptyString,wxFONTENCODING_DEFAULT);
 	underlineToggleButton->SetFont(underlineToggleButtonFont);
 	GridSizer1->Add(underlineToggleButton, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Couleur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Color :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	colorBt = new wxButton(this, ID_BUTTON3, _("Choisir la couleur"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	colorBt = new wxButton(this, ID_BUTTON3, _("Choose the color"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer3->Add(colorBt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Police :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Font :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	fontEdit = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxSize(75,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	FlexGridSizer4->Add(fontEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	fontBt = new wxButton(this, ID_BUTTON4, _("Choisir la police"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	fontBt = new wxButton(this, ID_BUTTON4, _("Choose the font"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer4->Add(fontBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Taille :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Size :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer3->Add(StaticText4, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
@@ -128,7 +128,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	FlexGridSizer5->Add(sizeEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(5,5,1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	smoothCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Lisser le texte"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	smoothCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Smooth the text"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	smoothCheck->SetValue(true);
 	FlexGridSizer3->Add(smoothCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer2->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -214,7 +214,7 @@ void TextObjectEditor::OncolorBtClick(wxCommandEvent& event)
 void TextObjectEditor::OnfontBtClick(wxCommandEvent& event)
 {
     wxString gameDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
-    wxFileDialog fileDialog(this, _("Choisissez une police de caractère ( fichiers ttf, ttc )"), gameDirectory, "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
+    wxFileDialog fileDialog(this, _("Choose a font ( ttf/ttc files )"), gameDirectory, "", "Polices (*.ttf, *.ttc)|*.ttf;*.ttc");
 
     if ( fileDialog.ShowModal() == wxID_OK )
     {
@@ -228,3 +228,4 @@ void TextObjectEditor::OnSizeEditChange(wxSpinEvent& event)
 {
 }
 #endif
+

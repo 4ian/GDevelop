@@ -19,3 +19,10 @@ private:
 
 
 #endif // LINKEDOBJECTSMANAGER_H
+
+
+
+
+
+
+

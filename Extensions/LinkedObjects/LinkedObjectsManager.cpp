@@ -9,3 +9,10 @@ LinkedObjectsManager::~LinkedObjectsManager()
 {
     //dtor
 }
+
+
+
+
+
+
+

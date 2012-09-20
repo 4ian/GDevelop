@@ -88,3 +88,4 @@ void GD_EXTENSION_API RemoveAllLinksOf(RuntimeScene & scene, Object * object)
 
 }
 }
+

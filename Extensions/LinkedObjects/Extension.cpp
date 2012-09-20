@@ -43,98 +43,98 @@ class Extension : public ExtensionBase
         Extension()
         {
             DECLARE_THE_EXTENSION("LinkedObjects",
-                                  _("Associations d'objets"),
-                                  _("Extension permettant d'associer virtuellement des objets entre eux et de les retrouver ensuite."),
+                                  _("Linked objects"),
+                                  _("Extension allowing to virtually link two objects."),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
             #if defined(GD_IDE_ONLY)
 
             DECLARE_ACTION("LinkObjects",
-                           _("Lier deux objets"),
-                           _("Lier deux objets ensemble, pour pouvoir retrouver l'un à partir de l'autre."),
-                           _("Lier _PARAM3_ et _PARAM4_"),
-                           _("Associations d'objets"),
+                           _("Link two objects"),
+                           _("Link two objects together, so as to be able to get one from the other."),
+                           _("Link _PARAM3_ and _PARAM4_"),
+                           _("Linked objects"),
                            "Extensions/LinkedObjectsicon24.png",
                            "Extensions/LinkedObjectsicon16.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
                 instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "3");
                 instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "4");
-                instrInfo.AddParameter("object", _("Objet 1"), "", false);
-                instrInfo.AddParameter("object", _("Objet 2"), "", false);
+                instrInfo.AddParameter("object", _("Object 1"), "", false);
+                instrInfo.AddParameter("object", _("Object 2"), "", false);
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::LinkedObjects::LinkObjects").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("RemoveLinkBetween",
-                           _("Délier deux objets"),
-                           _("Délier deux objets."),
-                           _("Délier _PARAM3_ et _PARAM4_"),
-                           _("Associations d'objets"),
+                           _("Unlink two objects"),
+                           _("Unlink two objects."),
+                           _("Unlink _PARAM3_ and _PARAM4_"),
+                           _("Linked objects"),
                            "Extensions/LinkedObjectsicon24.png",
                            "Extensions/LinkedObjectsicon16.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
                 instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "3");
                 instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "4");
-                instrInfo.AddParameter("object", _("Objet 1"), "", false);
-                instrInfo.AddParameter("object", _("Objet 2"), "", false);
+                instrInfo.AddParameter("object", _("Object 1"), "", false);
+                instrInfo.AddParameter("object", _("Object 2"), "", false);
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::LinkedObjects::RemoveLinkBetween").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("RemoveAllLinksOf",
-                           _("Délier tous les objets d'un objet"),
-                           _("Délier tous les objets d'un objet."),
-                           _("Délier tous les objets liés à _PARAM2_"),
-                           _("Associations d'objets"),
+                           _("Unlink all objects from an object"),
+                           _("Unlink all objects from an object."),
+                           _("Unlink all objects from _PARAM2_"),
+                           _("Linked objects"),
                            "Extensions/LinkedObjectsicon24.png",
                            "Extensions/LinkedObjectsicon16.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
                 instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "2");
-                instrInfo.AddParameter("object", _("Objet"), "", false);
+                instrInfo.AddParameter("object", _("Object"), "", false);
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::LinkedObjects::RemoveAllLinksOf").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
             DECLARE_END_ACTION()
 
             DECLARE_CONDITION("PickObjectsLinkedTo",
-                           _("Prendre en compte des objets liés"),
-                           _("Prends en compte des objets liés à un objet pour les prochaines conditions et actions.\nLa condition renvoie faux si aucun objet n'a été pris en compte."),
-                           _("Prendre en compte tous les objets \"_PARAM5_\" liés à _PARAM3_"),
-                           _("Associations d'objets"),
+                           _("Take into account linked objects"),
+                           _("Take some objects linked to the object into account for next conditions and actions.\nThe condition will return false if no object was taken into account."),
+                           _("Take into account all \"_PARAM5_\" linked to _PARAM3_"),
+                           _("Linked objects"),
                            "Extensions/LinkedObjectsicon24.png",
                            "Extensions/LinkedObjectsicon16.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
                 instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPicking", "5");
                 instrInfo.AddCodeOnlyParameter("inlineCode", "0"); //For backward compatibility
-                instrInfo.AddParameter("object", _("Objet"), "", false);
+                instrInfo.AddParameter("object", _("Object"), "", false);
                 instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "3");
-                instrInfo.AddParameter("object", _("Objets liés à prendre en compte"), "", false);
+                instrInfo.AddParameter("object", _("Linked objects to be taken in account"), "", false);
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
             DECLARE_END_CONDITION()
 
             DECLARE_ACTION("PickObjectsLinkedTo",
-                           _("Prendre en compte des objets liés"),
-                           _("Prends en compte des objets liés à un objet pour les prochaines actions."),
-                           _("Prendre en compte tous les objets \"_PARAM5_\" liés à _PARAM3_"),
-                           _("Associations d'objets"),
+                           _("Take into account linked objects"),
+                           _("Take objects linked to the object into account for next actions."),
+                           _("Take into account all \"_PARAM5_\" linked to _PARAM3_"),
+                           _("Linked objects"),
                            "Extensions/LinkedObjectsicon24.png",
                            "Extensions/LinkedObjectsicon16.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
                 instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameterWithoutPicking", "5");
                 instrInfo.AddCodeOnlyParameter("inlineCode", "0"); //For backward compatibility
-                instrInfo.AddParameter("object", _("Objet"), "", false);
+                instrInfo.AddParameter("object", _("Object"), "", false);
                 instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "3");
-                instrInfo.AddParameter("object", _("Objets liés à prendre en compte"), "", false);
+                instrInfo.AddParameter("object", _("Linked objects to be taken in account"), "", false);
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::LinkedObjects::PickObjectsLinkedTo").SetIncludeFile("LinkedObjects/LinkedObjectsTools.h");
 
@@ -231,3 +231,4 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }
+

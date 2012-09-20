@@ -48,3 +48,4 @@ bool GD_EXTENSION_API PickObjectsLinkedTo(RuntimeScene & scene, std::map <std::s
 }
 
 #endif // LINKEDOBJECTSTOOLS_H_INCLUDED
+

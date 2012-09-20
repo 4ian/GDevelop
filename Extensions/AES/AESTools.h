@@ -42,3 +42,4 @@ void GD_EXTENSION_API DecryptFile( const std::string & srcFile, const std::strin
 }
 
 #endif // AESACTIONS_H_INCLUDED
+

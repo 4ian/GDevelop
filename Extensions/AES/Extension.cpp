@@ -41,24 +41,24 @@ class Extension : public ExtensionBase
         Extension()
         {
             DECLARE_THE_EXTENSION("AES",
-                                  _("Algorithme de chiffrement AES"),
-                                  _("Extension permettant de chiffrer des fichiers avec l'algorithme AES."),
+                                  _("AES encryption algorithm"),
+                                  _("Extension to encrypt files with AES algorithm."),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
             #if defined(GD_IDE_ONLY)
 
             DECLARE_ACTION("EncryptFile",
-                           _("Crypter un fichier"),
-                           _("Crypte un fichier avec AES."),
-                           _("Crypter le fichier _PARAM0_ en _PARAM1_ avec AES"),
-                           _("Cryptage"),
+                           _("Crypt a file"),
+                           _("Crypt a file with AES."),
+                           _("Crypt file _PARAM0_ to _PARAM1_ with AES"),
+                           _("Encryption"),
                            "Extensions/AESicon24.png",
                            "Extensions/AESicon16.png");
 
-                instrInfo.AddParameter("file", _("Fichier source"), "", false);
-                instrInfo.AddParameter("file", _("Fichier de destination"), "", false);
-                instrInfo.AddParameter("string", _("Mot de passe ( 24 caractères )"), "", false);
+                instrInfo.AddParameter("file", _("Source file"), "", false);
+                instrInfo.AddParameter("file", _("Destination file"), "", false);
+                instrInfo.AddParameter("string", _("Password ( 24 characters )"), "", false);
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::AES::EncryptFile").SetIncludeFile("AES/AESTools.h");
 
@@ -66,31 +66,20 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("DecryptFile",
-                           _("Décrypter un fichier"),
-                           _("Décrypter un fichier avec AES."),
-                           _("Décrypter le fichier _PARAM0_ en _PARAM1_ avec AES"),
-                           _("Cryptage"),
+                           _("Decrypt a file"),
+                           _("Decrypt a file with AES."),
+                           _("Decrypt file _PARAM0_ to _PARAM1_ with AES"),
+                           _("Encryption"),
                            "Extensions/AESicon24.png",
                            "Extensions/AESicon16.png");
 
-                instrInfo.AddParameter("file", _("Fichier source"), "", false);
-                instrInfo.AddParameter("file", _("Fichier de destination"), "", false);
-                instrInfo.AddParameter("string", _("Mot de passe ( 24 caractères )"), "", false);
+                instrInfo.AddParameter("file", _("Source file"), "", false);
+                instrInfo.AddParameter("file", _("Destination file"), "", false);
+                instrInfo.AddParameter("string", _("Password ( 24 characters )"), "", false);
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::AES::DecryptFile").SetIncludeFile("AES/AESTools.h");
 
             DECLARE_END_ACTION()
-            /*
-            DECLARE_STR_EXPRESSION("Encrypt", _("Crypter"), _("Crypter"), _("Cryptage"), "res/actions/scaleHeight.png", &ExpEncrypt)
-                instrInfo.AddParameter("string", _("Texte à crypter"), "", false);
-                instrInfo.AddParameter("string", _("Mot de passe ( 24 caractères )"), "", false);
-            DECLARE_END_STR_EXPRESSION()
-
-            DECLARE_STR_EXPRESSION("Decrypt", _("Decrypter"), _("Decrypter"), _("Cryptage"), "res/actions/scaleHeight.png", &ExpDecrypt)
-                instrInfo.AddParameter("string", _("Texte à décrypter"), "", false);
-                instrInfo.AddParameter("string", _("Mot de passe ( 24 caractères )"), "", false);
-            DECLARE_END_STR_EXPRESSION()
-            */
 
             #endif
 
@@ -154,3 +143,4 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }
+

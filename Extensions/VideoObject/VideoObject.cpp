@@ -252,13 +252,13 @@ void VideoObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
 
 void VideoObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Fichier");                     value = GetVideoFile();}
-    else if ( propertyNb == 1 ) {name = _("Bouclage");                    value = looping ? _("Oui") : _("Non");}
-    else if ( propertyNb == 2 ) {name = _("Position dans la vidéo");      value = ToString(video.GetTimePosition())+"s";}
-    else if ( propertyNb == 3 ) {name = _("En pause");                    value = paused ? _("Oui") : _("Non");}
-    else if ( propertyNb == 4 ) {name = _("Durée");                       value = ToString(video.GetDuration())+"s";}
-    else if ( propertyNb == 5 ) {name = _("Couleur");                     value = ToString(colorR)+";"+ToString(colorG)+";"+ToString(colorB);}
-    else if ( propertyNb == 6 ) {name = _("Opacité");       value = ToString(GetOpacity());}
+    if      ( propertyNb == 0 ) {name = _("File");                     value = GetVideoFile();}
+    else if ( propertyNb == 1 ) {name = _("Automatic restart");                    value = looping ? _("Yes") : _("No");}
+    else if ( propertyNb == 2 ) {name = _("Position in video");      value = ToString(video.GetTimePosition())+"s";}
+    else if ( propertyNb == 3 ) {name = _("Paused");                    value = paused ? _("Yes") : _("No");}
+    else if ( propertyNb == 4 ) {name = _("Length");                       value = ToString(video.GetDuration())+"s";}
+    else if ( propertyNb == 5 ) {name = _("Color");                     value = ToString(colorR)+";"+ToString(colorG)+";"+ToString(colorB);}
+    else if ( propertyNb == 6 ) {name = _("Opacity");       value = ToString(GetOpacity());}
 }
 
 bool VideoObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -420,4 +420,5 @@ Object * CreateVideoObject(std::string name)
 {
     return new VideoObject(name);
 }
+
 

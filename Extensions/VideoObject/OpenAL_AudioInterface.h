@@ -63,9 +63,6 @@ public:
 	void play();
 	void seek(float time);
 };
-
-
-
 class OpenAL_AudioInterfaceFactory : public TheoraAudioInterfaceFactory
 {
 public:
@@ -75,3 +72,4 @@ public:
 };
 
 #endif
+

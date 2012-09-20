@@ -207,3 +207,4 @@ float VideoWrapper::GetDuration() const
 
     return 0;
 }
+

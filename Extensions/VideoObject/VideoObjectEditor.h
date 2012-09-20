@@ -99,3 +99,4 @@ class VideoObjectEditor: public wxDialog
 
 #endif
 #endif
+

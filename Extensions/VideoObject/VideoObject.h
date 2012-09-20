@@ -172,3 +172,4 @@ void DestroyVideoObject(Object * object);
 Object * CreateVideoObject(std::string name);
 
 #endif // VIDEOOBJECT_H
+

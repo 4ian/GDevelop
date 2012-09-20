@@ -203,3 +203,4 @@ OpenAL_AudioInterface* OpenAL_AudioInterfaceFactory::createInstance(TheoraVideoC
 {
 	return new OpenAL_AudioInterface(owner,nChannels,freq);
 }
+

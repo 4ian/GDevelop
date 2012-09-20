@@ -38,3 +38,4 @@ unsigned long TheoraMemoryLoader::tell()
 {
 	return mReadPointer;
 }
+

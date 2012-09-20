@@ -134,3 +134,4 @@ class GD_EXTENSION_API VideoWrapper
 };
 
 #endif // VIDEOWRAPPER_H
+

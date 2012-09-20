@@ -187,3 +187,4 @@ namespace AdvancedXML
         m_refs[newRef] = currentNode;
     }
 }
+

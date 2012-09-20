@@ -44,21 +44,21 @@ class Extension : public ExtensionBase
         {
             DECLARE_THE_EXTENSION("AdvancedXML",
                                   _("Advanced XML 1.0"),
-                                  _("Extension permettant de traiter des fichiers XML."),
+                                  _("Extension allowing to manipulate XML files."),
                                   "Victor Levasseur",
                                   "zlib/libpng License (Open Source)")
 
             #if defined(GD_IDE_ONLY)
 
             DECLARE_ACTION("NewFile",
-                           _("Créer un document XML"),
-                           _("Crée un document XML."),
-                           _("Créer un document XML dans la référence _PARAM0_"),
-                           _("XML avancé : Documents"),
+                           _("Create an XML document"),
+                           _("Create an XML document"),
+                           _("Create an XML document into reference _PARAM0_"),
+                           _("Advanced XML : Documents"),
                            "res/AdvancedXML/AdvancedXML.png",
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence (permet d'accéder directement à l'élément plus tard)"), "", false);
+                instrInfo.AddParameter("string", _("Reference (allow to access later to the element)"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::CreateNewDocument").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -66,15 +66,15 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("LoadFile",
-                           _("Charger un fichier XML"),
-                           _("Charge un fichier XML."),
-                           _("Charger le fichier XML _PARAM0_ dans la référence _PARAM1_"),
-                           _("XML avancé : Documents"),
+                           _("Load an XML file"),
+                           _("Load an XML file."),
+                           _("Load XML File _PARAM0_ into reference _PARAM1_"),
+                           _("Advanced XML : Documents"),
                            "res/AdvancedXML/AdvancedXMLOpen.png",
                            "res/AdvancedXML/AdvancedXMLOpen16.png");
 
-                instrInfo.AddParameter("file", _("Fichier source"), "", false);
-                instrInfo.AddParameter("string", _("Référence (permet d'accéder directement à l'élément plus tard)"), "", false);
+                instrInfo.AddParameter("file", _("Source file"), "", false);
+                instrInfo.AddParameter("string", _("Reference (allow to access later to the element)"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::LoadXmlFile").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -82,15 +82,15 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("SaveFile",
-                           _("Sauvegarder un fichier XML"),
-                           _("Sauvegarde un fichier XML."),
-                           _("Sauvegarder le fichier XML _PARAM1_ dans _PARAM0_"),
-                           _("XML avancé : Documents"),
+                           _("Save an XML file"),
+                           _("Save an XML file."),
+                           _("Save XML file _PARAM1_ into _PARAM0_"),
+                           _("Advanced XML : Documents"),
                            "res/AdvancedXML/AdvancedXMLSave.png",
                            "res/AdvancedXML/AdvancedXMLSave16.png");
 
-                instrInfo.AddParameter("file", _("Fichier où enregistrer le fichier"), "", false);
-                instrInfo.AddParameter("string", _("Référence sur le document XML"), "", false);
+                instrInfo.AddParameter("file", _("File where to save the document"), "", false);
+                instrInfo.AddParameter("string", _("Reference to the XML document"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::SaveXmlFile").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -98,16 +98,16 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("BrowseTo",
-                           _("Charger un élément dans une référence"),
-                           _("Charge un élément (relatif à un autre) dans une référence.\nNote : les références permettent d'accéder à un élément grâce au nom de la référence."),
-                           _("Charger le chemin _PARAM2_ relatif à _PARAM0_ dans la référence _PARAM1_"),
-                           _("XML avancé : Général"),
+                           _("Load an element into a reference"),
+                           _("Load an element (relative to another) in a reference.\nNote: References allows to access to an element using the name of the reference pointing to it."),
+                           _("Load path _PARAM2_ (relative to the element _PARAM0_) into reference _PARAM1_"),
+                           _("Advanced XML: General"),
                            "res/AdvancedXML/AdvancedXMLRef.png",
                            "res/AdvancedXML/AdvancedXMLRef16.png");
 
-                instrInfo.AddParameter("string", _("Référence d'un élément existant (le chemin de l'élément sera relatif à cet élément)"), "", false);
-                instrInfo.AddParameter("string", _("Nom de la référence à créer sur le futur élément"), "", false);
-                instrInfo.AddParameter("string", _("Chemin (séparé par / , * pour prendre le 1er élément enfant sans savoir le nom de la balise)"), "", false);
+                instrInfo.AddParameter("string", _("Reference of an existing element ( The path of the element will be relative to this element )"), "", false);
+                instrInfo.AddParameter("string", _("Name of the reference to the newly created element"), "", false);
+                instrInfo.AddParameter("string", _("Path ( tags can be browsed by separating them using /. Use * to go to the first child element without knowing the tag name )"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::BrowseTo").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -115,16 +115,16 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("NextSibling",
-                           _("Aller sur l'élément suivant"),
-                           _("Crée une référence sur un élément suivant d'un élément.\nNote : L'élément récupéré sera invalide s'il n'existe pas : il est conseillé de tester son existance avec la condition."),
-                           _("Charger l'élément nommé _PARAM2_ suivant _PARAM1_ dans la référence _PARAM0_"),
-                           _("XML avancé : Général"),
+                           _("Go to next element"),
+                           _("Create a reference on the element following the specified element.\nNote: The reference will be invalid if there is no valid element following the specified one.Conditions are available to check if an element is valid."),
+                           _("Load the element called _PARAM2_ following _PARAM1_ into reference _PARAM0_"),
+                           _("Advanced XML: General"),
                            "res/AdvancedXML/AdvancedXMLRef.png",
                            "res/AdvancedXML/AdvancedXMLRef16.png");
 
-                instrInfo.AddParameter("string", _("Référence à créer"), "", false);
-                instrInfo.AddParameter("string", _("Référence vers l'élément dont on doit récupérer l'élément suivant"), "", false);
-                instrInfo.AddParameter("string", _("Filtrer par un nom de balise"), "", true);
+                instrInfo.AddParameter("string", _("Reference to create"), "", false);
+                instrInfo.AddParameter("string", _("Reference to the element preceeding the element to be accessed"), "", false);
+                instrInfo.AddParameter("string", _("Tag name filter "), "", true);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::NextSibling").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -132,14 +132,14 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_CONDITION("IsRefValid",
-                           _("La référence est valide"),
-                           _("Est valide uniquement si la référence est sur un élément existant et valide."),
-                           _("_PARAM0_ existe et est valide"),
-                           _("XML avancé : Général"),
+                           _("The reference is valid"),
+                           _("Is valid only when the reference is pointing to an existing and valid element."),
+                           _("_PARAM0_ exists and is valid"),
+                           _("Advanced XML: General"),
                            "res/AdvancedXML/AdvancedXML.png",
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence vers l'élément à tester"), "", false);
+                instrInfo.AddParameter("string", _("Reference to the element to be tested"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::IsRefValid").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -147,16 +147,16 @@ class Extension : public ExtensionBase
             DECLARE_END_CONDITION()
 
             DECLARE_CONDITION("GetElementType",
-                           _("Type d'élément"),
-                           _("Teste le type d'un élément.\n(0 -> Balise, 1 -> Texte, 2 -> Commentaire, 3 -> Document XML, -1 -> Inconnu)"),
-                           _("_PARAM0_ est de type _PARAM2__PARAM1_"),
-                           _("XML avancé : Général"),
+                           _("Element type"),
+                           _("Test the type of the element.\n(0-> Tag, 1-> Text, 2-> Comment, 3-> XML Document, -1 -> Unknown )"),
+                           _("Type of _PARAM0_ _PARAM2__PARAM1_"),
+                           _("Advanced XML: General"),
                            "res/AdvancedXML/AdvancedXML.png",
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence vers l'élément à tester"), "", false);
+                instrInfo.AddParameter("string", _("Reference to the element to be tested"), "", false);
                 instrInfo.AddParameter("expression", _("Type"), "", false);
-                instrInfo.AddParameter("relationalOperator", _("Signe de comparaison"), "", false);
+                instrInfo.AddParameter("relationalOperator", _("Comparison sign"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::GetRefType").SetManipulatedType("number").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -164,12 +164,12 @@ class Extension : public ExtensionBase
             DECLARE_END_CONDITION()
 
             DECLARE_EXPRESSION("GetElementType",
-                           _("Type d'élément"),
-                           _("Retourne le type d'élément qu'est l'élément (0 -> Balise, 1 -> Texte, 2 -> Commentaire, 3 -> Document XML, -1 -> Inconnu)"),
-                           _("XML avancé : Général"),
+                           _("Element type"),
+                           _("Return the type of the element.\n(0-> Tag, 1-> Text, 2-> Comment, 3-> XML Document, -1 -> Unknown )"),
+                           _("Advanced XML: General"),
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence de l'élément"), "", false);
+                instrInfo.AddParameter("string", _("Element reference"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::GetRefType").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -177,16 +177,16 @@ class Extension : public ExtensionBase
             DECLARE_END_EXPRESSION()
 
             DECLARE_ACTION("CreateNewElement",
-                           _("Créer un nouvel élément"),
-                           _("Crée un nouvel élément.\nNote : les références permettent d'accéder à un élément grâce au nom de la référence."),
-                           _("Créer un nouvel élément dans la référence _PARAM0_ de type _PARAM1_"),
-                           _("XML avancé : Général"),
+                           _("Create a new element"),
+                           _("Create a new element.\nNote: References allows to access to an element using the name of the reference pointing to it."),
+                           _("Create a new element of type _PARAM1_ and attach to it the reference _PARAM0_"),
+                           _("Advanced XML: General"),
                            "res/AdvancedXML/AdvancedXMLAdd.png",
                            "res/AdvancedXML/AdvancedXMLAdd16.png");
 
-                instrInfo.AddParameter("string", _("Référence sur l'élément (permettant d'accéder ultérieurement à l'élément)"), "", false);
-                instrInfo.AddParameter("expression", _("Type d'élément à créer\n(0 -> Balise; 1 -> Texte; 2 -> Commentaire)"), "", false);
-                instrInfo.AddParameter("string", _("Texte de l'élément\nSi c'est une balise, ce sera le nom de la balise, \nsi c'est un texte ou un commentaire, ce sera le texte"), "", false);
+                instrInfo.AddParameter("string", _("Reference which will be used to access to the element"), "", false);
+                instrInfo.AddParameter("expression", _("Tye of the element to be created\n(0-> Tag, 1-> Text, 2-> Comment )"), "", false);
+                instrInfo.AddParameter("string", _("Text of the element\nIf the element is a tag, it will be the tag name,if the element is a text or a comment, it will be the content."), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::CreateNewElement").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -194,14 +194,14 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("DeleteAnElement",
-                           _("Supprimer un élément"),
-                           _("Supprime un élément (l'élément sera retiré de son élément parent et détruit)."),
-                           _("Supprimer l'élément _PARAM0_"),
-                           _("XML avancé : Général"),
+                           _("Delete an element"),
+                           _("Delete an element (The element will be removed from its parent and will be destroyed)."),
+                           _("Delete element _PARAM0_"),
+                           _("Advanced XML: General"),
                            "res/AdvancedXML/AdvancedXMLRemove.png",
                            "res/AdvancedXML/AdvancedXMLRemove16.png");
 
-                instrInfo.AddParameter("string", _("Référence sur l'élément à supprimer"), "", false);
+                instrInfo.AddParameter("string", _("Reference to the element to be deleted"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::DeleteAnElement").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -209,16 +209,16 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("InsertElementIntoAnother",
-                           _("Ajouter un élément dans un autre"),
-                           _("Ajoute un élément dans un autre. L'élément deviendra un \"enfant\" de son élément \"parent\"."),
-                           _("Ajouter _PARAM0_ en tant qu'enfant de _PARAM1_ (avant _PARAM2_)"),
-                           _("XML avancé : Balise"),
+                           _("Add an element inside another"),
+                           _("Add an element into another: The element will be a \"child\" of its \"parent\"."),
+                           _("Add _PARAM0_ as a child of _PARAM1_ (before _PARAM2_)"),
+                           _("Advanced XML: Tag"),
                            "res/AdvancedXML/AdvancedXML.png",
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence sur l'élément à ajouter (n'importe quel type)"), "", false);
-                instrInfo.AddParameter("string", _("Référence sur l'élément qui le contiendra (doit être une balise)"), "", false);
-                instrInfo.AddParameter("string", _("L'élément sera ajouté avant l'élément (si non défini, l'élément sera ajouté à la fin)"), "", true);
+                instrInfo.AddParameter("string", _("Reference to the element to be added"), "", false);
+                instrInfo.AddParameter("string", _("Reference to the parent element (must be a Tag element)"), "", false);
+                instrInfo.AddParameter("string", _("The element will be added before this element (if not defined, the element will be added at the end)"), "", true);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::InsertElementIntoAnother").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -226,16 +226,16 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("SetTagName",
-                           _("Changer le nom de la balise"),
-                           _("Change le nom de la balise"),
-                           _("Faire _PARAM2__PARAM1_ au nom de la balise _PARAM0_"),
-                           _("XML avancé : Balise"),
+                           _("Change the tag name"),
+                           _("Change the tag name"),
+                           _("Do _PARAM2__PARAM1_ to the name of tag _PARAM0_"),
+                           _("Advanced XML: Tag"),
                            "res/AdvancedXML/AdvancedXML.png",
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence vers l'élément balise"), "", false);
-                instrInfo.AddParameter("string", _("Nom de la balise"), "", false);
-                instrInfo.AddParameter("operator", _("Signe de modification"), "", false);
+                instrInfo.AddParameter("string", _("Reference to the Tag element"), "", false);
+                instrInfo.AddParameter("string", _("Tag name"), "", false);
+                instrInfo.AddParameter("operator", _("Modification sign"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::SetText").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetText").SetManipulatedType("string");
@@ -243,12 +243,12 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_STR_EXPRESSION("GetTagName",
-                           _("Nom d'une balise"),
-                           _("Récupère le nom d'une balise"),
-                           _("XML avancé : Balise"),
+                           _("Tag name"),
+                           _("Get the name of a tag"),
+                           _("Advanced XML: Tag"),
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence de l'élément"), "", false);
+                instrInfo.AddParameter("string", _("Element reference"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::GetText").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -256,16 +256,16 @@ class Extension : public ExtensionBase
             DECLARE_END_STR_EXPRESSION()
 
             DECLARE_ACTION("SetContent",
-                           _("Changer le contenu de l'élément"),
-                           _("Change le contenu (texte) de l'élément texte ou commentaire."),
-                           _("Faire _PARAM2__PARAM1_ au contenu de _PARAM0_"),
-                           _("XML avancé : Texte et Commentaire"),
+                           _("Change the content of the element"),
+                           _("Change the content (text) of the element ( For text and comments elements only )."),
+                           _("Do _PARAM2__PARAM1_ to the content of _PARAM0_"),
+                           _("Advanced XML : Text and comments"),
                            "res/AdvancedXML/AdvancedXML.png",
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence vers l'élément"), "", false);
-                instrInfo.AddParameter("string", _("Contenu"), "", false);
-                instrInfo.AddParameter("operator", _("Signe de modification"), "", false);
+                instrInfo.AddParameter("string", _("Reference to the element"), "", false);
+                instrInfo.AddParameter("string", _("Contents"), "", false);
+                instrInfo.AddParameter("operator", _("Modification sign"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::SetText").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetText").SetManipulatedType("string");
@@ -273,12 +273,12 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_STR_EXPRESSION("GetContent",
-                           _("Contenu"),
-                           _("Récupère le contenu d'un texte ou d'un commentaire"),
-                           _("XML avancé : Texte et Commentaire"),
+                           _("Contents"),
+                           _("Get the content of a text or comment element"),
+                           _("Advanced XML : Text and comments"),
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence de l'élément"), "", false);
+                instrInfo.AddParameter("string", _("Element reference"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::GetText").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -286,13 +286,13 @@ class Extension : public ExtensionBase
             DECLARE_END_STR_EXPRESSION()
 
             DECLARE_EXPRESSION("GetAttributeNumber",
-                           _("Valeur d'un attribut d'un élément"),
-                           _("Récupère la valeur d'un attribut d'un élément"),
-                           _("XML avancé : Balise"),
+                           _("Value of an attribute of an element"),
+                           _("Get the value of an attribute of an element"),
+                           _("Advanced XML: Tag"),
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence de l'élément"), "", false);
-                instrInfo.AddParameter("string", _("Nom de l'attribut"), "", false);
+                instrInfo.AddParameter("string", _("Element reference"), "", false);
+                instrInfo.AddParameter("string", _("Name of the attribute"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::GetAttributeNumber").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -300,17 +300,17 @@ class Extension : public ExtensionBase
             DECLARE_END_EXPRESSION()
 
             DECLARE_ACTION("SetAttributeNumber",
-                           _("Changer la valeur d'un attribut"),
-                           _("Change la valeur d'un attribut d'un élément (qui doit être une balise)."),
-                           _("Faire _PARAM3__PARAM2_ à l'attribut _PARAM1_ de l'élément _PARAM0_"),
-                           _("XML avancé : Balise"),
+                           _("Change the value of an attribute"),
+                           _("Change the value of an attribute of an element ( which must be a Tag element )."),
+                           _("Do _PARAM3__PARAM2_ to the attribute _PARAM1_ of element _PARAM0_"),
+                           _("Advanced XML: Tag"),
                            "res/AdvancedXML/AdvancedXML.png",
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence sur l'élément"), "", false);
-                instrInfo.AddParameter("string", _("Nom de l'attribut"), "", false);
-                instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                instrInfo.AddParameter("operator", _("Signe de modification"), "", false);
+                instrInfo.AddParameter("string", _("Reference to the element"), "", false);
+                instrInfo.AddParameter("string", _("Name of the attribute"), "", false);
+                instrInfo.AddParameter("expression", _("Value"), "", false);
+                instrInfo.AddParameter("operator", _("Modification sign"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::SetAttributeNumber").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetAttributeNumber").SetManipulatedType("number");
@@ -318,13 +318,13 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_STR_EXPRESSION("GetAttributeString",
-                           _("Texte d'un attribut d'un élément"),
-                           _("Récupère le texte d'un attribut d'un élément"),
-                           _("XML avancé : Balise"),
+                           _("Text of an attribute of an element"),
+                           _("Get the text of an attribute of an element"),
+                           _("Advanced XML: Tag"),
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence de l'élément"), "", false);
-                instrInfo.AddParameter("string", _("Nom de l'attribut"), "", false);
+                instrInfo.AddParameter("string", _("Element reference"), "", false);
+                instrInfo.AddParameter("string", _("Name of the attribute"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::GetAttributeString").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -332,17 +332,17 @@ class Extension : public ExtensionBase
             DECLARE_END_STR_EXPRESSION()
 
             DECLARE_ACTION("SetAttributeString",
-                           _("Changer le texte d'un attribut"),
-                           _("Change le texte d'un attribut d'un élément (qui doit être une balise)."),
-                           _("Faire _PARAM3__PARAM2_ à l'attribut _PARAM1_ de l'élément _PARAM0_"),
-                           _("XML avancé : Balise"),
+                           _("Change the text of an attribute"),
+                           _("Change the text of an attribute of an element ( which must be a Tag element )."),
+                           _("Do _PARAM3__PARAM2_ to the attribute _PARAM1_ of element _PARAM0_"),
+                           _("Advanced XML: Tag"),
                            "res/AdvancedXML/AdvancedXML.png",
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence sur l'élément"), "", false);
-                instrInfo.AddParameter("string", _("Nom de l'attribut"), "", false);
-                instrInfo.AddParameter("string", _("Valeur"), "", false);
-                instrInfo.AddParameter("operator", _("Signe de modification"), "", false);
+                instrInfo.AddParameter("string", _("Reference to the element"), "", false);
+                instrInfo.AddParameter("string", _("Name of the attribute"), "", false);
+                instrInfo.AddParameter("string", _("Value"), "", false);
+                instrInfo.AddParameter("operator", _("Modification sign"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::SetAttributeString").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h").SetAssociatedGetter("AdvancedXML::GetAttributeString").SetManipulatedType("string");
@@ -350,15 +350,15 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("RemoveAttribute",
-                           _("Supprimer un attribut"),
-                           _("Supprime un attribut d'un élément (qui doit être une balide)."),
-                           _("Supprimer l'attribut _PARAM1_ de l'élément _PARAM0_"),
-                           _("XML avancé : Balise"),
+                           _("Delete an attribute"),
+                           _("Delete an attribute from an element ( which must be a Tag element)."),
+                           _("Delete attribute _PARAM1_ from the element _PARAM0_"),
+                           _("Advanced XML: Tag"),
                            "res/AdvancedXML/AdvancedXML.png",
                            "res/AdvancedXML/AdvancedXML16.png");
 
-                instrInfo.AddParameter("string", _("Référence sur l'élément"), "", false);
-                instrInfo.AddParameter("string", _("Nom de l'attribut"), "", false);
+                instrInfo.AddParameter("string", _("Reference to the element"), "", false);
+                instrInfo.AddParameter("string", _("Name of the attribute"), "", false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("AdvancedXML::RemoveAttribute").SetIncludeFile("AdvancedXML/AdvancedXMLTools.h");
@@ -430,3 +430,4 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }
+

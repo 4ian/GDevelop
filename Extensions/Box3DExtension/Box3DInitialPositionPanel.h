@@ -82,3 +82,4 @@ class Box3DInitialPositionPanel: public wxPanel
 
 #endif
 #endif
+

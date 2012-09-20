@@ -143,3 +143,4 @@ class Box3DObjectEditor: public wxDialog
 
 #endif
 #endif
+

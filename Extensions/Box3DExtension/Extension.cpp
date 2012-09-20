@@ -42,14 +42,14 @@ class Extension : public ExtensionBase
         Extension()
         {
             DECLARE_THE_EXTENSION("Box3DObject",
-                                  _("Objet Boîte 3D"),
-                                  _("Extension permettant d'utiliser des objets boites en 3D."),
+                                  _("3D Box Object"),
+                                  _("Extension allowing to use 3D Box objects."),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
             DECLARE_OBJECT("Box3D",
-                           _("Boite en 3D"),
-                           _("Objet affichant une boite en 3D"),
+                           _("3D Box"),
+                           _("Object displaying a 3D Box"),
                            "Extensions/Box3Dicon.png",
                            &CreateBox3DObject,
                            &DestroyBox3DObject,
@@ -59,16 +59,16 @@ class Extension : public ExtensionBase
                 objInfos.SetIncludeFile("Box3DObject/Box3DObject.h");
 
                 DECLARE_OBJECT_ACTION("Width",
-                               _("Largeur"),
-                               _("Modifie la largeur d'une boite 3D."),
-                               _("Faire _PARAM2__PARAM1_ à la largeur de _PARAM0_"),
-                               _("Taille"),
+                               _("Width"),
+                               _("Modify the width of a 3D Box."),
+                               _("Do _PARAM2__PARAM1_ to the width of _PARAM0_"),
+                               _("Size"),
                                "res/actions/scaleWidth24.png",
                                "res/actions/scaleWidth.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetWidth").SetManipulatedType("number").SetAssociatedGetter("GetWidth").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -76,16 +76,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_CONDITION("Width",
-                               _("Largeur"),
-                               _("Teste la largeur d'une boite 3D."),
-                               _("La largeur de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                               _("Taille"),
+                               _("Width"),
+                               _("Test the width of a 3D Box."),
+                               _("The width of _PARAM0_ is _PARAM2__PARAM1_"),
+                               _("Size"),
                                "res/conditions/scaleWidth24.png",
                                "res/conditions/scaleWidth.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetWidth").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -94,16 +94,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_CONDITION()
 
                 DECLARE_OBJECT_ACTION("Height",
-                               _("Hauteur"),
-                               _("Modifie la hauteur d'une boite 3D."),
-                               _("Faire _PARAM2__PARAM1_ à la hauteur de _PARAM0_"),
-                               _("Taille"),
+                               _("Height"),
+                               _("Modify the height of a 3D Box."),
+                               _("Do _PARAM2__PARAM1_ to the height of _PARAM0_"),
+                               _("Size"),
                                "res/actions/scaleHeight24.png",
                                "res/actions/scaleHeight.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -112,16 +112,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_CONDITION("Height",
-                               _("Hauteur"),
-                               _("Teste la hauteur d'une boite 3D."),
-                               _("La hauteur de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                               _("Taille"),
+                               _("Height"),
+                               _("Test the height of a 3D Box."),
+                               _("The height of _PARAM0_ is _PARAM2__PARAM1_"),
+                               _("Size"),
                                "res/conditions/scaleHeight24.png",
                                "res/conditions/scaleHeight.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -130,16 +130,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_CONDITION()
 
                 DECLARE_OBJECT_ACTION("Depth",
-                               _("Profondeur"),
-                               _("Modifie la profondeur d'une boite 3D."),
-                               _("Faire _PARAM2__PARAM1_ à la profondeur de _PARAM0_"),
-                               _("Taille"),
+                               _("Depth"),
+                               _("Modify the depth of a 3D Box."),
+                               _("Do _PARAM2__PARAM1_ to the depth of _PARAM0_"),
+                               _("Size"),
                                "res/actions/depth24.png",
                                "res/actions/depth.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetDepth").SetManipulatedType("number").SetAssociatedGetter("GetDepth").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -148,16 +148,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_CONDITION("Depth",
-                               _("Profondeur"),
-                               _("Teste la profondeur d'une boite 3D."),
-                               _("La profondeur de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                               _("Taille"),
+                               _("Depth"),
+                               _("Test the depth of a 3D Box."),
+                               _("The depth of _PARAM0_ is _PARAM2__PARAM1_"),
+                               _("Size"),
                                "res/conditions/depth24.png",
                                "res/conditions/depth.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetDepth").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
 
@@ -165,16 +165,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_CONDITION()
 
                 DECLARE_OBJECT_ACTION("ZPosition",
-                               _("Position Z"),
-                               _("Modifie la position Z d'une boite 3D."),
-                               _("Faire _PARAM2__PARAM1_ à la position Z de _PARAM0_"),
+                               _("Z Position"),
+                               _("Modify the Z Position of a 3D Box."),
+                               _("Do _PARAM2__PARAM1_ to the Z position of _PARAM0_"),
                                _("Position"),
                                "res/actions/position24.png",
                                "res/actions/position.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetZPosition").SetManipulatedType("number").SetAssociatedGetter("GetZPosition").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -183,16 +183,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_CONDITION("ZPosition",
-                               _("Position Z"),
-                               _("Teste la position Z d'une boite 3D."),
-                               _("La position Z de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                               _("Z Position"),
+                               _("Test Z position of a 3D Box."),
+                               _("The Z position of _PARAM0_ is _PARAM2__PARAM1_"),
                                _("Position"),
                                "res/conditions/position24.png",
                                "res/conditions/position.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetZPosition").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -202,15 +202,15 @@ class Extension : public ExtensionBase
 
                 DECLARE_OBJECT_ACTION("Yaw",
                                _("Yaw"),
-                               _("Modifie la rotation yaw d'une boite 3D."),
-                               _("Faire _PARAM2__PARAM1_ au yaw de _PARAM0_"),
+                               _("Modify Yaw of a 3D Box object."),
+                               _("Do _PARAM2__PARAM1_ to yaw of _PARAM0_"),
                                _("Angle"),
                                "res/actions/rotate24.png",
                                "res/actions/rotate.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -220,15 +220,15 @@ class Extension : public ExtensionBase
 
                 DECLARE_OBJECT_CONDITION("Yaw",
                                _("Yaw"),
-                               _("Teste la rotation yaw d'une boite 3D."),
-                               _("Le yaw de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                               _("Test Yaw of a 3D Box object."),
+                               _("Yaw of _PARAM0_ is _PARAM2_ _PARAM1_"),
                                _("Angle"),
                                "res/conditions/rotate24.png",
                                "res/conditions/rotate.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -238,15 +238,15 @@ class Extension : public ExtensionBase
 
                 DECLARE_OBJECT_ACTION("Pitch",
                                _("Pitch"),
-                               _("Modifie la rotation pitch d'une boite 3D."),
-                               _("Faire _PARAM2__PARAM1_ au pitch de _PARAM0_"),
+                               _("Modify Pitch of a 3D Box object."),
+                               _("Do _PARAM2__PARAM1_ to Pitch of _PARAM0_"),
                                _("Angle"),
                                "res/actions/rotate24.png",
                                "res/actions/rotate.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetPitch").SetManipulatedType("number").SetAssociatedGetter("GetPitch").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -256,15 +256,15 @@ class Extension : public ExtensionBase
 
                 DECLARE_OBJECT_CONDITION("Pitch",
                                _("Pitch"),
-                               _("Teste la rotation pitch d'une boite 3D."),
-                               _("Le pitch de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                               _("Test Pitch of a 3D Box object."),
+                               _("Pitch of _PARAM0_ is _PARAM2__PARAM1_"),
                                _("Angle"),
                                "res/conditions/rotate24.png",
                                "res/conditions/rotate.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetPitch").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -274,15 +274,15 @@ class Extension : public ExtensionBase
 
                 DECLARE_OBJECT_ACTION("Roll",
                                _("Roll"),
-                               _("Modifie la rotation roll d'une boite 3D."),
-                               _("Faire _PARAM2__PARAM1_ au roll de _PARAM0_"),
+                               _("Modify Roll of a 3D Box object."),
+                               _("Do _PARAM2__PARAM1_ to the Roll of _PARAM0_"),
                                _("Angle"),
                                "res/actions/rotate24.png",
                                "res/actions/rotate.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetRoll").SetManipulatedType("number").SetAssociatedGetter("GetRoll").SetIncludeFile("Box3DObject/Box3DObject.h");
@@ -292,48 +292,45 @@ class Extension : public ExtensionBase
 
                 DECLARE_OBJECT_CONDITION("Roll",
                                _("Roll"),
-                               _("Teste la rotation roll d'une boite 3D."),
-                               _("Le roll de _PARAM0_ est _PARAM2_ à _PARAM1_"),
+                               _("Test Roll of a 3D Box object."),
+                               _("Roll of _PARAM0_ is _PARAM2_ _PARAM1_"),
                                _("Angle"),
                                "res/conditions/rotate24.png",
                                "res/conditions/rotate.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
-                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
+                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetRoll").SetManipulatedType("number").SetIncludeFile("Box3DObject/Box3DObject.h");
-
-
-
                 DECLARE_END_OBJECT_CONDITION()
 
-                DECLARE_OBJECT_EXPRESSION("Depth", _("Profondeur de la boite 3D"), _("Profondeur de la boite 3D"), _("Taille"), "res/actions/scaleHeight.png")
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
+                DECLARE_OBJECT_EXPRESSION("Depth", _("Depth of the 3D Box"), _("Depth of the 3D Box"), _("Size"), "res/actions/scaleHeight.png")
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetDepth").SetIncludeFile("Box3DObject/Box3DObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
 
-                DECLARE_OBJECT_EXPRESSION("Z", _("Position Z"), _("Position Z"), _("Position"), "res/actions/scaleHeight.png")
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
+                DECLARE_OBJECT_EXPRESSION("Z", _("Z Position"), _("Z Position"), _("Position"), "res/actions/scaleHeight.png")
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetZPosition").SetIncludeFile("Box3DObject/Box3DObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
 
                 DECLARE_OBJECT_EXPRESSION("Yaw", _("Yaw"), _("Yaw"), _("Angle"), "res/actions/scaleHeight.png")
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetIncludeFile("Box3DObject/Box3DObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
 
                 DECLARE_OBJECT_EXPRESSION("Pitch", _("Pitch"), _("Pitch"), _("Angle"), "res/actions/scaleHeight.png")
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetPitch").SetIncludeFile("Box3DObject/Box3DObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
 
                 DECLARE_OBJECT_EXPRESSION("Roll", _("Roll"), _("Roll"), _("Angle"), "res/actions/scaleHeight.png")
-                    instrInfo.AddParameter("object", _("Objet"), "Box3D", false);
+                    instrInfo.AddParameter("object", _("Object"), "Box3D", false);
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetRoll").SetIncludeFile("Box3DObject/Box3DObject.h");
                 DECLARE_END_OBJECT_EXPRESSION()
@@ -402,3 +399,4 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }
+

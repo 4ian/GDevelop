@@ -94,7 +94,7 @@ object(object_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Paramétrage de l\'objet Boite 3D"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Settings of the 3D Box object"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
@@ -107,17 +107,17 @@ object(object_)
 	FlexGridSizer4->AddGrowableRow(0);
 	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
-	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Taille"));
+	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Size"));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticText7 = new wxStaticText(Core, ID_STATICTEXT7, _("Largeur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	StaticText7 = new wxStaticText(Core, ID_STATICTEXT7, _("Width :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	FlexGridSizer6->Add(StaticText7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	widthEdit = new wxTextCtrl(Core, ID_TEXTCTRL7, _("32"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL7"));
 	FlexGridSizer6->Add(widthEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText8 = new wxStaticText(Core, ID_STATICTEXT8, _("Hauteur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
+	StaticText8 = new wxStaticText(Core, ID_STATICTEXT8, _("Height :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
 	FlexGridSizer6->Add(StaticText8, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	heightEdit = new wxTextCtrl(Core, ID_TEXTCTRL8, _("32"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL8"));
 	FlexGridSizer6->Add(heightEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText9 = new wxStaticText(Core, ID_STATICTEXT9, _("Profondeur :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
+	StaticText9 = new wxStaticText(Core, ID_STATICTEXT9, _("Depth :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
 	FlexGridSizer6->Add(StaticText9, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	depthEdit = new wxTextCtrl(Core, ID_TEXTCTRL9, _("32"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL9"));
 	FlexGridSizer6->Add(depthEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -127,37 +127,37 @@ object(object_)
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, Core, _("Textures"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer3->AddGrowableCol(1);
-	StaticText1 = new wxStaticText(Core, ID_STATICTEXT1, _("Face :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Core, ID_STATICTEXT1, _("Front :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	frontTextureEdit = new wxTextCtrl(Core, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer3->Add(frontTextureEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	frontAddFromBt = new wxBitmapButton(Core, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/addfromimagebanque.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
 	FlexGridSizer3->Add(frontAddFromBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText2 = new wxStaticText(Core, ID_STATICTEXT2, _("Dessus :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(Core, ID_STATICTEXT2, _("Top :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	topTextureEdit = new wxTextCtrl(Core, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
 	FlexGridSizer3->Add(topTextureEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	topAddFromBt = new wxBitmapButton(Core, ID_BITMAPBUTTON2, wxBitmap(wxImage(_T("res/addfromimagebanque.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON2"));
 	FlexGridSizer3->Add(topAddFromBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(Core, ID_STATICTEXT3, _("Dessous :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Core, ID_STATICTEXT3, _("Bottom :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer3->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	bottomTextureEdit = new wxTextCtrl(Core, ID_TEXTCTRL3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
 	FlexGridSizer3->Add(bottomTextureEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	bottomAddFromBt = new wxBitmapButton(Core, ID_BITMAPBUTTON3, wxBitmap(wxImage(_T("res/addfromimagebanque.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON3"));
 	FlexGridSizer3->Add(bottomAddFromBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText4 = new wxStaticText(Core, ID_STATICTEXT4, _("Gauche :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText4 = new wxStaticText(Core, ID_STATICTEXT4, _("Left :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer3->Add(StaticText4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	leftTextureEdit = new wxTextCtrl(Core, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
 	FlexGridSizer3->Add(leftTextureEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	leftAddFromBt = new wxBitmapButton(Core, ID_BITMAPBUTTON4, wxBitmap(wxImage(_T("res/addfromimagebanque.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON4"));
 	FlexGridSizer3->Add(leftAddFromBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText5 = new wxStaticText(Core, ID_STATICTEXT5, _("Droite :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
+	StaticText5 = new wxStaticText(Core, ID_STATICTEXT5, _("Right :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
 	FlexGridSizer3->Add(StaticText5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	rightTextureEdit = new wxTextCtrl(Core, ID_TEXTCTRL5, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL5"));
 	FlexGridSizer3->Add(rightTextureEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	rightAddFromBt = new wxBitmapButton(Core, ID_BITMAPBUTTON5, wxBitmap(wxImage(_T("res/addfromimagebanque.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON5"));
 	FlexGridSizer3->Add(rightAddFromBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText6 = new wxStaticText(Core, ID_STATICTEXT6, _("Arrière :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	StaticText6 = new wxStaticText(Core, ID_STATICTEXT6, _("Back :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	FlexGridSizer3->Add(StaticText6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	backTextureEdit = new wxTextCtrl(Core, ID_TEXTCTRL6, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
 	FlexGridSizer3->Add(backTextureEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -169,11 +169,11 @@ object(object_)
 	StaticLine1 = new wxStaticLine(Core, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer2->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
-	imageBankBt = new wxButton(Core, ID_BUTTON3, _("Afficher l\'éditeur de la banque d\'images"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	imageBankBt = new wxButton(Core, ID_BUTTON3, _("Show image bank\'s editor"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer7->Add(imageBankBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	okBt = new wxButton(Core, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer7->Add(okBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cancelBt = new wxButton(Core, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	cancelBt = new wxButton(Core, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer7->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer7, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	Core->SetSizer(FlexGridSizer2);
@@ -259,7 +259,7 @@ void Box3DObjectEditor::OnfrontAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Please display the image bank's editor and select an image before clicking on this button."));
         return;
     }
 
@@ -270,7 +270,7 @@ void Box3DObjectEditor::OntopAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Please display the image bank's editor and select an image before clicking on this button."));
         return;
     }
 
@@ -282,7 +282,7 @@ void Box3DObjectEditor::OnbottomAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Please display the image bank's editor and select an image before clicking on this button."));
         return;
     }
 
@@ -293,7 +293,7 @@ void Box3DObjectEditor::OnleftAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Please display the image bank's editor and select an image before clicking on this button."));
         return;
     }
 
@@ -304,7 +304,7 @@ void Box3DObjectEditor::OnrightAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Please display the image bank's editor and select an image before clicking on this button."));
         return;
     }
 
@@ -315,7 +315,7 @@ void Box3DObjectEditor::OnbackAddFromBtClick(wxCommandEvent& event)
 {
     if ( !m_mgr.GetPane( resourcesEditor ).IsShown() )
     {
-        wxLogMessage(_("Affichez l'éditeur de la banque d'image, et sélectionnez une image avant de cliquer sur ce bouton."));
+        wxLogMessage(_("Please display the image bank's editor and select an image before clicking on this button."));
         return;
     }
 
@@ -336,3 +336,4 @@ void Box3DObjectEditor::OnimageBankBtClick(wxCommandEvent& event)
 }
 
 #endif
+

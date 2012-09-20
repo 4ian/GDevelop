@@ -451,10 +451,10 @@ void Box3DObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositio
 
 void Box3DObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Largeur");       value = ToString(width);}
-    else if ( propertyNb == 1 ) {name = _("Hauteur");       value = ToString(height);}
-    else if ( propertyNb == 2 ) {name = _("Profondeur");    value = ToString(depth);}
-    else if ( propertyNb == 3 ) {name = _("Coordonnée Z");  value = ToString(zPosition);}
+    if      ( propertyNb == 0 ) {name = _("Width");       value = ToString(width);}
+    else if ( propertyNb == 1 ) {name = _("Height");       value = ToString(height);}
+    else if ( propertyNb == 2 ) {name = _("Depth");    value = ToString(depth);}
+    else if ( propertyNb == 3 ) {name = _("Z Coordinate");  value = ToString(zPosition);}
     else if ( propertyNb == 4 ) {name = _("Yaw");           value = ToString(yaw);}
     else if ( propertyNb == 5 ) {name = _("Pitch");         value = ToString(pitch);}
     else if ( propertyNb == 6 ) {name = _("Roll");          value = ToString(roll);}
@@ -559,3 +559,4 @@ Object * CreateBox3DObject(std::string name)
 {
     return new Box3DObject(name);
 }
+

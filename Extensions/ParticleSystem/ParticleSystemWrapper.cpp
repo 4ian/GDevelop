@@ -86,3 +86,4 @@ void ParticleSystemWrapper::Init(const ParticleSystemWrapper & other)
     particleSystem->removeGroup(other.group);
     particleSystem->addGroup(group);
 }
+

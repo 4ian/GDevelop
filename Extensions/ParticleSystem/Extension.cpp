@@ -41,15 +41,15 @@ freely, subject to the following restrictions:
 Extension::Extension()
 {
     DECLARE_THE_EXTENSION("ParticleSystem",
-                          _("Système de particules"),
-                          _("Extension permettant d'afficher un grand nombre de petites particules."),
+                          _("Particle system"),
+                          _("Extension allowing to display a large number of small particles."),
                           "Compil Games",
                           "zlib/libpng License ( Open Source )")
 
     //Declaration of all objects available
     DECLARE_OBJECT("ParticleEmitter",
-                   _("Emetteur de particules"),
-                   _("Objet affichant un grand nombre de petites particules"),
+                   _("Particles emitter"),
+                   _("Object displaying a large number of small particles"),
                    "Extensions/particleSystemicon.png",
                    &CreateParticleEmitterObject,
                    &DestroyParticleEmitterObject,
@@ -141,3 +141,4 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }
+

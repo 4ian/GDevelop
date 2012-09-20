@@ -85,3 +85,4 @@ class GD_EXTENSION_API ParticleSystemWrapper
 };
 
 #endif // PARTICLESYSTEMWRAPPER_H
+

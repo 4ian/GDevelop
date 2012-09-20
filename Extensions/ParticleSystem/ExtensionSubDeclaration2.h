@@ -5,3 +5,10 @@ class ExtensionObjectInfos;
 void ExtensionSubDeclaration2(ExtensionObjectInfos & objInfos);
 
 #endif // EXTENSIONSUBDECLARATION1_H
+
+
+
+
+
+
+

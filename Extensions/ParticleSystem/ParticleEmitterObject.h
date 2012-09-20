@@ -306,3 +306,4 @@ void DestroyParticleEmitterObject(Object * object);
 Object * CreateParticleEmitterObject(std::string name);
 
 #endif // PARTICLEEMITTEROBJECT_H
+

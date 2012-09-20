@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="ParticleEmitterObjectEditor">
-		<title>Editer l&apos;émetteur de particules</title>
+		<title>Edit the particle emitter</title>
 		<centered>1</centered>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
@@ -21,7 +21,7 @@
 								<growablecols>0</growablecols>
 								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer3" member="no">
-										<label>Rendu</label>
+										<label>Rendering</label>
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
 												<cols>1</cols>
@@ -31,7 +31,7 @@
 														<cols>4</cols>
 														<object class="sizeritem">
 															<object class="wxStaticText" name="ID_STATICTEXT7" variable="StaticText7" member="yes">
-																<label>Mode de rendu :</label>
+																<label>Renderering mode :</label>
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 															<border>5</border>
@@ -49,7 +49,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="lineCheck" member="yes">
-																<label>Lignes</label>
+																<label>Line</label>
 																<handler function="OnLineCheckSelect" entry="EVT_RADIOBUTTON" />
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -58,7 +58,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxRadioButton" name="ID_RADIOBUTTON3" variable="quadCheck" member="yes">
-																<label>Quadrilatère</label>
+																<label>Quad</label>
 																<handler function="OnQuadCheckSelect" entry="EVT_RADIOBUTTON" />
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -136,7 +136,7 @@
 														<cols>3</cols>
 														<object class="sizeritem">
 															<object class="wxRadioButton" name="ID_RADIOBUTTON22" variable="alphaRenderingCheck" member="yes">
-																<label>Rendu normal</label>
+																<label>Standard rendering</label>
 																<style>wxRB_GROUP</style>
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -145,7 +145,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxRadioButton" name="ID_RADIOBUTTON23" variable="additiveRenderingCheck" member="yes">
-																<label>Rendu additif</label>
+																<label>Additive rendering</label>
 																<selected>1</selected>
 															</object>
 															<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -175,7 +175,7 @@
 								<growablecols>0</growablecols>
 								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer4" member="no">
-										<label>Particules</label>
+										<label>Particles</label>
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer31" member="no">
 												<cols>2</cols>
@@ -187,7 +187,7 @@
 																<cols>7</cols>
 																<object class="sizeritem">
 																	<object class="wxStaticText" name="ID_STATICTEXT29" variable="StaticText27" member="yes">
-																		<label>Temps de vie : Entre</label>
+																		<label>Lifetime : Between</label>
 																	</object>
 																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -196,7 +196,7 @@
 																<object class="sizeritem">
 																	<object class="wxTextCtrl" name="ID_TEXTCTRL11" variable="lifeTimeMinEdit" member="yes">
 																		<size>55,21</size>
-																		<tooltip>Temps de vie minimum</tooltip>
+																		<tooltip>Minimum lifetime</tooltip>
 																	</object>
 																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -204,7 +204,7 @@
 																</object>
 																<object class="sizeritem">
 																	<object class="wxStaticText" name="ID_STATICTEXT30" variable="StaticText28" member="yes">
-																		<label>et</label>
+																		<label>and</label>
 																	</object>
 																	<flag>wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -213,7 +213,7 @@
 																<object class="sizeritem">
 																	<object class="wxTextCtrl" name="ID_TEXTCTRL12" variable="lifeTimeMaxEdit" member="yes">
 																		<size>55,21</size>
-																		<tooltip>Temps de vie maximum</tooltip>
+																		<tooltip>Maximum lifetime</tooltip>
 																	</object>
 																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -221,7 +221,7 @@
 																</object>
 																<object class="sizeritem">
 																	<object class="wxStaticText" name="ID_STATICTEXT31" variable="StaticText29" member="yes">
-																		<label>secondes</label>
+																		<label>seconds</label>
 																	</object>
 																	<flag>wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -237,8 +237,8 @@
 																<growablecols>2</growablecols>
 																<object class="sizeritem">
 																	<object class="wxCheckBox" name="ID_CHECKBOX1" variable="infiniteTankCheck" member="yes">
-																		<label>Capacité infinie</label>
-																		<tooltip>En cochant ceci, l&apos;émetteur ne s&apos;arrêtera jamais d&apos;émettre des particules.</tooltip>
+																		<label>Unlimited capacity</label>
+																		<tooltip>If this box is checked, the emitter will keep emit particles.</tooltip>
 																		<handler function="OninfiniteTankCheckClick" entry="EVT_CHECKBOX" />
 																	</object>
 																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -247,7 +247,7 @@
 																</object>
 																<object class="sizeritem">
 																	<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-																		<label>Capacité :</label>
+																		<label>Capacity :</label>
 																	</object>
 																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -255,7 +255,7 @@
 																</object>
 																<object class="sizeritem">
 																	<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="tankEdit" member="yes">
-																		<tooltip>Le nombre de particules disponibles.</tooltip>
+																		<tooltip>Available particles number.</tooltip>
 																	</object>
 																	<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -271,7 +271,7 @@
 																<growablecols>1</growablecols>
 																<object class="sizeritem">
 																	<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-																		<label>Flux :</label>
+																		<label>Flow :</label>
 																	</object>
 																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -279,7 +279,7 @@
 																</object>
 																<object class="sizeritem">
 																	<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="flowEdit" member="yes">
-																		<tooltip>Le nombre de particules émises à la seconde. -1 pour tout émettre d&apos;un coup.</tooltip>
+																		<tooltip>Number of particles emitted ( by seconds ). -1 to emit everything in a single shot.</tooltip>
 																	</object>
 																	<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -295,7 +295,7 @@
 																<growablecols>1</growablecols>
 																<object class="sizeritem">
 																	<object class="wxStaticText" name="ID_STATICTEXT62" variable="StaticText59" member="yes">
-																		<label>Nombre maximum de particules affichables :</label>
+																		<label>Maximum particles number:</label>
 																	</object>
 																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -333,13 +333,13 @@
 																			<growablerows>0</growablerows>
 																			<object class="sizeritem">
 																				<object class="wxStaticBoxSizer" variable="StaticBoxSizer12" member="no">
-																					<label>Couleur</label>
+																					<label>Color</label>
 																					<object class="sizeritem">
 																						<object class="wxFlexGridSizer" variable="FlexGridSizer43" member="no">
 																							<cols>2</cols>
 																							<object class="sizeritem">
 																								<object class="wxStaticText" name="ID_STATICTEXT40" variable="StaticText37" member="yes">
-																									<label>Couleur des particules à leur apparition :</label>
+																									<label>Initial particles color :</label>
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>5</border>
@@ -356,7 +356,7 @@
 																							</object>
 																							<object class="sizeritem">
 																								<object class="wxStaticText" name="ID_STATICTEXT41" variable="StaticText38" member="yes">
-																									<label>Couleur des particules à leur disparition :</label>
+																									<label>Final particles color :</label>
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>5</border>
@@ -382,7 +382,7 @@
 																			</object>
 																		</object>
 																	</object>
-																	<label>Couleurs</label>
+																	<label>Colors</label>
 																</object>
 																<object class="notebookpage">
 																	<object class="wxPanel" name="ID_PANEL2" variable="Panel1" member="yes">
@@ -395,7 +395,7 @@
 																					<cols>3</cols>
 																					<object class="sizeritem">
 																						<object class="wxStaticBoxSizer" variable="StaticBoxSizer5" member="no">
-																							<label>Rouge</label>
+																							<label>Red</label>
 																							<object class="sizeritem">
 																								<object class="wxFlexGridSizer" variable="FlexGridSizer13" member="no">
 																									<cols>1</cols>
@@ -405,7 +405,7 @@
 																											<cols>3</cols>
 																											<object class="sizeritem">
 																												<object class="wxRadioButton" name="ID_RADIOBUTTON6" variable="redFixedCheck" member="yes">
-																													<label>Fixé</label>
+																													<label>Fixed</label>
 																													<selected>1</selected>
 																													<style>wxRB_GROUP</style>
 																													<handler function="OnredFixedCheckSelect" entry="EVT_RADIOBUTTON" />
@@ -416,7 +416,7 @@
 																											</object>
 																											<object class="sizeritem">
 																												<object class="wxRadioButton" name="ID_RADIOBUTTON5" variable="redRandomCheck" member="yes">
-																													<label>Aléatoire</label>
+																													<label>Random</label>
 																													<handler function="OnredRandomCheckSelect" entry="EVT_RADIOBUTTON" />
 																												</object>
 																												<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -429,7 +429,7 @@
 																									</object>
 																									<object class="sizeritem">
 																										<object class="wxRadioButton" name="ID_RADIOBUTTON4" variable="redMutableCheck" member="yes">
-																											<label>Changeant au cours du temps</label>
+																											<label>Changing over time</label>
 																											<handler function="OnredRandomCheckSelect" entry="EVT_RADIOBUTTON" />
 																										</object>
 																										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -441,7 +441,7 @@
 																											<cols>5</cols>
 																											<object class="sizeritem">
 																												<object class="wxStaticText" name="ID_STATICTEXT13" variable="StaticText11" member="yes">
-																													<label>De</label>
+																													<label>From</label>
 																												</object>
 																												<flag>wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																												<border>5</border>
@@ -460,7 +460,7 @@
 																											</object>
 																											<object class="sizeritem">
 																												<object class="wxStaticText" name="ID_STATICTEXT12" variable="StaticText10" member="yes">
-																													<label>à</label>
+																													<label>to</label>
 																												</object>
 																												<flag>wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																												<border>5</border>
@@ -492,7 +492,7 @@
 																					</object>
 																					<object class="sizeritem">
 																						<object class="wxStaticBoxSizer" variable="StaticBoxSizer7" member="no">
-																							<label>Vert</label>
+																							<label>Green</label>
 																							<object class="sizeritem">
 																								<object class="wxFlexGridSizer" variable="FlexGridSizer18" member="no">
 																									<cols>1</cols>
@@ -502,7 +502,7 @@
 																											<cols>3</cols>
 																											<object class="sizeritem">
 																												<object class="wxRadioButton" name="ID_RADIOBUTTON10" variable="greenFixedCheck" member="yes">
-																													<label>Fixé</label>
+																													<label>Fixed</label>
 																													<selected>1</selected>
 																													<style>wxRB_GROUP</style>
 																													<handler function="OngreenFixedCheckSelect" entry="EVT_RADIOBUTTON" />
@@ -513,7 +513,7 @@
 																											</object>
 																											<object class="sizeritem">
 																												<object class="wxRadioButton" name="ID_RADIOBUTTON11" variable="greenRandomCheck" member="yes">
-																													<label>Aléatoire</label>
+																													<label>Random</label>
 																													<handler function="OngreenRandomCheckSelect" entry="EVT_RADIOBUTTON" />
 																												</object>
 																												<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -526,7 +526,7 @@
 																									</object>
 																									<object class="sizeritem">
 																										<object class="wxRadioButton" name="ID_RADIOBUTTON12" variable="greenMutableCheck" member="yes">
-																											<label>Changeant au cours du temps</label>
+																											<label>Changing over time</label>
 																											<handler function="OngreenRandomCheckSelect" entry="EVT_RADIOBUTTON" />
 																										</object>
 																										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -538,7 +538,7 @@
 																											<cols>5</cols>
 																											<object class="sizeritem">
 																												<object class="wxStaticText" name="ID_STATICTEXT18" variable="StaticText16" member="yes">
-																													<label>De</label>
+																													<label>From</label>
 																												</object>
 																												<flag>wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																												<border>5</border>
@@ -556,7 +556,7 @@
 																											</object>
 																											<object class="sizeritem">
 																												<object class="wxStaticText" name="ID_STATICTEXT19" variable="StaticText17" member="yes">
-																													<label>à</label>
+																													<label>to</label>
 																												</object>
 																												<flag>wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																												<border>5</border>
@@ -588,7 +588,7 @@
 																					</object>
 																					<object class="sizeritem">
 																						<object class="wxStaticBoxSizer" variable="StaticBoxSizer6" member="no">
-																							<label>Bleu</label>
+																							<label>Blue</label>
 																							<object class="sizeritem">
 																								<object class="wxFlexGridSizer" variable="FlexGridSizer16" member="no">
 																									<cols>1</cols>
@@ -598,7 +598,7 @@
 																											<cols>3</cols>
 																											<object class="sizeritem">
 																												<object class="wxRadioButton" name="ID_RADIOBUTTON7" variable="blueFixedCheck" member="yes">
-																													<label>Fixé</label>
+																													<label>Fixed</label>
 																													<selected>1</selected>
 																													<style>wxRB_GROUP</style>
 																													<handler function="OnblueFixedCheckSelect" entry="EVT_RADIOBUTTON" />
@@ -609,7 +609,7 @@
 																											</object>
 																											<object class="sizeritem">
 																												<object class="wxRadioButton" name="ID_RADIOBUTTON8" variable="blueRandomCheck" member="yes">
-																													<label>Aléatoire</label>
+																													<label>Random</label>
 																													<handler function="OnblueRandomCheckSelect" entry="EVT_RADIOBUTTON" />
 																												</object>
 																												<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -622,7 +622,7 @@
 																									</object>
 																									<object class="sizeritem">
 																										<object class="wxRadioButton" name="ID_RADIOBUTTON9" variable="blueMutableCheck" member="yes">
-																											<label>Changeant au cours du temps</label>
+																											<label>Changing over time</label>
 																											<handler function="OnblueRandomCheckSelect" entry="EVT_RADIOBUTTON" />
 																										</object>
 																										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -634,7 +634,7 @@
 																											<cols>5</cols>
 																											<object class="sizeritem">
 																												<object class="wxStaticText" name="ID_STATICTEXT15" variable="StaticText13" member="yes">
-																													<label>De</label>
+																													<label>From</label>
 																												</object>
 																												<flag>wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																												<border>5</border>
@@ -652,7 +652,7 @@
 																											</object>
 																											<object class="sizeritem">
 																												<object class="wxStaticText" name="ID_STATICTEXT16" variable="StaticText14" member="yes">
-																													<label>à</label>
+																													<label>to</label>
 																												</object>
 																												<flag>wxTOP|wxBOTTOM|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																												<border>5</border>
@@ -688,7 +688,7 @@
 																			</object>
 																		</object>
 																	</object>
-																	<label>Couleurs ( avancées )</label>
+																	<label>Colors ( advanced )</label>
 																</object>
 															</object>
 															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -701,7 +701,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxStaticBoxSizer" variable="StaticBoxSizer13" member="no">
-														<label>Transparence</label>
+														<label>Transparency</label>
 														<object class="sizeritem">
 															<object class="wxFlexGridSizer" variable="FlexGridSizer55" member="no">
 																<cols>1</cols>
@@ -710,7 +710,7 @@
 																		<cols>3</cols>
 																		<object class="sizeritem">
 																			<object class="wxRadioButton" name="ID_RADIOBUTTON13" variable="alphaRandomCheck" member="yes">
-																				<label>Valeur aléatoire</label>
+																				<label>Random value</label>
 																				<style>wxRB_GROUP</style>
 																				<handler function="OnalphaRandomCheckSelect1" entry="EVT_RADIOBUTTON" />
 																			</object>
@@ -720,7 +720,7 @@
 																		</object>
 																		<object class="sizeritem">
 																			<object class="wxRadioButton" name="ID_RADIOBUTTON14" variable="alphaMutableCheck" member="yes">
-																				<label>Evolution au cours du temps</label>
+																				<label>Changing over time</label>
 																				<handler function="OnalphaMutableCheckSelect" entry="EVT_RADIOBUTTON" />
 																			</object>
 																			<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -736,7 +736,7 @@
 																		<cols>4</cols>
 																		<object class="sizeritem">
 																			<object class="wxStaticText" name="ID_STATICTEXT42" variable="StaticText39" member="yes">
-																				<label>Entre</label>
+																				<label>Between</label>
 																			</object>
 																			<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 																			<border>5</border>
@@ -755,7 +755,7 @@
 																		</object>
 																		<object class="sizeritem">
 																			<object class="wxStaticText" name="ID_STATICTEXT61" variable="StaticText58" member="yes">
-																				<label>et</label>
+																				<label>and</label>
 																			</object>
 																			<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																			<border>5</border>
@@ -774,8 +774,8 @@
 																		</object>
 																		<object class="sizeritem">
 																			<object class="wxStaticText" name="ID_STATICTEXT17" variable="StaticText15" member="yes">
-																				<label>Variation aléatoire&#x0A;de ces deux valeurs :</label>
-																				<tooltip>Amplitude de la variation aléatoire de la valeur initiale de la transparence</tooltip>
+																				<label>Random variation&#x0A;between:</label>
+																				<tooltip>Ampltiude of the random variation of the initial transparency</tooltip>
 																			</object>
 																			<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																			<border>5</border>
@@ -787,7 +787,7 @@
 																				<include_file>wx/spinctrl.h</include_file>
 																				<style></style>
 																				<size>55,21</size>
-																				<tooltip>Amplitude de la variation aléatoire de la valeur.</tooltip>
+																				<tooltip>Ampltiude of the random variation of the value.</tooltip>
 																			</object>
 																			<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																			<border>5</border>
@@ -805,7 +805,7 @@
 																				<include_file>wx/spinctrl.h</include_file>
 																				<style></style>
 																				<size>55,21</size>
-																				<tooltip>Amplitude de la variation aléatoire de la valeur.</tooltip>
+																				<tooltip>Ampltiude of the random variation of the value.</tooltip>
 																			</object>
 																			<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																			<border>5</border>
@@ -829,7 +829,7 @@
 														<cols>3</cols>
 														<object class="sizeritem">
 															<object class="wxStaticBoxSizer" variable="StaticBoxSizer15" member="no">
-																<label>Angle d&apos;affichage</label>
+																<label>Display angle</label>
 																<object class="sizeritem">
 																	<object class="wxFlexGridSizer" variable="FlexGridSizer56" member="no">
 																		<cols>1</cols>
@@ -838,7 +838,7 @@
 																				<cols>3</cols>
 																				<object class="sizeritem">
 																					<object class="wxRadioButton" name="ID_RADIOBUTTON26" variable="angleRandomCheck" member="yes">
-																						<label>Valeur aléatoire</label>
+																						<label>Random value</label>
 																						<style>wxRB_GROUP</style>
 																						<handler function="OnangleRandomCheckSelect1" entry="EVT_RADIOBUTTON" />
 																					</object>
@@ -848,7 +848,7 @@
 																				</object>
 																				<object class="sizeritem">
 																					<object class="wxRadioButton" name="ID_RADIOBUTTON27" variable="angleMutableCheck" member="yes">
-																						<label>Evolution au cours du temps</label>
+																						<label>Changing over time</label>
 																						<handler function="OnangleMutableCheckSelect" entry="EVT_RADIOBUTTON" />
 																					</object>
 																					<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -864,7 +864,7 @@
 																				<cols>6</cols>
 																				<object class="sizeritem">
 																					<object class="wxStaticText" name="ID_STATICTEXT44" variable="StaticText41" member="yes">
-																						<label>Entre</label>
+																						<label>Between</label>
 																					</object>
 																					<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 																					<border>5</border>
@@ -888,7 +888,7 @@
 																				</object>
 																				<object class="sizeritem">
 																					<object class="wxStaticText" name="ID_STATICTEXT59" variable="StaticText56" member="yes">
-																						<label>et</label>
+																						<label>and</label>
 																					</object>
 																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																					<border>5</border>
@@ -912,8 +912,8 @@
 																				</object>
 																				<object class="sizeritem">
 																					<object class="wxStaticText" name="ID_STATICTEXT20" variable="StaticText18" member="yes">
-																						<label>Variation aléatoire&#x0A;de ces deux valeurs :</label>
-																						<tooltip>Amplitude de la variation aléatoire de la valeur initiale de la transparence</tooltip>
+																						<label>Random variation&#x0A;between:</label>
+																						<tooltip>Ampltiude of the random variation of the initial transparency</tooltip>
 																					</object>
 																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																					<border>5</border>
@@ -923,7 +923,7 @@
 																					<object class="wxTextCtrl" name="ID_TEXTCTRL17" variable="angle1RandomnessEdit" member="yes">
 																						<value>0</value>
 																						<size>55,21</size>
-																						<tooltip>Amplitude de la variation aléatoire de la valeur.</tooltip>
+																						<tooltip>Ampltiude of the random variation of the value.</tooltip>
 																					</object>
 																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																					<border>5</border>
@@ -943,7 +943,7 @@
 																					<object class="wxTextCtrl" name="ID_TEXTCTRL29" variable="angle2RandomnessEdit" member="yes">
 																						<value>0</value>
 																						<size>55,21</size>
-																						<tooltip>Amplitude de la variation aléatoire de la valeur.</tooltip>
+																						<tooltip>Ampltiude of the random variation of the value.</tooltip>
 																					</object>
 																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																					<border>5</border>
@@ -969,7 +969,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxStaticBoxSizer" variable="StaticBoxSizer14" member="no">
-																<label>Taille</label>
+																<label>Size</label>
 																<object class="sizeritem">
 																	<object class="wxFlexGridSizer" variable="FlexGridSizer54" member="no">
 																		<cols>1</cols>
@@ -978,7 +978,7 @@
 																				<cols>3</cols>
 																				<object class="sizeritem">
 																					<object class="wxRadioButton" name="ID_RADIOBUTTON25" variable="sizeRandomCheck" member="yes">
-																						<label>Valeur aléatoire</label>
+																						<label>Random value</label>
 																						<style>wxRB_GROUP</style>
 																						<handler function="OnsizeRandomCheckSelect1" entry="EVT_RADIOBUTTON" />
 																					</object>
@@ -988,7 +988,7 @@
 																				</object>
 																				<object class="sizeritem">
 																					<object class="wxRadioButton" name="ID_RADIOBUTTON24" variable="sizeMutableCheck" member="yes">
-																						<label>Evolution au cours du temps</label>
+																						<label>Changing over time</label>
 																						<handler function="OnsizeMutableCheckSelect" entry="EVT_RADIOBUTTON" />
 																					</object>
 																					<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -1004,7 +1004,7 @@
 																				<cols>7</cols>
 																				<object class="sizeritem">
 																					<object class="wxStaticText" name="ID_STATICTEXT43" variable="StaticText40" member="yes">
-																						<label>Entre</label>
+																						<label>Between</label>
 																					</object>
 																					<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 																					<border>5</border>
@@ -1031,7 +1031,7 @@
 																				</object>
 																				<object class="sizeritem">
 																					<object class="wxStaticText" name="ID_STATICTEXT55" variable="StaticText52" member="yes">
-																						<label>et</label>
+																						<label>and</label>
 																					</object>
 																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																					<border>5</border>
@@ -1058,7 +1058,7 @@
 																				</object>
 																				<object class="sizeritem">
 																					<object class="wxStaticText" name="ID_STATICTEXT57" variable="StaticText54" member="yes">
-																						<label>de la taille initiale</label>
+																						<label>of the initial size</label>
 																					</object>
 																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																					<border>5</border>
@@ -1066,8 +1066,8 @@
 																				</object>
 																				<object class="sizeritem">
 																					<object class="wxStaticText" name="ID_STATICTEXT21" variable="StaticText19" member="yes">
-																						<label>Variation aléatoire&#x0A;de ces deux valeurs :</label>
-																						<tooltip>Amplitude de la variation aléatoire de la valeur initiale de la transparence</tooltip>
+																						<label>Random variation&#x0A;between:</label>
+																						<tooltip>Ampltiude of the random variation of the initial transparency</tooltip>
 																					</object>
 																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																					<border>5</border>
@@ -1079,7 +1079,7 @@
 																						<include_file>wx/spinctrl.h</include_file>
 																						<style></style>
 																						<size>55,21</size>
-																						<tooltip>Amplitude de la variation aléatoire de la valeur.</tooltip>
+																						<tooltip>Ampltiude of the random variation of the value.</tooltip>
 																					</object>
 																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																					<border>5</border>
@@ -1101,7 +1101,7 @@
 																						<include_file>wx/spinctrl.h</include_file>
 																						<style></style>
 																						<size>55,21</size>
-																						<tooltip>Amplitude de la variation aléatoire de la valeur.</tooltip>
+																						<tooltip>Ampltiude of the random variation of the value.</tooltip>
 																					</object>
 																					<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																					<border>5</border>
@@ -1139,7 +1139,7 @@
 										<growablerows>0</growablerows>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer11" member="no">
-												<label>Zone et direction d&apos;émission</label>
+												<label>Zone and direction of emission</label>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer45" member="no">
 														<cols>1</cols>
@@ -1150,7 +1150,7 @@
 																<growablecols>1</growablecols>
 																<object class="sizeritem">
 																	<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-																		<label>Force d&apos;émission :</label>
+																		<label>Emission force :</label>
 																	</object>
 																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -1160,7 +1160,7 @@
 																	<object class="wxBoxSizer" variable="BoxSizer2" member="no">
 																		<object class="sizeritem">
 																			<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
-																				<label>Entre</label>
+																				<label>Between</label>
 																			</object>
 																			<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																			<border>5</border>
@@ -1175,7 +1175,7 @@
 																		</object>
 																		<object class="sizeritem">
 																			<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
-																				<label>et</label>
+																				<label>and</label>
 																			</object>
 																			<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																			<border>5</border>
@@ -1202,7 +1202,7 @@
 																<growablecols>1</growablecols>
 																<object class="sizeritem">
 																	<object class="wxStaticText" name="ID_STATICTEXT33" variable="StaticText30" member="yes">
-																		<label>Rayon de la sphère d&apos;apparition :</label>
+																		<label>Radius of the emission sphere :</label>
 																	</object>
 																	<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																	<border>5</border>
@@ -1233,7 +1233,7 @@
 																					<growablecols>1</growablecols>
 																					<object class="sizeritem">
 																						<object class="wxStaticText" name="ID_STATICTEXT48" variable="StaticText45" member="yes">
-																							<label>Angle d&apos;ouverture du cone d&apos;émission :</label>
+																							<label>Angle of the spray cone :</label>
 																						</object>
 																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																						<border>5</border>
@@ -1262,7 +1262,7 @@
 																			</object>
 																		</object>
 																	</object>
-																	<label>Configuration simple</label>
+																	<label>Simple setup</label>
 																</object>
 																<object class="notebookpage">
 																	<object class="wxPanel" name="ID_PANEL4" variable="Panel3" member="yes">
@@ -1275,7 +1275,7 @@
 																					<growablecols>1</growablecols>
 																					<object class="sizeritem">
 																						<object class="wxStaticText" name="ID_STATICTEXT34" variable="StaticText31" member="yes">
-																							<label>Direction d&apos;émission sur l&apos;axe Z :</label>
+																							<label>Emission Z direction:</label>
 																						</object>
 																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																						<border>5</border>
@@ -1286,7 +1286,7 @@
 																							<object class="sizeritem">
 																								<object class="wxTextCtrl" name="ID_TEXTCTRL20" variable="emitterDirZEdit" member="yes">
 																									<size>62,21</size>
-																									<tooltip>Direction de l&apos;émission, sur l&apos;axe Z ( profondeur )</tooltip>
+																									<tooltip>Emission X direction</tooltip>
 																								</object>
 																								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																								<border>5</border>
@@ -1306,7 +1306,7 @@
 																					<growablecols>2</growablecols>
 																					<object class="sizeritem">
 																						<object class="wxStaticText" name="ID_STATICTEXT36" variable="StaticText33" member="yes">
-																							<label>Angle de la zone d&apos;émission :</label>
+																							<label>Angle of the emission zone :</label>
 																						</object>
 																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																						<border>5</border>
@@ -1314,7 +1314,7 @@
 																					</object>
 																					<object class="sizeritem">
 																						<object class="wxStaticText" name="ID_STATICTEXT38" variable="StaticText35" member="yes">
-																							<label>1er angle :</label>
+																							<label>1st angle :</label>
 																						</object>
 																						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 																						<border>5</border>
@@ -1344,7 +1344,7 @@
 																					</object>
 																					<object class="sizeritem">
 																						<object class="wxStaticText" name="ID_STATICTEXT39" variable="StaticText36" member="yes">
-																							<label>2eme angle :</label>
+																							<label>2nd angle :</label>
 																						</object>
 																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																						<border>5</border>
@@ -1372,7 +1372,7 @@
 																			</object>
 																		</object>
 																	</object>
-																	<label>Configuration avancée</label>
+																	<label>Advanced setup</label>
 																</object>
 															</object>
 															<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -1390,7 +1390,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
-												<label>Gravité</label>
+												<label>Gravity</label>
 												<object class="sizeritem">
 													<object class="wxNotebook" name="ID_NOTEBOOK3" variable="gravityNotebook" member="yes">
 														<object class="notebookpage">
@@ -1406,7 +1406,7 @@
 																					<growablecols>1</growablecols>
 																					<object class="sizeritem">
 																						<object class="wxStaticText" name="ID_STATICTEXT50" variable="StaticText47" member="yes">
-																							<label>Gravité :</label>
+																							<label>Gravity :</label>
 																						</object>
 																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																						<border>5</border>
@@ -1415,7 +1415,7 @@
 																					<object class="sizeritem">
 																						<object class="wxTextCtrl" name="ID_TEXTCTRL23" variable="simpleGravityLengthEdit" member="yes">
 																							<size>62,21</size>
-																							<tooltip>Gravité sur l&apos;axe X</tooltip>
+																							<tooltip>Gravity on X axis</tooltip>
 																							<handler function="OnsimpleGravityAngleText" entry="EVT_TEXT" />
 																						</object>
 																						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -1432,7 +1432,7 @@
 																					<growablecols>1</growablecols>
 																					<object class="sizeritem">
 																						<object class="wxStaticText" name="ID_STATICTEXT52" variable="StaticText49" member="yes">
-																							<label>Angle de la gravité :</label>
+																							<label>Gravity angle :</label>
 																						</object>
 																						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																						<border>5</border>
@@ -1441,7 +1441,7 @@
 																					<object class="sizeritem">
 																						<object class="wxTextCtrl" name="ID_TEXTCTRL25" variable="simpleGravityAngleEdit" member="yes">
 																							<size>62,21</size>
-																							<tooltip>Gravité sur l&apos;axe Z ( profondeur )</tooltip>
+																							<tooltip>Gravity on Z axis ( depth )</tooltip>
 																							<handler function="OnsimpleGravityAngleText" entry="EVT_TEXT" />
 																						</object>
 																						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -1491,7 +1491,7 @@
 																	</object>
 																</object>
 															</object>
-															<label>Configuration simple</label>
+															<label>Simple setup</label>
 														</object>
 														<object class="notebookpage">
 															<object class="wxPanel" name="ID_PANEL6" variable="Panel5" member="yes">
@@ -1500,7 +1500,7 @@
 																	<growablecols>1</growablecols>
 																	<object class="sizeritem">
 																		<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-																			<label>Gravité appliquée aux particules :</label>
+																			<label>Gravity applied to particles :</label>
 																		</object>
 																		<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																		<border>5</border>
@@ -1512,7 +1512,7 @@
 																			<object class="sizeritem">
 																				<object class="wxTextCtrl" name="ID_TEXTCTRL3" variable="gravityXEdit" member="yes">
 																					<size>62,21</size>
-																					<tooltip>Gravité sur l&apos;axe X</tooltip>
+																					<tooltip>Gravity on X axis</tooltip>
 																				</object>
 																				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																				<border>5</border>
@@ -1521,7 +1521,7 @@
 																			<object class="sizeritem">
 																				<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="gravityYEdit" member="yes">
 																					<size>62,21</size>
-																					<tooltip>Gravité sur l&apos;axe Y</tooltip>
+																					<tooltip>Gravity on Y axis</tooltip>
 																				</object>
 																				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																				<border>5</border>
@@ -1530,7 +1530,7 @@
 																			<object class="sizeritem">
 																				<object class="wxTextCtrl" name="ID_TEXTCTRL5" variable="gravityZEdit" member="yes">
 																					<size>62,21</size>
-																					<tooltip>Gravité sur l&apos;axe Z ( profondeur )</tooltip>
+																					<tooltip>Gravity on Z axis ( depth )</tooltip>
 																				</object>
 																				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 																				<border>5</border>
@@ -1566,7 +1566,7 @@
 																	</object>
 																</object>
 															</object>
-															<label>Configuration avancée</label>
+															<label>Advanced setup</label>
 														</object>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -1599,7 +1599,7 @@
 								<growablecols>1</growablecols>
 								<object class="sizeritem">
 									<object class="wxButton" name="ID_BUTTON3" variable="imageBankBt" member="yes">
-										<label>Afficher la banque d&apos;images</label>
+										<label>Show the images bank</label>
 										<handler function="OnimageBankBtClick" entry="EVT_BUTTON" />
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -1617,7 +1617,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxButton" name="ID_BUTTON2" variable="cancelBt" member="yes">
-										<label>Annuler</label>
+										<label>Cancel</label>
 										<handler function="OncancelBtClick" entry="EVT_BUTTON" />
 									</object>
 									<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -1636,3 +1636,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

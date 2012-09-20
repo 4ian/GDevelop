@@ -47,3 +47,4 @@ class Extension : public ExtensionBase
 };
 
 #endif // EXTENSION_H_INCLUDED
+

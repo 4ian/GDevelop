@@ -643,7 +643,7 @@ void ParticleEmitterObject::GetPropertyForDebugger(unsigned int propertyNb, stri
 {
     if ( !particleSystem->particleSystem ) return;
 
-    if      ( propertyNb == 0 ) {name = _("Nombre de particules");      value = ToString(particleSystem->particleSystem->getNbParticles());}
+    if      ( propertyNb == 0 ) {name = _("Particles number");      value = ToString(particleSystem->particleSystem->getNbParticles());}
 }
 
 bool ParticleEmitterObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -930,4 +930,5 @@ Object * CreateParticleEmitterObject(std::string name)
 {
     return new ParticleEmitterObject(name);
 }
+
 

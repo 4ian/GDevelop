@@ -375,3 +375,4 @@ class ParticleEmitterObjectEditor: public wxDialog
 
 #endif
 #endif
+

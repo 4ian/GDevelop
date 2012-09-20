@@ -109,3 +109,4 @@ void DestroyTextEntryObject(Object * object);
 Object * CreateTextEntryObject(std::string name);
 
 #endif // TEXTENTRYOBJECT_H
+

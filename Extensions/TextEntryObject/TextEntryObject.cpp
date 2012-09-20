@@ -140,14 +140,14 @@ void TextEntryObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPos
 
 void TextEntryObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Texte en mémoire");             value = GetString();}
-    else if ( propertyNb == 1 ) {name = _("Activé ?");                     value = activated ? _("Oui") : _("Non");}
+    if      ( propertyNb == 0 ) {name = _("Text in memory");             value = GetString();}
+    else if ( propertyNb == 1 ) {name = _("Activated \?");                     value = activated ? _("Yes") : _("No");}
 }
 
 bool TextEntryObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if      ( propertyNb == 0 ) { SetString(newValue); return true; }
-    else if ( propertyNb == 1 ) { activated = (newValue != _("Non")); return true; }
+    else if ( propertyNb == 1 ) { activated = (newValue != _("No")); return true; }
 
     return true;
 }
@@ -230,4 +230,5 @@ Object * CreateTextEntryObject(std::string name)
 {
     return new TextEntryObject(name);
 }
+
 

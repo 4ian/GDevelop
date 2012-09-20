@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="TextEntryObjectEditor">
-		<title>Editer l&apos;objet texte</title>
+		<title>Edit the Text object</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
@@ -31,3 +31,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

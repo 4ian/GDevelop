@@ -76,3 +76,4 @@ class TextEntryObjectEditor: public wxDialog
 
 #endif
 #endif
+

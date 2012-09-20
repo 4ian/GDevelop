@@ -129,3 +129,4 @@ class GD_EXTENSION_API FunctionEvent : public gd::BaseEvent
 #endif // FUNCTIONEVENT_H
 
 #endif
+

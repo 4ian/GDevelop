@@ -53,29 +53,29 @@ class Extension : public ExtensionBase
         Extension()
         {
             DECLARE_THE_EXTENSION("Function",
-                                  _("Evenements fonctions"),
-                                  _("Extension permettant d'utiliser des évènements agissant comme des fonctions."),
+                                  _("Function events"),
+                                  _("Extension allowing to use events behaving as functions."),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
             #if defined(GD_IDE_ONLY)
 
             DECLARE_ACTION("LaunchFunction",
-                           _("Lancer une fonction"),
-                           _("Lance une fonction"),
-                           _("Lancer _PARAM0_ (_PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"),
-                           _("Fonctions"),
+                           _("Launch a function"),
+                           _("Launch a function"),
+                           _("Launch _PARAM0_ (_PARAM1_, _PARAM2_, _PARAM3_, _PARAM4_, _PARAM5_, _PARAM6_, _PARAM7_)"),
+                           _("Functions"),
                            "res/actions/function24.png",
                            "res/actions/function.png");
 
-                instrInfo.AddParameter("", _("Nom de la fonction"), "", false);
-                instrInfo.AddParameter("string", _("Paramètre 1"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 2"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 3"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 4"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 5"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 6"), "", true);
-                instrInfo.AddParameter("string", _("Paramètre 7"), "", true);
+                instrInfo.AddParameter("", _("Name of the function"), "", false);
+                instrInfo.AddParameter("string", _("Parameter 1"), "", true);
+                instrInfo.AddParameter("string", _("Parameter 2"), "", true);
+                instrInfo.AddParameter("string", _("Parameter 3"), "", true);
+                instrInfo.AddParameter("string", _("Parameter 4"), "", true);
+                instrInfo.AddParameter("string", _("Parameter 5"), "", true);
+                instrInfo.AddParameter("string", _("Parameter 6"), "", true);
+                instrInfo.AddParameter("string", _("Parameter 7"), "", true);
 
             class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
             {
@@ -144,8 +144,8 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_EVENT("Function",
-                          _("Fonction"),
-                          _("Évènement fonction : L'évènement lancé uniquement grâce à l'action \"Lancer une fonction\""),
+                          _("Function"),
+                          _("Function event : An event which is launched only thanks to action \"Launch a function\""),
                           "",
                           "res/function.png",
                           FunctionEvent)
@@ -153,12 +153,12 @@ class Extension : public ExtensionBase
             DECLARE_END_EVENT()
 
             DECLARE_STR_EXPRESSION("Parameter",
-                           _("Paramètre de la fonction actuel"),
-                           _("Renvoi le texte contenue dans un paramètre de la fonction actuellement lancée"),
-                           _("Fonction"),
+                           _("Parameter of the current function"),
+                           _("Return the text contained in a parameter of the currently launched function"),
+                           _("Function"),
                            "res/function.png")
 
-                instrInfo.AddParameter("expression", _("Numéro du paramètre ( Commence à 0 ! )"), "", false);
+                instrInfo.AddParameter("expression", _("Number of the parameter ( Parameters start at 0 ! )"), "", false);
 
             class CodeGenerator : public gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator
             {
@@ -248,3 +248,4 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }
+

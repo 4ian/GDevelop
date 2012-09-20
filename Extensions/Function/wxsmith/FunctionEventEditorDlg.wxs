@@ -25,7 +25,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-										<label>La fonction et ses sous évènements ne sera executée&#x0A;que lorsqu&apos;elle aura été lancée par une action ou une expression.</label>
+										<label>The function and its sub events will be executed&#x0A;only when it is launched by an action or expression.</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -54,7 +54,7 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-							<label>Nom de la fonction ( Doit être unique ) :</label>
+							<label>Name of the function ( Must be unique ) :</label>
 						</object>
 						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -91,7 +91,7 @@
 									<growablecols>0</growablecols>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-											<label>(Optionnel) Passer les objets du groupe suivant à la fonction :</label>
+											<label>(Optionnal) Pass the objects of this group to the function:</label>
 										</object>
 										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -123,7 +123,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
-											<label>Les objets de ce groupe qui sont concernés par les précédentes&#x0A;actions/conditions seront passés à la fonction lors de son appel&#x0A;par une action, et seront directement concernés par les actions&#x0A;et conditions qui leur font référence.</label>
+											<label>Objects of this group which are concerned by previous&#x0A;actions/conditions will be passed to the function when it is&#x0A;called by an action, and so they will be used by actions andconditions refering to them.</label>
 										</object>
 										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -131,7 +131,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT4" variable="StaticText4" member="yes">
-											<label>Les autres arguments peuvent être passés sous forme&#x0A;de texte lors de l&apos;appel à la fonction. ( Et récupérés dans&#x0A;la fonction avec Function::GetParameter(x) ).</label>
+											<label>Others arguments can be passed as text&#x0A;when the function is called. ( And they can&#x0A;be used in function using Function::GetParameter(x) ).</label>
 										</object>
 										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -172,7 +172,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="cancelBt" member="yes">
-							<label>Annuler</label>
+							<label>Cancel</label>
 							<handler function="OncancelBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -186,3 +186,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

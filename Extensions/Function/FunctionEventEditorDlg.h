@@ -77,3 +77,4 @@ class FunctionEventEditorDlg: public wxDialog
 
 #endif
 #endif
+

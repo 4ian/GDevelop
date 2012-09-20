@@ -203,8 +203,8 @@ void FunctionEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEd
     //Name
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
-    wxString caption = _("Fonction") + " " + name;
-    if ( !objectsPassedAsArgument.empty() ) caption += " "+_("( Objets passés en paramètre : ")+objectsPassedAsArgument+_(")");
+    wxString caption = _("Function") + " " + name;
+    if ( !objectsPassedAsArgument.empty() ) caption += " "+_("( Objects passed as parameters : ")+objectsPassedAsArgument+_(")");
     dc.DrawText( caption, x + 4, y + 3 );
 
     //Draw conditions rectangle
@@ -326,3 +326,4 @@ std::vector< boost::shared_ptr<FunctionEvent> > FunctionEvent::GetAllFunctionsIn
 }
 
 #endif
+

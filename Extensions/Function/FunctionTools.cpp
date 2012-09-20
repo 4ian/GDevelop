@@ -38,3 +38,4 @@ std::string GD_EXTENSION_API GetSafelyStringFromVector(std::vector<std::string> 
 
 }
 }
+

@@ -109,3 +109,4 @@ class AStarAutomatismEditor: public wxDialog
 
 #endif
 #endif
+

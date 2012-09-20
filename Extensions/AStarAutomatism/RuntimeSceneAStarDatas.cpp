@@ -38,3 +38,4 @@ diagonalMove(automatismSharedDatas.diagonalMove)
 RuntimeSceneAStarDatas::~RuntimeSceneAStarDatas()
 {
 }
+

@@ -190,3 +190,4 @@ private:
 };
 
 #endif // ASTARAUTOMATISM_H
+

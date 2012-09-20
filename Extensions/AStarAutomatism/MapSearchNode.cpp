@@ -182,3 +182,4 @@ float MapSearchNode::GetCost( MapSearchNode &successor )
 	return (float) GetCellOfMapAt( x, y );
 
 }
+

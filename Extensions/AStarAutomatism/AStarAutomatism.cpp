@@ -294,3 +294,4 @@ void AStarAutomatism::LoadFromXml(const TiXmlElement * elem)
         bottomBorder = temp;
     }
 }
+

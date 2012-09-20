@@ -43,15 +43,15 @@ class Extension : public ExtensionBase
         Extension()
         {
             DECLARE_THE_EXTENSION("AStarAutomatism",
-                                  _("Automatisme de recherche de chemin ( Pathfinding A* )"),
-                                  _("Automatisme permettant de déplacer les objets en évitant les obstacles."),
+                                  _("Pathfinding automatism"),
+                                  _("Automatism which move objects and avoid obstacles"),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
                 DECLARE_AUTOMATISM("AStarAutomatism",
-                          _("Recherche de chemin"),
+                          _("Pathfinding"),
                           _("AStar"),
-                          _("Automatisme permettant de déplacer les objets en évitant les obstacles."),
+                          _("Automatism which move objects and avoid obstacles"),
                           "",
                           "Extensions/AStaricon.png",
                           AStarAutomatism,
@@ -62,52 +62,52 @@ class Extension : public ExtensionBase
                     automatismInfo.SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_AUTOMATISM_ACTION("SetDestination",
-                                   _("Déplacement vers une position"),
-                                   _("Déplace l'objet vers une position"),
-                                   _("Déplacer _PARAM0_ vers _PARAM3_;_PARAM4_"),
-                                   _("Déplacement"),
+                                   _("Move to a position"),
+                                   _("Move the object to a position"),
+                                   _("Move _PARAM0_ to _PARAM3_;_PARAM4_"),
+                                   _("Displacement"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
-                        instrInfo.AddParameter("expression", _("Position X de la destination"), "", false);
-                        instrInfo.AddParameter("expression", _("Position Y de la destination"), "", false);
+                        instrInfo.AddParameter("expression", _("Destination X position"), "", false);
+                        instrInfo.AddParameter("expression", _("Destination Y position"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("MoveTo").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_ACTION("SetSpeed",
-                                   _("Vitesse"),
-                                   _("Change la vitesse de déplacement sur le chemin"),
-                                   _("Faire _PARAM3__PARAM2_ à la vitesse de _PARAM0_ sur le chemin"),
-                                   _("Déplacement"),
+                                   _("Speed"),
+                                   _("Change the moving speed on the path"),
+                                   _("Do _PARAM2__PARAM1_ to speed of of _PARAM0_ on the path"),
+                                   _("Displacement"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Vitesse"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Speed"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetSpeed").SetAssociatedGetter("GetSpeed").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_CONDITION("Speed",
-                                   _("Vitesse"),
-                                   _("Teste la vitesse de déplacement sur le chemin"),
-                                   _("La vitesse de déplacement de _PARAM0_ est _PARAM3_ à _PARAM2_"),
-                                   _("Déplacement"),
+                                   _("Speed"),
+                                   _("Test the moving speed on the path"),
+                                   _("Moving speed of _PARAM0_ is _PARAM3__PARAM2_"),
+                                   _("Displacement"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Vitesse"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Speed"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetSpeed").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
@@ -115,34 +115,34 @@ class Extension : public ExtensionBase
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("SetCost",
-                                   _("Difficulté de passage"),
-                                   _("Change la difficulté de passage au dessus de l'objet. 9 est un obstacle infranchissable."),
-                                   _("Faire _PARAM3__PARAM2_ à la difficulté de passage au dessus de _PARAM0_"),
+                                   _("Cost"),
+                                   _("Change the cost of going through the object. 9 means the object is impassable."),
+                                   _("Do _PARAM2__PARAM1_ to cost of _PARAM0_"),
                                    _("Obstacles"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Difficulté ( 0 à 9 )"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Difficulty ( from 0 to 9 )"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetCost").SetAssociatedGetter("GetCost").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_CONDITION("Cost",
-                                   _("Difficulté de passage"),
-                                   _("Teste la difficulté de passage au dessus de l'objet"),
-                                   _("La difficulté de passage au dessus de _PARAM0_ est _PARAM3_ à _PARAM2_"),
+                                   _("Cost"),
+                                   _("Test the cost of going through the object"),
+                                   _("Cost of _PARAM0_ is _PARAM3__PARAM2_"),
                                    _("Obstacles"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Difficulté"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Difficulty"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetCost").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
@@ -150,47 +150,47 @@ class Extension : public ExtensionBase
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_CONDITION("PathFound",
-                                   _("Chemin trouvé"),
-                                   _("Renvoi vrai si un chemin a été trouvé"),
-                                   _("Un chemin a été trouvé pour _PARAM0_"),
-                                   _("Déplacement"),
+                                   _("Path found"),
+                                   _("Return true if a path has been found"),
+                                   _("A path has been found for _PARAM0_"),
+                                   _("Displacement"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("PathFound").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_CONDITION("DestinationReached",
-                                   _("Destination atteinte"),
-                                   _("Renvoi vrai si la destination de l'objet a été atteinte"),
-                                   _("_PARAM0_ a atteint sa destination"),
-                                   _("Déplacement"),
+                                   _("Destination reached"),
+                                   _("Return true if destination was reached"),
+                                   _("_PARAM0_ reached its destination"),
+                                   _("Displacement"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("DestinationReached").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
                     DECLARE_AUTOMATISM_ACTION("SetGridWidth",
-                                   _("Largeur de la grille virtuelle"),
-                                   _("Change la largeur des cellules de la grille virtuelle."),
-                                   _("Faire _PARAM4__PARAM3_ à la largeur des cellules de la grille virtuelle"),
-                                   _("Paramétrage global"),
+                                   _("Width of the virtual grid"),
+                                   _("Change the width of cells of virtual grid."),
+                                   _("Do _PARAM4__PARAM3_ to the width of cells of the virtual grid"),
+                                   _("Global Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
-                        instrInfo.AddParameter("expression", _("Largeur ( pixels )"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                        instrInfo.AddParameter("expression", _("Width ( pixels )"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetGridWidth").SetAssociatedGetter("GetGridWidth").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
@@ -198,164 +198,164 @@ class Extension : public ExtensionBase
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_CONDITION("GridWidth",
-                                   _("Largeur de la grille virtuelle"),
-                                   _("Teste la largeur des cellules de la grille virtuelle."),
-                                   _("La largeur des cellules de la grille virtuelle est _PARAM4_ à _PARAM3_"),
-                                   _("Paramétrage global"),
+                                   _("Width of the virtual grid"),
+                                   _("Test the width of cells of the virtual grid."),
+                                   _("Width of cells of the virtual grid is _PARAM4__PARAM3_"),
+                                   _("Global Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
-                        instrInfo.AddParameter("expression", _("Largeur ( pixels )"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                        instrInfo.AddParameter("expression", _("Width ( pixels )"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetGridWidth").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
                     DECLARE_AUTOMATISM_ACTION("SetGridHeight",
-                                   _("Hauteur de la grille virtuelle"),
-                                   _("Change la hauteur des cellules de la grille virtuelle."),
-                                   _("Faire _PARAM4__PARAM3_ à la hauteur des cellules de la grille virtuelle"),
-                                   _("Paramétrage global"),
+                                   _("Height of the virtual grid"),
+                                   _("Change the height of cells of the virtual grid"),
+                                   _("Do _PARAM4__PARAM3_ to the height of cells of the virtual grid"),
+                                   _("Global Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
-                        instrInfo.AddParameter("expression", _("Hauteur ( pixels )"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                        instrInfo.AddParameter("expression", _("Height ( pixels )"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetGridHeight").SetAssociatedGetter("GetGridHeight").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_CONDITION("GridHeight",
-                                   _("Hauteur de la grille virtuelle"),
-                                   _("Teste la hauteur des cellules de la grille virtuelle."),
-                                   _("La hauteur des cellules de la grille virtuelle est _PARAM4_ à _PARAM3_"),
-                                   _("Paramétrage global"),
+                                   _("Height of the virtual grid"),
+                                   _("Test the height of cells of the virtual grid"),
+                                   _("Height of cells of the virtual grid is _PARAM4__PARAM3_"),
+                                   _("Global Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
-                        instrInfo.AddParameter("expression", _("Hauteur ( pixels )"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                        instrInfo.AddParameter("expression", _("Height ( pixels )"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetGridHeight").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("EnterSegment",
-                                   _("Changer la position sur le chemin"),
-                                   _("Change l'état d'avancement de l'objet sur le chemin calculé."),
-                                   _("Faire _PARAM3__PARAM2_ à l'état de l'avancement de l'objet sur le chemin calculé"),
-                                   _("Avancé"),
+                                   _("Change the position on the path"),
+                                   _("Change state of the object on the path"),
+                                   _("Do _PARAM__PARAM2_ to the state of the object on the path"),
+                                   _("Advanced"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("EnterSegment").SetAssociatedGetter("GetCurrentSegment").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_CONDITION("LeftBorder",
-                                   _("Bordure gauche"),
-                                   _("Teste la taille, en cases virtuelles, de la bordure gauche de l'objet."),
-                                   _("La bordure gauche de _PARAM0_ est _PARAM3_ à _PARAM2_"),
-                                   _("Paramétrage"),
+                                   _("Left border"),
+                                   _("Teste the size, in virtual cells, of the left border of the object."),
+                                   _("Test the size, in virtual cells, of the left border of the object."),
+                                   _("Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Largeur ( en cases virtuelles )"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Width ( virtual cells )"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_CONDITION("RightBorder",
-                                   _("Bordure droite"),
-                                   _("Teste la taille, en cases virtuelles, de la bordure droite de l'objet."),
-                                   _("La bordure droite de _PARAM0_ est _PARAM3_ à _PARAM2_"),
-                                   _("Paramétrage"),
+                                   _("Right border"),
+                                   _("Test the size, in virtual cells, of the right border of the object."),
+                                   _("Right border of _PARAM0_ is _PARAM2__PARAM1_"),
+                                   _("Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Largeur ( en cases virtuelles )"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Width ( virtual cells )"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_CONDITION("TopBorder",
-                                   _("Bordure haute"),
-                                   _("Teste la taille, en cases virtuelles, de la bordure haute de l'objet."),
-                                   _("La bordure haute de _PARAM0_ est _PARAM3_ à _PARAM2_"),
-                                   _("Paramétrage"),
+                                   _("Top border"),
+                                   _("Test the size, in virtual cells, of the top border of the object."),
+                                   _("Top border of _PARAM0_ is _PARAM2__PARAM1_"),
+                                   _("Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Largeur ( en cases virtuelles )"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Width ( virtual cells )"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_CONDITION("BottomBorder",
-                                   _("Bordure basse"),
-                                   _("Teste la taille, en cases virtuelles, de la bordure basse de l'objet."),
-                                   _("La bordure basse de _PARAM0_ est _PARAM3_ à _PARAM2_"),
-                                   _("Paramétrage"),
+                                   _("Bottom border"),
+                                   _("Test the size, in virtual cells, of the bottom border of the object."),
+                                   _("Bottom border of _PARAM0_ is _PARAM2_ _PARAM1_"),
+                                   _("Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Largeur ( en cases virtuelles )"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Width ( virtual cells )"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("SetLeftBorder",
-                                   _("Bordure gauche"),
-                                   _("Change la taille, en cases virtuelles, de la bordure gauche de l'objet."),
-                                   _("Faire _PARAM3__PARAM2_ à taille de la bordure gauche de _PARAM0_"),
-                                   _("Paramétrage"),
+                                   _("Left border"),
+                                   _("Change the size, in virtual cells, of the left border of the object."),
+                                   _("Do _PARAM2__PARAM1_ to the left border of _PARAM0_"),
+                                   _("Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Largeur ( Cases virtuelles )"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Width ( virtual cases )"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetLeftBorder").SetAssociatedGetter("GetLeftBorder").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_ACTION("SetRightBorder",
-                                   _("Bordure droite"),
-                                   _("Change la taille, en cases virtuelles, de la bordure droite de l'objet."),
-                                   _("Faire _PARAM3__PARAM2_ à taille de la bordure droite de _PARAM0_"),
-                                   _("Paramétrage"),
+                                   _("Right border"),
+                                   _("Change the size, in virtual cells, of the right border of the object."),
+                                   _("Do _PARAM2__PARAM1_ to the right border of _PARAM0_"),
+                                   _("Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Largeur ( Cases virtuelles )"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Width ( virtual cases )"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetRightBorder").SetAssociatedGetter("GetRightBorder").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
@@ -363,17 +363,17 @@ class Extension : public ExtensionBase
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_ACTION("SetTopBorder",
-                                   _("Bordure haute"),
-                                   _("Change la taille, en cases virtuelles, de la bordure haute de l'objet."),
-                                   _("Faire _PARAM3__PARAM2_ à taille de la bordure haute de _PARAM0_"),
-                                   _("Paramétrage"),
+                                   _("Top border"),
+                                   _("Change the size, in virtual cells, of the top border of the object."),
+                                   _("Do _PARAM2__PARAM1_ to  the top border of _PARAM0_"),
+                                   _("Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Largeur ( Cases virtuelles )"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Width ( virtual cases )"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetTopBorder").SetAssociatedGetter("GetTopBorder").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
@@ -381,116 +381,116 @@ class Extension : public ExtensionBase
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_ACTION("SetBottomBorder",
-                                   _("Bordure basse"),
-                                   _("Change la taille, en cases virtuelles, de la bordure basse de l'objet."),
-                                   _("Faire _PARAM3__PARAM2_ à taille de la bordure basse de _PARAM0_"),
-                                   _("Paramétrage"),
+                                   _("Bottom border"),
+                                   _("Change size, in virtual cells, of the bottom border of the object."),
+                                   _("Do _PARAM2__PARAM1_ to the  bottom border of _PARAM0_"),
+                                   _("Setup"),
                                    "Extensions/AStaricon24.png",
                                    "Extensions/AStaricon16.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Largeur ( Cases virtuelles )"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Width ( virtual cases )"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetBottomBorder").SetAssociatedGetter("GetBottomBorder").SetManipulatedType("number").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("Speed", _("Vitesse de déplacement"), _("Vitesse de déplacement sur le chemin"), _("Déplacement"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("Speed", _("Moving speed"), _("Moving speed on the path"), _("Displacement"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetSpeed").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("Cost", _("Difficulté de passage"), _("Difficulté de passage au dessus de l'objet"), _("Obstacles"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("Cost", _("Cost"), _("Obstacle cost"), _("Obstacles"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetCost").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("LastNodeX", _("Position X du dernier point de passage"), _("Position X du dernier point de passage"), _("Déplacement"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("LastNodeX", _("Last waypoint X position"), _("Last waypoint X position"), _("Displacement"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetLastNodeX").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("LastNodeY", _("Position Y du dernier point de passage"), _("Position Y du dernier point de passage"), _("Déplacement"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("LastNodeY", _("Last waypoint Y position"), _("Last waypoint Y position"), _("Displacement"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetLastNodeY").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("NextNodeX", _("Position X du prochain point de passage"), _("Position X du prochain point de passage"), _("Déplacement"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("NextNodeX", _("Next waypoint X position"), _("Next waypoint X position"), _("Displacement"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetNextNodeX").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("NextNodeY", _("Position Y du prochain point de passage"), _("Position Y du prochain point de passage"), _("Déplacement"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("NextNodeY", _("Next waypoint Y position"), _("Next waypoint Y position"), _("Displacement"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetNextNodeY").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("DestinationX", _("Position X de la destination"), _("Position X de la destination"), _("Déplacement"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("DestinationX", _("Destination X position"), _("Destination X position"), _("Displacement"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetDestinationX").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("DestinationY", _("Position Y de la destination"), _("Position Y de la destination"), _("Déplacement"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("DestinationY", _("Destination Y position"), _("Destination Y position"), _("Displacement"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetDestinationY").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("GridWidth", _("Largeur de la grille virtuelle"), _("Largeur de la grille virtuelle"), _("Paramétrage global"), "Extensions/AStaricon16.png")
+                    DECLARE_AUTOMATISM_EXPRESSION("GridWidth", _("Width of the virtual grid"), _("Width of the virtual grid"), _("Global Setup"), "Extensions/AStaricon16.png")
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetGridWidth").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("GridHeight", _("Hauteur de la grille virtuelle"), _("Hauteur de la grille virtuelle"), _("Paramétrage global"), "Extensions/AStaricon16.png")
+                    DECLARE_AUTOMATISM_EXPRESSION("GridHeight", _("Height of the virtual grid"), _("Height of the virtual grid"), _("Global Setup"), "Extensions/AStaricon16.png")
                         instrInfo.AddCodeOnlyParameter("currentScene", "");
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetGridHeight").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("LeftBorder", _("Bordure gauche"), _("Bordure gauche"), _("Paramétrage"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("LeftBorder", _("Left border"), _("Left border"), _("Setup"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetLeftBorder").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
-                    DECLARE_AUTOMATISM_EXPRESSION("RightBorder", _("Bordure droite"), _("Bordure droite"), _("Paramétrage"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("RightBorder", _("Right border"), _("Right border"), _("Setup"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetRightBorder").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
-                    DECLARE_AUTOMATISM_EXPRESSION("TopBorder", _("Bordure haute"), _("Bordure haute"), _("Paramétrage"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("TopBorder", _("Top border"), _("Top border"), _("Setup"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetTopBorder").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
-                    DECLARE_AUTOMATISM_EXPRESSION("BottomBorder", _("Bordure basse"), _("Bordure basse"), _("Paramétrage"), "Extensions/AStaricon16.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "AStarAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("BottomBorder", _("Bottom border"), _("Bottom border"), _("Setup"), "Extensions/AStaricon16.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "AStarAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetBottomBorder").SetIncludeFile("AStarAutomatism/AStarAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
@@ -558,3 +558,4 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }
+

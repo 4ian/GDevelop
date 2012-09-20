@@ -53,3 +53,4 @@ class GD_EXTENSION_API RuntimeSceneAStarDatas : public AutomatismsRuntimeSharedD
 };
 
 #endif // RUNTIMESCENEASTARDATAS_H
+

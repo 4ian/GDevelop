@@ -57,3 +57,4 @@ class GD_EXTENSION_API SceneAStarDatas : public AutomatismsSharedDatas
 };
 
 #endif // SCENEASTARDATAS_H
+

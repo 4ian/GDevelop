@@ -69,3 +69,4 @@ public:
 };
 
 #endif // MAPSEARCHNODE_H
+

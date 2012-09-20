@@ -27,3 +27,4 @@ freely, subject to the following restrictions:
 #include "TimedEventsManager.h"
 
 std::map < RuntimeScene* , TimedEventsManager > TimedEventsManager::managers; //List of managers associated with scenes.
+

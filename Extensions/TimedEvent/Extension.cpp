@@ -47,16 +47,16 @@ class Extension : public ExtensionBase
         Extension()
         {
             DECLARE_THE_EXTENSION("TimedEvent",
-                                  _("Evenements à retardement"),
-                                  _("Extension permettant d'utiliser des évènements qui ne se déclenche qu'au bout de l'accumulation d'un certain temps."),
+                                  _("Timed events"),
+                                  _("Event which launch its conditions and actions only after a amount of time is reached."),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
             #if defined(GD_IDE_ONLY)
 
             DECLARE_EVENT("TimedEvent",
-                          _("Evenement à retardement"),
-                          _("Evenement qui ne se déclenche qu'au bout de l'accumulation d'un certain temps"),
+                          _("Timed event"),
+                          _("Event which launch its conditions and actions only after a amount of time is reached."),
                           "",
                           "Extensions/timedevent16.png",
                           TimedEvent)
@@ -64,15 +64,15 @@ class Extension : public ExtensionBase
             DECLARE_END_EVENT()
 
             DECLARE_ACTION("ResetTimedEvent",
-                           _("Remettre à zéro un évènement retardé"),
-                           _("Remet à zéro un évènement à retardement"),
-                           _("Remettre à zéro le(s) évènement(s) retardé(s) _PARAM1_"),
-                           _("Evenements retardés"),
+                           _("Reset a timed event"),
+                           _("Reset a timed event"),
+                           _("Reset the timed event(s) called _PARAM1_"),
+                           _("Timed events"),
                            "Extensions/timedevent24.png",
                            "Extensions/timedevent16.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddParameter("", _("Nom"), "", false);
+                instrInfo.AddParameter("", _("Name"), "", false);
 
             class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
             {
@@ -92,14 +92,14 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("ResetTimedEventAndSubs",
-                           _("Remettre à zéro ainsi que les sous évènements"),
-                           _("Remet à zéro un évènement retardé, ainsi que tous les sous évènements à retardement qu'il contient."),
-                           _("Remettre à zéro le(s) évènement(s) retardé(s) _PARAM0_ et ses sous évènements"),
-                           _("Evenements retardés"),
+                           _("Reset a timed event and sub events"),
+                           _("Reset a timed events, as well as all of its sub events."),
+                           _("Reset timed events called _PARAM1_ and their sub events"),
+                           _("Timed events"),
                            "Extensions/timedevent24.png",
                            "Extensions/timedevent16.png");
 
-                instrInfo.AddParameter("", _("Nom"), "", false);
+                instrInfo.AddParameter("", _("Name"), "", false);
 
             class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
             {
@@ -165,7 +165,7 @@ class Extension : public ExtensionBase
                     if ( name.find("GDNamedTimedEvent_") == 0 && name.length() > 18 )
                         name = name.substr(18, name.length());
                     else
-                        name = _("Sans nom");
+                        name = _("No name");
 
                     value = ToString(static_cast<double>(iter->second.GetTime())/1000.0)+"s";
 
@@ -262,3 +262,4 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }
+

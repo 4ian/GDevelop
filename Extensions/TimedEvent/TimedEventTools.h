@@ -54,3 +54,4 @@ void GD_EXTENSION_API Reset(RuntimeScene & scene, std::string timedEventName);
 }
 
 #endif // TIMEDEVENTTOOLS_H
+

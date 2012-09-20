@@ -101,3 +101,4 @@ class TimedEventEditorDlg: public wxDialog
 
 #endif
 #endif
+

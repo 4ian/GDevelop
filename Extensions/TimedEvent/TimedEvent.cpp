@@ -206,7 +206,7 @@ void TimedEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     dc.SetTextForeground(wxColour(0,0,0));
     std::string nameTxt;
     if ( !name.empty() ) nameTxt = _T(" (Nom : "+name + ")");
-    dc.DrawText( _("Déclenchement retardé au bout de "+timeout.GetPlainString()+" secondes.")+" "+nameTxt, x + 4, y + 3 );
+    dc.DrawText( _("Delayed execution after ")+timeout.GetPlainString()+_(" seconds.")+" "+nameTxt, x + 4, y + 3 );
 
     //Draw conditions rectangle
     wxRect rect(x, y+functionTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-functionTextHeight);
@@ -288,3 +288,4 @@ TimedEvent& TimedEvent::operator=(const TimedEvent & event)
 }
 
 #endif
+

@@ -116,3 +116,4 @@ class GD_EXTENSION_API TimedEvent : public gd::BaseEvent
 #endif // TIMEDEVENT_H
 
 #endif
+

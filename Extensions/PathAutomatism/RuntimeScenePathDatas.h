@@ -50,3 +50,4 @@ class GD_EXTENSION_API RuntimeScenePathDatas : public AutomatismsRuntimeSharedDa
 };
 
 #endif // RUNTIMESCENEPATHDATAS_H
+

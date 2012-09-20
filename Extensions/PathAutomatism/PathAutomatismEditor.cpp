@@ -133,7 +133,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
 
-	Create(parent, wxID_ANY, _("Editer l\'automatisme"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edit the automatism"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
@@ -144,42 +144,42 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
 	FlexGridSizer12->AddGrowableCol(0);
 	FlexGridSizer12->AddGrowableRow(1);
 	FlexGridSizer13 = new wxFlexGridSizer(0, 6, 0, 0);
-	StaticText5 = new wxStaticText(this, ID_STATICTEXT6, _("Chemins :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	StaticText5 = new wxStaticText(this, ID_STATICTEXT6, _("Paths:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	FlexGridSizer13->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	pathChoice = new wxChoice(this, ID_CHOICE1, wxDefaultPosition, wxSize(136,-1), 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
 	pathChoice->SetSelection( pathChoice->Append(_("Object main path")) );
 	FlexGridSizer13->Add(pathChoice, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BitmapButton3 = new wxBitmapButton(this, ID_BITMAPBUTTON3, wxBitmap(wxImage(_T("res/addicon.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON3"));
 	BitmapButton3->SetDefault();
-	BitmapButton3->SetToolTip(_("Créer un chemin"));
+	BitmapButton3->SetToolTip(_("Create a path"));
 	FlexGridSizer13->Add(BitmapButton3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BitmapButton4 = new wxBitmapButton(this, ID_BITMAPBUTTON4, wxBitmap(wxImage(_T("res/deleteicon.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON4"));
 	BitmapButton4->SetDefault();
-	BitmapButton4->SetToolTip(_("Supprime ce chemin"));
+	BitmapButton4->SetToolTip(_("Delete this path"));
 	FlexGridSizer13->Add(BitmapButton4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, -2);
 	BitmapButton5 = new wxBitmapButton(this, ID_BITMAPBUTTON5, wxBitmap(wxImage(_T("res/editnom.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON5"));
 	BitmapButton5->SetDefault();
-	BitmapButton5->SetToolTip(_("Changer le nom"));
+	BitmapButton5->SetToolTip(_("Change the name"));
 	FlexGridSizer13->Add(BitmapButton5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	globalCheck = new wxCheckBox(this, ID_CHECKBOX4, _("Global"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
 	globalCheck->SetValue(false);
 	FlexGridSizer13->Add(globalCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer12->Add(FlexGridSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Editeur de chemin"));
+	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Paths editor"));
 	FlexGridSizer2 = new wxFlexGridSizer(4, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
 	FlexGridSizer2->AddGrowableRow(2);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 0, 0, 0);
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	BitmapButton1 = new wxBitmapButton(this, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/addicon.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
-	BitmapButton1->SetToolTip(_("Ajouter un point"));
+	BitmapButton1->SetToolTip(_("Add a point"));
 	BoxSizer1->Add(BitmapButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
 	BitmapButton6 = new wxBitmapButton(this, ID_BITMAPBUTTON6, wxBitmap(wxImage(_T("res/addmore.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON6"));
 	BitmapButton6->SetDefault();
-	BitmapButton6->SetToolTip(_("Ajouter..."));
+	BitmapButton6->SetToolTip(_("Add..."));
 	BoxSizer1->Add(BitmapButton6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 2);
 	BitmapButton2 = new wxBitmapButton(this, ID_BITMAPBUTTON2, wxBitmap(wxImage(_T("res/deleteicon.png"))), wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON2"));
-	BitmapButton2->SetToolTip(_("Supprimer un point"));
+	BitmapButton2->SetToolTip(_("Delete a point"));
 	BoxSizer1->Add(BitmapButton2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 3);
 	FlexGridSizer6->Add(BoxSizer1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	StaticText8 = new wxStaticText(this, ID_STATICTEXT9, _("0;0"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT9"));
@@ -195,7 +195,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
 	FlexGridSizer2->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer16 = new wxFlexGridSizer(0, 5, 0, 0);
 	ToggleButton1 = new wxToggleButton(this, ID_TOGGLEBUTTON1, _("Image"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TOGGLEBUTTON1"));
-	ToggleButton1->SetToolTip(_("Afficher une image en arrière-plan"));
+	ToggleButton1->SetToolTip(_("Display an image on the background"));
 	FlexGridSizer16->Add(ToggleButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText10 = new wxStaticText(this, ID_STATICTEXT11, _("X:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
 	FlexGridSizer16->Add(StaticText10, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -217,7 +217,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
 	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Position"));
 	FlexGridSizer14 = new wxFlexGridSizer(2, 1, 0, 0);
 	FlexGridSizer14->AddGrowableCol(0);
-	StaticText6 = new wxStaticText(this, ID_STATICTEXT7, _("Position du chemin par rapport à \nl\'origine de la scène."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	StaticText6 = new wxStaticText(this, ID_STATICTEXT7, _("Position of the path\nrelative to the scene origin."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
 	FlexGridSizer14->Add(StaticText6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer15 = new wxFlexGridSizer(0, 3, 0, 0);
 	xOffsetEdit = new wxTextCtrl(this, ID_TEXTCTRL3, _("0"), wxDefaultPosition, wxSize(51,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL3"));
@@ -229,15 +229,15 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
 	FlexGridSizer14->Add(FlexGridSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer4->Add(FlexGridSizer14, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer11->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Orientation de l\'objet"));
+	StaticBoxSizer3 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Object orientation"));
 	FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer7->AddGrowableCol(0);
-	followAngleCheck = new wxCheckBox(this, ID_CHECKBOX3, _("Orienter automatiquement l\'objet"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
+	followAngleCheck = new wxCheckBox(this, ID_CHECKBOX3, _("Automatically update object's angle"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
 	followAngleCheck->SetValue(false);
 	FlexGridSizer7->Add(followAngleCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT4, _("Décalage d\'angle :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
-	StaticText3->SetToolTip(_("Cet angle sera ajouté à celui automatiquement calculé avec la pente du chemin"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT4, _("Angle offset:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
+	StaticText3->SetToolTip(_("This angle will be added to the angle the object must take when following the path"));
 	FlexGridSizer8->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9 = new wxFlexGridSizer(0, 2, 0, 0);
 	angleOffsetEdit = new wxTextCtrl(this, ID_TEXTCTRL2, _("0"), wxDefaultPosition, wxSize(45,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL2"));
@@ -248,26 +248,26 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
 	FlexGridSizer7->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer3->Add(FlexGridSizer7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer11->Add(StaticBoxSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Mouvement et vitesse"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Movement and speed"));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer4->AddGrowableCol(1);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT2, _("Vitesse :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT2, _("Speed:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer4->Add(StaticText1, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	speedEdit = new wxTextCtrl(this, ID_TEXTCTRL1, _("200"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer4->Add(speedEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT3, _("Options :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT3, _("Options:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer4->Add(StaticText2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
-	reverseCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Inverser à la fin"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	reverseCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Reverse movement at the end"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	reverseCheck->SetValue(false);
 	BoxSizer2->Add(reverseCheck, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	stopCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Arrêter à la fin"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+	stopCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Stop at the end of the path"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	stopCheck->SetValue(false);
 	BoxSizer2->Add(stopCheck, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4->Add(BoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer1->Add(FlexGridSizer4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer11->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText9 = new wxStaticText(this, ID_STATICTEXT10, _("Ces paramètres sont indépendants du chemin."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
+	StaticText9 = new wxStaticText(this, ID_STATICTEXT10, _("These parameters are independent from the path."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT10"));
 	wxFont StaticText9Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText9->SetFont(StaticText9Font);
 	FlexGridSizer11->Add(StaticText9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -278,7 +278,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
 	okBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer3->Add(okBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cancelBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	cancelBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -307,13 +307,13 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&PathAutomatismEditor::OncancelBtClick);
 	//*)
 
-    coordsBt = new wxMenuItem(&pointMenu, coordsBtID, _("Voir les coordonnées"));
-    positionBt = new wxMenuItem(&pointMenu, positionBtID, _("Définir les coordonnées précisément"));
-    addPointAfterBt = new wxMenuItem(&pointMenu, addPointAfterBtID, _("Ajouter un point juste après"));
-    removePointBt = new wxMenuItem(&pointMenu, removePointBtID, _("Supprimer ce point"));
+    coordsBt = new wxMenuItem(&pointMenu, coordsBtID, _("See coordinates"));
+    positionBt = new wxMenuItem(&pointMenu, positionBtID, _("Enter manually coordinates"));
+    addPointAfterBt = new wxMenuItem(&pointMenu, addPointAfterBtID, _("Add a point after another"));
+    removePointBt = new wxMenuItem(&pointMenu, removePointBtID, _("Delete this point"));
 
-    addAfterBt = new wxMenuItem(&advanceAddMenu, addAfterBtID, _("Ajouter un point après un autre"));
-    addBeforeBt = new wxMenuItem(&advanceAddMenu, addBeforeBtID, _("Ajouter un point avant un autre"));
+    addAfterBt = new wxMenuItem(&advanceAddMenu, addAfterBtID, _("Add a point after another"));
+    addBeforeBt = new wxMenuItem(&advanceAddMenu, addBeforeBtID, _("Add a point before another"));
 
     pointMenu.Append(coordsBt);
     pointMenu.Append(positionBt);
@@ -341,7 +341,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
     //Setup shared datas
 	if ( !scene || scene->automatismsInitialSharedDatas.find(automatism.GetName()) == scene->automatismsInitialSharedDatas.end())
 	{
-	    wxLogError(_("Impossible d'accéder aux données partagées."));
+	    wxLogError(_("Unable to access to shared datas."));
 	    return;
 	}
 
@@ -349,7 +349,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
 
     if ( sharedDatas == boost::shared_ptr<ScenePathDatas>() )
     {
-	    wxLogError(_("Impossible d'accéder aux données partagées : Données de mauvais type"));
+	    wxLogError(_("Unable to access to shared datas : Bad data type."));
 	    return;
     }
 
@@ -381,7 +381,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
             std::string futureName;
             do
             {
-                futureName = ToString(wxGetTextFromUser(_("Un chemin global portant le même nom qu'un chemin local de l'objet actuel existe.\nPour éviter un conflit de nom, veuillez renommer le chemin local :"), _("Conflit entre deux chemin"), listOfPathsNames[a], this));
+                futureName = ToString(wxGetTextFromUser(_("A global path with the same name already exists.\nTo avoid name conflict, please rename the local path:"), _("Path conflict"), listOfPathsNames[a], this));
             } while (listOfPathsNames[a] == futureName);
 
             newPathInfo.name = futureName;
@@ -403,7 +403,7 @@ PathAutomatismEditor::PathAutomatismEditor(wxWindow* parent, Game & game_, Scene
     }
     else
     {
-        wxMessageBox(_("Le chemin \"" + automatism.GetCurrentPathName() + "\" de l'automatisme est introuvable.\nL'automatisme va le remplacer par \"Object main path\"."), _("Chemin introuvable"), wxOK | wxICON_EXCLAMATION, this);
+        wxMessageBox(_("Path \"") + automatism.GetCurrentPathName() + _("\" cannot be found.\nThe preview will go back to the \"Object main path\"."), _("Path not found"), wxOK | wxICON_EXCLAMATION, this);
         ChangePathOfPreview("Object main path");
     }
 }
@@ -478,11 +478,11 @@ void PathAutomatismEditor::UpdateComboBoxWithPathsName()
 
 void PathAutomatismEditor::OnBitmapButton3Click1(wxCommandEvent& event)
 {
-    std::string newPathName = ToString(wxGetTextFromUser(_("Nom du nouveau chemin :"), _("Nouveau chemin"), "newPath"));
+    std::string newPathName = ToString(wxGetTextFromUser(_("Name of the new path:"), _("New path"), "newPath"));
 
     if(PathExists(newPathName))
     {
-        wxMessageBox(_("Ce chemin existe déjà."), _("Impossible de créer le chemin"));
+        wxMessageBox(_("This path already exists."), _("Unable to create the path"));
         return;
     }
 
@@ -500,11 +500,11 @@ void PathAutomatismEditor::OnBitmapButton4Click(wxCommandEvent& event)
 {
     if(pathInfo->name == "Object main path")
     {
-        wxMessageBox(_("Impossible de supprimer le chemin principal de l'objet"), _("Erreur"));
+        wxMessageBox(_("Object's main path cannot be deleted"), _("Error"));
         return;
     }
 
-    int r = wxMessageBox(_("Êtes-vous sûr de supprimer ce chemin ?"), _("Confirmation de suppression"), wxYES_NO);
+    int r = wxMessageBox(_("Are you sure to delete this path\?"), _("Confirm deletion"), wxYES_NO);
     if(r != wxYES)
         return;
 
@@ -525,15 +525,15 @@ void PathAutomatismEditor::OnBitmapButton5Click(wxCommandEvent& event)
     std::string originalName = pathInfo->name;
     if(originalName == "")
     {
-        wxMessageBox(_("Impossible de renommer le chemin principal de l'objet"), _("Erreur"));
+        wxMessageBox(_("Object's main path cannot be renamed"), _("Error"));
         return;
     }
 
-    std::string newName = ToString(wxGetTextFromUser(_("Nouveau nom du chemin :"), _("Renommer un chemin"), originalName));
+    std::string newName = ToString(wxGetTextFromUser(_("New path name:"), _("Rename a path"), originalName));
 
     if(PathExists(newName) && newName != originalName)
     {
-        wxMessageBox(_("Ce chemin existe déjà."), _("Impossible de renommer le chemin"));
+        wxMessageBox(_("This path already exists."), _("Unable to rename the path"));
         return;
     }
 
@@ -579,7 +579,7 @@ void PathAutomatismEditor::OnokBtClick(wxCommandEvent& event)
     automatism.SetFollowAngle(followAngleCheck->GetValue());
 
     if(haveDeletedAGlobalPath)
-        mainFrameWrapper.GetInfoBar()->ShowMessage(_("Vous venez de supprimer un chemin global. Vérifiez bien qu'aucun autre objet ne l'utilisait."), wxICON_WARNING);
+        mainFrameWrapper.GetInfoBar()->ShowMessage(_("You have deleted a global path. Be sure that no other object was using it."), wxICON_WARNING);
 
     EndModal(1);
 }
@@ -794,12 +794,12 @@ void PathAutomatismEditor::OnpreviewPnlRightUp(wxMouseEvent& event)
 
             if(menuSelection == coordsBtID)
             {
-                wxMessageBox(_("Position du point : ") + ToString(path->at(selectedPoint).x).c_str() + ";" + ToString(path->at(selectedPoint).y));
+                wxMessageBox(_("Point position:") + ToString(path->at(selectedPoint).x).c_str() + ";" + ToString(path->at(selectedPoint).y));
             }
             else if(menuSelection == positionBtID)
             {
-                int posX = ToInt(ToString(wxGetTextFromUser(_("Position X :"), _("Positionner précisement"), ToString(path->at(selectedPoint).x), this)));
-                int posY = ToInt(ToString(wxGetTextFromUser(_("Position Y :"), _("Positionner précisement"), ToString(path->at(selectedPoint).y), this)));
+                int posX = ToInt(ToString(wxGetTextFromUser(_("X position:"), _("Position precisely"), ToString(path->at(selectedPoint).x), this)));
+                int posY = ToInt(ToString(wxGetTextFromUser(_("Y position:"), _("Position precisely"), ToString(path->at(selectedPoint).y), this)));
 
                 path->at(selectedPoint).x = posX;
                 path->at(selectedPoint).y = posY;
@@ -921,31 +921,31 @@ void PathAutomatismEditor::UpdateContextMessage()
 {
     if(previewPnlState.state == NOTHING)
     {
-        contextMessageLabel->SetLabelText(_("Déplacez et modifiez les points avec la souris."));
+        contextMessageLabel->SetLabelText(_("Move points using the mouse."));
     }
     else if(previewPnlState.state == DRAGGING)
     {
-        contextMessageLabel->SetLabelText(_("Relâchez la souris pour valider la position du point."));
+        contextMessageLabel->SetLabelText(_("Release the button to validate point's position."));
     }
     else if(previewPnlState.state == ADDING)
     {
-        contextMessageLabel->SetLabelText(_("Ajoutez un point en cliquant avec la souris. Cliquez sur un segment pour lui ajouter un point."));
+        contextMessageLabel->SetLabelText(_("Add a point by clicking with the mouse. Clic on a segment to add a point to it."));
     }
     else if(previewPnlState.state == REMOVING)
     {
-        contextMessageLabel->SetLabelText(_("Supprimez un point en cliquant dessus avec la souris."));
+        contextMessageLabel->SetLabelText(_("Delete a point by clicking on it with the cursor."));
     }
     else if(previewPnlState.state == VIEWMOVING)
     {
-        contextMessageLabel->SetLabelText(_("Glissez la souris pour faire défiler la vue."));
+        contextMessageLabel->SetLabelText(_("Drag the mouse to make the view scroll."));
     }
     else if(previewPnlState.state == ADDINGPOINTAFTER)
     {
-        contextMessageLabel->SetLabelText(_("Cliquez sur un point pour ajouter un point juste après."));
+        contextMessageLabel->SetLabelText(_("Click on a point to add a new point after."));
     }
     else if(previewPnlState.state == ADDINGPOINTBEFORE)
     {
-        contextMessageLabel->SetLabelText(_("Cliquez sur un point pour ajouter un point juste avant."));
+        contextMessageLabel->SetLabelText(_("Click on a point to add a new point before."));
     }
 }
 
@@ -965,7 +965,7 @@ void PathAutomatismEditor::OnglobalCheckClick(wxCommandEvent& event)
 {
     if(pathInfo->name == "Object main path")
     {
-        wxMessageBox(_("Impossible de rendre global le chemin principal de l'objet."), _("Erreur"));
+        wxMessageBox(_("The objet's main path cannot be made global."), _("Error"));
         globalCheck->SetValue(false);
         return;
     }
@@ -1000,7 +1000,7 @@ void PathAutomatismEditor::OnBitmapButton6Click(wxCommandEvent& event)
 {
     if(ToggleButton1->GetValue())
     {
-        wxString filename = wxLoadFileSelector(_("Choisissez une image à afficher"), "Images (*.png;*.jpg)|*.png;*.jpg");
+        wxString filename = wxLoadFileSelector(_("Choose an image to be displayed"), "Images (*.png;*.jpg)|*.png;*.jpg");
 
         if(!filename.empty())
         {
@@ -1043,3 +1043,4 @@ void PathAutomatismEditor::OnpreviewPnlEraseBackground(wxEraseEvent& event)
 }
 
 #endif
+

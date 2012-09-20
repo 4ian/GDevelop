@@ -63,3 +63,4 @@ void ScenePathDatas::LoadFromXml(const TiXmlElement * elem)
         childElem = childElem->NextSiblingElement();
     }
 }
+

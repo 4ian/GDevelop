@@ -60,3 +60,4 @@ class GD_EXTENSION_API ScenePathDatas : public AutomatismsSharedDatas
 };
 
 #endif // SCENEPATHDATAS_H
+

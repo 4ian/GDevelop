@@ -35,3 +35,4 @@ RuntimeScenePathDatas::RuntimeScenePathDatas(const ScenePathDatas & automatismSh
 RuntimeScenePathDatas::~RuntimeScenePathDatas()
 {
 }
+

@@ -442,3 +442,4 @@ float PathAutomatism::GetAngleOfSegment(sf::Vector2f &seg)
         return -acos(seg.x / norm) * 180.0 / PI;
     }
 }
+

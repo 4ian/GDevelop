@@ -47,15 +47,15 @@ class Extension : public ExtensionBase
         Extension()
         {
             DECLARE_THE_EXTENSION("PathAutomatism",
-                                  _("Automatisme Chemin"),
-                                  _("Automatisme permettant de déplacer les objets sur un chemin prédéfini"),
+                                  _("Path Automatism"),
+                                  _("Automatism allowing to move objects on a predefined path"),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
 
                 DECLARE_AUTOMATISM("PathAutomatism",
-                          _("Chemin"),
                           _("Path"),
-                          _("Automatisme permettant de déplacer les objets sur un chemin prédéfini."),
+                          _("Path"),
+                          _("Automatism allowing to move objects on a predefined path."),
                           "",
                           "res/path32.png",
                           PathAutomatism,
@@ -66,394 +66,394 @@ class Extension : public ExtensionBase
                     automatismInfo.SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_AUTOMATISM_ACTION("SetReverseAtEnd",
-                                   _("Dé/Activer les allers-retours"),
-                                   _("Active ou désactive les aller retours"),
-                                   _("Activer les allers-retours de _PARAM0_ : _PARAM2_"),
+                                   _("De/activate rounding"),
+                                   _("Activate or desactivate rounding"),
+                                   _("Activate rounding for _PARAM0_: _PARAM2_"),
                                    _("Options"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("yesorno", _("Activer"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("yesorno", _("Activate"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetReverseAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_ACTION("SetStopAtEnd",
-                                   _("Dé/Activer l'arrêt à la fin du chemin"),
-                                   _("Active ou désactive l'arrêt de l'objet à la fin du chemin."),
-                                   _("Activer l'arrêt de _PARAM0_ à la fin du chemin : _PARAM2_"),
+                                   _("De/activate the stop at the end of the path"),
+                                   _("Activate or deactivate the stop at the end of the object"),
+                                   _("Stop _PARAM0_ when the end of the path is reached: _PARAM2_"),
                                    _("Options"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("yesorno", _("Activer"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("yesorno", _("Activate"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetStopAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_CONDITION("ReverseAtEnd",
-                                   _("Allers-retours"),
-                                   _("Renvoie vrai si l'objet effectue des allers-retours"),
-                                   _("_PARAM0_ effectue des allers retours"),
+                                   _("Rounds"),
+                                   _("Return true if the object round"),
+                                   _("_PARAM0_ is rounding"),
                                    _("Options"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("ReverseAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_CONDITION("StopAtEnd",
-                                   _("Arrêt à la fin du chemin"),
-                                   _("Renvoie vrai si l'objet s'arrête à la fin de son chemin."),
-                                   _("_PARAM0_ s'arrête à la fin du chemin"),
+                                   _("Stop at the end of the path"),
+                                   _("Return true if the object stops at the end of its path."),
+                                   _("_PARAM0_ stops at the end of the path"),
                                    _("Options"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("StopAtEnd").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("Reverse",
-                                   _("Inverse le sens du mouvement sur le chemin"),
-                                   _("Inverse le sens du mouvement sur le chemin."),
-                                   _("Inverser le sens du mouvement de l'objet _PARAM0_ sur son chemin"),
-                                   _("Mouvement"),
+                                   _("Invert the movement on the path"),
+                                   _("Invert the movement on the path."),
+                                   _("Invert the sens of the movement of _PARAM0_ on its path"),
+                                   _("Movement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("Reverse").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_CONDITION("GetSegment",
-                                   _("Numéro du segment sur le chemin"),
-                                   _("Renvoie vrai si le numéro du segment sur le chemin vérifie bien le test."),
-                                   _("Le numéro du segment actuellement parcouru par _PARAM0_ est _PARAM3__PARAM2_"),
+                                   _("Number of the segment on the path"),
+                                   _("True if the number of the current segment on the path satisfies the test."),
+                                   _("The number of the current segment of the path of _PARAM0_ is _PARAM3__PARAM2_"),
                                    _("Position"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe de comparaison"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Comparison sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetCurrentSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("EnterSegment",
-                                   _("Placer sur un segment du chemin"),
-                                   _("Place l'objet sur un segment du chemin."),
-                                   _("Faire _PARAM3__PARAM2_ au numéro du segment actuellement parcouru par _PARAM0_"),
+                                   _("Position on the segment of a path"),
+                                   _("Put the object directly on specific segment of the path"),
+                                   _("Do _PARAM3__PARAM2_ to number of the current segment of _PARAM0_"),
                                    _("Position"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetCurrentSegment").SetAssociatedGetter("GetCurrentSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("Segment", _("Segment en cours"), _("N° du segment en cours"), _("Position"), "res/actions/window.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("Segment", _("Current segment"), _("Number of the current segment"), _("Position"), "res/actions/window.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetCurrentSegment").SetIncludeFile("PathAutomatism/PathAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
                     DECLARE_AUTOMATISM_CONDITION("GetPosition",
-                                   _("Position de l'objet sur le segment"),
-                                   _("Renvoie vrai si la position de l'objet sur le segment vérifie bien le test.\nValeur comprise entre 0 et 1."),
-                                   _("La position de _PARAM0_ sur le segment actuel est _PARAM3__PARAM2_"),
+                                   _("Position of the object on the segment"),
+                                   _("Return true if the position on the path satisfy the test.\nPosition on a segment is a value between 0 and 1."),
+                                   _("The position of _PARAM0_ on the current segment is _PARAM3__PARAM2_"),
                                    _("Position"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe de comparaison"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Comparison sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetPositionOnSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("SetPosition",
-                                   _("Placer à une position du segment actuel"),
-                                   _("Place l'objet à un endroit précis du segment actuel."),
-                                   _("Placer _PARAM0_ à _PARAM3__PARAM2_ sur le segment actuel"),
+                                   _("Put the object on a precise position of the current segment"),
+                                   _("Put the object on a precise position on the current segment."),
+                                   _("Put _PARAM0_ on _PARAM3__PARAM2_ on the current segment"),
                                    _("Position"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetPositionOnSegment").SetAssociatedGetter("GetPositionOnSegment").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("Position", _("Position sur segment"), _("Position sur le segment (entre 0 et 1)"), _("Position"), "res/actions/window.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("Position", _("Position on the segment"), _("Position on the segment ( value between 0 and 1 )"), _("Position"), "res/actions/window.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetPositionOnSegment").SetIncludeFile("PathAutomatism/PathAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
                     DECLARE_AUTOMATISM_CONDITION("GetPathName",
-                                   _("Nom du chemin"),
-                                   _("Renvoie vrai si le nom du chemin vérifie bien le test."),
-                                   _("Le nom du chemin actuel de _PARAM0_ est _PARAM3__PARAM2_"),
-                                   _("Chemin"),
+                                   _("Path name"),
+                                   _("Test the path name."),
+                                   _("The name of the current path of _PARAM0_ is _PARAM2__PARAM1_"),
+                                   _("Path"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("string", _("Nom"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe de comparaison"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("string", _("Name"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Comparison sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetCurrentPathName").SetManipulatedType("string").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("SetPathName",
-                                   _("Changer de chemin"),
-                                   _("Change le chemin utilisé par le chemin."),
-                                   _("Mettre _PARAM2_ en tant que chemin à parcourir de _PARAM0_"),
-                                   _("Chemin"),
+                                   _("Change the path"),
+                                   _("Change the path used."),
+                                   _("Set _PARAM2_ as the current path of _PARAM0_"),
+                                   _("Path"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("string", _("Nom"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("string", _("Name"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("ChangeCurrentPath").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
-                    DECLARE_AUTOMATISM_STR_EXPRESSION("CurrentPathName", _("Nom du chemin actuel"), _("Nom du chemin actuel"), _("Chemin"), "res/actions/window.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
+                    DECLARE_AUTOMATISM_STR_EXPRESSION("CurrentPathName", _("Current path name"), _("Current path name"), _("Path"), "res/actions/window.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetCurrentPathName").SetIncludeFile("PathAutomatism/PathAutomatism.h");
                     DECLARE_END_AUTOMATISM_STR_EXPRESSION()
 
                     DECLARE_AUTOMATISM_CONDITION("GetOffsetX",
-                                   _("Position X du chemin"),
-                                   _("Renvoie vrai si la position X du chemin vérifie bien le test."),
-                                   _("La position X du chemin de _PARAM0_ est _PARAM3__PARAM2_"),
-                                   _("Position du chemin"),
+                                   _("X position of the path"),
+                                   _("Return true if the X position satisfies the test."),
+                                   _("The X position of the path of _PARAM0_ is _PARAM3__PARAM2_"),
+                                   _("Path position"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe de comparaison"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Comparison sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetOffsetX").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("SetOffsetX",
-                                   _("Modifier la position X du chemin"),
-                                   _("Place le chemin à un endroit précis sur l'axe X."),
-                                   _("Mettre la position X du chemin de _PARAM0_ à _PARAM3__PARAM2_"),
-                                   _("Position du chemin"),
+                                   _("Modify the path X position"),
+                                   _("Change the path X position."),
+                                   _("Do _PARAM3__PARAM2_ to the X position of the path of _PARAM0_"),
+                                   _("Path position"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetOffsetX").SetAssociatedGetter("GetOffsetX").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("PathX", _("Position X du chemin"), _("Position X du chemin"), _("Position du chemin"), "res/actions/window.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("PathX", _("X position of the path"), _("X position of the path"), _("Path position"), "res/actions/window.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetOffsetX").SetIncludeFile("PathAutomatism/PathAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
                     DECLARE_AUTOMATISM_CONDITION("GetOffsetY",
-                                   _("Position Y du chemin"),
-                                   _("Renvoie vrai si la position Y du chemin vérifie bien le test."),
-                                   _("La position Y du chemin de _PARAM0_ est _PARAM3__PARAM2_"),
-                                   _("Position du chemin"),
+                                   _("Path Y position"),
+                                   _("Return true if the Y position satisfies the test."),
+                                   _("The Y position of the path of _PARAM0_ is _PARAM3__PARAM2_"),
+                                   _("Path position"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe de comparaison"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Comparison sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetOffsetY").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("SetOffsetY",
-                                   _("Modifier la position Y du chemin"),
-                                   _("Place le chemin à un endroit précis sur l'axe Y."),
-                                   _("Mettre la position Y du chemin de _PARAM0_ à _PARAM3__PARAM2_"),
-                                   _("Position du chemin"),
+                                   _("Modify the path Y position"),
+                                   _("Change the path Y position."),
+                                   _("Do _PARAM3__PARAM2_ to the Y position of the path of _PARAM0_"),
+                                   _("Path position"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetOffsetY").SetAssociatedGetter("GetOffsetY").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("PathY", _("Position Y du chemin"), _("Position Y du chemin"), _("Position du chemin"), "res/actions/window.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("PathY", _("Path Y position"), _("Path Y position"), _("Path position"), "res/actions/window.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetOffsetY").SetIncludeFile("PathAutomatism/PathAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
                     DECLARE_AUTOMATISM_CONDITION("GetFollowAngle",
-                                   _("Rotation automatique"),
-                                   _("Renvoie vrai l'objet est tournée automatiquement sur le chemin."),
-                                   _("_PARAM0_ est tourné automatiquement en fonction du chemin"),
+                                   _("Automatic rotation"),
+                                   _("Return true if the object's angle is automatically updated."),
+                                   _("The angle of _PARAM0_ is automatically updated on the path"),
                                    _("Options"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("FollowAngle").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("SetFollowAngle",
-                                   _("Dé/Activer la rotation automatique"),
-                                   _("Active ou désactive la rotation automatique de l'objet sur le chemin."),
-                                   _("Activer la rotation automatique de _PARAM0_ ? _PARAM2_"),
+                                   _("De/activate automatic rotation"),
+                                   _("Activate or deactivate the automatic update of the angle of the object on the path."),
+                                   _("Activate automatic rotation of _PARAM0_: _PARAM2_"),
                                    _("Options"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("yesorno", _("Activer ?"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("yesorno", _("Activate \?"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetFollowAngle").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
                     DECLARE_AUTOMATISM_CONDITION("GetAngleOffset",
-                                   _("Décalage d'angle"),
-                                   _("Renvoie vrai si le décalage d'angle (de la rotation automatique) vérifie la condition."),
-                                   _("Le décalage d'angle de _PARAM0_ sur le chemin est _PARAM3__PARAM2_"),
+                                   _("Angle offset"),
+                                   _("Return true if the angle offset satifies the condition."),
+                                   _("The angle offset of _PARAM0_ is _PARAM3__PARAM2_"),
                                    _("Options"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe de comparaison"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Comparison sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("SetAngleOffset",
-                                   _("Modifier le décalage d'angle"),
-                                   _("Modifie le décalage d'angle de la rotation automatique."),
-                                   _("Faire _PARAM3__PARAM2_ au décalage de l'angle de l'objet _PARAM0_"),
+                                   _("Change the angle offset"),
+                                   _("Change the angle offset"),
+                                   _("Do _PARAM3__PARAM2_ to angle offset of _PARAM0_"),
                                    _("Options"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetAngleOffset").SetAssociatedGetter("GetAngleOffset").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("AngleOffset", _("Décalage d'angle"), _("Décalage d'angle de l'objet sur le chemin"), _("Options"), "res/actions/window.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("AngleOffset", _("Angle offset"), _("Add an offset to the angle of the object"), _("Options"), "res/actions/window.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetAngleOffset").SetIncludeFile("PathAutomatism/PathAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
 
                     DECLARE_AUTOMATISM_CONDITION("GetSpeed",
-                                   _("Vitesse"),
-                                   _("Renvoie vrai si la vitesse vérifie bien le test."),
-                                   _("La vitesse de _PARAM0_ sur le chemin est _PARAM3__PARAM2_"),
-                                   _("Mouvement"),
+                                   _("Speed"),
+                                   _("Return true if the speed satisfy the condition."),
+                                   _("The speed of _PARAM0_ on the path is _PARAM3__PARAM2_"),
+                                   _("Movement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("relationalOperator", _("Signe de comparaison"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("relationalOperator", _("Comparison sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetSpeed").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_CONDITION()
 
                     DECLARE_AUTOMATISM_ACTION("SetSpeed",
-                                   _("Modifier la vitesse"),
-                                   _("Modifie la vitesse de l'objet sur le chemin."),
-                                   _("Faire _PARAM3__PARAM2_ à la vitesse de _PARAM0_ sur le chemin"),
-                                   _("Mouvement"),
+                                   _("Change the speed"),
+                                   _("Change the speed of the object on the path."),
+                                   _("Do _PARAM2__PARAM1_ to speed of of _PARAM0_ on the path"),
+                                   _("Movement"),
                                    "res/actions/window24.png",
                                    "res/actions/window.png");
 
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
-                        instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                        instrInfo.AddParameter("operator", _("Signe de modification"), "", false);
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
+                        instrInfo.AddParameter("expression", _("Value"), "", false);
+                        instrInfo.AddParameter("operator", _("Modification sign"), "", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("SetSpeed").SetAssociatedGetter("GetSpeed").SetManipulatedType("number").SetIncludeFile("PathAutomatism/PathAutomatism.h");
 
                     DECLARE_END_AUTOMATISM_ACTION()
 
-                    DECLARE_AUTOMATISM_EXPRESSION("Speed", _("Vitesse"), _("Vitesse de l'objet sur le chemin"), _("Mouvement"), "res/actions/window.png")
-                        instrInfo.AddParameter("object", _("Objet"), "", false);
-                        instrInfo.AddParameter("automatism", _("Automatisme"), "PathAutomatism", false);
+                    DECLARE_AUTOMATISM_EXPRESSION("Speed", _("Speed"), _("Moving speed on the path"), _("Movement"), "res/actions/window.png")
+                        instrInfo.AddParameter("object", _("Object"), "", false);
+                        instrInfo.AddParameter("automatism", _("Automatism"), "PathAutomatism", false);
 
                         instrInfo.cppCallingInformation.SetFunctionName("GetSpeed").SetIncludeFile("PathAutomatism/PathAutomatism.h");
                     DECLARE_END_AUTOMATISM_EXPRESSION()
@@ -521,3 +521,4 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }
+

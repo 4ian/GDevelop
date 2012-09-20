@@ -170,3 +170,4 @@ private:
 };
 
 #endif // PATHAUTOMATISM_H
+

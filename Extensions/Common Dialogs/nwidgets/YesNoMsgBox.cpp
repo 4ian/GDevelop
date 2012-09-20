@@ -106,3 +106,10 @@ void YesNoMsgBox::on_button_no_clicked()
 }
 
 } //namespace nw
+
+
+
+
+
+
+

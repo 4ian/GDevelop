@@ -89,3 +89,10 @@ namespace dlib
 
 #endif // DLIB_IMAGE_LOADEr_ABSTRACT_
 
+
+
+
+
+
+
+

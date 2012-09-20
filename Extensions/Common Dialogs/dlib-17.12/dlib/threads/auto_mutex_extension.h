@@ -72,3 +72,10 @@ namespace dlib
 
 #endif // DLIB_AUTO_MUTEX_EXTENSIOn_
 
+
+
+
+
+
+
+

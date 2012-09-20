@@ -56,3 +56,10 @@ namespace dlib
 
 #endif // DLIB_SPATIAL_FILTERINg_ABSTRACT_
 
+
+
+
+
+
+
+

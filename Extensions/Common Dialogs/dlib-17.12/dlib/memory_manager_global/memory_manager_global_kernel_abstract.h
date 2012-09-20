@@ -180,3 +180,10 @@ namespace dlib
 #endif // DLIB_MEMORY_MANAGER_GLOBAl_ABSTRACT_
 
 
+
+
+
+
+
+
+

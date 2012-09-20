@@ -200,3 +200,10 @@ namespace dlib
 
 #endif // DLIB_SLIDING_BUFFER_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

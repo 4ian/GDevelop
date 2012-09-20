@@ -39,3 +39,10 @@ namespace dlib
 
 #endif // DLIB_EXTRA_LOGGER_HEADERs_
 
+
+
+
+
+
+
+

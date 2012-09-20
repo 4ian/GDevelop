@@ -82,3 +82,10 @@ namespace dlib
 #endif // DLIB_IMAGE_SAVEr_ABSTRACT_
 
 
+
+
+
+
+
+
+

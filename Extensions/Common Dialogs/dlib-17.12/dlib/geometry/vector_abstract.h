@@ -585,3 +585,10 @@ namespace std
 
 #endif // DLIB_VECTOR_ABSTRACT_
 
+
+
+
+
+
+
+

@@ -310,3 +310,10 @@ namespace dlib
 
 #endif // DLIB_GUI_CANVAS_DRAWINg_ABSTRACT_
 
+
+
+
+
+
+
+

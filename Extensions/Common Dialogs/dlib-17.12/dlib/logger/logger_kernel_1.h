@@ -474,3 +474,10 @@ namespace dlib
 
 #endif // DLIB_LOGGER_KERNEl_1_
 
+
+
+
+
+
+
+

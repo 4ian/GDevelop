@@ -194,3 +194,10 @@ namespace dlib
 
 #endif // DLIB_SEQUENCE_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

@@ -223,3 +223,10 @@ namespace dlib {
 #endif // DLIB_WEAK_PTr_
 
 
+
+
+
+
+
+
+

@@ -217,3 +217,10 @@ namespace dlib
 
 #endif // DLIB_PIXEL_CPp_
 
+
+
+
+
+
+
+

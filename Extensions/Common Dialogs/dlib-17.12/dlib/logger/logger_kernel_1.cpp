@@ -412,3 +412,10 @@ namespace dlib
 
 #endif // DLIB_LOGGER_KERNEL_1_CPp_
 
+
+
+
+
+
+
+

@@ -83,3 +83,10 @@ int main()
     cout << "This sample should close to 0 and it is classified as a " << net(sample) << endl;
 }
 
+
+
+
+
+
+
+

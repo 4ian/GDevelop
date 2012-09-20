@@ -105,3 +105,10 @@ namespace dlib
 
 #endif // DLIB_RMUTEX_EXTENSIOn_ABSTRACT_
 
+
+
+
+
+
+
+

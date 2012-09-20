@@ -113,3 +113,10 @@ namespace dlib
 #endif // DLIB_ASSIGN_IMAGe_ABSTRACT
 
 
+
+
+
+
+
+
+

@@ -237,3 +237,10 @@ namespace dlib
 }
 #endif // DLIB_ENTROPY_ENCODER_KERNEL_1_CPp_
 
+
+
+
+
+
+
+

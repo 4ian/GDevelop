@@ -331,3 +331,10 @@ namespace dlib
 
 #endif // DLIB_CONDITIONING_CLASS_KERNEl_1_
 
+
+
+
+
+
+
+

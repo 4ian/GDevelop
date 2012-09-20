@@ -599,3 +599,10 @@ namespace dlib
 
 #endif // DLIB_QUEUE_KERNEl_2_
 
+
+
+
+
+
+
+

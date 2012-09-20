@@ -191,3 +191,10 @@ namespace dlib
 
 #endif // DLIB_QUEUE_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

@@ -230,3 +230,10 @@ namespace dlib
 
 #endif // DLIB_MAP_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

@@ -62,3 +62,10 @@ namespace dlib
 #endif // DLIB_RAND_FLOAt_ABSTRACT_
 
 
+
+
+
+
+
+
+

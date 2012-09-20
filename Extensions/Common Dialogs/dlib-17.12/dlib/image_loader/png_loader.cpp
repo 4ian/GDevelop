@@ -162,3 +162,10 @@ namespace dlib
 
 #endif // DLIB_PNG_LOADER_CPp_
 
+
+
+
+
+
+
+

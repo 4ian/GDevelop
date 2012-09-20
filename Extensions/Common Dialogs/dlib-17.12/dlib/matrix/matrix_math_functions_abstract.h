@@ -513,3 +513,10 @@ namespace dlib
 
 #endif // DLIB_MATRIx_MATH_FUNCTIONS_ABSTRACT_
 
+
+
+
+
+
+
+

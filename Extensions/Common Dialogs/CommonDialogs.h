@@ -44,3 +44,4 @@ void ShowTextInput( RuntimeScene & scene, const std::string & variable, const st
 }
 
 #endif // COMMONDIALOGS_H_INCLUDED
+

@@ -154,3 +154,10 @@ namespace dlib
 
 #endif // DLIB_THREADED_OBJECT_EXTENSIOn_ABSTRACT_
 
+
+
+
+
+
+
+

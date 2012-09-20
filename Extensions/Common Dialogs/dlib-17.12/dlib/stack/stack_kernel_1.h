@@ -503,3 +503,10 @@ namespace dlib
 
 #endif // DLIB_STACK_KERNEl_1_
 
+
+
+
+
+
+
+

@@ -149,3 +149,10 @@ namespace dlib
 
 #endif // DLIB_STATIC_SET_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

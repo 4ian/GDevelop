@@ -242,3 +242,10 @@ namespace dlib
 
 #endif // DLIB_HASH_MAP_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

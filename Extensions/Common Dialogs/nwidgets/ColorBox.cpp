@@ -51,3 +51,10 @@ void ColorBox::draw( const canvas& c ) const
     fill_rect(c,rect,rgb_pixel(red,green,blue));
 }
 } //namespace nw
+
+
+
+
+
+
+

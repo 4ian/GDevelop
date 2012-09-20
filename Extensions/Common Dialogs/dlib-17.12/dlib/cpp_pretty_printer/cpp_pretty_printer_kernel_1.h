@@ -581,3 +581,10 @@ namespace dlib
 
 #endif // DLIB_CPP_PRETTY_PRINTER_KERNEl_1_
 
+
+
+
+
+
+
+

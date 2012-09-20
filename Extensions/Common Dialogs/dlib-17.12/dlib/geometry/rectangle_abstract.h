@@ -604,3 +604,10 @@ namespace std
 
 #endif // DLIB_RECTANGLe_ABSTRACT_
 
+
+
+
+
+
+
+

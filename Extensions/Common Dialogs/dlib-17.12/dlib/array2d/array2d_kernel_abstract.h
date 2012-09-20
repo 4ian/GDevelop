@@ -240,3 +240,10 @@ namespace dlib
 
 #endif // DLIB_ARRAY2D_KERNEl_ABSTRACT_ 
 
+
+
+
+
+
+
+

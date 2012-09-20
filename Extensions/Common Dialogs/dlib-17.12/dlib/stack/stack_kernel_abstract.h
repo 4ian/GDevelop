@@ -175,3 +175,10 @@ namespace dlib
 
 #endif // DLIB_STACK_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

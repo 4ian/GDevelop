@@ -1060,3 +1060,10 @@ namespace dlib
 
 #endif // DLIB_MATRIx_UTILITIES_ABSTRACT_
 
+
+
+
+
+
+
+

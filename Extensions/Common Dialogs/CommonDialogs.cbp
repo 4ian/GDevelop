@@ -56,27 +56,27 @@
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-D__WXDEBUG__" />
 					<Add option="-DWXUSINGDLL" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswud" />
 					<Add directory="..\..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
 					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
-					<Add option="-lwxmsw29d_xrc" />
-					<Add option="-lwxmsw29d_richtext" />
-					<Add option="-lwxmsw29d_ribbon" />
-					<Add option="-lwxmsw29d_aui" />
-					<Add option="-lwxmsw29d_adv" />
-					<Add option="-lwxmsw29d_html" />
-					<Add option="-lwxmsw29d_core" />
-					<Add option="-lwxbase29d_xml" />
-					<Add option="-lwxbase29d_net" />
+					<Add option="-lwxmsw29ud_xrc" />
+					<Add option="-lwxmsw29ud_richtext" />
+					<Add option="-lwxmsw29ud_ribbon" />
+					<Add option="-lwxmsw29ud_aui" />
+					<Add option="-lwxmsw29ud_adv" />
+					<Add option="-lwxmsw29ud_html" />
+					<Add option="-lwxmsw29ud_core" />
+					<Add option="-lwxbase29ud_xml" />
+					<Add option="-lwxbase29ud_net" />
 					<Add option="-lwxexpatd" />
-					<Add option="-lwxbase29d" />
+					<Add option="-lwxbase29ud" />
 					<Add option="-lwxpngd" />
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
@@ -105,7 +105,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\IDE\bin\debug" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswd" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswud" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
@@ -159,27 +159,27 @@
 					<Add option="-DWINDOWS" />
 					<Add option="-DPYSUPPORT" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
-					<Add option="-lwxmsw29_xrc" />
-					<Add option="-lwxmsw29_richtext" />
-					<Add option="-lwxmsw29_ribbon" />
-					<Add option="-lwxmsw29_aui" />
-					<Add option="-lwxmsw29_adv" />
-					<Add option="-lwxmsw29_html" />
-					<Add option="-lwxmsw29_core" />
-					<Add option="-lwxbase29_xml" />
-					<Add option="-lwxbase29_net" />
+					<Add option="-lwxmsw29u_xrc" />
+					<Add option="-lwxmsw29u_richtext" />
+					<Add option="-lwxmsw29u_ribbon" />
+					<Add option="-lwxmsw29u_aui" />
+					<Add option="-lwxmsw29u_adv" />
+					<Add option="-lwxmsw29u_html" />
+					<Add option="-lwxmsw29u_core" />
+					<Add option="-lwxbase29u_xml" />
+					<Add option="-lwxbase29u_net" />
 					<Add option="-lwxexpat" />
-					<Add option="-lwxbase29" />
+					<Add option="-lwxbase29u" />
 					<Add option="-lwxpng" />
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
@@ -208,7 +208,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\IDE\bin\release" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>
@@ -262,27 +262,27 @@
 					<Add option="-DWINDOWS" />
 					<Add option="-DPYSUPPORT" />
 					<Add option="-DSFML_DYNAMIC" />
-					<Add option="-DwxUSE_UNICODE=0" />
+					<Add option="-DwxUSE_UNICODE=1" />
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\..\ExtLibs\wxwidgets\include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
 					<Add option="-lGDCore" />
 					<Add option="-lgdl" />
-					<Add option="-lwxmsw29_xrc" />
-					<Add option="-lwxmsw29_richtext" />
-					<Add option="-lwxmsw29_ribbon" />
-					<Add option="-lwxmsw29_aui" />
-					<Add option="-lwxmsw29_adv" />
-					<Add option="-lwxmsw29_html" />
-					<Add option="-lwxmsw29_core" />
-					<Add option="-lwxbase29_xml" />
-					<Add option="-lwxbase29_net" />
+					<Add option="-lwxmsw29u_xrc" />
+					<Add option="-lwxmsw29u_richtext" />
+					<Add option="-lwxmsw29u_ribbon" />
+					<Add option="-lwxmsw29u_aui" />
+					<Add option="-lwxmsw29u_adv" />
+					<Add option="-lwxmsw29u_html" />
+					<Add option="-lwxmsw29u_core" />
+					<Add option="-lwxbase29u_xml" />
+					<Add option="-lwxbase29u_net" />
 					<Add option="-lwxexpat" />
-					<Add option="-lwxbase29" />
+					<Add option="-lwxbase29u" />
 					<Add option="-lwxpng" />
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
@@ -311,7 +311,7 @@
 					<Add library="opengl32" />
 					<Add library="glu32" />
 					<Add directory="..\..\IDE\bin\dev" />
-					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\msw" />
+					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
 					<Add directory="..\..\ExtLibs\wxwidgets\lib\gcc_dll\" />
 				</Linker>
 			</Target>

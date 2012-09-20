@@ -810,3 +810,10 @@ namespace dlib
 
 #endif // DLIB_MATRIx_ABSTRACT_
 
+
+
+
+
+
+
+

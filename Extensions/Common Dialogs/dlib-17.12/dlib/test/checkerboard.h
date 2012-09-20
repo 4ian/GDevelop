@@ -53,3 +53,10 @@ namespace dlib
 
 #endif // DLIB_CHECKERBOARD_TeST_H_
 
+
+
+
+
+
+
+

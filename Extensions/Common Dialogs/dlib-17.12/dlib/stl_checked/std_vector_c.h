@@ -350,3 +350,10 @@ namespace dlib
 
 #endif // DLIB_STD_VECTOr_C_H_
 
+
+
+
+
+
+
+

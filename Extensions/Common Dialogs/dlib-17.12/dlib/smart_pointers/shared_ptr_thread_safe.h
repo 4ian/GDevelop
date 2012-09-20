@@ -495,3 +495,10 @@ namespace dlib
 
 #endif // DLIB_SHARED_THREAD_SAFE_PTr_
 
+
+
+
+
+
+
+

@@ -620,3 +620,10 @@ namespace dlib
 
 #endif // DLIB_REDUCEd_TRAINERS_
 
+
+
+
+
+
+
+

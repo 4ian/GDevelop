@@ -103,3 +103,10 @@ namespace dlib
 
 #endif // DLIB_CRC32_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

@@ -614,3 +614,10 @@ namespace nativefont
 
 #endif // DLIB_IGG_FONT_RENDERER_H_
 
+
+
+
+
+
+
+

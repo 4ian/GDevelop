@@ -227,3 +227,10 @@ namespace dlib
 
 #endif // DLIB_XML_PARSER_KERNEl_INTERFACES_
 
+
+
+
+
+
+
+

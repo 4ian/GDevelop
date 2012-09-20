@@ -467,3 +467,4 @@ bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, const std::string & v
 
 }
 } //namespace GDpriv
+

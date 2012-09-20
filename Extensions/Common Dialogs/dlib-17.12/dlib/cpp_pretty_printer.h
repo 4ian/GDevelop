@@ -37,3 +37,10 @@ namespace dlib
 
 #endif // DLIB_CPP_PRETTY_PRINTEr_
 
+
+
+
+
+
+
+

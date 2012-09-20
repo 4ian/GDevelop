@@ -481,3 +481,10 @@ namespace dlib
 
 #endif // DLIB_MEMBER_FUNCTION_POINTER_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

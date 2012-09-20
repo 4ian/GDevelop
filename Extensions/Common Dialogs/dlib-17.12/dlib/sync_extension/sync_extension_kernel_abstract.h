@@ -188,3 +188,10 @@ namespace dlib
 
 #endif // DLIB_SYNC_EXTENSION_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

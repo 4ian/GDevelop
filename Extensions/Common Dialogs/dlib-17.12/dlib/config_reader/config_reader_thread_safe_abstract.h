@@ -49,3 +49,10 @@ namespace dlib
 #endif // DLIB_CONFIG_READER_THREAD_SAFe_ABSTRACT_
 
 
+
+
+
+
+
+
+

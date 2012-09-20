@@ -702,3 +702,10 @@ namespace dlib
 
 #endif // DLIB_DIRECTED_GRAPH_KERNEl_1_
 
+
+
+
+
+
+
+

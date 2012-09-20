@@ -1339,3 +1339,10 @@ namespace dlib
 
 #endif // DLIB_SEQUENCE_KERNEl_1_
 
+
+
+
+
+
+
+

@@ -45,3 +45,10 @@ namespace dlib
 
 #endif  // DLIB_BOOST_NONCOPYABLE_HPP_INCLUDED
 
+
+
+
+
+
+
+

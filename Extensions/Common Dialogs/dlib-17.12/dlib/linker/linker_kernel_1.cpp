@@ -323,3 +323,10 @@ namespace dlib
 }
 #endif // DLIB_LINKER_KERNEL_1_CPp_
 
+
+
+
+
+
+
+

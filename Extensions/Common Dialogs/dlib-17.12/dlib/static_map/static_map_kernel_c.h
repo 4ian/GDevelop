@@ -87,3 +87,10 @@ namespace dlib
 
 #endif // DLIB_STATIC_MAP_KERNEl_C_
 
+
+
+
+
+
+
+

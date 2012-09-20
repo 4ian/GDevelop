@@ -176,3 +176,10 @@ namespace dlib
 
 #endif // DLIB_STATIC_MAP_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

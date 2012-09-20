@@ -190,3 +190,10 @@ namespace dlib
 
 #endif // DLIB_SET_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

@@ -1983,3 +1983,10 @@ namespace dlib
 
 #endif // DLIB_GUI_CORE_KERNEL_2_CPp_
 
+
+
+
+
+
+
+

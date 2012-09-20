@@ -125,3 +125,10 @@ namespace dlib
 
 #endif // DLIB_RAND_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

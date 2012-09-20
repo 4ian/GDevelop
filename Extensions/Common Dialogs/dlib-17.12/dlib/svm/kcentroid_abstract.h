@@ -245,3 +245,10 @@ namespace dlib
 
 #endif // DLIB_KCENTROId_ABSTRACT_
 
+
+
+
+
+
+
+

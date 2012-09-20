@@ -113,3 +113,10 @@ namespace dlib
 #endif // DLIB_SCOPED_PTr_ABSTRACT_
 
 
+
+
+
+
+
+
+

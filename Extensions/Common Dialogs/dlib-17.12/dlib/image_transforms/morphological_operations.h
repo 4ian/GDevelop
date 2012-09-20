@@ -613,3 +613,10 @@ namespace dlib
 
 #endif // DLIB_MORPHOLOGICAL_OPERATIONs_
 
+
+
+
+
+
+
+

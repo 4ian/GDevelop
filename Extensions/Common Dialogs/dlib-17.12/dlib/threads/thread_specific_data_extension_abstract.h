@@ -85,3 +85,10 @@ namespace dlib
 #endif // DLIB_THREAD_SPECIFIC_DATA_EXTENSIOn_ABSTRACT_
 
 
+
+
+
+
+
+
+

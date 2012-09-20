@@ -236,3 +236,10 @@ namespace dlib
 
 #endif // DLIB_REDUCED_TRAINERs_ABSTRACT_
 
+
+
+
+
+
+
+

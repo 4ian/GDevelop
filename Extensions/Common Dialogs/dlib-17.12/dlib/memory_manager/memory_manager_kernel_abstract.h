@@ -144,3 +144,10 @@ namespace dlib
 
 #endif // DLIB_MEMORY_MANAGER_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

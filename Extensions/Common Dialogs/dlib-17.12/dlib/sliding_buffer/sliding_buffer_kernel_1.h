@@ -225,3 +225,10 @@ namespace dlib
 
 #endif // DLIB_SLIDING_BUFFER_KERNEl_1_
 
+
+
+
+
+
+
+

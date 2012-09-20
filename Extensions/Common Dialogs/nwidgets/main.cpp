@@ -38,3 +38,10 @@ int main()
     nw::MsgBox box2("Une jolie MsgBox", "Vous avez choisi "+result+"\net le fichier"+file);
     box2.wait_until_closed();
 }
+
+
+
+
+
+
+

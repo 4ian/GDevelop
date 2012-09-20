@@ -382,3 +382,10 @@ namespace dlib
 
 #endif // DLIB_SHARED_PTr_THREAD_SAFE_ABSTRACT_
 
+
+
+
+
+
+
+

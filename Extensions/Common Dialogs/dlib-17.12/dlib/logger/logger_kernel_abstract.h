@@ -311,3 +311,10 @@ namespace dlib
 
 #endif // DLIB_LOGGER_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

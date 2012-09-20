@@ -353,3 +353,10 @@ void scrollStyle::draw_scroll_bar_slider( const canvas& c, const rectangle& rect
 }
 
 } //namespace nw
+
+
+
+
+
+
+

@@ -264,3 +264,10 @@ namespace dlib
 
 #endif // DLIB_MAP_KERNEl_C_
 
+
+
+
+
+
+
+

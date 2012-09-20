@@ -126,3 +126,10 @@ namespace dlib
 
 #endif // DLIB_LINKER_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

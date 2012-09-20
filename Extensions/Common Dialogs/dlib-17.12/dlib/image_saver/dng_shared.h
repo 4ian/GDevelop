@@ -300,3 +300,10 @@ namespace dlib
 
 #endif  // DLIB_DNG_SHAREd_
 
+
+
+
+
+
+
+

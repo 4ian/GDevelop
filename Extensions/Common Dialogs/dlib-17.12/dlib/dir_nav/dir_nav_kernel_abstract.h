@@ -423,3 +423,10 @@ namespace dlib
 
 #endif // DLIB_DIR_NAV_KERNEl_ABSTRACT_
 
+
+
+
+
+
+
+

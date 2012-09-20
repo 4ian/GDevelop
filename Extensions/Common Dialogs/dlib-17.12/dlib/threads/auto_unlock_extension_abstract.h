@@ -64,3 +64,10 @@ namespace dlib
 #endif // DLIB_AUTO_UNLOCK_EXTENSIOn_ABSTRACT_
 
 
+
+
+
+
+
+
+

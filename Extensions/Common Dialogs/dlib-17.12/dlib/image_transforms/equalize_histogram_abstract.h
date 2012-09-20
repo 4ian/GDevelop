@@ -65,3 +65,10 @@ namespace dlib
 #endif // DLIB_EQUALIZE_HISTOGRAm_ABSTRACT_
 
 
+
+
+
+
+
+
+

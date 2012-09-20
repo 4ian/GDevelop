@@ -715,3 +715,10 @@ namespace dlib
 
 #endif // DLIB_DRAWABLe_ABSTRACT_
 
+
+
+
+
+
+
+

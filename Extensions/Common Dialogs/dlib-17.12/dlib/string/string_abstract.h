@@ -435,3 +435,10 @@ namespace dlib
 
 #endif // DLIB_STRINg_ABSTRACT_
 
+
+
+
+
+
+
+

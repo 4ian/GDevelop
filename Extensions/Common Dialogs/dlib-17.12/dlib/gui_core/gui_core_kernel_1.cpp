@@ -2176,3 +2176,10 @@ namespace dlib
 
 #endif // DLIB_GUI_CORE_KERNEL_1_CPp_
 
+
+
+
+
+
+
+

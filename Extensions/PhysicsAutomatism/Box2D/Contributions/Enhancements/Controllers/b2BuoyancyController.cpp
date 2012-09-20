@@ -117,3 +117,10 @@ b2BuoyancyController* b2BuoyancyControllerDef::Create(b2BlockAllocator* allocato
 	void* mem = allocator->Allocate(sizeof(b2BuoyancyController));
 	return new (mem) b2BuoyancyController(this);
 }
+
+
+
+
+
+
+

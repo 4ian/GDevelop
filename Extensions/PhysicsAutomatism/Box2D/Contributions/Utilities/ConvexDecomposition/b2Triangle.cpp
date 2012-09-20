@@ -75,3 +75,9 @@ bool b2Triangle::IsInside(float32 _x, float32 _y){
 		
 		return ((u>=0)&&(v>=0)&&(u+v<=1));    
 }
+
+
+
+
+
+

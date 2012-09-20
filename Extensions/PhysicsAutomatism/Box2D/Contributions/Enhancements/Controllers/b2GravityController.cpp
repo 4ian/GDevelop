@@ -68,3 +68,10 @@ b2GravityController* b2GravityControllerDef::Create(b2BlockAllocator* allocator)
 	void* mem = allocator->Allocate(sizeof(b2GravityController));
 	return new (mem) b2GravityController(this);
 }
+
+
+
+
+
+
+

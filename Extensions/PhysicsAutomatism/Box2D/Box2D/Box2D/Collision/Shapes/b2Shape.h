@@ -42,7 +42,7 @@ struct b2MassData
 class b2Shape
 {
 public:
-	
+
 	enum Type
 	{
 		e_unknown= -1,
@@ -93,3 +93,4 @@ inline b2Shape::Type b2Shape::GetType() const
 }
 
 #endif
+

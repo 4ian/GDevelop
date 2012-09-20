@@ -264,3 +264,4 @@ void b2ContactManager::AddPair(void* proxyUserDataA, void* proxyUserDataB)
 
 	++m_contactCount;
 }
+

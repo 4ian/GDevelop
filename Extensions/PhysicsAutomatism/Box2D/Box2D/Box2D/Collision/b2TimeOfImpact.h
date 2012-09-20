@@ -57,3 +57,4 @@ struct b2TOIOutput
 void b2TimeOfImpact(b2TOIOutput* output, const b2TOIInput* input);
 
 #endif
+

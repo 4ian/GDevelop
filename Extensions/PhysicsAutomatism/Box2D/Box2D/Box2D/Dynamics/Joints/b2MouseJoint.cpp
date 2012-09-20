@@ -195,3 +195,4 @@ float32 b2MouseJoint::GetReactionTorque(float32 inv_dt) const
 {
 	return inv_dt * 0.0f;
 }
+

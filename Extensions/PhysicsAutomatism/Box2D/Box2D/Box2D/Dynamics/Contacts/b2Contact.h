@@ -240,3 +240,4 @@ inline void b2Contact::FlagForFiltering()
 }
 
 #endif
+

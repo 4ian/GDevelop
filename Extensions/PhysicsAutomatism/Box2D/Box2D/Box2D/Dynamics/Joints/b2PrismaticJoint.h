@@ -161,7 +161,7 @@ protected:
 	float32 m_upperTranslation;
 	float32 m_maxMotorForce;
 	float32 m_motorSpeed;
-	
+
 	bool m_enableLimit;
 	bool m_enableMotor;
 	b2LimitState m_limitState;
@@ -173,3 +173,4 @@ inline float32 b2PrismaticJoint::GetMotorSpeed() const
 }
 
 #endif
+

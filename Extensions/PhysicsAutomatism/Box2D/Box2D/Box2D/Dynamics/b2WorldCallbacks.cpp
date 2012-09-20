@@ -59,3 +59,4 @@ void b2DebugDraw::ClearFlags(uint32 flags)
 {
 	m_drawFlags &= ~flags;
 }
+

@@ -217,3 +217,4 @@ float32 b2WeldJoint::GetReactionTorque(float32 inv_dt) const
 {
 	return inv_dt * m_impulse.z;
 }
+

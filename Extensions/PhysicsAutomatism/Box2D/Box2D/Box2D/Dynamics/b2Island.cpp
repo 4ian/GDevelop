@@ -361,7 +361,7 @@ void b2Island::Report(const b2ContactConstraint* constraints)
 		b2Contact* c = m_contacts[i];
 
 		const b2ContactConstraint* cc = constraints + i;
-		
+
 		b2ContactImpulse impulse;
 		for (int32 j = 0; j < cc->pointCount; ++j)
 		{
@@ -372,3 +372,4 @@ void b2Island::Report(const b2ContactConstraint* constraints)
 		m_listener->PostSolve(c, &impulse);
 	}
 }
+

@@ -16,3 +16,4 @@ class ContactListener : public b2ContactListener
 };
 
 #endif // CONTACTLISTENER_H
+

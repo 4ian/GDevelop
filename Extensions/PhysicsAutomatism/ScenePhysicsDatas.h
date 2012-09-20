@@ -62,3 +62,4 @@ class ScenePhysicsDatas : public AutomatismsSharedDatas
 };
 
 #endif // SCENEPHYSICSDATAS_H
+

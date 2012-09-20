@@ -180,7 +180,7 @@ void b2GearJoint::SolveVelocityConstraints(const b2TimeStep& step)
 bool b2GearJoint::SolvePositionConstraints(float32 baumgarte)
 {
 	B2_NOT_USED(baumgarte);
-	
+
 	float32 linearError = 0.0f;
 
 	b2Body* b1 = m_bodyA;
@@ -257,3 +257,4 @@ float32 b2GearJoint::GetRatio() const
 {
 	return m_ratio;
 }
+

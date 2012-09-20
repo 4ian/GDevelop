@@ -241,3 +241,10 @@ void quat::print(FILE *dest, const char *name) const
     fprintf( dest, "%s:   v:<%3.2f %3.2f %3.2f>  s:%3.2f\n", 
         name, v[0], v[1], v[2], s );
 }   
+
+
+
+
+
+
+

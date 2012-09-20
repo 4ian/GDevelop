@@ -193,7 +193,7 @@ void b2DynamicTree::InsertLeaf(int32 leaf)
 	int32 sibling = m_root;
 	if (m_nodes[sibling].IsLeaf() == false)
 	{
-		do 
+		do
 		{
 			int32 child1 = m_nodes[sibling].child1;
 			int32 child2 = m_nodes[sibling].child2;
@@ -240,7 +240,7 @@ void b2DynamicTree::InsertLeaf(int32 leaf)
 		m_nodes[sibling].parent = node2;
 		m_nodes[leaf].parent = node2;
 
-		do 
+		do
 		{
 			if (m_nodes[node1].aabb.Contains(m_nodes[node2].aabb))
 			{
@@ -363,3 +363,4 @@ int32 b2DynamicTree::ComputeHeight() const
 {
 	return ComputeHeight(m_root);
 }
+

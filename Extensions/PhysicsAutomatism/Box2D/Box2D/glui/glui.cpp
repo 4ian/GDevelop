@@ -2103,3 +2103,10 @@ void GLUI_Master_Object::glui_setIdleFuncIfNecessary( void )
   else
     glutIdleFunc( NULL );  
 }
+
+
+
+
+
+
+

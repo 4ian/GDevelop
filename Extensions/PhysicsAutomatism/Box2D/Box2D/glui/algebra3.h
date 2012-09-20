@@ -473,3 +473,10 @@ vec3 operator * (const vec3 &v, const mat4 &a);
 vec4 operator * (const vec4 &v, const mat4 &a);
 
 #endif
+
+
+
+
+
+
+

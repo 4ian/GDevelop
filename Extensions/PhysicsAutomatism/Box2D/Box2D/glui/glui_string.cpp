@@ -60,3 +60,10 @@ GLUI_String& glui_format_str(GLUI_String& str, const char* fmt, ...)
   str=buf;
   return str;
 }
+
+
+
+
+
+
+

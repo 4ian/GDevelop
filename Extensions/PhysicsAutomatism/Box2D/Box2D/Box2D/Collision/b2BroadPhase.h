@@ -227,3 +227,4 @@ inline void b2BroadPhase::RayCast(T* callback, const b2RayCastInput& input) cons
 }
 
 #endif
+

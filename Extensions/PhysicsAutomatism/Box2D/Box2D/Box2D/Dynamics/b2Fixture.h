@@ -324,3 +324,4 @@ inline const b2AABB& b2Fixture::GetAABB() const
 }
 
 #endif
+

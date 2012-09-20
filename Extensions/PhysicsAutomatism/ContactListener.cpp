@@ -20,3 +20,4 @@ void ContactListener::EndContact( b2Contact * contact )
     automatism1->currentContacts.erase(automatism2);
     automatism2->currentContacts.erase(automatism1);
 }
+

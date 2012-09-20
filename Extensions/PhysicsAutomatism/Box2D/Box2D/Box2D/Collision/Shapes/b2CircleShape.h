@@ -85,3 +85,4 @@ inline const b2Vec2& b2CircleShape::GetVertex(int32 index) const
 }
 
 #endif
+

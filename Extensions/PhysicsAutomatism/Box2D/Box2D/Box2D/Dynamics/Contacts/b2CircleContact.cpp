@@ -50,3 +50,4 @@ void b2CircleContact::Evaluate(b2Manifold* manifold, const b2Transform& xfA, con
 					(b2CircleShape*)m_fixtureA->GetShape(), xfA,
 					(b2CircleShape*)m_fixtureB->GetShape(), xfB);
 }
+

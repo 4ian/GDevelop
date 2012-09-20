@@ -557,3 +557,10 @@ void  GLUI_Translation::set_one_val( float val, int index )
     this->glui->post_update_main_gfx();
   }
 }
+
+
+
+
+
+
+

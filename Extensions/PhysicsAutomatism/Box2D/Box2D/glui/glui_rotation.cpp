@@ -471,3 +471,10 @@ void GLUI_Rotation::common_init( void )
 
   reset();
 }
+
+
+
+
+
+
+

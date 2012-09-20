@@ -42,3 +42,10 @@ GLUI_Glut_Window::GLUI_Glut_Window()
 	glut_entry_CB(NULL)
 {
 }
+
+
+
+
+
+
+

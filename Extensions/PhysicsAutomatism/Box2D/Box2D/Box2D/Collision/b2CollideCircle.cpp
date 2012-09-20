@@ -152,3 +152,4 @@ void b2CollidePolygonAndCircle(
 		manifold->points[0].id.key = 0;
 	}
 }
+

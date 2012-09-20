@@ -1196,3 +1196,10 @@ int    GLUI_EditText::mouse_over( int state, int x, int y )
 
   return true;
 }
+
+
+
+
+
+
+

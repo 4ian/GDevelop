@@ -46,3 +46,4 @@ void ScenePhysicsDatas::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("scaleX", scaleX);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_FLOAT("scaleY", scaleY);
 }
+

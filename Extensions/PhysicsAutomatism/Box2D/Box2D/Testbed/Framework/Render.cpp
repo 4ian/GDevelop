@@ -191,3 +191,10 @@ void DebugDraw::DrawAABB(b2AABB* aabb, const b2Color& c)
 	glVertex2f(aabb->lowerBound.x, aabb->upperBound.y);
 	glEnd();
 }
+
+
+
+
+
+
+

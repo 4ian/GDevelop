@@ -51,7 +51,7 @@ void b2WorldManifold::Initialize(const b2Manifold* manifold,
 		{
 			normal = b2Mul(xfA.R, manifold->localNormal);
 			b2Vec2 planePoint = b2Mul(xfA, manifold->localPoint);
-			
+
 			for (int32 i = 0; i < manifold->pointCount; ++i)
 			{
 				b2Vec2 clipPoint = b2Mul(xfB, manifold->points[i].localPoint);
@@ -248,3 +248,4 @@ bool b2TestOverlap(const b2Shape* shapeA, const b2Shape* shapeB,
 
 	return output.distance < 10.0f * b2_epsilon;
 }
+

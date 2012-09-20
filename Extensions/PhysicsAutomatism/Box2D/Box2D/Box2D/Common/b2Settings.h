@@ -149,3 +149,4 @@ inline float32 b2MixRestitution(float32 restitution1, float32 restitution2)
 }
 
 #endif
+

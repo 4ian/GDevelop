@@ -385,3 +385,10 @@ void GLUI_TreePanel::resetToRoot(GLUI_Panel *new_root)
     curr_branch=(GLUI_Tree *)curr_branch->next();
   }
 }
+
+
+
+
+
+
+

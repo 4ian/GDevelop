@@ -160,3 +160,10 @@ public:
 	// Otherwise the default filter is used (b2CollisionFilter).
 	void SetFilter(b2CollisionFilter* filter);
 */
+
+
+
+
+
+
+

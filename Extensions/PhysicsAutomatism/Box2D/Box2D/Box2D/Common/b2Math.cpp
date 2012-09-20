@@ -53,3 +53,4 @@ b2Vec2 b2Mat33::Solve22(const b2Vec2& b) const
 	x.y = det * (a11 * b.y - a21 * b.x);
 	return x;
 }
+

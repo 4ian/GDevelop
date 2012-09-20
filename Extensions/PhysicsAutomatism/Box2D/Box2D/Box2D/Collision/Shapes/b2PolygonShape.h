@@ -129,3 +129,4 @@ inline const b2Vec2& b2PolygonShape::GetVertex(int32 index) const
 }
 
 #endif
+

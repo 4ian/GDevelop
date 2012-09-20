@@ -161,3 +161,4 @@ class PhysicsAutomatismEditor: public wxDialog
 
 #endif
 #endif
+

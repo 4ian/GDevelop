@@ -254,6 +254,7 @@ void PhysicsAutomatism::SetDynamic(RuntimeScene & scene )
 
     if ( !body ) CreateBody(scene);
     body->SetType(b2_dynamicBody);
+    body->SetAwake(true);
 }
 
 /**
@@ -738,3 +739,4 @@ std::vector<sf::Vector2f> PhysicsAutomatism::GetCoordsVectorFromString(const std
 
     return coordsVec;
 }
+

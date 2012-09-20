@@ -229,3 +229,4 @@ bool b2TOISolver::Solve(float32 baumgarte)
 	// push the separation above -b2_linearSlop.
 	return minSeparation >= -1.5f * b2_linearSlop;
 }
+

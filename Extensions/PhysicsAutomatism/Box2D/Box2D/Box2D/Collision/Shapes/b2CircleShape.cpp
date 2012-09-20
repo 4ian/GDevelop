@@ -87,3 +87,4 @@ void b2CircleShape::ComputeMass(b2MassData* massData, float32 density) const
 	// inertia about the local origin
 	massData->I = massData->mass * (0.5f * m_radius * m_radius + b2Dot(m_p, m_p));
 }
+

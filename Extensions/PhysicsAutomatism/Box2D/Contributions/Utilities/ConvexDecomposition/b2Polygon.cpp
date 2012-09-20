@@ -1577,3 +1577,10 @@ b2PolyNode* b2PolyNode::GetRightestConnection(b2Vec2& incomingDir){
 	b2Assert(res);
 	return res;
 }
+
+
+
+
+
+
+

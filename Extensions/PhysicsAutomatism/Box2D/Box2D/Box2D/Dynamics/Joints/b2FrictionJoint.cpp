@@ -227,3 +227,4 @@ float32 b2FrictionJoint::GetMaxTorque() const
 {
 	return m_maxTorque;
 }
+

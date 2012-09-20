@@ -44,3 +44,10 @@ b2ConstantAccelController* b2ConstantAccelControllerDef::Create(b2BlockAllocator
 	void* mem = allocator->Allocate(sizeof(b2ConstantAccelController));
 	return new (mem) b2ConstantAccelController(this);
 }
+
+
+
+
+
+
+

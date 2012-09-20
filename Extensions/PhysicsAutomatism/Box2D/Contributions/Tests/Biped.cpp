@@ -185,3 +185,10 @@ Biped::~Biped(void)
 	m_world->DestroyBody(LHand);
 	m_world->DestroyBody(RHand);
 }
+
+
+
+
+
+
+

@@ -98,7 +98,7 @@ struct b2SeparationFunction
 			m_type = e_faceA;
 			b2Vec2 localPointA1 = m_proxyA->GetVertex(cache->indexA[0]);
 			b2Vec2 localPointA2 = m_proxyA->GetVertex(cache->indexA[1]);
-			
+
 			m_axis = b2Cross(localPointA2 - localPointA1, 1.0f);
 			m_axis.Normalize();
 			b2Vec2 normal = b2Mul(xfA.R, m_axis);
@@ -137,7 +137,7 @@ struct b2SeparationFunction
 
 				b2Vec2 localPointA = m_proxyA->GetVertex(*indexA);
 				b2Vec2 localPointB = m_proxyB->GetVertex(*indexB);
-				
+
 				b2Vec2 pointA = b2Mul(xfA, localPointA);
 				b2Vec2 pointB = b2Mul(xfB, localPointB);
 
@@ -151,7 +151,7 @@ struct b2SeparationFunction
 				b2Vec2 pointA = b2Mul(xfA, m_localPoint);
 
 				b2Vec2 axisB = b2MulT(xfB.R, -normal);
-				
+
 				*indexA = -1;
 				*indexB = m_proxyB->GetSupport(axisB);
 
@@ -481,3 +481,4 @@ void b2TimeOfImpact(b2TOIOutput* output, const b2TOIInput* input)
 
 	b2_toiMaxIters = b2Max(b2_toiMaxIters, iter);
 }
+

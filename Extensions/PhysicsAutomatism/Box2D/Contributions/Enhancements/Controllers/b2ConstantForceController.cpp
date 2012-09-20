@@ -45,3 +45,10 @@ b2ConstantForceController* b2ConstantForceControllerDef::Create(b2BlockAllocator
 	void* mem = allocator->Allocate(sizeof(b2ConstantForceController));
 	return new (mem) b2ConstantForceController(this);
 }
+
+
+
+
+
+
+

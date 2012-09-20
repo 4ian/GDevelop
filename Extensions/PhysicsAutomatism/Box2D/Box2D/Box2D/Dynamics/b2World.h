@@ -53,7 +53,7 @@ public:
 
 	/// Register a contact filter to provide specific control over collision.
 	/// Otherwise the default filter is used (b2_defaultFilter). The listener is
-	/// owned by you and must remain in scope. 
+	/// owned by you and must remain in scope.
 	void SetContactFilter(b2ContactFilter* filter);
 
 	/// Register a contact event listener. The listener is owned by you and must
@@ -130,7 +130,7 @@ public:
 	/// Get the world contact list. With the returned contact, use b2Contact::GetNext to get
 	/// the next contact in the world list. A NULL contact indicates the end of the list.
 	/// @return the head of the world contact list.
-	/// @warning contacts are 
+	/// @warning contacts are
 	b2Contact* GetContactList();
 
 	/// Enable/disable warm starting. For testing.
@@ -153,7 +153,7 @@ public:
 
 	/// Change the global gravity vector.
 	void SetGravity(const b2Vec2& gravity);
-	
+
 	/// Get the global gravity vector.
 	b2Vec2 GetGravity() const;
 
@@ -283,3 +283,4 @@ inline bool b2World::GetAutoClearForces() const
 }
 
 #endif
+

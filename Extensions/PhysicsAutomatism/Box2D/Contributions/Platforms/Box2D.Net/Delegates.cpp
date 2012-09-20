@@ -26,3 +26,10 @@ namespace Box2D
 		public delegate bool CollisionFilter(Shape shape1, Shape shape2);
 	}
 }
+
+
+
+
+
+
+

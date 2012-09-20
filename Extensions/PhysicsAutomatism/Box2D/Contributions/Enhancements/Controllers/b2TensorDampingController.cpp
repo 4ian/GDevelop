@@ -70,3 +70,10 @@ b2TensorDampingController* b2TensorDampingControllerDef::Create(b2BlockAllocator
 	void* mem = allocator->Allocate(sizeof(b2TensorDampingController));
 	return new (mem) b2TensorDampingController(this);
 }
+
+
+
+
+
+
+

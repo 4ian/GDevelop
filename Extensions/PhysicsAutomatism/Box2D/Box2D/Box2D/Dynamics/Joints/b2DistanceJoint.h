@@ -138,3 +138,4 @@ inline float32 b2DistanceJoint::GetDampingRatio() const
 }
 
 #endif
+

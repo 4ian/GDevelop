@@ -87,3 +87,4 @@ class RuntimeScenePhysicsDatas : public AutomatismsRuntimeSharedDatas
 };
 
 #endif // RUNTIMESCENEPHYSICSDATAS_H
+

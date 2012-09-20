@@ -131,10 +131,8 @@ bool Triangulate::Process(const Vector2fVector &contour,Vector2fVector &result)
       count = 2*nv;
     }
   }
-
-
-
   delete V;
 
   return true;
 }
+

@@ -112,3 +112,10 @@ quat quat_identity();        /* Returns quaternion identity element */
 quat quat_slerp(const quat &from, const quat &to, float t);
 
 #endif
+
+
+
+
+
+
+

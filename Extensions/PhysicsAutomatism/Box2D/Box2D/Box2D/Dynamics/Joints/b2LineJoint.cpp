@@ -293,7 +293,7 @@ void b2LineJoint::SolveVelocityConstraints(const b2TimeStep& step)
 		}
 		else
 		{
-			f2r = f1.x;	
+			f2r = f1.x;
 		}
 
 		m_impulse.x = f2r;
@@ -584,8 +584,6 @@ float32 b2LineJoint::GetMotorForce() const
 {
 	return m_motorImpulse;
 }
-
-
 
 
 

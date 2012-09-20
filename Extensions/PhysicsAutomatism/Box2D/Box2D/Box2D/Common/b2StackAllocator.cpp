@@ -81,3 +81,4 @@ int32 b2StackAllocator::GetMaxAllocation() const
 {
 	return m_maxAllocation;
 }
+

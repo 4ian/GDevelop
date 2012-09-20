@@ -150,3 +150,4 @@ class CustomPolygonDialog: public wxDialog
 #endif
 
 #endif
+

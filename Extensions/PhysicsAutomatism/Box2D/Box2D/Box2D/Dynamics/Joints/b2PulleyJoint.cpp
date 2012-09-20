@@ -425,3 +425,4 @@ float32 b2PulleyJoint::GetRatio() const
 {
 	return m_ratio;
 }
+

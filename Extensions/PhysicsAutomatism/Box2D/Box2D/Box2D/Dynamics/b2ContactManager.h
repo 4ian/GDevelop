@@ -40,7 +40,7 @@ public:
 	void Destroy(b2Contact* c);
 
 	void Collide();
-            
+
 	b2BroadPhase m_broadPhase;
 	b2Contact* m_contactList;
 	int32 m_contactCount;
@@ -50,3 +50,4 @@ public:
 };
 
 #endif
+

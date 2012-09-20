@@ -476,3 +476,10 @@ void BipedDef::DefaultPositions()
 	NeckDef.position									= k_scale * b2Vec2(-.102f,.518f);
 	HeadDef.position									= k_scale * b2Vec2(.022f,.738f);
 }
+
+
+
+
+
+
+

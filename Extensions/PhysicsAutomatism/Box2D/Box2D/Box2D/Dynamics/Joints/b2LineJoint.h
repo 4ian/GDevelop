@@ -168,3 +168,4 @@ inline float32 b2LineJoint::GetMotorSpeed() const
 }
 
 #endif
+

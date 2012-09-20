@@ -464,7 +464,7 @@ bool b2PrismaticJoint::SolvePositionConstraints(float32 baumgarte)
 	b2->m_sweep.a = a2;
 	b1->SynchronizeTransform();
 	b2->SynchronizeTransform();
-	
+
 	return linearError <= b2_linearSlop && angularError <= b2_angularSlop;
 }
 
@@ -584,3 +584,4 @@ float32 b2PrismaticJoint::GetMotorForce() const
 {
 	return m_motorImpulse;
 }
+

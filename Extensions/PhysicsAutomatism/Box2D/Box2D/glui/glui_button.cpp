@@ -184,3 +184,10 @@ void   GLUI_Button::update_size( void )
   if ( w < text_size + 16 )
     w = text_size + 16 ;
 }
+
+
+
+
+
+
+

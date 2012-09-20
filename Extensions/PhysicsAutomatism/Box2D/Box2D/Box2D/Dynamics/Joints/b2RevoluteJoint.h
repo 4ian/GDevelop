@@ -136,7 +136,7 @@ public:
 	float32 GetMotorTorque() const;
 
 protected:
-	
+
 	friend class b2Joint;
 	friend class b2GearJoint;
 
@@ -154,7 +154,7 @@ protected:
 
 	b2Mat33 m_mass;			// effective mass for point-to-point constraint.
 	float32 m_motorMass;	// effective mass for motor/limit angular constraint.
-	
+
 	bool m_enableMotor;
 	float32 m_maxMotorTorque;
 	float32 m_motorSpeed;
@@ -172,3 +172,4 @@ inline float32 b2RevoluteJoint::GetMotorSpeed() const
 }
 
 #endif
+

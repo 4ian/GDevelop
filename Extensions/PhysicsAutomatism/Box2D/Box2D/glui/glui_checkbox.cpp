@@ -186,3 +186,10 @@ void    GLUI_Checkbox::set_int_val( int new_val )
   output_live(true);
   redraw();
 }
+
+
+
+
+
+
+

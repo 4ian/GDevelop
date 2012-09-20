@@ -50,3 +50,4 @@ void b2PolygonContact::Evaluate(b2Manifold* manifold, const b2Transform& xfA, co
 						(b2PolygonShape*)m_fixtureA->GetShape(), xfA,
 						(b2PolygonShape*)m_fixtureB->GetShape(), xfB);
 }
+

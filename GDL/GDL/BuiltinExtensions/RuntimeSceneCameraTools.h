@@ -28,3 +28,4 @@ void GD_API SetCameraViewport( RuntimeScene & scene,  const std::string & layer,
 
 
 #endif // RUNTIMESCENECAMERATOOLS_H
+

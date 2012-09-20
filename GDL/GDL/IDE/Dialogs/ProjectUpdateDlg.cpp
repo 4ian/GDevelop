@@ -34,7 +34,7 @@ ProjectUpdateDlg::ProjectUpdateDlg(wxWindow* parent, std::string updateText)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
-	Create(parent, wxID_ANY, _("Modifications nécessaires"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Adjustements required"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17->AddGrowableCol(0);
@@ -43,7 +43,7 @@ ProjectUpdateDlg::ProjectUpdateDlg(wxWindow* parent, std::string updateText)
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/projectUpdate24.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Des changements dans Game Develop impliquent\ndes modifications au niveau de votre projet."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("You have to do some adjustements so as your gameto execute properly."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT3"));
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->Fit(Panel1);
@@ -52,7 +52,7 @@ ProjectUpdateDlg::ProjectUpdateDlg(wxWindow* parent, std::string updateText)
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer17->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Des modifications intervenues dans cette version ou une version\nprécédente de Game Develop impliquent que vous apportiez\nquelques adapatations à votre jeu afin que celui ci fonctionnent normalement :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("You have to do some adjustments to your game\ndue to some changes made to this ( or a previous ) version\nof Game Develop :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer2->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	updateTextEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(432,174), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer2->Add(updateTextEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -83,3 +83,4 @@ void ProjectUpdateDlg::OnokBtClick(wxCommandEvent& event)
     EndModal(0);
 }
 #endif
+

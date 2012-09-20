@@ -803,3 +803,4 @@ private:
 };
 
 #endif // EXTENSIONBASE_H
+

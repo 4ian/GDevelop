@@ -1173,8 +1173,6 @@
 		<Unit filename="GDL\IDE\MainEditorCommand.h" />
 		<Unit filename="GDL\IDE\SceneCanvasSettings.cpp" />
 		<Unit filename="GDL\IDE\SceneCanvasSettings.h" />
-		<Unit filename="GDL\IDE\gdTreeItemStringData.cpp" />
-		<Unit filename="GDL\IDE\gdTreeItemStringData.h" />
 		<Unit filename="GDL\ImageManager.cpp" />
 		<Unit filename="GDL\ImageManager.h" />
 		<Unit filename="GDL\InitialInstancesContainer.cpp" />

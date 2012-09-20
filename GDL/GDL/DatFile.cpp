@@ -3,9 +3,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <fstream>
-
-
-
 DatFile::DatFile (void)
 {
     m_buffer = NULL;
@@ -228,3 +225,4 @@ long int DatFile::GetFileSize (std::string filename)
     }
     return (0);
 }
+

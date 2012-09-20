@@ -166,3 +166,4 @@ void ChangesNotifier::RequestAutomatismsSharedDataUpdate(gd::Project & project, 
 }
 
 #endif
+

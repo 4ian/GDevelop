@@ -16,3 +16,4 @@ bool GD_API MouseButtonPressed( RuntimeScene & scene, const std::string & key );
 int GD_API GetMouseWheelDelta(RuntimeScene & scene );
 
 #endif // MOUSETOOLS_H
+

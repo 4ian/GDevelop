@@ -187,3 +187,4 @@ StandardEvent& StandardEvent::operator=(const StandardEvent & event)
 }
 
 #endif
+

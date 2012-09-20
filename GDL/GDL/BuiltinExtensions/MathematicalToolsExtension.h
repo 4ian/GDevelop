@@ -22,3 +22,4 @@ class MathematicalToolsExtension : public ExtensionBase
 };
 
 #endif // MATHEMATICALTOOLSEXTENSION_H
+

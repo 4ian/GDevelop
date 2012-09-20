@@ -19,3 +19,4 @@ void GD_API EndProfileTimer(RuntimeScene & scene, unsigned int id);
 #endif // PROFILETOOLS_H
 
 #endif
+

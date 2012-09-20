@@ -132,3 +132,4 @@ protected:
 };
 
 #endif // AUTOMATISM_H
+

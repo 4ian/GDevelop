@@ -18,3 +18,4 @@ class SceneExtension : public ExtensionBase
 };
 
 #endif // SCENEEXTENSION_H
+

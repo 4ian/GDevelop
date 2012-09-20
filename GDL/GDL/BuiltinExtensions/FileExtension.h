@@ -28,3 +28,4 @@ class FileExtension : public ExtensionBase
 };
 
 #endif // FILEEXTENSION_H
+

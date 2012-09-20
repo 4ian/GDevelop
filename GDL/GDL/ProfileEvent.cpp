@@ -76,3 +76,4 @@ ProfileEvent& ProfileEvent::operator=(const ProfileEvent & event)
 }
 
 #endif
+

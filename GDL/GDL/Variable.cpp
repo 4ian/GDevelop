@@ -47,3 +47,4 @@ const std::string & Variable::GetString() const
 
     return str;
 }
+

@@ -41,3 +41,4 @@ double GD_API GetSoundPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int
 double GD_API GetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int channel);
 
 #endif // AUDIOTOOLS_H
+

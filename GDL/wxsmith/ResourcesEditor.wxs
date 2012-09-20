@@ -74,7 +74,7 @@
 													<item2></item2>
 												</items_text>
 												<size>200,170</size>
-												<tooltip>Clic droit sur une image pour accéder aux options</tooltip>
+												<tooltip>Right click on an image to access to more options</tooltip>
 												<style>wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE</style>
 												<handler function="OnresourcesTreeBeginDrag" entry="EVT_TREE_BEGIN_DRAG" />
 												<handler function="OnresourcesTreeBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
@@ -114,93 +114,93 @@
 		</object>
 		<object class="wxMenu" variable="ContextMenu" member="yes">
 			<object class="wxMenuItem" name="idMenuModProp" variable="editMenuItem" member="no">
-				<label>Modifier les propriétés de l&apos;image</label>
+				<label>Modify the image properties</label>
 				<bitmap>res/editpropicon.png</bitmap>
 				<handler function="OnModPropSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuMod" variable="MenuItem3" member="no">
-				<label>Modifier le nom de l&apos;image</label>
+				<label>Change the image name</label>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OnModNameImageBtClick" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuModFile" variable="MenuItem4" member="yes">
-				<label>Modifier le fichier de l&apos;image</label>
+				<label>Change image&apos;s file</label>
 				<bitmap>res/openicon.png</bitmap>
 				<handler function="OnModFileImage" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuAjouter" variable="MenuItem1" member="no">
-				<label>Ajouter une image</label>
+				<label>Add an image</label>
 				<bitmap>res/addicon.png</bitmap>
 				<handler function="OnAddImageBtClick" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuDel" variable="deleteImageItem" member="no">
-				<label>Supprimer l&apos;image</label>
+				<label>Delete the image</label>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDelImageBtClick" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM9" variable="MenuItem14" member="yes">
-				<label>Supprimer seulement du dossier</label>
+				<label>Remove from folder only</label>
 				<handler function="OnremoveFolderOnlySelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMoveUp" variable="MenuItem7" member="yes">
-				<label>Déplacer vers le haut</label>
+				<label>Move up</label>
 				<accel>Ctrl-P</accel>
-				<help>Déplacer l&apos;image vers le haut dans la liste</help>
+				<help>Move the image up</help>
 				<bitmap>res/up.png</bitmap>
 				<handler function="OnMoveUpSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMoveDown" variable="MenuItem8" member="yes">
-				<label>Déplacer vers le bas</label>
-				<help>Déplacer l&apos;image vers le bas dans la liste</help>
+				<label>Move down</label>
+				<help>Move the image down</help>
 				<bitmap>res/down.png</bitmap>
 				<handler function="OnMoveDownSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="emptyMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem2" member="yes">
-				<label>Ajouter une image</label>
+				<label>Add an image</label>
 				<bitmap>res/addicon.png</bitmap>
 				<handler function="OnAddImageBtClick" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="MenuItem6" member="yes">
-				<label>Ajouter un dossier</label>
+				<label>Add a folder</label>
 				<bitmap>res/dossier.png</bitmap>
 				<handler function="OnAddFolderSelected" entry="EVT_MENU" />
 			</object>
 		</object>
 		<object class="wxMenu" variable="folderMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem9" member="yes">
-				<label>Renommer</label>
+				<label>Rename</label>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OnModNameImageBtClick" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM5" variable="MenuItem13" member="yes">
-				<label>Supprimer</label>
+				<label>Delete</label>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnRemoveFolderSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM6" variable="MenuItem10" member="yes">
-				<label>Ajouter une image</label>
+				<label>Add an image</label>
 				<bitmap>res/addicon.png</bitmap>
 				<handler function="OnAddImageBtClick" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItem5" member="yes">
-				<label>Ajouter un dossier</label>
+				<label>Add a folder</label>
 				<handler function="OnAddFolderSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem11" member="yes">
-				<label>Déplacer vers le haut</label>
+				<label>Move up</label>
 				<bitmap>res/up.png</bitmap>
 				<handler function="OnMoveUpSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM8" variable="MenuItem12" member="yes">
-				<label>Déplacer vers le bas</label>
+				<label>Move down</label>
 				<bitmap>res/down.png</bitmap>
 				<handler function="OnMoveDownSelected" entry="EVT_MENU" />
 			</object>

@@ -23,3 +23,4 @@ class JoystickExtension : public ExtensionBase
 };
 
 #endif // JOYSTICKEXTENSION_H
+

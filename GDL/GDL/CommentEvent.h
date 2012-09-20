@@ -56,3 +56,4 @@ class GD_API CommentEvent : public gd::BaseEvent
 #endif // COMMENTEVENT_H
 
 #endif
+

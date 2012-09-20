@@ -42,3 +42,4 @@ class GD_API ProfileEvent : public gd::BaseEvent
 #endif // PROFILEEVENT_H
 
 #endif
+

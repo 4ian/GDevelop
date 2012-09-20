@@ -77,3 +77,4 @@ class EditRepeatEvent: public wxDialog
 
 #endif
 #endif
+

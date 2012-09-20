@@ -118,3 +118,4 @@ CollisionResult PolygonCollisionTest(Polygon2d & p1, Polygon2d & p2)
 
     return result;
 }
+

@@ -4,79 +4,79 @@
 FileExtension::FileExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinFile",
-                          _("Fichiers"),
-                          _("Extension offrant des actions et conditions sur les fichiers, integrée en standard."),
+                          _("Files"),
+                          _("Builtin extension providing actions and conditions on files."),
                           "Compil Games",
                           "Freeware")
     #if defined(GD_IDE_ONLY)
 
     DECLARE_CONDITION("FileExists",
-                   _("Le fichier existe"),
-                   _("Teste si le fichier existe."),
-                   _("Le fichier _PARAM0_ existe"),
-                   _("Fichiers"),
+                   _("A file exists"),
+                   _("Test if the file exists."),
+                   _("The file _PARAM0_ exists"),
+                   _("Files"),
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png");
 
-        instrInfo.AddParameter("file", _("Nom du fichier"), "",false);
+        instrInfo.AddParameter("file", _("Filename"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("FileExists").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("GroupExists",
-                   _("Existence d'un groupe"),
-                   _("Teste si le groupe ( de la forme /Racine/Exemple/1 ) existe dans le fichier.\nAttention ! Les espaces sont interdits dans le nom des groupes."),
-                   _("Le groupe _PARAM1_ existe dans le fichier _PARAM0_"),
-                   _("Fichiers XML"),
+                   _("Existence of a group"),
+                   _("Test if a group ( Example : Root/Level/3 ) exists in the file.\nWarning ! Spaces are forbidden in group's names."),
+                   _("The group _PARAM1_ exists in file _PARAM0_"),
+                   _("XML Files"),
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png");
 
-        instrInfo.AddParameter("file", _("Nom du fichier"), "",false);
-        instrInfo.AddParameter("string", _("Groupe"), "",false);
+        instrInfo.AddParameter("file", _("Filename"), "",false);
+        instrInfo.AddParameter("string", _("Group"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GroupExists").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_ACTION("LoadFile",
-                   _("Charger un fichier XML en mémoire"),
-                   _("Cette action charge le fichier XML en mémoire, pour permettre de lire et écrire dedans.\nIl est possible de lire et d'écrire dans un fichier XML sans passer par cette action, mais les performances seront moindres.\nN'oubliez surtout pas de décharger le fichier de la mémoire une fois les opérations terminées."),
-                   _("Charger le fichier XML _PARAM0_ en mémoire"),
-                   _("Fichiers XML"),
+                   _("Load a XML file in memory"),
+                   _("This action load the xml file in memory, so as to write and read it.\nYou can open and write without using this action, but it will be slower.\nIf you use this action, do not forget to unload the file from memory."),
+                   _("Load XML File _PARAM0_ in memory"),
+                   _("XML Files"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png");
 
-        instrInfo.AddParameter("file", _("Fichier"), "",false);
+        instrInfo.AddParameter("file", _("File"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("LoadFileInMemory").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("UnloadFile",
-                   _("Fermer un fichier XML chargé en mémoire"),
-                   _("Cette action ferme le fichier XML chargé précédemment en mémoire, en enregistrant les modifications apportées à celui ci."),
-                   _("Fermer le fichier XML _PARAM0_ chargé en mémoire"),
-                   _("Fichiers XML"),
+                   _("Close a XML file loaded in memory"),
+                   _("This action close the XML file previously loaded in memory, saving all changes made."),
+                   _("Close XML File _PARAM0_"),
+                   _("XML Files"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png");
 
-        instrInfo.AddParameter("file", _("Fichier"), "",false);
+        instrInfo.AddParameter("file", _("File"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("UnloadFileFromMemory").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("EcrireFichierExp",
-                   _("Ecrire une valeur"),
-                   _("Cette action écrit le résultat de l'expression dans le fichier, dans le groupe indiqué.\nIndiquez la structure du groupe en séparant les éléments par des /. (Exemple : Racine/MonPersonnage/X)\nAttention ! Les espaces sont interdits dans le nom des groupes."),
-                   _("Ecrire _PARAM2_ dans _PARAM1_ du fichier _PARAM0_"),
-                   _("Fichiers XML"),
+                   _("Write a value"),
+                   _("This action write the result of the expression in the file, in the specified group.\nIndicate the structure leading to the group by separing elements with / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in group's names."),
+                   _("Write _PARAM2_ in _PARAM1_ of file _PARAM0_"),
+                   _("XML Files"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png");
 
-        instrInfo.AddParameter("file", _("Fichier"), "",false);
-        instrInfo.AddParameter("string", _("Groupe"), "",false);
+        instrInfo.AddParameter("file", _("File"), "",false);
+        instrInfo.AddParameter("string", _("Group"), "",false);
         instrInfo.AddParameter("expression", _("Expression"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("WriteValueInFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
@@ -84,107 +84,107 @@ FileExtension::FileExtension()
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("EcrireFichierTxt",
-                   _("Ecrire un texte"),
-                   _("Cette action écrit le texte dans le fichier, dans le groupe indiqué.\nIndiquez la structure du groupe en séparant les éléments par des /. (Exemple : Racine/MonPersonnage/X)\nAttention ! Les espaces sont interdits dans le nom des groupes."),
-                   _("Ecrire _PARAM2_ dans _PARAM1_ du fichier _PARAM0_"),
-                   _("Fichiers XML"),
+                   _("Write a text"),
+                   _("This action write the text in the file, in the specified group.\nIndicate the structure leading to the group by separing elements with / ( Example : Root/Level/Current)\nWarning ! Spaces are forbidden in group's names."),
+                   _("Write _PARAM2_ in _PARAM1_ of file _PARAM0_"),
+                   _("XML Files"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png");
 
-        instrInfo.AddParameter("file", _("Fichier"), "",false);
-        instrInfo.AddParameter("string", _("Groupe"), "",false);
-        instrInfo.AddParameter("string", _("Texte"), "",false);
+        instrInfo.AddParameter("file", _("File"), "",false);
+        instrInfo.AddParameter("string", _("Group"), "",false);
+        instrInfo.AddParameter("string", _("Text"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("WriteStringInFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("LireFichierExp",
-                   _("Lire une valeur"),
-                   _("Cette action lit la valeur du groupe indiqué et\nla stocke dans une variable de la scène.\nIndiquez la structure du groupe en séparant les éléments par des /. (Exemple : Racine/Niveau/Actuel)\nAttention ! Les espaces sont interdits dans le nom des groupes."),
-                   _("Lire le groupe _PARAM1_ du fichier _PARAM0_ et stocker la valeur dans _PARAM3_"),
-                   _("Fichiers XML"),
+                   _("Read a value"),
+                   _("This action read the value saved in the specified group and\nsave it in a variable.\nIndicate the structure leading to the group by separing elements with / ( Example : Root/Level/Current)^nWarning ! Spaces are forbidden in group's names."),
+                   _("Read group _PARAM1_ from file _PARAM0_ and save value in _PARAM3_"),
+                   _("XML Files"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png");
 
-        instrInfo.AddParameter("file", _("Fichier"), "",false);
-        instrInfo.AddParameter("string", _("Groupe"), "",false);
+        instrInfo.AddParameter("file", _("File"), "",false);
+        instrInfo.AddParameter("string", _("Group"), "",false);
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("scenevar", _("Variable de la scène"), "",false);
+        instrInfo.AddParameter("scenevar", _("Scene variables"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("ReadValueFromFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("LireFichierTxt",
-                   _("Lire un texte"),
-                   _("Cette action lit le texte du groupe indiqué et\nle stocke dans une variable de la scène.\nIndiquez la structure du groupe en séparant les éléments par des /. (Exemple : Racine/Niveau/Actuel)\nAttention ! Les espaces sont interdits dans le nom des groupes."),
-                   _("Lire le groupe _PARAM1_ du fichier _PARAM0_ et stocker le texte dans _PARAM3_"),
-                   _("Fichiers XML"),
+                   _("Read a text"),
+                   _("This action read the text saved in the specified group and\nsave it in a variable.\nIndicate the structure leading to the group by separing elements with / ( Example : Root/Level/Current)^nWarning ! Spaces are forbidden in group's names."),
+                   _("Read group _PARAM1_ from file _PARAM0_ and save text in _PARAM3_"),
+                   _("XML Files"),
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png");
 
-        instrInfo.AddParameter("file", _("Fichier"), "",false);
-        instrInfo.AddParameter("string", _("Groupe"), "",false);
+        instrInfo.AddParameter("file", _("File"), "",false);
+        instrInfo.AddParameter("string", _("Group"), "",false);
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("scenevar", _("Variable de la scène"), "",false);
+        instrInfo.AddParameter("scenevar", _("Scene variables"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("ReadStringFromFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("DeleteFichier",
-                   _("Supprimer un fichier"),
-                   _("Supprime le fichier de façon définitive."),
-                   _("Supprimer le fichier _PARAM0_"),
-                   _("Fichiers"),
+                   _("Delete a file"),
+                   _("Delete the file."),
+                   _("Delete the file _PARAM0_"),
+                   _("Files"),
                    "res/actions/delete24.png",
                    "res/actions/delete.png");
 
-        instrInfo.AddParameter("file", _("Nom du fichier"), "",false);
+        instrInfo.AddParameter("file", _("Filename"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GDDeleteFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("DeleteGroupFichier",
-                   _("Supprimer un groupe"),
-                   _("Cette action supprime le groupe indiqué du fichier XML.\nIndiquez la structure du groupe en séparant les éléments par des /. (Exemple : Racine/Niveau/Actuel)"),
-                   _("Supprimer le groupe _PARAM1_ du fichier _PARAM0_"),
-                   _("Fichiers XML"),
+                   _("Delete a group"),
+                   _("This action delete the specified group from the XML file.\nIndicate the structure leading to the group by separing elements with / (Example : Root/Level/Current)"),
+                   _("Delete the group _PARAM1_ from the file _PARAM0_"),
+                   _("XML Files"),
                    "res/actions/delete24.png",
                    "res/actions/delete.png");
 
-        instrInfo.AddParameter("file", _("Nom du fichier"), "",false);
-        instrInfo.AddParameter("string", _("Groupe"), "",false);
+        instrInfo.AddParameter("file", _("Filename"), "",false);
+        instrInfo.AddParameter("string", _("Group"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("DeleteGroupFromFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("LaunchFile",
-                   _("Lancer un fichier"),
-                   _("Cette action lance le fichier indiqué."),
-                   _("Lancer le fichier _PARAM0_"),
-                   _("Fichiers"),
+                   _("Launch a file"),
+                   _("This action launch the specified file."),
+                   _("Launch the file _PARAM0_"),
+                   _("Files"),
                    "res/actions/launchFile24.png",
                    "res/actions/launchFile.png");
 
-        instrInfo.AddParameter("file", _("Nom du fichier"), "",false);
+        instrInfo.AddParameter("file", _("Filename"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("LaunchFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ExecuteCmd",
-                   _("Executer une commande"),
-                   _("Cette action execute la commande indiqué."),
-                   _("Executer _PARAM0_"),
-                   _("Fichiers"),
+                   _("Execute a command"),
+                   _("This action execute the specified command."),
+                   _("Execute _PARAM0_"),
+                   _("Files"),
                    "res/actions/launchFile24.png",
                    "res/actions/launchFile.png");
 
-        instrInfo.AddParameter("string", _("Commande"), "",false);
+        instrInfo.AddParameter("string", _("Command"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("ExecuteCmd").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
@@ -203,7 +203,7 @@ void FileExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int pr
     {
         if ( propertyNb == i )
         {
-            name = _("Fichier ouvert :");
+            name = _("Opened file:");
             value = iter->first;
 
             return;
@@ -223,3 +223,4 @@ unsigned int FileExtension::GetNumberOfProperties(RuntimeScene & scene) const
     return XmlFilesManager::GetOpenedFilesList().size();
 }
 #endif
+

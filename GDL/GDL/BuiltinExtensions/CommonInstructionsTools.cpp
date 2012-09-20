@@ -92,3 +92,4 @@ double GD_API ToDeg( double angle )
 }
 
 }
+

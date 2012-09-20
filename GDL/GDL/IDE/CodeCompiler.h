@@ -227,3 +227,4 @@ private:
 
 #endif // CODECOMPILER_H
 #endif
+

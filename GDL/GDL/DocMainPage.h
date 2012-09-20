@@ -217,8 +217,8 @@ The declarations are made with macros so as to make these declarations easier. T
     Extension()
     {
             DECLARE_THE_EXTENSION("TextObject",
-                                  _("Objet Texte"),
-                                  _("Extension permettant d'utiliser un objet affichant du texte."),
+                                  _("Text object"),
+                                  _("Extension allowing to use an object displaying a text."),
                                   "Compil Games",
                                   "zlib/libpng License ( Open Source )")
  * \endcode
@@ -589,4 +589,5 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
  * \brief Part of the tinyxml library
  * \ingroup TinyXml
  */
+
 

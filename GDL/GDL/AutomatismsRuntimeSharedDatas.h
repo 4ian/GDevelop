@@ -30,3 +30,4 @@ class AutomatismsRuntimeSharedDatas
 };
 
 #endif // AUTOMATISMSRUNTIMESHAREDDATAS_H
+

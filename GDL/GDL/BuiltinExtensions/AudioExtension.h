@@ -31,3 +31,4 @@ class AudioExtension : public ExtensionBase
 };
 
 #endif // AUDIOEXTENSION_H
+

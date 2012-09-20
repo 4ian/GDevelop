@@ -35,3 +35,4 @@ void RuntimeGame::Init(const RuntimeGame & runtimeGame)
     shaderManager = boost::shared_ptr<ShaderManager>(new ShaderManager(*runtimeGame.shaderManager));
     shaderManager->SetGame(this);
 }
+

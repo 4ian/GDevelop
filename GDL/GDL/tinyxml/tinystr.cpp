@@ -114,3 +114,4 @@ TiXmlString operator + (const char* a, const TiXmlString & b)
 
 
 #endif	// TIXML_USE_STL
+

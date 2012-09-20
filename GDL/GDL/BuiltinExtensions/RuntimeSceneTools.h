@@ -225,3 +225,4 @@ bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene );
 #endif
 
 #endif // RUNTIMESCENETOOLS_H
+

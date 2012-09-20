@@ -84,3 +84,4 @@ void Music::UpdateVolume()
     SoundManager * soundManager = SoundManager::GetInstance();
     music.SetVolume(volume * soundManager->GetGlobalVolume()/100.f);
 }
+

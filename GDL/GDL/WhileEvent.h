@@ -89,3 +89,4 @@ class WhileEvent : public gd::BaseEvent
 #endif // WHILEEVENT_H
 
 #endif
+

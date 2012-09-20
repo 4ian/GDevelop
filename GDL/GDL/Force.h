@@ -46,3 +46,4 @@ class GD_API Force
 };
 
 #endif // FORCE_H_INCLUDED
+

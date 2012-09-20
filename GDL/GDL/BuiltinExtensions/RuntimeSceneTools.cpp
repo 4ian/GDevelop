@@ -344,11 +344,13 @@ void GD_API DisplayLegacyTextOnScene( RuntimeScene & scene, const std::string & 
 #if defined(GD_IDE_ONLY)
 bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene )
 {
-    if (wxMessageBox(_("Un évènement \"Tant que\" s'est repété pendant 100000 itérations : Il se peut que vous ayez créé une boucle infine, qui se répète sans s'arrêter et qui va donc bloquer le logiciel.\n\n"
-                       "Si vous souhaitez arrêter l'aperçu pour corriger le problème, cliquez sur Oui.\n"
-                       "Si vous souhaitez continuer l'aperçu, cliquez sur Non.\n"
-                       "Vous pouvez désactiver cette avertissement en éditant les évènements \"Tant que\" en double cliquant dessus.\n\n"
-                        "Arrêter l'aperçu ?"), _("Risque de boucle infine"), wxYES_NO|wxICON_EXCLAMATION ) == wxYES)
+    if (wxMessageBox(_("A \"While\" event was repeated 100000 times: You may have created an infinite loop, which is repeating itself indefinitely and which is going to freeze the software.\n"
+                       "\n"
+                       "If you want to stop the preview to correct the issue, click on Yes.\n"
+                       "If you want to continue the preview, click on No.\n"
+                       "You can deactivate this warning by double clicking on While events.\n"
+                       "\n"
+                       "Stop the preview?"), _("Infinite loop"), wxYES_NO|wxICON_EXCLAMATION ) == wxYES)
     {
         scene.running = false;
         return true;
@@ -357,3 +359,4 @@ bool GD_API WarnAboutInfiniteLoop( RuntimeScene & scene )
     return false;
 }
 #endif
+

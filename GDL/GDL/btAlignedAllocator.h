@@ -101,9 +101,7 @@ public:
 
 	friend bool operator==( const self_type & , const self_type & ) { return true; }
 };
-
-
-
 #endif //BT_ALIGNED_ALLOCATOR
 
 #endif
+

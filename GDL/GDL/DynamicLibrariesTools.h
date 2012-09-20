@@ -54,3 +54,4 @@ Handle SetLibraryGlobal(const char* path);
 };
 
 #endif // DYNAMICLIBRARIESTOOLS_H
+

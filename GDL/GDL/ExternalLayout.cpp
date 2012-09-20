@@ -25,3 +25,4 @@ void ExternalLayout::SaveToXml(TiXmlElement * element) const
     instances.SaveToXml(instancesElement);
 }
 #endif
+

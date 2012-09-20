@@ -23,3 +23,4 @@ class GD_API BaseObjectExtension : public ExtensionBase
 };
 
 #endif // BUILTINEXTENSION_H
+

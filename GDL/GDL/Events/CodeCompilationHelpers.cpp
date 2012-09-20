@@ -309,3 +309,4 @@ void GD_API CodeCompilationHelpers::CreateExternalSourceFileCompilationTask(Game
 }
 
 #endif
+

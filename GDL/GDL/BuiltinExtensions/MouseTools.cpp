@@ -67,3 +67,4 @@ int GD_API GetMouseWheelDelta( RuntimeScene & scene )
 
     return 0;
 }
+

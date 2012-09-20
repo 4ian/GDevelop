@@ -4,27 +4,28 @@
 ExternalLayoutsExtension::ExternalLayoutsExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinExternalLayouts",
-                          _("Agencements"),
-                          _("Extension integrée offrant des actions et conditions liés aux agencement externes"),
+                          _("External layouts"),
+                          _("Builtin extension providing actions and conditions related to external layouts"),
                           "Compil Games",
                           "Freeware")
 
     #if defined(GD_IDE_ONLY)
     DECLARE_ACTION("CreateObjectsFromExternalLayout",
-                   _("Créer des objets depuis un agencement externe"),
-                   _("Créer les objets de l'agencement externe spécifié."),
-                   _("Créer les objets de l'agencement externe _PARAM1_"),
-                   _("Agencements externes"),
+                   _("Create objects from an external layout"),
+                   _("Create objects from an external layout."),
+                   _("Create objects from the external layout _PARAM1_"),
+                   _("External layouts"),
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("string", _("Nom de l'agencement externe"), "",false);
-        instrInfo.AddParameter("expression", _("Position X de l'origine"), "",true).SetDefaultValue("0");
-        instrInfo.AddParameter("expression", _("Position Y de l'origine"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("string", _("Name of the external layout"), "",false);
+        instrInfo.AddParameter("expression", _("X position of the origin"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Y position of the origin"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("ExternalLayoutsTools::CreateObjectsFromExternalLayout").SetIncludeFile("GDL/BuiltinExtensions/ExternalLayoutsTools.h");
 
     DECLARE_END_ACTION()
     #endif
 }
+

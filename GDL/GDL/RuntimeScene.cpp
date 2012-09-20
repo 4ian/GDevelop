@@ -612,3 +612,4 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const I
 
     return true;
 }
+

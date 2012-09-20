@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="SpriteObjectEditor">
-		<title>Edition de l&apos;objet Sprite</title>
+		<title>Edition of a Sprite object</title>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
 		<object class="wxAuiManager" variable="mgr" member="yes">
@@ -27,20 +27,20 @@
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarItem" name="ID_MASKITEM" variable="maskItem_" member="yes">
 															<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;maskEdit16" />
-															<shorthelp>Editer les masques de collision</shorthelp>
+															<shorthelp>Edit the collision masks ( Hit boxes )</shorthelp>
 															<itemkind>Check</itemkind>
 															<handler function="OnMaskEditClick" entry="EVT_TOOL" />
 														</object>
-														<label>Editer les masques de collision</label>
+														<label>Edit the collision masks ( Hit boxes )</label>
 													</object>
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarItem" name="ID_POINTSITEM" variable="pointsItem_" member="yes">
 															<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;pointEdit16" />
-															<shorthelp>Editer les points de l&apos;image</shorthelp>
+															<shorthelp>Edit the image&apos;s point</shorthelp>
 															<itemkind>Check</itemkind>
 															<handler function="OnPointEditClick" entry="EVT_TOOL" />
 														</object>
-														<label>Editer les points de l&apos;image</label>
+														<label>Edit the image&apos;s point</label>
 													</object>
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarSeparator" />
@@ -49,7 +49,7 @@
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM4" variable="AuiToolBarItem9" member="yes">
 															<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;preview16" />
-															<shorthelp>Aperçu</shorthelp>
+															<shorthelp>Preview</shorthelp>
 															<handler function="OnPreviewClick" entry="EVT_TOOL" />
 														</object>
 														<label>Item label</label>
@@ -61,10 +61,10 @@
 													<object class="AuiToolBarItem">
 														<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM2" variable="AuiToolBarItem2" member="yes">
 															<bitmap>res/helpicon.png</bitmap>
-															<shorthelp>Aperçu</shorthelp>
+															<shorthelp>Preview</shorthelp>
 															<handler function="OnHelpClick" entry="EVT_TOOL" />
 														</object>
-														<label>Aide</label>
+														<label>Help</label>
 													</object>
 												</object>
 												<name>PaneName</name>
@@ -177,7 +177,7 @@
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM5" variable="AuiToolBarItem10" member="yes">
 													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
-													<shorthelp>Ajouter une animation</shorthelp>
+													<shorthelp>Add an animation</shorthelp>
 													<handler function="OnAddAnimationSelected" entry="EVT_TOOL" />
 												</object>
 												<label>Item label</label>
@@ -185,7 +185,7 @@
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM8" variable="AuiToolBarItem11" member="yes">
 													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;remove16" />
-													<shorthelp>Supprimer une animation</shorthelp>
+													<shorthelp>Delete an animation</shorthelp>
 													<handler function="OnDeleteAnimationSelected" entry="EVT_TOOL" />
 												</object>
 												<label>Item label</label>
@@ -197,16 +197,16 @@
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_TOOLLOOP" variable="AuiToolBarItem12" member="yes">
 													<bitmap>res/repeat.png</bitmap>
-													<shorthelp>De/activer le bouclage de l&apos;animation</shorthelp>
+													<shorthelp>De/activate loop</shorthelp>
 													<itemkind>Check</itemkind>
 													<handler function="OnToolLoopClick" entry="EVT_TOOL" />
 												</object>
-												<label>De/activer le bouclage de l&apos;animation</label>
+												<label>De/activate loop</label>
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM10" variable="AuiToolBarItem13" member="yes">
 													<bitmap>res/time16.png</bitmap>
-													<shorthelp>Temps entre chaque image</shorthelp>
+													<shorthelp>Time between each images</shorthelp>
 													<handler function="OnTimeBetweenFramesSelected" entry="EVT_TOOL" />
 												</object>
 												<label>Item label</label>
@@ -343,10 +343,10 @@
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM1" variable="AuiToolBarItem1" member="yes">
 													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;defaultMask16" />
-													<shorthelp>Revenir au masque par défaut</shorthelp>
+													<shorthelp>Go back to default mask</shorthelp>
 													<handler function="OnDefaultMaskClick" entry="EVT_TOOL" />
 												</object>
-												<label>Revenir au masque par défaut</label>
+												<label>Go back to default mask</label>
 											</object>
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarSeparator" />
@@ -392,7 +392,7 @@
 					</object>
 				</object>
 				<name>maskPane</name>
-				<caption>Masques de collision</caption>
+				<caption>Collision masks ( Hit boxes )</caption>
 				<minimizebutton>0</minimizebutton>
 				<maximizebutton>0</maximizebutton>
 				<pinbutton>0</pinbutton>
@@ -435,10 +435,10 @@
 											<object class="AuiToolBarItem">
 												<object class="wxAuiToolBarItem" name="ID_POINTAPPLYWHOLEANIMITEM" variable="AuiToolBarItem4" member="yes">
 													<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;copy16" />
-													<shorthelp>Appliquer les changements à toutes les images de l&apos;animation</shorthelp>
+													<shorthelp>Apply changes to the whole animation</shorthelp>
 													<itemkind>Check</itemkind>
 												</object>
-												<label>Appliquer à toutes les images de l&apos;animation</label>
+												<label>Apply the changes to the whole animation</label>
 											</object>
 										</object>
 										<name>PaneName</name>
@@ -491,7 +491,7 @@
 					<handler function="OnpreviewPanelResize" entry="EVT_SIZE" />
 				</object>
 				<name>previewPane</name>
-				<caption>Aperçu</caption>
+				<caption>Preview</caption>
 				<minimizebutton>0</minimizebutton>
 				<maximizebutton>0</maximizebutton>
 				<pinbutton>0</pinbutton>
@@ -506,65 +506,65 @@
 			<object class="wxMenu" name="ID_MENUITEM4" variable="MenuItem2" member="yes">
 				<label>Type</label>
 				<object class="wxMenuItem" name="ID_MENUITEM5" variable="automaticRotationItem" member="yes">
-					<label>Rotation automatique</label>
+					<label>Automatic rotation</label>
 					<handler function="OnautomaticRotationItemSelected" entry="EVT_MENU" />
 					<radio>1</radio>
 				</object>
 				<object class="wxMenuItem" name="ID_MENUITEM6" variable="multipleDirectionsItem" member="yes">
-					<label>8 directions</label>
+					<label>8 Directions</label>
 					<handler function="OnmultipleDirectionsItemSelected" entry="EVT_MENU" />
 					<radio>1</radio>
 				</object>
 			</object>
 			<object class="wxMenuItem" name="ID_MENUTIMEBETWEENFRAMES" variable="MenuItem7" member="yes">
-				<label>Temps entre chaque image :</label>
+				<label>Time between each image :</label>
 				<handler function="OnTimeBetweenFramesSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENULOOP" variable="MenuItem8" member="yes">
-				<label>Boucler l&apos;animation</label>
+				<label>Loop the animation</label>
 				<handler function="OnMenuLoopSelected" entry="EVT_MENU" />
 				<checkable>1</checkable>
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM1" variable="MenuItem1" member="yes">
-				<label>Ajouter une animation</label>
+				<label>Add an animation</label>
 				<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
 				<handler function="OnAddAnimationSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM2" variable="deleteItem" member="yes">
-				<label>Supprimer</label>
+				<label>Delete</label>
 				<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;remove16" />
 				<handler function="OnDeleteAnimationSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem3" member="yes">
-				<label>Renommer</label>
+				<label>Rename</label>
 			</object>
 		</object>
 		<object class="wxMenu" variable="imagesMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem4" member="yes">
-				<label>Ajouter une image depuis un fichier</label>
+				<label>Add an image from a file</label>
 				<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
 				<handler function="OnAddImageFromFileSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem9" member="yes">
-				<label>Ajouter depuis la banque d&apos;image du jeu</label>
+				<label>Add from the image bank</label>
 				<handler function="OnAddFromImageBankSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM8" variable="removeImageItem" member="yes">
-				<label>Retirer</label>
+				<label>Remove</label>
 				<accel>DEL</accel>
 				<handler function="OnremoveImageItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM9" variable="moveLeftItem" member="yes">
-				<label>Déplacer vers la gauche</label>
+				<label>Move left</label>
 				<accel>J</accel>
 				<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;left16" />
 				<handler function="OnMoveLeftSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM10" variable="moveRightItem" member="yes">
-				<label>Déplacer vers la droite</label>
+				<label>Move right</label>
 				<accel>K</accel>
 				<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;right16" />
 				<handler function="OnMoveRightSelected" entry="EVT_MENU" />
@@ -572,16 +572,16 @@
 		</object>
 		<object class="wxMenu" variable="maskMenu" member="yes">
 			<object class="wxMenuItem" name="ID_POSITIONMASKITEM" variable="MenuItem5" member="yes">
-				<label>Positionner</label>
+				<label>Position</label>
 				<handler function="OnPositionMaskSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MOVEPOLYGONITEM" variable="MenuItem6" member="yes">
-				<label>Déplacer le polygone entier</label>
+				<label>Move the entire polygon</label>
 				<handler function="OnMovePolygonSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM14" variable="MenuItem12" member="yes">
-				<label>Tourner le polygone entier</label>
+				<label>Rotate the entire polygon</label>
 				<handler function="OnRotatePolygonSelected" entry="EVT_MENU" />
 			</object>
 		</object>
@@ -591,12 +591,12 @@
 		</object>
 		<object class="wxMenu" variable="emptyImagesMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM12" variable="MenuItem10" member="yes">
-				<label>Ajouter une image depuis un fichier</label>
+				<label>Add an image from a file</label>
 				<bitmap code="gd::CommonBitmapManager::GetInstance()-&gt;add16" />
 				<handler function="OnAddImageFromFileSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM13" variable="MenuItem11" member="yes">
-				<label>Ajouter depuis la banque d&apos;image du jeu</label>
+				<label>Add from the image bank</label>
 				<handler function="OnAddFromImageBankSelected" entry="EVT_MENU" />
 			</object>
 		</object>

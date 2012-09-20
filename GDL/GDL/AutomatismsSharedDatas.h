@@ -69,3 +69,4 @@ class GD_API AutomatismsSharedDatas
 };
 
 #endif // AUTOMATISMSSHAREDDATAS_H
+

@@ -22,3 +22,4 @@ public:
 };
 
 #endif // VARIABLESEXTENSION_H
+

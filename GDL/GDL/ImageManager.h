@@ -154,3 +154,4 @@ class GD_API OpenGLTextureWrapper
 
 
 #endif // ImageManager_H
+

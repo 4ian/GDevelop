@@ -405,3 +405,4 @@ bool CallbacksForGeneratingExpressionCode::OnSubTextExpression(const gd::Project
     return true;
 }
 #endif
+

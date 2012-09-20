@@ -98,3 +98,4 @@ void GD_API DownloadFile( const std::string & host, const std::string & uri, con
     cout << "Downloading file : Unable to open output file " << outputfilename;
     return;
 }
+

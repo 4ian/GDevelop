@@ -18,3 +18,4 @@ void GD_API SendDataToPhpWebPage(const std::string & webpageurl,
 void GD_API DownloadFile( const std::string & host, const std::string & uri, const std::string & outputfilename );
 
 #endif // NETWORKTOOLS_H
+

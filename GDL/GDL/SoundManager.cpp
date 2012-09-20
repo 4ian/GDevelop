@@ -87,3 +87,4 @@ void SoundManager::SetGlobalVolume(float volume)
         if ( musics[i] != boost::shared_ptr<Music>() ) musics[i]->UpdateVolume();
     }
 }
+

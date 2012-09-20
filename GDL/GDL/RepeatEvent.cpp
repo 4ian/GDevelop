@@ -158,7 +158,7 @@ void RepeatEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdit
     //Repeat text
     dc.SetFont( renderingHelper->GetNiceFont().Bold() );
     dc.SetTextForeground(wxColour(0,0,0));
-    dc.DrawText( _("Répéter") + " " + repeatNumberExpression.GetPlainString() + " " + _("fois :"), x + 4, y + 3 );
+    dc.DrawText( _("Repeat") + " " + repeatNumberExpression.GetPlainString() + " " + _("times :"), x + 4, y + 3 );
 
     //Draw conditions rectangle
     wxRect rect(x, y+repeatTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-repeatTextHeight);
@@ -240,3 +240,4 @@ RepeatEvent& RepeatEvent::operator=(const RepeatEvent & event)
 }
 
 #endif
+

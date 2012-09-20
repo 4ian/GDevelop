@@ -75,3 +75,4 @@ class GD_API ManualTimer
 };
 
 #endif // MANUALTIMER_H
+

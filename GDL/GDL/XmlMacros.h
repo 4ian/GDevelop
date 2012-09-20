@@ -29,3 +29,4 @@
 #define GD_CURRENT_ELEMENT_GET_ATTRIBUTE_BOOL(name_, variable_) if ( elem->Attribute( name_ )  != NULL && strcmp( elem->Attribute( name_ ), "false" ) == 0 ) variable_ = false; else variable_ = true;
 
 #endif // XMLMACROS_H_INCLUDED
+

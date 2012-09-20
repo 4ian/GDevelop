@@ -23,3 +23,4 @@ class CameraExtension : public ExtensionBase
 };
 
 #endif // CAMERAEXTENSION_H
+

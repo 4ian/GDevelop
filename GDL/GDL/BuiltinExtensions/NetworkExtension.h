@@ -23,3 +23,4 @@ class NetworkExtension : public ExtensionBase
 };
 
 #endif // NETWORKEXTENSION_H
+

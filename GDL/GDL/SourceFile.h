@@ -94,3 +94,4 @@ struct ExternalSourceFileHasName : public std::binary_function<boost::shared_ptr
 #endif // SOURCEFILE_H
 
 #endif
+

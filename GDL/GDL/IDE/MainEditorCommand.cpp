@@ -15,3 +15,4 @@ void gd::MainFrameWrapper::DisableControlsForScenePreviewing()
 };
 
 #endif
+

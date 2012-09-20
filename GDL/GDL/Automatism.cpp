@@ -31,3 +31,4 @@ void Automatism::EditAutomatism( wxWindow* parent, gd::Project & project, gd::La
     }
 }
 #endif
+

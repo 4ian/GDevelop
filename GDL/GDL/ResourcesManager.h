@@ -320,3 +320,4 @@ private:
 };
 
 #endif // RESOURCESMANAGER_H
+

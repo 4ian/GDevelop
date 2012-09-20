@@ -205,3 +205,4 @@ void GD_API SetCameraViewport( RuntimeScene & scene,  const std::string & layer,
     sf::FloatRect newViewport(viewportLeft, viewportTop, viewportRight - camera.GetViewport().Left, viewportBottom - camera.GetViewport().Top);
     camera.SetViewport(newViewport);
 }
+

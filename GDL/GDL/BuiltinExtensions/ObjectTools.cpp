@@ -321,3 +321,4 @@ bool GD_API MovesToward( const std::string & firstObjName, const std::string & s
 
     return isTrue;
 }
+

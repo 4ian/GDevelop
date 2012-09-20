@@ -62,3 +62,4 @@ class GD_API Point
 };
 
 #endif // POINT_H
+

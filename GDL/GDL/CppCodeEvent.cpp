@@ -117,7 +117,7 @@ void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
     //Header
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
-    dc.DrawText( (displayedName.empty() ? _("Code C++") : _("Code C++ : ")) + displayedName, x + 4, y + 3 );
+    dc.DrawText( (displayedName.empty() ? _("C++ code") : _("C++ code:")) + displayedName, x + 4, y + 3 );
 
     if ( codeDisplayedInEditor )
     {
@@ -291,3 +291,4 @@ codeDisplayedInEditor(false)
 }
 
 #endif
+

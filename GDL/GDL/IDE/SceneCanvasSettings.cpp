@@ -52,3 +52,4 @@ void SceneCanvasSettings::SaveToXml(TiXmlElement * element) const
     element->SetAttribute( "windowMask", windowMask ? "true" : "false" );
     element->SetAttribute( "associatedLayout", associatedLayout.c_str() );
 }
+

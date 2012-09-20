@@ -16,201 +16,201 @@ AudioExtension::AudioExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinAudio",
                           _("Audio"),
-                          _("Extension audio integrée en standard"),
+                          _("Builtin audio extension"),
                           "Compil Games",
                           "Freeware")
 
     #if defined(GD_IDE_ONLY)
     DECLARE_ACTION("PlaySoundCanal",
-                   _("Jouer un son sur un canal"),
-                   _("Joue un son ( court fichier audio ) sur un canal précis,\npour pouvoir ensuite interagir avec."),
-                   _("Jouer le son _PARAM1_ sur le canal _PARAM2_"),
-                   _("Sons"),
+                   _("Play a sound on a channel"),
+                   _("Play a sound ( small audio file ) on a specific canal,\nso as to be able to manipulate it."),
+                   _("Play the sound _PARAM1_ on the channel _PARAM2_"),
+                   _("Sounds"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("soundfile", _("Fichier audio"), "",false);
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("yesorno", _("Boucler le son ?"), "",true).SetDefaultValue("no");
-        instrInfo.AddParameter("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",true).SetDefaultValue("100");
-        instrInfo.AddParameter("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",true).SetDefaultValue("1");
+        instrInfo.AddParameter("soundfile", _("Audio file"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("yesorno", _("Repeat the sound \?"), "",true).SetDefaultValue("no");
+        instrInfo.AddParameter("expression", _("Volume ( From 0 to 100, 100 by default )"), "",true).SetDefaultValue("100");
+        instrInfo.AddParameter("expression", _("Pitch ( speed ) ( 1 by default )"), "",true).SetDefaultValue("1");
 
         instrInfo.cppCallingInformation.SetFunctionName("PlaySoundOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("StopSoundCanal",
-                   _("Arrêter le son sur un canal"),
-                   _("Arrêter le son joué sur le canal indiqué."),
-                   _("Arrêter le son du canal _PARAM1_"),
-                   _("Sons"),
+                   _("Stop the sound of a channel"),
+                   _("Stop the sound on the specified channel."),
+                   _("Stop the sound of channel _PARAM1_"),
+                   _("Sounds"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("StopSoundOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("PauseSoundCanal",
-                   _("Mettre en pause le son d'un canal"),
-                   _("Mettre en pause le son joué sur le canal indiqué."),
-                   _("Mettre en pause le son du canal _PARAM1_"),
-                   _("Sons"),
+                   _("Pause the sound of a channel"),
+                   _("Pause the sound played on the specified channel."),
+                   _("Pause the sound of channel _PARAM1_"),
+                   _("Sounds"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PauseSoundOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("RePlaySoundCanal",
-                   _("Jouer le son d'un canal"),
-                   _("(Re)jouer le son du canal."),
-                   _("Jouer le son du canal _PARAM1_"),
-                   _("Sons"),
+                   _("Play the sound of a channel"),
+                   _("Play the sound of the channel."),
+                   _("Play the sound of channel _PARAM1_"),
+                   _("Sounds"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("RePlaySoundOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("PlayMusicCanal",
-                   _("Jouer une musique sur un canal"),
-                   _("Joue une musique sur un canal précis,\npour pouvoir ensuite interagir avec."),
-                   _("Jouer la musique _PARAM1_ sur le canal _PARAM2_"),
-                   _("Musiques"),
+                   _("Play a music on a channel"),
+                   _("Play a music an on specific channel,\nso as to be able to interact with later."),
+                   _("Play the music _PARAM1_ on channel _PARAM2_"),
+                   _("Musics"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("musicfile", _("Fichier audio"), "",false);
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("yesorno", _("Boucler le son ?"), "",true).SetDefaultValue("no");
-        instrInfo.AddParameter("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",true).SetDefaultValue("100");
-        instrInfo.AddParameter("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",true).SetDefaultValue("1");
+        instrInfo.AddParameter("musicfile", _("Audio file"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("yesorno", _("Repeat the sound \?"), "",true).SetDefaultValue("no");
+        instrInfo.AddParameter("expression", _("Volume ( From 0 to 100, 100 by default )"), "",true).SetDefaultValue("100");
+        instrInfo.AddParameter("expression", _("Pitch ( speed ) ( 1 by default )"), "",true).SetDefaultValue("1");
 
         instrInfo.cppCallingInformation.SetFunctionName("PlayMusicOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("StopMusicCanal",
-                   _("Arrêter la musique sur un canal"),
-                   _("Arrêter la musique jouée sur le canal indiqué."),
-                   _("Arrêter la musique du canal _PARAM1_"),
-                   _("Musiques"),
+                   _("Stop the music on a channel"),
+                   _("Stop the music on the specified channel"),
+                   _("Stop the music of channel _PARAM1_"),
+                   _("Musics"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("StopMusicOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("PauseMusicCanal",
-                   _("Mettre en pause la musique d'un canal"),
-                   _("Mettre en pause la musique jouée sur le canal indiqué."),
-                   _("Mettre en pause la musique du canal _PARAM1_"),
-                   _("Musiques"),
+                   _("Pause the music of a channel"),
+                   _("Pause the music on the specified channel."),
+                   _("Pause the music of channel _PARAM1_"),
+                   _("Musics"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PauseMusicOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("RePlayMusicCanal",
-                   _("Jouer la musique d'un canal"),
-                   _("(Re)jouer la musique du canal."),
-                   _("Jouer la musique du canal _PARAM1_"),
-                   _("Musiques"),
+                   _("Play the music of a channel"),
+                   _("Play the music of the channel."),
+                   _("Play the music of channel _PARAM1_"),
+                   _("Musics"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("RePlayMusicOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModVolumeSoundCanal",
-                   _("Volume d'un son sur un canal"),
-                   _("Cette action modifie le volume du son sur le canal spécifié. Le volume est compris entre 0 et 100."),
-                   _("Faire _PARAM3__PARAM2_ au volume du son sur le canal  _PARAM1_"),
-                   _("Volume sonore"),
+                   _("Volume of the sound on a channel"),
+                   _("This action modify the volume of the sound on the specified channel. The volume is between 0 and 100."),
+                   _("Do _PARAM3__PARAM2_ to the volume of the sound on channel _PARAM1_"),
+                   _("Sound level"),
                    "res/actions/sonVolume24.png",
                    "res/actions/sonVolume.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Valeur"), "",false);
-        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Value"), "",false);
+        instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetSoundVolumeOnChannel").SetManipulatedType("number").SetAssociatedGetter("GetSoundVolumeOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModVolumeMusicCanal",
-                   _("Volume de la musique d'un canal"),
-                   _("Cette action modifie le volume de la musique sur le canal spécifié. Le volume est compris entre 0 et 100."),
-                   _("Faire _PARAM3__PARAM2_ au volume de la musique du canal  _PARAM1_"),
-                   _("Volume sonore"),
+                   _("Volume of the music on a channel"),
+                   _("This action modify the volume of the music on the specified channel. The volume is between 0 and 100."),
+                   _("Do _PARAM3__PARAM2_ to the volume of the music on channel _PARAM1_"),
+                   _("Sound level"),
                    "res/actions/sonVolume24.png",
                    "res/actions/sonVolume.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Valeur"), "",false);
-        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Value"), "",false);
+        instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetMusicVolumeOnChannel").SetManipulatedType("number").SetAssociatedGetter("GetMusicVolumeOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModGlobalVolume",
-                   _("Volume global du jeu"),
-                   _("Cette action modifie le volume sonore global du jeu. Le volume est compris entre 0 et 100."),
-                   _("Faire _PARAM2__PARAM1_ au volume sonore global"),
-                   _("Volume sonore"),
+                   _("Game global volume"),
+                   _("This action modify the global volumeof the game. The volume is between 0 and 100."),
+                   _("Do _PARAM2__PARAM1_ to global sound level"),
+                   _("Sound level"),
                    "res/actions/volume24.png",
                    "res/actions/volume.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Valeur"), "",false);
-        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
+        instrInfo.AddParameter("expression", _("Value"), "",false);
+        instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetGlobalVolume").SetAssociatedGetter("GetGlobalVolume").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModPitchSoundChannel",
-                   _("Pitch d'un son sur un canal"),
-                   _("Cette action modifie le pitch ( vitesse ) du son d'un canal.\nUn pitch de 1 indique une vitesse normale."),
-                   _("Faire _PARAM3__PARAM2_ au pitch du son sur le canal _PARAM1_"),
-                   _("Sons"),
+                   _("Pitch of the sound of a channel"),
+                   _("This action modify pitch ( speed ) of the sound on a channel.\n1 is the default pitch."),
+                   _("Do _PARAM3__PARAM2_ to the pitch of the sound on channel _PARAM1_"),
+                   _("Sounds"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Valeur"), "",false);
-        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Value"), "",false);
+        instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetSoundPitchOnChannel").SetAssociatedGetter("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
@@ -218,17 +218,17 @@ AudioExtension::AudioExtension()
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModPitchMusicChannel",
-                   _("Pitch de la musique d'un canal"),
-                   _("Cette action modifie le pitch de la musique sur un canal.\nUn pitch de 1 indique une vitesse normale."),
-                   _("Faire _PARAM3__PARAM2_ au pitch de la musique du canal _PARAM1_"),
-                   _("Musiques"),
+                   _("Pitch of the music on a channel"),
+                   _("This action modify the pitch of the music on the specified channel. 1 is the default pitch"),
+                   _("Do _PARAM3__PARAM2_ to the pitch of the music on channel _PARAM1_"),
+                   _("Musics"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Valeur"), "",false);
-        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Value"), "",false);
+        instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetMusicPitchOnChannel").SetAssociatedGetter("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
@@ -236,319 +236,319 @@ AudioExtension::AudioExtension()
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModPlayingOffsetSoundChannel",
-                   _("Position de lecture d'un son sur un canal"),
-                   _("Cette action modifie la position de lecture du son d'un canal."),
-                   _("Faire _PARAM3__PARAM2_s à la position de lecture du son sur le canal _PARAM1_"),
-                   _("Sons"),
+                   _("Playing offset of the sound on a channel"),
+                   _("This action modify the playinf offset of the sound on a channel"),
+                   _("Do _PARAM3__PARAM2_ to the playing offset of the sound on channel _PARAM1_"),
+                   _("Sounds"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Valeur"), "",false);
-        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Value"), "",false);
+        instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetSoundPlayingOffsetOnChannel").SetAssociatedGetter("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ModPlayingOffsetMusicChannel",
-                   _("Position de lecture de la musique d'un canal"),
-                   _("Cette action modifie la position de lecture de la musique sur un canal."),
-                   _("Faire _PARAM3__PARAM2_s à la position de lecture de la musique du canal _PARAM1_"),
-                   _("Musiques"),
+                   _("Playing offset of the music on a channel"),
+                   _("This action modify the playing offset of the music on the specified channel"),
+                   _("Do _PARAM3__PARAM2_ to the playing offset of the music on channel _PARAM1_"),
+                   _("Musics"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Valeur"), "",false);
-        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Value"), "",false);
+        instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetMusicPlayingOffsetOnChannel").SetAssociatedGetter("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("PlaySound",
-                   _("Jouer un son"),
-                   _("Joue un son."),
-                   _("Jouer le son _PARAM1_"),
-                   _("Sons"),
+                   _("Play a sound"),
+                   _("Play a sound."),
+                   _("Play the sound _PARAM1_"),
+                   _("Sounds"),
                    "res/actions/son24.png",
                    "res/actions/son.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("soundfile", _("Fichier audio"), "",false);
-        instrInfo.AddParameter("yesorno", _("Boucler le son ?"), "",true).SetDefaultValue("no");
-        instrInfo.AddParameter("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",true).SetDefaultValue("100");
-        instrInfo.AddParameter("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",true).SetDefaultValue("1");
+        instrInfo.AddParameter("soundfile", _("Audio file"), "",false);
+        instrInfo.AddParameter("yesorno", _("Repeat the sound \?"), "",true).SetDefaultValue("no");
+        instrInfo.AddParameter("expression", _("Volume ( From 0 to 100, 100 by default )"), "",true).SetDefaultValue("100");
+        instrInfo.AddParameter("expression", _("Pitch ( speed ) ( 1 by default )"), "",true).SetDefaultValue("1");
 
         instrInfo.cppCallingInformation.SetFunctionName("PlaySound").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("PlayMusic",
-                   _("Jouer une musique"),
-                   _("Joue une musique."),
-                   _("Jouer la musique _PARAM1_"),
-                   _("Musiques"),
+                   _("Play a music"),
+                   _("Play a music."),
+                   _("Play the music _PARAM1_"),
+                   _("Musics"),
                    "res/actions/music24.png",
                    "res/actions/music.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("musicfile", _("Fichier audio"), "",false);
-        instrInfo.AddParameter("yesorno", _("Boucler le son ?"), "",true).SetDefaultValue("no");
-        instrInfo.AddParameter("expression", _("Volume ( De 0 à 100, 100 par défaut )"), "",true).SetDefaultValue("100");
-        instrInfo.AddParameter("expression", _("Pitch ( Vitesse ) ( 1 par défaut )"), "",true).SetDefaultValue("1");
+        instrInfo.AddParameter("musicfile", _("Audio file"), "",false);
+        instrInfo.AddParameter("yesorno", _("Repeat the sound \?"), "",true).SetDefaultValue("no");
+        instrInfo.AddParameter("expression", _("Volume ( From 0 to 100, 100 by default )"), "",true).SetDefaultValue("100");
+        instrInfo.AddParameter("expression", _("Pitch ( speed ) ( 1 by default )"), "",true).SetDefaultValue("1");
 
         instrInfo.cppCallingInformation.SetFunctionName("PlayMusic").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_CONDITION("MusicPlaying",
-                   _("Une musique est entrain d'être jouée"),
-                   _("Teste si la musique sur le canal indiqué est entrain d'être jouée."),
-                   _("La musique sur le canal _PARAM1_ est entrain d'être jouée"),
-                   _("Musiques"),
+                   _("A music is being played"),
+                   _("Test if the music on a channel is being played"),
+                   _("The music on channel _PARAM1_ is being played"),
+                   _("Musics"),
                    "res/conditions/musicplaying24.png",
                    "res/conditions/musicplaying.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("MusicPlaying").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("MusicPaused",
-                   _("Une musique est en pause"),
-                   _("Teste si la musique sur le canal indiqué est en pause."),
-                   _("La musique sur le canal _PARAM1_ est en pause"),
-                   _("Musiques"),
+                   _("A music is paused"),
+                   _("Test if the music on the specified canal is paused."),
+                   _("The music on channel _PARAM1_ is paused"),
+                   _("Musics"),
                    "res/conditions/musicpaused24.png",
                    "res/conditions/musicpaused.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("MusicPaused").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("MusicStopped",
-                   _("Une musique est arrêtée"),
-                   _("Teste si la musique sur le canal indiqué est arrêtée."),
-                   _("La musique sur le canal _PARAM1_ est arrêtée"),
-                   _("Musiques"),
+                   _("A music is stopped"),
+                   _("Test if the music on the specified canal is stopped."),
+                   _("The music on channel _PARAM1_ is stopped"),
+                   _("Musics"),
                    "res/conditions/musicstopped24.png",
                    "res/conditions/musicstopped.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("MusicStopped").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
     DECLARE_CONDITION("SoundPlaying",
-                   _("Un son est entrain d'être joué"),
-                   _("Teste si le son sur le canal indiqué est entrain d'être joué."),
-                   _("Le son sur le canal _PARAM1_ est entrain d'être joué"),
-                   _("Sons"),
+                   _("A sound is being played"),
+                   _("Test if the sound on a channel is being played."),
+                   _("Thee sound on channel _PARAM1_ is being played"),
+                   _("Sounds"),
                    "res/conditions/sonplaying24.png",
                    "res/conditions/sonplaying.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SoundPlaying").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("SoundPaused",
-                   _("Un son est en pause"),
-                   _("Teste si le son sur le canal indiqué est en pause."),
-                   _("Le son sur le canal _PARAM1_ est en pause"),
-                   _("Sons"),
+                   _("A sound is paused"),
+                   _("Test if the sound on the specified canal is paused."),
+                   _("The sound on channel _PARAM1_ is paused"),
+                   _("Sounds"),
                    "res/conditions/sonpaused24.png",
                    "res/conditions/sonpaused.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SoundPaused").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("SoundStopped",
-                   _("Un son est arrêté"),
-                   _("Teste si le son sur le canal indiqué est arrêté."),
-                   _("Le son sur le canal _PARAM1_ est arrêté"),
-                   _("Sons"),
+                   _("A sound is stopped"),
+                   _("Test if the sound on the specified canal is stopped."),
+                   _("The sound on channel _PARAM1_ is stopped"),
+                   _("Sounds"),
                    "res/conditions/sonstopped24.png",
                    "res/conditions/sonstopped.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SoundStopped").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("SoundCanalVolume",
-                   _("Volume d'un son sur un canal"),
-                   _("Teste le volume du son sur le canal indiqué. Le volume est compris entre 0 et 100."),
-                   _("Le volume du son sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_"),
-                   _("Volume sonore"),
+                   _("Volume of the sound on a channel"),
+                   _("Test the volume of the sound on the specified channel. The volume is between 0 and 100."),
+                   _("The volume of the sound on channel _PARAM1_ is _PARAM3__PARAM2_"),
+                   _("Sound level"),
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Volume à tester"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Volume to test"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("MusicCanalVolume",
-                   _("Volume de la musique sur un canal"),
-                   _("Teste le volume de la musique sur le canal indiqué. Le volume est compris entre 0 et 100."),
-                   _("Le volume de la musique sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_"),
-                   _("Volume sonore"),
+                   _("Volume of the music on a channel"),
+                   _("Test the volume of the music on specified channel. The volume is between 0 and 100."),
+                   _("The volume of the music on channel _PARAM1_ is _PARAM3__PARAM2_"),
+                   _("Sound level"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Volume à tester"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Volume to test"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicVolumeOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("GlobalVolume",
-                   _("Volume sonore global"),
-                   _("Vérifie que le volume sonore global correspond au test. Le volume est compris entre 0 et 100."),
-                   _("Le volume sonore global est _PARAM2_ à _PARAM1_"),
-                   _("Volume sonore"),
+                   _("global"),
+                   _("Test the global sound level. The volume is between 0 and 100."),
+                   _("The global game volume is _PARAM2_ to _PARAM1_"),
+                   _("Sound level"),
                    "res/conditions/volume24.png",
                    "res/conditions/volume.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Volume à tester"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
+        instrInfo.AddParameter("expression", _("Volume to test"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVolume").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("SoundChannelPitch",
-                   _("Pitch du son d'un canal"),
-                   _("Teste le pitch ( vitesse ) du son sur le canal indiqué. Un pitch de 1 indique une vitesse normale."),
-                   _("Le pitch du son sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_"),
-                   _("Sons"),
+                   _("Pitch of the sound of a channel"),
+                   _("Test the pitch of the sound on the specified channel. 1 is the default pitch."),
+                   _("The pitch of the sound on channel _PARAM1_ is _PARAM3__PARAM2_"),
+                   _("Sounds"),
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Pitch à tester"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Pitch to test"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("MusicChannelPitch",
-                   _("Pitch de la musique d'un canal"),
-                   _("Teste le pitch ( vitesse ) de la musique sur le canal indiqué. Un pitch de 1 indique une vitesse normale."),
-                   _("Le volume de la musique sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_"),
-                   _("Musiques"),
+                   _("Pitch of the music on a channel"),
+                   _("Test the pitch ( speed ) of the music on specified channel. 1 is the default pitch."),
+                   _("The volume of the music on channel _PARAM1_ is _PARAM3__PARAM2_"),
+                   _("Musics"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Pitch à tester"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Pitch to test"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicPitchOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("SoundChannelPlayingOffset",
-                   _("Position de lecture du son d'un canal"),
-                   _("Teste la position de lecture du son sur le canal indiqué."),
-                   _("La position de lecture du son sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_s"),
-                   _("Sons"),
+                   _("Playing offset of the sound on a channel"),
+                   _("Test the playing offset of the sound on the specified channel."),
+                   _("The playing offset of the sound on channel _PARAM1_ is _PARAM3__PARAM2_"),
+                   _("Sounds"),
                    "res/conditions/sonVolume24.png",
                    "res/conditions/sonVolume.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Position à tester ( en secondes )"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Position ( in seconds )"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("MusicChannelPlayingOffset",
-                   _("Position de lecture de la musique d'un canal"),
-                   _("Teste la position de lecture de la musique sur le canal indiqué."),
-                   _("La position de lecture la musique sur le canal _PARAM1_ est _PARAM3_ à _PARAM2_s"),
-                   _("Musiques"),
+                   _("Playing offset of the music on a channel"),
+                   _("Test the playing offset of the music on the specified channel."),
+                   _("The playing offset of the music on channel _PARAM1_ is _PARAM3__PARAM2_"),
+                   _("Musics"),
                    "res/conditions/musicVolume24.png",
                    "res/conditions/musicVolume.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal ( 0 à 15 )"), "",false);
-        instrInfo.AddParameter("expression", _("Position à tester ( en secondes )"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
+        instrInfo.AddParameter("expression", _("Canal ( 0 - 15 )"), "",false);
+        instrInfo.AddParameter("expression", _("Position ( in seconds )"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicPlayingOffsetOnChannel").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
 
     DECLARE_END_CONDITION()
 
-    DECLARE_EXPRESSION("SoundChannelPlayingOffset", _("Position de lecture d'un son"), _("Position de lecture d'un son"), _("Sons"), "res/actions/son.png")
+    DECLARE_EXPRESSION("SoundChannelPlayingOffset", _("Sound playing offset"), _("Sound playing offset"), _("Sounds"), "res/actions/son.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundPlayingOffsetOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("MusicChannelPlayingOffset", _("Position de lecture d'une musique"), _("Position de lecture d'une musique"), _("Musiques"), "res/actions/music.png")
+    DECLARE_EXPRESSION("MusicChannelPlayingOffset", _("Music playing offset"), _("Music playing offset"), _("Musics"), "res/actions/music.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicPlayingOffsetOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("SoundChannelVolume", _("Volume d'un son"), _("Volume d'un son"), _("Sons"), "res/actions/son.png")
+    DECLARE_EXPRESSION("SoundChannelVolume", _("Sound volume"), _("Sound volume"), _("Sounds"), "res/actions/son.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundVolumeOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("MusicChannelVolume", _("Volume d'une musique"), _("Volume d'une musique"), _("Musiques"), "res/actions/music.png")
+    DECLARE_EXPRESSION("MusicChannelVolume", _("Music volume"), _("Music volume"), _("Musics"), "res/actions/music.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicVolumeOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("SoundChannelPitch", _("Pitch d'un son"), _("Pitch d'un son"), _("Sons"), "res/actions/son.png")
+    DECLARE_EXPRESSION("SoundChannelPitch", _("Sound's pitch"), _("Sound's pitch"), _("Sounds"), "res/actions/son.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSoundPitchOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("MusicChannelPitch", _("Pitch d'une musique"), _("Pitch d'une musique"), _("Musiques"), "res/actions/music.png")
+    DECLARE_EXPRESSION("MusicChannelPitch", _("Music's pitch"), _("Music's pitch"), _("Musics"), "res/actions/music.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Canal"), "",false);
+        instrInfo.AddParameter("expression", _("Channel"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetMusicPitchOnChannel").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("GlobalVolume", _("Volume global"), _("Valeur du volume global"), _("Volume sonore"), "res/conditions/volume.png")
+    DECLARE_EXPRESSION("GlobalVolume", _("Global volume"), _("Global volume value"), _("Sound level"), "res/conditions/volume.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetGlobalVolume").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
@@ -571,7 +571,7 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
 {
     if ( propertyNb == 0 )
     {
-        name = _("Volume global :");
+        name = _("Global volume:");
         value = ToString(SoundManager::GetInstance()->GetGlobalVolume());
     }
     else if ( propertyNb < 1+SoundManager::GetInstance()->sounds.size()*3 )
@@ -584,23 +584,23 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
             sf::Sound::Status soundStatus = SoundManager::GetInstance()->sounds[soundNb]->GetStatus();
 
             if ( soundStatus == sf::Sound::Playing)
-                name = _("Son joué :");
+                name = _("Sound played:");
             else if ( soundStatus == sf::Sound::Stopped)
-                name = _("Son stoppé :");
+                name = _("Sound stopped:");
             else if ( soundStatus == sf::Sound::Paused)
-                name = _("Son en pause :");
+                name = _("Paused sound:");
 
             value = SoundManager::GetInstance()->sounds[soundNb]->file;
         }
         else if ( propertyNb % 3 == 2)
         {
-            name = _(" -Volume/Pitch :");
+            name = _(" -Volume/Pitch:");
             value = ToString(SoundManager::GetInstance()->sounds[soundNb]->GetVolume())
                     +"/"+ToString(SoundManager::GetInstance()->sounds[soundNb]->GetPitch());
         }
         else
         {
-            name = _(" -Avancement (secondes) :");
+            name = _(" -Progress (seconds) :");
             value = ToString(SoundManager::GetInstance()->sounds[soundNb]->GetPlayingOffset());
         }
 
@@ -615,23 +615,23 @@ void AudioExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int p
             sf::Sound::Status soundStatus = SoundManager::GetInstance()->musics[musicNb]->GetStatus();
 
             if ( soundStatus == sf::Sound::Playing)
-                name = _("Musique jouée :");
+                name = _("Played music:");
             else if ( soundStatus == sf::Sound::Stopped)
-                name = _("Musique stoppée :");
+                name = _("Stopped music:");
             else if ( soundStatus == sf::Sound::Paused)
-                name = _("Musique en pause :");
+                name = _("Paused music:");
 
             value = SoundManager::GetInstance()->musics[musicNb]->file;
         }
         else if ( propertyNb % 3 == 2)
         {
-            name = _(" -Volume/Pitch :");
+            name = _(" -Volume/Pitch:");
             value = ToString(SoundManager::GetInstance()->musics[musicNb]->GetVolume())
                     +"/"+ToString(SoundManager::GetInstance()->musics[musicNb]->GetPitch());
         }
         else
         {
-            name = _(" -Avancement (secondes) :");
+            name = _(" -Progress (seconds) :");
             value = ToString(SoundManager::GetInstance()->musics[musicNb]->GetPlayingOffset());
         }
     }
@@ -704,3 +704,4 @@ unsigned int AudioExtension::GetNumberOfProperties(RuntimeScene & scene) const
 }
 
 #endif
+

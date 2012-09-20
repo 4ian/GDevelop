@@ -23,3 +23,4 @@ class KeyboardExtension : public ExtensionBase
 };
 
 #endif // KEYBOARDEXTENSION_H
+

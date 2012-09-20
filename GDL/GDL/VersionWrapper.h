@@ -68,3 +68,4 @@ class GD_API GDLVersionWrapper
 };
 
 #endif // VERSIONWRAPPER_H
+

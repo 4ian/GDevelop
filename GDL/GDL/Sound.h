@@ -78,3 +78,4 @@ class GD_API Sound : sf::NonCopyable
 };
 
 #endif // SON_H
+

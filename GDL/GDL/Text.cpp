@@ -29,3 +29,4 @@ void Text::Draw(sf::RenderWindow& App)
     text.SetFont(*fontManager->GetFont(fontName));
     App.Draw( text );
 }
+

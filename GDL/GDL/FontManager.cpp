@@ -63,3 +63,4 @@ void FontManager::DestroySingleton()
         _singleton = NULL;
     }
 }
+

@@ -71,9 +71,9 @@ ExtensionsManager::ExtensionsManager()
     AddExtension(boost::shared_ptr<ExtensionBase>(new ExternalLayoutsExtension()));
 
 #if defined(GD_IDE_ONLY)
-    badInstructionMetadata.fullname = _("Instruction inconnue");
-    badInstructionMetadata.description = _("Instruction inconnue");
-    badInstructionMetadata.sentence = _("Instruction inconnue");
+    badInstructionMetadata.fullname = _("Unknown instruction");
+    badInstructionMetadata.description = _("Unknown instruction");
+    badInstructionMetadata.sentence = _("Unknown instruction");
 #endif
 }
 
@@ -649,3 +649,4 @@ const ExtensionObjectInfos & ExtensionsManager::GetObjectMetadata(std::string ob
 	return badObjectInfo;
 }
 #endif
+

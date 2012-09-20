@@ -93,3 +93,4 @@ class GD_API PropImage: public wxDialog
 
 #endif
 #endif
+

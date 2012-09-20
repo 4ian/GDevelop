@@ -9,17 +9,17 @@
 AdvancedExtension::AdvancedExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinAdvanced",
-                          _("Fonctionnalités de contrôle avancé"),
-                          _("Extension offrant des fonctionnalités de contrôle avancé, integrée en standard"),
+                          _("Advanced control features"),
+                          _("Builtin extension providing advanced control features."),
                           "Compil Games",
                           "Freeware")
 
     #if defined(GD_IDE_ONLY)
     DECLARE_CONDITION("Toujours",
-                   _("Toujours"),
-                   _("Cette condition renvoie toujours vrai ( et toujours faux si le contraire est activé )."),
-                   _("Toujours"),
-                   _("Autre"),
+                   _("Always"),
+                   _("This condition returns always true ( and always false if contrary is checked )."),
+                   _("Always"),
+                   _("Other"),
                    "res/conditions/toujours24.png",
                    "res/conditions/toujours.png");
 
@@ -30,3 +30,4 @@ AdvancedExtension::AdvancedExtension()
     DECLARE_END_CONDITION()
     #endif
 }
+

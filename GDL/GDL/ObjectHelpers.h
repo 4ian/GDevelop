@@ -46,3 +46,4 @@ struct SortByZOrder
 };
 
 #endif // OBJECTHELPERS_H
+

@@ -30,3 +30,4 @@ class TimeExtension : public ExtensionBase
 };
 
 #endif // TIMEEXTENSION_H
+

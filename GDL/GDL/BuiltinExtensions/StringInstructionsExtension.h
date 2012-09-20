@@ -22,3 +22,4 @@ class StringInstructionsExtension : public ExtensionBase
 };
 
 #endif // STRINGINSTRUCTIONSEXTENSION_H
+

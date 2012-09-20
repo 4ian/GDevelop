@@ -32,3 +32,4 @@ private:
 #endif // IMAGEFILESWATCHER_H
 
 #endif
+

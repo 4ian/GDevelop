@@ -87,3 +87,4 @@ class ForEachEvent : public gd::BaseEvent
 #endif // FOREACHEVENT_H
 
 #endif
+

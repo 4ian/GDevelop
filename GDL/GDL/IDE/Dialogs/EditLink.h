@@ -84,3 +84,4 @@ class EditLink: public wxDialog
 
 #endif
 #endif
+

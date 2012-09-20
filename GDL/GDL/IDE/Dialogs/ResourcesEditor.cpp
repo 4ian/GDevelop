@@ -160,7 +160,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     FlexGridSizer3->AddGrowableCol(0);
     FlexGridSizer3->AddGrowableRow(0);
     resourcesTree = new wxTreeCtrl(treePanel, ID_TREECTRL1, wxDefaultPosition, wxSize(200,170), wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
-    resourcesTree->SetToolTip(_("Clic droit sur une image pour accéder aux options"));
+    resourcesTree->SetToolTip(_("Right click on an image to access to more options"));
     FlexGridSizer3->Add(resourcesTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     searchCtrl = new wxSearchCtrl(treePanel, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
     FlexGridSizer3->Add(searchCtrl, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -175,56 +175,56 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     FlexGridSizer4->SetSizeHints(Core);
     FlexGridSizer2->Add(Core, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer2);
-    editMenuItem = new wxMenuItem((&ContextMenu), idMenuModProp, _("Modifier les propriétés de l\'image"), wxEmptyString, wxITEM_NORMAL);
+    editMenuItem = new wxMenuItem((&ContextMenu), idMenuModProp, _("Modify the image properties"), wxEmptyString, wxITEM_NORMAL);
     editMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editpropicon.png"))));
     ContextMenu.Append(editMenuItem);
-    MenuItem3 = new wxMenuItem((&ContextMenu), idMenuMod, _("Modifier le nom de l\'image"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem3 = new wxMenuItem((&ContextMenu), idMenuMod, _("Change the image name"), wxEmptyString, wxITEM_NORMAL);
     MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
     ContextMenu.Append(MenuItem3);
-    MenuItem4 = new wxMenuItem((&ContextMenu), idMenuModFile, _("Modifier le fichier de l\'image"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem4 = new wxMenuItem((&ContextMenu), idMenuModFile, _("Change image\'s file"), wxEmptyString, wxITEM_NORMAL);
     MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/openicon.png"))));
     ContextMenu.Append(MenuItem4);
     ContextMenu.AppendSeparator();
-    MenuItem1 = new wxMenuItem((&ContextMenu), idMenuAjouter, _("Ajouter une image"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem1 = new wxMenuItem((&ContextMenu), idMenuAjouter, _("Add an image"), wxEmptyString, wxITEM_NORMAL);
     MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     ContextMenu.Append(MenuItem1);
-    deleteImageItem = new wxMenuItem((&ContextMenu), idMenuDel, _("Supprimer l\'image"), wxEmptyString, wxITEM_NORMAL);
+    deleteImageItem = new wxMenuItem((&ContextMenu), idMenuDel, _("Delete the image"), wxEmptyString, wxITEM_NORMAL);
     deleteImageItem->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
     ContextMenu.Append(deleteImageItem);
-    MenuItem14 = new wxMenuItem((&ContextMenu), ID_MENUITEM9, _("Supprimer seulement du dossier"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem14 = new wxMenuItem((&ContextMenu), ID_MENUITEM9, _("Remove from folder only"), wxEmptyString, wxITEM_NORMAL);
     ContextMenu.Append(MenuItem14);
     ContextMenu.AppendSeparator();
-    MenuItem7 = new wxMenuItem((&ContextMenu), idMoveUp, _("Déplacer vers le haut\tCtrl-P"), _("Déplacer l\'image vers le haut dans la liste"), wxITEM_NORMAL);
+    MenuItem7 = new wxMenuItem((&ContextMenu), idMoveUp, _("Move up\tCtrl-P"), _("Move the image up"), wxITEM_NORMAL);
     MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
     ContextMenu.Append(MenuItem7);
-    MenuItem8 = new wxMenuItem((&ContextMenu), idMoveDown, _("Déplacer vers le bas"), _("Déplacer l\'image vers le bas dans la liste"), wxITEM_NORMAL);
+    MenuItem8 = new wxMenuItem((&ContextMenu), idMoveDown, _("Move down"), _("Move the image down"), wxITEM_NORMAL);
     MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
     ContextMenu.Append(MenuItem8);
-    MenuItem2 = new wxMenuItem((&emptyMenu), ID_MENUITEM1, _("Ajouter une image"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem2 = new wxMenuItem((&emptyMenu), ID_MENUITEM1, _("Add an image"), wxEmptyString, wxITEM_NORMAL);
     MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     emptyMenu.Append(MenuItem2);
     emptyMenu.AppendSeparator();
-    MenuItem6 = new wxMenuItem((&emptyMenu), ID_MENUITEM2, _("Ajouter un dossier"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem6 = new wxMenuItem((&emptyMenu), ID_MENUITEM2, _("Add a folder"), wxEmptyString, wxITEM_NORMAL);
     MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/dossier.png"))));
     emptyMenu.Append(MenuItem6);
-    MenuItem9 = new wxMenuItem((&folderMenu), ID_MENUITEM3, _("Renommer"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem9 = new wxMenuItem((&folderMenu), ID_MENUITEM3, _("Rename"), wxEmptyString, wxITEM_NORMAL);
     MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
     folderMenu.Append(MenuItem9);
-    MenuItem13 = new wxMenuItem((&folderMenu), ID_MENUITEM5, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem13 = new wxMenuItem((&folderMenu), ID_MENUITEM5, _("Delete"), wxEmptyString, wxITEM_NORMAL);
     MenuItem13->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
     folderMenu.Append(MenuItem13);
     folderMenu.AppendSeparator();
-    MenuItem10 = new wxMenuItem((&folderMenu), ID_MENUITEM6, _("Ajouter une image"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem10 = new wxMenuItem((&folderMenu), ID_MENUITEM6, _("Add an image"), wxEmptyString, wxITEM_NORMAL);
     MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
     folderMenu.Append(MenuItem10);
     folderMenu.AppendSeparator();
-    MenuItem5 = new wxMenuItem((&folderMenu), ID_MENUITEM4, _("Ajouter un dossier"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem5 = new wxMenuItem((&folderMenu), ID_MENUITEM4, _("Add a folder"), wxEmptyString, wxITEM_NORMAL);
     folderMenu.Append(MenuItem5);
     folderMenu.AppendSeparator();
-    MenuItem11 = new wxMenuItem((&folderMenu), ID_MENUITEM7, _("Déplacer vers le haut"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem11 = new wxMenuItem((&folderMenu), ID_MENUITEM7, _("Move up"), wxEmptyString, wxITEM_NORMAL);
     MenuItem11->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
     folderMenu.Append(MenuItem11);
-    MenuItem12 = new wxMenuItem((&folderMenu), ID_MENUITEM8, _("Déplacer vers le bas"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem12 = new wxMenuItem((&folderMenu), ID_MENUITEM8, _("Move down"), wxEmptyString, wxITEM_NORMAL);
     MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
     folderMenu.Append(MenuItem12);
     FlexGridSizer2->Fit(this);
@@ -356,17 +356,17 @@ void ResourcesEditor::ConnectEvents()
 void ResourcesEditor::CreateToolbar()
 {
     toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( idMenuAjouter, _( "Ajouter une image" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Ajouter une image") );
-    toolbar->AddTool( idMenuResourcesLibrary, _( "Ouvrir la bibliothèque de ressources" ), wxBitmap( wxImage( "res/package16.png" ) ), _("Ouvrir la bibliothèque de ressources") );
-    toolbar->AddTool( idMenuDel, _( "Supprimer l'image selectionnée" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Supprimer l'image selectionnée") );
-    toolbar->AddTool( idMenuModProp, _( "Modifier les propriétés de l'image" ), wxBitmap( wxImage( "res/editpropicon.png" ) ), _("Modifier les propriétés de l'image") );
-    toolbar->AddTool( ID_BITMAPBUTTON6, _( "Plus d'options d'édition ( clic droit sur la liste )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _("Plus d'options d'édition ( clic droit sur la liste )") );
+    toolbar->AddTool( idMenuAjouter, _( "Add an image" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Add an image") );
+    toolbar->AddTool( idMenuResourcesLibrary, _( "Open resources library" ), wxBitmap( wxImage( "res/package16.png" ) ), _("Open resources library") );
+    toolbar->AddTool( idMenuDel, _( "Delete the selected image" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Delete the selected image") );
+    toolbar->AddTool( idMenuModProp, _( "Modify the image properties" ), wxBitmap( wxImage( "res/editpropicon.png" ) ), _("Modify the image properties") );
+    toolbar->AddTool( ID_BITMAPBUTTON6, _( "More edition options ( right click on the list )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _("More edition options ( right click on the list )") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON5, _( "Ouvrir l'image avec un éditeur" ), wxBitmap( wxImage( "res/paint.png" ) ), _("Ouvrir l'image avec un éditeur") );
-    toolbar->AddTool( ID_BITMAPBUTTON4, _( "Naviguer dans les dossiers" ), wxBitmap( wxImage( "res/dossier.png" ) ), _("Naviguer dans les dossiers") );
-    toolbar->AddTool( ID_BITMAPBUTTON2, _( "Rechercher une image" ), wxBitmap( wxImage( "res/searchicon.png" ) ), _("Rechercher une image") );
+    toolbar->AddTool( ID_BITMAPBUTTON5, _( "Open the image with an editor" ), wxBitmap( wxImage( "res/paint.png" ) ), _("Open the image with an editor") );
+    toolbar->AddTool( ID_BITMAPBUTTON4, _( "Browse folders" ), wxBitmap( wxImage( "res/dossier.png" ) ), _("Browse folders") );
+    toolbar->AddTool( ID_BITMAPBUTTON2, _( "Search for an image" ), wxBitmap( wxImage( "res/searchicon.png" ) ), _("Search for an image") );
     toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON3, _( "Aide de l'éditeur de la banque d'images" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Aide de l'éditeur de la banque d'images") );
+    toolbar->AddTool( ID_BITMAPBUTTON3, _( "Images bank editor Help" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Images bank editor Help") );
     toolbar->Realize();
 }
 
@@ -391,11 +391,11 @@ wxTreeItemId ResourcesEditor::GetSelectedFolderItem()
  */
 void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 {
-    wxFileDialog FileDialog( this, _("Choisissez une ou plusieurs images à ajouter"), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_MULTIPLE );
+    wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|All files|*.*"), wxFD_MULTIPLE );
 
     if ( FileDialog.ShowModal() == wxID_OK )
     {
-        wxLogStatus( _( "Ajout des images" ) );
+        wxLogStatus( _( "Adding images" ) );
 
         wxArrayString files;
         FileDialog.GetPaths( files );
@@ -418,7 +418,7 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 
         AddResources(filenames);
 
-        wxLogStatus( _( "Ajouts des ressources effectué avec succès" ) );
+        wxLogStatus( _( "Resources successfully added" ) );
     }
 
 }
@@ -437,7 +437,7 @@ void ResourcesEditor::CopyAndAddResources(std::vector<std::string> filenames, co
             wxString name = wxFileName::FileName(filenames[i]).GetFullName();
             wxFileName destinationFile = wxFileName::FileName(destinationDir.GetPath()+"/"+name);
 
-            wxLogStatus( _( "Copie de " ) + name );
+            wxLogStatus( _( "Copy of" ) + name );
 
             //Copy the resource
             wxCopyFile(filenames[i], destinationFile.GetFullPath(), true);
@@ -473,7 +473,7 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
 
         std::string name = ToString(file.GetFullName());
 
-        wxLogStatus( _( "Ajout de l'image " ) + name );
+        wxLogStatus( _( "Adding image" ) + name );
 
         boost::shared_ptr<ImageResource> image(new ImageResource);
         image->file = file.GetFullPath();
@@ -501,7 +501,7 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
     resourcesTree->ExpandAll();
 
     if ( !alreadyExistingResources.empty() )
-        wxLogMessage(wxString(_("Des images portant le même nom sont déjà présentes, et n'ont pas été ajoutées à la liste de toutes les images :")+alreadyExistingResources));
+        wxLogMessage(wxString(_("Some images in the list have already the same name, and have not been added:")+alreadyExistingResources));
 }
 
 void ResourcesEditor::OnAddFromLibraryBtClick( wxCommandEvent& event )
@@ -526,7 +526,7 @@ void ResourcesEditor::OnremoveFolderOnlySelected(wxCommandEvent& event)
         resourcesTree->Delete(m_itemSelected);
     }
     else
-        wxLogStatus( _( "Aucune image sélectionnée" ) );
+        wxLogStatus( _( "No image selected" ) );
 }
 
 /**
@@ -606,7 +606,7 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
     }
     else
     {
-        wxLogStatus( _( "Aucune image sélectionnée" ) );
+        wxLogStatus( _( "No image selected" ) );
     }
 }
 
@@ -621,7 +621,7 @@ void ResourcesEditor::OnModNameImageBtClick( wxCommandEvent& event )
     }
     else
     {
-        wxLogStatus( _( "Aucune image sélectionnée" ) );
+        wxLogStatus( _( "No image selected" ) );
     }
 }
 
@@ -727,7 +727,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
         {
             if ( game.resourceManager.HasFolder(newName) )
             {
-                wxLogWarning( _( "Impossible de renommer le dossier : un autre dossier porte déjà ce nom." ) );
+                wxLogWarning( _( "Unable to rename the folder : another folder has already this name." ) );
                 event.Veto();
                 return;
             }
@@ -741,7 +741,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
         {
             if ( game.resourceManager.HasResource(newName) )
             {
-                wxLogWarning( _( "Impossible de renommer l'image : une autre image porte déjà ce nom." ) );
+                wxLogWarning( _( "Unable to rename the image : another image has already this name." ) );
                 Refresh();
                 return;
             }
@@ -803,7 +803,7 @@ void ResourcesEditor::Refresh()
     }
 
     //All images
-    allImagesItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), _("Toutes les images"), -1,-1, new gd::TreeItemStringData("BaseFolder", "" ));
+    allImagesItem = resourcesTree->AppendItem( resourcesTree->GetRootItem(), _("All images"), -1,-1, new gd::TreeItemStringData("BaseFolder", "" ));
     for ( unsigned int i = 0;i < game.resourceManager.resources.size();i++ )
     {
         if ( game.resourceManager.resources[i] != boost::shared_ptr<Resource>())
@@ -872,7 +872,7 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
     }
 
     //Request the user to choose which images to remove.
-    wxMultiChoiceDialog dialog(this, _("Ces images ne semblent plus être utilisée dans le projet :\nCochez les images à supprimer."), _("Suppression d'images inutiles"), imagesNotUsed, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxOK | wxCANCEL);
+    wxMultiChoiceDialog dialog(this, _("These resources seems to be useless:\nCheck resources to delete."), _("Remove useless resources"), imagesNotUsed, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxOK | wxCANCEL);
     dialog.SetSelections(initialSelection);
     dialog.ShowModal();
 
@@ -897,7 +897,7 @@ void ResourcesEditor::OnModFileImage( wxCommandEvent& event )
 
     if ( !game.resourceManager.HasResource(data->GetSecondString()) )
     {
-        wxLogStatus( _( "L'image à modifier n'a pas été trouvée." ) );
+        wxLogStatus( _( "The image to change was not found." ) );
         return;
     }
 
@@ -911,7 +911,7 @@ void ResourcesEditor::OnChercherBtClick( wxCommandEvent& event )
 
 void ResourcesEditor::OnAideBtClick( wxCommandEvent& event )
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(9);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_image"));
@@ -931,7 +931,7 @@ void ResourcesEditor::OnModPropSelected(wxCommandEvent& event)
 
     if ( !game.resourceManager.HasResource(data->GetSecondString()) )
     {
-        wxLogWarning(_("La ressource est introuvable."));
+        wxLogWarning(_("Resource canoot be found"));
         return;
     }
 
@@ -964,7 +964,7 @@ void ResourcesEditor::OnOpenPaintProgramClick(wxCommandEvent& event)
 
     if ( result.empty() )
     {
-        wxFileDialog dialog(this, _("Choisissez le programme pour éditer ce type de ressource"), "", "", _("Programmes (*.exe)|*.exe"));
+        wxFileDialog dialog(this, _("Choose the program for editing this kind of resource"), "", "", _("Programs (*.exe)|*.exe"));
         dialog.ShowModal();
 
         wxConfigBase::Get()->Write( _T( "/EditeursExternes/"+resource.kind ), dialog.GetPath() );
@@ -991,8 +991,8 @@ void ResourcesEditor::OnapercuPanelPaint(wxPaintEvent& event)
         dc.SetBrush(wxColour(255,255,255));
         dc.DrawRectangle(0,0, size.GetWidth(), size.GetHeight());
 
-        wxString text = _("Choisissez une ressource dans\nla liste de gauche pour l'afficher.\n\n");
-        text += useRibbon ? _("Vous pouvez ajouter et\nmodifier les ressources avec le ruban.") : _("Vous pouvez ajouter et\nmodifier les ressources avec la barre d'outils");
+        wxString text = _("Choose a resource in the\nlist on the left to display it.\n\n");
+        text += useRibbon ? _("You can add and\nmodify resources using the ribbon.") : _("You can add and\nmodify resources using the toolbar");
         dc.DrawLabel(text, wxRect(wxPoint(0,0), size),wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL);
     }
 }
@@ -1043,7 +1043,7 @@ void ResourcesEditor::OnMoveUpSelected(wxCommandEvent& event)
 
             if ( index == -1 )
             {
-                wxLogStatus( _( "L'image à déplacer n'a pas été trouvée." ) );
+                wxLogStatus( _( "The image to move was not found." ) );
                 return;
             }
             else if ( index > 0 )
@@ -1136,7 +1136,7 @@ void ResourcesEditor::OnMoveDownSelected(wxCommandEvent& event)
 
             if ( index == -1 )
             {
-                wxLogStatus( _( "L'image à déplacer n'a pas été trouvée." ) );
+                wxLogStatus( _( "The image to move was not found." ) );
                 return;
             }
             else if ( index+1 < game.resourceManager.resources.size() )
@@ -1205,11 +1205,11 @@ void ResourcesEditor::ForceRefreshRibbonAndConnect()
 
 void ResourcesEditor::OnAddFolderSelected(wxCommandEvent& event)
 {
-    std::string newName = ToString(_("Nouveau dossier"));
+    std::string newName = ToString(_("New folder"));
     unsigned int i = 1;
     while( game.resourceManager.HasFolder(newName) )
     {
-        newName = ToString(_("Nouveau dossier")) + " " + ToString(i);
+        newName = ToString(_("New folder")) + " " + ToString(i);
         ++i;
     }
 
@@ -1244,3 +1244,4 @@ void ResourcesEditor::OnresourcesTreeBeginDrag(wxTreeEvent& event)
 }
 
 #endif
+

@@ -233,3 +233,4 @@ GD_API void DestroySpriteObject(Object * object);
 GD_API Object * CreateSpriteObject(std::string name);
 
 #endif // SPRITEOBJECT_H
+

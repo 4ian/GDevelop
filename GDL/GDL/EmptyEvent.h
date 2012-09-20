@@ -23,3 +23,4 @@ class EmptyEvent : public gd::BaseEvent
 #endif // EMPTYEVENT_H
 
 #endif
+

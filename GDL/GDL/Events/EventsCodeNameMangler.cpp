@@ -31,3 +31,4 @@ std::string ManObjListName(const std::string & objectName)
     return EventsCodeNameMangler::GetInstance()->GetMangledObjectsListName(objectName);
 }
 #endif
+

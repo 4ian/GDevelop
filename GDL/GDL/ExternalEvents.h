@@ -76,3 +76,4 @@ struct ExternalEventsHasName : public std::binary_function<boost::shared_ptr<Ext
 
 #endif // EXTERNALEVENTS_H
 #endif
+

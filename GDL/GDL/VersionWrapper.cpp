@@ -50,3 +50,4 @@ bool GDLVersionWrapper::CompiledForEdittime()
     return false;
 #endif
 }
+

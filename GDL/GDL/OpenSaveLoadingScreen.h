@@ -32,3 +32,4 @@ class GD_API OpenSaveLoadingScreen
 };
 
 #endif // OPENSAVELOADINGSCREEN_H
+

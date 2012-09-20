@@ -19,3 +19,4 @@ class CommonConversionsExtension : public ExtensionBase
 
 
 #endif // COMMONCONVERSIONSEXTENSION_H
+

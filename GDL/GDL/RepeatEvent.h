@@ -83,3 +83,4 @@ class RepeatEvent : public gd::BaseEvent
 #endif // REPEATEVENT_H
 
 #endif
+

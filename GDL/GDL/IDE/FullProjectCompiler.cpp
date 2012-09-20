@@ -69,10 +69,10 @@ void FullProjectCompiler::LaunchProjectCompilation()
     std::string linuxExecutableName = gameToCompile.linuxExecutableFilename.empty() ? "GameLinux" : gameToCompile.linuxExecutableFilename;
     std::string macExecutableName = gameToCompile.macExecutableFilename.empty() ? "GameMac" : gameToCompile.macExecutableFilename;
 
-    diagnosticManager.OnMessage(gd::ToString(_("Lancement de la compilation du projet.")));
+    diagnosticManager.OnMessage(gd::ToString(_("Project compilation launching")));
     if ( !windowsTarget && !linuxTarget && !macTarget)
     {
-        diagnosticManager.AddError(gd::ToString(_("Pas de système cible défini.")));
+        diagnosticManager.AddError(gd::ToString(_("No chosen target system.")));
         diagnosticManager.OnCompilationFailed();
         return;
     }
@@ -88,7 +88,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     //Wait current compilations to end
     if ( CodeCompiler::GetInstance()->CompilationInProcess() )
     {
-        diagnosticManager.OnMessage(gd::ToString(_("Compilation en attente de la fin des tâches en cours...")));
+        diagnosticManager.OnMessage(gd::ToString(_("Compilation waiting for other task to finish...")));
 
         wxStopWatch yieldClock;
         while (CodeCompiler::GetInstance()->CompilationInProcess())
@@ -105,7 +105,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     Game game = gameToCompile;
 
     //Prepare resources to copy
-    diagnosticManager.OnMessage( gd::ToString( _("Préparation des ressources...") ));
+    diagnosticManager.OnMessage( gd::ToString( _("Preparing resources...") ));
 
     //Add images
     for ( unsigned int i = 0;i < game.resourceManager.resources.size() ;i++ )
@@ -113,7 +113,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         if ( game.resourceManager.resources[i] == boost::shared_ptr<Resource>() )
             continue;
 
-        diagnosticManager.OnMessage( gd::ToString(_("Préparation des ressources...")), game.resourceManager.resources[i]->name );
+        diagnosticManager.OnMessage( gd::ToString(_("Preparing resources...")), game.resourceManager.resources[i]->name );
 
         if ( game.resourceManager.resources[i]->UseFile() )
             resourcesMergingHelper.ExposeResource(game.resourceManager.resources[i]->GetFile());
@@ -145,7 +145,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     {
         if ( game.GetLayouts()[i]->profiler ) game.GetLayouts()[i]->profiler->profilingActivated = false;
 
-        diagnosticManager.OnMessage(gd::ToString(_("Compilation de la scène ")+game.GetLayout(i).GetName()+_(".")));
+        diagnosticManager.OnMessage(gd::ToString(_("Compiling scene ")+game.GetLayout(i).GetName()+_(".")));
         CodeCompilerTask task;
         task.compilationForRuntime = true;
         task.optimize = optimize;
@@ -169,12 +169,14 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
         if ( !wxFileExists(task.outputFile) )
         {
-            diagnosticManager.AddError(gd::ToString(_("La compilation de la scène ")+game.GetLayout(i).GetName()+_(" a échouée : Rendez vous sur notre site pour nous rapporter cette erreur, en joignant le fichier suivant:\n"+CodeCompiler::GetInstance()->GetOutputDirectory()+"compilationErrors.txt"+"\n\nSi vous pensez que l'erreur provient d'une extension, contactez le développeur de celle ci.")));
+            diagnosticManager.AddError(gd::ToString(_("Compilation of scene ")+game.GetLayout(i).GetName()+_(" failed: Please go on our website to report this error, joining this file:\n")
+                                                    +CodeCompiler::GetInstance()->GetOutputDirectory()+"compilationErrors.txt"
+                                                    +_("\n\nIf you think the error is related to an extension, please contact its developer.")));
             diagnosticManager.OnCompilationFailed();
             return;
         }
         else
-            diagnosticManager.OnMessage(gd::ToString(_("Compilation de la scène ")+game.GetLayout(i).GetName()+_(" effectuée avec succès.")));
+            diagnosticManager.OnMessage(gd::ToString(_("Compiling scene ")+game.GetLayout(i).GetName()+_(" successed")));
 
         resourcesMergingHelper.ExposeResource(task.outputFile); //Export bitcode file.
 
@@ -182,13 +184,13 @@ void FullProjectCompiler::LaunchProjectCompilation()
     }
 
     //Now copy resources
-    diagnosticManager.OnMessage( gd::ToString( _("Copie des ressources...") ) );
+    diagnosticManager.OnMessage( gd::ToString( _("Copying resources...") ) );
     map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
     unsigned int i = 0;
     for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {
         if ( !it->first.empty() && wxCopyFile( it->first, tempDir + "/" + it->second, true ) == false )
-            diagnosticManager.AddError(gd::ToString(_( "Impossible de copier " )+it->first+_(" dans le répertoire de compilation.\n" )));
+            diagnosticManager.AddError(gd::ToString(_( "Unable to copy " )+it->first+_(" in compilation directory.\n" )));
 
         ++i;
         diagnosticManager.OnPercentUpdate( 50.0 + static_cast<float>(i) / static_cast<float>(resourcesNewFilename.size())*25.0 );
@@ -196,13 +198,13 @@ void FullProjectCompiler::LaunchProjectCompilation()
     }
 
     wxSafeYield();
-    diagnosticManager.OnMessage(gd::ToString(_( "Compilation du jeu..." )), gd::ToString(_( "Etape 1 sur 3" )));
+    diagnosticManager.OnMessage(gd::ToString(_( "Compiling game..." )), gd::ToString(_( "Step 1 out of 3" )));
     OpenSaveGame saveGame( game );
     saveGame.SaveToFile(static_cast<string>( tempDir + "/compil.gdg" ));
     diagnosticManager.OnPercentUpdate(80);
 
     wxSafeYield();
-    diagnosticManager.OnMessage(gd::ToString(_( "Compilation du jeu..." )), gd::ToString(_( "Etape 2 sur 3" )));
+    diagnosticManager.OnMessage(gd::ToString(_( "Compiling game..." )), gd::ToString(_( "Step 2 out of 3" )));
 
     //Création du fichier source
     {
@@ -244,7 +246,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     saveLS.SaveToFile(string(tempDir + "/loadingscreen"));
 
     //Création du fichier gam.egd
-    diagnosticManager.OnMessage(gd::ToString(_( "Compilation du jeu..." )), gd::ToString(_( "Etape 3 sur 3" )));
+    diagnosticManager.OnMessage(gd::ToString(_( "Compiling game..." )), gd::ToString(_( "Step 3 out of 3" )));
     wxSafeYield();
 
     //On créé une liste avec tous les fichiers
@@ -273,7 +275,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
             if ( filename.GetFullName() != "gam.egd" ) //On supprime tout sauf gam.egd
             {
                 if ( !wxRemoveFile( file ) )
-                    diagnosticManager.AddError(gd::ToString( _( "Impossible de supprimer le fichier " ) + file + _(" situé dans le répertoire de compilation.\n" )));
+                    diagnosticManager.AddError(gd::ToString( _( "Unable to delete the file" ) + file + _(" in compilation directory.\n" )));
             }
 
             file = wxFindNextFile();
@@ -281,7 +283,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     }
 
     diagnosticManager.OnPercentUpdate(90);
-    diagnosticManager.OnMessage(gd::ToString(_( "Exportation du jeu..." )));
+    diagnosticManager.OnMessage(gd::ToString(_( "Exporting game..." )));
     wxSafeYield();
 
     //Copy extensions
@@ -298,19 +300,19 @@ void FullProjectCompiler::LaunchProjectCompilation()
             if ( windowsTarget)
             {
                 if ( wxCopyFile( "Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdw", tempDir + "/" + game.GetUsedPlatformExtensions()[i]+".xgdw", true ) == false )
-                    diagnosticManager.AddError(gd::ToString(_( "Impossible de copier l'extension ")+game.GetUsedPlatformExtensions()[i]+_(" pour Windows dans le répertoire de compilation.\n" )));
+                    diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedPlatformExtensions()[i]+_(" for Windows in compilation directory.\n" )));
             }
 
             if ( linuxTarget )
             {
                 if ( wxCopyFile( "Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdl", tempDir + "/"+game.GetUsedPlatformExtensions()[i]+".xgdl", true ) == false )
-                    diagnosticManager.AddError(gd::ToString(_( "Impossible de copier l'extension ")+game.GetUsedPlatformExtensions()[i]+_(" pour Linux dans le répertoire de compilation.\n" )));
+                    diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedPlatformExtensions()[i]+_(" for Linux in compilation directory.\n" )));
             }
 
             if ( macTarget )
             {
                 if ( wxCopyFile( "Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdm", tempDir + "/"+game.GetUsedPlatformExtensions()[i]+".xgdm", true ) == false )
-                    diagnosticManager.AddError(gd::ToString(_( "Impossible de copier l'extension ")+game.GetUsedPlatformExtensions()[i]+_(" pour Mac OS dans le répertoire de compilation.\n" )));
+                    diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedPlatformExtensions()[i]+_(" for Mac OS in compilation directory.\n" )));
             }
         }
         if ( extension != boost::shared_ptr<ExtensionBase>() )
@@ -322,7 +324,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
                 {
                     if ( supplementaryFiles[i].first == "Windows"
                          && wxCopyFile( supplementaryFiles[i].second, tempDir + "/" + supplementaryFiles[i].second, true ) == false )
-                        diagnosticManager.AddError(gd::ToString(_( "Impossible de copier ")+supplementaryFiles[i].second+_(" pour Windows dans le répertoire de compilation.\n" )));
+                        diagnosticManager.AddError(gd::ToString(_( "Unable to copy ")+supplementaryFiles[i].second+_(" for Windows in compilation directory.\n" )));
                 }
             }
 
@@ -333,7 +335,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
                 {
                     if ( supplementaryFiles[i].first == "Linux"
                          && wxCopyFile( supplementaryFiles[i].second, tempDir + "/" + supplementaryFiles[i].second, true ) == false )
-                        diagnosticManager.AddError(gd::ToString(_( "Impossible de copier ")+supplementaryFiles[i].second+_(" pour Linux dans le répertoire de compilation.\n" )));
+                        diagnosticManager.AddError(gd::ToString(_( "Unable to copy ")+supplementaryFiles[i].second+_(" for Linux in compilation directory.\n" )));
                 }
             }
 
@@ -344,7 +346,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
                 {
                     if ( supplementaryFiles[i].first == "Mac"
                          && wxCopyFile( supplementaryFiles[i].second, tempDir + "/" + supplementaryFiles[i].second, true ) == false )
-                        diagnosticManager.AddError(gd::ToString(_( "Impossible de copier ")+supplementaryFiles[i].second+_(" pour Mac OS dans le répertoire de compilation.\n" )));
+                        diagnosticManager.AddError(gd::ToString(_( "Unable to copy ")+supplementaryFiles[i].second+_(" for Mac OS in compilation directory.\n" )));
                 }
             }
         }
@@ -352,7 +354,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     if ( game.useExternalSourceFiles )
     {
         if ( wxCopyFile( "dynext.dxgd", tempDir + "/" + "dynext.dxgd", true ) == false )
-            diagnosticManager.AddError(gd::ToString(_( "Impossible de copier les sources C++ compilées ( dynext.dxgd ) dans le répertoire de compilation.\n" )));
+            diagnosticManager.AddError(gd::ToString(_( "Unable to copy C++ sources ( dynext.dxgd ) in compilation directory.\n" )));
     }
 
     //Copie des derniers fichiers
@@ -362,31 +364,31 @@ void FullProjectCompiler::LaunchProjectCompilation()
         if ( windowsTarget )
         {
             if ( wxCopyFile( "Runtime/PlayWin.exe", tempDir + "/" + winExecutableName, true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Impossible de créer ")+"l'executable Windows"+_(" dans le répertoire de compilation.\n" )));
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable Windows"+_(" in compilation directory.\n" )));
 
             if ( wxCopyFile( "Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Impossible de créer ")+"l'executable gdl.dll"+_(" dans le répertoire de compilation.\n" )));
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable gdl.dll"+_(" in compilation directory.\n" )));
 
         }
         //Fichiers pour linux
         if ( linuxTarget )
         {
             if ( wxCopyFile( "Runtime/ExeLinux", tempDir + "/ExeLinux", true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Impossible de créer ")+"l'executable Linux"+_(" dans le répertoire de compilation.\n" )));
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable Linux"+_(" in compilation directory.\n" )));
 
             if ( wxCopyFile( "Runtime/PlayLinux", tempDir + "/" + linuxExecutableName, true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Impossible de créer ")+"le script executable Linux"+_(" dans le répertoire de compilation.\n" )));
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"le script executable Linux"+_(" in compilation directory.\n" )));
 
             if ( wxCopyFile( "Runtime/libgdl.so", tempDir + "/libgdl.so", true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Impossible de créer ")+"libgdl.so"+_(" dans le répertoire de compilation.\n" )));
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"libgdl.so"+_(" in compilation directory.\n" )));
         }
         if ( macTarget )
         {
             if ( wxCopyFile( "MacRuntime/MacExe", tempDir + "/MacExe", true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Impossible de créer ")+"l'executable Mac OS"+_(" dans le répertoire de compilation.\n" )));
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable Mac OS"+_(" in compilation directory.\n" )));
 
             if ( wxCopyFile( "MacRuntime/libgdl.dylib", tempDir + "/libgdl.dylib", true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Impossible de créer ")+"libgdl.dylib"+_(" dans le répertoire de compilation.\n" )));
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"libgdl.dylib"+_(" in compilation directory.\n" )));
         }
 
         //Copie du tout dans le répertoire final
@@ -395,7 +397,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             wxFileName fileName(file);
             if ( !wxCopyFile( file, outDir + "/" + fileName.GetFullName(), true ) )
-                diagnosticManager.AddError(gd::ToString(_( "Impossible de copier le fichier ") + file + _(" depuis le répertoire de compilation vers le répertoire final.\n" )));
+                diagnosticManager.AddError(gd::ToString(_( "Unable to copy file") + file + _(" from compilation directory to final directory.\n" )));
 
             file = wxFindNextFile();
         }
@@ -405,13 +407,13 @@ void FullProjectCompiler::LaunchProjectCompilation()
         if ( windowsTarget )
         {
             if ( wxCopyFile( "Runtime/PlayWin.exe", tempDir + "/internalstart.exe", true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Impossible de créer ")+"l'executable Windows"+_(" dans le répertoire de compilation.\n" )));
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable Windows"+_(" in compilation directory.\n" )));
 
             if ( wxCopyFile( "Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )
-                diagnosticManager.AddError(gd::ToString(_( "Impossible de créer ")+"l'executable gdl.dll"+_(" dans le répertoire de compilation.\n" )));
+                diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable gdl.dll"+_(" in compilation directory.\n" )));
 
             //Use 7zip to create a single archive
-            diagnosticManager.OnMessage( gd::ToString( _("Exportation du jeu... ( Compression )") ) );
+            diagnosticManager.OnMessage( gd::ToString( _("Exporting game... ( Compressing )") ) );
             wxArrayString arrStdOut, arrStdErr;
             wxExecute( _T( "7za.exe a  \""+ tempDir +"/archive.7z\" \"" + tempDir + "/*\"" ), arrStdOut, arrStdErr, wxEXEC_SYNC  );
 
@@ -477,7 +479,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         ExecutableIconChanger::ChangeWindowsExecutableIcon(string(outDir+"/"+winExecutableName), game.winExecutableIconFile);
     #endif
 
-    diagnosticManager.OnMessage(gd::ToString(_( "Compilation terminée" )));
+    diagnosticManager.OnMessage(gd::ToString(_( "Compilation finished" )));
     diagnosticManager.OnPercentUpdate(100);
 
     diagnosticManager.OnCompilationSuccessed();
@@ -500,7 +502,7 @@ std::string FullProjectCompiler::GetTempDir()
             tempDir = wxFileName::GetHomeDir();
 
         if ( !wxFileName::IsDirWritable(tempDir) )
-            wxMessageBox(_("Game Develop n'a pas réussi à trouver un répertoire temporaire pour la compilation.\nSi la compilation échoue, allez dans les préférences et choisissez un répertoire temporaire où vous avez les droits d'écriture."), _("La compilation risque d'échouer."), wxICON_EXCLAMATION);
+            wxMessageBox(_("Game Develop is unable to find a temporary compilation directory.\nIf compilation fail, go in the options and choose a temporary direction where you have read and write permissions."), _("Compilation may fail!"), wxICON_EXCLAMATION);
     }
 
     return tempDir + "/GDDeploymentTemporaries";
@@ -509,13 +511,13 @@ std::string FullProjectCompiler::GetTempDir()
 void FullProjectCompiler::ClearDirectory(std::string directory)
 {
     if ( !wxDirExists( directory ) && !wxMkdir( directory ) )
-            diagnosticManager.AddError(gd::ToString(_( "Impossible de créer le répertoire : " ) + directory + "\n"));
+            diagnosticManager.AddError(gd::ToString(_( "Unable to create directory:" ) + directory + "\n"));
 
     wxString file = wxFindFirstFile( directory + "/*" );
     while ( !file.empty() )
     {
         if ( !wxRemoveFile( file ) )
-            diagnosticManager.AddError(gd::ToString(_( "Impossible de supprimer le fichier " + file + " situé dans le répertoire "+directory+".\n" )));
+            diagnosticManager.AddError(gd::ToString(_("Unable to delete ") + file + _("in directory ")+directory+"\n" ));
 
         file = wxFindNextFile();
     }
@@ -524,13 +526,13 @@ void FullProjectCompiler::ClearDirectory(std::string directory)
 
 void FullProjectCompilerConsoleDiagnosticManager::OnCompilationFailed()
 {
-    cout << _("La compilation a échoué avec ces erreurs :") << endl;
+    cout << _("Compilation failed with these errors:") << endl;
     cout << GetErrors();
 }
 
 void FullProjectCompilerConsoleDiagnosticManager::OnCompilationSuccessed()
 {
-    cout << _("La compilation a terminé sans erreurs.") << endl;
+    cout << _("Compilation successed.") << endl;
 }
 
 void FullProjectCompilerConsoleDiagnosticManager::OnMessage(std::string message, std::string message2)
@@ -543,9 +545,10 @@ void FullProjectCompilerConsoleDiagnosticManager::OnMessage(std::string message,
 
 void FullProjectCompilerConsoleDiagnosticManager::OnPercentUpdate(float percents)
 {
-    cout << _("Avancement : ") << gd::ToString(percents) << endl;
+    cout << _("Progress:") << gd::ToString(percents) << endl;
 }
 
 
 }
 #endif
+

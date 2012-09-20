@@ -14,3 +14,4 @@ void AutomatismsSharedDatas::SetName(std::string name_)
 {
     name = name_;
 }
+

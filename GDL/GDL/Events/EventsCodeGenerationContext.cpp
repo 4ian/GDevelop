@@ -78,3 +78,4 @@ std::set<std::string> EventsCodeGenerationContext::GetObjectsToBeDeclared()
 }
 
 #endif
+

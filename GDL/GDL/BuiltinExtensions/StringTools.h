@@ -30,3 +30,4 @@ int GD_API StrRFindFrom(const std::string & str, const std::string & findwhat, u
 
 }
 #endif // STRINGEXPRESSIONS_H
+

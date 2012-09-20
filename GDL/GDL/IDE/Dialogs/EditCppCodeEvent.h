@@ -97,3 +97,4 @@ class EditCppCodeEvent: public wxDialog
 
 #endif
 #endif
+

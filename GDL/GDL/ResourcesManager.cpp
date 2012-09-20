@@ -57,7 +57,7 @@ void ResourcesManager::Init(const ResourcesManager & other)
 #if defined(GD_IDE_ONLY)
 bool ImageResource::EditMainProperty(gd::Project & project)
 {
-    wxFileDialog dialog( NULL, _( "Choisissez le fichier de l'image" ), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_OPEN );
+    wxFileDialog dialog( NULL, _( "Choose the image file" ), "", "", _("Supported image files|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|All files|*.*"), wxFD_OPEN );
     if ( dialog.ShowModal() == wxID_OK )
     {
         wxFileName filename = wxFileName::FileName(dialog.GetPath());
@@ -72,7 +72,7 @@ bool ImageResource::EditMainProperty(gd::Project & project)
 
 std::string ImageResource::GetMainPropertyDescription()
 {
-    return ToString(_("Fichier de l'image"));
+    return ToString(_("Image file"));
 }
 
 bool ImageResource::EditResource(gd::Project & project)
@@ -464,3 +464,4 @@ ResourcesManager::~ResourcesManager()
 {
     //dtor
 }
+

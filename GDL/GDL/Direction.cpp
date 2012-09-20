@@ -282,3 +282,4 @@ void Direction::SaveToXml(TiXmlElement * direction) const
 
 }
 #endif
+

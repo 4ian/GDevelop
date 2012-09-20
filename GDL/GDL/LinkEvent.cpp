@@ -126,14 +126,14 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditor
     dc.SetTextForeground( wxColour( 0, 0, 0 ) );
     dc.SetTextBackground( wxColour( 255, 255, 255 ) );
     dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-    dc.DrawText( _("Lien vers ")+GetTarget(), x+56, y + 16 );
-    wxRect lien = dc.GetTextExtent(_("Lien vers ")+GetTarget());
+    dc.DrawText( _("Link to ")+GetTarget(), x+56, y + 16 );
+    wxRect lien = dc.GetTextExtent(_("Link to ")+GetTarget());
 
     dc.SetFont( wxFont( 10, wxDEFAULT, wxNORMAL, wxNORMAL ) );
     if ( IncludeAllEvents() )
-        dc.DrawText( _("Inclure tous les évènements"), x+lien.GetWidth()+56+10, y + 18 );
+        dc.DrawText( _("Include all events"), x+lien.GetWidth()+56+10, y + 18 );
     else
-        dc.DrawText( _("Inclure les évènements ")+ToString(GetIncludeStart()+1)+_(" à ")+ToString(GetIncludeEnd()+1), x+lien.GetWidth()+56+10, y + 18 );
+        dc.DrawText( _("Include events ")+ToString(GetIncludeStart()+1)+_(" to ")+ToString(GetIncludeEnd()+1), x+lien.GetWidth()+56+10, y + 18 );
 }
 
 /**
@@ -148,7 +148,7 @@ unsigned int LinkEvent::GetRenderedHeight(unsigned int width) const
         dc.SelectObject(fakeBmp);
 
         dc.SetFont( wxFont( 12, wxDEFAULT, wxNORMAL, wxNORMAL ) );
-        wxRect lien = dc.GetTextExtent(_("Lien vers "));
+        wxRect lien = dc.GetTextExtent(_("Link to "));
 
         renderedHeight = lien.GetHeight()+32;
         eventHeightNeedUpdate = false;
@@ -158,3 +158,4 @@ unsigned int LinkEvent::GetRenderedHeight(unsigned int width) const
 }
 
 #endif
+

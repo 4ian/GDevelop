@@ -22,3 +22,4 @@ std::string GD_API ToString( const wxString & value )
     return string(value.mb_str());
 }
 #endif
+

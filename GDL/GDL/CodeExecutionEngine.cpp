@@ -165,7 +165,8 @@ void* UseSubstituteForUnknownFunctions(const std::string& name)
 {
     std::cout << "WARNING: Call to unknown function \"" << name << "\" redirected to GDEmptyFunctionDoingNothing." << std::endl;
     #if defined(GD_IDE_ONLY)
-    wxLogError(_("Une extension ou fonctionnalité de Game Develop présente une erreur. Veuillez rapporter ce problème au développeur de Game Develop en indiquant ce message d'erreur :\n")+name+_("\nDes actions/conditions du jeu ne s'executeront pas correctement."));
+    wxLogError(_("An extension or a feature of Game Develop has an error. Please report this problem to Game Develop author, including this error message:\n")+name+_("\nActions or conditions of the game will not execute properly."));
     #endif
     return (void*)(intptr_t)GDEmptyFunctionDoingNothing;
 }
+

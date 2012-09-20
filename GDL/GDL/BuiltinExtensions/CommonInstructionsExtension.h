@@ -18,3 +18,4 @@ class CommonInstructionsExtension : public ExtensionBase
 };
 
 #endif // COMMONINSTRUCTIONSEXTENSION_H
+

@@ -195,3 +195,4 @@ bool OpenSaveLoadingScreen::OpenFromElement(const TiXmlElement * elem)
 
     return true;
 }
+

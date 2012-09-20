@@ -56,3 +56,4 @@ void CompilerMessagesParser::ParseOutput(std::string rawOutput)
 }
 
 #endif
+

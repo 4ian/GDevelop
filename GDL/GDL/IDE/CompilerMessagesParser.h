@@ -53,3 +53,4 @@ class GD_API CompilerMessagesParser
 #endif // COMPILERERRORSPARSER_H
 
 #endif
+

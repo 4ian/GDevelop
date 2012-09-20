@@ -66,3 +66,4 @@ class AjoutPlusImage: public wxDialog
 
 #endif
 #endif
+

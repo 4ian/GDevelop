@@ -48,3 +48,4 @@ class SpriteInitialPositionPanel: public wxPanel
 
 #endif
 #endif
+

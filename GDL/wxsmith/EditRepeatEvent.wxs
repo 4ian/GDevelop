@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="EditRepeatEvent">
-		<title>Edition de l&apos;évènement Répéter</title>
+		<title>Edition of &quot;Repeat&quot; event</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
@@ -26,7 +26,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-										<label>Les conditions et actions seront répétées le nombre de fois indiquées.</label>
+										<label>The conditions and actions will be repeated a number of times.</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -55,7 +55,7 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-							<label>Nombre de répétitions :</label>
+							<label>Number of repetitions :</label>
 						</object>
 						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -110,7 +110,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="cancelBt" member="yes">
-							<label>Annuler</label>
+							<label>Cancel</label>
 							<handler function="OncancelBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -124,3 +124,5 @@
 		</object>
 	</object>
 </wxsmith>
+
+

@@ -264,3 +264,4 @@ void ExtensionBase::SceneLoaded(RuntimeScene & scene)
 void ExtensionBase::SceneUnloaded(RuntimeScene & scene)
 {
 }
+

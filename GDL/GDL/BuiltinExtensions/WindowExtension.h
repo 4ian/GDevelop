@@ -26,3 +26,4 @@ class WindowExtension : public ExtensionBase
 };
 
 #endif // WINDOWEXTENSION_H
+

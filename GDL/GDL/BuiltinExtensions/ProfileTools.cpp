@@ -22,3 +22,4 @@ void GD_API EndProfileTimer(RuntimeScene & scene, unsigned int id)
 }
 
 #endif
+

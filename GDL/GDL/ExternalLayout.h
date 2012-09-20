@@ -80,3 +80,4 @@ struct ExternalLayoutHasName : public std::binary_function<boost::shared_ptr<Ext
 };
 
 #endif // EXTERNALLAYOUT_H
+

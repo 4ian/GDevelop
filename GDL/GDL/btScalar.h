@@ -12,9 +12,6 @@ subject to the following restrictions:
 2. Altered source versions must be plainly marked as such, and must not be misrepresented as being the original software.
 3. This notice may not be removed or altered from any source distribution.
 */
-
-
-
 #ifndef SIMD___SCALAR_H
 #define SIMD___SCALAR_H
 
@@ -176,9 +173,6 @@ typedef float btScalar;
 //keep BT_LARGE_FLOAT*BT_LARGE_FLOAT < FLT_MAX
 #define BT_LARGE_FLOAT 1e18f
 #endif
-
-
-
 #define BT_DECLARE_ALIGNED_ALLOCATOR() \
    SIMD_FORCE_INLINE void* operator new(size_t sizeInBytes)   { return btAlignedAlloc(sizeInBytes,16); }   \
    SIMD_FORCE_INLINE void  operator delete(void* ptr)         { btAlignedFree(ptr); }   \
@@ -188,9 +182,6 @@ typedef float btScalar;
    SIMD_FORCE_INLINE void  operator delete[](void* ptr)         { btAlignedFree(ptr); }   \
    SIMD_FORCE_INLINE void* operator new[](size_t, void* ptr)   { return ptr; }   \
    SIMD_FORCE_INLINE void  operator delete[](void*, void*)      { }   \
-
-
-
 #if defined(BT_USE_DOUBLE_PRECISION) || defined(BT_FORCE_DOUBLE_FUNCTIONS)
 
 SIMD_FORCE_INLINE btScalar btSqrt(btScalar x) { return sqrt(x); }
@@ -312,9 +303,6 @@ SIMD_FORCE_INLINE bool btMachineIsLittleEndian()
    else
 	   return false;
 }
-
-
-
 ///btSelect avoids branches, which makes performance much better for consoles like Playstation 3 and XBox 360
 ///Thanks Phil Knight. See also http://www.cellperformance.com/articles/2006/04/more_techniques_for_eliminatin_1.html
 SIMD_FORCE_INLINE unsigned btSelect(unsigned condition, unsigned valueIfConditionNonZero, unsigned valueIfConditionZero)
@@ -443,3 +431,4 @@ SIMD_FORCE_INLINE double btUnswapEndianDouble(const unsigned char *src)
 
 #endif //SIMD___SCALAR_H
 #endif
+

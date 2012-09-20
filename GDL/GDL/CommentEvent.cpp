@@ -148,3 +148,4 @@ unsigned int CommentEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight+2;//2 : 2 small borders
 }
 #endif
+

@@ -27,3 +27,4 @@ private:
 };
 
 #endif // SCENENAMEMANGLER_H
+

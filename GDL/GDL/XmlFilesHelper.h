@@ -97,3 +97,4 @@ class XmlFilesManager
 };
 
 #endif // XMLFILESHELPER_H
+

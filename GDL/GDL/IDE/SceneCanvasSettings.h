@@ -34,3 +34,4 @@ public:
 };
 
 #endif // SCENECANVASSETTINGS_H
+

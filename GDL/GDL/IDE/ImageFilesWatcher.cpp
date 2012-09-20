@@ -25,3 +25,4 @@ void ImageFilesWatcher::OnChange(wxFileSystemWatcherEvent& event)
 }
 
 #endif
+

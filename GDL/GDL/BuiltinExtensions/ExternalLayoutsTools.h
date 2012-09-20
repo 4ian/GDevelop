@@ -9,3 +9,4 @@ namespace ExternalLayoutsTools
 };
 
 #endif // EXTERNALLAYOUTSTOOLS_H
+

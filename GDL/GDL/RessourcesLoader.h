@@ -100,3 +100,4 @@ private:
 };
 
 #endif // RESSOURCESLOADER_H
+

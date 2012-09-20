@@ -26,3 +26,4 @@ bool DndTextResourcesEditor::OnDropText(wxCoord x, wxCoord y, const wxString& te
     return true;
 }
 #endif
+

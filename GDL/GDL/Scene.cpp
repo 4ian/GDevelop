@@ -478,3 +478,4 @@ Scene& Scene::operator=(const Scene & scene)
 
     return *this;
 }
+

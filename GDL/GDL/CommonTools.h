@@ -135,3 +135,4 @@ inline double GDRound( double d )
 #endif
 
 #endif // STDALGO_H_INCLUDED
+

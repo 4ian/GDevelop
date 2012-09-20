@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="EditForEachEvent">
-		<title>Edition de l&apos;évènement &quot;Pour chaque objet&quot;</title>
+		<title>Edition of &quot;For each object&quot; event</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
@@ -26,7 +26,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-										<label>Les conditions et actions seront répétées pour chacun des objets ayant le nom indiqué.</label>
+										<label>The conditions and actions will be repeated for each of the object with the corresponding name.</label>
 										<size>253,60</size>
 										<style>wxALIGN_CENTRE</style>
 									</object>
@@ -56,7 +56,7 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-							<label>Répeter l&apos;évènement pour chaque objet :</label>
+							<label>Repeat event for each object:</label>
 						</object>
 						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -111,7 +111,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="cancelBt" member="yes">
-							<label>Annuler</label>
+							<label>Cancel</label>
 							<handler function="OncancelBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

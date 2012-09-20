@@ -23,3 +23,4 @@ class SpriteExtension : public ExtensionBase
 };
 
 #endif // SPRITEEXTENSION_H
+

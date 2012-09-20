@@ -55,3 +55,4 @@ void BaseProfiler::Reset()
     }
 }
 #endif
+

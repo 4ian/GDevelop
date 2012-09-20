@@ -109,3 +109,4 @@ void Force::SetClearing(float clearing_)
 {
     clearing = clearing_;
 }
+

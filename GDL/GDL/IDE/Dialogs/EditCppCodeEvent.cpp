@@ -74,7 +74,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game
 	wxFlexGridSizer* FlexGridSizer17;
 	wxStaticBoxSizer* StaticBoxSizer5;
 
-	Create(parent, wxID_ANY, _("Code C++"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("C++ code"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer2->AddGrowableCol(0);
 	FlexGridSizer2->AddGrowableRow(1);
@@ -86,7 +86,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game
 	FlexGridSizer6->AddGrowableCol(1);
 	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/source_cpp64.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
 	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("Les évènements code C++ permettent de faire appel à une fonction\ncodée en C++, en lui passant au besoin des objets ou une référence\nvers la scène. Vous pouvez également spécifier les fichiers annexes\nà compiler en même temps que la fonction si vous faites appel à des\nfonctionnalités declarées dans ces fichiers."), wxDefaultPosition, wxSize(760,75), 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("The C++ code events allow you to call a function written in C++,\nwith if needed the scene or some objects passed as arguments.\nYou can also specify the external source files which must be compiled\nif your function is refering to features implemented in external source files."), wxDefaultPosition, wxSize(760,75), 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->SetSizeHints(Panel1);
@@ -106,15 +106,15 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game
 	FlexGridSizer12 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer12->AddGrowableCol(0);
 	FlexGridSizer12->AddGrowableRow(1);
-	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Appel à la fonction"));
+	StaticBoxSizer2 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Call to function"));
 	FlexGridSizer7 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer7->AddGrowableCol(0);
-	sceneRefCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Passer une réfèrence vers la scène"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
+	sceneRefCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Pass a reference to the scene"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	sceneRefCheck->SetValue(true);
 	FlexGridSizer7->Add(sceneRefCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer8 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer8->AddGrowableCol(0);
-	objectsListCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Passer une liste de pointeurs vers les objets :"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
+	objectsListCheck = new wxCheckBox(this, ID_CHECKBOX1, _("Pass a list of pointers to objects:"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
 	objectsListCheck->SetValue(false);
 	FlexGridSizer8->Add(objectsListCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer13 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -129,7 +129,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game
 	FlexGridSizer7->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer2->Add(FlexGridSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer12->Add(StaticBoxSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Dépendances"));
+	StaticBoxSizer4 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Dependencies"));
 	FlexGridSizer14 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer14->AddGrowableCol(0);
 	FlexGridSizer14->AddGrowableRow(0);
@@ -137,14 +137,14 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game
 	FlexGridSizer14->Add(dependenciesList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticBoxSizer4->Add(FlexGridSizer14, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer12->Add(StaticBoxSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Affichage de l\'éditeur d\'évènements"));
+	StaticBoxSizer5 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Events editor displaying"));
 	FlexGridSizer15 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer15->AddGrowableCol(0);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Nom/Commentaire affiché pour l\'évènement :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Name/Comment displayed for the event:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer15->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	displayedNameEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(209,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer15->Add(displayedNameEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	displayCodeCheck = new wxCheckBox(this, ID_CHECKBOX3, _("Afficher le code dans l\'éditeur d\'évènements"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
+	displayCodeCheck = new wxCheckBox(this, ID_CHECKBOX3, _("Display the code in the events editor"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
 	displayCodeCheck->SetValue(false);
 	FlexGridSizer15->Add(displayCodeCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBoxSizer5->Add(FlexGridSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -154,7 +154,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game
 	FlexGridSizer10 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer10->AddGrowableCol(0);
 	FlexGridSizer10->AddGrowableRow(1);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Fichiers d\'entête"));
+	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Includes"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	includeTextCtrl = new wxTextCtrl(this, ID_TEXTCTRL2, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE, wxDefaultValidator, _T("ID_TEXTCTRL2"));
@@ -179,7 +179,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game
 	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
 	okBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer5->Add(okBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cancelBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	cancelBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer5->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer5, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer2);
@@ -327,4 +327,5 @@ void EditCppCodeEvent::UpdateTextCtrl(wxStyledTextEvent& event)
         codeEdit->BraceBadLight(codeEdit->GetCurrentPos());
 }
 #endif
+
 

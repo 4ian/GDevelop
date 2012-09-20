@@ -54,3 +54,4 @@ double GD_API angleDifference(double angle1, double angle2);
 }
 
 #endif // MATHEMATICALTOOLS_H
+

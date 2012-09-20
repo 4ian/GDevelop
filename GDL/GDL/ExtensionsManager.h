@@ -270,3 +270,4 @@ class GD_API ExtensionsManager
 };
 
 #endif // EXTENSIONSMANAGER_H
+

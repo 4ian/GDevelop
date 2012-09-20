@@ -102,3 +102,4 @@ struct LayerHasName : public std::binary_function<Layer, std::string, bool> {
 };
 
 #endif // LAYER_H
+

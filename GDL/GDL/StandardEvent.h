@@ -74,3 +74,4 @@ class GD_API StandardEvent : public gd::BaseEvent
 #endif // STANDARDEVENT_H
 
 #endif
+

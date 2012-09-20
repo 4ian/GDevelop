@@ -513,3 +513,4 @@ void DestroyBaseObject(Object * object);
 Object * CreateBaseObject(std::string name);
 
 #endif // OBJECT_H
+

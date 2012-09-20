@@ -13,3 +13,4 @@ double GD_API GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick,
 void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr, const std::string & variable );
 
 #endif // JOYSTICKTOOLS_H
+

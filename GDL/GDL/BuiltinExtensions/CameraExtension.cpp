@@ -9,282 +9,282 @@
 CameraExtension::CameraExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinCamera",
-                          _("Fonctionnalités sur les caméras"),
-                          _("Extension caméra integrée en standard"),
+                          _("Cameras and layers features"),
+                          _("Builtin camera extension"),
                           "Compil Games",
                           "Freeware")
     #if defined(GD_IDE_ONLY)
 
     DECLARE_CONDITION("CameraX",
-                   _("Position X de la caméra"),
-                   _("Teste si la valeur de la position x de la caméra\ncorrespond au test effectué."),
-                   _("La position X de la caméra _PARAM4_ est _PARAM2_ à _PARAM1_ ( Calque : _PARAM3_ )"),
-                   _("Calques et caméras"),
+                   _("Camera X position"),
+                   _("Test the X position of a camera."),
+                   _("X position of camera _PARAM4_ is _PARAM2__PARAM1_ ( Layer: _PARAM3_ )"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Valeur à tester"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Value to test"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraX").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("CameraY",
-                   _("Position Y de la caméra"),
-                   _("Teste si la valeur de la position Y de la caméra\ncorrespond au test effectué."),
-                   _("La position Y de la caméra _PARAM4_ est _PARAM2_ à _PARAM1_ ( Calque : _PARAM3_ )"),
-                   _("Calques et caméras"),
+                   _("Camera Y position"),
+                   _("Test the Y position of a camera."),
+                   _("The Y position of camera _PARAM4_ is _PARAM2__PARAM1_  ( Layer: _PARAM3_ )"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Valeur à tester"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",false).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Value to test"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraY").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_ACTION("CameraX",
-                   _("Position X de la caméra"),
-                   _("Modifie la position X de la caméra indiquée."),
-                   _("Faire _PARAM2__PARAM1_ à la position X de la caméra _PARAM4_ ( Calque : _PARAM3_ )"),
-                   _("Calques et caméras"),
+                   _("Camera X position"),
+                   _("Change X position of the specified camera."),
+                   _("Do _PARAM2__PARAM1_ to X position of camera _PARAM4_ ( Layer: _PARAM3_ )"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Valeur"), "",false);
-        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Value"), "",false);
+        instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("SetCameraX").SetManipulatedType("number").SetAssociatedGetter("GetCameraX").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("CameraY",
-                   _("Position Y de la caméra"),
-                   _("Modifie la position Y de la caméra indiquée."),
-                   _("Faire _PARAM2__PARAM1_ à la position Y de la caméra _PARAM4_ ( Calque : _PARAM3_ )"),
-                   _("Calques et caméras"),
+                   _("Camera Y position"),
+                   _("Change Y position of the specified camera."),
+                   _("Do _PARAM2__PARAM1_ to Y position of camera _PARAM4_ ( Layer: _PARAM3_ )"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Valeur"), "",false);
-        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Value"), "",false);
+        instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("SetCameraY").SetManipulatedType("number").SetAssociatedGetter("GetCameraY").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_CONDITION("CameraWidth",
-                   _("Largeur d'une caméra"),
-                   _("Teste la largeur d'une caméra d'un calque."),
-                   _("La largeur de la caméra _PARAM2_ du calque _PARAM1_ est _PARAM3_ à _PARAM4_"),
-                   _("Calques et caméras"),
+                   _("Width of a camera"),
+                   _("Test the width of a camera of a layer"),
+                   _("The width of camera _PARAM2_ of layer _PARAM1_ is _PARAM3__PARAM4_"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",false).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-        instrInfo.AddParameter("expression", _("Valeur à tester"), "",false);
+        instrInfo.AddParameter("layer", _("Layer"), "",false).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+        instrInfo.AddParameter("expression", _("Value to test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraWidth").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("CameraHeight",
-                   _("Hauteur d'une caméra"),
-                   _("Teste la hauteur d'une caméra d'un calque."),
-                   _("La hauteur de la caméra _PARAM2_ du calque _PARAM1_ est _PARAM3_ à _PARAM4_"),
-                   _("Calques et caméras"),
+                   _("Height of a camera"),
+                   _("Test the height of a camera of a layer"),
+                   _("The height of camera _PARAM2_ of layer _PARAM1_ is _PARAM3__PARAM4_"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-        instrInfo.AddParameter("expression", _("Valeur à tester"), "",false);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+        instrInfo.AddParameter("expression", _("Value to test"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraHeight").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("CameraAngle",
-                   _("Angle de la caméra d'un calque"),
-                   _("Teste l'angle d'une caméra."),
-                   _("L'angle de la caméra est _PARAM2_ à _PARAM1_° ( Calque : _PARAM3_, caméra : _PARAM4_  )"),
-                   _("Calques et caméras"),
+                   _("Angle of a camera of a layer"),
+                   _("Test a camera angle."),
+                   _("Angle of camera is _PARAM2__PARAM1_ ( layer : _PARAM3_, camera : _PARAM4_ )"),
+                   _("Layers and cameras"),
                    "res/conditions/camera24.png",
                    "res/conditions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Valeur à tester"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "",false);
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Value to test"), "",false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraAngle").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_ACTION("RotateCamera",
-                   _("Modifier l'angle de la caméra"),
-                   _("Cette action modifie l'angle de la caméra du calque indiqué."),
-                   _("Faire _PARAM2__PARAM1_ à l'angle de la caméra ( calque : _PARAM3_, caméra : _PARAM4_ )"),
-                   _("Calques et caméras"),
+                   _("Change camera angle"),
+                   _("This action modify the angle of a camera of the specified layer."),
+                   _("Do _PARAM2__PARAM1_ to angle of camera ( layer : _PARAM3_, camera : _PARAM4_ )"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Valeur"), "",false);
-        instrInfo.AddParameter("operator", _("Signe de la modification"), "",false);
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Value"), "",false);
+        instrInfo.AddParameter("operator", _("Modification's sign"), "",false);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("SetCameraAngle").SetAssociatedGetter("GetCameraAngle").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("AddCamera",
-                   _("Ajouter une caméra à un calque"),
-                   _("Cette action ajoute une caméra à un calque."),
-                   _("Ajouter une caméra au calque _PARAM1_"),
-                   _("Calques et caméras"),
+                   _("Add a camera to a layer"),
+                   _("This action add a camera to a layer"),
+                   _("Add a camera to layer _PARAM1_"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Largeur"), "",true);
-        instrInfo.AddParameter("expression", _("Hauteur"), "",true);
-        instrInfo.AddParameter("expression", _("Position X du point haut gauche de la zone de rendu ( entre 0 et 1 )"), "",true);
-        instrInfo.AddParameter("expression", _("Position Y du point haut gauche de la zone de rendu ( entre 0 et 1 )"), "",true);
-        instrInfo.AddParameter("expression", _("Position X du point bas droit de la zone de rendu ( entre 0 et 1 )"), "",true);
-        instrInfo.AddParameter("expression", _("Position Y du point bas droit de la zone de rendu ( entre 0 et 1 )"), "",true);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Width"), "",true);
+        instrInfo.AddParameter("expression", _("Height"), "",true);
+        instrInfo.AddParameter("expression", _("Render zone: Top left side: X Position ( Between 0 and 1 )"), "",true);
+        instrInfo.AddParameter("expression", _("Render zone: Top left side: Y Position ( Between 0 and 1 )"), "",true);
+        instrInfo.AddParameter("expression", _("Render zone: Bottom right side: X Position ( Between 0 and 1 )"), "",true);
+        instrInfo.AddParameter("expression", _("Render zone: Bottom right side: Y Position ( Between 0 and 1 )"), "",true);
 
         instrInfo.cppCallingInformation.SetFunctionName("AddCamera").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("DeleteCamera",
-                   _("Supprimer une caméra d'un calque"),
-                   _("Supprime la caméra indiquée d'un calque."),
-                   _("Supprimer la caméra _PARAM2_ du calque _PARAM1_"),
-                   _("Calques et caméras"),
+                   _("Delete a camera of a layer"),
+                   _("Remove the specified camera from a layer"),
+                   _("Delete camera _PARAM2_ from layer _PARAM1_"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra"), "",false);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("DeleteCamera").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("CameraSize",
-                   _("Modifier la taille d'une caméra"),
-                   _("Cette action modifie la taille d'une caméra. Remet le zoom à sa valeur initiale."),
-                   _("Changer la taille de la caméra _PARAM2_ du calque _PARAM1_ en _PARAM3_*_PARAM4_"),
-                   _("Calques et caméras"),
+                   _("Modify the size of a camera"),
+                   _("This action modify the size of a camera of the specified layer. The zoom will be reset."),
+                   _("Change the size of camera _PARAM2_ of _PARAM1_ to _PARAM3_*_PARAM4_"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra"), "",false);
-        instrInfo.AddParameter("expression", _("Largeur"), "",false);
-        instrInfo.AddParameter("expression", _("Hauteur"), "",false);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number"), "",false);
+        instrInfo.AddParameter("expression", _("Width"), "",false);
+        instrInfo.AddParameter("expression", _("Height"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetCameraSize").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("CameraViewport",
-                   _("Modifier la zone de rendu d'une caméra"),
-                   _("Cette action modifie la zone de rendu d'une caméra, exprimée en facteur de la fenêtre."),
-                   _("Mettre la zone de rendu de la caméra _PARAM2_ du calque _PARAM1_ à _PARAM3_;_PARAM4_ _PARAM5_;_PARAM6_"),
-                   _("Calques et caméras"),
+                   _("Modify the render zone of a camera"),
+                   _("This action modify the render zone of a camera of the specified layer."),
+                   _("Set the render zone of camera _PARAM2_ from layer _PARAM1_ to PARAM3_;_PARAM4_ _PARAM5_;_PARAM6_"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra"), "",false);
-        instrInfo.AddParameter("expression", _("Position X du point haut gauche de la zone ( entre 0 et 1 )"), "",false);
-        instrInfo.AddParameter("expression", _("Position Y du point haut gauche de la zone ( entre 0 et 1 )"), "",false);
-        instrInfo.AddParameter("expression", _("Position X du point bas droit de la zone ( entre 0 et 1 )"), "",false);
-        instrInfo.AddParameter("expression", _("Position Y du point bas droit de la zone ( entre 0 et 1 )"), "",false);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number"), "",false);
+        instrInfo.AddParameter("expression", _("Render zone: Top left side: X Position ( Between 0 and 1 )"), "",false);
+        instrInfo.AddParameter("expression", _("Render zone: Top left side: X Position ( Between 0 and 1 )"), "",false);
+        instrInfo.AddParameter("expression", _("Render zone: Bottom right side: X Position ( Between 0 and 1 )"), "",false);
+        instrInfo.AddParameter("expression", _("Render zone: Bottom right side: X Position ( Between 0 and 1 )"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetCameraViewport").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ZoomCamera",
-                   _("Changer le niveau de zoom de la caméra"),
-                   _("Modifie le niveau de zoom de la caméra."),
-                   _("Mettre le niveau de zoom de la caméra à _PARAM1_ ( calque : _PARAM2_, caméra : _PARAM3_ )"),
-                   _("Calques et caméras"),
+                   _("Change camera zoom."),
+                   _("Change camera zoom."),
+                   _("Change camera zoom to _PARAM1_ ( layer : _PARAM2_, camera : _PARAM3_ )"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Valeur ( 1: Zoom initial, 2: Zoom avant x2, 0.5:Zoom arrière x2... )"), "",false);
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Value ( 1:Initial zoom, 2:Zoom x2, 0.5:Unzoom x2...)"), "",false);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("SetCameraZoom").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("FixCamera",
-                   _("Centrer la caméra sur un objet ( Limites )"),
-                   _("Centre la caméra sur l'objet, dans les limites définies.\nIl est préférable d'appeler cette action vers la fin des évènements, quand toutes les actions\nde positionnement et de déplacement de l'objet ont été effectuées."),
-                   _("Centrer la caméra sur _PARAM1_ ( limites : de _PARAM3_;_PARAM4_ à _PARAM5_;_PARAM6_ ) ( calque : _PARAM8_, caméra : _PARAM9_ )"),
-                   _("Calques et caméras"),
+                   _("Center the camera on an object within limits"),
+                   _("Center the camera on the specified object, without leaving the specified limits."),
+                   _("Center the camera on _PARAM1_ ( limit : from _PARAM3_;_PARAM4_ to _PARAM5_;_PARAM6_ )  ( layer : _PARAM8_, camera : _PARAM9_ )"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("object", _("Objet"), "", false);
+        instrInfo.AddParameter("object", _("Object"), "", false);
         instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
-        instrInfo.AddParameter("expression", _("Coté haut gauche de la limite : Position X"), "",false);
-        instrInfo.AddParameter("expression", _("Coté haut gauche de la limite : Position Y"), "",false);
-        instrInfo.AddParameter("expression", _("Coté bas droit de la limite : Position X"), "",false);
-        instrInfo.AddParameter("expression", _("Coté bas droit de la limite : Position Y"), "",false);
-        instrInfo.AddParameter("yesorno", _("Anticiper le déplacement de l'objet ( oui par défaut )"), "",true).SetDefaultValue("true");
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("expression", _("Top left side of the boundary: X Position"), "",false);
+        instrInfo.AddParameter("expression", _("Top left side of the boundary: Y Position"), "",false);
+        instrInfo.AddParameter("expression", _("Bottom right side of the boundary: X Position"), "",false);
+        instrInfo.AddParameter("expression", _("Bottom right side of the boundary: Y Position"), "",false);
+        instrInfo.AddParameter("yesorno", _("Anticipating the displacement of the object (yes by default)"), "",true).SetDefaultValue("true");
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("CenterCameraOnObjectWithLimits").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("CentreCamera",
-                   _("Centrer la caméra sur un objet"),
-                   _("Centre la caméra sur l'objet indiqué.\nIl est préférable d'appeler cette action vers la fin des évènements, quand toutes les actions\nde positionnement et de déplacement de l'objet ont été effectuées."),
-                   _("Centrer la caméra sur _PARAM1_ ( calque : _PARAM4_, caméra : _PARAM5_ )"),
-                   _("Calques et caméras"),
+                   _("Center the camera on an object"),
+                   _("Center the camera on the specified object."),
+                   _("Center camera on _PARAM1_ ( layer : _PARAM4_, camera : _PARAM5_ )"),
+                   _("Layers and cameras"),
                    "res/actions/camera24.png",
                    "res/actions/camera.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("object", _("Objet"), "", false);
+        instrInfo.AddParameter("object", _("Object"), "", false);
         instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
-        instrInfo.AddParameter("yesorno", _("Anticiper le déplacement de l'objet ( oui par défaut )"), "",true).SetDefaultValue("true");
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("yesorno", _("Anticipating the displacement of the object (yes by default)"), "",true).SetDefaultValue("true");
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
 
         instrInfo.cppCallingInformation.SetFunctionName("CenterCameraOnObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
@@ -292,147 +292,148 @@ CameraExtension::CameraExtension()
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ShowLayer",
-                   _("Afficher un calque"),
-                   _("Rend visible un calque."),
-                   _("Afficher le calque _PARAM1_"),
-                   _("Calques et caméras"),
+                   _("Show a layer"),
+                   _("Show a layer."),
+                   _("Show layer _PARAM1_"),
+                   _("Layers and cameras"),
                    "res/actions/layer24.png",
                    "res/actions/layer.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"");
 
         instrInfo.cppCallingInformation.SetFunctionName("ShowLayer").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("HideLayer",
-                   _("Cacher un calque"),
-                   _("Rend invisible un calque."),
-                   _("Cacher le calque _PARAM1_"),
-                   _("Calques et caméras"),
+                   _("Hide a layer"),
+                   _("Hide a layer."),
+                   _("Hide layer _PARAM1_"),
+                   _("Layers and cameras"),
                    "res/actions/layer24.png",
                    "res/actions/layer.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"");
 
         instrInfo.cppCallingInformation.SetFunctionName("HideLayer").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");;
 
     DECLARE_END_ACTION()
 
     DECLARE_CONDITION("LayerVisible",
-                   _("Visibilité d'un calque"),
-                   _("Teste si un calque est affiché."),
-                   _("Le calque _PARAM1_ est visible"),
-                   _("Calques et caméras"),
+                   _("Visibility of a layer"),
+                   _("Test if a layer is displayed"),
+                   _("Layer _PARAM1_ is visible"),
+                   _("Layers and cameras"),
                    "res/conditions/layer24.png",
                    "res/conditions/layer.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",false).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",false).SetDefaultValue("\"\"");
 
         instrInfo.cppCallingInformation.SetFunctionName("LayerVisible").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");;
 
     DECLARE_END_CONDITION()
 
-    DECLARE_EXPRESSION("CameraWidth", _("Largeur de la caméra d'un calque"), _("Largeur de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("CameraWidth", _("Width of a camera of a layer"), _("Width of a camera of a layer"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",false);
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",false).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",false);
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraWidth");
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("CameraHeight", _("Hauteur de la caméra d'un calque"), _("Hauteur de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("CameraHeight", _("Height of a camera of a layer"), _("Height of a camera of a layer"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",false);
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",false).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",false);
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraHeight");
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("CameraViewportLeft", _("Position X du coté haut-gauche de la zone de rendu d'une caméra"), _("Position X du coté haut-gauche de la zone de rendu d'une caméra"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("CameraViewportLeft", _("X position of the top left side point of a render zone"), _("X position of the top left side point of a render zone"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",false);
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",false).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",false);
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportLeft");
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("CameraViewportTop", _("Position Y du coté haut-gauche de la zone de rendu d'une caméra"), _("Position Y du coté haut-gauche de la zone de rendu d'une caméra"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("CameraViewportTop", _("Y position of the top left side point of a render zone"), _("Y position of the top left side point of a render zone"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",false);
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",false).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",false);
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportTop");
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("CameraViewportRight", _("Position X du coté bas-droit de la zone de rendu d'une caméra"), _("Position X du coté bas-droit de la zone de rendu d'une caméra"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("CameraViewportRight", _("X position of the bottom right side point of a render zone"), _("X position of the bottom right side point of a render zone"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",false);
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",false).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",false);
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportRight");
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("CameraViewportBottom", _("Position Y du coté bas-droit de la zone de rendu d'une caméra"), _("Position Y du coté bas-droit de la zone de rendu d'une caméra"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("CameraViewportBottom", _("Y position of the bottom right side point of a render zone"), _("Y position of the bottom right side point of a render zone"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",false);
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",false).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",false);
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportBottom");
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("CameraX", _("Position X de la caméra d'un calque"), _("Position X de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("CameraX", _("Camera X position"), _("Camera X position"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraX");
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("VueX", _("Position X de la caméra d'un calque"), _("Position X de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("VueX", _("Camera X position"), _("Camera X position"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraX");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("CameraY", _("Position Y de la caméra d'un calque"), _("Position Y de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("CameraY", _("Camera Y position"), _("Camera Y position"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraY");
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("VueY", _("Position Y de la caméra d'un calque"), _("Position Y de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("VueY", _("Camera Y position"), _("Camera Y position"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraY");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("CameraRotation", _("Angle de la caméra d'un calque"), _("Angle de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("CameraRotation", _("Angle of a camera of a layer"), _("Angle of a camera of a layer"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraRotation");
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("VueRotation", _("Angle de la caméra d'un calque"), _("Angle de la caméra d'un calque"), _("Caméra"), "res/actions/camera.png")
+    DECLARE_EXPRESSION("VueRotation", _("Angle of a camera of a layer"), _("Angle of a camera of a layer"), _("Camera"), "res/actions/camera.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("layer", _("Calque"), "",true).SetDefaultValue("\"\"");
-        instrInfo.AddParameter("expression", _("Numéro de la caméra ( 0 par défaut )"), "",true).SetDefaultValue("0");
+        instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetCameraRotation");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
     #endif
 }
+

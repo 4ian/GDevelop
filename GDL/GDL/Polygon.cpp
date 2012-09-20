@@ -90,3 +90,4 @@ Polygon2d Polygon2d::CreateRectangle(float width, float height)
 
     return rect;
 }
+

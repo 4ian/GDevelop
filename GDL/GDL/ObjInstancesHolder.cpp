@@ -73,3 +73,4 @@ void ObjInstancesHolder::ObjectNameHasChanged(Object * object)
 
     AddObject(theObject);
 }
+

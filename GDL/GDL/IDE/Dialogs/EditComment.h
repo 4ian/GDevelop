@@ -56,3 +56,4 @@ class EditComment: public wxDialog
 
 #endif
 #endif
+

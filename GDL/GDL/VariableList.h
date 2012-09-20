@@ -166,3 +166,4 @@ private:
 };
 
 #endif // LISTVARIABLE_H
+

@@ -95,7 +95,7 @@ public:
      * - mapOfObjectListsOfParameter : a std::map containing lists of objects which are specified by the object name in another parameter. (std::map <std::string, std::vector<Object*> *>) Example:
      * \code
     DECLARE_EXPRESSION("Count", _("Object count"), _("Count the number of picked objects"), _("Objects"), "res/conditions/nbObjet.png")
-        instrInfo.AddParameter("object", _("Objet"), "", false);
+        instrInfo.AddParameter("object", _("Object"), "", false);
         instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
 
         instrInfo.cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
@@ -104,7 +104,7 @@ public:
      * - mapOfObjectListsOfParameterWithoutPicking : Same as mapOfObjectListsOfParameter but do not pick object if they are not already concerned.
      * - ptrToObjectOfParameter : Return a pointer to object specified by the object name in another parameter ( Object * ). Example:
      * \code
-    instrInfo.AddParameter("object", _("Objet"), "", false);
+    instrInfo.AddParameter("object", _("Object"), "", false);
     instrInfo.AddParameter("object", _("Target object"), "", false);
     instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1"); //The called function will be called with this signature : Function(std::string, std::string, Object*)
      * \endcode
@@ -220,3 +220,4 @@ private:
 
 #endif // EventsCodeGenerator_H
 #endif
+

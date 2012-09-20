@@ -20,3 +20,4 @@ class ExternalLayoutsExtension : public ExtensionBase
 
 
 #endif // EXTERNALLAYOUTSEXTENSION_H
+

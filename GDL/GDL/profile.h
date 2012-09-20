@@ -10,9 +10,6 @@
 
 // Credits: The Clock class was inspired by the Timer classes in
 // Ogre (www.ogre3d.org).
-
-
-
 #ifndef QUICK_PROF_H
 #define QUICK_PROF_H
 
@@ -23,9 +20,6 @@
 #include "GDL/btScalar.h"
 #include "GDL/btAlignedAllocator.h"
 #include <new>
-
-
-
 
 //if you don't need btClock, you can comment next line
 #define USE_BT_CLOCK 1
@@ -243,9 +237,6 @@ private:
 
 #endif //USE_BT_CLOCK
 
-
-
-
 ///A node in the Profile Hierarchy Tree
 class	CProfileNode {
 
@@ -373,11 +364,9 @@ public:
 #define	BT_PROFILE( name )
 
 #endif //#ifndef BT_NO_PROFILE
-
-
-
 #endif //QUICK_PROF_H
 
 #undef LoadImage
 
 #endif
+

@@ -75,3 +75,4 @@ class EditForEachEvent: public wxDialog
 
 #endif
 #endif
+

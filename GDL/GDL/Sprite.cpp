@@ -127,3 +127,4 @@ std::vector<Polygon2d> Sprite::GetCollisionMask() const
 
     return customCollisionMask;
 }
+

@@ -165,3 +165,4 @@ Music * RessourcesLoader::LoadMusic( const string & filename )
 
     return music;
 }
+

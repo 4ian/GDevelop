@@ -76,3 +76,4 @@ private:
 };
 
 #endif // OPENSAVEGAME_H
+

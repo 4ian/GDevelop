@@ -30,9 +30,6 @@ inline float Profile_Get_Tick_Rate(void)
 	return 1000.f;
 
 }
-
-
-
 /***************************************************************************************************
 **
 ** CProfileNode
@@ -326,9 +323,6 @@ void	CProfileManager::dumpRecursive(CProfileIterator* profileIterator, int spaci
 		profileIterator->Enter_Parent();
 	}
 }
-
-
-
 void	CProfileManager::dumpAll()
 {
 	CProfileIterator* profileIterator = 0;
@@ -340,3 +334,4 @@ void	CProfileManager::dumpAll()
 }
 
 #endif
+

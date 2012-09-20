@@ -333,3 +333,4 @@ void GD_API ReadStringFromFile( const std::string & filename, const std::string 
 
     return;
 }
+

@@ -12,115 +12,115 @@
 WindowExtension::WindowExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinWindow",
-                          _("Fonctionnalités de fenêtrage"),
-                          _("Extension permettant de manipuler la fenêtre de jeu, integrée en standard"),
+                          _("Window features"),
+                          _("Builtin extension allowing to manipulate the game's window"),
                           "Compil Games",
                           "Freeware")
     #if defined(GD_IDE_ONLY)
 
     DECLARE_ACTION("EcrireTexte",
-                   _("Afficher un texte"),
-                   _("Affiche le texte spécifié à l'écran."),
-                   _("Afficher _PARAM1_ en _PARAM2_;_PARAM3_ ( couleur : _PARAM4_ , taille : _PARAM5_, police : _PARAM6_ )"),
-                   _("Scène"),
+                   _("Display a text"),
+                   _("Display the specified text to screen"),
+                   _("Display _PARAM1_ at _PARAM2_;_PARAM3_ ( color  : _PARAM4_ , size : _PARAM5_, font : _PARAM6_ )"),
+                   _("Scene"),
                    "res/actions/texte24.png",
                    "res/actions/texte.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("string", _("Texte"), "",false);
-        instrInfo.AddParameter("expression", _("Position X"), "",false);
-        instrInfo.AddParameter("expression", _("Position Y"), "",false);
-        instrInfo.AddParameter("color", _("Couleur"), "",false);
-        instrInfo.AddParameter("expression", _("Taille"), "",false);
-        instrInfo.AddParameter("police", _("Police"), "",true);
-        instrInfo.AddParameter("layer", _("Calque ( Calque de base si vide )"), "",true).SetDefaultValue("\"\"");
+        instrInfo.AddParameter("string", _("Text"), "",false);
+        instrInfo.AddParameter("expression", _("X position"), "",false);
+        instrInfo.AddParameter("expression", _("Y position"), "",false);
+        instrInfo.AddParameter("color", _("Color"), "",false);
+        instrInfo.AddParameter("expression", _("Size"), "",false);
+        instrInfo.AddParameter("police", _("Font"), "",true);
+        instrInfo.AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"");
 
         instrInfo.cppCallingInformation.SetFunctionName("DisplayLegacyTextOnScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("SetFullScreen",
-                   _("(Dés)Activer le plein écran"),
-                   _("Cette action active ou désactive l'affichage du jeu en plein écran."),
-                   _("Activer le plein écran :  _PARAM1_"),
-                   _("Fenêtre de jeu"),
+                   _("De/activate fullscreen"),
+                   _("This action activate or desactivate fullscreen."),
+                   _("Activate fullscreen :  _PARAM1_"),
+                   _("Game's window"),
                    "res/actions/fullscreen24.png",
                    "res/actions/fullscreen.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("yesorno", _("Activer le plein écran"), "",false);
+        instrInfo.AddParameter("yesorno", _("Activate fullscreen"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetFullScreen").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("SetWindowSize",
-                   _("Changer la taille de l'écran"),
-                   _("Cette action change la taille de la fenêtre de jeu."),
-                   _("Changer la taille de la fenêtre de jeu en _PARAM1_x_PARAM2_"),
-                   _("Fenêtre de jeu"),
+                   _("Change the size of the screen"),
+                   _("This action change the size of the game window."),
+                   _("Change window size : _PARAM1_x_PARAM2_"),
+                   _("Game's window"),
                    "res/actions/window24.png",
                    "res/actions/window.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Largeur"), "",false);
-        instrInfo.AddParameter("expression", _("Hauteur"), "",false);
-        instrInfo.AddParameter("yesorno", _("Utiliser cette taille pour la taille par défaut des caméras des scènes ?"), "",false);
+        instrInfo.AddParameter("expression", _("Width"), "",false);
+        instrInfo.AddParameter("expression", _("Height"), "",false);
+        instrInfo.AddParameter("yesorno", _("Use this size as default size for new scene cameras \?"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetWindowSize").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
     DECLARE_ACTION("SetWindowIcon",
-                   _("Changer l'icône de la fenêtre"),
-                   _("Cette action change l'icône de la fenêtre de jeu."),
-                   _("Utiliser _PARAM1_ en tant qu'icone pour la fenêtre de jeu."),
-                   _("Fenêtre de jeu"),
+                   _("Change window's icon"),
+                   _("This action change the icon of the game's window."),
+                   _("Use _PARAM1_ as icon for the game's window."),
+                   _("Game's window"),
                    "res/actions/window24.png",
                    "res/actions/window.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("string", _("Nom de l'image à utiliser en tant qu'icône"), "",false);
+        instrInfo.AddParameter("string", _("Name of the image to be used as the icon"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetWindowIcon").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("SetWindowTitle",
-                   _("Changer le titre de la fenêtre"),
-                   _("Cette action change le titre de la fenêtre de jeu."),
-                   _("Changer le titre de la fenêtre en _PARAM1_"),
-                   _("Fenêtre de jeu"),
+                   _("Change window's title"),
+                   _("This action change the title of the game window."),
+                   _("Change window title to _PARAM1_"),
+                   _("Game's window"),
                    "res/actions/window24.png",
                    "res/actions/window.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("string", _("Nouveau titre"), "",false);
+        instrInfo.AddParameter("string", _("New title"), "",false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetWindowTitle").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     DECLARE_END_ACTION()
 
-    DECLARE_EXPRESSION("SceneWindowWidth", _("Largeur de la fenêtre de la scène"), _("Largeur de la fenêtre de la scène"), _("Ecran"), "res/window.png")
+    DECLARE_EXPRESSION("SceneWindowWidth", _("Width of the scene's window"), _("Width of the scene's window"), _("Screen"), "res/window.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSceneWindowWidth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("SceneWindowHeight", _("Hauteur de la fenêtre de la scène"), _("Hauteur de la fenêtre de la scène"), _("Ecran"), "res/window.png")
+    DECLARE_EXPRESSION("SceneWindowHeight", _("Height of the scene's window"), _("Height of the scene's window"), _("Screen"), "res/window.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetSceneWindowHeight").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("ScreenWidth", _("Largeur de la résolution actuelle"), _("Largeur de la résolution actuelle"), _("Ecran"), "res/display16.png")
+    DECLARE_EXPRESSION("ScreenWidth", _("Width of the current resolution"), _("Width of the current resolution"), _("Screen"), "res/display16.png")
         instrInfo.cppCallingInformation.SetFunctionName("GetScreenWidth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("ScreenHeight", _("Hauteur de la résolution actuelle"), _("Hauteur de la résolution actuelle"), _("Ecran"), "res/display16.png")
+    DECLARE_EXPRESSION("ScreenHeight", _("Height of the current resolution"), _("Height of the current resolution"), _("Screen"), "res/display16.png")
         instrInfo.cppCallingInformation.SetFunctionName("GetScreenHeight").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("ColorDepth", _("Profondeur de couleur de la résolution actuelle"), _("Profondeur de couleur de la résolution actuelle"), _("Ecran"), "res/display16.png")
+    DECLARE_EXPRESSION("ColorDepth", _("Color depth"), _("Color depth"), _("Screen"), "res/display16.png")
         instrInfo.cppCallingInformation.SetFunctionName("GetColorDepth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_STR_EXPRESSION("WindowTitle", _("Titre de la fenêtre"), _("Titre de la fenêtre"), _("Ecran"), "res/window.png")
+    DECLARE_STR_EXPRESSION("WindowTitle", _("Window's title"), _("Window's title"), _("Screen"), "res/window.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetWindowTitle").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
@@ -145,3 +145,4 @@ void WindowExtension::ExposeActionsResources(gd::Instruction & action, gd::Arbit
     }
 }
 #endif
+

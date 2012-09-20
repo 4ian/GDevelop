@@ -138,3 +138,4 @@ bool ExecutableIconChanger::ChangeWindowsExecutableIcon(std::string exeFile, std
 #endif
 }
 #endif
+

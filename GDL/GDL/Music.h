@@ -122,3 +122,4 @@ class GD_API Music
 };
 
 #endif // MUSIC_H
+

@@ -11,185 +11,185 @@
 TimeExtension::TimeExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinTime",
-                          _("Temps"),
-                          _("Extension proposant des actions et conditions sur le temps, integrée en standard"),
+                          _("Time"),
+                          _("Builtin extension providing actions and conditions about the time."),
                           "Compil Games",
                           "Freeware")
     #if defined(GD_IDE_ONLY)
 
     DECLARE_CONDITION("Timer",
-                   _("Valeur d'un chronomètre"),
-                   _("Teste si le chronomètre atteint ou dépasse le temps indiqué."),
-                   _("Le chronomètre _PARAM2_ est supérieur à _PARAM1_ secondes"),
-                   _("Temps et chronomètres"),
+                   _("Value of a timer"),
+                   _("Test the time elapsed of a timer."),
+                   _("The timer _PARAM2_ is greater to _PARAM1_ seconds"),
+                   _("Timers and time"),
                    "res/conditions/timer24.png",
                    "res/conditions/timer.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Temps en secondes"), "", false);
-        instrInfo.AddParameter("string", _("Nom du chronomètre"), "", false);
+        instrInfo.AddParameter("expression", _("Time in seconds"), "", false);
+        instrInfo.AddParameter("string", _("Timer's name"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("TimerElapsedTime").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("TimeScale",
-                   _("Echelle du temps"),
-                   _("Teste si l'échelle du temps actuelle correspond."),
-                   _("L'échelle du temps est _PARAM2_ à _PARAM1_"),
-                   _("Temps et chronomètres"),
+                   _("Time scale"),
+                   _("Test the time scale."),
+                   _("The time scale is _PARAM2__PARAM1_"),
+                   _("Timers and time"),
                    "res/conditions/time24.png",
                    "res/conditions/time.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
-        instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+        instrInfo.AddParameter("expression", _("Value to test"), "", false);
+        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetTimeScale").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("TimerPaused",
-                   _("Pause d'un chronomètre"),
-                   _("Teste si le chronomètre indiqué est en pause."),
-                   _("Le chronomètre _PARAM1_ est en pause"),
-                   _("Temps et chronomètres"),
+                   _("State of a timer"),
+                   _("Test if specified timer is paused."),
+                   _("The timer _PARAM1_ is paused"),
+                   _("Timers and time"),
                    "res/conditions/timerPaused24.png",
                    "res/conditions/timerPaused.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("string", _("Nom du chronomètre"), "", false);
+        instrInfo.AddParameter("string", _("Timer's name"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("TimerPaused").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     DECLARE_END_CONDITION()
 
     DECLARE_ACTION("ResetTimer",
-                   _("Remettre à zéro un chronomètre"),
-                   _("Remet à zéro le chronomètre indiqué."),
-                   _("Remettre à zéro le chronomètre _PARAM1_"),
-                   _("Temps et chronomètres"),
+                   _("Reset a timer"),
+                   _("Reset the specified timer."),
+                   _("Reset the timer _PARAM1_"),
+                   _("Timers and time"),
                    "res/actions/timer24.png",
                    "res/actions/timer.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("string", _("Nom du chronomètre"), "", false);
+        instrInfo.AddParameter("string", _("Timer's name"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("ResetTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("PauseTimer",
-                   _("Mettre en pause un chronomètre"),
-                   _("Met en pause le chronomètre indiqué."),
-                   _("Mettre en pause le chronomètre _PARAM1_"),
-                   _("Temps et chronomètres"),
+                   _("Pause a timer"),
+                   _("Pause a timer."),
+                   _("Pause timer _PARAM1_"),
+                   _("Timers and time"),
                    "res/actions/pauseTimer24.png",
                    "res/actions/pauseTimer.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("string", _("Nom du chronomètre"), "", false);
+        instrInfo.AddParameter("string", _("Timer's name"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("PauseTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("UnPauseTimer",
-                   _("Enlever la pause d'un chronomètre"),
-                   _("Enlève la pause du chronomètre indiqué."),
-                   _("Enlever la pause du chronomètre _PARAM1_"),
-                   _("Temps et chronomètres"),
+                   _("Unpause a timer"),
+                   _("Unpause a timer."),
+                   _("Unpause timer _PARAM1_"),
+                   _("Timers and time"),
                    "res/actions/unPauseTimer24.png",
                    "res/actions/unPauseTimer.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("string", _("Nom du chronomètre"), "", false);
+        instrInfo.AddParameter("string", _("Timer's name"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("UnPauseTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("RemoveTimer",
-                   _("Supprimer un chronomètre"),
-                   _("Supprime un chronomètre de la mémoire."),
-                   _("Supprimer le chronomètre _PARAM1_ de la mémoire"),
-                   _("Temps et chronomètres"),
+                   _("Delete a timer"),
+                   _("Delete a timer from memory."),
+                   _("Delete timer _PARAM1_ from memory"),
+                   _("Timers and time"),
                    "res/actions/time24.png",
                    "res/actions/time.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("string", _("Nom du chronomètre"), "", false);
+        instrInfo.AddParameter("string", _("Timer's name"), "", false);
         instrInfo.cppCallingInformation.SetFunctionName("RemoveTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     DECLARE_END_ACTION()
 
     DECLARE_ACTION("ChangeTimeScale",
-                   _("Changer l'échelle du temps"),
-                   _("Change la vitesse du déroulement du jeu."),
-                   _("Mettre à _PARAM1_ l'échelle du temps"),
-                   _("Temps et chronomètres"),
+                   _("Change time scale"),
+                   _("Change the time scale of the game."),
+                   _("Set time scale to _PARAM1_"),
+                   _("Timers and time"),
                    "res/actions/time24.png",
                    "res/actions/time.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("expression", _("Echelle ( 1 : Normal, 2 : Double la vitesse, 0.5 : Ralenti de moitié... )"), "", false);
+        instrInfo.AddParameter("expression", _("Scale ( 1 : Default, 2 : Faster, 0.5 : Slower... )"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("SetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     DECLARE_END_ACTION()
 
-    DECLARE_EXPRESSION("TimeDelta", _("Temps écoulé depuis la dernière image"), _("Temps écoulé depuis la dernière image"), _("Temps"), "res/actions/time.png")
+    DECLARE_EXPRESSION("TimeDelta", _("Time elapsed since the last image"), _("Time elapsed since the last image"), _("Time"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("TempsFrame", _("Temps écoulé depuis la dernière image"), _("Temps écoulé depuis la dernière image"), _("Temps"), "res/actions/time.png")
-        instrInfo.AddCodeOnlyParameter("currentScene", "");
-
-        instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
-        instrInfo.SetHidden();
-    DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("ElapsedTime", _("Temps écoulé depuis la dernière image"), _("Temps écoulé depuis la dernière image"), _("Temps"), "res/actions/time.png")
+    DECLARE_EXPRESSION("TempsFrame", _("Time elapsed since the last image"), _("Time elapsed since the last image"), _("Time"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("TimerElapsedTime", _("Temps d'un chronomètre"), _("Temps écoulé d'un chronomètre"), _("Temps"), "res/actions/time.png")
+    DECLARE_EXPRESSION("ElapsedTime", _("Time elapsed since the last image"), _("Time elapsed since the last image"), _("Time"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("string", _("Nom du chronomètre"), "", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        instrInfo.SetHidden();
+    DECLARE_END_EXPRESSION()
+    DECLARE_EXPRESSION("TimerElapsedTime", _("Timer value"), _("Value of a timer"), _("Time"), "res/actions/time.png")
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("string", _("Timer's name"), "", false);
 
         instrInfo.cppCallingInformation.SetFunctionName("GetTimerElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("TimeFromStart", _("Temps écoulé depuis le début de la scène"), _("Temps écoulé depuis le début de la scène"), _("Temps"), "res/actions/time.png")
+    DECLARE_EXPRESSION("TimeFromStart", _("Time elapsed since the beginning of the scene"), _("Time elapsed since the beginning of the scene"), _("Time"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("TempsDebut", _("Temps écoulé depuis le début de la scène"), _("Temps écoulé depuis le début de la scène"), _("Temps"), "res/actions/time.png")
+    DECLARE_EXPRESSION("TempsDebut", _("Time elapsed since the beginning of the scene"), _("Time elapsed since the beginning of the scene"), _("Time"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("TimeScale", _("Echelle du temps"), _("Echelle du temps"), _("Temps"), "res/actions/time.png")
+    DECLARE_EXPRESSION("TimeScale", _("Time scale"), _("Time scale"), _("Time"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
 
         instrInfo.cppCallingInformation.SetFunctionName("GetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
     DECLARE_END_EXPRESSION()
-    DECLARE_EXPRESSION("TimeScale", _("Echelle du temps"), _("Echelle du temps"), _("Temps"), "res/actions/time.png")
+    DECLARE_EXPRESSION("TimeScale", _("Time scale"), _("Time scale"), _("Time"), "res/actions/time.png")
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.cppCallingInformation.SetFunctionName("GetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
 
-    DECLARE_EXPRESSION("Time", _("Temps actuel"), _("Temps actuel"), _("Temps"), "res/actions/time.png")
+    DECLARE_EXPRESSION("Time", _("Current time"), _("Current time"), _("Time"), "res/actions/time.png")
         instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("", _("Valeur à récupérer :\n\nHeure : hour\nMinutes : min\nSecondes : sec\nJour du mois: mday\nMois depuis janvier : mon\nAnnées depuis 1900 : year\nJours depuis dimanche :wday\nJours depuis le 1er Janvier : yday"), "",false);
+        instrInfo.AddParameter("", _("Hour : hour\nMinutes : min\nSeconds : sec\nDay in the month : mday\nMonths since January : mon\nYear since 1900 : year\nDays since sunday :wday\nDays since January 1st : yday"), "",false);
         instrInfo.cppCallingInformation.SetFunctionName("GetTime").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
     DECLARE_END_EXPRESSION()
     #endif
@@ -224,3 +224,4 @@ unsigned int TimeExtension::GetNumberOfProperties(RuntimeScene & scene) const
     return scene.timers.size();
 }
 #endif
+

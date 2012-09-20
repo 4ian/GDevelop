@@ -134,3 +134,4 @@ bool GD_API AnyKeyIsPressed( RuntimeScene & scene )
 
     return false;
 }
+

@@ -33,3 +33,4 @@ private:
 };
 
 #endif // SHADERMANAGER_H
+

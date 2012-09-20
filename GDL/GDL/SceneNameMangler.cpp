@@ -23,3 +23,4 @@ std::string SceneNameMangler::GetMangledSceneName(const std::string & originalSc
 
     return partiallyMangledName;
 }
+

@@ -330,3 +330,4 @@ struct SceneHasName : public std::binary_function<boost::shared_ptr<Scene>, std:
 };
 
 #endif // SCENE_H
+

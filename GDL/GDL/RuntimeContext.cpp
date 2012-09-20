@@ -25,3 +25,4 @@ std::map <std::string, std::vector<Object*> *> RuntimeContext::ReturnObjectLists
 {
     return temporaryMap;
 }
+

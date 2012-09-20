@@ -67,3 +67,4 @@ void Camera::SetUseDefaultSize(bool useDefaultSize)
 {
     defaultSize = useDefaultSize;
 }
+

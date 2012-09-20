@@ -11,3 +11,4 @@ Layer::Layer() :
 isVisible(true)
 {
 }
+

@@ -109,3 +109,4 @@ private:
 };
 
 #endif // DIRECTION_H
+

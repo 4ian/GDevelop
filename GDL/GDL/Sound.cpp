@@ -66,3 +66,4 @@ void Sound::UpdateVolume()
 
     sound.SetVolume(volume*soundManager->GetGlobalVolume()/100.f);
 }
+

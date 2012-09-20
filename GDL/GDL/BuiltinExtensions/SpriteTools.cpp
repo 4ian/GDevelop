@@ -202,3 +202,4 @@ bool GD_API SpriteCollision( const std::string & firstObjName, const std::string
 
     return isTrue;
 }
+

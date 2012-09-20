@@ -92,9 +92,6 @@ sf::IntRect GetAABB( const sf::Sprite& Object )
     sf::IntRect AABB = sf::IntRect( pos.x+Left, pos.y+Top, Right-Left, Bottom-Top ); //4ian : Rect now uses width/height.
     return AABB;
 }
-
-
-
 bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf::Uint8 AlphaLimit, const sf::Image & Object1CollisionMask,  const sf::Image & Object2CollisionMask )
 {
     //Get AABBs of the two sprites
@@ -159,3 +156,4 @@ bool GD_API CheckCollision( const SpriteObject * const objet1, const SpriteObjec
 {
     return PixelPerfectTest( objet1->GetCurrentSFMLSprite(), objet2->GetCurrentSFMLSprite(), 1, objet1->GetCurrentSprite().GetSFMLTexture()->image, objet2->GetCurrentSprite().GetSFMLTexture()->image  );
 }
+

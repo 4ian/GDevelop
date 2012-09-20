@@ -82,10 +82,10 @@ bool OpenSaveGame::OpenFromFile(string file)
     {
 #if defined(GD_IDE_ONLY)
         wxString ErrorDescription = doc.ErrorDesc();
-        wxString Error = _( "Erreur lors du chargement : " ) + ErrorDescription + _("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
+        wxString Error = _( "Error while loading :" ) + ErrorDescription + _("\nMake sure the file exists and that you have sufficient rights to access.");
 #else
         string ErrorDescription = doc.ErrorDesc();
-        string Error =  "Erreur lors du chargement : " + ErrorDescription + _("\nVérifiez que le fichier existe et que vous possédez les droits suffisants pour y accéder.");
+        string Error =  "Erreur lors du chargement : " + ErrorDescription + _("\nMake sure the file exists and that you have sufficient rights to access.");
 #endif
         MSGERR( Error );
         return false;
@@ -139,13 +139,13 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     elem->QueryIntAttribute( "Revision", &revision );
     if ( major > GDLVersionWrapper::Major() )
     {
-        MSG( _( "La version de l'éditeur utilisé pour créer ce jeu semble être une nouvelle version.\nLe jeu peut donc ne pas s'ouvrir, ou des données peuvent manquer.\nVous devriez vérifier si une nouvelle version de Game Develop est disponible." ) );
+        MSG( _( "The version of the editor used to create this game seems to be a new version.\nThe game can not open, or datas may be missing.\nYou should check if a new version of Game Develop is available." ) );
     }
     else
     {
         if ( major == GDLVersionWrapper::Major() && (build > GDLVersionWrapper::Build() || minor > GDLVersionWrapper::Minor() || revision > GDLVersionWrapper::Revision()) )
         {
-            MSG( _( "La version de l'éditeur utilisé pour créer ce jeu semble être supérieure.\nLe jeu peut donc ne pas s'ouvrir, ou des données peuvent manquer.\nVous devriez vérifier si une nouvelle version de Game Develop est disponible." ) );
+            MSG( _( "The version of the editor used to create this game seems to be greater.\nThe game can not open, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
         }
     }
 
@@ -159,7 +159,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 
         if ( minor < 4 || build < 9587 )
         {
-            wxLogWarning(_("Le jeu ouvert a été enregistré avec une ancienne version de Game Develop.\nIl se peut que le jeu ne soit pas correctement ouvert.\nVeuillez ouvrir le jeu et l'enregistrer avec la version 1.5.10151 avant de le réouvrir avec cette version de Game Develop."));
+            wxLogWarning(_("The game was saved with an old version of Game Develop, and could have been opened incorrectly.\nPlease open and save the game with version 1.5.10151 before opening it with this version of Game Develop."));
         }
 
     }
@@ -193,10 +193,10 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
     #if defined(GD_IDE_ONLY)
     if ( major < 2 || (major == 2 && minor <= 0) )
     {
-        updateText += _("L'action \"Créer un objet de partir son nom\" nécessite dorénavant que vous indiquiez un groupe d'objet parmi lequel les objets sont susceptibles d'être créés.\nPar exemple, si les objets que vous crééez à partir de cette action peuvent prendre comme nom Objet1, Objet2 ou Objet3, créez un groupe avec ces 3 objets et passez le en paramètre à l'action.\n\n");
-        updateText += _("Les fonctions ont subi un changement au niveau de leur paramétrage. Vous devenez dorénavant indiquer les objets susceptibles passés en paramètre à la fonction, si vous en utilisez. De même que ci dessus, créez un groupe d'objet qui contient les objets devant être passés en argument à la fonction si vous en avez besoin.\n\n");
-        updateText += _("Enfin, si vous utilisez l'extension Association d'objets, les actions/conditions nécessitent dorénavant de toujours indiquer le nom des objets associés à prendre en compte : Vérifiez que vos évènements liés à cette extension sont toujours valides.\n\n");
-        updateText += _("Merci de votre compréhension.\n");
+        updateText += _("The action \"Create an object from its name\" need you to specify a group of objects containing all the objects which can be created by the action.\nFor example, if the objects created by the action can be Object1, Object2 or Object3, you can create a group containing these 3 objects and pass it as parameter of the action.\n\n");
+        updateText += _("Functions setup has been changed. You have now to specify the objects to be passed as arguments to the function, if needed. As below, you can create an object group containing the objects to be passed as arguments to the function.\n\n");
+        updateText += _("Finally, if you're using Linked Objects extension, the actions/conditions now always need you to specify the name of objects to be taken into account: Check your events related to this extension.\n\n");
+        updateText += _("Thank you for your understanding.\n");
     }
     #endif
     //End of Compatibility code
@@ -281,7 +281,7 @@ void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
 
     if ( notBackwardCompatible )
     {
-        MSG( _("Attention, si vous enregistrez votre jeu avec cette version de Game Develop, vous ne pourrez plus le réouvrir avec une version précédente.") );
+        MSG( _("Warning, if you save your game with this version of Game Develop, you won't be able to open it with a older version.") );
     }
 
     return;
@@ -780,7 +780,7 @@ bool OpenSaveGame::SaveToFile(string file)
     //Sauvegarde le tout
     if ( !doc.SaveFile( file.c_str() ) )
     {
-        MSG( _( "Impossible d'enregistrer le fichier. Vérifiez que le disque comporte assez d'espace disque, ou qu'il n'est pas protégé en écriture." ) );
+        MSG( _( "Unable to save file. Check that the drive has enough free space, is not write-protected and you have read/write permissions." ) );
         return false;
     }
 
@@ -1120,3 +1120,4 @@ void OpenSaveGame::AdaptEventsFromGD1x(vector < gd::BaseEventSPtr > & list)
 }
 
 #endif
+

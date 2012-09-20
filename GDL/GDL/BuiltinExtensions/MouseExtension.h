@@ -23,3 +23,4 @@ class MouseExtension : public ExtensionBase
 };
 
 #endif // MOUSEEXTENSION_H
+

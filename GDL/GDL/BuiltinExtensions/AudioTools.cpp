@@ -269,3 +269,4 @@ double GD_API GetMusicPlayingOffsetOnChannel( RuntimeScene & scene, unsigned int
 
     return static_cast<double>(SoundManager::GetInstance()->GetMusicOnChannel(channel)->GetPlayingOffset())/1000.0;
 }
+

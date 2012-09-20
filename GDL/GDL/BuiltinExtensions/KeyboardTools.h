@@ -14,3 +14,4 @@ bool IsKeyPressed(RuntimeScene & scene, std::string key);
 bool AnyKeyIsPressed(RuntimeScene & scene);
 
 #endif // KEYBOARDTOOLS_H
+

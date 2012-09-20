@@ -29,3 +29,4 @@ private:
 
 #endif // DNDRESOURCESEDITOR_H
 #endif
+

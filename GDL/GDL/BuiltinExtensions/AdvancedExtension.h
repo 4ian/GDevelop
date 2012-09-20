@@ -23,3 +23,4 @@ class AdvancedExtension : public ExtensionBase
 };
 
 #endif // ADVANCEDEXTENSION_H
+

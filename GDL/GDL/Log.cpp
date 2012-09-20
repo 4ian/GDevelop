@@ -26,3 +26,4 @@ void GD_API GDLogBanner()
     std::cout << sys << std::endl;
     std::cout << std::endl;
 }
+

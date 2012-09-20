@@ -41,3 +41,4 @@ class GD_API RuntimeGame : public Game
 };
 
 #endif // RUNTIMEGAME_H
+

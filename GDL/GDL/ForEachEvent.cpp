@@ -222,7 +222,7 @@ void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
     //For Each text
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
-    dc.DrawText( _("Pour chaque objet") + " " + objectsToPick.GetPlainString() + _(", répéter :"), x + 4, y + 3 );
+    dc.DrawText( _("For each object") + " " + objectsToPick.GetPlainString() + _(", repeat :"), x + 4, y + 3 );
 
     //Draw conditions rectangle
     wxRect rect(x, y+forEachTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-forEachTextHeight);
@@ -304,3 +304,4 @@ ForEachEvent& ForEachEvent::operator=(const ForEachEvent & event)
 }
 
 #endif
+

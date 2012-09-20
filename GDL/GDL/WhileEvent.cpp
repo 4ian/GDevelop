@@ -162,7 +162,7 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     //While text
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
-    dc.DrawText( _("Tant que :"), x+5, y+5 );
+    dc.DrawText( _("While :"), x+5, y+5 );
 
     //Draw icon if infinite loop warning is deactivated.
     if (!infiniteLoopWarning)
@@ -176,7 +176,7 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
 
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
-    dc.DrawText( _("Répéter :"), x+4, y+whileConditionsHeight+3);
+    dc.DrawText( _("Repeat :"), x+4, y+whileConditionsHeight+3);
     whileConditionsHeight += repeatHeight;
 
     //Draw conditions rectangle
@@ -218,14 +218,12 @@ gd::BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, Game
 {
     if ( !justCreatedByTheUser )
     {
-        wxMessageDialog dialog(parent_, _("Voulez vous activer l'affichage d'un message si l'évènement se répète 100000 fois ? Ce message permet d'éviter que le logiciel bloque, "
-                                          "dans le cas où vous créez accidentellement une boucle infinie ( en laissant les conditions vides par exemple ), en vous permettant alors "
-                                          "d'arrêter l'aperçu."),
-                               _("Protection contre les boucles infinies"),
+        wxMessageDialog dialog(parent_, _("Do you want to activate the display of a message if the event is repeated 100000 times? This message prevent the software from being frozen if you accidentally create an infinite loop ( by letting the conditions empty for example )."),
+                               _("Protection against infinite loops."),
                                wxYES_NO|wxCANCEL|wxICON_INFORMATION);
 
-        dialog.SetExtendedMessage(_("Ce message est activé par défaut pour les évènements \"Tant que\" dans l'éditeur, et est désactivé lorsque le jeu est compilé en executable."));
-        dialog.SetYesNoCancelLabels(_("Activer"), _("Désactiver"), _("Annuler"));
+        dialog.SetExtendedMessage(_("This message is activated by default for \"While\" events in the IDE, and is deactivated when the game is compiled to an executable."));
+        dialog.SetYesNoCancelLabels(_("Activate"), _("Deactivate"), _("Cancel"));
 
         int answer = dialog.ShowModal();
         if ( answer == wxID_YES ) infiniteLoopWarning = true;
@@ -275,3 +273,4 @@ WhileEvent& WhileEvent::operator=(const WhileEvent & event)
 }
 
 #endif
+

@@ -15,3 +15,4 @@
 void GD_API GDLogBanner();
 
 #endif // LOG_H_INCLUDED
+

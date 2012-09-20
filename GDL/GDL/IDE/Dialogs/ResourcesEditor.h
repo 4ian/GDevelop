@@ -208,3 +208,4 @@ class GD_API ResourcesEditor: public wxPanel
 
 #endif
 #endif
+

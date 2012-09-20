@@ -158,7 +158,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Edition de l\'objet Sprite"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edition of a Sprite object"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	mgr = new wxAuiManager(this, wxAUI_MGR_DEFAULT);
 	centerPanel = new wxPanel(this, ID_PANEL1, wxPoint(107,155), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -170,12 +170,12 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	toolbarPanel = new wxPanel(centerPanel, ID_PANEL6, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL6"));
 	AuiManager1 = new wxAuiManager(toolbarPanel, wxAUI_MGR_DEFAULT);
 	toolbar = new wxAuiToolBar(toolbarPanel, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	toolbar->AddTool(ID_MASKITEM, _("Editer les masques de collision"), gd::CommonBitmapManager::GetInstance()->maskEdit16, wxNullBitmap, wxITEM_CHECK, _("Editer les masques de collision"), wxEmptyString, NULL);
-	toolbar->AddTool(ID_POINTSITEM, _("Editer les points de l\'image"), gd::CommonBitmapManager::GetInstance()->pointEdit16, wxNullBitmap, wxITEM_CHECK, _("Editer les points de l\'image"), wxEmptyString, NULL);
+	toolbar->AddTool(ID_MASKITEM, _("Edit the collision masks ( Hit boxes )"), gd::CommonBitmapManager::GetInstance()->maskEdit16, wxNullBitmap, wxITEM_CHECK, _("Edit the collision masks ( Hit boxes )"), wxEmptyString, NULL);
+	toolbar->AddTool(ID_POINTSITEM, _("Edit the image\'s point"), gd::CommonBitmapManager::GetInstance()->pointEdit16, wxNullBitmap, wxITEM_CHECK, _("Edit the image\'s point"), wxEmptyString, NULL);
 	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Item label"), gd::CommonBitmapManager::GetInstance()->preview16, wxNullBitmap, wxITEM_NORMAL, _("Aperçu"), wxEmptyString, NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Item label"), gd::CommonBitmapManager::GetInstance()->preview16, wxNullBitmap, wxITEM_NORMAL, _("Preview"), wxEmptyString, NULL);
 	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Aide"), wxBitmap(wxImage(_T("res/helpicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Aperçu"), wxEmptyString, NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Help"), wxBitmap(wxImage(_T("res/helpicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Preview"), wxEmptyString, NULL);
 	toolbar->Realize();
 	AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager1->Update();
@@ -210,11 +210,11 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	Panel2 = new wxPanel(animationsPanel, ID_PANEL11, wxDefaultPosition, wxSize(-1,25), wxTAB_TRAVERSAL, _T("ID_PANEL11"));
 	AuiManager4 = new wxAuiManager(Panel2, wxAUI_MGR_DEFAULT);
 	animationToolbar = new wxAuiToolBar(Panel2, ID_AUITOOLBAR4, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
-	animationToolbar->AddTool(ID_AUITOOLBARITEM5, _("Item label"), gd::CommonBitmapManager::GetInstance()->add16, wxNullBitmap, wxITEM_NORMAL, _("Ajouter une animation"), wxEmptyString, NULL);
-	animationToolbar->AddTool(ID_AUITOOLBARITEM8, _("Item label"), gd::CommonBitmapManager::GetInstance()->remove16, wxNullBitmap, wxITEM_NORMAL, _("Supprimer une animation"), wxEmptyString, NULL);
+	animationToolbar->AddTool(ID_AUITOOLBARITEM5, _("Item label"), gd::CommonBitmapManager::GetInstance()->add16, wxNullBitmap, wxITEM_NORMAL, _("Add an animation"), wxEmptyString, NULL);
+	animationToolbar->AddTool(ID_AUITOOLBARITEM8, _("Item label"), gd::CommonBitmapManager::GetInstance()->remove16, wxNullBitmap, wxITEM_NORMAL, _("Delete an animation"), wxEmptyString, NULL);
 	animationToolbar->AddSeparator();
-	animationToolbar->AddTool(ID_TOOLLOOP, _("De/activer le bouclage de l\'animation"), wxBitmap(wxImage(_T("res/repeat.png"))), wxNullBitmap, wxITEM_CHECK, _("De/activer le bouclage de l\'animation"), wxEmptyString, NULL);
-	animationToolbar->AddTool(ID_AUITOOLBARITEM10, _("Item label"), wxBitmap(wxImage(_T("res/time16.png"))), wxNullBitmap, wxITEM_NORMAL, _("Temps entre chaque image"), wxEmptyString, NULL);
+	animationToolbar->AddTool(ID_TOOLLOOP, _("De/activate loop"), wxBitmap(wxImage(_T("res/repeat.png"))), wxNullBitmap, wxITEM_CHECK, _("De/activate loop"), wxEmptyString, NULL);
+	animationToolbar->AddTool(ID_AUITOOLBARITEM10, _("Item label"), wxBitmap(wxImage(_T("res/time16.png"))), wxNullBitmap, wxITEM_NORMAL, _("Time between each images"), wxEmptyString, NULL);
 	animationToolbar->Realize();
 	AuiManager4->AddPane(animationToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager4->Update();
@@ -249,7 +249,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	maskToolbar->AddSeparator();
 	maskToolbar->AddTool(ID_AUITOOLBARITEM7, _("Item label"), gd::CommonBitmapManager::GetInstance()->remove16, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->AddSeparator();
-	maskToolbar->AddTool(ID_AUITOOLBARITEM1, _("Revenir au masque par défaut"), gd::CommonBitmapManager::GetInstance()->defaultMask16, wxNullBitmap, wxITEM_NORMAL, _("Revenir au masque par défaut"), wxEmptyString, NULL);
+	maskToolbar->AddTool(ID_AUITOOLBARITEM1, _("Go back to default mask"), gd::CommonBitmapManager::GetInstance()->defaultMask16, wxNullBitmap, wxITEM_NORMAL, _("Go back to default mask"), wxEmptyString, NULL);
 	maskToolbar->AddSeparator();
 	maskToolbar->AddTool(ID_MASKAPPLYWHOLEANIMITEM, _("Item label"), gd::CommonBitmapManager::GetInstance()->copy16, wxNullBitmap, wxITEM_CHECK, wxEmptyString, wxEmptyString, NULL);
 	maskToolbar->Realize();
@@ -261,7 +261,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	maskPanel->SetSizer(FlexGridSizer6);
 	FlexGridSizer6->Fit(maskPanel);
 	FlexGridSizer6->SetSizeHints(maskPanel);
-	mgr->AddPane(maskPanel, wxAuiPaneInfo().Name(_T("maskPane")).Caption(_("Masques de collision")).CaptionVisible().Right());
+	mgr->AddPane(maskPanel, wxAuiPaneInfo().Name(_T("maskPane")).Caption(_("Collision masks ( Hit boxes )")).CaptionVisible().Right());
 	pointsPanel = new wxPanel(this, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL5"));
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
@@ -272,7 +272,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	pointToolbar->AddTool(ID_AUITOOLBARITEM3, _("Item label"), gd::CommonBitmapManager::GetInstance()->add16, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
 	pointToolbar->AddTool(ID_DELETEPOINTITEM, _("Item label"), gd::CommonBitmapManager::GetInstance()->remove16, wxNullBitmap, wxITEM_NORMAL, wxEmptyString, wxEmptyString, NULL);
 	pointToolbar->AddSeparator();
-	pointToolbar->AddTool(ID_POINTAPPLYWHOLEANIMITEM, _("Appliquer à toutes les images de l\'animation"), gd::CommonBitmapManager::GetInstance()->copy16, wxNullBitmap, wxITEM_CHECK, _("Appliquer les changements à toutes les images de l\'animation"), wxEmptyString, NULL);
+	pointToolbar->AddTool(ID_POINTAPPLYWHOLEANIMITEM, _("Apply the changes to the whole animation"), gd::CommonBitmapManager::GetInstance()->copy16, wxNullBitmap, wxITEM_CHECK, _("Apply changes to the whole animation"), wxEmptyString, NULL);
 	pointToolbar->Realize();
 	AuiManager2->AddPane(pointToolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Dockable(false).Movable(false).Gripper(false));
 	AuiManager2->Update();
@@ -284,55 +284,55 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	FlexGridSizer5->SetSizeHints(pointsPanel);
 	mgr->AddPane(pointsPanel, wxAuiPaneInfo().Name(_T("pointsPane")).Caption(_("Points")).CaptionVisible().Right());
 	previewPanel = new wxPanel(this, ID_PANEL10, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL10"));
-	mgr->AddPane(previewPanel, wxAuiPaneInfo().Name(_T("previewPane")).Caption(_("Aperçu")).CaptionVisible().Left());
+	mgr->AddPane(previewPanel, wxAuiPaneInfo().Name(_T("previewPane")).Caption(_("Preview")).CaptionVisible().Left());
 	mgr->Update();
 	MenuItem2 = new wxMenu();
-	automaticRotationItem = new wxMenuItem(MenuItem2, ID_MENUITEM5, _("Rotation automatique"), wxEmptyString, wxITEM_RADIO);
+	automaticRotationItem = new wxMenuItem(MenuItem2, ID_MENUITEM5, _("Automatic rotation"), wxEmptyString, wxITEM_RADIO);
 	MenuItem2->Append(automaticRotationItem);
-	multipleDirectionsItem = new wxMenuItem(MenuItem2, ID_MENUITEM6, _("8 directions"), wxEmptyString, wxITEM_RADIO);
+	multipleDirectionsItem = new wxMenuItem(MenuItem2, ID_MENUITEM6, _("8 Directions"), wxEmptyString, wxITEM_RADIO);
 	MenuItem2->Append(multipleDirectionsItem);
 	animationsMenu.Append(ID_MENUITEM4, _("Type"), MenuItem2, wxEmptyString);
-	MenuItem7 = new wxMenuItem((&animationsMenu), ID_MENUTIMEBETWEENFRAMES, _("Temps entre chaque image :"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem7 = new wxMenuItem((&animationsMenu), ID_MENUTIMEBETWEENFRAMES, _("Time between each image :"), wxEmptyString, wxITEM_NORMAL);
 	animationsMenu.Append(MenuItem7);
-	MenuItem8 = new wxMenuItem((&animationsMenu), ID_MENULOOP, _("Boucler l\'animation"), wxEmptyString, wxITEM_CHECK);
+	MenuItem8 = new wxMenuItem((&animationsMenu), ID_MENULOOP, _("Loop the animation"), wxEmptyString, wxITEM_CHECK);
 	animationsMenu.Append(MenuItem8);
 	animationsMenu.AppendSeparator();
-	MenuItem1 = new wxMenuItem((&animationsMenu), ID_MENUITEM1, _("Ajouter une animation"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem1 = new wxMenuItem((&animationsMenu), ID_MENUITEM1, _("Add an animation"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem1->SetBitmap(gd::CommonBitmapManager::GetInstance()->add16);
 	animationsMenu.Append(MenuItem1);
 	animationsMenu.AppendSeparator();
-	deleteItem = new wxMenuItem((&animationsMenu), ID_MENUITEM2, _("Supprimer"), wxEmptyString, wxITEM_NORMAL);
+	deleteItem = new wxMenuItem((&animationsMenu), ID_MENUITEM2, _("Delete"), wxEmptyString, wxITEM_NORMAL);
 	deleteItem->SetBitmap(gd::CommonBitmapManager::GetInstance()->remove16);
 	animationsMenu.Append(deleteItem);
-	MenuItem3 = new wxMenuItem((&animationsMenu), ID_MENUITEM3, _("Renommer"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem3 = new wxMenuItem((&animationsMenu), ID_MENUITEM3, _("Rename"), wxEmptyString, wxITEM_NORMAL);
 	animationsMenu.Append(MenuItem3);
-	MenuItem4 = new wxMenuItem((&imagesMenu), ID_MENUITEM7, _("Ajouter une image depuis un fichier"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem4 = new wxMenuItem((&imagesMenu), ID_MENUITEM7, _("Add an image from a file"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem4->SetBitmap(gd::CommonBitmapManager::GetInstance()->add16);
 	imagesMenu.Append(MenuItem4);
-	MenuItem9 = new wxMenuItem((&imagesMenu), ID_MENUITEM11, _("Ajouter depuis la banque d\'image du jeu"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem9 = new wxMenuItem((&imagesMenu), ID_MENUITEM11, _("Add from the image bank"), wxEmptyString, wxITEM_NORMAL);
 	imagesMenu.Append(MenuItem9);
 	imagesMenu.AppendSeparator();
-	removeImageItem = new wxMenuItem((&imagesMenu), ID_MENUITEM8, _("Retirer\tDEL"), wxEmptyString, wxITEM_NORMAL);
+	removeImageItem = new wxMenuItem((&imagesMenu), ID_MENUITEM8, _("Remove\tDEL"), wxEmptyString, wxITEM_NORMAL);
 	imagesMenu.Append(removeImageItem);
-	moveLeftItem = new wxMenuItem((&imagesMenu), ID_MENUITEM9, _("Déplacer vers la gauche\tJ"), wxEmptyString, wxITEM_NORMAL);
+	moveLeftItem = new wxMenuItem((&imagesMenu), ID_MENUITEM9, _("Move left\tJ"), wxEmptyString, wxITEM_NORMAL);
 	moveLeftItem->SetBitmap(gd::CommonBitmapManager::GetInstance()->left16);
 	imagesMenu.Append(moveLeftItem);
-	moveRightItem = new wxMenuItem((&imagesMenu), ID_MENUITEM10, _("Déplacer vers la droite\tK"), wxEmptyString, wxITEM_NORMAL);
+	moveRightItem = new wxMenuItem((&imagesMenu), ID_MENUITEM10, _("Move right\tK"), wxEmptyString, wxITEM_NORMAL);
 	moveRightItem->SetBitmap(gd::CommonBitmapManager::GetInstance()->right16);
 	imagesMenu.Append(moveRightItem);
-	MenuItem5 = new wxMenuItem((&maskMenu), ID_POSITIONMASKITEM, _("Positionner"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem5 = new wxMenuItem((&maskMenu), ID_POSITIONMASKITEM, _("Position"), wxEmptyString, wxITEM_NORMAL);
 	maskMenu.Append(MenuItem5);
 	maskMenu.AppendSeparator();
-	MenuItem6 = new wxMenuItem((&maskMenu), ID_MOVEPOLYGONITEM, _("Déplacer le polygone entier"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem6 = new wxMenuItem((&maskMenu), ID_MOVEPOLYGONITEM, _("Move the entire polygon"), wxEmptyString, wxITEM_NORMAL);
 	maskMenu.Append(MenuItem6);
-	MenuItem12 = new wxMenuItem((&maskMenu), ID_MENUITEM14, _("Tourner le polygone entier"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem12 = new wxMenuItem((&maskMenu), ID_MENUITEM14, _("Rotate the entire polygon"), wxEmptyString, wxITEM_NORMAL);
 	maskMenu.Append(MenuItem12);
 	previewTimer.SetOwner(this, ID_TIMER1);
 	previewTimer.Start(50, false);
-	MenuItem10 = new wxMenuItem((&emptyImagesMenu), ID_MENUITEM12, _("Ajouter une image depuis un fichier"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem10 = new wxMenuItem((&emptyImagesMenu), ID_MENUITEM12, _("Add an image from a file"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem10->SetBitmap(gd::CommonBitmapManager::GetInstance()->add16);
 	emptyImagesMenu.Append(MenuItem10);
-	MenuItem11 = new wxMenuItem((&emptyImagesMenu), ID_MENUITEM13, _("Ajouter depuis la banque d\'image du jeu"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem11 = new wxMenuItem((&emptyImagesMenu), ID_MENUITEM13, _("Add from the image bank"), wxEmptyString, wxITEM_NORMAL);
 	emptyImagesMenu.Append(MenuItem11);
 
 	Connect(ID_MASKITEM,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&SpriteObjectEditor::OnMaskEditClick);
@@ -395,7 +395,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
     wxImageList * iconList = new wxImageList(16,16);
     iconList->Add(gd::CommonBitmapManager::GetInstance()->pointEdit16);
     pointsList->AssignImageList(iconList, wxIMAGE_LIST_SMALL);
-    pointsList->InsertColumn(0, _("Nom"));
+    pointsList->InsertColumn(0, _("Name"));
     pointsList->InsertColumn(1, _("X"), wxLIST_FORMAT_LEFT, 35);
     pointsList->InsertColumn(2, _("Y"), wxLIST_FORMAT_LEFT, 35);
 
@@ -406,7 +406,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
     maskIconList->Add(wxBitmap("res/vertice.png",wxBITMAP_TYPE_ANY));
     maskIconList->Add(wxBitmap("res/warning.png",wxBITMAP_TYPE_ANY));
     maskTree->AssignImageList(maskIconList);
-    maskTree->AppendColumn(_("Forme"));
+    maskTree->AppendColumn(_("Shape"));
     maskTree->AppendColumn(_("X"), 35);
     maskTree->AppendColumn(_("Y"), 35);
 
@@ -415,7 +415,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 
     resourcesEditorPnl = new ResourcesEditor( this, game, mainFrameWrapper );
     resourcesEditorPnl->Refresh();
-    mgr->AddPane( resourcesEditorPnl, wxAuiPaneInfo().Name( "ResourcesEditor" ).Right().CloseButton( false ).Caption( _( "Editeur de la banque d'images" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(true) );
+    mgr->AddPane( resourcesEditorPnl, wxAuiPaneInfo().Name( "ResourcesEditor" ).Right().CloseButton( false ).Caption( _( "Images bank's editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(true) );
 
     #if defined(__WXMSW__) //Offer nice look to controls
     wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
@@ -423,7 +423,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
     if(theme) theme->SetWindowTheme((HWND) imagesList->GetHWND(), L"EXPLORER", NULL);
     #endif
 
-    statusTxt->SetLabel(_("Glissez une image depuis la banque dans la zone ci dessous pour l'ajouter à l'animation."));
+    statusTxt->SetLabel(_("Drag an image from the image bank to the area below to add it to the animation."));
 
     imagesList->SetDropTarget(new DndTextSpriteObjectEditor(*this));
 
@@ -483,7 +483,7 @@ void SpriteObjectEditor::RefreshAnimationTree()
     iconList->Add(gd::CommonBitmapManager::GetInstance()->rightupdir16);
 
     animationsTree->DeleteAllItems();
-    wxTreeItemId root = animationsTree->AddRoot(_("Toutes les animations"));
+    wxTreeItemId root = animationsTree->AddRoot(_("All animations"));
     for (unsigned int i = 0;i<object.GetAnimationCount();++i)
     {
         Animation & animation = object.GetAnimation(i);
@@ -768,9 +768,9 @@ void SpriteObjectEditor::RefreshCollisionMasks()
                 if ( mask[i].vertices.size() == 3)
                     polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Triangle"), 0, 0);
                 else if ( mask[i].vertices.size() == 4)
-                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Quadrilatère"), 1, 1);
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Quad"), 1, 1);
                 else
-                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Polygone"), 2, 2);
+                    polygonItem = maskTree->AppendItem(maskTree->GetRootItem(), _("Polygon"), 2, 2);
 
                 //Associate with the item the polygon #
                 maskTree->SetItemData(polygonItem, new wxStringClientData(ToString(i)));
@@ -778,12 +778,12 @@ void SpriteObjectEditor::RefreshCollisionMasks()
                 if ( !mask[i].IsConvex() )
                 {
                     maskTree->SetItemImage(polygonItem, 4, 4);
-                    maskTree->SetItemText(polygonItem, maskTree->GetItemText(polygonItem)+" "+_("( INVALIDE : Le polygone n'est pas convexe )"));
+                    maskTree->SetItemText(polygonItem, maskTree->GetItemText(polygonItem)+" "+_("( INVALID : The polygon is not convex )"));
                 }
 
                 for (unsigned int j = 0;j<mask[i].vertices.size();++j)
                 {
-                    wxTreeListItem pointItem = maskTree->AppendItem(polygonItem, _("Sommet"), 3,3);
+                    wxTreeListItem pointItem = maskTree->AppendItem(polygonItem, _("Vertice"), 3,3);
                     maskTree->SetItemText(pointItem, 1, ToString(mask[i].vertices[j].x));
                     maskTree->SetItemText(pointItem, 2, ToString(mask[i].vertices[j].y));
 
@@ -796,7 +796,7 @@ void SpriteObjectEditor::RefreshCollisionMasks()
         }
         else
         {
-            maskTree->AppendItem(maskTree->GetRootItem(), _("Par défaut"));
+            maskTree->AppendItem(maskTree->GetRootItem(), _("Default"));
         }
 
     }
@@ -893,14 +893,14 @@ void SpriteObjectEditor::OnanimationsTreeItemRightClick(wxTreeEvent& event)
             {
                 animationsMenu.Enable(ID_MENULOOP, false);
                 animationsMenu.Enable(ID_MENUTIMEBETWEENFRAMES, false);
-                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Temps entre chaque image"));
+                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Time between each images"));
             }
             else
             {
                 animationsMenu.Enable(ID_MENULOOP, true);
                 animationsMenu.Enable(ID_MENUTIMEBETWEENFRAMES, true);
                 animationsMenu.Check(ID_MENULOOP, direction.IsLooping());
-                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Temps entre chaque image : ")+ToString(direction.GetTimeBetweenFrames())+_("s"));
+                animationsMenu.SetLabel(ID_MENUTIMEBETWEENFRAMES, _("Time between each images:")+ToString(direction.GetTimeBetweenFrames())+_("s"));
             }
         }
     }
@@ -1077,7 +1077,7 @@ void SpriteObjectEditor::OnmgrPaneClose(wxAuiManagerEvent& event)
         }
         else
         {
-            wxLogMessage(_("Un ou plusieurs polygones du masque de collision ne sont pas convexes ( C'est à dire qu'ils contiennent un creux ).\nVeuillez modifier ces polygones avant de poursuivre."));
+            wxLogMessage(_("One or more polygons from the collision mask are not convex ( They have a hole ).\nPlease modify these polygons before continuing."));
             event.Veto();
         }
 
@@ -1211,11 +1211,11 @@ void SpriteObjectEditor::OnAddPointClick(wxCommandEvent& event)
     if ( sprites.empty() ) return;
 
     //Find a new name for the point
-    Point point(ToString(_("NouveauPoint")));
+    Point point(ToString(_("NewPoint")));
     unsigned int i = 2;
     while ( sprites[0]->HasPoint(point.GetName()) )
     {
-        point.SetName(ToString(_("NouveauPoint"))+ToString(i));
+        point.SetName(ToString(_("NewPoint"))+ToString(i));
         ++i;
     }
 
@@ -1239,8 +1239,8 @@ void SpriteObjectEditor::OnpointsListItemActivated(wxListEvent& event)
 
     if ( pointName == "Centre" ) //Center point can be automatically positioned.
     {
-        if (wxMessageBox(_("Le point centre peut être positionné automatiquement par Game Develop au centre (comportement par défaut).\nVoulez vous modifier ce point ?\nCliquez sur oui pour le modifier, cliquez sur non pour que Game Develop le place automatiquement."),
-                       _("Position du point \"Centre\""), wxYES_NO ) == wxNO)
+        if (wxMessageBox(_("The point \"Centre\" can be automatically placed by Game Develop at the center.\nDo you really want to modify the point\?\nClick on yes to modify it, click on no so as let Game Develop place it."),
+                       _("Position of the point \"Centre\""), wxYES_NO ) == wxNO)
         {
             for (unsigned int i = 0;i<sprites.size();++i) sprites[i]->SetCentreAutomatic(true);
             RefreshPoints();
@@ -1252,8 +1252,8 @@ void SpriteObjectEditor::OnpointsListItemActivated(wxListEvent& event)
 
     Point & point = sprites[0]->GetPoint(pointName);
 
-    std::string x_str = ToString(wxGetTextFromUser(_("Entrez la position X du point par rapport à l'image"), "Position X du point",ToString(point.GetX())));
-    std::string y_str = ToString(wxGetTextFromUser(_("Entrez la position Y du point par rapport à l'image"), "Position Y du point",ToString(point.GetY())));
+    std::string x_str = ToString(wxGetTextFromUser(_("Enter the X position of the point ( regarding the image )."), "Position X du point",ToString(point.GetX())));
+    std::string y_str = ToString(wxGetTextFromUser(_("Enter the Y position of the point ( regarding the image )."), "Position Y du point",ToString(point.GetY())));
 
     point.SetX(ToInt(x_str));
     point.SetY(ToInt(y_str));
@@ -1356,9 +1356,9 @@ void SpriteObjectEditor::OnAddMaskClick(wxCommandEvent& event)
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
     if ( sprites[0]->IsCollisionMaskAutomatic() ) mask.clear();
 
-    float width = ToFloat(string(wxGetTextFromUser(_("Entrez la largeur du rectangle"), _("Nouveau rectangle"), "32").mb_str()));
-    float height = ToFloat(string(wxGetTextFromUser(_("Entrez la hauteur du rectangle"), _("Nouveau rectangle"), "32").mb_str()));
-    float angle = ToFloat(string(wxGetTextFromUser(_("Entrez l'angle de rotation du rectangle ( en degrés )"), _("Nouveau rectangle"), "0").mb_str()));
+    float width = ToFloat(string(wxGetTextFromUser(_("Enter the width of the rectangle"), _("New rectangle"), "32").mb_str()));
+    float height = ToFloat(string(wxGetTextFromUser(_("Enter the height of the rectangle"), _("New rectangle"), "32").mb_str()));
+    float angle = ToFloat(string(wxGetTextFromUser(_("Enter the angle of the rotation of the rectangle ( in degrees )"), _("New rectangle"), "0").mb_str()));
 
     Polygon2d newRectangle = Polygon2d::CreateRectangle(width, height);
     newRectangle.Rotate(angle*3.14159/180);
@@ -1451,7 +1451,7 @@ void SpriteObjectEditor::OnDeleteMaskClick(wxCommandEvent& event)
             //Make sure not to delete a vertice if the polygon has 3 vertices
             if ( mask[selectedPolygon].vertices.size() <= 3 )
             {
-                if (wxMessageBox(_("Un polygone ne peut pas avoir moins de 3 sommets.\nVoulez vous supprimer le polygone entier ?"), _("Supprimer le polygone ?"), wxYES_NO|wxICON_EXCLAMATION ) == wxYES)
+                if (wxMessageBox(_("A polygon can not have less than 3 vertices.\nDo you want to delete the entire polygon\?"), _("Delete the polygon\?"), wxYES_NO|wxICON_EXCLAMATION ) == wxYES)
                 {
                     mask.erase(mask.begin()+selectedPolygon);
                 }
@@ -1476,8 +1476,8 @@ void SpriteObjectEditor::OnDeleteMaskClick(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnDefaultMaskClick(wxCommandEvent& event)
 {
-    if (wxMessageBox(_("Revenir au masque par défaut effacera définitivement le masque personnalisé.\nÊtes vous sûr de vouloir continuer ?"),
-                   _("Attention"), wxYES_NO | wxNO_DEFAULT ) == wxNO)
+    if (wxMessageBox(_("Go back to the default mask will erase any custom hit boxes.\nAre you sure you want to continue\?"),
+                   _("Caution"), wxYES_NO | wxNO_DEFAULT ) == wxNO)
     {
         return;
     }
@@ -1499,8 +1499,8 @@ void SpriteObjectEditor::OnPositionMaskSelected(wxCommandEvent& event)
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
     if ( selectedPolygon < mask.size() && selectedPolygonPoint < mask[selectedPolygon].vertices.size() )
     {
-        mask[selectedPolygon].vertices[selectedPolygonPoint].x = ToFloat(ToString(wxGetTextFromUser(_("Entrez la position X du sommet"), _("Repositionnement"), ToString(mask[selectedPolygon].vertices[selectedPolygonPoint].x))));
-        mask[selectedPolygon].vertices[selectedPolygonPoint].y = ToFloat(ToString(wxGetTextFromUser(_("Entrez la position Y du sommet"), _("Repositionnement"), ToString(mask[selectedPolygon].vertices[selectedPolygonPoint].y))));
+        mask[selectedPolygon].vertices[selectedPolygonPoint].x = ToFloat(ToString(wxGetTextFromUser(_("Enter the X position of the vertice"), _("Positioning"), ToString(mask[selectedPolygon].vertices[selectedPolygonPoint].x))));
+        mask[selectedPolygon].vertices[selectedPolygonPoint].y = ToFloat(ToString(wxGetTextFromUser(_("Enter the Y position of the vertice"), _("Positioning"), ToString(mask[selectedPolygon].vertices[selectedPolygonPoint].y))));
     }
 
     for (unsigned int i = 0;i<sprites.size();++i)
@@ -1521,8 +1521,8 @@ void SpriteObjectEditor::OnMovePolygonSelected(wxCommandEvent& event)
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
     if ( selectedPolygon < mask.size() )
     {
-        float xOffset = ToFloat(ToString(wxGetTextFromUser(_("Entrez le déplacement sur l'axe X"), _("Déplacement"), "0")));
-        float yOffset = ToFloat(ToString(wxGetTextFromUser(_("Entrez le déplacement sur l'axe Y"), _("Déplacement"), "0")));
+        float xOffset = ToFloat(ToString(wxGetTextFromUser(_("Enter the displacement offset on X axis."), _("Displacement"), "0")));
+        float yOffset = ToFloat(ToString(wxGetTextFromUser(_("Enter the displacement offset on Y axis."), _("Displacement"), "0")));
 
         mask[selectedPolygon].Move(xOffset, yOffset);
     }
@@ -1544,7 +1544,7 @@ void SpriteObjectEditor::OnRotatePolygonSelected(wxCommandEvent& event)
     std::vector<Polygon2d> mask = sprites[0]->GetCollisionMask();
     if ( selectedPolygon < mask.size() )
     {
-        float angle = ToFloat(ToString(wxGetTextFromUser(_("Entrez l'angle de rotation en degrés"), _("Rotation du polygone"), "0")))*3.14159/180;
+        float angle = ToFloat(ToString(wxGetTextFromUser(_("Enter the angle of the rotation, in degrees"), _("Rotation of the polygon"), "0")))*3.14159/180;
 
         mask[selectedPolygon].Rotate(angle);
     }
@@ -1606,8 +1606,8 @@ void SpriteObjectEditor::OnTimeBetweenFramesSelected(wxCommandEvent& event)
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection);
-        std::string newTime = ToString(wxGetTextFromUser(_("Entrez le temps entre chaque image ( en secondes )"),
-                                                         _("Temps entre chaque image"),
+        std::string newTime = ToString(wxGetTextFromUser(_("Enter time between each image ( in seconds )"),
+                                                         _("Time between each images"),
                                                          ToString(direction.GetTimeBetweenFrames())));
         if ( newTime.empty() ) return;
         direction.SetTimeBetweenFrames(ToFloat(newTime));
@@ -1687,7 +1687,7 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
          selectedDirection < object.GetAnimation(selectedAnimation).GetDirectionsNumber() )
     {
         Direction & direction = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection);
-        wxFileDialog FileDialog( this, _("Choisissez une ou plusieurs images à ajouter"), "", "", _("Images supportées|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|Tous les fichiers|*.*"), wxFD_MULTIPLE );
+        wxFileDialog FileDialog( this, _("Choose one or more images to add"), "", "", _("Supported image files|*.bmp;*.gif;*.jpg;*.png;*.tga;*.dds|All files|*.*"), wxFD_MULTIPLE );
         wxString projectDirectory = wxFileName::FileName(game.GetProjectFile()).GetPath();
 
         if ( FileDialog.ShowModal() == wxID_OK )
@@ -1741,12 +1741,13 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
 
 void SpriteObjectEditor::OnAddFromImageBankSelected(wxCommandEvent& event)
 {
-    wxLogMessage(_("Glissez déposez les images depuis la banque d'images pour les ajouter à l'animation."));
+    wxLogMessage(_("Drag images from the image bank to add them to the animation."));
 }
 
 void SpriteObjectEditor::OnHelpClick(wxCommandEvent& event)
 {
-    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/game_develop/documentation/manual/built_sprite"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/built_sprite"));
 }
 
 #endif
+

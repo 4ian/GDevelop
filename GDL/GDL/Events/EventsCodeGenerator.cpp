@@ -983,9 +983,9 @@ std::string EventsCodeGenerator::ConvertToCppString(std::string plainString)
             plainString.erase(plainString.begin()+i);
 
             if ( i < plainString.length() )
-                plainString.insert(i, "\\n");
+                plainString.insert(i, "\n");
             else
-                plainString += ("\\n");
+                plainString += ("\n");
         }
         else if ( plainString[i] == '\\' )
         {
@@ -1074,3 +1074,4 @@ void EventsCodeGenerator::ReportError()
 }
 
 #endif
+

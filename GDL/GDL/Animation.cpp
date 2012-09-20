@@ -65,3 +65,4 @@ void Animation::SetDirection(const Direction & direction, unsigned int nb)
 
     return;
 }
+

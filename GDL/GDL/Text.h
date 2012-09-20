@@ -33,3 +33,4 @@ class GD_API Text
 };
 
 #endif // TEXT_H
+

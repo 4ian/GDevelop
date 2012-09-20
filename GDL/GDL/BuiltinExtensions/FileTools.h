@@ -23,3 +23,4 @@ void GD_API ReadValueFromFile( const std::string & filename, const std::string &
 void GD_API ReadStringFromFile( const std::string & filename, const std::string & group, RuntimeScene & scene, const std::string & sceneVariable );
 
 #endif // FILETOOLS_H
+

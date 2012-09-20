@@ -56,3 +56,4 @@ private:
 
 #endif // CHANGESNOTIFIER_H
 #endif
+

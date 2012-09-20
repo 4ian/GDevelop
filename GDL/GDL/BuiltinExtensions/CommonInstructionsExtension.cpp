@@ -29,17 +29,17 @@ using namespace std;
 CommonInstructionsExtension::CommonInstructionsExtension()
 {
     DECLARE_THE_EXTENSION("BuiltinCommonInstructions",
-                          _("Évènements standards"),
-                          _("Extension apportant des types d'évènements de base, intégrée en standard."),
+                          _("Standard events"),
+                          _("Builtin extension providing standard events."),
                           "Compil Games",
                           "Freeware")
 
     #if defined(GD_IDE_ONLY)
     DECLARE_CONDITION("Or",
-                   _("Ou"),
-                   _("Renvoie vraie si une seule des sous conditions est vraie"),
-                   _("Si une de ces condition est vraie :"),
-                   _("Avancé"),
+                   _("Or"),
+                   _("Return true if one of the sub conditions is true"),
+                   _("If one of these conditions is true :"),
+                   _("Advanced"),
                    "res/conditions/or24.png",
                    "res/conditions/or.png");
 
@@ -121,10 +121,10 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("And",
-                   _("Et"),
-                   _("Renvoie vraie si toutes les sous conditions sont vraies"),
-                   _("Si toutes ces conditions sont vraies :"),
-                   _("Avancé"),
+                   _("And"),
+                   _("Return true if all sub conditions are true"),
+                   _("If all of these conditions are true :"),
+                   _("Advanced"),
                    "res/conditions/and24.png",
                    "res/conditions/and.png");
 
@@ -153,10 +153,10 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_CONDITION()
 
     DECLARE_CONDITION("Not",
-                   _("Non"),
-                   _("Renvoie l'inverse du résultat des sous conditions"),
-                   _("Inverser le résultat logique de ces conditions :"),
-                   _("Avancé"),
+                   _("No"),
+                   _("Return the contrary of the result of the sub conditions"),
+                   _("Invert the logical result of these conditions :"),
+                   _("Advanced"),
                    "res/conditions/not24.png",
                    "res/conditions/not.png");
 
@@ -204,7 +204,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_CONDITION()
 
     DECLARE_EVENT("Standard",
-                  _("Évènement standard"),
+                  _("Standard event"),
                   "Évènement standard : Actions qui sont lancées si des conditions sont vérifiées",
                   "",
                   "res/eventaddicon.png",
@@ -213,7 +213,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("Link",
-                  _("Lien"),
+                  _("Link"),
                   "Lien vers des évènements d'une autre scène",
                   "",
                   "res/lienaddicon.png",
@@ -222,7 +222,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("Comment",
-                  _("Commentaire"),
+                  _("Comment"),
                   "Un évènement permettant d'ajouter un commentaire dans la liste des évènements",
                   "",
                   "res/comment.png",
@@ -231,7 +231,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("While",
-                  _("Tant que"),
+                  _("While"),
                   "Répète des conditions et actions tant que certaines conditions ne sont pas vérifiées",
                   "",
                   "res/while.png",
@@ -240,7 +240,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("Repeat",
-                  _("Répéter"),
+                  _("Repeat"),
                   "Répète un certain nombre de fois des conditions et actions",
                   "",
                   "res/repeat.png",
@@ -249,7 +249,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("ForEach",
-                  _("Pour chaque objet"),
+                  _("For each object"),
                   "Répète des conditions et actions en prenant à chaque fois un objet ayant le nom indiqué",
                   "",
                   "res/foreach.png",
@@ -258,7 +258,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     DECLARE_END_EVENT()
 
     DECLARE_EVENT("CppCode",
-                  _("Code C++ ( Expérimental )"),
+                  _("C++ code ( Experimental )"),
                   "Execute du code C++",
                   "",
                   "res/source_cpp16.png",
@@ -297,3 +297,4 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Mac", "sndfile"));
     #endif
 }
+

@@ -182,3 +182,4 @@ double GD_API GetTime( const RuntimeScene & scene, const std::string & parameter
 
     return 0;
 }
+

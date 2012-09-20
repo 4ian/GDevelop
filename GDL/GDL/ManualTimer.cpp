@@ -19,3 +19,4 @@ ManualTimer::~ManualTimer()
 {
     //dtor
 }
+

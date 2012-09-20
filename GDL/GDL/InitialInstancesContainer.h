@@ -54,3 +54,4 @@ private:
 };
 
 #endif // INITIALINSTANCESCONTAINER_H
+

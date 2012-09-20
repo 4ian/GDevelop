@@ -67,3 +67,4 @@ private:
 
 #endif // BASEPROFILER_H
 #endif
+

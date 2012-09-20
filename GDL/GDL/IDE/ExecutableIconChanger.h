@@ -24,3 +24,4 @@ class GD_API ExecutableIconChanger
 
 #endif // EXECUTABLEICONCHANGER_H
 #endif
+

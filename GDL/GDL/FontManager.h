@@ -61,3 +61,4 @@ private:
 };
 
 #endif // FONTMANAGER_H
+

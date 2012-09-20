@@ -95,3 +95,4 @@ private:
 };
 
 #endif // VARIABLE_H
+

@@ -61,3 +61,4 @@ boost::shared_ptr<sf::Shader> ShaderManager::GetSFMLShader(const std::vector<std
 
     return shader;
 }
+

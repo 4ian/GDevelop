@@ -54,3 +54,4 @@ std::string GD_API ManObjListName(const std::string & objectName);
 
 #endif // EVENTSCODENAMEMANGLER_H
 #endif
+

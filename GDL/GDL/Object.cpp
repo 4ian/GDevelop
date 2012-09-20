@@ -244,14 +244,14 @@ void Object::GetPropertyForDebugger(unsigned int propertyNb, string & name, stri
 {
     if      ( propertyNb == 0 ) {name = _("Position");      value = ToString(GetX())+";"+ToString(GetY());}
     else if ( propertyNb == 1 ) {name = _("Angle");         value = ToString(GetAngle())+"°";}
-    else if ( propertyNb == 2 ) {name = _("Taille");        value = ToString(GetWidth())+";"+ToString(GetHeight());}
-    else if ( propertyNb == 3 ) {name = _("Visibilité");    value = hidden ? _("Masqué") : _("Affiché");}
-    else if ( propertyNb == 4 ) {name = _("Calque");        value = layer;}
-    else if ( propertyNb == 5 ) {name = _("Plan");          value = ToString(zOrder);}
-    else if ( propertyNb == 6 ) {name = _("Vitesse");       value = ToString(TotalForceLength());}
-    else if ( propertyNb == 7 ) {name = _("Angle de déplacement"); value = ToString(TotalForceAngle());}
-    else if ( propertyNb == 8 ) {name = _("Déplacement en X");     value = ToString(TotalForceX());}
-    else if ( propertyNb == 9 ) {name = _("Déplacement en Y"); value = ToString(TotalForceY());}
+    else if ( propertyNb == 2 ) {name = _("Size");        value = ToString(GetWidth())+";"+ToString(GetHeight());}
+    else if ( propertyNb == 3 ) {name = _("Visibility");    value = hidden ? _("Hidden") : _("Displayed");}
+    else if ( propertyNb == 4 ) {name = _("Layer");        value = layer;}
+    else if ( propertyNb == 5 ) {name = _("Z order");          value = ToString(zOrder);}
+    else if ( propertyNb == 6 ) {name = _("Speed");       value = ToString(TotalForceLength());}
+    else if ( propertyNb == 7 ) {name = _("Angle of moving"); value = ToString(TotalForceAngle());}
+    else if ( propertyNb == 8 ) {name = _("X coordinate of moving");     value = ToString(TotalForceX());}
+    else if ( propertyNb == 9 ) {name = _("Y coordinate of moving"); value = ToString(TotalForceY());}
 }
 
 bool Object::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -273,7 +273,7 @@ bool Object::ChangeProperty(unsigned int propertyNb, string newValue)
     else if ( propertyNb == 2 ) {return false;}
     else if ( propertyNb == 3 )
     {
-        if ( newValue == _("Masqué") )
+        if ( newValue == _("Hidden") )
         {
             SetHidden();
         }
@@ -674,3 +674,4 @@ Object * CreateBaseObject(std::string name)
 {
     return new Object(name);
 }
+

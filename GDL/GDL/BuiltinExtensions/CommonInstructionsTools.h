@@ -59,3 +59,4 @@ double GD_API ToDeg( double angle );
 }
 
 #endif // COMMONINSTRUCTIONS_H
+

@@ -184,37 +184,37 @@ string ActionSentenceFormatter::LabelFromType(const std::string & type)
     else if ( type == "expression" )
         return ToString(_("Expression"));
     else if ( type == "object" )
-        return ToString(_("Choisir l'objet"));
+        return ToString(_("Choose the object"));
     else if ( type == "automatism" )
-        return ToString(_("Choisir l'automatisme"));
+        return ToString(_("Choose automatism"));
     else if ( type == "operator" )
-        return ToString(_("Choisir le signe"));
+        return ToString(_("Choose the sign"));
     else if ( type == "file" )
-        return ToString(_("Choisir le fichier"));
+        return ToString(_("Choose the file"));
     else if ( type == "yesorno" )
-        return ToString(_("Oui ou non"));
+        return ToString(_("Yes or no"));
     else if ( type == "police" )
-        return ToString(_("Choisir la police"));
+        return ToString(_("Choose the font"));
     else if ( type == "color" )
-        return ToString(_("Choisir la couleur"));
+        return ToString(_("Choose the color"));
     else if ( type == "string" )
-        return ToString(_("Editer le texte"));
+        return ToString(_("Edit the text"));
     else if ( type == "musicfile" )
-        return ToString(_("Choisir la musique"));
+        return ToString(_("Choose the music"));
     else if ( type == "soundfile" )
-        return ToString(_("Choisir le son"));
+        return ToString(_("Choose the sound"));
     else if ( type == "password" )
-        return ToString(_("Créer un mot de passe"));
+        return ToString(_("Create a password"));
     else if ( type == "layer" )
-        return ToString(_("Choisir le calque"));
+        return ToString(_("Choose the layer"));
     else if ( type == "joyaxis" )
-        return ToString(_("Choisir l'axe"));
+        return ToString(_("Choose axis"));
     else if ( type == "objectvar" )
-        return ToString(_("Choisir la variable de l'objet"));
+        return ToString(_("Choose a variable of the object"));
     else if ( type == "scenevar" )
-        return ToString(_("Choisir la variable de la scène"));
+        return ToString(_("Choose the scene variable"));
     else if ( type == "globalvar" )
-        return ToString(_("Choisir la variable globale"));
+        return ToString(_("Choose the global variable"));
 
     return "undefined";
 }

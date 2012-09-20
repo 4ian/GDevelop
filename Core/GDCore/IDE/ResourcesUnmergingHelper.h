@@ -39,3 +39,5 @@ private:
 }
 
 #endif // ResourcesUnmergingHelper_H
+
+

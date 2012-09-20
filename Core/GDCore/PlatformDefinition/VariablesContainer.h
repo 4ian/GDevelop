@@ -142,3 +142,10 @@ private:
 }
 
 #endif // GDCORE_VARIABLESCONTAINER_H
+
+
+
+
+
+
+

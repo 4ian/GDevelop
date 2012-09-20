@@ -26,3 +26,5 @@ void gd::MainFrameWrapper::RemoveControlToBeDisabledOnPreview(wxWindow * control
         }
     }
 }
+
+

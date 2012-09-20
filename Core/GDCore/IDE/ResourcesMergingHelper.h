@@ -64,3 +64,10 @@ protected:
 }
 
 #endif // RESOURCESMERGINGHELPER_H
+
+
+
+
+
+
+

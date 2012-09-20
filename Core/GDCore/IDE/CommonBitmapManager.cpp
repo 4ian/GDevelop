@@ -69,6 +69,7 @@ CommonBitmapManager::CommonBitmapManager()
     defaultMask16.LoadFile("res/defaultMask16.png", wxBITMAP_TYPE_ANY);
     preview16.LoadFile("res/preview16.png", wxBITMAP_TYPE_ANY);
     objectGroup16.LoadFile("res/groupeobjeticon.png", wxBITMAP_TYPE_ANY);
+    gdFileIcon32.LoadFile("res/gdFile32.png", wxBITMAP_TYPE_ANY);
 
     layers24.LoadFile("res/layers24.png", wxBITMAP_TYPE_ANY);
     undo24.LoadFile("res/undo24.png", wxBITMAP_TYPE_ANY);

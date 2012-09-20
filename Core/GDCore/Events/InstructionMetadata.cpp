@@ -6,7 +6,8 @@ namespace gd
 
 InstructionMetadata::InstructionMetadata(std::string instructionNamespace_) :
 canHaveSubInstructions(false),
-extensionNamespace(instructionNamespace_)
+extensionNamespace(instructionNamespace_),
+hidden(false)
 {
 }
 
@@ -41,3 +42,10 @@ ParameterMetadata & InstructionMetadata::AddCodeOnlyParameter(const std::string 
 }
 
 }
+
+
+
+
+
+
+

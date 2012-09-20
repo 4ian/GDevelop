@@ -3,11 +3,10 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#if defined(GD_IDE_ONLY)
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include <wx/log.h>
 
-namespace GDpriv
+namespace gd
 {
 
 LocaleManager * LocaleManager::_singleton = 0;
@@ -22,8 +21,8 @@ bool LocaleManager::SetLanguage(int languageWxWidgetsId)
     wxLocale::AddCatalogLookupPathPrefix(wxT(".."));
     wxLocale::AddCatalogLookupPathPrefix(_T("locale"));
     wxLocale::AddCatalogLookupPathPrefix(_T("Extensions"));
-    locale->AddCatalog(_T("GD"));      //Application translations
     locale->AddCatalog(_T("wxstd"));   //wxWidgets specific translations
+    locale->AddCatalog(_T("GD"));      //Application translations
 
     wxSetlocale(LC_NUMERIC, "C"); // This sets the decimal point to be '.', whatever the language defined.
 
@@ -37,5 +36,3 @@ void LocaleManager::AddCatalog(std::string catalogName)
 }
 
 }
-
-#endif

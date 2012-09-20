@@ -34,3 +34,5 @@ private:
 }
 
 #endif // GDCORE_TreeItemStringData_H
+
+

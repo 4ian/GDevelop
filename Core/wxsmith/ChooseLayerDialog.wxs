@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="ChooseLayerDialog">
-		<title>Choisir un calque</title>
+		<title>Choose a layer </title>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -27,7 +27,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-										<label>Choisissez un des calques de la scène.&#x0A;Pour ajouter ou modifier des calques,&#x0A;utilisez l&apos;éditeur des calques de la scène.</label>
+										<label>Choose one of the layer of the scene.&#x0A;To add or modify layers,&#x0A;use the layers editor of the scene.</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -77,7 +77,7 @@
 							<cols>3</cols>
 							<object class="sizeritem">
 								<object class="wxButton" name="ID_BUTTON2" variable="okBt" member="yes">
-									<label>Choisir</label>
+									<label>Choose</label>
 									<handler function="OnokBtClick" entry="EVT_BUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -86,7 +86,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxButton" name="ID_BUTTON1" variable="cancelBt" member="yes">
-									<label>Annuler</label>
+									<label>Cancel</label>
 									<handler function="OncancelBtClick" entry="EVT_BUTTON" />
 								</object>
 								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

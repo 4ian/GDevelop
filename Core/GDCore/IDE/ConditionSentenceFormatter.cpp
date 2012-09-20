@@ -44,35 +44,35 @@ std::string ConditionSentenceFormatter::LabelFromType( const std::string & type 
     else if ( type == "expression" )
         return static_cast<string>(_( "Expression" ));
     else if ( type == "object" )
-        return static_cast<string>(_( "Choisir l'objet" ));
+        return static_cast<string>(_( "Choose the object" ));
     else if ( type == "automatism" )
-        return static_cast<string>(_( "Choisir l'automatisme" ));
+        return static_cast<string>(_( "Choose automatism" ));
     else if ( type == "relationalOperator" )
-        return static_cast<string>(_( "Choisir le signe" ));
+        return static_cast<string>(_( "Choose the sign" ));
     else if ( type == "file" )
-        return static_cast<string>(_( "Choisir le fichier" ));
+        return static_cast<string>(_( "Choose the file" ));
     else if ( type == "color" )
-        return static_cast<string>(_( "Choisir la couleur" ));
+        return static_cast<string>(_( "Choose the color" ));
     else if ( type == "string" )
-        return static_cast<string>(_( "Choisir le texte" ));
+        return static_cast<string>(_( "Choose the text" ));
     else if ( type == "key" )
-        return static_cast<string>(_( "Choisir la touche" ));
+        return static_cast<string>(_( "Choose the key" ));
     else if ( type == "mouse" )
-        return static_cast<string>(_( "Choisir le bouton" ));
+        return static_cast<string>(_( "Choose the button" ));
     else if ( type == "trueorfalse" )
-        return static_cast<string>(_( "Vrai ou Faux" ));
+        return static_cast<string>(_( "True or False" ));
     else if ( type == "yesorno" )
-        return static_cast<string>(_( "Oui ou non" ));
+        return static_cast<string>(_( "Yes or no" ));
     else if ( type == "layer" )
-        return static_cast<string>(_( "Choisir le calque" ));
+        return static_cast<string>(_( "Choose the layer" ));
     else if ( type == "joyaxis" )
-        return static_cast<string>(_( "Choisir l'axe" ));
+        return static_cast<string>(_( "Choose axis" ));
     else if ( type == "objectvar" )
-        return static_cast<string>(_("Choisir la variable de l'objet"));
+        return static_cast<string>(_("Choose a variable of the object"));
     else if ( type == "scenevar" )
-        return static_cast<string>(_("Choisir la variable de la scène"));
+        return static_cast<string>(_("Choose the scene variable"));
     else if ( type == "globalvar" )
-        return static_cast<string>(_("Choisir la variable globale"));
+        return static_cast<string>(_("Choose the global variable"));
 
     wxLogWarning( "Game Develop n'a pas pu trouver le nom d'un bouton suivant le type du paramètre" );
     return "undefined";

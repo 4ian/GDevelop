@@ -49,7 +49,7 @@ ResourceLibraryDialog::ResourceLibraryDialog(wxWindow* parent,wxWindowID id,cons
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, id, _("Bibliothèque de ressources"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("id"));
+	Create(parent, id, _("Resources library"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("id"));
 	SetClientSize(wxDefaultSize);
 	Move(wxDefaultPosition);
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -61,7 +61,7 @@ ResourceLibraryDialog::ResourceLibraryDialog(wxWindow* parent,wxWindowID id,cons
 	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	Panel1->SetBackgroundColour(wxColour(255,255,255));
 	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Glissez déposer les images pour les ajouter à la banque d\'images de votre jeu."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Drag images to add them to your project images bank."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer5->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer5);
 	FlexGridSizer5->Fit(Panel1);
@@ -75,21 +75,21 @@ ResourceLibraryDialog::ResourceLibraryDialog(wxWindow* parent,wxWindowID id,cons
 	BoxSizer1->Add(listCtrl, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(BoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Les images sont copiées dans le dossier du jeu lorsque vous les insérez en les glissant/déposant\ndans la banque d\'images. Vous pouvez choisir un sous dossier spécifique :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("Images are copied into the project folder when you drag and drop them in the\nimage bank. You can choose a specific subfolder:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer3->AddGrowableCol(1);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Sous dossier où copier les images :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Sub folder where copy images:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	insertionFolderEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	insertionFolderEdit->SetToolTip(_("Le chemin est relatif au répertoire du jeu"));
+	insertionFolderEdit->SetToolTip(_("The file is relative to the folder of the project"));
 	FlexGridSizer3->Add(insertionFolderEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
-	closeBt = new wxButton(this, ID_BUTTON1, _("Fermer"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
+	closeBt = new wxButton(this, ID_BUTTON1, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(closeBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -158,7 +158,7 @@ void ResourceLibraryDialog::ConstructList()
     wxFileName rootPath(wxGetCwd()+"/Ressources/");
     rootPath.Normalize();
     if ( currentDirPath.GetFullPath() != rootPath.GetFullPath() )
-        listCtrl->InsertItem(0, _("Dossier parent"), 0);
+        listCtrl->InsertItem(0, _("Parent folder"), 0);
 
     //Browse file and directories
     wxDir dir(currentDir);
@@ -204,7 +204,7 @@ void ResourceLibraryDialog::ConstructList()
 
 void ResourceLibraryDialog::OnlistCtrlItemActivated(wxListEvent& event)
 {
-    if ( event.GetLabel() == _("Dossier parent") && event.GetIndex() == 0 )
+    if ( event.GetLabel() == _("Parent folder") && event.GetIndex() == 0 )
     {
         wxFileName dir = wxFileName::DirName(currentDir+"/..");
         currentDir = dir.GetPath();
@@ -234,7 +234,7 @@ void ResourceLibraryDialog::OnlistCtrlBeginDrag(wxListEvent& event)
         itemIndex = listCtrl->GetNextItem(itemIndex,  wxLIST_NEXT_ALL, wxLIST_STATE_SELECTED);
         if (itemIndex == -1) break;
 
-        if ( (listCtrl->GetItemText(itemIndex) == _("Dossier parent") && itemIndex == 0) || wxDirExists(currentDir+"/"+listCtrl->GetItemText(itemIndex)) )
+        if ( (listCtrl->GetItemText(itemIndex) == _("Parent folder") && itemIndex == 0) || wxDirExists(currentDir+"/"+listCtrl->GetItemText(itemIndex)) )
         {
             //Folder: Do nothing
         }

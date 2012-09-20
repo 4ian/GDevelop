@@ -51,3 +51,10 @@ public:
 }
 
 #endif // GDCORE_VARIABLE_H
+
+
+
+
+
+
+

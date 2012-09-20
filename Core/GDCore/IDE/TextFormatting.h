@@ -37,3 +37,5 @@ public:
 }
 
 #endif // TEXTFORMATTING_H
+
+

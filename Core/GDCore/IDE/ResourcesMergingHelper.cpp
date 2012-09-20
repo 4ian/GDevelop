@@ -49,3 +49,10 @@ void ResourcesMergingHelper::SetBaseDirectory(const std::string & baseDirectory_
 }
 
 }
+
+
+
+
+
+
+

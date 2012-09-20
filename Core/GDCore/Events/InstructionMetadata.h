@@ -83,6 +83,22 @@ public:
     }
 
     /**
+     * \brief Set the instruction to be hidden in the IDE.
+     *
+     * Used mainly when an instruction is deprecated.
+     */
+    InstructionMetadata & SetHidden()
+    {
+        hidden = true;
+        return *this;
+    }
+
+    /**
+     * \brief Return true if the instruction must be hidden in the IDE.
+     */
+    bool IsHidden() const { return hidden; }
+
+    /**
      * Add a parameter to the instruction ( condition or action ) information class.
      * \param type One of the type handled by Game Develop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
      * \param description Edittime only description for parameter
@@ -97,6 +113,7 @@ public:
      * \param supplementaryInformation Can be used if needed. For example, when type == "inlineCode", the content of supplementaryInformation is inserted in the generated C++ code.
      */
     ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+
 
     /**
      * \brief Defines information about how generate C++ code for an instruction
@@ -203,8 +220,11 @@ public:
 
 private:
     std::string extensionNamespace;
+    bool hidden;
 };
 
 }
 
 #endif // INSTRUCTIONMETADATA_H
+
+

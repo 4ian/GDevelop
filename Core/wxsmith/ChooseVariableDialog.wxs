@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="ChooseVariableDialog">
-		<title>Choisir une variable</title>
+		<title>Choose a variable</title>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -30,7 +30,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText4" member="yes">
-										<label>Choisissez la variable à utiliser.&#x0A;Notez qu&apos;il n&apos;est pas obligatoire de déclarer une variable&#x0A;dans le tableau pour l&apos;utiliser. Déclarer une variable dans&#x0A;le tableau permet de lui affecter une valeur initiale, et de&#x0A;pouvoir la retrouver facilement.</label>
+										<label>Choose the variable to use.&#x0A;Note that you don&apos;t have to declare a variable in&#x0A;the table so as to use it. Declaring a variable in this&#x0A;table allow to assign it an initial value and to find it easily.</label>
 										<style>wxALIGN_CENTRE</style>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -102,7 +102,7 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON1" variable="okBt" member="yes">
-							<label>Choisir</label>
+							<label>Choose</label>
 							<handler function="OnokBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
@@ -111,7 +111,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON3" variable="cancelBt" member="yes">
-							<label>Annuler</label>
+							<label>Cancel</label>
 							<handler function="OncancelBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -120,7 +120,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="helpBt" member="yes">
-							<label>Aide</label>
+							<label>Help</label>
 							<handler function="OnhelpBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

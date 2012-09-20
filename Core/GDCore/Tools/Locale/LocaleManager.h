@@ -9,7 +9,7 @@
 #define LOCALEMANAGER_H
 #include <wx/intl.h>
 
-namespace GDpriv
+namespace gd
 {
 
 /**

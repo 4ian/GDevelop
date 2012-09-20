@@ -249,6 +249,8 @@
 		<Unit filename="GDCore\IDE\Dialogs\ChooseLayerDialog.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseObjectDialog.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseObjectDialog.h" />
+		<Unit filename="GDCore\IDE\Dialogs\ChooseObjectTypeDialog.cpp" />
+		<Unit filename="GDCore\IDE\Dialogs\ChooseObjectTypeDialog.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseVariableDialog.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\ChooseVariableDialog.h" />
 		<Unit filename="GDCore\IDE\Dialogs\EditExpressionDialog.cpp" />
@@ -284,6 +286,7 @@
 		<Unit filename="GDCore\IDE\ResourcesUnmergingHelper.cpp" />
 		<Unit filename="GDCore\IDE\ResourcesUnmergingHelper.h" />
 		<Unit filename="GDCore\IDE\TextFormatting.h" />
+		<Unit filename="GDCore\IDE\wxTools\TreeItemStringData.h" />
 		<Unit filename="GDCore\PlatformDefinition\Automatism.cpp" />
 		<Unit filename="GDCore\PlatformDefinition\Automatism.h" />
 		<Unit filename="GDCore\PlatformDefinition\ChangesNotifier.cpp" />
@@ -326,6 +329,7 @@
 		<Unit filename="wxsmith\ChooseAutomatismDialog.wxs" />
 		<Unit filename="wxsmith\ChooseLayerDialog.wxs" />
 		<Unit filename="wxsmith\ChooseObjectDialog.wxs" />
+		<Unit filename="wxsmith\ChooseObjectTypeDialog.wxs" />
 		<Unit filename="wxsmith\ChooseVariableDialog.wxs" />
 		<Unit filename="wxsmith\EditExpressionDialog.wxs" />
 		<Unit filename="wxsmith\EditStrExpressionDialog.wxs" />
@@ -355,6 +359,7 @@
 					<wxDialog wxs="wxsmith/EditExpressionDialog.wxs" src="GDCore\IDE\Dialogs\EditExpressionDialog.cpp" hdr="GDCore\IDE\Dialogs\EditExpressionDialog.h" fwddecl="0" i18n="1" name="EditExpressionDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/EditStrExpressionDialog.wxs" src="GDCore\IDE\Dialogs\EditStrExpressionDialog.cpp" hdr="GDCore\IDE\Dialogs\EditStrExpressionDialog.h" fwddecl="0" i18n="1" name="EditStrExpressionDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/AdvancedEntryDialog.wxs" src="GDCore\IDE\Dialogs\AdvancedEntryDialog.cpp" hdr="GDCore\IDE\Dialogs\AdvancedEntryDialog.h" fwddecl="0" i18n="1" name="AdvancedEntryDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/ChooseObjectTypeDialog.wxs" src="GDCore\IDE\Dialogs\ChooseObjectTypeDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseObjectTypeDialog.h" fwddecl="0" i18n="1" name="ChooseObjectTypeDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

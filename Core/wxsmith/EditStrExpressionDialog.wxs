@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="EditStrExpressionDialog">
-		<title>Editer le texte</title>
+		<title>Edit the text</title>
 		<centered>1</centered>
 		<extra_code>wxIcon FrameIcon;&#x0A;FrameIcon.CopyFromBitmap(wxBitmap(wxImage(__T(&quot;res/texteicon.png&quot;))));&#x0A;SetIcon(FrameIcon);</extra_code>
 		<id_arg>0</id_arg>
@@ -45,8 +45,8 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="errorTxt" member="yes">
-												<label>Pas d&apos;erreurs.</label>
-												<tooltip>Cliquer pour positionner le curseur sur l&apos;erreur.</tooltip>
+												<label>No errors.</label>
+												<tooltip>Click to position cursor on the error.</tooltip>
 												<style>wxHL_ALIGN_LEFT|wxNO_BORDER</style>
 												<handler function="OnerrorTxtClick" entry="EVT_HYPERLINK" />
 											</object>
@@ -56,7 +56,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxButton" name="ID_BUTTON4" variable="helpBt" member="yes">
-												<label>Aide</label>
+												<label>Help</label>
 												<handler function="OnhelpBtClick" entry="EVT_BUTTON" />
 											</object>
 											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -114,7 +114,7 @@
 						</object>
 						<object class="sizeritem">
 							<object class="wxButton" name="ID_BUTTON10" variable="AddPropBt" member="yes">
-								<label>Ajouter</label>
+								<label>Add</label>
 								<handler function="OnAddPropBtClick" entry="EVT_BUTTON" />
 							</object>
 							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -124,7 +124,7 @@
 					</object>
 				</object>
 				<name>objectsFunctionsPane</name>
-				<caption>Fonctions d&apos;objets</caption>
+				<caption>Objects functions</caption>
 				<minimizebutton>0</minimizebutton>
 				<maximizebutton>0</maximizebutton>
 				<pinbutton>0</pinbutton>
@@ -160,7 +160,7 @@
 						</object>
 						<object class="sizeritem">
 							<object class="wxButton" name="ID_BUTTON7" variable="AddFunctionBt" member="yes">
-								<label>Ajouter</label>
+								<label>Add</label>
 								<handler function="OnAddFunctionBtClick" entry="EVT_BUTTON" />
 							</object>
 							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -170,7 +170,7 @@
 					</object>
 				</object>
 				<name>freeFunctionsPane</name>
-				<caption>Autres fonctions</caption>
+				<caption>Other functions</caption>
 				<minimizebutton>0</minimizebutton>
 				<maximizebutton>0</maximizebutton>
 				<pinbutton>0</pinbutton>

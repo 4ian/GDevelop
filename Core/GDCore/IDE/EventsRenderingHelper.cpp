@@ -163,7 +163,7 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
 
         dc.SetTextForeground( wxColour(0,0,0) );
         dc.SetFont( niceFont.Italic() );
-        dc.DrawText( _("Pas de conditions"), x + 2, y + 1 );
+        dc.DrawText( _("No conditions"), x + 2, y + 1 );
 
         return 15;
     }
@@ -260,7 +260,7 @@ int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions,
 
         dc.SetTextForeground( wxColour(0,0,0) );
         dc.SetFont( niceFont.Italic() );
-        dc.DrawText( _("Pas d'actions"), x + 2, y + 1 );
+        dc.DrawText( _("No actions"), x + 2, y + 1 );
 
         return 15;
     }

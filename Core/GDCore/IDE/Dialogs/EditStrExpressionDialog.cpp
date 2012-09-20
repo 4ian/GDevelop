@@ -64,7 +64,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	wxFlexGridSizer* FlexGridSizer7;
 	wxFlexGridSizer* FlexGridSizer1;
 
-	Create(parent, wxID_ANY, _("Editer le texte"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edit the text"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/texteicon.png"))));
 	SetIcon(FrameIcon);
@@ -83,10 +83,10 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	FlexGridSizer3->Add(TexteEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	OkBt = new wxButton(centerPanel, ID_BUTTON2, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(OkBt, 1, wxALL|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
-	errorTxt = new wxHyperlinkCtrl(centerPanel, ID_HYPERLINKCTRL1, _("Pas d\'erreurs."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
-	errorTxt->SetToolTip(_("Cliquer pour positionner le curseur sur l\'erreur."));
+	errorTxt = new wxHyperlinkCtrl(centerPanel, ID_HYPERLINKCTRL1, _("No errors."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	errorTxt->SetToolTip(_("Click to position cursor on the error."));
 	FlexGridSizer3->Add(errorTxt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	helpBt = new wxButton(centerPanel, ID_BUTTON4, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	helpBt = new wxButton(centerPanel, ID_BUTTON4, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer3->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -100,24 +100,24 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	FlexGridSizer7->AddGrowableRow(0);
 	ObjList = new wxTreeCtrl(objectsFunctionsPanel, ID_TREECTRL1, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer7->Add(ObjList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	AddPropBt = new wxButton(objectsFunctionsPanel, ID_BUTTON10, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
+	AddPropBt = new wxButton(objectsFunctionsPanel, ID_BUTTON10, _("Add"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
 	FlexGridSizer7->Add(AddPropBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	objectsFunctionsPanel->SetSizer(FlexGridSizer7);
 	FlexGridSizer7->Fit(objectsFunctionsPanel);
 	FlexGridSizer7->SetSizeHints(objectsFunctionsPanel);
-	mgr->AddPane(objectsFunctionsPanel, wxAuiPaneInfo().Name(_T("objectsFunctionsPane")).Caption(_("Fonctions d'objets")).CaptionVisible().Bottom());
+	mgr->AddPane(objectsFunctionsPanel, wxAuiPaneInfo().Name(_T("objectsFunctionsPane")).Caption(_("Objects functions")).CaptionVisible().Bottom());
 	freeFunctionsPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	FlexGridSizer10 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer10->AddGrowableCol(0);
 	FlexGridSizer10->AddGrowableRow(0);
 	ValList = new wxTreeCtrl(freeFunctionsPanel, ID_TREECTRL2, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
 	FlexGridSizer10->Add(ValList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	AddFunctionBt = new wxButton(freeFunctionsPanel, ID_BUTTON7, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
+	AddFunctionBt = new wxButton(freeFunctionsPanel, ID_BUTTON7, _("Add"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
 	FlexGridSizer10->Add(AddFunctionBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	freeFunctionsPanel->SetSizer(FlexGridSizer10);
 	FlexGridSizer10->Fit(freeFunctionsPanel);
 	FlexGridSizer10->SetSizeHints(freeFunctionsPanel);
-	mgr->AddPane(freeFunctionsPanel, wxAuiPaneInfo().Name(_T("freeFunctionsPane")).Caption(_("Autres fonctions")).CaptionVisible().Bottom());
+	mgr->AddPane(freeFunctionsPanel, wxAuiPaneInfo().Name(_T("freeFunctionsPane")).Caption(_("Other functions")).CaptionVisible().Bottom());
 	mgr->Update();
 	Center();
 
@@ -145,10 +145,10 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 
     //Prepare lists
     ObjList->DeleteAllItems();
-    ObjList->AddRoot( _( "Toutes les proprietés" ), 0 );
+    ObjList->AddRoot( _( "All properties" ), 0 );
 
     ValList->DeleteAllItems();
-    ValList->AddRoot( _( "Toutes les valeurs spéciales" ), 0 );
+    ValList->AddRoot( _( "All special values" ), 0 );
 
     //Insert extension objects expressions
     const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetPlatform().GetAllPlatformExtensions();
@@ -168,8 +168,8 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	    for(unsigned int j = 0;j<objectsTypes.size();++j)
 	    {
             wxTreeItemId objectTypeItem =   objectsTypes[j] == "" ?
-                                            ObjList->AppendItem(extensionItem, _("Tous les objets"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Objet") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),0) ;
+                                            ObjList->AppendItem(extensionItem, _("All objects"), 0) :
+                                            ObjList->AppendItem(extensionItem, _("Object") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),0) ;
 
             //Add each object expression
             std::map<string, gd::StrExpressionMetadata > allObjExpr = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
@@ -203,8 +203,8 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
 	    {
             wxTreeItemId automatismTypeItem =   automatismsTypes[j] == "" ?
-                                            ObjList->AppendItem(extensionItem, _("Tous les objets"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),0) ;
+                                            ObjList->AppendItem(extensionItem, _("All objects"), 0) :
+                                            ObjList->AppendItem(extensionItem, _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),0) ;
 
             //Add each automatism expression
             std::map<string, gd::StrExpressionMetadata > allAutoExpr = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
@@ -391,7 +391,7 @@ void EditStrExpressionDialog::OnOkBtClick(wxCommandEvent& event)
 
     if ( !expressionParser.ParseStringExpression(project, layout, callbacks) )
     {
-        if ( wxMessageBox(_("L'expression est mal formulée. Êtes vous sûr de vouloir valider cette expression ?"), _("L'expression contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(_("The expression is malformed. Are you sur you want to validate this expression \?"), _("The expression contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 
@@ -405,7 +405,7 @@ string EditStrExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata 
 {
     if ( parameterMetadata.type == "expression" )
     {
-        gd::AdvancedTextEntryDialog dialog(this, ToString(_("Paramètre")), parameterMetadata.description, "0", gd::AdvancedTextEntryDialog::MathExpression, &project, &layout);
+        gd::AdvancedTextEntryDialog dialog(this, ToString(_("Parameter")), parameterMetadata.description, "0", gd::AdvancedTextEntryDialog::MathExpression, &project, &layout);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -420,7 +420,7 @@ string EditStrExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata 
     }
     else if ( parameterMetadata.type == "string" )
     {
-        gd::AdvancedTextEntryDialog dialog(this, ToString(_("Paramètre")), parameterMetadata.description, "\"\"", gd::AdvancedTextEntryDialog::TextExpression, &project, &layout);
+        gd::AdvancedTextEntryDialog dialog(this, ToString(_("Parameter")), parameterMetadata.description, "\"\"", gd::AdvancedTextEntryDialog::TextExpression, &project, &layout);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -470,12 +470,12 @@ string EditStrExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata 
     }
     else if ( parameterMetadata.type == "camera" )
     {
-        std::string param = ToString(wxGetTextFromUser(parameterMetadata.description, _("Numéro de la caméra"), "0", this));
+        std::string param = ToString(wxGetTextFromUser(parameterMetadata.description, _("Camera number"), "0", this));
         return param;
     }
     else if ( parameterMetadata.type == "" )
     {
-        std::string param = ToString(wxGetTextFromUser(parameterMetadata.description, _("Paramètre"), "", this));
+        std::string param = ToString(wxGetTextFromUser(parameterMetadata.description, _("Parameter"), "", this));
         return param;
     }
 
@@ -509,7 +509,7 @@ void EditStrExpressionDialog::TextModified(wxStyledTextEvent& event)
     }
     else
     {
-        errorTxt->SetLabel(_("Pas d'erreurs."));
+        errorTxt->SetLabel(_("No errors."));
         lastErrorPos = std::string::npos;
     }
 
@@ -607,10 +607,17 @@ void EditStrExpressionDialog::OnerrorTxtClick(wxCommandEvent& event)
 
 void EditStrExpressionDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(9);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_text"));
 }
 
 }
+
+
+
+
+
+
+

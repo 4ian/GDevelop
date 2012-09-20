@@ -56,7 +56,7 @@ AdvancedTextEntryDialog::AdvancedTextEntryDialog(wxWindow* parent, std::string c
 	FlexGridSizer2->AddGrowableRow(0);
 	moreBt = new wxButton(this, ID_BUTTON1, wxEmptyString, wxDefaultPosition, wxSize(199,23), 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer2->Add(moreBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	cancelBt = new wxButton(this, ID_BUTTON2, _("Annuler"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
+	cancelBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer2->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	okBt = new wxButton(this, ID_BUTTON3, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	okBt->SetDefault();
@@ -77,9 +77,9 @@ AdvancedTextEntryDialog::AdvancedTextEntryDialog(wxWindow* parent, std::string c
 	if ( moreButtonType == None )
         moreBt->Show(false);
     else if ( moreButtonType == MathExpression )
-        moreBt->SetLabel(_("Ouvrir un éditeur d'expression"));
+        moreBt->SetLabel(_("Open an expression editor"));
     else if ( moreButtonType == TextExpression )
-        moreBt->SetLabel(_("Ouvrir un éditeur de texte"));
+        moreBt->SetLabel(_("Open a text editor"));
 }
 
 AdvancedTextEntryDialog::~AdvancedTextEntryDialog()

@@ -18,7 +18,7 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     bool searching = searchText.empty() ? false : true;
 
     sceneObjectsList->DeleteAllItems();
-    sceneObjectsList->AddRoot( _( "Tous les objets de la scène" ) );
+    sceneObjectsList->AddRoot( _( "All objects groups of the scene" ) );
 
     for ( unsigned int i = 0;i < layout.GetObjectsCount();i++ )
     {
@@ -35,7 +35,7 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     sceneObjectsList->ExpandAll();
 
     sceneGroupsList->DeleteAllItems();
-    sceneGroupsList->AddRoot( _( "Tous les groupes de la scène" ) );
+    sceneGroupsList->AddRoot( _( "All groups of the scene" ) );
 
     for ( unsigned int i = 0;i < layout.GetObjectGroups().size();i++ )
     {
@@ -52,7 +52,7 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     sceneGroupsList->ExpandAll();
 
     globalObjectsList->DeleteAllItems();
-    globalObjectsList->AddRoot( _( "Tous les objets globaux" ) );
+    globalObjectsList->AddRoot( _( "All globals objects" ) );
 
     for ( unsigned int i = 0;i < project.GetObjectsCount();i++ )
     {
@@ -69,7 +69,7 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
     globalObjectsList->ExpandAll();
 
     globalGroupsList->DeleteAllItems();
-    globalGroupsList->AddRoot( _( "Tous les groupes globaux" ) );
+    globalGroupsList->AddRoot( _( "All globals groups" ) );
 
     for ( unsigned int i = 0;i < project.GetObjectGroups().size();i++ )
     {
@@ -88,3 +88,5 @@ void ObjectListDialogsHelper::RefreshLists(wxTreeCtrl * sceneObjectsList, wxTree
 
 
 }
+
+

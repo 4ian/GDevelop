@@ -109,7 +109,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
         {
             if ( requestNumber )
             {
-                firstErrorStr = _("Nombre attendu");
+                firstErrorStr = _("Number excepted");
 
                 return false;
             }
@@ -133,14 +133,14 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
             {
                 if ( !parsingNumber )
                 {
-                    firstErrorStr = _("Erreur de syntaxe");
+                    firstErrorStr = _("Syntax error");
 
                     return false;
                 }
 
                 if ( parsingDecimalNumber )
                 {
-                    firstErrorStr = _("Erreur de syntaxe dans la formation d'un nombre.");
+                    firstErrorStr = _("Syntax error in a number.");
 
                     return false;
                 }
@@ -152,7 +152,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
             {
                 if ( parsingScientificNotationNumber )
                 {
-                    firstErrorStr = _("Erreur de syntaxe dans la formation d'un nombre.");
+                    firstErrorStr = _("Syntax error in a number.");
 
                     return false;
                 }
@@ -163,7 +163,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
             if ( numberWasParsedLast )
             {
-                firstErrorStr = _("Opérateur manquant devant un nombre");
+                firstErrorStr = _("Operator missing before a number");
 
                 return false;
             }
@@ -175,7 +175,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
         {
             if ( requestNumber )
             {
-                firstErrorStr = _("Nombre attendu");
+                firstErrorStr = _("Number excepted");
 
                 return false;
             }
@@ -192,7 +192,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
             if ( !numberWasParsedLast )
             {
-                firstErrorStr = _("Opérateur en trop avant la parenthèse.");
+                firstErrorStr = _("Superfluous operator before a paranthesis");
 
                 return false;
             }
@@ -200,14 +200,14 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
             if (parenthesisLevel>0) parenthesisLevel--;
             else
             {
-                firstErrorStr = _("Parenthèse fermante en trop");
+                firstErrorStr = _("Bad closing paranthesis");
 
                 return false;
             }
 
             if ( str[parsePos-1] == '(' )
             {
-                firstErrorStr = _("Parenthèses vides");
+                firstErrorStr = _("Empty paranthesis");
 
                 return false;
             }
@@ -217,7 +217,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
         {
             if ( requestNumber )
             {
-                firstErrorStr = _("Nombre attendu");
+                firstErrorStr = _("Number excepted");
 
                 return false;
             }
@@ -234,7 +234,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
             if ( numberWasParsedLast )
             {
-                firstErrorStr = _("Opérateur manquant devant une paranthèse");
+                firstErrorStr = _("Operator missing before a paranthesis");
 
                 return false;
             }
@@ -254,7 +254,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
             {
                 if ( requestNumber )
                 {
-                    firstErrorStr = _("Nombre attendu");
+                    firstErrorStr = _("Number excepted");
 
                     return false;
                 }
@@ -271,7 +271,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
 
                 if ( str[parsePos] != '-' && str[parsePos] != '+' && !numberWasParsedLast )
                 {
-                    firstErrorStr = _("Opérateurs accolés sans nombres entre eux");
+                    firstErrorStr = _("Operators without any number between them");
 
                     return false;
                 }
@@ -282,7 +282,7 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
         }
         else
         {
-            firstErrorStr = _("Erreur de syntaxe");
+            firstErrorStr = _("Syntax error");
 
             return false;
         }
@@ -299,21 +299,21 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
     }
     else if ( requestNumber )
     {
-        firstErrorStr = _("Nombre attendu");
+        firstErrorStr = _("Number excepted");
 
         return false;
     }
 
     if ( parenthesisLevel != 0 )
     {
-        firstErrorStr = _("Parenthèses mal formées");
+        firstErrorStr = _("Paranthesis mismatch");
 
         return false;
     }
 
     if (!numberWasParsedLast)
     {
-        firstErrorStr = _("Opérateur seul en fin d'expression");
+        firstErrorStr = _("Alone operator at the end of the expression");
 
         return false;
     }
@@ -455,7 +455,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Project & project, const gd
                     //Testing function call is properly closed
                     if(parametersEnd == expression.length() || expression[parametersEnd] != ')')
                     {
-                        firstErrorStr = _("Parenthèses non fermées");
+                        firstErrorStr = _("Paranthesis not closed");
                         firstErrorPos = parametersEnd-1;
 
                         return false;
@@ -465,9 +465,9 @@ bool ExpressionParser::ParseMathExpression(const gd::Project & project, const gd
                     if ( parameters.size() > GetMaximalParametersNumber(instructionInfos.parameters) || parameters.size() < GetMinimalParametersNumber(instructionInfos.parameters) )
                     {
                         firstErrorPos = functionNameEnd;
-                        firstErrorStr = _("Nombre de paramètre incorrect.");
+                        firstErrorStr = _("Incorrect number of parameters");
                         firstErrorStr += " ";
-                        firstErrorStr += _("Attendu ( au maximum ) :");
+                        firstErrorStr += _("Excepted ( maximum ) :");
                         firstErrorStr += ToString(GetMaximalParametersNumber(instructionInfos.parameters));
 
                         return false;
@@ -484,7 +484,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Project & project, const gd
                 else
                 {
                     firstErrorPos = functionNameEnd;
-                    firstErrorStr = _("Parenthèses des paramètres manquantes");
+                    firstErrorStr = _("Parameters' parenthesis missing");
 
                     return false;
                 }
@@ -548,7 +548,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
     if ( firstPointPos == string::npos && firstParPos == string::npos && firstQuotePos == string::npos  )
     {
         firstErrorPos = 0;
-        firstErrorStr = _("L'expression est invalide ou vide. Entrez un texte ( entouré de guillemets ) ou une fonction.");
+        firstErrorStr = _("The expression is invalid or empty. Enter a text ( surrounded by quotes ) or a function.");
 
         return false;
     }
@@ -567,7 +567,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
             if ( finalQuotePosition == string::npos )
             {
                 firstErrorPos = firstQuotePos;
-                firstErrorStr = _("Guillemets non fermés.");
+                firstErrorStr = _("Quotes not closed.");
 
                 return false;
             }
@@ -649,7 +649,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
             if ( parametersEnd == expression.length() || expression[parametersEnd] != ')' )
             {
                 firstErrorPos = parametersEnd-1;
-                firstErrorStr = _("Parenthèses non fermées");
+                firstErrorStr = _("Paranthesis not closed");
 
                 return false;
             }
@@ -672,7 +672,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
                 if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
                 {
                     firstErrorPos = functionNameEnd;
-                    firstErrorStr = _("Nombre de paramètres incorrect.");
+                    firstErrorStr = _("Incorrect number of parameters");
 
                     return false;
                 }
@@ -697,7 +697,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
                 if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
                 {
                     firstErrorPos = functionNameEnd;
-                    firstErrorStr = _("Nombre de paramètres incorrect.");
+                    firstErrorStr = _("Incorrect number of parameters");
 
                     for (unsigned int i = 0;i<parameters.size();++i)
                         cout << "Param:" << parameters[i].GetPlainString() << endl;
@@ -747,7 +747,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
                             if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
                             {
                                 firstErrorPos = functionNameEnd;
-                                firstErrorStr = _("Nombre de paramètres incorrect.");
+                                firstErrorStr = _("Incorrect number of parameters");
 
                                 return false;
                             }
@@ -771,7 +771,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
             if ( !functionFound ) //Function was not found
             {
                 firstErrorPos = nameStart;
-                firstErrorStr = _("Fonction non reconnue.");
+                firstErrorStr = _("Function not recognized.");
 
                 return false;
             }
@@ -795,14 +795,14 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
             if (nextTokenPos < firstPlusPos)
             {
                 firstErrorPos = nextTokenPos;
-                firstErrorStr = _("+ manquant entre deux chaines.");
+                firstErrorStr = _("Symbol missing between two +.");
 
                 return false;
             }
             else if ( expression.find("+", firstPlusPos+1) < nextTokenPos )
             {
                 firstErrorPos = firstPlusPos;
-                firstErrorStr = _("Symbole manquant entre deux +.");
+                firstErrorStr = _("Symbol missing between two +.");
 
                 return false;
             }
@@ -812,7 +812,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
     if ( expression.substr(parsePosition, expression.length()).find_first_not_of(" \n") != std::string::npos )
     {
         firstErrorPos = parsePosition;
-        firstErrorStr = _("Symbole erroné en fin d'expression.");
+        firstErrorStr = _("Bad symbol at the end of the expression.");
 
         return false;
     }

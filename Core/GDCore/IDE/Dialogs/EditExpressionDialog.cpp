@@ -110,7 +110,7 @@ lastErrorPos(std::string::npos)
 	wxFlexGridSizer* FlexGridSizer1;
 	wxGridSizer* GridSizer2;
 
-	Create(parent, wxID_ANY, _("Editer l\'expression"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Edit the expression"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	wxIcon FrameIcon;
 	FrameIcon.CopyFromBitmap(wxBitmap(wxImage(_T("res/expressionicon.png"))));
 	SetIcon(FrameIcon);
@@ -129,11 +129,11 @@ lastErrorPos(std::string::npos)
 	FlexGridSizer7 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer7->AddGrowableCol(0);
 	FlexGridSizer7->AddGrowableRow(0);
-	errorTxt = new wxHyperlinkCtrl(centerPanel, ID_HYPERLINKCTRL1, _("Pas d\'erreurs."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
-	errorTxt->SetToolTip(_("Cliquer pour positionner le curseur sur l\'erreur."));
+	errorTxt = new wxHyperlinkCtrl(centerPanel, ID_HYPERLINKCTRL1, _("No errors."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	errorTxt->SetToolTip(_("Click to position cursor on the error."));
 	FlexGridSizer7->Add(errorTxt, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer7, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	helpBt = new wxButton(centerPanel, ID_BUTTON34, _("Aide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON34"));
+	helpBt = new wxButton(centerPanel, ID_BUTTON34, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON34"));
 	FlexGridSizer2->Add(helpBt, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	centerPanel->SetSizer(FlexGridSizer1);
@@ -143,7 +143,7 @@ lastErrorPos(std::string::npos)
 	mathPanel = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
-	StaticText1 = new wxStaticText(mathPanel, ID_STATICTEXT1, _("Opérations courantes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(mathPanel, ID_STATICTEXT1, _("Basic operations"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer3->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	PlusBt = new wxButton(mathPanel, ID_BUTTON2, _("+"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON2"));
@@ -155,7 +155,7 @@ lastErrorPos(std::string::npos)
 	DivBt = new wxButton(mathPanel, ID_BUTTON5, _("/"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON5"));
 	BoxSizer1->Add(DivBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(BoxSizer1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText2 = new wxStaticText(mathPanel, ID_STATICTEXT2, _("Opérations complexes"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(mathPanel, ID_STATICTEXT2, _("Complex operations"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer3->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	GridSizer2 = new wxGridSizer(0, 4, 0, 0);
 	POBt = new wxButton(mathPanel, ID_BUTTON6, _("("), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON6"));
@@ -163,55 +163,55 @@ lastErrorPos(std::string::npos)
 	PFBt = new wxButton(mathPanel, ID_BUTTON7, _(")"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON7"));
 	GridSizer2->Add(PFBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button2 = new wxButton(mathPanel, ID_BUTTON13, _("^"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON13"));
-	Button2->SetToolTip(_("x^n éleve x à la puissance n"));
+	Button2->SetToolTip(_("x^n raise x to power n"));
 	GridSizer2->Add(Button2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button3 = new wxButton(mathPanel, ID_BUTTON14, _("E10"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON14"));
 	GridSizer2->Add(Button3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BitmapButton2 = new wxBitmapButton(mathPanel, ID_BITMAPBUTTON2, wxBitmap(wxImage(_T("res/sqrt.png"))), wxDefaultPosition, wxSize(25,23), wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON2"));
-	BitmapButton2->SetToolTip(_("sqrt(x) calcule la racine carrée de x."));
+	BitmapButton2->SetToolTip(_("sqrt(x) compute the square root of x."));
 	GridSizer2->Add(BitmapButton2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BitmapButton1 = new wxBitmapButton(mathPanel, ID_BITMAPBUTTON1, wxBitmap(wxImage(_T("res/nth root.png"))), wxDefaultPosition, wxSize(25,23), wxBU_AUTODRAW, wxDefaultValidator, _T("ID_BITMAPBUTTON1"));
-	BitmapButton1->SetToolTip(_("Racine n-ième. nthroot(27, 3) donnera 3"));
+	BitmapButton1->SetToolTip(_("Nth root of a number. nthroot(27, 3) will return 3."));
 	GridSizer2->Add(BitmapButton1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button4 = new wxButton(mathPanel, ID_BUTTON15, _("exp"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON15"));
-	Button4->SetToolTip(_("Exponentielle"));
+	Button4->SetToolTip(_("Exponential"));
 	GridSizer2->Add(Button4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button1 = new wxButton(mathPanel, ID_BUTTON12, _("log"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON12"));
-	Button1->SetToolTip(_("Logarithme népérien"));
+	Button1->SetToolTip(_("Natural logarithm"));
 	GridSizer2->Add(Button1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	CosBt = new wxButton(mathPanel, ID_BUTTON8, _("cos"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON8"));
-	CosBt->SetToolTip(_("Cosinus"));
+	CosBt->SetToolTip(_("Cosine"));
 	GridSizer2->Add(CosBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SinBt = new wxButton(mathPanel, ID_BUTTON9, _("sin"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON9"));
-	SinBt->SetToolTip(_("Sinus"));
+	SinBt->SetToolTip(_("Sine"));
 	GridSizer2->Add(SinBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button5 = new wxButton(mathPanel, ID_BUTTON16, _("tan"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON16"));
-	Button5->SetToolTip(_("Tangente"));
+	Button5->SetToolTip(_("Tangent"));
 	GridSizer2->Add(Button5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button21 = new wxButton(mathPanel, ID_BUTTON33, _("log10"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON33"));
 	wxFont Button21Font(6,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button21->SetFont(Button21Font);
-	Button21->SetToolTip(_("Logarithme en base 10."));
+	Button21->SetToolTip(_("Base-10 logarithm"));
 	GridSizer2->Add(Button21, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button17 = new wxButton(mathPanel, ID_BUTTON29, _("cosh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON29"));
 	wxFont Button17Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button17->SetFont(Button17Font);
-	Button17->SetToolTip(_("Cosinus hyperbolique"));
+	Button17->SetToolTip(_("Hyperbolic cosine"));
 	GridSizer2->Add(Button17, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button16 = new wxButton(mathPanel, ID_BUTTON28, _("sinh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON28"));
 	wxFont Button16Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button16->SetFont(Button16Font);
-	Button16->SetToolTip(_("Sinus hyperbolique"));
+	Button16->SetToolTip(_("Hyperbolic sine"));
 	GridSizer2->Add(Button16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button15 = new wxButton(mathPanel, ID_BUTTON27, _("tanh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON27"));
 	wxFont Button15Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button15->SetFont(Button15Font);
-	Button15->SetToolTip(_("Tangente hyperbolique"));
+	Button15->SetToolTip(_("Hyperbolic tangent"));
 	GridSizer2->Add(Button15, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button14 = new wxButton(mathPanel, ID_BUTTON26, _("floor"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON26"));
 	wxFont Button14Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button14->SetFont(Button14Font);
-	Button14->SetToolTip(_("Arrondi à l\'entier le plus petit."));
+	Button14->SetToolTip(_("Round to the smallest following integer."));
 	GridSizer2->Add(Button14, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button7 = new wxButton(mathPanel, ID_BUTTON18, _("acos"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON18"));
 	wxFont Button7Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
@@ -226,7 +226,7 @@ lastErrorPos(std::string::npos)
 	Button9->SetFont(Button9Font);
 	GridSizer2->Add(Button9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	ceilBt = new wxButton(mathPanel, ID_BUTTON21, _("ceil"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON21"));
-	ceilBt->SetToolTip(_("Arrondi à l\'entier le plus grand."));
+	ceilBt->SetToolTip(_("Round to the greatest following integer."));
 	GridSizer2->Add(ceilBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button10 = new wxButton(mathPanel, ID_BUTTON22, _("a\ncosh"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON22"));
 	wxFont Button10Font(6,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
@@ -241,55 +241,55 @@ lastErrorPos(std::string::npos)
 	Button12->SetFont(Button12Font);
 	GridSizer2->Add(Button12, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	intBt = new wxButton(mathPanel, ID_BUTTON25, _("int"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON25"));
-	intBt->SetToolTip(_("int(x) convertit x en un entier."));
+	intBt->SetToolTip(_("in(x) convert x in an integer."));
 	GridSizer2->Add(intBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button18 = new wxButton(mathPanel, ID_BUTTON30, _("sec"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON30"));
 	wxFont Button18Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button18->SetFont(Button18Font);
-	Button18->SetToolTip(_("Sécante ( 1/cos(x) )"));
+	Button18->SetToolTip(_("Secant ( 1/cos(x) )"));
 	GridSizer2->Add(Button18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button19 = new wxButton(mathPanel, ID_BUTTON31, _("csc"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON31"));
 	wxFont Button19Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button19->SetFont(Button19Font);
-	Button19->SetToolTip(_("Cosécante ( 1/sin(x) )"));
+	Button19->SetToolTip(_("Cosecant ( 1/sin(x) )"));
 	GridSizer2->Add(Button19, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button20 = new wxButton(mathPanel, ID_BUTTON32, _("cot"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON32"));
 	wxFont Button20Font(7,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	Button20->SetFont(Button20Font);
-	Button20->SetToolTip(_("Cotangente ( 1/tan(x) )"));
+	Button20->SetToolTip(_("Cotangent ( 1/tan(x) )"));
 	GridSizer2->Add(Button20, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Button6 = new wxButton(mathPanel, ID_BUTTON17, _("abs"), wxDefaultPosition, wxSize(25,23), 0, wxDefaultValidator, _T("ID_BUTTON17"));
-	Button6->SetToolTip(_("abs(x) renvoie la valeur absolue de x."));
+	Button6->SetToolTip(_("abs(x) return the absolute value of x."));
 	GridSizer2->Add(Button6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3->Add(GridSizer2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	mathPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(mathPanel);
 	FlexGridSizer3->SetSizeHints(mathPanel);
-	mgr->AddPane(mathPanel, wxAuiPaneInfo().Name(_T("mathPane")).Caption(_("Opérations et fonctions mathématiques")).CaptionVisible().CloseButton(false).Bottom().Resizable(false));
+	mgr->AddPane(mathPanel, wxAuiPaneInfo().Name(_T("mathPane")).Caption(_("Mathematical functions and operators")).CaptionVisible().CloseButton(false).Bottom().Resizable(false));
 	objectsPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	FlexGridSizer4 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
 	FlexGridSizer4->AddGrowableRow(0);
 	ObjList = new wxTreeCtrl(objectsPanel, ID_TREECTRL1, wxDefaultPosition, wxSize(195,177), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
 	FlexGridSizer4->Add(ObjList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	AddPropBt = new wxButton(objectsPanel, ID_BUTTON10, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
+	AddPropBt = new wxButton(objectsPanel, ID_BUTTON10, _("Add"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON10"));
 	FlexGridSizer4->Add(AddPropBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	objectsPanel->SetSizer(FlexGridSizer4);
 	FlexGridSizer4->Fit(objectsPanel);
 	FlexGridSizer4->SetSizeHints(objectsPanel);
-	mgr->AddPane(objectsPanel, wxAuiPaneInfo().Name(_T("objectsPane")).Caption(_("Fonctions d'objets")).CaptionVisible().CloseButton(false).Bottom());
+	mgr->AddPane(objectsPanel, wxAuiPaneInfo().Name(_T("objectsPane")).Caption(_("Objects functions")).CaptionVisible().CloseButton(false).Bottom());
 	freeFunctionsPanel = new wxPanel(this, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer5 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer5->AddGrowableCol(0);
 	FlexGridSizer5->AddGrowableRow(0);
 	ValList = new wxTreeCtrl(freeFunctionsPanel, ID_TREECTRL2, wxDefaultPosition, wxSize(178,147), wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL2"));
 	FlexGridSizer5->Add(ValList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	AddValBt = new wxButton(freeFunctionsPanel, ID_BUTTON11, _("Ajouter"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON11"));
+	AddValBt = new wxButton(freeFunctionsPanel, ID_BUTTON11, _("Add"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON11"));
 	FlexGridSizer5->Add(AddValBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	freeFunctionsPanel->SetSizer(FlexGridSizer5);
 	FlexGridSizer5->Fit(freeFunctionsPanel);
 	FlexGridSizer5->SetSizeHints(freeFunctionsPanel);
-	mgr->AddPane(freeFunctionsPanel, wxAuiPaneInfo().Name(_T("freeFunctionsPane")).Caption(_("Autres fonctions")).CaptionVisible().CloseButton(false).Bottom());
+	mgr->AddPane(freeFunctionsPanel, wxAuiPaneInfo().Name(_T("freeFunctionsPane")).Caption(_("Other functions")).CaptionVisible().CloseButton(false).Bottom());
 	mgr->Update();
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpressionDialog::OnOkBtClick);
@@ -473,7 +473,7 @@ void EditExpressionDialog::TextModified(wxStyledTextEvent& event)
     }
     else
     {
-        errorTxt->SetLabel(_("Pas d'erreurs."));
+        errorTxt->SetLabel(_("No errors."));
         lastErrorPos = std::string::npos;
     }
 
@@ -487,7 +487,7 @@ void EditExpressionDialog::OnOkBtClick(wxCommandEvent& event)
 
     if ( !expressionParser.ParseMathExpression(project, layout, callbacks) )
     {
-        if ( wxMessageBox(_("L'expression est mal formulée. Êtes vous sûr de vouloir valider cette expression ?"), _("L'expression contient une ou plusieurs erreurs."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
+        if ( wxMessageBox(_("The expression is malformed. Are you sur you want to validate this expression \?"), _("The expression contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
     }
 
@@ -497,10 +497,10 @@ void EditExpressionDialog::OnOkBtClick(wxCommandEvent& event)
 void EditExpressionDialog::RefreshLists()
 {
     ObjList->DeleteAllItems();
-    ObjList->AddRoot( _( "Toutes les proprietés" ), 0 );
+    ObjList->AddRoot( _( "All properties" ), 0 );
 
     ValList->DeleteAllItems();
-    ValList->AddRoot( _( "Toutes les valeurs spéciales" ), 0 );
+    ValList->AddRoot( _( "All special values" ), 0 );
 
     const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetPlatform().GetAllPlatformExtensions();
 
@@ -521,8 +521,8 @@ void EditExpressionDialog::RefreshLists()
 	    for(unsigned int j = 0;j<objectsTypes.size();++j)
 	    {
             wxTreeItemId objectTypeItem =   objectsTypes[j] == "" ?
-                                            ObjList->AppendItem(extensionItem, _("Tous les objets"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Objet") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),0) ;
+                                            ObjList->AppendItem(extensionItem, _("All objects"), 0) :
+                                            ObjList->AppendItem(extensionItem, _("Object") + wxString(" ") + extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),0) ;
 
             //Add each object expression
             std::map<string, gd::ExpressionMetadata > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
@@ -556,8 +556,8 @@ void EditExpressionDialog::RefreshLists()
 	    for(unsigned int j = 0;j<automatismsTypes.size();++j)
 	    {
             wxTreeItemId automatismTypeItem =   automatismsTypes[j] == "" ?
-                                            ObjList->AppendItem(extensionItem, _("Tous les objets"), 0) :
-                                            ObjList->AppendItem(extensionItem, _("Automatisme") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),0) ;
+                                            ObjList->AppendItem(extensionItem, _("All objects"), 0) :
+                                            ObjList->AppendItem(extensionItem, _("Automatism") + wxString(" ") + extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName(),0) ;
 
             //Add each automatism expression
             std::map<string, gd::ExpressionMetadata > allAutoExpr = extensions[i]->GetAllExpressionsForAutomatism(automatismsTypes[j]);
@@ -670,7 +670,7 @@ string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & p
 {
     if ( parameterMetadata.type == "expression" )
     {
-        gd::AdvancedTextEntryDialog dialog(this, ToString(_("Paramètre")), parameterMetadata.description, "0", AdvancedTextEntryDialog::MathExpression, &project, &layout);
+        gd::AdvancedTextEntryDialog dialog(this, ToString(_("Parameter")), parameterMetadata.description, "0", AdvancedTextEntryDialog::MathExpression, &project, &layout);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -678,7 +678,7 @@ string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & p
     }
     else if ( parameterMetadata.type == "string" )
     {
-        gd::AdvancedTextEntryDialog dialog(this, ToString(_("Paramètre")), parameterMetadata.description, "\"\"", AdvancedTextEntryDialog::TextExpression, &project, &layout);
+        gd::AdvancedTextEntryDialog dialog(this, ToString(_("Parameter")), parameterMetadata.description, "\"\"", AdvancedTextEntryDialog::TextExpression, &project, &layout);
         if ( dialog.ShowModal() == wxOK )
             return dialog.text;
         else
@@ -733,12 +733,12 @@ string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & p
     }
     else if ( parameterMetadata.type == "camera" )
     {
-        string param = ToString(wxGetTextFromUser(parameterMetadata.description, _("Numéro de la caméra"), "0", this));
+        string param = ToString(wxGetTextFromUser(parameterMetadata.description, _("Camera number"), "0", this));
         return param;
     }
     else
     {
-        string param = ToString(wxGetTextFromUser(parameterMetadata.description, _("Paramètre"), "", this));
+        string param = ToString(wxGetTextFromUser(parameterMetadata.description, _("Parameter"), "", this));
         return param;
     }
 
@@ -961,10 +961,17 @@ void EditExpressionDialog::OnButton17Click(wxCommandEvent& event)
 
 void EditExpressionDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    if ( GDpriv::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(145);
     else
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_expr"));
 }
 
 }
+
+
+
+
+
+
+

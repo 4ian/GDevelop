@@ -42,15 +42,15 @@ class Extension : public ExtensionBase
         Extension()
         {
             DECLARE_THE_EXTENSION("PrimitiveDrawing",
-                          _("Dessin primitif"),
-                          _("Extension permettant de dessiner directement des formes et de manipuler des images."),
+                          _("Primitive drawing"),
+                          _("Extension allowing to draw shapes and manipulate images."),
                           "Compil Games",
                           "zlib/libpng License ( Open Source )")
 
             //Declaration of all objects available
             DECLARE_OBJECT("Drawer",
-                           _("Dessinateur manuel"),
-                           _("Objet permettant de dessiner à l'écran"),
+                           _("Drawer"),
+                           _("Object allowing to draw on screen"),
                            "Extensions/primitivedrawingicon.png",
                            &CreateDrawerObject,
                            &DestroyDrawerObject,
@@ -62,17 +62,17 @@ class Extension : public ExtensionBase
 
                 DECLARE_OBJECT_ACTION("Rectangle",
                                _("Rectangle"),
-                               _("Dessine un rectangle à l'écran"),
-                               _("Dessiner de _PARAM1_;_PARAM2_ à _PARAM3_;_PARAM4_ un rectangle avec _PARAM0_"),
-                               _("Dessin"),
+                               _("Draw a rectangle on screen"),
+                               _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a rectangle with _PARAM0_"),
+                               _("Drawing"),
                                "res/actions/rectangle24.png",
                                "res/actions/rectangle.png");
 
-                    instrInfo.AddParameter("object", _("Objet dessinateur"), "Drawer", false);
-                    instrInfo.AddParameter("expression", _("Position X du point haut gauche"), "", false);
-                    instrInfo.AddParameter("expression", _("Position Y du point haut gauche"), "", false);
-                    instrInfo.AddParameter("expression", _("Position X du point bas droit"), "", false);
-                    instrInfo.AddParameter("expression", _("Position Y du point bas droit"), "", false);
+                    instrInfo.AddParameter("object", _("Drawer object"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Top left side: X Position"), "", false);
+                    instrInfo.AddParameter("expression", _("Top left side : Y Position"), "", false);
+                    instrInfo.AddParameter("expression", _("Bottom right side : X Position"), "", false);
+                    instrInfo.AddParameter("expression", _("Bottom right side : Y Position"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("DrawRectangle").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
@@ -80,17 +80,17 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_ACTION("Circle",
-                               _("Cercle"),
-                               _("Dessine un cercle à l'écran"),
-                               _("Dessiner en _PARAM1_;_PARAM2_ un cercle de rayon _PARAM3_ avec _PARAM0_"),
-                               _("Dessin"),
+                               _("Circle"),
+                               _("Draw a circle on screen"),
+                               _("Draw at _PARAM1_;_PARAM2_ a circle of radius _PARAM3_ with _PARAM0_"),
+                               _("Drawing"),
                                "res/actions/circle24.png",
                                "res/actions/circle.png");
 
-                    instrInfo.AddParameter("object", _("Objet dessinateur"), "Drawer", false);
-                    instrInfo.AddParameter("expression", _("Position X du centre"), "", false);
-                    instrInfo.AddParameter("expression", _("Position Y du centre"), "", false);
-                    instrInfo.AddParameter("expression", _("Rayon en pixels"), "", false);
+                    instrInfo.AddParameter("object", _("Drawer object"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("X position of center"), "", false);
+                    instrInfo.AddParameter("expression", _("Y position of center"), "", false);
+                    instrInfo.AddParameter("expression", _("Radius ( in pixels )"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("DrawCircle").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
@@ -98,19 +98,19 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_ACTION("Line",
-                               _("Ligne"),
-                               _("Dessine une ligne à l'écran"),
-                               _("Dessiner de _PARAM1_;_PARAM2_ à _PARAM3_;_PARAM4_ une ligne ( épaisseur  : _PARAM5_) avec _PARAM0_"),
-                               _("Dessin"),
+                               _("Line"),
+                               _("Draw a line  on screen"),
+                               _("Draw from _PARAM1_;_PARAM2_ to _PARAM3_;_PARAM4_ a line ( thickness  : _PARAM5_) with _PARAM0_"),
+                               _("Drawing"),
                                "res/actions/line24.png",
                                "res/actions/line.png");
 
-                    instrInfo.AddParameter("object", _("Objet dessinateur"), "Drawer", false);
-                    instrInfo.AddParameter("expression", _("Position X du point de départ"), "", false);
-                    instrInfo.AddParameter("expression", _("Position Y du point de départ"), "", false);
-                    instrInfo.AddParameter("expression", _("Position X du point d'arrivée"), "", false);
-                    instrInfo.AddParameter("expression", _("Position Y du point d'arrivée"), "", false);
-                    instrInfo.AddParameter("expression", _("Epaisseur en pixels"), "", false);
+                    instrInfo.AddParameter("object", _("Drawer object"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("X Position of start point"), "", false);
+                    instrInfo.AddParameter("expression", _("Y Position of start point"), "", false);
+                    instrInfo.AddParameter("expression", _("X Position of end point"), "", false);
+                    instrInfo.AddParameter("expression", _("Y Position of end point"), "", false);
+                    instrInfo.AddParameter("expression", _("Thickness ( in pixels )"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("DrawLine").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
@@ -118,15 +118,15 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_ACTION("FillColor",
-                               _("Couleur de remplissage"),
-                               _("Change la couleur de remplissage pour le dessin."),
-                               _("Changer la couleur de remplissage de _PARAM0_ en _PARAM1_"),
-                               _("Paramétrage"),
+                               _("Fill color"),
+                               _("Change the color of filling"),
+                               _("Change fill color of _PARAM0_ to _PARAM1_"),
+                               _("Setup"),
                                "res/actions/text24.png",
                                "res/actions/text.png");
 
-                    instrInfo.AddParameter("object", _("Objet dessinateur"), "Drawer", false);
-                    instrInfo.AddParameter("color", _("Couleur de remplissage"), "", false);
+                    instrInfo.AddParameter("object", _("Drawer object"), "Drawer", false);
+                    instrInfo.AddParameter("color", _("Fill color"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetFillColor").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
@@ -134,15 +134,15 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_ACTION("OutlineColor",
-                               _("Couleur du contour"),
-                               _("Change la couleur du contour des futurs dessins."),
-                               _("Changer la couleur du contour de _PARAM0_ en _PARAM1_"),
-                               _("Paramétrage"),
+                               _("Outline color"),
+                               _("Modify the color of the outline of future drawings."),
+                               _("Change outline color of _PARAM0_ to _PARAM1_"),
+                               _("Setup"),
                                "res/actions/color24.png",
                                "res/actions/color.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
-                    instrInfo.AddParameter("color", _("Couleur"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Drawer", false);
+                    instrInfo.AddParameter("color", _("Color"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetOutlineColor").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
@@ -150,16 +150,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_ACTION("OutlineSize",
-                               _("Taille du contour"),
-                               _("Modifie la taille du contour des futurs dessins."),
-                               _("Faire _PARAM2__PARAM1_ à la taille du contour de _PARAM0_"),
-                               _("Paramétrage"),
+                               _("Outline size"),
+                               _("Modify the size of the outline of future drawings."),
+                               _("Do _PARAM2__PARAM1_ to the size of the outline of _PARAM0_"),
+                               _("Setup"),
                                "res/actions/outlineSize24.png",
                                "res/actions/outlineSize.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
-                    instrInfo.AddParameter("expression", _("Taille en pixels"), "", false);
-                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Size in pixels"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetOutlineSize").SetManipulatedType("number").SetAssociatedGetter("GetOutlineSize").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
@@ -167,16 +167,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_CONDITION("OutlineSize",
-                               _("Taille du contour"),
-                               _("Teste la taille du contour."),
-                               _("La taille du contour de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                               _("Paramétrage"),
+                               _("Outline size"),
+                               _("Test the size of the outline."),
+                               _("The size of the outline of _PARAM0_ is _PARAM2__PARAM1_"),
+                               _("Setup"),
                                "res/conditions/outlineSize24.png",
                                "res/conditions/outlineSize.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
-                    instrInfo.AddParameter("expression", _("Taille à tester"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Size to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetOutlineSize").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
@@ -184,16 +184,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_CONDITION()
 
                 DECLARE_OBJECT_ACTION("FillOpacity",
-                               _("Opacité du remplissage"),
-                               _("Modifie la transparence du remplissage des futurs dessins."),
-                               _("Faire _PARAM2__PARAM1_ à l'opacité du remplissage de _PARAM0_"),
-                               _("Paramétrage"),
+                               _("Fill opacity"),
+                               _("Modify the opacity of filling of future drawings."),
+                               _("Do _PARAM2__PARAM1_ to the opacity of filling of _PARAM0_"),
+                               _("Setup"),
                                "res/actions/opacity24.png",
                                "res/actions/opacity.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
-                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Value"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetFillOpacity").SetManipulatedType("number").SetAssociatedGetter("GetFillOpacity").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
@@ -202,16 +202,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_CONDITION("FillOpacity",
-                               _("Opacité du remplissage"),
-                               _("Teste la valeur de l'opacité du remplissage."),
-                               _("L'opacité du remplissage de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                               _("Paramétrage"),
+                               _("Fill opacity"),
+                               _("Test the value of the opacity of the filling."),
+                               _("The opacity of filling of _PARAM0_ is _PARAM2__PARAM1_"),
+                               _("Setup"),
                                "res/conditions/opacity24.png",
                                "res/conditions/opacity.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
-                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetFillOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
@@ -219,16 +219,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_CONDITION()
 
                 DECLARE_OBJECT_ACTION("OutlineOpacity",
-                               _("Opacité du contour"),
-                               _("Modifie l'opacité du contour des futurs dessins."),
-                               _("Faire _PARAM2__PARAM1_ à l'opacité du contour de _PARAM0_"),
-                               _("Paramétrage"),
+                               _("Outline opacity"),
+                               _("Modify the opacity of the outline of future drawings."),
+                               _("Do _PARAM2__PARAM1_ to the opacity of the outline of _PARAM0_"),
+                               _("Setup"),
                                "res/actions/opacity24.png",
                                "res/actions/opacity.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
-                    instrInfo.AddParameter("expression", _("Valeur"), "", false);
-                    instrInfo.AddParameter("operator", _("Signe de la modification"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Value"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("SetOutlineOpacity").SetManipulatedType("number").SetAssociatedGetter("GetOutlineOpacity").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
@@ -236,16 +236,16 @@ class Extension : public ExtensionBase
                 DECLARE_END_OBJECT_ACTION()
 
                 DECLARE_OBJECT_CONDITION("OutlineOpacity",
-                               _("Opacité du contour"),
-                               _("Teste la valeur de l'opacité du contour."),
-                               _("L'opacité du contour de _PARAM0_ est _PARAM2_ à _PARAM1_"),
-                               _("Paramétrage"),
+                               _("Outline opacity"),
+                               _("Test the opacity of the outline."),
+                               _("The opacity of the outline of _PARAM0_ is _PARAM2__PARAM1_"),
+                               _("Setup"),
                                "res/conditions/opacity24.png",
                                "res/conditions/opacity.png");
 
-                    instrInfo.AddParameter("object", _("Objet"), "Drawer", false);
-                    instrInfo.AddParameter("expression", _("Valeur à tester"), "", false);
-                    instrInfo.AddParameter("relationalOperator", _("Signe du test"), "", false);
+                    instrInfo.AddParameter("object", _("Object"), "Drawer", false);
+                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
 
                     instrInfo.cppCallingInformation.SetFunctionName("GetOutlineOpacity").SetManipulatedType("number").SetIncludeFile("PrimitiveDrawing/DrawerObject.h");
@@ -259,18 +259,18 @@ class Extension : public ExtensionBase
             #if defined(GD_IDE_ONLY)
 
             DECLARE_ACTION("CopyImageOnAnother",
-                           _("Copier une image sur une autre"),
-                           _("Copie une image sur une autre.\nNotez qu'il est préférable que l'image source reste chargée en mémoire si l'opération est répétée."),
-                           _("Copier l'image _PARAM1_ sur _PARAM0_ à l'emplacement _PARAM2_;_PARAM3_"),
+                           _("Copy an image on another"),
+                           _("Copy an image on another.\nNote that the source image must be preferably kept loaded in memory."),
+                           _("Copy the image _PARAM1_ on _PARAM0_ at _PARAM2_;_PARAM3_"),
                            _("Images"),
                            "res/copy24.png",
                            "res/copyicon.png");
 
-                instrInfo.AddParameter("string", _("Nom de l'image à modifier"), "", false);
-                instrInfo.AddParameter("string", _("Nom de l'image source"), "", false);
-                instrInfo.AddParameter("expression", _("Position X"), "", false);
-                instrInfo.AddParameter("expression", _("Position Y"), "", false);
-                instrInfo.AddParameter("yesorno", _("Utiliser la transparence de la source ( non si vide )"), "",false);
+                instrInfo.AddParameter("string", _("Name of the image to modify"), "", false);
+                instrInfo.AddParameter("string", _("Name of the source image"), "", false);
+                instrInfo.AddParameter("expression", _("X position"), "", false);
+                instrInfo.AddParameter("expression", _("Y position"), "", false);
+                instrInfo.AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false);
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::CopyImageOnAnother").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
@@ -279,66 +279,66 @@ class Extension : public ExtensionBase
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("CaptureScreen",
-                           _("Capturer l'écran"),
-                           _("Effectue une copie de l'écran et l'enregistre dans le fichier indiqué et/ou\ndans l'image de la banque d'images indiquée."),
-                           _("Faire une copie de l'écran ( L'enregistrer dans le fichier _PARAM1_ et/ou dans l'image _PARAM2_ )"),
+                           _("Capture the screen"),
+                           _("Capture the screen and save it into the specified folder and/or\nin the specified image."),
+                           _("Capture the screen ( Save it in file _PARAM1_ and/or in image _PARAM2_ )"),
                            _("Images"),
                            "res/imageicon24.png",
                            "res/imageicon.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddParameter("string", _("Nom du fichier sous lequel enregistrer la capture"), "", true).SetDefaultValue("");
-                instrInfo.AddParameter("string", _("Nom de l'image sous laquelle enregistrer la capture"), "", true).SetDefaultValue("");
+                instrInfo.AddParameter("string", _("File where save capture"), "", true).SetDefaultValue("");
+                instrInfo.AddParameter("string", _("Name of the image where capture must be saved"), "", true).SetDefaultValue("");
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::CaptureScreen").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("CreateSFMLTexture",
-                           _("Créer une image en mémoire"),
-                           _("Créé une image en mémoire, stockée dans la banque d'images du jeu.\nVous pouvez par exemple ensuite ouvrir une image depuis le disque et la stocker dedans"),
-                           _("Créer une image nommée _PARAM1_ en mémoire ( Largeur : _PARAM2_, Hauteur : _PARAM3_, Couleur : _PARAM4_ )"),
+                           _("Create an image in memory"),
+                           _("Create an image in memory."),
+                           _("Create image _PARAM1_ in memory ( Width: _PARAM2_, Height: _PARAM3_, Color: _PARAM4_ )"),
                            _("Images"),
                            "res/imageicon24.png",
                            "res/imageicon.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddParameter("string", _("Nom de l'image"), "", false);
-                instrInfo.AddParameter("expression", _("Largeur"), "", true);
-                instrInfo.AddParameter("expression", _("Hauteur"), "", true);
-                instrInfo.AddParameter("color", _("Couleur initiale"), "", true).SetDefaultValue("0;0;0");
+                instrInfo.AddParameter("string", _("Name of the image"), "", false);
+                instrInfo.AddParameter("expression", _("Width"), "", true);
+                instrInfo.AddParameter("expression", _("Height"), "", true);
+                instrInfo.AddParameter("color", _("Initial color"), "", true).SetDefaultValue("0;0;0");
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::CreateSFMLTexture").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("OpenSFMLTextureFromFile",
-                           _("Ouvrir une image depuis un fichier"),
-                           _("Charge en mémoire une image depuis un fichier."),
-                           _("Charger en mémoire le fichier _PARAM1_ dans l'image _PARAM2_"),
+                           _("Open an image from a file"),
+                           _("Load in memory an image from a file."),
+                           _("Load in memory file _PARAM1_ inside image _PARAM2_"),
                            _("Images"),
                            "res/imageicon24.png",
                            "res/imageicon.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddParameter("file", _("Nom du ficher"), "", false);
-                instrInfo.AddParameter("string", _("Nom de l'image"), "", false);
+                instrInfo.AddParameter("file", _("File"), "", false);
+                instrInfo.AddParameter("string", _("Name of the image"), "", false);
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::OpenSFMLTextureFromFile").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
             DECLARE_END_ACTION()
 
             DECLARE_ACTION("SaveSFMLTextureToFile",
-                           _("Enregistrer une image dans un fichier"),
-                           _("Enregistre une image dans un fichier."),
-                           _("Sauver l'image _PARAM2_ dans le fichier _PARAM1_"),
+                           _("Save an image to a file"),
+                           _("Save an image to a file"),
+                           _("Save image _PARAM2_ to file _PARAM1_"),
                            _("Images"),
                            "res/imageicon24.png",
                            "res/imageicon.png");
 
                 instrInfo.AddCodeOnlyParameter("currentScene", "");
-                instrInfo.AddParameter("file", _("Nom du ficher"), "", false);
-                instrInfo.AddParameter("string", _("Nom de l'image"), "", false);
+                instrInfo.AddParameter("file", _("File"), "", false);
+                instrInfo.AddParameter("string", _("Name of the image"), "", false);
 
                 instrInfo.cppCallingInformation.SetFunctionName("GDpriv::PrimitiveDrawingTools::SaveSFMLTextureToFile").SetIncludeFile("PrimitiveDrawing/PrimitiveDrawingTools.h");
 
@@ -407,3 +407,4 @@ extern "C" ExtensionBase * GD_EXTENSION_API CreateGDExtension() {
 extern "C" void GD_EXTENSION_API DestroyGDExtension(ExtensionBase * p) {
     delete p;
 }
+

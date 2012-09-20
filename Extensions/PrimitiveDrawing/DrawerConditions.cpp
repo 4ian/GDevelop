@@ -87,3 +87,10 @@ bool DrawerObject::CondOutlineOpacity( RuntimeScene & scene, ObjectsConcerned & 
 
     return false;
 }
+
+
+
+
+
+
+

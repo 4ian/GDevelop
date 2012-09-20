@@ -44,3 +44,4 @@ void GD_EXTENSION_API SaveSFMLTextureToFile( RuntimeScene & scene, const std::st
 }
 
 #endif // PRIMITIVEDRAWINGTOOLS_H
+

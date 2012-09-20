@@ -106,3 +106,4 @@ class DrawerObjectEditor: public wxDialog
 #endif
 
 #endif
+

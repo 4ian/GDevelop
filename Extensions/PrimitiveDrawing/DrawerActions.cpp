@@ -191,3 +191,10 @@ bool ActCopyImageOnAnother( RuntimeScene & scene, ObjectsConcerned & objectsConc
 
     return true;
 }
+
+
+
+
+
+
+

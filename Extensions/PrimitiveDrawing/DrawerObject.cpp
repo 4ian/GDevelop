@@ -255,11 +255,11 @@ void DrawerObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPositi
 
 void DrawerObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Couleur de remplissage");    value = ToString(fillColorR)+";"+ToString(fillColorG)+";"+ToString(fillColorB);}
-    else if ( propertyNb == 1 ) {name = _("Opacité du remplissage");    value = ToString(fillOpacity);}
-    else if ( propertyNb == 2 ) {name = _("Taille du contour");         value = ToString(outlineSize);}
-    else if ( propertyNb == 3 ) {name = _("Couleur du contour");        value = ToString(outlineColorR)+";"+ToString(outlineColorG)+";"+ToString(outlineColorB);}
-    else if ( propertyNb == 4 ) {name = _("Opacité du contour");        value = ToString(outlineOpacity);}
+    if      ( propertyNb == 0 ) {name = _("Fill color");    value = ToString(fillColorR)+";"+ToString(fillColorG)+";"+ToString(fillColorB);}
+    else if ( propertyNb == 1 ) {name = _("Fill opacity");    value = ToString(fillOpacity);}
+    else if ( propertyNb == 2 ) {name = _("Outline size");         value = ToString(outlineSize);}
+    else if ( propertyNb == 3 ) {name = _("Outline color");        value = ToString(outlineColorR)+";"+ToString(outlineColorG)+";"+ToString(outlineColorB);}
+    else if ( propertyNb == 4 ) {name = _("Outline opacity");        value = ToString(outlineOpacity);}
 }
 
 bool DrawerObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -508,3 +508,4 @@ Object * CreateDrawerObject(std::string name)
 {
     return new DrawerObject(name);
 }
+

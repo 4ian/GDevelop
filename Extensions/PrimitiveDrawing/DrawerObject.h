@@ -163,3 +163,4 @@ void DestroyDrawerObject(Object * object);
 Object * CreateDrawerObject(std::string name);
 
 #endif // DRAWEROBJECT_H
+

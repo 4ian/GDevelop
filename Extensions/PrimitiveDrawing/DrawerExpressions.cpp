@@ -39,3 +39,10 @@ double DrawerObject::ExpOutlineOpacity( const RuntimeScene & scene, ObjectsConce
 {
     return outlineOpacity;
 }
+
+
+
+
+
+
+

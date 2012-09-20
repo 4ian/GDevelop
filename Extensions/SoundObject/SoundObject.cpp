@@ -310,11 +310,11 @@ void SoundObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrappe
 
 void SoundObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
-    if      ( propertyNb == 0 ) {name = _("Volume");                    value = ToString(GetVolume());}
-    else if ( propertyNb == 1 ) {name = _("Distance minimale");         value = ToString(GetMinDistance());}
-    else if ( propertyNb == 2 ) {name = _("Atténuation");               value = ToString(GetAttenuation());}
-    else if ( propertyNb == 3 ) {name = _("En boucle");                 value = IsLooping() ? _("Oui") : _("Non");}
-    else if ( propertyNb == 4 ) {name = _("Position Z");                          value = ToString(GetZPos());}
+    if      ( propertyNb == 0 ) {name = _("Sound level");                    value = ToString(GetVolume());}
+    else if ( propertyNb == 1 ) {name = _("Minimal distance");         value = ToString(GetMinDistance());}
+    else if ( propertyNb == 2 ) {name = _("Attenuation");               value = ToString(GetAttenuation());}
+    else if ( propertyNb == 3 ) {name = _("Loop");                 value = IsLooping() ? _("Yes") : _("No");}
+    else if ( propertyNb == 4 ) {name = _("Z Position");                          value = ToString(GetZPos());}
 }
 
 bool SoundObject::ChangeProperty(unsigned int propertyNb, string newValue)
@@ -322,7 +322,7 @@ bool SoundObject::ChangeProperty(unsigned int propertyNb, string newValue)
     if(propertyNb == 0) {SetVolume(ToFloat(newValue));}
     else if (propertyNb == 1) {SetMinDistance(ToFloat(newValue));}
     else if (propertyNb == 2) {SetAttenuation(ToFloat(newValue));}
-    else if (propertyNb == 3) {SetLooping(!(newValue == _("Non")));}
+    else if (propertyNb == 3) {SetLooping(!(newValue == _("No")));}
     else if (propertyNb == 4) {SetZPos(ToFloat(newValue));}
     return true;
 }
@@ -513,3 +513,4 @@ Object * CreateSoundObject(std::string name)
 {
     return new SoundObject(name);
 }
+

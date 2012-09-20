@@ -96,3 +96,4 @@ float GD_EXTENSION_API GetGlobalVolume()
 {
     return sf::Listener::GetGlobalVolume();
 }
+

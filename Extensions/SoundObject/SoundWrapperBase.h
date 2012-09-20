@@ -169,3 +169,4 @@ class MusicWrapper : public SoundWrapperBase
 };
 
 #endif // SOUNDWRAPPERBASE_H
+

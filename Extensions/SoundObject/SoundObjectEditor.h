@@ -120,3 +120,4 @@ class SoundObjectEditor: public wxDialog
 
 #endif
 #endif
+

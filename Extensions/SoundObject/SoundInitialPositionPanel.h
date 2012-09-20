@@ -67,3 +67,4 @@ class SoundInitialPositionPanel: public wxPanel
 
 #endif
 #endif
+

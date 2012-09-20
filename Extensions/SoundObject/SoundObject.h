@@ -158,3 +158,4 @@ void DestroySoundObject(Object * object);
 Object * CreateSoundObject(std::string name);
 
 #endif // SoundObject_H
+

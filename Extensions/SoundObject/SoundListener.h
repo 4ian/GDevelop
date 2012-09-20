@@ -46,3 +46,4 @@ void GD_EXTENSION_API SetGlobalVolume(const float & globalVolume);
 float GD_EXTENSION_API GetGlobalVolume();
 
 #endif
+

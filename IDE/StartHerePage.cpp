@@ -10,6 +10,7 @@
 #include <wx/config.h>
 #include <wx/dcclient.h>
 #include <wx/dcbuffer.h>
+#include <wx/filedlg.h>
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/CommonTools.h"

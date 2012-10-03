@@ -137,30 +137,27 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
         return;
 
     Game secondGame;
-    OpenSaveGame open(secondGame);
-    open.OpenFromFile(static_cast<string>( dialog.GetPath() ));
+    secondGame.LoadFromFile(static_cast<string>( dialog.GetPath() ));
 
     if ( ImageCheck->GetValue() )
     {
-        for(unsigned int i = 0;i<secondGame.resourceManager.resources.size();i++)
+        std::vector<std::string> resources = secondGame.GetResourcesManager().GetAllResourcesList();
+        for(unsigned int i = 0;i<resources.size();i++)
         {
-            if ( secondGame.resourceManager.resources[i] == boost::shared_ptr<Resource>() )
-                continue;
-
-            if ( game.resourceManager.HasResource(secondGame.resourceManager.resources[i]->name) )
+            if ( game.GetResourcesManager().HasResource(resources[i]) )
             {
                 wxString depart = _("A resource named \"");
                 wxString fin = _("\" already exists in the game. Do you want to replace it \?");
-                if (wxMessageBox(depart+secondGame.resourceManager.resources[i]->name+fin, "Une ressource de ce nom existe déjà",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+resources[i]+fin, _("A resource with this name already exists"),wxYES_NO ) == wxYES)
                 {
                     //Remplacement
-                    game.resourceManager.RemoveResource(secondGame.resourceManager.resources[i]->name);
-                    game.resourceManager.resources.push_back(secondGame.resourceManager.resources[i]->Clone());
+                    game.GetResourcesManager().RemoveResource(resources[i]);
+                    game.GetResourcesManager().AddResource(secondGame.GetResourcesManager().GetResource(resources[i]));
                 }
 
             }
             else
-                game.resourceManager.resources.push_back(secondGame.resourceManager.resources[i]->Clone());
+                game.GetResourcesManager().AddResource(secondGame.GetResourcesManager().GetResource(resources[i]));
         }
     }
     if ( ScenesCheck->GetValue() )

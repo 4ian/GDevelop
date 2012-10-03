@@ -11,6 +11,7 @@
 #include <wx/log.h>
 #include <wx/help.h>
 #include <wx/config.h>
+#include <wx/msgdlg.h>
 #include <string>
 #include <vector>
 #include <algorithm>

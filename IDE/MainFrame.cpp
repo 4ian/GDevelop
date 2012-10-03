@@ -32,17 +32,15 @@
 #include <list>
 #include <sstream>
 #include "GDAuiTabArt.h"
-
-#ifdef __WXMSW__
-#include <wx/msw/winundef.h>
-#endif
-
 #include "MainFrame.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
+#ifdef __WXMSW__
+#include <wx/msw/winundef.h>
+#endif
 #include "MyStatusBar.h"
 #include "EditorObjets.h"
 #include "EventsEditor.h"
@@ -392,12 +390,10 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
         }
 
         {
-            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Selected resource"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
+            wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("View"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
-            ribbonBar->AddButton(ResourcesEditor::idRibbonMod, !hideLabels ? _("Name") : "", wxBitmap("res/editname24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonModFile, !hideLabels ? _("Change the file") : "", wxBitmap("res/openicon24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonModProp, !hideLabels ? _("Properties") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonPaintProgram, !hideLabels ? _("Edit") : "", wxBitmap("res/paint24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPreview, !hideLabels ? _("Preview") : "", wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPropertyGrid, !hideLabels ? _("Properties grid") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
         }
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -501,7 +497,6 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     {
         games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
         SetCurrentGame(0);
-        projectManager->Refresh();
     }
 }
 void MainFrame::OnResize(wxSizeEvent& event)
@@ -526,7 +521,7 @@ MainFrame::~MainFrame()
 
 /** Change current project
   */
-void MainFrame::SetCurrentGame(unsigned int i)
+void MainFrame::SetCurrentGame(unsigned int i, bool refreshProjectManager)
 {
     gameCurrentlyEdited = i;
     if ( i >= games.size())
@@ -541,6 +536,8 @@ void MainFrame::SetCurrentGame(unsigned int i)
         SetTitle( GD + " - [" + games[i]->GetName() + "] "+games[i]->GetProjectFile() );
         projectPropertiesPnl->SetProject(games[i].get()); //Update editors displaying current project properties
     }
+
+    if ( refreshProjectManager ) projectManager->Refresh();
 
     return;
 }
@@ -631,7 +628,7 @@ void MainFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
     else if ( ResourcesEditor * imagesEditorPtr = dynamic_cast<ResourcesEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
     {
         imagesEditorPtr->ForceRefreshRibbonAndConnect();
-        LogFileManager::GetInstance()->WriteToLogFile("Switched to resources editor of project \""+imagesEditorPtr->game.GetName()+"\"");
+        LogFileManager::GetInstance()->WriteToLogFile("Switched to resources editor of project \""+imagesEditorPtr->project.GetName()+"\"");
     }
     else if ( CodeEditor * codeEditorPtr = dynamic_cast<CodeEditor*>(editorsNotebook->GetPage(event.GetSelection())) )
     {
@@ -906,8 +903,7 @@ void MainFrame::OnautoSaveTimerTrigger(wxTimerEvent& event)
         {
             wxString filename = wxFileName(games[i]->GetProjectFile()).GetPath()+"/"+wxFileName(games[i]->GetProjectFile()).GetName()+".gdg.autosave";
 
-            OpenSaveGame saveGame( *games[i] );
-            if ( !saveGame.SaveToFile(string(filename.mb_str())) ) {wxLogStatus( "L'enregistrement automatique a échoué." );}
+            if ( !games[i]->SaveToFile(string(filename.mb_str())) ) {wxLogStatus( "L'enregistrement automatique a échoué." );}
         }
     }
 }

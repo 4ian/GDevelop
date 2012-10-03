@@ -426,10 +426,7 @@ void Game_Develop_EditorApp::OnUnhandledException()
     try
     {
         for (unsigned int i = 0;i<mainEditor->games.size();++i)
-        {
-            OpenSaveGame save(*mainEditor->games[i]);
-            save.SaveToFile("gameDump"+ToString(i)+".gdg");
-        }
+            mainEditor->games[i]->SaveToFile("gameDump"+ToString(i)+".gdg");
     }
     catch(...)
     {
@@ -452,10 +449,7 @@ bool Game_Develop_EditorApp::OnExceptionInMainLoop()
     try
     {
         for (unsigned int i = 0;i<mainEditor->games.size();++i)
-        {
-            OpenSaveGame save(*mainEditor->games[i]);
-            save.SaveToFile("gameDump"+ToString(i)+".gdg");
-        }
+            mainEditor->games[i]->SaveToFile("gameDump"+ToString(i)+".gdg");
     }
     catch(...)
     {

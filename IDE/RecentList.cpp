@@ -1,3 +1,4 @@
+#include <wx/menu.h>
 #include "RecentList.h"
 
 RecentList::RecentList()

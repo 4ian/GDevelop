@@ -17,7 +17,7 @@
 #include <wx/filename.h>
 #include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDCore/CommonTools.h"
-#include "PlatformDefinition/Platform.h"
+#include "GDL/PlatformDefinition/Platform.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/Game.h"
 #include "GDL/Object.h"
@@ -124,42 +124,7 @@ void Portable::OnButton1Click(wxCommandEvent& event)
     resourcesMergingHelper.SetBaseDirectory(gd::ToString(wxFileName::FileName(game.GetProjectFile()).GetPath()));
     resourcesMergingHelper.PreserveDirectoriesStructure(true);
 
-    //Add loading image
-    if ( !game.loadingScreen.imageFichier.empty() )
-        resourcesMergingHelper.ExposeResource(game.loadingScreen.imageFichier);
-
-    //Add images
-    for ( unsigned int i = 0;i < game.resourceManager.resources.size() ;i++ )
-    {
-        if ( game.resourceManager.resources[i] == boost::shared_ptr<Resource>() )
-            continue;
-
-        if ( game.resourceManager.resources[i]->UseFile() )
-            resourcesMergingHelper.ExposeResource(game.resourceManager.resources[i]->GetFile());
-
-        AvancementGauge->SetValue(i/game.resourceManager.resources.size()*33.0f);
-    }
-    wxSafeYield();
-
-    //Add layouts resources
-    for ( unsigned int s = 0;s < game.GetLayoutCount();s++ )
-    {
-        for (unsigned int j = 0;j<game.GetLayouts()[s]->GetInitialObjects().size();++j) //Add objects resources
-        	game.GetLayouts()[s]->GetInitialObjects()[j]->ExposeResources(resourcesMergingHelper);
-
-        LaunchResourceWorkerOnEvents(game, game.GetLayout(s).GetEvents(), resourcesMergingHelper);
-        AvancementGauge->SetValue(s/game.GetLayoutCount()*16.0f+33.0f);
-    }
-    //Add external events resources
-    for ( unsigned int s = 0;s < game.GetExternalEventsCount();s++ )
-    {
-        LaunchResourceWorkerOnEvents(game, game.GetExternalEvents(s).GetEvents(), resourcesMergingHelper);
-    }
-    wxSafeYield();
-    //Add global objects resources
-    for (unsigned int j = 0;j<game.GetGlobalObjects().size();++j)
-        game.GetGlobalObjects()[j]->ExposeResources(resourcesMergingHelper);
-    wxSafeYield();
+    game.ExposeResources(resourcesMergingHelper);
 
     //Copy resources
     map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesOldAndNewFilename();
@@ -186,9 +151,8 @@ void Portable::OnButton1Click(wxCommandEvent& event)
         wxSafeYield();
     }
 
-    OpenSaveGame saveGame(game);
     wxString filename = game.GetProjectFile().empty() ? "Game.gdg" : wxFileName::FileName(game.GetProjectFile()).GetName()+".gdg";
-    saveGame.SaveToFile(rep+"/"+gd::ToString(filename));
+    game.SaveToFile(rep+"/"+gd::ToString(filename));
 
     AvancementGauge->SetValue(100);
     wxLogMessage(_("The game is available in the directory under the name: ")+gd::ToString(filename));

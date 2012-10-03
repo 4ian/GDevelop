@@ -20,7 +20,7 @@ namespace gd { class Project; }
 class MainFrame;
 class Game;
 class RuntimeGame;
-class gdTreeItemGameData;
+class gdTreeItemProjectData;
 
 class ProjectManager: public wxPanel
 {
@@ -196,20 +196,20 @@ class ProjectManager: public wxPanel
 		void OnPasteExternalLayoutSelected(wxCommandEvent& event);
 		//*)
 
-		bool GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemGameData *& data);
+		bool GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemProjectData *& data);
 
 		void OnRibbonExtensionsSelected(wxRibbonButtonBarEvent& event);
 		void OnRibbonHelpSelected(wxRibbonButtonBarEvent& event);
 		void EditExtensionsOfGame(gd::Project & project);
-		void CloseGame(Game * game);
+		void CloseGame(gd::Project * project);
 		void OnRibbonAddSceneSelected(wxRibbonButtonBarEvent& event);
-		void AddSceneToGame(Game * game, unsigned int position);
+		void AddLayoutToProject(gd::Project * project, unsigned int position);
 		void OnRibbonEditImagesSelected(wxRibbonButtonBarEvent& event);
-		void EditImagesOfGame(Game * game);
+		void EditResourcesOfProject(gd::Project * project);
 		void OnRibbonAddExternalEventsSelected(wxRibbonButtonBarEvent& event);
-		void AddExternalEventsToGame(Game * game);
+		void AddExternalEventsToGame(gd::Project * project);
 		void OnRibbonAddExternalLayoutSelected(wxRibbonButtonBarEvent& event);
-		void AddExternalLayoutToGame(Game * game);
+		void AddExternalLayoutToGame(gd::Project * project);
 		void OnRibbonEditSelectionSelected(wxRibbonButtonBarEvent& event);
 
         wxTreeItemId selectedItem;

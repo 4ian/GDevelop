@@ -1,11 +1,7 @@
 #ifndef RECENTLIST_H_INCLUDED
 #define RECENTLIST_H_INCLUDED
-
-#include "wx/wxprec.h"
-#ifndef WX_PRECOMP
-    #include "wx/wx.h"
-#endif
-
+#include <wx/arrstr.h>
+class wxMenu;
 
 class RecentList
 {

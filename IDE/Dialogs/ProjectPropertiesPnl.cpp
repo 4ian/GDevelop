@@ -43,14 +43,13 @@ ProjectPropertiesPnl::ProjectPropertiesPnl(wxWindow* parent,wxWindowID id,const 
     Connect(ID_PROPGRID, wxEVT_PG_SELECTED, (wxObjectEventFunction)&ProjectPropertiesPnl::OnPropertySelected);
     Connect(ID_PROPGRID, wxEVT_PG_CHANGED, (wxObjectEventFunction)&ProjectPropertiesPnl::OnPropertyChanged);
 
-    wxColour my_grey_1(212,208,200);
-    wxColour my_grey_2(217,226,226);
+    //Offer nice theme to property grid
     propertyGrid->SetMarginColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
     propertyGrid->SetCaptionBackgroundColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
     propertyGrid->SetEmptySpaceColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
     propertyGrid->SetCellBackgroundColour( *wxWHITE );
     propertyGrid->SetCellTextColour( *wxBLACK );
-    propertyGrid->SetLineColour( my_grey_1 );
+    propertyGrid->SetLineColour( wxColour(212,208,200) );
 }
 
 ProjectPropertiesPnl::~ProjectPropertiesPnl()

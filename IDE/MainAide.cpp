@@ -3,6 +3,7 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#include <wx/app.h> //This include must be placed first
 #include "MainFrame.h"
 #include <wx/string.h>
 #include <wx/mimetype.h> // mimetype support

@@ -64,15 +64,15 @@ class MainFrame: public wxFrame
         MainFrame(wxWindow* parent, bool createEmptyProject);
         virtual ~MainFrame();
 
-        vector < boost::shared_ptr<RuntimeGame> > games; ///< All games opened
+        vector < boost::shared_ptr<gd::Project> > games; ///< All games opened
         unsigned int gameCurrentlyEdited; ///< Index of the current game ( "Current" means chosen in the project manager )
 
         /**
          * Get a shared pointer to the current game ( "Current" means choosen in the project manager )
          */
-        inline boost::shared_ptr<RuntimeGame> GetCurrentGame()
+        inline boost::shared_ptr<gd::Project> GetCurrentGame()
         {
-            if ( gameCurrentlyEdited >= games.size()) return boost::shared_ptr<RuntimeGame> ();
+            if ( gameCurrentlyEdited >= games.size()) return boost::shared_ptr<gd::Project> ();
 
             return games[gameCurrentlyEdited];
         }
@@ -90,7 +90,7 @@ class MainFrame: public wxFrame
         /**
          * Change the current game
          */
-        void SetCurrentGame(unsigned int i);
+        void SetCurrentGame(unsigned int i, bool refreshProjectManager = true);
 
         /**
          * Open a game from its filename

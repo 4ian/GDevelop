@@ -24,6 +24,7 @@
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
 #include <wx/textdlg.h>
+#include <wx/msgdlg.h>
 #include <wx/choicdlg.h>
 #include <wx/imaglist.h>
 #include <wx/richtooltip.h>

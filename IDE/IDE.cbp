@@ -743,6 +743,8 @@
 		<Unit filename="ObjectsOnBadLayerBox.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur calques\" />
 		</Unit>
+		<Unit filename="PlatformManager.cpp" />
+		<Unit filename="PlatformManager.h" />
 		<Unit filename="PlayerUnitTests.cpp" />
 		<Unit filename="Portable.cpp">
 			<Option virtualFolder="Fichiers\" />
@@ -817,8 +819,8 @@
 		<Unit filename="TrueOrFalse.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\" />
 		</Unit>
-		<Unit filename="gdTreeItemGameData.cpp" />
-		<Unit filename="gdTreeItemGameData.h" />
+		<Unit filename="gdTreeItemProjectData.cpp" />
+		<Unit filename="gdTreeItemProjectData.h" />
 		<Unit filename="mp3ogg.cpp">
 			<Option virtualFolder="Editeur principal\Outils\" />
 		</Unit>

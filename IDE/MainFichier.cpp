@@ -5,9 +5,13 @@
 
 #include <wx/progdlg.h>
 #include <wx/richmsgdlg.h>
+#include <wx/filedlg.h>
 #include <boost/shared_ptr.hpp>
 #include <SFML/System.hpp>
-#include "GDL/OpenSaveGame.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/IDE/ProjectResourcesCopier.h"
+#include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Game.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
@@ -20,6 +24,7 @@
 #include "BuildProgressPnl.h"
 #include "Compilation.h"
 #include "Portable.h"
+#include "PlatformManager.h"
 #include "Fusion.h"
 #include "MessagePlus.h"
 #include "ProjectManager.h"
@@ -47,16 +52,33 @@ void MainFrame::OnMenuNewSelected( wxCommandEvent& event )
     NewProjectDialog dialog(this);
     if ( dialog.ShowModal() == 1 )
     {
+        boost::shared_ptr<gd::Platform> associatedPlatform = PlatformManager::GetInstance()->GetPlatform(dialog.GetChosenTemplatePlatform());
+        if ( associatedPlatform != boost::shared_ptr<gd::Platform>() )
+        {
+            boost::shared_ptr<gd::Project> newProject = boost::shared_ptr<gd::Project> (associatedPlatform->CreateNewEmptyProject());
+            if ( newProject != boost::shared_ptr<gd::Project> () )
+            {
+                //Be sure that the directory of the target exists
+                wxString targetDirectory = wxFileName::FileName(dialog.GetChosenFilename()).GetPath();
+                if ( !wxDirExists(targetDirectory) ) gd::RecursiveMkDir::MkDir(targetDirectory);
 
-        games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
-        wxString GD = "Game Develop - "+_( "New game" );
-        SetTitle( GD );
+                if ( !dialog.GetChosenTemplateFile().empty() )
+                {
+                    newProject->SetProjectFile(dialog.GetChosenTemplateFile());
+                    newProject->LoadFromFile(newProject->GetProjectFile());
+                    gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, ToString(targetDirectory));
+                }
 
-        gameCurrentlyEdited = games.size()-1;
+                newProject->SetProjectFile(dialog.GetChosenFilename());
+                newProject->SaveToFile(newProject->GetProjectFile());
 
-        //Mise à jour des éditeurs
-        projectManager->Refresh();
-        if ( startPage ) startPage->Refresh();
+                games.push_back(newProject);
+                SetCurrentGame(games.size()-1);
+                if ( startPage ) startPage->Refresh();
+            }
+            else wxLogError(_("Unable to create the project associated with the platform.\n\nPlease report this error to Game Develop developer."));
+        }
+        else wxLogError(_("Unable to find the platform associated with the template.\n\nPlease report this error to Game Develop developer."));
 
     }
 }
@@ -129,10 +151,8 @@ void MainFrame::Open( string file )
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-    boost::shared_ptr<RuntimeGame> newGame(new RuntimeGame);
-
-    OpenSaveGame openGame( *newGame );
-    if ( openGame.OpenFromFile(file) )
+    boost::shared_ptr<RuntimeGame> newGame(new RuntimeGame); //TODO: Abstract
+    if ( newGame->LoadFromFile(file) )
     {
         games.push_back(newGame);
 
@@ -141,7 +161,6 @@ void MainFrame::Open( string file )
 
         //Mise à jour des éditeurs
         SetCurrentGame(games.size()-1);
-        projectManager->Refresh();
         if ( startPage ) startPage->Refresh();
 
         string unknownExtensions = "";
@@ -172,8 +191,7 @@ void MainFrame::OnMenuSaveSelected( wxCommandEvent& event )
         SaveAs();
     else
     {
-        OpenSaveGame saveGame( *GetCurrentGame() );
-        if ( !saveGame.SaveToFile(GetCurrentGame()->GetProjectFile()) )
+        if ( !GetCurrentGame()->SaveToFile(GetCurrentGame()->GetProjectFile()) )
             wxLogError( "L'enregistrement a échoué." );
         else
             wxLogStatus(_("Save ended."));
@@ -207,7 +225,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
         {
             sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-            wxFileDialog FileDialog( this, _( "Choose where save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+            wxFileDialog FileDialog( this, _( "Choose where to save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
             FileDialog.ShowModal();
 
             std::string path = ToString(FileDialog.GetPath());
@@ -222,23 +240,17 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
             {
                 //oui, donc on l'enregistre
                 games[i]->SetProjectFile(path);
-                OpenSaveGame saveGame( *games[i] );
 
-                if ( !saveGame.SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( "L'enregistrement a échoué." );}
+                if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( "L'enregistrement a échoué." );}
                 SetLastUsedFile( games[i]->GetProjectFile() );
 
                 if ( games[i] == GetCurrentGame() )
-                {
-                    wxString GD = "Game Develop";
-                    wxString Fichier = GetCurrentGame()->GetProjectFile();
-                    SetTitle( GD + " - " + Fichier );
-                }
+                    SetCurrentGame(i);
             }
         }
         else
         {
-            OpenSaveGame saveGame( *games[i] );
-            if ( !saveGame.SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( "L'enregistrement a échoué." );}
+            if ( !games[i]->SaveToFile(games[i]->GetProjectFile()) ) {wxLogError( "L'enregistrement a échoué." );}
         }
     }
 
@@ -265,43 +277,44 @@ void MainFrame::SaveAs()
     wxFileDialog fileDialog( this, _( "Choose where save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
     fileDialog.ShowModal();
 
-    std::string path = ToString(fileDialog.GetPath());
+    std::string file = ToString(fileDialog.GetPath());
     #if defined(LINUX) //Extension seems not be added with wxGTK?
-    if ( fileDialog.GetFilterIndex() == 0 && !path.empty() )
-        path += ".gdg";
+    if ( fileDialog.GetFilterIndex() == 0 && !file.empty() )
+        file += ".gdg";
     #endif
 
     //A t on  un fichier à enregistrer ?
-    if ( !path.empty() )
+    if ( !file.empty() )
     {
         wxString oldPath = !GetCurrentGame()->GetProjectFile().empty() ? wxFileName::FileName(GetCurrentGame()->GetProjectFile()).GetPath() : "";
-
-        //oui, donc on l'enregistre
-        GetCurrentGame()->SetProjectFile(path);
-        OpenSaveGame saveGame( *GetCurrentGame() );
-
-        if ( !saveGame.SaveToFile(GetCurrentGame()->GetProjectFile()) )
-            wxLogError( "L'enregistrement a échoué" );
-
-        SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
-
-        wxString GD = "Game Develop";
-        SetTitle( GD + " - " + GetCurrentGame()->GetProjectFile() );
 
         //Warn the user that resources should maybe be also moved.
         bool avertOnSaveCheck;
         wxConfigBase::Get()->Read("/Save/AvertOnSaveAs", &avertOnSaveCheck, true);
-        wxString newPath = wxFileName::FileName(GetCurrentGame()->GetProjectFile()).GetPath();
+        wxString newPath = wxFileName::FileName(file).GetPath();
         if ( avertOnSaveCheck && newPath != oldPath && oldPath != "" )
         {
-            wxRichMessageDialog dlg(this, _("Project has been saved in a new folder.\nBe sure to also copy resources used by the game into this folder if needed."), _("Saving in a new directory"), wxOK|wxICON_INFORMATION );
+            wxRichMessageDialog dlg(this, _("Project has been saved in a new folder.\nDo you want to also copy its resources into this new folder?"), _("Saving in a new directory"), wxYES_NO|wxICON_INFORMATION );
             dlg.ShowCheckBox(_("Do not show again"));
-            dlg.ShowDetailedText(_("Since the last versions of Game Develop, resources filenames are relative\nto the project folder, allowing to copy or move a project simply by moving the directory\nof the project, provided that resources are also in this directory."));
+            //dlg.ShowDetailedText(_("Since the last versions of Game Develop, resources filenames are relative\nto the project folder, allowing to copy or move a project simply by moving the directory\nof the project, provided that resources are also in this directory."));
 
-            dlg.ShowModal();
+            if ( dlg.ShowModal() == wxID_YES )
+            {
+                wxProgressDialog progressDialog(_("Save progress"), _("Exporting resources..."));
+                gd::ProjectResourcesCopier::CopyAllResourcesTo(*GetCurrentGame(), ToString(newPath), &progressDialog);
+            }
+
             if ( dlg.IsCheckBoxChecked() )
                 wxConfigBase::Get()->Write("/Save/AvertOnSaveAs", "false");
         }
+
+        GetCurrentGame()->SetProjectFile(file);
+
+        if ( !GetCurrentGame()->SaveToFile(GetCurrentGame()->GetProjectFile()) )
+            wxLogError( _("The project could not be saved properly!") );
+
+        SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
+        SetCurrentGame(gameCurrentlyEdited, false);
 
         return;
     }
@@ -311,7 +324,7 @@ void MainFrame::OnMenuCompilationSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
-    Compilation Dialog( this, *GetCurrentGame() );
+    Compilation Dialog( this, * dynamic_cast<Game*>(GetCurrentGame().get()) ); //TODO : Abstract
     Dialog.ShowModal();
 }
 
@@ -322,7 +335,8 @@ void MainFrame::OnMenuPortableSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
-    Portable dialog( this, GetCurrentGame().get() );
+    //TODO: Adapt Portable dialog to gd::Project
+    Portable dialog( this, dynamic_cast<Game*>(GetCurrentGame().get()) );
     dialog.ShowModal();
 }
 
@@ -374,8 +388,17 @@ void MainFrame::OnMenuFusionSelected(wxCommandEvent& event)
 {
     if ( !CurrentGameIsValid() ) return;
 
-    Fusion dialog(this, *GetCurrentGame());
-    dialog.ShowModal();
+    try //TODO
+    {
+        Game & game = dynamic_cast<Game &>(*GetCurrentGame());
+        Fusion dialog(this, game);
+        dialog.ShowModal();
+    }
+    catch(...)
+    {
+        std::cout << "WARNING: The merge dialog is not yet adapted for non GD C++ Platform project";
+    }
+
 
     projectManager->Refresh();
     if ( startPage ) startPage->Refresh();

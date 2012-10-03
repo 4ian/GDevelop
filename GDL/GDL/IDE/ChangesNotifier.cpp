@@ -165,5 +165,18 @@ void ChangesNotifier::RequestAutomatismsSharedDataUpdate(gd::Project & project, 
     }
 }
 
+void ChangesNotifier::OnResourceModified(gd::Project & project, const std::string & resourceName) const
+{
+    try
+    {
+        Game & game = dynamic_cast<Game &>(project);
+        game.imagesChanged.push_back(resourceName);
+    }
+    catch(...)
+    {
+        std::cout << "WARNING: IDE probably sent a gd::Project object which is not a GD C++ Platform project" << std::endl;
+    }
+}
+
 #endif
 

@@ -22,6 +22,15 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
+/**
+ * Changes by Florian Rival :
+ * Added GD_IDE_ONLY guard ( see below ) to prevent this file from being compiled when we're compiling the library for the IDE
+ * ( as in this case, Game Develop Core provides TinyXml ).
+ */
+
+#if defined(GD_IDE_ONLY)
+#include "GDCore/TinyXml/tinyxml.h"
+#else
 
 #ifndef TINYXML_INCLUDED
 #define TINYXML_INCLUDED
@@ -1801,3 +1810,4 @@ private:
 #endif
 
 
+#endif

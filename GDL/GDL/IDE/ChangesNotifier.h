@@ -36,6 +36,7 @@ public:
     virtual void OnAutomatismRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism, const std::string & oldName) const;
     virtual void OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & automatismName) const;
     virtual void OnEventsModified(gd::Project & project, gd::Layout & layout, bool indirectChange = false) const;
+    virtual void OnResourceModified(gd::Project & project, const std::string & resourceName) const;
 
     ///@}
 

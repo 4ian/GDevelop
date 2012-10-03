@@ -129,6 +129,11 @@ public:
     virtual void SetVerticalSyncActivatedByDefault(bool enable) { verticalSync = enable; }
 
     /**
+     * Called to load the layout from a TiXmlElement.
+     */
+    virtual void LoadFromXml(const TiXmlElement * element);
+
+    /**
      * Return a reference to the vector containing the (smart) pointers to the layouts.
      */
     inline const std::vector < boost::shared_ptr<Object> > & GetGlobalObjects() const { return globalObjects; }
@@ -168,6 +173,16 @@ public:
      */
     inline ListVariable & GetVariables() { return variables; }
 
+    /**
+     * Provide access to the ResourceManager member containing the list of the resources.
+     */
+    inline const ResourcesManager & GetResourcesManager() const { return resourcesManager; }
+
+    /**
+     * Provide access to the ResourceManager member containing the list of the resources.
+     */
+    inline ResourcesManager & GetResourcesManager() { return resourcesManager; }
+
     #if defined(GD_IDE_ONLY)
     /**
      * Return a reference to the vector containing the (smart) pointers to the external events.
@@ -181,7 +196,6 @@ public:
     #endif
 
     LoadingScreen loadingScreen; ///< Data concerning the loading screen
-    ResourcesManager resourceManager; ///< Contains all resources used by the project
     bool useExternalSourceFiles; ///< True if game used external source files.
 
     #if defined(GD_IDE_ONLY)
@@ -198,17 +212,23 @@ public:
      * See gd::Project documentation ( Game Develo Core library ) for more information about what these members functions should do.
      */
     ///@{
+    virtual gd::Project * Clone() const { return new Game(*this); };
+
     virtual void SetAuthor(const std::string & author_) { author = author_; };
-    virtual const std::string & GetAuthor() {return author;}
+    virtual const std::string & GetAuthor() const {return author;}
     virtual void SetProjectFile(const std::string & file) { gameFile = file; }
     virtual const std::string & GetProjectFile() const { return gameFile; }
     virtual void SetLastCompilationDirectory(const std::string & dir){ latestCompilationDirectory = dir; }
     virtual const std::string & GetLastCompilationDirectory() const {return latestCompilationDirectory;}
 
+    virtual void SaveToXml(TiXmlElement * element) const;
+
     virtual void PopulatePropertyGrid(wxPropertyGrid * grid);
     virtual void UpdateFromPropertyGrid(wxPropertyGrid * grid);
     virtual void OnSelectionInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event);
     virtual void OnChangeInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent & event);
+
+    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
     virtual bool HasLayoutNamed(const std::string & name) const;
     virtual gd::Layout & GetLayout(const std::string & name);
@@ -271,6 +291,11 @@ private:
      */
     void Init(const Game & game);
 
+    /**
+     * Helper method for LoadFromXml method.
+     */
+    void LoadGameInformationFromXml(const TiXmlElement * elem);
+
     std::string                                         name; ///< Game name
     unsigned int                                        windowWidth; ///< Window default width
     unsigned int                                        windowHeight; ///< Window default height
@@ -281,6 +306,7 @@ private:
     std::vector < boost::shared_ptr<Object> >           globalObjects; ///< Global objects
     ListVariable                                        variables; ///< Initial global variables
     std::vector < boost::shared_ptr<ExternalLayout> >   externalLayouts; ///< List of all externals layouts
+    ResourcesManager                                    resourcesManager; ///< Contains all resources used by the project
     #if defined(GD_IDE_ONLY)
     std::string                                         author; ///< Game author name
     std::string                                         gameFile; ///< File of the game

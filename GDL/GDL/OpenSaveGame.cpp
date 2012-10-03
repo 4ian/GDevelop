@@ -8,7 +8,7 @@
     #define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
     #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
     #include "GDL/IDE/Dialogs/ProjectUpdateDlg.h"
-    #include "PlatformDefinition/Platform.h"
+    #include "GDL/PlatformDefinition/Platform.h"
     #include "GDCore/PlatformDefinition/ObjectGroup.h"
     #include "GDCore/IDE/ResourcesUnmergingHelper.h"
     #include "GDCore/Events/Event.h"
@@ -57,296 +57,6 @@
 #include "GDL/SourceFile.h"
 
 using namespace std;
-
-#if defined(GD_IDE_ONLY)
-bool OpenSaveGame::updateEventsFromGD1x = false;
-#endif
-
-OpenSaveGame::OpenSaveGame( Game & game_ ) :
-game(game_)
-{
-}
-
-OpenSaveGame::~OpenSaveGame()
-{
-    //dtor
-}
-
-////////////////////////////////////////////////////////////
-/// Chargement depuis un fichier
-////////////////////////////////////////////////////////////
-bool OpenSaveGame::OpenFromFile(string file)
-{
-    TiXmlDocument doc;
-    if ( !doc.LoadFile(file.c_str()) )
-    {
-#if defined(GD_IDE_ONLY)
-        wxString ErrorDescription = doc.ErrorDesc();
-        wxString Error = _( "Error while loading :" ) + ErrorDescription + _("\nMake sure the file exists and that you have sufficient rights to access.");
-#else
-        string ErrorDescription = doc.ErrorDesc();
-        string Error =  "Erreur lors du chargement : " + ErrorDescription + _("\nMake sure the file exists and that you have sufficient rights to access.");
-#endif
-        MSGERR( Error );
-        return false;
-    }
-
-    OpenDocument(doc);
-    #if defined(GD_IDE_ONLY)
-    game.SetProjectFile(file);
-    #endif
-
-    #if defined(GD_IDE_ONLY)
-    if (!updateText.empty())
-    {
-        ProjectUpdateDlg updateDialog(NULL, updateText);
-        updateDialog.ShowModal();
-    }
-    #endif
-
-    return true;
-}
-
-////////////////////////////////////////////////////////////
-/// Chargement depuis une chaine
-////////////////////////////////////////////////////////////
-void OpenSaveGame::OpenFromString(string text)
-{
-    TiXmlDocument doc;
-    doc.Parse(text.c_str());
-
-    OpenDocument(doc);
-}
-
-////////////////////////////////////////////////////////////
-/// Chargement depuis un TiXmlDocument
-////////////////////////////////////////////////////////////
-void OpenSaveGame::OpenDocument(TiXmlDocument & doc)
-{
-    bool notBackwardCompatible = false;
-
-    TiXmlHandle hdl( &doc );
-    TiXmlElement *elem = hdl.FirstChildElement().FirstChildElement().Element();
-
-    //Comparaison de versions
-    int major = 0;
-    int minor = 0;
-    int build = 0;
-    int revision = 0;
-    elem->QueryIntAttribute( "Major", &major );
-    elem->QueryIntAttribute( "Minor", &minor );
-    elem->QueryIntAttribute( "Build", &build );
-    elem->QueryIntAttribute( "Revision", &revision );
-    if ( major > GDLVersionWrapper::Major() )
-    {
-        MSG( _( "The version of the editor used to create this game seems to be a new version.\nThe game can not open, or datas may be missing.\nYou should check if a new version of Game Develop is available." ) );
-    }
-    else
-    {
-        if ( major == GDLVersionWrapper::Major() && (build > GDLVersionWrapper::Build() || minor > GDLVersionWrapper::Minor() || revision > GDLVersionWrapper::Revision()) )
-        {
-            MSG( _( "The version of the editor used to create this game seems to be greater.\nThe game can not open, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
-        }
-    }
-
-
-    //Compatibility code
-    #if defined(GD_IDE_ONLY)
-    if ( major <= 1 )
-    {
-        updateEventsFromGD1x = true;
-        game.GetUsedPlatformExtensions().push_back("BuiltinMathematicalTools");
-
-        if ( minor < 4 || build < 9587 )
-        {
-            wxLogWarning(_("The game was saved with an old version of Game Develop, and could have been opened incorrectly.\nPlease open and save the game with version 1.5.10151 before opening it with this version of Game Develop."));
-        }
-
-    }
-    else
-        updateEventsFromGD1x = false;
-
-    //End of Compatibility code
-    #endif
-
-    elem = hdl.FirstChildElement().FirstChildElement( "Info" ).Element();
-    if ( elem )
-        OpenGameInformations(elem);
-
-    if (  elem->FirstChildElement( "Chargement" ) != NULL )
-    {
-        OpenSaveLoadingScreen openLoadingScreen(game.loadingScreen);
-        openLoadingScreen.OpenFromElement(elem->FirstChildElement( "Chargement" ));
-    }
-
-    //Compatibility code
-    #if defined(GD_IDE_ONLY)
-    if ( major < 2 || (major == 2 && minor == 0 && build <= 10498) )
-    {
-        OpenImagesFromGD2010498(hdl.FirstChildElement().FirstChildElement( "Images" ).FirstChildElement().Element(),
-                   hdl.FirstChildElement().FirstChildElement( "DossierImages" ).FirstChildElement().Element());
-    }
-    #endif
-    //End of Compatibility code
-
-    //Compatibility code
-    #if defined(GD_IDE_ONLY)
-    if ( major < 2 || (major == 2 && minor <= 0) )
-    {
-        updateText += _("The action \"Create an object from its name\" need you to specify a group of objects containing all the objects which can be created by the action.\nFor example, if the objects created by the action can be Object1, Object2 or Object3, you can create a group containing these 3 objects and pass it as parameter of the action.\n\n");
-        updateText += _("Functions setup has been changed. You have now to specify the objects to be passed as arguments to the function, if needed. As below, you can create an object group containing the objects to be passed as arguments to the function.\n\n");
-        updateText += _("Finally, if you're using Linked Objects extension, the actions/conditions now always need you to specify the name of objects to be taken into account: Check your events related to this extension.\n\n");
-        updateText += _("Thank you for your understanding.\n");
-    }
-    #endif
-    //End of Compatibility code
-
-    //Compatibility code
-    #if defined(GD_IDE_ONLY)
-    if ( major < 2 || (major == 2 && minor <= 1 && build <= 10822) )
-    {
-        game.GetUsedPlatformExtensions().push_back("BuiltinExternalLayouts");
-    }
-    #endif
-
-    game.resourceManager.LoadFromXml(hdl.FirstChildElement().FirstChildElement( "Resources" ).Element());
-
-    //Global objects
-    elem = hdl.FirstChildElement().FirstChildElement( "Objects" ).Element();
-    if ( elem )
-        OpenObjects(game.GetGlobalObjects(), elem);
-
-    #if defined(GD_IDE_ONLY)
-    //Global object groups
-    elem = hdl.FirstChildElement().FirstChildElement( "ObjectGroups" ).Element();
-    if ( elem )
-        OpenGroupesObjets(game.GetObjectGroups(), elem);
-    #endif
-
-    //Global variables
-    elem = hdl.FirstChildElement().FirstChildElement( "Variables" ).Element();
-    if ( elem ) game.GetVariables().LoadFromXml(elem);
-
-    //Scenes
-    elem = hdl.FirstChildElement().FirstChildElement( "Scenes" ).Element();
-    if ( elem == NULL ) { MSG( "Les informations concernant les scenes manquent" ); }
-
-    elem = hdl.FirstChildElement().FirstChildElement( "Scenes" ).FirstChildElement().Element();
-    while ( elem )
-    {
-        std::string layoutName = elem->Attribute( "nom" ) != NULL ? elem->Attribute( "nom" ) : "";
-
-        //Add a new layout
-        game.GetLayouts().push_back(boost::shared_ptr<Scene>(new Scene));
-        game.GetLayouts().back()->SetName(layoutName);
-        game.GetLayouts().back()->LoadFromXml(elem);
-
-        elem = elem->NextSiblingElement();
-    }
-
-    #if defined(GD_IDE_ONLY)
-    //External events
-    elem = hdl.FirstChildElement().FirstChildElement( "ExternalEvents" ).Element();
-    if ( elem )
-        OpenExternalEvents(game.GetExternalEvents(), elem);
-
-    elem = hdl.FirstChildElement().FirstChildElement( "ExternalSourceFiles" ).Element();
-    if ( elem )
-    {
-        TiXmlElement * sourceFileElem = elem->FirstChildElement( "SourceFile" );
-        while (sourceFileElem)
-        {
-            boost::shared_ptr<GDpriv::SourceFile> newSourceFile(new GDpriv::SourceFile);
-            newSourceFile->LoadFromXml(sourceFileElem);
-            game.externalSourceFiles.push_back(newSourceFile);
-
-            sourceFileElem = sourceFileElem->NextSiblingElement();
-        }
-    }
-    #endif
-
-    elem = hdl.FirstChildElement().FirstChildElement( "ExternalLayouts" ).Element();
-    if ( elem )
-    {
-        TiXmlElement * externalLayoutElem = elem->FirstChildElement( "ExternalLayout" );
-        while (externalLayoutElem)
-        {
-            boost::shared_ptr<ExternalLayout> newExternalLayout(new ExternalLayout);
-            newExternalLayout->LoadFromXml(externalLayoutElem);
-            game.GetExternalLayouts().push_back(newExternalLayout);
-
-            externalLayoutElem = externalLayoutElem->NextSiblingElement();
-        }
-    }
-
-    if ( notBackwardCompatible )
-    {
-        MSG( _("Warning, if you save your game with this version of Game Develop, you won't be able to open it with a older version.") );
-    }
-
-    return;
-}
-
-void OpenSaveGame::OpenGameInformations(const TiXmlElement * elem)
-{
-    if ( elem->FirstChildElement( "Nom" ) != NULL ) { game.SetName( elem->FirstChildElement( "Nom" )->Attribute( "value" ) ); }
-    else { MSG( "Les informations concernant le nom manquent." ); }
-    if ( elem->FirstChildElement( "WindowW" ) != NULL ) { game.SetMainWindowDefaultWidth(ToInt(elem->FirstChildElement( "WindowW" )->Attribute( "value"))); }
-    else { MSG( "Les informations concernant la largeur manquent." ); }
-    if ( elem->FirstChildElement( "WindowH" ) != NULL ) { game.SetMainWindowDefaultHeight(ToInt(elem->FirstChildElement( "WindowH" )->Attribute( "value"))); }
-    else { MSG( "Les informations concernant la hauteur manquent." ); }
-
-    if ( elem->FirstChildElement( "FPSmax" ) != NULL ) { game.SetMaximumFPS(ToInt(elem->FirstChildElement( "FPSmax" )->Attribute( "value" ))); }
-    if ( elem->FirstChildElement( "FPSmin" ) != NULL ) { game.SetMinimumFPS(ToInt(elem->FirstChildElement( "FPSmin" )->Attribute( "value" ))); }
-
-    game.SetVerticalSyncActivatedByDefault( false );
-    if ( elem->FirstChildElement( "verticalSync" ) != NULL )
-    {
-        string result = elem->FirstChildElement( "verticalSync" )->Attribute("value");
-        if ( result == "true")
-            game.SetVerticalSyncActivatedByDefault(true);
-    }
-
-    #if defined(GD_IDE_ONLY)
-    if ( elem->FirstChildElement( "Auteur" ) != NULL ) { game.SetAuthor( elem->FirstChildElement( "Auteur" )->Attribute( "value" ) ); }
-    else { MSG( "Les informations concernant l'auteur manquent." ); }
-    if ( elem->FirstChildElement( "LatestCompilationDirectory" ) != NULL && elem->FirstChildElement( "LatestCompilationDirectory" )->Attribute( "value" ) != NULL )
-        game.SetLastCompilationDirectory( elem->FirstChildElement( "LatestCompilationDirectory" )->Attribute( "value" ) );
-
-    if ( elem->FirstChildElement( "Extensions" ) != NULL )
-    {
-        const TiXmlElement * extensionsElem = elem->FirstChildElement( "Extensions" )->FirstChildElement();
-        while (extensionsElem)
-        {
-            if ( extensionsElem->Attribute("name") )
-            {
-                std::string extensionName = extensionsElem->Attribute("name");
-                if ( find(game.GetUsedPlatformExtensions().begin(), game.GetUsedPlatformExtensions().end(), extensionName ) == game.GetUsedPlatformExtensions().end() )
-                    game.GetUsedPlatformExtensions().push_back(extensionName);
-            }
-
-            extensionsElem = extensionsElem->NextSiblingElement();
-        }
-    }
-
-    //Compatibility with Game Develop 1.3 and older
-    {
-        std::vector<string>::iterator oldName = find(game.GetUsedPlatformExtensions().begin(), game.GetUsedPlatformExtensions().end(), "BuiltinInterface");
-        if ( oldName != game.GetUsedPlatformExtensions().end() ) *oldName = "CommonDialogs";
-    }
-
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableFilename", game.winExecutableFilename);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
-    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("macExecutableFilename", game.macExecutableFilename);
-    if ( elem->Attribute( "useExternalSourceFiles" )  != NULL )
-    {
-        GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("useExternalSourceFiles", game.useExternalSourceFiles);
-    }
-    #endif
-
-    return;
-}
 
 void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, const TiXmlElement * elem)
 {
@@ -631,7 +341,6 @@ void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents
 
         if ( elemScene->FirstChildElement("Events") != NULL )
             OpenEvents(externalEvents->GetEvents(), elemScene->FirstChildElement("Events"));
-        if ( updateEventsFromGD1x ) AdaptEventsFromGD1x(externalEvents->GetEvents());
 
         list.push_back(externalEvents);
         elemScene = elemScene->NextSiblingElement();
@@ -641,153 +350,6 @@ void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents
 
 
 #if defined(GD_IDE_ONLY)
-////////////////////////////////////////////////////////////
-/// Sauvegarde le jeu dans le fichier indiqué
-////////////////////////////////////////////////////////////
-bool OpenSaveGame::SaveToFile(string file)
-{
-
-    TiXmlDocument doc;
-    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "ISO-8859-1", "" );
-    doc.LinkEndChild( decl );
-
-    TiXmlElement * root = new TiXmlElement( "Game" );
-    doc.LinkEndChild( root );
-
-    TiXmlElement * version = new TiXmlElement( "GDVersion" );
-    root->LinkEndChild( version );
-    version->SetAttribute( "Major", ToString( GDLVersionWrapper::Major() ).c_str() );
-    version->SetAttribute( "Minor", ToString( GDLVersionWrapper::Minor() ).c_str() );
-    version->SetAttribute( "Build", ToString( GDLVersionWrapper::Build() ).c_str() );
-    version->SetAttribute( "Revision", ToString( GDLVersionWrapper::Revision() ).c_str() );
-
-    TiXmlElement * infos = new TiXmlElement( "Info" );
-    root->LinkEndChild( infos );
-
-    //Info du jeu
-    TiXmlElement * info;
-    {
-        info = new TiXmlElement( "Nom" );
-        infos->LinkEndChild( info );
-        info->SetAttribute( "value", game.GetName().c_str() );
-        info = new TiXmlElement( "Auteur" );
-        infos->LinkEndChild( info );
-        info->SetAttribute( "value", game.GetAuthor().c_str() );
-        info = new TiXmlElement( "WindowW" );
-        infos->LinkEndChild( info );
-        info->SetAttribute( "value", game.GetMainWindowDefaultWidth() );
-        info = new TiXmlElement( "WindowH" );
-        infos->LinkEndChild( info );
-        info->SetAttribute( "value", game.GetMainWindowDefaultHeight() );
-        info = new TiXmlElement( "Portable" );
-        infos->LinkEndChild( info );
-        info = new TiXmlElement( "LatestCompilationDirectory" );
-        infos->LinkEndChild( info );
-        info->SetAttribute( "value", game.GetLastCompilationDirectory().c_str() );
-    }
-    {
-        TiXmlElement * elem = infos;
-        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("winExecutableFilename", game.winExecutableFilename);
-        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("winExecutableIconFile", game.winExecutableIconFile);
-        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("linuxExecutableFilename", game.linuxExecutableFilename);
-        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_STRING("macExecutableFilename", game.macExecutableFilename);
-        GD_CURRENT_ELEMENT_SAVE_ATTRIBUTE_BOOL("useExternalSourceFiles", game.useExternalSourceFiles);
-    }
-
-    TiXmlElement * extensions = new TiXmlElement( "Extensions" );
-    infos->LinkEndChild( extensions );
-    for (unsigned int i =0;i<game.GetUsedPlatformExtensions().size();++i)
-    {
-        TiXmlElement * extension = new TiXmlElement( "Extension" );
-        extensions->LinkEndChild( extension );
-        extension->SetAttribute("name", game.GetUsedPlatformExtensions().at(i).c_str());
-    }
-
-    info = new TiXmlElement( "FPSmax" );
-    infos->LinkEndChild( info );
-    info->SetAttribute( "value", game.GetMaximumFPS() );
-    info = new TiXmlElement( "FPSmin" );
-    infos->LinkEndChild( info );
-    info->SetAttribute( "value", game.GetMinimumFPS() );
-
-    info = new TiXmlElement( "verticalSync" );
-    infos->LinkEndChild( info );
-    info->SetAttribute( "value", game.IsVerticalSynchronizationEnabledByDefault() ? "true" : "false" );
-
-    TiXmlElement * chargement = new TiXmlElement( "Chargement" );
-    infos->LinkEndChild( chargement );
-
-    OpenSaveLoadingScreen saveLoadingScreen(game.loadingScreen);
-    saveLoadingScreen.SaveToElement(chargement);
-
-    //Ressources
-    TiXmlElement * resources = new TiXmlElement( "Resources" );
-    root->LinkEndChild( resources );
-    game.resourceManager.SaveToXml(resources);
-
-    //Global objects
-    TiXmlElement * objects = new TiXmlElement( "Objects" );
-    root->LinkEndChild( objects );
-    SaveObjects(game.GetGlobalObjects(), objects);
-
-    //Global object groups
-    TiXmlElement * globalObjectGroups = new TiXmlElement( "ObjectGroups" );
-    root->LinkEndChild( globalObjectGroups );
-    SaveGroupesObjets(game.GetObjectGroups(), globalObjectGroups);
-
-    //Global variables
-    TiXmlElement * variables = new TiXmlElement( "Variables" );
-    root->LinkEndChild( variables );
-    game.GetVariables().SaveToXml(variables);
-
-    //Scenes
-    TiXmlElement * scenes = new TiXmlElement( "Scenes" );
-    root->LinkEndChild( scenes );
-    TiXmlElement * scene;
-
-    for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
-    {
-        scene = new TiXmlElement( "Scene" );
-        scenes->LinkEndChild( scene );
-        game.GetLayout(i).SaveToXml(scene);
-    }
-
-    //External events
-    TiXmlElement * externalEvents = new TiXmlElement( "ExternalEvents" );
-    root->LinkEndChild( externalEvents );
-    SaveExternalEvents(game.GetExternalEvents(), externalEvents);
-
-    //External layouts
-    TiXmlElement * externalLayouts = new TiXmlElement( "ExternalLayouts" );
-    root->LinkEndChild( externalLayouts );
-    for (unsigned int i = 0;i<game.GetExternalLayouts().size();++i)
-    {
-        TiXmlElement * externalLayout = new TiXmlElement( "ExternalLayout" );
-        externalLayouts->LinkEndChild( externalLayout );
-        game.GetExternalLayouts()[i]->SaveToXml(externalLayout);
-    }
-
-    //External source files
-    TiXmlElement * externalSourceFiles = new TiXmlElement( "ExternalSourceFiles" );
-    root->LinkEndChild( externalSourceFiles );
-    for (unsigned int i = 0;i<game.externalSourceFiles.size();++i)
-    {
-        TiXmlElement * sourceFile = new TiXmlElement( "SourceFile" );
-        externalSourceFiles->LinkEndChild( sourceFile );
-        game.externalSourceFiles[i]->SaveToXml(sourceFile);
-    }
-
-    //Sauvegarde le tout
-    if ( !doc.SaveFile( file.c_str() ) )
-    {
-        MSG( _( "Unable to save file. Check that the drive has enough free space, is not write-protected and you have read/write permissions." ) );
-        return false;
-    }
-
-    return true;
-}
-
-
 void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects )
 {
     //Objets
@@ -981,143 +543,54 @@ void OpenSaveGame::SaveExternalEvents(const vector < boost::shared_ptr<ExternalE
 #endif
 
 #if defined(GD_IDE_ONLY)
-void OpenSaveGame::OpenImagesFromGD2010498(const TiXmlElement * imagesElem, TiXmlElement * dossierElem)
+void OpenSaveGame::OpenImagesFromGD2010498(Game & game, const TiXmlElement * imagesElem, const TiXmlElement * dossierElem)
 {
     //Images
-    game.resourceManager.resources.clear();
     while ( imagesElem )
     {
-        boost::shared_ptr<ImageResource> image(new ImageResource);
+        ImageResource image;
 
-        if ( imagesElem->Attribute( "nom" ) != NULL ) { image->name = imagesElem->Attribute( "nom" ); }
+        if ( imagesElem->Attribute( "nom" ) != NULL ) { image.SetName(imagesElem->Attribute( "nom" )); }
         else { MSG( "Les informations concernant le nom de l'image manquent." ); }
-        if ( imagesElem->Attribute( "fichier" ) != NULL ) {image->file = imagesElem->Attribute( "fichier" ); }
+        if ( imagesElem->Attribute( "fichier" ) != NULL ) {image.GetFile() = imagesElem->Attribute( "fichier" ); }
         else { MSG( "Les informations concernant le fichier de l'image manquent." ); }
 
-        image->smooth = true;
+        image.smooth = true;
         if ( imagesElem->Attribute( "lissage" ) != NULL && string(imagesElem->Attribute( "lissage" )) == "false")
-                image->smooth = false;
+                image.smooth = false;
 
-        image->alwaysLoaded = false;
+        image.alwaysLoaded = false;
         if ( imagesElem->Attribute( "alwaysLoaded" ) != NULL && string(imagesElem->Attribute( "alwaysLoaded" )) == "true")
-                image->alwaysLoaded = true;
+                image.alwaysLoaded = true;
 
-        game.resourceManager.resources.push_back(image);
+        game.GetResourcesManager().AddResource(image);
         imagesElem = imagesElem->NextSiblingElement();
     }
 
     //Dossiers d'images
-    game.resourceManager.folders.clear();
     while ( dossierElem )
     {
-        ResourceFolder folder;
-
-        if ( dossierElem->Attribute( "nom" ) != NULL ) { folder.name =  dossierElem->Attribute( "nom" ); }
-        else { MSG( "Les informations concernant le nom d'un dossier d'images manquent." ); }
-
-        //On vérifie que le dossier n'existe pas plusieurs fois.
-        //Notamment pour purger les fichiers qui ont eu des dossiers dupliqués suite à un bug
-        //27/04/09
-        bool alreadyexist = false;
-        for (unsigned int i =0;i<game.resourceManager.folders.size();++i)
+        if ( dossierElem->Attribute( "nom" ) != NULL )
         {
-        	if ( folder.name == game.resourceManager.folders[i].name )
-                alreadyexist = true;
-        }
+            game.GetResourcesManager().CreateFolder( dossierElem->Attribute( "nom" ) );
+            ResourceFolder & folder = game.GetResourcesManager().GetFolder(dossierElem->Attribute( "nom" ));
 
-        if ( !alreadyexist )
-        {
-            TiXmlElement *elemDossier = dossierElem;
+            const TiXmlElement *elemDossier = dossierElem;
             if ( elemDossier->FirstChildElement( "Contenu" ) != NULL )
             {
                 elemDossier = elemDossier->FirstChildElement( "Contenu" )->FirstChildElement();
                 while ( elemDossier )
                 {
-                    if ( elemDossier->Attribute( "nom" ) != NULL ) { folder.AddResource(elemDossier->Attribute( "nom" ), game.resourceManager.resources); }
+                    if ( elemDossier->Attribute( "nom" ) != NULL ) { folder.AddResource(elemDossier->Attribute( "nom" ), game.GetResourcesManager()); }
                     else { MSG( "Les informations concernant le nom d'une image d'un dossier manquent." ); }
 
                     elemDossier = elemDossier->NextSiblingElement();
                 }
             }
-
-            game.resourceManager.folders.push_back( folder );
         }
 
         dossierElem = dossierElem->NextSiblingElement();
     }
 }
 
-
-void OpenSaveGame::AdaptConditionFromGD1x(gd::Instruction & instruction, const gd::InstructionMetadata & instrInfos)
-{
-    vector < gd::Expression > newParameters = instruction.GetParameters();
-    for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)
-    {
-        if ( instrInfos.parameters[i].codeOnly )
-            newParameters.insert(newParameters.begin()+i, gd::Expression(""));
-    }
-
-    instruction.SetParameters(newParameters);
-
-    if ( instrInfos.canHaveSubInstructions )
-    {
-        ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-
-        vector < gd::Instruction > & subInstructions = instruction.GetSubInstructions();
-        for (unsigned int i = 0;i<subInstructions.size();++i)
-            AdaptConditionFromGD1x(subInstructions[i], extensionManager->GetConditionMetadata(subInstructions[i].GetType()));
-    }
-}
-
-void OpenSaveGame::AdaptActionFromGD1x(gd::Instruction & instruction, const gd::InstructionMetadata & instrInfos)
-{
-    vector < gd::Expression > newParameters = instruction.GetParameters();
-    for (unsigned int i = 0;i<instrInfos.parameters.size() && i<newParameters.size();++i)
-    {
-        if ( instrInfos.parameters[i].codeOnly )
-            newParameters.insert(newParameters.begin()+i, gd::Expression(""));
-    }
-
-    instruction.SetParameters(newParameters);
-
-    if ( instrInfos.canHaveSubInstructions )
-    {
-        ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-
-        vector < gd::Instruction > & subInstructions = instruction.GetSubInstructions();
-        for (unsigned int i = 0;i<subInstructions.size();++i)
-            AdaptActionFromGD1x(subInstructions[i], extensionManager->GetActionMetadata(subInstructions[i].GetType()));
-    }
-}
-
-void OpenSaveGame::AdaptEventsFromGD1x(vector < gd::BaseEventSPtr > & list)
-{
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-
-    for (unsigned int eId = 0;eId<list.size();++eId)
-    {
-        vector < vector<gd::Instruction>* > conditions = list[eId]->GetAllConditionsVectors();
-        for (unsigned cV = 0;cV<conditions.size();++cV)
-        {
-            for (unsigned int cId = 0;cId<conditions[cV]->size();++cId)
-            {
-                AdaptConditionFromGD1x((*conditions[cV])[cId], extensionManager->GetConditionMetadata((*conditions[cV])[cId].GetType()));
-            }
-        }
-
-        vector < vector<gd::Instruction>* > actions = list[eId]->GetAllActionsVectors();
-        for (unsigned aV = 0;aV<actions.size();++aV)
-        {
-            for (unsigned int aId = 0;aId<actions[aV]->size();++aId)
-            {
-                AdaptActionFromGD1x( (*actions[aV])[aId], extensionManager->GetActionMetadata((*actions[aV])[aId].GetType()));
-            }
-        }
-
-        if ( list[eId]->CanHaveSubEvents() )
-            AdaptEventsFromGD1x(list[eId]->GetSubEvents());
-    }
-}
-
 #endif
-

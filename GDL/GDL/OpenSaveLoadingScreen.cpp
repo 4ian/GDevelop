@@ -10,18 +10,7 @@
 
 using namespace std;
 
-OpenSaveLoadingScreen::OpenSaveLoadingScreen(LoadingScreen & datas_) :
-datas(datas_)
-{
-    //ctor
-}
-
-OpenSaveLoadingScreen::~OpenSaveLoadingScreen()
-{
-    //dtor
-}
-
-bool OpenSaveLoadingScreen::SaveToFile(string file)
+bool OpenSaveLoadingScreen::SaveToFile(const LoadingScreen & data, string file)
 {
     TiXmlDocument doc;
     TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "ISO-8859-1", "" );
@@ -30,7 +19,7 @@ bool OpenSaveLoadingScreen::SaveToFile(string file)
     TiXmlElement * root = new TiXmlElement( "LoadingScreen" );
     doc.LinkEndChild( root );
 
-    SaveToElement(root);
+    SaveToElement(data, root);
 
     //Sauvegarde le tout
     if ( !doc.SaveFile( file.c_str() ) )
@@ -42,81 +31,81 @@ bool OpenSaveLoadingScreen::SaveToFile(string file)
     return true;
 }
 
-void OpenSaveLoadingScreen::SaveToElement(TiXmlElement * root)
+void OpenSaveLoadingScreen::SaveToElement(const LoadingScreen & data, TiXmlElement * root)
 {
     TiXmlElement * infoChargement = new TiXmlElement("Afficher");
     root->LinkEndChild( infoChargement );
     infoChargement->SetAttribute( "value", "true" );
-    if ( datas.afficher == false ) infoChargement->SetAttribute( "value", "false" );
+    if ( data.afficher == false ) infoChargement->SetAttribute( "value", "false" );
 
     infoChargement = new TiXmlElement("Border");
     root->LinkEndChild( infoChargement );
     infoChargement->SetAttribute( "value", "true" );
-    if ( datas.border == false ) infoChargement->SetAttribute( "value", "false" );
+    if ( data.border == false ) infoChargement->SetAttribute( "value", "false" );
 
     infoChargement = new TiXmlElement("Smooth");
     root->LinkEndChild( infoChargement );
     infoChargement->SetAttribute( "value", "true" );
-    if ( datas.smooth == false ) infoChargement->SetAttribute( "value", "false" );
+    if ( data.smooth == false ) infoChargement->SetAttribute( "value", "false" );
 
     infoChargement = new TiXmlElement("Width");
     root->LinkEndChild( infoChargement );
-    infoChargement->SetDoubleAttribute( "value", datas.width );
+    infoChargement->SetDoubleAttribute( "value", data.width );
     infoChargement = new TiXmlElement("Height");
     root->LinkEndChild( infoChargement );
-    infoChargement->SetDoubleAttribute( "value", datas.height );
+    infoChargement->SetDoubleAttribute( "value", data.height );
 
     infoChargement = new TiXmlElement("TexteAfficher");
     root->LinkEndChild( infoChargement );
     infoChargement->SetAttribute( "value", "true" );
-    if ( datas.texte == false ) infoChargement->SetAttribute( "value", "false" );
+    if ( data.texte == false ) infoChargement->SetAttribute( "value", "false" );
     infoChargement = new TiXmlElement("TexteXPos");
     root->LinkEndChild( infoChargement );
-    infoChargement->SetDoubleAttribute( "value", datas.texteXPos );
+    infoChargement->SetDoubleAttribute( "value", data.texteXPos );
     infoChargement = new TiXmlElement("TexteYPos");
     root->LinkEndChild( infoChargement );
-    infoChargement->SetDoubleAttribute( "value", datas.texteYPos );
+    infoChargement->SetDoubleAttribute( "value", data.texteYPos );
     infoChargement = new TiXmlElement("Texte");
     root->LinkEndChild( infoChargement );
-    infoChargement->SetAttribute( "value", datas.texteChargement.c_str() );
+    infoChargement->SetAttribute( "value", data.texteChargement.c_str() );
 
     infoChargement = new TiXmlElement("PourcentAfficher");
     root->LinkEndChild( infoChargement );
     infoChargement->SetAttribute( "value", "true" );
-    if ( datas.pourcent == false ) infoChargement->SetAttribute( "value", "false" );
+    if ( data.pourcent == false ) infoChargement->SetAttribute( "value", "false" );
     infoChargement = new TiXmlElement("PourcentXPos");
     root->LinkEndChild( infoChargement );
-    infoChargement->SetDoubleAttribute( "value", datas.pourcentXPos );
+    infoChargement->SetDoubleAttribute( "value", data.pourcentXPos );
     infoChargement = new TiXmlElement("PourcentYPos");
     root->LinkEndChild( infoChargement );
-    infoChargement->SetDoubleAttribute( "value", datas.pourcentYPos );
+    infoChargement->SetDoubleAttribute( "value", data.pourcentYPos );
 
     infoChargement = new TiXmlElement("ImageAfficher");
     root->LinkEndChild( infoChargement );
     infoChargement->SetAttribute( "value", "true" );
-    if ( datas.image == false ) infoChargement->SetAttribute( "value", "false" );
+    if ( data.image == false ) infoChargement->SetAttribute( "value", "false" );
     infoChargement = new TiXmlElement("Image");
     root->LinkEndChild( infoChargement );
-    infoChargement->SetAttribute( "value", datas.imageFichier.c_str() );
+    infoChargement->SetAttribute( "value", data.imageFichier.c_str() );
 }
 
 ////////////////////////////////////////////////////////////
 /// Chargement depuis une chaine
 ////////////////////////////////////////////////////////////
-bool OpenSaveLoadingScreen::OpenFromString(string text)
+bool OpenSaveLoadingScreen::OpenFromString(LoadingScreen & data, string text)
 {
     TiXmlDocument doc;
     doc.Parse(text.c_str());
 
     TiXmlHandle hdl( &doc );
     TiXmlElement *elem = hdl.FirstChildElement().Element();
-    return OpenFromElement(elem);
+    return OpenFromElement(data, elem);
 }
 
 ////////////////////////////////////////////////////////////
 /// Chargement depuis un fichier
 ////////////////////////////////////////////////////////////
-bool OpenSaveLoadingScreen::OpenFromFile(string file)
+bool OpenSaveLoadingScreen::OpenFromFile(LoadingScreen & data, string file)
 {
     TiXmlDocument doc;
     if ( !doc.LoadFile(file.c_str()) )
@@ -124,72 +113,72 @@ bool OpenSaveLoadingScreen::OpenFromFile(string file)
 
     TiXmlHandle hdl( &doc );
     TiXmlElement *elem = hdl.FirstChildElement().Element();
-    return OpenFromElement(elem);
+    return OpenFromElement(data, elem);
 }
 
 ////////////////////////////////////////////////////////////
 /// Chargement depuis un TiXmlElement
 ////////////////////////////////////////////////////////////
-bool OpenSaveLoadingScreen::OpenFromElement(const TiXmlElement * elem)
+bool OpenSaveLoadingScreen::OpenFromElement(LoadingScreen & data, const TiXmlElement * elem)
 {
     if (  elem != NULL )
     {
-        datas.afficher = true;
+        data.afficher = true;
         if ( elem->FirstChildElement("Afficher") != NULL )
         {
             string result = elem->FirstChildElement("Afficher")->Attribute("value");
             if ( result == "false")
-                datas.afficher = false;
+                data.afficher = false;
         }
 
-        datas.border = true;
+        data.border = true;
         if ( elem->FirstChildElement("Border") != NULL )
         {
             string result = elem->FirstChildElement("Border")->Attribute("value");
             if ( result == "false")
-                datas.border = false;
+                data.border = false;
         }
 
-        datas.smooth = true;
+        data.smooth = true;
         if ( elem->FirstChildElement("Smooth") != NULL )
         {
             string result = elem->FirstChildElement("Smooth")->Attribute("value");
             if ( result == "false")
-                datas.smooth = false;
+                data.smooth = false;
         }
 
-        if ( elem->FirstChildElement("Width") != NULL ) elem->FirstChildElement("Width")->QueryIntAttribute("value", &datas.width);
-        if ( elem->FirstChildElement("Height") != NULL ) elem->FirstChildElement("Height")->QueryIntAttribute("value", &datas.height);
+        if ( elem->FirstChildElement("Width") != NULL ) elem->FirstChildElement("Width")->QueryIntAttribute("value", &data.width);
+        if ( elem->FirstChildElement("Height") != NULL ) elem->FirstChildElement("Height")->QueryIntAttribute("value", &data.height);
 
-        datas.texte = true;
+        data.texte = true;
         if ( elem->FirstChildElement("TexteAfficher") != NULL )
         {
             string result = elem->FirstChildElement("TexteAfficher")->Attribute("value");
             if ( result == "false")
-                datas.texte = false;
+                data.texte = false;
         }
-        if ( elem->FirstChildElement("TexteXPos") != NULL ) elem->FirstChildElement("TexteXPos")->QueryIntAttribute("value", &datas.texteXPos);
-        if ( elem->FirstChildElement("TexteYPos") != NULL ) elem->FirstChildElement("TexteYPos")->QueryIntAttribute("value", &datas.texteYPos);
-        if ( elem->FirstChildElement("Texte") != NULL ) datas.texteChargement = elem->FirstChildElement("Texte")->Attribute("value");
+        if ( elem->FirstChildElement("TexteXPos") != NULL ) elem->FirstChildElement("TexteXPos")->QueryIntAttribute("value", &data.texteXPos);
+        if ( elem->FirstChildElement("TexteYPos") != NULL ) elem->FirstChildElement("TexteYPos")->QueryIntAttribute("value", &data.texteYPos);
+        if ( elem->FirstChildElement("Texte") != NULL ) data.texteChargement = elem->FirstChildElement("Texte")->Attribute("value");
 
-        datas.pourcent = false;
+        data.pourcent = false;
         if ( elem->FirstChildElement("PourcentAfficher") != NULL )
         {
             string result = elem->FirstChildElement("PourcentAfficher")->Attribute("value");
             if ( result == "true")
-                datas.pourcent = true;
+                data.pourcent = true;
         }
-        if ( elem->FirstChildElement("PourcentXPos") != NULL ) elem->FirstChildElement("PourcentXPos")->QueryIntAttribute("value", &datas.pourcentXPos);
-        if ( elem->FirstChildElement("PourcentYPos") != NULL ) elem->FirstChildElement("PourcentYPos")->QueryIntAttribute("value", &datas.pourcentYPos);
+        if ( elem->FirstChildElement("PourcentXPos") != NULL ) elem->FirstChildElement("PourcentXPos")->QueryIntAttribute("value", &data.pourcentXPos);
+        if ( elem->FirstChildElement("PourcentYPos") != NULL ) elem->FirstChildElement("PourcentYPos")->QueryIntAttribute("value", &data.pourcentYPos);
 
-        datas.image = false;
+        data.image = false;
         if ( elem->FirstChildElement("ImageAfficher") != NULL )
         {
             string result = elem->FirstChildElement("ImageAfficher")->Attribute("value");
             if ( result == "true")
-                datas.image = true;
+                data.image = true;
         }
-        if ( elem->FirstChildElement("Image") != NULL ) datas.imageFichier = elem->FirstChildElement("Image")->Attribute("value");
+        if ( elem->FirstChildElement("Image") != NULL ) data.imageFichier = elem->FirstChildElement("Image")->Attribute("value");
 
     }
 

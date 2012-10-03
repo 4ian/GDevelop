@@ -34,9 +34,9 @@ namespace gd { class MainFrameWrapper; }
 using namespace std;
 
 /**
- * \brief Internal class managing static extensions.
+ * \brief Internal class managing extensions.
  *
- * ExtensionsManager manages static extensions, and provide useful things like :
+ * ExtensionsManager manages extensions, and provide useful things like :
  * - Functions for creating an object ( from another or from a type ).
  * - Functions for getting pointers to actions/conditions functions.
  */
@@ -45,228 +45,243 @@ class GD_API ExtensionsManager
 : public gd::InstructionsMetadataHolder
 #endif
 {
-    public:
+public:
 
-        /**
-         * Add an extension to the manager
-         */
-        bool AddExtension(boost::shared_ptr<ExtensionBase> extension);
+    /** \name Extensions management
+     * Member functions used to manage the extensions
+     */
+    ///@{
 
-        /**
-         * Return true if an extension with the sam name is loaded
-         */
-        bool IsExtensionLoaded(string name) const;
+    /**
+     * Add an extension to the manager.
+     * \see ExtensionsLoader
+     */
+    bool AddExtension(boost::shared_ptr<ExtensionBase> extension);
 
-        /**
-         * Get an extension
-         * @return Shared pointer to the extension
-         */
-        boost::shared_ptr<ExtensionBase> GetExtension(string name) const;
+    /**
+     * Return true if an extension with the same name is loaded
+     */
+    bool IsExtensionLoaded(string name) const;
 
-        /**
-         * Get all extensions
-         * @return Vector of Shared pointer containing all extensions
-         */
-        inline const vector < boost::shared_ptr<ExtensionBase> > & GetExtensions() const { return extensionsLoaded; };
+    /**
+     * Get an extension
+     * @return Shared pointer to the extension
+     */
+    boost::shared_ptr<ExtensionBase> GetExtension(string name) const;
 
-        /**
-         * Return a shared_ptr to a new object.
-         */
-        boost::shared_ptr<Object> CreateObject(std::string type, std::string name);
+    /**
+     * Get all extensions
+     * @return Vector of Shared pointer containing all extensions
+     */
+    inline const vector < boost::shared_ptr<ExtensionBase> > & GetExtensions() const { return extensionsLoaded; };
 
-        /**
-         * Create a new automatism of given type
-         */
-        Automatism* CreateAutomatism(std::string automatismType) const;
+    ///@}
 
-        /**
-         * Create shared datas of the automatism of given type
-         */
-        boost::shared_ptr<AutomatismsSharedDatas> CreateAutomatismSharedDatas(std::string automatismType) const;
+    /** \name Extensions features
+     * Member functions providing access to extensions features
+     */
+    ///@{
 
-        #if defined(GD_IDE_ONLY)
-        /**
-         * Verifying if a ( static ) condition exists
-         * @return true if the ( static ) condition exists
-         */
-        bool HasCondition(string name) const;
+    /**
+     * Return a shared_ptr to a new object.
+     */
+    boost::shared_ptr<Object> CreateObject(std::string type, std::string name);
 
-        /**
-         * Verifying if a ( object ) condition exists
-         * @return true if the ( object ) condition exists
-         */
-        bool HasObjectCondition(std::string objectType, string name) const;
+    /**
+     * Create a new automatism of given type
+     */
+    Automatism* CreateAutomatism(std::string automatismType) const;
 
-        /**
-         * Verifying if a ( automatism ) condition exists
-         * @return true if the ( automatism ) condition exists
-         */
-        bool HasAutomatismCondition(std::string automatismType, string name) const;
+    /**
+     * Create shared datas of the automatism of given type
+     */
+    boost::shared_ptr<AutomatismsSharedDatas> CreateAutomatismSharedDatas(std::string automatismType) const;
 
-        /**
-         * Verifying if a ( static ) action exists
-         * @return true if the ( static ) action exists
-         */
-        bool HasAction(string name) const;
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Verifying if a ( static ) condition exists
+     * @return true if the ( static ) condition exists
+     */
+    bool HasCondition(string name) const;
 
-        /**
-         * Get information about an action from its type
-         * Works for object, automatisms and static actions.
-         */
-        const gd::InstructionMetadata & GetActionMetadata(string actionType) const;
+    /**
+     * Verifying if a ( object ) condition exists
+     * @return true if the ( object ) condition exists
+     */
+    bool HasObjectCondition(std::string objectType, string name) const;
 
-        /**
-         * Get information about a condition from its type
-         * Works for object, automatisms and static conditions.
-         */
-        const gd::InstructionMetadata & GetConditionMetadata(string conditionType) const;
+    /**
+     * Verifying if a ( automatism ) condition exists
+     * @return true if the ( automatism ) condition exists
+     */
+    bool HasAutomatismCondition(std::string automatismType, string name) const;
 
-        /**
-         * Get information about an expression from its type
-         * Works for static expressions.
-         */
-        const gd::ExpressionMetadata & GetExpressionMetadata(string exprType) const;
+    /**
+     * Verifying if a ( static ) action exists
+     * @return true if the ( static ) action exists
+     */
+    bool HasAction(string name) const;
 
-        /**
-         * Get information about an expression from its type
-         * Works for object expressions.
-         */
-        const gd::ExpressionMetadata & GetObjectExpressionMetadata(string objectType, string exprType) const;
+    /**
+     * Get information about an action from its type
+     * Works for object, automatisms and static actions.
+     */
+    const gd::InstructionMetadata & GetActionMetadata(string actionType) const;
 
-        /**
-         * Get information about an expression from its type
-         * Works for automatism expressions.
-         */
-        const gd::ExpressionMetadata & GetAutomatismExpressionMetadata(string autoType, string exprType) const;
+    /**
+     * Get information about a condition from its type
+     * Works for object, automatisms and static conditions.
+     */
+    const gd::InstructionMetadata & GetConditionMetadata(string conditionType) const;
 
-        /**
-         * Get information about a string expression from its type
-         * Works for static expressions.
-         */
-        const gd::StrExpressionMetadata & GetStrExpressionMetadata(string exprType) const;
+    /**
+     * Get information about an expression from its type
+     * Works for static expressions.
+     */
+    const gd::ExpressionMetadata & GetExpressionMetadata(string exprType) const;
 
-        /**
-         * Get information about a string expression from its type
-         * Works for object expressions.
-         */
-        const gd::StrExpressionMetadata & GetObjectStrExpressionMetadata(string objectType, string exprType) const;
+    /**
+     * Get information about an expression from its type
+     * Works for object expressions.
+     */
+    const gd::ExpressionMetadata & GetObjectExpressionMetadata(string objectType, string exprType) const;
 
-        /**
-         * Get information about a string expression from its type
-         * Works for automatism expressions.
-         */
-        const gd::StrExpressionMetadata & GetAutomatismStrExpressionMetadata(string autoType, string exprType) const;
+    /**
+     * Get information about an expression from its type
+     * Works for automatism expressions.
+     */
+    const gd::ExpressionMetadata & GetAutomatismExpressionMetadata(string autoType, string exprType) const;
 
-        /**
-         * Verifying if a ( object ) action exists
-         * @return true if the ( object ) action exists
-         */
-        bool HasObjectAction(std::string objectType, string name) const;
+    /**
+     * Get information about a string expression from its type
+     * Works for static expressions.
+     */
+    const gd::StrExpressionMetadata & GetStrExpressionMetadata(string exprType) const;
 
-        /**
-         * Verifying if a ( Automatism ) action exists
-         * @return true if the ( Automatism ) action exists
-         */
-        bool HasAutomatismAction(std::string automatismType, string name) const;
+    /**
+     * Get information about a string expression from its type
+     * Works for object expressions.
+     */
+    const gd::StrExpressionMetadata & GetObjectStrExpressionMetadata(string objectType, string exprType) const;
 
-        /**
-         * Verifying if a ( static ) expression exists
-         * @return true if the ( static ) expression exists
-         */
-        bool HasExpression(string name) const;
+    /**
+     * Get information about a string expression from its type
+     * Works for automatism expressions.
+     */
+    const gd::StrExpressionMetadata & GetAutomatismStrExpressionMetadata(string autoType, string exprType) const;
 
-        /**
-         * Verifying if a ( object ) expression exists
-         * @return true if the ( object ) expression exists
-         */
-        bool HasObjectExpression(std::string objectType, string name) const;
+    /**
+     * Verifying if a ( object ) action exists
+     * @return true if the ( object ) action exists
+     */
+    bool HasObjectAction(std::string objectType, string name) const;
 
-        /**
-         * Verifying if a ( automatism ) expression exists
-         * @return true if the ( automatism ) expression exists
-         */
-        bool HasAutomatismExpression(std::string automatismType, string name) const;
+    /**
+     * Verifying if a ( Automatism ) action exists
+     * @return true if the ( Automatism ) action exists
+     */
+    bool HasAutomatismAction(std::string automatismType, string name) const;
 
-        /**
-         * Verifying if a ( static ) string expression exists
-         * @return true if the ( static ) string expression exists
-         */
-        bool HasStrExpression(string name) const;
+    /**
+     * Verifying if a ( static ) expression exists
+     * @return true if the ( static ) expression exists
+     */
+    bool HasExpression(string name) const;
 
-        /**
-         * Verifying if a ( object ) string expression exists
-         * @return true if the ( object ) string expression exists
-         */
-        bool HasObjectStrExpression(std::string objectType, string name) const;
+    /**
+     * Verifying if a ( object ) expression exists
+     * @return true if the ( object ) expression exists
+     */
+    bool HasObjectExpression(std::string objectType, string name) const;
 
-        /**
-         * Verifying if a ( object ) string expression exists
-         * @return true if the ( object ) string expression exists
-         */
-        bool HasAutomatismStrExpression(std::string automatismType, string name) const;
+    /**
+     * Verifying if a ( automatism ) expression exists
+     * @return true if the ( automatism ) expression exists
+     */
+    bool HasAutomatismExpression(std::string automatismType, string name) const;
 
-        /**
-         * Check if an event type is available
-         */
-        bool HasEventType(std::string eventType) const;
+    /**
+     * Verifying if a ( static ) string expression exists
+     * @return true if the ( static ) string expression exists
+     */
+    bool HasStrExpression(string name) const;
 
-        /**
-         * Create a new event of given type
-         */
-        boost::shared_ptr<gd::BaseEvent> CreateEvent(std::string eventType) const;
+    /**
+     * Verifying if a ( object ) string expression exists
+     * @return true if the ( object ) string expression exists
+     */
+    bool HasObjectStrExpression(std::string objectType, string name) const;
 
-        /**
-         * Check if an automatism type is available
-         */
-        bool HasAutomatism(std::string automatism) const;
+    /**
+     * Verifying if a ( object ) string expression exists
+     * @return true if the ( object ) string expression exists
+     */
+    bool HasAutomatismStrExpression(std::string automatismType, string name) const;
 
-        /**
-         * Get information about an automatism
-         */
-        const AutomatismInfo & GetAutomatismMetadata(std::string automatismType) const;
+    /**
+     * Check if an event type is available
+     */
+    bool HasEventType(std::string eventType) const;
 
-        /**
-         * Get information about an object
-         */
-        const ExtensionObjectInfos & GetObjectMetadata(std::string type);
-        #endif
+    /**
+     * Create a new event of given type
+     */
+    boost::shared_ptr<gd::BaseEvent> CreateEvent(std::string eventType) const;
 
-        static ExtensionsManager *GetInstance()
+    /**
+     * Check if an automatism type is available
+     */
+    bool HasAutomatism(std::string automatism) const;
+
+    /**
+     * Get information about an automatism
+     */
+    const AutomatismInfo & GetAutomatismMetadata(std::string automatismType) const;
+
+    /**
+     * Get information about an object
+     */
+    const ExtensionObjectInfos & GetObjectMetadata(std::string type);
+    #endif
+
+    ///@}
+
+    static ExtensionsManager *GetInstance()
+    {
+        if ( NULL == _singleton )
         {
-            if ( NULL == _singleton )
-            {
-                _singleton = new ExtensionsManager;
-            }
-
-            return ( static_cast<ExtensionsManager*>( _singleton ) );
+            _singleton = new ExtensionsManager;
         }
 
-        static void DestroySingleton()
+        return ( static_cast<ExtensionsManager*>( _singleton ) );
+    }
+
+    static void DestroySingleton()
+    {
+        if ( NULL != _singleton )
         {
-            if ( NULL != _singleton )
-            {
-                delete _singleton;
-                _singleton = NULL;
-            }
+            delete _singleton;
+            _singleton = NULL;
         }
+    }
 
-    private:
-        ExtensionsManager();
-        virtual ~ExtensionsManager() {};
+private:
+    ExtensionsManager();
+    virtual ~ExtensionsManager() {};
 
-        std::vector < boost::shared_ptr<ExtensionBase> > extensionsLoaded;
-        std::map < std::string, CreateFunPtr >           creationFunctionTable;
-        std::map < std::string, DestroyFunPtr >          destroyFunctionTable;
+    std::vector < boost::shared_ptr<ExtensionBase> > extensionsLoaded;
+    std::map < std::string, CreateFunPtr >           creationFunctionTable;
+    std::map < std::string, DestroyFunPtr >          destroyFunctionTable;
 
-        #if defined(GD_IDE_ONLY)
-        static gd::InstructionMetadata badInstructionMetadata;
-        static gd::ExpressionMetadata badExpressionMetadata;
-        static gd::StrExpressionMetadata badStrExpressionMetadata;
-        #endif
-        static AutomatismInfo badAutomatismInfo;
-        static ExtensionObjectInfos badObjectInfo;
+    #if defined(GD_IDE_ONLY)
+    static gd::InstructionMetadata badInstructionMetadata;
+    static gd::ExpressionMetadata badExpressionMetadata;
+    static gd::StrExpressionMetadata badStrExpressionMetadata;
+    #endif
+    static AutomatismInfo badAutomatismInfo;
+    static ExtensionObjectInfos badObjectInfo;
 
-        static ExtensionsManager *_singleton;
+    static ExtensionsManager *_singleton;
 };
 
 #endif // EXTENSIONSMANAGER_H

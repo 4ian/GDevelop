@@ -21,22 +21,17 @@ using namespace std;
 
 /**
  * \brief Internal class used so as to save and open games files.
+ *
+ * \deprecated All saving/loading related tasks must now be transfered to SaveToXml/LoadFromXml member functions.
  */
 class GD_API OpenSaveGame
 {
 public:
-    OpenSaveGame( Game & game_ );
-    virtual ~OpenSaveGame();
-
-    bool OpenFromFile(string file);
-    void OpenFromString(string text);
-
     #if defined(GD_IDE_ONLY)
     static void OpenEvents( vector < gd::BaseEventSPtr > & list, const TiXmlElement * elem );
     static void OpenConditions(vector < gd::Instruction > & list, const TiXmlElement * elem);
     static void OpenActions(vector < gd::Instruction > & list, const TiXmlElement * elem);
 
-    bool SaveToFile(string file);
     static void SaveEvents( const vector < gd::BaseEventSPtr > & list, TiXmlElement * events );
     static void SaveConditions(const vector < gd::Instruction > & list, TiXmlElement * elem);
     static void SaveActions(const vector < gd::Instruction > & list, TiXmlElement * elem);
@@ -47,32 +42,14 @@ public:
     static void SaveObjects( const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects );
     static void SaveLayers( const vector < Layer > & list, TiXmlElement * layers );
 
-    //Compatibility code --- with Game Develop 1
-    static void AdaptEventsFromGD1x(vector < gd::BaseEventSPtr > & list);
-    static bool updateEventsFromGD1x;
+    static void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, const TiXmlElement * elem );
+    static void OpenImagesFromGD2010498(Game & game, const TiXmlElement * elem, const TiXmlElement * dossierElem );
+
+    static void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
     #endif
 
     static void OpenObjects(vector < boost::shared_ptr<Object> > & objects, const TiXmlElement * elem);
     static void OpenLayers( vector < Layer > & list, const TiXmlElement * elem );
-
-private:
-
-    Game & game;
-
-    void OpenDocument(TiXmlDocument & doc);
-    void OpenGameInformations( const TiXmlElement * elem );
-
-    #if defined(GD_IDE_ONLY)
-    void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, const TiXmlElement * elem );
-    void OpenImagesFromGD2010498( const TiXmlElement * elem, TiXmlElement * dossierElem );
-
-    void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
-
-    static void AdaptConditionFromGD1x(gd::Instruction & instruction, const gd::InstructionMetadata & instrInfos);
-    static void AdaptActionFromGD1x(gd::Instruction & instruction, const gd::InstructionMetadata & instrInfos);
-
-    std::string updateText;
-    #endif
 };
 
 #endif // OPENSAVEGAME_H

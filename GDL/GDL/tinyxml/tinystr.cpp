@@ -26,6 +26,13 @@ distribution.
  * THIS FILE WAS ALTERED BY Tyge Løvset, 7. April 2005.
  */
 
+/**
+ * Changes by Florian Rival :
+ * Added GD_IDE_ONLY guard ( see below ) to prevent this file from being compiled when we're compiling the library for the IDE
+ * ( as in this case, Game Develop Core provides TinyXml ).
+ */
+
+#if !defined(GD_IDE_ONLY)
 
 #ifndef TIXML_USE_STL
 
@@ -115,3 +122,4 @@ TiXmlString operator + (const char* a, const TiXmlString & b)
 
 #endif	// TIXML_USE_STL
 
+#endif

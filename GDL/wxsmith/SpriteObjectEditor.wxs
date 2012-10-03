@@ -384,7 +384,6 @@
 							<object class="Custom" name="ID_TREELISTCTRL1" subclass="wxTreeListCtrl" variable="maskTree" member="yes">
 								<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),$(STYLE),$(NAME));</creating_code>
 								<include_file>wx/treelist.h</include_file>
-								<style></style>
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<option>1</option>

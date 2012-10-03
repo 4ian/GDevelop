@@ -517,9 +517,9 @@ void SpriteObjectEditor::RefreshImagesList()
         {
             const Sprite & sprite = direction.GetSprite(i);
             wxBitmap spriteBitmap;
-            if ( game.resourceManager.HasResource(sprite.GetImageName()) )
+            if ( game.GetResourcesManager().HasResource(sprite.GetImageName()) )
             {
-                spriteBitmap = GetwxBitmapFromImageResource(game.resourceManager.GetResource(sprite.GetImageName()));
+                spriteBitmap = GetwxBitmapFromImageResource(game.GetResourcesManager().GetResource(sprite.GetImageName()));
                 spriteBitmap = Rescale(spriteBitmap, 48, 48);
             }
 
@@ -605,7 +605,7 @@ void SpriteObjectEditor::OnimagePanelPaint(wxPaintEvent& event)
     {
         //Draw the sprite
         const Sprite & sprite = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSprite(selectedImage);
-        wxBitmap bmp = GetwxBitmapFromImageResource(game.resourceManager.GetResource(sprite.GetImageName()));
+        wxBitmap bmp = GetwxBitmapFromImageResource(game.GetResourcesManager().GetResource(sprite.GetImageName()));
 
         xScrollBar->SetScrollbar(xScrollBar->GetThumbPosition(),size.GetWidth(), bmp.GetWidth(),size.GetWidth());
         yScrollBar->SetScrollbar(yScrollBar->GetThumbPosition(), size.GetHeight(), bmp.GetHeight(), size.GetHeight());
@@ -696,7 +696,7 @@ void SpriteObjectEditor::OnpreviewPanelPaint(wxPaintEvent& event)
     {
         //Draw the sprite
         const Sprite & sprite = object.GetAnimation(selectedAnimation).GetDirection(selectedDirection).GetSprite(previewCurrentSprite);
-        wxBitmap bmp = GetwxBitmapFromImageResource(game.resourceManager.GetResource(sprite.GetImageName()));
+        wxBitmap bmp = GetwxBitmapFromImageResource(game.GetResourcesManager().GetResource(sprite.GetImageName()));
 
         spritePosX = (size.GetWidth() - bmp.GetWidth()) / 2;
         spritePosY = (size.GetHeight() - bmp.GetHeight()) / 2;
@@ -717,7 +717,7 @@ void SpriteObjectEditor::RefreshPoints()
          selectedImage < object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection).GetSpriteCount() )
     {
         const Sprite & sprite = object.GetAnimation(selectedAnimation).GetDirectionToModify(selectedDirection).GetSprite(selectedImage);
-        wxBitmap bmp = GetwxBitmapFromImageResource(game.resourceManager.GetResource(sprite.GetImageName()));
+        wxBitmap bmp = GetwxBitmapFromImageResource(game.GetResourcesManager().GetResource(sprite.GetImageName()));
 
         pointsList->InsertItem(pointsList->GetItemCount(), "Origin", 0);
         pointsList->SetItem(pointsList->GetItemCount()-1, 1, ToString(sprite.GetOrigine().GetX()));
@@ -1119,7 +1119,7 @@ void SpriteObjectEditor::OnimagePanelLeftUp(wxMouseEvent& event)
         {
             //Move selected point
             wxSize size = imagePanel->GetSize();
-            wxBitmap bmp = GetwxBitmapFromImageResource(game.resourceManager.GetResource(sprite.GetImageName()));
+            wxBitmap bmp = GetwxBitmapFromImageResource(game.GetResourcesManager().GetResource(sprite.GetImageName()));
             int spritePosX = (size.GetWidth() - bmp.GetWidth() - xScrollBar->GetThumbPosition()) / 2;
             int spritePosY = (size.GetHeight() - bmp.GetHeight() - yScrollBar->GetThumbPosition()) / 2;
 
@@ -1708,23 +1708,23 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
                 std::string name = ToString(file.GetFullName());
 
                 //Add the resource if it does not exist or if it is not the same resource
-                if ( !game.resourceManager.HasResource(name) || !(game.resourceManager.GetResource(name).GetFile() == file.GetFullPath()) )
+                if ( !game.GetResourcesManager().HasResource(name) || !(game.GetResourcesManager().GetResource(name).GetFile() == file.GetFullPath()) )
                 {
                     //Find a new unique name for the resource
                     unsigned int uniqueID = 2;
-                    while ( game.resourceManager.HasResource(name) )
+                    while ( game.GetResourcesManager().HasResource(name) )
                     {
                         name = ToString(file.GetFullName())+ToString(uniqueID);
                         uniqueID++;
                     }
 
-                    boost::shared_ptr<ImageResource> image(new ImageResource);
-                    image->file = file.GetFullPath();
-                    image->name = name;
-                    image->userAdded = false;
+                    ImageResource image;
+                    image.GetFile() = file.GetFullPath();
+                    image.SetName(name);
+                    image.SetUserAdded(false);
 
-                    game.resourceManager.resources.push_back(image);
-                    game.imagesChanged.push_back(name);
+                    game.GetResourcesManager().AddResource(image);
+                    game.GetChangesNotifier().OnResourceModified(game, name);
                 }
 
                 Sprite sprite;

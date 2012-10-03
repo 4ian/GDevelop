@@ -22,6 +22,14 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
+/**
+ * Changes by Florian Rival :
+ * Added GD_IDE_ONLY guard ( see below ) to prevent this file from being compiled when we're compiling the library for the IDE
+ * ( as in this case, Game Develop Core provides TinyXml ).
+ */
+
+#if !defined(GD_IDE_ONLY)
+
 #include "GDL/tinyxml/tinyxml.h"
 
 // The goal of the seperate error file is to make the first
@@ -52,3 +60,4 @@ const char* TiXmlBase::errorString[ TIXML_ERROR_STRING_COUNT ] =
 	"Error when TiXmlDocument added to document, because TiXmlDocument can only be at the root.",
 };
 
+#endif

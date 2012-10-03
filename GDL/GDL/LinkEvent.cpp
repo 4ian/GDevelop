@@ -30,6 +30,7 @@ void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
     limitsElem = new TiXmlElement( "Limites" );
     eventElem->LinkEndChild( limitsElem );
 
+    limitsElem->SetAttribute( "includeAll", IncludeAllEvents() ? "true" : "false" );
     limitsElem->SetDoubleAttribute( "start", GetIncludeStart() );
     limitsElem->SetDoubleAttribute( "end", GetIncludeEnd() );
 
@@ -41,13 +42,25 @@ void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
 
 void LinkEvent::LoadFromXml(const TiXmlElement * eventElem)
 {
-    if ( eventElem->FirstChildElement( "Limites" )->Attribute( "start" ) != NULL && eventElem->FirstChildElement( "Limites" )->Attribute( "end" ) != NULL )
+    if ( eventElem->FirstChildElement( "Limites" ) )
     {
-        SetIncludeStartAndEnd(ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "start" )),
-                              ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "end" )));
+        if ( eventElem->FirstChildElement( "Limites" )->Attribute( "includeAll" ) )
+        {
+            SetIncludeAllEvents( !(ToString(eventElem->FirstChildElement( "Limites" )->Attribute( "includeAll" )) == "false") );
+        }
+
+        if ( eventElem->FirstChildElement( "Limites" )->Attribute( "start" ) != NULL && eventElem->FirstChildElement( "Limites" )->Attribute( "end" ) != NULL )
+        {
+            SetIncludeStartAndEnd(ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "start" )),
+                                  ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "end" )));
+
+            //Backward compatibility
+            if ( ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "start" )) == -1 && ToInt(eventElem->FirstChildElement( "Limites" )->Attribute( "end" )) == -1  )
+                SetIncludeAllEvents( true );
+        }
     }
 
-    if ( eventElem->FirstChildElement( "Scene" )->Attribute( "value" ) != NULL ) { SetTarget(eventElem->FirstChildElement( "Scene" )->Attribute( "value" ));}
+    if ( eventElem->FirstChildElement( "Scene" ) && eventElem->FirstChildElement( "Scene" )->Attribute( "value" ) != NULL ) { SetTarget(eventElem->FirstChildElement( "Scene" )->Attribute( "value" ));}
     else { cout <<"Les informations concernant le nom de la scène liée."; }
 }
 

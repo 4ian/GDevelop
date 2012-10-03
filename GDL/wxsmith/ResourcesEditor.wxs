@@ -2,131 +2,132 @@
 <wxsmith>
 	<object class="wxPanel" name="ResourcesEditor">
 		<id_arg>0</id_arg>
-		<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
-			<cols>1</cols>
-			<growablecols>0</growablecols>
-			<growablerows>0</growablerows>
-			<object class="sizeritem">
-				<object class="wxPanel" name="ID_PANEL1" variable="Core" member="yes">
-					<handler function="OnResize" entry="EVT_SIZE" />
-					<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
+		<handler function="OnResize" entry="EVT_SIZE" />
+		<object class="wxAuiManager" variable="AuiManager1" member="yes">
+			<object class="AuiManagerItem">
+				<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes" />
+				<name>PaneName</name>
+				<standardpanetype>Toolbar</standardpanetype>
+				<caption>Pane caption</caption>
+				<captionvisible>0</captionvisible>
+				<minimizebutton>0</minimizebutton>
+				<maximizebutton>0</maximizebutton>
+				<pinbutton>0</pinbutton>
+				<layer>10</layer>
+				<dockabledirection></dockabledirection>
+				<resizable>0</resizable>
+				<gripper>Default</gripper>
+				<destroyonclose>0</destroyonclose>
+				<firstadd>0</firstadd>
+			</object>
+			<object class="AuiManagerItem">
+				<object class="wxPanel" name="ID_PANEL1" variable="corePanel" member="yes">
+					<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 						<cols>1</cols>
 						<growablecols>0</growablecols>
-						<growablerows>1</growablerows>
+						<growablerows>0</growablerows>
 						<object class="sizeritem">
-							<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
-								<cols>3</cols>
-								<growablecols>0</growablecols>
-								<growablerows>0</growablerows>
-								<object class="sizeritem">
-									<object class="wxPanel" name="ID_PANEL2" variable="toolbarPanel" member="yes">
-										<size>-1,25</size>
-										<fg>wxSYS_COLOUR_HIGHLIGHT</fg>
-										<bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-										<extra_code>if ( useRibbon ) toolbarPanel-&gt;Hide();</extra_code>
-										<object class="wxAuiManager" variable="AuiManager1" member="yes">
-											<object class="AuiManagerItem">
-												<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes" />
-												<name>PaneName</name>
-												<standardpanetype>Toolbar</standardpanetype>
-												<caption>Pane caption</caption>
-												<captionvisible>0</captionvisible>
-												<minimizebutton>0</minimizebutton>
-												<maximizebutton>0</maximizebutton>
-												<pinbutton>0</pinbutton>
-												<layer>10</layer>
-												<dockfixed>0</dockfixed>
-												<dockabledirection></dockabledirection>
-												<resizable>0</resizable>
-												<destroyonclose>0</destroyonclose>
-												<firstadd>0</firstadd>
-											</object>
-										</object>
-									</object>
-									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-									<option>1</option>
-								</object>
+							<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="resourcesTree" member="yes">
+								<image_list></image_list>
+								<tree_items>
+									<item>resourcesTree</item>
+									<item></item>
+								</tree_items>
+								<items_text>
+									<item2>resourcesTree</item2>
+									<item2></item2>
+								</items_text>
+								<size>200,170</size>
+								<tooltip>Right click on an image to access to more options</tooltip>
+								<style>wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE</style>
+								<handler function="OnresourcesTreeBeginDrag" entry="EVT_TREE_BEGIN_DRAG" />
+								<handler function="OnresourcesTreeBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
+								<handler function="OnresourcesTreeEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
+								<handler function="OnresourcesTreeItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
+								<handler function="OnresourcesTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+								<handler function="OnresourcesTreeItemMenu" entry="EVT_TREE_ITEM_MENU" />
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<option>1</option>
 						</object>
 						<object class="sizeritem">
-							<object class="wxSplitterWindow" name="ID_SPLITTERWINDOW1" variable="SplitterWindow1" member="yes">
-								<minsize>10</minsize>
-								<orientation>vertical</orientation>
-								<size>239,271</size>
-								<minsize>10,10</minsize>
-								<object class="wxPanel" name="ID_PANEL4" variable="treePanel" member="yes">
-									<pos>24,64</pos>
-									<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
-										<cols>1</cols>
-										<growablecols>0</growablecols>
-										<growablerows>0</growablerows>
-										<object class="sizeritem">
-											<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="resourcesTree" member="yes">
-												<image_list></image_list>
-												<tree_items>
-													<item>resourcesTree</item>
-													<item></item>
-												</tree_items>
-												<items_text>
-													<item2>resourcesTree</item2>
-													<item2></item2>
-												</items_text>
-												<size>200,170</size>
-												<tooltip>Right click on an image to access to more options</tooltip>
-												<style>wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE</style>
-												<handler function="OnresourcesTreeBeginDrag" entry="EVT_TREE_BEGIN_DRAG" />
-												<handler function="OnresourcesTreeBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
-												<handler function="OnresourcesTreeEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
-												<handler function="OnresourcesTreeItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
-												<handler function="OnresourcesTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
-												<handler function="OnresourcesTreeItemMenu" entry="EVT_TREE_ITEM_MENU" />
-											</object>
-											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-											<option>1</option>
-										</object>
-										<object class="sizeritem">
-											<object class="wxTextCtrl" name="ID_TEXTCTRL1" subclass="wxSearchCtrl" variable="searchCtrl" member="yes">
-												<handler function="OnsearchCtrlText" entry="EVT_TEXT" />
-											</object>
-											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-											<border>5</border>
-											<option>1</option>
-										</object>
-									</object>
-								</object>
-								<object class="wxPanel" name="ID_PANEL3" variable="apercuPanel" member="yes">
-									<size>200,120</size>
-									<style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
-									<handler function="OnapercuPanelPaint" entry="EVT_PAINT" />
-									<handler function="OnapercuPanelResize" entry="EVT_SIZE" />
-								</object>
+							<object class="wxTextCtrl" name="ID_TEXTCTRL1" subclass="wxSearchCtrl" variable="searchCtrl" member="yes">
+								<handler function="OnsearchCtrlText" entry="EVT_TEXT" />
+							</object>
+							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							<border>5</border>
+							<option>1</option>
+						</object>
+					</object>
+				</object>
+				<name>corePane</name>
+				<caption>Pane caption</caption>
+				<captionvisible>0</captionvisible>
+				<minimizebutton>0</minimizebutton>
+				<maximizebutton>0</maximizebutton>
+				<pinbutton>0</pinbutton>
+				<closebutton>0</closebutton>
+				<dockdirection>Center</dockdirection>
+				<dockfixed>0</dockfixed>
+				<dockabledirection></dockabledirection>
+				<destroyonclose>0</destroyonclose>
+				<firstadd>0</firstadd>
+			</object>
+			<object class="AuiManagerItem">
+				<object class="wxPanel" name="ID_PANEL3" variable="previewPanel" member="yes">
+					<style>wxSUNKEN_BORDER|wxTAB_TRAVERSAL</style>
+					<handler function="OnpreviewPanelPaint" entry="EVT_PAINT" />
+					<handler function="OnpreviewPanelResize" entry="EVT_SIZE" />
+				</object>
+				<name>previewPane</name>
+				<caption>Preview</caption>
+				<minimizebutton>0</minimizebutton>
+				<maximizebutton>0</maximizebutton>
+				<pinbutton>0</pinbutton>
+				<closebutton>0</closebutton>
+				<dockdirection>Right</dockdirection>
+				<dockfixed>0</dockfixed>
+				<dockabledirection></dockabledirection>
+				<destroyonclose>0</destroyonclose>
+				<firstadd>0</firstadd>
+			</object>
+			<object class="AuiManagerItem">
+				<object class="wxPanel" name="ID_PANEL2" variable="propertiesPanel" member="yes">
+					<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+						<cols>3</cols>
+						<growablecols>0</growablecols>
+						<growablerows>0</growablerows>
+						<object class="sizeritem">
+							<object class="Custom" name="ID_PROPGRID" subclass="wxPropertyGridManager" variable="propertyGrid" member="yes">
+								<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),0,$(NAME));</creating_code>
+								<include_file>wx/propgrid/manager.h</include_file>
+								<style></style>
+								<fg>wxSYS_COLOUR_HIGHLIGHT</fg>
+								<bg>wxSYS_COLOUR_HIGHLIGHT</bg>
 							</object>
 							<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 							<option>1</option>
 						</object>
 					</object>
 				</object>
-				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<option>1</option>
+				<name>propertiesPane</name>
+				<caption>Properties</caption>
+				<minimizebutton>0</minimizebutton>
+				<maximizebutton>0</maximizebutton>
+				<pinbutton>0</pinbutton>
+				<position>1</position>
+				<dockdirection>Right</dockdirection>
+				<dockfixed>0</dockfixed>
+				<dockabledirection></dockabledirection>
+				<destroyonclose>0</destroyonclose>
+				<firstadd>0</firstadd>
 			</object>
 		</object>
 		<object class="wxMenu" variable="ContextMenu" member="yes">
-			<object class="wxMenuItem" name="idMenuModProp" variable="editMenuItem" member="no">
-				<label>Modify the image properties</label>
-				<bitmap>res/editpropicon.png</bitmap>
-				<handler function="OnModPropSelected" entry="EVT_MENU" />
-			</object>
 			<object class="wxMenuItem" name="idMenuMod" variable="MenuItem3" member="no">
-				<label>Change the image name</label>
+				<label>Rename</label>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OnModNameImageBtClick" entry="EVT_MENU" />
-			</object>
-			<object class="wxMenuItem" name="idMenuModFile" variable="MenuItem4" member="yes">
-				<label>Change image&apos;s file</label>
-				<bitmap>res/openicon.png</bitmap>
-				<handler function="OnModFileImage" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuAjouter" variable="MenuItem1" member="no">
@@ -136,6 +137,7 @@
 			</object>
 			<object class="wxMenuItem" name="idMenuDel" variable="deleteImageItem" member="no">
 				<label>Delete the image</label>
+				<accel>DEL</accel>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDelImageBtClick" entry="EVT_MENU" />
 			</object>
@@ -146,13 +148,14 @@
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMoveUp" variable="MenuItem7" member="yes">
 				<label>Move up</label>
-				<accel>Ctrl-P</accel>
+				<accel>Ctrl-J</accel>
 				<help>Move the image up</help>
 				<bitmap>res/up.png</bitmap>
 				<handler function="OnMoveUpSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMoveDown" variable="MenuItem8" member="yes">
 				<label>Move down</label>
+				<accel>Ctrl-K</accel>
 				<help>Move the image down</help>
 				<bitmap>res/down.png</bitmap>
 				<handler function="OnMoveDownSelected" entry="EVT_MENU" />
@@ -179,8 +182,9 @@
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM5" variable="MenuItem13" member="yes">
 				<label>Delete</label>
+				<accel>DEL</accel>
 				<bitmap>res/deleteicon.png</bitmap>
-				<handler function="OnRemoveFolderSelected" entry="EVT_MENU" />
+				<handler function="OnDelImageBtClick" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM6" variable="MenuItem10" member="yes">
@@ -191,16 +195,19 @@
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItem5" member="yes">
 				<label>Add a folder</label>
+				<bitmap>res/dossier.png</bitmap>
 				<handler function="OnAddFolderSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem11" member="yes">
 				<label>Move up</label>
+				<accel>Ctrl-J</accel>
 				<bitmap>res/up.png</bitmap>
 				<handler function="OnMoveUpSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM8" variable="MenuItem12" member="yes">
 				<label>Move down</label>
+				<accel>Ctrl-K</accel>
 				<bitmap>res/down.png</bitmap>
 				<handler function="OnMoveDownSelected" entry="EVT_MENU" />
 			</object>

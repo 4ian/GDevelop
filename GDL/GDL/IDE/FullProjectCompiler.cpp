@@ -38,7 +38,7 @@
 #include "GDCore/CommonTools.h"
 #include "GDL/IDE/ExecutableIconChanger.h"
 #include "GDL/IDE/BaseProfiler.h"
-#include "PlatformDefinition/Platform.h"
+#include "GDL/PlatformDefinition/Platform.h"
 
 using namespace std;
 
@@ -108,15 +108,13 @@ void FullProjectCompiler::LaunchProjectCompilation()
     diagnosticManager.OnMessage( gd::ToString( _("Preparing resources...") ));
 
     //Add images
-    for ( unsigned int i = 0;i < game.resourceManager.resources.size() ;i++ )
+    std::vector<std::string> allResources = game.GetResourcesManager().GetAllResourcesList();
+    for ( unsigned int i = 0;i < allResources.size() ;i++ )
     {
-        if ( game.resourceManager.resources[i] == boost::shared_ptr<Resource>() )
-            continue;
+        diagnosticManager.OnMessage( gd::ToString(_("Preparing resources...")), allResources[i] );
 
-        diagnosticManager.OnMessage( gd::ToString(_("Preparing resources...")), game.resourceManager.resources[i]->name );
-
-        if ( game.resourceManager.resources[i]->UseFile() )
-            resourcesMergingHelper.ExposeResource(game.resourceManager.resources[i]->GetFile());
+        if ( game.GetResourcesManager().GetResource(allResources[i]).UseFile() )
+            resourcesMergingHelper.ExposeResource(game.GetResourcesManager().GetResource(allResources[i]).GetFile());
     }
     if ( !game.loadingScreen.imageFichier.empty() )
     {
@@ -199,8 +197,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
     wxSafeYield();
     diagnosticManager.OnMessage(gd::ToString(_( "Compiling game..." )), gd::ToString(_( "Step 1 out of 3" )));
-    OpenSaveGame saveGame( game );
-    saveGame.SaveToFile(static_cast<string>( tempDir + "/compil.gdg" ));
+    game.SaveToFile(static_cast<string>( tempDir + "/compil.gdg" ));
     diagnosticManager.OnPercentUpdate(80);
 
     wxSafeYield();
@@ -242,8 +239,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
     wxRemoveFile( tempDir + "/compil.gdg" );
     diagnosticManager.OnPercentUpdate(85);
 
-    OpenSaveLoadingScreen saveLS(game.loadingScreen);
-    saveLS.SaveToFile(string(tempDir + "/loadingscreen"));
+    OpenSaveLoadingScreen::SaveToFile(game.loadingScreen, string(tempDir + "/loadingscreen"));
 
     //Création du fichier gam.egd
     diagnosticManager.OnMessage(gd::ToString(_( "Compiling game..." )), gd::ToString(_( "Step 3 out of 3" )));

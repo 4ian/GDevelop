@@ -22,6 +22,14 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
+/**
+ * Changes by Florian Rival :
+ * Added GD_IDE_ONLY guard ( see below ) to prevent this file from being compiled when we're compiling the library for the IDE
+ * ( as in this case, Game Develop Core provides TinyXml ).
+ */
+
+#if !defined(GD_IDE_ONLY)
+
 #include <ctype.h>
 #include <stddef.h>
 
@@ -1636,4 +1644,4 @@ bool TiXmlText::Blank() const
 	return true;
 }
 
-
+#endif

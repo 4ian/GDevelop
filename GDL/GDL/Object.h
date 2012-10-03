@@ -376,18 +376,6 @@ public:
     virtual bool DrawEdittime(sf::RenderTarget & renderTarget) {return true;};
 
     /**
-     * Called ( e.g. during compilation ) so as to inventory internal resources and sometimes update their filename.
-     * Implementation example:
-     * \code
-     * worker.ExposeImage(myImage);
-     * worker.ExposeResource(myResourceFile);
-     * \endcode
-     *
-     * \see ArbitraryResourceWorker
-     */
-    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker) {return;};
-
-    /**
      * Generate thumbnail for editor
      */
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) {return false;};

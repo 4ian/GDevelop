@@ -374,7 +374,6 @@ void Scene::LoadFromXml(const TiXmlElement * elem)
     #if defined(GD_IDE_ONLY)
     if ( elem->FirstChildElement( "Events" ) != NULL )
         OpenSaveGame::OpenEvents(GetEvents(), elem->FirstChildElement( "Events" ));
-    if ( OpenSaveGame::updateEventsFromGD1x ) OpenSaveGame::AdaptEventsFromGD1x(GetEvents());
     #endif
 
     if ( elem->FirstChildElement( "Variables" ) != NULL )

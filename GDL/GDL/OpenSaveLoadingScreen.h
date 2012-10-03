@@ -12,23 +12,17 @@
 using namespace std;
 
 /**
- * \brief Internal class for saving and loading data of LoadingScreen.
+ * \brief Internal helper class for saving and loading data of LoadingScreen.
  */
 class GD_API OpenSaveLoadingScreen
 {
-    public:
-        OpenSaveLoadingScreen(LoadingScreen & datas_);
-        virtual ~OpenSaveLoadingScreen();
+public:
 
-        bool SaveToFile(string file);
-        void SaveToElement(TiXmlElement * root);
-        bool OpenFromFile(string file);
-        bool OpenFromString(string text);
-        bool OpenFromElement(const TiXmlElement * elem);
-    protected:
-    private:
-
-        LoadingScreen & datas;
+    static bool SaveToFile(const LoadingScreen & datas, string file);
+    static void SaveToElement(const LoadingScreen & datas, TiXmlElement * root);
+    static bool OpenFromFile(LoadingScreen & datas, string file);
+    static bool OpenFromString(LoadingScreen & datas, string text);
+    static bool OpenFromElement(LoadingScreen & datas, const TiXmlElement * elem);
 };
 
 #endif // OPENSAVELOADINGSCREEN_H

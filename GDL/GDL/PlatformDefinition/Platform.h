@@ -29,6 +29,8 @@ public:
     virtual boost::shared_ptr<gd::PlatformExtension> GetExtension(const std::string & name) const;
 
     virtual gd::InstructionsMetadataHolder & GetInstructionsMetadataHolder() const;
+
+    virtual boost::shared_ptr<gd::Project> CreateNewEmptyProject() const;
 };
 
 #endif // PLATFORM_H

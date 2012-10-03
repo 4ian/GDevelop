@@ -7,6 +7,8 @@
 
 #include "Platform.h"
 #include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDL/RuntimeGame.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 
@@ -34,6 +36,11 @@ boost::shared_ptr<gd::PlatformExtension> Platform::GetExtension(const std::strin
 gd::InstructionsMetadataHolder & Platform::GetInstructionsMetadataHolder() const
 {
     return *ExtensionsManager::GetInstance();
+}
+
+boost::shared_ptr<gd::Project> Platform::CreateNewEmptyProject() const
+{
+    return boost::shared_ptr<gd::Project>(new RuntimeGame);
 }
 
 /**

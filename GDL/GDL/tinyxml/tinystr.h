@@ -37,7 +37,14 @@ distribution.
 /**
  * Changes by Florian Rival :
  * Added GD_API to integrate TinyXml to Game Develop Library.
+ *
+ * Added GD_IDE_ONLY guard ( see below ) to prevent this file from being used when we're compiling the library for the IDE
+ * ( as in this case, Game Develop Core provides TinyXml ).
  */
+
+#if defined(GD_IDE_ONLY)
+#include "GDCore/TinyXml/tinystr.h"
+#else
 
 #ifndef TIXML_USE_STL
 
@@ -323,3 +330,4 @@ public :
 #endif	// TIXML_STRING_INCLUDED
 #endif	// TIXML_USE_STL
 
+#endif

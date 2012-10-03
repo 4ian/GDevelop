@@ -9,15 +9,18 @@
 #include <vector>
 class wxPropertyGrid;
 class wxPropertyGridEvent;
+class TiXmlElement;
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/PlatformDefinition/ClassWithObjects.h"
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
+namespace gd { class ResourcesManager; }
 namespace gd { class ExternalLayout; }
 namespace gd { class Object; }
 namespace gd { class VariablesContainer; }
+namespace gd { class ArbitraryResourceWorker; }
 #undef GetObject //Disable an annoying macro
 
 namespace gd
@@ -32,6 +35,17 @@ class GD_CORE_API Project : public ClassWithObjects
 public:
     Project();
     virtual ~Project();
+
+    /**
+     * Must return a pointer to a copy of the project.
+     * A such method is needed as the IDE may want to store copies of some projects and so need a way to do polymorphic copies.
+     *
+     * Typical implementation example:
+     * \code
+     * return new MyProject(*this);
+     * \endcode
+     */
+    virtual Project * Clone() const =0;
 
     /** \name Common properties
      * Some properties for the project
@@ -56,7 +70,7 @@ public:
     /**
      * Must return the name of the project.
      */
-    virtual const std::string & GetAuthor() =0;
+    virtual const std::string & GetAuthor() const =0;
 
     /**
      * Called when project file has changed.
@@ -255,6 +269,34 @@ public:
 
     ///@}
 
+    /** \name Saving and loading
+     * Members functions related to saving and loading the project.
+     */
+    ///@{
+
+    /**
+     * Save the project to a file.
+     * \warning This tool method do not need to ( and must not ) be redefined: See Project::SaveToXml method instead.
+     */
+    bool SaveToFile(const std::string & filename);
+
+    /**
+     * Load the project from a file.
+     * \warning This tool method do not need to ( and must not ) be redefined: See Project::LoadFromXml method instead.
+     */
+    bool LoadFromFile(const std::string & filename);
+
+    /**
+     * Called to save the layout to a TiXmlElement.
+     */
+    virtual void SaveToXml(TiXmlElement * element) const {};
+
+    /**
+     * Called to load the layout from a TiXmlElement.
+     */
+    virtual void LoadFromXml(const TiXmlElement * element) {};
+    ///@}
+
     /** \name External events management
      * Members functions related to external events management.
      */
@@ -392,6 +434,38 @@ public:
 
     ///@}
 
+    /** \name Resources management
+     * Members functions related to resources management.
+     */
+    ///@{
+    /**
+     * Provide access to the ResourcesManager member containing the list of the resources.
+     */
+    virtual const gd::ResourcesManager & GetResourcesManager() const =0;
+
+    /**
+     * Provide access to the ResourcesManager member containing the list of the resources.
+     */
+    virtual gd::ResourcesManager & GetResourcesManager() =0;
+
+    /**
+     * Called ( e.g. during compilation ) so as to inventory internal resources and sometimes update their filename.
+     *
+     * \note The default implementation takes care of exposing all resources of global objects, layouts, events.
+     * If you want to expose additional resources, you can redefine this method to add the resources to expose and call the
+     * base class method too:
+     * \code
+     * void MyProject::ExposeResources(gd::ArbitraryResourceWorker & worker)
+     * {
+     *     gd::Project::ExposeResources(worker);
+     *     worker.ExposeResource(myResource);
+     * }
+     * \endcode
+     *
+     * \see ArbitraryResourceWorker
+     */
+    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
+    ///@}
 
     /** \name Variable management
      * Members functions related to global variables management.

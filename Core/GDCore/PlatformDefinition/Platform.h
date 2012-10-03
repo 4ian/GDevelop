@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 namespace gd { class InstructionsMetadataHolder; }
+namespace gd { class Project; }
 
 namespace gd
 {
@@ -52,6 +53,11 @@ public:
      * \see gd::InstructionsMetadataHolder
      */
     virtual gd::InstructionsMetadataHolder & GetInstructionsMetadataHolder() const =0;
+
+    /**
+     * Must create an empty project
+     */
+    virtual boost::shared_ptr<gd::Project> CreateNewEmptyProject() const =0;
 
 private:
 };

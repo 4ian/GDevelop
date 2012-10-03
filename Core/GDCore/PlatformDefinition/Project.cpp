@@ -8,14 +8,21 @@
 #include <string>
 #include <wx/propgrid/propgrid.h>
 #include <wx/settings.h>
+#include <wx/log.h>
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
+#include "GDCore/IDE/ArbitraryResourceWorker.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/PlatformDefinition/ResourcesManager.h"
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
 #include "GDCore/CommonTools.h"
+#include "GDCore/TinyXml/tinyxml.h"
 #include "Project.h"
 
 namespace gd
@@ -32,6 +39,38 @@ Project::Project()
 Project::~Project()
 {
     //dtor
+}
+
+void Project::ExposeResources(gd::ArbitraryResourceWorker & worker)
+{
+    //Add project resources
+    std::vector<std::string> resources = GetResourcesManager().GetAllResourcesList();
+    for ( unsigned int i = 0;i < resources.size() ;i++ )
+    {
+        if ( GetResourcesManager().GetResource(resources[i]).UseFile() )
+            worker.ExposeResource(GetResourcesManager().GetResource(resources[i]).GetFile());
+    }
+    wxSafeYield();
+
+    //Add layouts resources
+    for ( unsigned int s = 0;s < GetLayoutCount();s++ )
+    {
+        for (unsigned int j = 0;j<GetLayout(s).GetObjectsCount();++j) //Add objects resources
+        	GetLayout(s).GetObject(j).ExposeResources(worker);
+
+        LaunchResourceWorkerOnEvents(*this, GetLayout(s).GetEvents(), worker);
+    }
+    //Add external events resources
+    for ( unsigned int s = 0;s < GetExternalEventsCount();s++ )
+    {
+        LaunchResourceWorkerOnEvents(*this, GetExternalEvents(s).GetEvents(), worker);
+    }
+    wxSafeYield();
+
+    //Add global objects resources
+    for (unsigned int j = 0;j<GetObjectsCount();++j)
+        GetObject(j).ExposeResources(worker);
+    wxSafeYield();
 }
 
 void Project::PopulatePropertyGrid(wxPropertyGrid * grid)
@@ -107,6 +146,56 @@ void Project::OnChangeInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent 
         grid->EnableProperty(_("Maximum FPS"), grid->GetProperty(_("Limit the framerate"))->GetValue().GetBool());
 
     UpdateFromPropertyGrid(grid);
+}
+
+bool Project::SaveToFile(const std::string & filename)
+{
+    //Create document structure
+    TiXmlDocument doc;
+    TiXmlDeclaration* decl = new TiXmlDeclaration( "1.0", "ISO-8859-1", "" );
+    doc.LinkEndChild( decl );
+
+    TiXmlElement * root = new TiXmlElement( "Project" );
+    doc.LinkEndChild( root );
+
+    SaveToXml(root);
+
+    //Wrie XML to file
+    if ( !doc.SaveFile( filename.c_str() ) )
+    {
+        wxLogError( _( "Unable to save file to ")+filename+_("\nCheck that the drive has enough free space, is not write-protected and that you have read/write permissions." ) );
+        return false;
+    }
+
+    return true;
+}
+
+bool Project::LoadFromFile(const std::string & filename)
+{
+    //Load document structure
+    TiXmlDocument doc;
+    if ( !doc.LoadFile(filename.c_str()) )
+    {
+        wxString errorTinyXmlDesc = doc.ErrorDesc();
+        wxString error = _( "Error while loading :" ) + "\n" + errorTinyXmlDesc + "\n\n" +_("Make sure the file exists and that you have the right to open the file.");
+
+        wxLogError( error );
+        return false;
+    }
+
+    SetProjectFile(filename);
+
+    TiXmlHandle hdl( &doc );
+    LoadFromXml(hdl.FirstChildElement().Element());
+
+    /*#if defined(GD_IDE_ONLY) //TODO
+    if (!updateText.empty())
+    {
+        ProjectUpdateDlg updateDialog(NULL, updateText);
+        updateDialog.ShowModal();
+    }
+    #endif*/
+    return true;
 }
 
 bool Project::ValidateObjectName(const std::string & name)

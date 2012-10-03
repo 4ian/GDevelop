@@ -124,6 +124,13 @@ public:
      */
     virtual void OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & automatismName) const {};
 
+    /**
+     * Called when a resource have been added/removed/modified
+     * \param project Related project
+     * \param automatismName The name of the resource which have been modified
+     */
+    virtual void OnResourceModified(gd::Project & project, const std::string & resourceName) const {};
+
     ///@}
 };
 

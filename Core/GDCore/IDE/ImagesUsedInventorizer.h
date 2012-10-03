@@ -18,6 +18,8 @@
 
 /**
  * \brief Class used to track all images used in a game.
+ *
+ * \ingroup IDE
  */
 class ImagesUsedInventorizer : public gd::ArbitraryResourceWorker
 {

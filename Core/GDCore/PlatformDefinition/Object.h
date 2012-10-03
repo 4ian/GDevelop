@@ -10,6 +10,7 @@ namespace gd { class Automatism; }
 namespace gd { class Project; }
 namespace gd { class VariablesContainer; }
 namespace gd { class MainFrameWrapper; }
+namespace gd { class ArbitraryResourceWorker; }
 class wxWindow;
 class wxBitmap;
 
@@ -113,6 +114,24 @@ public:
      * \see gd::VariablesContainer
      */
     virtual gd::VariablesContainer & GetVariables() =0;
+    ///@}
+
+
+    /** \name Resources management
+     * Members functions related to managing resources used by the object
+     */
+    ///@{
+    /**
+     * Called ( e.g. during compilation ) so as to inventory internal resources and sometimes update their filename.
+     * Implementation example:
+     * \code
+     * worker.ExposeImage(myImage);
+     * worker.ExposeResource(myResourceFile);
+     * \endcode
+     *
+     * \see ArbitraryResourceWorker
+     */
+    virtual void ExposeResources(gd::ArbitraryResourceWorker & worker) {return;};
     ///@}
 
     /** \name GUI related

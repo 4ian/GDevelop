@@ -12,6 +12,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/IDE/ProjectResourcesCopier.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
+#include "GDCore/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Game.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
@@ -23,7 +24,6 @@
 #include "BuildToolsPnl.h"
 #include "BuildProgressPnl.h"
 #include "Compilation.h"
-#include "Portable.h"
 #include "PlatformManager.h"
 #include "Fusion.h"
 #include "MessagePlus.h"
@@ -44,10 +44,7 @@ void MainFrame::OnCloseCurrentProjectSelected(wxCommandEvent& event)
     if ( projectManager ) projectManager->OnRibbonCloseSelected(uselessEvent);
 }
 
-////////////////////////////////////////////////////////////
-/// Créer un nouveau jeu vierge
-////////////////////////////////////////////////////////////
-void MainFrame::OnMenuNewSelected( wxCommandEvent& event )
+void MainFrame::CreateNewProject()
 {
     NewProjectDialog dialog(this);
     if ( dialog.ShowModal() == 1 )
@@ -66,8 +63,10 @@ void MainFrame::OnMenuNewSelected( wxCommandEvent& event )
                 {
                     newProject->SetProjectFile(dialog.GetChosenTemplateFile());
                     newProject->LoadFromFile(newProject->GetProjectFile());
-                    gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, ToString(targetDirectory));
+                    gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, ToString(targetDirectory), false);
                 }
+                else
+                    newProject->InsertNewLayout(gd::ToString(_("New scene")), 0);
 
                 newProject->SetProjectFile(dialog.GetChosenFilename());
                 newProject->SaveToFile(newProject->GetProjectFile());
@@ -75,21 +74,27 @@ void MainFrame::OnMenuNewSelected( wxCommandEvent& event )
                 games.push_back(newProject);
                 SetCurrentGame(games.size()-1);
                 if ( startPage ) startPage->Refresh();
+
+                if ( newProject->GetLayoutCount() > 0 ) projectManager->EditLayout(*newProject, newProject->GetLayout(0));
             }
             else wxLogError(_("Unable to create the project associated with the platform.\n\nPlease report this error to Game Develop developer."));
         }
         else wxLogError(_("Unable to find the platform associated with the template.\n\nPlease report this error to Game Develop developer."));
-
+    }
+    else if ( dialog.UserWantToBrowseExamples() )
+    {
+        wxCommandEvent uselessEvent;
+        OnOpenExampleSelected(uselessEvent);
     }
 }
 
-/**
- * Adapter for the ribbon
- */
+void MainFrame::OnMenuNewSelected( wxCommandEvent& event )
+{
+    CreateNewProject();
+}
 void MainFrame::OnRibbonNewClicked(wxRibbonButtonBarEvent& evt)
 {
-    wxCommandEvent uselessEvent;
-    OnMenuNewSelected(uselessEvent);
+    CreateNewProject();
 }
 
 /**
@@ -301,7 +306,7 @@ void MainFrame::SaveAs()
             if ( dlg.ShowModal() == wxID_YES )
             {
                 wxProgressDialog progressDialog(_("Save progress"), _("Exporting resources..."));
-                gd::ProjectResourcesCopier::CopyAllResourcesTo(*GetCurrentGame(), ToString(newPath), &progressDialog);
+                gd::ProjectResourcesCopier::CopyAllResourcesTo(*GetCurrentGame(), ToString(newPath), true, &progressDialog);
             }
 
             if ( dlg.IsCheckBoxChecked() )
@@ -326,18 +331,6 @@ void MainFrame::OnMenuCompilationSelected( wxCommandEvent& event )
 
     Compilation Dialog( this, * dynamic_cast<Game*>(GetCurrentGame().get()) ); //TODO : Abstract
     Dialog.ShowModal();
-}
-
-/**
- * Open the window to gather a project and its resources.
- */
-void MainFrame::OnMenuPortableSelected( wxCommandEvent& event )
-{
-    if ( !CurrentGameIsValid() ) return;
-
-    //TODO: Adapt Portable dialog to gd::Project
-    Portable dialog( this, dynamic_cast<Game*>(GetCurrentGame().get()) );
-    dialog.ShowModal();
 }
 
 void MainFrame::OnRecentClicked( wxCommandEvent& event )

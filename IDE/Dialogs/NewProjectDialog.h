@@ -12,6 +12,7 @@
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/statline.h>
+#include <wx/hyperlink.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -29,10 +30,11 @@ public:
     wxStaticText* StaticText1;
     wxButton* cancelBt;
     wxTextCtrl* projectFileEdit;
-    wxButton* Button3;
     wxStaticLine* StaticLine1;
     wxListCtrl* templateList;
+    wxButton* browseBt;
     wxButton* createProjectBt;
+    wxHyperlinkCtrl* examplesBt;
     //*)
 
     /**
@@ -52,6 +54,11 @@ public:
      */
     std::string GetChosenTemplatePlatform() const { return chosenTemplatePlatform; }
 
+    /**
+     * Return true if the user clicked on the button to browse examples ( ShowModal() returned 0 )
+     */
+    bool UserWantToBrowseExamples() const { return userWantToBrowseExamples; }
+
 protected:
 
     //(*Identifiers(NewProjectDialog)
@@ -62,6 +69,7 @@ protected:
     static const long ID_TEXTCTRL1;
     static const long ID_BUTTON3;
     static const long ID_STATICLINE1;
+    static const long ID_HYPERLINKCTRL1;
     static const long ID_BUTTON1;
     static const long ID_BUTTON2;
     //*)
@@ -74,15 +82,19 @@ private:
     void OncancelBtClick(wxCommandEvent& event);
     void OntemplateListItemSelect(wxListEvent& event);
     void OnplatformListItemSelect(wxListEvent& event);
+    void OnbrowseBtClick(wxCommandEvent& event);
+    void OnexamplesBtClick(wxCommandEvent& event);
     //*)
     void UpdateListColumnsWidth();
     void RefreshTemplateList();
     void RefreshPlatformList();
 
+    wxString newProjectBaseFolder; ///< Computed in the constructor
+
     std::string chosenFilename;
     std::string chosenTemplateFile;
     std::string chosenTemplatePlatform;
-
+    bool userWantToBrowseExamples;
 
     DECLARE_EVENT_TABLE()
 };

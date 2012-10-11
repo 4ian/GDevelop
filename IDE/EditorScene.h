@@ -21,6 +21,7 @@
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/toolbar.h>
 namespace gd {class Layout;}
+namespace gd {class Project;}
 class RuntimeGame;
 class EventsEditor;
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
@@ -36,7 +37,7 @@ class EditorScene: public wxPanel
 {
 	public:
 
-		EditorScene(wxWindow* parent, RuntimeGame & game_, gd::Layout & layout_, const gd::MainFrameWrapper & mainFrameWrapper_);
+		EditorScene(wxWindow* parent, gd::Project & project, gd::Layout & layout_, const gd::MainFrameWrapper & mainFrameWrapper_);
 		virtual ~EditorScene();
 
 		//(*Declarations(EditorScene)
@@ -94,7 +95,7 @@ class EditorScene: public wxPanel
 		void OnsceneCanvasPanelResize(wxSizeEvent& event);
 		//*)
 
-		RuntimeGame & game;
+		gd::Project & project;
 		gd::Layout & layout;
 		gd::MainFrameWrapper mainFrameWrapper;
 

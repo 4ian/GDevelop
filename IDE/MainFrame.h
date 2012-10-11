@@ -59,9 +59,8 @@ class MainFrame: public wxFrame
         /**
          * Constructor.
          * \param Parent window
-         * \param True to create an initial empty project
          */
-        MainFrame(wxWindow* parent, bool createEmptyProject);
+        MainFrame(wxWindow* parent );
         virtual ~MainFrame();
 
         vector < boost::shared_ptr<gd::Project> > games; ///< All games opened
@@ -96,6 +95,11 @@ class MainFrame: public wxFrame
          * Open a game from its filename
          */
         void Open(string FichierJeu);
+
+        /**
+         * Open the new project dialog
+         */
+        void CreateNewProject();
 
         static void LoadSkin(wxRibbonBar * bar);
         static void LoadSkin(wxAuiManager * auiManager, wxAuiNotebook * notebook);
@@ -176,7 +180,6 @@ class MainFrame: public wxFrame
         void OnMenuPrefSelected(wxCommandEvent& event);
         void OnRefreshAnalyseBtClick(wxCommandEvent& event);
         void OnMenuCompilationSelected(wxCommandEvent& event);
-        void OnMenuPortableSelected(wxCommandEvent& event);
         void OnMenuItem23Selected(wxCommandEvent& event);
         void OnMenuForumSelected(wxCommandEvent& event);
         void OnMenuSiteSelected(wxCommandEvent& event);
@@ -233,7 +236,6 @@ class MainFrame: public wxFrame
         static const long ID_MENUITEM1;
         static const long ID_MENUITEM8;
         static const long ID_MENUITEM2;
-        static const long ID_MENUITEM3;
         static const long ID_MENUITEM4;
         static const long ID_MENUITEM5;
         static const long ID_MENUITEM6;

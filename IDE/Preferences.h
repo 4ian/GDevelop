@@ -43,6 +43,7 @@ class Preferences: public wxDialog
 		wxRadioBox* ribbonStyleBox;
 		wxButton* gdStyleBt;
 		wxButton* BrowseDossierTempBt;
+		wxTextCtrl* newProjectFolderEdit;
 		wxTextCtrl* codeEditorEdit;
 		wxButton* oxygenStyleBt;
 		wxStaticText* StaticText13;
@@ -71,6 +72,7 @@ class Preferences: public wxDialog
 		wxStaticText* StaticText3;
 		wxTextCtrl* EditeurImageEdit;
 		wxPanel* inactiveTextColorPnl;
+		wxButton* newProjectFolderBrowseBt;
 		wxPanel* InactifColor2Pnl;
 		wxCheckBox* hidePageTabsCheck;
 		wxPanel* Panel6;
@@ -103,6 +105,7 @@ class Preferences: public wxDialog
 		wxButton* browseCodeEditorBt;
 		wxButton* browseCompilationTempDir;
 		wxButton* officeStyleBt;
+		wxStaticText* StaticText16;
 		wxStaticBitmap* StaticBitmap3;
 		wxRadioButton* internalCodeEditorCheck;
 		wxButton* AideBt;
@@ -127,6 +130,9 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT13;
 		static const long ID_CHOICE2;
 		static const long ID_PANEL15;
+		static const long ID_STATICTEXT16;
+		static const long ID_TEXTCTRL7;
+		static const long ID_BUTTON9;
 		static const long ID_STATICTEXT6;
 		static const long ID_TEXTCTRL3;
 		static const long ID_BUTTON5;
@@ -228,6 +234,7 @@ class Preferences: public wxDialog
 		void OnoxygenStyleBtClick(wxCommandEvent& event);
 		void OnfileBtColorPnlLeftUp(wxMouseEvent& event);
 		void OnlogCheckClick(wxCommandEvent& event);
+		void OnnewProjectFolderBrowseBtClick(wxCommandEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();

@@ -65,7 +65,6 @@ const long MainFrame::ID_PANEL1 = wxNewId();
 const long MainFrame::ID_MENUITEM1 = wxNewId();
 const long MainFrame::ID_MENUITEM8 = wxNewId();
 const long MainFrame::ID_MENUITEM2 = wxNewId();
-const long MainFrame::ID_MENUITEM3 = wxNewId();
 const long MainFrame::ID_MENUITEM4 = wxNewId();
 const long MainFrame::ID_MENUITEM5 = wxNewId();
 const long MainFrame::ID_MENUITEM6 = wxNewId();
@@ -122,7 +121,7 @@ END_EVENT_TABLE()
 /**
  * Constructor of the main frame.
  */
-MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
+MainFrame::MainFrame( wxWindow* parent ) :
     gameCurrentlyEdited(0),
     m_ribbon(NULL),
     ribbonFileBt(NULL),
@@ -137,7 +136,6 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     //(*Initialize(MainFrame)
     wxBoxSizer* ribbonSizer;
     wxMenuItem* MenuItem1;
-    wxMenuItem* MenuItem11;
     wxFlexGridSizer* FlexGridSizer2;
     wxMenuItem* MenuItem42;
     wxMenuItem* MenuItem41;
@@ -165,7 +163,8 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     editorsNotebook = new wxAuiNotebook(Panel1, ID_AUINOTEBOOK1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_TOP|wxNO_BORDER);
     FlexGridSizer2->Add(editorsNotebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     Panel1->SetSizer(FlexGridSizer2);
-    FlexGridSizer2->SetSizeHints(Panel1);
+    SetSizer(FlexGridSizer2);
+    Layout();
     FlexGridSizer1->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer1);
     MenuItem1 = new wxMenuItem((&openContextMenu), ID_MENUITEM1, _("Open an example"), wxEmptyString, wxITEM_NORMAL);
@@ -176,9 +175,6 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     MenuItem10 = new wxMenuItem((&saveContextMenu), ID_MENUITEM2, _("Save as..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem10->SetBitmap(wxBitmap(wxImage(_T("res/saveasicon.png"))));
     saveContextMenu.Append(MenuItem10);
-    MenuItem11 = new wxMenuItem((&saveContextMenu), ID_MENUITEM3, _("Save in portable version"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem11->SetBitmap(wxBitmap(wxImage(_T("res/portableicon.png"))));
-    saveContextMenu.Append(MenuItem11);
     MenuItem41 = new wxMenuItem((&decomposerContextMenu), ID_MENUITEM4, _("Decompose an animated GIF"), wxEmptyString, wxITEM_NORMAL);
     MenuItem41->SetBitmap(wxBitmap(wxImage(_T("res/importgif.png"))));
     decomposerContextMenu.Append(MenuItem41);
@@ -194,7 +190,7 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/newicon.png"))));
     fileMenu.Append(MenuItem2);
     fileMenu.AppendSeparator();
-    MenuItem3 = new wxMenuItem((&fileMenu), ID_MENUITEM9, _("Open\tCtrl-O"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem3 = new wxMenuItem((&fileMenu), ID_MENUITEM9, _("Open\tCtrl+O"), wxEmptyString, wxITEM_NORMAL);
     MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/openicon.png"))));
     fileMenu.Append(MenuItem3);
     MenuItem4 = new wxMenuItem((&fileMenu), ID_MENUITEM10, _("Open an example"), wxEmptyString, wxITEM_NORMAL);
@@ -259,7 +255,8 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     MenuItem17 = new wxMenuItem((&helpMenu), ID_MENUITEM21, _("About..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem17->SetBitmap(wxBitmap(wxImage(_T("res/icon16.png"))));
     helpMenu.Append(MenuItem17);
-    FlexGridSizer1->SetSizeHints(this);
+    SetSizer(FlexGridSizer1);
+    Layout();
     Center();
 
     Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE,(wxObjectEventFunction)&MainFrame::OneditorsNotebookPageClose);
@@ -267,7 +264,6 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     Connect(ID_MENUITEM1,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnOpenExampleSelected);
     Connect(ID_MENUITEM8,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuFusionSelected);
     Connect(ID_MENUITEM2,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAsSelected);
-    Connect(ID_MENUITEM3,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuPortableSelected);
     Connect(ID_MENUITEM4,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnDecomposeGIFSelected);
     Connect(ID_MENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnDecomposeRPGSelected);
     Connect(ID_MENUITEM6,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnDecomposeSSSelected);
@@ -280,7 +276,6 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     Connect(ID_MENUITEM13,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAsSelected);
     Connect(ID_MENUITEM16,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSaveAllSelected);
     Connect(ID_MENUITEM15,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuCompilationSelected);
-    Connect(ID_MENUITEM18,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuPortableSelected);
     Connect(ID_MENUITEM19,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnCloseCurrentProjectSelected);
     Connect(ID_MENUITEM17,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuPrefSelected);
     Connect(ID_MENUITEM27,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuAideSelected);
@@ -349,9 +344,12 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     }
 
     //Create status bar
-    MyStatusBar * myStatusBar = new MyStatusBar(this);
-    myStatusBar->SetStatusText( "2008-2012 Compil Games", 1 );
-    SetStatusBar(myStatusBar);
+    wxStatusBar * statusBar = new wxStatusBar(this);
+    static int widths[2] = { -1, 175 };
+    statusBar->SetFieldsCount(2);
+    statusBar->SetStatusWidths(2, widths);
+    statusBar->SetStatusText( "2008-2012 Compil Games", 1 );
+    SetStatusBar(statusBar);
 
     //Ribbon setup
     long ribbonStyle = wxRIBBON_BAR_DEFAULT_STYLE;
@@ -492,20 +490,13 @@ MainFrame::MainFrame( wxWindow* parent, bool createEmptyProject) :
     SetSize(900,740);
     Center();
     Maximize(true);
-
-    if ( createEmptyProject )
-    {
-        games.push_back(boost::shared_ptr<RuntimeGame>(new RuntimeGame));
-        SetCurrentGame(0);
-    }
 }
-void MainFrame::OnResize(wxSizeEvent& event)
 
+void MainFrame::OnResize(wxSizeEvent& event)
 {
     Layout();
     if ( ribbonHelpBt != NULL ) ribbonHelpBt->SetPosition(wxPoint(m_ribbon->GetSize().GetWidth()-ribbonHelpBt->GetSize().GetWidth()-2, 2));
 }
-
 
 /**
  * Destructor : Uninit

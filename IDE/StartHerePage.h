@@ -27,6 +27,7 @@ class StartHerePage: public wxPanel
 		wxStaticBitmap* StaticBitmap7;
 		wxHyperlinkCtrl* HyperlinkCtrl3;
 		wxHyperlinkCtrl* HyperlinkCtrl6;
+		wxHyperlinkCtrl* newProjectLink;
 		wxStaticText* StaticText2;
 		wxStaticBitmap* StaticBitmap16;
 		wxHyperlinkCtrl* HyperlinkCtrl9;
@@ -40,7 +41,6 @@ class StartHerePage: public wxPanel
 		wxHyperlinkCtrl* recent5Bt;
 		wxHyperlinkCtrl* secondTutoLink;
 		wxStaticText* StaticText1;
-		wxStaticText* StaticText3;
 		wxStaticBitmap* StaticBitmap15;
 		wxHyperlinkCtrl* HyperlinkCtrl4;
 		wxStaticBitmap* StaticBitmap10;
@@ -52,6 +52,7 @@ class StartHerePage: public wxPanel
 		wxStaticBitmap* StaticBitmap6;
 		wxHyperlinkCtrl* recent7Bt;
 		wxStaticBitmap* StaticBitmap13;
+		wxStaticBitmap* StaticBitmap18;
 		wxStaticText* StaticText4;
 		wxHyperlinkCtrl* googleplusLink;
 		wxStaticBitmap* StaticBitmap3;
@@ -66,7 +67,8 @@ class StartHerePage: public wxPanel
 		//(*Identifiers(StartHerePage)
 		static const long ID_STATICBITMAP1;
 		static const long ID_STATICTEXT2;
-		static const long ID_STATICTEXT3;
+		static const long ID_STATICBITMAP18;
+		static const long ID_HYPERLINKCTRL12;
 		static const long ID_STATICBITMAP9;
 		static const long ID_HYPERLINKCTRL18;
 		static const long ID_STATICBITMAP10;
@@ -128,6 +130,7 @@ class StartHerePage: public wxPanel
 		void OncenterPanelPaint(wxPaintEvent& event);
 		void OnfbLinkClick(wxCommandEvent& event);
 		void OngoogleplusLinkClick(wxCommandEvent& event);
+		void OnnewProjectLinkClick(wxCommandEvent& event);
 		//*)
 
 		MainFrame & mainEditor;

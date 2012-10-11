@@ -17,6 +17,7 @@
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
 namespace gd { class Project; }
+namespace gd { class Layout; }
 class MainFrame;
 class Game;
 class RuntimeGame;
@@ -33,6 +34,11 @@ class ProjectManager: public wxPanel
          * Open a source file. Game can be NULL.
          */
 		void EditSourceFile(Game * game, std::string filename, size_t line = std::string::npos);
+
+        /**
+         * Open a \a layout from a \a project.
+         */
+		void EditLayout(gd::Project & project, gd::Layout & layout);
 
 		/**
 		 * Refresh project tree

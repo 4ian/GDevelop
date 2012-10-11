@@ -8,8 +8,16 @@
 			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="projectsTree" member="yes">
+					<image_list></image_list>
+					<tree_items>
+						<item>projectsTree</item>
+						<item></item>
+					</tree_items>
+					<items_text>
+						<item2>projectsTree</item2>
+						<item2></item2>
+					</items_text>
 					<size>209,197</size>
-					<tooltip>Double click to set the project as actual project.&#x0A;Double click on an item to edit it, or use right&#x0A;click to access to more options.</tooltip>
 					<style>wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE</style>
 					<handler function="OnprojectsTreeBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
 					<handler function="OnprojectsTreeEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
@@ -227,10 +235,3 @@
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

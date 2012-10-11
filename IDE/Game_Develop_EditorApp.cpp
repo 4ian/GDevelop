@@ -321,7 +321,7 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Creating main window
     cout << "* Creating main window" << endl;
-    mainEditor = new MainFrame( 0, filesToOpen.empty() && !openRecupFiles );
+    mainEditor = new MainFrame( 0 );
     SetTopWindow( mainEditor );
 
     //Open files

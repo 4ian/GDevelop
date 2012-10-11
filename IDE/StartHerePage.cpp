@@ -22,7 +22,8 @@ using namespace gd;
 //(*IdInit(StartHerePage)
 const long StartHerePage::ID_STATICBITMAP1 = wxNewId();
 const long StartHerePage::ID_STATICTEXT2 = wxNewId();
-const long StartHerePage::ID_STATICTEXT3 = wxNewId();
+const long StartHerePage::ID_STATICBITMAP18 = wxNewId();
+const long StartHerePage::ID_HYPERLINKCTRL12 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP9 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL18 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP10 = wxNewId();
@@ -105,9 +106,11 @@ mainEditor(mainEditor_)
 	wxFont StaticText2Font(12,wxDEFAULT,wxFONTSTYLE_NORMAL,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
 	FlexGridSizer4->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT3, _("To begin, use the project manager\nto add a scene ( right click on \"Scenes\" ).\nDouble click then on the new scene to edit it."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
-	FlexGridSizer4->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 2, 0, 0);
+	StaticBitmap18 = new wxStaticBitmap(this, ID_STATICBITMAP18, wxBitmap(wxImage(_T("res/newicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP18"));
+	FlexGridSizer3->Add(StaticBitmap18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	newProjectLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL12, _("Create a new project"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL12"));
+	FlexGridSizer3->Add(newProjectLink, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap9 = new wxStaticBitmap(this, ID_STATICBITMAP9, wxBitmap(wxImage(_T("res/modesimpleicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP9"));
 	FlexGridSizer3->Add(StaticBitmap9, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	HyperlinkCtrl6 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL18, _("Read Getting Started Guide"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL18"));
@@ -130,15 +133,15 @@ mainEditor(mainEditor_)
 	FlexGridSizer7 = new wxFlexGridSizer(0, 2, 0, 0);
 	StaticBitmap5 = new wxStaticBitmap(this, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/wikiicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
 	FlexGridSizer7->Add(StaticBitmap5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl3 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL3, _("Access to wiki ( Knowledge base )"), _("http://www.wiki.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL3"));
+	HyperlinkCtrl3 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL3, _("Go to wiki ( Knowledge base )"), _("http://www.wiki.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL3"));
 	FlexGridSizer7->Add(HyperlinkCtrl3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap6 = new wxStaticBitmap(this, ID_STATICBITMAP6, wxBitmap(wxImage(_T("res/community.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP6"));
 	FlexGridSizer7->Add(StaticBitmap6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl4 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL4, _("Access to forum"), _("http://www.forum.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL4"));
+	HyperlinkCtrl4 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL4, _("Go on the forum"), _("http://www.forum.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL4"));
 	FlexGridSizer7->Add(HyperlinkCtrl4, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap7 = new wxStaticBitmap(this, ID_STATICBITMAP7, wxBitmap(wxImage(_T("res/paint.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP7"));
 	FlexGridSizer7->Add(StaticBitmap7, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	resourcesLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL15, _("Access to resources"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL15"));
+	resourcesLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL15, _("View free to use resources"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL15"));
 	FlexGridSizer7->Add(resourcesLink, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap16 = new wxStaticBitmap(this, ID_STATICBITMAP16, wxBitmap(wxImage(_T("res/fb16.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP16"));
 	FlexGridSizer7->Add(StaticBitmap16, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -216,6 +219,7 @@ mainEditor(mainEditor_)
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
+	Connect(ID_HYPERLINKCTRL12,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnnewProjectLinkClick);
 	Connect(ID_HYPERLINKCTRL18,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnguideBtClick);
 	Connect(ID_HYPERLINKCTRL19,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OntutoBtClick);
 	Connect(ID_HYPERLINKCTRL20,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnTutorial2BtClick);
@@ -427,6 +431,11 @@ void StartHerePage::OnfbLinkClick(wxCommandEvent& event)
     }
 }
 
+void StartHerePage::OnnewProjectLinkClick(wxCommandEvent& event)
+{
+    mainEditor.CreateNewProject();
+}
+
 void StartHerePage::OngoogleplusLinkClick(wxCommandEvent& event)
 {
     wxString link = "http://plus.google.com/b/115765205668071442683/115765205668071442683/";
@@ -450,4 +459,5 @@ void StartHerePage::OngoogleplusLinkClick(wxCommandEvent& event)
         delete filetype;
     }
 }
+
 

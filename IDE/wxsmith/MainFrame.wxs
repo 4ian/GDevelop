@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxFrame" name="Game_Develop_EditorFrame">
+	<object class="wxFrame" name="MainFrame">
 		<title>Game Develop - New game</title>
 		<centered>1</centered>
 		<icon>res/icon16.png</icon>
@@ -67,11 +67,6 @@
 				<bitmap>res/saveasicon.png</bitmap>
 				<handler function="OnMenuSaveAsSelected" entry="EVT_MENU" />
 			</object>
-			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem11" member="no">
-				<label>Save in portable version</label>
-				<bitmap>res/portableicon.png</bitmap>
-				<handler function="OnMenuPortableSelected" entry="EVT_MENU" />
-			</object>
 		</object>
 		<object class="wxMenu" variable="decomposerContextMenu" member="yes">
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItem41" member="no">
@@ -137,7 +132,7 @@
 				<handler function="OnMenuSaveAsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM16" variable="MenuItem12" member="yes">
-				<label>Enregistrer tous les projets ouverts</label>
+				<label>Save all opened projects</label>
 				<accel>Ctrl+Shift+S</accel>
 				<bitmap>res/save_all16.png</bitmap>
 				<handler function="OnMenuSaveAllSelected" entry="EVT_MENU" />
@@ -216,10 +211,3 @@
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

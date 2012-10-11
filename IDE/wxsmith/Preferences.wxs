@@ -3,7 +3,6 @@
 	<object class="wxDialog" name="Preferences">
 		<title>Game Develop settings</title>
 		<centered>1</centered>
-		<size>467,330</size>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxMINIMIZE_BOX</style>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
@@ -16,7 +15,6 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxPanel" name="ID_PANEL5" variable="Panel1" member="yes">
-							<size>420,54</size>
 							<bg>wxSYS_COLOUR_WINDOW</bg>
 							<object class="wxFlexGridSizer" variable="FlexGridSizer12" member="no">
 								<cols>3</cols>
@@ -205,6 +203,47 @@
 								<cols>1</cols>
 								<growablecols>0</growablecols>
 								<object class="sizeritem">
+									<object class="wxStaticBoxSizer" variable="StaticBoxSizer17" member="no">
+										<label>New projects</label>
+										<object class="sizeritem">
+											<object class="wxFlexGridSizer" variable="FlexGridSizer24" member="no">
+												<cols>3</cols>
+												<growablecols>1</growablecols>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT16" variable="StaticText16" member="yes">
+														<label>New projects default folder:</label>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxTextCtrl" name="ID_TEXTCTRL7" variable="newProjectFolderEdit" member="yes">
+														<tooltip>Path to the image editing program.</tooltip>
+													</object>
+													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxButton" name="ID_BUTTON9" variable="newProjectFolderBrowseBt" member="yes">
+														<label>Browse</label>
+														<handler function="OnnewProjectFolderBrowseBtClick" entry="EVT_BUTTON" />
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
 									<object class="wxStaticBoxSizer" variable="StaticBoxSizer5" member="no">
 										<label>External programs</label>
 										<object class="sizeritem">
@@ -213,7 +252,7 @@
 												<growablecols>1</growablecols>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT6" variable="StaticText6" member="yes">
-														<label>Images' edition :</label>
+														<label>Images&apos; edition:</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -288,7 +327,7 @@
 												<growablecols>1</growablecols>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT21" variable="StaticText21" member="yes">
-														<label>Temporary folder for compilation :</label>
+														<label>Temporary folder for compilation:</label>
 													</object>
 													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -449,7 +488,7 @@
 										<growablecols>2</growablecols>
 										<object class="sizeritem">
 											<object class="wxRadioBox" name="ID_RADIOBOX1" variable="ribbonStyleBox" member="yes">
-												<label>Ribbon's style</label>
+												<label>Ribbon&apos;s style</label>
 												<content>
 													<item>Microsoft Office</item>
 													<item>wxAUI</item>
@@ -463,7 +502,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer7" member="no">
-												<label>Ribbon's colors</label>
+												<label>Ribbon&apos;s colors</label>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
 														<cols>2</cols>
@@ -522,7 +561,7 @@
 														<growablecols>0</growablecols>
 														<object class="sizeritem">
 															<object class="wxCheckBox" name="ID_CHECKBOX2" variable="hideLabelsCheck" member="yes">
-																<label>Hide the button's labels</label>
+																<label>Hide the button&apos;s labels</label>
 																<handler function="OnhideLabelsCheckClick" entry="EVT_CHECKBOX" />
 															</object>
 															<flag>wxALL|wxALIGN_LEFT|wxALIGN_TOP</flag>
@@ -531,7 +570,7 @@
 														</object>
 														<object class="sizeritem">
 															<object class="wxCheckBox" name="ID_CHECKBOX5" variable="hidePageTabsCheck" member="yes">
-																<label>Hide tabs of ribbon's pages</label>
+																<label>Hide tabs of ribbon&apos;s pages</label>
 																<handler function="OnhideLabelsCheckClick" entry="EVT_CHECKBOX" />
 															</object>
 															<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
@@ -589,7 +628,7 @@
 										<cols>3</cols>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer3" member="no">
-												<label>Panes' color</label>
+												<label>Panes&apos; color</label>
 												<orient>wxVERTICAL</orient>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
@@ -659,7 +698,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer8" member="no">
-												<label>Sash's color</label>
+												<label>Sash&apos;s color</label>
 												<orient>wxVERTICAL</orient>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer8" member="no">
@@ -711,7 +750,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxStaticBoxSizer" variable="StaticBoxSizer9" member="no">
-												<label>Text's color</label>
+												<label>Text&apos;s color</label>
 												<orient>wxVERTICAL</orient>
 												<object class="sizeritem">
 													<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
@@ -859,7 +898,7 @@
 								</object>
 								<object class="sizeritem">
 									<object class="wxCheckBox" name="ID_CHECKBOX6" variable="hideContextPanelsLabels" member="yes">
-										<label>Hide the button's labels in context panels</label>
+										<label>Hide the button&apos;s labels in context panels</label>
 									</object>
 									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 									<border>5</border>
@@ -899,7 +938,6 @@
 					</object>
 					<object class="listbookpage">
 						<object class="wxPanel" name="ID_PANEL17" variable="Panel7" member="yes">
-							<size>463,247</size>
 							<object class="wxFlexGridSizer" variable="FlexGridSizer23" member="no">
 								<cols>1</cols>
 								<growablecols>0</growablecols>
@@ -1014,10 +1052,3 @@
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

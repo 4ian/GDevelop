@@ -59,19 +59,21 @@ BEGIN_EVENT_TABLE(EditorScene,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorScene::EditorScene(wxWindow* parent, RuntimeGame & game_, gd::Layout & layout_, const gd::MainFrameWrapper & mainFrameWrapper_) :
+EditorScene::EditorScene(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, const gd::MainFrameWrapper & mainFrameWrapper_) :
+project(project_),
 layout(layout_),
-game(game_),
 mainFrameWrapper(mainFrameWrapper_)
 {
     //TODO: GD C++ Platform specific code
     try
     {
         Scene & scene = dynamic_cast<Scene&>(layout);
+        Game & game = dynamic_cast<Game&>(project);
     }
-    catch (...) { std::cout << "Scene editor is not adapted to arbitrary gd::Layout, GD will crash."; /*Not a GD C++ Platform scene*/ }
+    catch (...) { std::cout << "Scene editor is not adapted to arbitrary gd::Layout, GD will crash."; std::cout << char(7); /*Not a GD C++ Platform scene*/ }
 
     Scene & scene = dynamic_cast<Scene&>(layout);
+    RuntimeGame & game = dynamic_cast<RuntimeGame&>(project);
 
 	//(*Initialize(EditorScene)
 	wxFlexGridSizer* FlexGridSizer3;

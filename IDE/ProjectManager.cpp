@@ -129,7 +129,6 @@ mainEditor(mainEditor_)
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
 	projectsTree = new wxTreeCtrl(this, ID_TREECTRL1, wxDefaultPosition, wxSize(209,197), wxTR_EDIT_LABELS|wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE, wxDefaultValidator, _T("ID_TREECTRL1"));
-	projectsTree->SetToolTip(_("Double click to set the project as actual project.\nDouble click on an item to edit it, or use right\nclick to access to more options."));
 	FlexGridSizer1->Add(projectsTree, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	editSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuEditScene, _("Edit this scene"), wxEmptyString, wxITEM_NORMAL);
@@ -458,6 +457,11 @@ void ProjectManager::Refresh()
     }
 
     projectsTree->ExpandAll();
+
+    if ( !mainEditor.games.empty() )
+        projectsTree->SetToolTip(_("Double click to set the project as the current project.\nDouble click on an item to edit it, or use right\nclick to display more options."));
+    else
+        projectsTree->SetToolTip(_("Create or open a project using the ribbon."));
 }
 
 /**
@@ -685,8 +689,11 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
         return;
     }
 
-    gd::Layout & layout = game->GetLayout(data->GetSecondString());
+    EditLayout(*game, game->GetLayout(data->GetSecondString()));
+}
 
+void ProjectManager::EditLayout(gd::Project & project, gd::Layout & layout)
+{
     //Verify if the scene editor is not already opened
     for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
     {
@@ -707,13 +714,13 @@ void ProjectManager::OneditSceneMenuItemSelected(wxCommandEvent& event)
     string prefix = "";
     if ( mainEditor.games.size() > 1 )
     {
-        prefix = "["+game->GetName()+"] ";
-        if ( game->GetName().length() > gameMaxCharDisplayedInEditor )
-            prefix = "["+game->GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
+        prefix = "["+project.GetName()+"] ";
+        if ( project.GetName().length() > gameMaxCharDisplayedInEditor )
+            prefix = "["+project.GetName().substr(0, gameMaxCharDisplayedInEditor-3)+"...] ";
     }
 
-    EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), *game, layout, mainEditor.GetMainFrameWrapper());
-    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+data->GetSecondString(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY)) )
+    EditorScene * editorScene = new EditorScene(mainEditor.GetEditorsNotebook(), project, layout, mainEditor.GetMainFrameWrapper());
+    if ( !mainEditor.GetEditorsNotebook()->AddPage(editorScene, prefix+layout.GetName(), true, wxBitmap("res/sceneeditor.png", wxBITMAP_TYPE_ANY)) )
     {
         wxLogError(_("Unable to add a new tab !"));
     }
@@ -1296,7 +1303,7 @@ void ProjectManager::OnRibbonCloseSelected(wxRibbonButtonBarEvent& event)
 {
     if ( !mainEditor.CurrentGameIsValid() ) return;
 
-    if ( wxMessageBox( _( "Warning !All changes not saved will be lost.\n\nClose the project \?" ), _( "Confirmation" ), wxYES_NO, this ) == wxNO )
+    if ( wxMessageBox( _( "Warning! All changes not saved will be lost.\n\nClose the project \?" ), _( "Confirmation" ), wxYES_NO, this ) == wxNO )
         return;
 
     CloseGame(mainEditor.GetCurrentGame().get());
@@ -1313,7 +1320,7 @@ void ProjectManager::OncloseGameBtSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    if ( wxMessageBox( _( "Warning !All changes not saved will be lost.\n\nClose the project \?" ), _( "Confirmation" ), wxYES_NO, this ) == wxNO )
+    if ( wxMessageBox( _( "Warning! All changes not saved will be lost.\n\nClose the project \?" ), _( "Confirmation" ), wxYES_NO, this ) == wxNO )
         return;
 
     CloseGame(game);

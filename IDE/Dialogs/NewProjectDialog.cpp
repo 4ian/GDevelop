@@ -11,7 +11,9 @@
 //*)
 #include <wx/imaglist.h>
 #include <wx/filename.h>
+#include <wx/filedlg.h>
 #include <wx/dir.h>
+#include <wx/config.h>
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>
 #endif
@@ -28,6 +30,7 @@ const long NewProjectDialog::ID_STATICTEXT2 = wxNewId();
 const long NewProjectDialog::ID_TEXTCTRL1 = wxNewId();
 const long NewProjectDialog::ID_BUTTON3 = wxNewId();
 const long NewProjectDialog::ID_STATICLINE1 = wxNewId();
+const long NewProjectDialog::ID_HYPERLINKCTRL1 = wxNewId();
 const long NewProjectDialog::ID_BUTTON1 = wxNewId();
 const long NewProjectDialog::ID_BUTTON2 = wxNewId();
 //*)
@@ -37,7 +40,8 @@ BEGIN_EVENT_TABLE(NewProjectDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size)
+NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint& pos,const wxSize& size) :
+    userWantToBrowseExamples(false)
 {
 	//(*Initialize(NewProjectDialog)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -72,23 +76,28 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
 	FlexGridSizer5->AddGrowableRow(0);
 	projectFileEdit = new wxTextCtrl(this, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer5->Add(projectFileEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	Button3 = new wxButton(this, ID_BUTTON3, _("..."), wxDefaultPosition, wxSize(31,23), 0, wxDefaultValidator, _T("ID_BUTTON3"));
-	FlexGridSizer5->Add(Button3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	browseBt = new wxButton(this, ID_BUTTON3, _("..."), wxDefaultPosition, wxSize(31,23), 0, wxDefaultValidator, _T("ID_BUTTON3"));
+	FlexGridSizer5->Add(browseBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer3->AddGrowableCol(0);
+	examplesBt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("You can also browse the examples"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	FlexGridSizer3->Add(examplesBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	createProjectBt = new wxButton(this, ID_BUTTON1, _("Create the new project"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer3->Add(createProjectBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	cancelBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(cancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&NewProjectDialog::OnplatformListItemSelect);
 	Connect(ID_LISTCTRL2,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&NewProjectDialog::OntemplateListItemSelect);
+	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NewProjectDialog::OnbrowseBtClick);
+	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&NewProjectDialog::OnexamplesBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NewProjectDialog::OncreateProjectBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NewProjectDialog::OncancelBtClick);
 	Connect(wxEVT_SIZE,(wxObjectEventFunction)&NewProjectDialog::OnResize);
@@ -105,10 +114,26 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
     #endif
 
     projectFileEdit->AutoCompleteDirectories();
-    projectFileEdit->SetValue(wxFileName::GetHomeDir()+wxFileName::GetPathSeparator()+
-                                _("Game Develop projects")+wxFileName::GetPathSeparator()+
-                                _("My project")+wxFileName::GetPathSeparator()+
-                                _("Project.gdg"));
+
+    //Get the base folder for the new projects
+    wxConfigBase::Get()->Read("/Dossier/NewProjectDefaultFolder", &newProjectBaseFolder);
+    if ( newProjectBaseFolder.empty() ) newProjectBaseFolder = wxFileName::GetHomeDir()+wxFileName::GetPathSeparator()+
+                                                               _("Game Develop projects")+wxFileName::GetPathSeparator();
+    newProjectBaseFolder = wxFileName::FileName(newProjectBaseFolder).GetPath(); //Normalize.
+
+    //Create a filename for the project
+    wxString newProjectFile = newProjectBaseFolder+wxFileName::GetPathSeparator()+
+                              _("My project")+wxFileName::GetPathSeparator()+
+                              _("Project.gdg");
+    unsigned int i = 2;
+    while ( wxFileExists(newProjectFile) )
+    {
+        newProjectFile = newProjectBaseFolder+wxFileName::GetPathSeparator()+
+                              _("My project")+" "+gd::ToString(i)+wxFileName::GetPathSeparator()+
+                              _("Project.gdg");
+        ++i;
+    }
+    projectFileEdit->SetValue(newProjectFile);
 
 	SetSize(640,480);
 
@@ -145,11 +170,6 @@ void NewProjectDialog::RefreshTemplateList()
     templateList->AssignImageList(templateImageList, wxIMAGE_LIST_SMALL);
 
     wxString currentDir = wxGetCwd()+"/Templates";
-
-    //Add a default empty project item
-    templateList->InsertItem(0, _("Empty project"), 0);
-    templateList->SetItem(0, 1, _("Create a new empty project"));
-    templateList->SetItemPtrData(0, wxPtrToUInt(new gd::TreeItemStringData("", chosenTemplatePlatform)));
 
     //Browse file and directories to add template files
     wxDir dir(currentDir);
@@ -204,6 +224,11 @@ void NewProjectDialog::RefreshTemplateList()
 
         cont = dir.GetNext(&filename);
     }
+
+    //Add a default empty project item
+    templateList->InsertItem(0, _("Empty project"), 0);
+    templateList->SetItem(0, 1, _("Create a new empty project"));
+    templateList->SetItemPtrData(0, wxPtrToUInt(new gd::TreeItemStringData("", chosenTemplatePlatform)));
 }
 
 void NewProjectDialog::OnResize(wxSizeEvent& event)
@@ -256,4 +281,20 @@ void NewProjectDialog::OnplatformListItemSelect(wxListEvent& event)
     {
         chosenTemplatePlatform = associatedData->GetString();
     }
+}
+
+void NewProjectDialog::OnbrowseBtClick(wxCommandEvent& event)
+{
+    wxFileDialog dialog( this, _( "Choose a file for the project" ), newProjectBaseFolder, _("Project.gdg"), "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
+
+    if ( dialog.ShowModal() != wxID_CANCEL )
+    {
+        projectFileEdit->ChangeValue(dialog.GetPath());
+    }
+}
+
+void NewProjectDialog::OnexamplesBtClick(wxCommandEvent& event)
+{
+    EndModal(0);
+    userWantToBrowseExamples = true;
 }

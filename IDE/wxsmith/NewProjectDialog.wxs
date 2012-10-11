@@ -72,9 +72,10 @@
 						<option>1</option>
 					</object>
 					<object class="sizeritem">
-						<object class="wxButton" name="ID_BUTTON3" variable="Button3" member="yes">
+						<object class="wxButton" name="ID_BUTTON3" variable="browseBt" member="yes">
 							<label>...</label>
 							<size>31,23</size>
+							<handler function="OnbrowseBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
@@ -94,6 +95,16 @@
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 					<cols>3</cols>
+					<growablecols>0</growablecols>
+					<object class="sizeritem">
+						<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="examplesBt" member="yes">
+							<label>You can also browse the examples</label>
+							<handler function="OnexamplesBtClick" entry="EVT_HYPERLINK" />
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON1" variable="createProjectBt" member="yes">
 							<label>Create the new project</label>
@@ -113,7 +124,7 @@
 						<option>1</option>
 					</object>
 				</object>
-				<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+				<flag>wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
 			</object>
 		</object>

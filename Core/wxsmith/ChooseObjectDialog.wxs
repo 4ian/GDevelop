@@ -8,58 +8,21 @@
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<growablecols>0</growablecols>
-			<growablerows>1</growablerows>
-			<object class="sizeritem">
-				<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
-					<cols>1</cols>
-					<growablecols>0</growablecols>
-					<object class="sizeritem">
-						<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
-							<size>420,54</size>
-							<bg>wxSYS_COLOUR_WINDOW</bg>
-							<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
-								<cols>3</cols>
-								<object class="sizeritem">
-									<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
-										<bitmap>res/objeticon64.png</bitmap>
-										<style>wxNO_BORDER</style>
-									</object>
-									<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-								<object class="sizeritem">
-									<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-										<label>Choose one of the objects of the scene. To add or&#x0A;modify objects, use the object editor of the scene.</label>
-										<style>wxALIGN_CENTRE</style>
-									</object>
-									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-									<border>5</border>
-									<option>1</option>
-								</object>
-							</object>
-						</object>
-						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-						<option>1</option>
-					</object>
-					<object class="sizeritem">
-						<object class="wxStaticLine" name="ID_STATICLINE2" variable="StaticLine2" member="yes">
-							<size>10,-1</size>
-						</object>
-						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-						<option>1</option>
-					</object>
-				</object>
-				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<option>1</option>
-			</object>
+			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
-					<size>413,227</size>
 					<object class="notebookpage">
 						<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="ObjetsList" member="yes">
+							<image_list></image_list>
+							<tree_items>
+								<item>ObjetsList</item>
+								<item></item>
+							</tree_items>
+							<items_text>
+								<item2>ObjetsList</item2>
+								<item2></item2>
+							</items_text>
 							<pos>-71,-11</pos>
-							<size>179,170</size>
 							<tooltip>Choose an object in the list</tooltip>
 							<style>wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 							<handler function="OnObjetsListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
@@ -70,8 +33,16 @@
 					</object>
 					<object class="notebookpage">
 						<object class="wxTreeCtrl" name="ID_TREECTRL2" variable="GroupesList" member="yes">
+							<image_list></image_list>
+							<tree_items>
+								<item>GroupesList</item>
+								<item></item>
+							</tree_items>
+							<items_text>
+								<item2>GroupesList</item2>
+								<item2></item2>
+							</items_text>
 							<pos>-71,-11</pos>
-							<size>179,170</size>
 							<tooltip>Choose an object in the list</tooltip>
 							<style>wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 							<handler function="OnGroupesListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
@@ -82,8 +53,16 @@
 					</object>
 					<object class="notebookpage">
 						<object class="wxTreeCtrl" name="ID_TREECTRL3" variable="globalObjectsList" member="yes">
+							<image_list></image_list>
+							<tree_items>
+								<item>globalObjectsList</item>
+								<item></item>
+							</tree_items>
+							<items_text>
+								<item2>globalObjectsList</item2>
+								<item2></item2>
+							</items_text>
 							<pos>-71,-11</pos>
-							<size>179,170</size>
 							<tooltip>Choose an object in the list</tooltip>
 							<style>wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 							<handler function="OnglobalObjectsListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
@@ -94,8 +73,16 @@
 					</object>
 					<object class="notebookpage">
 						<object class="wxTreeCtrl" name="ID_TREECTRL4" variable="globalObjectGroups" member="yes">
+							<image_list></image_list>
+							<tree_items>
+								<item>globalObjectGroups</item>
+								<item></item>
+							</tree_items>
+							<items_text>
+								<item2>globalObjectGroups</item2>
+								<item2></item2>
+							</items_text>
 							<pos>-71,-11</pos>
-							<size>281,190</size>
 							<tooltip>Choose an object in the list</tooltip>
 							<style>wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 							<handler function="OnglobalObjectGroupsItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
@@ -113,7 +100,6 @@
 				<object class="wxTextCtrl" name="ID_TEXTCTRL1" subclass="wxSearchCtrl" variable="searchCtrl" member="yes">
 					<focused>1</focused>
 					<handler function="OnsearchCtrlText" entry="EVT_TEXT" />
-					<handler function="OnsearchCtrlTextEnter" entry="EVT_TEXT_ENTER" />
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>

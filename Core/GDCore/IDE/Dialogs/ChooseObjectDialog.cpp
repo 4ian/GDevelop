@@ -4,10 +4,7 @@
  */
 
 //(*InternalHeaders(ChooseObjectDialog)
-#include <wx/bitmap.h>
-#include <wx/settings.h>
 #include <wx/intl.h>
-#include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <wx/image.h>
@@ -24,10 +21,6 @@ namespace gd
 {
 
 //(*IdInit(ChooseObjectDialog)
-const long ChooseObjectDialog::ID_STATICBITMAP3 = wxNewId();
-const long ChooseObjectDialog::ID_STATICTEXT1 = wxNewId();
-const long ChooseObjectDialog::ID_PANEL1 = wxNewId();
-const long ChooseObjectDialog::ID_STATICLINE2 = wxNewId();
 const long ChooseObjectDialog::ID_TREECTRL1 = wxNewId();
 const long ChooseObjectDialog::ID_TREECTRL2 = wxNewId();
 const long ChooseObjectDialog::ID_TREECTRL3 = wxNewId();
@@ -58,9 +51,7 @@ canSelectGroup(canSelectGroup_)
 {
 	//(*Initialize(ChooseObjectDialog)
 	wxFlexGridSizer* FlexGridSizer2;
-	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
-	wxFlexGridSizer* FlexGridSizer17;
 
 	Create(parent, wxID_ANY, _("Choose an object"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxMINIMIZE_BOX, _T("wxID_ANY"));
 	wxIcon FrameIcon;
@@ -68,30 +59,15 @@ canSelectGroup(canSelectGroup_)
 	SetIcon(FrameIcon);
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
-	FlexGridSizer1->AddGrowableRow(1);
-	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer17->AddGrowableCol(0);
-	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
-	Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/objeticon64.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
-	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Choose one of the objects of the scene. To add or\nmodify objects, use the object editor of the scene."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
-	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	Panel1->SetSizer(FlexGridSizer6);
-	FlexGridSizer6->SetSizeHints(Panel1);
-	FlexGridSizer17->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
-	FlexGridSizer17->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxSize(413,227), 0, _T("ID_NOTEBOOK1"));
-	ObjetsList = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
+	FlexGridSizer1->AddGrowableRow(0);
+	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK1"));
+	ObjetsList = new wxTreeCtrl(Notebook1, ID_TREECTRL1, wxPoint(-71,-11), wxDefaultSize, wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL1"));
 	ObjetsList->SetToolTip(_("Choose an object in the list"));
-	GroupesList = new wxTreeCtrl(Notebook1, ID_TREECTRL2, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
+	GroupesList = new wxTreeCtrl(Notebook1, ID_TREECTRL2, wxPoint(-71,-11), wxDefaultSize, wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL2"));
 	GroupesList->SetToolTip(_("Choose an object in the list"));
-	globalObjectsList = new wxTreeCtrl(Notebook1, ID_TREECTRL3, wxPoint(-71,-11), wxSize(179,170), wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
+	globalObjectsList = new wxTreeCtrl(Notebook1, ID_TREECTRL3, wxPoint(-71,-11), wxDefaultSize, wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL3"));
 	globalObjectsList->SetToolTip(_("Choose an object in the list"));
-	globalObjectGroups = new wxTreeCtrl(Notebook1, ID_TREECTRL4, wxPoint(-71,-11), wxSize(281,190), wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
+	globalObjectGroups = new wxTreeCtrl(Notebook1, ID_TREECTRL4, wxPoint(-71,-11), wxDefaultSize, wxTR_HIDE_ROOT|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER, wxDefaultValidator, _T("ID_TREECTRL4"));
 	globalObjectGroups->SetToolTip(_("Choose an object in the list"));
 	Notebook1->AddPage(ObjetsList, _("Objects"), false);
 	Notebook1->AddPage(GroupesList, _("Objects groups"), false);
@@ -183,6 +159,7 @@ canSelectGroup(canSelectGroup_)
         Notebook1->RemovePage(1);
     }
 
+    SetSize(400, 500);
 	Refresh();
 }
 

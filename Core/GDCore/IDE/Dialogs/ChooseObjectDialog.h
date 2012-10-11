@@ -12,12 +12,9 @@
 #include <wx/treectrl.h>
 #include <wx/notebook.h>
 #include <wx/sizer.h>
-#include <wx/stattext.h>
 #include <wx/menu.h>
 #include <wx/textctrl.h>
 #include <wx/statline.h>
-#include <wx/panel.h>
-#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -77,26 +74,18 @@ public:
     wxButton* AucunBt;
     wxButton* ChoisirBt;
     wxMenuItem* editGroupMenuItem;
-    wxPanel* Panel1;
-    wxStaticText* StaticText1;
     wxTreeCtrl* ObjetsList;
-    wxStaticLine* StaticLine2;
     wxStaticLine* StaticLine1;
     wxTreeCtrl* globalObjectsList;
     wxButton* AnnulerBt;
     wxMenuItem* editMenuItem;
     wxTreeCtrl* GroupesList;
-    wxStaticBitmap* StaticBitmap3;
     //*)
 
 
 protected:
 
     //(*Identifiers(ChooseObjectDialog)
-    static const long ID_STATICBITMAP3;
-    static const long ID_STATICTEXT1;
-    static const long ID_PANEL1;
-    static const long ID_STATICLINE2;
     static const long ID_TREECTRL1;
     static const long ID_TREECTRL2;
     static const long ID_TREECTRL3;

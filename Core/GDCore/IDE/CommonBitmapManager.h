@@ -70,6 +70,7 @@ public:
     wxBitmap preview16;
     wxBitmap objectGroup16;
     wxBitmap gdFileIcon32;
+    wxBitmap error48;
 
     /** \name 24x24 bitmaps
      * wxBitmap which can be used for ribbons.

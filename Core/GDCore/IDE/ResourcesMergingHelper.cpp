@@ -33,8 +33,11 @@ void ResourcesMergingHelper::ExposeResource(std::string & resourceFilename)
             //We want to preserve the directory structure : Keep paths relative to the base directory
             if ( filename.MakeRelativeTo(baseDirectory) )
                 resourcesNewFilename[resourceFullFilename] = std::string( filename.GetFullPath().mb_str() );
-            else //Unless the filename cannot be made relative. In this case, just keep the filename.
-                resourcesNewFilename[resourceFullFilename] = std::string( wxFileNameFromPath(resourceFullFilename).mb_str() );
+            else //Unless the filename cannot be made relative. In this case:
+            {
+                if ( !preserveAbsoluteFilenames ) //Just strip the filename to its file part if we do not want to preserve the absolute filenames.
+                    resourcesNewFilename[resourceFullFilename] = std::string( wxFileNameFromPath(resourceFullFilename).mb_str() );
+            }
 
         }
     }

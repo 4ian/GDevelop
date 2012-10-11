@@ -252,7 +252,7 @@ public:
     /**
      * Must add a new empty layout called "name" at the specified position in the layout list.
      */
-    virtual void InsertNewLayout(std::string & name, unsigned int position) =0;
+    virtual void InsertNewLayout(const std::string & name, unsigned int position) =0;
 
     /**
      * Must add a new layout constructed from the layout passed as parameter.

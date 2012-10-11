@@ -6,28 +6,44 @@
 #include <map>
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/ResourcesMergingHelper.h"
+#include "GDCore/IDE/ResourcesAbsolutePathChecker.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/CommonTools.h"
 #include <wx/filename.h>
 #include <wx/log.h>
 #include <wx/utils.h>
 #include <wx/progdlg.h>
+#include <wx/msgdlg.h>
 
 using namespace std;
 
 namespace gd
 {
 
-bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, std::string destinationDirectory, wxProgressDialog * optionalProgressDialog)
+bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, std::string destinationDirectory, bool updateOriginalProject, wxProgressDialog * optionalProgressDialog)
 {
-    boost::shared_ptr<gd::Project> project = boost::shared_ptr<gd::Project>(originalProject.Clone());
+    //Check if there are some resources with absolute filenames
+    gd::ResourcesAbsolutePathChecker absolutePathChecker;
+    originalProject.ExposeResources(absolutePathChecker);
+    bool copyAlsoResourcesWithAbsolutePath = ( absolutePathChecker.HasResourceWithAbsoluteFilenames() &&
+                                               wxMessageBox(_("Some resources are using absolute filenames.\nDo you want them to be copied in the new folder of the project? If you choose No, they won't be modified."),
+                                                            _("Some resources are using absolute filenames."),
+                                                            wxYES_NO | wxICON_QUESTION) == wxYES );
 
     //Get the resources to be copied
     gd::ResourcesMergingHelper resourcesMergingHelper;
     resourcesMergingHelper.SetBaseDirectory(gd::ToString(wxFileName::FileName(originalProject.GetProjectFile()).GetPath()));
     resourcesMergingHelper.PreserveDirectoriesStructure(true);
 
-    project->ExposeResources(resourcesMergingHelper);
+    if ( updateOriginalProject )
+    {
+        originalProject.ExposeResources(resourcesMergingHelper);
+    }
+    else
+    {
+        boost::shared_ptr<gd::Project> project = boost::shared_ptr<gd::Project>(originalProject.Clone());
+        project->ExposeResources(resourcesMergingHelper);
+    }
 
     //Copy resources
     map<string, string> & resourcesNewFilename = resourcesMergingHelper.GetAllResourcesOldAndNewFilename();

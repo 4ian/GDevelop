@@ -21,7 +21,6 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
-					<size>629,484</size>
 					<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 						<cols>1</cols>
 						<growablecols>0</growablecols>
@@ -132,7 +131,7 @@
 				<handler function="OnMenuSaveAsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM16" variable="MenuItem12" member="yes">
-				<label>Save all opened projects</label>
+				<label>Save all</label>
 				<accel>Ctrl+Shift+S</accel>
 				<bitmap>res/save_all16.png</bitmap>
 				<handler function="OnMenuSaveAllSelected" entry="EVT_MENU" />
@@ -142,13 +141,6 @@
 				<label>Compile to a standalone game.</label>
 				<bitmap>res/compilationicon.png</bitmap>
 				<handler function="OnMenuCompilationSelected" entry="EVT_MENU" />
-			</object>
-			<object class="wxMenu" name="ID_MENUITEM28" variable="MenuItem24" member="yes">
-				<label>Other</label>
-				<object class="wxMenuItem" name="ID_MENUITEM18" variable="MenuItem14" member="yes">
-					<label>Gather the project and its resources in a folder</label>
-					<handler function="OnMenuPortableSelected" entry="EVT_MENU" />
-				</object>
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM19" variable="MenuItem15" member="yes">

@@ -250,8 +250,6 @@ class MainFrame: public wxFrame
         static const long ID_MENUITEM13;
         static const long ID_MENUITEM16;
         static const long ID_MENUITEM15;
-        static const long ID_MENUITEM18;
-        static const long ID_MENUITEM28;
         static const long ID_MENUITEM19;
         static const long ID_MENUITEM17;
         static const long ID_MENUITEM27;
@@ -289,7 +287,6 @@ class MainFrame: public wxFrame
         wxMenuItem* MenuItem2;
         wxTimer autoSaveTimer;
         wxMenuItem* MenuItem4;
-        wxMenuItem* MenuItem14;
         wxMenuItem* MenuItem15;
         wxMenu* menuRecentFiles;
         wxMenuItem* MenuItem22;
@@ -306,7 +303,6 @@ class MainFrame: public wxFrame
         wxMenuItem* MenuItem6;
         wxMenuItem* MenuItem23;
         wxInfoBar* infoBar;
-        wxMenu* MenuItem24;
         wxMenu helpMenu;
         wxMenuItem* MenuItem21;
         wxMenuItem* MenuItem16;

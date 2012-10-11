@@ -590,6 +590,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         DECLARE_END_OBJECT_ACTION()
 
+        //Deprecated action
         DECLARE_OBJECT_ACTION("Rebondir",
                        _("Move an object away from another"),
                        _("Move an object away from another, using forces."),
@@ -607,6 +608,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         DECLARE_END_OBJECT_ACTION()
 
+        //Deprecated action
         DECLARE_OBJECT_ACTION("Ecarter",
                        _("Move an object away from another"),
                        _("Move an object away from another without using forces."),
@@ -626,8 +628,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
         DECLARE_OBJECT_ACTION("SeparateFromObjects",
                        _("Separate two objects"),
-                       _("Move an object away from another without using forces."),
-                       _("Move away _PARAM0_ of _PARAM2_ ( only _PARAM0_ will move )"),
+                       _("Move an object away from another using their collision masks.\nBe sure to call this action on a reasonable number of objects so as\nnot to slow down the game."),
+                       _("Move away _PARAM0_ of _PARAM1_ ( only _PARAM0_ will move )"),
                        _("Position"),
                        "res/actions/ecarter24.png",
                        "res/actions/ecarter.png");

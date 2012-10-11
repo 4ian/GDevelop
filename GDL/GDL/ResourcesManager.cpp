@@ -66,7 +66,7 @@ bool ResourcesManager::AddResource(const gd::Resource & resource)
 
         resources.push_back(newResource);
     }
-    catch(...) { std::cout << "WARNING: Tried to add a resource which is not a GD C++ Platform Resource to a GD C++ Platform project"; }
+    catch(...) { std::cout << "WARNING: Tried to add a resource which is not a GD C++ Platform Resource to a GD C++ Platform project"; std::cout << char(7); }
 
     return true;
 }

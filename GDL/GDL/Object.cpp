@@ -461,7 +461,10 @@ void Object::SeparateFromObjects(const std::string & , std::map <std::string, st
                 for (unsigned int l = 0;l<otherHitBoxes.size();++l)
                 {
                     CollisionResult result = PolygonCollisionTest(hitBoxes[k], otherHitBoxes[l]);
-                    if ( result.collision ) moveVector += result.move_axis;
+                    if ( result.collision )
+                    {
+                        moveVector += result.move_axis;
+                    }
                 }
             }
 

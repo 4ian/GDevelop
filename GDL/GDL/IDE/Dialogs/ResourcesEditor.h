@@ -104,6 +104,9 @@ public:
 protected:
 
     //(*Identifiers(ResourcesEditor)
+    static const long ID_AUITOOLBARITEM1;
+    static const long ID_AUITOOLBARITEM2;
+    static const long ID_AUITOOLBARITEM5;
     static const long ID_AUITOOLBAR1;
     static const long ID_TREECTRL1;
     static const long ID_TEXTCTRL1;
@@ -185,7 +188,6 @@ private:
     void OnDeleteUnusedFiles( wxCommandEvent& event );
     void OnShowPreviewBtClick( wxCommandEvent& event );
     void OnShowPropertyGridBtClick( wxCommandEvent& event );
-    void CreateToolbar();
     void ConnectEvents();
     void OnPropertyChanged(wxPropertyGridEvent& event);
     void OnPropertyChanging(wxPropertyGridEvent& event);

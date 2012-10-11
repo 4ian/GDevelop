@@ -38,14 +38,15 @@
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/ResourcesManager.h"
 #include "GDCore/IDE/ImagesUsedInventorizer.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/Dialogs/ResourceLibraryDialog.h"
 #include "GDCore/IDE/wxTools/FileProperty.h"
+#include "GDCore/CommonTools.h"
 
-#include "GDL/Game.h"
-#include "GDL/CommonTools.h"
 #include "GDL/IDE/DndResourcesEditor.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 
@@ -55,6 +56,9 @@
 #endif
 
 //(*IdInit(ResourcesEditor)
+const long ResourcesEditor::ID_AUITOOLBARITEM1 = wxNewId();
+const long ResourcesEditor::ID_AUITOOLBARITEM2 = wxNewId();
+const long ResourcesEditor::ID_AUITOOLBARITEM5 = wxNewId();
 const long ResourcesEditor::ID_AUITOOLBAR1 = wxNewId();
 const long ResourcesEditor::ID_TREECTRL1 = wxNewId();
 const long ResourcesEditor::ID_TEXTCTRL1 = wxNewId();
@@ -120,8 +124,12 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
     AuiManager1 = new wxAuiManager(this, wxAUI_MGR_DEFAULT);
     toolbar = new wxAuiToolBar(this, ID_AUITOOLBAR1, wxDefaultPosition, wxDefaultSize, wxAUI_TB_DEFAULT_STYLE);
+    toolbar->AddTool(ID_AUITOOLBARITEM1, _("Add an image"), wxBitmap(wxImage(_T("res/addicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Add an image"), _("Add an image"), NULL);
+    toolbar->AddTool(ID_AUITOOLBARITEM2, _("Add from resource library"), wxBitmap(wxImage(_T("res/package16.png"))), wxNullBitmap, wxITEM_NORMAL, _("Add from resource library"), _("Add from resource library"), NULL);
+    toolbar->AddSeparator();
+    toolbar->AddTool(ID_AUITOOLBARITEM5, _("Help"), wxBitmap(wxImage(_T("res/helpicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Get help about using the resource manager"), _("Get help about using the resource manager"), NULL);
     toolbar->Realize();
-    AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Gripper());
+    AuiManager1->AddPane(toolbar, wxAuiPaneInfo().Name(_T("PaneName")).ToolbarPane().Caption(_("Pane caption")).Layer(10).Top().DockFixed().Floatable(false).Movable(false).Gripper(false));
     corePanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer3->AddGrowableCol(0);
@@ -136,7 +144,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     FlexGridSizer3->SetSizeHints(corePanel);
     AuiManager1->AddPane(corePanel, wxAuiPaneInfo().Name(_T("corePane")).Caption(_("Pane caption")).CaptionVisible(false).CloseButton(false).Center());
     previewPanel = new wxPanel(this, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxSUNKEN_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL3"));
-    AuiManager1->AddPane(previewPanel, wxAuiPaneInfo().Name(_T("previewPane")).Caption(_("Preview")).CaptionVisible().CloseButton(false).Right());
+    AuiManager1->AddPane(previewPanel, wxAuiPaneInfo().Name(_T("previewPane")).Caption(_("Preview")).CaptionVisible().Right());
     propertiesPanel = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
     FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer1->AddGrowableCol(0);
@@ -196,6 +204,8 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
     folderMenu.Append(MenuItem12);
 
+    Connect(ID_AUITOOLBARITEM1,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&ResourcesEditor::OnAddImageBtClick);
+    Connect(ID_AUITOOLBARITEM5,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&ResourcesEditor::OnAideBtClick);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_DRAG,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeBeginDrag);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_BEGIN_LABEL_EDIT,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeBeginLabelEdit);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_END_LABEL_EDIT,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeEndLabelEdit);
@@ -238,8 +248,6 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     propertyGrid->GetGrid()->SetCellBackgroundColour( *wxWHITE );
     propertyGrid->GetGrid()->SetCellTextColour( *wxBLACK );
     propertyGrid->GetGrid()->SetLineColour( wxColour(212,208,200) );
-
-    CreateToolbar();
 
     //ResourcesEditor can be used without ribbon
     if ( useRibbon )
@@ -317,20 +325,6 @@ void ResourcesEditor::ConnectEvents()
     //After updating to wxWidgets 2.9.2 ( SVN ), buttons are not created correctly if we create them from here.
 }*/
 
-void ResourcesEditor::CreateToolbar()
-{
-    toolbar->SetToolBitmapSize( wxSize( 16, 16 ) );
-    toolbar->AddTool( idMenuAjouter, _( "Add an image" ), wxBitmap( wxImage( "res/addicon.png" ) ), _("Add an image") );
-    toolbar->AddTool( idMenuResourcesLibrary, _( "Open resources library" ), wxBitmap( wxImage( "res/package16.png" ) ), _("Open resources library") );
-    toolbar->AddTool( idMenuDel, _( "Delete the selected image" ), wxBitmap( wxImage( "res/deleteicon.png" ) ), _("Delete the selected image") );
-    toolbar->AddTool( ID_BITMAPBUTTON6, _( "More edition options ( right click on the list )" ), wxBitmap( wxImage( "res/moreicon.png" ) ), _("More edition options ( right click on the list )") );
-    toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON5, _( "Open the image with an editor" ), wxBitmap( wxImage( "res/paint.png" ) ), _("Open the image with an editor") );
-    toolbar->AddSeparator();
-    toolbar->AddTool( ID_BITMAPBUTTON3, _( "Images bank editor Help" ), wxBitmap( wxImage( "res/helpicon.png" ) ), _("Images bank editor Help") );
-    toolbar->Realize();
-}
-
 wxTreeItemId ResourcesEditor::GetSelectedFolderItem()
 {
     wxTreeItemId item = m_itemSelected;
@@ -360,12 +354,12 @@ void ResourcesEditor::OnAddImageBtClick( wxCommandEvent& event )
 
         wxArrayString files;
         FileDialog.GetPaths( files );
-        string imageNonAjoutees;
+        std::string imageNonAjoutees;
 
         //Add each image to images list and to folder if any
         std::vector < std::string > filenames;
         for ( unsigned int i = 0; i < files.GetCount();++i )
-            filenames.push_back(ToString(files[i]));
+            filenames.push_back(gd::ToString(files[i]));
 
         AddResources(filenames);
 
@@ -401,7 +395,7 @@ void ResourcesEditor::CopyAndAddResources(std::vector<std::string> filenames, co
 
 void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
 {
-    string alreadyExistingResources;
+    std::string alreadyExistingResources;
 
     //Find current folder, if any.
     gd::ResourceFolder * currentFolder = NULL;
@@ -422,11 +416,11 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
         if (!projectDirectory.empty())  //If game is not saved, we keep absolute filenames
             file.MakeRelativeTo(projectDirectory);
 
-        std::string name = ToString(file.GetFullName());
+        std::string name = gd::ToString(file.GetFullName());
         wxLogStatus( _( "Adding " ) + name );
 
         //Add to all images
-        if ( project.GetResourcesManager().AddResource(name, ToString(file.GetFullPath())) )
+        if ( project.GetResourcesManager().AddResource(name, gd::ToString(file.GetFullPath())) )
         {
             project.GetChangesNotifier().OnResourceModified(project, name);
 
@@ -619,7 +613,7 @@ void ResourcesEditor::OnresourcesTreeSelectionChanged( wxTreeEvent& event )
     wxFocusEvent unusedEvent;
     OnSetFocus(unusedEvent);
 
-    string name = ToString(resourcesTree->GetItemText( event.GetItem() ));
+    std::string name = gd::ToString(resourcesTree->GetItemText( event.GetItem() ));
     //Changement de l'item sélectionné
     m_itemSelected = event.GetItem();
 
@@ -760,8 +754,8 @@ void ResourcesEditor::UpdatePropertyGrid()
 
 void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
 {
-    std::string propertyName = ToString(event.GetPropertyName());
-    std::string propertyNewValue = ToString(event.GetPropertyValue().GetString());
+    std::string propertyName = gd::ToString(event.GetPropertyName());
+    std::string propertyNewValue = gd::ToString(event.GetPropertyValue().GetString());
 
     wxArrayTreeItemIds selection;
     resourcesTree->GetSelections(selection);
@@ -783,6 +777,8 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
             }
             else
                 project.GetResourcesManager().GetResource(data->GetSecondString()).ChangeProperty(project, propertyName, propertyNewValue);
+
+            project.GetChangesNotifier().OnResourceModified(project, data->GetSecondString());
         }
         else if ( data && data->GetString() == "Folder")
         {
@@ -796,8 +792,8 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
 
 void ResourcesEditor::OnPropertyChanging(wxPropertyGridEvent& event)
 {
-    std::string propertyName = ToString(event.GetPropertyName());
-    std::string propertyNewValue = ToString(event.GetPropertyValue().GetString());
+    std::string propertyName = gd::ToString(event.GetPropertyName());
+    std::string propertyNewValue = gd::ToString(event.GetPropertyValue().GetString());
 
     wxArrayTreeItemIds selection;
     resourcesTree->GetSelections(selection);
@@ -866,7 +862,7 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(event.GetItem()));
     if ( !event.IsEditCancelled() && data )
     {
-        std::string newName = string(event.GetLabel().mb_str());
+        std::string newName = std::string(event.GetLabel().mb_str());
 
         if ( data->GetString() == "Folder" )
         {
@@ -928,7 +924,7 @@ void ResourcesEditor::Refresh()
     resourcesTree->AddRoot( "ImagesBank" );
 
     //Setup search
-    std::string search = boost::to_upper_copy(ToString(searchCtrl->GetValue()));
+    std::string search = boost::to_upper_copy(gd::ToString(searchCtrl->GetValue()));
     bool searching = search.empty() ? false : true;
 
     //Folders
@@ -943,7 +939,7 @@ void ResourcesEditor::Refresh()
         {
             gd::Resource & resource = folder.GetResource(resources[j]);
 
-            if ( searching && boost::to_upper_copy(resource.GetName()).find(search) == string::npos)
+            if ( searching && boost::to_upper_copy(resource.GetName()).find(search) == std::string::npos)
                 continue;
 
             resourcesTree->AppendItem( folderItem, resource.GetName(), -1,-1, new gd::TreeItemStringData("Image", resource.GetName() ));
@@ -957,7 +953,7 @@ void ResourcesEditor::Refresh()
     {
         gd::Resource & resource = project.GetResourcesManager().GetResource(resources[i]);
 
-        if ( searching && boost::to_upper_copy(resource.GetName()).find(search) == string::npos)
+        if ( searching && boost::to_upper_copy(resource.GetName()).find(search) == std::string::npos)
             continue;
 
         resourcesTree->AppendItem( allImagesItem, resource.GetName(), -1, -1, new gd::TreeItemStringData("Image", resource.GetName() ));
@@ -1010,7 +1006,7 @@ void ResourcesEditor::OnDeleteUnusedFiles( wxCommandEvent& event )
     wxArrayInt selection = dialog.GetSelections();
     for (unsigned int i = 0;i<selection.size();++i)
     {
-        std::string imageName = ToString(imagesNotUsed[selection[i]]);
+        std::string imageName = gd::ToString(imagesNotUsed[selection[i]]);
 
         project.GetResourcesManager().RemoveResource(imageName);
         RemoveImageFromTree( resourcesTree->GetRootItem(), imageName );
@@ -1114,7 +1110,7 @@ void ResourcesEditor::ShiftUpElementOfTree()
  */
 void ResourcesEditor::OnMoveUpSelected(wxCommandEvent& event)
 {
-    string name = static_cast< string > ( resourcesTree->GetItemText( m_itemSelected ));
+    std::string name = static_cast< std::string > ( resourcesTree->GetItemText( m_itemSelected ));
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
     if ( !data ) return;
 
@@ -1168,7 +1164,7 @@ void ResourcesEditor::ShiftDownElementOfTree()
  */
 void ResourcesEditor::OnMoveDownSelected(wxCommandEvent& event)
 {
-    string name = static_cast< string > ( resourcesTree->GetItemText( m_itemSelected ));
+    std::string name = static_cast< std::string > ( resourcesTree->GetItemText( m_itemSelected ));
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData(m_itemSelected));
     if ( !data ) return;
 
@@ -1205,7 +1201,7 @@ void ResourcesEditor::TriggerDrop(wxCoord x, wxCoord y)
     m_itemSelected = resourcesTree->HitTest(wxPoint(x,y));
     if ( !m_itemSelected.IsOk() ) return;
 
-    string name = static_cast< string > ( resourcesTree->GetItemText( m_itemSelected ));
+    std::string name = static_cast< std::string > ( resourcesTree->GetItemText( m_itemSelected ));
     gd::TreeItemStringData * data = dynamic_cast<gd::TreeItemStringData*>(resourcesTree->GetItemData( m_itemSelected ));
     if ( !data ) return;
 
@@ -1263,11 +1259,11 @@ void ResourcesEditor::ForceRefreshRibbonAndConnect()
 
 void ResourcesEditor::OnAddFolderSelected(wxCommandEvent& event)
 {
-    std::string newName = ToString(_("New folder"));
+    std::string newName = gd::ToString(_("New folder"));
     unsigned int i = 1;
     while( project.GetResourcesManager().HasFolder(newName) )
     {
-        newName = ToString(_("New folder")) + " " + ToString(i);
+        newName = gd::ToString(_("New folder")) + " " + gd::ToString(i);
         ++i;
     }
 
@@ -1299,7 +1295,7 @@ void ResourcesEditor::OnresourcesTreeBeginDrag(wxTreeEvent& event)
         if ( currentFolderData && currentFolderData->GetString() == "Folder" )
             currentFolderName = currentFolderData->GetSecondString();
 
-        wxTextDataObject name("DRAG;"+currentFolderName+";"+ToString( resourcesTree->GetItemText( event.GetItem() )));
+        wxTextDataObject name(/*"DRAG;"+currentFolderName+";"+*/gd::ToString( resourcesTree->GetItemText( event.GetItem() )));
         wxDropSource dragSource( this );
         dragSource.SetData( name );
         dragSource.DoDragDrop( true );

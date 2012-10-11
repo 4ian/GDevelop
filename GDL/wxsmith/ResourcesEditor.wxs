@@ -5,7 +5,38 @@
 		<handler function="OnResize" entry="EVT_SIZE" />
 		<object class="wxAuiManager" variable="AuiManager1" member="yes">
 			<object class="AuiManagerItem">
-				<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes" />
+				<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes">
+					<object class="AuiToolBarItem">
+						<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM1" variable="AuiToolBarItem1" member="yes">
+							<bitmap>res/addicon.png</bitmap>
+							<shorthelp>Add an image</shorthelp>
+							<longhelp>Add an image</longhelp>
+							<handler function="OnAddImageBtClick" entry="EVT_TOOL" />
+						</object>
+						<label>Add an image</label>
+					</object>
+					<object class="AuiToolBarItem">
+						<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM2" variable="AuiToolBarItem2" member="yes">
+							<bitmap>res/package16.png</bitmap>
+							<shorthelp>Add from resource library</shorthelp>
+							<longhelp>Add from resource library</longhelp>
+						</object>
+						<label>Add from resource library</label>
+					</object>
+					<object class="AuiToolBarItem">
+						<object class="wxAuiToolBarSeparator" />
+						<label>Item label</label>
+					</object>
+					<object class="AuiToolBarItem">
+						<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM5" variable="AuiToolBarItem5" member="yes">
+							<bitmap>res/helpicon.png</bitmap>
+							<shorthelp>Get help about using the resource manager</shorthelp>
+							<longhelp>Get help about using the resource manager</longhelp>
+							<handler function="OnAideBtClick" entry="EVT_TOOL" />
+						</object>
+						<label>Help</label>
+					</object>
+				</object>
 				<name>PaneName</name>
 				<standardpanetype>Toolbar</standardpanetype>
 				<caption>Pane caption</caption>
@@ -15,8 +46,9 @@
 				<pinbutton>0</pinbutton>
 				<layer>10</layer>
 				<dockabledirection></dockabledirection>
+				<floatable>0</floatable>
 				<resizable>0</resizable>
-				<gripper>Default</gripper>
+				<movable>0</movable>
 				<destroyonclose>0</destroyonclose>
 				<firstadd>0</firstadd>
 			</object>
@@ -84,7 +116,6 @@
 				<minimizebutton>0</minimizebutton>
 				<maximizebutton>0</maximizebutton>
 				<pinbutton>0</pinbutton>
-				<closebutton>0</closebutton>
 				<dockdirection>Right</dockdirection>
 				<dockfixed>0</dockfixed>
 				<dockabledirection></dockabledirection>

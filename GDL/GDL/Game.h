@@ -237,7 +237,7 @@ public:
     virtual const gd::Layout & GetLayout (unsigned int index) const;
     virtual unsigned int GetLayoutPosition(const std::string & name) const;
     virtual unsigned int GetLayoutCount() const;
-    virtual void InsertNewLayout(std::string & name, unsigned int position);
+    virtual void InsertNewLayout(const std::string & name, unsigned int position);
     virtual void InsertLayout(const gd::Layout & layout, unsigned int position);
     virtual void RemoveLayout(const std::string & name);
 

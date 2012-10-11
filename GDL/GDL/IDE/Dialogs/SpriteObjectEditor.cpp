@@ -41,6 +41,8 @@ namespace { //Some private tools functions
 
 wxBitmap Rescale(wxBitmap bmp, int max_width, int max_height) {
 
+    if ( !bmp.IsOk() ) return bmp;
+
     float xFactor = max_width/static_cast<float>(bmp.GetWidth());
     float yFactor = max_height/static_cast<float>(bmp.GetHeight());
     float factor = std::min(xFactor, yFactor);
@@ -523,7 +525,10 @@ void SpriteObjectEditor::RefreshImagesList()
                 spriteBitmap = Rescale(spriteBitmap, 48, 48);
             }
 
-            thumbnailList->Add(spriteBitmap);
+            if ( spriteBitmap.IsOk() )
+                thumbnailList->Add(spriteBitmap);
+            else
+                thumbnailList->Add(gd::CommonBitmapManager::GetInstance()->error48);
             imagesList->InsertItem(imagesList->GetItemCount(), ToString(i), i);
         }
     }
@@ -537,6 +542,8 @@ void SpriteObjectEditor::RefreshImageAndControls()
     RefreshPoints();
     RefreshCollisionMasks();
 }
+
+#include <typeinfo>
 
 wxBitmap SpriteObjectEditor::GetwxBitmapFromImageResource(Resource & resource)
 {
@@ -555,7 +562,7 @@ wxBitmap SpriteObjectEditor::GetwxBitmapFromImageResource(Resource & resource)
         //Resource is probably not an image.
     }
 
-    return wxBitmap( "res/error48.png", wxBITMAP_TYPE_ANY );
+    return gd::CommonBitmapManager::GetInstance()->error48;
 }
 
 SpriteObjectEditor::~SpriteObjectEditor()

@@ -606,7 +606,7 @@ unsigned int Game::GetLayoutCount() const
     return scenes.size();
 }
 
-void Game::InsertNewLayout(std::string & name, unsigned int position)
+void Game::InsertNewLayout(const std::string & name, unsigned int position)
 {
     boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(new Scene);
     if (position<scenes.size())

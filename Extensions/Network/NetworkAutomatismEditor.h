@@ -100,3 +100,4 @@ class NetworkAutomatismEditor: public wxDialog
 
 #endif
 #endif
+

@@ -38,3 +38,4 @@ void SceneNetworkDatas::SaveToXml(TiXmlElement * elem) const
 void SceneNetworkDatas::LoadFromXml(const TiXmlElement * elem)
 {
 }
+

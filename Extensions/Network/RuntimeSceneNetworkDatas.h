@@ -45,3 +45,4 @@ class GD_EXTENSION_API RuntimeSceneNetworkDatas : public AutomatismsRuntimeShare
 };
 
 #endif // RUNTIMESCENENETWORKDATAS_H
+

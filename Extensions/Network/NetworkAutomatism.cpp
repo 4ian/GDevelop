@@ -177,3 +177,4 @@ void NetworkAutomatism::LoadFromXml(const TiXmlElement * elem)
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("height", height);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_STRING("dataPrefix", dataPrefix);
 }
+

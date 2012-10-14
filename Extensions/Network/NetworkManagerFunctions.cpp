@@ -123,3 +123,4 @@ std::string GD_EXTENSION_API GetLocalAddress()
 
 }
 }
+

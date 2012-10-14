@@ -68,3 +68,4 @@ class GD_EXTENSION_API ReceivedDataManager
 };
 
 #endif // RECEIVEDDATAMANAGER_H
+

@@ -46,3 +46,4 @@ class GD_EXTENSION_API ErrorManager
 };
 
 #endif // ERRORMANAGER_H
+

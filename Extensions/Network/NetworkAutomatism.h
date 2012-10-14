@@ -94,3 +94,4 @@ class GD_EXTENSION_API NetworkAutomatism : public Automatism
 };
 
 #endif // NETWORKAUTOMATISM_H
+

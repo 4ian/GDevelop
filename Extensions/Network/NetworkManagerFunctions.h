@@ -51,3 +51,4 @@ std::string GD_EXTENSION_API GetLocalAddress();
 }
 
 #endif // NetworkACTIONS_H_INCLUDED
+

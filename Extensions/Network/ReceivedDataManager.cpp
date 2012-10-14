@@ -27,3 +27,4 @@ freely, subject to the following restrictions:
 #include "ReceivedDataManager.h"
 
 ReceivedDataManager * ReceivedDataManager::_singleton = 0;
+

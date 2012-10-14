@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
 	<object class="wxDialog" name="NetworkAutomatismEditor">
-		<title>Editer l&apos;automatisme</title>
+		<title>Edit the automatism</title>
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
@@ -13,10 +13,10 @@
 							<cols>1</cols>
 							<object class="sizeritem">
 								<object class="wxRadioBox" name="ID_RADIOBOX1" variable="initialBehaviourList" member="yes">
-									<label>Comportement initial</label>
+									<label>Initial behaviour</label>
 									<content>
-										<item>Envoyer les données</item>
-										<item>Recevoir les données</item>
+										<item>Send datas</item>
+										<item>Receive data</item>
 									</content>
 									<default>-1</default>
 								</object>
@@ -42,13 +42,13 @@
 							<growablecols>1</growablecols>
 							<object class="sizeritem">
 								<object class="wxStaticBoxSizer" variable="StaticBoxSizer1" member="no">
-									<label>Données envoyées / reçues</label>
+									<label>Sent / Received data</label>
 									<object class="sizeritem">
 										<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
 											<cols>2</cols>
 											<object class="sizeritem">
 												<object class="wxCheckBox" name="ID_CHECKBOX1" variable="xPosCheck" member="yes">
-													<label>Position X</label>
+													<label>X position</label>
 													<checked>1</checked>
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -57,7 +57,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxCheckBox" name="ID_CHECKBOX2" variable="yPosCheck" member="yes">
-													<label>Position Y</label>
+													<label>Y position</label>
 													<checked>1</checked>
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -75,7 +75,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxCheckBox" name="ID_CHECKBOX4" variable="widthCheck" member="yes">
-													<label>Largeur</label>
+													<label>Width</label>
 												</object>
 												<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 												<border>5</border>
@@ -83,7 +83,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxCheckBox" name="ID_CHECKBOX5" variable="heightCheck" member="yes">
-													<label>Hauteur</label>
+													<label>Height</label>
 												</object>
 												<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 												<border>5</border>
@@ -100,7 +100,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxStaticBoxSizer" variable="StaticBoxSizer2" member="no">
-									<label>Forme des données</label>
+									<label>Data format</label>
 									<object class="sizeritem">
 										<object class="wxFlexGridSizer" variable="FlexGridSizer7" member="no">
 											<cols>1</cols>
@@ -131,7 +131,7 @@
 											</object>
 											<object class="sizeritem">
 												<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText3" member="yes">
-													<label>X représente le numéro d&apos;identification et Data la donnée.</label>
+													<label>X represent identifier number and Data the data title.</label>
 												</object>
 												<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 												<border>5</border>
@@ -170,7 +170,7 @@
 					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON2" variable="cancelBt" member="yes">
-							<label>Annuler</label>
+							<label>Cancel</label>
 							<handler function="OncancelBtClick" entry="EVT_BUTTON" />
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -185,3 +185,10 @@
 		</object>
 	</object>
 </wxsmith>
+
+
+
+
+
+
+

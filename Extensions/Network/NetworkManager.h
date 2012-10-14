@@ -107,3 +107,4 @@ private:
 };
 
 #endif // NETWORKMANAGER_H
+

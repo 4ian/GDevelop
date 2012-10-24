@@ -34,6 +34,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, s
     gd::ResourcesMergingHelper resourcesMergingHelper;
     resourcesMergingHelper.SetBaseDirectory(gd::ToString(wxFileName::FileName(originalProject.GetProjectFile()).GetPath()));
     resourcesMergingHelper.PreserveDirectoriesStructure(true);
+    resourcesMergingHelper.PreserveAbsoluteFilenames(!copyAlsoResourcesWithAbsolutePath);
 
     if ( updateOriginalProject )
     {

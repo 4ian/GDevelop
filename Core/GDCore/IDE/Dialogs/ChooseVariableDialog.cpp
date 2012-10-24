@@ -227,6 +227,7 @@ void ChooseVariableDialog::OnAddVarSelected(wxCommandEvent& event)
     unsigned int listInsertPosition = temporaryContainer->HasVariableNamed(selectedVariable) ? temporaryContainer->GetVariablePosition(selectedVariable) : 0;
     temporaryContainer->InsertNewVariable(newName, listInsertPosition);
     variablesList->InsertItem(listInsertPosition, newName);
+    variablesList->SetItem(listInsertPosition, 1, "0");
     variablesList->EditLabel(listInsertPosition);
 }
 

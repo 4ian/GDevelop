@@ -281,6 +281,10 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
 	conditionColumnWidth = config->ReadDouble("EventsEditor/ConditionColumnWidth", 350);
 	hideContextPanelsLabels = config->ReadBool("EventsEditor/HideContextPanelsLabels", false);
 
+	wxFont eventsEditorFont;
+	if ( config->Read("EventsEditor/Font", &eventsEditorFont) )
+        gd::EventsRenderingHelper::GetInstance()->SetFont(eventsEditorFont);
+
     //Adding events types
     ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
     const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();

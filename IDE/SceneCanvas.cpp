@@ -45,6 +45,7 @@
 #include "DebuggerGUI.h"
 #include "GridSetup.h"
 #include "ProfileDlg.h"
+#undef GetObject //Disable an annoying macro
 
 const long SceneCanvas::ID_ADDOBJMENU = wxNewId();
 const long SceneCanvas::ID_DELOBJMENU = wxNewId();
@@ -208,7 +209,7 @@ void SceneCanvas::OnPlayWindowBtClick( wxCommandEvent & event )
     editing = false;
 
     externalWindow->Show(true);
-    externalWindow->renderCanvas->SetFramerateLimit( previewData.game.GetMaximumFPS() );
+    externalWindow->renderCanvas->setFramerateLimit( previewData.game.GetMaximumFPS() );
 
     externalWindow->SetSizeOfRenderingZone(gameEdited.GetMainWindowDefaultWidth(), gameEdited.GetMainWindowDefaultHeight());
     previewData.scene.ChangeRenderWindow(externalWindow->renderCanvas);
@@ -296,24 +297,24 @@ void SceneCanvas::Refresh()
         {
             //Display a message when compiling
             sf::Event event;
-            while ( PollEvent( event ) )
+            while ( pollEvent( event ) )
                 ;
 
-            Clear(sf::Color(255,255,255));
+            clear(sf::Color(255,255,255));
 
-            SaveGLStates();
-            SetView(sf::View(sf::Vector2f(GetWidth()/2,GetHeight()/2), sf::Vector2f(GetWidth(),GetHeight())));
+            pushGLStates();
+            setView(sf::View(sf::Vector2f(getSize().x/2, getSize().y/2), sf::Vector2f(getSize().x, getSize().y)));
 
-            reloadingIconSprite.SetTexture(reloadingIconImage);
-            reloadingIconSprite.SetColor(sf::Color(255,255,255,128));
-            reloadingIconSprite.SetPosition(GetWidth()/2-reloadingIconSprite.GetSize().x/2, GetHeight()/2-reloadingIconSprite.GetSize().y/2);
-            reloadingText.SetPosition(GetWidth()/2-reloadingText.GetRect().Width/2, reloadingIconSprite.GetPosition().y+reloadingIconSprite.GetSize().y+10);
+            reloadingIconSprite.setTexture(reloadingIconImage);
+            reloadingIconSprite.setColor(sf::Color(255,255,255,128));
+            reloadingIconSprite.setPosition(getSize().x/2-reloadingIconSprite.getLocalBounds().width/2, getSize().y/2-reloadingIconSprite.getLocalBounds().height/2);
+            reloadingText.setPosition(getSize().x/2-reloadingText.getLocalBounds().width/2, reloadingIconSprite.getPosition().y+reloadingIconSprite.getLocalBounds().height+10);
 
-            Draw(reloadingIconSprite);
-            Draw(reloadingText);
+            draw(reloadingIconSprite);
+            draw(reloadingText);
 
-            RestoreGLStates();
-            Display();
+            popGLStates();
+            display();
             return;
         }
         else //Everything is finished, reloading is complete!
@@ -365,7 +366,7 @@ void SceneCanvas::Refresh()
                 mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the game will quit." ));
             else if ( retourEvent != -1 )
             {
-                if (retourEvent < gameEdited.GetLayouts().size())
+                if (retourEvent > 0 && static_cast<unsigned>(retourEvent) < gameEdited.GetLayouts().size())
                     mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + "\"" + gameEdited.GetLayouts()[retourEvent]->GetName() + "\"");
             }
         }
@@ -380,32 +381,32 @@ void SceneCanvas::EdittimeRender()
 {
     previewData.scene.ManageRenderTargetEvents();
 
-    Clear( sf::Color( previewData.scene.GetBackgroundColorRed(), previewData.scene.GetBackgroundColorGreen(), previewData.scene.GetBackgroundColorBlue() ) );
-    SetView(editionData.view);
+    clear( sf::Color( previewData.scene.GetBackgroundColorRed(), previewData.scene.GetBackgroundColorGreen(), previewData.scene.GetBackgroundColorBlue() ) );
+    setView(editionData.view);
 
     glClear(GL_DEPTH_BUFFER_BIT);
-    SaveGLStates(); //To allow using OpenGL to draw
+    pushGLStates(); //To allow using OpenGL to draw
 
     //On trie les objets par leurs plans
     ObjList allObjects = previewData.scene.objectsInstances.GetAllObjects();
     previewData.scene.OrderObjectsByZOrder( allObjects );
 
-    std::vector < sf::Shape > GUIelements;
+    std::vector < boost::shared_ptr<sf::Shape> > GUIelements;
 
     for (unsigned int layerIndex =0;layerIndex<previewData.scene.GetLayersCount();++layerIndex)
     {
         if ( previewData.scene.GetLayer(layerIndex).GetVisibility() )
         {
             //Prepare OpenGL rendering
-            RestoreGLStates();
+            popGLStates();
 
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
-            gluPerspective(previewData.scene.GetOpenGLFOV(), static_cast<double>(GetWidth())/static_cast<double>(GetHeight()), previewData.scene.GetOpenGLZNear(), previewData.scene.GetOpenGLZFar());
+            gluPerspective(previewData.scene.GetOpenGLFOV(), static_cast<double>(getSize().x)/static_cast<double>(getSize().y), previewData.scene.GetOpenGLZNear(), previewData.scene.GetOpenGLZFar());
 
-            glViewport(0,0, GetWidth(), GetHeight());
+            glViewport(0,0, getSize().x, getSize().y);
 
-            SaveGLStates();
+            pushGLStates();
 
             //Render all objects
             for (unsigned int id = 0;id < allObjects.size();++id)
@@ -421,47 +422,49 @@ void SceneCanvas::EdittimeRender()
                         sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth(),
                                                                                allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight(), editionData.view);
 
-                        sf::Shape selection = sf::Shape::Rectangle(rectangleOrigin.x, rectangleOrigin.y,
-                                                                   rectangleEnd.x-rectangleOrigin.x,
-                                                                   rectangleEnd.y-rectangleOrigin.y,
-                                                                   sf::Color( 0, 0, 200, 40 ), 1, sf::Color( 0, 0, 255, 128 ));
+                        boost::shared_ptr<sf::Shape> selection = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, rectangleEnd.y-rectangleOrigin.y)));
+                        selection->setPosition(rectangleOrigin.x, rectangleOrigin.y);
+                        selection->setFillColor(sf::Color( 0, 0, 200, 40 ));
+                        selection->setOutlineColor(sf::Color( 0, 0, 255, 128 ));
+
                         GUIelements.push_back( selection );
 
                         if ( editionData.objectsSelected.size() == 1)
                         {
-                            sf::Shape resizeXBt = sf::Shape::Rectangle( 0, 0, 4, 4, sf::Color( 255, 255, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
-                            sf::Shape resizeYBt = sf::Shape::Rectangle( 0, 0, 4, 4, sf::Color( 255, 255, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
-                            sf::Shape angleBt = sf::Shape::Rectangle( 0, 0, 4, 4, sf::Color( 255, 255, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
-                            sf::Shape center = sf::Shape::Circle( 0, 0, 2, sf::Color( 0, 0, 255, 255 ), 1, sf::Color( 0, 0, 255, 255 ) );
+                            boost::shared_ptr<sf::Shape> resizeXBt = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(4, 4)));
+                            resizeXBt->setFillColor(sf::Color( 255, 255, 255, 255 )); resizeXBt->setOutlineColor(sf::Color( 0, 0, 255, 255 ));
 
-                            resizeXBt.SetPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth(),
+                            boost::shared_ptr<sf::Shape> resizeYBt = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(4, 4)));
+                            resizeYBt->setFillColor(sf::Color( 255, 255, 255, 255 )); resizeYBt->setOutlineColor(sf::Color( 0, 0, 255, 255 ));
+
+                            boost::shared_ptr<sf::Shape> angleBt = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(4, 4)));
+                            angleBt->setFillColor(sf::Color( 255, 255, 255, 255 )); angleBt->setOutlineColor(sf::Color( 0, 0, 255, 255 ));
+
+                            boost::shared_ptr<sf::Shape> center = boost::shared_ptr<sf::Shape>(new sf::CircleShape(2));
+                            center->setFillColor(sf::Color( 0, 0, 255, 255 )); center->setOutlineColor(sf::Color( 0, 0, 255, 255 ));
+
+                            resizeXBt->setPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth(),
                                                                              allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2,
                                                                              editionData.view ));
-                            resizeXBt.Move(-4,-2);
+                            resizeXBt->move(-4,-2);
 
-                            resizeYBt.SetPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
+                            resizeYBt->setPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
                                                                              allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight(),
                                                                              editionData.view ));
-                            resizeYBt.Move(-2,-4);
+                            resizeYBt->move(-2,-4);
 
-                            center.SetPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
+                            center->setPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
                                                                           allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2,
                                                                           editionData.view ));
-                            center.Move(-2,-2);
+                            center->move(-2,-2);
 
-                            angleBt.SetPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2
+                            angleBt->setPosition(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2
                                                                            +20*cos(allObjects[id]->GetAngle()/180.f*3.14159),
                                                                            allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2
                                                                            +20*sin(allObjects[id]->GetAngle()/180.f*3.14159),
                                                                           editionData.view ));
-                            resizeXBt.Move(-2,-2);
+                            angleBt->move(-2,-2);
 
-                            sf::Shape centerToAngle = sf::Shape::Line(ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth()/2,
-                                                                                 allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight()/2,
-                                                                                 editionData.view ),
-                                                                      angleBt.GetPosition(), 1, sf::Color( 0, 0, 255, 255 ), 0, sf::Color( 0, 0, 255, 255 ) );
-
-                            GUIelements.push_back( centerToAngle );
                             GUIelements.push_back( center );
                             GUIelements.push_back( angleBt );
                             GUIelements.push_back( resizeXBt );
@@ -474,12 +477,12 @@ void SceneCanvas::EdittimeRender()
     }
 
     //Go back to "window" view before drawing GUI elements
-    SetView(sf::View(sf::Vector2f(GetWidth()/2,GetHeight()/2), sf::Vector2f(GetWidth(),GetHeight())));
+    setView(sf::View(sf::Vector2f(getSize().x/2,getSize().y/2), sf::Vector2f(getSize().x,getSize().y)));
 
     if ( settings.grid ) RenderGrid();
 
     for (unsigned int i = 0;i<GUIelements.size();++i)
-    	Draw(GUIelements[i]);
+    	draw(*GUIelements[i]);
 
     if ( editionData.isSelecting )
     {
@@ -491,63 +494,66 @@ void SceneCanvas::EdittimeRender()
                                                  editionData.yEndRectangleSelection);
         rectangleEnd = ConvertToWindowCoordinates(rectangleEnd.x, rectangleEnd.y, editionData.view);
 
-        sf::Shape selection = sf::Shape::Rectangle(rectangleOrigin.x, rectangleOrigin.y,
-                                                   rectangleEnd.x-rectangleOrigin.x, rectangleEnd.y-rectangleOrigin.y,
-                                                   sf::Color( 0, 0, 200, 40 ), 1, sf::Color( 0, 0, 255, 128 ) );
-        Draw(selection);
+        sf::RectangleShape selection(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, rectangleEnd.y-rectangleOrigin.y));
+        selection.setPosition(rectangleOrigin.x, rectangleOrigin.y);
+        selection.setFillColor(sf::Color( 0, 0, 200, 40 ));
+        selection.setOutlineColor(sf::Color( 0, 0, 255, 128 ));
+        draw(selection);
     }
 
     if ( settings.windowMask )
     {
-        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(editionData.view.GetCenter().x-previewData.scene.game->GetMainWindowDefaultWidth()/2,
-                                                                  editionData.view.GetCenter().y-previewData.scene.game->GetMainWindowDefaultHeight()/2,
+        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(editionData.view.getCenter().x-previewData.scene.game->GetMainWindowDefaultWidth()/2,
+                                                                  editionData.view.getCenter().y-previewData.scene.game->GetMainWindowDefaultHeight()/2,
                                                                   editionData.view);
 
-        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(editionData.view.GetCenter().x+previewData.scene.game->GetMainWindowDefaultWidth()/2,
-                                                                  editionData.view.GetCenter().y+previewData.scene.game->GetMainWindowDefaultHeight()/2,
+        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(editionData.view.getCenter().x+previewData.scene.game->GetMainWindowDefaultWidth()/2,
+                                                                  editionData.view.getCenter().y+previewData.scene.game->GetMainWindowDefaultHeight()/2,
                                                                   editionData.view);
 
-        Draw(sf::Shape::Rectangle(rectangleOrigin.x, rectangleOrigin.y,
-                                  rectangleEnd.x-rectangleOrigin.x, rectangleEnd.y-rectangleOrigin.y,
-                                  sf::Color( 0, 0, 0, 0 ), 1, sf::Color( 255, 255, 255, 128 ) ));
+        sf::RectangleShape mask(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, rectangleEnd.y-rectangleOrigin.y));
+        mask.setPosition(rectangleOrigin.x, rectangleOrigin.y);
+        mask.setFillColor(sf::Color( 0, 0, 0, 0 ));
+        mask.setOutlineColor(sf::Color( 255, 255, 255, 128 ));
+        draw(mask);
     }
 
-    SetView(editionData.view);
-    RestoreGLStates();
-    Display();
+    setView(editionData.view);
+    popGLStates();
+    display();
 }
 
 void SceneCanvas::RenderGrid()
 {
-    int initialXPos = floor((editionData.view.GetCenter().x-editionData.view.GetSize().x/2) / settings.gridWidth)-settings.gridWidth;
+    int initialXPos = floor((editionData.view.getCenter().x-editionData.view.getSize().x/2) / settings.gridWidth)-settings.gridWidth;
     initialXPos *= settings.gridWidth;
-    int initialYPos = floor((editionData.view.GetCenter().y-editionData.view.GetSize().y/2) / settings.gridHeight)-settings.gridHeight;
+    int initialYPos = floor((editionData.view.getCenter().y-editionData.view.getSize().y/2) / settings.gridHeight)-settings.gridHeight;
     initialYPos *= settings.gridHeight;
 
-    for ( int Xpos = initialXPos;Xpos < (editionData.view.GetCenter().x+editionData.view.GetSize().x/2) ; Xpos += settings.gridWidth )
+    for ( int Xpos = initialXPos;Xpos < (editionData.view.getCenter().x+editionData.view.getSize().x/2) ; Xpos += settings.gridWidth )
     {
-        Draw (sf::Shape::Line(ConvertToWindowCoordinates(Xpos, initialYPos, editionData.view),
-                              ConvertToWindowCoordinates(Xpos, editionData.view.GetCenter().y+editionData.view.GetSize().y/2, editionData.view),
-                              1, sf::Color( settings.gridR, settings.gridG, settings.gridB )));
+        sf::Vertex line[2] = {sf::Vertex(ConvertToWindowCoordinates(Xpos, initialYPos, editionData.view), sf::Color(settings.gridR, settings.gridG, settings.gridB)),
+                              sf::Vertex(ConvertToWindowCoordinates(Xpos, editionData.view.getCenter().y+editionData.view.getSize().y/2, editionData.view), sf::Color(settings.gridR, settings.gridG, settings.gridB))};
+        draw(line, 2, sf::Lines);
     }
 
-    for ( int Ypos = initialYPos;Ypos < (editionData.view.GetCenter().y+editionData.view.GetSize().y/2) ; Ypos += settings.gridHeight )
+    for ( int Ypos = initialYPos;Ypos < (editionData.view.getCenter().y+editionData.view.getSize().y/2) ; Ypos += settings.gridHeight )
     {
-        Draw (sf::Shape::Line(ConvertToWindowCoordinates(initialXPos, Ypos, editionData.view),
-                              ConvertToWindowCoordinates(editionData.view.GetCenter().x+editionData.view.GetSize().x/2, Ypos, editionData.view),
-                              1, sf::Color( settings.gridR, settings.gridG, settings.gridB )));
+        sf::Vertex line[2] = {sf::Vertex(ConvertToWindowCoordinates(initialXPos, Ypos, editionData.view), sf::Color(settings.gridR, settings.gridG, settings.gridB)),
+                              sf::Vertex(ConvertToWindowCoordinates(editionData.view.getCenter().x+editionData.view.getSize().x/2, Ypos, editionData.view), sf::Color(settings.gridR, settings.gridG, settings.gridB))};
+        draw(line, 2, sf::Lines);
     }
 }
 
 sf::Vector2f SceneCanvas::ConvertToWindowCoordinates(float x, float y, const sf::View & view)
 {
     //Transform by the view matrix
-    sf::Vector2f hCoords = view.GetMatrix().Transform(sf::Vector2f(x,y));
+    sf::Vector2f hCoords = view.getTransform().transformPoint(x,y);
 
     //Go back from homogeneous coordinates to viewport ones.
-    sf::IntRect viewport = GetViewport(view);
-    return sf::Vector2f(( hCoords.x + 1.f ) / 2.f * viewport.Width + viewport.Left,
-                        (-hCoords.y + 1.f ) / 2.f * viewport.Height + viewport.Top);
+    sf::IntRect viewport = getViewport(view);
+    return sf::Vector2f(( hCoords.x + 1.f ) / 2.f * viewport.width + viewport.left,
+                        (-hCoords.y + 1.f ) / 2.f * viewport.height + viewport.top);
 }
 
 void SceneCanvas::OnUpdate()
@@ -626,11 +632,11 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
 
     ObjSPtr object = FindSmallestObjectUnderCursor();
 
-    float mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
-    float mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
+    float mouseX = convertCoords(sf::Mouse::getPosition(*previewData.scene.renderWindow)).x;
+    float mouseY = convertCoords(sf::Mouse::getPosition(*previewData.scene.renderWindow)).y;
 
     //Suppress selection
-    if ( (!sf::Keyboard::IsKeyPressed(sf::Keyboard::LShift) && !sf::Keyboard::IsKeyPressed(sf::Keyboard::RShift)) && //Check that shift is not pressed
+    if ( (!sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) && !sf::Keyboard::isKeyPressed(sf::Keyboard::RShift)) && //Check that shift is not pressed
         ( object == boost::shared_ptr<Object> () || //If no object is clicked
          find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), object) == editionData.objectsSelected.end()) ) //Or an object which is not currently selected.
     {
@@ -729,10 +735,10 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
 {
     #if defined(GD_IDE_ONLY) && defined(LINUX)
     sf::Event myEvent;
-    myEvent.Type = sf::Event::MouseButtonReleased;
-    myEvent.MouseButton.X = event.GetX();
-    myEvent.MouseButton.Y = event.GetY();
-    myEvent.MouseButton.Button = sf::Mouse::Left;
+    myEvent.type = sf::Event::MouseButtonReleased;
+    myEvent.mouseButton.x = event.GetX();
+    myEvent.mouseButton.y = event.GetY();
+    myEvent.mouseButton.button = sf::Mouse::Left;
 
     previewData.scene.GetRenderTargetEvents().push_back(myEvent);
     #endif
@@ -810,8 +816,8 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
 void SceneCanvas::OnMotion( wxMouseEvent &event )
 {
     //Mille mercis Laurent.
-    float mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
-    float mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
+    float mouseX = convertCoords(sf::Mouse::getPosition(*previewData.scene.renderWindow)).x;
+    float mouseY = convertCoords(sf::Mouse::getPosition(*previewData.scene.renderWindow)).y;
 
     if ( !editing )
         wxLogStatus( wxString( _( "Position " ) ) + ToString( mouseX ) + wxString( _( ";" ) ) + ToString( mouseY ) + wxString( _( ". ( Base layer, camera 0 )" ) ) );
@@ -825,10 +831,10 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
     //Moving using middle click
     if ( editionData.isMoving )
     {
-        float zoomFactor = static_cast<float>(GetWidth())/editionData.view.GetSize().x;
+        float zoomFactor = static_cast<float>(getSize().x)/editionData.view.getSize().x;
 
-        editionData.view.SetCenter( editionData.viewStartPosition.x + (editionData.mouseStartPosition.x - sf::Mouse::GetPosition(*previewData.scene.renderWindow).x)/zoomFactor,
-                                   editionData.viewStartPosition.y + (editionData.mouseStartPosition.y - sf::Mouse::GetPosition(*previewData.scene.renderWindow).y)/zoomFactor );
+        editionData.view.setCenter( editionData.viewStartPosition.x + (editionData.mouseStartPosition.x - sf::Mouse::getPosition(*previewData.scene.renderWindow).x)/zoomFactor,
+                                   editionData.viewStartPosition.y + (editionData.mouseStartPosition.y - sf::Mouse::getPosition(*previewData.scene.renderWindow).y)/zoomFactor );
     }
 
     if ( editionData.isResizingX )
@@ -984,10 +990,10 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
 {
     #if defined(GD_IDE_ONLY) && defined(LINUX)
     sf::Event myEvent;
-    myEvent.Type = sf::Event::MouseButtonReleased;
-    myEvent.MouseButton.X = event.GetX();
-    myEvent.MouseButton.Y = event.GetY();
-    myEvent.MouseButton.Button = sf::Mouse::Right;
+    myEvent.type = sf::Event::MouseButtonReleased;
+    myEvent.mouseButton.x = event.GetX();
+    myEvent.mouseButton.y = event.GetY();
+    myEvent.mouseButton.button = sf::Mouse::Right;
 
     previewData.scene.GetRenderTargetEvents().push_back(myEvent);
     #endif
@@ -999,7 +1005,7 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
 
     //Suppress selection if the user
     if ( object == boost::shared_ptr<Object> () || /*Did not click on an object*/
-        (( !sf::Keyboard::IsKeyPressed(sf::Keyboard::LShift) && !sf::Keyboard::IsKeyPressed(sf::Keyboard::RShift) ) && /*Clicked without using shift*/
+        (( !sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) && !sf::Keyboard::isKeyPressed(sf::Keyboard::RShift) ) && /*Clicked without using shift*/
          find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), object) == editionData.objectsSelected.end() ))
     {
         ClearSelection();
@@ -1007,8 +1013,8 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
     }
 
     //Remember now the position of the mouse for latter use
-    editionData.oldMouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
-    editionData.oldMouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
+    editionData.oldMouseX = convertCoords(sf::Mouse::getPosition(*previewData.scene.renderWindow)).x;
+    editionData.oldMouseY = convertCoords(sf::Mouse::getPosition(*previewData.scene.renderWindow)).y;
 
     if ( object == boost::shared_ptr<Object> () ) //Popup "no object" context menu
     {
@@ -1057,12 +1063,9 @@ void SceneCanvas::OnCopySelected(wxCommandEvent & event)
 
     for (unsigned int i =0;i<editionData.objectsSelected.size();++i)
     {
-        int mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
-        int mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
-
         copiedPositions.push_back(GetInitialPositionFromObject(editionData.objectsSelected[i]));
-        copiedPositions.back().SetX(copiedPositions.back().GetX() - mouseX);
-        copiedPositions.back().SetY(copiedPositions.back().GetY() - mouseY);
+        copiedPositions.back().SetX(copiedPositions.back().GetX() - editionData.oldMouseX);
+        copiedPositions.back().SetY(copiedPositions.back().GetY() - editionData.oldMouseY);
     }
 
     Clipboard::GetInstance()->SetPositionsSelection(copiedPositions);
@@ -1075,14 +1078,9 @@ void SceneCanvas::OnCutSelected(wxCommandEvent & event)
     for (unsigned int i =0;i<editionData.objectsSelected.size();++i)
     {
         InitialPosition & initialInstance = GetInitialPositionFromObject(editionData.objectsSelected[i]);
-
-        //Copy position
-        float mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
-        float mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
-
         copiedPositions.push_back(initialInstance);
-        copiedPositions.back().SetX(copiedPositions.back().GetX() - mouseX);
-        copiedPositions.back().SetY(copiedPositions.back().GetY() - mouseY);
+        copiedPositions.back().SetX(copiedPositions.back().GetX() - editionData.oldMouseX);
+        copiedPositions.back().SetY(copiedPositions.back().GetY() - editionData.oldMouseY);
 
         //Remove objects
         instances.RemoveInstance(initialInstance);
@@ -1106,13 +1104,10 @@ void SceneCanvas::OnPasteSelected(wxCommandEvent & event)
 
     for (unsigned int i =0;i<pastedPositions.size();++i)
     {
-        float mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
-        float mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
-
         instances.InsertInitialInstance(pastedPositions[i]);
         gd::InitialInstance & insertedInstance = instances.GetInstance(instances.GetInstancesCount()-1);
-        insertedInstance.SetX(insertedInstance.GetX()+mouseX);
-        insertedInstance.SetY(insertedInstance.GetY()+mouseY);
+        insertedInstance.SetX(insertedInstance.GetX()+editionData.oldMouseX);
+        insertedInstance.SetY(insertedInstance.GetY()+editionData.oldMouseY);
     }
 
     if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
@@ -1125,13 +1120,9 @@ void SceneCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
     if ( !Clipboard::GetInstance()->HasPositionsSelection() ) return;
     vector < InitialPosition > pastedPositions = Clipboard::GetInstance()->GetPositionsSelection();
 
-    float mouseX = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
-    float mouseY = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
-
     AdvancedPasteDlg dialog(this);
-    dialog.SetStartX(mouseX);
-    dialog.SetStartY(mouseY);
-
+    dialog.SetStartX(editionData.oldMouseX);
+    dialog.SetStartY(editionData.oldMouseY);
 
     ObjSPtr object = GetObjectFromInitialPosition(pastedPositions.front());
     if ( object != boost::shared_ptr<Object>() )
@@ -1261,8 +1252,8 @@ void SceneCanvas::OnMiddleDown( wxMouseEvent &event )
     if ( !editionData.isMoving )
     {
         editionData.isMoving = true;
-        editionData.mouseStartPosition = sf::Mouse::GetPosition(*previewData.scene.renderWindow);
-        editionData.viewStartPosition = GetView().GetCenter();
+        editionData.mouseStartPosition = sf::Mouse::getPosition(*previewData.scene.renderWindow);
+        editionData.viewStartPosition = getView().getCenter();
         SetCursor( wxCursor( wxCURSOR_SIZING ) );
 
         return;
@@ -1284,8 +1275,8 @@ void SceneCanvas::OnMouseWheel( wxMouseEvent &event )
         return;
 
     float rotation = event.GetWheelRotation()*3;
-    float newheight = editionData.view.GetSize().y + ( rotation / 25 );
-    float newZoomFactor = static_cast<float>(GetHeight())/newheight;
+    float newheight = editionData.view.getSize().y + ( rotation / 25 );
+    float newZoomFactor = static_cast<float>(getSize().y)/newheight;
     if ( newZoomFactor > 0 ) settings.zoomFactor = newZoomFactor;
     UpdateAccordingToZoomFactor();
 }
@@ -1379,8 +1370,8 @@ ObjSPtr SceneCanvas::GetObjectFromInitialPosition(const InitialPosition & initia
 boost::shared_ptr<Object> SceneCanvas::FindSmallestObjectUnderCursor()
 {
     ObjList potentialObjects;
-    float x = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).x;
-    float y = ConvertCoords(sf::Mouse::GetPosition(*previewData.scene.renderWindow).x, sf::Mouse::GetPosition(*previewData.scene.renderWindow).y).y;
+    float x = convertCoords(sf::Mouse::getPosition(*previewData.scene.renderWindow)).x;
+    float y = convertCoords(sf::Mouse::getPosition(*previewData.scene.renderWindow)).y;
 
     ObjList allObjects = previewData.scene.objectsInstances.GetAllObjects();
 

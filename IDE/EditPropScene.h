@@ -9,10 +9,10 @@
 //(*Headers(EditPropScene)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
-#include <wx/radiobox.h>
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/statline.h>
+#include <wx/radiobut.h>
 #include <wx/panel.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -31,12 +31,13 @@ class EditPropScene: public wxDialog
 
 		//(*Declarations(EditPropScene)
 		wxButton* OkBt;
+		wxStaticText* StaticText9;
+		wxCheckBox* disableInputCheck;
 		wxTextCtrl* zFarEdit;
-		wxButton* ColorBt;
 		wxStaticText* StaticText2;
-		wxStaticText* NomSceneTxt;
 		wxTextCtrl* CaptionEdit;
 		wxStaticText* StaticText6;
+		wxStaticText* StaticText8;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
@@ -44,29 +45,30 @@ class EditPropScene: public wxDialog
 		wxTextCtrl* zNearEdit;
 		wxStaticText* StaticText5;
 		wxTextCtrl* fovEdit;
-		wxStaticLine* StaticLine1;
+		wxStaticText* StaticText7;
+		wxRadioButton* stableSortCheck;
+		wxRadioButton* fastSortCheck;
 		wxButton* AnnulerBt;
-		wxPanel* Panel2;
 		wxCheckBox* stopSoundsCheck;
 		wxStaticText* StaticText4;
-		wxRadioBox* TriBox;
 		wxButton* AideBt;
 		//*)
 
 	protected:
 
 		//(*Identifiers(EditPropScene)
-		static const long ID_STATICTEXT1;
-		static const long ID_STATICTEXT2;
-		static const long ID_PANEL2;
-		static const long ID_STATICLINE1;
-		static const long ID_TEXTCTRL1;
-		static const long ID_PANEL1;
-		static const long ID_BUTTON1;
-		static const long ID_CHECKBOX1;
-		static const long ID_RADIOBOX1;
-		static const long ID_STATICTEXT3;
 		static const long ID_STATICTEXT4;
+		static const long ID_STATICTEXT8;
+		static const long ID_TEXTCTRL1;
+		static const long ID_STATICTEXT9;
+		static const long ID_PANEL1;
+		static const long ID_CHECKBOX2;
+		static const long ID_CHECKBOX1;
+		static const long ID_STATICTEXT1;
+		static const long ID_RADIOBUTTON1;
+		static const long ID_RADIOBUTTON2;
+		static const long ID_STATICTEXT3;
+		static const long ID_STATICTEXT2;
 		static const long ID_TEXTCTRL2;
 		static const long ID_STATICTEXT5;
 		static const long ID_STATICTEXT6;
@@ -86,6 +88,7 @@ class EditPropScene: public wxDialog
 		void OnAnnulerBtClick(wxCommandEvent& event);
 		void OnColorBtClick(wxCommandEvent& event);
 		void OnAideBtClick(wxCommandEvent& event);
+		void OnPanel1LeftUp(wxMouseEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

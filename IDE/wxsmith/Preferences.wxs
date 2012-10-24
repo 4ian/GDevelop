@@ -932,6 +932,15 @@
 									<border>5</border>
 									<option>1</option>
 								</object>
+								<object class="sizeritem">
+									<object class="wxButton" name="ID_BUTTON14" variable="eventsEditorFontBt" member="yes">
+										<label>Choose the font used by events editors</label>
+										<handler function="OneventsEditorFontBtClick" entry="EVT_BUTTON" />
+									</object>
+									<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
 							</object>
 						</object>
 						<label>Events editor</label>
@@ -1049,6 +1058,10 @@
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
 			</object>
+		</object>
+		<object class="wxFontDialog" variable="eventsEditorFontDialog" member="yes">
+			<allow_symbols>0</allow_symbols>
+			<enable_effects>0</enable_effects>
 		</object>
 	</object>
 </wxsmith>

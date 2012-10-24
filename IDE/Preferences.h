@@ -2,6 +2,7 @@
 #define PREFERENCES_H
 
 //(*Headers(Preferences)
+#include <wx/fontdlg.h>
 #include <wx/notebook.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
@@ -29,6 +30,7 @@ class Preferences: public wxDialog
 		//(*Declarations(Preferences)
 		wxStaticText* StaticText10;
 		wxRadioButton* externalCodeEditorCheck;
+		wxButton* eventsEditorFontBt;
 		wxPanel* InactifColorPnl;
 		wxStaticText* StaticText22;
 		wxButton* OkBt;
@@ -65,6 +67,7 @@ class Preferences: public wxDialog
 		wxPanel* Panel8;
 		wxPanel* tabColorPnl;
 		wxTextCtrl* eventsCompilerTempDirEdit;
+		wxFontDialog* eventsEditorFontDialog;
 		wxPanel* Panel1;
 		wxTextCtrl* conditionsColumnWidthEdit;
 		wxPanel* activeTextColorPnl;
@@ -185,6 +188,7 @@ class Preferences: public wxDialog
 		static const long ID_STATICTEXT18;
 		static const long ID_CHECKBOX6;
 		static const long ID_CUSTOM1;
+		static const long ID_BUTTON14;
 		static const long ID_PANEL18;
 		static const long ID_RADIOBUTTON2;
 		static const long ID_RADIOBUTTON1;
@@ -235,6 +239,7 @@ class Preferences: public wxDialog
 		void OnfileBtColorPnlLeftUp(wxMouseEvent& event);
 		void OnlogCheckClick(wxCommandEvent& event);
 		void OnnewProjectFolderBrowseBtClick(wxCommandEvent& event);
+		void OneventsEditorFontBtClick(wxCommandEvent& event);
 		//*)
 		void SetSkinDefault();
 		void SetSkinOffice();

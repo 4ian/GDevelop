@@ -16,6 +16,8 @@
 #include <boost/weak_ptr.hpp>
 #include <wx/textdlg.h>
 #include <wx/log.h>
+#include <string>
+#include <set>
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
@@ -288,7 +290,7 @@ void DebuggerGUI::UpdateGUI()
     generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
     //TODO //generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
     generalList->SetItem(4, 1, ToString(scene.game->GetMainWindowDefaultWidth())+"*"+ToString(scene.game->GetMainWindowDefaultHeight()));
-    generalList->SetItem(5, 1, ToString(sf::Mouse::GetPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::GetPosition(*scene.renderWindow).y));
+    generalList->SetItem(5, 1, ToString(sf::Mouse::getPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::getPosition(*scene.renderWindow).y));
     generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000.0)+"s");
 
     const vector < Variable > sceneVariables = scene.GetVariables().GetVariablesVector();

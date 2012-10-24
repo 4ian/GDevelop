@@ -13,6 +13,7 @@
 					<extra_code>notebook-&gt;SetArtProvider(new GDAuiTabArt);</extra_code>
 					<style>wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_BOTTOM|wxNO_BORDER</style>
 					<handler function="OnnotebookPageChanged" entry="EVT_AUINOTEBOOK_PAGE_CHANGED" />
+					<handler function="OnnotebookPageChanging" entry="EVT_AUINOTEBOOK_PAGE_CHANGING" />
 					<object class="AuiNotebookPage">
 						<object class="wxPanel" name="ID_PANEL5" variable="scenePanel" member="yes">
 							<bg>#FFFFFF</bg>
@@ -79,10 +80,3 @@
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

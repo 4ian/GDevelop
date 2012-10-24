@@ -96,6 +96,7 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
 
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&NewProjectDialog::OnplatformListItemSelect);
 	Connect(ID_LISTCTRL2,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&NewProjectDialog::OntemplateListItemSelect);
+	Connect(ID_LISTCTRL2,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&NewProjectDialog::OntemplateListItemActivated);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NewProjectDialog::OnbrowseBtClick);
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&NewProjectDialog::OnexamplesBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&NewProjectDialog::OncreateProjectBtClick);
@@ -167,6 +168,7 @@ void NewProjectDialog::RefreshPlatformList()
 void NewProjectDialog::RefreshTemplateList()
 {
     wxImageList * templateImageList = new wxImageList(32,32);
+    templateImageList->Add(wxBitmap("res/gdFile32.png", wxBITMAP_TYPE_ANY));
     templateList->AssignImageList(templateImageList, wxIMAGE_LIST_SMALL);
 
     wxString currentDir = wxGetCwd()+"/Templates";
@@ -195,6 +197,9 @@ void NewProjectDialog::RefreshTemplateList()
                     for (unsigned int currentLineNb = 0; descriptionFile.good() ; ++currentLineNb )
                     {
                         getline (descriptionFile,currentLine);
+                        if(!currentLine.empty() && *currentLine.rbegin() == '\r')
+                            currentLine.erase( currentLine.length()-1, 1);
+
 
                         if ( currentLineNb == 0 ) platform = currentLine;
                         else if ( currentLineNb == 1 ) name = currentLine;
@@ -258,6 +263,12 @@ void NewProjectDialog::OncreateProjectBtClick(wxCommandEvent& event)
     chosenFilename = gd::ToString(projectFileEdit->GetValue());
     EndModal(1);
 }
+void NewProjectDialog::OntemplateListItemActivated(wxListEvent& event)
+{
+    chosenFilename = gd::ToString(projectFileEdit->GetValue());
+    EndModal(1);
+}
+
 
 void NewProjectDialog::OncancelBtClick(wxCommandEvent& event)
 {

@@ -119,6 +119,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	sceneCanvas->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorScene::OnsceneCanvasSetFocus,0,this);
 	scenePanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnscenePanelResize,0,this);
 	Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&EditorScene::OnnotebookPageChanged);
+	Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING,(wxObjectEventFunction)&EditorScene::OnnotebookPageChanging);
 	//*)
 
 	//Prepare pane manager
@@ -187,28 +188,28 @@ EditorScene::~EditorScene()
 	m_mgr.UnInit();
 }
 
-////////////////////////////////////////////////////////////
-/// Change la vue en fonction de la scrollbar, et agrandit celle ci si besoin.
-////////////////////////////////////////////////////////////
+/**
+ * Manually change the view position when the scrollbar is moved
+ */
 void EditorScene::OnScrollBar2Scroll(wxScrollEvent& event)
 {
     int position = event.GetPosition();
 
-    int newY = position-(scrollBar2->GetRange()/2)+(sceneCanvas->GetHeight()/2);
-    sceneCanvas->GetEditionView().SetCenter( sceneCanvas->GetEditionView().GetCenter().x, newY);
+    int newY = position-(scrollBar2->GetRange()/2)+(sceneCanvas->getSize().y/2);
+    sceneCanvas->GetEditionView().setCenter( sceneCanvas->GetEditionView().getCenter().x, newY);
 
     sceneCanvas->ManualRefresh();
 }
 
-////////////////////////////////////////////////////////////
-/// Change la vue en fonction de la scrollbar, et agrandit celle ci si besoin.
-////////////////////////////////////////////////////////////
+/**
+ * Manually change the view position when the scrollbar is moved
+ */
 void EditorScene::OnScrollBar1Scroll(wxScrollEvent& event)
 {
     int position = event.GetPosition();
 
-    int newX = position-(scrollBar1->GetRange()/2)+(sceneCanvas->GetWidth()/2);
-    sceneCanvas->GetEditionView().SetCenter( newX,  sceneCanvas->GetEditionView().GetCenter().y);
+    int newX = position-(scrollBar1->GetRange()/2)+(sceneCanvas->getSize().x/2);
+    sceneCanvas->GetEditionView().setCenter( newX,  sceneCanvas->GetEditionView().getCenter().y);
 
     sceneCanvas->ManualRefresh();
 }
@@ -239,12 +240,22 @@ bool EditorScene::CanBeClosed()
 }
 
 /**
- * Update ribbon
+ * Update ribbon when notebook page has changed
  */
 void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)
 {
     ForceRefreshRibbonAndConnect();
 }
+
+void EditorScene::OnnotebookPageChanging(wxAuiNotebookEvent& event)
+{
+    if ( !sceneCanvas->IsEditing() )
+    {
+        event.Veto();
+        mainFrameWrapper.GetInfoBar()->ShowMessage(_("You can not edit events while previewing the scene."));
+    }
+}
+
 
 void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
@@ -252,4 +263,3 @@ void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
     mainFrameWrapper.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();
 }
-

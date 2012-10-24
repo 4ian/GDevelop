@@ -80,7 +80,7 @@ void InitialPositionBrowserDlg::OninitialPositionsListItemActivated(wxListEvent&
 
     if ( id >= instancesContainer.GetInstancesCount() ) return;
 
-    sceneCanvas.GetEditionView().SetCenter( instancesContainer.GetInstance(id).GetX(),  instancesContainer.GetInstance(id).GetY());
+    sceneCanvas.GetEditionView().setCenter( instancesContainer.GetInstance(id).GetX(),  instancesContainer.GetInstance(id).GetY());
 
     //Update scene canvas selection with list selection
     sceneCanvas.ClearSelection();

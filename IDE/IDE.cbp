@@ -746,12 +746,6 @@
 		<Unit filename="PlatformManager.cpp" />
 		<Unit filename="PlatformManager.h" />
 		<Unit filename="PlayerUnitTests.cpp" />
-		<Unit filename="Portable.cpp">
-			<Option virtualFolder="Fichiers\" />
-		</Unit>
-		<Unit filename="Portable.h">
-			<Option virtualFolder="Fichiers\" />
-		</Unit>
 		<Unit filename="Preferences.cpp">
 			<Option virtualFolder="Editeur principal\" />
 		</Unit>
@@ -900,7 +894,6 @@
 					<wxDialog wxs="wxsmith/MessagePlus.wxs" src="MessagePlus.cpp" hdr="MessagePlus.h" fwddecl="0" i18n="1" name="MessagePlus" language="CPP" />
 					<wxDialog wxs="wxsmith/Compilation.wxs" src="Compilation.cpp" hdr="Compilation.h" fwddecl="0" i18n="1" name="Compilation" language="CPP" />
 					<wxDialog wxs="wxsmith/Demarrage.wxs" src="Demarrage.cpp" hdr="Demarrage.h" fwddecl="0" i18n="1" name="Demarrage" language="CPP" />
-					<wxDialog wxs="wxsmith/Portable.wxs" src="Portable.cpp" hdr="Portable.h" fwddecl="0" i18n="1" name="Portable" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixClavier.wxs" src="ChoixClavier.cpp" hdr="ChoixClavier.h" fwddecl="0" i18n="1" name="ChoixClavier" language="CPP" />
 					<wxDialog wxs="wxsmith/mp3ogg.wxs" src="mp3ogg.cpp" hdr="mp3ogg.h" fwddecl="0" i18n="1" name="mp3ogg" language="CPP" />
 					<wxDialog wxs="wxsmith/SigneModification.wxs" src="SigneModification.cpp" hdr="SigneModification.h" fwddecl="0" i18n="1" name="SigneModification" language="CPP" />

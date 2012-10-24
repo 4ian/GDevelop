@@ -264,10 +264,10 @@ void EditLayer::RefreshCameraSettings()
         viewportY1Edit->Enable(true);
         viewportY2Edit->Enable(true);
 
-        viewportX1Edit->ChangeValue(ToString(camera.GetViewport().Left));
-        viewportY1Edit->ChangeValue(ToString(camera.GetViewport().Top));
-        viewportX2Edit->ChangeValue(ToString(camera.GetViewport().Left+camera.GetViewport().Width));
-        viewportY2Edit->ChangeValue(ToString(camera.GetViewport().Top+camera.GetViewport().Height));
+        viewportX1Edit->ChangeValue(ToString(camera.GetViewport().left));
+        viewportY1Edit->ChangeValue(ToString(camera.GetViewport().top));
+        viewportX2Edit->ChangeValue(ToString(camera.GetViewport().left+camera.GetViewport().width));
+        viewportY2Edit->ChangeValue(ToString(camera.GetViewport().top+camera.GetViewport().height));
     }
 }
 
@@ -326,7 +326,7 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
         float newValue = ToFloat(ToString(viewportX1Edit->GetValue()));
         if ( newValue >= 0 && newValue <= 1)
         {
-            newViewport.Left = newValue;
+            newViewport.left = newValue;
             viewportX1Edit->SetBackgroundColour(wxColour(255,255,255));
         }
         else
@@ -337,7 +337,7 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
         float newValue =  ToFloat(ToString(viewportY1Edit->GetValue()));
         if ( newValue >= 0 && newValue <= 1)
         {
-            newViewport.Top = newValue;
+            newViewport.top = newValue;
             viewportY1Edit->SetBackgroundColour(wxColour(255,255,255));
         }
         else
@@ -348,7 +348,7 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
         float newValue = ToFloat(ToString(viewportX2Edit->GetValue()));
         if ( newValue >= 0 && newValue <= 1)
         {
-            newViewport.Width = newValue-newViewport.Left;
+            newViewport.width = newValue-newViewport.left;
             viewportX2Edit->SetBackgroundColour(wxColour(255,255,255));
         }
         else
@@ -359,7 +359,7 @@ void EditLayer::OnviewportX1EditText(wxCommandEvent& event)
         float newValue = ToFloat(ToString(viewportY2Edit->GetValue()));
         if ( newValue >= 0 && newValue <= 1)
         {
-            newViewport.Height = newValue-newViewport.Top;
+            newViewport.height = newValue-newViewport.top;
             viewportY2Edit->SetBackgroundColour(wxColour(255,255,255));
         }
         else

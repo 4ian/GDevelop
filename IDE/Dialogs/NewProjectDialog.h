@@ -84,6 +84,7 @@ private:
     void OnplatformListItemSelect(wxListEvent& event);
     void OnbrowseBtClick(wxCommandEvent& event);
     void OnexamplesBtClick(wxCommandEvent& event);
+    void OntemplateListItemActivated(wxListEvent& event);
     //*)
     void UpdateListColumnsWidth();
     void RefreshTemplateList();

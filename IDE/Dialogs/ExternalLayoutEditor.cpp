@@ -183,8 +183,8 @@ void ExternalLayoutEditor::OnscrollBar2Scroll(wxScrollEvent& event)
 {
     int position = event.GetPosition();
 
-    int newY = position-(scrollBar2->GetRange()/2)+(sceneCanvas->GetHeight()/2);
-    sceneCanvas->GetEditionView().SetCenter( sceneCanvas->GetEditionView().GetCenter().x, newY);
+    int newY = position-(scrollBar2->GetRange()/2)+(sceneCanvas->getSize().y/2);
+    sceneCanvas->GetEditionView().setCenter( sceneCanvas->GetEditionView().getCenter().x, newY);
 
     sceneCanvas->ManualRefresh();
 }
@@ -193,8 +193,8 @@ void ExternalLayoutEditor::OnscrollBar1Scroll(wxScrollEvent& event)
 {
     int position = event.GetPosition();
 
-    int newX = position-(scrollBar1->GetRange()/2)+(sceneCanvas->GetWidth()/2);
-    sceneCanvas->GetEditionView().SetCenter( newX,  sceneCanvas->GetEditionView().GetCenter().y);
+    int newX = position-(scrollBar1->GetRange()/2)+(sceneCanvas->getSize().x/2);
+    sceneCanvas->GetEditionView().setCenter( newX,  sceneCanvas->GetEditionView().getCenter().y);
 
     sceneCanvas->ManualRefresh();
 }

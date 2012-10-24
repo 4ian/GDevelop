@@ -49,12 +49,12 @@ wxControl(Parent, Id, Position, Size, Style)
 
         GdkWindow* Win = widget->window;
         XFlush(GDK_WINDOW_XDISPLAY(Win));
-        sf::RenderWindow::Create(GDK_WINDOW_XWINDOW(Win));
+        sf::RenderWindow::create(GDK_WINDOW_XWINDOW(Win));
 
     #else
 
         // Tested under Windows XP only (should work with X11 and other Windows versions - no idea about MacOS)
-        sf::RenderWindow::Create(static_cast<sf::WindowHandle>(GetHandle()));
+        sf::RenderWindow::create(static_cast<sf::WindowHandle>(GetHandle()));
 
     #endif
 

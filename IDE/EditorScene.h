@@ -93,6 +93,7 @@ class EditorScene: public wxPanel
 		void OnPanel2Resize(wxSizeEvent& event);
 		void OnCoreResize1(wxSizeEvent& event);
 		void OnsceneCanvasPanelResize(wxSizeEvent& event);
+		void OnnotebookPageChanging(wxAuiNotebookEvent& event);
 		//*)
 
 		gd::Project & project;

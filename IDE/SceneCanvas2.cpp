@@ -40,18 +40,18 @@ SceneCanvas::SceneCanvas( wxWindow* parent, RuntimeGame & game_, Scene & scene_,
     scrollBar1(NULL),
     scrollBar2(NULL)
 {
-    reloadingIconImage.LoadFromFile("res/compile128.png");
-    reloadingIconSprite.SetTexture(reloadingIconImage);
-    reloadingText.SetColor(sf::Color(0,0,0,128));
-    reloadingText.SetString(string(_("Compiling...").mb_str()));
-    reloadingText.SetCharacterSize(40);
+    reloadingIconImage.loadFromFile("res/compile128.png");
+    reloadingIconSprite.setTexture(reloadingIconImage);
+    reloadingText.setColor(sf::Color(0,0,0,128));
+    reloadingText.setString(string(_("Compiling...").mb_str()));
+    reloadingText.setCharacterSize(40);
 
-    SetView( editionData.view );
-    editionData.view.SetCenter( (gameEdited.GetMainWindowDefaultWidth()/2),(gameEdited.GetMainWindowDefaultHeight()/2));
+    setView( editionData.view );
+    editionData.view.setCenter( (gameEdited.GetMainWindowDefaultWidth()/2),(gameEdited.GetMainWindowDefaultHeight()/2));
 
-    SetFramerateLimit( gameEdited.GetMaximumFPS() );
-    EnableVerticalSync(gameEdited.IsVerticalSynchronizationEnabledByDefault() );
-    Clear( sf::Color( 125, 125, 125, 255 ) );
+    setFramerateLimit( gameEdited.GetMaximumFPS() );
+    setVerticalSyncEnabled(gameEdited.IsVerticalSynchronizationEnabledByDefault() );
+    clear( sf::Color( 125, 125, 125, 255 ) );
 
     Connect(ID_DELOBJMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnDelObjetSelected);
     Connect(ID_PROPMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneCanvas::OnPropObjSelected);
@@ -237,7 +237,7 @@ void SceneCanvas::UpdateSize()
     else
     {
         //Scene has the size of the game's window size in preview mode.
-        Window::SetSize(gameEdited.GetMainWindowDefaultWidth(), gameEdited.GetMainWindowDefaultHeight());
+        Window::setSize(sf::Vector2u(gameEdited.GetMainWindowDefaultWidth(), gameEdited.GetMainWindowDefaultHeight()));
         wxWindowBase::SetClientSize(gameEdited.GetMainWindowDefaultWidth(), gameEdited.GetMainWindowDefaultHeight());
 
         externalWindow->SetSizeOfRenderingZone(gameEdited.GetMainWindowDefaultWidth(), gameEdited.GetMainWindowDefaultHeight());
@@ -352,23 +352,23 @@ void SceneCanvas::UpdateScrollbars()
         return;
 
     //On calcule la position du thumb
-    int thumbY = editionData.view.GetCenter().y+scrollBar2->GetRange()/2-GetHeight()/2;
-    scrollBar2->SetScrollbar(thumbY, GetHeight(), scrollBar2->GetRange(), GetHeight());
+    int thumbY = editionData.view.getCenter().y+scrollBar2->GetRange()/2-getSize().y/2;
+    scrollBar2->SetScrollbar(thumbY, getSize().y, scrollBar2->GetRange(), getSize().y);
 
-    int thumbX = editionData.view.GetCenter().x+scrollBar1->GetRange()/2-GetWidth()/2;
-    scrollBar1->SetScrollbar(thumbX, GetWidth(), scrollBar1->GetRange(), GetWidth());
+    int thumbX = editionData.view.getCenter().x+scrollBar1->GetRange()/2-getSize().x/2;
+    scrollBar1->SetScrollbar(thumbX, getSize().x, scrollBar1->GetRange(), getSize().x);
 
     //On agrandit les scrollbars si besoin est
-    if ( thumbY <= 0 || static_cast<int>(thumbY+GetHeight()) >= scrollBar2->GetRange())
+    if ( thumbY <= 0 || static_cast<int>(thumbY+getSize().y) >= scrollBar2->GetRange())
     {
-        int ajout = GetHeight();
-        scrollBar2->SetScrollbar(thumbY+ajout/2, GetHeight(), scrollBar2->GetRange()+ajout, GetHeight());
+        int ajout = getSize().y;
+        scrollBar2->SetScrollbar(thumbY+ajout/2, getSize().y, scrollBar2->GetRange()+ajout, getSize().y);
     }
 
-    if ( thumbX <= 0 || static_cast<int>(thumbX+GetWidth()) >= scrollBar1->GetRange())
+    if ( thumbX <= 0 || static_cast<int>(thumbX+getSize().x) >= scrollBar1->GetRange())
     {
-        int ajout = GetWidth();
-        scrollBar1->SetScrollbar(thumbX+ajout/2, GetWidth(), scrollBar1->GetRange()+ajout, GetWidth());
+        int ajout = getSize().x;
+        scrollBar1->SetScrollbar(thumbX+ajout/2, getSize().x, scrollBar1->GetRange()+ajout, getSize().x);
     }
 }
 
@@ -384,14 +384,14 @@ void SceneCanvas::OnAnyMouseEvent( wxMouseEvent & event )
             myEvent.Type = sf::Event::MouseButtonPressed;
         else if ( event.ButtonUp() )
             myEvent.Type = sf::Event::MouseButtonReleased;
-        myEvent.MouseButton.X = event.GetX();
-        myEvent.MouseButton.Y = event.GetY();
+        myEvent.mouseButton.x = event.GetX();
+        myEvent.mouseButton.y = event.GetY();
 
-        if ( event.GetButton() == wxMOUSE_BTN_LEFT ) myEvent.MouseButton.Button = sf::Mouse::Left;
-        else if ( event.GetButton() == wxMOUSE_BTN_RIGHT ) myEvent.MouseButton.Button = sf::Mouse::Right;
-        else if ( event.GetButton() == wxMOUSE_BTN_MIDDLE ) myEvent.MouseButton.Button = sf::Mouse::Middle;
-        else if ( event.GetButton() == wxMOUSE_BTN_AUX1 ) myEvent.MouseButton.Button = sf::Mouse::XButton1;
-        else if ( event.GetButton() == wxMOUSE_BTN_AUX2 ) myEvent.MouseButton.Button = sf::Mouse::XButton2;
+        if ( event.GetButton() == wxMOUSE_BTN_LEFT ) myEvent.mouseButton.button = sf::Mouse::Left;
+        else if ( event.GetButton() == wxMOUSE_BTN_RIGHT ) myEvent.mouseButton.button = sf::Mouse::Right;
+        else if ( event.GetButton() == wxMOUSE_BTN_MIDDLE ) myEvent.mouseButton.button = sf::Mouse::Middle;
+        else if ( event.GetButton() == wxMOUSE_BTN_AUX1 ) myEvent.mouseButton.button = sf::Mouse::XButton1;
+        else if ( event.GetButton() == wxMOUSE_BTN_AUX2 ) myEvent.mouseButton.button = sf::Mouse::XButton2;
 
         previewData.scene.GetRenderTargetEvents().push_back(myEvent);
     }
@@ -481,7 +481,7 @@ void SceneCanvas::OnZoomInitBtClick( wxCommandEvent & event )
 
 void SceneCanvas::OnOrigineBtClick(wxCommandEvent & event )
 {
-    editionData.view.SetCenter( (gameEdited.GetMainWindowDefaultWidth()/2),(gameEdited.GetMainWindowDefaultHeight()/2));
+    editionData.view.setCenter( (gameEdited.GetMainWindowDefaultWidth()/2),(gameEdited.GetMainWindowDefaultHeight()/2));
 }
 
 void SceneCanvas::OnDebugBtClick( wxCommandEvent & event )
@@ -575,7 +575,7 @@ void SceneCanvas::OnZoomMoreBtClick(wxRibbonButtonBarEvent& evt)
 
 void SceneCanvas::UpdateAccordingToZoomFactor()
 {
-    editionData.view.SetSize(GetClientSize().GetWidth()/settings.zoomFactor, GetClientSize().GetHeight()/settings.zoomFactor);
+    editionData.view.setSize(GetClientSize().GetWidth()/settings.zoomFactor, GetClientSize().GetHeight()/settings.zoomFactor);
 }
 
 void SceneCanvas::Onzoom5Selected(wxCommandEvent& event)

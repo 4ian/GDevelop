@@ -9,7 +9,8 @@
 
 bool DndTextSceneEditor::OnDropText(wxCoord x, wxCoord y, const wxString& text)
 {
-    sceneCanvas.AddObject(gd::ToString(text), sceneCanvas.ConvertCoords(x, 0).x, sceneCanvas.ConvertCoords(0, y).y);
+    sf::Vector2f dropPosition = sceneCanvas.convertCoords(sf::Vector2i(x,y));
+    sceneCanvas.AddObject(gd::ToString(text), dropPosition.x, dropPosition.y);
 
     return true;
 }

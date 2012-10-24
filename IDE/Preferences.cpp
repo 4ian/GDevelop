@@ -23,6 +23,7 @@
 #include "GDL/CommonTools.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/IDE/ActionSentenceFormatter.h"
+#include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "LogFileManager.h"
 #include <wx/listctrl.h>
@@ -105,6 +106,7 @@ const long Preferences::ID_TEXTCTRL5 = wxNewId();
 const long Preferences::ID_STATICTEXT18 = wxNewId();
 const long Preferences::ID_CHECKBOX6 = wxNewId();
 const long Preferences::ID_CUSTOM1 = wxNewId();
+const long Preferences::ID_BUTTON14 = wxNewId();
 const long Preferences::ID_PANEL18 = wxNewId();
 const long Preferences::ID_RADIOBUTTON2 = wxNewId();
 const long Preferences::ID_RADIOBUTTON1 = wxNewId();
@@ -453,6 +455,8 @@ changesNeedRestart(false)
     FlexGridSizer29->Add(eventsEditorParametersProperties, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     StaticBoxSizer15->Add(FlexGridSizer29, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer27->Add(StaticBoxSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    eventsEditorFontBt = new wxButton(Panel8, ID_BUTTON14, _("Choose the font used by events editors"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON14"));
+    FlexGridSizer27->Add(eventsEditorFontBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     Panel8->SetSizer(FlexGridSizer27);
     FlexGridSizer27->Fit(Panel8);
     FlexGridSizer27->SetSizeHints(Panel8);
@@ -499,6 +503,11 @@ changesNeedRestart(false)
     FlexGridSizer5->Add(AideBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(FlexGridSizer1);
+    	wxFontData fontData_1;
+    	fontData_1.EnableEffects(false);
+    	fontData_1.SetInitialFont(*wxNORMAL_FONT);
+    	fontData_1.SetAllowSymbols(false);
+    eventsEditorFontDialog = new wxFontDialog(this, fontData_1);
     FlexGridSizer1->Fit(this);
     FlexGridSizer1->SetSizeHints(this);
     Center();
@@ -530,6 +539,7 @@ changesNeedRestart(false)
     inactiveTextColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OninactiveTextColorPnlLeftUp,0,this);
     activeTabColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OnactiveTabColorPnlLeftUp,0,this);
     tabColorPnl->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&Preferences::OntabColorPnlLeftUp,0,this);
+    Connect(ID_BUTTON14,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OneventsEditorFontBtClick);
     Connect(ID_BUTTON11,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnbrowseCodeEditorBtClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnOkBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Preferences::OnAnnulerBtClick);
@@ -785,8 +795,19 @@ changesNeedRestart(false)
     }
 
 	conditionsColumnWidthEdit->SetValue(ToString(static_cast<int>(pConfig->ReadDouble("EventsEditor/ConditionColumnWidth", 350))));
-
 	hideContextPanelsLabels->SetValue(pConfig->ReadBool("EventsEditor/HideContextPanelsLabels", false));
+
+	wxFont eventsEditorFont;
+	if ( pConfig->Read("EventsEditor/Font", &eventsEditorFont) )
+    {
+        eventsEditorFontDialog->GetFontData().SetInitialFont(eventsEditorFont);
+        eventsEditorFontDialog->GetFontData().SetChosenFont(eventsEditorFont);
+    }
+    else
+    {
+        eventsEditorFontDialog->GetFontData().SetInitialFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
+        eventsEditorFontDialog->GetFontData().SetChosenFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
+    }
 }
 
 Preferences::~Preferences()
@@ -794,7 +815,6 @@ Preferences::~Preferences()
     //(*Destroy(Preferences)
     //*)
 }
-
 
 void Preferences::OnOkBtClick( wxCommandEvent& event )
 {
@@ -946,6 +966,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     gd::ActionSentenceFormatter::GetInstance()->SaveTypesFormattingToConfig();
 	pConfig->Write("EventsEditor/ConditionColumnWidth", ToInt(ToString(conditionsColumnWidthEdit->GetValue())));
 	pConfig->Write("EventsEditor/HideContextPanelsLabels", hideContextPanelsLabels->GetValue());
+	pConfig->Write("EventsEditor/Font", eventsEditorFontDialog->GetFontData().GetChosenFont());
 
     EndModal( 1 );
 }
@@ -1458,5 +1479,19 @@ void Preferences::OnlogCheckClick(wxCommandEvent& event)
         if ( dialog.ShowModal() == wxCANCEL) return;
 
         logFile = dialog.GetPath();
+    }
+}
+
+void Preferences::OneventsEditorFontBtClick(wxCommandEvent& event)
+{
+    wxFont oldFont = eventsEditorFontDialog->GetFontData().GetChosenFont();
+    eventsEditorFontDialog->ShowModal();
+
+    //Ensure we can use this font with the events editor.
+    if (eventsEditorFontDialog->GetFontData().GetChosenFont().GetFamily() != wxFONTFAMILY_TELETYPE &&
+        eventsEditorFontDialog->GetFontData().GetChosenFont().GetFamily() != wxFONTFAMILY_MODERN )
+    {
+        eventsEditorFontDialog->GetFontData().GetChosenFont() = oldFont;
+        wxLogWarning(_("The font you have chosen is not a fixed-width font. It cannot be used by the events editor.\n"));
     }
 }

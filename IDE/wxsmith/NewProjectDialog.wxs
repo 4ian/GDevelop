@@ -34,6 +34,7 @@
 						<object class="wxListCtrl" name="ID_LISTCTRL2" variable="templateList" member="yes">
 							<style>wxLC_REPORT|wxLC_NO_HEADER</style>
 							<handler function="OntemplateListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
+							<handler function="OntemplateListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
 						</object>
 						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>

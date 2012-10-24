@@ -80,9 +80,6 @@ public:
     ~ImageResource() {};
     virtual ImageResource* Clone() const { return new ImageResource(*this);}
 
-    #if defined(GD_IDE_ONLY)
-    virtual bool UseFile() { return true; }
-
     /**
      * Return the file used by the resource.
      */
@@ -92,6 +89,9 @@ public:
      * Return the file used by the resource.
      */
     virtual const std::string & GetFile() const {return file;};
+
+    #if defined(GD_IDE_ONLY)
+    virtual bool UseFile() { return true; }
 
     /**
      * Called when the resource must be rendered in a preview panel.
@@ -255,16 +255,21 @@ public:
     virtual const Resource & GetResource(const std::string & name) const;
 
     /**
-     * Return a (smart) pointer to a resource.
-     */
-    virtual boost::shared_ptr<gd::Resource> GetResourceSPtr(const std::string & name);
-
-    /**
      * Create a new resource but does not add it to the list
      */
     boost::shared_ptr<Resource> CreateResource(const std::string & kind);
 
+    /**
+     * Get a list containing the name of all of the resources.
+     */
+    virtual std::vector<std::string> GetAllResourcesList();
+
     #if defined(GD_IDE_ONLY)
+    /**
+     * Return a (smart) pointer to a resource.
+     */
+    virtual boost::shared_ptr<gd::Resource> GetResourceSPtr(const std::string & name);
+
     /**
      * Add an already constructed resource
      */
@@ -284,11 +289,6 @@ public:
      * Rename a resource
      */
     virtual void RenameResource(const std::string & oldName, const std::string & newName);
-
-    /**
-     * Get a list containing the name of all of the resources.
-     */
-    virtual std::vector<std::string> GetAllResourcesList();
 
     /**
      * Move a resource up in the list

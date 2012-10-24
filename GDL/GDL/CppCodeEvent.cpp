@@ -107,7 +107,6 @@ std::string CppCodeEvent::GenerateAssociatedFileCode()
 void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
 {
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
-    int border = renderingHelper->instructionsListBorder;
     const int titleTextHeight = 20;
 
     //Draw header rectangle

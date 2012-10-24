@@ -37,7 +37,7 @@ const sf::Font * FontManager::GetFont(const string & fontName)
                 #include "GDL/Arial.hpp"
             };
 
-            defaultFont.LoadFromMemory(data, sizeof(data));
+            defaultFont.loadFromMemory(data, sizeof(data));
             loaded = true;
         }
 

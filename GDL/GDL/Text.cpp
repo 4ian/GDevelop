@@ -26,7 +26,7 @@ void Text::Draw(sf::RenderWindow& App)
 {
     FontManager * fontManager = FontManager::GetInstance();
 
-    text.SetFont(*fontManager->GetFont(fontName));
-    App.Draw( text );
+    text.setFont(*fontManager->GetFont(fontName));
+    App.draw( text );
 }
 

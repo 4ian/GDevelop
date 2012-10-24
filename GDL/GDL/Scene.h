@@ -213,6 +213,15 @@ public:
     /** \name Other properties
      */
     ///@{
+    /**
+     * Set if the input must be disabled when window lost focus.
+     */
+    void DisableInputWhenFocusIsLost(bool disable = true) { disableInputWhenNotFocused = disable; }
+
+    /**
+     * Return true if the input must be disabled when window lost focus.
+     */
+    bool IsInputDisabledWhenFocusIsLost() { return disableInputWhenNotFocused; }
 
     /**
      * Set if the objects z-order are sorted using the standard method
@@ -303,6 +312,7 @@ private:
     float                                       oglFOV; ///< OpenGL Field Of View value
     float                                       oglZNear; ///< OpenGL Near Z position
     float                                       oglZFar; ///< OpenGL Far Z position
+    bool                                        disableInputWhenNotFocused; /// If set to true, the input must be disabled when the window do not have the focus.
 
     #if defined(GD_IDE_ONLY)
     std::vector < gd::BaseEventSPtr >           events; ///< Scene events

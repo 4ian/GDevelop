@@ -46,6 +46,11 @@ void GD_API MoveObjects( RuntimeScene & scene );
 /**
  * Only used internally by GD events generated code.
  */
+void GD_API DisableInputWhenFocusIsLost( RuntimeScene & scene, bool disable );
+
+/**
+ * Only used internally by GD events generated code.
+ */
 void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int useless, const std::string & objectName, float positionX, float positionY, const std::string & layer);
 
 /**

@@ -152,8 +152,8 @@ public :
 
     virtual std::vector<Polygon2d> GetHitBoxes() const;
 
-    void FlipX(bool flip = true) { isFlippedX = flip; };
-    void FlipY(bool flip = true) { isFlippedY = flip; };
+    void FlipX(bool flip = true);
+    void FlipY(bool flip = true);
     bool IsFlippedX() const { return isFlippedX; };
     bool IsFlippedY() const { return isFlippedY; };
 

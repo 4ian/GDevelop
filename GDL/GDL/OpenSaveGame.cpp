@@ -517,10 +517,10 @@ void OpenSaveGame::SaveLayers(const vector < Layer > & list, TiXmlElement * laye
 
             camera->SetAttribute("DefaultViewport", list.at(j).GetCamera(c).UseDefaultViewport() ? "true" : "false");
 
-            camera->SetDoubleAttribute("ViewportLeft", list.at(j).GetCamera(c).GetViewport().Left);
-            camera->SetDoubleAttribute("ViewportTop", list.at(j).GetCamera(c).GetViewport().Top);
-            camera->SetDoubleAttribute("ViewportRight", list.at(j).GetCamera(c).GetViewport().Left+list.at(j).GetCamera(c).GetViewport().Width);
-            camera->SetDoubleAttribute("ViewportBottom", list.at(j).GetCamera(c).GetViewport().Top+list.at(j).GetCamera(c).GetViewport().Height);
+            camera->SetDoubleAttribute("ViewportLeft", list.at(j).GetCamera(c).GetViewport().left);
+            camera->SetDoubleAttribute("ViewportTop", list.at(j).GetCamera(c).GetViewport().top);
+            camera->SetDoubleAttribute("ViewportRight", list.at(j).GetCamera(c).GetViewport().left+list.at(j).GetCamera(c).GetViewport().width);
+            camera->SetDoubleAttribute("ViewportBottom", list.at(j).GetCamera(c).GetViewport().top+list.at(j).GetCamera(c).GetViewport().height);
         }
     }
 }

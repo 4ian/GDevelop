@@ -525,40 +525,40 @@ void Game::OnSelectionInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent 
 
         sf::Texture image;
         if ( grid->GetProperty(_("Display an image"))->GetValue().GetBool() )
-            image.LoadFromFile( gd::ToString(grid->GetProperty(_("Image file"))->GetValueAsString()) );
+            image.loadFromFile( gd::ToString(grid->GetProperty(_("Image file"))->GetValueAsString()) );
 
-        image.SetSmooth(grid->GetProperty(_("Smooth the image"))->GetValue().GetBool());
+        image.setSmooth(grid->GetProperty(_("Smooth the image"))->GetValue().GetBool());
 
         sf::Sprite sprite( image );
 
-        sf::Text Chargement( gd::ToString(grid->GetProperty(_("Text to display"))->GetValueAsString()), *FontManager::GetInstance()->GetFont("") );
-        Chargement.SetPosition(texteXPos, texteYPos);
-        App.Draw( Chargement );
+        sf::Text loadingText( gd::ToString(grid->GetProperty(_("Text to display"))->GetValueAsString()), *FontManager::GetInstance()->GetFont("") );
+        loadingText.setPosition(texteXPos, texteYPos);
+        App.draw( loadingText );
 
-        App.Clear( sf::Color( 100, 100, 100 ) );
-        App.SetFramerateLimit( 30 );
-        App.Display();
+        App.clear( sf::Color( 100, 100, 100 ) );
+        App.setFramerateLimit( 30 );
+        App.display();
 
         bool Running = true;
         sf::Event Event;
         while ( Running )
         {
-            App.Clear( sf::Color( 100, 100, 100 ) );
+            App.clear( sf::Color( 100, 100, 100 ) );
 
             // Process events
-            while ( App.PollEvent( Event ) )
+            while ( App.pollEvent( Event ) )
             {
                 // Close window : exit
-                if ( Event.Type == sf::Event::Closed || Event.Type == sf::Event::KeyPressed )
+                if ( Event.type == sf::Event::Closed || Event.type == sf::Event::KeyPressed )
                     Running = false;
             }
 
             if ( grid->GetProperty(_("Display an image"))->GetValue().GetBool() )
-                App.Draw( sprite );
+                App.draw( sprite );
             if ( grid->GetProperty(_("Display a text"))->GetValue().GetBool() )
-                App.Draw(Chargement);
+                App.draw(loadingText);
 
-            App.Display();
+            App.display();
         }
     }
 }

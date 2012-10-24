@@ -80,14 +80,14 @@ void GD_API PlaySoundOnChannel( RuntimeScene & scene, const std::string & file, 
 
     //Son à jouer
     boost::shared_ptr<Sound> sound = boost::shared_ptr<Sound>(new Sound(file));
-    sound->sound.Play();
+    sound->sound.play();
 
     soundManager->SetSoundOnChannel(channel, sound);
-    soundManager->GetSoundOnChannel(channel)->sound.SetLoop(repeat);
+    soundManager->GetSoundOnChannel(channel)->sound.setLoop(repeat);
     soundManager->GetSoundOnChannel(channel)->SetVolume(volume);
     soundManager->GetSoundOnChannel(channel)->SetPitch(pitch);
 
-    scene.NotifyPauseWasMade(latency.GetElapsedTime());
+    scene.NotifyPauseWasMade(latency.getElapsedTime().asMilliseconds());
 }
 
 void GD_API PlaySound( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch )
@@ -96,33 +96,33 @@ void GD_API PlaySound( RuntimeScene & scene, const std::string & file, bool repe
 
     SoundManager * soundManager = SoundManager::GetInstance();
     soundManager->sounds.push_back(boost::shared_ptr<Sound>(new Sound(file)));
-    soundManager->sounds.back()->sound.Play();
-    soundManager->sounds.back()->sound.SetLoop(repeat);
+    soundManager->sounds.back()->sound.play();
+    soundManager->sounds.back()->sound.setLoop(repeat);
     soundManager->sounds.back()->SetVolume(volume);
     soundManager->sounds.back()->SetPitch(pitch);
 
-    scene.NotifyPauseWasMade(latency.GetElapsedTime());
+    scene.NotifyPauseWasMade(latency.getElapsedTime().asMilliseconds());
 }
 
 void GD_API StopSoundOnChannel( RuntimeScene & scene, unsigned int channel )
 {
     if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
 
-    SoundManager::GetInstance()->GetSoundOnChannel(channel)->sound.Stop();
+    SoundManager::GetInstance()->GetSoundOnChannel(channel)->sound.stop();
 }
 
 void GD_API PauseSoundOnChannel( RuntimeScene & scene, unsigned int channel )
 {
     if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
 
-    SoundManager::GetInstance()->GetSoundOnChannel(channel)->sound.Pause();
+    SoundManager::GetInstance()->GetSoundOnChannel(channel)->sound.pause();
 }
 
 void GD_API RePlaySoundOnChannel( RuntimeScene & scene, unsigned int channel )
 {
     if ( SoundManager::GetInstance()->GetSoundOnChannel(channel) == boost::shared_ptr<Sound>() ) return;
 
-    SoundManager::GetInstance()->GetSoundOnChannel(channel)->sound.Play();
+    SoundManager::GetInstance()->GetSoundOnChannel(channel)->sound.play();
 }
 
 void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch )

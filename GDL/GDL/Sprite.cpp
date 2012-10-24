@@ -82,11 +82,11 @@ Point & Sprite::GetPoint(const std::string & name)
 void Sprite::LoadImage(boost::shared_ptr<SFMLTextureWrapper> image_)
 {
     sfmlImage = image_;
-    sfmlSprite.SetTexture(sfmlImage->texture, true);
+    sfmlSprite.setTexture(sfmlImage->texture, true);
     hasItsOwnImage = false;
 
     if ( automaticCentre )
-        centre.SetXY(sfmlSprite.GetSubRect().Width/2, sfmlSprite.GetSubRect().Height/2);
+        centre.SetXY(sfmlSprite.getLocalBounds().width/2, sfmlSprite.getLocalBounds().height/2);
 }
 
 bool Sprite::SetCentreAutomatic(bool enabled)
@@ -94,7 +94,7 @@ bool Sprite::SetCentreAutomatic(bool enabled)
     automaticCentre = enabled;
 
     if ( automaticCentre )
-        centre.SetXY(sfmlSprite.GetSubRect().Width/2, sfmlSprite.GetSubRect().Height/2);
+        centre.SetXY(sfmlSprite.getLocalBounds().width/2, sfmlSprite.getLocalBounds().height/2);
 
     return true;
 }
@@ -104,7 +104,7 @@ void Sprite::MakeSpriteOwnsItsImage()
     if ( !hasItsOwnImage || sfmlImage == boost::shared_ptr<SFMLTextureWrapper>() )
     {
         sfmlImage = boost::shared_ptr<SFMLTextureWrapper>(new SFMLTextureWrapper(sfmlImage->texture)); //Copy the texture.
-        sfmlSprite.SetTexture(sfmlImage->texture);
+        sfmlSprite.setTexture(sfmlImage->texture);
         hasItsOwnImage = true;
     }
 }
@@ -117,9 +117,9 @@ std::vector<Polygon2d> Sprite::GetCollisionMask() const
 
         Polygon2d rectangle;
         rectangle.vertices.push_back(sf::Vector2f(0, 0));
-        rectangle.vertices.push_back(sf::Vector2f(sfmlSprite.GetSubRect().Width, 0));
-        rectangle.vertices.push_back(sf::Vector2f(sfmlSprite.GetSubRect().Width, sfmlSprite.GetSubRect().Height));
-        rectangle.vertices.push_back(sf::Vector2f(0, sfmlSprite.GetSubRect().Height));
+        rectangle.vertices.push_back(sf::Vector2f(sfmlSprite.getLocalBounds().width, 0));
+        rectangle.vertices.push_back(sf::Vector2f(sfmlSprite.getLocalBounds().width, sfmlSprite.getLocalBounds().height));
+        rectangle.vertices.push_back(sf::Vector2f(0, sfmlSprite.getLocalBounds().height));
 
         mask.push_back(rectangle);
         return mask;

@@ -9,7 +9,7 @@
 
 bool GD_API JoystickButtonDown( RuntimeScene & scene, unsigned int joystick, unsigned int button )
 {
-    return sf::Joystick::IsButtonPressed(joystick, button);
+    return sf::Joystick::isButtonPressed(joystick, button);
 }
 
 double GD_API GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr )
@@ -26,7 +26,7 @@ double GD_API GetJoystickAxisValue( RuntimeScene & scene, unsigned int joystick,
     else if ( axisStr == "AxisPovY" ) axis = sf::Joystick::PovY;
     else return 0;
 
-    return sf::Joystick::GetAxisPosition(joystick, axis);
+    return sf::Joystick::getAxisPosition(joystick, axis);
 }
 
 void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joystick, const std::string & axisStr, const std::string & variable )
@@ -45,7 +45,7 @@ void GD_API JoystickAxisValueToVariable( RuntimeScene & scene, unsigned int joys
     else return;
 
     //Update variable value
-    scene.GetVariables().ObtainVariable(variable) = sf::Joystick::GetAxisPosition(joystick, axis);
+    scene.GetVariables().ObtainVariable(variable) = sf::Joystick::getAxisPosition(joystick, axis);
 
     return;
 }

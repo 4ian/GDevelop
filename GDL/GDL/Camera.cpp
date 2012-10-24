@@ -19,10 +19,10 @@ void Camera::InitializeSFMLView(const sf::View & defaultView)
 {
     sfmlView = defaultView;
     if ( defaultViewport ) viewport = sf::FloatRect(0,0,1,1); //Default viewport : Make sure viewport datas are correct
-    sfmlView.SetViewport(viewport);
+    sfmlView.setViewport(viewport);
 
-    if ( defaultSize ) size = defaultView.GetSize();
-    sfmlView.SetSize(sf::Vector2f(size.x/zoomFactor, size.y/zoomFactor));
+    if ( defaultSize ) size = defaultView.getSize();
+    sfmlView.setSize(sf::Vector2f(size.x/zoomFactor, size.y/zoomFactor));
 
     sfmlViewInitialized = true;
 }
@@ -30,13 +30,13 @@ void Camera::InitializeSFMLView(const sf::View & defaultView)
 void Camera::SetViewport(sf::FloatRect newViewport)
 {
     viewport = newViewport;
-    if ( sfmlViewInitialized ) sfmlView.SetViewport(viewport);
+    if ( sfmlViewInitialized ) sfmlView.setViewport(viewport);
 }
 
 void Camera::SetSize(sf::Vector2f newSize)
 {
     size = newSize;
-    if ( sfmlViewInitialized ) sfmlView.SetSize(sf::Vector2f(size.x/zoomFactor, size.y/zoomFactor));
+    if ( sfmlViewInitialized ) sfmlView.setSize(sf::Vector2f(size.x/zoomFactor, size.y/zoomFactor));
 }
 
 void Camera::SetZoom(float newZoom)
@@ -44,18 +44,18 @@ void Camera::SetZoom(float newZoom)
     if (newZoom == 0) return;
 
     zoomFactor = newZoom;
-    if ( sfmlViewInitialized ) sfmlView.SetSize(sf::Vector2f(size.x/zoomFactor, size.y/zoomFactor));
+    if ( sfmlViewInitialized ) sfmlView.setSize(sf::Vector2f(size.x/zoomFactor, size.y/zoomFactor));
 }
 
 void Camera::SetRotation(float newAngle)
 {
     angle = newAngle;
-    if ( sfmlViewInitialized ) sfmlView.SetRotation(angle);
+    if ( sfmlViewInitialized ) sfmlView.setRotation(angle);
 }
 
 void Camera::SetViewCenter(const sf::Vector2f & newCenter)
 {
-    if ( sfmlViewInitialized ) sfmlView.SetCenter(newCenter);
+    if ( sfmlViewInitialized ) sfmlView.setCenter(newCenter);
 }
 
 void Camera::SetUseDefaultViewport(bool useDefaultViewport)

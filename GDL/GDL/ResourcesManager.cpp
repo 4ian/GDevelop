@@ -53,6 +53,60 @@ void ResourcesManager::Init(const ResourcesManager & other)
 #endif
 }
 
+Resource & ResourcesManager::GetResource(const std::string & name)
+{
+    for (unsigned int i = 0;i<resources.size();++i)
+    {
+        if ( resources[i]->GetName() == name )
+            return *resources[i];
+    }
+
+    return badResource;
+}
+
+const Resource & ResourcesManager::GetResource(const std::string & name) const
+{
+    for (unsigned int i = 0;i<resources.size();++i)
+    {
+        if ( resources[i]->GetName() == name )
+            return *resources[i];
+    }
+
+    return badResource;
+}
+
+boost::shared_ptr<Resource> ResourcesManager::CreateResource(const std::string & kind)
+{
+    if (kind == "image")
+    {
+        return boost::shared_ptr<Resource>(new ImageResource);
+    }
+
+    std::cout << "Bad resource created ( type: " << kind << ")" << std::endl;
+    return boost::shared_ptr<Resource>(new Resource);
+}
+
+bool ResourcesManager::HasResource(const std::string & name) const
+{
+    for (unsigned int i = 0;i<resources.size();++i)
+    {
+        if ( resources[i]->GetName() == name )
+            return true;
+    }
+
+    return false;
+}
+
+std::vector<std::string> ResourcesManager::GetAllResourcesList()
+{
+    std::vector<std::string> allResources;
+    for (unsigned int i = 0;i<resources.size();++i)
+        allResources.push_back(resources[i]->GetName());
+
+    return allResources;
+}
+
+
 #if defined(GD_IDE_ONLY)
 bool ResourcesManager::AddResource(const gd::Resource & resource)
 {
@@ -82,15 +136,6 @@ bool ResourcesManager::AddResource(const std::string & name, const std::string &
     resources.push_back(image);
 
     return true;
-}
-
-std::vector<std::string> ResourcesManager::GetAllResourcesList()
-{
-    std::vector<std::string> allResources;
-    for (unsigned int i = 0;i<resources.size();++i)
-        allResources.push_back(resources[i]->GetName());
-
-    return allResources;
 }
 
 std::vector<std::string> ResourceFolder::GetAllResourcesList()
@@ -322,29 +367,6 @@ bool ResourcesManager::MoveFolderDownInList(const std::string & name)
 
     return false;
 }
-#endif
-
-Resource & ResourcesManager::GetResource(const std::string & name)
-{
-    for (unsigned int i = 0;i<resources.size();++i)
-    {
-        if ( resources[i]->GetName() == name )
-            return *resources[i];
-    }
-
-    return badResource;
-}
-
-const Resource & ResourcesManager::GetResource(const std::string & name) const
-{
-    for (unsigned int i = 0;i<resources.size();++i)
-    {
-        if ( resources[i]->GetName() == name )
-            return *resources[i];
-    }
-
-    return badResource;
-}
 
 boost::shared_ptr<gd::Resource> ResourcesManager::GetResourceSPtr(const std::string & name)
 {
@@ -357,18 +379,6 @@ boost::shared_ptr<gd::Resource> ResourcesManager::GetResourceSPtr(const std::str
     return boost::shared_ptr<gd::Resource>();
 }
 
-boost::shared_ptr<Resource> ResourcesManager::CreateResource(const std::string & kind)
-{
-    if (kind == "image")
-    {
-        return boost::shared_ptr<Resource>(new ImageResource);
-    }
-
-    std::cout << "Bad resource created ( type: " << kind << ")" << std::endl;
-    return boost::shared_ptr<Resource>(new Resource);
-}
-
-#if defined(GD_IDE_ONLY)
 bool ResourcesManager::HasFolder(const std::string & name) const
 {
     for (unsigned int i = 0;i<folders.size();++i)
@@ -458,17 +468,6 @@ void ResourceFolder::AddResource(const std::string & name, gd::ResourcesManager 
     }
 }
 
-bool ResourcesManager::HasResource(const std::string & name) const
-{
-    for (unsigned int i = 0;i<resources.size();++i)
-    {
-        if ( resources[i]->GetName() == name )
-            return true;
-    }
-
-    return false;
-}
-
 void ResourcesManager::RenameResource(const std::string & oldName, const std::string & newName)
 {
     for (unsigned int i = 0;i<resources.size();++i)
@@ -488,7 +487,6 @@ void ResourceFolder::RemoveResource(const std::string & name)
             ++i;
     }
 }
-#endif
 
 void ResourcesManager::RemoveResource(const std::string & name)
 {
@@ -500,11 +498,10 @@ void ResourcesManager::RemoveResource(const std::string & name)
             ++i;
     }
 
-#if defined(GD_IDE_ONLY)
     for (unsigned int i = 0;i<folders.size();++i)
         folders[i].RemoveResource(name);
-#endif
 }
+#endif
 
 
 #if defined(GD_IDE_ONLY)

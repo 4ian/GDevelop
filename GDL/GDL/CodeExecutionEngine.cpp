@@ -149,7 +149,7 @@ bool CodeExecutionEngine::LoadFromLLVMBitCode(std::vector<llvm::MemoryBuffer *> 
     std::cout << "JIT Compilation to machine code...\n";
     sf::Clock jitTimer;
     compiledRawFunction = llvmExecutionEngine->getPointerToFunction(eventsEntryFunction);
-    std::cout << "JIT Compilation duration: " << jitTimer.GetElapsedTime()/1000.0f <<"s"<<std::endl;
+    std::cout << "JIT Compilation duration: " << jitTimer.getElapsedTime().asSeconds() <<"s"<<std::endl;
 
 
     engineReady = true;

@@ -57,7 +57,8 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_
     timeScale(1),
     timeFromStart(0),
     pauseTime(0),
-    specialAction(-1)
+    specialAction(-1),
+    windowHasFocus(true)
 {
     ChangeRenderWindow(renderWindow);
 }
@@ -101,6 +102,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     timeFromStart = scene.timeFromStart;
     specialAction = scene.specialAction;
     renderTargetEvents = scene.renderTargetEvents;
+    windowHasFocus = scene.windowHasFocus;
 
     automatismsSharedDatas.clear();
     for (std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> >::const_iterator it = scene.automatismsSharedDatas.begin();
@@ -135,7 +137,7 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
     }
 
     renderWindow = newWindow;
-    renderWindow->SetTitle(GetWindowDefaultTitle());
+    renderWindow->setTitle(GetWindowDefaultTitle());
 
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_TRUE);
@@ -145,7 +147,7 @@ void RuntimeScene::ChangeRenderWindow(sf::RenderWindow * newWindow)
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    double windowRatio = static_cast<double>(renderWindow->GetWidth())/static_cast<double>(renderWindow->GetHeight());
+    double windowRatio = static_cast<double>(renderWindow->getSize().x)/static_cast<double>(renderWindow->getSize().y);
     gluPerspective(GetOpenGLFOV(), windowRatio, GetOpenGLZNear(), GetOpenGLZFar());
 }
 
@@ -158,15 +160,15 @@ void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, in
     while ( !iter->Is_Done() )
     {
         sf::Text text("", *fontManager->GetFont("consola.ttf"));
-        text.SetCharacterSize(12);
+        text.setCharacterSize(12);
         ostringstream texte;
         if ( CProfileManager::Get_Frame_Count_Since_Reset() != 0 )
             texte << fixed <<  iter->Get_Current_Name()   << " Calls/Frame:" << iter->Get_Current_Total_Calls()/CProfileManager::Get_Frame_Count_Since_Reset()
                                                 << " Time/Frame:" << iter->Get_Current_Total_Time()/CProfileManager::Get_Frame_Count_Since_Reset()
                                                 << " %Time/Parent " << iter->Get_Current_Total_Time()/iter->Get_Current_Parent_Total_Time()*100.0f;
-        text.SetString(texte.str());
-        text.SetPosition(x,y);
-        renderWindow->Draw(text);
+        text.setString(texte.str());
+        text.setPosition(x,y);
+        renderWindow->draw(text);
 
         //Childs
         CProfileIterator * childIter = CProfileManager::Get_Iterator();
@@ -279,19 +281,19 @@ void RuntimeScene::ManageRenderTargetEvents()
     renderTargetEvents.clear();
 
     sf::Event event;
-    while ( renderWindow->PollEvent( event ) )
+    while ( renderWindow->pollEvent( event ) )
     {
         renderTargetEvents.push_back(event);
 
         // Close window : exit
-        if ( event.Type == sf::Event::Closed )
+        if ( event.type == sf::Event::Closed )
         {
             running = false;
+            renderWindow->close();
             #if defined(GD_IDE_ONLY)
-            renderWindow->Close();
             #endif
         }
-        else if (event.Type == sf::Event::Resized)
+        else if (event.type == sf::Event::Resized)
         {
             //Resetup OpenGL
             glEnable(GL_DEPTH_TEST);
@@ -302,9 +304,13 @@ void RuntimeScene::ManageRenderTargetEvents()
             glMatrixMode(GL_PROJECTION);
             glLoadIdentity();
 
-            double windowRatio = static_cast<double>(event.Size.Width)/static_cast<double>(event.Size.Height);
+            double windowRatio = static_cast<double>(event.size.width)/static_cast<double>(event.size.height);
             gluPerspective(GetOpenGLFOV(), windowRatio, GetOpenGLZNear(), GetOpenGLZFar());
         }
+        else if ( event.type == sf::Event::GainedFocus)
+            windowHasFocus = true;
+        else if ( event.type == sf::Event::LostFocus)
+            windowHasFocus = false;
     }
 }
 
@@ -323,7 +329,7 @@ void RuntimeScene::RenderWithoutStep()
 
 void RuntimeScene::Render()
 {
-    renderWindow->Clear( sf::Color( GetBackgroundColorRed(), GetBackgroundColorGreen(), GetBackgroundColorBlue() ) );
+    renderWindow->clear( sf::Color( GetBackgroundColorRed(), GetBackgroundColorGreen(), GetBackgroundColorBlue() ) );
 
     //Sort object by order to render them
     ObjList allObjects = objectsInstances.GetAllObjects();
@@ -331,8 +337,8 @@ void RuntimeScene::Render()
 
     //To allow using OpenGL to draw :
     glClear(GL_DEPTH_BUFFER_BIT); // Clear the depth buffer
-    renderWindow->SaveGLStates();
-    renderWindow->SetActive();
+    renderWindow->pushGLStates();
+    renderWindow->setActive();
 
     //Draw layer by layer
     for (unsigned int layerIndex =0;layerIndex<GetLayersCount();++layerIndex)
@@ -344,22 +350,22 @@ void RuntimeScene::Render()
                 Camera & camera = GetLayer(layerIndex).GetCamera(cameraIndex);
 
                 //Prepare OpenGL rendering
-                renderWindow->RestoreGLStates();
+                renderWindow->popGLStates();
 
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
                 gluPerspective(GetOpenGLFOV(), camera.GetSize().x/camera.GetSize().y, GetOpenGLZNear(), GetOpenGLZFar());
 
                 const sf::FloatRect & viewport = camera.GetViewport();
-                glViewport(viewport.Left*renderWindow->GetWidth(),
-                           renderWindow->GetHeight()-(viewport.Top+viewport.Height)*renderWindow->GetHeight(), //Y start from bottom
-                           viewport.Width*renderWindow->GetWidth(),
-                           viewport.Height*renderWindow->GetHeight());
+                glViewport(viewport.left*renderWindow->getSize().x,
+                           renderWindow->getSize().y-(viewport.top+viewport.height)*renderWindow->getSize().y, //Y start from bottom
+                           viewport.width*renderWindow->getSize().x,
+                           viewport.height*renderWindow->getSize().y);
 
-                renderWindow->SaveGLStates();
+                renderWindow->pushGLStates();
 
                 //Prepare SFML rendering
-                renderWindow->SetView(camera.GetSFMLView());
+                renderWindow->setView(camera.GetSFMLView());
 
                 //Rendering all objects
                 for (unsigned int id = 0;id < allObjects.size();++id)
@@ -377,10 +383,10 @@ void RuntimeScene::Render()
 
         //Internal profiler
         #ifndef RELEASE
-        if ( sf::Keyboard::IsKeyPressed(sf::Keyboard::F2))
+        if ( sf::Keyboard::isKeyPressed(sf::Keyboard::F2))
             CProfileManager::Reset();
 
-        renderWindow->SetView(sf::View(sf::FloatRect(0.0f,0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight())));
+        renderWindow->setView(sf::View(sf::FloatRect(0.0f,0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight())));
 
         CProfileIterator * iter = CProfileManager::Get_Iterator();
         int y = 0;
@@ -389,14 +395,14 @@ void RuntimeScene::Render()
         #endif
 
     // Display window contents on screen
-    renderWindow->RestoreGLStates();
-    renderWindow->Display();
+    renderWindow->popGLStates();
+    renderWindow->display();
 }
 
 bool RuntimeScene::UpdateTime()
 {
     //Update time elapsed since last frame
-    realElapsedTime = renderWindow->GetFrameTime();
+    realElapsedTime = clock.restart().asMilliseconds();
     realElapsedTime -= pauseTime; //On enlève le temps de pause
 
     //On modifie ce temps écoulé si il est trop bas.
@@ -606,7 +612,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const I
     }
 
     if ( StopSoundsOnStartup() ) {SoundManager::GetInstance()->ClearAllSoundsAndMusics(); }
-    if ( renderWindow ) renderWindow->SetTitle(GetWindowDefaultTitle());
+    if ( renderWindow ) renderWindow->setTitle(GetWindowDefaultTitle());
 
     MessageLoading( "Loading finished", 100 );
 

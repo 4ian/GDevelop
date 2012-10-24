@@ -33,10 +33,10 @@ sf::Texture * RessourcesLoader::LoadSFMLTexture(const string & filename)
         if (buffer==NULL)
             cout << "Failed to get the file of a SFML texture from resource file: " << filename << endl;
 
-        if (!image->LoadFromMemory(buffer, resFile.GetFileSize(filename)))
+        if (!image->loadFromMemory(buffer, resFile.GetFileSize(filename)))
             cout << "Failed to load a SFML texture from resource file: " << filename << endl;
     }
-    else if (!image->LoadFromFile(filename)) //Chargement depuis un fichier externe
+    else if (!image->loadFromFile(filename)) //Chargement depuis un fichier externe
         cout << "Failed to load a SFML texture: " << filename << endl;
 
     return image;
@@ -56,10 +56,10 @@ sf::Font * RessourcesLoader::LoadFont(const string & filename)
         char * fontBuffer = new char[resFile.GetFileSize(filename)];
         memcpy(fontBuffer, buffer, resFile.GetFileSize(filename));
 
-        if (!font->LoadFromMemory(fontBuffer, resFile.GetFileSize(filename)))
+        if (!font->loadFromMemory(fontBuffer, resFile.GetFileSize(filename)))
             cout << "Failed to load a font from resource file: " << filename << endl;
     }
-    else if (!font->LoadFromFile(filename)) //Chargement depuis un fichier externe
+    else if (!font->loadFromFile(filename)) //Chargement depuis un fichier externe
         cout << "Failed to load a font: " << filename << endl;
 
     return font;
@@ -75,10 +75,10 @@ sf::SoundBuffer RessourcesLoader::LoadSoundBuffer( const string & filename )
         if (buffer==NULL)
             cout << "Failed to get the file of a sound buffer from resource file: " << filename << endl;
 
-        if (!sbuffer.LoadFromMemory(buffer, resFile.GetFileSize(filename)))
+        if (!sbuffer.loadFromMemory(buffer, resFile.GetFileSize(filename)))
             cout << "Failed to load a sound buffer from resource file: " << filename << endl;
     }
-    else if (!sbuffer.LoadFromFile(filename)) //Chargement depuis un fichier externe
+    else if (!sbuffer.loadFromFile(filename)) //Chargement depuis un fichier externe
         cout << "Failed to load a sound buffer: " << filename << endl;
 
     return sbuffer;

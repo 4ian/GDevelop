@@ -249,7 +249,7 @@ void CodeCompiler::ProcessTasks()
                 std::cout << error;
 
                 compilationSucceeded = true;
-                std::cout << "WritingBitCodeTIme :"<<time.GetElapsedTime() << std::endl;
+                std::cout << "WritingBitCodeTIme :"<<time.getElapsedTime().asMilliseconds() << std::endl;
             }
 
             //Compilation ended, loading diagnostics
@@ -308,7 +308,7 @@ void CodeCompiler::AddTask(CodeCompilerTask task)
     {
         std::cout << "Launching compilation thread..." << std::endl;
         threadLaunched = true;
-        currentTaskThread.Launch();
+        currentTaskThread.launch();
     }
 }
 
@@ -356,7 +356,7 @@ void CodeCompiler::EnableTaskRelatedTo(Scene & scene)
     {
         std::cout << "Launching compilation thread...";
         threadLaunched = true;
-        currentTaskThread.Launch();
+        currentTaskThread.launch();
     }
 }
 

@@ -27,7 +27,7 @@ void SoundManager::ManageGarbage()
 {
     for ( unsigned int i = 0;i < sounds.size();i++ )
     {
-        if ( sounds[i]->sound.GetStatus() == sf::Sound::Stopped )
+        if ( sounds[i]->sound.getStatus() == sf::Sound::Stopped )
             sounds.erase( sounds.begin() + i );
     }
 

@@ -25,7 +25,7 @@ bool Music::OpenFromFile(const string & filename)
     #if defined(GDE)
     file = filename;
     #endif
-    return music.OpenFromFile(filename);
+    return music.openFromFile(filename);
 }
 
 void Music::SetBuffer(const char * newbuffer, std::size_t size)
@@ -45,29 +45,29 @@ void Music::SetBuffer(const char * newbuffer, std::size_t size)
 
 bool Music::OpenFromMemory(std::size_t size)
 {
-    music.OpenFromMemory(buffer, size);
+    music.openFromMemory(buffer, size);
 
     return true;
 }
 
 void Music::Play()
 {
-    music.Play();
+    music.play();
 }
 
 void Music::Pause()
 {
-    music.Pause();
+    music.pause();
 }
 
 void Music::Stop()
 {
-    music.Stop();
+    music.stop();
 }
 
 void Music::SetLoop(bool loop)
 {
-    music.SetLoop(loop);
+    music.setLoop(loop);
 }
 
 void Music::SetVolume(float volume_)
@@ -81,7 +81,6 @@ void Music::SetVolume(float volume_)
 
 void Music::UpdateVolume()
 {
-    SoundManager * soundManager = SoundManager::GetInstance();
-    music.SetVolume(volume * soundManager->GetGlobalVolume()/100.f);
+    music.setVolume(volume * SoundManager::GetInstance()->GetGlobalVolume()/100.f);
 }
 

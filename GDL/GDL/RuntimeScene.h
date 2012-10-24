@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <SFML/System.hpp>
 #include <boost/shared_ptr.hpp>
 #include "GDL/ObjInstancesHolder.h"
 class Text;
@@ -115,7 +116,13 @@ public:
     void SetRenderWindowIsFullScreen(bool yes = true) { isFullScreen = yes; }
 
     /**
-     * By calling this method, scene will
+     * Return true if window has focus.
+     */
+    bool RenderWindowHasFocus() { return windowHasFocus; }
+
+    /**
+     * After calling this method, RenderAndStep() will return the number passed as parameter.
+     * \see RenderAndStep
      */
     void GotoSceneWhenEventsAreFinished(int scene);
 
@@ -205,7 +212,8 @@ protected:
     int                                     specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
     ListVariable                            variables; ///<List of the scene variables
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
-
+    sf::Clock                               clock;
+    bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.
     std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
 
     std::vector < Text >                    textes; ///<Deprecated way of displaying a text

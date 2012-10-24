@@ -100,8 +100,10 @@ bool SpriteObject::Draw( sf::RenderTarget & renderTarget )
     //Don't draw anything if hidden
     if ( hidden ) return true;
 
-    renderTarget.Draw( GetCurrentSFMLSprite() );
-
+    renderTarget.draw( GetCurrentSFMLSprite(), sf::RenderStates(blendMode == 0 ? sf::BlendAlpha :
+                                                               (blendMode == 1 ? sf::BlendAdd :
+                                                               (blendMode == 2 ? sf::BlendMultiply :
+                                                                sf::BlendNone))));
     /*std::vector<Polygon2d> polygons = GetHitBoxes();
     for (unsigned int i = 0;i<polygons.size();++i)
     {
@@ -111,7 +113,7 @@ bool SpriteObject::Draw( sf::RenderTarget & renderTarget )
         {
             shape.AddPoint(polygons[i].vertices[j], sf::Color(255,120,120), sf::Color(0,120,0));
         }
-        renderTarget.Draw(shape);
+        renderTarget.draw(shape);
     }*/
 
     return true;
@@ -123,7 +125,7 @@ bool SpriteObject::Draw( sf::RenderTarget & renderTarget )
  */
 bool SpriteObject::DrawEdittime( sf::RenderTarget & renderTarget )
 {
-    renderTarget.Draw( GetCurrentSFMLSprite() );
+    renderTarget.draw( GetCurrentSFMLSprite() );
 
     return true;
 }
@@ -243,7 +245,7 @@ float SpriteObject::GetDrawableX() const
     //FIXME (The not commented code is correct but not optimal)
     //Bad placement when origine of sf::Sprite is changed ( for automatic Rotation for example )
     //return GetCurrentSFMLSprite().GetPosition().x;
-    return X - GetCurrentSprite().GetOrigine().GetX() + (GetCurrentSFMLSprite().GetSubRect().Width)*(1-scaleX)/2;
+    return X - GetCurrentSprite().GetOrigine().GetX() + (GetCurrentSFMLSprite().getLocalBounds().width)*(1-scaleX)/2;
 }
 
 /**
@@ -252,7 +254,7 @@ float SpriteObject::GetDrawableX() const
 float SpriteObject::GetDrawableY() const
 {
     //return GetCurrentSFMLSprite().GetPosition().y;
-    return Y - GetCurrentSprite().GetOrigine().GetY() + (GetCurrentSFMLSprite().GetSubRect().Height)*(1-scaleY)/2;
+    return Y - GetCurrentSprite().GetOrigine().GetY() + (GetCurrentSFMLSprite().getLocalBounds().height)*(1-scaleY)/2;
 }
 
 /**
@@ -260,7 +262,7 @@ float SpriteObject::GetDrawableY() const
  */
 float SpriteObject::GetWidth() const
 {
-    return GetCurrentSFMLSprite().GetSize().x;
+    return scaleX > 0 ? GetCurrentSFMLSprite().getLocalBounds().width*scaleX : -GetCurrentSFMLSprite().getLocalBounds().width*scaleX;
 }
 
 /**
@@ -268,14 +270,15 @@ float SpriteObject::GetWidth() const
  */
 float SpriteObject::GetHeight() const
 {
-    return GetCurrentSFMLSprite().GetSize().y;
+    return scaleY > 0 ? GetCurrentSFMLSprite().getLocalBounds().height*scaleY : -GetCurrentSFMLSprite().getLocalBounds().height*scaleY;
 }
 
 void SpriteObject::SetWidth(float newWidth)
 {
     if ( newWidth > 0 )
     {
-        scaleX = newWidth/(GetCurrentSFMLSprite().GetSubRect().Width);
+        scaleX = newWidth/GetCurrentSFMLSprite().getLocalBounds().width;
+        if ( isFlippedX ) scaleX *= -1;
         needUpdateCurrentSprite = true;
     }
 }
@@ -284,7 +287,8 @@ void SpriteObject::SetHeight(float newHeight)
 {
     if ( newHeight > 0 )
     {
-        scaleY = newHeight/(GetCurrentSFMLSprite().GetSubRect().Height);
+        scaleY = newHeight/GetCurrentSFMLSprite().getLocalBounds().height;
+        if ( isFlippedY ) scaleY *= -1;
         needUpdateCurrentSprite = true;
     }
 }
@@ -318,11 +322,8 @@ float SpriteObject::GetPointX(const std::string & point) const
 {
     if ( !point.empty() )
     {
-        return GetCurrentSFMLSprite().TransformToGlobal(
-                    sf::Vector2f(
-                        !isFlippedX ? GetCurrentSprite().GetPoint(point).GetX() : GetCurrentSprite().GetSFMLSprite().GetSize().x-GetCurrentSprite().GetPoint(point).GetX(),
-                        !isFlippedY ? GetCurrentSprite().GetPoint(point).GetY() : GetCurrentSprite().GetSFMLSprite().GetSize().y-GetCurrentSprite().GetPoint(point).GetY()
-                    )).x;
+        return GetCurrentSFMLSprite().getTransform().transformPoint(GetCurrentSprite().GetPoint(point).GetX(),
+                                                                    GetCurrentSprite().GetPoint(point).GetY()).x;
     }
 
     return GetX();
@@ -332,11 +333,8 @@ float SpriteObject::GetPointY(const std::string & point) const
 {
     if ( !point.empty() )
     {
-        return GetCurrentSFMLSprite().TransformToGlobal(
-                    sf::Vector2f(
-                        !isFlippedX ? GetCurrentSprite().GetPoint(point).GetX() : GetCurrentSprite().GetSFMLSprite().GetSize().x-GetCurrentSprite().GetPoint(point).GetX(),
-                        !isFlippedY ? GetCurrentSprite().GetPoint(point).GetY() : GetCurrentSprite().GetSFMLSprite().GetSize().y-GetCurrentSprite().GetPoint(point).GetY()
-                    )).y;
+        return GetCurrentSFMLSprite().getTransform().transformPoint(GetCurrentSprite().GetPoint(point).GetX(),
+                                                                    GetCurrentSprite().GetPoint(point).GetY()).y;
     }
 
     return GetY();
@@ -381,12 +379,12 @@ void SpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const s
     boost::shared_ptr<SFMLTextureWrapper> dest = ptrToCurrentSprite->GetSFMLTexture();
 
     //Make sure the coordinates are correct.
-    if ( xPosition < 0 || static_cast<unsigned>(xPosition) >= dest->texture.GetWidth()) return;
-    if ( yPosition < 0 || static_cast<unsigned>(yPosition) >= dest->texture.GetWidth()) return;
+    if ( xPosition < 0 || static_cast<unsigned>(xPosition) >= dest->texture.getSize().x) return;
+    if ( yPosition < 0 || static_cast<unsigned>(yPosition) >= dest->texture.getSize().y) return;
 
     //Update texture and pixel perfect collision mask
-    dest->image.Copy(scene.game->imageManager->GetSFMLTexture(imageName)->image, xPosition, yPosition, sf::IntRect(0, 0, 0, 0), useTransparency);
-    dest->texture.LoadFromImage(dest->image);
+    dest->image.copy(scene.game->imageManager->GetSFMLTexture(imageName)->image, xPosition, yPosition, sf::IntRect(0, 0, 0, 0), useTransparency);
+    dest->texture.loadFromImage(dest->image);
 }
 
 void SpriteObject::MakeColorTransparent( const std::string & colorStr )
@@ -401,8 +399,8 @@ void SpriteObject::MakeColorTransparent( const std::string & colorStr )
     if ( colors.size() < 3 ) return; //La couleur est incorrecte
 
     //Update texture and pixel perfect collision mask
-    dest->image.CreateMaskFromColor(  sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2])));
-    dest->texture.LoadFromImage(dest->image);
+    dest->image.createMaskFromColor(  sf::Color( ToInt(colors[0]), ToInt(colors[1]), ToInt(colors[2])));
+    dest->texture.loadFromImage(dest->image);
 }
 
 void SpriteObject::SetColor(const std::string & colorStr)
@@ -446,8 +444,8 @@ void SpriteObject::UpdateCurrentSprite() const
             else
                 ptrToCurrentSprite = &currentAnim.GetDirectionToModify( currentDirection ).GetSprite( currentSprite );
 
-            ptrToCurrentSprite->GetSFMLSprite().SetX( X - ptrToCurrentSprite->GetOrigine().GetX() + (ptrToCurrentSprite->GetSFMLSprite().GetSubRect().Width)*(1-scaleX)/2 );
-            ptrToCurrentSprite->GetSFMLSprite().SetY( Y - ptrToCurrentSprite->GetOrigine().GetY() + (ptrToCurrentSprite->GetSFMLSprite().GetSubRect().Height)*(1-scaleY)/2 );
+            ptrToCurrentSprite->GetSFMLSprite().setPosition( X - ptrToCurrentSprite->GetOrigine().GetX() + (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().width)*(1-scaleX)/2,
+                                                             Y - ptrToCurrentSprite->GetOrigine().GetY() + (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().height)*(1-scaleY)/2 );
         }
         else
         {
@@ -457,25 +455,18 @@ void SpriteObject::UpdateCurrentSprite() const
             else
                 ptrToCurrentSprite = &currentAnim.GetDirectionToModify(0).GetSprite( currentSprite );
 
-            ptrToCurrentSprite->GetSFMLSprite().SetX( X  + ptrToCurrentSprite->GetCentre().GetX()*scaleX - ptrToCurrentSprite->GetOrigine().GetX()
-                                                + (ptrToCurrentSprite->GetSFMLSprite().GetSubRect().Width)*(1-scaleX)/2);
-            ptrToCurrentSprite->GetSFMLSprite().SetY( Y  + ptrToCurrentSprite->GetCentre().GetY()*scaleY - ptrToCurrentSprite->GetOrigine().GetY()
-                                                + (ptrToCurrentSprite->GetSFMLSprite().GetSubRect().Height)*(1-scaleY)/2);
+            ptrToCurrentSprite->GetSFMLSprite().setPosition( X + ptrToCurrentSprite->GetCentre().GetX()*scaleX - ptrToCurrentSprite->GetOrigine().GetX()
+                                                               + (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().width)*(1-scaleX)/2,
+                                                             Y + ptrToCurrentSprite->GetCentre().GetY()*scaleY - ptrToCurrentSprite->GetOrigine().GetY()
+                                                               + (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().height)*(1-scaleY)/2);
 
-            ptrToCurrentSprite->GetSFMLSprite().SetOrigin(   ptrToCurrentSprite->GetCentre().GetX(),
-                                                    ptrToCurrentSprite->GetCentre().GetY() );
-            ptrToCurrentSprite->GetSFMLSprite().SetRotation( currentAngle );
+            ptrToCurrentSprite->GetSFMLSprite().setOrigin( ptrToCurrentSprite->GetCentre().GetX(), ptrToCurrentSprite->GetCentre().GetY() );
+            ptrToCurrentSprite->GetSFMLSprite().setRotation( currentAngle );
         }
     }
 
-    ptrToCurrentSprite->GetSFMLSprite().SetScale( scaleX, scaleY );
-    ptrToCurrentSprite->GetSFMLSprite().SetColor( sf::Color( colorR, colorV, colorB, opacity ) );
-    ptrToCurrentSprite->GetSFMLSprite().FlipX(isFlippedX);
-    ptrToCurrentSprite->GetSFMLSprite().FlipY(isFlippedY);
-    if ( blendMode == 0 ) ptrToCurrentSprite->GetSFMLSprite().SetBlendMode(sf::Blend::Alpha);
-    else if ( blendMode == 1 ) ptrToCurrentSprite->GetSFMLSprite().SetBlendMode(sf::Blend::Add);
-    else if ( blendMode == 2 ) ptrToCurrentSprite->GetSFMLSprite().SetBlendMode(sf::Blend::Multiply);
-    else if ( blendMode == 3 ) ptrToCurrentSprite->GetSFMLSprite().SetBlendMode(sf::Blend::None);
+    ptrToCurrentSprite->GetSFMLSprite().setScale( scaleX, scaleY );
+    ptrToCurrentSprite->GetSFMLSprite().setColor( sf::Color( colorR, colorV, colorB, opacity ) );
 
     needUpdateCurrentSprite = false;
 }
@@ -552,11 +543,9 @@ std::vector<Polygon2d> SpriteObject::GetHitBoxes() const
     {
         for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
         {
-            sf::Vector2f newVertice = currentSFMLSprite.TransformToGlobal(
-                        sf::Vector2f(
-                            !isFlippedX ? polygons[i].vertices[j].x : GetCurrentSprite().GetSFMLSprite().GetSize().x-polygons[i].vertices[j].x,
-                            !isFlippedY ? polygons[i].vertices[j].y : GetCurrentSprite().GetSFMLSprite().GetSize().y-polygons[i].vertices[j].y
-                        ));
+            sf::Vector2f newVertice = currentSFMLSprite.getTransform().transformPoint(
+                            !isFlippedX ? polygons[i].vertices[j].x : GetCurrentSprite().GetSFMLSprite().getLocalBounds().width-polygons[i].vertices[j].x,
+                            !isFlippedY ? polygons[i].vertices[j].y : GetCurrentSprite().GetSFMLSprite().getLocalBounds().height-polygons[i].vertices[j].y);
             polygons[i].vertices[j] = newVertice;
         }
     }
@@ -742,12 +731,23 @@ void SpriteObject::SetColor( unsigned int r, unsigned int v, unsigned int b )
     needUpdateCurrentSprite = true;
 }
 
+void SpriteObject::FlipX(bool flip)
+{
+    if ( flip != isFlippedX ) scaleX *= -1;
+    isFlippedX = flip;
+};
+void SpriteObject::FlipY(bool flip)
+{
+    if ( flip != isFlippedY ) scaleY *= -1;
+    isFlippedY = flip;
+};
+
 bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
 {
     for (unsigned int cameraIndex = 0;cameraIndex < scene.GetLayer(layer).GetCameraCount();++cameraIndex)
     {
-        int mouseXInTheLayer = scene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*scene.renderWindow).x, sf::Mouse::GetPosition(*scene.renderWindow).y, scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).x;
-        int mouseYInTheLayer = scene.renderWindow->ConvertCoords(sf::Mouse::GetPosition(*scene.renderWindow).x, sf::Mouse::GetPosition(*scene.renderWindow).y, scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).y;
+        int mouseXInTheLayer = scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).x;
+        int mouseYInTheLayer = scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).y;
 
         if  ( GetDrawableX() < mouseXInTheLayer &&
             ( GetDrawableX() + GetWidth() ) > mouseXInTheLayer &&
@@ -757,7 +757,7 @@ bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
             int ClicX = static_cast<int>( mouseXInTheLayer - GetDrawableX() );
             int ClicY = static_cast<int>( mouseYInTheLayer - GetDrawableY() );
 
-            return ( !accurate || GetCurrentSprite().GetSFMLTexture()->image.GetPixel( ClicX , ClicY ).a != 0 );
+            return ( !accurate || GetCurrentSprite().GetSFMLTexture()->image.getPixel( ClicX , ClicY ).a != 0 );
         }
     }
 

@@ -18,16 +18,14 @@ Sound::Sound(string pFile) :
 file(pFile),
 volume(100)
 {
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
-
-    buffer = ressourcesLoader->LoadSoundBuffer(file);
-    sound.SetBuffer(buffer);
+    buffer = RessourcesLoader::GetInstance()->LoadSoundBuffer(file);
+    sound.setBuffer(buffer);
 }
 
 Sound::Sound() :
 volume(100)
 {
-    sound.SetBuffer(buffer);
+    sound.setBuffer(buffer);
 }
 
 Sound::~Sound()
@@ -38,10 +36,8 @@ Sound::~Sound()
 Sound::Sound(const Sound & copy) :
 file(copy.file)
 {
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
-
-    buffer = ressourcesLoader->LoadSoundBuffer(file);
-    sound.SetBuffer(buffer);
+    buffer = RessourcesLoader::GetInstance()->LoadSoundBuffer(file);
+    sound.setBuffer(buffer);
 }
 
 ////////////////////////////////////////////////////////////
@@ -64,6 +60,6 @@ void Sound::UpdateVolume()
 {
     SoundManager * soundManager = SoundManager::GetInstance();
 
-    sound.SetVolume(volume*soundManager->GetGlobalVolume()/100.f);
+    sound.setVolume(volume*soundManager->GetGlobalVolume()/100.f);
 }
 

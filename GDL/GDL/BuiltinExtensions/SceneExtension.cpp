@@ -85,6 +85,21 @@ SceneExtension::SceneExtension()
 
     DECLARE_END_ACTION()
 
+    DECLARE_ACTION("DisableInputWhenFocusIsLost",
+                   _("Disable input when focus is lost"),
+                   _("Set if the keyboard and mouse buttons must be taken into account even\nif the window is not active."),
+                   _("Disable input when focus is lost: _PARAM1_"),
+                   _("Scene"),
+                   "res/actions/window24.png",
+                   "res/actions/window.png");
+
+        instrInfo.AddCodeOnlyParameter("currentScene", "");
+        instrInfo.AddParameter("yesorno", _("Deactivate input when focus is lost"), "", false);
+
+        instrInfo.cppCallingInformation.SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+
+    DECLARE_END_ACTION()
+
     DECLARE_CONDITION("Egal",
                    _("Compare two expressions"),
                    _("Test the two expression"),

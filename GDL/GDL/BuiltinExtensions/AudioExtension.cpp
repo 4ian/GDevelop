@@ -237,7 +237,7 @@ AudioExtension::AudioExtension()
 
     DECLARE_ACTION("ModPlayingOffsetSoundChannel",
                    _("Playing offset of the sound on a channel"),
-                   _("This action modify the playinf offset of the sound on a channel"),
+                   _("This action modify the playing offset of the sound on a channel"),
                    _("Do _PARAM3__PARAM2_ to the playing offset of the sound on channel _PARAM1_"),
                    _("Sounds"),
                    "res/actions/son24.png",

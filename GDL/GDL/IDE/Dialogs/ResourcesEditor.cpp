@@ -22,6 +22,7 @@
 #include <wx/config.h>
 #include <wx/msgdlg.h>
 #include <wx/aui/aui.h>
+#include <wx/settings.h>
 #include <wx/log.h>
 #include <wx/filedlg.h>
 #include <wx/image.h>
@@ -375,14 +376,14 @@ void ResourcesEditor::CopyAndAddResources(std::vector<std::string> filenames, co
         //Copy all resources into the destination directory
         wxString projectDirectory = wxFileName::FileName(project.GetProjectFile()).GetPath();
 
-        wxFileName destinationDir = wxFileName::FileName(destinationDirStr+"/");
+        wxFileName destinationDir = wxFileName::FileName(projectDirectory+"/"+destinationDirStr+"/");
         destinationDir.MakeAbsolute(projectDirectory);
         for (unsigned int i = 0;i<filenames.size();++i)
         {
             wxString name = wxFileName::FileName(filenames[i]).GetFullName();
             wxFileName destinationFile = wxFileName::FileName(destinationDir.GetPath()+"/"+name);
 
-            wxLogStatus( _( "Copy of" ) + name );
+            wxLogStatus( _( "Copy of" ) + " " + name );
 
             //Copy the resource
             wxCopyFile(filenames[i], destinationFile.GetFullPath(), true);
@@ -765,7 +766,11 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
         if ( data && data->GetString() == "Image")
         {
             if ( propertyName == "File" )
+            {
                 project.GetResourcesManager().GetResource(data->GetSecondString()).GetFile() = propertyNewValue;
+                previewPanel->Refresh();
+                previewPanel->Update();
+            }
             if ( propertyName == "Name" )
             {
                 project.GetResourcesManager().RenameResource(renamedItemOldName, propertyNewValue);

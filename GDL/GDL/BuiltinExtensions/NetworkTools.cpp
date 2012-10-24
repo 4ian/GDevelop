@@ -76,20 +76,20 @@ void GD_API DownloadFile( const std::string & host, const std::string & uri, con
 {
     // Create Http
     sf::Http Http;
-    Http.SetHost(host);
+    Http.setHost(host);
 
     // Create request
     sf::Http::Request Request;
-    Request.SetMethod(sf::Http::Request::Get);
-    Request.SetUri(uri);
+    Request.setMethod(sf::Http::Request::Get);
+    Request.setUri(uri);
 
     // Send request & Get response
-    sf::Http::Response datas = Http.SendRequest(Request);
+    sf::Http::Response datas = Http.sendRequest(Request);
 
     ofstream ofile(outputfilename.c_str(), ios_base::binary);
     if ( ofile.is_open() )
     {
-        ofile.write(datas.GetBody().c_str(),datas.GetBody().size());
+        ofile.write(datas.getBody().c_str(),datas.getBody().size());
         ofile.close();
 
         return;

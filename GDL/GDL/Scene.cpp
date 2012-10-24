@@ -37,7 +37,8 @@ stopSoundsOnStartup(true),
 standardSortMethod(true),
 oglFOV(90.0f),
 oglZNear(1.0f),
-oglZFar(500.0f)
+oglZFar(500.0f),
+disableInputWhenNotFocused(true)
 #if defined(GD_IDE_ONLY)
 ,wasModified(false),
 compilationNeeded(true)
@@ -286,6 +287,7 @@ void Scene::SaveToXml(TiXmlElement * scene) const
     scene->SetDoubleAttribute( "oglZFar", oglZFar );
     scene->SetAttribute( "standardSortMethod", standardSortMethod ? "true" : "false" );
     scene->SetAttribute( "stopSoundsOnStartup", stopSoundsOnStartup ? "true" : "false" );
+    scene->SetAttribute( "disableInputWhenNotFocused", disableInputWhenNotFocused ? "true" : "false" );
     #if defined(GD_IDE_ONLY)
     TiXmlElement * settings = new TiXmlElement( "UISettings" );
     scene->LinkEndChild( settings );
@@ -352,6 +354,7 @@ void Scene::LoadFromXml(const TiXmlElement * elem)
     if ( elem->Attribute( "oglZFar" ) != NULL ) { elem->QueryFloatAttribute("oglZFar", &oglZFar); }
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("standardSortMethod", standardSortMethod);
     GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("stopSoundsOnStartup", stopSoundsOnStartup);
+    GD_CURRENT_ELEMENT_LOAD_ATTRIBUTE_BOOL("disableInputWhenNotFocused", disableInputWhenNotFocused);
 
     #if defined(GD_IDE_ONLY)
     associatedSettings.LoadFromXml(elem->FirstChildElement( "UISettings" ));
@@ -425,6 +428,7 @@ void Scene::Init(const Scene & scene)
     oglZNear = scene.oglZNear;
     oglZFar = scene.oglZFar;
     stopSoundsOnStartup = scene.stopSoundsOnStartup;
+    disableInputWhenNotFocused = scene.disableInputWhenNotFocused;
 
     #if defined(GD_IDE_ONLY)
     profiler = scene.profiler;

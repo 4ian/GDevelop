@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
 #include <iostream>
 #include <vector>
 #include <string>
@@ -13,14 +12,12 @@
 #include "GDL/SpriteObject.h"
 #include "GDL/Collisions.h"
 
-#ifndef PI
-#define PI (3.14159265358979323846)
-#endif
-#define RADIANS_PER_DEGREE (PI/180.0)
+namespace //Some private tools functions
+{
 
 sf::Vector2f GD_API RotatePoint( const sf::Vector2f& Point, float Angle )
 {
-    Angle = -Angle * RADIANS_PER_DEGREE;
+    Angle = -Angle * 3.14159265358979323846/180.0;
     sf::Vector2f RotatedPoint;
     RotatedPoint.x = Point.x * cos( Angle ) + Point.y * sin( Angle );
     RotatedPoint.y = -Point.x * sin( Angle ) + Point.y * cos( Angle );
@@ -49,33 +46,35 @@ inline float MaxValue( float a, float b, float c, float d )
     return max;
 }
 
+}
+
 sf::IntRect GetAABB( const sf::Sprite& Object )
 {
 
     //Get the top left corner of the sprite regardless of the sprite's center
     //This is in Global Coordinates so we can put the rectangle back into the right place
-    sf::Vector2f pos = Object.TransformToGlobal( sf::Vector2f( 0, 0 ) );
+    sf::Vector2f pos = Object.getTransform().transformPoint( 0,0 );
 
     //Store the size so we can calculate the other corners
-    sf::Vector2f size = Object.GetSize();
+    sf::FloatRect size = Object.getLocalBounds();
 
-    float Angle = Object.GetRotation();
+    float Angle = Object.getRotation();
 
     //Bail out early if the sprite isn't rotated
     if ( Angle == 0.0f )
     {
         return sf::IntRect( static_cast<int>( pos.x ),
                             static_cast<int>( pos.y ),
-                            static_cast<int>( size.x ), //4ian : Rect now uses width/height.
-                            static_cast<int>( size.y ) );
+                            static_cast<int>( size.width ),
+                            static_cast<int>( size.height ) );
     }
 
     //Calculate the other points as vectors from (0,0)
     //Imagine sf::Vector2f A(0,0); but its not necessary
     //as rotation is around this point.
-    sf::Vector2f B( size.x, 0 );
-    sf::Vector2f C( size.x, size.y );
-    sf::Vector2f D( 0, size.y );
+    sf::Vector2f B( size.width, 0 );
+    sf::Vector2f C( size.width, size.height );
+    sf::Vector2f D( 0, size.height );
 
     //Rotate the points to match the sprite rotation
     B = RotatePoint( B, Angle );
@@ -100,7 +99,8 @@ bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf:
 
     sf::IntRect Intersection;
 
-    if ( Object1AABB.Intersects( Object2AABB, Intersection ) )
+    //TODO : Use sf::Sprite::getGlobalBounds ?
+    if ( Object1AABB.intersects( Object2AABB, Intersection ) )
     {
 
         //We've got an intersection we need to process the pixels
@@ -113,31 +113,28 @@ bool PixelPerfectTest( const sf::Sprite& Object1, const sf::Sprite& Object2, sf:
         //Or Points outside the image.  We need to check for these as they print to the error console
         //which is slow, and then return black which registers as a hit.
 
-        sf::IntRect O1SubRect = Object1.GetSubRect();
-        sf::IntRect O2SubRect = Object2.GetSubRect();
-
-        sf::Vector2i O1SubRectSize( O1SubRect.Width, O1SubRect.Height );
-        sf::Vector2i O2SubRectSize( O2SubRect.Width, O2SubRect.Height );
+        sf::FloatRect O1SubRect = Object1.getLocalBounds();
+        sf::FloatRect O2SubRect = Object2.getLocalBounds();
 
         sf::Vector2f o1v;
         sf::Vector2f o2v;
         //Loop through our pixels
-        for ( int i = Intersection.Left; i < Intersection.Left+Intersection.Width; i++ ) //4ian : Rect now uses width/height.
+        for ( int i = Intersection.left; i < Intersection.left+Intersection.width; i++ ) //4ian : Rect now uses width/height.
         {
-            for ( int j = Intersection.Top; j < Intersection.Top+Intersection.Height; j++ ) //4ian : Rect now uses width/height.
+            for ( int j = Intersection.top; j < Intersection.top+Intersection.height; j++ ) //4ian : Rect now uses width/height.
             {
 
-                o1v = Object1.TransformToLocal( sf::Vector2f( i, j ) ); //Creating Objects each loop :(
-                o2v = Object2.TransformToLocal( sf::Vector2f( i, j ) );
+                o1v = Object1.getInverseTransform().transformPoint( i, j ); //Creating Objects each loop :(
+                o2v = Object2.getInverseTransform().transformPoint( i, j );
 
                 //Hack to make sure pixels fall within the Sprite's Image
                 if ( o1v.x > 0 && o1v.y > 0 && o2v.x > 0 && o2v.y > 0 &&
-                        o1v.x < Object1CollisionMask.GetWidth() && o1v.y < Object1CollisionMask.GetHeight() &&
-                        o2v.x < Object2CollisionMask.GetWidth() && o2v.y < Object2CollisionMask.GetHeight() )
+                        o1v.x < Object1CollisionMask.getSize().x && o1v.y < Object1CollisionMask.getSize().y &&
+                        o2v.x < Object2CollisionMask.getSize().x && o2v.y < Object2CollisionMask.getSize().y )
                 {
                     //If both sprites have opaque pixels at the same point we've got a hit
-                    if (( Object1CollisionMask.GetPixel( static_cast<int>( o1v.x ), static_cast<int>( o1v.y ) ).a > AlphaLimit ) &&
-                        ( Object2CollisionMask.GetPixel( static_cast<int>( o2v.x ), static_cast<int>( o2v.y ) ).a > AlphaLimit ) )
+                    if (( Object1CollisionMask.getPixel( static_cast<int>( o1v.x ), static_cast<int>( o1v.y ) ).a > AlphaLimit ) &&
+                        ( Object2CollisionMask.getPixel( static_cast<int>( o2v.x ), static_cast<int>( o2v.y ) ).a > AlphaLimit ) )
                     {
                         return true;
                     }

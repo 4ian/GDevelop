@@ -44,7 +44,7 @@ public:
     float GetRotation() const { return angle; };
 
     void SetViewCenter(const sf::Vector2f & newCenter);
-    const sf::Vector2f & GetViewCenter() const {return sfmlView.GetCenter(); };
+    const sf::Vector2f & GetViewCenter() const {return sfmlView.getCenter(); };
 
     /**
      * Provide a read only access to the sf::View associated with the camera.

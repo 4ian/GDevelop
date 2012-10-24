@@ -35,10 +35,10 @@ stepTime(50)
 
 void BaseProfiler::Update()
 {
-    if ( stepClock.GetElapsedTime() > stepTime )
+    if ( stepClock.getElapsedTime().asMilliseconds() > stepTime )
     {
         UpdateGUI();
-        stepClock.Reset();
+        stepClock.restart();
     }
 }
 

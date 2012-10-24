@@ -55,7 +55,7 @@ boost::shared_ptr<sf::Shader> ShaderManager::GetSFMLShader(const std::vector<std
     for (unsigned int i = 0;i<declarations.size();++i) shaderSource += declarations[i];
     shaderSource += "\nvoid main()\n{"+mainFunctions+"}";
     std::cout << "ShaderSource:" << shaderSource << std::endl;
-    shader->LoadFromMemory(shaderSource);
+    shader->loadFromMemory(shaderSource, sf::Shader::Fragment);
 
     alreadyLoadedShader[shaders] = shader;
 

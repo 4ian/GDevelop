@@ -233,13 +233,13 @@ void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
     if ( image == boost::shared_ptr<SFMLTextureWrapper>() )
         return;
 
-    scene.renderWindow->SetIcon(image->image.GetWidth(), image->image.GetHeight(), image->image.GetPixelsPtr());
+    scene.renderWindow->setIcon(image->image.getSize().x, image->image.getSize().y, image->image.getPixelsPtr());
 }
 
 void GD_API SetWindowTitle(RuntimeScene & scene, const std::string & newName)
 {
     scene.SetWindowDefaultTitle( newName );
-    if (scene.renderWindow != NULL) scene.renderWindow->SetTitle(scene.GetWindowDefaultTitle());
+    if (scene.renderWindow != NULL) scene.renderWindow->setTitle(scene.GetWindowDefaultTitle());
 }
 
 const std::string & GD_API GetWindowTitle(RuntimeScene & scene)
@@ -258,12 +258,12 @@ void GD_API SetWindowSize( RuntimeScene & scene, int windowWidth, int windowHeig
 
     if ( scene.RenderWindowIsFullScreen() )
     {
-        scene.renderWindow->Create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close | sf::Style::Fullscreen );
+        scene.renderWindow->create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close | sf::Style::Fullscreen );
         scene.ChangeRenderWindow(scene.renderWindow);
     }
     else
     {
-        scene.renderWindow->Create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close );
+        scene.renderWindow->create( sf::VideoMode( windowWidth, windowHeight, 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close );
         scene.ChangeRenderWindow(scene.renderWindow);
     }
     #endif
@@ -275,13 +275,13 @@ void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen)
     if ( fullscreen && !scene.RenderWindowIsFullScreen() )
     {
         scene.SetRenderWindowIsFullScreen();
-        scene.renderWindow->Create( sf::VideoMode( scene.game->GetMainWindowDefaultWidth(), scene.game->GetMainWindowDefaultHeight(), 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close | sf::Style::Fullscreen );
+        scene.renderWindow->create( sf::VideoMode( scene.game->GetMainWindowDefaultWidth(), scene.game->GetMainWindowDefaultHeight(), 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close | sf::Style::Fullscreen );
         scene.ChangeRenderWindow(scene.renderWindow);
     }
     else if ( !fullscreen && scene.RenderWindowIsFullScreen() )
     {
         scene.SetRenderWindowIsFullScreen(false);
-        scene.renderWindow->Create( sf::VideoMode( scene.game->GetMainWindowDefaultWidth(), scene.game->GetMainWindowDefaultHeight(), 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close );
+        scene.renderWindow->create( sf::VideoMode( scene.game->GetMainWindowDefaultWidth(), scene.game->GetMainWindowDefaultHeight(), 32 ), scene.GetWindowDefaultTitle(), sf::Style::Close );
         scene.ChangeRenderWindow(scene.renderWindow);
     }
     #endif
@@ -289,7 +289,7 @@ void GD_API SetFullScreen(RuntimeScene & scene, bool fullscreen)
 unsigned int GD_API GetSceneWindowWidth(RuntimeScene & scene)
 {
     if ( scene.renderWindow != NULL )
-        return scene.renderWindow->GetWidth();
+        return scene.renderWindow->getSize().x;
 
     return 0;
 }
@@ -297,48 +297,53 @@ unsigned int GD_API GetSceneWindowWidth(RuntimeScene & scene)
 unsigned int GD_API GetSceneWindowHeight(RuntimeScene & scene)
 {
     if ( scene.renderWindow != NULL )
-        return scene.renderWindow->GetHeight();
+        return scene.renderWindow->getSize().y;
 
     return 0;
 }
 
 unsigned int GD_API GetScreenWidth()
 {
-    sf::VideoMode videoMode = sf::VideoMode::GetDesktopMode();
+    sf::VideoMode videoMode = sf::VideoMode::getDesktopMode();
 
-    return videoMode.Width;
+    return videoMode.width;
 }
 
 unsigned int GD_API GetScreenHeight()
 {
-    sf::VideoMode videoMode = sf::VideoMode::GetDesktopMode();
+    sf::VideoMode videoMode = sf::VideoMode::getDesktopMode();
 
-    return videoMode.Height;
+    return videoMode.height;
 }
 
 unsigned int GD_API GetScreenColorDepth()
 {
-    sf::VideoMode videoMode = sf::VideoMode::GetDesktopMode();
+    sf::VideoMode videoMode = sf::VideoMode::getDesktopMode();
 
-    return videoMode.BitsPerPixel;
+    return videoMode.bitsPerPixel;
 }
 
 void GD_API DisplayLegacyTextOnScene( RuntimeScene & scene, const std::string & str, float x, float y, const std::string & color, float characterSize, const std::string & fontName, const std::string & layer)
 {
     Text texte;
-    texte.text.SetString(str);
-    texte.text.SetPosition(x, y);
+    texte.text.setString(str);
+    texte.text.setPosition(x, y);
 
     vector < string > colors = SplitString <string> (color, ';');
-    if ( colors.size() > 2 ) texte.text.SetColor(sf::Color(ToInt(colors[0]), ToInt(colors[1]),ToInt(colors[2]) ));
+    if ( colors.size() > 2 ) texte.text.setColor(sf::Color(ToInt(colors[0]), ToInt(colors[1]),ToInt(colors[2]) ));
 
-    texte.text.SetCharacterSize(characterSize);
+    texte.text.setCharacterSize(characterSize);
     texte.fontName = fontName;
     texte.layer = layer;
 
     scene.DisplayText(texte);
 
     return;
+}
+
+void GD_API DisableInputWhenFocusIsLost( RuntimeScene & scene, bool disable )
+{
+    scene.DisableInputWhenFocusIsLost(disable);
 }
 
 #if defined(GD_IDE_ONLY)

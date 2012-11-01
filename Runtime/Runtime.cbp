@@ -242,6 +242,7 @@
 					<Add option="-lGLU" />
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
+					<Add option="-Wl,-rpath=&apos;$$ORIGIN/.&apos;" />
 					<Add directory="bin\release" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>
@@ -285,6 +286,7 @@
 					<Add option="-lpthread" />
 					<Add option="-g" />
 					<Add option="-pg" />
+					<Add option="-Wl,-rpath=&apos;$$ORIGIN/.&apos;" />
 					<Add directory="bin\debug" />
 					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
 				</Linker>

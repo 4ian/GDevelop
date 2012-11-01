@@ -29,6 +29,7 @@
 #include "CompilationChecker.h"
 #include "GDL/Log.h"
 #include "GDL/Tools/AES.h"
+#include "GDL/tinyxml/tinyxml.h"
 
 #include <time.h>
 #include <stdlib.h>
@@ -79,32 +80,30 @@ int main( int argc, char *p_argv[] )
     RuntimeGame game;
 
     //Display optional loading screen
-    OpenSaveLoadingScreen openLS(game.loadingScreen);
-    openLS.OpenFromString(resLoader->LoadPlainText( "loadingscreen" ));
+    OpenSaveLoadingScreen::OpenFromString(game.loadingScreen, resLoader->LoadPlainText( "loadingscreen" ));
 
     unsigned long style = 0;
     if ( game.loadingScreen.border ) style |= sf::Style::Titlebar;
     sf::RenderWindow loadingApp( sf::VideoMode( game.loadingScreen.width, game.loadingScreen.height, 32 ), "Chargement en cours...", style );
-    loadingApp.Show(game.loadingScreen.afficher);
-    loadingApp.Clear( sf::Color( 100, 100, 100 ) );
+    loadingApp.setVisible(game.loadingScreen.afficher);
+    loadingApp.clear( sf::Color( 100, 100, 100 ) );
 
     boost::shared_ptr<sf::Texture> image = boost::shared_ptr<sf::Texture>(resLoader->LoadSFMLTexture( game.loadingScreen.imageFichier ));
-    if ( !game.loadingScreen.smooth ) image->SetSmooth(false);
+    if ( !game.loadingScreen.smooth ) image->setSmooth(false);
 
     sf::Sprite sprite( *image );
     if ( game.loadingScreen.image )
     {
-        loadingApp.Draw( sprite );
+        loadingApp.draw( sprite );
     }
     if ( game.loadingScreen.texte )
     {
-        sf::Text Chargement( game.loadingScreen.texteChargement, *FontManager::GetInstance()->GetFont("") );
-        Chargement.SetPosition( game.loadingScreen.texteXPos, game.loadingScreen.texteYPos );
-        loadingApp.Draw( Chargement );
+        sf::Text loadingText( game.loadingScreen.texteChargement, *FontManager::GetInstance()->GetFont("") );
+        loadingText.setPosition( game.loadingScreen.texteXPos, game.loadingScreen.texteYPos );
+        loadingApp.draw( loadingText );
     }
-    loadingApp.Display();
+    loadingApp.display();
 
-    OpenSaveGame openGame( game );
     {
         cout << "Getting src file size..." << endl;
         int fsize = resLoader->GetBinaryFileSize( "src" );
@@ -127,8 +126,16 @@ int main( int argc, char *p_argv[] )
         string uncryptedSrc = obuffer;
         delete [] obuffer;
 
-        cout << "Loading game info..." << endl;
-        openGame.OpenFromString(uncryptedSrc);
+        cout << "Loading game data..." << endl;
+        TiXmlDocument doc;
+        if ( !doc.Parse(uncryptedSrc.c_str()) )
+        {
+            cout << "Unable to parser game data!" << endl;
+            return EXIT_FAILURE;
+        }
+
+        TiXmlHandle hdl(&doc);
+        game.LoadFromXml(hdl.FirstChildElement().Element());
 	}
 
     if ( game.GetLayouts().empty() )
@@ -164,25 +171,25 @@ int main( int argc, char *p_argv[] )
     game.imageManager->SetGame( &game );
     game.imageManager->LoadPermanentImages();
 
-    loadingApp.Close();
+    loadingApp.close();
 
     //Fenêtre de jeu
     sf::RenderWindow window;
-    window.SetFramerateLimit( game.GetMaximumFPS() );
-    window.EnableVerticalSync( game.IsVerticalSynchronizationEnabledByDefault() );
+    window.setFramerateLimit( game.GetMaximumFPS() );
+    window.setVerticalSyncEnabled( game.IsVerticalSynchronizationEnabledByDefault() );
 
     RuntimeScene scenePlayed(&window, &game);
     if ( !scenePlayed.LoadFromScene( *game.GetLayouts()[0] ) )
         std::cout << "Unable to load first scene." << std::endl;
 
-    window.Create( sf::VideoMode( game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32 ), scenePlayed.GetWindowDefaultTitle(), sf::Style::Close );
-    window.SetActive(true);
+    window.create( sf::VideoMode( game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32 ), scenePlayed.GetWindowDefaultTitle(), sf::Style::Close );
+    window.setActive(true);
     scenePlayed.ChangeRenderWindow(&window);
 
     //Boucle de jeu
     while ( scenePlayed.running )
     {
-        int returnCode = scenePlayed.RenderAndStep(1);
+        int returnCode = scenePlayed.RenderAndStep();
 
         if ( returnCode == -2 ) //Quitter le jeu
             scenePlayed.running = false;

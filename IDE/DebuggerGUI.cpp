@@ -245,7 +245,7 @@ void DebuggerGUI::OnPauseBtClick(wxCommandEvent& event)
 }
 void DebuggerGUI::OnStepBtClick(wxCommandEvent& event)
 {
-    scene.RenderAndStep(1);
+    scene.RenderAndStep();
     scene.running = false;
 }
 
@@ -285,13 +285,13 @@ void DebuggerGUI::UpdateGUI()
         return;
 
     //General tab
-    generalList->SetItem(0, 1, ToString(1000.0/scene.GetElapsedTime())+_(" fps"));
-    generalList->SetItem(1, 1, ToString(static_cast<double>(scene.GetElapsedTime())/1000.0)+"s");
+    generalList->SetItem(0, 1, ToString(1000000.0/static_cast<double>(scene.GetElapsedTime()))+_(" fps"));
+    generalList->SetItem(1, 1, ToString(static_cast<double>(scene.GetElapsedTime())/1000.0)+"ms");
     generalList->SetItem(2, 1, ToString(scene.objectsInstances.GetAllObjects().size()));
     //TODO //generalList->SetItem(3, 1, ToString(scene.game->resourcesManager.resources.size()));
     generalList->SetItem(4, 1, ToString(scene.game->GetMainWindowDefaultWidth())+"*"+ToString(scene.game->GetMainWindowDefaultHeight()));
     generalList->SetItem(5, 1, ToString(sf::Mouse::getPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::getPosition(*scene.renderWindow).y));
-    generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000.0)+"s");
+    generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
 
     const vector < Variable > sceneVariables = scene.GetVariables().GetVariablesVector();
     const vector < Variable > gameVariables = scene.game->GetVariables().GetVariablesVector();

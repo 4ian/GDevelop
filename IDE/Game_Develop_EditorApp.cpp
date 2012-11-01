@@ -174,6 +174,18 @@ bool Game_Develop_EditorApp::OnInit()
         else
             parser.Found( wxT("lang"), &wantedLanguage);
 
+        //If SelectLanguage.cfg file exists, then read the language from it
+        if ( wxFileExists(ConfigPath+"SelectLanguage.cfg") )
+        {
+            wxTextFile languageFile;
+            languageFile.Open(ConfigPath+"SelectLanguage.cfg");
+
+            wantedLanguage = languageFile.GetFirstLine();
+            languageFile.Close();
+
+            wxRemoveFile(ConfigPath+"SelectLanguage.cfg");
+        }
+
         //Retrieve languages files
         std::vector <std::string> languagesAvailables;
         wxDir dir(wxGetCwd()+"/locale/");

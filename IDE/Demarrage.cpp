@@ -285,8 +285,17 @@ void Demarrage::OnFermerBtClick(wxCommandEvent& event)
 
 void Demarrage::OnTutorielBtClick(wxCommandEvent& event)
 {
-    wxString link = wxGetCwd() + "/Tutorial/"+_("Tutorial.pdf");
-    wxString mimetype = "application/pdf";
+    wxString link = _("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials");
+    wxString mimetype = wxEmptyString;
+    if (link.StartsWith (_T("http://"))) {
+        mimetype = _T("text/html");
+    }else if (link.StartsWith (_T("ftp://"))) {
+        mimetype = _T("text/html");
+    }else if (link.StartsWith (_T("mailto:"))) {
+        mimetype = _T("message/rfc822");
+    }else{
+        return;
+    }
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {
         wxString cmd;

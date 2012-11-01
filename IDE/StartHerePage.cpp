@@ -346,8 +346,17 @@ void StartHerePage::OnguideBtClick(wxCommandEvent& event)
 
 void StartHerePage::OntutoBtClick(wxCommandEvent& event)
 {
-    wxString link = wxGetCwd() + "/Tutorial/"+_("Tutorial.pdf");
-    wxString mimetype = "application/pdf";
+    wxString link = _("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials");
+    wxString mimetype = wxEmptyString;
+    if (link.StartsWith (_T("http://"))) {
+        mimetype = _T("text/html");
+    }else if (link.StartsWith (_T("ftp://"))) {
+        mimetype = _T("text/html");
+    }else if (link.StartsWith (_T("mailto:"))) {
+        mimetype = _T("message/rfc822");
+    }else{
+        return;
+    }
     wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
     if (filetype) {
         wxString cmd;
@@ -357,27 +366,10 @@ void StartHerePage::OntutoBtClick(wxCommandEvent& event)
         }
         delete filetype;
     }
-    else
-        wxLogMessage(_("Unable to launch the tutorial. Tutorials can be found in the directoy called \"Tutorial\", inside Game Develop directory."));
 }
 
 void StartHerePage::OnTutorial2BtClick(wxCommandEvent& event)
 {
-    if ( _("Spanish Tutorial.pdf") == "" ) return;
-
-    wxString link = wxGetCwd() + "/Tutorial/"+_("Spanish Tutorial.pdf");
-    wxString mimetype = "application/pdf";
-    wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
-    if (filetype) {
-        wxString cmd;
-        if (filetype->GetOpenCommand (&cmd, wxFileType::MessageParameters (link))) {
-            cmd.Replace(_T("file://"), wxEmptyString);
-            ::wxExecute(cmd);
-        }
-        delete filetype;
-    }
-    else
-        wxLogMessage(_("Unable to launch the tutorial. Tutorials can be found in the directoy called \"Tutorial\", inside Game Develop directory."));
 }
 
 void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)

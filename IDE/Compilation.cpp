@@ -227,6 +227,8 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
         return;
     }
 
+    gameToCompile.SetLastCompilationDirectory(ToString(dirEdit->GetValue()));
+
     wxString tempDir;
     wxConfigBase::Get()->Read( _T( "/Dossier/Compilation" ), &tempDir );
 
@@ -244,10 +246,7 @@ void Compilation::OnCompilBtClick( wxCommandEvent& event )
 
 void Compilation::OnAideBtClick( wxCommandEvent& event )
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(125);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/distribution/compilation"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/distribution/compilation"));
 }
 
 void Compilation::OnbrowseBtClick(wxCommandEvent& event)

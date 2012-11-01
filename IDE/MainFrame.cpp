@@ -455,7 +455,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     m_mgr.AddPane( Panel1, wxAuiPaneInfo().Name( wxT( "EP" ) ).Caption( _( "Main editor" ) ).Center().CaptionVisible(false).CloseButton( false ).MaximizeButton( true ).MinimizeButton( false ) );
     m_mgr.AddPane( m_ribbon, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ribbon" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).Resizable(false) );
     m_mgr.AddPane( buildToolsPnl, wxAuiPaneInfo().Name( wxT( "CT" ) ).Caption( _( "Compilation tools" ) ).Bottom().MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(120,130));
-    m_mgr.AddPane( projectPropertiesPnl, wxAuiPaneInfo().Name( wxT( "PP" ) ).Caption( _( "Project properties" ) ).Show(false) );
+    m_mgr.AddPane( projectPropertiesPnl, wxAuiPaneInfo().Name( wxT( "PP" ) ).Caption( _( "Project properties" ) ).Float().Show(false) );
 
     wxString result;
     pConfig->Read( _T( "/Workspace/Actuel" ), &result );

@@ -360,7 +360,7 @@ void SceneCanvas::Refresh()
         //Then display the scene
         if ( previewData.scene.running ) //At runtime
         {
-            int retourEvent = previewData.scene.RenderAndStep(1);
+            int retourEvent = previewData.scene.RenderAndStep();
 
             if ( retourEvent == -2 )
                 mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the game will quit." ));

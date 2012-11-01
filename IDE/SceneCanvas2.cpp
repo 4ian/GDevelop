@@ -10,6 +10,7 @@
 #include <SFML/Graphics.hpp>
 #include <wx/scrolbar.h>
 #include <wx/config.h>
+#include "GDL/FontManager.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
@@ -45,6 +46,7 @@ SceneCanvas::SceneCanvas( wxWindow* parent, RuntimeGame & game_, Scene & scene_,
     reloadingText.setColor(sf::Color(0,0,0,128));
     reloadingText.setString(string(_("Compiling...").mb_str()));
     reloadingText.setCharacterSize(40);
+    reloadingText.setFont(*FontManager::GetInstance()->GetFont(""));
 
     setView( editionData.view );
     editionData.view.setCenter( (gameEdited.GetMainWindowDefaultWidth()/2),(gameEdited.GetMainWindowDefaultHeight()/2));
@@ -381,9 +383,9 @@ void SceneCanvas::OnAnyMouseEvent( wxMouseEvent & event )
     {
         sf::Event myEvent;
         if ( event.ButtonDown() )
-            myEvent.Type = sf::Event::MouseButtonPressed;
+            myEvent.type = sf::Event::MouseButtonPressed;
         else if ( event.ButtonUp() )
-            myEvent.Type = sf::Event::MouseButtonReleased;
+            myEvent.type = sf::Event::MouseButtonReleased;
         myEvent.mouseButton.x = event.GetX();
         myEvent.mouseButton.y = event.GetY();
 

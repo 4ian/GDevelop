@@ -30,7 +30,7 @@ class BaseProfiler;
  * \brief Represents a scene being played.
  *
  * A RuntimeScene is used when a game is played.
- * It contains everything a scene provide, but also specific
+ * It contains everything a- scene provide, but also specific
  * functions and members for runtime ( Render functions, objects instances, variables... )
  *
  * \ingroup GameEngine
@@ -130,7 +130,7 @@ public:
      * Render and play the scene one frame.
      * \return -1 for doing nothing, -2 to quit the game, another number to change the scene
      */
-    int RenderAndStep(unsigned int nbStep);
+    int RenderAndStep();
 
     /**
      * Just render a frame.
@@ -148,14 +148,14 @@ public:
     inline double GetTimeScale() const { return timeScale; };
 
     /**
-     * Get elapsed time since last frame, in milliseconds.
+     * Get elapsed time since last frame, in microseconds.
      */
-    inline unsigned int GetElapsedTime() const { return elapsedTime; };
+    inline signed long long GetElapsedTime() const { return elapsedTime; };
 
     /**
-     * Get time elapsed since beginning, in milliseconds.
+     * Get time elapsed since beginning, in microseconds.
      */
-    inline unsigned int GetTimeFromStart() const { return timeFromStart; };
+    inline signed long long GetTimeFromStart() const { return timeFromStart; };
 
     /**
      * Return true if the scene was just rendered once.
@@ -164,9 +164,9 @@ public:
 
     /**
      * Notify the scene that something ( Like an open file dialog ) stopped scene rendering for a certain amount of time.
-     * \param Pause duration, in milliseconds.
+     * \param Pause duration, in microseconds.
      */
-    void NotifyPauseWasMade(unsigned int pauseTime_) { pauseTime += pauseTime_; }
+    void NotifyPauseWasMade(signed long long pauseTime_) { pauseTime += pauseTime_; }
 
     void ManageRenderTargetEvents();
 
@@ -204,11 +204,11 @@ protected:
     bool                                    firstLoop; ///<true if the scene was just rendered once.
     bool                                    isFullScreen; ///< As sf::RenderWindow can't say if it is fullscreen or not
     std::vector<sf::Event>                  renderTargetEvents;
-    unsigned int                            realElapsedTime; ///< Elpased time since last frame, in milliseconds, without taking time scale in account.
-    unsigned int                            elapsedTime; ///< Elpased time since last frame, in milliseconds
+    signed int                              realElapsedTime; ///< Elapsed time since last frame, in microseconds, without taking time scale in account.
+    signed int                              elapsedTime; ///< Elapsed time since last frame, in microseconds ( elapsedTime = realElapsedTime*timeScale ).
     double                                  timeScale; ///< Time scale
-    unsigned int                            timeFromStart; ///< Time in milliseconds elapsed from start
-    unsigned int                            pauseTime;
+    signed long long                        timeFromStart; ///< Time in microseconds elapsed from start.
+    signed long long                        pauseTime; ///< Time to be subtracted to realElapsedTime for the current frame.
     int                                     specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
     ListVariable                            variables; ///<List of the scene variables
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.

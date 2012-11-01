@@ -245,7 +245,7 @@ float SpriteObject::GetDrawableX() const
     //FIXME (The not commented code is correct but not optimal)
     //Bad placement when origine of sf::Sprite is changed ( for automatic Rotation for example )
     //return GetCurrentSFMLSprite().GetPosition().x;
-    return X - GetCurrentSprite().GetOrigine().GetX() + (GetCurrentSFMLSprite().getLocalBounds().width)*(1-scaleX)/2;
+    return X - GetCurrentSprite().GetOrigine().GetX() + (GetCurrentSFMLSprite().getLocalBounds().width)*(1-std::abs(scaleX))/2;
 }
 
 /**
@@ -254,7 +254,7 @@ float SpriteObject::GetDrawableX() const
 float SpriteObject::GetDrawableY() const
 {
     //return GetCurrentSFMLSprite().GetPosition().y;
-    return Y - GetCurrentSprite().GetOrigine().GetY() + (GetCurrentSFMLSprite().getLocalBounds().height)*(1-scaleY)/2;
+    return Y - GetCurrentSprite().GetOrigine().GetY() + (GetCurrentSFMLSprite().getLocalBounds().height)*(1-std::abs(scaleY))/2;
 }
 
 /**

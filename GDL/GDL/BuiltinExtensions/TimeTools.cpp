@@ -2,7 +2,7 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/ManualTimer.h"
 
-bool GD_API TimerElapsedTime( RuntimeScene & scene, float time, const std::string & timerName )
+bool GD_API TimerElapsedTime( RuntimeScene & scene, double time, const std::string & timerName )
 {
     if ( timerName.empty() ) return false;
 
@@ -12,7 +12,7 @@ bool GD_API TimerElapsedTime( RuntimeScene & scene, float time, const std::strin
         //On cherche le nom du timer
         if ( scene.timers[i].GetName() == timerName )
         {
-            return ( scene.timers[i].GetTime() >= time*1000.0 );
+            return ( scene.timers[i].GetTime() >= time*1000000.0 );
         }
 
     }
@@ -28,7 +28,7 @@ double GD_API GetTimerElapsedTimeInSeconds( RuntimeScene & scene, const std::str
     {
         if ( scene.timers[i].GetName() == timerName )
         {
-            return ( scene.timers[i].GetTime()/1000.0 );
+            return ( static_cast<double>(scene.timers[i].GetTime())/1000000.0 );
         }
     }
 
@@ -150,7 +150,7 @@ void GD_API SetTimeScale( RuntimeScene & scene, double value )
 
 double GD_API GetElapsedTimeInSeconds(RuntimeScene & scene)
 {
-    return scene.GetElapsedTime()/1000.0;
+    return scene.GetElapsedTime()/1000000.0;
 }
 
 double GD_API GetTimeFromStartInSeconds(RuntimeScene & scene)

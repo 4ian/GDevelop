@@ -101,8 +101,8 @@ void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, const std::stri
     //Prise en compte des déplacements de l'objet
     if ( anticipateObjectMove )
     {
-        decalementX = ( object->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000.0f );
-        decalementY = ( object->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000.0f );
+        decalementX = ( object->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
+        decalementY = ( object->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
     }
 
     //Si on est dans le cadre
@@ -147,8 +147,8 @@ void GD_API CenterCameraOnObject(RuntimeScene & scene, const std::string &, Obje
     //Prise en compte des déplacements de l'objet
     if ( anticipateObjectMove )
     {
-        decalementX = ( object->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000.0f );
-        decalementY = ( object->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000.0f );
+        decalementX = ( object->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
+        decalementY = ( object->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
     }
 
     scene.GetLayer(layer).GetCamera(camera).SetViewCenter(sf::Vector2f(object->GetX() + decalementX, object->GetY() + decalementY));

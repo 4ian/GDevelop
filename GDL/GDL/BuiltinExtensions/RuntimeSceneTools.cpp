@@ -68,10 +68,10 @@ void GD_API MoveObjects( RuntimeScene & scene )
 
     for (unsigned int id = 0;id < allObjects.size();++id)
     {
-        allObjects[id]->SetX( allObjects[id]->GetX() + allObjects[id]->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000.0f );
-        allObjects[id]->SetY( allObjects[id]->GetY() + allObjects[id]->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000.0f );
+        allObjects[id]->SetX( allObjects[id]->GetX() + allObjects[id]->TotalForceX() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
+        allObjects[id]->SetY( allObjects[id]->GetY() + allObjects[id]->TotalForceY() * static_cast<double>(scene.GetElapsedTime())/1000000.0 );
 
-        allObjects[id]->UpdateForce( static_cast<double>(scene.GetElapsedTime())/1000.0f );
+        allObjects[id]->UpdateForce( static_cast<double>(scene.GetElapsedTime())/1000000.0 );
     }
 
     return;

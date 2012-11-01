@@ -1,12 +1,15 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
 #ifndef MANUALTIMER_H
 #define MANUALTIMER_H
 #include <string>
 
-using namespace std;
 /**
  * \brief Manual timer updated using ManualTimer::UpdateTime member function.
  *
- *  A manual timer is a timer which is updated manually by calling UpdateTime.
+ *  A manual timer is a timer which is updated manually by calling ManualTimer::UpdateTime.
  *
  * \ingroup GameEngine
  */
@@ -32,9 +35,9 @@ class GD_API ManualTimer
 
         /**
          * Update the time of the timer
-         * @param time_ Time to add in milliseconds
+         * @param time_ Time to add in microseconds
          */
-        inline void UpdateTime(float time_) { if (!isPaused) time += time_; };
+        inline void UpdateTime(signed long long time_) { if (!isPaused) time += time_; };
 
         /**
          * Reset time to zero.
@@ -42,17 +45,17 @@ class GD_API ManualTimer
         inline void Reset() { time = 0; };
 
         /**
-         * Get the current time elapsed, in milliseconds.
+         * Get the current time elapsed, in microseconds.
          * @return Time elapsed
          */
-        inline float GetTime() const { return time; };
+        inline signed long long GetTime() const { return time; };
 
         /**
          * Change the timer's value.
          *
          * \param newTime The timer's new value
          */
-        inline void SetTime(float newTime) { time = newTime; };
+        inline void SetTime(signed long long newTime) { time = newTime; };
 
         /**
          * Get the paused state of the timer.
@@ -66,11 +69,10 @@ class GD_API ManualTimer
          */
         inline void SetPaused(bool newState = true) { isPaused = newState; };
 
-    protected:
     private:
 
         std::string name; ///< The name of the timer
-        unsigned int time; ///< Time elapsed in milliseconds
+        signed long long time; ///< Time elapsed in microseconds
         bool isPaused; ///< True if timer is paused
 };
 

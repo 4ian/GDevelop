@@ -55,7 +55,7 @@ public:
     void Reset();
 
 protected:
-    sf::Uint32 stepTime; ///< Time between each UpdateGUI.
+    sf::Uint32 stepTime; ///< Time between each UpdateGUI, in milliseconds.
 
     /**
      * Redefine this function so as to update GUI.

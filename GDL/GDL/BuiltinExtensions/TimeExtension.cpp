@@ -201,7 +201,7 @@ void TimeExtension::GetPropertyForDebugger(RuntimeScene & scene, unsigned int pr
     if ( propertyNb < scene.timers.size() )
     {
         name = scene.timers[propertyNb].GetName();
-        value = ToString(static_cast<double>(scene.timers[propertyNb].GetTime())/1000.0)+"s";
+        value = ToString(static_cast<double>(scene.timers[propertyNb].GetTime())/1000000.0)+"s";
 
         return;
     }
@@ -211,7 +211,7 @@ bool TimeExtension::ChangeProperty(RuntimeScene & scene, unsigned int propertyNb
 {
     if ( propertyNb < scene.timers.size() )
     {
-        scene.timers[propertyNb].SetTime(ToFloat(newValue)*1000.0);
+        scene.timers[propertyNb].SetTime(ToDouble(newValue)*1000000.0);
 
         return true;
     }

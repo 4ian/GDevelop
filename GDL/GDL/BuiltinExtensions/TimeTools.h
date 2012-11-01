@@ -4,7 +4,7 @@
 #include <string>
 class RuntimeScene;
 
-bool GD_API TimerElapsedTime( RuntimeScene & scene, float time, const std::string & timerName );
+bool GD_API TimerElapsedTime( RuntimeScene & scene, double time, const std::string & timerName );
 bool GD_API TimerPaused( RuntimeScene & scene, const std::string & timerName );
 double GD_API GetTimeScale( RuntimeScene & scene );
 double GD_API GetTimerElapsedTimeInSeconds( RuntimeScene & scene, const std::string & timerName );

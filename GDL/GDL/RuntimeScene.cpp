@@ -183,95 +183,92 @@ void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, in
 }
 #endif
 
-int RuntimeScene::RenderAndStep(unsigned int nbStep)
+int RuntimeScene::RenderAndStep()
 {
 #if !defined(RELEASE)
     BT_PROFILE("RenderAndStep");
 #endif
 
-    for (unsigned int step = 0;step<nbStep;++step)
+    //Gestion pré-évènements
     {
-        //Gestion pré-évènements
-        {
 #if !defined(RELEASE)
-            BT_PROFILE("ManageRenderTargetEvents");
+        BT_PROFILE("ManageRenderTargetEvents");
 #endif
-            ManageRenderTargetEvents();
-        }
-        {
-#if !defined(RELEASE)
-            BT_PROFILE("UpdateTime");
-#endif
-            UpdateTime();
-        }
-        {
-#if !defined(RELEASE)
-            BT_PROFILE("ManageObjectsBeforeEvents");
-#endif
-            ManageObjectsBeforeEvents();
-        }
-        SoundManager::GetInstance()->ManageGarbage();
-
-        #if defined(GD_IDE_ONLY)
-        if( profiler )
-        {
-            if ( firstLoop ) profiler->Reset();
-            profiler->eventsClock.reset();
-        }
-        #endif
-
-        {
-#if !defined(RELEASE)
-            BT_PROFILE("Events");
-#endif
-            codeExecutionEngine->Execute();
-        }
-
-        #if defined(GD_IDE_ONLY)
-        if( profiler && profiler->profilingActivated )
-        {
-            profiler->lastEventsTime = profiler->eventsClock.getTimeMicroseconds();
-            profiler->renderingClock.reset();
-        }
-        #endif
-
-        //Gestions post-évènement
-        {
-#if !defined(RELEASE)
-            BT_PROFILE("ManageObjectsAfterEvents");
-#endif
-            ManageObjectsAfterEvents();
-        }
-
-        #if defined(GD_IDE_ONLY)
-        if( debugger )
-        {
-            BT_PROFILE("Debugger");
-            debugger->Update();
-        }
-        #endif
-
-        //Rendering
-        {
-#if !defined(RELEASE)
-            BT_PROFILE("Rendering");
-#endif
-            Render();
-            textes.clear(); //Legacy texts
-        }
-
-        #if defined(GD_IDE_ONLY)
-        if( profiler && profiler->profilingActivated )
-        {
-            profiler->lastRenderingTime = profiler->renderingClock.getTimeMicroseconds();
-            profiler->totalSceneTime += profiler->lastRenderingTime + profiler->lastEventsTime;
-            profiler->totalEventsTime += profiler->lastEventsTime;
-            profiler->Update();
-        }
-        #endif
-
-        if ( firstLoop ) firstLoop = false; //The first frame is passed
+        ManageRenderTargetEvents();
     }
+    {
+#if !defined(RELEASE)
+        BT_PROFILE("UpdateTime");
+#endif
+        UpdateTime();
+    }
+    {
+#if !defined(RELEASE)
+        BT_PROFILE("ManageObjectsBeforeEvents");
+#endif
+        ManageObjectsBeforeEvents();
+    }
+    SoundManager::GetInstance()->ManageGarbage();
+
+    #if defined(GD_IDE_ONLY)
+    if( profiler )
+    {
+        if ( firstLoop ) profiler->Reset();
+        profiler->eventsClock.reset();
+    }
+    #endif
+
+    {
+#if !defined(RELEASE)
+        BT_PROFILE("Events");
+#endif
+        codeExecutionEngine->Execute();
+    }
+
+    #if defined(GD_IDE_ONLY)
+    if( profiler && profiler->profilingActivated )
+    {
+        profiler->lastEventsTime = profiler->eventsClock.getTimeMicroseconds();
+        profiler->renderingClock.reset();
+    }
+    #endif
+
+    //Gestions post-évènement
+    {
+#if !defined(RELEASE)
+        BT_PROFILE("ManageObjectsAfterEvents");
+#endif
+        ManageObjectsAfterEvents();
+    }
+
+    #if defined(GD_IDE_ONLY)
+    if( debugger )
+    {
+        BT_PROFILE("Debugger");
+        debugger->Update();
+    }
+    #endif
+
+    //Rendering
+    {
+#if !defined(RELEASE)
+        BT_PROFILE("Rendering");
+#endif
+        Render();
+        textes.clear(); //Legacy texts
+    }
+
+    #if defined(GD_IDE_ONLY)
+    if( profiler && profiler->profilingActivated )
+    {
+        profiler->lastRenderingTime = profiler->renderingClock.getTimeMicroseconds();
+        profiler->totalSceneTime += profiler->lastRenderingTime + profiler->lastEventsTime;
+        profiler->totalEventsTime += profiler->lastEventsTime;
+        profiler->Update();
+    }
+    #endif
+
+    firstLoop = false; //The first frame was rendered
 
     return specialAction;
 }
@@ -402,12 +399,12 @@ void RuntimeScene::Render()
 bool RuntimeScene::UpdateTime()
 {
     //Update time elapsed since last frame
-    realElapsedTime = clock.restart().asMilliseconds();
+    realElapsedTime = clock.restart().asMicroseconds();
     realElapsedTime -= pauseTime; //On enlève le temps de pause
 
     //On modifie ce temps écoulé si il est trop bas.
-    if ( game->GetMinimumFPS() != 0 && realElapsedTime > 1000.0/static_cast<double>(game->GetMinimumFPS()) )
-        realElapsedTime = 1000.0/static_cast<double>(game->GetMinimumFPS()); //On ralentit le jeu si les FPS sont trop bas.
+    if ( game->GetMinimumFPS() != 0 && realElapsedTime > 1000000.0/static_cast<double>(game->GetMinimumFPS()) )
+        realElapsedTime = 1000000.0/static_cast<double>(game->GetMinimumFPS()); //On ralentit le jeu si les FPS sont trop bas.
 
     elapsedTime = realElapsedTime*timeScale; //Le temps écoulé par le jeu est modifié suivant l'échelle du temps
 
@@ -468,10 +465,10 @@ void RuntimeScene::ManageObjectsAfterEvents()
     allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
     {
-        allObjects[id]->SetX( allObjects[id]->GetX() + ( allObjects[id]->TotalForceX() * static_cast<double>(GetElapsedTime())/1000.0f ));
-        allObjects[id]->SetY( allObjects[id]->GetY() + ( allObjects[id]->TotalForceY() * static_cast<double>(GetElapsedTime())/1000.0f ));
-        allObjects[id]->UpdateTime( static_cast<double>(GetElapsedTime())/1000.0f );
-        allObjects[id]->UpdateForce( static_cast<double>(GetElapsedTime())/1000.0f );
+        allObjects[id]->SetX( allObjects[id]->GetX() + ( allObjects[id]->TotalForceX() * static_cast<double>(GetElapsedTime())/1000000.0 ));
+        allObjects[id]->SetY( allObjects[id]->GetY() + ( allObjects[id]->TotalForceY() * static_cast<double>(GetElapsedTime())/1000000.0 ));
+        allObjects[id]->UpdateTime( static_cast<double>(GetElapsedTime())/1000000.0 );
+        allObjects[id]->UpdateForce( static_cast<double>(GetElapsedTime())/1000000.0 );
         allObjects[id]->DoAutomatismsPostEvents(*this);
     }
 }

@@ -9,6 +9,7 @@
 #include <wx/radiobox.h>
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
+#include <wx/spinctrl.h>
 #include <wx/propgrid/propgrid.h>
 #include <wx/statline.h>
 #include <wx/radiobut.h>
@@ -59,6 +60,7 @@ class Preferences: public wxDialog
 		wxStaticText* StaticText6;
 		wxPanel* activeTabColorPnl;
 		wxPanel* borderColorPnl;
+		wxSpinCtrl* codeCompilerThreadEdit;
 		wxStaticText* StaticText19;
 		wxStaticText* StaticText8;
 		wxStaticText* StaticText11;
@@ -82,6 +84,7 @@ class Preferences: public wxDialog
 		wxPanel* Panel3;
 		wxStaticText* StaticText21;
 		wxStaticLine* StaticLine2;
+		wxStaticText* StaticText23;
 		wxPanel* ActifColorPnl;
 		wxCheckBox* GuideCheck;
 		wxCheckBox* hideContextPanelsLabels;
@@ -194,6 +197,8 @@ class Preferences: public wxDialog
 		static const long ID_RADIOBUTTON1;
 		static const long ID_TEXTCTRL2;
 		static const long ID_BUTTON11;
+		static const long ID_STATICTEXT23;
+		static const long ID_SPINCTRL1;
 		static const long ID_PANEL17;
 		static const long ID_LISTBOOK1;
 		static const long ID_STATICLINE1;

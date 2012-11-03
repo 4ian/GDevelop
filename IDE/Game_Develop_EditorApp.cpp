@@ -34,7 +34,6 @@
 #include "CppUnitLite/TestHarness.h"
 
 #include "GDL/CodeExecutionEngine.h"
-#include <llvm/Support/DynamicLibrary.h>
 
 #include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
@@ -297,6 +296,11 @@ bool Game_Develop_EditorApp::OnInit()
         CodeCompiler::GetInstance()->SetOutputDirectory(ToString(eventsCompilerTempDir));
     else
         CodeCompiler::GetInstance()->SetOutputDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
+    int eventsCompilerMaxThread = 0;
+    if ( Config->Read("/CodeCompiler/MaxThread", &eventsCompilerMaxThread, 0) && eventsCompilerMaxThread >= 0 )
+        CodeCompiler::GetInstance()->AllowMultithread(eventsCompilerMaxThread > 1, eventsCompilerMaxThread);
+    else
+        CodeCompiler::GetInstance()->AllowMultithread(false);
 
     //Load extensions
     cout << "* Loading extensions:" << endl;

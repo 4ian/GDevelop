@@ -112,6 +112,8 @@ const long Preferences::ID_RADIOBUTTON2 = wxNewId();
 const long Preferences::ID_RADIOBUTTON1 = wxNewId();
 const long Preferences::ID_TEXTCTRL2 = wxNewId();
 const long Preferences::ID_BUTTON11 = wxNewId();
+const long Preferences::ID_STATICTEXT23 = wxNewId();
+const long Preferences::ID_SPINCTRL1 = wxNewId();
 const long Preferences::ID_PANEL17 = wxNewId();
 const long Preferences::ID_LISTBOOK1 = wxNewId();
 const long Preferences::ID_STATICLINE1 = wxNewId();
@@ -170,11 +172,13 @@ changesNeedRestart(false)
     wxFlexGridSizer* FlexGridSizer6;
     wxStaticBoxSizer* StaticBoxSizer1;
     wxFlexGridSizer* FlexGridSizer1;
+    wxFlexGridSizer* FlexGridSizer33;
     wxFlexGridSizer* FlexGridSizer11;
     wxFlexGridSizer* FlexGridSizer17;
     wxStaticBoxSizer* StaticBoxSizer5;
     wxFlexGridSizer* FlexGridSizer32;
     wxFlexGridSizer* FlexGridSizer31;
+    wxStaticBoxSizer* StaticBoxSizer18;
     wxFlexGridSizer* FlexGridSizer28;
     wxFlexGridSizer* FlexGridSizer26;
     wxFlexGridSizer* FlexGridSizer30;
@@ -480,6 +484,15 @@ changesNeedRestart(false)
     FlexGridSizer25->Add(FlexGridSizer26, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     StaticBoxSizer13->Add(FlexGridSizer25, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer23->Add(StaticBoxSizer13, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer18 = new wxStaticBoxSizer(wxHORIZONTAL, Panel7, _("Internal code compiler"));
+    FlexGridSizer33 = new wxFlexGridSizer(0, 3, 0, 0);
+    StaticText23 = new wxStaticText(Panel7, ID_STATICTEXT23, _("Maximum thread number for code compiler :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT23"));
+    FlexGridSizer33->Add(StaticText23, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    codeCompilerThreadEdit = new wxSpinCtrl(Panel7, ID_SPINCTRL1, _T("1"), wxDefaultPosition, wxDefaultSize, 0, 1, 100, 1, _T("ID_SPINCTRL1"));
+    codeCompilerThreadEdit->SetValue(_T("1"));
+    FlexGridSizer33->Add(codeCompilerThreadEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    StaticBoxSizer18->Add(FlexGridSizer33, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+    FlexGridSizer23->Add(StaticBoxSizer18, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     Panel7->SetSizer(FlexGridSizer23);
     FlexGridSizer23->Fit(Panel7);
     FlexGridSizer23->SetSizeHints(Panel7);
@@ -808,6 +821,12 @@ changesNeedRestart(false)
         eventsEditorFontDialog->GetFontData().SetInitialFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
         eventsEditorFontDialog->GetFontData().SetChosenFont(gd::EventsRenderingHelper::GetInstance()->GetFont());
     }
+
+    int eventsCompilerMaxThread = 0;
+    if ( pConfig->Read("/CodeCompiler/MaxThread", &eventsCompilerMaxThread, 1) )
+    {
+        codeCompilerThreadEdit->SetValue(eventsCompilerMaxThread);
+    }
 }
 
 Preferences::~Preferences()
@@ -967,6 +986,9 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 	pConfig->Write("EventsEditor/ConditionColumnWidth", ToInt(ToString(conditionsColumnWidthEdit->GetValue())));
 	pConfig->Write("EventsEditor/HideContextPanelsLabels", hideContextPanelsLabels->GetValue());
 	pConfig->Write("EventsEditor/Font", eventsEditorFontDialog->GetFontData().GetChosenFont());
+
+    pConfig->Write("/CodeCompiler/MaxThread", codeCompilerThreadEdit->GetValue() );
+    CodeCompiler::GetInstance()->AllowMultithread(codeCompilerThreadEdit->GetValue() > 1, codeCompilerThreadEdit->GetValue());
 
     EndModal( 1 );
 }

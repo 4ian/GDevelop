@@ -14861,7 +14861,7 @@
 	"GDL/Layer.h"
 	"GDL/RuntimeCamera.h"
 
-1351341290 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
+1351689205 source:d:\florian\programmation\gamedevelop2\gdl\gdl\runtimescene.cpp
 	<wx/wx.h>
 	<sstream>
 	<fstream>
@@ -33819,7 +33819,7 @@
 	<string>
 	"GDL/RuntimeScene.h"
 
-1351341057 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\timeextension.cpp
+1351802164 source:d:\florian\programmation\gamedevelop2\gdl\gdl\builtinextensions\timeextension.cpp
 	"GDL/BuiltinExtensions/TimeExtension.h"
 	"GDL/RuntimeScene.h"
 	"GDL/ManualTimer.h"
@@ -34675,7 +34675,7 @@
 	<set>
 	<boost/shared_ptr.hpp>
 
-1348166685 source:d:\florian\programmation\gamedevelop2\gdl\gdl\events\eventscodegenerator.cpp
+1351774921 source:d:\florian\programmation\gamedevelop2\gdl\gdl\events\eventscodegenerator.cpp
 	<utility>
 	"GDCore/PlatformDefinition/Layout.h"
 	"GDL/Events/EventsCodeGenerator.h"
@@ -35067,7 +35067,7 @@
 	<SFML/System.hpp>
 	"GDL/IDE/CodeCompiler.h"
 
-1348166688 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\codecompiler.h
+1351969268 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\codecompiler.h
 	<string>
 	<vector>
 	<set>
@@ -35075,7 +35075,7 @@
 	<boost/shared_ptr.hpp>
 	<wx/event.h>
 
-1350300053 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\codecompiler.cpp
+1351969870 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\codecompiler.cpp
 	"CodeCompiler.h"
 	<SFML/System.hpp>
 	<iostream>
@@ -35131,7 +35131,7 @@
 	<wx/filename.h>
 	<wx/filefn.h>
 
-1348166688 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\codecompiler.h
+1351969268 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\codecompiler.h
 	<string>
 	<vector>
 	<set>
@@ -35149,11 +35149,12 @@
 	<SFML/System.hpp>
 	"GDL/IDE/CodeCompiler.h"
 
-1350302714 source:d:\florian\programmation\gamedevelop2\gdl\gdl\codeexecutionengine.cpp
+1351950560 source:d:\florian\programmation\gamedevelop2\gdl\gdl\codeexecutionengine.cpp
 	<iostream>
 	"CodeExecutionEngine.h"
 	<llvm/ExecutionEngine/GenericValue.h>
 	<llvm/ExecutionEngine/ExecutionEngine.h>
+	<llvm/Support/Threading.h>
 	<llvm/ExecutionEngine/JIT.h>
 	<llvm/Support/DynamicLibrary.h>
 	<llvm/Config/config.h>

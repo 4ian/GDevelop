@@ -71,45 +71,110 @@ CodeCompiler *CodeCompiler::_singleton = NULL;
 sf::Mutex CodeCompiler::openSaveDialogMutex;
 const wxEventType CodeCompiler::refreshEventType = wxNewEventType();
 
+namespace {
+
+/**
+ * \brief Tool function to create a task which is empty.
+ */
+CodeCompilerTask ConstructEmptyTask()
+{
+    CodeCompilerTask task;
+    task.emptyTask = true;
+    return task;
+}
+
+}
+
+/**
+ * \brief Internal tool class used to store information about a thread
+ */
+class CodeCompilerThreadStateNotifier
+{
+public:
+    CodeCompilerThreadStateNotifier(CodeCompiler & owner_, sf::Thread * threadRunningTheFunction_) :
+        owner(owner_),
+        threadRunningTheFunction(threadRunningTheFunction_)
+    {
+    }
+
+    /**
+     * Default destructor. Notify CodeCompiler that the thread finished work.
+     */
+    ~CodeCompilerThreadStateNotifier()
+    {
+        owner.ThreadEndedWork(threadRunningTheFunction);
+    }
+
+    /**
+     * Return true if the thread was sent to garbage.
+     */
+    bool IsGarbage()
+    {
+        return ( owner.currentTaskThread.get() != threadRunningTheFunction );
+    }
+
+private:
+
+    CodeCompiler & owner;
+    sf::Thread * threadRunningTheFunction;
+};
+
 void CodeCompiler::ProcessTasks()
 {
+    //Get at the startup the tread used to launch this function
+    sf::Thread * ourThread = currentTaskThread.get();
+    CodeCompilerThreadStateNotifier stateNotifier(*this, ourThread);
+
     while(true)
     {
+        if ( stateNotifier.IsGarbage() ) //Check if we have not being asked to stop our work.
+        {
+            std::cout << "Thread " << ourThread << " aborted as it was sent to garbage." << std::endl;
+            return;
+        }
+
         //Check if there is a task to be made
         {
             sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
-            bool newTaskFound = false;
-            for (unsigned int i = 0;i<pendingTasks.size();++i)
+            if ( !currentTask.emptyTask )
             {
-                //Be sure that the task is not disabled
-                if ( find(compilationDisallowed.begin(), compilationDisallowed.end(), pendingTasks[i].scene) == compilationDisallowed.end() )
+               //currentTask is not empty: Do it.
+            }
+            else
+            {
+                bool newTaskFound = false;
+                for (unsigned int i = 0;i<pendingTasks.size();++i)
                 {
-                    currentTask = pendingTasks[i];
-                    pendingTasks.erase(pendingTasks.begin()+i);
+                    //Be sure that the task is not disabled
+                    if ( find(compilationDisallowed.begin(), compilationDisallowed.end(), pendingTasks[i].scene) == compilationDisallowed.end() )
+                    {
+                        currentTask = pendingTasks[i];
+                        pendingTasks.erase(pendingTasks.begin()+i);
 
-                    newTaskFound = true;
-                    break;
+                        newTaskFound = true;
+                        break;
+                    }
                 }
-            }
-            if ( !newTaskFound ) //Bail out if no task can be made
-            {
-                if ( pendingTasks.empty() )
-                    std::cout << "No more task to be processed." << std::endl;
-                else
-                    std::cout << "No more task to be processed ( But "+ToString(pendingTasks.size())+" disabled task(s) waiting for being enabled )." << std::endl;
+                if ( !newTaskFound ) //Bail out if no task can be made
+                {
+                    if ( pendingTasks.empty() )
+                        std::cout << "No more task to be processed." << std::endl;
+                    else
+                        std::cout << "No more task to be processed ( But "+ToString(pendingTasks.size())+" disabled task(s) waiting for being enabled )." << std::endl;
 
-                threadLaunched = false;
-                NotifyControls();
-                return;
-            }
+                    threadLaunched = false;
+                    NotifyControls();
+                    return;
+                }
 
+            }
         }
 
-        std::cout << "Processing task " << currentTask.userFriendlyName << "..." << std::endl;
+        std::cout << "Processing task " << currentTask.userFriendlyName << "... ( Thread " << ourThread << " )" << std::endl;
         lastTaskFailed = false;
         NotifyControls();
-        bool skip = false; ///Set to true if the preworker of the task asked to relaunch the task later.
+        bool skip = false; //Set to true if the preworker of the task asked to relaunch the task later.
 
         if ( currentTask.preWork != boost::shared_ptr<CodeCompilerExtraWork>() )
         {
@@ -125,6 +190,12 @@ void CodeCompiler::ProcessTasks()
 
                 skip = true;
             }
+        }
+
+        if ( stateNotifier.IsGarbage() ) //Check if we have not being asked to stop our work.
+        {
+            std::cout << "Thread " << ourThread << " aborted as it was sent to garbage." << std::endl;
+            return;
         }
 
         bool compilationSucceeded = false; //Some post worker want to be informed of the compilation success/fail.
@@ -238,18 +309,28 @@ void CodeCompiler::ProcessTasks()
             else
             {
                 sf::Clock time;
-                std::cout << "Compilation succeeded. Writing bitcode to file...\n";
+                std::cout << "Compilation succeeded. ( Thread " << ourThread << ")" << std::endl;
+
+                if ( stateNotifier.IsGarbage() ) //Check if we have not being asked to stop our work.
+                {
+                    std::cout << "Thread " << ourThread << " aborted as it was sent to garbage." << std::endl;
+                    return;
+                }
+
+                std::cout << "Writing bitcode to file..." << std::endl;
+
                 sf::Lock lock(openSaveDialogMutex); //On windows, GD is crashing if we write bitcode while an open/save file dialog is displayed.
+                {
+                    llvm::OwningPtr<llvm::Module> module(Act->takeModule());
 
-                llvm::OwningPtr<llvm::Module> module(Act->takeModule());
+                    std::string error;
+                    llvm::raw_fd_ostream file(currentTask.outputFile.c_str(), error, llvm::raw_fd_ostream::F_Binary);
+                    llvm::WriteBitcodeToFile(module.get(), file);
+                    std::cout << error;
 
-                std::string error;
-                llvm::raw_fd_ostream file(currentTask.outputFile.c_str(), error, llvm::raw_fd_ostream::F_Binary);
-                llvm::WriteBitcodeToFile(module.get(), file);
-                std::cout << error;
-
-                compilationSucceeded = true;
-                std::cout << "WritingBitCodeTIme :"<<time.getElapsedTime().asMilliseconds() << std::endl;
+                    compilationSucceeded = true;
+                    std::cout << "Bitcode written in "<<time.getElapsedTime().asMilliseconds() << "ms ( Thread " << ourThread << ")." << std::endl;
+                }
             }
 
             //Compilation ended, loading diagnostics
@@ -259,24 +340,35 @@ void CodeCompiler::ProcessTasks()
             }
         }
 
-        if (!skip && currentTask.postWork != boost::shared_ptr<CodeCompilerExtraWork>() )
+        //Now do post work and notify task has been done.
         {
-            std::cout << "Launching post task" << std::endl;
-            currentTask.postWork->compilationSucceeded = compilationSucceeded;
-            currentTask.postWork->Execute();
+            sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
-            if ( currentTask.postWork->requestRelaunchCompilationLater )
+            if ( stateNotifier.IsGarbage() ) //Check if we have not being asked to stop our work.
             {
-                std::cout << "Postworker asked to launch again the task later" << std::endl;
-
-                sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
-                pendingTasks.push_back(currentTask);
-                pendingTasks.back().postWork->requestRelaunchCompilationLater = false;
+                std::cout << "Thread " << ourThread << " aborted as it was sent to garbage." << std::endl;
+                return;
             }
-        }
 
-        std::cout << "Task ended." << std::endl;
-        NotifyControls();
+            if (!skip && currentTask.postWork != boost::shared_ptr<CodeCompilerExtraWork>() )
+            {
+                std::cout << "Launching post task" << std::endl;
+                currentTask.postWork->compilationSucceeded = compilationSucceeded;
+                currentTask.postWork->Execute();
+
+                if ( currentTask.postWork->requestRelaunchCompilationLater )
+                {
+                    std::cout << "Postworker asked to launch again the task later" << std::endl;
+
+                    pendingTasks.push_back(currentTask);
+                    pendingTasks.back().postWork->requestRelaunchCompilationLater = false;
+                }
+            }
+
+            std::cout << "Task ended for thread " << ourThread << "." << std::endl;
+            currentTask = ConstructEmptyTask();
+            NotifyControls();
+        }
     }
 }
 
@@ -289,8 +381,48 @@ void CodeCompiler::NotifyControls()
     }
 }
 
+void CodeCompiler::SendCurrentThreadToGarbage()
+{
+    sf::Lock lock(garbageThreadsMutex); //Disallow modifying garbageThreads.
+    std::cout << "Old thread (" << currentTaskThread.get() << ") sent to garbage." << std::endl;
+
+    garbageThreads.push_back(currentTaskThread);
+    livingGarbageThreadsCount++; //We increment livingGarbageThreadsCount as the thread sent to garbageThreads was alive ( i.e. : doing work )
+
+    currentTaskThread = boost::shared_ptr<sf::Thread>();
+    threadLaunched = false;
+}
+
+void CodeCompiler::ThreadEndedWork(sf::Thread * thread)
+{
+    sf::Lock lock(garbageThreadsMutex); //Disallow modifying garbageThreads.
+
+    bool isAGarbageThread = false;
+    for (unsigned int i = 0;i<garbageThreads.size();++i)
+    {
+        if ( garbageThreads[i].get() == thread)
+            isAGarbageThread = true;
+    }
+
+    if ( isAGarbageThread )
+    {
+        livingGarbageThreadsCount--; //A thread sent to garbage is now useless.
+        //Note that we cannot destroy the thread here, as this function is called by the thread itself.
+    }
+}
+
+void CodeCompiler::CleanGarbageThreads()
+{
+    sf::Lock lock(garbageThreadsMutex); //Disallow modifying garbageThreads.
+
+    if ( livingGarbageThreadsCount == 0 )
+        garbageThreads.clear();
+}
+
 void CodeCompiler::AddTask(CodeCompilerTask task)
 {
+    CleanGarbageThreads(); //Take this opportunity to clean a bit useless garbage threads, if any.
+
     {
         sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
@@ -300,15 +432,35 @@ void CodeCompiler::AddTask(CodeCompilerTask task)
             if ( task.IsSameTaskAs(pendingTasks[i]) ) return;
         }
 
-        pendingTasks.push_back(task);
-        std::cout << "New task added (" << task.userFriendlyName << ")" << std::endl;
+        //If the task is equivalent to the current one, abort it.
+        if ( threadLaunched && task.IsSameTaskAs(currentTask) )
+        {
+            std::cout << "Task requested is equivalent to the current one (" << task.userFriendlyName << ")" << std::endl;
+
+            if ( livingGarbageThreadsCount < maxGarbageThread )
+            {
+                SendCurrentThreadToGarbage();
+            }
+            else
+            {
+                pendingTasks.push_back(task);
+                std::cout << "Max thread count reached, new pending task added (" << task.userFriendlyName << ")" << std::endl;
+            }
+        }
+        else
+        {
+            pendingTasks.push_back(task);
+            std::cout << "New pending task added (" << task.userFriendlyName << ")" << std::endl;
+        }
     }
 
     if ( !threadLaunched )
     {
-        std::cout << "Launching compilation thread..." << std::endl;
+        std::cout << "Launching new compilation thread";
         threadLaunched = true;
-        currentTaskThread.launch();
+        currentTaskThread = boost::shared_ptr<sf::Thread>(new sf::Thread(&CodeCompiler::ProcessTasks, this));
+        std::cout << " (" << currentTaskThread.get() << ")" << std::endl;
+        currentTaskThread->launch();
     }
 }
 
@@ -356,7 +508,8 @@ void CodeCompiler::EnableTaskRelatedTo(Scene & scene)
     {
         std::cout << "Launching compilation thread...";
         threadLaunched = true;
-        currentTaskThread.launch();
+        currentTaskThread = boost::shared_ptr<sf::Thread>(new sf::Thread(&CodeCompiler::ProcessTasks, this));
+        currentTaskThread->launch();
     }
 }
 
@@ -389,7 +542,7 @@ bool CodeCompiler::CompilationInProcess() const
 {
     sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
-    return (threadLaunched);
+    return threadLaunched;
 }
 
 void CodeCompiler::SetOutputDirectory(std::string outputDir_)
@@ -448,9 +601,19 @@ void CodeCompiler::SetBaseDirectory(std::string baseDir_)
     }
 }
 
+void CodeCompiler::AllowMultithread(bool allow, unsigned int maxThread)
+{
+    if (!allow || maxThread == 1)
+        maxGarbageThread = 0;
+    else
+        maxGarbageThread = maxThread-1;
+}
+
 CodeCompiler::CodeCompiler() :
     threadLaunched(false),
-    currentTaskThread(&CodeCompiler::ProcessTasks, this),
+    currentTask(ConstructEmptyTask()),
+    maxGarbageThread(2),
+    livingGarbageThreadsCount(0),
     lastTaskFailed(false)
 {
 }

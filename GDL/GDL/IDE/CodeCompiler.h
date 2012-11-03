@@ -15,6 +15,7 @@
 #include <wx/event.h>
 class CodeCompilerExtraWork;
 class Scene;
+class CodeCompilerThreadStateNotifier;
 
 /**
  * \brief Define a task to be processed by the code compiler.
@@ -24,9 +25,10 @@ class Scene;
 class GD_API CodeCompilerTask
 {
 public:
-    CodeCompilerTask() : compilationForRuntime(false), optimize(false), eventsGeneratedCode(true), scene(NULL) {};
+    CodeCompilerTask() : emptyTask(false), compilationForRuntime(false), optimize(false), eventsGeneratedCode(true), scene(NULL) {};
     virtual ~CodeCompilerTask() {};
 
+    bool emptyTask; ///< If set to true, this task will be skipped.
     std::string inputFile;
     std::string outputFile;
 
@@ -80,6 +82,7 @@ public:
  */
 class GD_API CodeCompiler
 {
+    friend class CodeCompilerThreadStateNotifier;
 public:
 
     /**
@@ -181,6 +184,16 @@ public:
      */
     const std::string & GetOutputDirectory() const { return outputDir; };
 
+    /**
+     * Set if CodeCompiler is allowed to launch more than one thread.
+     *
+     * For example, if a task is requested twice in a short time, CodeCompiler can launch a 2nd
+     * thread to do the work and discard the result of the 1st as it is useless.
+     * If multithread is disabled or if maxThread count is reached, then the second task is added
+     * to pending tasks.
+     */
+    void AllowMultithread(bool allow = true, unsigned int maxThread = 3);
+
     static CodeCompiler * GetInstance();
     static void DestroySingleton();
 
@@ -199,14 +212,41 @@ private:
      */
     void NotifyControls();
 
+    /**
+     * Set the current thread to be considered as garbage: It will be moved to the garbageThreads list
+     * and it will stop its work as soon as possible.
+     */
+    void SendCurrentThreadToGarbage();
+
+    /**
+     * Must be called by threads when they end they work ( whatever their state: Being the currentTaskThread
+     * or not ( in which case they are in garbageThreads ) ).
+     */
+    void ThreadEndedWork(sf::Thread * thread);
+
+    /**
+     * Clear garbageThreads if livingGarbageThreadsCount == 0. ( I.e. all garbage threads have finished their works
+     * and so they can be destroyed ).
+     * \warning Do not call it in ThreadEndedWork as this function is called by threads themselves.
+     */
+    void CleanGarbageThreads();
+
     //Current tasks
     bool threadLaunched; ///< Set to true when the thread is working, and to false when the pending task list has been exhausted.
     CodeCompilerTask currentTask; ///< When a task is being done, it is removed from pendingTasks and stored here.
-    sf::Thread currentTaskThread; ///< The thread used to process tasks
+    boost::shared_ptr<sf::Thread> currentTaskThread; ///< The thread used to process tasks
+
+    //Garbage threads
+    unsigned int maxGarbageThread;
+    mutable sf::Mutex garbageThreadsMutex; ///< A mutex is used to be sure that garbageThreads is not modified by two threads ( example: A thread finishing its work and another being sent to garbage )
+    unsigned int livingGarbageThreadsCount; ///< Incremented when a thread is sent to garbage, decremented when a garbage thread ends.
+    std::vector< boost::shared_ptr<sf::Thread> > garbageThreads; ///< The threads which were doing the currentTask but which were then replaced by currentTaskThread.
+                                                                 ///< They should abort as soon as possible without doing any post work: In particular, it is not guaranteed
+                                                                 ///< that currentTask remains valid if thread has been sent to garbage.
 
     //Pending task management
     std::vector < CodeCompilerTask > pendingTasks; ///< Compilation task waiting to be launched.
-    mutable sf::Mutex pendingTasksMutex; ///< A mutex is used to b sure that pending tasks are not modified by the thread and another method at the same time.
+    mutable sf::Mutex pendingTasksMutex; ///< A mutex is used to be sure that pending tasks are not modified by the thread and another method at the same time.
     std::vector < Scene* > compilationDisallowed; ///< List of scenes which disallow their events to be compiled. (However, if a compilation is being made, it will not be stopped)
 
     //Global compiler configuration

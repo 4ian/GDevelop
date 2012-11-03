@@ -114,8 +114,8 @@ TimeExtension::TimeExtension()
                    _("Delete a timer from memory."),
                    _("Delete timer _PARAM1_ from memory"),
                    _("Timers and time"),
-                   "res/actions/time24.png",
-                   "res/actions/time.png");
+                   "res/actions/timer24.png",
+                   "res/actions/timer.png");
 
         instrInfo.AddCodeOnlyParameter("currentScene", "");
         instrInfo.AddParameter("string", _("Timer's name"), "", false);

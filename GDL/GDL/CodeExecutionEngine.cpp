@@ -7,6 +7,7 @@
 #include "CodeExecutionEngine.h"
 #include <llvm/ExecutionEngine/GenericValue.h>
 #include <llvm/ExecutionEngine/ExecutionEngine.h>
+#include <llvm/Support/Threading.h>
 #include <llvm/ExecutionEngine/JIT.h>
 #include <llvm/Support/DynamicLibrary.h>
 #include <llvm/Config/config.h>
@@ -32,6 +33,7 @@ void CodeExecutionEngine::EnsureLLVMTargetsInitialization()
 {
     if ( !llvmTargetsInitialized )
     {
+        if ( !llvm::llvm_start_multithreaded() ) std::cout << "LLVM Multithreading is not available" << std::endl;
         llvm::InitializeNativeTarget();
         llvmTargetsInitialized = true;
     }

@@ -159,7 +159,7 @@ void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, in
     y += 15;
     while ( !iter->Is_Done() )
     {
-        sf::Text text("", *fontManager->GetFont("consola.ttf"));
+        sf::Text text("", *fontManager->GetFont(""));
         text.setCharacterSize(12);
         ostringstream texte;
         if ( CProfileManager::Get_Frame_Count_Since_Reset() != 0 )

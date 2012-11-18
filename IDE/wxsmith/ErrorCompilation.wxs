@@ -11,13 +11,13 @@
 			<growablerows>2</growablerows>
 			<object class="sizeritem">
 				<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
-					<size>420,54</size>
 					<bg>wxSYS_COLOUR_WINDOW</bg>
 					<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
 						<cols>2</cols>
 						<object class="sizeritem">
 							<object class="wxStaticBitmap" name="ID_STATICBITMAP3" variable="StaticBitmap3" member="yes">
 								<bitmap>res/error24.png</bitmap>
+								<style>wxNO_BORDER</style>
 							</object>
 							<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 							<border>5</border>
@@ -144,10 +144,3 @@
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

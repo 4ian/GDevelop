@@ -437,19 +437,20 @@ void ProjectManager::Refresh()
             projectsTree->AppendItem(externalayoutsItem, mainEditor.games[i]->GetExternalLayout(j).GetName(), 6 , 6, externalLayoutsItemData);
         }
 
-        /*if ( mainEditor.games[i]->useExternalSourceFiles )
+        boost::shared_ptr<RuntimeGame> game = boost::dynamic_pointer_cast<RuntimeGame>(mainEditor.games[i]);
+        if ( game !=  boost::shared_ptr<RuntimeGame>() && game->useExternalSourceFiles )
         {
             gdTreeItemProjectData * sourceFilesItemData = new gdTreeItemProjectData("SourceFiles", "", mainEditor.games[i].get());
             wxTreeItemId sourceFilesItem = projectsTree->AppendItem(projectItem, _("C++ source files"), 5 ,5, sourceFilesItemData);
-            for (unsigned int j = 0;j<mainEditor.games[i]->externalSourceFiles.size();++j)
+            for (unsigned int j = 0;j<game->externalSourceFiles.size();++j)
             {
-                if ( mainEditor.games[i]->externalSourceFiles[j]->IsGDManaged() )
+                if ( game->externalSourceFiles[j]->IsGDManaged() )
                     continue;
 
-                gdTreeItemProjectData * sourceFileItem = new gdTreeItemProjectData("SourceFile", mainEditor.games[i]->externalSourceFiles[j]->GetFileName(), mainEditor.games[i].get());
-                projectsTree->AppendItem(sourceFilesItem, mainEditor.games[i]->externalSourceFiles[j]->GetFileName(), 5 ,5, sourceFileItem);
+                gdTreeItemProjectData * sourceFileItem = new gdTreeItemProjectData("SourceFile", game->externalSourceFiles[j]->GetFileName(), game.get());
+                projectsTree->AppendItem(sourceFilesItem, game->externalSourceFiles[j]->GetFileName(), 5 ,5, sourceFileItem);
             }
-        }*/
+        }
 
         //Extensions
         gdTreeItemProjectData * extensionsItemData = new gdTreeItemProjectData("Extensions", "", mainEditor.games[i].get());
@@ -776,10 +777,7 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
     gd::ChooseVariableDialog dialog(this, (*scene)->GetVariables(), /*editingOnly=*/true);
     dialog.SetAssociatedLayout(game, (*scene).get());
     if ( dialog.ShowModal() == 1 )
-    {
-        (*scene)->wasModified = true;
-        CodeCompilationHelpers::CreateSceneEventsCompilationTask(*game, *(*scene));
-    }
+        game->GetChangesNotifier().OnVariablesModified(*game, (*scene).get());
 }
 
 /**
@@ -855,6 +853,8 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
             if ( sceneEditorPtr != NULL && &sceneEditorPtr->GetLayout() == &layout)
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
+
+        game->GetChangesNotifier().OnLayoutRenamed(*game, layout, data->GetSecondString());
     }
     //Renaming external events
     else if ( data->GetString() == "ExternalEvents")
@@ -959,6 +959,11 @@ void ProjectManager::AddLayoutToProject(gd::Project * project, unsigned int posi
     }
 
     project->InsertNewLayout(newSceneName, position);
+
+    if ( project->HasLayoutNamed(newSceneName) )
+        project->GetChangesNotifier().OnLayoutAdded(*project, project->GetLayout(newSceneName));
+    else
+        wxLogError(_("Unable to add the new layout!"));
 }
 
 /**
@@ -1048,6 +1053,7 @@ void ProjectManager::OndeleteSceneMenuItemSelected(wxCommandEvent& event)
     if ( waitDialog ) delete waitDialog;
 
     game->RemoveLayout(sceneName);
+    game->GetChangesNotifier().OnLayoutDeleted(*game, sceneName);
 }
 
 /**
@@ -1114,6 +1120,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     if ( waitDialog ) delete waitDialog;
 
     game->RemoveLayout(layoutName);
+    game->GetChangesNotifier().OnLayoutDeleted(*game, layoutName);
 }
 
 void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
@@ -1128,23 +1135,24 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     gd::Layout & newLayout = *clipboard->GetLayout();
 
     //Finding a new, unique name for the layout
-    string newSceneName = string(_("Copy of")) + " " + newLayout.GetName();
+    string newLayoutName = string(_("Copy of")) + " " + newLayout.GetName();
     int i = 2;
-    while(game->HasLayoutNamed(newSceneName))
+    while(game->HasLayoutNamed(newLayoutName))
     {
-        newSceneName = _("Copy of") + " " + newLayout.GetName() + " " + ToString(i);
+        newLayoutName = _("Copy of") + " " + newLayout.GetName() + " " + ToString(i);
         ++i;
     }
 
-    newLayout.SetName(newSceneName);
+    newLayout.SetName(newLayoutName);
     game->InsertLayout(newLayout, game->GetLayoutPosition(data->GetSecondString()));
+    game->GetChangesNotifier().OnLayoutAdded(*game, game->GetLayout(newLayoutName));
 
     //Insert in tree
-    gdTreeItemProjectData * sceneItemData = new gdTreeItemProjectData("Scene", newSceneName, game);
+    gdTreeItemProjectData * sceneItemData = new gdTreeItemProjectData("Scene", newLayoutName, game);
     if ( projectsTree->GetPrevSibling(selectedItem).IsOk() )
-        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), newSceneName, 1, 1, sceneItemData);
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), projectsTree->GetPrevSibling(selectedItem), newLayoutName, 1, 1, sceneItemData);
     else
-        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, newSceneName, 1, 1, sceneItemData);
+        projectsTree->InsertItem(projectsTree->GetItemParent(selectedItem), 0, newLayoutName, 1, 1, sceneItemData);
 }
 
 /**
@@ -1168,11 +1176,7 @@ void ProjectManager::OneditGblVarMenuItemSelected(wxCommandEvent& event)
     dialog.SetAssociatedProject(game);
     if ( dialog.ShowModal() == 1 )
     {
-        for (unsigned int i = 0;i<game->GetLayouts().size();++i)
-        {
-        	game->GetLayouts()[i]->wasModified = true;
-            CodeCompilationHelpers::CreateSceneEventsCompilationTask(*game, *game->GetLayouts()[i]);
-        }
+        game->GetChangesNotifier().OnVariablesModified(*game);
     }
 }
 

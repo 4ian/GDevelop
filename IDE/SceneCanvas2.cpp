@@ -215,7 +215,7 @@ void SceneCanvas::SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDia
         profileDialog->SetAssociatedSceneCanvas(this);
 
     if ( profileDialog )
-        sceneEdited.profiler = profileDialog.get();
+        sceneEdited.SetProfiler(profileDialog.get());
 }
 
 /**

@@ -346,7 +346,6 @@ private :
     static const long ID_MENUITEM6; ///< Zoom menu item
     static const long ID_MENUITEM7; ///< Zoom menu item
 
-    void ReloadFirstPart();
     void ReloadSecondPart();
     void UpdateScrollbars();
     boost::shared_ptr<Object> FindSmallestObjectUnderCursor();

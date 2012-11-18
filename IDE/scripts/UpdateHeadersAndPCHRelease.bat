@@ -16,7 +16,7 @@ xcopy ..\..\GDL\*.h ..\Bin\Release\include\GDL\*.h /S /Y /D
 xcopy ..\..\Core\*.h ..\Bin\Release\include\Core\*.h /S /Y /D
 
 rem Boost (shared_ptr and dependencies) headers
-..\..\ExtLibs\boost\bcp.exe --boost=..\..\ExtLibs\boost\ version config shared_ptr weak_ptr enable_shared_from_this ..\bin\release\include\boost\
+..\..\ExtLibs\boost\bcp.exe --boost=..\..\ExtLibs\boost\ version config shared_ptr weak_ptr enable_shared_from_this unordered mpl ..\bin\release\include\boost\
 
 rem SFML headers 
 xcopy ..\..\ExtLibs\SFML\include\*.h ..\Bin\Release\include\SFML\include\*.h /S /Y /D

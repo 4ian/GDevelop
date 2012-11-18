@@ -66,14 +66,6 @@
 										<label>Startup</label>
 										<orient>wxVERTICAL</orient>
 										<object class="sizeritem">
-											<object class="wxCheckBox" name="ID_CHECKBOX1" variable="GuideCheck" member="yes">
-												<label>Show Getting Started Guide</label>
-											</object>
-											<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-											<border>5</border>
-											<option>1</option>
-										</object>
-										<object class="sizeritem">
 											<object class="wxCheckBox" name="ID_CHECKBOX4" variable="MAJCheck" member="yes">
 												<label>Checking for updates</label>
 											</object>
@@ -302,7 +294,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxTextCtrl" name="ID_TEXTCTRL4" variable="DossierTempCompEdit" member="yes">
-														<tooltip>Dossier servant à compiler un jeu.&#x0A;Vous devez posséder les droits d&apos;écriture pour ce dossier.&#x0A;Par défaut, il s&apos;agit du dossier &quot;Compil&quot; dans le répertoire de Game Develop.</tooltip>
+														<tooltip>Folder used to store temporary files when compiling a game.&#x0A;We must own write permissions on this folder.&#x0A;If empty, the default temporary folder of the system is used.</tooltip>
 													</object>
 													<flag>wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL</flag>
 													<border>5</border>
@@ -335,7 +327,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxTextCtrl" name="ID_TEXTCTRL6" variable="eventsCompilerTempDirEdit" member="yes">
-														<tooltip>Dossier servant à compiler un jeu.&#x0A;Vous devez posséder les droits d&apos;écriture pour ce dossier.&#x0A;Par défaut, il s&apos;agit du dossier &quot;Compil&quot; dans le répertoire de Game Develop.</tooltip>
+														<tooltip>Folder used to store temporary files when compiling a game.&#x0A;We must own write permissions on this folder.&#x0A;If empty, the default temporary folder of the system is used.</tooltip>
 														<handler function="OneventsCompilerTempDirEditText" entry="EVT_TEXT" />
 													</object>
 													<flag>wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL</flag>

@@ -266,12 +266,12 @@ void ProfileDlg::ParseProfileEvents()
 {
     if ( !sceneCanvas ) return;
 
-    for (unsigned int i = 0;i<sceneCanvas->GetEditedScene().profiler->profileEventsInformation.size();++i)
+    for (unsigned int i = 0;i<sceneCanvas->GetEditedScene().GetProfiler()->profileEventsInformation.size();++i)
     {
-        boost::shared_ptr<gd::BaseEvent> event = sceneCanvas->GetEditedScene().profiler->profileEventsInformation[i].originalEvent.lock();
+        boost::shared_ptr<gd::BaseEvent> event = sceneCanvas->GetEditedScene().GetProfiler()->profileEventsInformation[i].originalEvent.lock();
         if ( event != boost::shared_ptr<gd::BaseEvent>())
         {
-            event->totalTimeDuringLastSession = sceneCanvas->GetEditedScene().profiler->profileEventsInformation[i].GetTime();
+            event->totalTimeDuringLastSession = sceneCanvas->GetEditedScene().GetProfiler()->profileEventsInformation[i].GetTime();
             event->percentDuringLastSession = static_cast<double>(event->totalTimeDuringLastSession)/static_cast<double>(totalEventsTime)*100.0;
         }
     }

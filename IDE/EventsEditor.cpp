@@ -28,7 +28,6 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
@@ -1088,8 +1087,10 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory, bool noNeedForSceneRe
 
     if ( !noNeedForSceneRecompilation )
     {
-        gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(game, scene);
-        if ( externalEvents != NULL ) gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
+        if ( externalEvents != NULL )
+            gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
+        else
+            gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(game, scene);
     }
 }
 

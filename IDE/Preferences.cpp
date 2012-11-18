@@ -39,7 +39,6 @@ const long Preferences::ID_STATICBITMAP3 = wxNewId();
 const long Preferences::ID_STATICTEXT7 = wxNewId();
 const long Preferences::ID_PANEL5 = wxNewId();
 const long Preferences::ID_STATICLINE2 = wxNewId();
-const long Preferences::ID_CHECKBOX1 = wxNewId();
 const long Preferences::ID_CHECKBOX4 = wxNewId();
 const long Preferences::ID_CHECKBOX3 = wxNewId();
 const long Preferences::ID_TEXTCTRL1 = wxNewId();
@@ -208,9 +207,6 @@ changesNeedRestart(false)
     FlexGridSizer14 = new wxFlexGridSizer(0, 1, 0, 0);
     FlexGridSizer14->AddGrowableCol(0);
     StaticBoxSizer1 = new wxStaticBoxSizer(wxVERTICAL, Panel2, _("Startup"));
-    GuideCheck = new wxCheckBox(Panel2, ID_CHECKBOX1, _("Show Getting Started Guide"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX1"));
-    GuideCheck->SetValue(false);
-    StaticBoxSizer1->Add(GuideCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
     MAJCheck = new wxCheckBox(Panel2, ID_CHECKBOX4, _("Checking for updates"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX4"));
     MAJCheck->SetValue(false);
     StaticBoxSizer1->Add(MAJCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -285,7 +281,7 @@ changesNeedRestart(false)
     StaticText8 = new wxStaticText(Panel3, ID_STATICTEXT8, _("Temporary deployment directory:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT8"));
     FlexGridSizer13->Add(StaticText8, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     DossierTempCompEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL4, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL4"));
-    DossierTempCompEdit->SetToolTip(_("Dossier servant à compiler un jeu.\nVous devez posséder les droits d\'écriture pour ce dossier.\nPar défaut, il s\'agit du dossier \"Compil\" dans le répertoire de Game Develop."));
+    DossierTempCompEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nWe must own write permissions on this folder.\nIf empty, the default temporary folder of the system is used."));
     FlexGridSizer13->Add(DossierTempCompEdit, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
     BrowseDossierTempBt = new wxButton(Panel3, ID_BUTTON4, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
     FlexGridSizer13->Add(BrowseDossierTempBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -295,7 +291,7 @@ changesNeedRestart(false)
     StaticText21 = new wxStaticText(Panel3, ID_STATICTEXT21, _("Temporary folder for compilation:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT21"));
     FlexGridSizer31->Add(StaticText21, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     eventsCompilerTempDirEdit = new wxTextCtrl(Panel3, ID_TEXTCTRL6, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL6"));
-    eventsCompilerTempDirEdit->SetToolTip(_("Dossier servant à compiler un jeu.\nVous devez posséder les droits d\'écriture pour ce dossier.\nPar défaut, il s\'agit du dossier \"Compil\" dans le répertoire de Game Develop."));
+    eventsCompilerTempDirEdit->SetToolTip(_("Folder used to store temporary files when compiling a game.\nWe must own write permissions on this folder.\nIf empty, the default temporary folder of the system is used."));
     FlexGridSizer31->Add(eventsCompilerTempDirEdit, 1, wxALL|wxEXPAND|wxALIGN_BOTTOM|wxALIGN_CENTER_HORIZONTAL, 5);
     browseCompilationTempDir = new wxButton(Panel3, ID_BUTTON12, _("Browse"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON12"));
     FlexGridSizer31->Add(browseCompilationTempDir, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -594,17 +590,6 @@ changesNeedRestart(false)
     {
         wxString result;
 
-        pConfig->Read( _T( "/Startup/GettingStartedWindow" ), &result );
-        if ( result == "false" )
-        {
-            GuideCheck->SetValue( false );
-        }
-        else { GuideCheck->SetValue( true ); }
-    }
-
-    {
-        wxString result;
-
         pConfig->Read( _T( "/Startup/CheckUpdate" ), &result );
         if ( result == "false" )
         {
@@ -839,14 +824,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
 {
     wxConfigBase * pConfig = wxConfigBase::Get();
 
-    //Démarrage
-    if ( GuideCheck->GetValue() )
-    {
-        pConfig->Write( _T( "/Startup/GettingStartedWindow" ), "true" );
-    }
-    else { pConfig->Write( _T( "/Startup/GettingStartedWindow" ), "false" ); }
-
-
+    //Startup options
     if ( MAJCheck->GetValue() )
     {
         pConfig->Write( _T( "/Startup/CheckUpdate" ), "true" );
@@ -854,7 +832,7 @@ void Preferences::OnOkBtClick( wxCommandEvent& event )
     else { pConfig->Write( _T( "/Startup/CheckUpdate" ), "false" ); }
 
 
-    //Apparence
+    //Skin options
     wxColourData cData;
 
     if ( ribbonStyleBox->GetSelection() == 0)

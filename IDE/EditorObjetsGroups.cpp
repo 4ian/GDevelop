@@ -339,7 +339,7 @@ void EditorObjetsGroups::OnEditGroupSelected(wxCommandEvent& event)
         if ( dialog.ShowModal() == 1 )
             *i = dialog.group;
 
-        scene.wasModified = true;
+        scene.SetRefreshNeeded();
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
         return;
     }
@@ -370,7 +370,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     objectsGroups->push_back( NewGroup );
     ObjetsGroupsList->AppendItem( rootId, name );
 
-    scene.wasModified = true;
+    scene.SetRefreshNeeded();
     CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
     wxLogStatus( _( "The group was correctly added." ) );
 }
@@ -415,7 +415,7 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
                 gd::EventsRefactorer::RemoveObjectInEvents(game, scene, scene.GetEvents(), groupName);
             }
 
-            scene.wasModified = true;
+            scene.SetRefreshNeeded();
             CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
             ObjetsGroupsList->Delete( itemSelected );
         }
@@ -525,7 +525,7 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
 
             gd::EventsRefactorer::RenameObjectInEvents(game, scene, scene.GetEvents(), ancienNom, newName);
 
-            scene.wasModified = true;
+            scene.SetRefreshNeeded();
             CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
             return;
         }
@@ -591,7 +591,7 @@ void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
     clipboard->SetObjectGroup(*i);
     objectsGroups->erase( i );
 
-    scene.wasModified = true;
+    scene.SetRefreshNeeded();
     CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
     ObjetsGroupsList->Delete( itemSelected );
 }
@@ -617,7 +617,7 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
     objectsGroups->push_back( groupPasted );
     ObjetsGroupsList->AppendItem( rootId, groupPasted.GetName());
 
-    scene.wasModified = true;
+    scene.SetRefreshNeeded();
     CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
 }
 

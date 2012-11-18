@@ -227,13 +227,7 @@ void SceneCanvas::OnPauseBtClick( wxCommandEvent & event )
     if ( debugger ) debugger->Pause();
 }
 
-
 void SceneCanvas::Reload()
-{
-    ReloadFirstPart();
-}
-
-void SceneCanvas::ReloadFirstPart()
 {
     cout << "Scene canvas reloading... ( Step 1/2 )" << endl;
     isReloading = true;
@@ -258,10 +252,10 @@ void SceneCanvas::ReloadFirstPart()
         CodeCompilationHelpers::CreateSceneEventsCompilationTask(gameEdited, sceneEdited);
 
         if ( !editing )
-            mainFrameWrapper.GetInfoBar()->ShowMessage(_("Changes made to events will be taken ino account when you switch to Edition mode"));
+            mainFrameWrapper.GetInfoBar()->ShowMessage(_("Changes made to events will be taken into account when you switch to Edition mode"));
     }
 
-    return; //Reload second par will be called by Refresh when appropriate
+    return; //Reload second part will be called by Refresh when appropriate
 }
 
 void SceneCanvas::ReloadSecondPart()
@@ -274,7 +268,7 @@ void SceneCanvas::ReloadSecondPart()
         wxSetWorkingDirectory(wxFileName::FileName(gameEdited.GetProjectFile()).GetPath());
 
     previewData.scene.LoadFromSceneAndCustomInstances( sceneEdited, instances );
-    sceneEdited.wasModified = false;
+    sceneEdited.SetRefreshNotNeeded();
 
     //If a preview is not going to be made, switch back to the IDE working directory
     if ( editing ) wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
@@ -321,7 +315,7 @@ void SceneCanvas::Refresh()
         {
 
             //But be sure that no error occured.
-            if ( !editing && !sceneEdited.codeExecutionEngine->Ready() )
+            if ( !editing && !sceneEdited.GetCodeExecutionEngine()->Ready() )
             {
                 wxLogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")+CodeCompiler::GetInstance()->GetOutputDirectory()+"compilationErrors.txt");
                 wxCommandEvent useless;
@@ -348,12 +342,12 @@ void SceneCanvas::Refresh()
 
                 gameEdited.imageManager->LoadPermanentImages();
                 gameEdited.imagesChanged.clear();
-                sceneEdited.wasModified = true;
+                sceneEdited.SetRefreshNeeded();
 
                 wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory()); //Go back to the IDE cwd.
             }
 
-            if ( sceneEdited.wasModified ) //Reload scene if necessary
+            if ( sceneEdited.RefreshNeeded() ) //Reload scene if necessary
                 Reload();
         }
 

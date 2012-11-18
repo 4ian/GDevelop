@@ -903,7 +903,6 @@
 					<wxDialog wxs="wxsmith/BugReport.wxs" src="BugReport.cpp" hdr="BugReport.h" fwddecl="0" i18n="1" name="BugReport" language="CPP" />
 					<wxDialog wxs="wxsmith/Fusion.wxs" src="Fusion.cpp" hdr="Fusion.h" fwddecl="0" i18n="1" name="Fusion" language="CPP" />
 					<wxDialog wxs="wxsmith/MAJ.wxs" src="MAJ.cpp" hdr="MAJ.h" fwddecl="0" i18n="1" name="MAJ" language="CPP" />
-					<wxDialog wxs="wxsmith/AjoutPlusImage.wxs" src="AjoutPlusImage.cpp" hdr="AjoutPlusImage.h" fwddecl="0" i18n="1" name="AjoutPlusImage" language="CPP" />
 					<wxDialog wxs="wxsmith/CreateTemplate.wxs" src="CreateTemplate.cpp" hdr="CreateTemplate.h" fwddecl="0" i18n="1" name="CreateTemplate" language="CPP" />
 					<wxDialog wxs="wxsmith/ErrorCompilation.wxs" src="ErrorCompilation.cpp" hdr="ErrorCompilation.h" fwddecl="0" i18n="1" name="ErrorCompilation" language="CPP" />
 					<wxDialog wxs="wxsmith/GeneratePassword.wxs" src="GeneratePassword.cpp" hdr="GeneratePassword.h" fwddecl="0" i18n="1" name="GeneratePassword" language="CPP" />

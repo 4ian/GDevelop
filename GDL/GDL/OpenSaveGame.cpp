@@ -336,11 +336,7 @@ void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents
     {
         boost::shared_ptr<ExternalEvents> externalEvents = boost::shared_ptr<ExternalEvents>(new ExternalEvents);
 
-        string name = elemScene->Attribute( "Name" ) != NULL ? elemScene->Attribute( "Name" ) : "";
-        externalEvents->SetName(name);
-
-        if ( elemScene->FirstChildElement("Events") != NULL )
-            OpenEvents(externalEvents->GetEvents(), elemScene->FirstChildElement("Events"));
+        externalEvents->LoadFromXml(elemScene);
 
         list.push_back(externalEvents);
         elemScene = elemScene->NextSiblingElement();
@@ -532,17 +528,11 @@ void OpenSaveGame::SaveExternalEvents(const vector < boost::shared_ptr<ExternalE
         TiXmlElement * externalEvents = new TiXmlElement( "ExternalEvents" );
         elem->LinkEndChild( externalEvents );
 
-        externalEvents->SetAttribute("Name", list[j]->GetName().c_str());
-
-        TiXmlElement * events = new TiXmlElement( "Events" );
-        externalEvents->LinkEndChild( events );
-        SaveEvents(list[j]->GetEvents(), events);
+        list[j]->SaveToXml(externalEvents);
     }
 }
 
-#endif
 
-#if defined(GD_IDE_ONLY)
 void OpenSaveGame::OpenImagesFromGD2010498(Game & game, const TiXmlElement * imagesElem, const TiXmlElement * dossierElem)
 {
     //Images

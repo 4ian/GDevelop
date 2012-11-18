@@ -266,7 +266,7 @@ SpriteExtension::SpriteExtension()
                        "res/conditions/animation24.png",
                        "res/conditions/animation.png");
 
-            instrInfo.AddParameter("object", _("Object"), "", false);
+            instrInfo.AddParameter("object", _("Object"), "Sprite", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("AnimationEnded").SetIncludeFile("GDL/SpriteObject.h");
 

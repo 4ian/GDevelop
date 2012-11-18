@@ -36,17 +36,6 @@ std::string CppCodeEvent::GenerateEventCode(Game & game, Scene & scene, EventsCo
     file << GenerateAssociatedFileCode();
     file.close();
 
-    //Notify the scene it depends on the compilation of a source file
-    if ( std::find(scene.externalSourcesDependList.begin(), scene.externalSourcesDependList.end(), associatedGDManagedSourceFile)  == scene.externalSourcesDependList.end())
-        scene.externalSourcesDependList.push_back(associatedGDManagedSourceFile);
-
-    //And even on the compilation of some others source files.
-    for (unsigned int i = 0;i<dependencies.size();++i)
-    {
-        if ( std::find(scene.externalSourcesDependList.begin(), scene.externalSourcesDependList.end(), dependencies[i])  == scene.externalSourcesDependList.end())
-            scene.externalSourcesDependList.push_back(dependencies[i]);
-    }
-
     //Generate the code to call the associated source file
     std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") + ((passSceneAsParameter && passObjectListAsParameter) ? ", ":"") + (passObjectListAsParameter ? "std::vector<Object*> objectsList" :"") + ");";
     codeGenerator.AddGlobalDeclaration(functionPrototype+"\n");
@@ -85,7 +74,21 @@ std::string CppCodeEvent::GenerateEventCode(Game & game, Scene & scene, EventsCo
     return outputCode;
 }
 
-std::string CppCodeEvent::GenerateAssociatedFileCode()
+void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(const Game & parentGame) const
+{
+    wxFileName outputFile(associatedGDManagedSourceFile);
+    outputFile.MakeAbsolute(wxFileName::FileName(parentGame.GetProjectFile()).GetPath());
+
+    if ( !wxFileExists(outputFile.GetFullPath()) )
+    {
+        std::ofstream file;
+        file.open( ToString(outputFile.GetFullPath()).c_str() );
+        file << GenerateAssociatedFileCode();
+        file.close();
+    }
+}
+
+std::string CppCodeEvent::GenerateAssociatedFileCode() const
 {
     std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") +((passSceneAsParameter && passObjectListAsParameter) ? ", ":"")+ (passObjectListAsParameter ? "std::vector<Object*> objectsList" :"") + ")";
     std::string output;
@@ -154,10 +157,22 @@ gd::BaseEvent::EditEventReturnType CppCodeEvent::EditEvent(wxWindow* parent_, Ga
     EditCppCodeEvent dialog(parent_, *this, game_, scene_);
     int returned = dialog.ShowModal();
 
-    if ( returned == 0 ) return Cancelled;
-    else if (returned == 2) return ChangesMadeButNoNeedForEventsRecompilation;
+    if ( returned == 0 )
+        return Cancelled;
+    else
+    {
+        //Force recreation of the assocaited source file
+        wxFileName outputFile(associatedGDManagedSourceFile);
+        outputFile.MakeAbsolute(wxFileName::FileName(game_.GetProjectFile()).GetPath());
+        if ( wxFileExists(outputFile.GetFullPath()) ) wxRemoveFile(outputFile.GetFullPath());
 
-    return ChangesMade;
+        EnsureAssociatedSourceFileIsUpToDate(game_);
+
+        if (returned == 2)
+            return ChangesMadeButNoNeedForEventsRecompilation;
+        else
+            return ChangesMade;
+    }
 }
 
 void CppCodeEvent::SaveToXml(TiXmlElement * elem) const

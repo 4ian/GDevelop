@@ -9,14 +9,20 @@
 #include "GDL/LinkEvent.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
+#include "GDCore/PlatformDefinition/Object.h"
 #include "GDL/CommonTools.h"
 #include "GDL/EmptyEvent.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDL/Events/EventsCodeGenerator.h"
+#include "GDL/Events/EventsCodeNameMangler.h"
+#include "GDL/IDE/DependenciesAnalyzer.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Game.h"
-#include <iostream>
 #include "GDL/IDE/Dialogs/EditLink.h"
+#include <iostream>
+#include <fstream>
 
 using namespace std;
 
@@ -64,56 +70,92 @@ void LinkEvent::LoadFromXml(const TiXmlElement * eventElem)
     else { cout <<"Les informations concernant le nom de la scène liée."; }
 }
 
-void LinkEvent::Preprocess(const Game & game, const Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
+void LinkEvent::Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
 {
     if ( IsDisabled() ) return;
 
-    //Finding events to include
+    //Finding what to link to.
     const vector< gd::BaseEventSPtr > * eventsToInclude = NULL;
-    if ( game.HasExternalEventsNamed(GetTarget()) ) eventsToInclude = &game.GetExternalEvents(GetTarget()).GetEvents();
+    ExternalEvents * linkedExternalEvents = NULL;
+    if ( game.HasExternalEventsNamed(GetTarget()) )
+    {
+        linkedExternalEvents = &game.GetExternalEvents(GetTarget());
+        eventsToInclude = &game.GetExternalEvents(GetTarget()).GetEvents();
+    }
     else if ( game.HasLayoutNamed(GetTarget()) ) eventsToInclude = &game.GetLayout(GetTarget()).GetEvents();
 
-    if ( eventsToInclude == NULL )
-    {
-        std::cout << "Unable to get events from a link" << std::endl;
+    //Check if the link refers to external events compiled separately
+    DependenciesAnalyzer analyzer(game);
+    if (linkedExternalEvents != NULL &&
+        analyzer.ExternalEventsCanBeCompiledForAScene(linkedExternalEvents->GetName()) == scene.GetName()) //Check if the link refers to events
+    {                                                                                                      //compiled separately.
+        //There is nothing more to do for now: The code calling the external events will be generated in LinkEvent::GenerateEventCode.
         return;
     }
 
-    unsigned int firstEvent = IncludeAllEvents() ? 0 : GetIncludeStart();
-    unsigned int lastEvent = IncludeAllEvents() ? eventsToInclude->size() - 1 : GetIncludeEnd();
-
-    //Check bounds
-    if ( firstEvent >= eventsToInclude->size() )
+    if ( eventsToInclude != NULL )
     {
-        std::cout << "Unable to get events from a link ( Invalid start )" << std::endl;
+        unsigned int firstEvent = IncludeAllEvents() ? 0 : GetIncludeStart();
+        unsigned int lastEvent = IncludeAllEvents() ? eventsToInclude->size() - 1 : GetIncludeEnd();
+
+        //Check bounds
+        if ( firstEvent >= eventsToInclude->size() )
+        {
+            std::cout << "Unable to get events from a link ( Invalid start )" << std::endl;
+            linkWasInvalid = true;
+            return;
+        }
+        if ( lastEvent >= eventsToInclude->size() )
+        {
+            std::cout << "Unable to get events from a link ( Invalid end )" << std::endl;
+            linkWasInvalid = true;
+            return;
+        }
+        if ( firstEvent > lastEvent )
+        {
+            std::cout << "Unable to get events from a link ( End is before start )" << std::endl;
+            linkWasInvalid = true;
+            return;
+        }
+
+        //Insert an empty event to replace the link event ( we'll delete the link event at the end )
+        //( If we just erase the link event without adding a blank event to replace it,
+        //the first event inserted by the link will not be preprocessed ( and it can be annoying if it require preprocessing, such as another link event ). )
+        eventList.insert(eventList.begin() + indexOfTheEventInThisList, boost::shared_ptr<gd::BaseEvent>(new EmptyEvent));
+
+        //Insert linked events
+        for ( unsigned int insertion = 0;insertion <= static_cast<unsigned>(lastEvent-firstEvent);insertion++ )
+        {
+            //Profiling can be enabled in editor, so we use CloneRememberingOriginalEvent.
+            eventList.insert( eventList.begin() + indexOfTheEventInThisList + 1 + insertion, /*Start inserted at indexOfTheEventInThisList+1 ( after the empty event ) */
+                             CloneRememberingOriginalEvent(eventsToInclude->at( firstEvent+insertion )));
+        }
+
+        //Delete the link event ( which is now at the end of the list of events we've just inserted )
+        eventList.erase( eventList.begin() + indexOfTheEventInThisList + 1 + static_cast<unsigned>(lastEvent-firstEvent)+1 );
+    }
+    else
+    {
+        std::cout << "Unable to get events from a link." << std::endl;
+        linkWasInvalid = true;
         return;
     }
-    if ( lastEvent >= eventsToInclude->size() )
-    {
-        std::cout << "Unable to get events from a link ( Invalid end )" << std::endl;
-        return;
-    }
-    if ( firstEvent > lastEvent )
-    {
-        std::cout << "Unable to get events from a link ( End is before start )" << std::endl;
-        return;
-    }
 
-    //Insert an empty event to replace the link event ( we'll delete the link event at the end )
-    //( If we just erase the link event without adding a blank event to replace it,
-    //the first event inserted by the link will not be preprocessed ( and it can be annoying if it require preprocessing, such as another link event ). )
-    eventList.insert(eventList.begin() + indexOfTheEventInThisList, boost::shared_ptr<gd::BaseEvent>(new EmptyEvent));
+    linkWasInvalid = false;
+}
 
-    //Insert linked events
-    for ( unsigned int insertion = 0;insertion <= static_cast<unsigned>(lastEvent-firstEvent);insertion++ )
-    {
-        //Profiling can be enabled in editor, so we use CloneRememberingOriginalEvent.
-        eventList.insert( eventList.begin() + indexOfTheEventInThisList + 1 + insertion, /*Start inserted at indexOfTheEventInThisList+1 ( after the empty event ) */
-                         CloneRememberingOriginalEvent(eventsToInclude->at( firstEvent+insertion )));
-    }
+std::string LinkEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+{
+    //This function is called only when the link refers to external events compiled separately. ( See LinkEvent::Preprocess )
+    //We must generate code to call these external events.
+    std::string outputCode;
 
-    //Delete the link event ( which is now at the end of the list of events we've just inserted )
-    eventList.erase( eventList.begin() + indexOfTheEventInThisList + 1 + static_cast<unsigned>(lastEvent-firstEvent)+1 );
+    std::string functionCall = EventsCodeNameMangler::GetInstance()->GetExternalEventsFunctionMangledName(GetTarget())+"(runtimeContext);";
+    std::string functionDeclaration = "void "+EventsCodeNameMangler::GetInstance()->GetExternalEventsFunctionMangledName(GetTarget())+"(RuntimeContext * context);";
+    outputCode += functionCall+"\n";
+    codeGenerator.AddGlobalDeclaration(functionDeclaration);
+
+    return outputCode;
 }
 
 gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game & game, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_)

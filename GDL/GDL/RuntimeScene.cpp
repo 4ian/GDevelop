@@ -92,7 +92,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     timers = scene.timers;
     pauseTime = scene.pauseTime;
 
-    codeExecutionEngine = scene.codeExecutionEngine;
+    GetCodeExecutionEngine() = scene.GetCodeExecutionEngine();
 
     firstLoop = scene.firstLoop;
     isFullScreen = scene.isFullScreen;
@@ -185,36 +185,23 @@ void DisplayProfile(sf::RenderWindow * renderWindow, CProfileIterator * iter, in
 
 int RuntimeScene::RenderAndStep()
 {
-#if !defined(RELEASE)
-    BT_PROFILE("RenderAndStep");
-#endif
-
     //Gestion pré-évènements
     {
-#if !defined(RELEASE)
-        BT_PROFILE("ManageRenderTargetEvents");
-#endif
         ManageRenderTargetEvents();
     }
     {
-#if !defined(RELEASE)
-        BT_PROFILE("UpdateTime");
-#endif
         UpdateTime();
     }
     {
-#if !defined(RELEASE)
-        BT_PROFILE("ManageObjectsBeforeEvents");
-#endif
         ManageObjectsBeforeEvents();
     }
     SoundManager::GetInstance()->ManageGarbage();
 
     #if defined(GD_IDE_ONLY)
-    if( profiler )
+    if( GetProfiler() )
     {
-        if ( firstLoop ) profiler->Reset();
-        profiler->eventsClock.reset();
+        if ( firstLoop ) GetProfiler()->Reset();
+        GetProfiler()->eventsClock.reset();
     }
     #endif
 
@@ -222,49 +209,42 @@ int RuntimeScene::RenderAndStep()
 #if !defined(RELEASE)
         BT_PROFILE("Events");
 #endif
-        codeExecutionEngine->Execute();
+        GetCodeExecutionEngine()->Execute();
     }
 
     #if defined(GD_IDE_ONLY)
-    if( profiler && profiler->profilingActivated )
+    if( GetProfiler() && GetProfiler()->profilingActivated )
     {
-        profiler->lastEventsTime = profiler->eventsClock.getTimeMicroseconds();
-        profiler->renderingClock.reset();
+        GetProfiler()->lastEventsTime = GetProfiler()->eventsClock.getTimeMicroseconds();
+        GetProfiler()->renderingClock.reset();
     }
     #endif
 
     //Gestions post-évènement
     {
-#if !defined(RELEASE)
-        BT_PROFILE("ManageObjectsAfterEvents");
-#endif
         ManageObjectsAfterEvents();
     }
 
     #if defined(GD_IDE_ONLY)
     if( debugger )
     {
-        BT_PROFILE("Debugger");
         debugger->Update();
     }
     #endif
 
     //Rendering
     {
-#if !defined(RELEASE)
-        BT_PROFILE("Rendering");
-#endif
         Render();
         textes.clear(); //Legacy texts
     }
 
     #if defined(GD_IDE_ONLY)
-    if( profiler && profiler->profilingActivated )
+    if( GetProfiler() && GetProfiler()->profilingActivated )
     {
-        profiler->lastRenderingTime = profiler->renderingClock.getTimeMicroseconds();
-        profiler->totalSceneTime += profiler->lastRenderingTime + profiler->lastEventsTime;
-        profiler->totalEventsTime += profiler->lastEventsTime;
-        profiler->Update();
+        GetProfiler()->lastRenderingTime = GetProfiler()->renderingClock.getTimeMicroseconds();
+        GetProfiler()->totalSceneTime += GetProfiler()->lastRenderingTime + GetProfiler()->lastEventsTime;
+        GetProfiler()->totalEventsTime += GetProfiler()->lastEventsTime;
+        GetProfiler()->Update();
     }
     #endif
 
@@ -287,8 +267,6 @@ void RuntimeScene::ManageRenderTargetEvents()
         {
             running = false;
             renderWindow->close();
-            #if defined(GD_IDE_ONLY)
-            #endif
         }
         else if (event.type == sf::Event::Resized)
         {
@@ -378,18 +356,18 @@ void RuntimeScene::Render()
         }
     }
 
-        //Internal profiler
-        #ifndef RELEASE
-        if ( sf::Keyboard::isKeyPressed(sf::Keyboard::F2))
-            CProfileManager::Reset();
+    //Internal profiler
+    #ifndef RELEASE
+    if ( sf::Keyboard::isKeyPressed(sf::Keyboard::F2))
+        CProfileManager::Reset();
 
-        renderWindow->setView(sf::View(sf::FloatRect(0.0f,0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight())));
+    renderWindow->setView(sf::View(sf::FloatRect(0.0f,0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight())));
 
-        CProfileIterator * iter = CProfileManager::Get_Iterator();
-        int y = 0;
-        DisplayProfile(renderWindow, iter, 0,y);
-        CProfileManager::Increment_Frame_Counter();
-        #endif
+    CProfileIterator * iter = CProfileManager::Get_Iterator();
+    int y = 0;
+    DisplayProfile(renderWindow, iter, 0,y);
+    CProfileManager::Increment_Frame_Counter();
+    #endif
 
     // Display window contents on screen
     renderWindow->popGLStates();
@@ -560,8 +538,8 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const I
     timeFromStart = 0;
     specialAction = -1;
 
-    codeExecutionEngine = scene.codeExecutionEngine;
-    codeExecutionEngine->llvmRuntimeContext->scene = this;
+    GetCodeExecutionEngine() = scene.GetCodeExecutionEngine();
+    GetCodeExecutionEngine()->llvmRuntimeContext->scene = this;
 
     //Initialize variables
     variables = scene.GetVariables();

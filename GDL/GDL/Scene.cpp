@@ -29,9 +29,6 @@ Scene::Scene() :
 backgroundColorR(209),
 backgroundColorG(209),
 backgroundColorB(209),
-#if defined(GD_IDE_ONLY)
-profiler(NULL),
-#endif
 codeExecutionEngine(boost::shared_ptr<CodeExecutionEngine>(new CodeExecutionEngine)),
 stopSoundsOnStartup(true),
 standardSortMethod(true),
@@ -40,7 +37,8 @@ oglZNear(1.0f),
 oglZFar(500.0f),
 disableInputWhenNotFocused(true)
 #if defined(GD_IDE_ONLY)
-,wasModified(false),
+,profiler(NULL),
+refreshNeeded(false),
 compilationNeeded(true)
 #endif
 {
@@ -288,11 +286,10 @@ void Scene::SaveToXml(TiXmlElement * scene) const
     scene->SetAttribute( "standardSortMethod", standardSortMethod ? "true" : "false" );
     scene->SetAttribute( "stopSoundsOnStartup", stopSoundsOnStartup ? "true" : "false" );
     scene->SetAttribute( "disableInputWhenNotFocused", disableInputWhenNotFocused ? "true" : "false" );
-    #if defined(GD_IDE_ONLY)
+
     TiXmlElement * settings = new TiXmlElement( "UISettings" );
     scene->LinkEndChild( settings );
     GetAssociatedSceneCanvasSettings().SaveToXml(settings);
-    #endif
 
     TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
     scene->LinkEndChild( grpsobjets );
@@ -325,12 +322,12 @@ void Scene::SaveToXml(TiXmlElement * scene) const
 
     TiXmlElement * dependenciesElem = new TiXmlElement( "Dependencies" );
     scene->LinkEndChild( dependenciesElem );
-    for ( unsigned int j = 0;j < externalSourcesDependList.size();++j)
+    for ( unsigned int j = 0;j < externalBitCodeDependList.size();++j)
     {
         TiXmlElement * dependencyElem = new TiXmlElement( "Dependency" );
         dependenciesElem->LinkEndChild( dependencyElem );
 
-        dependencyElem->SetAttribute("sourceFile", externalSourcesDependList[j].c_str());
+        dependencyElem->SetAttribute("bitcodeFile", externalBitCodeDependList[j].c_str());
     }
 
     TiXmlElement * positions = new TiXmlElement( "Positions" );
@@ -358,9 +355,7 @@ void Scene::LoadFromXml(const TiXmlElement * elem)
 
     #if defined(GD_IDE_ONLY)
     associatedSettings.LoadFromXml(elem->FirstChildElement( "UISettings" ));
-    #endif
 
-    #if defined(GD_IDE_ONLY)
     if ( elem->FirstChildElement( "GroupesObjets" ) != NULL )
         OpenSaveGame::OpenGroupesObjets(GetObjectGroups(), elem->FirstChildElement( "GroupesObjets" ));
     #endif
@@ -401,14 +396,14 @@ void Scene::LoadFromXml(const TiXmlElement * elem)
         }
     }
 
-    externalSourcesDependList.clear();
+    externalBitCodeDependList.clear();
     const TiXmlElement * dependenciesElem = elem->FirstChildElement( "Dependencies" );
     if ( dependenciesElem != NULL)
     {
         const TiXmlElement * dependencyElem = dependenciesElem->FirstChildElement();
         while(dependencyElem)
         {
-            externalSourcesDependList.push_back(dependencyElem->Attribute("sourceFile") != NULL ? dependencyElem->Attribute("sourceFile") : "");
+            externalBitCodeDependList.push_back(dependencyElem->Attribute("bitcodeFile") != NULL ? dependencyElem->Attribute("bitcodeFile") : "");
 
             dependencyElem = dependencyElem->NextSiblingElement();
         }
@@ -430,13 +425,7 @@ void Scene::Init(const Scene & scene)
     stopSoundsOnStartup = scene.stopSoundsOnStartup;
     disableInputWhenNotFocused = scene.disableInputWhenNotFocused;
 
-    #if defined(GD_IDE_ONLY)
-    profiler = scene.profiler;
-
-    events = CloneVectorOfEvents(scene.events);
-    #endif
-
-    externalSourcesDependList = scene.externalSourcesDependList;
+    externalBitCodeDependList = scene.GetExternalBitCodeDependList();
     codeExecutionEngine = boost::shared_ptr<CodeExecutionEngine>(new CodeExecutionEngine);
 
     GetInitialObjects().clear();
@@ -455,10 +444,12 @@ void Scene::Init(const Scene & scene)
     }
 
     #if defined(GD_IDE_ONLY)
-    compilationNeeded = true; //Force recompilation/refreshing
-    wasModified = true;
-
+    profiler = scene.profiler;
     associatedSettings = scene.associatedSettings;
+    events = CloneVectorOfEvents(scene.events);
+
+    SetCompilationNeeded(); //Force recompilation/refreshing
+    SetRefreshNeeded();
     #endif
 }
 Scene::Scene(const Scene & scene)

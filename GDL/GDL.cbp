@@ -1141,6 +1141,8 @@
 		<Unit filename="GDL\IDE\CodeCompiler.h" />
 		<Unit filename="GDL\IDE\CompilerMessagesParser.cpp" />
 		<Unit filename="GDL\IDE\CompilerMessagesParser.h" />
+		<Unit filename="GDL\IDE\DependenciesAnalyzer.cpp" />
+		<Unit filename="GDL\IDE\DependenciesAnalyzer.h" />
 		<Unit filename="GDL\IDE\Dialogs\AjoutPlusImage.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\AjoutPlusImage.h" />
 		<Unit filename="GDL\IDE\Dialogs\EditComment.cpp" />
@@ -1299,7 +1301,7 @@
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />
-				<doxyfile_dot />
+				<doxyfile_dot have_dot="1" />
 				<general />
 			</DoxyBlocks>
 		</Extensions>

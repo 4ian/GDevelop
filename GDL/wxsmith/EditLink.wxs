@@ -11,7 +11,6 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
-							<size>420,54</size>
 							<bg>wxSYS_COLOUR_WINDOW</bg>
 							<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
 								<cols>3</cols>
@@ -81,7 +80,7 @@
 							<growablecols>0</growablecols>
 							<object class="sizeritem">
 								<object class="wxRadioButton" name="ID_RADIOBUTTON1" variable="AllEventsCheck" member="yes">
-									<label>Every scene's events</label>
+									<label>Every scene&apos;s events</label>
 									<selected>1</selected>
 									<style>wxRB_GROUP</style>
 								</object>
@@ -205,6 +204,3 @@
 		</object>
 	</object>
 </wxsmith>
-
-
-

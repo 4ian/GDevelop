@@ -21,28 +21,18 @@ public:
      */
     std::string GetMangledObjectsListName(const std::string & originalObjectName);
 
-    static EventsCodeNameMangler *GetInstance()
-    {
-        if ( NULL == _singleton )
-        {
-            _singleton = new EventsCodeNameMangler;
-        }
+    /**
+     * Get the mangled function name to be used to call external events named \a externalEventsName.
+     */
+    std::string GetExternalEventsFunctionMangledName(const std::string & externalEventsName);
 
-        return ( static_cast<EventsCodeNameMangler*>( _singleton ) );
-    }
+    static EventsCodeNameMangler *GetInstance();
+    static void DestroySingleton();
 
-    static void DestroySingleton()
-    {
-        if ( NULL != _singleton )
-        {
-            delete _singleton;
-            _singleton = NULL;
-        }
-    }
 private:
-        EventsCodeNameMangler() {};
-        virtual ~EventsCodeNameMangler() {};
-        static EventsCodeNameMangler *_singleton;
+    EventsCodeNameMangler() {};
+    virtual ~EventsCodeNameMangler() {};
+    static EventsCodeNameMangler *_singleton;
 };
 
 /**

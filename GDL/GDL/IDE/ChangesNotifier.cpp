@@ -6,7 +6,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <wx/datetime.h>
 #include "ChangesNotifier.h"
+#include "GDL/IDE/DependenciesAnalyzer.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
@@ -19,11 +21,11 @@ void ChangesNotifier::OnObjectEdited(gd::Project & project, gd::Layout * layout,
         Scene * scene = dynamic_cast<Scene *>(layout);
 
         if ( scene )
-            scene->wasModified = true;
+            scene->SetRefreshNeeded();
         else //Scene pointer is not NULL: Update shared data of all scenes
         {
             for (unsigned int i = 0;i<game.GetLayouts().size();++i)
-                game.GetLayouts()[i]->wasModified = true;
+                game.GetLayouts()[i]->SetRefreshNeeded();
         }
     }
     catch(...)
@@ -34,18 +36,23 @@ void ChangesNotifier::OnObjectEdited(gd::Project & project, gd::Layout * layout,
 
 void ChangesNotifier::OnObjectAdded(gd::Project & project, gd::Layout * layout, gd::Object & object) const
 {
-    RequestCompilation(project, layout);
+    RequestFullRecompilation(project, layout);
 }
 
 void ChangesNotifier::OnObjectRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & oldName) const
 {
-    RequestCompilation(project, layout);
+    RequestFullRecompilation(project, layout);
+}
+
+void ChangesNotifier::OnVariablesModified(gd::Project & project, gd::Layout * layout) const
+{
+    RequestFullRecompilation(project, layout);
 }
 
 void ChangesNotifier::OnObjectsDeleted(gd::Project & project, gd::Layout * layout, const std::vector<std::string> & deletedObjects) const
 {
     RequestAutomatismsSharedDataUpdate(project, layout);
-    RequestCompilation(project, layout);
+    RequestFullRecompilation(project, layout);
 }
 
 void ChangesNotifier::OnAutomatismEdited(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const
@@ -56,11 +63,11 @@ void ChangesNotifier::OnAutomatismEdited(gd::Project & project, gd::Layout * lay
         Scene * scene = dynamic_cast<Scene *>(layout);
 
         if ( scene )
-            scene->wasModified = true;
+            scene->SetRefreshNeeded();
         else //Scene pointer is not NULL: Update shared data of all scenes
         {
             for (unsigned int i = 0;i<game.GetLayouts().size();++i)
-                game.GetLayouts()[i]->wasModified = true;
+                game.GetLayouts()[i]->SetRefreshNeeded();
         }
     }
     catch(...)
@@ -72,19 +79,19 @@ void ChangesNotifier::OnAutomatismEdited(gd::Project & project, gd::Layout * lay
 void ChangesNotifier::OnAutomatismAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const
 {
     RequestAutomatismsSharedDataUpdate(project, layout);
-    RequestCompilation(project, layout);
+    RequestFullRecompilation(project, layout);
 }
 
 void ChangesNotifier::OnAutomatismRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism, const std::string & oldName) const
 {
     RequestAutomatismsSharedDataUpdate(project, layout);
-    RequestCompilation(project, layout);
+    RequestFullRecompilation(project, layout);
 }
 
 void ChangesNotifier::OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & automatismName) const
 {
     RequestAutomatismsSharedDataUpdate(project, layout);
-    RequestCompilation(project, layout);
+    RequestFullRecompilation(project, layout);
 }
 
 void ChangesNotifier::OnObjectVariablesChanged(gd::Project & project, gd::Layout * layout, gd::Object & object) const
@@ -95,11 +102,18 @@ void ChangesNotifier::OnObjectVariablesChanged(gd::Project & project, gd::Layout
         Scene * scene = dynamic_cast<Scene *>(layout);
 
         if ( scene )
-            scene->wasModified = true;
+            scene->SetRefreshNeeded();
         else //Scene pointer is NULL: Update shared data of all scenes
         {
             for (unsigned int i = 0;i<game.GetLayouts().size();++i)
-                game.GetLayouts()[i]->wasModified = true;
+            {
+                game.GetLayouts()[i]->SetRefreshNeeded();
+                game.GetLayouts()[i]->SetCompilationNeeded();
+            }
+            for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
+            {
+                game.GetExternalEvents()[i]->SetLastChangeTimeStamp(wxDateTime::Now().GetTicks()); //Do no forget external events as they can have been compiled separately from scenes.
+            }
         }
     }
     catch(...)
@@ -108,16 +122,33 @@ void ChangesNotifier::OnObjectVariablesChanged(gd::Project & project, gd::Layout
     }
 }
 
-void ChangesNotifier::OnEventsModified(gd::Project & project, gd::Layout & layout, bool indirectChange) const
+void ChangesNotifier::OnEventsModified(gd::Project & project, gd::Layout & layout, bool indirectChange, std::string sourceOfTheIndirectChange) const
 {
     try
     {
         Game & game = dynamic_cast<Game &>(project);
         Scene & scene = dynamic_cast<Scene &>(layout);
 
-        scene.wasModified = true;
-        scene.SetCompilationNeeded();
-        if ( !indirectChange ) CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+        scene.SetRefreshNeeded();
+        if ( !indirectChange ) //Changes occured directly in the scene: Recompile it.
+        {
+            scene.SetCompilationNeeded();
+            CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+        }
+        else
+        {
+            DependenciesAnalyzer analyzer(game);
+            if ( analyzer.ExternalEventsCanBeCompiledForAScene(sourceOfTheIndirectChange) == scene.GetName() )
+            {
+                //Do nothing: Changes occured in an external event which is compiled separately
+            }
+            else
+            {
+                //Changes occured in an external event which is directly included in the scene events.
+                scene.SetCompilationNeeded();
+                CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+            }
+        }
     }
     catch(...)
     {
@@ -125,7 +156,71 @@ void ChangesNotifier::OnEventsModified(gd::Project & project, gd::Layout & layou
     }
 }
 
-void ChangesNotifier::RequestCompilation(gd::Project & project, gd::Layout * layout) const
+void ChangesNotifier::OnEventsModified(gd::Project & project, gd::ExternalEvents & externalEvents, bool indirectChange, std::string sourceOfTheIndirectChange) const
+{
+    try
+    {
+        Game & game = dynamic_cast<Game &>(project);
+        ExternalEvents & events = dynamic_cast<ExternalEvents &>(externalEvents);
+
+        DependenciesAnalyzer analyzer(game);
+        std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName());
+        bool externalEventsAreCompiledSeparately = !associatedScene.empty();
+
+        if ( externalEventsAreCompiledSeparately )
+        {
+            //The external events are compiled separately from the scene events:
+            //We need to recompile them if the changes occured inside them.
+
+            if ( !indirectChange )
+            {
+                DependenciesAnalyzer analyzer(game);
+                if ( analyzer.ExternalEventsCanBeCompiledForAScene(sourceOfTheIndirectChange) == associatedScene )
+                {
+                    //Do nothing: Changes occured in an external event which is compiled separately
+                }
+                else
+                {
+                    //Changes occured in an external event which is directly included in the scene events.
+                    events.SetLastChangeTimeStamp(wxDateTime::Now().GetTicks());
+                    CodeCompilationHelpers::CreateExternalEventsCompilationTask(game, events);
+                }
+            }
+            else
+            {
+                //Changes occured directly inside the external events: We need to recompile them
+                events.SetLastChangeTimeStamp(wxDateTime::Now().GetTicks());
+                CodeCompilationHelpers::CreateExternalEventsCompilationTask(game, events);
+            }
+
+        }
+    }
+    catch(...)
+    {
+        std::cout << "WARNING: IDE probably sent a gd::Project object which is not a GD C++ Platform project" << std::endl;
+    }
+}
+
+void ChangesNotifier::OnLayoutAdded(gd::Project & project, gd::Layout & layout) const
+{
+
+}
+
+void ChangesNotifier::OnLayoutRenamed(gd::Project & project, gd::Layout & layout, const std::string & oldName) const
+{
+
+}
+
+void ChangesNotifier::OnLayoutDeleted(gd::Project & project, const std::string deletedLayout) const
+{
+    //There is a possibility that the deleting the layout now enables some external events
+    //to be compiled separately from the scene using them ( For instance, scenes A and B are including
+    //the external events, and scene B is deleted ).
+    //So we request the recompilation of all scenes.
+    RequestFullRecompilation(project, NULL);
+}
+
+void ChangesNotifier::RequestFullRecompilation(gd::Project & project, gd::Layout * layout) const
 {
     try
     {
@@ -134,8 +229,33 @@ void ChangesNotifier::RequestCompilation(gd::Project & project, gd::Layout * lay
 
         if ( scene )
         {
-            scene->wasModified = true;
+            //Notify the scene it has been changed...
+            scene->SetRefreshNeeded();
+
+            //...as well as the dependencies
+            DependenciesAnalyzer analyzer(game);
+            analyzer.Analyze(scene->GetEvents());
+            std::set< std::string > externalEventsDependencies = analyzer.GetExternalEventsDependencies();
+            for (std::set<std::string>::const_iterator i = externalEventsDependencies.begin();i!=externalEventsDependencies.end();++i)
+            {
+                if ( game.HasExternalEventsNamed(*i) )
+                    game.GetExternalEvents(*i).SetLastChangeTimeStamp(wxDateTime::Now().GetTicks());
+            }
+
+            //And ask for a recompilation of everything.
             CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, *scene);
+        }
+        else //Scene pointer is NULL: Mark all scenes as modified
+        {
+            for (unsigned int i = 0;i<game.GetLayouts().size();++i)
+            {
+                game.GetLayouts()[i]->SetRefreshNeeded();
+                game.GetLayouts()[i]->SetCompilationNeeded();
+            }
+            for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
+            {
+                game.GetExternalEvents()[i]->SetLastChangeTimeStamp(wxDateTime::Now().GetTicks()); //Do no forget external events as they can have been compiled separately from scenes.
+            }
         }
     }
     catch(...)

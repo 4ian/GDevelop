@@ -17,7 +17,7 @@ class GD_API SceneNameMangler
 public:
 
     /**
-     * Mangle the name of a scene, replacing all characters that are not 0-9, a-z, A-Z or _ by "_"+AsciiCodeOfTheCharacter.
+     * Mangle the name of a scene, replacing all characters that are not 0-9, a-z, A-Z by "_"+AsciiCodeOfTheCharacter.
      */
     static std::string GetMangledSceneName(const std::string & originalSceneName);
 

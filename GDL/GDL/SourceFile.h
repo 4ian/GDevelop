@@ -28,16 +28,6 @@ public:
     virtual ~SourceFile();
 
     /**
-     * Get the latest time of the build
-     */
-    time_t GetLastBuildTimeStamp() const { return lastBuildTimeStamp; };
-
-    /**
-     * Change the latest time of the build of the file
-     */
-    void SetLastBuildTimeStamp(time_t newTimeStamp) { lastBuildTimeStamp = newTimeStamp; };
-
-    /**
      * Get the filename
      */
     std::string GetFileName() const { return filename; };

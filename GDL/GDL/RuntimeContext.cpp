@@ -1,5 +1,6 @@
 #include "RuntimeContext.h"
 #include "GDL/RuntimeScene.h"
+#include "GDL/profile.h"
 #include <vector>
 
 std::vector<Object*> RuntimeContext::GetObjectsRawPointers(const std::string & name)

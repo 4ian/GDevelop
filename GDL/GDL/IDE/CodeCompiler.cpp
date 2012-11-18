@@ -179,9 +179,14 @@ void CodeCompiler::ProcessTasks()
         if ( currentTask.preWork != boost::shared_ptr<CodeCompilerExtraWork>() )
         {
             std::cout << "Launching pre work..." << std::endl;
-            currentTask.preWork->Execute();
+            bool result = currentTask.preWork->Execute();
 
-            if ( currentTask.preWork->requestRelaunchCompilationLater )
+            if ( !result )
+            {
+                std::cout << "Preworker execution failed, task aborted." << std::endl;
+                skip = true;
+            }
+            else if ( currentTask.preWork->requestRelaunchCompilationLater )
             {
                 std::cout << "Preworker asked to launch the task later" << std::endl;
                 sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
@@ -275,10 +280,7 @@ void CodeCompiler::ProcessTasks()
 
             // Infer the builtin include path if unspecified.
             if (Clang.getHeaderSearchOpts().UseBuiltinIncludes && Clang.getHeaderSearchOpts().ResourceDir.empty())
-            {
                 Clang.getHeaderSearchOpts().ResourceDir = wxGetCwd();
-                std::cout << "Set res dir to " << Clang.getHeaderSearchOpts().ResourceDir << std::endl;
-            }
 
             //Diagnostic classes
             std::string compilationErrorFileErrors;

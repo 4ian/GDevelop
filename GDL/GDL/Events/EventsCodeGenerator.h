@@ -14,6 +14,7 @@
 #include <set>
 #include <utility>
 class Scene;
+class ExternalEvents;
 namespace gd { class ParameterMetadata; }
 class EventsCodeGenerationContext;
 namespace gd { class InstructionMetadata;}
@@ -27,9 +28,30 @@ class GD_API EventsCodeGenerator
 {
 public:
 
-    static std::string GenerateEventsCompleteCode(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events, bool compilationForRuntime = false);
+    /**
+     * Generate complete C++ file for compiling events of a scene
+     *
+     * \param game Game used
+     * \param scene Scene used
+     * \param events events of the scene
+     * \param compilationForRuntime Set this to true if the code is generated for runtime.
+     * \return C++ code
+     */
+    static std::string GenerateSceneEventsCompleteCode(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events, bool compilationForRuntime = false);
+
+    /**
+     * Generate complete C++ file for compiling external events.
+     * \note If events.AreCompiled() == false, no code is generated.
+     *
+     * \param game Game used
+     * \param events External events used.
+     * \param compilationForRuntime Set this to true if the code is generated for runtime.
+     * \return C++ code
+     */
+    static std::string GenerateExternalEventsCompleteCode(Game & game, ExternalEvents & events, bool compilationForRuntime = false);
+
     static void DeleteUselessEvents(std::vector < gd::BaseEventSPtr > & events);
-    static void PreprocessEventList( const Game & game, const Scene & scene, std::vector < gd::BaseEventSPtr > & listEvent );
+    static void PreprocessEventList( Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & listEvent );
 
     EventsCodeGenerator() : errorOccurred(false), compilationForRuntime(false) {};
     virtual ~EventsCodeGenerator() {};

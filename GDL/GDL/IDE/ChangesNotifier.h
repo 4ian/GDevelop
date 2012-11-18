@@ -21,11 +21,15 @@ public:
     ChangesNotifier() : gd::ChangesNotifier() {};
     virtual ~ChangesNotifier() {};
 
-    /** \name Specialization of gd::Layout members
+    /** \name Specialization of gd::ChangesNotifier members
      * See gd::ChangesNotifier documentation for more information about what these members functions should do.
      */
     ///@{
 
+    virtual void OnLayoutAdded(gd::Project & project, gd::Layout & layout) const;
+    virtual void OnLayoutRenamed(gd::Project & project, gd::Layout & layout, const std::string & oldName) const;
+    virtual void OnLayoutDeleted(gd::Project & project, const std::string deletedLayout) const;
+    virtual void OnVariablesModified(gd::Project & project, gd::Layout * layout) const;
     virtual void OnObjectEdited(gd::Project & project, gd::Layout * layout, gd::Object & object) const;
     virtual void OnObjectAdded(gd::Project & project, gd::Layout * layout, gd::Object & object) const;
     virtual void OnObjectRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & oldName) const;
@@ -35,7 +39,8 @@ public:
     virtual void OnAutomatismAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const;
     virtual void OnAutomatismRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism, const std::string & oldName) const;
     virtual void OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & automatismName) const;
-    virtual void OnEventsModified(gd::Project & project, gd::Layout & layout, bool indirectChange = false) const;
+    virtual void OnEventsModified(gd::Project & project, gd::Layout & layout, bool indirectChange = false, std::string sourceOfTheIndirectChange = "") const;
+    virtual void OnEventsModified(gd::Project & project, gd::ExternalEvents & externalEvents, bool indirectChange = false, std::string sourceOfTheIndirectChange = "") const;
     virtual void OnResourceModified(gd::Project & project, const std::string & resourceName) const;
 
     ///@}
@@ -44,9 +49,9 @@ private:
 
     /**
      * A common task when a changes have been made is to request the events of the scene
-     * to be compiled. This method do this by calling
+     * to be compiled, as well as its dependencies.
      */
-    void RequestCompilation(gd::Project & project, gd::Layout * layout) const;
+    void RequestFullRecompilation(gd::Project & project, gd::Layout * layout) const;
 
     /**
      * A common task when a changes have been made is to update the shared data of automatisms,

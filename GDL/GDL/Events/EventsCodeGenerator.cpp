@@ -7,9 +7,11 @@
 
 #include <utility>
 #include "GDCore/PlatformDefinition/Layout.h"
+#include "GDL/IDE/DependenciesAnalyzer.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/ExternalEvents.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
@@ -936,7 +938,7 @@ string EventsCodeGenerator::GenerateEventsListCode(Game & game, Scene & scene, v
     return output;
 }
 
-string EventsCodeGenerator::GenerateEventsCompleteCode(Game & game, Scene & scene, vector < gd::BaseEventSPtr > & events, bool compilationForRuntime)
+string EventsCodeGenerator::GenerateSceneEventsCompleteCode(Game & game, Scene & scene, vector < gd::BaseEventSPtr > & events, bool compilationForRuntime)
 {
     string output;
 
@@ -974,6 +976,51 @@ string EventsCodeGenerator::GenerateEventsCompleteCode(Game & game, Scene & scen
 
     return output;
 }
+
+std::string EventsCodeGenerator::GenerateExternalEventsCompleteCode(Game & game, ExternalEvents & events, bool compilationForRuntime)
+{
+    DependenciesAnalyzer analyzer(game);
+    std::string associatedSceneName = analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName());
+    if ( associatedSceneName.empty() || !game.HasLayoutNamed(associatedSceneName) )
+    {
+        std::cout << "ERROR: Cannot generate code for an external event: No unique associated scene." << std::endl;
+        return "";
+    }
+    Scene & associatedScene = *game.GetLayouts()[game.GetLayoutPosition(associatedSceneName)];
+
+    string output;
+
+    //Prepare the global context ( Used to get needed header files )
+    EventsCodeGenerationContext context;
+    EventsCodeGenerator codeGenerator;
+    codeGenerator.SetGenerateCodeForRuntime(compilationForRuntime);
+
+    //Generate whole events code
+    string wholeEventsCode = codeGenerator.GenerateEventsListCode(game, associatedScene, events.GetEvents(), context);
+
+    //Generate default code around events:
+    //Includes
+    output += "#include <vector>\n#include <map>\n#include <string>\n#include <algorithm>\n#include <SFML/System/Clock.hpp>\n#include <SFML/System/Vector2.hpp>\n#include <SFML/Graphics/Color.hpp>\n#include \"GDL/RuntimeContext.h\"\n#include \"GDL/Object.h\"\n";
+    for ( set<string>::iterator include = codeGenerator.GetIncludeFiles().begin() ; include != codeGenerator.GetIncludeFiles().end(); ++include )
+        output += "#include \""+*include+"\"\n";
+
+    //Extra declarations needed by events
+    for ( set<string>::iterator declaration = codeGenerator.GetCustomGlobalDeclaration().begin() ; declaration != codeGenerator.GetCustomGlobalDeclaration().end(); ++declaration )
+        output += *declaration+"\n";
+
+    output +=
+    codeGenerator.GetCustomCodeOutsideMain()+
+    "\n"
+    "void "+EventsCodeNameMangler::GetInstance()->GetExternalEventsFunctionMangledName(events.GetName())+"(RuntimeContext * runtimeContext)\n"
+    "{\n"
+	+codeGenerator.GetCustomCodeInMain()
+    +wholeEventsCode+
+    "return;\n"
+    "}\n";
+
+    return output;
+}
+
 std::string EventsCodeGenerator::ConvertToCppString(std::string plainString)
 {
     for (size_t i = 0;i<plainString.length();++i)
@@ -1027,11 +1074,9 @@ void EventsCodeGenerator::DeleteUselessEvents(vector < gd::BaseEventSPtr > & eve
 /**
  * Call preprocession method of each event
  */
-void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & scene, vector < gd::BaseEventSPtr > & listEvent )
+void EventsCodeGenerator::PreprocessEventList( Game & game, Scene & scene, vector < gd::BaseEventSPtr > & listEvent )
 {
-    #if defined(GD_IDE_ONLY)
     boost::shared_ptr<ProfileEvent> previousProfileEvent;
-    #endif
 
     for ( unsigned int i = 0;i < listEvent.size();++i )
     {
@@ -1039,8 +1084,7 @@ void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & 
         if ( listEvent[i]->CanHaveSubEvents() )
             PreprocessEventList( game, scene, listEvent[i]->GetSubEvents());
 
-        #if defined(GD_IDE_ONLY)
-        if ( scene.profiler && scene.profiler->profilingActivated && listEvent[i]->IsExecutable() )
+        if ( scene.GetProfiler() && scene.GetProfiler()->profilingActivated && listEvent[i]->IsExecutable() )
         {
             //Define a new profile event
             boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
@@ -1053,10 +1097,9 @@ void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & 
             previousProfileEvent = profileEvent;
             ++i; //Don't preprocess the newly added profile event
         }
-        #endif
     }
-    #if defined(GD_IDE_ONLY)
-    if ( !listEvent.empty() && scene.profiler && scene.profiler->profilingActivated )
+
+    if ( !listEvent.empty() && scene.GetProfiler() && scene.GetProfiler()->profilingActivated )
     {
         //Define a new profile event
         boost::shared_ptr<ProfileEvent> profileEvent = boost::shared_ptr<ProfileEvent>(new ProfileEvent);
@@ -1065,7 +1108,6 @@ void EventsCodeGenerator::PreprocessEventList( const Game & game, const Scene & 
         //Add it at the end of the events list
         listEvent.push_back(profileEvent);
     }
-    #endif
 }
 
 void EventsCodeGenerator::ReportError()

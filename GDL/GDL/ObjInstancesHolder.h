@@ -5,6 +5,7 @@
 #include <vector>
 #include <map>
 #include <boost/shared_ptr.hpp>
+#include <boost/unordered_map.hpp>
 class Object;
 
 typedef std::vector < boost::shared_ptr<Object> > ObjList;
@@ -46,7 +47,7 @@ public:
     {
         ObjList objList;
 
-        for (std::map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (boost::unordered_map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
             copy(it->second.begin(), it->second.end(), back_inserter(objList));
 
         return objList;
@@ -63,12 +64,12 @@ public:
      */
     inline void RemoveObject(const ObjSPtr & object)
     {
-        for (std::map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (boost::unordered_map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
         {
             ObjList & associatedList = it->second;
             associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
         }
-        for (std::map<std::string, std::vector<Object*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
+        for (boost::unordered_map<std::string, std::vector<Object*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
         {
             std::vector<Object*> & associatedList = it->second;
             associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object.get()), associatedList.end());
@@ -96,11 +97,6 @@ public:
     ObjInstancesHolder CopyAndCloneAllObjects() const;
 
     /**
-     * Merge this ObjInstancesHolder with the objects of another.
-     */
-    void Merge(ObjInstancesHolder & second);
-
-    /**
      * Clear the container.
      */
     inline void Clear()
@@ -109,11 +105,10 @@ public:
         objectsRawPointersInstances.clear();
     }
 
-protected:
 private:
 
-    std::map<std::string, ObjList > objectsInstances;
-    std::map<std::string, std::vector<Object*> > objectsRawPointersInstances;
+    boost::unordered_map<std::string, ObjList > objectsInstances;
+    boost::unordered_map<std::string, std::vector<Object*> > objectsRawPointersInstances;
 };
 
 #endif // OBJINSTANCESHOLDER_H

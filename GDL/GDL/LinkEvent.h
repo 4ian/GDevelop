@@ -20,14 +20,16 @@ class wxWindow;
 class LinkEvent : public gd::LinkEvent
 {
 public:
-    LinkEvent(): gd::LinkEvent() {};
+    LinkEvent(): gd::LinkEvent(), linkWasInvalid(false) {};
     virtual ~LinkEvent() {};
     virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new LinkEvent(*this));}
 
     virtual void SaveToXml(TiXmlElement * eventElem) const;
     virtual void LoadFromXml(const TiXmlElement * eventElem);
 
-    virtual void Preprocess(const Game & game, const Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
+    virtual bool IsExecutable() const { return true; };
+    virtual void Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
+    virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext);
 
     /**
      * Called by event editor to draw the event.
@@ -40,6 +42,8 @@ public:
     virtual unsigned int GetRenderedHeight(unsigned int width) const;
 
     virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+
+    bool linkWasInvalid; ///< Set to true by Preprocess if the links was invalid the last time is was processed. Used to display a warning in the events editor.
 };
 
 #endif // LINKCOMMENT_H

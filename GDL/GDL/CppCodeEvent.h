@@ -34,8 +34,7 @@ class CppCodeEvent : public gd::BaseEvent
         virtual bool CanHaveSubEvents() const {return false;}
 
         virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
-
-        std::string GenerateAssociatedFileCode();
+        void EnsureAssociatedSourceFileIsUpToDate(const Game & parentGame) const;
 
         const std::vector<std::string> & GetIncludeFiles() const { return includeFiles; };
         void SetIncludeFiles(const std::vector<std::string> & include_) { includeFiles = include_; };
@@ -46,7 +45,7 @@ class CppCodeEvent : public gd::BaseEvent
         const std::string & GetFunctionToCall() const { return functionToCall; };
         void SetFunctionToCall(const std::string & functionToCall_) { functionToCall = functionToCall_; };
 
-        const std::string & GetAssociatedGDManagedSourceFile() const { return associatedGDManagedSourceFile; };
+        const std::string & GetAssociatedGDManagedSourceFile(const Game & parentGame) const { EnsureAssociatedSourceFileIsUpToDate(parentGame); return associatedGDManagedSourceFile; };
         void SetAssociatedGDManagedSourceFile(const std::string & associatedGDManagedSourceFile_) { associatedGDManagedSourceFile = associatedGDManagedSourceFile_; };
 
         const std::vector<std::string> & GetDependencies() const { return dependencies; };
@@ -87,6 +86,7 @@ class CppCodeEvent : public gd::BaseEvent
 
     private:
         void Init(const CppCodeEvent & event);
+        std::string GenerateAssociatedFileCode() const;
 
         std::vector<std::string> includeFiles;
         std::vector<std::string> dependencies; ///< List of source files that must be compiled and loaded at the same time as the C++ event function.

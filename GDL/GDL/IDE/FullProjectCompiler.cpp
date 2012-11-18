@@ -141,14 +141,14 @@ void FullProjectCompiler::LaunchProjectCompilation()
     //Compile all scene events to bitcode
     for (unsigned int i = 0;i<game.GetLayoutCount();++i)
     {
-        if ( game.GetLayouts()[i]->profiler ) game.GetLayouts()[i]->profiler->profilingActivated = false;
+        if ( game.GetLayouts()[i]->GetProfiler() ) game.GetLayouts()[i]->GetProfiler()->profilingActivated = false;
 
         diagnosticManager.OnMessage(gd::ToString(_("Compiling scene ")+game.GetLayout(i).GetName()+_(".")));
         CodeCompilerTask task;
         task.compilationForRuntime = true;
         task.optimize = optimize;
         task.eventsGeneratedCode = true;
-        task.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+gd::ToString(game.GetLayouts()[i].get())+"events.cpp");
+        task.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GDPriv"+gd::ToString(game.GetLayouts()[i].get())+".cpp");
         task.outputFile = tempDir+"/GDpriv"+SceneNameMangler::GetMangledSceneName(game.GetLayouts()[i]->GetName())+".ir";
         task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, game.GetLayouts()[i].get(), resourcesMergingHelper));
         task.scene = game.GetLayouts()[i].get();

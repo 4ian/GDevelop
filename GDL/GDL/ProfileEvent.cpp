@@ -30,8 +30,8 @@ std::string ProfileEvent::GenerateEventCode(Game & game, Scene & scene, EventsCo
 
     ProfileLink profileLink;
     profileLink.originalEvent = originalEvent;
-    scene.profiler->profileEventsInformation.push_back(profileLink);
-    index = scene.profiler->profileEventsInformation.size()-1;
+    scene.GetProfiler()->profileEventsInformation.push_back(profileLink);
+    index = scene.GetProfiler()->profileEventsInformation.size()-1;
 
     std::string code;
 

@@ -13,12 +13,12 @@
 
 void GD_API StartProfileTimer(RuntimeScene & scene, unsigned int id)
 {
-    scene.profiler->profileEventsInformation[id].Reset();
+    scene.GetProfiler()->profileEventsInformation[id].Reset();
 }
 
 void GD_API EndProfileTimer(RuntimeScene & scene, unsigned int id)
 {
-    scene.profiler->profileEventsInformation[id].Stop();
+    scene.GetProfiler()->profileEventsInformation[id].Stop();
 }
 
 #endif

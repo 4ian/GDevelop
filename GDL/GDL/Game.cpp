@@ -503,7 +503,7 @@ void Game::OnSelectionInPropertyGrid(wxPropertyGrid * grid, wxPropertyGridEvent 
         //Our implementation need to do a full recompilation when global variables have been edited
         for (unsigned int i = 0;i<GetLayouts().size();++i)
         {
-            GetLayouts()[i]->wasModified = true;
+            GetLayouts()[i]->SetRefreshNeeded();
             CodeCompilationHelpers::CreateSceneEventsCompilationTask(*this, *GetLayouts()[i]);
         }
     }
@@ -646,19 +646,19 @@ bool Game::HasExternalEventsNamed(const std::string & name) const
 {
     return ( find_if(externalEvents.begin(), externalEvents.end(), bind2nd(ExternalEventsHasName(), name)) != externalEvents.end() );
 }
-gd::ExternalEvents & Game::GetExternalEvents(const std::string & name)
+ExternalEvents & Game::GetExternalEvents(const std::string & name)
 {
     return *(*find_if(externalEvents.begin(), externalEvents.end(), bind2nd(ExternalEventsHasName(), name)));
 }
-const gd::ExternalEvents & Game::GetExternalEvents(const std::string & name) const
+const ExternalEvents & Game::GetExternalEvents(const std::string & name) const
 {
     return *(*find_if(externalEvents.begin(), externalEvents.end(), bind2nd(ExternalEventsHasName(), name)));
 }
-gd::ExternalEvents & Game::GetExternalEvents(unsigned int index)
+ExternalEvents & Game::GetExternalEvents(unsigned int index)
 {
     return *externalEvents[index];
 }
-const gd::ExternalEvents & Game::GetExternalEvents (unsigned int index) const
+const ExternalEvents & Game::GetExternalEvents (unsigned int index) const
 {
     return *externalEvents[index];
 }

@@ -175,6 +175,13 @@ public:
     virtual void SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex);
     ///@}
 
+    /** \name Events compilation and bitcode management
+     * Members functions related to managing the compilation of events and the resulting bitcodes.
+     *
+     * \see CodeCompilationHelpers
+     */
+    ///@{
+
     /**
      * Set that the events need to be compiled.
      * \note The compilation is not launched at this time. It will for example occur when triggered by SceneCanvas
@@ -197,6 +204,32 @@ public:
      */
     virtual bool CompilationNeeded() { return compilationNeeded; };
 
+    ///@}
+
+    /** \name Changes notification
+     * Members functions used to notify the editor ( mainly SceneCanvas ) that changes have been made
+     * and that refreshing should be made.
+     */
+    ///@{
+
+    /**
+     * Return true if important changes have been made and so the editors must reload the scene.
+     * ( Important changes may refers to objects modified, properties updated, objects groups modified, variables modified )
+     */
+    bool RefreshNeeded() const { return refreshNeeded; }
+
+    /**
+     * Must be called when some important changes have been made and so the editors must reload the scene
+     * \see Scene::RefreshNeeded
+     */
+    void SetRefreshNeeded() { refreshNeeded = true; }
+
+    /**
+     * Must be called when the editor ( i.e: SceneCanvas ) managing the scene has reloaded it.
+     */
+    void SetRefreshNotNeeded() { refreshNeeded = false; }
+    ///@}
+
     /**
      * Make sure that the scene had an instance of shared data for
      * every automatism of every object that can be used on the scene
@@ -206,6 +239,26 @@ public:
      * or when a scene have been added to a game.
      */
     void UpdateAutomatismsSharedData(Game & game);
+
+    /**
+     * Return the settings associated to the scene.
+     */
+    const SceneCanvasSettings & GetAssociatedSceneCanvasSettings() const { return associatedSettings; }
+
+    /**
+     * Return the settings associated to the scene.
+     */
+    SceneCanvasSettings & GetAssociatedSceneCanvasSettings() { return associatedSettings; }
+
+    /**
+     * Get the profiler associated with the scene. Can be NULL.
+     */
+    BaseProfiler * GetProfiler() { return profiler; };
+
+    /**
+     * Set the profiler associated with the scene. Can be NULL.
+     */
+    void SetProfiler(BaseProfiler * profiler_) { profiler = profiler_; };
 
     virtual void SaveToXml(TiXmlElement * element) const;
     #endif
@@ -274,27 +327,26 @@ public:
     float GetOpenGLZFar() const { return oglZFar; }
     ///@}
 
-    #if defined(GD_IDE_ONLY)
-    BaseProfiler *                          profiler; ///< Pointer to the profiler. Can be NULL.
-    #endif
     std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
 
-    mutable std::vector<std::string>        externalSourcesDependList; ///< List of source files the scene code depends on.
-    boost::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
-
-    #if defined(GD_IDE_ONLY)
-    bool wasModified;
+    /** \name Code execution engine
+     * Functions members giving access to the code execution engine.
+     */
+    ///@{
 
     /**
-     * Return the settings associated to the scene.
+     * Get the list containing the list of bitcodes files which must be loaded at the same time of the scene's bitcode.
+     * This list is populated at the compilation ( see CodeCompiler and EventsCodeCompilerRuntimePreWork classes ) and is only used at runtime ( i.e: Not in the IDE ).
+     * The IDE takes care of loading itself the necessary bitcodes ( See EventsCodeCompilerPostWork class ).
      */
-    const SceneCanvasSettings & GetAssociatedSceneCanvasSettings() const { return associatedSettings; }
+    std::vector<std::string> & GetExternalBitCodeDependList() const { return externalBitCodeDependList; };
 
     /**
-     * Return the settings associated to the scene.
+     * Give access to the execution engine of the scene.
+     * Each scene has its own unique execution engine.
      */
-    SceneCanvasSettings & GetAssociatedSceneCanvasSettings() { return associatedSettings; }
-    #endif
+    boost::shared_ptr<CodeExecutionEngine> GetCodeExecutionEngine() const { return codeExecutionEngine; }
+    ///@}
 
 private:
 
@@ -314,8 +366,13 @@ private:
     float                                       oglZFar; ///< OpenGL Far Z position
     bool                                        disableInputWhenNotFocused; /// If set to true, the input must be disabled when the window do not have the focus.
 
+    mutable std::vector<std::string>            externalBitCodeDependList; ///< List of bitcode files the scene depends on. Used only for runtime and not in the IDE.
+    mutable boost::shared_ptr<CodeExecutionEngine> codeExecutionEngine;
+
     #if defined(GD_IDE_ONLY)
     std::vector < gd::BaseEventSPtr >           events; ///< Scene events
+    BaseProfiler *                              profiler; ///< Pointer to the profiler. Can be NULL.
+    bool                                        refreshNeeded; ///< If set to true, the IDE will reload the scene( thanks to SceneCanvas notably which check this flag when the scene is being edited )
     bool                                        compilationNeeded; ///< If set to true, the IDE will recompile the events ( thanks to SceneCanvas notably which check this flag when the scene is being edited )
     SceneCanvasSettings                         associatedSettings;
     #endif

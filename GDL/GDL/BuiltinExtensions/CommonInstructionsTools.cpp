@@ -4,6 +4,7 @@
  */
 
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
+#include "GDL/profile.h"
 #include <SFML/Graphics.hpp>
 #include <sstream>
 

@@ -22,9 +22,9 @@ class wxPropertyGridEvent;
 #include "GDCore/PlatformDefinition/Project.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
-namespace gd { class ExternalEvents; }
 namespace GDpriv { class SourceFile; }
 #include "GDL/IDE/ChangesNotifier.h"
+#include "GDL/ExternalEvents.h"
 #endif
 
 /**
@@ -242,10 +242,10 @@ public:
     virtual void RemoveLayout(const std::string & name);
 
     virtual bool HasExternalEventsNamed(const std::string & name) const;
-    virtual gd::ExternalEvents & GetExternalEvents(const std::string & name);
-    virtual const gd::ExternalEvents & GetExternalEvents(const std::string & name) const;
-    virtual gd::ExternalEvents & GetExternalEvents(unsigned int index);
-    virtual const gd::ExternalEvents & GetExternalEvents (unsigned int index) const;
+    virtual ExternalEvents & GetExternalEvents(const std::string & name);
+    virtual const ExternalEvents & GetExternalEvents(const std::string & name) const;
+    virtual ExternalEvents & GetExternalEvents(unsigned int index);
+    virtual const ExternalEvents & GetExternalEvents (unsigned int index) const;
     virtual unsigned int GetExternalEventsPosition(const std::string & name) const;
     virtual unsigned int GetExternalEventsCount() const;
     virtual void InsertNewExternalEvents(std::string & name, unsigned int position);

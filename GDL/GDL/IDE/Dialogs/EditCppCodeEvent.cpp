@@ -80,7 +80,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game
 	FlexGridSizer2->AddGrowableRow(1);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer17->AddGrowableCol(0);
-	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
+	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer6->AddGrowableCol(1);
@@ -89,6 +89,7 @@ EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game
 	StaticText3 = new wxStaticText(Panel1, ID_STATICTEXT3, _("The C++ code events allow you to call a function written in C++,\nwith if needed the scene or some objects passed as arguments.\nYou can also specify the external source files which must be compiled\nif your function is refering to features implemented in external source files."), wxDefaultPosition, wxSize(760,75), 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer6->Add(StaticText3, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
+	FlexGridSizer6->Fit(Panel1);
 	FlexGridSizer6->SetSizeHints(Panel1);
 	FlexGridSizer17->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
@@ -257,7 +258,7 @@ void EditCppCodeEvent::OnokBtClick(wxCommandEvent& event)
     editedEvent.SetDependencies(dependencies);
 
     //Create a (hidden gd managed) source filed if needed
-    if ( editedEvent.GetAssociatedGDManagedSourceFile().empty() )
+    if ( editedEvent.GetAssociatedGDManagedSourceFile(game).empty() )
     {
         boost::shared_ptr<GDpriv::SourceFile> associatedSourceFile(new GDpriv::SourceFile);
         associatedSourceFile->SetGDManaged(true);

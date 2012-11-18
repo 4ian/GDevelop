@@ -11,6 +11,7 @@
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/RuntimeGame.h"
+#include "GDL/profile.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Text.h"
 

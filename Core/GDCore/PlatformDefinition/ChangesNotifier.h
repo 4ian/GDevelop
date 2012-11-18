@@ -11,6 +11,7 @@ namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class Object; }
 namespace gd { class Automatism; }
+namespace gd { class ExternalEvents; }
 
 namespace gd
 {
@@ -28,17 +29,64 @@ public:
     ChangesNotifier() {};
     virtual ~ChangesNotifier() {};
 
+    /** \name Layouts
+     * Members functions called by the IDE so as to notify changes have been made
+     */
+    ///@{
+
+    /**
+     * Called when a layout was added to a project
+     * \param project Related project
+     * \param layout Layout
+     */
+    virtual void OnLayoutAdded(gd::Project & project, gd::Layout & layout) const {};
+
+    /**
+     * Called when a layout was renamed
+     * \param project Related project
+     * \param layout Layout
+     * \param oldName Old name of the layout
+     */
+    virtual void OnLayoutRenamed(gd::Project & project, gd::Layout & layout, const std::string & oldName) const {};
+
+    /**
+     * Called when a layout was removed from a project
+     * \param project Related project
+     * \param deletedLayout Name of the removed layout
+     */
+    virtual void OnLayoutDeleted(gd::Project & project, const std::string deletedLayout) const {};
+
+    /**
+     * Called when (layout or global) variables were modified
+     * \param project Related project
+     * \param layout Layout owning the variables, if applicable
+     */
+    virtual void OnVariablesModified(gd::Project & project, gd::Layout * layout = NULL) const {};
+
+    ///@}
+
     /** \name Events
      * Members functions called by the IDE so as to notify changes have been made
      */
     ///@{
+
     /**
      * Called when the events of a layout have been modified.
      * \param project Related project
      * \param layout Layout
      * \param indirectChange true if the changes have been made "indirectly" by modifying for example some external events used by a layout
+     * \param sourceOfTheIndirectChange if indirectChange == true, contains the name of the external events which trigger the change.
      */
-    virtual void OnEventsModified(gd::Project & project, gd::Layout & layout, bool indirectChange = false) const {std::cout << "AAA";};
+    virtual void OnEventsModified(gd::Project & project, gd::Layout & layout, bool indirectChange = false, std::string sourceOfTheIndirectChange = "") const {};
+
+    /**
+     * Called when some external events have been modified.
+     * \param project Related project
+     * \param events External events
+     * \param indirectChange true if the changes have been made "indirectly" by modifying for example some external events used by a layout
+     * \param sourceOfTheIndirectChange if indirectChange == true, contains the name of the external events which trigger the change.
+     */
+    virtual void OnEventsModified(gd::Project & project, gd::ExternalEvents & events, bool indirectChange = false, std::string sourceOfTheIndirectChange = "") const {};
     ///@}
 
     /** \name Objects and automatisms notifications

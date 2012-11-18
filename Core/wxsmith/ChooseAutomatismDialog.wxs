@@ -14,7 +14,6 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
-							<size>420,54</size>
 							<bg>wxSYS_COLOUR_WINDOW</bg>
 							<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
 								<cols>3</cols>

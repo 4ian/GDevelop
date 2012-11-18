@@ -142,7 +142,7 @@ public:
     /**
      * Called before events are compiled
      */
-    virtual void Preprocess(const Game & game, const Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
+    virtual void Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
 
     ///@}
 

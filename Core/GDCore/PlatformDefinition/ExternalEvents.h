@@ -9,6 +9,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 namespace gd { class BaseEvent; }
+class TiXmlElement;
 
 namespace gd
 {
@@ -47,6 +48,17 @@ public:
     virtual void SetName(const std::string & name_) = 0;
 
     /**
+     * Get the scene associated with external events.
+     */
+    virtual const std::string & GetAssociatedScene() const = 0;
+
+    /**
+     * Set the scene associated with external events.
+     * Useful to display objects, variables available during edition in the IDE for example.
+     */
+    virtual void SetAssociatedScene(const std::string & name_) = 0;
+
+    /**
      * Must return a reference to the list of events associated to the ExternalEvents class.
      */
     virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const =0;
@@ -55,6 +67,22 @@ public:
      * Must return a reference to the list of events associated to the ExternalEvents class.
      */
     virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() =0;
+
+    /** \name Saving and loading
+     * Members functions related to saving and loading the object.
+     */
+    ///@{
+
+    /**
+     * Called to save the layout to a TiXmlElement.
+     */
+    virtual void SaveToXml(TiXmlElement * element) const =0;
+
+    /**
+     * Called to load the layout from a TiXmlElement.
+     */
+    virtual void LoadFromXml(const TiXmlElement * element) =0;
+    ///@}
 
 private:
 };

@@ -25,20 +25,36 @@ void EventsChangesNotifier::NotifyChangesInEventsOfScene(gd::Project & project, 
         if ( &project.GetLayout(i) == &layout ) continue;
 
         std::vector< gd::Layout* > linkedScenes;
-        std::vector< gd::ExternalEvents * > notUsed;
+        std::vector< gd::ExternalEvents * > linkedExternalEvents;
 
-        GetScenesAndExternalEventsLinkedTo(project.GetLayout(i).GetEvents(), project, linkedScenes, notUsed);
+        GetScenesAndExternalEventsLinkedTo(project.GetLayout(i).GetEvents(), project, linkedScenes, linkedExternalEvents);
 
         for (unsigned int j = 0;j<linkedScenes.size();++j)
         {
             if ( linkedScenes[j]->GetName() == layout.GetName() )
-                project.GetChangesNotifier().OnEventsModified(project, project.GetLayout(i), /*indirectChange=*/true);
+                project.GetChangesNotifier().OnEventsModified(project, project.GetLayout(i), /*indirectChange=*/true, layout.GetName());
+        }
+    }
+    //Also notify external events
+    for (unsigned int i = 0;i<project.GetExternalEventsCount();++i)
+    {
+        std::vector< gd::Layout* > linkedScenes;
+        std::vector< gd::ExternalEvents * > linkedExternalEvents;
+
+        GetScenesAndExternalEventsLinkedTo(project.GetExternalEvents(i).GetEvents(), project, linkedScenes, linkedExternalEvents);
+
+        for (unsigned int j = 0;j<linkedScenes.size();++j)
+        {
+            if ( linkedScenes[j]->GetName() == layout.GetName() )
+                project.GetChangesNotifier().OnEventsModified(project, project.GetExternalEvents(i), /*indirectChange=*/true, layout.GetName());
         }
     }
 }
 
 void EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(gd::Project & project, gd::ExternalEvents & externalEvents)
 {
+    project.GetChangesNotifier().OnEventsModified(project, externalEvents);
+
     //Notify scenes, which include the external events ( even indirectly ), that their events has changed
     for (unsigned int i = 0;i<project.GetLayoutCount();++i)
     {
@@ -50,7 +66,21 @@ void EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(gd::Project & 
         for (unsigned int j = 0;j<linkedExternalEvents.size();++j)
         {
             if ( linkedExternalEvents[j]->GetName() == externalEvents.GetName() )
-                project.GetChangesNotifier().OnEventsModified(project, project.GetLayout(i), /*indirectChange=*/true);
+                project.GetChangesNotifier().OnEventsModified(project, project.GetLayout(i), /*indirectChange=*/true, externalEvents.GetName());
+        }
+    }
+    //Also notify external events
+    for (unsigned int i = 0;i<project.GetExternalEventsCount();++i)
+    {
+        std::vector< gd::Layout* > linkedScenes;
+        std::vector< gd::ExternalEvents * > linkedExternalEvents;
+
+        GetScenesAndExternalEventsLinkedTo(project.GetExternalEvents(i).GetEvents(), project, linkedScenes, linkedExternalEvents);
+
+        for (unsigned int j = 0;j<linkedScenes.size();++j)
+        {
+            if ( linkedScenes[j]->GetName() == externalEvents.GetName() )
+                project.GetChangesNotifier().OnEventsModified(project, project.GetExternalEvents(i), /*indirectChange=*/true, externalEvents.GetName());
         }
     }
 }

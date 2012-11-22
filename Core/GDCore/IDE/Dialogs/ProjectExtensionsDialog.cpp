@@ -24,6 +24,7 @@
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 
 using namespace std;
 
@@ -47,6 +48,8 @@ const long ProjectExtensionsDialog::ID_STATICBITMAP4 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICBITMAP1 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICTEXT8 = wxNewId();
 const long ProjectExtensionsDialog::ID_HYPERLINKCTRL1 = wxNewId();
+const long ProjectExtensionsDialog::ID_STATICBITMAP5 = wxNewId();
+const long ProjectExtensionsDialog::ID_HYPERLINKCTRL2 = wxNewId();
 const long ProjectExtensionsDialog::ID_STATICTEXT2 = wxNewId();
 const long ProjectExtensionsDialog::ID_BUTTON3 = wxNewId();
 //*)
@@ -75,6 +78,7 @@ project(project_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
+	wxFlexGridSizer* FlexGridSizer17;
 
 	Create(parent, wxID_ANY, _("Use extension modules for Game Develop"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -162,6 +166,14 @@ project(project_)
 	FlexGridSizer1->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer4->AddGrowableCol(0);
+	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer17->AddGrowableRow(0);
+	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
+	FlexGridSizer17->Add(StaticBitmap2, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	helpBt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL2, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
+	helpBt->SetToolTip(_("Display help about this window"));
+	FlexGridSizer17->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer4->Add(FlexGridSizer17, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Close and reopen scene editors so as to take in account newly added extensions."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	wxFont StaticText2Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_ITALIC,wxNORMAL,false,wxEmptyString,wxFONTENCODING_DEFAULT);
 	StaticText2->SetFont(StaticText2Font);
@@ -175,6 +187,7 @@ project(project_)
 	Center();
 
 	Connect(ID_CHECKLISTBOX1,wxEVT_COMMAND_LISTBOX_SELECTED,(wxObjectEventFunction)&ProjectExtensionsDialog::OnExtensionsListSelect);
+	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ProjectExtensionsDialog::OnhelpBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ProjectExtensionsDialog::OnFermerBtClick);
 	//*)
 
@@ -290,6 +303,11 @@ void ProjectExtensionsDialog::OnFermerBtClick(wxCommandEvent& event)
     }
 
     EndModal(0);
+}
+
+void ProjectExtensionsDialog::OnhelpBtClick(wxCommandEvent& event)
+{
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/extensions"));
 }
 
 }

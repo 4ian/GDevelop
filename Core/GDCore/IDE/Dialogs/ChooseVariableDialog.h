@@ -12,6 +12,7 @@
 #include <wx/aui/aui.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -69,11 +70,12 @@ public:
 
     //(*Declarations(ChooseVariableDialog)
     wxAuiManager* AuiManager1;
-    wxButton* helpBt;
+    wxStaticBitmap* StaticBitmap2;
     wxPanel* toolbarPanel;
     wxAuiToolBar* toolbar;
     wxStaticBitmap* StaticBitmap1;
     wxListCtrl* variablesList;
+    wxHyperlinkCtrl* HyperlinkCtrl1;
     wxButton* cancelBt;
     wxStaticLine* StaticLine2;
     wxStaticLine* StaticLine1;
@@ -93,9 +95,10 @@ protected:
     static const long ID_PANEL1;
     static const long ID_LISTCTRL1;
     static const long ID_STATICLINE2;
+    static const long ID_STATICBITMAP2;
+    static const long ID_HYPERLINKCTRL1;
     static const long ID_BUTTON1;
     static const long ID_BUTTON3;
-    static const long ID_BUTTON2;
     //*)
     static const long idAddVar;
     static const long idEditVar;

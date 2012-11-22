@@ -27,6 +27,7 @@
 											<object class="Custom" name="ID_CUSTOM1" subclass="wxStyledTextCtrl" variable="TexteEdit" member="yes">
 												<creating_code>$(THIS) = new $(CLASS)($(PARENT),$(ID),$(POS),$(SIZE),$(STYLE),$(NAME));</creating_code>
 												<include_file>wx/stc/stc.h</include_file>
+												<style></style>
 												<size>300,28</size>
 												<minsize>300,28</minsize>
 											</object>
@@ -55,11 +56,30 @@
 											<option>1</option>
 										</object>
 										<object class="sizeritem">
-											<object class="wxButton" name="ID_BUTTON4" variable="helpBt" member="yes">
-												<label>Help</label>
-												<handler function="OnhelpBtClick" entry="EVT_BUTTON" />
+											<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
+												<cols>3</cols>
+												<growablerows>0</growablerows>
+												<object class="sizeritem">
+													<object class="wxStaticBitmap" name="ID_STATICBITMAP5" variable="StaticBitmap2" member="yes">
+														<bitmap>res/helpicon.png</bitmap>
+														<style>wxNO_BORDER</style>
+													</object>
+													<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL2" variable="HyperlinkCtrl1" member="yes">
+														<label>Help</label>
+														<tooltip>Display help about this window</tooltip>
+														<handler function="OnhelpBtClick" entry="EVT_HYPERLINK" />
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
 											</object>
-											<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<flag>wxRIGHT|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 											<border>5</border>
 											<option>1</option>
 										</object>

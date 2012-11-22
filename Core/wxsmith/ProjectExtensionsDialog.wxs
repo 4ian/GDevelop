@@ -262,6 +262,33 @@
 					<cols>3</cols>
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
+						<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
+							<cols>3</cols>
+							<growablerows>0</growablerows>
+							<object class="sizeritem">
+								<object class="wxStaticBitmap" name="ID_STATICBITMAP5" variable="StaticBitmap2" member="yes">
+									<bitmap>res/helpicon.png</bitmap>
+									<style>wxNO_BORDER</style>
+								</object>
+								<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL2" variable="helpBt" member="yes">
+									<label>Help</label>
+									<tooltip>Display help about this window</tooltip>
+									<handler function="OnhelpBtClick" entry="EVT_HYPERLINK" />
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
 						<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
 							<label>Close and reopen scene editors so as to take in account newly added extensions.</label>
 							<font>

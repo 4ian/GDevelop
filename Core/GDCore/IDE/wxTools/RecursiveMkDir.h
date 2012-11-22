@@ -12,6 +12,9 @@ namespace gd
 
 /**
  * \brief Provides an access to a recursive mkdir function.
+ *
+ * \ingroup IDE
+ * \ingroup wxTools
  */
 class GD_CORE_API RecursiveMkDir
 {

@@ -44,7 +44,8 @@ namespace gd
 const long EditExpressionDialog::ID_CUSTOM1 = wxNewId();
 const long EditExpressionDialog::ID_BUTTON1 = wxNewId();
 const long EditExpressionDialog::ID_HYPERLINKCTRL1 = wxNewId();
-const long EditExpressionDialog::ID_BUTTON34 = wxNewId();
+const long EditExpressionDialog::ID_STATICBITMAP5 = wxNewId();
+const long EditExpressionDialog::ID_HYPERLINKCTRL2 = wxNewId();
 const long EditExpressionDialog::ID_PANEL1 = wxNewId();
 const long EditExpressionDialog::ID_STATICTEXT1 = wxNewId();
 const long EditExpressionDialog::ID_BUTTON2 = wxNewId();
@@ -108,6 +109,7 @@ lastErrorPos(std::string::npos)
 	wxFlexGridSizer* FlexGridSizer7;
 	wxBoxSizer* BoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
+	wxFlexGridSizer* FlexGridSizer17;
 	wxGridSizer* GridSizer2;
 
 	Create(parent, wxID_ANY, _("Edit the expression"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
@@ -133,8 +135,14 @@ lastErrorPos(std::string::npos)
 	errorTxt->SetToolTip(_("Click to position cursor on the error."));
 	FlexGridSizer7->Add(errorTxt, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer7, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	helpBt = new wxButton(centerPanel, ID_BUTTON34, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON34"));
-	FlexGridSizer2->Add(helpBt, 0, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer17->AddGrowableRow(0);
+	StaticBitmap2 = new wxStaticBitmap(centerPanel, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
+	FlexGridSizer17->Add(StaticBitmap2, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	HyperlinkCtrl1 = new wxHyperlinkCtrl(centerPanel, ID_HYPERLINKCTRL2, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
+	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
+	FlexGridSizer17->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(FlexGridSizer17, 1, wxRIGHT|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	centerPanel->SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(centerPanel);
@@ -294,7 +302,7 @@ lastErrorPos(std::string::npos)
 
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpressionDialog::OnOkBtClick);
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditExpressionDialog::OnerrorTxtClick);
-	Connect(ID_BUTTON34,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpressionDialog::OnhelpBtClick);
+	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditExpressionDialog::OnhelpBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpressionDialog::OnPlusBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpressionDialog::OnMinusBtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditExpressionDialog::OnMultBtClick);
@@ -961,10 +969,7 @@ void EditExpressionDialog::OnButton17Click(wxCommandEvent& event)
 
 void EditExpressionDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(145);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_expr"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_expr"));
 }
 
 }

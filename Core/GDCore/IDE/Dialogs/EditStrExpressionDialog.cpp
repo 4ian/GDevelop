@@ -4,7 +4,9 @@
  */
 
 //(*InternalHeaders(EditStrExpressionDialog)
+#include <wx/bitmap.h>
 #include <wx/intl.h>
+#include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <wx/msgdlg.h>
@@ -37,7 +39,8 @@ namespace gd
 const long EditStrExpressionDialog::ID_CUSTOM1 = wxNewId();
 const long EditStrExpressionDialog::ID_BUTTON2 = wxNewId();
 const long EditStrExpressionDialog::ID_HYPERLINKCTRL1 = wxNewId();
-const long EditStrExpressionDialog::ID_BUTTON4 = wxNewId();
+const long EditStrExpressionDialog::ID_STATICBITMAP5 = wxNewId();
+const long EditStrExpressionDialog::ID_HYPERLINKCTRL2 = wxNewId();
 const long EditStrExpressionDialog::ID_PANEL1 = wxNewId();
 const long EditStrExpressionDialog::ID_TREECTRL1 = wxNewId();
 const long EditStrExpressionDialog::ID_BUTTON10 = wxNewId();
@@ -63,6 +66,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	wxFlexGridSizer* FlexGridSizer9;
 	wxFlexGridSizer* FlexGridSizer7;
 	wxFlexGridSizer* FlexGridSizer1;
+	wxFlexGridSizer* FlexGridSizer17;
 
 	Create(parent, wxID_ANY, _("Edit the text"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX, _T("wxID_ANY"));
 	wxIcon FrameIcon;
@@ -86,8 +90,14 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 	errorTxt = new wxHyperlinkCtrl(centerPanel, ID_HYPERLINKCTRL1, _("No errors."), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_LEFT|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	errorTxt->SetToolTip(_("Click to position cursor on the error."));
 	FlexGridSizer3->Add(errorTxt, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	helpBt = new wxButton(centerPanel, ID_BUTTON4, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
-	FlexGridSizer3->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer17->AddGrowableRow(0);
+	StaticBitmap2 = new wxStaticBitmap(centerPanel, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
+	FlexGridSizer17->Add(StaticBitmap2, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	HyperlinkCtrl1 = new wxHyperlinkCtrl(centerPanel, ID_HYPERLINKCTRL2, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
+	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
+	FlexGridSizer17->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3->Add(FlexGridSizer17, 1, wxRIGHT|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	centerPanel->SetSizer(FlexGridSizer1);
@@ -123,7 +133,7 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
 
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditStrExpressionDialog::OnOkBtClick);
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditStrExpressionDialog::OnerrorTxtClick);
-	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditStrExpressionDialog::OnhelpBtClick);
+	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditStrExpressionDialog::OnhelpBtClick);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&EditStrExpressionDialog::OnObjListItemActivated);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&EditStrExpressionDialog::OnObjListSelectionChanged);
 	Connect(ID_BUTTON10,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditStrExpressionDialog::OnAddPropBtClick);
@@ -607,10 +617,7 @@ void EditStrExpressionDialog::OnerrorTxtClick(wxCommandEvent& event)
 
 void EditStrExpressionDialog::OnhelpBtClick(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(9);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_text"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_text"));
 }
 
 }

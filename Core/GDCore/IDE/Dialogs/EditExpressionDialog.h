@@ -15,6 +15,7 @@
 #include <wx/panel.h>
 #include <wx/hyperlink.h>
 #include <wx/bmpbuttn.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 #include <wx/stc/stc.h>
@@ -57,7 +58,7 @@ public:
     wxPanel* mathPanel;
     wxButton* OkBt;
     wxButton* Button20;
-    wxButton* helpBt;
+    wxStaticBitmap* StaticBitmap2;
     wxButton* Button4;
     wxButton* DivBt;
     wxAuiManager* mgr;
@@ -72,6 +73,7 @@ public:
     wxButton* Button14;
     wxBitmapButton* BitmapButton2;
     wxStaticText* StaticText1;
+    wxHyperlinkCtrl* HyperlinkCtrl1;
     wxBitmapButton* BitmapButton1;
     wxPanel* freeFunctionsPanel;
     wxTreeCtrl* ObjList;
@@ -108,7 +110,8 @@ protected:
     static const long ID_CUSTOM1;
     static const long ID_BUTTON1;
     static const long ID_HYPERLINKCTRL1;
-    static const long ID_BUTTON34;
+    static const long ID_STATICBITMAP5;
+    static const long ID_HYPERLINKCTRL2;
     static const long ID_PANEL1;
     static const long ID_STATICTEXT1;
     static const long ID_BUTTON2;

@@ -11,6 +11,7 @@
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/statline.h>
+#include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -45,12 +46,14 @@ public:
     const std::string & GetSelectedObjectType() const { return selectedObjectType; }
 
     //(*Declarations(ChooseObjectTypeDialog)
+    wxStaticBitmap* StaticBitmap2;
     wxStaticBitmap* iconBmp;
     wxStaticText* StaticText2;
     wxTextCtrl* infoEdit;
     wxButton* moreObjectsBt;
     wxButton* cancelBt;
     wxStaticLine* StaticLine2;
+    wxHyperlinkCtrl* helpBt;
     wxButton* okBt;
     wxListCtrl* objectsList;
     //*)
@@ -65,6 +68,8 @@ protected:
     static const long ID_TEXTCTRL1;
     static const long ID_STATICLINE2;
     static const long ID_BUTTON3;
+    static const long ID_STATICBITMAP5;
+    static const long ID_HYPERLINKCTRL2;
     static const long ID_BUTTON1;
     static const long ID_BUTTON2;
     //*)
@@ -78,6 +83,7 @@ private:
     void OnokBtClick(wxCommandEvent& event);
     void OnClose(wxCloseEvent& event);
     void OnmoreObjectsBtClick(wxCommandEvent& event);
+    void OnhelpBtClick(wxCommandEvent& event);
     //*)
 
     void RefreshList();

@@ -14,6 +14,9 @@ namespace gd
 /**
  * \brief Tool class which can be used with wxTreeCtrl or others controls to
  * associate one or two strings with items.
+ *
+ * \ingroup IDE
+ * \ingroup wxTools
  */
 class GD_CORE_API TreeItemStringData : public wxTreeItemData
 {

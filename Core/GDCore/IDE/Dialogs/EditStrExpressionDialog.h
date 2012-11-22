@@ -11,6 +11,7 @@
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/hyperlink.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 #include <wx/stc/stc.h>
@@ -52,13 +53,14 @@ public:
     //(*Declarations(EditStrExpressionDialog)
     wxPanel* objectsFunctionsPanel;
     wxButton* OkBt;
-    wxButton* helpBt;
+    wxStaticBitmap* StaticBitmap2;
     wxAuiManager* mgr;
     wxButton* AddFunctionBt;
     wxPanel* centerPanel;
     wxTreeCtrl* ValList;
     wxHyperlinkCtrl* errorTxt;
     wxStyledTextCtrl* TexteEdit;
+    wxHyperlinkCtrl* HyperlinkCtrl1;
     wxPanel* freeFunctionsPanel;
     wxTreeCtrl* ObjList;
     wxButton* AddPropBt;
@@ -70,7 +72,8 @@ protected:
     static const long ID_CUSTOM1;
     static const long ID_BUTTON2;
     static const long ID_HYPERLINKCTRL1;
-    static const long ID_BUTTON4;
+    static const long ID_STATICBITMAP5;
+    static const long ID_HYPERLINKCTRL2;
     static const long ID_PANEL1;
     static const long ID_TREECTRL1;
     static const long ID_BUTTON10;

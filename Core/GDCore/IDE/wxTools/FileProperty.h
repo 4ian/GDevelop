@@ -21,6 +21,8 @@ namespace gd
  *
  * Supports wxPG_FILE_WILDCARD, wxPG_FILE_SHOW_RELATIVE_PATH, wxPG_FILE_INITIAL_PATH, wxPG_FILE_DIALOG_TITLE attributes.
  *
+ * \ingroup IDE
+ * \ingroup wxTools
  */
 class GD_CORE_API FileProperty : public wxLongStringProperty
 {

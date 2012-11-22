@@ -2,23 +2,37 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
 #ifndef HELPFILEACCESS_H
 #define HELPFILEACCESS_H
 #include "GDCore/Tools/Locale/LocaleManager.h"
-#include <string>
-#include <wx/help.h>
-#include <wx/fs_zip.h>
+#include <wx/string.h>
 
 namespace gd
 {
 
 /**
- * \brief Tool class allowing to easily open help file.
+ * \brief Tool base class, meant to be used only by the IDE, to provide help.
+ *
+ * IDEs must create a child of this class and declares it to gd::HelpFileAccess thanks to gd::HelpFileAccess::SetHelpProvider.
+ *
+ * \ingroup Tools
+ */
+class GD_CORE_API HelpProvider
+{
+public:
+    HelpProvider() {};
+    virtual ~HelpProvider() {};
+
+    virtual void OpenURL(wxString url) =0;
+};
+
+/**
+ * \brief Tool class to provide a link between the platforms implementations
+ * and the IDE, which is responsible for displaying the help.
  *
  * Usage example:
  * \code
- * gd::HelpFileAccess::GetInstance()->DisplaySection(52);
+ * gd::HelpFileAccess::GetInstance()->DisplayURL(_("www.mywebsite.com/wiki/help_about_my_topic");
  * \endcode
  *
  * \ingroup Tools
@@ -28,35 +42,24 @@ class GD_CORE_API HelpFileAccess
 public:
 
     /**
-     * Initialize the help controller with the specified file.
+     * \brief Initialize the help controller with the specified help provider.
+     *
      * This method is usually called by the IDE itself.
+     * \warning The caller is responsible of \a newHelpProvider and must deleted it if needed ( when application is closed notably or if a new help provider is set )
+     * \see gd::HelpProvider
      */
-    inline void InitWithHelpFile(const std::string & file)
+    inline void SetHelpProvider(HelpProvider * newHelpProvider)
     {
-        helpController = new wxHelpController;
-        helpController->Initialize(file);
+        helpProvider = newHelpProvider;
     }
 
     /**
-     * Open a specific section of the help file
+     * Ask the IDE to display the specified URL as help.
      */
-    inline void DisplaySection(int nb)
+    inline void OpenURL(wxString url)
     {
-        helpController->DisplaySection(nb);
+        helpProvider->OpenURL(url);
     }
-
-    /**
-     * Open the help file displaying its contents.
-     */
-    inline void DisplayContents()
-    {
-        helpController->DisplayContents();
-    }
-
-    /**
-     * Open an URL
-     */
-    void OpenURL(wxString url);
 
     static HelpFileAccess *GetInstance()
     {
@@ -76,15 +79,12 @@ public:
     }
 
 private:
-    HelpFileAccess() : helpController(NULL) {};
-    virtual ~HelpFileAccess() { if (helpController) delete helpController; };
+    HelpFileAccess() : helpProvider(NULL) {};
+    virtual ~HelpFileAccess() {  };
 
     static HelpFileAccess *_singleton;
-    wxHelpController * helpController;
+    HelpProvider * helpProvider;
 };
 
 }
-
 #endif // HELPFILEACCESS_H
-
-

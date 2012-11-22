@@ -36,6 +36,7 @@ class GD_CORE_API ProjectExtensionsDialog: public wxDialog
 
 		//(*Declarations(ProjectExtensionsDialog)
 		wxStaticText* authorTxt;
+		wxStaticBitmap* StaticBitmap2;
 		wxStaticBitmap* maccompatibleBmp;
 		wxCheckListBox* ExtensionsList;
 		wxStaticText* StaticText2;
@@ -48,6 +49,7 @@ class GD_CORE_API ProjectExtensionsDialog: public wxDialog
 		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxStaticText* StaticText5;
 		wxStaticLine* StaticLine1;
+		wxHyperlinkCtrl* helpBt;
 		wxStaticText* licenseTxt;
 		wxStaticText* StaticText4;
 		wxStaticBitmap* StaticBitmap3;
@@ -74,6 +76,8 @@ class GD_CORE_API ProjectExtensionsDialog: public wxDialog
 		static const long ID_STATICBITMAP1;
 		static const long ID_STATICTEXT8;
 		static const long ID_HYPERLINKCTRL1;
+		static const long ID_STATICBITMAP5;
+		static const long ID_HYPERLINKCTRL2;
 		static const long ID_STATICTEXT2;
 		static const long ID_BUTTON3;
 		//*)
@@ -85,6 +89,8 @@ class GD_CORE_API ProjectExtensionsDialog: public wxDialog
 		void OnuninstallExtensionBtClick(wxCommandEvent& event);
 		void OnExtensionsListSelect(wxCommandEvent& event);
 		void OnFermerBtClick(wxCommandEvent& event);
+		void OnHyperlinkCtrl2Click(wxCommandEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 		void UpdateList();
 

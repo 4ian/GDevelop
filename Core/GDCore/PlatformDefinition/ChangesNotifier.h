@@ -173,6 +173,39 @@ public:
     virtual void OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & automatismName) const {};
 
     /**
+     * Called when a group have been added
+     * \param project Related project
+     * \param layout Related layout ( can be NULL )
+     * \param groupName The name of the group added
+     */
+    virtual void OnObjectGroupAdded(gd::Project & project, gd::Layout * layout, const std::string & groupName) const {};
+
+    /**
+     * Called when a group has been edited
+     * \param project Related project
+     * \param layout Related layout ( can be NULL )
+     * \param groupName The name of the group modified
+     */
+    virtual void OnObjectGroupEdited(gd::Project & project, gd::Layout * layout, const std::string & groupName) const {};
+
+    /**
+     * Called when a group have been renamed
+     * \param project Related project
+     * \param layout Related layout ( can be NULL )
+     * \param groupName The name of the group modified
+     * \param oldName Group's old name
+     */
+    virtual void OnObjectGroupRenamed(gd::Project & project, gd::Layout * layout, const std::string & groupName, const std::string & oldName) const {};
+
+    /**
+     * Called when a group have been deleted
+     * \param project Related project
+     * \param layout Related layout ( can be NULL )
+     * \param groupName The name of the group removed
+     */
+    virtual void OnObjectGroupDeleted(gd::Project & project, gd::Layout * layout, const std::string & groupName) const {};
+
+    /**
      * Called when a resource have been added/removed/modified
      * \param project Related project
      * \param automatismName The name of the resource which have been modified

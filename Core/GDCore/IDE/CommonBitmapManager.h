@@ -14,6 +14,8 @@ namespace gd
  * \brief Provide easy access to the most common wxBitmap used in dialogs.
  *
  * The bitmaps are loaded when the CommonBitmapManager is constructed for the first time ( usually by the IDE ).
+ *
+ * \ingroup IDE
  */
 class GD_CORE_API CommonBitmapManager
 {

@@ -4,11 +4,11 @@
 //(*Headers(EditObjectGroup)
 #include <wx/treectrl.h>
 #include <wx/sizer.h>
-#include <wx/stattext.h>
 #include <wx/menu.h>
 #include <wx/aui/aui.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -39,35 +39,30 @@ class EditObjectGroup: public wxDialog
 		wxButton* OkBt;
 		wxAuiToolBar* toolbar;
 		wxMenuItem* MenuItem2;
+		wxStaticBitmap* StaticBitmap1;
 		wxMenuItem* MenuItem1;
-		wxPanel* Panel1;
-		wxStaticText* StaticText3;
 		wxMenu ContextMenu;
 		wxTreeCtrl* ObjetsList;
-		wxStaticLine* StaticLine2;
 		wxStaticLine* StaticLine1;
 		wxButton* AnnulerBt;
+		wxHyperlinkCtrl* helpBt;
 		wxPanel* Panel2;
-		wxStaticBitmap* StaticBitmap3;
 		//*)
 
 	protected:
 
 		//(*Identifiers(EditObjectGroup)
-		static const long ID_STATICBITMAP3;
-		static const long ID_STATICTEXT3;
-		static const long ID_PANEL1;
-		static const long ID_STATICLINE2;
 		static const long ID_AUITOOLBAR1;
 		static const long ID_PANEL2;
 		static const long ID_TREECTRL1;
 		static const long ID_STATICLINE1;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
 		static const long idAddObjet;
 		static const long idDelObjet;
 		//*)
-		static const long ID_Help;
 
 	private:
 
@@ -81,8 +76,8 @@ class EditObjectGroup: public wxDialog
 		void OnObjetsListItemRightClick(wxTreeEvent& event);
 		void OnAddObjetSelected(wxCommandEvent& event);
 		void OnDelObjetSelected(wxCommandEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
-		void OnHelp(wxCommandEvent& event);
         void Refresh();
 
         wxTreeItemId itemSelected;

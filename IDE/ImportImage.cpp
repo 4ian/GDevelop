@@ -120,12 +120,13 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
 	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticBitmap1 = new wxStaticBitmap(Panel1, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/imagewizard.png"))), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICBITMAP1"));
+	StaticBitmap1 = new wxStaticBitmap(Panel1, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/imagewizard.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP1"));
 	FlexGridSizer6->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Importing images allow to generate\nquickly your images or objects from\nanimated files or spritesheets."), wxDefaultPosition, wxSize(295,53), wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
 	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel1->SetSizer(FlexGridSizer6);
-	FlexGridSizer6->SetSizeHints(Panel1);
+	SetSizer(FlexGridSizer6);
+	Layout();
 	FlexGridSizer1->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -161,7 +162,8 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	DecomposeGIFBt = new wxButton(Panel2, ID_BUTTON2, _("Decompose"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(DecomposeGIFBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
 	Panel2->SetSizer(FlexGridSizer3);
-	FlexGridSizer3->SetSizeHints(Panel2);
+	SetSizer(FlexGridSizer3);
+	Layout();
 	Panel3 = new wxPanel(Notebook1, ID_PANEL3, wxPoint(110,3), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	FlexGridSizer9 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer9->AddGrowableCol(0);

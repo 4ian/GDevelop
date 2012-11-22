@@ -3,9 +3,11 @@
 	<object class="wxDialog" name="ChoiceFile">
 		<title>Choose a file</title>
 		<id_arg>0</id_arg>
+		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 					<cols>1</cols>
@@ -63,15 +65,34 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
-					<cols>3</cols>
-					<growablecols>0</growablecols>
+					<cols>4</cols>
+					<growablecols>1</growablecols>
+					<growablerows>0</growablerows>
 					<object class="sizeritem">
-						<object class="wxButton" name="ID_BUTTON2" variable="advancedBt" member="yes">
-							<label>Advanced</label>
-							<handler function="OnadvancedBtClick" entry="EVT_BUTTON" />
+						<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
+							<cols>3</cols>
+							<growablerows>0</growablerows>
+							<object class="sizeritem">
+								<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap2" member="yes">
+									<bitmap>res/helpicon.png</bitmap>
+									<style>wxNO_BORDER</style>
+								</object>
+								<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="helpBt" member="yes">
+									<label>Help</label>
+									<tooltip>Display help about this window</tooltip>
+									<handler function="OnhelpBtClick" entry="EVT_HYPERLINK" />
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
 						</object>
-						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
-						<border>5</border>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<option>1</option>
 					</object>
 					<object class="sizeritem">
@@ -79,7 +100,7 @@
 							<label>Ok</label>
 							<handler function="OnokBtClick" entry="EVT_BUTTON" />
 						</object>
-						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
 						<option>1</option>
 					</object>
@@ -92,6 +113,15 @@
 						<border>5</border>
 						<option>1</option>
 					</object>
+					<object class="sizeritem">
+						<object class="wxButton" name="ID_BUTTON2" variable="advancedBt" member="yes">
+							<label>Advanced</label>
+							<handler function="OnadvancedBtClick" entry="EVT_BUTTON" />
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
@@ -99,10 +129,3 @@
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

@@ -4,7 +4,9 @@
  */
 
 //(*InternalHeaders(Compilation)
+#include <wx/bitmap.h>
 #include <wx/intl.h>
+#include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <wx/textctrl.h>
@@ -51,7 +53,8 @@ const long Compilation::ID_BUTTON5 = wxNewId();
 const long Compilation::ID_CHECKBOX1 = wxNewId();
 const long Compilation::ID_CHECKBOX4 = wxNewId();
 const long Compilation::ID_STATICLINE2 = wxNewId();
-const long Compilation::ID_BUTTON4 = wxNewId();
+const long Compilation::ID_STATICBITMAP2 = wxNewId();
+const long Compilation::ID_HYPERLINKCTRL1 = wxNewId();
 const long Compilation::ID_BUTTON2 = wxNewId();
 //*)
 
@@ -67,6 +70,7 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     wxFlexGridSizer* FlexGridSizer10;
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer5;
+    wxFlexGridSizer* FlexGridSizer2;
     wxFlexGridSizer* FlexGridSizer7;
     wxFlexGridSizer* FlexGridSizer8;
     wxStaticBoxSizer* StaticBoxSizer1;
@@ -121,8 +125,14 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer3->AddGrowableCol(0);
-    AideBt = new wxButton(this, ID_BUTTON4, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
-    FlexGridSizer3->Add(AideBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer2->AddGrowableRow(0);
+    StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+    FlexGridSizer2->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+    HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
+    FlexGridSizer2->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer3->Add(FlexGridSizer2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
     FermerBt = new wxButton(this, ID_BUTTON2, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     FlexGridSizer3->Add(FermerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
@@ -133,7 +143,7 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
 
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnCompilBtClick);
     Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnbrowseBtClick);
-    Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnAideBtClick);
+    Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&Compilation::OnAideBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&Compilation::OnFermerBtClick);
     //*)
 

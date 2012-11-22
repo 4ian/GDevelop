@@ -15,6 +15,7 @@
 #include <wx/checkbox.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -57,9 +58,11 @@ class ChoixCondition: public wxDialog
 		wxStaticText* NomConditionTxt;
 		wxCheckBox* ContraireCheck;
 		wxTreeCtrl* globalObjectGroups;
+		wxStaticBitmap* StaticBitmap1;
 		wxFlexGridSizer* GridSizer1;
 		wxPanel* Panel1;
 		wxTreeCtrl* objectConditionsTree;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxTreeCtrl* ObjetsList;
 		wxStaticLine* StaticLine2;
 		wxStaticText* ConditionTextTxt;
@@ -72,7 +75,6 @@ class ChoixCondition: public wxDialog
 		wxTreeCtrl* GroupesList;
 		wxCheckBox* objSortCheck;
 		wxBoxSizer* conditionSizer;
-		wxButton* AideBt;
 		//*)
 		vector < wxCheckBox * > ParaFac;
 		vector < wxStaticText * > ParaText;
@@ -104,9 +106,10 @@ class ChoixCondition: public wxDialog
 		static const long ID_STATICLINE2;
 		static const long ID_BUTTON4;
 		static const long ID_CHECKBOX3;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
-		static const long ID_BUTTON3;
 		//*)
 		static const long ID_TEXTARRAY;
 		static const long ID_EDITARRAY;

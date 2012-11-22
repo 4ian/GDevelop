@@ -8,6 +8,7 @@
 #include <wx/string.h>
 #include <wx/mimetype.h> // mimetype support
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "Dialogs/HelpViewerDlg.h"
 #include "Credits.h"
 #include "MAJ.h"
 
@@ -16,10 +17,15 @@
  */
 void MainFrame::OnMenuAideSelected( wxCommandEvent& event )
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplayContents();
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"));
+}
+
+/**
+ * Display tutorial
+ */
+void MainFrame::OnMenuTutoSelected(wxCommandEvent& event)
+{
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials/beginnertutorial"));
 }
 
 /**
@@ -100,59 +106,3 @@ void MainFrame::OnMenuItem36Selected(wxCommandEvent& event)
         wxExit();
     }
 }
-
-/**
- * Display tutorial
- */
-void MainFrame::OnMenuTutoSelected(wxCommandEvent& event)
-{
-    wxString link = _("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials");
-    wxString mimetype = wxEmptyString;
-    if (link.StartsWith (_T("http://"))) {
-        mimetype = _T("text/html");
-    }else if (link.StartsWith (_T("ftp://"))) {
-        mimetype = _T("text/html");
-    }else if (link.StartsWith (_T("mailto:"))) {
-        mimetype = _T("message/rfc822");
-    }else{
-        return;
-    }
-    wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
-    if (filetype) {
-        wxString cmd;
-        if (filetype->GetOpenCommand (&cmd, wxFileType::MessageParameters (link))) {
-            cmd.Replace(_T("file://"), wxEmptyString);
-            ::wxExecute(cmd);
-        }
-        delete filetype;
-    }
-}
-
-/**
- * Access wiki
- */
-void MainFrame::OnMenuWikiSelected(wxCommandEvent& event)
-{
-    wxString link = "http://www.wiki.compilgames.net";
-
-    wxString mimetype = wxEmptyString;
-    if (link.StartsWith (_T("http://"))) {
-        mimetype = _T("text/html");
-    }else if (link.StartsWith (_T("ftp://"))) {
-        mimetype = _T("text/html");
-    }else if (link.StartsWith (_T("mailto:"))) {
-        mimetype = _T("message/rfc822");
-    }else{
-        return;
-    }
-    wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
-    if (filetype) {
-        wxString cmd;
-        if (filetype->GetOpenCommand (&cmd, wxFileType::MessageParameters (link))) {
-            cmd.Replace(_T("file://"), wxEmptyString);
-            ::wxExecute(cmd);
-        }
-        delete filetype;
-    }
-}
-

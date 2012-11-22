@@ -14,8 +14,8 @@
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/statline.h>
-#include <wx/radiobut.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -44,7 +44,6 @@ class ChoixAction: public wxDialog
 
         //Les données de l'action à modifier
         string Type;
-        bool Loc;
         Game & game;
         Scene & scene;
         vector < gd::Expression > Param;
@@ -56,9 +55,10 @@ class ChoixAction: public wxDialog
 		wxNotebook* Notebook1;
 		wxStaticText* NomActionTxt;
 		wxTreeCtrl* globalObjectGroups;
+		wxStaticBitmap* StaticBitmap1;
 		wxFlexGridSizer* GridSizer1;
 		wxPanel* Panel1;
-		wxRadioButton* LocaliseCheck;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxTreeCtrl* ObjetsList;
 		wxStaticLine* StaticLine2;
 		wxTreeCtrl* objectActionsTree;
@@ -71,8 +71,6 @@ class ChoixAction: public wxDialog
 		wxStaticText* ActionTextTxt;
 		wxTreeCtrl* GroupesList;
 		wxCheckBox* objSortCheck;
-		wxRadioButton* GlobalCheck;
-		wxButton* AideBt;
 		wxTreeCtrl* ActionsTree;
 		//*)
 
@@ -94,14 +92,13 @@ class ChoixAction: public wxDialog
 		static const long ID_STATICTEXT1;
 		static const long ID_STATICTEXT2;
 		static const long ID_STATICLINE1;
-		static const long ID_RADIOBUTTON1;
-		static const long ID_RADIOBUTTON2;
 		static const long ID_STATICLINE2;
 		static const long ID_BUTTON4;
 		static const long ID_CHECKBOX2;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
-		static const long ID_BUTTON3;
 		//*)
 		static const long ID_TEXTARRAY;
 		static const long ID_EDITARRAY;

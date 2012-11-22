@@ -28,7 +28,6 @@ const long StartHerePage::ID_STATICBITMAP9 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL18 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP10 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL19 = wxNewId();
-const long StartHerePage::ID_HYPERLINKCTRL20 = wxNewId();
 const long StartHerePage::ID_STATICTEXT5 = wxNewId();
 const long StartHerePage::ID_STATICBITMAP5 = wxNewId();
 const long StartHerePage::ID_HYPERLINKCTRL3 = wxNewId();
@@ -83,7 +82,6 @@ mainEditor(mainEditor_)
 	wxFlexGridSizer* FlexGridSizer12;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
-	wxFlexGridSizer* FlexGridSizer11;
 
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("wxID_ANY"));
 	SetBackgroundColour(wxColour(255,255,255));
@@ -117,12 +115,8 @@ mainEditor(mainEditor_)
 	FlexGridSizer3->Add(HyperlinkCtrl6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap10 = new wxStaticBitmap(this, ID_STATICBITMAP10, wxBitmap(wxImage(_T("res/tutoicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP10"));
 	FlexGridSizer3->Add(StaticBitmap10, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
 	HyperlinkCtrl7 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL19, _("Read the tutorial"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL19"));
-	FlexGridSizer11->Add(HyperlinkCtrl7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	secondTutoLink = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL20, _("( Spanish tutorial also available )"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL20"));
-	FlexGridSizer11->Add(secondTutoLink, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer3->Add(FlexGridSizer11, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer3->Add(HyperlinkCtrl7, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer4->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4->Add(384,9,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticText5 = new wxStaticText(this, ID_STATICTEXT5, _("Links"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
@@ -133,7 +127,7 @@ mainEditor(mainEditor_)
 	FlexGridSizer7 = new wxFlexGridSizer(0, 2, 0, 0);
 	StaticBitmap5 = new wxStaticBitmap(this, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/wikiicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
 	FlexGridSizer7->Add(StaticBitmap5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	HyperlinkCtrl3 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL3, _("Go to wiki ( Knowledge base )"), _("http://www.wiki.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL3"));
+	HyperlinkCtrl3 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL3, _("Open the online help"), _("http://www.wiki.compilgames.net"), wxDefaultPosition, wxDefaultSize, wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL3"));
 	FlexGridSizer7->Add(HyperlinkCtrl3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticBitmap6 = new wxStaticBitmap(this, ID_STATICBITMAP6, wxBitmap(wxImage(_T("res/community.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP6"));
 	FlexGridSizer7->Add(StaticBitmap6, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -222,7 +216,6 @@ mainEditor(mainEditor_)
 	Connect(ID_HYPERLINKCTRL12,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnnewProjectLinkClick);
 	Connect(ID_HYPERLINKCTRL18,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnguideBtClick);
 	Connect(ID_HYPERLINKCTRL19,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OntutoBtClick);
-	Connect(ID_HYPERLINKCTRL20,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnTutorial2BtClick);
 	Connect(ID_HYPERLINKCTRL15,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnresourcesLinkClick);
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnfbLinkClick);
 	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OngoogleplusLinkClick);
@@ -235,9 +228,6 @@ mainEditor(mainEditor_)
 	Connect(ID_HYPERLINKCTRL11,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::Onrecent7BtClick);
 	Connect(ID_HYPERLINKCTRL21,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&StartHerePage::OnopenExamplesLinkClick);
 	//*)
-
-    if ( _("( Spanish tutorial also available )") == "(-Insert the name of the second tutorial or a blank text-)" )
-        secondTutoLink->SetLabel("");
 
     Refresh();
 }
@@ -338,38 +328,12 @@ void StartHerePage::Onrecent7BtClick(wxCommandEvent& event)
 
 void StartHerePage::OnguideBtClick(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(16);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_getstart"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_getstart"));
 }
 
 void StartHerePage::OntutoBtClick(wxCommandEvent& event)
 {
-    wxString link = _("http://wiki.compilgames.net/doku.php/en/game_develop/tutorials");
-    wxString mimetype = wxEmptyString;
-    if (link.StartsWith (_T("http://"))) {
-        mimetype = _T("text/html");
-    }else if (link.StartsWith (_T("ftp://"))) {
-        mimetype = _T("text/html");
-    }else if (link.StartsWith (_T("mailto:"))) {
-        mimetype = _T("message/rfc822");
-    }else{
-        return;
-    }
-    wxFileType *filetype = wxTheMimeTypesManager->GetFileTypeFromMimeType (mimetype);
-    if (filetype) {
-        wxString cmd;
-        if (filetype->GetOpenCommand (&cmd, wxFileType::MessageParameters (link))) {
-            cmd.Replace(_T("file://"), wxEmptyString);
-            ::wxExecute(cmd);
-        }
-        delete filetype;
-    }
-}
-
-void StartHerePage::OnTutorial2BtClick(wxCommandEvent& event)
-{
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/tutorials/beginnertutorial"));
 }
 
 void StartHerePage::OnopenExamplesLinkClick(wxCommandEvent& event)

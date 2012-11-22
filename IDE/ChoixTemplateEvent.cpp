@@ -314,7 +314,7 @@ void ChoixTemplateEvent::RefreshTree()
 
     struct dirent *lecture;
     DIR *rep;
-    rep = opendir( "template" );
+    rep = opendir( "Templates" );
     int l = 0;
 
     while (( lecture = readdir( rep ) ) )
@@ -384,9 +384,9 @@ string ChoixTemplateEvent::ConvertParam( string parameter, const string & toRepl
 
 void ChoixTemplateEvent::OnAideBtClick(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    /*if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(151);
-    else
+    else*/
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/template")); //TODO
 }
 

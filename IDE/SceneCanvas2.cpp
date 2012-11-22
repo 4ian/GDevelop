@@ -496,10 +496,7 @@ void SceneCanvas::OnDebugBtClick( wxCommandEvent & event )
 
 void SceneCanvas::OnHelpBtClick( wxCommandEvent & event )
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(12);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_scene"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_scene"));
 }
 
 void SceneCanvas::OnLayersEditor( wxCommandEvent & event )

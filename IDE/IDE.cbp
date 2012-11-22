@@ -154,6 +154,7 @@
 					<Add option="-lgdl" />
 					<Add option="-lwxmsw29u_xrc" />
 					<Add option="-lwxmsw29u_stc" />
+					<Add option="-lwxmsw29u_webview" />
 					<Add option="-lwxmsw29u_propgrid" />
 					<Add option="-lwxmsw29u_richtext" />
 					<Add option="-lwxmsw29u_ribbon" />
@@ -566,14 +567,10 @@
 		<Unit filename="DebuggerGUI.h">
 			<Option virtualFolder="Editeurs\Editeur Scene\" />
 		</Unit>
-		<Unit filename="Demarrage.cpp">
-			<Option virtualFolder="Racine\Demarrage\" />
-		</Unit>
-		<Unit filename="Demarrage.h">
-			<Option virtualFolder="Racine\Demarrage\" />
-		</Unit>
 		<Unit filename="Dialogs\ExternalLayoutEditor.cpp" />
 		<Unit filename="Dialogs\ExternalLayoutEditor.h" />
+		<Unit filename="Dialogs\HelpViewerDlg.cpp" />
+		<Unit filename="Dialogs\HelpViewerDlg.h" />
 		<Unit filename="Dialogs\HtmlViewerPnl.cpp" />
 		<Unit filename="Dialogs\HtmlViewerPnl.h" />
 		<Unit filename="Dialogs\NewProjectDialog.cpp" />
@@ -836,6 +833,7 @@
 			<Option virtualFolder="wxSFML Canvas\" />
 		</Unit>
 		<Unit filename="wxsmith\ExternalLayoutEditor.wxs" />
+		<Unit filename="wxsmith\HelpViewerDlg.wxs" />
 		<Unit filename="wxsmith\HtmlViewerPnl.wxs" />
 		<Unit filename="wxsmith\NewProjectDialog.wxs" />
 		<Unit filename="wxsmith\ProjectPropertiesPnl.wxs" />
@@ -885,17 +883,14 @@
 					<wxPanel wxs="wxsmith/EditorObjets.wxs" src="EditorObjets.cpp" hdr="EditorObjets.h" fwddecl="0" i18n="1" name="EditorObjets" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixCondition.wxs" src="ChoixCondition.cpp" hdr="ChoixCondition.h" fwddecl="0" i18n="1" name="ChoixCondition" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixAction.wxs" src="ChoixAction.cpp" hdr="ChoixAction.h" fwddecl="0" i18n="1" name="ChoixAction" language="CPP" />
-					<wxDialog wxs="wxsmith/EditorObjet.wxs" src="EditorObjet.cpp" hdr="EditorObjet.h" fwddecl="0" i18n="1" name="EditorObjet" language="CPP" />
 					<wxDialog wxs="wxsmith/EditOptionsPosition.wxs" src="EditOptionsPosition.cpp" hdr="EditOptionsPosition.h" fwddecl="0" i18n="1" name="EditOptionsPosition" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixBouton.wxs" src="ChoixBouton.cpp" hdr="ChoixBouton.h" fwddecl="0" i18n="1" name="ChoixBouton" language="CPP" />
 					<wxDialog wxs="wxsmith/EditPropScene.wxs" src="EditPropScene.cpp" hdr="EditPropScene.h" fwddecl="0" i18n="1" name="EditPropScene" language="CPP" />
-					<wxDialog wxs="wxsmith/EditPropJeu.wxs" src="EditPropJeu.cpp" hdr="EditPropJeu.h" fwddecl="0" i18n="1" name="EditPropJeu" language="CPP" />
 					<wxDialog wxs="wxsmith/Preferences.wxs" src="Preferences.cpp" hdr="Preferences.h" fwddecl="0" i18n="1" name="Preferences" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixTemplateEvent.wxs" src="ChoixTemplateEvent.cpp" hdr="ChoixTemplateEvent.h" fwddecl="0" i18n="1" name="ChoixTemplateEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/Credits.wxs" src="Credits.cpp" hdr="Credits.h" fwddecl="0" i18n="1" name="Credits" language="CPP" />
 					<wxDialog wxs="wxsmith/MessagePlus.wxs" src="MessagePlus.cpp" hdr="MessagePlus.h" fwddecl="0" i18n="1" name="MessagePlus" language="CPP" />
 					<wxDialog wxs="wxsmith/Compilation.wxs" src="Compilation.cpp" hdr="Compilation.h" fwddecl="0" i18n="1" name="Compilation" language="CPP" />
-					<wxDialog wxs="wxsmith/Demarrage.wxs" src="Demarrage.cpp" hdr="Demarrage.h" fwddecl="0" i18n="1" name="Demarrage" language="CPP" />
 					<wxDialog wxs="wxsmith/ChoixClavier.wxs" src="ChoixClavier.cpp" hdr="ChoixClavier.h" fwddecl="0" i18n="1" name="ChoixClavier" language="CPP" />
 					<wxDialog wxs="wxsmith/mp3ogg.wxs" src="mp3ogg.cpp" hdr="mp3ogg.h" fwddecl="0" i18n="1" name="mp3ogg" language="CPP" />
 					<wxDialog wxs="wxsmith/SigneModification.wxs" src="SigneModification.cpp" hdr="SigneModification.h" fwddecl="0" i18n="1" name="SigneModification" language="CPP" />
@@ -924,7 +919,6 @@
 					<wxPanel wxs="wxsmith/EditorObjectList.wxs" src="EditorObjectList.cpp" hdr="EditorObjectList.h" fwddecl="0" i18n="1" name="EditorObjectList" language="CPP" />
 					<wxFrame wxs="wxsmith/ConsoleFrame.wxs" src="ConsoleFrame.cpp" hdr="ConsoleFrame.h" fwddecl="0" i18n="1" name="ConsoleFrame" language="CPP" />
 					<wxPanel wxs="wxsmith/SpriteInitialPositionPanel.wxs" src="SpriteInitialPositionPanel.cpp" hdr="SpriteInitialPositionPanel.h" fwddecl="0" i18n="1" name="SpriteInitialPositionPanel" language="CPP" />
-					<wxDialog wxs="wxsmith/InitialVariablesDialog.wxs" src="InitialVariablesDialog.cpp" hdr="InitialVariablesDialog.h" fwddecl="0" i18n="1" name="InitialVariablesDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/TextObjectEditor.wxs" src="TextObjectEditor.cpp" hdr="TextObjectEditor.h" fwddecl="0" i18n="1" name="TextObjectEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/DrawerObjectEditor.wxs" src="DrawerObjectEditor.cpp" hdr="DrawerObjectEditor.h" fwddecl="0" i18n="1" name="DrawerObjectEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="RenderDialog.cpp" hdr="RenderDialog.h" fwddecl="0" i18n="1" name="RenderDialog" language="CPP" />
@@ -945,6 +939,7 @@
 					<wxPanel wxs="wxsmith/HtmlViewerPnl.wxs" src="Dialogs\HtmlViewerPnl.cpp" hdr="Dialogs\HtmlViewerPnl.h" fwddecl="0" i18n="1" name="HtmlViewerPnl" language="CPP" />
 					<wxPanel wxs="wxsmith/ProjectPropertiesPnl.wxs" src="Dialogs\ProjectPropertiesPnl.cpp" hdr="Dialogs\ProjectPropertiesPnl.h" fwddecl="0" i18n="1" name="ProjectPropertiesPnl" language="CPP" />
 					<wxDialog wxs="wxsmith/NewProjectDialog.wxs" src="Dialogs\NewProjectDialog.cpp" hdr="Dialogs\NewProjectDialog.h" fwddecl="0" i18n="1" name="NewProjectDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/HelpViewerDlg.wxs" src="Dialogs\HelpViewerDlg.cpp" hdr="Dialogs\HelpViewerDlg.h" fwddecl="0" i18n="1" name="HelpViewerDlg" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

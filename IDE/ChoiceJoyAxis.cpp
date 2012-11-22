@@ -6,7 +6,9 @@
 #include "ChoiceJoyAxis.h"
 
 //(*InternalHeaders(ChoiceJoyAxis)
+#include <wx/bitmap.h>
 #include <wx/intl.h>
+#include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <string>
@@ -14,6 +16,7 @@
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 
 using namespace std;
 
@@ -21,6 +24,8 @@ using namespace std;
 const long ChoiceJoyAxis::ID_STATICTEXT1 = wxNewId();
 const long ChoiceJoyAxis::ID_RADIOBOX1 = wxNewId();
 const long ChoiceJoyAxis::ID_STATICLINE1 = wxNewId();
+const long ChoiceJoyAxis::ID_STATICBITMAP2 = wxNewId();
+const long ChoiceJoyAxis::ID_HYPERLINKCTRL1 = wxNewId();
 const long ChoiceJoyAxis::ID_BUTTON3 = wxNewId();
 const long ChoiceJoyAxis::ID_BUTTON2 = wxNewId();
 const long ChoiceJoyAxis::ID_BUTTON4 = wxNewId();
@@ -39,8 +44,9 @@ scene(scene_)
 	//(*Initialize(ChoiceJoyAxis)
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer1;
+	wxFlexGridSizer* FlexGridSizer17;
 
-	Create(parent, wxID_ANY, _("Choose joystick's axis"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Choose joystick\'s axis"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Choose directly Joystick axis :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer1->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
@@ -58,9 +64,18 @@ scene(scene_)
 	FlexGridSizer1->Add(axisRadio, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer3 = new wxFlexGridSizer(0, 4, 0, 0);
+	FlexGridSizer3->AddGrowableCol(1);
+	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer17->AddGrowableRow(0);
+	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	FlexGridSizer17->Add(StaticBitmap2, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	helpBt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	helpBt->SetToolTip(_("Display help about this window"));
+	FlexGridSizer17->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3->Add(FlexGridSizer17, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	okBt = new wxButton(this, ID_BUTTON3, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
-	FlexGridSizer3->Add(okBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3->Add(okBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	annulerBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(annulerBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	advancedBt = new wxButton(this, ID_BUTTON4, _("Advanced"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
@@ -71,6 +86,7 @@ scene(scene_)
 	FlexGridSizer1->SetSizeHints(this);
 
 	Connect(ID_RADIOBOX1,wxEVT_COMMAND_RADIOBOX_SELECTED,(wxObjectEventFunction)&ChoiceJoyAxis::OnaxisRadioSelect);
+	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ChoiceJoyAxis::OnhelpBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoiceJoyAxis::OnokBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoiceJoyAxis::OnannulerBtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoiceJoyAxis::OnadvancedBtClick);
@@ -121,3 +137,8 @@ void ChoiceJoyAxis::OnannulerBtClick(wxCommandEvent& event)
     EndModal(0);
 }
 
+
+void ChoiceJoyAxis::OnhelpBtClick(wxCommandEvent& event)
+{
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/parameters"));
+}

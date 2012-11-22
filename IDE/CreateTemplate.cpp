@@ -343,9 +343,9 @@ string CreateTemplate::ConvertParam( string Parametre, string ToReplace, string 
 
 void CreateTemplate::OnAideBtClick( wxCommandEvent& event )
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
+    /*if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
         gd::HelpFileAccess::GetInstance()->DisplaySection(151);
-    else
+    else*/
         gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/create_template")); //TODO
 }
 

@@ -38,7 +38,6 @@
 #include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
 #include "Log.h"
-#include "Demarrage.h"
 #include "CheckMAJ.h"
 #include "MAJ.h"
 #include "SplashScreen.h"
@@ -48,6 +47,7 @@
 #include "Clipboard.h"
 #include "LogFileManager.h"
 #include "ExtensionBugReportDlg.h"
+#include "Dialogs/HelpViewerDlg.h"
 
 #include "GDL/Game.h"
 #include "GDL/Log.h"
@@ -236,16 +236,6 @@ bool Game_Develop_EditorApp::OnInit()
     }
     cout << "* GDL checked" << endl;
 
-    //Set help file
-    {
-        gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-        if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_ENGLISH )
-            helpFileAccess->InitWithHelpFile("help.chm");
-        else if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-            helpFileAccess->InitWithHelpFile("aide.chm");
-    }
-    cout << "* Help file set" << endl;
-
     //Test si le programme n'aurait pas planté la dernière fois
     //En vérifiant si un fichier existe toujours
     bool openRecupFiles = false;
@@ -358,6 +348,13 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "* Connecting shortcuts" << endl;
     Connect(wxID_ANY,wxEVT_KEY_DOWN, wxKeyEventHandler(Game_Develop_EditorApp::OnKeyPressed));
 
+    //Set help provider
+    {
+        gd::HelpFileAccess::GetInstance()->SetHelpProvider(HelpProvider::GetInstance());
+        HelpProvider::GetInstance()->SetParentWindow(mainEditor);
+    }
+    cout << "* Help provider set" << endl;
+
     cout << "* Loading events editor configuration" << endl;
     gd::ActionSentenceFormatter::GetInstance()->LoadTypesFormattingFromConfig();
 
@@ -407,17 +404,13 @@ bool Game_Develop_EditorApp::OnInit()
 
 int Game_Develop_EditorApp::OnExit()
 {
-
     delete wxConfigBase::Set(( wxConfigBase* )NULL );
 
-    SoundManager * soundManager = SoundManager::GetInstance();
-    soundManager->DestroySingleton();
-    Clipboard * clipboard = Clipboard::GetInstance();
-    clipboard->DestroySingleton();
-    FontManager * fontManager = FontManager::GetInstance();
-    fontManager->DestroySingleton();
-    gd::HelpFileAccess * helpFileAccess = gd::HelpFileAccess::GetInstance();
-    helpFileAccess->DestroySingleton();
+    SoundManager::GetInstance()->DestroySingleton();
+    Clipboard::GetInstance()->DestroySingleton();
+    FontManager::GetInstance()->DestroySingleton();
+    gd::HelpFileAccess::GetInstance()->DestroySingleton();
+    HelpProvider::GetInstance()->DestroySingleton();
 
     #if defined(LINUX) || defined(MAC)
     if ( singleInstanceChecker ) delete singleInstanceChecker;

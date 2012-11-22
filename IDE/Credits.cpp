@@ -120,7 +120,7 @@ Credits::Credits(wxWindow* parent)
 	FlexGridSizer11 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer11->AddGrowableCol(0);
 	FlexGridSizer11->AddGrowableRow(0);
-	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("·Game DevelopGame Develop is a freeware, meaning it is totally free.-You can use the software, for personal or commercial use.-The software is provided \'as-is\', without any express or implied warranty.-You can distribute the software to anybody provided you don\'t require money for it, you don\'t claim to be the author and you distribute the entire software with its installer.-You must not try to decompile the software.·Games created with Game Develop-The author of Game Develop is not liable for games made with the software.-If you create a game with Game Develop, an acknowledgment in the game documentation would be appreciated but is not required.·If you have any questionsContact the author : CompilGames@gmail.com\nGo on our website : http://www.compilgames.net"), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	TextCtrl1 = new wxTextCtrl(Panel2, ID_TEXTCTRL1, _("·Game Develop\n\nGame Develop is a freeware, meaning it is totally free.\n\n-You can use the software, for personal or commercial use.\n-The software is provided \'as-is\', without any express or implied warranty.\n-You can distribute the software to anybody provided you don\'t require money for it, you don\'t claim to be the author and you distribute the entire software with its installer.\n-You must not try to decompile the software.\n\n·Games created with Game Develop\n\n-The author of Game Develop is not liable for games made with the software.\n-If you created a game with Game Develop, an acknowledgment in the game documentation would be appreciated but is not required.\n\n·If you have any questions, contact the author : CompilGames@gmail.com"), wxDefaultPosition, wxSize(272,51), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer11->Add(TextCtrl1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	Panel2->SetSizer(FlexGridSizer11);
 	FlexGridSizer11->Fit(Panel2);
@@ -209,7 +209,7 @@ Credits::Credits(wxWindow* parent)
                       +_("François Dumortier : Game Deveop logo design and website conception.")+"<br>"
                       +"( <a href=http://www.fdumortier.com>http://www.fdumortier.com</a> )"+"<br>"
                       +"<br>"
-                      +_("Victor Levasseur: Widgets and Advanced XML extensions and contributions to Physics Engine, Text object, Video object, Path automatism and Sound object extension.")+"<br>"
+                      +_("Victor Levasseur: Widgets, Advanced XML and Tiled Sprite extensions and contributions to Physics Engine, Text object, Video object, Path automatism and Sound object extension.")+"<br>"
                       +"( <a href=http://www.levasseursoftware.net/>http://www.levasseursoftware.net</a> )"+"<br>"
                       +"<br>"
                       +_("Diego Schiavon : English translation of the tutorial")+"<br>"
@@ -225,6 +225,8 @@ Credits::Credits(wxWindow* parent)
                       +"<br>"
                       +_("Most icons came from Crystal Project Icons by Everaldo Coelho")+"<br>"
                       +"( <a href=http://www.everaldo.com>http://www.everaldo.com</a> )"+"<br>"
+                      +_("Some icons came from Fugue Icons by Yusuke Kamiyamane")+"<br>"
+                      +"( <a href=http://www.http://p.yusukekamiyamane.com/>http://http://p.yusukekamiyamane.com/</a> )"+"<br>"
                       +_("Some images of examples came from images pack by Daniel Cook")+"<br>"
                       +"( <a href=http://www.lostgarden.com>http://www.lostgarden.com</a> )"+"<br>"
                       +_("Some images of examples came from images pack by Ari Feldman")+"<br>"

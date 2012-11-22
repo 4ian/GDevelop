@@ -8,6 +8,8 @@
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -32,7 +34,7 @@ class SearchEvents: public wxDialog
 
 		//(*Declarations(SearchEvents)
 		wxCheckBox* replaceCaseCheck;
-		wxButton* helpBt;
+		wxStaticBitmap* StaticBitmap2;
 		wxButton* previousBt;
 		wxCheckBox* actionsCheck;
 		wxNotebook* Notebook1;
@@ -50,6 +52,7 @@ class SearchEvents: public wxDialog
 		wxTextCtrl* searchToReplaceEdit;
 		wxStaticText* resultsCountTxt;
 		wxButton* replaceBt;
+		wxHyperlinkCtrl* helpBt;
 		wxPanel* Panel2;
 		wxButton* nextBt;
 		wxButton* searchBt;
@@ -65,10 +68,11 @@ class SearchEvents: public wxDialog
 		static const long ID_CHECKBOX6;
 		static const long ID_CHECKBOX1;
 		static const long ID_CHECKBOX2;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON3;
-		static const long ID_BUTTON5;
 		static const long ID_PANEL1;
 		static const long ID_STATICTEXT2;
 		static const long ID_TEXTCTRL2;

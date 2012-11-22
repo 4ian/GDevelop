@@ -241,12 +241,40 @@
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
 					<cols>3</cols>
+					<growablecols>1</growablecols>
+					<object class="sizeritem">
+						<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
+							<cols>3</cols>
+							<growablerows>0</growablerows>
+							<object class="sizeritem">
+								<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap2" member="yes">
+									<bitmap>res/helpicon.png</bitmap>
+									<style>wxNO_BORDER</style>
+								</object>
+								<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="helpBt" member="yes">
+									<label>Help</label>
+									<tooltip>Display help about this window</tooltip>
+									<handler function="OnhelpBtClick" entry="EVT_HYPERLINK" />
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
 					<object class="sizeritem">
 						<object class="wxButton" name="ID_BUTTON1" variable="okBt" member="yes">
 							<label>Ok</label>
 							<handler function="OnokBtClick" entry="EVT_BUTTON" />
 						</object>
-						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
 						<option>1</option>
 					</object>
@@ -260,16 +288,9 @@
 						<option>1</option>
 					</object>
 				</object>
-				<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+				<flag>wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
 			</object>
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

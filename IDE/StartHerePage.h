@@ -39,7 +39,6 @@ class StartHerePage: public wxPanel
 		wxHyperlinkCtrl* HyperlinkCtrl5;
 		wxStaticBitmap* StaticBitmap4;
 		wxHyperlinkCtrl* recent5Bt;
-		wxHyperlinkCtrl* secondTutoLink;
 		wxStaticText* StaticText1;
 		wxStaticBitmap* StaticBitmap15;
 		wxHyperlinkCtrl* HyperlinkCtrl4;
@@ -73,7 +72,6 @@ class StartHerePage: public wxPanel
 		static const long ID_HYPERLINKCTRL18;
 		static const long ID_STATICBITMAP10;
 		static const long ID_HYPERLINKCTRL19;
-		static const long ID_HYPERLINKCTRL20;
 		static const long ID_STATICTEXT5;
 		static const long ID_STATICBITMAP5;
 		static const long ID_HYPERLINKCTRL3;

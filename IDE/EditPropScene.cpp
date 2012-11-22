@@ -6,8 +6,10 @@
 #include "EditPropScene.h"
 
 //(*InternalHeaders(EditPropScene)
+#include <wx/bitmap.h>
 #include <wx/font.h>
 #include <wx/intl.h>
+#include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <wx/colour.h>
@@ -41,9 +43,10 @@ const long EditPropScene::ID_TEXTCTRL3 = wxNewId();
 const long EditPropScene::ID_STATICTEXT7 = wxNewId();
 const long EditPropScene::ID_TEXTCTRL4 = wxNewId();
 const long EditPropScene::ID_STATICLINE2 = wxNewId();
+const long EditPropScene::ID_STATICBITMAP2 = wxNewId();
+const long EditPropScene::ID_HYPERLINKCTRL1 = wxNewId();
 const long EditPropScene::ID_BUTTON2 = wxNewId();
 const long EditPropScene::ID_BUTTON3 = wxNewId();
-const long EditPropScene::ID_BUTTON4 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(EditPropScene,wxDialog)
@@ -58,6 +61,7 @@ EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
 	wxFlexGridSizer* FlexGridSizer10;
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer5;
+	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer7;
 	wxFlexGridSizer* FlexGridSizer1;
 
@@ -126,22 +130,29 @@ EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer3->AddGrowableCol(0);
+	FlexGridSizer2 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer2->AddGrowableRow(0);
+	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	FlexGridSizer2->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
+	FlexGridSizer2->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	OkBt = new wxButton(this, ID_BUTTON2, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	AnnulerBt = new wxButton(this, ID_BUTTON3, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	FlexGridSizer3->Add(AnnulerBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AideBt = new wxButton(this, ID_BUTTON4, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
-	FlexGridSizer3->Add(AideBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 	Center();
 
 	Panel1->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&EditPropScene::OnPanel1LeftUp,0,this);
+	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditPropScene::OnAideBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropScene::OnOkBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropScene::OnAnnulerBtClick);
-	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditPropScene::OnAideBtClick);
 	//*)
 
 	CaptionEdit->ChangeValue(layout.GetWindowDefaultTitle());
@@ -216,10 +227,7 @@ void EditPropScene::OnPanel1LeftUp(wxMouseEvent& event)
 
 void EditPropScene::OnAideBtClick(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(8);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_projman"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_projman"));
 }
 
 

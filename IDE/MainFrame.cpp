@@ -31,13 +31,13 @@
 #include <string>
 #include <list>
 #include <sstream>
-#include "GDAuiTabArt.h"
 #include "MainFrame.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -85,7 +85,6 @@ const long MainFrame::ID_MENUITEM27 = wxNewId();
 const long MainFrame::ID_MENUITEM14 = wxNewId();
 const long MainFrame::ID_MENUITEM20 = wxNewId();
 const long MainFrame::ID_MENUITEM23 = wxNewId();
-const long MainFrame::ID_MENUITEM22 = wxNewId();
 const long MainFrame::ID_MENUITEM25 = wxNewId();
 const long MainFrame::ID_MENUITEM24 = wxNewId();
 const long MainFrame::ID_MENUITEM21 = wxNewId();
@@ -101,7 +100,6 @@ const long MainFrame::idRibbonCompil = wxNewId();
 const long MainFrame::idRibbonOptions = wxNewId();
 const long MainFrame::idRibbonHelp = wxNewId();
 const long MainFrame::idRibbonTuto = wxNewId();
-const long MainFrame::idRibbonWiki = wxNewId();
 const long MainFrame::idRibbonForum = wxNewId();
 const long MainFrame::idRibbonUpdate = wxNewId();
 const long MainFrame::idRibbonWebSite = wxNewId();
@@ -235,9 +233,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     MenuItem19 = new wxMenuItem((&helpMenu), ID_MENUITEM23, _("Tutorial"), wxEmptyString, wxITEM_NORMAL);
     MenuItem19->SetBitmap(wxBitmap(wxImage(_T("res/tutoicon.png"))));
     helpMenu.Append(MenuItem19);
-    MenuItem18 = new wxMenuItem((&helpMenu), ID_MENUITEM22, _("Wiki"), wxEmptyString, wxITEM_NORMAL);
-    MenuItem18->SetBitmap(wxBitmap(wxImage(_T("res/wikiicon.png"))));
-    helpMenu.Append(MenuItem18);
     helpMenu.AppendSeparator();
     MenuItem21 = new wxMenuItem((&helpMenu), ID_MENUITEM25, _("Check for updates"), wxEmptyString, wxITEM_NORMAL);
     MenuItem21->SetBitmap(wxBitmap(wxImage(_T("res/update16.png"))));
@@ -276,7 +271,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect(ID_MENUITEM14,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnQuit);
     Connect(ID_MENUITEM20,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuAideSelected);
     Connect(ID_MENUITEM23,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuTutoSelected);
-    Connect(ID_MENUITEM22,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuWikiSelected);
     Connect(ID_MENUITEM25,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuItem36Selected);
     Connect(ID_MENUITEM24,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnMenuSiteSelected);
     Connect(ID_MENUITEM21,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&MainFrame::OnAbout);
@@ -294,7 +288,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect( idRibbonOptions, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuPrefSelected );
     Connect( idRibbonHelp, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuAideSelected );
     Connect( idRibbonTuto, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuTutoSelected );
-    Connect( idRibbonWiki, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuWikiSelected );
     Connect( idRibbonForum, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuForumSelected );
     Connect( idRibbonUpdate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuItem36Selected );
     Connect( idRibbonWebSite, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuSiteSelected );
@@ -431,8 +424,9 @@ MainFrame::MainFrame( wxWindow* parent ) :
     //Load wxAUI
     m_mgr.SetManagedWindow( this );
 
-    LoadSkin(&m_mgr, editorsNotebook);
-    LoadSkin(m_ribbon);
+    gd::SkinHelper::ApplyCurrentSkin(m_mgr);
+    gd::SkinHelper::ApplyCurrentSkin(*editorsNotebook);
+    gd::SkinHelper::ApplyCurrentSkin(*m_ribbon);
 
     RealizeRibbonCustomButtons();
 
@@ -627,132 +621,6 @@ void MainFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
     }
 }
 
-void MainFrame::LoadSkin(wxRibbonBar * bar)
-{
-    wxConfigBase *pConfig = wxConfigBase::Get();
-    wxString result;
-    pConfig->Read( _T( "/Skin/RDefined" ), &result );
-
-    //Ribbon skin
-    if ( result == "true" )
-    {
-        int r = 120, v = 120, b = 120;
-        int r2 = 120, v2 = 120, b2 = 120;
-
-        wxRibbonArtProvider * ribbonArtProvider = NULL;
-        pConfig->Read( _T( "/Skin/RibbonStyle" ), &result );
-
-        //Style
-        if ( result == "Office" )
-            ribbonArtProvider = new wxRibbonMSWArtProvider();
-        else if ( result == "AUI" )
-            ribbonArtProvider = new wxRibbonAUIArtProvider();
-        else
-            ribbonArtProvider = new wxRibbonMSWArtProvider();
-
-        bar->SetArtProvider(ribbonArtProvider);
-
-        //Colors
-        pConfig->Read( _T( "/Skin/Ribbon1R" ), &r );
-        pConfig->Read( _T( "/Skin/Ribbon1G" ), &v );
-        pConfig->Read( _T( "/Skin/Ribbon1B" ), &b );
-
-        pConfig->Read( _T( "/Skin/Ribbon2R" ), &r2 );
-        pConfig->Read( _T( "/Skin/Ribbon2G" ), &v2 );
-        pConfig->Read( _T( "/Skin/Ribbon2B" ), &b2 );
-
-        wxColour colour, secondary, tertiary;
-        bar->GetArtProvider()->GetColourScheme(&colour, &secondary, &tertiary);
-        bar->GetArtProvider()->SetColourScheme(wxColour(r, v, b), wxColour(r2, v2, b2), wxColour(0, 0, 0));
-
-    }
-    else
-    {
-        bar->SetArtProvider(new wxRibbonMSWArtProvider());
-        bar->GetArtProvider()->SetColourScheme(wxColour(244, 245, 247), wxColour(231, 241, 254), wxColour(0, 0, 0));
-    }
-}
-
-void MainFrame::LoadSkin(wxAuiManager * auiManager, wxAuiNotebook * notebook)
-{
-    wxConfigBase *pConfig = wxConfigBase::Get();
-    wxString result;
-
-    //DockArt skin
-    wxAuiDefaultDockArt *dockArt = new wxAuiDefaultDockArt();
-    GDAuiTabArt * tabArt = new GDAuiTabArt();
-    pConfig->Read( _T( "/Skin/Defined" ), &result );
-    if ( result == "true" )
-    {
-        int r = 120, v = 120, b = 120;
-
-        pConfig->Read( _T( "/Skin/PaneA1R" ), &r );
-        pConfig->Read( _T( "/Skin/PaneA1G" ), &v );
-        pConfig->Read( _T( "/Skin/PaneA1B" ), &b );
-        dockArt->SetColour( 7, wxColour( r, v, b ) );
-
-        pConfig->Read( _T( "/Skin/PaneA2R" ), &r );
-        pConfig->Read( _T( "/Skin/PaneA2G" ), &v );
-        pConfig->Read( _T( "/Skin/PaneA2B" ), &b );
-        dockArt->SetColour( 8, wxColour( r, v, b ) );
-
-        pConfig->Read( _T( "/Skin/PaneI1R" ), &r );
-        pConfig->Read( _T( "/Skin/PaneI1G" ), &v );
-        pConfig->Read( _T( "/Skin/PaneI1B" ), &b );
-        dockArt->SetColour( 9, wxColour( r, v, b ) );
-
-        pConfig->Read( _T( "/Skin/PaneI2R" ), &r );
-        pConfig->Read( _T( "/Skin/PaneI2G" ), &v );
-        pConfig->Read( _T( "/Skin/PaneI2B" ), &b );
-        dockArt->SetColour( 10, wxColour( r, v, b ) );
-
-        pConfig->Read( _T( "/Skin/BorderR" ), &r );
-        pConfig->Read( _T( "/Skin/BorderG" ), &v );
-        pConfig->Read( _T( "/Skin/BorderB" ), &b );
-        dockArt->SetColour( 13, wxColour( r, v, b ) );
-
-        pConfig->Read( _T( "/Skin/BackR" ), &r );
-        pConfig->Read( _T( "/Skin/BackG" ), &v );
-        pConfig->Read( _T( "/Skin/BackB" ), &b );
-        dockArt->SetColour( 6, wxColour( r, v, b ) );
-
-        pConfig->Read( _T( "/Skin/ATextR" ), &r );
-        pConfig->Read( _T( "/Skin/ATextG" ), &v );
-        pConfig->Read( _T( "/Skin/ATextB" ), &b );
-        dockArt->SetColour( 11, wxColour( r, v, b ) );
-
-        pConfig->Read( _T( "/Skin/ITextR" ), &r );
-        pConfig->Read( _T( "/Skin/ITextG" ), &v );
-        pConfig->Read( _T( "/Skin/ITextB" ), &b );
-        dockArt->SetColour( 12, wxColour( r, v, b ) );
-
-        wxColor tabColor;
-        pConfig->Read( _T( "/Skin/TabColor" ), &tabColor );
-        tabArt->SetColour(tabColor);
-
-        wxColor activeTabColor;
-        pConfig->Read( _T( "/Skin/ActiveTabColor" ), &activeTabColor );
-        tabArt->SetActiveColour(activeTabColor);
-    }
-    else
-    {
-        dockArt->SetColour(6, wxColour(211,222,246));
-        dockArt->SetColour(13, wxColour(172,183,208));
-        dockArt->SetColour(9, wxColour(214,221,233));
-        dockArt->SetColour(10, wxColour(214,221,233));
-        dockArt->SetColour(7, wxColour(221,229,246));
-        dockArt->SetColour(8, wxColour(221,229,246));
-        dockArt->SetColour(11, wxColour(104,114,138));
-        dockArt->SetColour(12, wxColour(104,114,138));
-
-        tabArt->SetColour(wxColour(220, 225, 232));
-        tabArt->SetActiveColour(wxColour(220, 225, 232));
-    }
-
-    if (auiManager) auiManager->SetArtProvider(dockArt);
-    if (notebook) notebook->SetArtProvider(tabArt);
-}
-
 void MainFrame::RealizeRibbonCustomButtons()
 {
     wxRibbonArtProvider * artProvider = m_ribbon->GetArtProvider();
@@ -789,7 +657,7 @@ void MainFrame::RealizeRibbonCustomButtons()
     pages.Add(tabInfo);
     pages.Add(tabInfo); //Add page twice to ensure that tab have a correct height
 
-    //Compite height of the bitmap button and create bitmap
+    //Compute height of the bitmap button and create bitmap
     int height = artProvider->GetTabCtrlHeight(dc, m_ribbon, pages);
     wxBitmap bitmapLabel(width+2, height);
     dc.SelectObject(bitmapLabel);
@@ -808,6 +676,7 @@ void MainFrame::RealizeRibbonCustomButtons()
     tabInfo.active = false;
     tabInfo.hovered = true;
     artProvider->DrawTabCtrlBackground(dc, fakeRibbon, bitmapHoveredLabel.GetSize());
+    wxColour backgroundColour = wxColor(bitmapHoveredLabel.ConvertToImage().GetRed(0,0), bitmapHoveredLabel.ConvertToImage().GetGreen(0,0), bitmapHoveredLabel.ConvertToImage().GetBlue(0,0)); //For later use...
     fakeRibbon->GetArtProvider()->DrawTab(dc, fakeRibbon, tabInfo);
     ribbonFileHoveredBitmap = bitmapHoveredLabel;
 
@@ -821,12 +690,25 @@ void MainFrame::RealizeRibbonCustomButtons()
     //Render help file button
     wxBitmap helpIcon("res/helpicon.png", wxBITMAP_TYPE_ANY);
 
-    ribbonHelpNormalBitmap = wxBitmap(helpIcon.ConvertToImage());
-    dc.SelectObject(ribbonHelpNormalBitmap);
-    artProvider->DrawTabCtrlBackground(dc, fakeRibbon, ribbonHelpNormalBitmap.GetSize());
-    dc.DrawBitmap(helpIcon, wxPoint(0,0), true /*Use mask*/);
-
-    ribbonHelpHoveredBitmap = wxBitmap(ribbonHelpNormalBitmap.ConvertToImage());
+    { //(Painful) generation of help button
+        wxMemoryDC dc;
+        ribbonHelpNormalBitmap = wxBitmap(16,16,24 /*We **need** to specify 24 bit depth so as to keep the background color ( see below )*/);
+        dc.SelectObject(ribbonHelpNormalBitmap);
+        dc.SetBackground(wxBrush(backgroundColour));
+        dc.Clear();
+        //artProvider->DrawTabCtrlBackground(dc, fakeRibbon, ribbonHelpHoveredBitmap.GetSize()); //Useless, the background is destroyed by the next call to DrawBitmap ??
+                                                                                                 //That's why we use a simple background color.
+        dc.DrawBitmap(helpIcon, wxPoint(0,0), true /*Use mask, but it does not seems to work so we must use a background color ( see above )*/);
+    }
+    { //Same thing for hovered button
+        wxMemoryDC dc;
+        ribbonHelpHoveredBitmap = wxBitmap(16,16,24);
+        dc.SelectObject(ribbonHelpHoveredBitmap);
+        dc.SetBackground(wxBrush(backgroundColour));
+        dc.Clear();
+        helpIcon = wxBitmap(helpIcon.ConvertToImage().ConvertToDisabled(255));
+        dc.DrawBitmap(helpIcon, wxPoint(0,0), true);
+    }
 
     fakeRibbon->Destroy();
 
@@ -1017,8 +899,9 @@ void MainFrame::OnMenuPrefSelected( wxCommandEvent& event )
     Dialog.ShowModal();
 
     //Reload skins and update controls
-    LoadSkin(&m_mgr, editorsNotebook);
-    LoadSkin(m_ribbon);
+    gd::SkinHelper::ApplyCurrentSkin(m_mgr);
+    gd::SkinHelper::ApplyCurrentSkin(*editorsNotebook);
+    gd::SkinHelper::ApplyCurrentSkin(*m_ribbon);
 
     PrepareAutosave();
 

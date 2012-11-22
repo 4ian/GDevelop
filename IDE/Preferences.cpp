@@ -1283,10 +1283,7 @@ void Preferences::OnInactifColor2PnlRightUp( wxMouseEvent& event )
 
 void Preferences::OnAideBtClick( wxCommandEvent& event )
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplayContents();
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation")); //TODO
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation")); //TODO
 }
 
 void Preferences::OnBrowseDossierTempBtClick( wxCommandEvent& event )

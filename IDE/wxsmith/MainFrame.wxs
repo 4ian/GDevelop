@@ -178,11 +178,6 @@
 				<bitmap>res/tutoicon.png</bitmap>
 				<handler function="OnMenuTutoSelected" entry="EVT_MENU" />
 			</object>
-			<object class="wxMenuItem" name="ID_MENUITEM22" variable="MenuItem18" member="yes">
-				<label>Wiki</label>
-				<bitmap>res/wikiicon.png</bitmap>
-				<handler function="OnMenuWikiSelected" entry="EVT_MENU" />
-			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM25" variable="MenuItem21" member="yes">
 				<label>Check for updates</label>

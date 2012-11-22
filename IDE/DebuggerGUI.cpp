@@ -26,6 +26,7 @@
 #include "GDL/ObjectHelpers.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "ConsoleManager.h"
 
 
@@ -159,6 +160,8 @@ objectChanged(true)
     Connect(ID_VARGLOBALBT,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnAddVarGlobalBtClick);
     Connect(ID_ADDOBJBT,wxEVT_COMMAND_TOOL_CLICKED,(wxObjectEventFunction)&DebuggerGUI::OnAddObjBtClick);
 	Connect(ID_EXTLIST,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&DebuggerGUI::OnExtensionListItemActivated);
+
+    gd::SkinHelper::ApplyCurrentSkin(*toolbar);
 
     font = *wxNORMAL_FONT;
     font.SetWeight(wxFONTWEIGHT_BOLD);

@@ -71,14 +71,13 @@ const long ChoixAction::ID_STATICBITMAP1 = wxNewId();
 const long ChoixAction::ID_STATICTEXT1 = wxNewId();
 const long ChoixAction::ID_STATICTEXT2 = wxNewId();
 const long ChoixAction::ID_STATICLINE1 = wxNewId();
-const long ChoixAction::ID_RADIOBUTTON1 = wxNewId();
-const long ChoixAction::ID_RADIOBUTTON2 = wxNewId();
 const long ChoixAction::ID_STATICLINE2 = wxNewId();
 const long ChoixAction::ID_BUTTON4 = wxNewId();
 const long ChoixAction::ID_CHECKBOX2 = wxNewId();
+const long ChoixAction::ID_STATICBITMAP2 = wxNewId();
+const long ChoixAction::ID_HYPERLINKCTRL1 = wxNewId();
 const long ChoixAction::ID_BUTTON1 = wxNewId();
 const long ChoixAction::ID_BUTTON2 = wxNewId();
-const long ChoixAction::ID_BUTTON3 = wxNewId();
 //*)
 const long ChoixAction::ID_EDITARRAY = wxNewId();
 const long ChoixAction::ID_TEXTARRAY = wxNewId();
@@ -97,7 +96,6 @@ scene(scene_)
 	//(*Initialize(ChoixAction)
 	wxBoxSizer* BoxSizer4;
 	wxBoxSizer* BoxSizer6;
-	wxFlexGridSizer* FlexGridSizer4;
 	wxBoxSizer* BoxSizer5;
 	wxBoxSizer* BoxSizer10;
 	wxBoxSizer* BoxSizer7;
@@ -109,7 +107,6 @@ scene(scene_)
 	wxBoxSizer* BoxSizer1;
 	wxBoxSizer* BoxSizer9;
 	wxFlexGridSizer* FlexGridSizer6;
-	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxBoxSizer* BoxSizer3;
 
@@ -182,21 +179,6 @@ scene(scene_)
 	GridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	GridSizer1->AddGrowableCol(1);
 	BoxSizer8->Add(GridSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer4 = new wxFlexGridSizer(0, 4, 0, 0);
-	FlexGridSizer4->AddGrowableCol(0);
-	FlexGridSizer4->AddGrowableRow(0);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Objects selection"));
-	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
-	LocaliseCheck = new wxRadioButton(this, ID_RADIOBUTTON1, _("Default"), wxDefaultPosition, wxDefaultSize, wxRB_GROUP, wxDefaultValidator, _T("ID_RADIOBUTTON1"));
-	LocaliseCheck->SetValue(true);
-	LocaliseCheck->SetToolTip(_("Only objects concerned by previous conditions and actions will be considered."));
-	FlexGridSizer5->Add(LocaliseCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	GlobalCheck = new wxRadioButton(this, ID_RADIOBUTTON2, _("Force global"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_RADIOBUTTON2"));
-	GlobalCheck->SetToolTip(_("All objects will be considered by this action."));
-	FlexGridSizer5->Add(GlobalCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer1->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer4->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	BoxSizer8->Add(FlexGridSizer4, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer7->Add(BoxSizer8, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer6->Add(BoxSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
@@ -210,19 +192,27 @@ scene(scene_)
 	FlexGridSizer6->Add(moreBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	objSortCheck = new wxCheckBox(this, ID_CHECKBOX2, _("Sort by objects"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX2"));
 	objSortCheck->SetValue(false);
+	objSortCheck->Hide();
 	FlexGridSizer6->Add(objSortCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer5->AddGrowableRow(0);
+	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	FlexGridSizer5->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
+	FlexGridSizer5->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer6->Add(FlexGridSizer5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2->Add(FlexGridSizer6, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer5 = new wxBoxSizer(wxHORIZONTAL);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	BoxSizer5->Add(OkBt, 1, wxALL|wxFIXED_MINSIZE|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	CancelBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	BoxSizer5->Add(CancelBt, 1, wxALL|wxFIXED_MINSIZE|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AideBt = new wxButton(this, ID_BUTTON3, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
-	BoxSizer5->Add(AideBt, 1, wxALL|wxFIXED_MINSIZE|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(BoxSizer5, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer6->Add(FlexGridSizer2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(BoxSizer6);
-	BoxSizer6->SetSizeHints(this);
+	SetSizer(BoxSizer6);
+	Layout();
 	Center();
 
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixAction::OnActionsTreeSelectionChanged);
@@ -235,9 +225,9 @@ scene(scene_)
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChoixAction::OnsearchCtrlText);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixAction::OnmoreBtClick);
 	Connect(ID_CHECKBOX2,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&ChoixAction::OnobjSortCheckClick);
+	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ChoixAction::OnAideBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixAction::OnOkBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixAction::OnCancelBtClick);
-	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixAction::OnAideBtClick);
 	//*)
     moreBt->SetBitmap(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
 
@@ -259,7 +249,6 @@ scene(scene_)
     objectActionsTree->SetImageList( imageList );
 
     Type = "";
-    Loc = true;
 
     RefreshAllLists();
     Center();
@@ -712,10 +701,6 @@ void ChoixAction::RefreshFromAction()
     Layout();
     GridSizer1->Layout();
 
-    //Update localization
-    LocaliseCheck->SetValue(Loc);
-    GlobalCheck->SetValue(!Loc);
-
     Layout();
 }
 
@@ -1025,11 +1010,6 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
             Param.push_back(gd::Expression(string(ParaEdit.at(i)->GetValue().mb_str())));
     }
 
-    if ( LocaliseCheck->GetValue() )
-    {
-        Loc = true;
-    } else { Loc = false; }
-
     EndModal( 0 );
 }
 
@@ -1040,10 +1020,7 @@ void ChoixAction::OnCancelBtClick(wxCommandEvent& event)
 
 void ChoixAction::OnAideBtClick(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(29);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action")); //TODO
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/action"));
 }
 
 void ChoixAction::OnextSortCheckClick(wxCommandEvent& event)

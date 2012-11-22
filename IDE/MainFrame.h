@@ -101,9 +101,6 @@ class MainFrame: public wxFrame
          */
         void CreateNewProject();
 
-        static void LoadSkin(wxRibbonBar * bar);
-        static void LoadSkin(wxAuiManager * auiManager, wxAuiNotebook * notebook);
-
         /**
          * Get a pointer to the notebook containing editors
          */
@@ -188,7 +185,6 @@ class MainFrame: public wxFrame
         void OnMenuTutoSelected(wxCommandEvent& event);
         void OnDecomposeGIFSelected(wxCommandEvent& event);
         void OnDecomposeRPGSelected(wxCommandEvent& event);
-        void OnMenuWikiSelected(wxCommandEvent& event);
         void OnSceneTreeItemActivated(wxTreeEvent& event);
         void OnextensionsEditBtClick(wxCommandEvent& event);
         void OnDecomposeSSSelected(wxCommandEvent& event);
@@ -256,7 +252,6 @@ class MainFrame: public wxFrame
         static const long ID_MENUITEM14;
         static const long ID_MENUITEM20;
         static const long ID_MENUITEM23;
-        static const long ID_MENUITEM22;
         static const long ID_MENUITEM25;
         static const long ID_MENUITEM24;
         static const long ID_MENUITEM21;
@@ -272,7 +267,6 @@ class MainFrame: public wxFrame
         static const long idRibbonOptions;
         static const long idRibbonHelp;
         static const long idRibbonTuto;
-        static const long idRibbonWiki;
         static const long idRibbonForum;
         static const long idRibbonUpdate;
         static const long idRibbonWebSite;
@@ -308,7 +302,6 @@ class MainFrame: public wxFrame
         wxMenuItem* MenuItem16;
         wxMenuItem* MenuItem43;
         wxMenuItem* MenuItem9;
-        wxMenuItem* MenuItem18;
         wxMenu saveContextMenu;
         wxMenuItem* MenuItem19;
         wxMenu fileMenu;

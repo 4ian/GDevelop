@@ -8,6 +8,8 @@
 #include <wx/checkbox.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -20,6 +22,7 @@ class GridSetup: public wxDialog
 		virtual ~GridSetup();
 
 		//(*Declarations(GridSetup)
+		wxStaticBitmap* StaticBitmap2;
 		wxTextCtrl* widthEdit;
 		wxStaticText* StaticText6;
 		wxTextCtrl* heightEdit;
@@ -29,6 +32,7 @@ class GridSetup: public wxDialog
 		wxPanel* colorPanel;
 		wxStaticText* StaticText5;
 		wxStaticLine* StaticLine1;
+		wxHyperlinkCtrl* helpBt;
 		wxStaticText* StaticText4;
 		wxButton* okBt;
 		wxCheckBox* snapCheck;
@@ -53,6 +57,8 @@ class GridSetup: public wxDialog
 		static const long ID_STATICTEXT1;
 		static const long ID_PANEL1;
 		static const long ID_STATICLINE1;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
 		//*)
@@ -63,6 +69,7 @@ class GridSetup: public wxDialog
 		void OnokBtClick(wxCommandEvent& event);
 		void OncancelBtClick(wxCommandEvent& event);
 		void OncolorPanelLeftUp(wxMouseEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

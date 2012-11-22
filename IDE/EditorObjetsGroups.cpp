@@ -167,6 +167,11 @@ EditorObjetsGroups::~EditorObjetsGroups()
 	//*)
 }
 
+bool EditorObjetsGroups::EditingLayoutGroups()
+{
+    return (&scene.GetObjectGroups() == objectsGroups);
+}
+
 /**
  * Static method for creating ribbon page for this kind of editor
  */
@@ -294,10 +299,7 @@ void EditorObjetsGroups::OnMoveDownSelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnHelp(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(180);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_group")); //TODO
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_group"));
 }
 
 ////////////////////////////////////////////////////////////
@@ -339,8 +341,7 @@ void EditorObjetsGroups::OnEditGroupSelected(wxCommandEvent& event)
         if ( dialog.ShowModal() == 1 )
             *i = dialog.group;
 
-        scene.SetRefreshNeeded();
-        CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+        game.GetChangesNotifier().OnObjectGroupEdited(game, EditingLayoutGroups() ? &scene : NULL, i->GetName());
         return;
     }
 }
@@ -370,8 +371,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     objectsGroups->push_back( NewGroup );
     ObjetsGroupsList->AppendItem( rootId, name );
 
-    scene.SetRefreshNeeded();
-    CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+    game.GetChangesNotifier().OnObjectGroupAdded(game, EditingLayoutGroups() ? &scene : NULL, ToString(name));
     wxLogStatus( _( "The group was correctly added." ) );
 }
 
@@ -415,8 +415,7 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
                 gd::EventsRefactorer::RemoveObjectInEvents(game, scene, scene.GetEvents(), groupName);
             }
 
-            scene.SetRefreshNeeded();
-            CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+            game.GetChangesNotifier().OnObjectGroupDeleted(game, EditingLayoutGroups() ? &scene : NULL, groupName);
             ObjetsGroupsList->Delete( itemSelected );
         }
     }
@@ -483,7 +482,7 @@ void EditorObjetsGroups::OnObjetsGroupsListBeginLabelEdit(wxTreeEvent& event)
 
     if ( event.GetItem() != ObjetsGroupsList->GetRootItem() )
     {
-        ancienNom = ObjetsGroupsList->GetItemText( event.GetItem() );
+        renamedGroupOldName = ObjetsGroupsList->GetItemText( event.GetItem() );
     }
     else
     {
@@ -517,16 +516,15 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
     {
         vector<gd::ObjectGroup>::iterator i = std::find_if( objectsGroups->begin(),
                                                         objectsGroups->end(),
-                                                        std::bind2nd(gd::GroupHasTheSameName(), ancienNom));
+                                                        std::bind2nd(gd::GroupHasTheSameName(), renamedGroupOldName));
 
         if ( i != objectsGroups->end() )
         {
             i->SetName( newName );
 
-            gd::EventsRefactorer::RenameObjectInEvents(game, scene, scene.GetEvents(), ancienNom, newName);
+            gd::EventsRefactorer::RenameObjectInEvents(game, scene, scene.GetEvents(), renamedGroupOldName, newName);
 
-            scene.SetRefreshNeeded();
-            CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+            game.GetChangesNotifier().OnObjectGroupRenamed(game, EditingLayoutGroups() ? &scene : NULL, newName, renamedGroupOldName);
             return;
         }
     }
@@ -591,8 +589,7 @@ void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
     clipboard->SetObjectGroup(*i);
     objectsGroups->erase( i );
 
-    scene.SetRefreshNeeded();
-    CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+    game.GetChangesNotifier().OnObjectGroupDeleted(game, EditingLayoutGroups() ? &scene : NULL, ToString(ObjetsGroupsList->GetItemText( itemSelected )));
     ObjetsGroupsList->Delete( itemSelected );
 }
 
@@ -617,7 +614,6 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
     objectsGroups->push_back( groupPasted );
     ObjetsGroupsList->AppendItem( rootId, groupPasted.GetName());
 
-    scene.SetRefreshNeeded();
-    CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+    game.GetChangesNotifier().OnObjectGroupAdded(game, EditingLayoutGroups() ? &scene : NULL,  groupPasted.GetName());
 }
 

@@ -2,7 +2,6 @@
 
 //(*InternalHeaders(MAJ)
 #include <wx/bitmap.h>
-#include <wx/settings.h>
 #include <wx/font.h>
 #include <wx/intl.h>
 #include <wx/image.h>
@@ -21,22 +20,22 @@
 #include "CheckMAJ.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
+#include "GDCore/Tools/HelpFileAccess.h"
 
 //(*IdInit(MAJ)
-const long MAJ::ID_STATICBITMAP3 = wxNewId();
-const long MAJ::ID_STATICTEXT1 = wxNewId();
-const long MAJ::ID_PANEL1 = wxNewId();
-const long MAJ::ID_STATICLINE1 = wxNewId();
 const long MAJ::ID_STATICTEXT2 = wxNewId();
 const long MAJ::ID_STATICTEXT3 = wxNewId();
 const long MAJ::ID_STATICTEXT4 = wxNewId();
 const long MAJ::ID_STATICTEXT5 = wxNewId();
+const long MAJ::ID_STATICTEXT1 = wxNewId();
 const long MAJ::ID_TEXTCTRL1 = wxNewId();
 const long MAJ::ID_STATICTEXT7 = wxNewId();
 const long MAJ::ID_BUTTON4 = wxNewId();
 const long MAJ::ID_STATICTEXT6 = wxNewId();
 const long MAJ::ID_HYPERLINKCTRL1 = wxNewId();
 const long MAJ::ID_STATICLINE2 = wxNewId();
+const long MAJ::ID_STATICBITMAP2 = wxNewId();
+const long MAJ::ID_HYPERLINKCTRL2 = wxNewId();
 const long MAJ::ID_BUTTON2 = wxNewId();
 const long MAJ::ID_BUTTON1 = wxNewId();
 //*)
@@ -52,30 +51,15 @@ parent(parent_)
 	//(*Initialize(MAJ)
 	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer3;
+	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer2;
 	wxFlexGridSizer* FlexGridSizer6;
 	wxFlexGridSizer* FlexGridSizer1;
-	wxFlexGridSizer* FlexGridSizer17;
 
 	Create(parent, wxID_ANY, _("Check for updates"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer17 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer17->AddGrowableCol(0);
-	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
-	Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticBitmap3 = new wxStaticBitmap(Panel1, ID_STATICBITMAP3, wxBitmap(wxImage(_T("res/maj.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP3"));
-	FlexGridSizer6->Add(StaticBitmap3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Game Develop can verify if a new version is\navailable. The new versions bring bugs' fixes,\nimprovements and new features."), wxDefaultPosition, wxDefaultSize, wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
-	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	Panel1->SetSizer(FlexGridSizer6);
-	FlexGridSizer6->SetSizeHints(Panel1);
-	FlexGridSizer17->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
-	FlexGridSizer17->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer1->Add(FlexGridSizer17, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
-	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Actual version :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
+	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Your version :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer2->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	versionTxt = new wxStaticText(this, ID_STATICTEXT3, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	wxFont versionTxtFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
@@ -84,19 +68,28 @@ parent(parent_)
 	StaticText4 = new wxStaticText(this, ID_STATICTEXT4, _("Available version :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT4"));
 	FlexGridSizer2->Add(StaticText4, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	versionMAJTxt = new wxStaticText(this, ID_STATICTEXT5, _("No informations available"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT5"));
-	wxFont versionMAJTxtFont(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
-	versionMAJTxt->SetFont(versionMAJTxtFont);
-	FlexGridSizer2->Add(versionMAJTxt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer2->Add(versionMAJTxt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	infoEdit = new wxTextCtrl(this, ID_TEXTCTRL1, _("No informations about the new version"), wxDefaultPosition, wxSize(365,130), wxTE_AUTO_SCROLL|wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer6->AddGrowableCol(0);
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	wxFont StaticText1Font(wxDEFAULT,wxDEFAULT,wxFONTSTYLE_NORMAL,wxBOLD,false,wxEmptyString,wxFONTENCODING_DEFAULT);
+	StaticText1->SetFont(StaticText1Font);
+	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	infoEdit = new wxTextCtrl(this, ID_TEXTCTRL1, _("No informations about the new version"), wxDefaultPosition, wxSize(400,227), wxTE_AUTO_SCROLL|wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
 	FlexGridSizer1->Add(infoEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer1->Add(0,0,1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
+	FlexGridSizer4->AddGrowableCol(1);
 	StaticText5 = new wxStaticText(this, ID_STATICTEXT7, _("Automatic download :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT7"));
+	StaticText5->Hide();
 	FlexGridSizer4->Add(StaticText5, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	downloadAndInstallBt = new wxButton(this, ID_BUTTON4, _("Install the new version"), wxDefaultPosition, wxSize(234,23), 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	downloadAndInstallBt->Disable();
+	downloadAndInstallBt->Hide();
 	FlexGridSizer4->Add(downloadAndInstallBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText3 = new wxStaticText(this, ID_STATICTEXT6, _("Manual download :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
+	StaticText3 = new wxStaticText(this, ID_STATICTEXT6, _("Download it here:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT6"));
 	FlexGridSizer4->Add(StaticText3, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	linkCtrl = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("No link"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
 	FlexGridSizer4->Add(linkCtrl, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -104,18 +97,28 @@ parent(parent_)
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer3->AddGrowableCol(0);
+	FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer5->AddGrowableRow(0);
+	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	FlexGridSizer5->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL2, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
+	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
+	FlexGridSizer5->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer3->Add(FlexGridSizer5, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	VerifMAJBt = new wxButton(this, ID_BUTTON2, _("Check for updates again"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	VerifMAJBt->SetDefault();
 	FlexGridSizer3->Add(VerifMAJBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FermerBt = new wxButton(this, ID_BUTTON1, _("Close"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer3->Add(FermerBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer1->Add(FlexGridSizer3, 1, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MAJ::OndownloadAndInstallBtClick);
 	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&MAJ::OnLienBtClick);
+	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&MAJ::OnHelpBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MAJ::OnVerifMAJBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MAJ::OnFermerBtClick);
 	//*)
@@ -127,7 +130,6 @@ parent(parent_)
         StaticText1->SetLabel(_("A new version of Game Develop is available !"));
         VerifMAJBt->Show(false);
     }
-
 
     CheckForUpdate();
 }
@@ -249,3 +251,8 @@ void MAJ::OndownloadAndInstallBtClick(wxCommandEvent& event)
     EndModal(2);
 }
 
+
+void MAJ::OnHelpBtClick(wxCommandEvent& event)
+{
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/update"));
+}

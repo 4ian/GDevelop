@@ -1018,10 +1018,7 @@ void EditorObjectList::OnobjectsListKeyDown(wxTreeEvent& event)
 
 void EditorObjectList::OnAideBtClick( wxCommandEvent& event )
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(10);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object")); //TODO
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"));
 }
 
 void EditorObjectList::OnsearchCtrlText(wxCommandEvent& event)

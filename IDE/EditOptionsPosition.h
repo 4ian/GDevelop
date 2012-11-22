@@ -8,7 +8,9 @@
 #include <wx/checkbox.h>
 #include <wx/statline.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/choice.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -36,12 +38,14 @@ class EditOptionsPosition: public wxDialog
 		wxCheckBox* sizeCheck;
 		wxChoice* layerChoice;
 		wxStaticText* StaticText6;
+		wxStaticBitmap* StaticBitmap1;
 		wxTextCtrl* heightEdit;
 		wxStaticText* StaticText8;
 		wxPanel* Panel1;
 		wxPanel* customPanel;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxTextCtrl* XEdit;
 		wxStaticLine* StaticLine2;
 		wxStaticText* StaticText5;
@@ -52,7 +56,6 @@ class EditOptionsPosition: public wxDialog
 		wxTextCtrl* zOrderEdit;
 		wxStaticText* StaticText4;
 		wxStaticText* objectNameTxt;
-		wxButton* AideBt;
 		//*)
 
 	protected:
@@ -80,9 +83,10 @@ class EditOptionsPosition: public wxDialog
 		static const long ID_STATICTEXT9;
 		static const long ID_PANEL2;
 		static const long ID_STATICLINE2;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
-		static const long ID_BUTTON3;
 		//*)
 
 	private:

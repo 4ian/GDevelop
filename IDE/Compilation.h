@@ -10,6 +10,8 @@
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/statline.h>
+#include <wx/hyperlink.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 #include <wx/gauge.h>
@@ -34,8 +36,10 @@ class Compilation: public wxDialog
 		//(*Declarations(Compilation)
 		wxStaticText* statusTxt;
 		wxButton* FermerBt;
+		wxStaticBitmap* StaticBitmap1;
 		wxCheckBox* optimizationCheck;
 		wxCheckBox* compressCheck;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxStaticText* status2Txt;
 		wxStaticLine* StaticLine2;
 		wxGauge* AvancementGauge;
@@ -43,7 +47,6 @@ class Compilation: public wxDialog
 		wxStaticText* StaticText4;
 		wxTextCtrl* dirEdit;
 		wxButton* CompilBt;
-		wxButton* AideBt;
 		//*)
 
 	protected:
@@ -59,7 +62,8 @@ class Compilation: public wxDialog
 		static const long ID_CHECKBOX1;
 		static const long ID_CHECKBOX4;
 		static const long ID_STATICLINE2;
-		static const long ID_BUTTON4;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON2;
 		//*)
 

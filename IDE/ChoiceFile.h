@@ -11,6 +11,8 @@
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/statline.h>
+#include <wx/hyperlink.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -33,6 +35,7 @@ class ChoiceFile: public wxDialog
 		virtual ~ChoiceFile();
 
 		//(*Declarations(ChoiceFile)
+		wxStaticBitmap* StaticBitmap2;
 		wxStaticText* StaticText2;
 		wxButton* advancedBt;
 		wxStaticText* StaticText1;
@@ -40,6 +43,7 @@ class ChoiceFile: public wxDialog
 		wxTextCtrl* fileEdit;
 		wxStaticLine* StaticLine1;
 		wxButton* browseBt;
+		wxHyperlinkCtrl* helpBt;
 		wxButton* okBt;
 		//*)
 
@@ -53,9 +57,11 @@ class ChoiceFile: public wxDialog
 		static const long ID_BUTTON1;
 		static const long ID_STATICTEXT2;
 		static const long ID_STATICLINE1;
-		static const long ID_BUTTON2;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON4;
 		static const long ID_BUTTON3;
+		static const long ID_BUTTON2;
 		//*)
 
 	private:
@@ -66,6 +72,7 @@ class ChoiceFile: public wxDialog
 		void OncancelBtClick(wxCommandEvent& event);
 		void OnfileEditText(wxCommandEvent& event);
 		void OnbrowseBtClick(wxCommandEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 
         //Données pour éditer une expression textuelle

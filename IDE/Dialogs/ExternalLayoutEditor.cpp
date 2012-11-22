@@ -17,6 +17,7 @@
 #include "../EditorObjets.h"
 #include "../SceneCanvas.h"
 #include "../MainFrame.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 
 //(*IdInit(ExternalLayoutEditor)
 const long ExternalLayoutEditor::ID_STATICTEXT1 = wxNewId();
@@ -138,7 +139,7 @@ mainFrameWrapper(mainFrameWrapper_)
 
     m_mgr.AddPane( corePanel, wxAuiPaneInfo().Name( wxT( "LayoutPanel" ) ).Center().CloseButton( false ).Caption( _( "Scene's editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
 
-    MainFrame::LoadSkin(&m_mgr, NULL);
+    gd::SkinHelper::ApplyCurrentSkin(m_mgr);
 
     //If the
     vector< boost::shared_ptr<Scene> >::iterator sceneFound =

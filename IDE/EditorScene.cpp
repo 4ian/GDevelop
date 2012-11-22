@@ -37,7 +37,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "EventsEditor.h"
 #include "GridSetup.h"
-#include "GDAuiTabArt.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
@@ -85,7 +85,6 @@ mainFrameWrapper(mainFrameWrapper_)
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
 	notebook = new wxAuiNotebook(this, ID_AUINOTEBOOK1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_BOTTOM|wxNO_BORDER);
-	notebook->SetArtProvider(new GDAuiTabArt);
 	scenePanel = new wxPanel(notebook, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL5"));
 	scenePanel->SetBackgroundColour(wxColour(255,255,255));
 	scrollBar2 = new wxScrollBar(scenePanel, ID_SCROLLBAR2, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL, wxDefaultValidator, _T("ID_SCROLLBAR2"));
@@ -159,7 +158,8 @@ mainFrameWrapper(mainFrameWrapper_)
         }
     }
 
-    MainFrame::LoadSkin(&m_mgr, notebook);
+    gd::SkinHelper::ApplyCurrentSkin(m_mgr);
+    gd::SkinHelper::ApplyCurrentSkin(*notebook);
 
     mainFrameWrapper.GetRibbon()->SetActivePage(2);
     sceneCanvas->ConnectEvents();

@@ -7,6 +7,8 @@
 #include <wx/textctrl.h>
 #include <wx/spinctrl.h>
 #include <wx/statline.h>
+#include <wx/hyperlink.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -34,6 +36,7 @@ class AdvancedPasteDlg: public wxDialog
 		//(*Declarations(AdvancedPasteDlg)
 		wxTextCtrl* yGapEdit;
 		wxStaticText* StaticText9;
+		wxStaticBitmap* StaticBitmap2;
 		wxSpinCtrl* xCountEdit;
 		wxStaticText* StaticText2;
 		wxTextCtrl* xStartEdit;
@@ -48,6 +51,7 @@ class AdvancedPasteDlg: public wxDialog
 		wxStaticText* StaticText7;
 		wxTextCtrl* yStartEdit;
 		wxStaticLine* StaticLine1;
+		wxHyperlinkCtrl* helpBt;
 		wxSpinCtrl* yCountEdit;
 		wxTextCtrl* xGapEdit;
 		wxStaticText* StaticText4;
@@ -75,6 +79,8 @@ class AdvancedPasteDlg: public wxDialog
 		static const long ID_TEXTCTRL1;
 		static const long ID_STATICTEXT5;
 		static const long ID_STATICLINE1;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
 		//*)
@@ -84,6 +90,7 @@ class AdvancedPasteDlg: public wxDialog
 		//(*Handlers(AdvancedPasteDlg)
 		void OnokBtClick(wxCommandEvent& event);
 		void OncancelBtClick(wxCommandEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

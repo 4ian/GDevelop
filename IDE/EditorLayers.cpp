@@ -18,6 +18,7 @@
 #include "ObjectsOnBadLayerBox.h"
 #include "EditLayer.h"
 #include "SceneCanvas.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
 #endif
@@ -114,6 +115,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	layersList->InsertColumn(2, _("Visible"));
 
     CreateToolbar();
+    gd::SkinHelper::ApplyCurrentSkin(*toolbar);
 
     Refresh();
 }
@@ -164,10 +166,7 @@ void EditorLayers::OnMoreOptions(wxCommandEvent& event)
 
 void EditorLayers::OnHelp(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(226);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_layer"));
 }
 
 ////////////////////////////////////////////////////////////

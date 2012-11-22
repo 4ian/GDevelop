@@ -82,9 +82,10 @@ const long ChoixCondition::ID_CHECKBOX1 = wxNewId();
 const long ChoixCondition::ID_STATICLINE2 = wxNewId();
 const long ChoixCondition::ID_BUTTON4 = wxNewId();
 const long ChoixCondition::ID_CHECKBOX3 = wxNewId();
+const long ChoixCondition::ID_STATICBITMAP2 = wxNewId();
+const long ChoixCondition::ID_HYPERLINKCTRL1 = wxNewId();
 const long ChoixCondition::ID_BUTTON1 = wxNewId();
 const long ChoixCondition::ID_BUTTON2 = wxNewId();
-const long ChoixCondition::ID_BUTTON3 = wxNewId();
 //*)
 const long ChoixCondition::ID_EDITARRAY = wxNewId();
 const long ChoixCondition::ID_TEXTARRAY = wxNewId();
@@ -110,6 +111,7 @@ conditionInverted(false)
     wxBoxSizer* BoxSizer10;
     wxBoxSizer* BoxSizer7;
     wxFlexGridSizer* FlexGridSizer3;
+    wxFlexGridSizer* FlexGridSizer5;
     wxFlexGridSizer* FlexGridSizer2;
     wxBoxSizer* BoxSizer2;
     wxBoxSizer* BoxSizer11;
@@ -212,19 +214,27 @@ conditionInverted(false)
     FlexGridSizer1->Add(moreBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     objSortCheck = new wxCheckBox(this, ID_CHECKBOX3, _("Sort by objects"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX3"));
     objSortCheck->SetValue(false);
+    objSortCheck->Hide();
     FlexGridSizer1->Add(objSortCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer5 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer5->AddGrowableRow(0);
+    StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+    FlexGridSizer5->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+    HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
+    FlexGridSizer5->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer1->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer2->Add(FlexGridSizer1, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer5 = new wxBoxSizer(wxHORIZONTAL);
     OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
     BoxSizer5->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     CancelBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     BoxSizer5->Add(CancelBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-    AideBt = new wxButton(this, ID_BUTTON3, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
-    BoxSizer5->Add(AideBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer2->Add(BoxSizer5, 0, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
     BoxSizer6->Add(FlexGridSizer2, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     SetSizer(BoxSizer6);
-    BoxSizer6->SetSizeHints(this);
+    SetSizer(BoxSizer6);
+    Layout();
     Center();
 
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ChoixCondition::OnConditionsTreeSelectionChanged);
@@ -237,9 +247,9 @@ conditionInverted(false)
     Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ChoixCondition::OnsearchCtrlText);
     Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnmoreBtClick);
     Connect(ID_CHECKBOX3,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnobjSortCheckClick);
+    Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ChoixCondition::OnAideBtClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnOkBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnCancelBtClick);
-    Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixCondition::OnAideBtClick);
     //*)
 
     #if defined(__WXMSW__) //Offer nice look to list
@@ -796,7 +806,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             ChoixClavier dialog(this, ToString( ParaEdit.at(i)->GetValue() ));
             if ( dialog.ShowModal() == 1 )
             {
-                ParaEdit.at(i)->ChangeValue(dialog.touche);
+                ParaEdit.at(i)->ChangeValue(dialog.selectedKey);
             }
             return;
         }
@@ -989,10 +999,7 @@ void ChoixCondition::OnCancelBtClick( wxCommandEvent& event )
 
 void ChoixCondition::OnAideBtClick(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(23);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition")); //TODO
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/condition"));
 }
 
 void ChoixCondition::OnextSortCheckClick(wxCommandEvent& event)

@@ -5,9 +5,11 @@
 #include "EditOptionsPosition.h"
 
 //(*InternalHeaders(EditOptionsPosition)
+#include <wx/bitmap.h>
 #include <wx/settings.h>
 #include <wx/font.h>
 #include <wx/intl.h>
+#include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include "GDL/Position.h"
@@ -47,9 +49,10 @@ const long EditOptionsPosition::ID_BUTTON4 = wxNewId();
 const long EditOptionsPosition::ID_STATICTEXT9 = wxNewId();
 const long EditOptionsPosition::ID_PANEL2 = wxNewId();
 const long EditOptionsPosition::ID_STATICLINE2 = wxNewId();
+const long EditOptionsPosition::ID_STATICBITMAP2 = wxNewId();
+const long EditOptionsPosition::ID_HYPERLINKCTRL1 = wxNewId();
 const long EditOptionsPosition::ID_BUTTON1 = wxNewId();
 const long EditOptionsPosition::ID_BUTTON2 = wxNewId();
-const long EditOptionsPosition::ID_BUTTON3 = wxNewId();
 //*)
 
 BEGIN_EVENT_TABLE(EditOptionsPosition,wxDialog)
@@ -85,6 +88,7 @@ scene(scene_)
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
+	wxFlexGridSizer* FlexGridSizer17;
 	wxStaticBoxSizer* StaticBoxSizer5;
 
 	Create(parent, wxID_ANY, _("Edit the properties of the object on the scene"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
@@ -159,7 +163,7 @@ scene(scene_)
 	FlexGridSizer12->AddGrowableCol(0);
 	FlexGridSizer14 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer14->AddGrowableCol(1);
-	StaticText8 = new wxStaticText(this, ID_STATICTEXT11, _("Object's layer :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
+	StaticText8 = new wxStaticText(this, ID_STATICTEXT11, _("Object\'s layer :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT11"));
 	FlexGridSizer14->Add(StaticText8, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	layerChoice = new wxChoice(this, ID_CHOICE1, wxDefaultPosition, wxDefaultSize, 0, 0, 0, wxDefaultValidator, _T("ID_CHOICE1"));
 	FlexGridSizer14->Add(layerChoice, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -210,24 +214,31 @@ scene(scene_)
 	FlexGridSizer9 = new wxFlexGridSizer(0, 0, 0, 0);
 	FlexGridSizer9->AddGrowableCol(0);
 	FlexGridSizer9->AddGrowableRow(0);
+	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer17->AddGrowableRow(0);
+	StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	FlexGridSizer17->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	HyperlinkCtrl1 = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
+	FlexGridSizer17->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer9->Add(FlexGridSizer17, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	BoxSizer2 = new wxBoxSizer(wxHORIZONTAL);
 	OkBt = new wxButton(this, ID_BUTTON1, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	BoxSizer2->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	AnnulerBt = new wxButton(this, ID_BUTTON2, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	BoxSizer2->Add(AnnulerBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	AideBt = new wxButton(this, ID_BUTTON3, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
-	BoxSizer2->Add(AideBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer9->Add(BoxSizer2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	FlexGridSizer1->SetSizeHints(this);
+	SetSizer(FlexGridSizer1);
+	Layout();
 	Center();
 
 	Connect(ID_CHECKBOX1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnsizeCheckClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OneditInitialVariablesClick);
+	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&EditOptionsPosition::OnAideBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnOkBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnAnnulerBtClick);
-	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnAideBtClick);
 	//*)
 
     //Initializing controls with values
@@ -325,10 +336,7 @@ void EditOptionsPosition::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditOptionsPosition::OnAideBtClick(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(25);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_scene_edit"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/editors/scene_editor/edit_scene_edit"));
 }
 
 void EditOptionsPosition::OnsizeCheckClick(wxCommandEvent& event)

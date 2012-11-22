@@ -12,6 +12,7 @@
 #include <wx/config.h>
 #include <wx/cursor.h>
 #include <wx/msgdlg.h>
+#include <wx/filename.h>
 #include <wx/log.h>
 #include <wx/scrolbar.h>
 #include <wx/infobar.h>

@@ -1,18 +1,23 @@
 #include "ChoixBouton.h"
 
 //(*InternalHeaders(ChoixBouton)
+#include <wx/bitmap.h>
 #include <wx/intl.h>
+#include <wx/image.h>
 #include <wx/string.h>
 //*)
 
 #include <string>
 #include <vector>
+#include "GDCore/Tools/HelpFileAccess.h"
 
 using namespace std;
 
 //(*IdInit(ChoixBouton)
 const long ChoixBouton::ID_RADIOBOX1 = wxNewId();
 const long ChoixBouton::ID_PANEL1 = wxNewId();
+const long ChoixBouton::ID_STATICBITMAP2 = wxNewId();
+const long ChoixBouton::ID_HYPERLINKCTRL1 = wxNewId();
 const long ChoixBouton::ID_BUTTON2 = wxNewId();
 const long ChoixBouton::ID_BUTTON1 = wxNewId();
 //*)
@@ -29,6 +34,7 @@ ChoixBouton::ChoixBouton( wxWindow* parent, string pBouton ) :
     wxFlexGridSizer* FlexGridSizer3;
     wxFlexGridSizer* FlexGridSizer2;
     wxFlexGridSizer* FlexGridSizer1;
+    wxFlexGridSizer* FlexGridSizer17;
 
     Create(parent, wxID_ANY, _("Choose a mouse button"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(333,249));
@@ -52,6 +58,14 @@ ChoixBouton::ChoixBouton( wxWindow* parent, string pBouton ) :
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer3->AddGrowableCol(0);
     FlexGridSizer3->AddGrowableRow(0);
+    FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
+    FlexGridSizer17->AddGrowableRow(0);
+    StaticBitmap1 = new wxStaticBitmap(this, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+    FlexGridSizer17->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    helpBt = new wxHyperlinkCtrl(this, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+    helpBt->SetToolTip(_("Display help about this window"));
+    FlexGridSizer17->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer3->Add(FlexGridSizer17, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
     OkBt = new wxButton(this, ID_BUTTON2, _("Ok"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
     FlexGridSizer3->Add(OkBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
     CancelBt = new wxButton(this, ID_BUTTON1, _("Cancel"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
@@ -65,6 +79,7 @@ ChoixBouton::ChoixBouton( wxWindow* parent, string pBouton ) :
     TestPanel->Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&ChoixBouton::OnTestPanelLeftUp,0,this);
     TestPanel->Connect(wxEVT_MIDDLE_UP,(wxObjectEventFunction)&ChoixBouton::OnTestPanelMiddleUp,0,this);
     TestPanel->Connect(wxEVT_RIGHT_DOWN,(wxObjectEventFunction)&ChoixBouton::OnTestPanelRightDown,0,this);
+    Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ChoixBouton::OnhelpBtClick);
     Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixBouton::OnOkBtClick);
     Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChoixBouton::OnCancelBtClick);
     //*)
@@ -122,3 +137,8 @@ void ChoixBouton::OnTestPanelRightDown( wxMouseEvent& event )
     bouton = "Right";
 }
 
+
+void ChoixBouton::OnhelpBtClick(wxCommandEvent& event)
+{
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/parameters"));
+}

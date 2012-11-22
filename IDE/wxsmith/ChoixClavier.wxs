@@ -4,68 +4,70 @@
 		<title>Choose a key</title>
 		<size>234,179</size>
 		<id_arg>0</id_arg>
+		<style>wxDEFAULT_DIALOG_STYLE|wxWANTS_CHARS</style>
 		<handler function="OnKeyDown" entry="EVT_KEY_DOWN" />
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
+			<growablecols>0</growablecols>
 			<object class="sizeritem">
 				<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText2" member="yes">
-					<label>Click on the area, and press a key</label>
+					<label>Just press a key</label>
 				</object>
 				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
-				<object class="wxPanel" name="ID_PANEL1" variable="AideTxt" member="yes">
-					<size>285,85</size>
-					<bg>#505050</bg>
-					<style>wxSUNKEN_BORDER|wxWANTS_CHARS</style>
-					<handler function="OnPanel1KeyDown" entry="EVT_KEY_DOWN" />
+				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
+					<size>10,-1</size>
 				</object>
-				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<border>5</border>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
-				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 					<cols>3</cols>
+					<growablecols>1</growablecols>
 					<object class="sizeritem">
-						<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-							<label>Chosen key :</label>
+						<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
+							<cols>3</cols>
+							<growablerows>0</growablerows>
+							<object class="sizeritem">
+								<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap1" member="yes">
+									<bitmap>res/helpicon.png</bitmap>
+									<style>wxNO_BORDER</style>
+								</object>
+								<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="helpBt" member="yes">
+									<label>Help</label>
+									<tooltip>Display help about this window</tooltip>
+									<handler function="OnhelpBtClick" entry="EVT_HYPERLINK" />
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
 						</object>
 						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-						<border>5</border>
 						<option>1</option>
 					</object>
 					<object class="sizeritem">
-						<object class="wxStaticText" name="ID_STATICTEXT2" variable="toucheTxt" member="yes">
-							<label></label>
+						<object class="wxButton" name="ID_BUTTON1" variable="Button1" member="yes">
+							<label>Cancel</label>
+							<handler function="OnButton1Click" entry="EVT_BUTTON" />
 						</object>
-						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
 						<option>1</option>
 					</object>
 				</object>
-				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<border>5</border>
-				<option>1</option>
-			</object>
-			<object class="sizeritem">
-				<object class="wxButton" name="ID_BUTTON1" variable="Button1" member="yes">
-					<label>Close</label>
-					<handler function="OnButton1Click" entry="EVT_BUTTON" />
-				</object>
-				<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<border>5</border>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
 			</object>
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

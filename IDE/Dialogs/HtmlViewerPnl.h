@@ -1,4 +1,3 @@
-#if defined(DEACTIVATED)
 #ifndef HTMLVIEWERPNL_H
 #define HTMLVIEWERPNL_H
 
@@ -14,6 +13,10 @@ class HtmlViewerPnl: public wxPanel
 
 		HtmlViewerPnl(wxWindow* parent,wxWindowID id=wxID_ANY,const wxPoint& pos=wxDefaultPosition,const wxSize& size=wxDefaultSize);
 		virtual ~HtmlViewerPnl();
+
+		void OpenURL(wxString url);
+		void GoBack();
+		void GoForward();
 
 		//(*Declarations(HtmlViewerPnl)
 		wxWebView* Custom1;
@@ -34,5 +37,3 @@ class HtmlViewerPnl: public wxPanel
 };
 
 #endif
-#endif
-

@@ -4,7 +4,9 @@
 //(*Headers(ChoixClavier)
 #include <wx/sizer.h>
 #include <wx/stattext.h>
-#include <wx/panel.h>
+#include <wx/statline.h>
+#include <wx/hyperlink.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -12,45 +14,44 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
 class ChoixClavier: public wxDialog
 {
-	public:
+public:
 
-		ChoixClavier(wxWindow* parent, string pTouche);
-		virtual ~ChoixClavier();
+    ChoixClavier(wxWindow* parent, std::string pTouche);
+    virtual ~ChoixClavier();
 
-		//(*Declarations(ChoixClavier)
-		wxStaticText* StaticText2;
-		wxButton* Button1;
-		wxPanel* AideTxt;
-		wxStaticText* StaticText1;
-		wxStaticText* toucheTxt;
-		//*)
+    //(*Declarations(ChoixClavier)
+    wxStaticText* StaticText2;
+    wxButton* Button1;
+    wxStaticBitmap* StaticBitmap1;
+    wxStaticLine* StaticLine1;
+    wxHyperlinkCtrl* helpBt;
+    //*)
 
-		string touche;
+    std::string selectedKey;
 
-	protected:
+protected:
 
-		//(*Identifiers(ChoixClavier)
-		static const long ID_STATICTEXT3;
-		static const long ID_PANEL1;
-		static const long ID_STATICTEXT1;
-		static const long ID_STATICTEXT2;
-		static const long ID_BUTTON1;
-		//*)
+    //(*Identifiers(ChoixClavier)
+    static const long ID_STATICTEXT3;
+    static const long ID_STATICLINE1;
+    static const long ID_STATICBITMAP2;
+    static const long ID_HYPERLINKCTRL1;
+    static const long ID_BUTTON1;
+    //*)
 
-	private:
+private:
 
-		//(*Handlers(ChoixClavier)
-		void OnKeyDown(wxKeyEvent& event);
-		void OnButton1Click(wxCommandEvent& event);
-		void OnTextCtrl1Text(wxCommandEvent& event);
-		void OnPanel1KeyDown(wxKeyEvent& event);
-		//*)
+    //(*Handlers(ChoixClavier)
+    void OnKeyDown(wxKeyEvent& event);
+    void OnButton1Click(wxCommandEvent& event);
+    void OnTextCtrl1Text(wxCommandEvent& event);
+    void OnPanel1KeyDown(wxKeyEvent& event);
+    void OnhelpBtClick(wxCommandEvent& event);
+    //*)
 
-		DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

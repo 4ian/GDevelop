@@ -1,7 +1,9 @@
 #include "SearchEvents.h"
 
 //(*InternalHeaders(SearchEvents)
+#include <wx/bitmap.h>
 #include <wx/intl.h>
+#include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <string>
@@ -24,10 +26,11 @@ const long SearchEvents::ID_STATICTEXT4 = wxNewId();
 const long SearchEvents::ID_CHECKBOX6 = wxNewId();
 const long SearchEvents::ID_CHECKBOX1 = wxNewId();
 const long SearchEvents::ID_CHECKBOX2 = wxNewId();
+const long SearchEvents::ID_STATICBITMAP2 = wxNewId();
+const long SearchEvents::ID_HYPERLINKCTRL1 = wxNewId();
 const long SearchEvents::ID_BUTTON1 = wxNewId();
 const long SearchEvents::ID_BUTTON2 = wxNewId();
 const long SearchEvents::ID_BUTTON3 = wxNewId();
-const long SearchEvents::ID_BUTTON5 = wxNewId();
 const long SearchEvents::ID_PANEL1 = wxNewId();
 const long SearchEvents::ID_STATICTEXT2 = wxNewId();
 const long SearchEvents::ID_TEXTCTRL2 = wxNewId();
@@ -67,6 +70,7 @@ events(events_)
 	wxFlexGridSizer* FlexGridSizer7;
 	wxStaticBoxSizer* StaticBoxSizer3;
 	wxFlexGridSizer* FlexGridSizer15;
+	wxFlexGridSizer* FlexGridSizer18;
 	wxFlexGridSizer* FlexGridSizer8;
 	wxFlexGridSizer* FlexGridSizer14;
 	wxBoxSizer* BoxSizer1;
@@ -122,7 +126,16 @@ events(events_)
 	FlexGridSizer2->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer15 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer15->AddGrowableCol(0);
-	FlexGridSizer8 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer8 = new wxFlexGridSizer(0, 4, 0, 0);
+	FlexGridSizer8->AddGrowableCol(1);
+	FlexGridSizer18 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer18->AddGrowableRow(0);
+	StaticBitmap2 = new wxStaticBitmap(Panel1, ID_STATICBITMAP2, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP2"));
+	FlexGridSizer18->Add(StaticBitmap2, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	helpBt = new wxHyperlinkCtrl(Panel1, ID_HYPERLINKCTRL1, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL1"));
+	helpBt->SetToolTip(_("Display help about this window"));
+	FlexGridSizer18->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer8->Add(FlexGridSizer18, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	searchBt = new wxButton(Panel1, ID_BUTTON1, _("Search"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON1"));
 	FlexGridSizer8->Add(searchBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	nextBt = new wxButton(Panel1, ID_BUTTON2, _("Next"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
@@ -131,9 +144,7 @@ events(events_)
 	previousBt = new wxButton(Panel1, ID_BUTTON3, _("Previous"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON3"));
 	previousBt->Disable();
 	FlexGridSizer8->Add(previousBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer15->Add(FlexGridSizer8, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
-	helpBt = new wxButton(Panel1, ID_BUTTON5, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON5"));
-	FlexGridSizer15->Add(helpBt, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer15->Add(FlexGridSizer8, 1, wxALL|wxEXPAND|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2->Add(FlexGridSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel1->SetSizer(FlexGridSizer2);
 	FlexGridSizer2->Fit(Panel1);
@@ -202,10 +213,10 @@ events(events_)
 	FlexGridSizer1->SetSizeHints(this);
 
 	Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&SearchEvents::OnsearchEditText);
+	Connect(ID_HYPERLINKCTRL1,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&SearchEvents::OnhelpBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnsearchBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnnextBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnpreviousBtClick);
-	Connect(ID_BUTTON5,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnhelpBtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnreplaceBtClick);
 	Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnhelpBtClick);
 	//*)
@@ -306,9 +317,6 @@ void SearchEvents::OnpreviousBtClick(wxCommandEvent&)
 
 void SearchEvents::OnhelpBtClick(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(58);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/events_editor/search")); //TODO
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event_find"));
 }
 

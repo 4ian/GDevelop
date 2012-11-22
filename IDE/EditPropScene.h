@@ -14,6 +14,8 @@
 #include <wx/statline.h>
 #include <wx/radiobut.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -37,10 +39,12 @@ class EditPropScene: public wxDialog
 		wxStaticText* StaticText2;
 		wxTextCtrl* CaptionEdit;
 		wxStaticText* StaticText6;
+		wxStaticBitmap* StaticBitmap1;
 		wxStaticText* StaticText8;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxStaticLine* StaticLine2;
 		wxTextCtrl* zNearEdit;
 		wxStaticText* StaticText5;
@@ -51,7 +55,6 @@ class EditPropScene: public wxDialog
 		wxButton* AnnulerBt;
 		wxCheckBox* stopSoundsCheck;
 		wxStaticText* StaticText4;
-		wxButton* AideBt;
 		//*)
 
 	protected:
@@ -76,9 +79,10 @@ class EditPropScene: public wxDialog
 		static const long ID_STATICTEXT7;
 		static const long ID_TEXTCTRL4;
 		static const long ID_STATICLINE2;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON3;
-		static const long ID_BUTTON4;
 		//*)
 
 	private:

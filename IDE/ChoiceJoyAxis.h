@@ -11,6 +11,8 @@
 #include <wx/stattext.h>
 #include <wx/radiobox.h>
 #include <wx/statline.h>
+#include <wx/hyperlink.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -32,10 +34,12 @@ class ChoiceJoyAxis: public wxDialog
 		virtual ~ChoiceJoyAxis();
 
 		//(*Declarations(ChoiceJoyAxis)
+		wxStaticBitmap* StaticBitmap2;
 		wxRadioBox* axisRadio;
 		wxButton* advancedBt;
 		wxStaticText* StaticText1;
 		wxStaticLine* StaticLine1;
+		wxHyperlinkCtrl* helpBt;
 		wxButton* okBt;
 		wxButton* annulerBt;
 		//*)
@@ -48,6 +52,8 @@ class ChoiceJoyAxis: public wxDialog
 		static const long ID_STATICTEXT1;
 		static const long ID_RADIOBOX1;
 		static const long ID_STATICLINE1;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON3;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON4;
@@ -64,6 +70,7 @@ class ChoiceJoyAxis: public wxDialog
 		void OnaxisRadioSelect(wxCommandEvent& event);
 		void OnokBtClick(wxCommandEvent& event);
 		void OnannulerBtClick(wxCommandEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 
 		DECLARE_EVENT_TABLE()

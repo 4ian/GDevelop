@@ -1572,10 +1572,7 @@ void EventsEditor::OnredoMenuSelected(wxCommandEvent& event)
 
 void EventsEditor::OnHelpBtClick(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(11);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event"));
 }
 
 void EventsEditor::OnCreateTemplateBtClick( wxCommandEvent& event )

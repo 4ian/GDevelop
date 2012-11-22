@@ -7,7 +7,9 @@
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
 #include <wx/statline.h>
+#include <wx/hyperlink.h>
 #include <wx/choice.h>
+#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -22,6 +24,7 @@ class EditLayer: public wxDialog
 
 		//(*Declarations(EditLayer)
 		wxStaticText* StaticText9;
+		wxStaticBitmap* StaticBitmap2;
 		wxTextCtrl* viewportX2Edit;
 		wxStaticText* StaticText2;
 		wxCheckBox* sizeCheck;
@@ -38,6 +41,7 @@ class EditLayer: public wxDialog
 		wxStaticLine* StaticLine1;
 		wxTextCtrl* viewportX1Edit;
 		wxButton* deleteCameraBt;
+		wxHyperlinkCtrl* helpBt;
 		wxButton* addCameraBt;
 		wxChoice* cameraChoice;
 		wxStaticText* StaticText4;
@@ -75,6 +79,8 @@ class EditLayer: public wxDialog
 		static const long ID_TEXTCTRL7;
 		static const long ID_STATICTEXT3;
 		static const long ID_STATICLINE1;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON2;
 		static const long ID_BUTTON1;
 		//*)
@@ -92,6 +98,7 @@ class EditLayer: public wxDialog
 		void OnviewportCheckClick(wxCommandEvent& event);
 		void OnviewportX1EditText(wxCommandEvent& event);
 		void OndeleteCameraBtClick(wxCommandEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 		void RefreshCameraSettings();
 

@@ -31,6 +31,7 @@
 #include "GDL/Game.h"
 #include "GDL/ResourcesManager.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #include <wx/msw/uxtheme.h>
@@ -439,6 +440,9 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 
     //Offer nice background color to toolbar area.
     AuiManager1->GetArtProvider()->SetColour(wxAUI_DOCKART_BACKGROUND_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
+    gd::SkinHelper::ApplyCurrentSkin(*mgr);
+    gd::SkinHelper::ApplyCurrentSkin(*toolbar);
+    gd::SkinHelper::ApplyCurrentSkin(*animationToolbar);
 
 	RefreshAll();
 	mgr->GetPane(imagesPanel).MinSize(400,150);

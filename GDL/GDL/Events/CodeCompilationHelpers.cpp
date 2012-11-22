@@ -141,9 +141,10 @@ namespace
                 task.additionalHeaderDirectories.push_back(ToString(wxFileName::FileName(game.GetProjectFile()).GetPath()));
                 task.scene = NULL;
                 task.postWork = boost::shared_ptr<CodeCompilerExtraWork>(new SourceFileCodeCompilerPostWork(optionalScene));
-
                 task.userFriendlyName = "Compilation of file "+task.inputFile;
-                resourceWorker.ExposeResource(task.outputFile);
+
+                std::string outputFile = task.outputFile; //Be careful, we need to do a copy as ExposeResource will modify the string
+                resourceWorker.ExposeResource(outputFile);
 
                 CodeCompiler::GetInstance()->AddTask(task);
             }
@@ -169,7 +170,9 @@ namespace
                     task.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GDPriv"+ToString(events.get())+".ir");
                     task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new ExternalEventsCodeCompilerRuntimePreWork(&game, events.get(), resourceWorker));
                     task.userFriendlyName = "Compilation of external events "+events->GetName();
-                    resourceWorker.ExposeResource(task.outputFile);
+
+                    std::string outputFile = task.outputFile; //Be careful, we need to do a copy as ExposeResource will modify the string
+                    resourceWorker.ExposeResource(outputFile);
 
                     CodeCompiler::GetInstance()->AddTask(task);
                 }

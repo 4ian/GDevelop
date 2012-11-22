@@ -38,13 +38,27 @@ void ChangesNotifier::OnObjectAdded(gd::Project & project, gd::Layout * layout, 
 {
     RequestFullRecompilation(project, layout);
 }
-
 void ChangesNotifier::OnObjectRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & oldName) const
 {
     RequestFullRecompilation(project, layout);
 }
-
 void ChangesNotifier::OnVariablesModified(gd::Project & project, gd::Layout * layout) const
+{
+    RequestFullRecompilation(project, layout);
+}
+void ChangesNotifier::OnObjectGroupAdded(gd::Project & project, gd::Layout * layout, const std::string & groupName) const
+{
+    RequestFullRecompilation(project, layout);
+}
+void ChangesNotifier::OnObjectGroupEdited(gd::Project & project, gd::Layout * layout, const std::string & groupName) const
+{
+    RequestFullRecompilation(project, layout);
+}
+void ChangesNotifier::OnObjectGroupRenamed(gd::Project & project, gd::Layout * layout, const std::string & groupName, const std::string & oldName) const
+{
+    RequestFullRecompilation(project, layout);
+}
+void ChangesNotifier::OnObjectGroupDeleted(gd::Project & project, gd::Layout * layout, const std::string & groupName) const
 {
     RequestFullRecompilation(project, layout);
 }

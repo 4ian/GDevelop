@@ -346,6 +346,12 @@ public:
      * Each scene has its own unique execution engine.
      */
     boost::shared_ptr<CodeExecutionEngine> GetCodeExecutionEngine() const { return codeExecutionEngine; }
+
+    /**
+     * Give access to the execution engine of the scene.
+     * Each scene has its own unique execution engine.
+     */
+    void SetCodeExecutionEngine(boost::shared_ptr<CodeExecutionEngine> codeExecutionEngine_) { codeExecutionEngine = codeExecutionEngine_; }
     ///@}
 
 private:

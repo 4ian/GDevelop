@@ -46,6 +46,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/Dialogs/ResourceLibraryDialog.h"
 #include "GDCore/IDE/wxTools/FileProperty.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 
 #include "GDL/IDE/DndResourcesEditor.h"
@@ -259,6 +260,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
 
     SetDropTarget(new DndTextResourcesEditor(*this));
 
+    gd::SkinHelper::ApplyCurrentSkin(*toolbar);
     AuiManager1->GetPane(previewPanel).MinSize(200,200).BestSize(400,200);
     AuiManager1->GetPane(propertiesPanel).MinSize(200,200).BestSize(400,200);
     AuiManager1->Update();

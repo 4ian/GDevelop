@@ -39,6 +39,10 @@ public:
     virtual void OnAutomatismAdded(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism) const;
     virtual void OnAutomatismRenamed(gd::Project & project, gd::Layout * layout, gd::Object & object, gd::Automatism & automatism, const std::string & oldName) const;
     virtual void OnAutomatismDeleted(gd::Project & project, gd::Layout * layout, gd::Object & object, const std::string & automatismName) const;
+    virtual void OnObjectGroupAdded(gd::Project & project, gd::Layout * layout, const std::string & groupName) const;
+    virtual void OnObjectGroupEdited(gd::Project & project, gd::Layout * layout, const std::string & groupName) const;
+    virtual void OnObjectGroupRenamed(gd::Project & project, gd::Layout * layout, const std::string & groupName, const std::string & oldName) const;
+    virtual void OnObjectGroupDeleted(gd::Project & project, gd::Layout * layout, const std::string & groupName) const;
     virtual void OnEventsModified(gd::Project & project, gd::Layout & layout, bool indirectChange = false, std::string sourceOfTheIndirectChange = "") const;
     virtual void OnEventsModified(gd::Project & project, gd::ExternalEvents & externalEvents, bool indirectChange = false, std::string sourceOfTheIndirectChange = "") const;
     virtual void OnResourceModified(gd::Project & project, const std::string & resourceName) const;

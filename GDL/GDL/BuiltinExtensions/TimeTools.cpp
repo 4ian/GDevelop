@@ -155,7 +155,7 @@ double GD_API GetElapsedTimeInSeconds(RuntimeScene & scene)
 
 double GD_API GetTimeFromStartInSeconds(RuntimeScene & scene)
 {
-    return static_cast<double>(scene.GetTimeFromStart())/1000.0;
+    return static_cast<double>(scene.GetTimeFromStart())/1000000.0;
 }
 
 double GD_API GetTime( const RuntimeScene & scene, const std::string & parameter )

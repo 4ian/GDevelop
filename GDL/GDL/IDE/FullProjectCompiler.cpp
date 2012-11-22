@@ -18,6 +18,7 @@
 #include <wx/dirdlg.h>
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
+#include <cstdio>
 #include <wx/filename.h>
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/IDE/CodeCompiler.h"
@@ -187,6 +188,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
     unsigned int i = 0;
     for(map<string, string>::const_iterator it = resourcesNewFilename.begin(); it != resourcesNewFilename.end(); ++it)
     {
+        diagnosticManager.OnMessage( gd::ToString( _("Copying resources...")), it->first );
+
         if ( !it->first.empty() && wxCopyFile( it->first, tempDir + "/" + it->second, true ) == false )
             diagnosticManager.AddError(gd::ToString(_( "Unable to copy " )+it->first+_(" in compilation directory.\n" )));
 

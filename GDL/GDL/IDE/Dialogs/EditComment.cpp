@@ -125,10 +125,7 @@ void EditComment::OnAnnulerBtClick(wxCommandEvent& event)
 
 void EditComment::OnAideBtClick(wxCommandEvent& event)
 {
-    if ( gd::LocaleManager::GetInstance()->locale->GetLanguage() == wxLANGUAGE_FRENCH )
-        gd::HelpFileAccess::GetInstance()->DisplaySection(21);
-    else
-        gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/comment_events"));
+    gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/comment_events"));
 }
 void EditComment::OntxtColorBtClick(wxCommandEvent& event)
 {

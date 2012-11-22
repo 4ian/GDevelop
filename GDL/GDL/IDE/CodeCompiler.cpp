@@ -319,7 +319,7 @@ void CodeCompiler::ProcessTasks()
                     return;
                 }
 
-                std::cout << "Writing bitcode to file..." << std::endl;
+                std::cout << "Writing bitcode to file " << currentTask.outputFile << "..." << std::endl;
 
                 sf::Lock lock(openSaveDialogMutex); //On windows, GD is crashing if we write bitcode while an open/save file dialog is displayed.
                 {

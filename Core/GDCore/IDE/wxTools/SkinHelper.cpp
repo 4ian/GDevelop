@@ -8,6 +8,7 @@
 #include <wx/ribbon/art.h>
 #include <wx/aui/aui.h>
 #include <wx/aui/auibar.h>
+#include <wx/propgrid/propgrid.h>
 #include <wx/config.h>
 #include <wx/dcbuffer.h>
 
@@ -123,6 +124,7 @@ void SkinHelper::ApplyCurrentSkin(wxAuiManager & auiManager)
         dockArt->SetColour(11, wxColour(104,114,138));
         dockArt->SetColour(12, wxColour(104,114,138));
     }
+    dockArt->SetColour(wxAUI_DOCKART_BACKGROUND_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
 
     auiManager.SetArtProvider(dockArt);
 }
@@ -184,6 +186,16 @@ public:
 void SkinHelper::ApplyCurrentSkin(wxAuiToolBar & toolbar)
 {
     toolbar.SetArtProvider(new AuiToolBarArt);
+}
+
+void SkinHelper::ApplyCurrentSkin(wxPropertyGrid & propertyGrid)
+{
+    propertyGrid.SetMarginColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
+    propertyGrid.SetCaptionBackgroundColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
+    propertyGrid.SetEmptySpaceColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
+    propertyGrid.SetCellBackgroundColour( *wxWHITE );
+    propertyGrid.SetCellTextColour( *wxBLACK );
+    propertyGrid.SetLineColour( wxColour(212,208,200) );
 }
 
 }

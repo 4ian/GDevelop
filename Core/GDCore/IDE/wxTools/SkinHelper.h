@@ -8,6 +8,7 @@ class wxRibbonBar;
 class wxAuiManager;
 class wxAuiNotebook;
 class wxAuiToolBar;
+class wxPropertyGrid;
 
 namespace gd
 {
@@ -29,6 +30,7 @@ public:
     static void ApplyCurrentSkin(wxAuiManager & auiManager);
     static void ApplyCurrentSkin(wxAuiNotebook & notebook);
     static void ApplyCurrentSkin(wxAuiToolBar & toolbar);
+    static void ApplyCurrentSkin(wxPropertyGrid & propertyGrid);
 
 private:
     SkinHelper();

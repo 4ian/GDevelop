@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxPanel" name="EditorObjectList">
+		<id_arg>0</id_arg>
+		<handler function="OnSetFocus" entry="EVT_SET_FOCUS" />
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
+			<object class="sizeritem">
+				<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="objectsList" member="yes">
+					<image_list></image_list>
+					<tree_items>
+						<item>objectsList</item>
+						<item></item>
+					</tree_items>
+					<items_text>
+						<item2>objectsList</item2>
+						<item2></item2>
+					</items_text>
+					<pos>-72,-72</pos>
+					<size>179,170</size>
+					<style>wxTR_EDIT_LABELS|wxTR_MULTIPLE|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
+					<handler function="OnobjectsListBeginDrag" entry="EVT_TREE_BEGIN_DRAG" />
+					<handler function="OnobjectsListBeginLabelEdit" entry="EVT_TREE_BEGIN_LABEL_EDIT" />
+					<handler function="OnobjectsListEndLabelEdit" entry="EVT_TREE_END_LABEL_EDIT" />
+					<handler function="OnobjectsListItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
+					<handler function="OnobjectsListItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
+					<handler function="OnobjectsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+					<handler function="OnobjectsListKeyDown" entry="EVT_TREE_KEY_DOWN" />
+					<handler function="OnobjectsListItemMenu" entry="EVT_TREE_ITEM_MENU" />
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxTextCtrl" name="ID_TEXTCTRL1" subclass="wxSearchCtrl" variable="searchCtrl" member="yes">
+					<handler function="OnsearchCtrlText" entry="EVT_TEXT" />
+				</object>
+				<flag>wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<border>5</border>
+				<option>1</option>
+			</object>
+		</object>
+		<object class="wxMenu" variable="ContextMenu" member="yes">
+			<object class="wxMenuItem" name="idMenuModObj" variable="editMenuI" member="no">
+				<label>Change the object properties</label>
+				<bitmap>res/editicon.png</bitmap>
+				<handler function="OneditMenuISelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMenuModVar" variable="editVarMenuI" member="no">
+				<label>Initial variables</label>
+				<bitmap>res/var.png</bitmap>
+				<handler function="OneditVarMenuISelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenu" name="ID_MENUITEM1" variable="automatismsMenu" member="yes">
+				<label>Automatisms</label>
+				<object class="separator" />
+				<object class="wxMenuItem" name="ID_MENUITEM2" variable="addAutomatismItem" member="yes">
+					<label>Add an automatism</label>
+					<bitmap>res/addicon.png</bitmap>
+					<handler function="OnaddAutomatismItemSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="ID_MENUITEM5" variable="renameAutomatism" member="yes">
+					<label>Rename an automatism</label>
+					<bitmap>res/editnom.png</bitmap>
+					<handler function="OnrenameAutomatismSelected" entry="EVT_MENU" />
+				</object>
+				<object class="wxMenuItem" name="ID_MENUITEM3" variable="deleteAutomatismItem" member="yes">
+					<label>Delete an automatism</label>
+					<bitmap>res/deleteicon.png</bitmap>
+					<handler function="OndeleteAutomatismItemSelected" entry="EVT_MENU" />
+				</object>
+			</object>
+			<object class="wxMenuItem" name="idMenuEffects" variable="effectsMenuI" member="yes">
+				<label>Effects</label>
+			</object>
+			<object class="wxMenuItem" name="idMenuModName" variable="editNameMenuI" member="no">
+				<label>Change the name of the object</label>
+				<bitmap>res/editnom.png</bitmap>
+				<handler function="OneditNameMenuISelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="idMenuAddObj" variable="addObjMenuI" member="no">
+				<label>Add an object</label>
+				<bitmap>res/addicon.png</bitmap>
+				<handler function="OnaddObjMenuISelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMenuDelObj" variable="delObjMenuI" member="no">
+				<label>Delete the object</label>
+				<accel>Del</accel>
+				<bitmap>res/deleteicon.png</bitmap>
+				<handler function="OndelObjMenuISelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="idMoveUp" variable="moveUpMenuI" member="yes">
+				<label>Move up</label>
+				<accel>Ctrl-Up</accel>
+				<bitmap>res/up.png</bitmap>
+				<handler function="OnMoveUpSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMoveDown" variable="moveDownMenuI" member="yes">
+				<label>Move down</label>
+				<accel>Ctrl-Down</accel>
+				<bitmap>res/down.png</bitmap>
+				<handler function="OnMoveDownSelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="idMenuCopy" variable="copyMenuI" member="yes">
+				<label>Copy</label>
+				<accel>Ctrl-C</accel>
+				<bitmap>res/copyicon.png</bitmap>
+				<handler function="OnCopySelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMenuCut" variable="cutMenuI" member="yes">
+				<label>Cut</label>
+				<accel>Ctrl-X</accel>
+				<bitmap>res/cuticon.png</bitmap>
+				<handler function="OnCutSelected" entry="EVT_MENU" />
+			</object>
+			<object class="wxMenuItem" name="idMenuPaste" variable="pasteMenuI" member="yes">
+				<label>Paste</label>
+				<accel>Ctrl-V</accel>
+				<bitmap>res/pasteicon.png</bitmap>
+				<handler function="OnPasteSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+		<object class="wxMenu" variable="rootContextMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM4" variable="MenuItem1" member="yes">
+				<label>Add an object</label>
+				<bitmap>res/addicon.png</bitmap>
+				<handler function="OnaddObjMenuISelected" entry="EVT_MENU" />
+			</object>
+			<object class="separator" />
+			<object class="wxMenuItem" name="ID_MENUITEM6" variable="MenuItem3" member="yes">
+				<label>Paste</label>
+				<accel>Ctrl-V</accel>
+				<bitmap>res/pasteicon.png</bitmap>
+				<handler function="OnPasteSelected" entry="EVT_MENU" />
+			</object>
+		</object>
+		<object class="wxMenu" variable="multipleContextMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM7" variable="MenuItem2" member="yes">
+				<label>Supprimer les objets</label>
+				<accel>DEL</accel>
+				<help>Delete all selected objects</help>
+				<bitmap>res/deleteicon.png</bitmap>
+				<handler function="OndelObjMenuISelected" entry="EVT_MENU" />
+			</object>
+		</object>
+	</object>
+</wxsmith>
+
+
+
+
+
+
+

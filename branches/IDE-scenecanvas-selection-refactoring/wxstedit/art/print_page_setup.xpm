@@ -1,0 +1,28 @@
+/* XPM */
+static const char *print_page_setup_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 6 1",
+"  c None",
+"a c Black",
+"b c #808000",
+"c c #FFFF00",
+"d c #0000FF",
+"f c #FFFFFF",
+/* pixels */
+"                ",
+"aaaaaaa         ",
+"ffffffa   aaaaaa",
+"aaaafa    afffff",
+"fffffa    afdddd",
+"aaafaaaa  afdfff",
+"ffffa a a afdfff",
+"aaaa a aa afdfff",
+"    a a a afdfff",
+"aaaaaa  a afdfff",
+" bb  a aa afdfff",
+" cc  aa a afdfff",
+"aaaaaa a  afdddd",
+"    a a   afffff",
+"aaaaaa    aaaaaa",
+"                "
+};

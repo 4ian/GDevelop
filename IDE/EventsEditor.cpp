@@ -1627,9 +1627,9 @@ void EventsEditor::OnSearchBtClick(wxCommandEvent& event)
 
 void EventsEditor::OnProfilingBtClick(wxCommandEvent& event)
 {
-    if (sceneCanvas && sceneCanvas->GetOwnedProfileDialog() != boost::shared_ptr<ProfileDlg>())
+    if (sceneCanvas && sceneCanvas->GetProfileDialog() != boost::shared_ptr<ProfileDlg>())
     {
-        if ( !profilingActivated && !sceneCanvas->GetOwnedProfileDialog()->profilingActivated)
+        if ( !profilingActivated && !sceneCanvas->GetProfileDialog()->profilingActivated)
         {
             wxLogMessage(_("Profiling is not activated. Activate profiling thanks to the Profiling window when previewing a scene."));
             return;

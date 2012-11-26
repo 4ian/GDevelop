@@ -38,6 +38,7 @@ ChoixClavier::ChoixClavier(wxWindow* parent, string pTouche)
 	SetClientSize(wxSize(234,179));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
+	FlexGridSizer1->AddGrowableRow(0);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT3, _("Just press a key"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT3"));
 	FlexGridSizer1->Add(StaticText2, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));

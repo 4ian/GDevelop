@@ -18,11 +18,11 @@
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include "GDCore/Events/Event.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeGame.h"
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/InitialInstancesContainer.h"
 #include "SceneCanvasEditionData.h"
 #include "SceneCanvasPreviewData.h"
@@ -33,6 +33,7 @@ class DebuggerGUI;
 class ProfileDlg;
 class InitialPositionBrowserDlg;
 class SceneCanvasSettings;
+class LayoutEditorPropertiesPnl;
 
 /**
  * \brief Control to be used to render, edit and preview a layout.
@@ -61,64 +62,69 @@ public :
     ~SceneCanvas();
 
     /**
-     * Set the scene canvas to own the object editor passed in parameter
+     * Set the scene canvas to use the object editor passed in parameter
      */
-    void SetOwnedObjectsEditor(boost::shared_ptr<EditorObjets> objectsEditor_);
+    void SetObjectsEditor(boost::shared_ptr<EditorObjets> objectsEditor_);
 
     /**
-     * Set the scene canvas to own the layer editor passed in parameter
+     * Set the scene canvas to use the layer editor passed in parameter
      */
-    void SetOwnedLayersEditor(boost::shared_ptr<EditorLayers> layersEditor_);
+    void SetLayersEditor(boost::shared_ptr<EditorLayers> layersEditor_);
 
     /**
-     * Set the scene canvas to own the debugger passed in parameter
+     * Set the scene canvas to use the debugger passed in parameter
      */
-    void SetOwnedDebugger(boost::shared_ptr<DebuggerGUI> debugger_);
+    void SetDebugger(boost::shared_ptr<DebuggerGUI> debugger_);
 
     /**
-     * Set the scene canvas to own the preview window passed in parameter
+     * Set the scene canvas to use the properties panel passed in parameter
      */
-    void SetOwnedExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_);
+    void SetPropertiesPanel(boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPanel_);
 
     /**
-     * Set the scene canvas to own the initial position browser passed in parameter
+     * Set the scene canvas to use the preview window passed in parameter
      */
-    void SetOwnedInitialPositionBrowser(boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser_);
+    void SetExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_);
 
     /**
-     * Set the scene canvas to own the profile dialog passed in parameter
+     * Set the scene canvas to use the initial position browser passed in parameter
      */
-    void SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDialog_);
+    void SetInitialPositionBrowser(boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser_);
 
     /**
-     * Return the objects editor owned by the SceneCanvas.
+     * Set the scene canvas to use the profile dialog passed in parameter
      */
-    boost::shared_ptr<EditorObjets> GetOwnedObjectsEditor() const { return objectsEditor; };
+    void SetProfileDialog(boost::shared_ptr<ProfileDlg> profileDialog_);
 
     /**
-     * Return the layers editor owned by the SceneCanvas.
+     * Return the objects editor used by the SceneCanvas.
      */
-    boost::shared_ptr<EditorLayers> GetOwnedLayersEditor() const { return layersEditor; };
+    boost::shared_ptr<EditorObjets> GetObjectsEditor() const { return objectsEditor; };
 
     /**
-     * Return the debugger owned by the SceneCanvas.
+     * Return the layers editor used by the SceneCanvas.
      */
-    boost::shared_ptr<DebuggerGUI> GetOwnedDebugger() const { return debugger; };
+    boost::shared_ptr<EditorLayers> GetLayersEditor() const { return layersEditor; };
 
     /**
-     * Return the external window owned by the SceneCanvas.
+     * Return the debugger used by the SceneCanvas.
      */
-    boost::shared_ptr<RenderDialog> GetOwnedExternalWindow() const { return externalWindow; };
+    boost::shared_ptr<DebuggerGUI> GetDebugger() const { return debugger; };
 
     /**
-     * Return the initial instances browser owned by the SceneCanvas.
+     * Return the external window used by the SceneCanvas.
      */
-    boost::shared_ptr<InitialPositionBrowserDlg> GetOwnedInitialPositionBrowser() const { return initialPositionsBrowser; };
+    boost::shared_ptr<RenderDialog> GetExternalWindow() const { return externalWindow; };
 
     /**
-     * Return the profiler dialog owned by the SceneCanvas.
+     * Return the initial instances browser used by the SceneCanvas.
      */
-    boost::shared_ptr<ProfileDlg> GetOwnedProfileDialog() const { return profileDialog; };
+    boost::shared_ptr<InitialPositionBrowserDlg> GetInitialPositionBrowser() const { return initialPositionsBrowser; };
+
+    /**
+     * Return the profiler dialog used by the SceneCanvas.
+     */
+    boost::shared_ptr<ProfileDlg> GetProfileDialog() const { return profileDialog; };
 
     /**
      * To be called when the size must be updated ( Parent panel size have changed )
@@ -400,12 +406,13 @@ private :
 
     wxScrollBar * scrollBar1; ///< Link to the scrollbar used by the sceneCanvas.
     wxScrollBar * scrollBar2; ///< Link to the scrollbar used by the sceneCanvas.
-    boost::shared_ptr<EditorObjets> objectsEditor; ///< Object editor owned by the sceneCanvas
-    boost::shared_ptr<EditorLayers> layersEditor; ///< Layer editor owned by the sceneCanvas
-    boost::shared_ptr<DebuggerGUI> debugger; ///< Debugger owned by the sceneCanvas
-    boost::shared_ptr<RenderDialog> externalWindow; ///< External preview window owned by the sceneCanvas
-    boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser;  ///< Initial position browser owned by the sceneCanvas
-    boost::shared_ptr<ProfileDlg> profileDialog;  ///< Profile dialog window owned by the sceneCanvas
+    boost::shared_ptr<EditorObjets> objectsEditor; ///< Object editor used by the sceneCanvas
+    boost::shared_ptr<EditorLayers> layersEditor; ///< Layer editor used by the sceneCanvas
+    boost::shared_ptr<DebuggerGUI> debugger; ///< Debugger used by the sceneCanvas
+    boost::shared_ptr<RenderDialog> externalWindow; ///< External preview window used by the sceneCanvas
+    boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser;  ///< Initial position browser used by the sceneCanvas
+    boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPanel;  ///< The properties panel used by the sceneCanvas
+    boost::shared_ptr<ProfileDlg> profileDialog;  ///< Profile dialog window used by the sceneCanvas
     wxAuiManager * m_mgr; ///< Link to the wxAuiManager managing editors windows.
     wxPanel * parentPanel;  ///< Link to the panel in which the sceneCanvas is inserted
 

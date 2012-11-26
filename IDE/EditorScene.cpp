@@ -38,6 +38,7 @@
 #include "EventsEditor.h"
 #include "GridSetup.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "Dialogs/LayoutEditorPropertiesPnl.h"
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
@@ -125,12 +126,22 @@ mainFrameWrapper(mainFrameWrapper_)
     m_mgr.SetManagedWindow( this );
 
     //Create all editors linked to scene canvas.
-    sceneCanvas->SetOwnedObjectsEditor( boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainFrameWrapper) ));
-    sceneCanvas->SetOwnedLayersEditor( boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, mainFrameWrapper) ));
-    sceneCanvas->SetOwnedDebugger( boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(this, sceneCanvas->GetRuntimeScene()) ));
-    sceneCanvas->SetOwnedExternalWindow( boost::shared_ptr<RenderDialog>(new RenderDialog(this, sceneCanvas) ));
-    sceneCanvas->SetOwnedInitialPositionBrowser( boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, scene.GetInitialInstances(), *sceneCanvas) ));
-    sceneCanvas->SetOwnedProfileDialog( boost::shared_ptr<ProfileDlg>(new ProfileDlg(this) ));
+    objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainFrameWrapper) );
+    layersEditor =  boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, mainFrameWrapper) );
+    debugger =  boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(this, sceneCanvas->GetRuntimeScene()) );
+    externalPreviewWindow = boost::shared_ptr<RenderDialog>(new RenderDialog(this, sceneCanvas) );
+    initialPositionBrowser =  boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, scene.GetInitialInstances(), *sceneCanvas) );
+    profilerDlg =  boost::shared_ptr<ProfileDlg>(new ProfileDlg(this));
+    propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this));
+
+    //Link some editors together
+    sceneCanvas->SetObjectsEditor( objectsEditor );
+    sceneCanvas->SetLayersEditor( layersEditor );
+    sceneCanvas->SetDebugger( debugger );
+    sceneCanvas->SetExternalWindow( externalPreviewWindow );
+    sceneCanvas->SetInitialPositionBrowser( initialPositionBrowser );
+    sceneCanvas->SetProfileDialog( profilerDlg );
+    sceneCanvas->SetPropertiesPanel( propertiesPnl );
     sceneCanvas->SetParentPanelAndDockManager( scenePanel, &m_mgr );
     sceneCanvas->SetScrollbars(scrollBar1, scrollBar2);
     sceneCanvas->Reload();
@@ -139,11 +150,12 @@ mainFrameWrapper(mainFrameWrapper_)
 
     //Display editors in panes
     m_mgr.AddPane( notebook, wxAuiPaneInfo().Name( wxT( "ESCenter" ) ).PaneBorder(false).Center().CloseButton( false ).Caption( _( "Scene's editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
-    m_mgr.AddPane( sceneCanvas->GetOwnedObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-    m_mgr.AddPane( sceneCanvas->GetOwnedLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Float().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-    m_mgr.AddPane( sceneCanvas->GetOwnedDebugger().get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-    m_mgr.AddPane( sceneCanvas->GetOwnedInitialPositionBrowser().get(), wxAuiPaneInfo().Name( wxT( "IPB" ) ).Float().CloseButton( true ).Caption( _( "Initial positions of objects" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-    m_mgr.AddPane( sceneCanvas->GetOwnedProfileDialog().get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Profiling" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );
+    m_mgr.AddPane( objectsEditor.get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+    m_mgr.AddPane( layersEditor.get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Float().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+    m_mgr.AddPane( debugger.get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+    m_mgr.AddPane( initialPositionBrowser.get(), wxAuiPaneInfo().Name( wxT( "IPB" ) ).Float().CloseButton( true ).Caption( _( "Initial positions of objects" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+    m_mgr.AddPane( profilerDlg.get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Profiling" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );
+    m_mgr.AddPane( propertiesPnl.get(), wxAuiPaneInfo().Name( wxT( "PROPERTIES" ) ).Float().CloseButton( true ).Caption( _( "Properties" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
 
     //Load preferences
     {

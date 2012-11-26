@@ -32,6 +32,7 @@
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/CodeExecutionEngine.h"
 #include "GDL/SoundManager.h"
+#include "Dialogs/LayoutEditorPropertiesPnl.h"
 #include "BuildMessagesPnl.h"
 #include "BuildProgressPnl.h"
 #include "BuildToolsPnl.h"
@@ -156,7 +157,7 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
     //Let the editor go back to edition state
     scrollBar1->Show(true);
     scrollBar2->Show(true);
-    externalWindow->Show(false);
+    if ( externalWindow ) externalWindow->Show(false);
     previewData.scene.ChangeRenderWindow(this);
 
     //Parse now the results of profiling
@@ -186,7 +187,7 @@ void SceneCanvas::OnPlayBtClick( wxCommandEvent & event )
     previewData.scene.running = true;
     editing = false;
 
-    externalWindow->Show(false);
+    if ( externalWindow ) externalWindow->Show(false);
     previewData.scene.ChangeRenderWindow(this);
 
     if ( debugger ) debugger->Play();
@@ -694,8 +695,8 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
         {
             SelectObject(object);
 
-            if ( initialPositionsBrowser )
-                initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
+            if ( initialPositionsBrowser ) initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
+            if ( propertiesPanel ) propertiesPanel->SelectInitialPosition(GetInitialPositionFromObject(object));
         }
 
         //Clone the selection using Ctrl

@@ -24,6 +24,7 @@ namespace gd {class Layout;}
 namespace gd {class Project;}
 class RuntimeGame;
 class EventsEditor;
+class LayoutEditorPropertiesPnl;
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "RenderDialog.h"
 #include "SceneCanvas.h"
@@ -35,74 +36,81 @@ using namespace std;
  */
 class EditorScene: public wxPanel
 {
-	public:
+public:
 
-		EditorScene(wxWindow* parent, gd::Project & project, gd::Layout & layout_, const gd::MainFrameWrapper & mainFrameWrapper_);
-		virtual ~EditorScene();
+    EditorScene(wxWindow* parent, gd::Project & project, gd::Layout & layout_, const gd::MainFrameWrapper & mainFrameWrapper_);
+    virtual ~EditorScene();
 
-		//(*Declarations(EditorScene)
-		wxScrollBar* scrollBar1;
-		EventsEditor* eventsEditor;
-		wxScrollBar* scrollBar2;
-		SceneCanvas* sceneCanvas;
-		wxPanel* scenePanel;
-		wxPanel* eventsPanel;
-		wxAuiNotebook* notebook;
-		//*)
+    /**
+     * Return the layout edited by the editor
+     */
+    gd::Layout & GetLayout() { return layout; };
 
-		/**
-		 * Return the layout edited by the editor
-		 */
-		gd::Layout & GetLayout() { return layout; };
+    /**
+     * Can be called by parent so as to refresh ribbon for this editor.
+     */
+    void ForceRefreshRibbonAndConnect();
 
-        /**
-         * Can be called by parent so as to refresh ribbon for this editor.
-         */
-        void ForceRefreshRibbonAndConnect();
+    /**
+     * Return true if the editor can be closed, false otherwise ( i.e. Scene is being previewed )
+     */
+    bool CanBeClosed();
 
-        /**
-         * Return true if the editor can be closed, false otherwise ( i.e. Scene is being previewed )
-         */
-        bool CanBeClosed();
+protected:
 
-	protected:
+    //(*Identifiers(EditorScene)
+    static const long ID_SCROLLBAR2;
+    static const long ID_SCROLLBAR1;
+    static const long ID_CUSTOM1;
+    static const long ID_PANEL5;
+    static const long ID_CUSTOM2;
+    static const long ID_PANEL6;
+    static const long ID_AUINOTEBOOK1;
+    //*)
 
-		//(*Identifiers(EditorScene)
-		static const long ID_SCROLLBAR2;
-		static const long ID_SCROLLBAR1;
-		static const long ID_CUSTOM1;
-		static const long ID_PANEL5;
-		static const long ID_CUSTOM2;
-		static const long ID_PANEL6;
-		static const long ID_AUINOTEBOOK1;
-		//*)
+private:
 
-	private:
+    //(*Handlers(EditorScene)
+    void OnScrollBar2Scroll(wxScrollEvent& event);
+    void OnScrollBar1Scroll(wxScrollEvent& event);
+    void OnCorePaint(wxPaintEvent& event);
+    void OnPanel1KeyDown(wxKeyEvent& event);
+    void OnsceneCanvasRightDown(wxMouseEvent& event);
+    void OnsceneCanvasPaint(wxPaintEvent& event);
+    void OnPanel1Resize(wxSizeEvent& event);
+    void OnscenePanelResize(wxSizeEvent& event);
+    void OnnotebookPageChanged(wxAuiNotebookEvent& event);
+    void OnsceneCanvasSetFocus(wxFocusEvent& event);
+    void OnPanel2Resize(wxSizeEvent& event);
+    void OnCoreResize1(wxSizeEvent& event);
+    void OnsceneCanvasPanelResize(wxSizeEvent& event);
+    void OnnotebookPageChanging(wxAuiNotebookEvent& event);
+    //*)
 
-		//(*Handlers(EditorScene)
-		void OnScrollBar2Scroll(wxScrollEvent& event);
-		void OnScrollBar1Scroll(wxScrollEvent& event);
-		void OnCorePaint(wxPaintEvent& event);
-		void OnPanel1KeyDown(wxKeyEvent& event);
-		void OnsceneCanvasRightDown(wxMouseEvent& event);
-		void OnsceneCanvasPaint(wxPaintEvent& event);
-		void OnPanel1Resize(wxSizeEvent& event);
-		void OnscenePanelResize(wxSizeEvent& event);
-		void OnnotebookPageChanged(wxAuiNotebookEvent& event);
-		void OnsceneCanvasSetFocus(wxFocusEvent& event);
-		void OnPanel2Resize(wxSizeEvent& event);
-		void OnCoreResize1(wxSizeEvent& event);
-		void OnsceneCanvasPanelResize(wxSizeEvent& event);
-		void OnnotebookPageChanging(wxAuiNotebookEvent& event);
-		//*)
+    //(*Declarations(EditorScene)
+    wxScrollBar* scrollBar1;
+    EventsEditor* eventsEditor;
+    wxScrollBar* scrollBar2;
+    SceneCanvas* sceneCanvas;
+    wxPanel* scenePanel;
+    wxPanel* eventsPanel;
+    wxAuiNotebook* notebook;
+    //*)
+    boost::shared_ptr<EditorObjets> objectsEditor;
+    boost::shared_ptr<EditorLayers> layersEditor;
+    boost::shared_ptr<DebuggerGUI> debugger;
+    boost::shared_ptr<RenderDialog> externalPreviewWindow;
+    boost::shared_ptr<InitialPositionBrowserDlg> initialPositionBrowser;
+    boost::shared_ptr<ProfileDlg> profilerDlg;
+    boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
 
-		gd::Project & project;
-		gd::Layout & layout;
-		gd::MainFrameWrapper mainFrameWrapper;
+    gd::Project & project;
+    gd::Layout & layout;
+    gd::MainFrameWrapper mainFrameWrapper;
 
-        wxAuiManager m_mgr;
+    wxAuiManager m_mgr;
 
-		DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

@@ -5,7 +5,7 @@
 		<Option title="IDE" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Fichiers\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\Editeur calques\;Editeur principal\Apparence\;LIB CppUnitLite\;" />
+		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Fichiers\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;Editeurs\Editeur Scene\Editeur calques\;LIB CppUnitLite\;" />
 		<Build>
 			<Target title="Debug - Edittime">
 				<Option platforms="Windows;" />
@@ -619,10 +619,6 @@
 		<Unit filename="EditPropScene.h">
 			<Option virtualFolder="Editeur principal\Autres\" />
 		</Unit>
-		<Unit filename="EditorJeu.cpp">
-			<Option virtualFolder="Racine\" />
-		</Unit>
-		<Unit filename="EditorJeu.h" />
 		<Unit filename="EditorLayers.cpp">
 			<Option virtualFolder="Editeurs\Editeur Scene\Editeur calques\" />
 		</Unit>
@@ -670,12 +666,6 @@
 		</Unit>
 		<Unit filename="Fusion.h">
 			<Option virtualFolder="Editeur principal\Fichier\" />
-		</Unit>
-		<Unit filename="GDAuiTabArt.cpp">
-			<Option virtualFolder="Editeur principal\Apparence\" />
-		</Unit>
-		<Unit filename="GDAuiTabArt.h">
-			<Option virtualFolder="Editeur principal\Apparence\" />
 		</Unit>
 		<Unit filename="Game_Develop_EditorApp.cpp">
 			<Option virtualFolder="Racine\" />
@@ -902,7 +892,6 @@
 					<wxDialog wxs="wxsmith/ErrorCompilation.wxs" src="ErrorCompilation.cpp" hdr="ErrorCompilation.h" fwddecl="0" i18n="1" name="ErrorCompilation" language="CPP" />
 					<wxDialog wxs="wxsmith/GeneratePassword.wxs" src="GeneratePassword.cpp" hdr="GeneratePassword.h" fwddecl="0" i18n="1" name="GeneratePassword" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorScene.wxs" src="EditorScene.cpp" hdr="EditorScene.h" fwddecl="0" i18n="1" name="EditorScene" language="CPP" />
-					<wxPanel wxs="wxsmith/EditorJeu.wxs" src="EditorJeu.cpp" hdr="EditorJeu.h" fwddecl="0" i18n="1" name="EditorJeu" language="CPP" />
 					<wxPanel wxs="wxsmith/EditorObjetsGroups.wxs" src="EditorObjetsGroups.cpp" hdr="EditorObjetsGroups.h" fwddecl="0" i18n="1" name="EditorObjetsGroups" language="CPP" />
 					<wxDialog wxs="wxsmith/EditObjectGroup.wxs" src="EditObjectGroup.cpp" hdr="EditObjectGroup.h" fwddecl="0" i18n="1" name="EditObjectGroup" language="CPP" />
 					<wxDialog wxs="wxsmith/ImportImage.wxs" src="ImportImage.cpp" hdr="ImportImage.h" fwddecl="0" i18n="1" name="ImportImage" language="CPP" />

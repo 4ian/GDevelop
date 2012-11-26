@@ -11,6 +11,7 @@
 #include <wx/settings.h>
 #include <wx/treectrl.h>
 #include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "../ProjectManager.h"
 
 //(*IdInit(ProjectPropertiesPnl)
@@ -44,12 +45,7 @@ ProjectPropertiesPnl::ProjectPropertiesPnl(wxWindow* parent,wxWindowID id,const 
     Connect(ID_PROPGRID, wxEVT_PG_CHANGED, (wxObjectEventFunction)&ProjectPropertiesPnl::OnPropertyChanged);
 
     //Offer nice theme to property grid
-    propertyGrid->SetMarginColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
-    propertyGrid->SetCaptionBackgroundColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
-    propertyGrid->SetEmptySpaceColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
-    propertyGrid->SetCellBackgroundColour( *wxWHITE );
-    propertyGrid->SetCellTextColour( *wxBLACK );
-    propertyGrid->SetLineColour( wxColour(212,208,200) );
+    gd::SkinHelper::ApplyCurrentSkin(*propertyGrid);
 }
 
 ProjectPropertiesPnl::~ProjectPropertiesPnl()

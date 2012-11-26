@@ -183,32 +183,32 @@ void SceneCanvas::CreateToolsBar(wxRibbonButtonBar * bar, bool editing)
     bar->Realize();
 }
 
-void SceneCanvas::SetOwnedObjectsEditor(boost::shared_ptr<EditorObjets> objectsEditor_)
+void SceneCanvas::SetObjectsEditor(boost::shared_ptr<EditorObjets> objectsEditor_)
 {
     objectsEditor = objectsEditor_;
 }
-void SceneCanvas::SetOwnedLayersEditor(boost::shared_ptr<EditorLayers> layersEditor_)
+void SceneCanvas::SetLayersEditor(boost::shared_ptr<EditorLayers> layersEditor_)
 {
     layersEditor = layersEditor_;
     if ( layersEditor && layersEditor->GetAssociatedSceneCanvas() != this)
         layersEditor->SetAssociatedSceneCanvas(this);
 }
-void SceneCanvas::SetOwnedDebugger(boost::shared_ptr<DebuggerGUI> debugger_)
+void SceneCanvas::SetDebugger(boost::shared_ptr<DebuggerGUI> debugger_)
 {
     debugger = debugger_;
 
     if ( debugger )
         previewData.scene.debugger = debugger.get();
 }
-void SceneCanvas::SetOwnedExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_)
+void SceneCanvas::SetExternalWindow(boost::shared_ptr<RenderDialog> externalWindow_)
 {
     externalWindow = externalWindow_;
 }
-void SceneCanvas::SetOwnedInitialPositionBrowser(boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser_)
+void SceneCanvas::SetInitialPositionBrowser(boost::shared_ptr<InitialPositionBrowserDlg> initialPositionsBrowser_)
 {
     initialPositionsBrowser = initialPositionsBrowser_;
 }
-void SceneCanvas::SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDialog_)
+void SceneCanvas::SetProfileDialog(boost::shared_ptr<ProfileDlg> profileDialog_)
 {
     profileDialog = profileDialog_;
     if ( profileDialog && profileDialog->GetAssociatedSceneCanvas() != this)
@@ -216,6 +216,10 @@ void SceneCanvas::SetOwnedProfileDialog(boost::shared_ptr<ProfileDlg> profileDia
 
     if ( profileDialog )
         sceneEdited.SetProfiler(profileDialog.get());
+}
+void SceneCanvas::SetPropertiesPanel(boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPanel_)
+{
+    propertiesPanel = propertiesPanel_;
 }
 
 /**
@@ -242,7 +246,7 @@ void SceneCanvas::UpdateSize()
         Window::setSize(sf::Vector2u(gameEdited.GetMainWindowDefaultWidth(), gameEdited.GetMainWindowDefaultHeight()));
         wxWindowBase::SetClientSize(gameEdited.GetMainWindowDefaultWidth(), gameEdited.GetMainWindowDefaultHeight());
 
-        externalWindow->SetSizeOfRenderingZone(gameEdited.GetMainWindowDefaultWidth(), gameEdited.GetMainWindowDefaultHeight());
+        if ( externalWindow ) externalWindow->SetSizeOfRenderingZone(gameEdited.GetMainWindowDefaultWidth(), gameEdited.GetMainWindowDefaultHeight());
 
         //Scene is centered in preview mode
         wxWindowBase::SetPosition(wxPoint((parentPanel->GetSize().GetWidth()-wxWindowBase::GetSize().GetX())/2,

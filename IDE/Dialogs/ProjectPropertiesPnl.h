@@ -47,11 +47,6 @@ public:
      */
      void SetAssociatedProjectManager(ProjectManager * associatedProjectManager);
 
-    //(*Declarations(ProjectPropertiesPnl)
-    wxPropertyGrid* propertyGrid;
-    //*)
-
-
 protected:
 
     //(*Identifiers(ProjectPropertiesPnl)
@@ -59,6 +54,10 @@ protected:
     //*)
 
 private:
+
+    //(*Declarations(ProjectPropertiesPnl)
+    wxPropertyGrid* propertyGrid;
+    //*)
 
     //(*Handlers(ProjectPropertiesPnl)
     //*)

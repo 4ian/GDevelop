@@ -91,6 +91,10 @@ public:
     static void CreateRibbonPage(wxRibbonPage * page);
     void ConnectEvents();
 
+    /**
+     * Declare a SceneCanvas to be associated with this events editor.
+     * Used to check if profiling is enabled.
+     */
     void SetAssociatedSceneCanvas(SceneCanvas * sceneCanvas_) { sceneCanvas = sceneCanvas_; };
     SceneCanvas * GetAssociatedSceneCanvas() { return sceneCanvas; };
 

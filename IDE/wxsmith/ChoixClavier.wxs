@@ -2,13 +2,13 @@
 <wxsmith>
 	<object class="wxDialog" name="ChoixClavier">
 		<title>Choose a key</title>
-		<size>234,179</size>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxWANTS_CHARS</style>
 		<handler function="OnKeyDown" entry="EVT_KEY_DOWN" />
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxStaticText" name="ID_STATICTEXT3" variable="StaticText2" member="yes">
 					<label>Just press a key</label>

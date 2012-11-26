@@ -68,7 +68,6 @@ scene(scene_)
 {
 	//(*Initialize(EditOptionsPosition)
 	wxStaticBoxSizer* StaticBoxSizer2;
-	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer16;
 	wxStaticBoxSizer* StaticBoxSizer4;
 	wxFlexGridSizer* FlexGridSizer10;
@@ -92,7 +91,6 @@ scene(scene_)
 	wxStaticBoxSizer* StaticBoxSizer5;
 
 	Create(parent, wxID_ANY, _("Edit the properties of the object on the scene"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
-	SetClientSize(wxSize(397,260));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(2);
@@ -113,12 +111,9 @@ scene(scene_)
 	FlexGridSizer1->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
 	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer4 = new wxFlexGridSizer(0, 2, 0, 0);
-	FlexGridSizer4->AddGrowableCol(0);
-	FlexGridSizer4->AddGrowableRow(0);
 	FlexGridSizer6 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer6->AddGrowableCol(0);
-	FlexGridSizer6->AddGrowableRow(1);
+	FlexGridSizer6->AddGrowableRow(2);
 	FlexGridSizer13 = new wxFlexGridSizer(0, 2, 0, 0);
 	FlexGridSizer13->AddGrowableCol(0);
 	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Position"));
@@ -207,8 +202,7 @@ scene(scene_)
 	customPanel = new wxPanel(this, ID_PANEL2, wxDefaultPosition, wxSize(0,0), wxTAB_TRAVERSAL, _T("ID_PANEL2"));
 	FlexGridSizer15->Add(customPanel, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer6->Add(FlexGridSizer15, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer4->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer1->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer1->Add(FlexGridSizer6, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer9 = new wxFlexGridSizer(0, 0, 0, 0);
@@ -230,8 +224,8 @@ scene(scene_)
 	FlexGridSizer9->Add(BoxSizer2, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer1->Add(FlexGridSizer9, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
-	SetSizer(FlexGridSizer1);
-	Layout();
+	FlexGridSizer1->Fit(this);
+	FlexGridSizer1->SetSizeHints(this);
 	Center();
 
 	Connect(ID_CHECKBOX1,wxEVT_COMMAND_CHECKBOX_CLICKED,(wxObjectEventFunction)&EditOptionsPosition::OnsizeCheckClick);

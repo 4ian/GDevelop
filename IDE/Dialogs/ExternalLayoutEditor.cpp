@@ -231,9 +231,9 @@ void ExternalLayoutEditor::SetupForScene(Scene & scene)
             InitialInstancesContainer & instanceContainer = dynamic_cast<InitialInstancesContainer&>(externalLayout.GetInitialInstances());
 
             //Check if external editors already have been created
-            bool creatingEditorsForFirsttime = (sceneCanvas->GetOwnedObjectsEditor() == boost::shared_ptr<EditorObjets>() ||
-                                                 sceneCanvas->GetOwnedLayersEditor() == boost::shared_ptr<EditorLayers>() ||
-                                                 sceneCanvas->GetOwnedInitialPositionBrowser() == boost::shared_ptr<InitialPositionBrowserDlg>());
+            bool creatingEditorsForFirsttime = (sceneCanvas->GetObjectsEditor() == boost::shared_ptr<EditorObjets>() ||
+                                                 sceneCanvas->GetLayersEditor() == boost::shared_ptr<EditorLayers>() ||
+                                                 sceneCanvas->GetInitialPositionBrowser() == boost::shared_ptr<InitialPositionBrowserDlg>());
 
             //(Re)create scene canvas
             if ( sceneCanvas ) delete sceneCanvas;
@@ -245,20 +245,20 @@ void ExternalLayoutEditor::SetupForScene(Scene & scene)
             boost::shared_ptr<EditorObjets> objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainFrameWrapper));
             boost::shared_ptr<EditorLayers> layersEditor = boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, mainFrameWrapper) );
             boost::shared_ptr<InitialPositionBrowserDlg> browserEditor = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *sceneCanvas) );
-            sceneCanvas->SetOwnedObjectsEditor(objectsEditor);
-            sceneCanvas->SetOwnedLayersEditor(layersEditor);
-            sceneCanvas->SetOwnedInitialPositionBrowser(browserEditor);
+            sceneCanvas->SetObjectsEditor(objectsEditor);
+            sceneCanvas->SetLayersEditor(layersEditor);
+            sceneCanvas->SetInitialPositionBrowser(browserEditor);
             sceneCanvas->Reload();
 
             //Display editors in panes
             if ( creatingEditorsForFirsttime )
             {
                 if ( !m_mgr.GetPane("ObjectsEditor").IsOk() )
-                    m_mgr.AddPane( sceneCanvas->GetOwnedObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "ObjectsEditor" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+                    m_mgr.AddPane( sceneCanvas->GetObjectsEditor().get(), wxAuiPaneInfo().Name( wxT( "ObjectsEditor" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
                 if ( !m_mgr.GetPane("LayersEditor").IsOk() )
-                    m_mgr.AddPane( sceneCanvas->GetOwnedLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "LayersEditor" ) ).Right().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+                    m_mgr.AddPane( sceneCanvas->GetLayersEditor().get(), wxAuiPaneInfo().Name( wxT( "LayersEditor" ) ).Right().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
                 if ( !m_mgr.GetPane("InstancesBrowser").IsOk() )
-                    m_mgr.AddPane( sceneCanvas->GetOwnedInitialPositionBrowser().get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Initial positions of objects" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+                    m_mgr.AddPane( sceneCanvas->GetInitialPositionBrowser().get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Initial positions of objects" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
 
                 wxString perspective;
                 wxConfigBase::Get()->Read("/ExternalLayoutEditor/LastWorkspace", &perspective);
@@ -266,9 +266,9 @@ void ExternalLayoutEditor::SetupForScene(Scene & scene)
             }
             else
             {
-                m_mgr.GetPane("ObjectsEditor").Window(sceneCanvas->GetOwnedObjectsEditor().get());
-                m_mgr.GetPane("LayersEditor").Window(sceneCanvas->GetOwnedLayersEditor().get());
-                m_mgr.GetPane("InstancesBrowser").Window(sceneCanvas->GetOwnedInitialPositionBrowser().get());
+                m_mgr.GetPane("ObjectsEditor").Window(sceneCanvas->GetObjectsEditor().get());
+                m_mgr.GetPane("LayersEditor").Window(sceneCanvas->GetLayersEditor().get());
+                m_mgr.GetPane("InstancesBrowser").Window(sceneCanvas->GetInitialPositionBrowser().get());
             }
 
             m_mgr.Update();

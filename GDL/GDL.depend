@@ -34254,7 +34254,7 @@
 	<wx/dialog.h>
 	"GDL/ResourcesManager.h"
 
-1353624798 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\resourceseditor.cpp
+1353859679 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\resourceseditor.cpp
 	"GDL/IDE/Dialogs/ResourcesEditor.h"
 	<wx/msw/winundef.h>
 	<wx/bitmap.h>
@@ -34297,7 +34297,7 @@
 	"GDCore/IDE/wxTools/TreeItemStringData.h"
 	<gtk/gtk.h>
 
-1349984620 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\resourceseditor.h
+1353772624 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\resourceseditor.h
 	<wx/treectrl.h>
 	<wx/sizer.h>
 	<wx/menu.h>
@@ -34586,9 +34586,11 @@
 	<map>
 	<vector>
 
-1348166688 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editcomment.h
+1353770406 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editcomment.h
 	<wx/sizer.h>
 	<wx/textctrl.h>
+	<wx/hyperlink.h>
+	<wx/statbmp.h>
 	<wx/button.h>
 	<wx/dialog.h>
 	"GDL/CommentEvent.h"
@@ -34718,12 +34720,12 @@
 1352644130 d:\florian\programmation\gamedevelop2\gdl\gdl\events\eventscodenamemangler.h
 	<string>
 
-1348166688 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editforeachevent.h
+1353770599 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editforeachevent.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
 	<wx/statline.h>
-	<wx/panel.h>
+	<wx/hyperlink.h>
 	<wx/bmpbuttn.h>
 	<wx/statbmp.h>
 	<wx/button.h>
@@ -34757,17 +34759,21 @@
 	<string>
 	<vector>
 
-1353450824 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editcomment.cpp
+1353770412 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editcomment.cpp
 	"EditComment.h"
+	<wx/bitmap.h>
 	<wx/intl.h>
+	<wx/image.h>
 	<wx/string.h>
 	<wx/colordlg.h>
 	"GDCore/Events/Event.h"
 	"GDCore/Tools/HelpFileAccess.h"
 
-1348166688 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editcomment.h
+1353770406 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editcomment.h
 	<wx/sizer.h>
 	<wx/textctrl.h>
+	<wx/hyperlink.h>
+	<wx/statbmp.h>
 	<wx/button.h>
 	<wx/dialog.h>
 	"GDL/CommentEvent.h"
@@ -34818,32 +34824,32 @@
 	<wx/stc/stc.h>
 	<wx/imaglist.h>
 
-1351975270 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editforeachevent.cpp
+1353770784 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editforeachevent.cpp
 	"EditForEachEvent.h"
 	<wx/bitmap.h>
-	<wx/settings.h>
 	<wx/intl.h>
 	<wx/image.h>
 	<wx/string.h>
 	"GDL/ForEachEvent.h"
 	"GDCore/IDE/Dialogs/ChooseObjectDialog.h"
+	"GDCore/Tools/HelpFileAccess.h"
 	"GDL/CommonTools.h"
 	"GDL/Game.h"
 	"GDL/Scene.h"
 
-1348166688 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editforeachevent.h
+1353770599 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editforeachevent.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
 	<wx/statline.h>
-	<wx/panel.h>
+	<wx/hyperlink.h>
 	<wx/bmpbuttn.h>
 	<wx/statbmp.h>
 	<wx/button.h>
 	<wx/dialog.h>
 	"GDL/ForEachEvent.h"
 
-1353450825 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editlink.cpp
+1353770379 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editlink.cpp
 	"EditLink.h"
 	<wx/bitmap.h>
 	<wx/settings.h>
@@ -34859,38 +34865,39 @@
 	"GDL/Scene.h"
 	<wx/help.h>
 
-1348166689 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editlink.h
+1353770324 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editlink.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
 	<wx/statline.h>
 	<wx/radiobut.h>
 	<wx/panel.h>
+	<wx/hyperlink.h>
 	<wx/statbmp.h>
 	<wx/button.h>
 	<wx/dialog.h>
 	<wx/combobox.h>
 	"GDL/LinkEvent.h"
 
-1351975239 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editrepeatevent.cpp
+1353770949 source:d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editrepeatevent.cpp
 	"EditRepeatEvent.h"
 	<wx/bitmap.h>
-	<wx/settings.h>
 	<wx/intl.h>
 	<wx/image.h>
 	<wx/string.h>
 	"GDCore/IDE/Dialogs/EditExpressionDialog.h"
+	"GDCore/Tools/HelpFileAccess.h"
 	"GDL/RepeatEvent.h"
 	"GDL/Game.h"
 	"GDL/Scene.h"
 	"GDL/CommonTools.h"
 
-1348166689 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editrepeatevent.h
+1353770562 d:\florian\programmation\gamedevelop2\gdl\gdl\ide\dialogs\editrepeatevent.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
 	<wx/statline.h>
-	<wx/panel.h>
+	<wx/hyperlink.h>
 	<wx/bmpbuttn.h>
 	<wx/statbmp.h>
 	<wx/button.h>
@@ -34955,25 +34962,26 @@
 	<map>
 	<list>
 
-1348166689 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editlink.h
+1353770324 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editlink.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
 	<wx/statline.h>
 	<wx/radiobut.h>
 	<wx/panel.h>
+	<wx/hyperlink.h>
 	<wx/statbmp.h>
 	<wx/button.h>
 	<wx/dialog.h>
 	<wx/combobox.h>
 	"GDL/LinkEvent.h"
 
-1348166689 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editrepeatevent.h
+1353770562 d:\florian\programmation\gamedevelop2\gdl\\gdl\ide\dialogs\editrepeatevent.h
 	<wx/sizer.h>
 	<wx/stattext.h>
 	<wx/textctrl.h>
 	<wx/statline.h>
-	<wx/panel.h>
+	<wx/hyperlink.h>
 	<wx/bmpbuttn.h>
 	<wx/statbmp.h>
 	<wx/button.h>
@@ -36294,5 +36302,5 @@
 	<string>
 	<boost/shared_ptr.hpp>
 
-1353624264 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\wxtools\skinhelper.h
+1353859285 d:\florian\programmation\gamedevelop2\core\\gdcore\ide\wxtools\skinhelper.h
 

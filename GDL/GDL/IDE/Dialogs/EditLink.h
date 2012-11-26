@@ -9,6 +9,7 @@
 #include <wx/statline.h>
 #include <wx/radiobut.h>
 #include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
@@ -29,10 +30,12 @@ class EditLink: public wxDialog
 		wxStaticText* StaticText2;
 		wxComboBox* linkedNameEdit;
 		wxRadioButton* AllEventsCheck;
+		wxStaticBitmap* StaticBitmap1;
 		wxTextCtrl* EndEdit;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxStaticLine* StaticLine2;
 		wxTextCtrl* StartEdit;
 		wxRadioButton* OnlyEventsCheck;
@@ -41,7 +44,6 @@ class EditLink: public wxDialog
 		wxButton* AnnulerBt;
 		wxStaticText* StaticText4;
 		wxStaticBitmap* StaticBitmap3;
-		wxButton* AideBt;
 		//*)
 
 	protected:
@@ -61,9 +63,10 @@ class EditLink: public wxDialog
 		static const long ID_STATICTEXT4;
 		static const long ID_STATICTEXT5;
 		static const long ID_STATICLINE1;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
-		static const long ID_BUTTON3;
 		//*)
 
 	private:

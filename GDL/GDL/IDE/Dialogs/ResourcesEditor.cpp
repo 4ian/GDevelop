@@ -244,12 +244,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     //Offer nice theme to property grid
     propertyGrid->SetWindowStyle(wxPG_HIDE_MARGIN|wxPGMAN_DEFAULT_STYLE|wxPG_DESCRIPTION);
     propertyGrid->AddPage("SinglePage");
-    propertyGrid->GetGrid()->SetMarginColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
-    propertyGrid->GetGrid()->SetCaptionBackgroundColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
-    propertyGrid->GetGrid()->SetEmptySpaceColour( wxSystemSettings::GetColour(wxSYS_COLOUR_MENU) );
-    propertyGrid->GetGrid()->SetCellBackgroundColour( *wxWHITE );
-    propertyGrid->GetGrid()->SetCellTextColour( *wxBLACK );
-    propertyGrid->GetGrid()->SetLineColour( wxColour(212,208,200) );
+    gd::SkinHelper::ApplyCurrentSkin(*propertyGrid->GetGrid());
 
     //ResourcesEditor can be used without ribbon
     if ( useRibbon )
@@ -260,7 +255,10 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
 
     SetDropTarget(new DndTextResourcesEditor(*this));
 
+    //Apply skins and nice colours
     gd::SkinHelper::ApplyCurrentSkin(*toolbar);
+    gd::SkinHelper::ApplyCurrentSkin(*AuiManager1);
+
     AuiManager1->GetPane(previewPanel).MinSize(200,200).BestSize(400,200);
     AuiManager1->GetPane(propertiesPanel).MinSize(200,200).BestSize(400,200);
     AuiManager1->Update();
@@ -451,6 +449,10 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
 void ResourcesEditor::OnAddFromLibraryBtClick( wxCommandEvent& event )
 {
     resourceLibraryDialog->Show(true);
+}
+void ResourcesEditor::OnAddFromLibraryToolbarBtClick(wxCommandEvent& event)
+{
+    OnAddFromLibraryBtClick(event);
 }
 
 void ResourcesEditor::OnremoveFolderOnlySelected(wxCommandEvent& event)

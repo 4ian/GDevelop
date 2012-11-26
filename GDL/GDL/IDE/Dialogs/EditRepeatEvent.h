@@ -12,7 +12,7 @@
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/statline.h>
-#include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/bmpbuttn.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
@@ -34,28 +34,24 @@ class EditRepeatEvent: public wxDialog
 
 		//(*Declarations(EditRepeatEvent)
 		wxBitmapButton* expressionBt;
-		wxPanel* Panel1;
+		wxStaticBitmap* StaticBitmap1;
 		wxStaticText* StaticText1;
-		wxStaticText* StaticText3;
 		wxButton* cancelBt;
-		wxStaticLine* StaticLine2;
 		wxStaticLine* StaticLine1;
 		wxTextCtrl* expressionEdit;
+		wxHyperlinkCtrl* helpBt;
 		wxButton* okBt;
-		wxStaticBitmap* StaticBitmap3;
 		//*)
 
 	protected:
 
 		//(*Identifiers(EditRepeatEvent)
-		static const long ID_STATICBITMAP3;
-		static const long ID_STATICTEXT3;
-		static const long ID_PANEL1;
-		static const long ID_STATICLINE2;
 		static const long ID_STATICTEXT1;
 		static const long ID_TEXTCTRL1;
 		static const long ID_BITMAPBUTTON1;
 		static const long ID_STATICLINE1;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
 		//*)
@@ -66,6 +62,7 @@ class EditRepeatEvent: public wxDialog
 		void OnexpressionBtClick(wxCommandEvent& event);
 		void OnokBtClick(wxCommandEvent& event);
 		void OncancelBtClick(wxCommandEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 
 		RepeatEvent & event;

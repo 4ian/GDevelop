@@ -12,7 +12,7 @@
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 #include <wx/statline.h>
-#include <wx/panel.h>
+#include <wx/hyperlink.h>
 #include <wx/bmpbuttn.h>
 #include <wx/statbmp.h>
 #include <wx/button.h>
@@ -30,16 +30,14 @@ class EditForEachEvent: public wxDialog
 		virtual ~EditForEachEvent();
 
 		//(*Declarations(EditForEachEvent)
-		wxPanel* Panel1;
+		wxStaticBitmap* StaticBitmap1;
 		wxStaticText* StaticText1;
-		wxStaticText* StaticText3;
 		wxButton* cancelBt;
-		wxStaticLine* StaticLine2;
 		wxBitmapButton* objectBt;
 		wxStaticLine* StaticLine1;
 		wxTextCtrl* objectEdit;
+		wxHyperlinkCtrl* helpBt;
 		wxButton* okBt;
-		wxStaticBitmap* StaticBitmap3;
 		//*)
 
 		ForEachEvent & eventEdited;
@@ -47,14 +45,12 @@ class EditForEachEvent: public wxDialog
 	protected:
 
 		//(*Identifiers(EditForEachEvent)
-		static const long ID_STATICBITMAP3;
-		static const long ID_STATICTEXT3;
-		static const long ID_PANEL1;
-		static const long ID_STATICLINE2;
 		static const long ID_STATICTEXT1;
 		static const long ID_TEXTCTRL1;
 		static const long ID_BITMAPBUTTON1;
 		static const long ID_STATICLINE1;
+		static const long ID_STATICBITMAP2;
+		static const long ID_HYPERLINKCTRL1;
 		static const long ID_BUTTON1;
 		static const long ID_BUTTON2;
 		//*)
@@ -65,6 +61,7 @@ class EditForEachEvent: public wxDialog
 		void OnokBtClick(wxCommandEvent& event);
 		void OncancelBtClick(wxCommandEvent& event);
 		void OnobjectBtClick(wxCommandEvent& event);
+		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 
 		Game & game;

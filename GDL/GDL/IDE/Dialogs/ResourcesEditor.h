@@ -182,6 +182,7 @@ private:
     void OnpreviewPanelResize(wxSizeEvent& event);
     void OnresourcesTreeKeyDown(wxTreeEvent& event);
     void OnresourcesTreeEndDrag(wxTreeEvent& event);
+    void OnAddFromLibraryToolbarBtClick(wxCommandEvent& event);
     //*)
     void OnMoreOptions( wxCommandEvent& event );
     void OnAddFromLibraryBtClick(wxCommandEvent& event);

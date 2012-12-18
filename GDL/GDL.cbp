@@ -1145,6 +1145,8 @@
 		<Unit filename="GDL\IDE\DependenciesAnalyzer.h" />
 		<Unit filename="GDL\IDE\Dialogs\AjoutPlusImage.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\AjoutPlusImage.h" />
+		<Unit filename="GDL\IDE\Dialogs\DebuggerGUI.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\DebuggerGUI.h" />
 		<Unit filename="GDL\IDE\Dialogs\EditComment.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\EditComment.h" />
 		<Unit filename="GDL\IDE\Dialogs\EditCppCodeEvent.cpp" />
@@ -1155,10 +1157,15 @@
 		<Unit filename="GDL\IDE\Dialogs\EditLink.h" />
 		<Unit filename="GDL\IDE\Dialogs\EditRepeatEvent.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\EditRepeatEvent.h" />
+		<Unit filename="GDL\IDE\Dialogs\ProfileDlg.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\ProfileDlg.h" />
 		<Unit filename="GDL\IDE\Dialogs\ProjectUpdateDlg.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\ProjectUpdateDlg.h" />
 		<Unit filename="GDL\IDE\Dialogs\ResourcesEditor.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\ResourcesEditor.h" />
+		<Unit filename="GDL\IDE\Dialogs\SceneEditorCanvas.cpp" />
+		<Unit filename="GDL\IDE\Dialogs\SceneEditorCanvas.h" />
+		<Unit filename="GDL\IDE\Dialogs\SceneEditorCanvas2.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\SpriteObjectEditor.cpp" />
 		<Unit filename="GDL\IDE\Dialogs\SpriteObjectEditor.h" />
 		<Unit filename="GDL\IDE\DndResourcesEditor.cpp" />
@@ -1169,10 +1176,6 @@
 		<Unit filename="GDL\IDE\FullProjectCompiler.h" />
 		<Unit filename="GDL\IDE\ImageFilesWatcher.cpp" />
 		<Unit filename="GDL\IDE\ImageFilesWatcher.h" />
-		<Unit filename="GDL\IDE\MainEditorCommand.cpp" />
-		<Unit filename="GDL\IDE\MainEditorCommand.h" />
-		<Unit filename="GDL\IDE\SceneCanvasSettings.cpp" />
-		<Unit filename="GDL\IDE\SceneCanvasSettings.h" />
 		<Unit filename="GDL\ImageManager.cpp" />
 		<Unit filename="GDL\ImageManager.h" />
 		<Unit filename="GDL\InitialInstancesContainer.cpp" />
@@ -1271,6 +1274,8 @@
 		<Unit filename="GDL\tinyxml\tinyxml.h" />
 		<Unit filename="GDL\tinyxml\tinyxmlerror.cpp" />
 		<Unit filename="GDL\tinyxml\tinyxmlparser.cpp" />
+		<Unit filename="wxsmith\DebuggerGUI.wxs" />
+		<Unit filename="wxsmith\ProfileDlg.wxs" />
 		<Unit filename="wxsmith\SpriteObjectEditor.wxs" />
 		<Extensions>
 			<code_completion />
@@ -1293,6 +1298,8 @@
 					<wxDialog wxs="wxsmith/EditCppCodeEvent.wxs" src="GDL\IDE\Dialogs\EditCppCodeEvent.cpp" hdr="GDL\IDE\Dialogs\EditCppCodeEvent.h" fwddecl="0" i18n="1" name="EditCppCodeEvent" language="CPP" />
 					<wxDialog wxs="wxsmith/ProjectUpdateDlg.wxs" src="GDL\IDE\Dialogs\ProjectUpdateDlg.cpp" hdr="GDL\IDE\Dialogs\ProjectUpdateDlg.h" fwddecl="0" i18n="1" name="ProjectUpdateDlg" language="CPP" />
 					<wxDialog wxs="wxsmith/SpriteObjectEditor.wxs" src="GDL\IDE\Dialogs\SpriteObjectEditor.cpp" hdr="GDL\IDE\Dialogs\SpriteObjectEditor.h" fwddecl="0" i18n="1" name="SpriteObjectEditor" language="CPP" />
+					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="GDL\IDE\Dialogs\ProfileDlg.cpp" hdr="GDL\IDE\Dialogs\ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
+					<wxPanel wxs="wxsmith/DebuggerGUI.wxs" src="GDL\IDE\Dialogs\DebuggerGUI.cpp" hdr="GDL\IDE\Dialogs\DebuggerGUI.h" fwddecl="0" i18n="1" name="DebuggerGUI" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

@@ -8,7 +8,7 @@
 #include <boost/shared_ptr.hpp>
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/ExternalLayout.h"
-#include "GDL/IDE/SceneCanvasSettings.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.h"
 #endif
 #include "GDL/InitialInstancesContainer.h"
 
@@ -50,8 +50,8 @@ public:
     virtual InitialInstancesContainer & GetInitialInstances() { return instances; }
 
     #if defined(GD_IDE_ONLY)
-    virtual const SceneCanvasSettings & GetAssociatedSettings() const {return editionSettings;}
-    virtual SceneCanvasSettings & GetAssociatedSettings() {return editionSettings;}
+    virtual const gd::LayoutEditorCanvasOptions & GetAssociatedSettings() const {return editionSettings;}
+    virtual gd::LayoutEditorCanvasOptions & GetAssociatedSettings() {return editionSettings;}
     #endif
 
     /** \name Serialization
@@ -68,7 +68,7 @@ private:
     std::string name;
     InitialInstancesContainer instances;
     #if defined(GD_IDE_ONLY)
-    SceneCanvasSettings editionSettings;
+    gd::LayoutEditorCanvasOptions editionSettings;
     #endif
 };
 

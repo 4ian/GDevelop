@@ -17,7 +17,7 @@ class AutomatismsSharedDatas;
 class BaseProfiler;
 class TiXmlElement;
 #if defined(GD_IDE_ONLY)
-#include "GDL/IDE/SceneCanvasSettings.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 namespace gd { class BaseEvent; }
 namespace gd { typedef boost::shared_ptr<BaseEvent> BaseEventSPtr; }
@@ -243,12 +243,12 @@ public:
     /**
      * Return the settings associated to the scene.
      */
-    const SceneCanvasSettings & GetAssociatedSceneCanvasSettings() const { return associatedSettings; }
+    const gd::LayoutEditorCanvasOptions & GetAssociatedLayoutEditorCanvasOptions() const { return associatedSettings; }
 
     /**
      * Return the settings associated to the scene.
      */
-    SceneCanvasSettings & GetAssociatedSceneCanvasSettings() { return associatedSettings; }
+    gd::LayoutEditorCanvasOptions & GetAssociatedLayoutEditorCanvasOptions() { return associatedSettings; }
 
     /**
      * Get the profiler associated with the scene. Can be NULL.
@@ -380,7 +380,7 @@ private:
     BaseProfiler *                              profiler; ///< Pointer to the profiler. Can be NULL.
     bool                                        refreshNeeded; ///< If set to true, the IDE will reload the scene( thanks to SceneCanvas notably which check this flag when the scene is being edited )
     bool                                        compilationNeeded; ///< If set to true, the IDE will recompile the events ( thanks to SceneCanvas notably which check this flag when the scene is being edited )
-    SceneCanvasSettings                         associatedSettings;
+    gd::LayoutEditorCanvasOptions               associatedSettings;
     #endif
 
     /**

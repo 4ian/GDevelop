@@ -56,11 +56,11 @@ public:
     virtual bool HasCustomSize() const { return personalizedSize; }
     virtual void SetHasCustomSize(bool hasCustomSize_ ) { personalizedSize = hasCustomSize_; }
 
-    virtual float GetWidth() const { return width; }
-    virtual void SetWidth(float width_) { width = width_; }
+    virtual float GetCustomWidth() const { return width; }
+    virtual void SetCustomWidth(float width_) { width = width_; }
 
-    virtual float GetHeight() const { return height; }
-    virtual void SetHeight(float height_) { height = height_; }
+    virtual float GetCustomHeight() const { return height; }
+    virtual void SetCustomHeight(float height_) { height = height_; }
 
     ///@}
 

@@ -467,7 +467,7 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
     specialAction = scene;
 }
 
-void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container, float xOffset, float yOffset)
+void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const InitialPosition *, boost::shared_ptr<Object> > * optionalMap)
 {
     for(unsigned int i = 0;i < container.GetInstancesCount();++i)
     {
@@ -494,8 +494,8 @@ void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container
 
             if ( initialInstance.HasCustomSize() )
             {
-                newObject->SetWidth(initialInstance.GetWidth());
-                newObject->SetHeight(initialInstance.GetHeight());
+                newObject->SetWidth(initialInstance.GetCustomWidth());
+                newObject->SetHeight(initialInstance.GetCustomHeight());
             }
 
             //Substitute initial variables specific to that object instance.
@@ -511,6 +511,8 @@ void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container
         }
         else
             std::cout << "Could not find and put object " << initialInstance.GetObjectName() << std::endl;
+
+        if ( optionalMap ) (*optionalMap)[&initialInstance] = newObject;
     }
 }
 

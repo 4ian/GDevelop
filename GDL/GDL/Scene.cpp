@@ -289,7 +289,7 @@ void Scene::SaveToXml(TiXmlElement * scene) const
 
     TiXmlElement * settings = new TiXmlElement( "UISettings" );
     scene->LinkEndChild( settings );
-    GetAssociatedSceneCanvasSettings().SaveToXml(settings);
+    GetAssociatedLayoutEditorCanvasOptions().SaveToXml(settings);
 
     TiXmlElement * grpsobjets = new TiXmlElement( "GroupesObjets" );
     scene->LinkEndChild( grpsobjets );

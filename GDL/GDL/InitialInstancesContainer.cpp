@@ -57,8 +57,8 @@ void InitialInstancesContainer::LoadFromXml(const TiXmlElement * rootElem)
         if ( elem->Attribute( "y" ) != NULL ) newPosition.SetY(ToFloat(elem->Attribute("y")));
         if ( elem->Attribute( "angle" ) != NULL ) newPosition.SetAngle(ToFloat(elem->Attribute("angle")));
         newPosition.SetHasCustomSize( elem->Attribute( "personalizedSize" ) != NULL && std::string(elem->Attribute( "personalizedSize" )) == "true" );
-        if ( elem->Attribute( "width" ) != NULL ) newPosition.SetWidth(ToFloat(elem->Attribute("width")));
-        if ( elem->Attribute( "height" ) != NULL ) newPosition.SetHeight(ToFloat(elem->Attribute("height")));
+        if ( elem->Attribute( "width" ) != NULL ) newPosition.SetCustomWidth(ToFloat(elem->Attribute("width")));
+        if ( elem->Attribute( "height" ) != NULL ) newPosition.SetCustomHeight(ToFloat(elem->Attribute("height")));
         if ( elem->Attribute( "plan" ) != NULL ) newPosition.SetZOrder(ToInt(elem->Attribute("plan")));
         if ( elem->Attribute( "layer" ) != NULL ) newPosition.SetLayer(elem->Attribute("layer"));
 
@@ -180,8 +180,8 @@ void InitialInstancesContainer::SaveToXml(TiXmlElement * element) const
         objet->SetAttribute( "layer", initialInstances[j].GetLayer().c_str() );
         objet->SetDoubleAttribute( "angle", initialInstances[j].GetAngle() );
         objet->SetAttribute( "personalizedSize", initialInstances[j].HasCustomSize() ? "true" : "false" );
-        objet->SetDoubleAttribute( "width", initialInstances[j].GetWidth() );
-        objet->SetDoubleAttribute( "height", initialInstances[j].GetHeight() );
+        objet->SetDoubleAttribute( "width", initialInstances[j].GetCustomWidth() );
+        objet->SetDoubleAttribute( "height", initialInstances[j].GetCustomHeight() );
 
         TiXmlElement * floatInfos = new TiXmlElement( "floatInfos" );
         objet->LinkEndChild( floatInfos );

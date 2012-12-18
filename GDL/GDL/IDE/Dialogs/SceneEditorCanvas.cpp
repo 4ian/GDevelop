@@ -1,0 +1,754 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+#if defined(GD_IDE_ONLY)
+#include <iostream>
+#include <wx/dcclient.h>
+#include <wx/log.h>
+#include <wx/filename.h>
+#include <wx/ribbon/buttonbar.h>
+#include <wx/scrolbar.h>
+// Platform-specific includes
+#ifdef __WXGTK__
+    #include <gdk/gdkx.h>
+    #include <gtk/gtk.h>
+    #include <wx/gtk/private/win_gtk.h>
+#endif
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDL/RuntimeGame.h"
+#include "GDL/RuntimeScene.h"
+#include "GDL/CodeExecutionEngine.h"
+#include "GDL/SoundManager.h"
+#include "GDL/FontManager.h"
+#include "GDL/Object.h"
+#include "GDL/SpriteObject.h"
+#include "GDL/Events/CodeCompilationHelpers.h"
+#include "GDL/IDE/Dialogs/DebuggerGUI.h"
+#include "GDL/IDE/Dialogs/ProfileDlg.h"
+#include "GDL/IDE/Dialogs/RenderDialog.h"
+#include "SceneEditorCanvas.h"
+
+sf::Texture SceneEditorCanvas::reloadingIconImage;
+sf::Sprite SceneEditorCanvas::reloadingIconSprite;
+sf::Text SceneEditorCanvas::reloadingText;
+
+const long SceneEditorCanvas::idRibbonOrigine = wxNewId();
+const long SceneEditorCanvas::idRibbonOriginalZoom = wxNewId();
+const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM = wxNewId();
+const long SceneEditorCanvas::idRibbonRefresh = wxNewId();
+const long SceneEditorCanvas::idRibbonPlay = wxNewId();
+const long SceneEditorCanvas::idRibbonPlayWin = wxNewId();
+const long SceneEditorCanvas::idRibbonPause = wxNewId();
+const long SceneEditorCanvas::idRibbonResetGlobalVars = wxNewId();
+const long SceneEditorCanvas::idRibbonDebugger = wxNewId();
+const long SceneEditorCanvas::idRibbonProfiler = wxNewId();
+
+SceneEditorCanvas::SceneEditorCanvas(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, gd::InitialInstancesContainer & instances_, gd::LayoutEditorCanvasOptions & settings_, gd::MainFrameWrapper & mainFrameWrapper_) :
+    LayoutEditorCanvas(parent, project_, layout_, instances_, settings_, mainFrameWrapper_),
+    game(dynamic_cast<RuntimeGame &>(project_)),
+    scene(dynamic_cast<Scene &>(layout_)),
+    instances(dynamic_cast<InitialInstancesContainer &>(instances_)),
+    previewScene(this, &game),
+    isMovingView(false),
+    isReloading(false)
+{
+    //Initialization allowing to run SFML within the wxWidgets control.
+    //See also SceneEditorCanvas::OnUpdate & co.
+    #ifdef __WXGTK__
+
+        // GTK implementation requires to go deeper to find the low-level X11 identifier of the widget
+        gtk_widget_realize(m_wxwindow);
+        gtk_widget_set_double_buffered(m_wxwindow, false);
+
+        GtkWidget* privHandle = m_wxwindow;
+        wxPizza * pizza = WX_PIZZA(privHandle);
+        GtkWidget * widget = GTK_WIDGET(pizza);
+
+        GdkWindow* Win = widget->window;
+        XFlush(GDK_WINDOW_XDISPLAY(Win));
+        sf::RenderWindow::create(GDK_WINDOW_XWINDOW(Win));
+
+    #else
+
+        // Tested under Windows XP only (should work with X11 and other Windows versions - no idea about MacOS)
+        sf::RenderWindow::create(static_cast<sf::WindowHandle>(GetHandle()));
+
+    #endif
+
+    //Creating additional editors used specifically by our platform.
+    externalPreviewWindow = boost::shared_ptr<RenderDialog>(new RenderDialog(this, this) );
+    //Others editors are created in SetParentAuiManager method.
+
+    //Loading some GUI elements
+    reloadingIconImage.loadFromFile("res/compile128.png");
+    reloadingIconSprite.setTexture(reloadingIconImage);
+    reloadingText.setColor(sf::Color(0,0,0,128));
+    reloadingText.setString(string(_("Compiling...").mb_str()));
+    reloadingText.setCharacterSize(40);
+    reloadingText.setFont(*FontManager::GetInstance()->GetFont(""));
+
+    editionView.setCenter( (game.GetMainWindowDefaultWidth()/2),(game.GetMainWindowDefaultHeight()/2));
+
+    //Generate zoom menu
+	wxMenuItem * zoom5 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("5%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom5);
+	wxMenuItem * zoom10 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("10%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom10);
+	wxMenuItem * zoom25 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("25%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom25);
+	wxMenuItem * zoom50 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("50%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom50);
+	wxMenuItem * zoom100 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("100%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom100);
+	wxMenuItem * zoom150 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("150%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom150);
+	wxMenuItem * zoom200 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("200%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom200);
+	wxMenuItem * zoom500 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("500%"), wxEmptyString, wxITEM_NORMAL);
+	zoomMenu.Append(zoom500);
+
+    RecreateRibbonToolbar();
+}
+
+void SceneEditorCanvas::OnIdle(wxIdleEvent&)
+{
+    // Send a paint message when the control is idle, to ensure maximum framerate
+    Refresh();
+}
+
+void SceneEditorCanvas::OnPaint(wxPaintEvent&)
+{
+    // Make sure the control is able to be repainted
+    wxPaintDC Dc(this);
+    OnUpdate();
+}
+
+/**
+ * Go in preview mode
+ */
+void SceneEditorCanvas::OnPreviewBtClick( wxCommandEvent & event )
+{
+    if ( !editing ) return;
+    std::cout << "Switching to preview mode..." << std::endl;
+    LayoutEditorCanvas::OnPreviewBtClick(event);
+
+    previewScene.running = false;
+
+    Reload();
+    UpdateSize();
+    UpdateScrollbars();
+
+    if ( debugger ) debugger->Play();
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->Refresh();
+}
+
+/**
+ * Go in edition mode
+ */
+void SceneEditorCanvas::OnEditionBtClick( wxCommandEvent & event )
+{
+    if ( editing ) return;
+    std::cout << "Switching to edition mode..." << std::endl;
+    LayoutEditorCanvas::OnEditionBtClick(event);
+
+    CodeCompiler::GetInstance()->EnableTaskRelatedTo(scene);
+    previewScene.running = false;
+
+    if ( externalPreviewWindow ) externalPreviewWindow->Show(false);
+    previewScene.ChangeRenderWindow(this);
+
+    //Parse now the results of profiling
+    if ( profiler ) profiler->ParseProfileEvents();
+
+    Reload();
+    UpdateSize();
+    UpdateScrollbars();
+
+    if ( debugger ) debugger->Pause();
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->Refresh();
+}
+
+void SceneEditorCanvas::OnUpdate()
+{
+    if ( isReloading )
+    {
+        if ( !editing && CodeCompiler::GetInstance()->CompilationInProcess()  ) //We're still waiting for compilation to finish
+        {
+            RenderCompilationScreen(); //Display a message when compiling
+            return;
+        }
+        else //Everything is finished, reloading is complete!
+        {
+            //But be sure that no error occurred.
+            if ( !editing && !scene.GetCodeExecutionEngine()->Ready() )
+            {
+                wxLogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")+CodeCompiler::GetInstance()->GetOutputDirectory()+"compilationErrors.txt");
+                wxCommandEvent useless;
+                OnEditionBtClick(useless);
+            }
+            else
+                ReloadSecondPart();
+        }
+    }
+    else //We're displaying the scene
+    {
+        //First ensure scene does not need to be reloaded
+        if ( !previewScene.running || editing )
+        {
+            //Reload changed images.
+            if ( !game.imagesChanged.empty() )
+            {
+                if ( wxDirExists(wxFileName::FileName(game.GetProjectFile()).GetPath()))
+                    wxSetWorkingDirectory(wxFileName::FileName(game.GetProjectFile()).GetPath()); //Resources loading stuff incoming: Switch current work dir.
+
+                for (unsigned int i = 0;i<game.imagesChanged.size();++i)
+                    previewGame.imageManager->ReloadImage(game.imagesChanged[i]);
+
+                game.imageManager->LoadPermanentImages();
+                game.imagesChanged.clear();
+                scene.SetRefreshNeeded();
+
+                wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory()); //Go back to the IDE cwd.
+            }
+
+            if ( scene.RefreshNeeded() ) //Reload scene if necessary
+                Reload();
+        }
+
+        //Then display the scene
+        if ( previewScene.running && !editing ) //At runtime
+        {
+            int retourEvent = previewScene.RenderAndStep();
+
+            if ( retourEvent == -2 )
+                mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the game will quit." ));
+            else if ( retourEvent != -1 )
+            {
+                if (retourEvent > 0 && static_cast<unsigned>(retourEvent) < game.GetLayouts().size())
+                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + "\"" + game.GetLayouts()[retourEvent]->GetName() + "\"");
+            }
+        }
+        else if ( !previewScene.running && !editing ) //Runtime paused
+            previewScene.RenderWithoutStep();
+        else //Edittime
+        {
+            RenderEdittime();
+            UpdateScrollbars();
+        }
+    }
+}
+
+void SceneEditorCanvas::Reload()
+{
+    cout << "Scene Editor canvas reloading... ( Step 1/2 )" << endl;
+    isReloading = true;
+
+    SoundManager::GetInstance()->ClearAllSoundsAndMusics();
+    if ( game.imageManager ) game.imageManager->PreventImagesUnloading(); //Images are normally unloaded and loaded again when reloading the scene. We can prevent this to happen as it is time wasting.
+
+    //Reset game
+    previewGame = game;
+    previewGame.imageManager = game.imageManager; //Use same image manager.
+
+    //Reset scene
+    RuntimeScene newScene(this, &previewGame);
+    previewScene = newScene;
+    previewScene.running = false;
+    if ( debugger ) previewScene.debugger = debugger.get();
+
+    //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
+    //Useful when opening a scene for the first time for example.
+    if ( scene.CompilationNeeded() && !CodeCompiler::GetInstance()->HasTaskRelatedTo(scene) )
+    {
+        CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
+
+        if ( !editing )
+            mainFrameWrapper.GetInfoBar()->ShowMessage(_("Changes made to events will be taken into account when you switch to Edition mode"));
+    }
+
+    return; //ReloadSecondPart() will be called by OnUpdate() when appropriate
+}
+
+void SceneEditorCanvas::ReloadSecondPart()
+{
+    cout << "Scene canvas reloading... ( Step 2/2 )" << endl;
+    if ( !editing )  CodeCompiler::GetInstance()->DisableTaskRelatedTo(scene);
+
+    //Switch the working directory as we are making calls to the runtime scene
+    if ( wxDirExists(wxFileName::FileName(game.GetProjectFile()).GetPath()))
+        wxSetWorkingDirectory(wxFileName::FileName(game.GetProjectFile()).GetPath());
+
+    //Load the scene ( compilation is done )
+    if ( editing )
+    {
+        //Create the map linking initial instances to real objects used by the scene for rendering.
+        initialInstancesAndObjectsBimap.clear();
+        InitialInstancesContainer noInstances; //We need to load the scene in a two time fashion...
+        previewScene.LoadFromSceneAndCustomInstances(scene, noInstances);
+        std::map< const InitialPosition*, boost::shared_ptr<Object> > tempMap;
+        previewScene.CreateObjectsFrom(instances, 0, 0, &tempMap); //...so as to fill the tracking map.
+
+        for (std::map< const InitialPosition*, boost::shared_ptr<Object> >::const_iterator it = tempMap.begin();it!=tempMap.end();++it)
+            initialInstancesAndObjectsBimap.insert(InstanceAndObjectPair(const_cast<InitialPosition*>(it->first), it->second));
+            //I know the const_cast is ugly, but I do not know how to bypass the issue otherwise.
+
+    }
+    else
+        previewScene.LoadFromSceneAndCustomInstances( scene, instances );
+    scene.SetRefreshNotNeeded();
+
+    //If a preview is not going to be made, switch back to the IDE working directory
+    if ( editing ) wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
+
+    if ( game.imageManager ) game.imageManager->EnableImagesUnloading(); //We were preventing images unloading so as to be sure not to waste time unloading and reloading just after scenes images.
+
+    isReloading = false;
+}
+
+void SceneEditorCanvas::OnPreviewRefreshBtClick( wxCommandEvent & event )
+{
+    previewScene.running = false;
+
+    Reload();
+}
+
+void SceneEditorCanvas::OnPreviewPlayBtClick( wxCommandEvent & event )
+{
+    previewScene.running = true;
+    editing = false;
+
+    if ( externalPreviewWindow ) externalPreviewWindow->Show(false);
+    previewScene.ChangeRenderWindow(this);
+
+    if ( debugger ) debugger->Play();
+}
+void SceneEditorCanvas::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
+{
+    previewScene.running = true;
+    editing = false;
+
+    if ( externalPreviewWindow )
+    {
+        externalPreviewWindow->Show(true);
+        externalPreviewWindow->renderCanvas->setFramerateLimit( previewGame.GetMaximumFPS() );
+
+        externalPreviewWindow->SetSizeOfRenderingZone(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
+        previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);
+
+        externalPreviewWindow->SetSizeOfRenderingZone(game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight());
+        previewScene.ChangeRenderWindow(externalPreviewWindow->renderCanvas);
+    }
+
+    if ( debugger ) debugger->Play();
+}
+void SceneEditorCanvas::ExternalWindowClosed()
+{
+    if ( !editing && previewScene.running )
+    {
+        wxCommandEvent uselessEvent;
+        OnPreviewPlayBtClick(uselessEvent); //Go back to the internal preview
+    }
+}
+
+void SceneEditorCanvas::OnPreviewPauseBtClick( wxCommandEvent & event )
+{
+    previewScene.running = false;
+
+    if ( debugger ) debugger->Pause();
+}
+
+void SceneEditorCanvas::OnPreviewDebugBtClick( wxCommandEvent & event )
+{
+    if ( !parentAuiManager || !debugger ) return;
+
+    parentAuiManager->GetPane(debugger.get()).Show();
+    parentAuiManager->Update();
+}
+
+void SceneEditorCanvas::OnPreviewProfilerBtClick( wxCommandEvent & event )
+{
+    if ( !parentAuiManager || !profiler ) return;
+
+    parentAuiManager->GetPane(profiler.get()).Show();
+    parentAuiManager->Update();
+}
+
+void SceneEditorCanvas::OnLeftUp( wxMouseEvent &event )
+{
+    if ( currentResizeBt.substr(0,6) == "resize")
+    {
+        currentResizeBt.clear();
+        ChangesMade();
+    }
+    else
+        LayoutEditorCanvas::OnLeftUp(event);
+}
+
+void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
+{
+    //First check if we're using a resize button
+    if ( currentResizeBt.substr(0,6) == "resize")
+    {
+        if ( currentResizeBt == "resizeRight" || currentResizeBt == "resizeRightUp" || currentResizeBt == "resizeRightDown" )
+        {
+            for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+            {
+                boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+
+                if ( associatedObject )
+                {
+                    if (resizeOriginalWidths[it->first]+GetMouseXOnLayout()-resizeMouseStartPosition.x < 0) continue;
+
+                    associatedObject->SetWidth(resizeOriginalWidths[it->first]+GetMouseXOnLayout()-resizeMouseStartPosition.x);
+                    it->first->SetHasCustomSize(true);
+                    it->first->SetCustomWidth(associatedObject->GetWidth());
+
+                    //Ugly hack to let the Sprite behave as others objects
+                    if ( boost::shared_ptr<SpriteObject> spriteObject = boost::dynamic_pointer_cast<SpriteObject>(associatedObject) )
+                    {
+                        spriteObject->SetX(it->second.x+0.5*(GetMouseXOnLayout()-resizeMouseStartPosition.x));
+                        it->first->SetX(spriteObject->GetX());
+                    }
+                }
+            }
+        }
+        if ( currentResizeBt == "resizeDown" || currentResizeBt == "resizeRightDown" || currentResizeBt == "resizeLeftDown" )
+        {
+            for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+            {
+                boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+
+                if ( associatedObject )
+                {
+                    if ( resizeOriginalHeights[it->first]+GetMouseYOnLayout()-resizeMouseStartPosition.y < 0 ) continue;
+
+                    associatedObject->SetHeight(resizeOriginalHeights[it->first]+GetMouseYOnLayout()-resizeMouseStartPosition.y);
+                    it->first->SetHasCustomSize(true);
+                    it->first->SetCustomHeight(associatedObject->GetHeight());
+
+                    //Ugly hack to let the Sprite behave as others objects
+                    if ( boost::shared_ptr<SpriteObject> spriteObject = boost::dynamic_pointer_cast<SpriteObject>(associatedObject) )
+                    {
+                        spriteObject->SetY(it->second.y+0.5*(GetMouseYOnLayout()-resizeMouseStartPosition.y));
+                        it->first->SetY(spriteObject->GetY());
+                    }
+                }
+            }
+        }
+        if ( currentResizeBt == "resizeLeft" || currentResizeBt == "resizeLeftUp" || currentResizeBt == "resizeLeftDown" )
+        {
+            for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+            {
+                boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+
+                if ( associatedObject )
+                {
+                    if (resizeOriginalWidths[it->first]-GetMouseXOnLayout()+resizeMouseStartPosition.x < 0) continue;
+
+                    associatedObject->SetWidth(resizeOriginalWidths[it->first]-GetMouseXOnLayout()+resizeMouseStartPosition.x);
+                    associatedObject->SetX(it->second.x+GetMouseXOnLayout()-resizeMouseStartPosition.x);
+                    it->first->SetHasCustomSize(true);
+                    it->first->SetCustomWidth(associatedObject->GetWidth());
+                    it->first->SetX(associatedObject->GetX());
+
+                    //Ugly hack to let the Sprite behave as others objects
+                    if ( boost::shared_ptr<SpriteObject> spriteObject = boost::dynamic_pointer_cast<SpriteObject>(associatedObject) )
+                    {
+                        spriteObject->SetX(it->second.x+0.5*(GetMouseXOnLayout()-resizeMouseStartPosition.x));
+                        it->first->SetX(spriteObject->GetX());
+                    }
+                }
+            }
+        }
+        if ( currentResizeBt == "resizeUp" || currentResizeBt == "resizeLeftUp" || currentResizeBt == "resizeRightUp" )
+        {
+            for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+            {
+                boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+
+                if ( associatedObject )
+                {
+                    if ( resizeOriginalHeights[it->first]-GetMouseYOnLayout()+resizeMouseStartPosition.y < 0 ) continue;
+
+                    associatedObject->SetHeight(resizeOriginalHeights[it->first]-GetMouseYOnLayout()+resizeMouseStartPosition.y);
+                    associatedObject->SetY(it->second.y+GetMouseYOnLayout()-resizeMouseStartPosition.y);
+                    it->first->SetHasCustomSize(true);
+                    it->first->SetCustomHeight(associatedObject->GetHeight());
+                    it->first->SetY(associatedObject->GetY());
+
+                    //Ugly hack to let the Sprite behave as others objects
+                    if ( boost::shared_ptr<SpriteObject> spriteObject = boost::dynamic_pointer_cast<SpriteObject>(associatedObject) )
+                    {
+                        spriteObject->SetY(it->second.y+0.5*(GetMouseYOnLayout()-resizeMouseStartPosition.y));
+                        it->first->SetY(spriteObject->GetY());
+                    }
+                }
+            }
+        }
+
+        UpdateMouseResizeCursor(currentResizeBt);
+    }
+    else //No buttons being used
+    {
+        //Moving using middle click
+        if ( isMovingView )
+        {
+            float zoomFactor = static_cast<float>(getSize().x)/editionView.getSize().x;
+
+            editionView.setCenter( movingViewStartPosition + (movingViewMouseStartPosition - sf::Vector2f(sf::Mouse::getPosition(*this)))/zoomFactor );
+        }
+
+        LayoutEditorCanvas::OnMotion(event);
+    }
+}
+
+void SceneEditorCanvas::OnMiddleDown( wxMouseEvent &event )
+{
+    if ( !editing ) return;
+
+    //User can move the view thanks to middle click
+    if ( !isMovingView )
+    {
+        isMovingView = true;
+        movingViewMouseStartPosition = sf::Vector2f(sf::Mouse::getPosition(*this));
+        movingViewStartPosition = getView().getCenter();
+        SetCursor( wxCursor( wxCURSOR_SIZING ) );
+
+        return;
+    }
+    else
+    {
+        isMovingView = false;
+        SetCursor( wxNullCursor );
+    }
+}
+
+void SceneEditorCanvas::OnRightUp( wxMouseEvent &event )
+{
+
+}
+
+void SceneEditorCanvas::OnGuiElementHovered(const gd::LayoutEditorCanvasGuiElement & guiElement)
+{
+    UpdateMouseResizeCursor(guiElement.name);
+}
+
+void SceneEditorCanvas::OnGuiElementPressed(const gd::LayoutEditorCanvasGuiElement & guiElement)
+{
+    if ( currentResizeBt.empty() && guiElement.name.substr(0, 6) == "resize" )
+    {
+        currentResizeBt = guiElement.name;
+
+        resizeOriginalWidths.clear();
+        for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+        {
+            boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+            if ( associatedObject) resizeOriginalWidths[it->first] = associatedObject->GetWidth();
+            if ( associatedObject) resizeOriginalHeights[it->first] = associatedObject->GetHeight();
+        }
+        resizeMouseStartPosition = sf::Vector2f(GetMouseXOnLayout(), GetMouseYOnLayout());
+    }
+}
+
+void SceneEditorCanvas::DrawSelectionRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
+{
+    boost::shared_ptr<sf::Shape> selection = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangle.width, rectangle.height)));
+    selection->setPosition(rectangle.left, rectangle.top);
+    selection->setFillColor(sf::Color( 0, 0, 200, 40 ));
+    selection->setOutlineColor(sf::Color( 0, 0, 255, 128 ));
+    selection->setOutlineThickness(1);
+
+    target.push_back(selection);
+}
+
+void SceneEditorCanvas::AddSmallButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName )
+{
+    //Declare the button as a gui element
+    gd::LayoutEditorCanvasGuiElement guiElement;
+    guiElement.name = buttonName;
+    guiElement.area = wxRect(position.x, position.y, smallButtonSize, smallButtonSize);
+    guiElements.push_back(guiElement);
+
+    //Draw button
+    boost::shared_ptr<sf::Shape> button = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(smallButtonSize, smallButtonSize)));
+    button->setPosition(position);
+    button->setOutlineColor(sf::Color( 0, 0, 0, 255 ));
+    button->setOutlineThickness(1);
+    if ( !guiElement.area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
+        button->setFillColor(sf::Color( 220, 220, 220, 255 ));
+    else
+        button->setFillColor(sf::Color( 255, 255, 255, 255 ));
+
+    target.push_back(button);
+}
+
+void SceneEditorCanvas::RenderEdittime()
+{
+    previewScene.ManageRenderTargetEvents();
+
+    clear( sf::Color( previewScene.GetBackgroundColorRed(), previewScene.GetBackgroundColorGreen(), previewScene.GetBackgroundColorBlue() ) );
+    setView(editionView);
+
+    glClear(GL_DEPTH_BUFFER_BIT);
+    pushGLStates(); //To allow using OpenGL to draw
+
+    //On trie les objets par leurs plans
+    ObjList allObjects = previewScene.objectsInstances.GetAllObjects();
+    previewScene.OrderObjectsByZOrder( allObjects );
+
+    //Reseting the gui elements
+    std::vector < boost::shared_ptr<sf::Shape> > guiElementsShapes;
+    guiElements.clear();
+
+    bool drawResizeButtons = false;
+    float resizeButtonsMaxX = 0;
+    float resizeButtonsMinX = 0;
+    float resizeButtonsMaxY = 0;
+    float resizeButtonsMinY = 0;
+
+    for (unsigned int layerIndex =0;layerIndex<previewScene.GetLayersCount();++layerIndex)
+    {
+        if ( previewScene.GetLayer(layerIndex).GetVisibility() )
+        {
+            //Prepare OpenGL rendering
+            popGLStates();
+
+            glMatrixMode(GL_PROJECTION);
+            glLoadIdentity();
+            gluPerspective(previewScene.GetOpenGLFOV(), static_cast<double>(getSize().x)/static_cast<double>(getSize().y), previewScene.GetOpenGLZNear(), previewScene.GetOpenGLZFar());
+
+            glViewport(0,0, getSize().x, getSize().y);
+
+            pushGLStates();
+
+            //Render all objects
+            for (unsigned int id = 0;id < allObjects.size();++id)
+            {
+                if ( allObjects[id]->GetLayer() == previewScene.GetLayer(layerIndex).GetName())
+                {
+                    allObjects[id]->DrawEdittime(*previewScene.renderWindow);
+
+                    //Selection rectangle
+                    InitialPosition * associatedInitialInstance = initialInstancesAndObjectsBimap.right.find(allObjects[id])->second;
+                    if ( selectedInstances.find(associatedInitialInstance) != selectedInstances.end() )
+                    {
+                        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX(), allObjects[id]->GetDrawableY(), editionView);
+                        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth(),
+                                                                               allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight(), editionView);
+
+                        DrawSelectionRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin ));
+
+                        if ( !drawResizeButtons )
+                        {
+                            resizeButtonsMaxX = rectangleEnd.x;
+                            resizeButtonsMaxY = rectangleEnd.y;
+                            resizeButtonsMinX = rectangleOrigin.x;
+                            resizeButtonsMinY = rectangleOrigin.y;
+                            drawResizeButtons = true;
+                        }
+                        else
+                        {
+                            resizeButtonsMaxX = std::max(resizeButtonsMaxX, rectangleEnd.x);
+                            resizeButtonsMaxY = std::max(resizeButtonsMaxY, rectangleEnd.y);
+                            resizeButtonsMinX = std::min(resizeButtonsMinX, rectangleOrigin.x);
+                            resizeButtonsMinY = std::min(resizeButtonsMinY, rectangleOrigin.y);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    //Go back to "window" view before drawing GUI elements
+    setView(sf::View(sf::Vector2f(getSize().x/2,getSize().y/2), sf::Vector2f(getSize().x,getSize().y)));
+
+    if ( options.grid ) RenderGrid();
+
+    if ( drawResizeButtons )
+    {
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMinX-gapBetweenButtonsAndRectangle-smallButtonSize, resizeButtonsMinY-gapBetweenButtonsAndRectangle-smallButtonSize), "resizeLeftUp");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(0.5*(resizeButtonsMinX+resizeButtonsMaxX-smallButtonSize), resizeButtonsMinY-gapBetweenButtonsAndRectangle-smallButtonSize), "resizeUp");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMaxX+gapBetweenButtonsAndRectangle, resizeButtonsMinY-gapBetweenButtonsAndRectangle-smallButtonSize), "resizeRightUp");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMaxX+gapBetweenButtonsAndRectangle, 0.5*(resizeButtonsMinY+resizeButtonsMaxY-smallButtonSize)), "resizeRight");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMaxX+gapBetweenButtonsAndRectangle, resizeButtonsMaxY+gapBetweenButtonsAndRectangle), "resizeRightDown");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(0.5*(resizeButtonsMinX+resizeButtonsMaxX-smallButtonSize), resizeButtonsMaxY+gapBetweenButtonsAndRectangle), "resizeDown");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMinX-gapBetweenButtonsAndRectangle-smallButtonSize, resizeButtonsMaxY+gapBetweenButtonsAndRectangle), "resizeLeftDown");
+        AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMinX-gapBetweenButtonsAndRectangle-smallButtonSize, 0.5*(resizeButtonsMinY+resizeButtonsMaxY-smallButtonSize)), "resizeLeft" );
+    }
+
+    if ( isSelecting )
+    {
+        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(selectionRectangle.GetX(), selectionRectangle.GetY(),
+                                                                  editionView);
+
+        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(selectionRectangle.GetBottomRight().x,
+                                                               selectionRectangle.GetBottomRight().y,
+                                                               editionView);
+
+        DrawSelectionRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin));
+    }
+
+    for (unsigned int i = 0;i<guiElementsShapes.size();++i)
+    	draw(*guiElementsShapes[i]);
+
+    if ( options.windowMask )
+    {
+        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(editionView.getCenter().x-previewScene.game->GetMainWindowDefaultWidth()/2,
+                                                                  editionView.getCenter().y-previewScene.game->GetMainWindowDefaultHeight()/2,
+                                                                  editionView);
+
+        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(editionView.getCenter().x+previewScene.game->GetMainWindowDefaultWidth()/2,
+                                                                  editionView.getCenter().y+previewScene.game->GetMainWindowDefaultHeight()/2,
+                                                                  editionView);
+
+        sf::RectangleShape mask(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, rectangleEnd.y-rectangleOrigin.y));
+        mask.setPosition(rectangleOrigin.x, rectangleOrigin.y);
+        mask.setFillColor(sf::Color( 0, 0, 0, 0 ));
+        mask.setOutlineColor(sf::Color( 255, 255, 255, 128 ));
+        draw(mask);
+    }
+
+    setView(editionView);
+    popGLStates();
+    display();
+}
+
+
+void SceneEditorCanvas::RenderGrid()
+{
+    int initialXPos = floor((editionView.getCenter().x-editionView.getSize().x/2) / options.gridWidth)-options.gridWidth;
+    initialXPos *= options.gridWidth;
+    int initialYPos = floor((editionView.getCenter().y-editionView.getSize().y/2) / options.gridHeight)-options.gridHeight;
+    initialYPos *= options.gridHeight;
+
+    for ( int Xpos = initialXPos;Xpos < (editionView.getCenter().x+editionView.getSize().x/2) ; Xpos += options.gridWidth )
+    {
+        sf::Vertex line[2] = {sf::Vertex(ConvertToWindowCoordinates(Xpos, initialYPos, editionView), sf::Color(options.gridR, options.gridG, options.gridB)),
+                              sf::Vertex(ConvertToWindowCoordinates(Xpos, editionView.getCenter().y+editionView.getSize().y/2, editionView), sf::Color(options.gridR, options.gridG, options.gridB))};
+        draw(line, 2, sf::Lines);
+    }
+
+    for ( int Ypos = initialYPos;Ypos < (editionView.getCenter().y+editionView.getSize().y/2) ; Ypos += options.gridHeight )
+    {
+        sf::Vertex line[2] = {sf::Vertex(ConvertToWindowCoordinates(initialXPos, Ypos, editionView), sf::Color(options.gridR, options.gridG, options.gridB)),
+                              sf::Vertex(ConvertToWindowCoordinates(editionView.getCenter().x+editionView.getSize().x/2, Ypos, editionView), sf::Color(options.gridR, options.gridG, options.gridB))};
+        draw(line, 2, sf::Lines);
+    }
+}
+
+sf::Vector2f SceneEditorCanvas::ConvertToWindowCoordinates(float x, float y, const sf::View & view)
+{
+    //Transform by the view matrix
+    sf::Vector2f hCoords = view.getTransform().transformPoint(x,y);
+
+    //Go back from homogeneous coordinates to viewport ones.
+    sf::IntRect viewport = getViewport(view);
+    return sf::Vector2f(( hCoords.x + 1.f ) / 2.f * viewport.width + viewport.left,
+                        (-hCoords.y + 1.f ) / 2.f * viewport.height + viewport.top);
+}
+
+
+//The rest of the implementation is available in SceneEditorCanvas2.cpp
+#endif

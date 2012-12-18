@@ -189,7 +189,7 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	FlexGridSizer4->AddGrowableRow(0);
 	imagePanel = new wxPanel(centerPanel, ID_PANEL4, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL4"));
 	FlexGridSizer4->Add(imagePanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	yScrollBar = new wxScrollBar(centerPanel, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_SCROLLBAR1"));
+	yScrollBar = new wxScrollBar(centerPanel, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
 	yScrollBar->SetScrollbar(0, 1, 10, 1);
 	yScrollBar->SetMinSize(wxSize(16,0));
 	FlexGridSizer4->Add(yScrollBar, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);

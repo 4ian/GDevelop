@@ -97,8 +97,9 @@ public:
      * \param container The object containing the initial instances to be created
      * \param xOffset The offset on x axis to be applied to objects created
      * \param yOffset The offset on y axis to be applied to objects created
+     * \param optionalMap An optional pointer to a std::map<const InitialPosition *, boost::shared_ptr<Object> > which will be filled with the index of the initial instances. Can be NULL.
      */
-    void CreateObjectsFrom(const InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0);
+    void CreateObjectsFrom(const InitialInstancesContainer & container, float xOffset = 0, float yOffset = 0, std::map<const InitialPosition *, boost::shared_ptr<Object> > * optionalMap = NULL);
 
     /**
      * Change the window used for rendering the scene

@@ -46,11 +46,11 @@ public:
     virtual bool HasCustomSize() const = 0;
     virtual void SetHasCustomSize(bool hasCustomSize_ ) = 0;
 
-    virtual float GetWidth() const = 0;
-    virtual void SetWidth(float width) = 0;
+    virtual float GetCustomWidth() const = 0;
+    virtual void SetCustomWidth(float width) = 0;
 
-    virtual float GetHeight() const = 0;
-    virtual void SetHeight(float height) = 0;
+    virtual float GetCustomHeight() const = 0;
+    virtual void SetCustomHeight(float height) = 0;
 
     ///@}
 

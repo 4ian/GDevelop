@@ -7,7 +7,7 @@
 #define GDCORE_EXTERNALLAYOUT_H
 #include <string>
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
-class SceneCanvasSettings;
+namespace gd { class LayoutEditorCanvasOptions; }
 
 namespace gd
 {
@@ -50,9 +50,17 @@ public:
      */
     virtual InitialInstancesContainer & GetInitialInstances() =0;
 
-    //TODO
-    virtual const SceneCanvasSettings & GetAssociatedSettings() const =0;
-    virtual SceneCanvasSettings & GetAssociatedSettings() =0;
+    /**
+     * Must return a reference to the LayoutEditorCanvasOptions object associated
+     * to the external layout. ( In most implementation, it will be a member of the external layout )
+     */
+    virtual const gd::LayoutEditorCanvasOptions & GetAssociatedSettings() const =0;
+
+    /**
+     * Must return a reference to the LayoutEditorCanvasOptions object associated
+     * to the external layout. ( In most implementation, it will be a member of the external layout )
+     */
+    virtual gd::LayoutEditorCanvasOptions & GetAssociatedSettings() =0;
 };
 
 }

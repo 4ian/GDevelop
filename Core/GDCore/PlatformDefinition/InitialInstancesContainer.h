@@ -20,7 +20,7 @@ public:
 
     /**
      * Must return a pointer to a copy of the container.
-     * A such method is needed as the IDE may want to store copies of some variables container and so need a way to do polymorphic copies.
+     * A such method is needed as the IDE may want to store copies of some containers and so need a way to do polymorphic copies.
      *
      * Typical implementation example:
      * \code
@@ -31,7 +31,7 @@ public:
 
     /**
      * Must construct the class from the source
-     * A such method is needed as the IDE may want to store copies of some variables container and so need a way to do polymorphic copies.
+     * A such method is needed as the IDE may want to store copies of some containers and so need a way to do polymorphic copies.
      *
      * Typical implementation example:
      * \code

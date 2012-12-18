@@ -257,6 +257,12 @@
 		<Unit filename="GDCore\IDE\Dialogs\EditExpressionDialog.h" />
 		<Unit filename="GDCore\IDE\Dialogs\EditStrExpressionDialog.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\EditStrExpressionDialog.h" />
+		<Unit filename="GDCore\IDE\Dialogs\LayoutEditorCanvas.cpp" />
+		<Unit filename="GDCore\IDE\Dialogs\LayoutEditorCanvas.h" />
+		<Unit filename="GDCore\IDE\Dialogs\LayoutEditorCanvasAssociatedEditor.cpp" />
+		<Unit filename="GDCore\IDE\Dialogs\LayoutEditorCanvasAssociatedEditor.h" />
+		<Unit filename="GDCore\IDE\Dialogs\LayoutEditorCanvasOptions.cpp" />
+		<Unit filename="GDCore\IDE\Dialogs\LayoutEditorCanvasOptions.h" />
 		<Unit filename="GDCore\IDE\Dialogs\MainFrameWrapper.cpp" />
 		<Unit filename="GDCore\IDE\Dialogs\MainFrameWrapper.h" />
 		<Unit filename="GDCore\IDE\Dialogs\ObjectListDialogsHelper.cpp" />
@@ -353,6 +359,7 @@
 		<Unit filename="wxsmith\ChooseVariableDialog.wxs" />
 		<Unit filename="wxsmith\EditExpressionDialog.wxs" />
 		<Unit filename="wxsmith\EditStrExpressionDialog.wxs" />
+		<Unit filename="wxsmith\LayoutEditorCanvas.wxs" />
 		<Unit filename="wxsmith\ProjectExtensionsDialog.wxs" />
 		<Unit filename="wxsmith\ResourceLibraryDialog.wxs" />
 		<Extensions>
@@ -380,6 +387,7 @@
 					<wxDialog wxs="wxsmith/EditStrExpressionDialog.wxs" src="GDCore\IDE\Dialogs\EditStrExpressionDialog.cpp" hdr="GDCore\IDE\Dialogs\EditStrExpressionDialog.h" fwddecl="0" i18n="1" name="EditStrExpressionDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/AdvancedEntryDialog.wxs" src="GDCore\IDE\Dialogs\AdvancedEntryDialog.cpp" hdr="GDCore\IDE\Dialogs\AdvancedEntryDialog.h" fwddecl="0" i18n="1" name="AdvancedEntryDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseObjectTypeDialog.wxs" src="GDCore\IDE\Dialogs\ChooseObjectTypeDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseObjectTypeDialog.h" fwddecl="0" i18n="1" name="ChooseObjectTypeDialog" language="CPP" />
+					<wxPanel wxs="wxsmith/LayoutEditorCanvas.wxs" src="GDCore\IDE\Dialogs\LayoutEditorCanvas.cpp" hdr="GDCore\IDE\Dialogs\LayoutEditorCanvas.h" fwddecl="0" i18n="1" name="LayoutEditorCanvas" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

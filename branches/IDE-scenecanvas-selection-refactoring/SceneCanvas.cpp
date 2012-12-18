@@ -28,7 +28,7 @@
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
-#include "GDL/IDE/SceneCanvasSettings.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/CodeExecutionEngine.h"
 #include "GDL/SoundManager.h"
@@ -40,13 +40,13 @@
 #include "Clipboard.h"
 #include "DndTextSceneEditor.h"
 #include "InitialPositionBrowserDlg.h"
-#include "RenderDialog.h"
+#include "GDL/IDE/Dialogs/RenderDialog.h"
 #include "AdvancedPasteDlg.h"
 #include "EditorObjets.h"
 #include "EditorLayers.h"
-#include "DebuggerGUI.h"
+#include "GDL/IDE/Dialogs/DebuggerGUI.h"
 #include "GridSetup.h"
-#include "ProfileDlg.h"
+#include "GDL/IDE/Dialogs/ProfileDlg.h"
 #undef GetObject //Disable an annoying macro
 
 const long SceneCanvas::ID_ADDOBJMENU = wxNewId();
@@ -161,7 +161,7 @@ void SceneCanvas::OnEditionBtClick( wxCommandEvent & event )
     previewData.scene.ChangeRenderWindow(this);
 
     //Parse now the results of profiling
-    if ( profileDialog ) profileDialog->ParseProfileEvents();
+    //if ( profileDialog ) profileDialog->ParseProfileEvents();
 
     Reload();
     UpdateSize();
@@ -842,8 +842,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
 
             InitialPosition & initialInstance = GetInitialPositionFromObject(object);
             initialInstance.SetHasCustomSize(true);
-            initialInstance.SetWidth(object->GetWidth());
-            initialInstance.SetHeight(object->GetHeight());
+            initialInstance.SetCustomWidth(object->GetWidth());
+            initialInstance.SetCustomHeight(object->GetHeight());
         }
     }
     if ( editionData.isResizingY )
@@ -855,8 +855,8 @@ void SceneCanvas::OnMotion( wxMouseEvent &event )
 
             InitialPosition & initialInstance = GetInitialPositionFromObject(object);
             initialInstance.SetHasCustomSize(true);
-            initialInstance.SetWidth(object->GetWidth());
-            initialInstance.SetHeight(object->GetHeight());
+            initialInstance.SetCustomWidth(object->GetWidth());
+            initialInstance.SetCustomHeight(object->GetHeight());
         }
     }
     if ( editionData.isRotatingObject )
@@ -1201,8 +1201,8 @@ void SceneCanvas::OnPropObjSelected(wxCommandEvent & event)
 
         if ( initialInstance.HasCustomSize() )
         {
-            editionData.rightClickSelectedObject->SetWidth( initialInstance.GetWidth() );
-            editionData.rightClickSelectedObject->SetHeight( initialInstance.GetHeight() );
+            editionData.rightClickSelectedObject->SetWidth( initialInstance.GetCustomWidth() );
+            editionData.rightClickSelectedObject->SetHeight( initialInstance.GetCustomHeight() );
         }
         else if ( hadAPersonalizedSize ) //For now, we reload the scene so as the object get back its initial size
         {
@@ -1274,7 +1274,7 @@ void SceneCanvas::OnMouseWheel( wxMouseEvent &event )
     float newheight = editionData.view.getSize().y + ( rotation / 25 );
     float newZoomFactor = static_cast<float>(getSize().y)/newheight;
     if ( newZoomFactor > 0 ) settings.zoomFactor = newZoomFactor;
-    UpdateAccordingToZoomFactor();
+    UpdateViewAccordingToZoomFactor();
 }
 
 int SceneCanvas::GetObjectsSelectedHighestLayer()

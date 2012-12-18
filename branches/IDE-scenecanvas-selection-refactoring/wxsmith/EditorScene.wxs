@@ -14,11 +14,49 @@
 					<handler function="OnnotebookPageChanged" entry="EVT_AUINOTEBOOK_PAGE_CHANGED" />
 					<handler function="OnnotebookPageChanging" entry="EVT_AUINOTEBOOK_PAGE_CHANGING" />
 					<object class="AuiNotebookPage">
-						<object class="wxPanel" name="ID_PANEL5" variable="scenePanel" member="yes">
+						<object class="wxPanel" name="ID_PANEL1" variable="scenePanel" member="yes">
 							<bg>#FFFFFF</bg>
 							<style>wxNO_BORDER|wxTAB_TRAVERSAL</style>
 							<handler function="OnscenePanelResize" entry="EVT_SIZE" />
-							<object class="wxScrollBar" name="ID_SCROLLBAR2" variable="scrollBar2" member="yes">
+							<object class="wxScrollBar" name="ID_SCROLLBAR3" variable="vScrollbar" member="yes">
+								<value>2500</value>
+								<thumbsize>10</thumbsize>
+								<range>5000</range>
+								<pagesize>10</pagesize>
+								<style>wxSB_VERTICAL</style>
+								<handler function="OnvScrollbarScroll" entry="EVT_COMMAND_SCROLL" />
+								<handler function="OnvScrollbarScroll" entry="EVT_COMMAND_SCROLL_THUMBTRACK" />
+								<handler function="OnvScrollbarScroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
+							</object>
+							<object class="wxScrollBar" name="ID_SCROLLBAR4" variable="hScrollbar" member="yes">
+								<value>2500</value>
+								<thumbsize>10</thumbsize>
+								<range>5000</range>
+								<pagesize>10</pagesize>
+								<style>wxSB_HORIZONTAL</style>
+								<handler function="OnhScrollbarScroll" entry="EVT_COMMAND_SCROLL" />
+								<handler function="OnhScrollbarScroll" entry="EVT_COMMAND_SCROLL_THUMBTRACK" />
+								<handler function="OnhScrollbarScroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
+							</object>
+							<object class="Custom" name="ID_CUSTOM3" subclass="SceneEditorCanvas" variable="layoutEditorCanvas" member="yes">
+								<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, scene.GetInitialInstances(), scene.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);</creating_code>
+								<include_file>GDL/IDE/Dialogs/SceneEditorCanvas.h</include_file>
+								<local_include>1</local_include>
+								<style></style>
+								<pos>0,0</pos>
+								<size>800,600</size>
+								<focused>1</focused>
+								<handler function="OnsceneCanvasSetFocus" entry="EVT_SET_FOCUS" />
+							</object>
+						</object>
+						<label>New scene editor</label>
+					</object>
+					<object class="AuiNotebookPage">
+						<object class="wxPanel" name="ID_PANEL5" variable="oldScenePanel" member="yes">
+							<bg>#FFFFFF</bg>
+							<style>wxNO_BORDER|wxTAB_TRAVERSAL</style>
+							<handler function="OnscenePanelResize" entry="EVT_SIZE" />
+							<object class="wxScrollBar" name="ID_SCROLLBAR2" variable="oldScrollBar2" member="yes">
 								<value>2500</value>
 								<thumbsize>10</thumbsize>
 								<range>5000</range>
@@ -28,7 +66,7 @@
 								<handler function="OnScrollBar2Scroll" entry="EVT_COMMAND_SCROLL_THUMBTRACK" />
 								<handler function="OnScrollBar2Scroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
 							</object>
-							<object class="wxScrollBar" name="ID_SCROLLBAR1" variable="scrollBar1" member="yes">
+							<object class="wxScrollBar" name="ID_SCROLLBAR1" variable="oldScrollBar1" member="yes">
 								<value>2500</value>
 								<thumbsize>10</thumbsize>
 								<range>5000</range>
@@ -39,7 +77,7 @@
 								<handler function="OnScrollBar1Scroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
 							</object>
 							<object class="Custom" name="ID_CUSTOM1" subclass="SceneCanvas" variable="sceneCanvas" member="yes">
-								<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, scene.GetInitialInstances(), scene.GetAssociatedSceneCanvasSettings(), mainFrameWrapper);</creating_code>
+								<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, scene.GetInitialInstances(), scene.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);</creating_code>
 								<style></style>
 								<pos>0,0</pos>
 								<size>800,600</size>

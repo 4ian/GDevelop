@@ -3,6 +3,10 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#include <iostream>
+#include <string>
+#include <list>
+#include <sstream>
 //(*InternalHeaders(MainFrame)
 #include <wx/bitmap.h>
 #include <wx/icon.h>
@@ -27,21 +31,17 @@
 #include <wx/ribbon/toolbar.h>
 #include <wx/ribbon/buttonbar.h>
 
-#include <iostream>
-#include <string>
-#include <list>
-#include <sstream>
 #include "MainFrame.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
-#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDCore/IDE/wxTools/SkinHelper.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include "MyStatusBar.h"
 #include "EditorObjets.h"
 #include "EventsEditor.h"
 #include "EditorScene.h"
@@ -388,7 +388,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     }
     {
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Scene"));
-        ribbonSceneEditorButtonBar = SceneCanvas::CreateRibbonPage(ribbonEditorPage);
+        ribbonSceneEditorButtonBar = gd::LayoutEditorCanvas::CreateRibbonPage(ribbonEditorPage);
     }
     {
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Events"));

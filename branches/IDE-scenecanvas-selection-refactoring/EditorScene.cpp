@@ -27,11 +27,12 @@
 #include "MainFrame.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "SceneCanvas.h"
-#include "DebuggerGUI.h"
+#include "GDL/IDE/Dialogs/DebuggerGUI.h"
 #include "EditorObjets.h"
 #include "EditorLayers.h"
 #include "InitialPositionBrowserDlg.h"
-#include "ProfileDlg.h"
+#include "GDL/IDE/Dialogs/ProfileDlg.h"
+#include "GDL/IDE/Dialogs/RenderDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
@@ -45,6 +46,10 @@
 #endif
 
 //(*IdInit(EditorScene)
+const long EditorScene::ID_SCROLLBAR3 = wxNewId();
+const long EditorScene::ID_SCROLLBAR4 = wxNewId();
+const long EditorScene::ID_CUSTOM3 = wxNewId();
+const long EditorScene::ID_PANEL1 = wxNewId();
 const long EditorScene::ID_SCROLLBAR2 = wxNewId();
 const long EditorScene::ID_SCROLLBAR1 = wxNewId();
 const long EditorScene::ID_CUSTOM1 = wxNewId();
@@ -86,13 +91,20 @@ mainFrameWrapper(mainFrameWrapper_)
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
 	notebook = new wxAuiNotebook(this, ID_AUINOTEBOOK1, wxDefaultPosition, wxDefaultSize, wxAUI_NB_TAB_SPLIT|wxAUI_NB_TAB_MOVE|wxAUI_NB_SCROLL_BUTTONS|wxAUI_NB_BOTTOM|wxNO_BORDER);
-	scenePanel = new wxPanel(notebook, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL5"));
+	scenePanel = new wxPanel(notebook, ID_PANEL1, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL1"));
 	scenePanel->SetBackgroundColour(wxColour(255,255,255));
-	scrollBar2 = new wxScrollBar(scenePanel, ID_SCROLLBAR2, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL, wxDefaultValidator, _T("ID_SCROLLBAR2"));
-	scrollBar2->SetScrollbar(2500, 10, 5000, 10);
-	scrollBar1 = new wxScrollBar(scenePanel, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
-	scrollBar1->SetScrollbar(2500, 10, 5000, 10);
-	sceneCanvas = new SceneCanvas(scenePanel, game, scene, scene.GetInitialInstances(), scene.GetAssociatedSceneCanvasSettings(), mainFrameWrapper);
+	vScrollbar = new wxScrollBar(scenePanel, ID_SCROLLBAR3, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL, wxDefaultValidator, _T("ID_SCROLLBAR3"));
+	vScrollbar->SetScrollbar(2500, 10, 5000, 10);
+	hScrollbar = new wxScrollBar(scenePanel, ID_SCROLLBAR4, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR4"));
+	hScrollbar->SetScrollbar(2500, 10, 5000, 10);
+	layoutEditorCanvas = new SceneEditorCanvas(scenePanel, game, scene, scene.GetInitialInstances(), scene.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);
+	oldScenePanel = new wxPanel(notebook, ID_PANEL5, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL5"));
+	oldScenePanel->SetBackgroundColour(wxColour(255,255,255));
+	oldScrollBar2 = new wxScrollBar(oldScenePanel, ID_SCROLLBAR2, wxDefaultPosition, wxDefaultSize, wxSB_VERTICAL, wxDefaultValidator, _T("ID_SCROLLBAR2"));
+	oldScrollBar2->SetScrollbar(2500, 10, 5000, 10);
+	oldScrollBar1 = new wxScrollBar(oldScenePanel, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
+	oldScrollBar1->SetScrollbar(2500, 10, 5000, 10);
+	sceneCanvas = new SceneCanvas(oldScenePanel, game, scene, scene.GetInitialInstances(), scene.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);
 	eventsPanel = new wxPanel(notebook, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
 	eventsPanel->SetBackgroundColour(wxColour(255,255,255));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -103,13 +115,22 @@ mainFrameWrapper(mainFrameWrapper_)
 	eventsPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(eventsPanel);
 	FlexGridSizer3->SetSizeHints(eventsPanel);
-	notebook->AddPage(scenePanel, _("Scene"), false, wxBitmap(wxImage(_T("res/sceneeditor.png"))));
+	notebook->AddPage(scenePanel, _("New scene editor"));
+	notebook->AddPage(oldScenePanel, _("Scene"), false, wxBitmap(wxImage(_T("res/sceneeditor.png"))));
 	notebook->AddPage(eventsPanel, _("Events"), false, wxBitmap(wxImage(_T("res/events16.png"))));
 	FlexGridSizer1->Add(notebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
 
+	Connect(ID_SCROLLBAR3,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnvScrollbarScroll);
+	Connect(ID_SCROLLBAR3,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&EditorScene::OnvScrollbarScroll);
+	Connect(ID_SCROLLBAR3,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnvScrollbarScroll);
+	Connect(ID_SCROLLBAR4,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnhScrollbarScroll);
+	Connect(ID_SCROLLBAR4,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&EditorScene::OnhScrollbarScroll);
+	Connect(ID_SCROLLBAR4,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnhScrollbarScroll);
+	layoutEditorCanvas->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorScene::OnsceneCanvasSetFocus,0,this);
+	scenePanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnscenePanelResize,0,this);
 	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_TOP|wxEVT_SCROLL_BOTTOM|wxEVT_SCROLL_LINEUP|wxEVT_SCROLL_LINEDOWN|wxEVT_SCROLL_PAGEUP|wxEVT_SCROLL_PAGEDOWN|wxEVT_SCROLL_THUMBTRACK|wxEVT_SCROLL_THUMBRELEASE|wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnScrollBar2Scroll);
 	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&EditorScene::OnScrollBar2Scroll);
 	Connect(ID_SCROLLBAR2,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnScrollBar2Scroll);
@@ -117,7 +138,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_THUMBTRACK,(wxObjectEventFunction)&EditorScene::OnScrollBar1Scroll);
 	Connect(ID_SCROLLBAR1,wxEVT_SCROLL_CHANGED,(wxObjectEventFunction)&EditorScene::OnScrollBar1Scroll);
 	sceneCanvas->Connect(wxEVT_SET_FOCUS,(wxObjectEventFunction)&EditorScene::OnsceneCanvasSetFocus,0,this);
-	scenePanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnscenePanelResize,0,this);
+	oldScenePanel->Connect(wxEVT_SIZE,(wxObjectEventFunction)&EditorScene::OnscenePanelResize,0,this);
 	Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED,(wxObjectEventFunction)&EditorScene::OnnotebookPageChanged);
 	Connect(ID_AUINOTEBOOK1,wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING,(wxObjectEventFunction)&EditorScene::OnnotebookPageChanging);
 	//*)
@@ -125,26 +146,28 @@ mainFrameWrapper(mainFrameWrapper_)
 	//Prepare pane manager
     m_mgr.SetManagedWindow( this );
 
+    layoutEditorCanvas->SetParentAuiManager(&m_mgr);
+    layoutEditorCanvas->SetScrollbars(hScrollbar, vScrollbar);
+
     //Create all editors linked to scene canvas.
     objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainFrameWrapper) );
     layersEditor =  boost::shared_ptr<EditorLayers>(new EditorLayers(this, game, scene, mainFrameWrapper) );
-    debugger =  boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(this, sceneCanvas->GetRuntimeScene()) );
-    externalPreviewWindow = boost::shared_ptr<RenderDialog>(new RenderDialog(this, sceneCanvas) );
+    //debugger =  boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(this, sceneCanvas->GetRuntimeScene()) );
+    //externalPreviewWindow = boost::shared_ptr<RenderDialog>(new RenderDialog(this, sceneCanvas) );
     initialPositionBrowser =  boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, scene.GetInitialInstances(), *sceneCanvas) );
-    profilerDlg =  boost::shared_ptr<ProfileDlg>(new ProfileDlg(this));
+    //profilerDlg =  boost::shared_ptr<ProfileDlg>(new ProfileDlg(this));
     propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this));
 
     //Link some editors together
     sceneCanvas->SetObjectsEditor( objectsEditor );
     sceneCanvas->SetLayersEditor( layersEditor );
-    sceneCanvas->SetDebugger( debugger );
+    //sceneCanvas->SetDebugger( debugger );
     sceneCanvas->SetExternalWindow( externalPreviewWindow );
     sceneCanvas->SetInitialPositionBrowser( initialPositionBrowser );
-    sceneCanvas->SetProfileDialog( profilerDlg );
+    //sceneCanvas->SetProfileDialog( profilerDlg );
     sceneCanvas->SetPropertiesPanel( propertiesPnl );
-    sceneCanvas->SetParentPanelAndDockManager( scenePanel, &m_mgr );
-    sceneCanvas->SetScrollbars(scrollBar1, scrollBar2);
-    sceneCanvas->Reload();
+    sceneCanvas->SetParentPanelAndDockManager( oldScenePanel, &m_mgr );
+    sceneCanvas->SetScrollbars(oldScrollBar1, oldScrollBar2);
 
     eventsEditor->SetAssociatedSceneCanvas(sceneCanvas);
 
@@ -152,9 +175,9 @@ mainFrameWrapper(mainFrameWrapper_)
     m_mgr.AddPane( notebook, wxAuiPaneInfo().Name( wxT( "ESCenter" ) ).PaneBorder(false).Center().CloseButton( false ).Caption( _( "Scene's editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
     m_mgr.AddPane( objectsEditor.get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
     m_mgr.AddPane( layersEditor.get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Float().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-    m_mgr.AddPane( debugger.get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+    //m_mgr.AddPane( debugger.get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
     m_mgr.AddPane( initialPositionBrowser.get(), wxAuiPaneInfo().Name( wxT( "IPB" ) ).Float().CloseButton( true ).Caption( _( "Initial positions of objects" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-    m_mgr.AddPane( profilerDlg.get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Profiling" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );
+    //m_mgr.AddPane( profilerDlg.get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Profiling" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );
     m_mgr.AddPane( propertiesPnl.get(), wxAuiPaneInfo().Name( wxT( "PROPERTIES" ) ).Float().CloseButton( true ).Caption( _( "Properties" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
 
     //Load preferences
@@ -174,21 +197,27 @@ mainFrameWrapper(mainFrameWrapper_)
     gd::SkinHelper::ApplyCurrentSkin(*notebook);
 
     mainFrameWrapper.GetRibbon()->SetActivePage(2);
-    sceneCanvas->ConnectEvents();
+    layoutEditorCanvas->ConnectEvents();
 
     wxString perspective;
 	wxConfigBase::Get()->Read("/SceneEditor/LastWorkspace", &perspective);
 	m_mgr.LoadPerspective(perspective);
 
     m_mgr.Update();
+    layoutEditorCanvas->Reload();
+    sceneCanvas->Reload();
 }
 void EditorScene::OnscenePanelResize(wxSizeEvent& event)
 {
     //Manual resizing of scene's panel
     sceneCanvas->UpdateSize();
 
-    scrollBar1->SetSize(0, scenePanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight(), scenePanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), scrollBar1->GetSize().GetHeight());
-    scrollBar2->SetSize(scenePanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), 0, scrollBar2->GetSize().GetWidth(), scenePanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
+    oldScrollBar1->SetSize(0, scenePanel->GetSize().GetHeight()-oldScrollBar1->GetSize().GetHeight(), scenePanel->GetSize().GetWidth()-oldScrollBar2->GetSize().GetWidth(), oldScrollBar1->GetSize().GetHeight());
+    oldScrollBar2->SetSize(scenePanel->GetSize().GetWidth()-oldScrollBar2->GetSize().GetWidth(), 0, oldScrollBar2->GetSize().GetWidth(), scenePanel->GetSize().GetHeight()-oldScrollBar1->GetSize().GetHeight());
+
+    layoutEditorCanvas->UpdateSize();
+    hScrollbar->SetSize(0, scenePanel->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight(), scenePanel->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), hScrollbar->GetSize().GetHeight());
+    vScrollbar->SetSize(scenePanel->GetSize().GetWidth()-vScrollbar->GetSize().GetWidth(), 0, vScrollbar->GetSize().GetWidth(), scenePanel->GetSize().GetHeight()-hScrollbar->GetSize().GetHeight());
 }
 
 EditorScene::~EditorScene()
@@ -207,7 +236,7 @@ void EditorScene::OnScrollBar2Scroll(wxScrollEvent& event)
 {
     int position = event.GetPosition();
 
-    int newY = position-(scrollBar2->GetRange()/2)+(sceneCanvas->getSize().y/2);
+    int newY = position-(oldScrollBar2->GetRange()/2)+(sceneCanvas->getSize().y/2);
     sceneCanvas->GetEditionView().setCenter( sceneCanvas->GetEditionView().getCenter().x, newY);
 
     sceneCanvas->ManualRefresh();
@@ -220,7 +249,7 @@ void EditorScene::OnScrollBar1Scroll(wxScrollEvent& event)
 {
     int position = event.GetPosition();
 
-    int newX = position-(scrollBar1->GetRange()/2)+(sceneCanvas->getSize().x/2);
+    int newX = position-(oldScrollBar1->GetRange()/2)+(sceneCanvas->getSize().x/2);
     sceneCanvas->GetEditionView().setCenter( newX,  sceneCanvas->GetEditionView().getCenter().y);
 
     sceneCanvas->ManualRefresh();
@@ -230,9 +259,9 @@ void EditorScene::ForceRefreshRibbonAndConnect()
 {
     if ( notebook->GetPageText(notebook->GetSelection()) == _("Scene") )
     {
-        sceneCanvas->CreateToolsBar(mainFrameWrapper.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
+        layoutEditorCanvas->RecreateRibbonToolbar();
         mainFrameWrapper.GetRibbon()->SetActivePage(2);
-        sceneCanvas->ConnectEvents();
+        layoutEditorCanvas->ConnectEvents();
     }
     else if ( notebook->GetPageText(notebook->GetSelection()) == _("Events") )
     {
@@ -271,7 +300,16 @@ void EditorScene::OnnotebookPageChanging(wxAuiNotebookEvent& event)
 
 void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {
-    sceneCanvas->CreateToolsBar(mainFrameWrapper.GetRibbonSceneEditorButtonBar(), sceneCanvas->IsEditing());
     mainFrameWrapper.GetRibbon()->SetActivePage(2);
-    sceneCanvas->ConnectEvents();
+    layoutEditorCanvas->ConnectEvents();
+}
+
+void EditorScene::OnvScrollbarScroll(wxScrollEvent& event)
+{
+    layoutEditorCanvas->OnvScrollbarScroll(event);
+}
+
+void EditorScene::OnhScrollbarScroll(wxScrollEvent& event)
+{
+    layoutEditorCanvas->OnhScrollbarScroll(event);
 }

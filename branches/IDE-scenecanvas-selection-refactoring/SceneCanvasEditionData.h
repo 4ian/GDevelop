@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <boost/bimap.hpp>
 #include <SFML/Graphics.hpp>
 class Object;
 
@@ -21,7 +22,6 @@ public:
     sf::View view; //sf::View used at edtitime
 
     //Ajout d'objet
-    std::string objectToAdd;
     std::string currentLayer;
 
     //Déplacement d'objets
@@ -35,6 +35,8 @@ public:
     int xDecalement;
     int yDecalement;
     boost::shared_ptr<Object> rightClickSelectedObject;
+
+    boost::bimap< unsigned int, boost::shared_ptr<Object> > initialInstancesAndObjectsMap;
 
     //Rectangle de selection
     float xRectangleSelection;

@@ -33,7 +33,7 @@
 #include "GDL/ExternalEvents.h"
 #include "SceneCanvas.h"
 #include "LogFileManager.h"
-#include "ProfileDlg.h"
+#include "GDL/IDE/Dialogs/ProfileDlg.h"
 #include "SearchEvents.h"
 #include "CreateTemplate.h"
 #include "ChoixTemplateEvent.h"

@@ -240,8 +240,8 @@ scene(scene_)
 
     XEdit->ChangeValue( ToString(position.GetX()) );
     YEdit->ChangeValue( ToString(position.GetY()) );
-    widthEdit->ChangeValue( ToString(position.GetWidth()) );
-    heightEdit->ChangeValue( ToString(position.GetHeight()) );
+    widthEdit->ChangeValue( ToString(position.GetCustomWidth()) );
+    heightEdit->ChangeValue( ToString(position.GetCustomHeight()) );
     if ( position.HasCustomSize() )
     {
         sizeCheck->SetValue(true);
@@ -301,8 +301,8 @@ void EditOptionsPosition::OnOkBtClick(wxCommandEvent& event)
 {
     position.SetX(ToFloat(ToString(XEdit->GetValue())));
     position.SetY(ToFloat(ToString(YEdit->GetValue())));
-    position.SetWidth(ToFloat(ToString(widthEdit->GetValue())));
-    position.SetHeight(ToFloat(ToString(heightEdit->GetValue())));
+    position.SetCustomWidth(ToFloat(ToString(widthEdit->GetValue())));
+    position.SetCustomHeight(ToFloat(ToString(heightEdit->GetValue())));
     position.SetHasCustomSize(sizeCheck->GetValue());
     position.SetZOrder(ToInt(ToString(zOrderEdit->GetValue())));
 

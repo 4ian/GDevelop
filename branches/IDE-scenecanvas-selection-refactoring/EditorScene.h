@@ -10,6 +10,7 @@
 #include <vector>
 //(*Headers(EditorScene)
 #include <wx/sizer.h>
+#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
@@ -26,7 +27,7 @@ class RuntimeGame;
 class EventsEditor;
 class LayoutEditorPropertiesPnl;
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "RenderDialog.h"
+#include "GDL/IDE/Dialogs/RenderDialog.h"
 #include "SceneCanvas.h"
 
 using namespace std;
@@ -59,6 +60,10 @@ public:
 protected:
 
     //(*Identifiers(EditorScene)
+    static const long ID_SCROLLBAR3;
+    static const long ID_SCROLLBAR4;
+    static const long ID_CUSTOM3;
+    static const long ID_PANEL1;
     static const long ID_SCROLLBAR2;
     static const long ID_SCROLLBAR1;
     static const long ID_CUSTOM1;
@@ -85,16 +90,22 @@ private:
     void OnCoreResize1(wxSizeEvent& event);
     void OnsceneCanvasPanelResize(wxSizeEvent& event);
     void OnnotebookPageChanging(wxAuiNotebookEvent& event);
+    void OnvScrollbarScroll(wxScrollEvent& event);
+    void OnhScrollbarScroll(wxScrollEvent& event);
     //*)
 
     //(*Declarations(EditorScene)
-    wxScrollBar* scrollBar1;
     EventsEditor* eventsEditor;
-    wxScrollBar* scrollBar2;
+    wxScrollBar* oldScrollBar2;
     SceneCanvas* sceneCanvas;
+    wxPanel* oldScenePanel;
+    wxScrollBar* oldScrollBar1;
     wxPanel* scenePanel;
     wxPanel* eventsPanel;
+    wxScrollBar* hScrollbar;
+    SceneEditorCanvas* layoutEditorCanvas;
     wxAuiNotebook* notebook;
+    wxScrollBar* vScrollbar;
     //*)
     boost::shared_ptr<EditorObjets> objectsEditor;
     boost::shared_ptr<EditorLayers> layersEditor;

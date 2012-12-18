@@ -26,13 +26,13 @@
 #include "GDL/InitialInstancesContainer.h"
 #include "SceneCanvasEditionData.h"
 #include "SceneCanvasPreviewData.h"
+namespace gd { class LayoutEditorCanvasOptions; }
 class RenderDialog;
 class EditorObjets;
 class EditorLayers;
 class DebuggerGUI;
 class ProfileDlg;
 class InitialPositionBrowserDlg;
-class SceneCanvasSettings;
 class LayoutEditorPropertiesPnl;
 
 /**
@@ -54,7 +54,7 @@ public :
      * \param gd::MainFrameWrapper A gd::MainFrameWrapper object to be used to communicate with the IDE.
      * \param allowPreview If set to false, preview mode will be deactivated ( Useful when editing an external layout )
      */
-    SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances, SceneCanvasSettings & settings, gd::MainFrameWrapper & mainFrameWrapper_, bool allowPreview = true);
+    SceneCanvas( wxWindow* Parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances, gd::LayoutEditorCanvasOptions & settings, gd::MainFrameWrapper & mainFrameWrapper_, bool allowPreview = true);
 
     /**
      * \brief Default destructor
@@ -360,7 +360,7 @@ private :
     /**
      * Update the zoom according to the value stored in settings.zoomFactor
      */
-    void UpdateAccordingToZoomFactor();
+    void UpdateViewAccordingToZoomFactor();
 
     /**
      * Used to render a scene when editing it. For previewing a scene, the RuntimeScene takes care of rendering itself.
@@ -398,7 +398,7 @@ private :
     RuntimeGame & gameEdited; ///< Game owning the instances being edited
     Scene & sceneEdited; ///< Scene to be used for edition
     InitialInstancesContainer & instances; ///< Instances to be edited
-    SceneCanvasSettings & settings; ///< Settings to be used
+    gd::LayoutEditorCanvasOptions & settings; ///< Settings to be used
     SceneCanvasEditionData editionData; ///< Contains all the data relevant to the edition mode
     SceneCanvasPreviewData previewData; ///< Contains all the data relevant to the preview mode
 

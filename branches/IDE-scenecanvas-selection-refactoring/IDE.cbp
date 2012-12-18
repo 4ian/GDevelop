@@ -561,18 +561,14 @@
 		<Unit filename="Credits.h">
 			<Option virtualFolder="Editeur principal\Aide\" />
 		</Unit>
-		<Unit filename="DebuggerGUI.cpp">
-			<Option virtualFolder="Editeurs\Editeur Scene\" />
-		</Unit>
-		<Unit filename="DebuggerGUI.h">
-			<Option virtualFolder="Editeurs\Editeur Scene\" />
-		</Unit>
 		<Unit filename="Dialogs\ExternalLayoutEditor.cpp" />
 		<Unit filename="Dialogs\ExternalLayoutEditor.h" />
 		<Unit filename="Dialogs\HelpViewerDlg.cpp" />
 		<Unit filename="Dialogs\HelpViewerDlg.h" />
 		<Unit filename="Dialogs\HtmlViewerPnl.cpp" />
 		<Unit filename="Dialogs\HtmlViewerPnl.h" />
+		<Unit filename="Dialogs\LayoutEditorPropertiesPnl.cpp" />
+		<Unit filename="Dialogs\LayoutEditorPropertiesPnl.h" />
 		<Unit filename="Dialogs\NewProjectDialog.cpp" />
 		<Unit filename="Dialogs\NewProjectDialog.h" />
 		<Unit filename="Dialogs\ProjectPropertiesPnl.cpp" />
@@ -741,8 +737,6 @@
 		<Unit filename="Preferences.h">
 			<Option virtualFolder="Editeur principal\" />
 		</Unit>
-		<Unit filename="ProfileDlg.cpp" />
-		<Unit filename="ProfileDlg.h" />
 		<Unit filename="ProjectManager.cpp" />
 		<Unit filename="ProjectManager.h" />
 		<Unit filename="RecentList.cpp">
@@ -825,6 +819,7 @@
 		<Unit filename="wxsmith\ExternalLayoutEditor.wxs" />
 		<Unit filename="wxsmith\HelpViewerDlg.wxs" />
 		<Unit filename="wxsmith\HtmlViewerPnl.wxs" />
+		<Unit filename="wxsmith\LayoutEditorPropertiesPnl.wxs" />
 		<Unit filename="wxsmith\NewProjectDialog.wxs" />
 		<Unit filename="wxsmith\ProjectPropertiesPnl.wxs" />
 		<Unit filename="wxstedit\include\wx\stedit\pairarr.h" />
@@ -916,7 +911,6 @@
 					<wxPanel wxs="wxsmith/ExternalEventsEditor.wxs" src="ExternalEventsEditor.cpp" hdr="ExternalEventsEditor.h" fwddecl="0" i18n="1" name="ExternalEventsEditor" language="CPP" />
 					<wxDialog wxs="wxsmith/AutomatismTypeChoice.wxs" src="AutomatismTypeChoice.cpp" hdr="AutomatismTypeChoice.h" fwddecl="0" i18n="1" name="AutomatismTypeChoice" language="CPP" />
 					<wxPanel wxs="wxsmith/InitialPositionBrowserDlg.wxs" src="InitialPositionBrowserDlg.cpp" hdr="InitialPositionBrowserDlg.h" fwddecl="0" i18n="1" name="InitialPositionBrowserDlg" language="CPP" />
-					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="ProfileDlg.cpp" hdr="ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/CodeEditor.wxs" src="CodeEditor.cpp" hdr="CodeEditor.h" fwddecl="0" i18n="1" name="CodeEditor" language="CPP" />
 					<wxPanel wxs="wxsmith/BuildMessagesPnl.wxs" src="BuildMessagesPnl.cpp" hdr="BuildMessagesPnl.h" fwddecl="0" i18n="1" name="BuildMessagesPnl" language="CPP" />
 					<wxPanel wxs="wxsmith/BuildProgressPnl.wxs" src="BuildProgressPnl.cpp" hdr="BuildProgressPnl.h" fwddecl="0" i18n="1" name="BuildProgressPnl" language="CPP" />
@@ -929,6 +923,7 @@
 					<wxPanel wxs="wxsmith/ProjectPropertiesPnl.wxs" src="Dialogs\ProjectPropertiesPnl.cpp" hdr="Dialogs\ProjectPropertiesPnl.h" fwddecl="0" i18n="1" name="ProjectPropertiesPnl" language="CPP" />
 					<wxDialog wxs="wxsmith/NewProjectDialog.wxs" src="Dialogs\NewProjectDialog.cpp" hdr="Dialogs\NewProjectDialog.h" fwddecl="0" i18n="1" name="NewProjectDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/HelpViewerDlg.wxs" src="Dialogs\HelpViewerDlg.cpp" hdr="Dialogs\HelpViewerDlg.h" fwddecl="0" i18n="1" name="HelpViewerDlg" language="CPP" />
+					<wxPanel wxs="wxsmith/LayoutEditorPropertiesPnl.wxs" src="Dialogs\LayoutEditorPropertiesPnl.cpp" hdr="Dialogs\LayoutEditorPropertiesPnl.h" fwddecl="0" i18n="1" name="LayoutEditorPropertiesPnl" language="CPP" />
 				</resources>
 			</wxsmith>
 			<AutoVersioning>

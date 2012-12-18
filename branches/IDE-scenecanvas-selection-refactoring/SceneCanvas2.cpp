@@ -16,16 +16,16 @@
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/Object.h"
 #include "EditorLayers.h"
-#include "DebuggerGUI.h"
+#include "GDL/IDE/Dialogs/DebuggerGUI.h"
 #include "EditorObjets.h"
 #include "SceneCanvas.h"
-#include "RenderDialog.h"
+#include "GDL/IDE/Dialogs/RenderDialog.h"
 #include "GridSetup.h"
-#include "ProfileDlg.h"
+#include "GDL/IDE/Dialogs/ProfileDlg.h"
 #include "InitialPositionBrowserDlg.h"
 #include "DndTextSceneEditor.h"
 
-SceneCanvas::SceneCanvas( wxWindow* parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances_, SceneCanvasSettings & settings_, gd::MainFrameWrapper & mainFrameWrapper_, bool allowPreview_) :
+SceneCanvas::SceneCanvas( wxWindow* parent, RuntimeGame & game_, Scene & scene_, InitialInstancesContainer & instances_, gd::LayoutEditorCanvasOptions & settings_, gd::MainFrameWrapper & mainFrameWrapper_, bool allowPreview_) :
     wxSFMLCanvas( parent, -1, wxDefaultPosition, wxDefaultSize, wxWANTS_CHARS | wxBORDER_SIMPLE ),
     gameEdited(game_),
     sceneEdited(scene_),
@@ -71,7 +71,7 @@ SceneCanvas::SceneCanvas( wxWindow* parent, RuntimeGame & game_, Scene & scene_,
 
     SetDropTarget(new DndTextSceneEditor(*this));
 
-    CreateToolsBar(mainFrameWrapper.GetRibbonSceneEditorButtonBar(), editing);
+    //CreateToolsBar(mainFrameWrapper.GetRibbonSceneEditorButtonBar(), editing); Deactivated so as to let the ribbon of the new layout editor canvas.
 }
 
 SceneCanvas::~SceneCanvas()
@@ -210,12 +210,12 @@ void SceneCanvas::SetInitialPositionBrowser(boost::shared_ptr<InitialPositionBro
 }
 void SceneCanvas::SetProfileDialog(boost::shared_ptr<ProfileDlg> profileDialog_)
 {
-    profileDialog = profileDialog_;
+    /*profileDialog = profileDialog_;
     if ( profileDialog && profileDialog->GetAssociatedSceneCanvas() != this)
         profileDialog->SetAssociatedSceneCanvas(this);
 
     if ( profileDialog )
-        sceneEdited.SetProfiler(profileDialog.get());
+        sceneEdited.SetProfiler(profileDialog.get());*/
 }
 void SceneCanvas::SetPropertiesPanel(boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPanel_)
 {
@@ -238,7 +238,7 @@ void SceneCanvas::UpdateSize()
         wxWindowBase::SetPosition(wxPoint(0,0));
         wxWindowBase::SetSize(parentPanel->GetSize().GetWidth()-scrollBar2->GetSize().GetWidth(), parentPanel->GetSize().GetHeight()-scrollBar1->GetSize().GetHeight());
 
-        UpdateAccordingToZoomFactor();
+        UpdateViewAccordingToZoomFactor();
     }
     else
     {
@@ -482,7 +482,7 @@ void SceneCanvas::CreateMenus()
 void SceneCanvas::OnZoomInitBtClick( wxCommandEvent & event )
 {
     settings.zoomFactor = 1;
-    UpdateAccordingToZoomFactor();
+    UpdateViewAccordingToZoomFactor();
 }
 
 void SceneCanvas::OnOrigineBtClick(wxCommandEvent & event )
@@ -523,10 +523,10 @@ void SceneCanvas::OnObjectsPositionList( wxCommandEvent & event )
 
 void SceneCanvas::OnProfilerBtClick( wxCommandEvent & event )
 {
-    if ( !profileDialog ) return;
+    /*if ( !profileDialog ) return;
 
     m_mgr->GetPane(profileDialog.get()).Show();
-    m_mgr->Update();
+    m_mgr->Update();*/
 }
 
 /**
@@ -576,7 +576,7 @@ void SceneCanvas::OnZoomMoreBtClick(wxRibbonButtonBarEvent& evt)
     evt.PopupMenu(&zoomMenu);
 }
 
-void SceneCanvas::UpdateAccordingToZoomFactor()
+void SceneCanvas::UpdateViewAccordingToZoomFactor()
 {
     editionData.view.setSize(GetClientSize().GetWidth()/settings.zoomFactor, GetClientSize().GetHeight()/settings.zoomFactor);
 }
@@ -584,49 +584,50 @@ void SceneCanvas::UpdateAccordingToZoomFactor()
 void SceneCanvas::Onzoom5Selected(wxCommandEvent& event)
 {
     settings.zoomFactor = 0.05f;
-    UpdateAccordingToZoomFactor();
+    UpdateViewAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom10Selected(wxCommandEvent& event)
 {
     settings.zoomFactor = 0.1f;
-    UpdateAccordingToZoomFactor();
+    UpdateViewAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom25Selected(wxCommandEvent& event)
 {
     settings.zoomFactor = 0.25f;
-    UpdateAccordingToZoomFactor();
+    UpdateViewAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom50Selected(wxCommandEvent& event)
 {
     settings.zoomFactor = 0.5f;
-    UpdateAccordingToZoomFactor();
+    UpdateViewAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom100Selected(wxCommandEvent& event)
 {
     settings.zoomFactor = 1;
-    UpdateAccordingToZoomFactor();
+    UpdateViewAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom150Selected(wxCommandEvent& event)
 {
     settings.zoomFactor = 1.5f;
-    UpdateAccordingToZoomFactor();
+
+    UpdateViewAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom200Selected(wxCommandEvent& event)
 {
     settings.zoomFactor = 2.0f;
-    UpdateAccordingToZoomFactor();
+    UpdateViewAccordingToZoomFactor();
 }
 
 void SceneCanvas::Onzoom500Selected(wxCommandEvent& event)
 {
     settings.zoomFactor = 5.0;
-    UpdateAccordingToZoomFactor();
+    UpdateViewAccordingToZoomFactor();
 }
 
 int SceneCanvas::GetHighestZOrderOnLayer(const std::string & layer)

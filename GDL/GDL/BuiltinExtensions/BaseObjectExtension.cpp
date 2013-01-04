@@ -143,7 +143,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("object", _("Object"), "", false);
             instrInfo.AddParameter("expression", _("X coordinate of moving"), "", false);
             instrInfo.AddParameter("expression", _("Y coordinate of moving"), "", false);
-            instrInfo.AddParameter("expression", _("Dissipation ( Default : 0 )"), "", false);
+            instrInfo.AddParameter("expression", _("Damping ( Default : 0 )"), "", false);
 
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForce");
@@ -160,7 +160,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("object", _("Object"), "", false);
             instrInfo.AddParameter("expression", _("Angle"), "", false);
             instrInfo.AddParameter("expression", _("Length ( in pixels )"), "", false);
-            instrInfo.AddParameter("expression", _("Dissipation ( Default : 0 )"), "", false);
+            instrInfo.AddParameter("expression", _("Damping ( Default : 0 )"), "", false);
 
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForceUsingPolarCoordinates");
@@ -179,7 +179,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("expression", _("X position"), "", false);
             instrInfo.AddParameter("expression", _("Y position"), "", false);
             instrInfo.AddParameter("expression", _("Length ( in pixels )"), "", false);
-            instrInfo.AddParameter("expression", _("Dissipation ( Default : 0 )"), "", false);
+            instrInfo.AddParameter("expression", _("Damping ( Default : 0 )"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForceTowardPosition");
 
@@ -198,7 +198,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("expression", _("Y position of the center"), "", false);
             instrInfo.AddParameter("expression", _("Speed ( in Degrees per seconds )"), "", false);
             instrInfo.AddParameter("expression", _("Distance ( in pixels )"), "", false);
-            instrInfo.AddParameter("expression", _("Dissipation ( Default : 0 )"), "", false);
+            instrInfo.AddParameter("expression", _("Damping ( Default : 0 )"), "", false);
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForceToMoveAround");
 
@@ -546,7 +546,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("object", _("Object"), "", false);
             instrInfo.AddParameter("object", _("Target Object"), "", false);
             instrInfo.AddParameter("expression", _("Length in pixel"), "", false);
-            instrInfo.AddParameter("expression", _("Dissipation ( Default : 0 )"), "", false);
+            instrInfo.AddParameter("expression", _("Damping ( Default : 0 )"), "", false);
             instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForceTowardObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
@@ -565,7 +565,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             instrInfo.AddParameter("object", _("Rotate around this object"), "", false);
             instrInfo.AddParameter("expression", _("Speed ( Degrees per second )"), "", false);
             instrInfo.AddParameter("expression", _("Distance ( in pixel )"), "", false);
-            instrInfo.AddParameter("expression", _("Dissipation ( Default : 0 )"), "", false);
+            instrInfo.AddParameter("expression", _("Damping ( Default : 0 )"), "", false);
             instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1");
 
             instrInfo.cppCallingInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");

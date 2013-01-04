@@ -4,6 +4,9 @@
  */
 
 #include "GDL/Layer.h"
+#if defined(GD_IDE_ONLY)
+#include "GDL/IDE/Dialogs/EditLayerDialog.h"
+#endif
 
 Camera Layer::badCamera;
 
@@ -12,3 +15,13 @@ isVisible(true)
 {
 }
 
+#if defined(GD_IDE_ONLY)
+/**
+ * Display a window to edit the layer
+ */
+void Layer::EditLayer()
+{
+    EditLayerDialog dialog(NULL, *this);
+    dialog.ShowModal();
+}
+#endif

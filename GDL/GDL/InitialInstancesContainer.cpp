@@ -16,31 +16,18 @@ unsigned int InitialInstancesContainer::GetInstancesCount() const
     return initialInstances.size();
 }
 
-const InitialPosition & InitialInstancesContainer::GetInstance(unsigned int index) const
+void InitialInstancesContainer::IterateOverInstances(gd::InitialInstanceFunctor & func)
 {
-    if ( index > initialInstances.size() ) return badPosition;
-
-    return initialInstances[index];
+    for (std::list<InitialPosition>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
+        func(*it);
 }
 
-InitialPosition & InitialInstancesContainer::GetInstance(unsigned int index)
-{
-    if ( index > initialInstances.size() ) return badPosition;
-
-    return initialInstances[index];
-}
-
-void InitialInstancesContainer::InsertNewInitialInstance()
+gd::InitialInstance & InitialInstancesContainer::InsertNewInitialInstance()
 {
     InitialPosition newInstance;
     initialInstances.push_back(newInstance);
-}
 
-void InitialInstancesContainer::RemoveInstance(unsigned int index)
-{
-    if ( index > initialInstances.size() ) return;
-
-    initialInstances.erase(initialInstances.begin()+index);
+    return initialInstances.back();
 }
 
 void InitialInstancesContainer::LoadFromXml(const TiXmlElement * rootElem)
@@ -98,62 +85,78 @@ void InitialInstancesContainer::LoadFromXml(const TiXmlElement * rootElem)
 
 void InitialInstancesContainer::RemoveInstance(const gd::InitialInstance & instance)
 {
-    for (unsigned int i = 0;i<initialInstances.size();++i)
+    for (std::list<InitialPosition>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end;)
     {
-        if ( &initialInstances[i] == &instance )
-        {
-            initialInstances.erase(initialInstances.begin()+i);
-            return;
-        }
+        if ( &(*it) == &instance )
+            it = initialInstances.erase(it);
+        else
+            ++it;
     }
 }
 
-void InitialInstancesContainer::InsertInitialInstance(const gd::InitialInstance & instance)
+gd::InitialInstance & InitialInstancesContainer::InsertInitialInstance(const gd::InitialInstance & instance)
 {
     try
     {
         const InitialPosition & castedInstance = dynamic_cast<const InitialPosition&>(instance);
         initialInstances.push_back(castedInstance);
+
+        return initialInstances.back();
     }
     catch(...) { std::cout << "WARNING: Tried to add an InitialPosition which is not a GD C++ Platform InitialPosition to a GD C++ Platform project"; }
+
+    return badPosition;
 }
 
 void InitialInstancesContainer::RenameInstancesOfObject(const std::string & oldName, const std::string & newName)
 {
-    for (unsigned int i = 0;i<initialInstances.size();++i)
+    for (std::list<InitialPosition>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
     {
-        if ( initialInstances[i].GetObjectName() == oldName )
-            initialInstances[i].SetObjectName(newName);
+        if ( (*it).GetObjectName() == oldName )
+            (*it).SetObjectName(newName);
     }
 }
 
 void InitialInstancesContainer::RemoveInitialInstancesOfObject(const std::string & objectName)
 {
-    for (unsigned int i = initialInstances.size()-1;i<initialInstances.size();--i)
+    for (std::list<InitialPosition>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end;)
     {
-        if ( initialInstances[i].GetObjectName() == objectName )
-            initialInstances.erase(initialInstances.begin()+i);
+        if ( (*it).GetObjectName() == objectName )
+            it = initialInstances.erase(it);
+        else
+            ++it;
     }
 }
 
 void InitialInstancesContainer::RemoveAllInstancesOnLayer(const std::string & layerName)
 {
-    for (unsigned int i = initialInstances.size()-1;i<initialInstances.size();--i)
+    for (std::list<InitialPosition>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end;)
     {
-        if ( initialInstances[i].GetLayer() == layerName )
-            initialInstances.erase(initialInstances.begin()+i);
+        if ( (*it).GetLayer() == layerName )
+            it = initialInstances.erase(it);
+        else
+            ++it;
     }
 }
 
 void InitialInstancesContainer::MoveInstancesToLayer(const std::string & fromLayer, const std::string & toLayer)
 {
-    for (unsigned int i = 0;i<initialInstances.size();++i)
+    for (std::list<InitialPosition>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
     {
-        if ( initialInstances[i].GetLayer() == fromLayer )
-            initialInstances[i].SetLayer(toLayer);
+        if ( (*it).GetLayer() == fromLayer )
+            (*it).SetLayer(toLayer);
     }
 }
 
+bool InitialInstancesContainer::SomeInstancesAreOnLayer(const std::string & layerName)
+{
+    for (std::list<InitialPosition>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
+    {
+        if ( (*it).GetLayer() == layerName )
+            return true;
+    }
+    return false;
+}
 
 void InitialInstancesContainer::Create(const gd::InitialInstancesContainer & source)
 {
@@ -162,31 +165,31 @@ void InitialInstancesContainer::Create(const gd::InitialInstancesContainer & sou
         const InitialInstancesContainer & castedSource = dynamic_cast<const InitialInstancesContainer&>(source);
         operator=(castedSource);
     }
-    catch(...) { std::cout << "WARNING: Tried to create a InitialInstancesContainer object from an object which is not a InitialInstancesContainer"; }
+    catch(...) { std::cout << "WARNING: Tried to create a GD C++ Platform InitialInstancesContainer object from an object which is not of the same type."; }
 }
 
 void InitialInstancesContainer::SaveToXml(TiXmlElement * element) const
 {
     if ( element == NULL ) return;
 
-    for (unsigned int j = 0;j < initialInstances.size();++j)
+    for (std::list<InitialPosition>::const_iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
     {
         TiXmlElement * objet = new TiXmlElement( "Objet" );
         element->LinkEndChild( objet );
-        objet->SetAttribute( "nom", initialInstances[j].GetObjectName().c_str() );
-        objet->SetDoubleAttribute( "x", initialInstances[j].GetX() );
-        objet->SetDoubleAttribute( "y", initialInstances[j].GetY() );
-        objet->SetAttribute( "plan", initialInstances[j].GetZOrder() );
-        objet->SetAttribute( "layer", initialInstances[j].GetLayer().c_str() );
-        objet->SetDoubleAttribute( "angle", initialInstances[j].GetAngle() );
-        objet->SetAttribute( "personalizedSize", initialInstances[j].HasCustomSize() ? "true" : "false" );
-        objet->SetDoubleAttribute( "width", initialInstances[j].GetCustomWidth() );
-        objet->SetDoubleAttribute( "height", initialInstances[j].GetCustomHeight() );
+        objet->SetAttribute( "nom", (*it).GetObjectName().c_str() );
+        objet->SetDoubleAttribute( "x", (*it).GetX() );
+        objet->SetDoubleAttribute( "y", (*it).GetY() );
+        objet->SetAttribute( "plan", (*it).GetZOrder() );
+        objet->SetAttribute( "layer", (*it).GetLayer().c_str() );
+        objet->SetDoubleAttribute( "angle", (*it).GetAngle() );
+        objet->SetAttribute( "personalizedSize", (*it).HasCustomSize() ? "true" : "false" );
+        objet->SetDoubleAttribute( "width", (*it).GetCustomWidth() );
+        objet->SetDoubleAttribute( "height", (*it).GetCustomHeight() );
 
         TiXmlElement * floatInfos = new TiXmlElement( "floatInfos" );
         objet->LinkEndChild( floatInfos );
 
-        for(std::map<std::string, float>::const_iterator floatInfo = initialInstances[j].floatInfos.begin(); floatInfo != initialInstances[j].floatInfos.end(); ++floatInfo)
+        for(std::map<std::string, float>::const_iterator floatInfo = (*it).floatInfos.begin(); floatInfo != (*it).floatInfos.end(); ++floatInfo)
         {
             TiXmlElement * info = new TiXmlElement( "Info" );
             floatInfos->LinkEndChild( info );
@@ -197,7 +200,7 @@ void InitialInstancesContainer::SaveToXml(TiXmlElement * element) const
         TiXmlElement * stringInfos = new TiXmlElement( "stringInfos" );
         objet->LinkEndChild( stringInfos );
 
-        for(std::map<std::string, std::string>::const_iterator stringInfo = initialInstances[j].stringInfos.begin(); stringInfo != initialInstances[j].stringInfos.end(); ++stringInfo)
+        for(std::map<std::string, std::string>::const_iterator stringInfo = (*it).stringInfos.begin(); stringInfo != (*it).stringInfos.end(); ++stringInfo)
         {
             TiXmlElement * info = new TiXmlElement( "Info" );
             stringInfos->LinkEndChild( info );
@@ -207,7 +210,7 @@ void InitialInstancesContainer::SaveToXml(TiXmlElement * element) const
 
         TiXmlElement * initialVariables = new TiXmlElement( "InitialVariables" );
         objet->LinkEndChild( initialVariables );
-        initialInstances[j].GetVariables().SaveToXml(initialVariables);
+        (*it).GetVariables().SaveToXml(initialVariables);
     }
 }
 #endif

@@ -179,7 +179,7 @@ public:
     #if defined(GD_IDE_ONLY)
     /**
      * Get a list, with read-write access, of SFML events managed by the render target.
-     * \note This method is used by the IDE ( class SceneCanvas precisely ) to manually inject
+     * \note This method is used by the IDE ( class SceneEditorCanvas precisely ) to manually inject
      * events not caught by SFML on linux when using a wxSFMLCanvas.
      * \warning You should not rely on this method as it could be removed when this specific problem will be fixed
      * ( but you can safely use the const version of this method )

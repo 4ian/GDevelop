@@ -13,10 +13,15 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDL/IDE/Dialogs/DebuggerGUI.h"
 #include "GDL/IDE/Dialogs/ProfileDlg.h"
+#include "GDL/Position.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
+#include "GDL/CommonTools.h"
+#undef GetObject //Undefining an annoying macro
 
 void SceneEditorCanvas::RenderCompilationScreen()
 {
@@ -73,17 +78,17 @@ void SceneEditorCanvas::UpdateMouseResizeCursor(const std::string & currentResiz
         wxSetCursor(wxCursor(wxCURSOR_SIZENESW));
 }
 
-double SceneEditorCanvas::GetMouseXOnLayout()
+double SceneEditorCanvas::GetMouseXOnLayout() const
 {
     return convertCoords(sf::Mouse::getPosition(*this), editionView).x;
 }
 
-double SceneEditorCanvas::GetMouseYOnLayout()
+double SceneEditorCanvas::GetMouseYOnLayout() const
 {
     return convertCoords(sf::Mouse::getPosition(*this), editionView).y;
 }
 
-boost::shared_ptr<Object> SceneEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialInstance & instance)
+boost::shared_ptr<Object> SceneEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const
 {
     if ( initialInstancesAndObjectsBimap.left.find(dynamic_cast<InitialPosition*>(&instance)) == initialInstancesAndObjectsBimap.left.end() )
     {
@@ -94,7 +99,7 @@ boost::shared_ptr<Object> SceneEditorCanvas::GetObjectLinkedToInitialInstance(gd
     return initialInstancesAndObjectsBimap.left.find(dynamic_cast<InitialPosition*>(&instance))->second;
 }
 
-double SceneEditorCanvas::GetWidthOfInitialInstance(gd::InitialInstance & instance)
+double SceneEditorCanvas::GetWidthOfInitialInstance(gd::InitialInstance & instance) const
 {
     boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
     if ( object ) return object->GetWidth();
@@ -102,7 +107,7 @@ double SceneEditorCanvas::GetWidthOfInitialInstance(gd::InitialInstance & instan
     return 0;
 }
 
-double SceneEditorCanvas::GetHeightOfInitialInstance(gd::InitialInstance & instance)
+double SceneEditorCanvas::GetHeightOfInitialInstance(gd::InitialInstance & instance) const
 {
     boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
     if ( object ) return object->GetHeight();
@@ -110,7 +115,7 @@ double SceneEditorCanvas::GetHeightOfInitialInstance(gd::InitialInstance & insta
     return 0;
 }
 
-double SceneEditorCanvas::GetRealXPositionOfInitialInstance(gd::InitialInstance & instance)
+double SceneEditorCanvas::GetRealXPositionOfInitialInstance(gd::InitialInstance & instance) const
 {
     boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
     if ( object ) return object->GetDrawableX();
@@ -118,7 +123,7 @@ double SceneEditorCanvas::GetRealXPositionOfInitialInstance(gd::InitialInstance 
     return instance.GetX();
 }
 
-double SceneEditorCanvas::GetRealYPositionOfInitialInstance(gd::InitialInstance & instance)
+double SceneEditorCanvas::GetRealYPositionOfInitialInstance(gd::InitialInstance & instance) const
 {
     boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
     if ( object ) return object->GetDrawableY();
@@ -228,6 +233,247 @@ void SceneEditorCanvas::DoConnectEvents()
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonPause, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneEditorCanvas::OnPreviewPauseBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonDebugger, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneEditorCanvas::OnPreviewDebugBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonProfiler, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneEditorCanvas::OnPreviewProfilerBtClick, NULL, this);
+
+    Connect(ID_DELOBJMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnDeleteObjectSelected);
+    Connect(ID_PROPMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnPropObjSelected);
+    Connect(ID_LAYERUPMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnLayerUpSelected);
+    Connect(ID_LAYERDOWNMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnLayerDownSelected);
+    Connect(ID_COPYMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCopySelected);
+    Connect(ID_CUTMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCutSelected);
+    Connect(ID_PASTEMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnPasteSelected);
+    Connect(ID_PASTESPECIALMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnPasteSpecialSelected);
+    Connect(ID_CREATEOBJECTMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCreateObjectSelected);
+}
+
+void SceneEditorCanvas::UpdateContextMenu()
+{
+    if ( selectedInstances.empty() ) return;
+
+    //Can we send the objects on a higher layer ?
+    unsigned int lowestLayer = previewScene.GetLayersCount()-1;
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+    {
+        if (it->first == NULL) continue;
+        lowestLayer = std::min(lowestLayer, previewScene.GetLayerPosition(it->first->GetLayer()));
+    }
+
+    contextMenu.FindItem(ID_LAYERUPMENU)->Enable(false);
+    if ( lowestLayer+1 < previewScene.GetLayersCount() )
+    {
+        string name = previewScene.GetLayer(lowestLayer+1).GetName();
+        if ( name == "" ) name = _("Base layer");
+        contextMenu.FindItem(ID_LAYERUPMENU)->Enable(true);
+        contextMenu.FindItem(ID_LAYERUPMENU)->SetItemLabel(string(_("Put the object(s) on the layer \"")) + name +"\"");
+    }
+
+    //Can we send the objects on a lower layer ?
+    unsigned int highestLayer = 0;
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+    {
+        if (it->first == NULL) continue;
+        highestLayer = std::max(highestLayer, previewScene.GetLayerPosition(it->first->GetLayer()));
+    }
+
+    contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(false);
+    if ( highestLayer >= 1 )
+    {
+        string name = previewScene.GetLayer(highestLayer-1).GetName();
+        if ( name == "" ) name = _("Base layer");
+
+        contextMenu.FindItem(ID_LAYERDOWNMENU)->Enable(true);
+        contextMenu.FindItem(ID_LAYERDOWNMENU)->SetItemLabel(string(_("Put the object(s) on the layer \"")) + name +"\"");
+    }
+}
+
+void SceneEditorCanvas::OnLayerUpSelected(wxCommandEvent & event)
+{
+    unsigned int lowestLayer = previewScene.GetLayersCount()-1;
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+    {
+        if (it->first == NULL) continue;
+        lowestLayer = std::min(lowestLayer, previewScene.GetLayerPosition(it->first->GetLayer()));
+    }
+
+    if ( lowestLayer+1 < previewScene.GetLayersCount() ) SendSelectionToLayer(previewScene.GetLayer(lowestLayer+1).GetName());
+}
+
+void SceneEditorCanvas::OnLayerDownSelected(wxCommandEvent & event)
+{
+    unsigned int highestLayer = 0;
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+    {
+        if (it->first == NULL) continue;
+        highestLayer = std::max(highestLayer, previewScene.GetLayerPosition(it->first->GetLayer()));
+    }
+
+    if ( highestLayer >= 1 ) SendSelectionToLayer(previewScene.GetLayer(highestLayer-1).GetName());
+}
+
+void SceneEditorCanvas::SendSelectionToLayer(const std::string & newLayerName)
+{
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+    {
+        if (it->first == NULL) continue;
+
+        it->first->SetLayer(newLayerName);
+        boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*it->first);
+        if ( associatedObject ) associatedObject->SetLayer(newLayerName);
+    }
+
+    ChangesMade();
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
+}
+
+void SceneEditorCanvas::OnPropObjSelected(wxCommandEvent & event)
+{
+    parentAuiManager->GetPane("PROPERTIES").Show();
+    parentAuiManager->Update();
+}
+
+void SceneEditorCanvas::OnDeleteObjectSelected(wxCommandEvent & event)
+{
+    std::vector<gd::InitialInstance*> instancesToDelete;
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+        instancesToDelete.push_back(it->first);
+
+    DeleteInstances(instancesToDelete);
+
+    ClearSelection();
+    ChangesMade();
+}
+
+void SceneEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
+{
+    gd::ChooseObjectTypeDialog chooseTypeDialog(this, game);
+    if ( chooseTypeDialog.ShowModal() == 0 )
+        return;
+
+    //Find a new unique name for the object
+    std::string name = ToString(_("NewObject"));
+    for (unsigned int i = 0;scene.HasObjectNamed(name);)
+    {
+        ++i;
+        name =  _("NewObject")+ToString(i);
+    }
+
+    //Add a new object of selected type to objects list
+    scene.InsertNewObject(chooseTypeDialog.GetSelectedObjectType(), name, scene.GetObjectsCount());
+
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->ObjectsUpdated();
+
+    //Add it on the scene ( Use oldMouseX/Y as the cursor has moved since the right click )
+    AddObject(name, oldMouseX, oldMouseY);
+
+    //Edit now the object
+    scene.GetObject(name).EditObject(this, game, mainFrameWrapper);
+    game.GetChangesNotifier().OnObjectEdited(game, &scene, scene.GetObject(name));
+}
+
+void SceneEditorCanvas::OnCopySelected(wxCommandEvent & event)
+{
+    /*
+    vector < InitialPosition > copiedPositions;
+
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+    {
+        InitialPosition * instance = dynamic_cast<InitialPosition*>(it->first);
+        if ( instance == NULL ) continue;
+
+        copiedPositions.push_back(*instance);
+        copiedPositions.back().SetX(copiedPositions.back().GetX() - oldMouseX);
+        copiedPositions.back().SetY(copiedPositions.back().GetY() - oldMouseY);
+    }
+
+    Clipboard::GetInstance()->SetPositionsSelection(copiedPositions);*/
+}
+
+void SceneEditorCanvas::OnCutSelected(wxCommandEvent & event)
+{
+    /*vector < InitialPosition > copiedPositions;
+
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+    {
+        InitialPosition * instance = dynamic_cast<InitialPosition*>(it->first);
+        if ( instance == NULL ) continue;
+
+        copiedPositions.push_back(*instance);
+        copiedPositions.back().SetX(copiedPositions.back().GetX() - oldMouseX);
+        copiedPositions.back().SetY(copiedPositions.back().GetY() - oldMouseY);
+    }
+
+    //Do not forget to remove the cut instances
+    std::vector<gd::InitialInstance*> instancesToDelete;
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+        instancesToDelete.push_back(it->first);
+
+    DeleteInstances(instancesToDelete);
+
+    Clipboard::GetInstance()->SetPositionsSelection(copiedPositions);
+    ChangesMade();*/
+}
+
+void SceneEditorCanvas::OnPasteSelected(wxCommandEvent & event)
+{
+    /*if ( !Clipboard::GetInstance()->HasPositionsSelection() ) return;
+
+    vector < InitialPosition > pastedPositions = Clipboard::GetInstance()->GetPositionsSelection();
+
+    for (unsigned int i =0;i<pastedPositions.size();++i)
+    {
+        instances.InsertInitialInstance(pastedPositions[i]);
+        gd::InitialInstance & insertedInstance = instances.GetInstance(instances.GetInstancesCount()-1);
+        insertedInstance.SetX(insertedInstance.GetX()+editionData.oldMouseX);
+        insertedInstance.SetY(insertedInstance.GetY()+editionData.oldMouseY);
+    }
+
+    ChangesMade();
+    Reload();*/
+}
+
+void SceneEditorCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
+{
+    /*
+    if ( !Clipboard::GetInstance()->HasPositionsSelection() ) return;
+    vector < InitialPosition > pastedPositions = Clipboard::GetInstance()->GetPositionsSelection();
+
+    AdvancedPasteDlg dialog(this);
+    dialog.SetStartX(editionData.oldMouseX);
+    dialog.SetStartY(editionData.oldMouseY);
+
+    ObjSPtr object = GetObjectFromInitialPosition(pastedPositions.front());
+    if ( object != boost::shared_ptr<Object>() )
+    {
+        dialog.SetXGap(object->GetWidth());
+        dialog.SetYGap(object->GetHeight());
+    }
+
+    if ( dialog.ShowModal() != 1 ) return;
+
+    float angle = dialog.GetRotationIncrementation();
+    for (unsigned int i = 0;i<dialog.GetYCount();++i)
+    {
+        for (unsigned int j = 0;j<dialog.GetXCount();++j)
+        {
+            instances.InsertInitialInstance(pastedPositions.front());
+            gd::InitialInstance & insertedInstance = instances.GetInstance(instances.GetInstancesCount()-1);
+            insertedInstance.SetX(dialog.GetStartX()+dialog.GetXGap()*j);
+            insertedInstance.SetY(dialog.GetStartY()+dialog.GetYGap()*i);
+            insertedInstance.SetAngle(pastedPositions.front().GetAngle() + angle);
+
+            angle += dialog.GetRotationIncrementation();
+        }
+    }
+
+    if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
+    ChangesMade();
+    Reload();*/
+}
+
+void SceneEditorCanvas::EnsureVisible(const gd::InitialInstance & instance)
+{
+    editionView.setCenter(instance.GetX(), instance.GetY());
 }
 
 void SceneEditorCanvas::OnZoomInitBtClick( wxCommandEvent & event )

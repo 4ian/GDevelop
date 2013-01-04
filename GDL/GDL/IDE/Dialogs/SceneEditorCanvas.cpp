@@ -9,12 +9,6 @@
 #include <wx/filename.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/scrolbar.h>
-// Platform-specific includes
-#ifdef __WXGTK__
-    #include <gdk/gdkx.h>
-    #include <gtk/gtk.h>
-    #include <wx/gtk/private/win_gtk.h>
-#endif
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDL/RuntimeGame.h"
@@ -29,11 +23,27 @@
 #include "GDL/IDE/Dialogs/ProfileDlg.h"
 #include "GDL/IDE/Dialogs/RenderDialog.h"
 #include "SceneEditorCanvas.h"
+// Platform-specific includes. Be sure to include them at the end as it seems to be some incompatibilities with SFML's WindowStyle.hpp
+#ifdef __WXGTK__
+    #include <gdk/gdkx.h>
+    #include <gtk/gtk.h>
+    #include <wx/gtk/private/win_gtk.h> //If this file is unable during compilation, then you must manually locate the "gtk/private" folder it in the wxWidgets folder and copy it into the folder where wx is installed.
+#endif
 
 sf::Texture SceneEditorCanvas::reloadingIconImage;
 sf::Sprite SceneEditorCanvas::reloadingIconSprite;
 sf::Text SceneEditorCanvas::reloadingText;
 
+const long SceneEditorCanvas::ID_ADDOBJMENU = wxNewId();
+const long SceneEditorCanvas::ID_DELOBJMENU = wxNewId();
+const long SceneEditorCanvas::ID_PROPMENU = wxNewId();
+const long SceneEditorCanvas::ID_LAYERUPMENU = wxNewId();
+const long SceneEditorCanvas::ID_LAYERDOWNMENU = wxNewId();
+const long SceneEditorCanvas::ID_COPYMENU = wxNewId();
+const long SceneEditorCanvas::ID_CUTMENU = wxNewId();
+const long SceneEditorCanvas::ID_PASTEMENU = wxNewId();
+const long SceneEditorCanvas::ID_PASTESPECIALMENU = wxNewId();
+const long SceneEditorCanvas::ID_CREATEOBJECTMENU = wxNewId();
 const long SceneEditorCanvas::idRibbonOrigine = wxNewId();
 const long SceneEditorCanvas::idRibbonOriginalZoom = wxNewId();
 const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM = wxNewId();
@@ -109,6 +119,49 @@ SceneEditorCanvas::SceneEditorCanvas(wxWindow* parent, gd::Project & project_, g
 	wxMenuItem * zoom500 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("500%"), wxEmptyString, wxITEM_NORMAL);
 	zoomMenu.Append(zoom500);
 
+    //Generate context menu
+    {
+        wxMenuItem * layerUpItem = new wxMenuItem((&contextMenu), ID_LAYERUPMENU, _("Put the object(s) on the higher layer"), wxEmptyString, wxITEM_NORMAL);
+        layerUpItem->SetBitmap(wxImage( "res/up.png" ) );
+        wxMenuItem * layerDownItem = new wxMenuItem((&contextMenu), ID_LAYERDOWNMENU, _("Put the object(s) on the lower layer"), wxEmptyString, wxITEM_NORMAL);
+        layerDownItem->SetBitmap(wxImage( "res/down.png" ) );
+        wxMenuItem * deleteItem = new wxMenuItem((&contextMenu), ID_DELOBJMENU, _("Delete the selection\tDEL"), wxEmptyString, wxITEM_NORMAL);
+        deleteItem->SetBitmap(wxImage( "res/deleteicon.png" ) );
+
+        contextMenu.Append(ID_PROPMENU, _("Properties"));
+        contextMenu.AppendSeparator();
+        contextMenu.Append(ID_CREATEOBJECTMENU, _("Insert a new object"));
+        contextMenu.AppendSeparator();
+        contextMenu.Append(deleteItem);
+        contextMenu.AppendSeparator();
+        contextMenu.Append(layerUpItem);
+        contextMenu.Append(layerDownItem);
+        contextMenu.AppendSeparator();
+
+        wxMenuItem * copyItem = new wxMenuItem((&contextMenu), ID_COPYMENU, _("Copy"), wxEmptyString, wxITEM_NORMAL);
+        copyItem->SetBitmap(wxImage( "res/copyicon.png" ) );
+        contextMenu.Append(copyItem);
+        wxMenuItem * cutItem = new wxMenuItem((&contextMenu), ID_CUTMENU, _("Cut"), wxEmptyString, wxITEM_NORMAL);
+        cutItem->SetBitmap(wxImage( "res/cuticon.png" ) );
+        contextMenu.Append(cutItem);
+        wxMenuItem * pasteItem = new wxMenuItem((&contextMenu), ID_PASTEMENU, _("Paste"), wxEmptyString, wxITEM_NORMAL);
+        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
+        contextMenu.Append(pasteItem);
+        wxMenuItem * pasteSpecialItem = new wxMenuItem((&contextMenu), ID_PASTESPECIALMENU, _("Special paste"), wxEmptyString, wxITEM_NORMAL);
+        contextMenu.Append(pasteSpecialItem);
+    }
+
+    //Generate "no object" context menu
+    {
+        noObjectContextMenu.Append(ID_CREATEOBJECTMENU, _("Insert a new object"));
+        noObjectContextMenu.AppendSeparator();
+        wxMenuItem * pasteItem = new wxMenuItem((&noObjectContextMenu), ID_PASTEMENU, _("Paste"), wxEmptyString, wxITEM_NORMAL);
+        pasteItem->SetBitmap(wxImage( "res/pasteicon.png" ) );
+        noObjectContextMenu.Append(pasteItem);
+        wxMenuItem * pasteSpecialItem = new wxMenuItem((&noObjectContextMenu), ID_PASTESPECIALMENU, _("Special paste"), wxEmptyString, wxITEM_NORMAL);
+        noObjectContextMenu.Append(pasteSpecialItem);
+    }
+
     RecreateRibbonToolbar();
 }
 
@@ -136,7 +189,7 @@ void SceneEditorCanvas::OnPreviewBtClick( wxCommandEvent & event )
 
     previewScene.running = false;
 
-    Reload();
+    RefreshFromLayout();
     UpdateSize();
     UpdateScrollbars();
 
@@ -162,7 +215,7 @@ void SceneEditorCanvas::OnEditionBtClick( wxCommandEvent & event )
     //Parse now the results of profiling
     if ( profiler ) profiler->ParseProfileEvents();
 
-    Reload();
+    RefreshFromLayout();
     UpdateSize();
     UpdateScrollbars();
 
@@ -189,7 +242,7 @@ void SceneEditorCanvas::OnUpdate()
                 OnEditionBtClick(useless);
             }
             else
-                ReloadSecondPart();
+                RefreshFromLayoutSecondPart();
         }
     }
     else //We're displaying the scene
@@ -214,7 +267,7 @@ void SceneEditorCanvas::OnUpdate()
             }
 
             if ( scene.RefreshNeeded() ) //Reload scene if necessary
-                Reload();
+                RefreshFromLayout();
         }
 
         //Then display the scene
@@ -240,7 +293,7 @@ void SceneEditorCanvas::OnUpdate()
     }
 }
 
-void SceneEditorCanvas::Reload()
+void SceneEditorCanvas::RefreshFromLayout()
 {
     cout << "Scene Editor canvas reloading... ( Step 1/2 )" << endl;
     isReloading = true;
@@ -268,10 +321,10 @@ void SceneEditorCanvas::Reload()
             mainFrameWrapper.GetInfoBar()->ShowMessage(_("Changes made to events will be taken into account when you switch to Edition mode"));
     }
 
-    return; //ReloadSecondPart() will be called by OnUpdate() when appropriate
+    return; //RefreshFromLayoutSecondPart() will be called by OnUpdate() when appropriate
 }
 
-void SceneEditorCanvas::ReloadSecondPart()
+void SceneEditorCanvas::RefreshFromLayoutSecondPart()
 {
     cout << "Scene canvas reloading... ( Step 2/2 )" << endl;
     if ( !editing )  CodeCompiler::GetInstance()->DisableTaskRelatedTo(scene);
@@ -311,7 +364,7 @@ void SceneEditorCanvas::OnPreviewRefreshBtClick( wxCommandEvent & event )
 {
     previewScene.running = false;
 
-    Reload();
+    RefreshFromLayout();
 }
 
 void SceneEditorCanvas::OnPreviewPlayBtClick( wxCommandEvent & event )
@@ -377,6 +430,18 @@ void SceneEditorCanvas::OnPreviewProfilerBtClick( wxCommandEvent & event )
 
 void SceneEditorCanvas::OnLeftUp( wxMouseEvent &event )
 {
+    #if defined(LINUX) //Simulate click on linux
+    sf::Event myEvent;
+    myEvent.type = sf::Event::MouseButtonReleased;
+    myEvent.mouseButton.x = event.GetX();
+    myEvent.mouseButton.y = event.GetY();
+    myEvent.mouseButton.button = sf::Mouse::Left;
+
+    previewScene.GetRenderTargetEvents().push_back(myEvent);
+    #endif
+
+    if ( !editing ) return;
+
     if ( currentResizeBt.substr(0,6) == "resize")
     {
         currentResizeBt.clear();
@@ -527,7 +592,48 @@ void SceneEditorCanvas::OnMiddleDown( wxMouseEvent &event )
 
 void SceneEditorCanvas::OnRightUp( wxMouseEvent &event )
 {
+    #if defined(LINUX) //Simulate click on linux
+    sf::Event myEvent;
+    myEvent.type = sf::Event::MouseButtonReleased;
+    myEvent.mouseButton.x = event.GetX();
+    myEvent.mouseButton.y = event.GetY();
+    myEvent.mouseButton.button = sf::Mouse::Right;
 
+    previewScene.GetRenderTargetEvents().push_back(myEvent);
+    #endif
+
+    if ( !editing ) return;
+
+
+    //Check if an instance is selected
+    {
+        gd::InitialInstance * instance = GetInitialInstanceUnderCursor();
+
+        double mouseX = GetMouseXOnLayout();
+        double mouseY = GetMouseYOnLayout();
+
+        //Check if we must unselect all the objects
+        if ( !shiftPressed && //Check that shift is not pressed
+            ( instance == NULL || //If no object is clicked
+              selectedInstances.find(instance) == selectedInstances.end()) ) //Or an object which is not currently selected.
+        {
+            ClearSelection();
+        }
+
+        //Display the appropriate context menu
+        if ( instance != NULL )
+        {
+            SelectInstance(instance);
+            OnUpdate(); //So as to display selection rectangle for the newly selected object
+            UpdateContextMenu();
+            PopupMenu(&contextMenu);
+        }
+        else
+            PopupMenu(&noObjectContextMenu);
+
+        oldMouseX = mouseX; //Remember the old position of the cursor for
+        oldMouseY = mouseY; //use during the next event.
+    }
 }
 
 void SceneEditorCanvas::OnGuiElementHovered(const gd::LayoutEditorCanvasGuiElement & guiElement)

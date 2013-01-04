@@ -51,7 +51,7 @@ VariablesExtension::VariablesExtension()
                 }
 
                 //Generate variable getter call.
-                std::string variableGetCode = "GetSceneVariableValue(*runtimeContext->scene, \""+instruction.GetParameters()[1].GetPlainString()+"\")";
+                std::string variableGetCode = "GetSceneVariableValue(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -113,7 +113,7 @@ VariablesExtension::VariablesExtension()
                 }
 
                 //Generate variable getter call.
-                std::string variableGetCode = "GetSceneVariableString(*runtimeContext->scene, \""+instruction.GetParameters()[1].GetPlainString()+"\")";
+                std::string variableGetCode = "GetSceneVariableString(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -182,7 +182,7 @@ VariablesExtension::VariablesExtension()
                 }
 
                 //Generate variable getter call.
-                std::string variableGetCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+instruction.GetParameters()[1].GetPlainString()+"\")";
+                std::string variableGetCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<game.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( game.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -244,7 +244,7 @@ VariablesExtension::VariablesExtension()
                 }
 
                 //Generate variable getter call.
-                std::string variableGetCode = "GetGlobalVariableString(*runtimeContext->scene, \""+instruction.GetParameters()[1].GetPlainString()+"\")";
+                std::string variableGetCode = "GetGlobalVariableString(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<game.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( game.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -313,7 +313,7 @@ VariablesExtension::VariablesExtension()
                 }
 
                 //Generate variable getter call.
-                std::string variableObtainCode = "GetSceneVariable(*runtimeContext->scene, \""+instruction.GetParameters()[1].GetPlainString()+"\")";
+                std::string variableObtainCode = "GetSceneVariable(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -373,7 +373,7 @@ VariablesExtension::VariablesExtension()
                 }
 
                 //Generate variable getter call.
-                std::string variableObtainCode = "GetSceneVariable(*runtimeContext->scene, \""+instruction.GetParameters()[1].GetPlainString()+"\")";
+                std::string variableObtainCode = "GetSceneVariable(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -427,7 +427,7 @@ VariablesExtension::VariablesExtension()
                 }
 
                 //Generate variable getter call.
-                std::string variableObtainCode = "GetGlobalVariable(*runtimeContext->scene, \""+instruction.GetParameters()[1].GetPlainString()+"\")";
+                std::string variableObtainCode = "GetGlobalVariable(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<game.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( game.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -487,7 +487,7 @@ VariablesExtension::VariablesExtension()
                 }
 
                 //Generate variable getter call.
-                std::string variableObtainCode = "GetGlobalVariable(*runtimeContext->scene, \""+instruction.GetParameters()[1].GetPlainString()+"\")";
+                std::string variableObtainCode = "GetGlobalVariable(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<game.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( game.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -525,7 +525,7 @@ VariablesExtension::VariablesExtension()
             virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-                std::string variableObtainCode = "GetSceneVariableValue(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
+                std::string variableObtainCode = "GetSceneVariableValue(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(parameters[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
@@ -557,7 +557,7 @@ VariablesExtension::VariablesExtension()
             virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-                std::string variableObtainCode = "GetSceneVariableString(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
+                std::string variableObtainCode = "GetSceneVariableString(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(parameters[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
@@ -587,7 +587,7 @@ VariablesExtension::VariablesExtension()
             virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-                std::string variableObtainCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
+                std::string variableObtainCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(parameters[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<game.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( game.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
@@ -617,7 +617,7 @@ VariablesExtension::VariablesExtension()
             virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-                std::string variableObtainCode = "GetGlobalVariableString(*runtimeContext->scene, \""+parameters[1].GetPlainString()+"\")";
+                std::string variableObtainCode = "GetGlobalVariableString(*runtimeContext->scene, \""+EventsCodeGenerator::ConvertToCppString(parameters[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<game.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( game.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )

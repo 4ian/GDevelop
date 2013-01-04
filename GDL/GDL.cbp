@@ -8,8 +8,8 @@
 		<Build>
 			<Target title="Debug">
 				<Option platforms="Windows;" />
-				<Option output="..\Runtime\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Debug\" />
+				<Option output="../Runtime/bin/debug/gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -24,8 +24,8 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
-					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
+					<Add directory="../ExtLibs/llvm/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -78,14 +78,14 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
-					<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
+					<Add directory="../ExtLibs/SFML/build-mingw-debug/lib" />
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="..\IDE\bin\debug\gdl" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Debug Edittime\" />
+				<Option output="../IDE/bin/debug/gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -107,12 +107,12 @@
 					<Add option="-DWXUSINGDLL" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswud" />
-					<Add directory="..\ExtLibs\wxwidgets\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\tools\clang\include" />
-					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
+					<Add directory="../ExtLibs/wxwidgets/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/tools/clang/include" />
+					<Add directory="../ExtLibs/llvm/tools/clang/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -192,17 +192,17 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswud" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
-					<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
-					<Add directory="..\IDE\bin\debug" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
+					<Add directory="../ExtLibs/SFML/build-mingw-debug/lib" />
+					<Add directory="../IDE/bin/debug" />
 				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option platforms="Windows;" />
-				<Option output="..\Runtime\bin\release\gdl" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Release\" />
+				<Option output="../Runtime/bin/release/gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -217,8 +217,8 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
-					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
+					<Add directory="../ExtLibs/llvm/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -270,14 +270,14 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
-					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
+					<Add directory="../ExtLibs/SFML/build-mingw-release/lib" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="..\IDE\bin\release\gdl" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Release Edittime\" />
+				<Option output="../IDE/bin/release/gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -298,12 +298,12 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="..\ExtLibs\wxwidgets\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\tools\clang\include" />
-					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../ExtLibs/wxwidgets/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/tools/clang/include" />
+					<Add directory="../ExtLibs/llvm/tools/clang/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -383,17 +383,17 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
-					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
-					<Add directory="..\IDE\bin\release" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
+					<Add directory="../ExtLibs/SFML/build-mingw-release/lib" />
+					<Add directory="../IDE/bin/release" />
 				</Linker>
 			</Target>
 			<Target title="Development">
 				<Option platforms="Windows;" />
-				<Option output="..\Runtime\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Dev\" />
+				<Option output="../Runtime/bin/dev/gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Dev/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -408,8 +408,8 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
-					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
+					<Add directory="../ExtLibs/llvm/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -461,14 +461,14 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
-					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
+					<Add directory="../ExtLibs/SFML/build-mingw-release/lib" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="..\IDE\bin\dev\gdl" prefix_auto="1" extension_auto="1" />
-				<Option object_output="obj\Dev Edittime\" />
+				<Option output="../IDE/bin/dev/gdl" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Dev Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createStaticLib="1" />
@@ -489,12 +489,12 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="..\ExtLibs\wxwidgets\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\tools\clang\include" />
-					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../ExtLibs/wxwidgets/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/tools/clang/include" />
+					<Add directory="../ExtLibs/llvm/tools/clang/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lGDCore" />
@@ -573,17 +573,17 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll\mswu" />
-					<Add directory="..\ExtLibs\wxwidgets\lib\gcc_dll" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
-					<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
-					<Add directory="..\IDE\bin\dev" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
+					<Add directory="../ExtLibs/SFML/build-mingw-release/lib" />
+					<Add directory="../IDE/bin/dev" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
 				<Option platforms="Windows;Unix;" />
-				<Option output="..\Runtime\bin\release\libgdl.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="obj\Release\" />
+				<Option output="../Runtime/bin/release/libgdl.so" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -602,8 +602,8 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\llvm\build\include" />
-					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
+					<Add directory="../ExtLibs/llvm/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -656,14 +656,14 @@
 					<Add option="-lLLVMARMCodeGen" />
 					<Add option="-lLLVMCBackendInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
-					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
-					<Add directory="..\ExtLibs\llvm\build\lib" />
+					<Add directory="../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="../ExtLibs/llvm/build/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
 				<Option platforms="Windows;Unix;" />
-				<Option output="..\IDE\bin\release\libgdl.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="obj\Release Edittime\" />
+				<Option output="../IDE/bin/release/libgdl.so" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj/Release Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -685,10 +685,10 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\llvm\build\include" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
-					<Add directory="..\ExtLibs\llvm\build\tools\clang\include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/tools/clang/include" />
+					<Add directory="../ExtLibs/llvm/build/tools/clang/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -744,15 +744,15 @@
 					<Add option="-lLLVMARMCodeGen" />
 					<Add option="-lLLVMCBackendInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
-					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
-					<Add directory="..\ExtLibs\llvm\build\lib" />
-					<Add directory="..\IDE\bin\release" />
+					<Add directory="../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="../ExtLibs/llvm/build/lib" />
+					<Add directory="../IDE/bin/release" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
 				<Option platforms="Windows;Unix;" />
-				<Option output="..\IDE\bin\debug\libgdl.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="obj\Debug Edittime\" />
+				<Option output="../IDE/bin/debug/libgdl.so" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj/Debug Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -773,10 +773,10 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\llvm\build\include" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\tools\clang\include" />
-					<Add directory="..\ExtLibs\llvm\build\tools\clang\include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/tools/clang/include" />
+					<Add directory="../ExtLibs/llvm/build/tools/clang/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lGDCore" />
@@ -831,15 +831,15 @@
 					<Add option="-lLLVMARMCodeGen" />
 					<Add option="-lLLVMCBackendInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
-					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
-					<Add directory="..\ExtLibs\llvm\build\lib" />
-					<Add directory="..\IDE\bin\debug" />
+					<Add directory="../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="../ExtLibs/llvm/build/lib" />
+					<Add directory="../IDE/bin/debug" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
 				<Option platforms="Windows;Unix;" />
-				<Option output="..\Runtime\bin\debug\libgdl.so" prefix_auto="0" extension_auto="0" />
-				<Option object_output="obj\Debug\" />
+				<Option output="../Runtime/bin/debug/libgdl.so" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -855,8 +855,8 @@
 					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\llvm\build\include" />
-					<Add directory="..\ExtLibs\llvm\include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
+					<Add directory="../ExtLibs/llvm/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lsfml-audio" />
@@ -910,14 +910,14 @@
 					<Add option="-lLLVMARMCodeGen" />
 					<Add option="-lLLVMCBackendInfo" />
 					<Add option="-lLLVMCppBackendInfo" />
-					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
-					<Add directory="..\ExtLibs\llvm\build\lib" />
+					<Add directory="../ExtLibs/SFML/build-linux/lib" />
+					<Add directory="../ExtLibs/llvm/build/lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
 				<Option platforms="Windows;Mac;" />
-				<Option output="..\Runtime\bin\release\libgdl.dylib" prefix_auto="0" extension_auto="0" />
-				<Option object_output="obj\Release\" />
+				<Option output="../Runtime/bin/release/libgdl.dylib" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -934,8 +934,8 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\..\libs\boost_1_43_0" />
-					<Add directory="..\..\libs\sfml\include" />
+					<Add directory="../../libs/boost_1_43_0" />
+					<Add directory="../../libs/sfml/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -949,7 +949,7 @@
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
-					<Add directory="..\ExtLibs\SFML\build-mac\lib" />
+					<Add directory="../ExtLibs/SFML/build-mac/lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/release/libgdl.dylib" />
@@ -957,8 +957,8 @@
 			</Target>
 			<Target title="Mac - Debug">
 				<Option platforms="Windows;Unix;" />
-				<Option output="..\Runtime\bin\debug\libgdl.dylib" prefix_auto="0" extension_auto="0" />
-				<Option object_output="obj\Debug\" />
+				<Option output="../Runtime/bin/debug/libgdl.dylib" prefix_auto="0" extension_auto="0" />
+				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
@@ -973,8 +973,8 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\..\libs\boost_1_43_0" />
-					<Add directory="..\..\libs\sfml\include" />
+					<Add directory="../../libs/boost_1_43_0" />
+					<Add directory="../../libs/sfml/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lsfml-audio-d" />
@@ -989,7 +989,7 @@
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
-					<Add directory="..\ExtLibs\SFML\build-mac\lib" />
+					<Add directory="../ExtLibs/SFML/build-mac/lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/debug/libgdl.dylib" />
@@ -997,286 +997,291 @@
 			</Target>
 		</Build>
 		<Compiler>
-			<Add directory="..\GDL\" />
-			<Add directory="..\Core\" />
-			<Add directory="..\ExtLibs\boost" />
-			<Add directory="..\ExtLibs\SFML\include" />
+			<Add directory="../GDL/" />
+			<Add directory="../Core/" />
+			<Add directory="../ExtLibs/boost" />
+			<Add directory="../ExtLibs/SFML/include" />
 		</Compiler>
-		<Unit filename="GDL\Animation.cpp" />
-		<Unit filename="GDL\Animation.h" />
-		<Unit filename="GDL\Arial.hpp" />
-		<Unit filename="GDL\Automatism.cpp" />
-		<Unit filename="GDL\Automatism.h" />
-		<Unit filename="GDL\AutomatismsRuntimeSharedDatas.cpp" />
-		<Unit filename="GDL\AutomatismsRuntimeSharedDatas.h" />
-		<Unit filename="GDL\AutomatismsSharedDatas.cpp" />
-		<Unit filename="GDL\AutomatismsSharedDatas.h" />
-		<Unit filename="GDL\BuiltinExtensions\AdvancedExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\AdvancedExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\AudioExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\AudioExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\AudioTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\AudioTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\BaseObjectExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\BaseObjectExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\BaseObjectExtension2.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\CameraExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\CameraExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\CommonConversionsExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\CommonConversionsExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\CommonInstructionsExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\CommonInstructionsExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\CommonInstructionsTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\CommonInstructionsTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\ExternalLayoutsExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\ExternalLayoutsExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\ExternalLayoutsTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\ExternalLayoutsTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\FileExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\FileExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\FileTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\FileTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\JoystickExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\JoystickExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\JoystickTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\JoystickTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\KeyboardExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\KeyboardExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\KeyboardTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\KeyboardTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\MathematicalTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\MathematicalTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\MathematicalToolsExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\MathematicalToolsExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\MouseExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\MouseExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\MouseTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\MouseTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\NetworkExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\NetworkExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\NetworkTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\NetworkTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\ObjectTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\ObjectTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\ProfileTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\ProfileTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\RuntimeSceneCameraTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\RuntimeSceneCameraTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\RuntimeSceneTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\RuntimeSceneTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\SceneExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\SceneExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\SpriteExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\SpriteExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\SpriteTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\SpriteTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\StringInstructionsExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\StringInstructionsExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\StringTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\StringTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\TimeExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\TimeExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\TimeTools.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\TimeTools.h" />
-		<Unit filename="GDL\BuiltinExtensions\VariablesExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\VariablesExtension.h" />
-		<Unit filename="GDL\BuiltinExtensions\WindowExtension.cpp" />
-		<Unit filename="GDL\BuiltinExtensions\WindowExtension.h" />
-		<Unit filename="GDL\Camera.cpp" />
-		<Unit filename="GDL\Camera.h" />
-		<Unit filename="GDL\CodeExecutionEngine.cpp" />
-		<Unit filename="GDL\CodeExecutionEngine.h" />
-		<Unit filename="GDL\Collisions.cpp" />
-		<Unit filename="GDL\Collisions.h" />
-		<Unit filename="GDL\CommentEvent.cpp" />
-		<Unit filename="GDL\CommentEvent.h" />
-		<Unit filename="GDL\CommonTools.cpp" />
-		<Unit filename="GDL\CommonTools.h" />
-		<Unit filename="GDL\CppCodeEvent.cpp" />
-		<Unit filename="GDL\CppCodeEvent.h" />
-		<Unit filename="GDL\DatFile.cpp" />
-		<Unit filename="GDL\DatFile.h" />
-		<Unit filename="GDL\Direction.cpp" />
-		<Unit filename="GDL\Direction.h" />
-		<Unit filename="GDL\DocMainPage.h" />
-		<Unit filename="GDL\DynamicLibrariesTools.cpp" />
-		<Unit filename="GDL\DynamicLibrariesTools.h" />
-		<Unit filename="GDL\EmptyEvent.cpp" />
-		<Unit filename="GDL\EmptyEvent.h" />
-		<Unit filename="GDL\Events\CodeCompilationHelpers.cpp" />
-		<Unit filename="GDL\Events\CodeCompilationHelpers.h" />
-		<Unit filename="GDL\Events\EventsCodeGenerationContext.cpp" />
-		<Unit filename="GDL\Events\EventsCodeGenerationContext.h" />
-		<Unit filename="GDL\Events\EventsCodeGenerator.cpp" />
-		<Unit filename="GDL\Events\EventsCodeGenerator.h" />
-		<Unit filename="GDL\Events\EventsCodeNameMangler.cpp" />
-		<Unit filename="GDL\Events\EventsCodeNameMangler.h" />
-		<Unit filename="GDL\Events\ExpressionsCodeGeneration.cpp" />
-		<Unit filename="GDL\Events\ExpressionsCodeGeneration.h" />
-		<Unit filename="GDL\ExtensionBase.cpp" />
-		<Unit filename="GDL\ExtensionBase.h" />
-		<Unit filename="GDL\ExtensionsLoader.cpp" />
-		<Unit filename="GDL\ExtensionsLoader.h" />
-		<Unit filename="GDL\ExtensionsManager.cpp" />
-		<Unit filename="GDL\ExtensionsManager.h" />
-		<Unit filename="GDL\ExternalEvents.cpp" />
-		<Unit filename="GDL\ExternalEvents.h" />
-		<Unit filename="GDL\ExternalLayout.cpp" />
-		<Unit filename="GDL\ExternalLayout.h" />
-		<Unit filename="GDL\FontManager.cpp" />
-		<Unit filename="GDL\FontManager.h" />
-		<Unit filename="GDL\ForEachEvent.cpp" />
-		<Unit filename="GDL\ForEachEvent.h" />
-		<Unit filename="GDL\Force.cpp" />
-		<Unit filename="GDL\Force.h" />
-		<Unit filename="GDL\Game.cpp" />
-		<Unit filename="GDL\Game.h" />
-		<Unit filename="GDL\IDE\BaseDebugger.cpp" />
-		<Unit filename="GDL\IDE\BaseDebugger.h" />
-		<Unit filename="GDL\IDE\BaseProfiler.cpp" />
-		<Unit filename="GDL\IDE\BaseProfiler.h" />
-		<Unit filename="GDL\IDE\ChangesNotifier.cpp" />
-		<Unit filename="GDL\IDE\ChangesNotifier.h" />
-		<Unit filename="GDL\IDE\CodeCompiler.cpp" />
-		<Unit filename="GDL\IDE\CodeCompiler.h" />
-		<Unit filename="GDL\IDE\CompilerMessagesParser.cpp" />
-		<Unit filename="GDL\IDE\CompilerMessagesParser.h" />
-		<Unit filename="GDL\IDE\DependenciesAnalyzer.cpp" />
-		<Unit filename="GDL\IDE\DependenciesAnalyzer.h" />
-		<Unit filename="GDL\IDE\Dialogs\AjoutPlusImage.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\AjoutPlusImage.h" />
-		<Unit filename="GDL\IDE\Dialogs\DebuggerGUI.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\DebuggerGUI.h" />
-		<Unit filename="GDL\IDE\Dialogs\EditComment.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\EditComment.h" />
-		<Unit filename="GDL\IDE\Dialogs\EditCppCodeEvent.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\EditCppCodeEvent.h" />
-		<Unit filename="GDL\IDE\Dialogs\EditForEachEvent.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\EditForEachEvent.h" />
-		<Unit filename="GDL\IDE\Dialogs\EditLink.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\EditLink.h" />
-		<Unit filename="GDL\IDE\Dialogs\EditRepeatEvent.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\EditRepeatEvent.h" />
-		<Unit filename="GDL\IDE\Dialogs\ProfileDlg.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\ProfileDlg.h" />
-		<Unit filename="GDL\IDE\Dialogs\ProjectUpdateDlg.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\ProjectUpdateDlg.h" />
-		<Unit filename="GDL\IDE\Dialogs\ResourcesEditor.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\ResourcesEditor.h" />
-		<Unit filename="GDL\IDE\Dialogs\SceneEditorCanvas.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\SceneEditorCanvas.h" />
-		<Unit filename="GDL\IDE\Dialogs\SceneEditorCanvas2.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\SpriteObjectEditor.cpp" />
-		<Unit filename="GDL\IDE\Dialogs\SpriteObjectEditor.h" />
-		<Unit filename="GDL\IDE\DndResourcesEditor.cpp" />
-		<Unit filename="GDL\IDE\DndResourcesEditor.h" />
-		<Unit filename="GDL\IDE\ExecutableIconChanger.cpp" />
-		<Unit filename="GDL\IDE\ExecutableIconChanger.h" />
-		<Unit filename="GDL\IDE\FullProjectCompiler.cpp" />
-		<Unit filename="GDL\IDE\FullProjectCompiler.h" />
-		<Unit filename="GDL\IDE\ImageFilesWatcher.cpp" />
-		<Unit filename="GDL\IDE\ImageFilesWatcher.h" />
-		<Unit filename="GDL\ImageManager.cpp" />
-		<Unit filename="GDL\ImageManager.h" />
-		<Unit filename="GDL\InitialInstancesContainer.cpp" />
-		<Unit filename="GDL\InitialInstancesContainer.h" />
-		<Unit filename="GDL\InvalidImage.h" />
-		<Unit filename="GDL\Layer.cpp" />
-		<Unit filename="GDL\Layer.h" />
-		<Unit filename="GDL\LinkEvent.cpp" />
-		<Unit filename="GDL\LinkEvent.h" />
-		<Unit filename="GDL\LoadingScreen.cpp" />
-		<Unit filename="GDL\LoadingScreen.h" />
-		<Unit filename="GDL\Log.cpp" />
-		<Unit filename="GDL\Log.h" />
-		<Unit filename="GDL\ManualTimer.cpp" />
-		<Unit filename="GDL\ManualTimer.h" />
-		<Unit filename="GDL\Music.cpp" />
-		<Unit filename="GDL\Music.h" />
-		<Unit filename="GDL\ObjInstancesHolder.cpp" />
-		<Unit filename="GDL\ObjInstancesHolder.h" />
-		<Unit filename="GDL\Object.cpp" />
-		<Unit filename="GDL\Object.h" />
-		<Unit filename="GDL\ObjectHelpers.h" />
-		<Unit filename="GDL\OpenSaveGame.cpp" />
-		<Unit filename="GDL\OpenSaveGame.h" />
-		<Unit filename="GDL\OpenSaveLoadingScreen.cpp" />
-		<Unit filename="GDL\OpenSaveLoadingScreen.h" />
-		<Unit filename="GDL\PlatformDefinition\Platform.cpp" />
-		<Unit filename="GDL\PlatformDefinition\Platform.h" />
-		<Unit filename="GDL\Point.cpp" />
-		<Unit filename="GDL\Point.h" />
-		<Unit filename="GDL\Polygon.cpp" />
-		<Unit filename="GDL\Polygon.h" />
-		<Unit filename="GDL\PolygonCollision.cpp" />
-		<Unit filename="GDL\PolygonCollision.h" />
-		<Unit filename="GDL\Position.cpp" />
-		<Unit filename="GDL\Position.h" />
-		<Unit filename="GDL\ProfileEvent.cpp" />
-		<Unit filename="GDL\ProfileEvent.h" />
-		<Unit filename="GDL\RepeatEvent.cpp" />
-		<Unit filename="GDL\RepeatEvent.h" />
-		<Unit filename="GDL\ResourcesManager.cpp" />
-		<Unit filename="GDL\ResourcesManager.h" />
-		<Unit filename="GDL\RessourcesLoader.cpp" />
-		<Unit filename="GDL\RessourcesLoader.h" />
-		<Unit filename="GDL\RuntimeContext.cpp" />
-		<Unit filename="GDL\RuntimeContext.h" />
-		<Unit filename="GDL\RuntimeGame.cpp" />
-		<Unit filename="GDL\RuntimeGame.h" />
-		<Unit filename="GDL\RuntimeScene.cpp" />
-		<Unit filename="GDL\RuntimeScene.h" />
-		<Unit filename="GDL\Scene.cpp" />
-		<Unit filename="GDL\Scene.h" />
-		<Unit filename="GDL\SceneNameMangler.cpp" />
-		<Unit filename="GDL\SceneNameMangler.h" />
-		<Unit filename="GDL\ShaderManager.cpp" />
-		<Unit filename="GDL\ShaderManager.h" />
-		<Unit filename="GDL\Sound.cpp" />
-		<Unit filename="GDL\Sound.h" />
-		<Unit filename="GDL\SoundManager.cpp" />
-		<Unit filename="GDL\SoundManager.h" />
-		<Unit filename="GDL\SourceFile.cpp" />
-		<Unit filename="GDL\SourceFile.h" />
-		<Unit filename="GDL\Sprite.cpp" />
-		<Unit filename="GDL\Sprite.h" />
-		<Unit filename="GDL\SpriteInitialPositionPanel.cpp" />
-		<Unit filename="GDL\SpriteInitialPositionPanel.h" />
-		<Unit filename="GDL\SpriteObject.cpp" />
-		<Unit filename="GDL\SpriteObject.h" />
-		<Unit filename="GDL\StandardEvent.cpp" />
-		<Unit filename="GDL\StandardEvent.h" />
-		<Unit filename="GDL\Text.cpp" />
-		<Unit filename="GDL\Text.h" />
-		<Unit filename="GDL\Tools\AES.cpp" />
-		<Unit filename="GDL\Tools\AES.h" />
-		<Unit filename="GDL\Tools\md5.cpp" />
-		<Unit filename="GDL\Tools\md5.h" />
-		<Unit filename="GDL\Variable.cpp" />
-		<Unit filename="GDL\Variable.h" />
-		<Unit filename="GDL\VariableList.cpp" />
-		<Unit filename="GDL\VariableList.h" />
-		<Unit filename="GDL\Version.h" />
-		<Unit filename="GDL\VersionWrapper.cpp" />
-		<Unit filename="GDL\VersionWrapper.h" />
-		<Unit filename="GDL\WhileEvent.cpp" />
-		<Unit filename="GDL\WhileEvent.h" />
-		<Unit filename="GDL\XmlFilesHelper.cpp" />
-		<Unit filename="GDL\XmlFilesHelper.h" />
-		<Unit filename="GDL\XmlMacros.h" />
-		<Unit filename="GDL\btAlignedAllocator.h" />
-		<Unit filename="GDL\btScalar.h" />
-		<Unit filename="GDL\profile.cpp" />
-		<Unit filename="GDL\profile.h" />
-		<Unit filename="GDL\tinyxml\tinystr.cpp" />
-		<Unit filename="GDL\tinyxml\tinystr.h" />
-		<Unit filename="GDL\tinyxml\tinyxml.cpp" />
-		<Unit filename="GDL\tinyxml\tinyxml.h" />
-		<Unit filename="GDL\tinyxml\tinyxmlerror.cpp" />
-		<Unit filename="GDL\tinyxml\tinyxmlparser.cpp" />
-		<Unit filename="wxsmith\DebuggerGUI.wxs" />
-		<Unit filename="wxsmith\ProfileDlg.wxs" />
-		<Unit filename="wxsmith\SpriteObjectEditor.wxs" />
+		<Unit filename="GDL/Animation.cpp" />
+		<Unit filename="GDL/Animation.h" />
+		<Unit filename="GDL/Arial.hpp" />
+		<Unit filename="GDL/Automatism.cpp" />
+		<Unit filename="GDL/Automatism.h" />
+		<Unit filename="GDL/AutomatismsRuntimeSharedDatas.cpp" />
+		<Unit filename="GDL/AutomatismsRuntimeSharedDatas.h" />
+		<Unit filename="GDL/AutomatismsSharedDatas.cpp" />
+		<Unit filename="GDL/AutomatismsSharedDatas.h" />
+		<Unit filename="GDL/BuiltinExtensions/AdvancedExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/AdvancedExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/AudioExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/AudioExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/AudioTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/AudioTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/BaseObjectExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/BaseObjectExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/BaseObjectExtension2.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/CameraExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/CameraExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/CommonConversionsExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/CommonConversionsExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/CommonInstructionsExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/CommonInstructionsExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/CommonInstructionsTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/CommonInstructionsTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/ExternalLayoutsExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/ExternalLayoutsExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/ExternalLayoutsTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/ExternalLayoutsTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/FileExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/FileExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/FileTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/FileTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/JoystickExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/JoystickExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/JoystickTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/JoystickTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/KeyboardExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/KeyboardExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/KeyboardTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/KeyboardTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/MathematicalTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/MathematicalTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/MathematicalToolsExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/MathematicalToolsExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/MouseExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/MouseExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/MouseTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/MouseTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/NetworkExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/NetworkExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/NetworkTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/NetworkTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/ObjectTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/ObjectTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/ProfileTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/ProfileTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/RuntimeSceneCameraTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/RuntimeSceneCameraTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/RuntimeSceneTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/RuntimeSceneTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/SceneExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/SceneExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/SpriteExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/SpriteExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/SpriteTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/SpriteTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/StringInstructionsExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/StringInstructionsExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/StringTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/StringTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/TimeExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/TimeExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/TimeTools.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/TimeTools.h" />
+		<Unit filename="GDL/BuiltinExtensions/VariablesExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/VariablesExtension.h" />
+		<Unit filename="GDL/BuiltinExtensions/WindowExtension.cpp" />
+		<Unit filename="GDL/BuiltinExtensions/WindowExtension.h" />
+		<Unit filename="GDL/Camera.cpp" />
+		<Unit filename="GDL/Camera.h" />
+		<Unit filename="GDL/CodeExecutionEngine.cpp" />
+		<Unit filename="GDL/CodeExecutionEngine.h" />
+		<Unit filename="GDL/Collisions.cpp" />
+		<Unit filename="GDL/Collisions.h" />
+		<Unit filename="GDL/CommentEvent.cpp" />
+		<Unit filename="GDL/CommentEvent.h" />
+		<Unit filename="GDL/CommonTools.cpp" />
+		<Unit filename="GDL/CommonTools.h" />
+		<Unit filename="GDL/CppCodeEvent.cpp" />
+		<Unit filename="GDL/CppCodeEvent.h" />
+		<Unit filename="GDL/DatFile.cpp" />
+		<Unit filename="GDL/DatFile.h" />
+		<Unit filename="GDL/Direction.cpp" />
+		<Unit filename="GDL/Direction.h" />
+		<Unit filename="GDL/DocMainPage.h" />
+		<Unit filename="GDL/DynamicLibrariesTools.cpp" />
+		<Unit filename="GDL/DynamicLibrariesTools.h" />
+		<Unit filename="GDL/EmptyEvent.cpp" />
+		<Unit filename="GDL/EmptyEvent.h" />
+		<Unit filename="GDL/Events/CodeCompilationHelpers.cpp" />
+		<Unit filename="GDL/Events/CodeCompilationHelpers.h" />
+		<Unit filename="GDL/Events/EventsCodeGenerationContext.cpp" />
+		<Unit filename="GDL/Events/EventsCodeGenerationContext.h" />
+		<Unit filename="GDL/Events/EventsCodeGenerator.cpp" />
+		<Unit filename="GDL/Events/EventsCodeGenerator.h" />
+		<Unit filename="GDL/Events/EventsCodeNameMangler.cpp" />
+		<Unit filename="GDL/Events/EventsCodeNameMangler.h" />
+		<Unit filename="GDL/Events/ExpressionsCodeGeneration.cpp" />
+		<Unit filename="GDL/Events/ExpressionsCodeGeneration.h" />
+		<Unit filename="GDL/ExtensionBase.cpp" />
+		<Unit filename="GDL/ExtensionBase.h" />
+		<Unit filename="GDL/ExtensionsLoader.cpp" />
+		<Unit filename="GDL/ExtensionsLoader.h" />
+		<Unit filename="GDL/ExtensionsManager.cpp" />
+		<Unit filename="GDL/ExtensionsManager.h" />
+		<Unit filename="GDL/ExternalEvents.cpp" />
+		<Unit filename="GDL/ExternalEvents.h" />
+		<Unit filename="GDL/ExternalLayout.cpp" />
+		<Unit filename="GDL/ExternalLayout.h" />
+		<Unit filename="GDL/FontManager.cpp" />
+		<Unit filename="GDL/FontManager.h" />
+		<Unit filename="GDL/ForEachEvent.cpp" />
+		<Unit filename="GDL/ForEachEvent.h" />
+		<Unit filename="GDL/Force.cpp" />
+		<Unit filename="GDL/Force.h" />
+		<Unit filename="GDL/Game.cpp" />
+		<Unit filename="GDL/Game.h" />
+		<Unit filename="GDL/IDE/BaseDebugger.cpp" />
+		<Unit filename="GDL/IDE/BaseDebugger.h" />
+		<Unit filename="GDL/IDE/BaseProfiler.cpp" />
+		<Unit filename="GDL/IDE/BaseProfiler.h" />
+		<Unit filename="GDL/IDE/ChangesNotifier.cpp" />
+		<Unit filename="GDL/IDE/ChangesNotifier.h" />
+		<Unit filename="GDL/IDE/CodeCompiler.cpp" />
+		<Unit filename="GDL/IDE/CodeCompiler.h" />
+		<Unit filename="GDL/IDE/CompilerMessagesParser.cpp" />
+		<Unit filename="GDL/IDE/CompilerMessagesParser.h" />
+		<Unit filename="GDL/IDE/DependenciesAnalyzer.cpp" />
+		<Unit filename="GDL/IDE/DependenciesAnalyzer.h" />
+		<Unit filename="GDL/IDE/Dialogs/DebuggerGUI.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/DebuggerGUI.h" />
+		<Unit filename="GDL/IDE/Dialogs/EditComment.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/EditComment.h" />
+		<Unit filename="GDL/IDE/Dialogs/EditCppCodeEvent.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/EditCppCodeEvent.h" />
+		<Unit filename="GDL/IDE/Dialogs/EditForEachEvent.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/EditForEachEvent.h" />
+		<Unit filename="GDL/IDE/Dialogs/EditLayerDialog.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/EditLayerDialog.h" />
+		<Unit filename="GDL/IDE/Dialogs/EditLink.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/EditLink.h" />
+		<Unit filename="GDL/IDE/Dialogs/EditRepeatEvent.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/EditRepeatEvent.h" />
+		<Unit filename="GDL/IDE/Dialogs/ProfileDlg.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/ProfileDlg.h" />
+		<Unit filename="GDL/IDE/Dialogs/ProjectUpdateDlg.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/ProjectUpdateDlg.h" />
+		<Unit filename="GDL/IDE/Dialogs/RenderDialog.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/RenderDialog.h" />
+		<Unit filename="GDL/IDE/Dialogs/ResourcesEditor.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/ResourcesEditor.h" />
+		<Unit filename="GDL/IDE/Dialogs/SceneEditorCanvas.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/SceneEditorCanvas.h" />
+		<Unit filename="GDL/IDE/Dialogs/SceneEditorCanvas2.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/SpriteObjectEditor.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/SpriteObjectEditor.h" />
+		<Unit filename="GDL/IDE/Dialogs/wxSFMLCanvas.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/wxSFMLCanvas.hpp" />
+		<Unit filename="GDL/IDE/DndResourcesEditor.cpp" />
+		<Unit filename="GDL/IDE/DndResourcesEditor.h" />
+		<Unit filename="GDL/IDE/ExecutableIconChanger.cpp" />
+		<Unit filename="GDL/IDE/ExecutableIconChanger.h" />
+		<Unit filename="GDL/IDE/FullProjectCompiler.cpp" />
+		<Unit filename="GDL/IDE/FullProjectCompiler.h" />
+		<Unit filename="GDL/IDE/ImageFilesWatcher.cpp" />
+		<Unit filename="GDL/IDE/ImageFilesWatcher.h" />
+		<Unit filename="GDL/ImageManager.cpp" />
+		<Unit filename="GDL/ImageManager.h" />
+		<Unit filename="GDL/InitialInstancesContainer.cpp" />
+		<Unit filename="GDL/InitialInstancesContainer.h" />
+		<Unit filename="GDL/InvalidImage.h" />
+		<Unit filename="GDL/Layer.cpp" />
+		<Unit filename="GDL/Layer.h" />
+		<Unit filename="GDL/LinkEvent.cpp" />
+		<Unit filename="GDL/LinkEvent.h" />
+		<Unit filename="GDL/LoadingScreen.cpp" />
+		<Unit filename="GDL/LoadingScreen.h" />
+		<Unit filename="GDL/Log.cpp" />
+		<Unit filename="GDL/Log.h" />
+		<Unit filename="GDL/ManualTimer.cpp" />
+		<Unit filename="GDL/ManualTimer.h" />
+		<Unit filename="GDL/Music.cpp" />
+		<Unit filename="GDL/Music.h" />
+		<Unit filename="GDL/ObjInstancesHolder.cpp" />
+		<Unit filename="GDL/ObjInstancesHolder.h" />
+		<Unit filename="GDL/Object.cpp" />
+		<Unit filename="GDL/Object.h" />
+		<Unit filename="GDL/ObjectHelpers.h" />
+		<Unit filename="GDL/OpenSaveGame.cpp" />
+		<Unit filename="GDL/OpenSaveGame.h" />
+		<Unit filename="GDL/OpenSaveLoadingScreen.cpp" />
+		<Unit filename="GDL/OpenSaveLoadingScreen.h" />
+		<Unit filename="GDL/PlatformDefinition/Platform.cpp" />
+		<Unit filename="GDL/PlatformDefinition/Platform.h" />
+		<Unit filename="GDL/Point.cpp" />
+		<Unit filename="GDL/Point.h" />
+		<Unit filename="GDL/Polygon.cpp" />
+		<Unit filename="GDL/Polygon.h" />
+		<Unit filename="GDL/PolygonCollision.cpp" />
+		<Unit filename="GDL/PolygonCollision.h" />
+		<Unit filename="GDL/Position.cpp" />
+		<Unit filename="GDL/Position.h" />
+		<Unit filename="GDL/ProfileEvent.cpp" />
+		<Unit filename="GDL/ProfileEvent.h" />
+		<Unit filename="GDL/RepeatEvent.cpp" />
+		<Unit filename="GDL/RepeatEvent.h" />
+		<Unit filename="GDL/ResourcesManager.cpp" />
+		<Unit filename="GDL/ResourcesManager.h" />
+		<Unit filename="GDL/RessourcesLoader.cpp" />
+		<Unit filename="GDL/RessourcesLoader.h" />
+		<Unit filename="GDL/RuntimeContext.cpp" />
+		<Unit filename="GDL/RuntimeContext.h" />
+		<Unit filename="GDL/RuntimeGame.cpp" />
+		<Unit filename="GDL/RuntimeGame.h" />
+		<Unit filename="GDL/RuntimeScene.cpp" />
+		<Unit filename="GDL/RuntimeScene.h" />
+		<Unit filename="GDL/Scene.cpp" />
+		<Unit filename="GDL/Scene.h" />
+		<Unit filename="GDL/SceneNameMangler.cpp" />
+		<Unit filename="GDL/SceneNameMangler.h" />
+		<Unit filename="GDL/ShaderManager.cpp" />
+		<Unit filename="GDL/ShaderManager.h" />
+		<Unit filename="GDL/Sound.cpp" />
+		<Unit filename="GDL/Sound.h" />
+		<Unit filename="GDL/SoundManager.cpp" />
+		<Unit filename="GDL/SoundManager.h" />
+		<Unit filename="GDL/SourceFile.cpp" />
+		<Unit filename="GDL/SourceFile.h" />
+		<Unit filename="GDL/Sprite.cpp" />
+		<Unit filename="GDL/Sprite.h" />
+		<Unit filename="GDL/SpriteInitialPositionPanel.cpp" />
+		<Unit filename="GDL/SpriteInitialPositionPanel.h" />
+		<Unit filename="GDL/SpriteObject.cpp" />
+		<Unit filename="GDL/SpriteObject.h" />
+		<Unit filename="GDL/StandardEvent.cpp" />
+		<Unit filename="GDL/StandardEvent.h" />
+		<Unit filename="GDL/Text.cpp" />
+		<Unit filename="GDL/Text.h" />
+		<Unit filename="GDL/Tools/AES.cpp" />
+		<Unit filename="GDL/Tools/AES.h" />
+		<Unit filename="GDL/Tools/md5.cpp" />
+		<Unit filename="GDL/Tools/md5.h" />
+		<Unit filename="GDL/Variable.cpp" />
+		<Unit filename="GDL/Variable.h" />
+		<Unit filename="GDL/VariableList.cpp" />
+		<Unit filename="GDL/VariableList.h" />
+		<Unit filename="GDL/Version.h" />
+		<Unit filename="GDL/VersionWrapper.cpp" />
+		<Unit filename="GDL/VersionWrapper.h" />
+		<Unit filename="GDL/WhileEvent.cpp" />
+		<Unit filename="GDL/WhileEvent.h" />
+		<Unit filename="GDL/XmlFilesHelper.cpp" />
+		<Unit filename="GDL/XmlFilesHelper.h" />
+		<Unit filename="GDL/XmlMacros.h" />
+		<Unit filename="GDL/btAlignedAllocator.h" />
+		<Unit filename="GDL/btScalar.h" />
+		<Unit filename="GDL/profile.cpp" />
+		<Unit filename="GDL/profile.h" />
+		<Unit filename="GDL/tinyxml/tinystr.cpp" />
+		<Unit filename="GDL/tinyxml/tinystr.h" />
+		<Unit filename="GDL/tinyxml/tinyxml.cpp" />
+		<Unit filename="GDL/tinyxml/tinyxml.h" />
+		<Unit filename="GDL/tinyxml/tinyxmlerror.cpp" />
+		<Unit filename="GDL/tinyxml/tinyxmlparser.cpp" />
+		<Unit filename="wxsmith/DebuggerGUI.wxs" />
+		<Unit filename="wxsmith/ProfileDlg.wxs" />
+		<Unit filename="wxsmith/RenderDialog.wxs" />
+		<Unit filename="wxsmith/SpriteObjectEditor.wxs" />
 		<Extensions>
 			<code_completion />
 			<envvars />
@@ -1300,6 +1305,7 @@
 					<wxDialog wxs="wxsmith/SpriteObjectEditor.wxs" src="GDL\IDE\Dialogs\SpriteObjectEditor.cpp" hdr="GDL\IDE\Dialogs\SpriteObjectEditor.h" fwddecl="0" i18n="1" name="SpriteObjectEditor" language="CPP" />
 					<wxPanel wxs="wxsmith/ProfileDlg.wxs" src="GDL\IDE\Dialogs\ProfileDlg.cpp" hdr="GDL\IDE\Dialogs\ProfileDlg.h" fwddecl="0" i18n="1" name="ProfileDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/DebuggerGUI.wxs" src="GDL\IDE\Dialogs\DebuggerGUI.cpp" hdr="GDL\IDE\Dialogs\DebuggerGUI.h" fwddecl="0" i18n="1" name="DebuggerGUI" language="CPP" />
+					<wxDialog wxs="wxsmith/RenderDialog.wxs" src="GDL\IDE\Dialogs\RenderDialog.cpp" hdr="GDL\IDE\Dialogs\RenderDialog.h" fwddecl="0" i18n="1" name="RenderDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 			<DoxyBlocks>

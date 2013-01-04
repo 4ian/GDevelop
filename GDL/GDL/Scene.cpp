@@ -230,7 +230,7 @@ unsigned int Scene::GetLayerPosition(const std::string & name) const
     return std::string::npos;
 }
 
-void Scene::InsertNewLayer(std::string & name, unsigned int position)
+void Scene::InsertNewLayer(const std::string & name, unsigned int position)
 {
     Layer newLayer;
     newLayer.SetName(name);

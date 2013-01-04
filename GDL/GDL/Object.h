@@ -84,6 +84,12 @@ public:
      */
     virtual Object * Clone() const { return new Object(*this);}
 
+
+    /** \name Drawing and resources management
+     * Members functions related to drawing the object and managing resources
+     */
+    ///@{
+
     /**
      * Called by RuntimeScene at loading. The object is not necessarily used on the scene.
      */
@@ -105,22 +111,87 @@ public:
      */
     virtual bool Draw(sf::RenderTarget & renderTarget) {return true;};
 
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Draw the object at edittime ( on a scene editor typically )
+     * \param renderTarget The SFML Rendertarget where object must be drawn.
+     */
+    virtual bool DrawEdittime(sf::RenderTarget & renderTarget) {return true;};
+    #endif
+
     /**
      * Redefine this function to return true if your object can use shaders.
      */
     virtual bool SupportShaders() { return false; }
 
-    /**
-     * Load object from an xml element.
+    ///@}
+
+    /** \name Common properties
+     * Members functions related to common properties of the object
      */
-    virtual void LoadFromXml(const TiXmlElement * elemScene) {};
-    #if defined(GD_IDE_ONLY)
+    ///@{
+
+    /** Change name
+     */
+    virtual void SetName(const std::string & name_) {name = name_;};
+
+    /** Get string representing object's name.
+     */
+    virtual inline const std::string & GetName() const { return name; }
 
     /**
-     * Save object to an xml element.
+     * Set the type of the object.
      */
-    virtual void SaveToXml(TiXmlElement * elemScene) {};
-    #endif
+    virtual inline void SetType(const std::string & type_) { type = type_; }
+
+    /** Return the type of the object.
+     */
+    virtual inline const std::string & GetType() const { return type; }
+
+    /**
+     * Query the Z order of the object
+     */
+    inline int GetZOrder() const { return zOrder; }
+
+    /**
+     * Change the Z order of the object
+     */
+    inline void SetZOrder(int zOrder_ ) { zOrder = zOrder_; }
+
+    /**
+     * Return if the object is hidden or not
+     */
+    inline bool IsHidden() const {return hidden;};
+
+    /**
+     * Return if the object is visible ( not hidden )
+     */
+    inline bool IsVisible() const {return !hidden;};
+
+    /**
+     * Hide/Show the object
+     */
+    inline void SetHidden(bool hide = true) {hidden = hide;};
+
+    /**
+     * Change the layer of the object
+     */
+    inline void SetLayer(const std::string & layer_) { layer = layer_;}
+
+    /**
+     * Get the layer of the object
+     */
+    inline const std::string & GetLayer() const { return layer; }
+
+    /**
+     * Return true if object's layer is layer_.
+     */
+    inline bool IsOnLayer(const std::string & layer_) const { return layer == layer_; }
+
+    /**
+     * Get object hit box(es)
+     */
+    virtual std::vector<Polygon2d> GetHitBoxes() const;
 
     /**
      * Called at each frame so as to update internal object's things using time ( Such as animation for a sprite ).
@@ -212,86 +283,37 @@ public:
      */
     virtual float GetCenterY() const {return 0;};
 
-    //Forces
-    Force Force5;
+    ///@}
+
+    /** \name Forces
+     * Members functions providing access to built-in force system
+     * used to move the objects
+     */
+    ///@{
+
+    Force Force5; ///< \deprecated Old custom force used to manage collisions.
     std::vector < Force > Forces; ///< Forces applied to object
 
     /**
      * Automatically called at each frame so as to update forces applied on the object.
      */
     bool UpdateForce(float ElapsedTime);
+
     float TotalForceX() const;
     float TotalForceY() const;
     float TotalForceAngle() const;
     float TotalForceLength() const;
+    ///@}
 
     /**
      * Delete all forces applied to the object
      */
     bool ClearForce();
 
-    /** Change name
+    /** \name Object's variables
+     * Members functions providing access to the object's variables.
      */
-    virtual void SetName(const std::string & name_) {name = name_;};
-
-    /** Get string representing object's name.
-     */
-    virtual inline const std::string & GetName() const { return name; }
-
-    /**
-     * Set the type of the object.
-     */
-    virtual inline void SetType(const std::string & type_) { type = type_; }
-
-    /** Return the type of the object.
-     */
-    virtual inline const std::string & GetType() const { return type; }
-
-    /**
-     * Query the Z order of the object
-     */
-    inline int GetZOrder() const { return zOrder; }
-
-    /**
-     * Change the Z order of the object
-     */
-    inline void SetZOrder(int zOrder_ ) { zOrder = zOrder_; }
-
-    /**
-     * Return if the object is hidden or not
-     */
-    inline bool IsHidden() const {return hidden;};
-
-    /**
-     * Return if the object is visible ( not hidden )
-     */
-    inline bool IsVisible() const {return !hidden;};
-
-    /**
-     * Hide/Show the object
-     */
-    inline void SetHidden(bool hide = true) {hidden = hide;};
-
-    /**
-     * Change the layer of the object
-     */
-    inline void SetLayer(const std::string & layer_) { layer = layer_;}
-
-    /**
-     * Get the layer of the object
-     */
-    inline const std::string & GetLayer() const { return layer; }
-
-    /**
-     * Return true if object's layer is layer_.
-     */
-    inline bool IsOnLayer(const std::string & layer_) const { return layer == layer_; }
-
-
-    /**
-     * Get object hit box(es)
-     */
-    virtual std::vector<Polygon2d> GetHitBoxes() const;
+    ///@{
 
     /**
      * Provide access to the ListVariable member containing the layout variables
@@ -302,6 +324,8 @@ public:
      * Provide access to the ListVariable member containing the layout variables
      */
     inline ListVariable & GetVariables() { return objectVariables; }
+
+    ///@}
 
     /** \name Automatism related functions
      * Functions related to automatisms management.
@@ -369,12 +393,10 @@ public:
     ///@}
 
     #if defined(GD_IDE_ONLY)
-    /**
-     * Draw the object at edittime ( on a scene editor typically )
-     * \param renderTarget The SFML Rendertarget where object must be drawn.
+    /** \name Others IDE related functions
+     * Members functions used by the IDE
      */
-    virtual bool DrawEdittime(sf::RenderTarget & renderTarget) {return true;};
-
+    ///@{
     /**
      * Generate thumbnail for editor
      */
@@ -388,14 +410,20 @@ public:
     virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ );
 
     /**
-     * Called when user edit an object on scene.
+     * Called when the IDE wants to know about the custom properties of an initial instance of this object.
+     *
+     * \return a std::map with properties names as key and values.
+     * \see InitialPosition
      */
-    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
+    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const InitialPosition & position, Game & game, Scene & scene);
 
     /**
-     * Called so as to update InitialPosition values with values of panel.
+     * Called when the IDE wants to update a custom property of an initial instance of this object.
+     *
+     * \return false if the new value cannot be set
+     * \see InitialPosition
      */
-    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position) {};
+    virtual bool UpdateInitialInstanceProperty(InitialPosition & position, const std::string & name, const std::string & value, Game & game, Scene & scene) {return false;};
 
     /**
      * Called by the debugger so as to get a property value and name
@@ -424,6 +452,25 @@ public:
      */
     virtual unsigned int GetNumberOfProperties() const;
     #endif
+
+    /** \name Serialization
+     * Members functions related to saving and loading the object
+     */
+    ///@{
+
+    /**
+     * Load object from an xml element.
+     */
+    virtual void LoadFromXml(const TiXmlElement * elemScene) {};
+
+    #if defined(GD_IDE_ONLY)
+
+    /**
+     * Save object to an xml element.
+     */
+    virtual void SaveToXml(TiXmlElement * elemScene) {};
+    #endif
+    ///@}
 
     /** \name Functions meant to be used by events generated code
      */

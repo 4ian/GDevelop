@@ -18,6 +18,7 @@
 #include "GDL/CommonTools.h"
 #include "GDCore/Events/ExpressionParser.h"
 #include "GDL/Events/EventsCodeNameMangler.h"
+#include "GDL/SceneNameMangler.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/Events/ExpressionsCodeGeneration.h"
 
@@ -957,7 +958,7 @@ string EventsCodeGenerator::GenerateSceneEventsCompleteCode(Game & game, Scene &
         output += "#include \""+*include+"\"\n";
 
     output +=
-    "\nextern void * pointerToRuntimeContext;\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
+    "\nint _CRT_MT = 1; //Required, when using O3, but not exported by any dlls?\n\n";
 
     //Extra declarations needed by events
     for ( set<string>::iterator declaration = codeGenerator.GetCustomGlobalDeclaration().begin() ; declaration != codeGenerator.GetCustomGlobalDeclaration().end(); ++declaration )
@@ -966,9 +967,8 @@ string EventsCodeGenerator::GenerateSceneEventsCompleteCode(Game & game, Scene &
     output +=
     codeGenerator.GetCustomCodeOutsideMain()+
     "\n"
-    "int main()\n"
+    "extern \"C\" int GDSceneEvents"+SceneNameMangler::GetMangledSceneName(scene.GetName())+"(RuntimeContext * runtimeContext)\n"
     "{\n"
-	"RuntimeContext * runtimeContext = static_cast< RuntimeContext *> (pointerToRuntimeContext);"
 	+codeGenerator.GetCustomCodeInMain()
     +wholeEventsCode+
     "return 0;\n"

@@ -28,6 +28,7 @@
 #include "GDL/IDE/DependenciesAnalyzer.h"
 #include "GDL/IDE/BaseProfiler.h"
 #include "GDL/CommonTools.h"
+#include "GDL/SceneNameMangler.h"
 #include "GDL/SourceFile.h"
 
 using namespace std;
@@ -250,7 +251,7 @@ namespace
             }
         }
 
-        if ( !scene.GetCodeExecutionEngine()->LoadFromLLVMBitCode(codeBuffers) )
+        if ( !scene.GetCodeExecutionEngine()->LoadFromLLVMBitCode(codeBuffers, "GDSceneEvents"+SceneNameMangler::GetMangledSceneName(scene.GetName())) )
         {
             cout << "Failed to load bitcode into executionEngine." << endl << char(7);
             return false;

@@ -83,6 +83,13 @@ public:
      */
     inline void AddCamera(const Camera & camera) { cameras.push_back(camera); };
 
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Display a window to edit the layer
+     */
+    virtual void EditLayer();
+    #endif
+
 private:
 
     std::string name;

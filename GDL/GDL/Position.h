@@ -82,8 +82,29 @@ public:
     virtual ListVariable & GetVariables() { return initialVariables; }
     ///@}
 
+    /** \name Others properties management
+     * Members functions related to exposing others properties of the instance.
+     *
+     * \note Extensions writers: Even if we can define new types of object by inheriting from Object class,
+     * we cannot define new InitialPosition classes. However, objects can store custom
+     * properties for their associated initial instances : These properties can be stored
+     * into floatInfos and stringInfos. When the IDE want to get the custom properties, it
+     * will call GetProperties and UpdateProperty methods ( see GDCore documentation ). These
+     * methods are here overloaded to forward the call to the Object associated to the InitialPosition.
+     * ( By looking at the value returned by GetObjectName() ).
+     *
+     * \see Object
+     */
+    ///@{
+
+    #if defined(GD_IDE_ONLY)
+    virtual std::map<std::string, std::string> GetCustomProperties(gd::Project & project, gd::Layout & layout);
+    virtual bool UpdateCustomProperty(const std::string & name, const std::string & value, gd::Project & project, gd::Layout & layout);
+    #endif
+
     std::map < std::string, float > floatInfos; ///< More data which can be used by the object
     std::map < std::string, std::string > stringInfos; ///< More data which can be used by the object
+    ///@}
 
 private:
     std::string objectName; ///< Object name
@@ -96,6 +117,9 @@ private:
     float width;  ///< Object custom width
     float height; ///< Object custom height
     ListVariable initialVariables;
+
+    //In our implementation, more properties can be stored in floatInfos and stringInfos.
+    //These properties are then managed by the Object class.
 };
 
 #endif // POSITION_H

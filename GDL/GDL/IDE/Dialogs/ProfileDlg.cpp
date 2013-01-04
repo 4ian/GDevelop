@@ -307,7 +307,7 @@ void ProfileDlg::OnactivateCheckClick(wxCommandEvent& event)
 
     gd::Project & project = sceneCanvas.GetEditedGame();
     project.GetChangesNotifier().OnEventsModified(project, sceneCanvas.GetEditedScene());
-    sceneCanvas.Reload();
+    sceneCanvas.RefreshFromLayout();
 
 }
 

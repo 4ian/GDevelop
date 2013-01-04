@@ -54,8 +54,8 @@ public :
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
     virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
+    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const InitialPosition & position, Game & game, Scene & scene);
+    virtual bool UpdateInitialInstanceProperty(InitialPosition & position, const std::string & name, const std::string & value, Game & game, Scene & scene);
 
     virtual bool SupportShaders() { return true; }
 

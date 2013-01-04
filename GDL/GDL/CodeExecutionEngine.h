@@ -40,7 +40,7 @@ public:
      * Execute compiled events.
      * Beware, there is no protection against calling Execute on an CodeExecutionEngine that is not initialized with bitcode
      */
-    void Execute() { ((void(*)())compiledRawFunction)(); };
+    void Execute() { ((void(*)(RuntimeContext *))compiledRawFunction)(llvmRuntimeContext); };
 
     /**
      * Return true if loading from bitcode has been made successfully and if Execute can be called.
@@ -55,15 +55,16 @@ public:
      *
      * \param data vector containing std::pair : The first member is the raw memory buffer, and the second member is the size of the buffer.
      */
-    bool LoadFromLLVMBitCode(std::vector< std::pair<const char * /*src*/, unsigned int /*size*/> > data);
+    bool LoadFromLLVMBitCode(std::vector< std::pair<const char * /*src*/, unsigned int /*size*/> > data, const std::string & functionToCallName);
 
     /**
      * Initialize execution engine from bitcode loaded in llvm::MemoryBuffer.
      * The first bitcode buffer will be used to generate the main llvm module, and the other will be linked to the first one.
      *
      * \param bitcodeBuffers vector containing one or more pointers to memory buffers containing bitcode. These buffers won't be modified or freed by the function.
+     * \param functionToCallName The name of the function to be called.
      */
-    bool LoadFromLLVMBitCode(std::vector<llvm::MemoryBuffer *> bitcodeBuffers);
+    bool LoadFromLLVMBitCode(std::vector<llvm::MemoryBuffer *> bitcodeBuffers, const std::string & functionToCallName);
 
     void * compiledRawFunction; ///< Pointer to compiled events entry function.
     llvm::LLVMContext llvmContext;

@@ -178,30 +178,22 @@ void SpriteObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapp
     dialog.ShowModal();
 }
 
-wxPanel * SpriteObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
+
+std::map<std::string, std::string> SpriteObject::GetInitialInstanceProperties(const InitialPosition & position, Game & game, Scene & scene)
 {
-    SpriteInitialPositionPanel * panel = new SpriteInitialPositionPanel(parent);
+    std::map<std::string, std::string> properties;
+    properties[ToString(_("Animation"))] = position.floatInfos.find("animation") != position.floatInfos.end() ?
+                                           ToString(position.floatInfos.find("animation")->second) :
+                                           "0";
 
-    panel->DirectionEdit->ChangeValue(ToString( position.GetAngle() ));
-
-    for (unsigned int i = 0;i<GetAnimationCount();i++ )
-        panel->AnimationCombo->Append(ToString(i));
-
-    if ( position.floatInfos.find("animation") != position.floatInfos.end())
-        panel->AnimationCombo->SetSelection(position.floatInfos.find("animation")->second);
-    else
-        panel->AnimationCombo->SetSelection(0);
-
-    return panel;
+    return properties;
 }
 
-void SpriteObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position)
+bool SpriteObject::UpdateInitialInstanceProperty(InitialPosition & position, const std::string & name, const std::string & value, Game & game, Scene & scene)
 {
-    SpriteInitialPositionPanel * spritePanel = dynamic_cast<SpriteInitialPositionPanel*>(panel);
-    if (spritePanel == NULL) return;
+    if ( name == _("Animation") ) position.floatInfos["animation"] = ToInt(value);
 
-    position.SetAngle(ToInt(string(spritePanel->DirectionEdit->GetValue().mb_str())));
-    position.floatInfos["animation"] = ToInt(string(spritePanel->AnimationCombo->GetValue().mb_str()));
+    return true;
 }
 
 void SpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const

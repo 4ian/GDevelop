@@ -14,7 +14,7 @@
  */
 class GD_API Force
 {
-    public:
+public:
 
     Force();
 
@@ -30,7 +30,7 @@ class GD_API Force
     void SetLength(float length_);
     void SetClearing(float clearing_);
 
-    private:
+private:
 
     mutable float X;
     mutable float Y;

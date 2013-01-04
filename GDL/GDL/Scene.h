@@ -169,7 +169,7 @@ public:
 
     virtual bool HasLayerNamed(const std::string & name) const;
     virtual unsigned int GetLayerPosition(const std::string & name) const;
-    virtual void InsertNewLayer(std::string & name, unsigned int position);
+    virtual void InsertNewLayer(const std::string & name, unsigned int position);
     virtual void InsertLayer(const gd::Layer & theLayer, unsigned int position);
     virtual void RemoveLayer(const std::string & name);
     virtual void SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex);
@@ -184,7 +184,7 @@ public:
 
     /**
      * Set that the events need to be compiled.
-     * \note The compilation is not launched at this time. It will for example occur when triggered by SceneCanvas
+     * \note The compilation is not launched at this time. It will for example occur when triggered by SceneEditorCanvas
      * or if you manually add a task to the code compiler ( see CodeCompilationHelpers ).
      *
      * \see ChangesNotifier
@@ -199,7 +199,7 @@ public:
 
     /**
      * Return true if a compilation is needed.
-     * This method is usually called by SceneCanvas when (re)loading a scene
+     * This method is usually called by SceneEditorCanvas when (re)loading a scene
      * so as to know if it should launch compilation.
      */
     virtual bool CompilationNeeded() { return compilationNeeded; };
@@ -207,7 +207,7 @@ public:
     ///@}
 
     /** \name Changes notification
-     * Members functions used to notify the editor ( mainly SceneCanvas ) that changes have been made
+     * Members functions used to notify the editor ( mainly SceneEditorCanvas ) that changes have been made
      * and that refreshing should be made.
      */
     ///@{
@@ -225,7 +225,7 @@ public:
     void SetRefreshNeeded() { refreshNeeded = true; }
 
     /**
-     * Must be called when the editor ( i.e: SceneCanvas ) managing the scene has reloaded it.
+     * Must be called when the editor ( i.e: SceneEditorCanvas ) managing the scene has reloaded it.
      */
     void SetRefreshNotNeeded() { refreshNeeded = false; }
     ///@}
@@ -378,8 +378,8 @@ private:
     #if defined(GD_IDE_ONLY)
     std::vector < gd::BaseEventSPtr >           events; ///< Scene events
     BaseProfiler *                              profiler; ///< Pointer to the profiler. Can be NULL.
-    bool                                        refreshNeeded; ///< If set to true, the IDE will reload the scene( thanks to SceneCanvas notably which check this flag when the scene is being edited )
-    bool                                        compilationNeeded; ///< If set to true, the IDE will recompile the events ( thanks to SceneCanvas notably which check this flag when the scene is being edited )
+    bool                                        refreshNeeded; ///< If set to true, the IDE will reload the scene( thanks to SceneEditorCanvas notably which check this flag when the scene is being edited )
+    bool                                        compilationNeeded; ///< If set to true, the IDE will recompile the events ( thanks to SceneEditorCanvas notably which check this flag when the scene is being edited )
     gd::LayoutEditorCanvasOptions               associatedSettings;
     #endif
 

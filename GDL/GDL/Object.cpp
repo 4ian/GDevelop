@@ -34,7 +34,7 @@ Object::Object(std::string name_) :
         zOrder( 0 ),
         hidden( false )
 {
-    this->ClearForce();
+    ClearForce();
 }
 
 Object::~Object()
@@ -71,11 +71,8 @@ void Object::Init(const Object & object)
     }
 }
 
-////////////////////////////////////////////////////////////
-/// Met les forces à zéro
 //NE PAS EFFACER CETTE FONCTION APPARAMMENT INUTILE,
 //VOIR PLUS LOIN
-////////////////////////////////////////////////////////////
 bool Object::ClearForce()
 {
     Force ForceVide;
@@ -106,9 +103,6 @@ struct NullForce
     }
 };
 
-////////////////////////////////////////////////////////////
-/// Met à jour les forces en fonction de leur diffusion
-////////////////////////////////////////////////////////////
 bool Object::UpdateForce( float ElapsedTime )
 {
     Force5.SetLength( Force5.GetLength() - Force5.GetLength() * ( 1 - Force5.GetClearing() ) * ElapsedTime );
@@ -124,9 +118,7 @@ bool Object::UpdateForce( float ElapsedTime )
 
     return true;
 }
-////////////////////////////////////////////////////////////
-/// Donne le total des forces en X
-////////////////////////////////////////////////////////////
+
 float Object::TotalForceX() const
 {
     float ForceXsimple = 0;
@@ -136,9 +128,6 @@ float Object::TotalForceX() const
     return ForceXsimple + Force5.GetX();
 }
 
-////////////////////////////////////////////////////////////
-/// Donne le total des forces en Y
-////////////////////////////////////////////////////////////
 float Object::TotalForceY() const
 {
     float ForceYsimple = 0;
@@ -148,9 +137,6 @@ float Object::TotalForceY() const
     return ForceYsimple + Force5.GetY();
 }
 
-////////////////////////////////////////////////////////////
-/// Donne l'angle moyen des force
-////////////////////////////////////////////////////////////
 float Object::TotalForceAngle() const
 {
     Force ForceMoyenne;
@@ -160,9 +146,6 @@ float Object::TotalForceAngle() const
     return ForceMoyenne.GetAngle();
 }
 
-////////////////////////////////////////////////////////////
-/// Donne l'angle moyen des force
-////////////////////////////////////////////////////////////
 float Object::TotalForceLength() const
 {
     Force ForceMoyenne;
@@ -228,6 +211,12 @@ const std::string & Object::GetVariableString( const std::string & variable )
 }
 
 #if defined(GD_IDE_ONLY)
+std::map<std::string, std::string> Object::GetInitialInstanceProperties(const InitialPosition & position, Game & game, Scene & scene)
+{
+    std::map<std::string, std::string> nothing;
+    return nothing;
+}
+
 void Object::EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ )
 {
     try
@@ -294,11 +283,6 @@ unsigned int Object::GetNumberOfProperties() const
 {
     //Be careful, properties start at 0.
     return 10;
-}
-
-wxPanel * Object::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
-{
-    return new wxPanel(parent);
 }
 #endif
 

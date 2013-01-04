@@ -26,6 +26,7 @@
 #include <wx/intl.h>
 #include <wx/log.h>
 #endif
+#include "GDL/DynamicLibrariesTools.h"
 
 bool CodeExecutionEngine::llvmTargetsInitialized = false;
 
@@ -59,7 +60,7 @@ CodeExecutionEngine::~CodeExecutionEngine()
     if ( llvmRuntimeContext != NULL ) delete llvmRuntimeContext;
 }
 
-bool CodeExecutionEngine::LoadFromLLVMBitCode(std::vector< std::pair<const char * /*src*/, unsigned int /*size*/> > data)
+bool CodeExecutionEngine::LoadFromLLVMBitCode(std::vector< std::pair<const char * /*src*/, unsigned int /*size*/> > data, const std::string & functionToCallName)
 {
     std::vector < llvm::MemoryBuffer* > codeBuffers;
     for (unsigned int i = 0;i<data.size();++i)
@@ -73,14 +74,22 @@ bool CodeExecutionEngine::LoadFromLLVMBitCode(std::vector< std::pair<const char 
         codeBuffers.push_back(codeBuffer);
     }
 
-    bool result = LoadFromLLVMBitCode(codeBuffers);
+    bool result = LoadFromLLVMBitCode(codeBuffers, functionToCallName);
     for (unsigned int i = 0;i<codeBuffers.size();++i) delete codeBuffers[i];
 
     return result;
 }
 
-bool CodeExecutionEngine::LoadFromLLVMBitCode(std::vector<llvm::MemoryBuffer *> bitcodeBuffers)
+bool CodeExecutionEngine::LoadFromLLVMBitCode(std::vector<llvm::MemoryBuffer *> bitcodeBuffers, const std::string & functionToCallName)
 {
+    /*//TEMP TEST
+    Handle lib = GDpriv::OpenLibrary("D:/Florian/Programmation/GameDevelop2/IDE/scripts/clangtest/code.dll");
+    compiledRawFunction = GDpriv::GetSymbol(lib, functionToCallName.c_str());
+
+    engineReady = true;
+    return true;
+    //END oF TEMP TEST*/
+
     if ( bitcodeBuffers.empty() )
     {
         std::cout << "No bitcode to load." << std::endl;
@@ -109,16 +118,16 @@ bool CodeExecutionEngine::LoadFromLLVMBitCode(std::vector<llvm::MemoryBuffer *> 
         return false;
     }
 
-    llvm::Function * eventsEntryFunction = llvmMainModule->getFunction("main");
+    llvm::Function * eventsEntryFunction = llvmMainModule->getFunction(functionToCallName);
     if (!eventsEntryFunction)
     {
-        std::cout << "'main' function not found in the main module.\n";
+        std::cout << "'GDSceneEventsMain' function not found in the main module.\n";
         return false;
     }
 
     std::cout << "Mapping objects of execution engine...\n";
-    llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(llvmMainModule->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(llvmMainModule->getContext())));
-    llvmExecutionEngine->addGlobalMapping(globalValue, &llvmRuntimeContext);
+    /*llvm::GlobalValue *globalValue = llvm::cast<llvm::GlobalValue>(llvmMainModule->getOrInsertGlobal("pointerToRuntimeContext", llvm::TypeBuilder<void*, false>::get(llvmMainModule->getContext())));
+    llvmExecutionEngine->addGlobalMapping(globalValue, &llvmRuntimeContext);*/
 
     // Using this, warnAboutUnknownFunctions is called if we need to generate code for an unknown function.
     // As each function should normally be provided by extensions or gd, no such unknown function should exists.

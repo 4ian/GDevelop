@@ -441,7 +441,7 @@ void Game::PopulatePropertyGrid(wxPropertyGrid * grid)
     grid->Append( new wxStringProperty(_("Preview"), "Preview", _("Click to preview")) );
 
     grid->SetPropertyCell("Preview", 1, _("Click to preview"), wxNullBitmap, wxSystemSettings::GetColour(wxSYS_COLOUR_HOTLIGHT));
-    grid->SetPropertyReadOnly(_("Globals variables"));
+    grid->SetPropertyReadOnly("Preview");
 
     grid->EnableProperty(_("Setup"), grid->GetProperty(_("Display the loading screen"))->GetValue().GetBool());
 }

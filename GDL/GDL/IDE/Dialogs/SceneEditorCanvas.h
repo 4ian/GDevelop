@@ -53,13 +53,18 @@ public:
      * Can be called internally, when the editor see that changes have been made
      * or from other external editors.
      */
-    void Reload();
+    void RefreshFromLayout();
 
     /**
      * Can be called by the external window, owned by the editor, so as to notify the editor that
      * the window has been closed.
      */
     void ExternalWindowClosed();
+
+    /**
+     * Return a boost::shared_ptr to the profiler owned by the editor. Can be NULL.
+     */
+    boost::shared_ptr<ProfileDlg> GetProfileDialog() const { return profiler; }
 
     /**
      * We're redefining this method so as to create missing sub editors if needed.
@@ -70,6 +75,12 @@ public:
     virtual void UpdateScrollbars();
     virtual void OnvScrollbarScroll(wxScrollEvent& event);
     virtual void OnhScrollbarScroll(wxScrollEvent& event);
+    virtual void EnsureVisible(const gd::InitialInstance & instance);
+
+    virtual double GetWidthOfInitialInstance(gd::InitialInstance & instance) const;
+    virtual double GetHeightOfInitialInstance(gd::InitialInstance & instance) const;
+    virtual double GetRealXPositionOfInitialInstance(gd::InitialInstance & instance) const;
+    virtual double GetRealYPositionOfInitialInstance(gd::InitialInstance & instance) const;
 
     void UpdateViewAccordingToZoomFactor();
 
@@ -96,21 +107,26 @@ private:
     virtual void OnMotion( wxMouseEvent &event );
     virtual void OnRightUp( wxMouseEvent &event );
     virtual void OnMouseWheel( wxMouseEvent &event );
+    virtual void OnPropObjSelected( wxCommandEvent & event );
+    virtual void OnLayerUpSelected( wxCommandEvent & event );
+    virtual void OnLayerDownSelected( wxCommandEvent & event );
+    virtual void OnCopySelected( wxCommandEvent & event );
+    virtual void OnCutSelected( wxCommandEvent & event );
+    virtual void OnPasteSelected( wxCommandEvent & event );
+    virtual void OnPasteSpecialSelected( wxCommandEvent & event );
+    virtual void OnDeleteObjectSelected( wxCommandEvent & event );
+    virtual void OnCreateObjectSelected( wxCommandEvent & event );
 
     virtual void OnInitialInstanceMoved(gd::InitialInstance & instance);
     virtual void OnInitialInstanceAdded(gd::InitialInstance & instance);
     virtual void OnInitialInstanceDeleted(gd::InitialInstance & instance);
     virtual void OnGuiElementPressed(const gd::LayoutEditorCanvasGuiElement & guiElement);
     virtual void OnGuiElementHovered(const gd::LayoutEditorCanvasGuiElement & guiElement);
-    virtual void Undo(unsigned int times = 1) { LayoutEditorCanvas::Undo(times); Reload(); };
-    virtual void Redo(unsigned int times = 1) { LayoutEditorCanvas::Redo(times); Reload(); };
+    virtual void Undo(unsigned int times = 1) { LayoutEditorCanvas::Undo(times); RefreshFromLayout(); };
+    virtual void Redo(unsigned int times = 1) { LayoutEditorCanvas::Redo(times); RefreshFromLayout(); };
 
-    virtual double GetMouseXOnLayout();
-    virtual double GetMouseYOnLayout();
-    virtual double GetWidthOfInitialInstance(gd::InitialInstance & instance);
-    virtual double GetHeightOfInitialInstance(gd::InitialInstance & instance);
-    virtual double GetRealXPositionOfInitialInstance(gd::InitialInstance & instance);
-    virtual double GetRealYPositionOfInitialInstance(gd::InitialInstance & instance);
+    virtual double GetMouseXOnLayout() const;
+    virtual double GetMouseYOnLayout() const;
     virtual void CreatePreviewRibbonTools();
     virtual void CreateEditionRibbonTools();
 
@@ -121,7 +137,7 @@ private:
     virtual void OnPreviewDebugBtClick( wxCommandEvent & event );
     virtual void OnPreviewProfilerBtClick( wxCommandEvent & event );
 
-    void ReloadSecondPart();
+    void RefreshFromLayoutSecondPart();
 
     //Rendering methods. The rendering during preview is done by previewScene.
     void RenderCompilationScreen();
@@ -177,18 +193,35 @@ private:
     static const long idRibbonDebugger;
     static const long idRibbonProfiler;
 
+    //Context menu identifiers
+    static const long ID_ADDOBJMENU;
+    static const long ID_DELOBJMENU;
+    static const long ID_PROPMENU;
+    static const long ID_LAYERUPMENU;
+    static const long ID_LAYERDOWNMENU;
+    static const long ID_COPYMENU;
+    static const long ID_CUTMENU;
+    static const long ID_PASTEMENU;
+    static const long ID_PASTESPECIALMENU;
+    static const long ID_CREATEOBJECTMENU;
+
+    wxMenu contextMenu;
+    wxMenu noObjectContextMenu;
     wxMenu zoomMenu;
 
     /**
      * Tool function returning the object used to display during the \a instance when editing.
      * Can return a null pointer if the object is not found ( even if it should not happen normally ).
      */
-    boost::shared_ptr<Object> GetObjectLinkedToInitialInstance(gd::InitialInstance & instance);
+    boost::shared_ptr<Object> GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const;
 
     /**
      * Update the mouse according to the selected button
      */
     void UpdateMouseResizeCursor(const std::string & currentResizeBt);
+
+    void UpdateContextMenu();
+    void SendSelectionToLayer(const std::string & newLayerName);
 
     //State management
     bool isReloading; ///< Our editor is a bit special: It sometimes need to wait for a compilation to finish before going into preview mode.

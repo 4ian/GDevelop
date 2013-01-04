@@ -18,7 +18,6 @@
 #include <deque>
 #include "GDCore/Events/Event.h"
 #include "GDL/IDE/BaseProfiler.h"
-class SceneCanvas;
 class SceneEditorCanvas;
 
 class GD_API ProfileDlg: public wxPanel, public BaseProfiler

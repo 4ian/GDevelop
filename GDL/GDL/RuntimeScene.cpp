@@ -469,9 +469,9 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
 
 void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const InitialPosition *, boost::shared_ptr<Object> > * optionalMap)
 {
-    for(unsigned int i = 0;i < container.GetInstancesCount();++i)
+    for (std::list<InitialPosition>::const_iterator it = container.initialInstances.begin(), end = container.initialInstances.end(); it != end; ++it)
     {
-        const InitialPosition & initialInstance = container.GetInstance(i);
+        const InitialPosition & initialInstance = *it;
 
         std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(GetInitialObjects().begin(), GetInitialObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
         std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game->GetGlobalObjects().begin(), game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));

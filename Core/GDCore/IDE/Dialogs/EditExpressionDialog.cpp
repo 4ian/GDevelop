@@ -706,7 +706,7 @@ string EditExpressionDialog::ShowParameterDialog(const gd::ParameterMetadata & p
 
         return dialog.GetChosenLayer();
     }
-    else if ( parameterMetadata.type == "layoutvar" )
+    else if ( parameterMetadata.type == "scenevar" )
     {
         gd::ChooseVariableDialog dialog(this, layout.GetVariables());
         dialog.SetAssociatedLayout(&project, &layout);

@@ -119,6 +119,12 @@ public:
     void ConnectEvents();
 
     /**
+     * Called when the an editor made changes to the layout ( New layout added for example ) and so the editor must
+     * be refreshed if needed.
+     */
+    virtual void RefreshFromLayout() {};
+
+    /**
      * Static method for creating the ribbon's page used by all layout editors.
      * Called by the IDE.
      * \return The wxRibbonButtonBar to be used for the custom tools. Can be accessed then thanks to the MainFrameWrapper object.
@@ -146,11 +152,89 @@ public:
      */
     virtual void OnhScrollbarScroll(wxScrollEvent& event) {};
 
+    /**
+     * Return a list of the currently selected instances.
+     */
+    std::vector<gd::InitialInstance*> GetSelection();
+
+    /**
+     * Clear the selection, notifying associated editors.
+     */
+    void ClearSelection();
+
+    /**
+     * Add an instance of the specified object at the cursor position.
+     */
+    void AddObject(const std::string & objectName);
+
+    /**
+     * Add an instance of the specified object at the specified position.
+     */
+    void AddObject(const std::string & objectName, float x, float y);
+
+    /**
+     * Add an instance to selection, notifying associated editors.
+     */
+    void SelectInstance(InitialInstance * instance);
+
+    /**
+     * Remove an instance from selection, notifying associated editors.
+     */
+    void UnselectInstance(InitialInstance * instance);
+
+    /**
+     * Delete the specified instance, notifying associated editors.
+     */
+    void DeleteInstances(std::vector<InitialInstance *> instances);
+
+    /**
+     * Can be called so that the editor make the initial instance passed in parameters visible.
+     */
+    virtual void EnsureVisible(const gd::InitialInstance & instance) {};
+
+    /**
+     * Set the layer where the new instance must be added
+     */
+    void SetCurrentLayer(const std::string & newLayer) { currentLayer = newLayer; }
+
+    /**
+     * Return the current layer
+     */
+    const std::string & GetCurrentLayer() const { return currentLayer; }
+
+    /**
+     * Return true if the editor is in editing state.
+     */
+    bool IsEditing() const { return editing; }
+
+    /**
+     * Must return the real X position of the object drawn by the initial instance
+     * ( Some platforms are using objects which can be drawn not at their exact X position )
+     *
+     * The bounding box of an initial instance is assumed to be at position (GetRealXPositionOfInitialInstance;GetRealYPositionOfInitialInstance)
+     * and its size is (GetWidthOfInitialInstance;GetHeightOfInitialInstance)
+     *
+     * \note Default implementation returns instance.GetX() and it should be ok for most usages.
+     *
+     * \see GetRealYPositionOfInitialInstance
+     * \see GetWidthOfInitialInstance
+     * \see GetHeightOfInitialInstance
+     */
+    virtual double GetRealXPositionOfInitialInstance(InitialInstance & instance) const;
+
+    /** \see GetRealXPositionOfInitialInstance */
+    virtual double GetRealYPositionOfInitialInstance(InitialInstance & instance) const;
+
+    /** To be redefined by the child classes so as to provide the width of an initial instance */
+    virtual double GetWidthOfInitialInstance(InitialInstance & instance) const { return 16; };
+
+    /** To be redefined by the child classes so as to provide the height of an initial instance */
+    virtual double GetHeightOfInitialInstance(InitialInstance & instance) const { return 16; };
+
     //(*Declarations(LayoutEditorCanvas)
     //*)
 
 protected:
-
     //(*Identifiers(LayoutEditorCanvas)
     //*)
     //Common identifiers of ribbon buttons shared by layout editors of any platform.
@@ -208,34 +292,10 @@ protected:
     virtual void OnInitialInstanceDeleted(gd::InitialInstance & instance) {};
 
     /** To be redefined by the child classes so as to provide the position of the mouse */
-    virtual double GetMouseXOnLayout() { return 0; };
+    virtual double GetMouseXOnLayout() const { return 0; };
 
     /** To be redefined by the child classes so as to provide the position of the mouse */
-    virtual double GetMouseYOnLayout() { return 0; };
-
-    /**
-     * Must return the real X position of the object drawn by the initial instance
-     * ( Some platforms are using objects which can be drawn not at their exact X position )
-     *
-     * The bounding box of an initial instance is assumed to be at position (GetRealXPositionOfInitialInstance;GetRealYPositionOfInitialInstance)
-     * and its size is (GetWidthOfInitialInstance;GetHeightOfInitialInstance)
-     *
-     * \note Default implementation returns instance.GetX() and it should be ok for most usages.
-     *
-     * \see GetRealYPositionOfInitialInstance
-     * \see GetWidthOfInitialInstance
-     * \see GetHeightOfInitialInstance
-     */
-    virtual double GetRealXPositionOfInitialInstance(InitialInstance & instance);
-
-    /** \see GetRealXPositionOfInitialInstance */
-    virtual double GetRealYPositionOfInitialInstance(InitialInstance & instance);
-
-    /** To be redefined by the child classes so as to provide the width of an initial instance */
-    virtual double GetWidthOfInitialInstance(InitialInstance & instance) { return 16; };
-
-    /** To be redefined by the child classes so as to provide the height of an initial instance */
-    virtual double GetHeightOfInitialInstance(InitialInstance & instance) { return 16; };
+    virtual double GetMouseYOnLayout() const { return 0; };
 
     /**
      * Can be called ( most of the time when the layout is rendered when editing ) to declare that
@@ -294,22 +354,6 @@ protected:
     InitialInstance * GetInitialInstanceUnderCursor();
 
     /**
-     * Clear the selection, notifying associated editors.
-     */
-    void ClearSelection();
-
-    /**
-     * Add an instance to selection, notifying associated editors.
-     */
-    void SelectInstance(InitialInstance * instance);
-
-    /**
-     * Delete the specified instance, notifying associated editors.
-     * Also remove it from selection.
-     */
-    void DeleteInstance(InitialInstance * instance);
-
-    /**
      * Called when a changes has been made ( Something which is lasting, e.g. when an object has been moved,
      * but not when it is being moved ).
      */
@@ -347,6 +391,7 @@ protected:
     bool isSelecting;
     wxRect selectionRectangle;
     std::map <InitialInstance*, wxRealPoint > selectedInstances;
+    std::string currentLayer; ///< The layer where the new instance must be added.
 
     std::vector < boost::shared_ptr<gd::InitialInstancesContainer> > history; ///< History of changes
     std::vector < boost::shared_ptr<gd::InitialInstancesContainer> > redoHistory; ///< Histoy of changes so as to "redo"
@@ -357,6 +402,8 @@ protected:
     bool editing; ///< True if the layout is being edited, false if a preview is running.
 
     DECLARE_EVENT_TABLE()
+    friend class InstancesInsideSelectionPicker;
+    friend class SmallestInstanceUnderCursorPicker;
 };
 
 }

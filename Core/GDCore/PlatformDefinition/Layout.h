@@ -201,7 +201,7 @@ public:
     /**
      * Must add a new empty the layer sheet called "name" at the specified position in the layout list.
      */
-    virtual void InsertNewLayer(std::string & name, unsigned int position) =0;
+    virtual void InsertNewLayer(const std::string & name, unsigned int position) =0;
 
     /**
      * Must add a new the layer constructed from the layout passed as parameter.

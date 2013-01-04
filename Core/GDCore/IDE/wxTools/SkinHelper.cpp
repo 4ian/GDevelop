@@ -11,6 +11,7 @@
 #include <wx/propgrid/propgrid.h>
 #include <wx/config.h>
 #include <wx/dcbuffer.h>
+#include <wx/settings.h>
 
 namespace gd
 {

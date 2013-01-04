@@ -36,6 +36,11 @@ public:
     virtual void SelectedInitialInstance(const gd::InitialInstance & instance) {};
 
     /**
+     * Called by LayoutEditorCanvas when an initial instance is deselected
+     */
+    virtual void DeselectedInitialInstance(const gd::InitialInstance & instance) {};
+
+    /**
      * Called by LayoutEditorCanvas when all initial instances are deselected.
      */
     virtual void DeselectedAllInitialInstance() {};
@@ -52,14 +57,9 @@ public:
     virtual void ObjectsUpdated() {};
 
     /**
-     * Ask the editor to go in a disabled ( greyed ) state.
+     * Ask the editor to go into a normal ( non greyed ) or disabled ( greyed ) state.
      */
-    virtual void Disable() =0;
-
-    /**
-     * Ask the editor to go back into a normal ( non greyed ) state.
-     */
-    virtual void Enable() =0;
+    virtual bool Enable(bool enable=true) =0;
 };
 
 }

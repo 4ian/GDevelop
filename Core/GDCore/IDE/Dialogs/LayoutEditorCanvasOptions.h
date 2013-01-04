@@ -11,7 +11,7 @@ namespace gd
 {
 
 /**
- * \brief Tool class used to store settings of a SceneCanvas.
+ * \brief Tool class used to store settings of a LayoutEditorCanvas.
  *
  * \see Scene
  */

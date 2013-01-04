@@ -3,14 +3,17 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "LayoutEditorCanvas.h"
+#include <cmath>
 #include <wx/wx.h>
 #include <wx/config.h>
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/page.h>
 #include <wx/ribbon/buttonbar.h>
+#include <wx/aui/aui.h>
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvasTextDnd.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.h"
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
@@ -80,6 +83,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
 	Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&LayoutEditorCanvas::OnKey);
 	Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnKeyUp);
 	Connect(wxEVT_MOUSEWHEEL,(wxObjectEventFunction)&LayoutEditorCanvas::OnMouseWheel);
+    SetDropTarget(new LayoutEditorCanvasTextDnd(*this));
 
     //Generate undo menu
     {
@@ -127,7 +131,7 @@ void LayoutEditorCanvas::ConnectEvents()
     mainFrameWrapper.GetMainEditor()->Connect(idUndo10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayoutEditorCanvas::OnUndo10Selected, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idUndo20,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayoutEditorCanvas::OnUndo20Selected, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idClearHistory,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayoutEditorCanvas::OnClearHistorySelected, NULL, this);
-    mainFrameWrapper.GetMainEditor()->Connect(idRibbonFullScreen,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&LayoutEditorCanvas::OnFullScreenBtClick, NULL, this);
+    mainFrameWrapper.GetMainEditor()->Connect(idRibbonFullScreen,wxEVT_COMMAND_RIBBONBUTTON_CLICKED,(wxObjectEventFunction)&LayoutEditorCanvas::OnFullScreenBtClick, NULL, this);
 
     DoConnectEvents();
 }
@@ -152,7 +156,7 @@ void LayoutEditorCanvas::OnPreviewBtClick( wxCommandEvent & event )
     mainFrameWrapper.LockShortcuts(this);
     mainFrameWrapper.DisableControlsForScenePreviewing();
     for (std::set<LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
-        (*it)->Disable();
+        (*it)->Enable(false);
 
     RecreateRibbonToolbar();
     hScrollbar->Show(false);
@@ -246,6 +250,75 @@ void LayoutEditorCanvas::CreateEditionRibbonTools()
     ribbonToolbar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Objects list") : "", bitmapManager->objectsPositionsList24);
 }
 
+/** \brief Tool class picking the smallest instance under the cursor.
+ */
+class HighestZOrderFinder : public gd::InitialInstanceFunctor
+{
+public:
+    HighestZOrderFinder() : highestZOrder(0), firstCall(true), layerRestricted(false) {};
+    virtual ~HighestZOrderFinder() {};
+
+    virtual void operator()(gd::InitialInstance & instance)
+    {
+        if ( !layerRestricted || instance.GetLayer() == layerName)
+        {
+            if ( firstCall ) highestZOrder = instance.GetZOrder();
+            else highestZOrder = std::max(highestZOrder, instance.GetZOrder());
+        }
+    }
+
+    void RestrictSearchToLayer(const std::string & layerName_) { layerName = layerName_; layerRestricted = true; };
+    int GetHighestZOrder() const { return highestZOrder; }
+
+private:
+    int highestZOrder;
+    bool firstCall;
+
+    bool layerRestricted; ///< If true, the search is restricted to the layer called \a layerName.
+    std::string layerName;
+};
+
+void LayoutEditorCanvas::AddObject(const std::string & objectName)
+{
+    AddObject(objectName, GetMouseXOnLayout(), GetMouseYOnLayout());
+}
+
+void LayoutEditorCanvas::AddObject(const std::string & objectName, float x, float y)
+{
+    if ( !editing || objectName.empty() ) return;
+    isMovingInstance = false;
+
+    //Create the new instance
+    InitialInstance & newInstance = instances.InsertNewInitialInstance();
+    newInstance.SetObjectName(objectName);
+    newInstance.SetLayer(currentLayer);
+
+    //Compute position
+    if ( options.grid && options.snap )
+    {
+        newInstance.SetX(static_cast<int>(x/options.gridWidth +0.5)*options.gridWidth);
+        newInstance.SetY(static_cast<int>(y/options.gridHeight+0.5)*options.gridHeight);
+    }
+    else
+    {
+        newInstance.SetX(x);
+        newInstance.SetY(y);
+    }
+
+    //Compute the Z order
+    HighestZOrderFinder zOrderFinder;
+    zOrderFinder.RestrictSearchToLayer(currentLayer);
+    instances.IterateOverInstances(zOrderFinder);
+    newInstance.SetZOrder(zOrderFinder.GetHighestZOrder()+1);
+
+    //Notify child and sub editors
+    OnInitialInstanceAdded(newInstance);
+
+    for (std::set<LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
+    ChangesMade();
+}
+
 void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
 {
     SetFocus();
@@ -298,8 +371,7 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
             {
                 for ( std::map <InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
                 {
-                    instances.InsertInitialInstance(*(it->first));
-                    OnInitialInstanceAdded(instances.GetInstance(instances.GetInstancesCount()-1));
+                    OnInitialInstanceAdded(instances.InsertInitialInstance(*(it->first)));
                 }
 
                 for (std::set<LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
@@ -330,31 +402,58 @@ void LayoutEditorCanvas::SelectInstance(InitialInstance * instance)
         (*it)->SelectedInitialInstance(*instance);
 }
 
-void LayoutEditorCanvas::DeleteInstance(InitialInstance * instance)
+void LayoutEditorCanvas::UnselectInstance(InitialInstance * instance)
 {
     if ( !instance ) return;
 
     selectedInstances.erase(instance);
-    OnInitialInstanceDeleted(*instance);
-    instances.RemoveInstance(*instance);
+    for (std::set<LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->DeselectedInitialInstance(*instance);
 }
 
-////////////////////////////////////////////////////////////
-/// Bouton gauche relaché : Fin du déplacement
-////////////////////////////////////////////////////////////
+void LayoutEditorCanvas::DeleteInstances(std::vector<InitialInstance *> instancesToDelete)
+{
+    for (unsigned int i = 0;i<instancesToDelete.size();++i)
+    {
+        if (instancesToDelete[i] == NULL ) continue;
+
+        OnInitialInstanceDeleted(*instancesToDelete[i]);
+        instances.RemoveInstance(*instancesToDelete[i]);
+
+        if ( selectedInstances.find(instancesToDelete[i]) != selectedInstances.end()) selectedInstances.erase(instancesToDelete[i]);
+    }
+
+    for (std::set<LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
+}
+
+/** \brief Tool class collecting in a list all the instances that are inside the selectionRectangle of the layout editor canvas.
+ */
+class InstancesInsideSelectionPicker : public gd::InitialInstanceFunctor
+{
+public:
+    InstancesInsideSelectionPicker(const LayoutEditorCanvas & editor_) : editor(editor_) {};
+    virtual ~InstancesInsideSelectionPicker() {};
+
+    virtual void operator()(gd::InitialInstance & instance)
+    {
+        if ( editor.selectionRectangle.Contains(editor.GetRealXPositionOfInitialInstance(instance), editor.GetRealYPositionOfInitialInstance(instance)) &&
+             editor.selectionRectangle.Contains(editor.GetRealXPositionOfInitialInstance(instance)+editor.GetWidthOfInitialInstance(instance),
+                                                editor.GetRealYPositionOfInitialInstance(instance)+editor.GetHeightOfInitialInstance(instance)) )
+        {
+            selectedList.push_back(&instance);
+        }
+    }
+
+    std::vector<InitialInstance*> & GetSelectedList() { return selectedList; };
+
+private:
+    const LayoutEditorCanvas & editor;
+    std::vector<InitialInstance*> selectedList; ///< This list will be filled with the instances that are into the selectionRectangle
+};
+
 void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
 {
-    //TODO
-    #if defined(GD_IDE_ONLY) && defined(LINUX)
-    sf::Event myEvent;
-    myEvent.type = sf::Event::MouseButtonReleased;
-    myEvent.mouseButton.x = event.GetX();
-    myEvent.mouseButton.y = event.GetY();
-    myEvent.mouseButton.button = sf::Mouse::Left;
-
-    previewData.scene.GetRenderTargetEvents().push_back(myEvent);
-    #endif
-
     if ( !editing ) return;
 
     //Check if there is a click released on a gui element inside the layout
@@ -393,29 +492,24 @@ void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
     //Select object thanks to the selection area
     if ( isSelecting )
     {
-        for ( unsigned int i = 0; i<instances.GetInstancesCount();++i)
+        //Be sure that the selection rectangle origin is on the top left
+        if ( selectionRectangle.GetWidth() < 0 )
         {
-            gd::InitialInstance & instance = instances.GetInstance(i);
-
-            //Be sure that the selection rectangle origin is on the top left
-            if ( selectionRectangle.GetWidth() < 0 )
-            {
-                selectionRectangle.SetX(selectionRectangle.GetX()+selectionRectangle.GetWidth());
-                selectionRectangle.SetWidth(-selectionRectangle.GetWidth());
-            }
-            if ( selectionRectangle.GetHeight() < 0 )
-            {
-                selectionRectangle.SetY(selectionRectangle.GetY()+selectionRectangle.GetHeight());
-                selectionRectangle.SetHeight(-selectionRectangle.GetHeight());
-            }
-
-            if ( selectionRectangle.Contains(GetRealXPositionOfInitialInstance(instance), GetRealYPositionOfInitialInstance(instance)) &&
-                 selectionRectangle.Contains(GetRealXPositionOfInitialInstance(instance)+GetWidthOfInitialInstance(instance),
-                                             GetRealYPositionOfInitialInstance(instance)+GetHeightOfInitialInstance(instance)) )
-            {
-                SelectInstance(&instance);
-            }
+            selectionRectangle.SetX(selectionRectangle.GetX()+selectionRectangle.GetWidth());
+            selectionRectangle.SetWidth(-selectionRectangle.GetWidth());
         }
+        if ( selectionRectangle.GetHeight() < 0 )
+        {
+            selectionRectangle.SetY(selectionRectangle.GetY()+selectionRectangle.GetHeight());
+            selectionRectangle.SetHeight(-selectionRectangle.GetHeight());
+        }
+
+        //Select the instances that are inside the selection rectangle
+        InstancesInsideSelectionPicker picker(*this);
+        instances.IterateOverInstances(picker);
+
+        for ( unsigned int i = 0; i<picker.GetSelectedList().size();++i)
+            SelectInstance(picker.GetSelectedList()[i]);
 
         isSelecting = false;
     }
@@ -432,8 +526,11 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
 
     if ( evt.GetKeyCode() == WXK_DELETE )
     {
+        std::vector<InitialInstance*> instancesToDelete;
         for ( std::map <InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
-            DeleteInstance(it->first);
+            instancesToDelete.push_back(it->first);
+
+        DeleteInstances(instancesToDelete);
 
         ClearSelection();
         ChangesMade();
@@ -515,17 +612,13 @@ void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )
 
             if ( options.grid && options.snap )
             {
-                newX = static_cast<int>(newX/options.gridWidth)*options.gridWidth;
-                newY = static_cast<int>(newY/options.gridHeight)*options.gridHeight;
+                newX = std::floor(newX/options.gridWidth +0.5)*options.gridWidth;
+                newY = std::floor(newY/options.gridHeight+0.5)*options.gridHeight;
             }
 
             //Move the initial instance
             it->first->SetX(newX);
             it->first->SetY(newY);
-
-            //Notify others editors and the sub class
-            for (std::set<LayoutEditorCanvasAssociatedEditor*>::iterator editor = associatedEditors.begin();editor !=associatedEditors.end();++editor)
-                (*editor)->InitialInstancesUpdated();
 
             OnInitialInstanceMoved(*(it->first));
         }
@@ -543,19 +636,26 @@ void LayoutEditorCanvas::ChangesMade()
     latestState->Create(instances);
 }
 
-InitialInstance * LayoutEditorCanvas::GetInitialInstanceUnderCursor()
+
+/** \brief Tool class picking the smallest instance under the cursor.
+ */
+class SmallestInstanceUnderCursorPicker : public gd::InitialInstanceFunctor
 {
-    double mouseX = GetMouseXOnLayout();
-    double mouseY = GetMouseYOnLayout();
-
-    InitialInstance * smallestInstance = NULL;
-    double smallestInstanceArea = 0;
-
-    for (unsigned int i = 0;i<instances.GetInstancesCount();++i)
+public:
+    SmallestInstanceUnderCursorPicker(const LayoutEditorCanvas & editor_) :
+        editor(editor_),
+        smallestInstance(NULL),
+        smallestInstanceArea(0),
+        mouseX(editor.GetMouseXOnLayout()),
+        mouseY(editor.GetMouseYOnLayout())
     {
-        InitialInstance & instance = instances.GetInstance(i);
-        wxRect2DDouble boundingBox(GetRealXPositionOfInitialInstance(instance), GetRealYPositionOfInitialInstance(instance),
-                                   GetWidthOfInitialInstance(instance), GetHeightOfInitialInstance(instance));
+    };
+    virtual ~SmallestInstanceUnderCursorPicker() {};
+
+    virtual void operator()(gd::InitialInstance & instance)
+    {
+        wxRect2DDouble boundingBox(editor.GetRealXPositionOfInitialInstance(instance), editor.GetRealYPositionOfInitialInstance(instance),
+                                   editor.GetWidthOfInitialInstance(instance), editor.GetHeightOfInitialInstance(instance));
 
         if ( boundingBox.Contains(wxPoint2DDouble(mouseX, mouseY)) )
         {
@@ -567,35 +667,59 @@ InitialInstance * LayoutEditorCanvas::GetInitialInstanceUnderCursor()
         }
     }
 
-    return smallestInstance;
+    InitialInstance * GetSmallestInstanceUnderCursor() { return smallestInstance; };
+
+private:
+    const LayoutEditorCanvas & editor;
+    InitialInstance * smallestInstance;
+    double smallestInstanceArea;
+    const double mouseX;
+    const double mouseY;
+};
+
+InitialInstance * LayoutEditorCanvas::GetInitialInstanceUnderCursor()
+{
+    SmallestInstanceUnderCursorPicker picker(*this);
+    instances.IterateOverInstances(picker);
+
+    return picker.GetSmallestInstanceUnderCursor();
 }
 
-double LayoutEditorCanvas::GetRealXPositionOfInitialInstance(InitialInstance & instance)
+std::vector<gd::InitialInstance*> LayoutEditorCanvas::GetSelection()
+{
+    std::vector<gd::InitialInstance*> selection;
+    for ( std::map <InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+        selection.push_back(it->first);
+
+    return selection;
+}
+
+double LayoutEditorCanvas::GetRealXPositionOfInitialInstance(InitialInstance & instance) const
 {
     return instance.GetX();
 }
 
-double LayoutEditorCanvas::GetRealYPositionOfInitialInstance(InitialInstance & instance)
+double LayoutEditorCanvas::GetRealYPositionOfInitialInstance(InitialInstance & instance) const
 {
     return instance.GetY();
 }
 
 void LayoutEditorCanvas::OnLayersEditor( wxCommandEvent & event )
 {
-    /*parentAuiManager->GetPane(layersEditor.get()).Show();
-    parentAuiManager->Update();*/
+    parentAuiManager->GetPane("EL").Show();
+    parentAuiManager->Update();
 }
 
 void LayoutEditorCanvas::OnObjectsEditor( wxCommandEvent & event )
 {
-    /*parentAuiManager->GetPane(objectsEditor.get()).Show();
-    parentAuiManager->Update();*/
+    parentAuiManager->GetPane("EO").Show();
+    parentAuiManager->Update();
 }
 
 void LayoutEditorCanvas::OnObjectsPositionList( wxCommandEvent & event )
 {
-    /*parentAuiManager->GetPane(initialPositionsBrowser.get()).Show();
-    parentAuiManager->Update();*/
+    parentAuiManager->GetPane("InstancesBrowser").Show();
+    parentAuiManager->Update();
 }
 
 void LayoutEditorCanvas::OnGridBtClick( wxCommandEvent & event )

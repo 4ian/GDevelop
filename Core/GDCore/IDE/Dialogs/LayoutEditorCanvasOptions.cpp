@@ -11,7 +11,7 @@ namespace gd
 
 LayoutEditorCanvasOptions::LayoutEditorCanvasOptions() :
     grid( false ),
-    snap( false),
+    snap( true ),
     gridWidth( 32 ),
     gridHeight( 32 ),
     gridR( 158 ),

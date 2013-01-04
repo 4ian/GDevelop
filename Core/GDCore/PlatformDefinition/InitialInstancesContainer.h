@@ -5,13 +5,27 @@
 
 #ifndef GDCORE_INITIALINSTANCESCONTAINER_H
 #define GDCORE_INITIALINSTANCESCONTAINER_H
+#include <boost/function.hpp>
 #include <string>
 namespace gd { class InitialInstance; }
+namespace gd { class InitialInstanceFunctor; }
 class TiXmlElement;
 
 namespace gd
 {
 
+/**
+ * \brief Defines a container of gd::InitialInstances.
+ *
+ * The container must notably be able to ensure that pointers
+ * to the elements of the container are not invalidated when
+ * a change occurs ( through InsertNewInitialInstance or RemoveInstance
+ * for example ). <br>
+ * Thus, most implementations should use a std::list
+ * for holding the instances. In this way, the container is not required
+ * to provide a direct access to element based on an index. Instead,
+ * the method IterateOverInstances is used to perform operations.
+ */
 class GD_CORE_API InitialInstancesContainer
 {
 public:
@@ -56,27 +70,21 @@ public:
     virtual unsigned int GetInstancesCount() const =0;
 
     /**
-     * Must return the specified \a instance
+     * Must apply \a func to each instance of the container.
      */
-    virtual const InitialInstance & GetInstance(unsigned int index) const =0;
+    virtual void IterateOverInstances(InitialInstanceFunctor & func) =0;
 
     /**
-     * Must return the specified \a instance
+     * Must insert the specified \a instance into the list and return a
+     * a reference to the newly added instance.
      */
-    virtual InitialInstance & GetInstance(unsigned int index) =0;
+    virtual InitialInstance & InsertInitialInstance(const InitialInstance & instance) =0;
 
     /**
-     * Must insert the specified \a instance into the list
+     * Must insert a new blank instance at the end of the list and return a
+     * a reference to the newly added instance.
      */
-    virtual void InsertInitialInstance(const InitialInstance & instance) =0;
-    /**
-     * Must insert a new blank instance at the end of the list
-     */
-    virtual void InsertNewInitialInstance() =0;
-    /**
-     * Must remove the specified \a instance
-     */
-    virtual void RemoveInstance(unsigned int index) =0;
+    virtual InitialInstance & InsertNewInitialInstance() =0;
 
     /**
      * Must remove the specified \a instance
@@ -103,6 +111,11 @@ public:
      */
     virtual void RenameInstancesOfObject(const std::string & oldName, const std::string & newName) =0;
 
+    /**
+     * Must return true if there is at least one instance on the layer named \a layerName.
+     */
+    virtual bool SomeInstancesAreOnLayer(const std::string & layerName) =0;
+
     ///@}
 
     /** \name Saving and loading
@@ -120,6 +133,18 @@ public:
      */
     virtual void LoadFromXml(const TiXmlElement * element) {}
     ///@}
+};
+
+/**
+ * \brief Tool class to be used with gd::InitialInstancesContainer::IterateOverInstances
+ */
+class InitialInstanceFunctor
+{
+public:
+    InitialInstanceFunctor() {};
+    virtual ~InitialInstanceFunctor() {};
+
+    virtual void operator()(InitialInstance & instance) =0;
 };
 
 }

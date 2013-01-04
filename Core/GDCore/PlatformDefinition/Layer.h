@@ -40,6 +40,11 @@ public:
      * Must return true if the layer is visible
      */
     virtual bool GetVisibility() const =0;
+
+    /**
+     * Called when the user double click on a layer in a layer editor.
+     */
+    virtual void EditLayer() =0;
 };
 
 }

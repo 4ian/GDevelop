@@ -6,7 +6,12 @@
 #ifndef GDCORE_INITIALINSTANCE_H
 #define GDCORE_INITIALINSTANCE_H
 #include <string>
+#include <map>
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
+namespace gd { class Project; }
+namespace gd { class Layout; }
+class wxPropertyGrid;
+class wxPropertyGridEvent;
 
 namespace gd
 {
@@ -70,6 +75,24 @@ public:
      * \see gd::VariablesContainer
      */
     virtual gd::VariablesContainer & GetVariables() =0;
+    ///@}
+
+    /** \name Others properties management
+     * Members functions related to exposing others properties of the instance
+     */
+    ///@{
+    /**
+     * Must return a map containing the properties names (as keys) and their values.
+     * \note Common properties do not need to be inserted in this map
+     */
+    virtual std::map<std::string, std::string> GetCustomProperties(gd::Project & project, gd::Layout & layout) {std::map<std::string, std::string> nothing; return nothing;}
+
+    /**
+     * Must update the property called \a name with the new \a value.
+     *
+     * \return false if the property could not be updated.
+     */
+    virtual bool UpdateCustomProperty(const std::string & name, const std::string & value, gd::Project & project, gd::Layout & layout) {return false;};
     ///@}
 };
 

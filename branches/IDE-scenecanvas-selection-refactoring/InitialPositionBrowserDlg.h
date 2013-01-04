@@ -11,23 +11,32 @@
 #include <wx/panel.h>
 //*)
 #include <vector>
-namespace gd { class InitialInstance; }
-class InitialInstancesContainer;
-class SceneCanvas;
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
+namespace gd { class InitialInstancesContainer; }
+namespace gd { class LayoutEditorCanvas; }
 
-class InitialPositionBrowserDlg: public wxPanel
+/**
+ * \brief Panel displaying a list of the instances of a InitialInstancesContainer.
+ *
+ * Usually used to display the objects of a layout.
+ */
+class InitialPositionBrowserDlg: public wxPanel, public gd::LayoutEditorCanvasAssociatedEditor
 {
 public:
 
-    InitialPositionBrowserDlg(wxWindow* parent, InitialInstancesContainer & initialInstancesContainer_, SceneCanvas & sceneCanvas_);
+    InitialPositionBrowserDlg(wxWindow* parent, gd::InitialInstancesContainer & initialInstancesContainer_, gd::LayoutEditorCanvas & layoutEditorCanvas);
     virtual ~InitialPositionBrowserDlg();
+
+    virtual void SelectedInitialInstance(const gd::InitialInstance & instance);
+    virtual void DeselectedInitialInstance(const gd::InitialInstance & instance);
+    virtual void DeselectedAllInitialInstance();
+    virtual void InitialInstancesUpdated();
+    virtual void Refresh();
+    virtual bool Enable(bool enable=true) { return wxWindow::Enable(enable); };
 
     //(*Declarations(InitialPositionBrowserDlg)
     wxListCtrl* initialPositionsList;
     //*)
-    void SelectInitialPosition(const gd::InitialInstance & instance);
-    void DeselectAll();
-    void Refresh();
 
 protected:
 
@@ -39,11 +48,18 @@ private:
 
     //(*Handlers(InitialPositionBrowserDlg)
     void OninitialPositionsListItemActivated(wxListEvent& event);
+    void OninitialPositionsListKeyDown(wxListEvent& event);
+    void OninitialPositionsListItemDeselect(wxListEvent& event);
+    void OninitialPositionsListItemSelect(wxListEvent& event);
     //*)
-    InitialInstancesContainer & instancesContainer;
-    SceneCanvas & sceneCanvas;
+    gd::InitialInstancesContainer & instancesContainer;
+    gd::LayoutEditorCanvas & layoutCanvas;
+
+    bool deletingInitialInstances; ///< Used to avoid refreshing multiple times the editor when deleting instances
+    bool notUserSelection; ///< Used to avoid to consider the selection of an item made by SelectedInitialInstance as a user click.
 
     DECLARE_EVENT_TABLE()
+    friend class InitialPositionBrowserDlgRefresher;
 };
 
 #endif

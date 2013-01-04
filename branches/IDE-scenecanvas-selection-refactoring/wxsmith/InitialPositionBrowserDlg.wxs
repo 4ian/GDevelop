@@ -10,19 +10,13 @@
 				<object class="wxListCtrl" name="ID_LISTCTRL1" variable="initialPositionsList" member="yes">
 					<size>206,167</size>
 					<style>wxLC_REPORT</style>
-					<handler function="OninitialPositionsListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
+					<handler function="OninitialPositionsListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
+					<handler function="OninitialPositionsListItemDeselect" entry="EVT_LIST_ITEM_DESELECTED" />
+					<handler function="OninitialPositionsListKeyDown" entry="EVT_LIST_KEY_DOWN" />
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<border>5</border>
 				<option>1</option>
 			</object>
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

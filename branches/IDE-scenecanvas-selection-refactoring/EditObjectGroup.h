@@ -1,3 +1,8 @@
+/** \file
+ *  Game Develop
+ *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ */
+
 #ifndef EDITOBJECTGROUP_H
 #define EDITOBJECTGROUP_H
 
@@ -13,9 +18,8 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-#include <wx/toolbar.h>
-#include "GDL/Scene.h"
-#include "GDL/Game.h"
+namespace gd { class Project; }
+namespace gd { class Layout; }
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -23,72 +27,74 @@
 #include <string>
 #include <vector>
 
-using namespace std;
-
+/**
+ * \brief Editor allowing to edit the objects of a specific group.
+ *
+ * \todo Move in GDCore.*
+ */
 class EditObjectGroup: public wxDialog
 {
-	public:
+public:
 
-		EditObjectGroup(wxWindow* parent, Game & game_, Scene & scene_, const gd::ObjectGroup & group_);
-		virtual ~EditObjectGroup();
+    EditObjectGroup(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, const gd::ObjectGroup & group_);
+    virtual ~EditObjectGroup();
 
-		gd::ObjectGroup group;
+    gd::ObjectGroup group;
 
-		//(*Declarations(EditObjectGroup)
-		wxAuiManager* AuiManager1;
-		wxButton* OkBt;
-		wxAuiToolBar* toolbar;
-		wxMenuItem* MenuItem2;
-		wxStaticBitmap* StaticBitmap1;
-		wxMenuItem* MenuItem1;
-		wxMenu ContextMenu;
-		wxTreeCtrl* ObjetsList;
-		wxStaticLine* StaticLine1;
-		wxButton* AnnulerBt;
-		wxHyperlinkCtrl* helpBt;
-		wxPanel* Panel2;
-		//*)
+    //(*Declarations(EditObjectGroup)
+    wxAuiManager* AuiManager1;
+    wxButton* OkBt;
+    wxAuiToolBar* toolbar;
+    wxMenuItem* MenuItem2;
+    wxStaticBitmap* StaticBitmap1;
+    wxMenuItem* MenuItem1;
+    wxMenu ContextMenu;
+    wxTreeCtrl* ObjetsList;
+    wxStaticLine* StaticLine1;
+    wxButton* AnnulerBt;
+    wxHyperlinkCtrl* helpBt;
+    wxPanel* Panel2;
+    //*)
 
-	protected:
+protected:
 
-		//(*Identifiers(EditObjectGroup)
-		static const long ID_AUITOOLBAR1;
-		static const long ID_PANEL2;
-		static const long ID_TREECTRL1;
-		static const long ID_STATICLINE1;
-		static const long ID_STATICBITMAP2;
-		static const long ID_HYPERLINKCTRL1;
-		static const long ID_BUTTON1;
-		static const long ID_BUTTON2;
-		static const long idAddObjet;
-		static const long idDelObjet;
-		//*)
+    //(*Identifiers(EditObjectGroup)
+    static const long ID_AUITOOLBAR1;
+    static const long ID_PANEL2;
+    static const long ID_TREECTRL1;
+    static const long ID_STATICLINE1;
+    static const long ID_STATICBITMAP2;
+    static const long ID_HYPERLINKCTRL1;
+    static const long ID_BUTTON1;
+    static const long ID_BUTTON2;
+    static const long idAddObjet;
+    static const long idDelObjet;
+    //*)
 
-	private:
+private:
 
-		//(*Handlers(EditObjectGroup)
-		void OnOkBtClick(wxCommandEvent& event);
-		void OnAnnulerBtClick(wxCommandEvent& event);
-		void OnPanel2Resize(wxSizeEvent& event);
-		void OnObjetsListBeginLabelEdit(wxTreeEvent& event);
-		void OnObjetsListEndLabelEdit(wxTreeEvent& event);
-		void OnObjetsListItemActivated(wxTreeEvent& event);
-		void OnObjetsListItemRightClick(wxTreeEvent& event);
-		void OnAddObjetSelected(wxCommandEvent& event);
-		void OnDelObjetSelected(wxCommandEvent& event);
-		void OnhelpBtClick(wxCommandEvent& event);
-		//*)
-        void Refresh();
+    //(*Handlers(EditObjectGroup)
+    void OnOkBtClick(wxCommandEvent& event);
+    void OnAnnulerBtClick(wxCommandEvent& event);
+    void OnPanel2Resize(wxSizeEvent& event);
+    void OnObjetsListBeginLabelEdit(wxTreeEvent& event);
+    void OnObjetsListEndLabelEdit(wxTreeEvent& event);
+    void OnObjetsListItemActivated(wxTreeEvent& event);
+    void OnObjetsListItemRightClick(wxTreeEvent& event);
+    void OnAddObjetSelected(wxCommandEvent& event);
+    void OnDelObjetSelected(wxCommandEvent& event);
+    void OnhelpBtClick(wxCommandEvent& event);
+    //*)
+    void Refresh();
 
-        wxTreeItemId itemSelected;
+    wxTreeItemId itemSelected;
 
-		Game & game;
-		Scene & scene;
+    gd::Project & project;
+    gd::Layout & layout;
 
-		unsigned int modificationCount; ///< Track the number of modification. If the user made lots of modifications and wants to cancel, he will be warned.
+    unsigned int modificationCount; ///< Track the number of modification. If the user made lots of modifications and wants to cancel, he will be warned.
 
-		DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif
-

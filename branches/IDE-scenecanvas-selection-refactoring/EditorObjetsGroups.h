@@ -15,23 +15,24 @@
 #include <wx/msw/winundef.h>
 #endif
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
-#include "GDL/Object.h"
-#include "GDL/Game.h"
+namespace gd { class Project; }
+namespace gd { class Layout; }
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
 
-using namespace std;
-
 /**
- * \brief
+ * \brief Editor which displays the groups of objects available and allows to edit them.
+ *
+ * \todo Move in GDCore.
+ * \todo Replace toolbar with an AUI one.
  */
 class EditorObjetsGroups: public wxPanel
 {
 public:
 
-    EditorObjetsGroups(wxWindow* parent, Game & game_, Scene & scene_, vector < gd::ObjectGroup > * objectsGroups_, gd::MainFrameWrapper & mainFrameWrapper);
+    EditorObjetsGroups(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, std::vector < gd::ObjectGroup > * objectsGroups_, gd::MainFrameWrapper & mainFrameWrapper);
     virtual ~EditorObjetsGroups();
 
     //(*Declarations(EditorObjetsGroups)
@@ -108,9 +109,9 @@ private:
 
     wxToolBar * toolbar;
 
-    Game & game; ///< Reference to the game owning the scene
-    Scene & scene; ///< Reference to the scene to edit
-    vector < gd::ObjectGroup > * objectsGroups; ///< The groups list to edit ( This is not necessarily the list of the scene, as we can also edit global groups )
+    gd::Project & project; ///< Reference to the project the groups belong to.
+    gd::Layout & layout; ///< Reference to the layout containing the group to edit
+    std::vector < gd::ObjectGroup > * objectsGroups; ///< The groups list to edit ( This is not necessarily the groups of the layout, as we can also edit global groups )
 
     gd::MainFrameWrapper & mainFrameWrapper;
 

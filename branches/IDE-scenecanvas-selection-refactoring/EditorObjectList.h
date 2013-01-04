@@ -27,6 +27,12 @@ namespace gd {class ClassWithObjects;}
 #include "GDL/Scene.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
+
+/**
+ * \brief Panel allowing to display and edit objects
+ *
+ * \todo Move this to GDCore.
+ */
 class EditorObjectList: public wxPanel
 {
 public:
@@ -34,12 +40,12 @@ public:
     /**
      * Default constructor
      * \param parent wxWidgets parent window
-     * \param game Project the objects belong to
+     * \param project Project the objects belong to
      * \param objects The class with the objects to edit ( i.e. The project or a layout )
      * \param mainFrameWrapper gd::MainFrameWrapper object
-     * \param scene optional pointer to the layout the objects belong to. Can be NULL.
+     * \param layout optional pointer to the layout the objects belong to. Can be NULL.
      */
-    EditorObjectList(wxWindow* parent, Game & game_, gd::ClassWithObjects & objects, gd::MainFrameWrapper & mainFrameWrapper, Scene * scene_);
+    EditorObjectList(wxWindow* parent, gd::Project & project_, gd::ClassWithObjects & objects, gd::MainFrameWrapper & mainFrameWrapper, gd::Layout * layout = NULL);
     virtual ~EditorObjectList();
 
     //(*Declarations(EditorObjectList)
@@ -150,16 +156,15 @@ private:
     wxImageList* imageList;
     wxImageList* objectsImagesList;
 
-    Game & game;
-    Scene * scene; ///< Scene edited. Can be NULL, in which case objects are considered to be global.
-    bool globalObjects; ///< If true, the objects edited are global. Automatically deduced (in the constructor) by checking if &game == &objects.
-
+    gd::Project & project;
+    gd::Layout * layout; ///< Layout edited. Can be NULL.
+    bool globalObjects; ///< If true, the objects edited are global. Automatically deduced (in the constructor) by checking if &project == &objects.
     gd::MainFrameWrapper & mainFrameWrapper;
 
-    vector < std::pair<long, std::string> > idForAutomatism;
+    std::vector < std::pair<long, std::string> > idForAutomatism;
 
     wxTreeItemId item; ///< Selected item in the list
-    string ancienNom;
+    std::string ancienNom;
 
     DECLARE_EVENT_TABLE()
 };

@@ -16,7 +16,6 @@
 #include <wx/thread.h>
 #include <wx/stopwatch.h>
 class Game;
-class SceneCanvas;
 
 class BuildProgressPnl: public wxPanel
 {

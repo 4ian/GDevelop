@@ -2,7 +2,6 @@
  *  Game Develop
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
-
 #ifndef EDITORSCENE_H
 #define EDITORSCENE_H
 
@@ -21,19 +20,17 @@
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/toolbar.h>
+#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 namespace gd {class Layout;}
 namespace gd {class Project;}
-class RuntimeGame;
+namespace gd {class LayersEditorPanel;}
+class EditorObjets;
 class EventsEditor;
 class LayoutEditorPropertiesPnl;
-#include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-#include "GDL/IDE/Dialogs/RenderDialog.h"
-#include "SceneCanvas.h"
-
-using namespace std;
+class InitialPositionBrowserDlg;
 
 /**
- * EditorScene manage and contains all editors needed so as to edit a scene.
+ * \brief Panel containing the main editors of a layout
  */
 class EditorScene: public wxPanel
 {
@@ -64,10 +61,6 @@ protected:
     static const long ID_SCROLLBAR4;
     static const long ID_CUSTOM3;
     static const long ID_PANEL1;
-    static const long ID_SCROLLBAR2;
-    static const long ID_SCROLLBAR1;
-    static const long ID_CUSTOM1;
-    static const long ID_PANEL5;
     static const long ID_CUSTOM2;
     static const long ID_PANEL6;
     static const long ID_AUINOTEBOOK1;
@@ -96,10 +89,6 @@ private:
 
     //(*Declarations(EditorScene)
     EventsEditor* eventsEditor;
-    wxScrollBar* oldScrollBar2;
-    SceneCanvas* sceneCanvas;
-    wxPanel* oldScenePanel;
-    wxScrollBar* oldScrollBar1;
     wxPanel* scenePanel;
     wxPanel* eventsPanel;
     wxScrollBar* hScrollbar;
@@ -108,12 +97,9 @@ private:
     wxScrollBar* vScrollbar;
     //*)
     boost::shared_ptr<EditorObjets> objectsEditor;
-    boost::shared_ptr<EditorLayers> layersEditor;
-    boost::shared_ptr<DebuggerGUI> debugger;
-    boost::shared_ptr<RenderDialog> externalPreviewWindow;
-    boost::shared_ptr<InitialPositionBrowserDlg> initialPositionBrowser;
-    boost::shared_ptr<ProfileDlg> profilerDlg;
+    boost::shared_ptr<gd::LayersEditorPanel> layersEditor;
     boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
+    boost::shared_ptr<InitialPositionBrowserDlg> initialInstancesBrowser;
 
     gd::Project & project;
     gd::Layout & layout;

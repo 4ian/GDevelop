@@ -53,7 +53,7 @@
 								<growablecols>0</growablecols>
 								<growablerows>0,1</growablerows>
 								<object class="sizeritem">
-									<object class="wxPanel" name="ID_PANEL5" variable="scenePanel" member="yes">
+									<object class="wxPanel" name="ID_PANEL5" variable="layoutPanel" member="yes">
 										<bg>#FFFFFF</bg>
 										<style>wxNO_BORDER|wxTAB_TRAVERSAL</style>
 										<handler function="OnscenePanelResize" entry="EVT_SIZE" />
@@ -73,8 +73,8 @@
 											<style>wxSB_HORIZONTAL</style>
 											<handler function="OnscrollBar1Scroll" entry="EVT_COMMAND_SCROLL" />
 										</object>
-										<object class="Custom" name="ID_CUSTOM1" subclass="SceneCanvas" variable="sceneCanvas" member="yes">
-											<creating_code>sceneCanvas = new SceneCanvas(scenePanel, game, emptyScene, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper, false);</creating_code>
+										<object class="Custom" name="ID_CUSTOM1" subclass="SceneEditorCanvas" variable="layoutEditorCanvas" member="yes">
+											<creating_code>layoutEditorCanvas = new SceneEditorCanvas(layoutPanel, project, emptyLayout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);</creating_code>
 											<style>wxWANTS__CHARS | wxBORDER__SIMPLE</style>
 											<pos>0,0</pos>
 											<size>800,600</size>
@@ -126,4 +126,3 @@
 		</object>
 	</object>
 </wxsmith>
-

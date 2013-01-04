@@ -638,8 +638,8 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
     {
         ClearSelection();
 
-        if ( initialPositionsBrowser )
-            initialPositionsBrowser->DeselectAll();
+        /*if ( initialPositionsBrowser )
+            initialPositionsBrowser->DeselectAll();*/
     }
 
     //Manage selection area
@@ -695,8 +695,8 @@ void SceneCanvas::OnLeftDown( wxMouseEvent &event )
         {
             SelectObject(object);
 
-            if ( initialPositionsBrowser ) initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
-            if ( propertiesPanel ) propertiesPanel->SelectInitialPosition(GetInitialPositionFromObject(object));
+            //if ( initialPositionsBrowser ) initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
+            //if ( propertiesPanel ) propertiesPanel->SelectInitialPosition(GetInitialPositionFromObject(object));
         }
 
         //Clone the selection using Ctrl
@@ -762,8 +762,8 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
                 editionData.yObjectsSelected[i] = initialInstance.GetY();
             }
 
-            if ( initialPositionsBrowser )
-                initialPositionsBrowser->SelectInitialPosition(initialInstance);
+            /*if ( initialPositionsBrowser )
+                initialPositionsBrowser->SelectInitialPosition(initialInstance);*/
         }
 
         if ( changesMade ) ChangesMade();
@@ -790,7 +790,7 @@ void SceneCanvas::OnLeftUp( wxMouseEvent &event )
                 if ( find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), object) == editionData.objectsSelected.end() )
                 {
                     SelectObject(object);
-                    if ( initialPositionsBrowser )initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
+                    //if ( initialPositionsBrowser )initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
                 }
             }
         }
@@ -1005,7 +1005,7 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
          find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), object) == editionData.objectsSelected.end() ))
     {
         ClearSelection();
-        if ( initialPositionsBrowser ) initialPositionsBrowser->DeselectAll();
+        //if ( initialPositionsBrowser ) initialPositionsBrowser->DeselectAll();
     }
 
     //Remember now the position of the mouse for latter use
@@ -1023,7 +1023,7 @@ void SceneCanvas::OnRightUp( wxMouseEvent &event )
     if ( find(editionData.objectsSelected.begin(), editionData.objectsSelected.end(), object) == editionData.objectsSelected.end() )
     {
         SelectObject(object);
-        if ( initialPositionsBrowser ) initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
+        //if ( initialPositionsBrowser ) initialPositionsBrowser->SelectInitialPosition(GetInitialPositionFromObject(object));
     }
 
     OnUpdate(); //So as to display selection rectangle for the newly selected object
@@ -1085,8 +1085,8 @@ void SceneCanvas::OnCutSelected(wxCommandEvent & event)
 
     ClearSelection();
 
-    if ( initialPositionsBrowser ) initialPositionsBrowser->DeselectAll();
-    if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
+    //if ( initialPositionsBrowser ) initialPositionsBrowser->DeselectAll();
+    //if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
 
     Clipboard::GetInstance()->SetPositionsSelection(copiedPositions);
     ChangesMade();

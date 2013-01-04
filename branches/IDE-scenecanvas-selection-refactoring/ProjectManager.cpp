@@ -910,7 +910,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
         {
             ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-            if ( editorPtr != NULL && &editorPtr->externalLayout == &game->GetExternalLayout(newName))
+            if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(newName))
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
     }
@@ -1273,7 +1273,7 @@ void ProjectManager::CloseGame(gd::Project * project)
         }
         else if ( externalLayoutEditorPtr != NULL )
         {
-            if ( &externalLayoutEditorPtr->game == project)
+            if ( &externalLayoutEditorPtr->GetProject() == project)
             {
                 if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                     wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
@@ -1608,7 +1608,7 @@ void ProjectManager::OnEditExternalLayoutSelected(wxCommandEvent& event)
     {
         ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
 
-        if ( externalLayoutEditorPtr != NULL && &externalLayoutEditorPtr->externalLayout == &game->GetExternalLayout(data->GetSecondString()) )
+        if ( externalLayoutEditorPtr != NULL && &externalLayoutEditorPtr->GetExternalLayout() == &game->GetExternalLayout(data->GetSecondString()) )
         {
             //Change notebook page to scene page
             mainEditor.GetEditorsNotebook()->SetSelection(j);
@@ -1655,7 +1655,7 @@ void ProjectManager::OnDeleteExternalLayoutSelected(wxCommandEvent& event)
     {
         ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-        if ( editorPtr != NULL && &editorPtr->externalLayout == &game->GetExternalLayout(data->GetSecondString()))
+        if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(data->GetSecondString()))
         {
             if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                 wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
@@ -1705,7 +1705,7 @@ void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
     {
         ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-        if ( editorPtr != NULL && &editorPtr->externalLayout == &game->GetExternalLayout(data->GetSecondString()))
+        if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(data->GetSecondString()))
         {
             if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                 wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );

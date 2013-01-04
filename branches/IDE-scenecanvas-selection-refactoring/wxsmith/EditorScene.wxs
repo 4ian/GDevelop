@@ -16,6 +16,7 @@
 					<object class="AuiNotebookPage">
 						<object class="wxPanel" name="ID_PANEL1" variable="scenePanel" member="yes">
 							<bg>#FFFFFF</bg>
+							<help>Edit the layout of the scene</help>
 							<style>wxNO_BORDER|wxTAB_TRAVERSAL</style>
 							<handler function="OnscenePanelResize" entry="EVT_SIZE" />
 							<object class="wxScrollBar" name="ID_SCROLLBAR3" variable="vScrollbar" member="yes">
@@ -49,48 +50,12 @@
 								<handler function="OnsceneCanvasSetFocus" entry="EVT_SET_FOCUS" />
 							</object>
 						</object>
-						<label>New scene editor</label>
-					</object>
-					<object class="AuiNotebookPage">
-						<object class="wxPanel" name="ID_PANEL5" variable="oldScenePanel" member="yes">
-							<bg>#FFFFFF</bg>
-							<style>wxNO_BORDER|wxTAB_TRAVERSAL</style>
-							<handler function="OnscenePanelResize" entry="EVT_SIZE" />
-							<object class="wxScrollBar" name="ID_SCROLLBAR2" variable="oldScrollBar2" member="yes">
-								<value>2500</value>
-								<thumbsize>10</thumbsize>
-								<range>5000</range>
-								<pagesize>10</pagesize>
-								<style>wxSB_VERTICAL</style>
-								<handler function="OnScrollBar2Scroll" entry="EVT_COMMAND_SCROLL" />
-								<handler function="OnScrollBar2Scroll" entry="EVT_COMMAND_SCROLL_THUMBTRACK" />
-								<handler function="OnScrollBar2Scroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
-							</object>
-							<object class="wxScrollBar" name="ID_SCROLLBAR1" variable="oldScrollBar1" member="yes">
-								<value>2500</value>
-								<thumbsize>10</thumbsize>
-								<range>5000</range>
-								<pagesize>10</pagesize>
-								<style>wxSB_HORIZONTAL</style>
-								<handler function="OnScrollBar1Scroll" entry="EVT_COMMAND_SCROLL" />
-								<handler function="OnScrollBar1Scroll" entry="EVT_COMMAND_SCROLL_THUMBTRACK" />
-								<handler function="OnScrollBar1Scroll" entry="EVT_COMMAND_SCROLL_CHANGED" />
-							</object>
-							<object class="Custom" name="ID_CUSTOM1" subclass="SceneCanvas" variable="sceneCanvas" member="yes">
-								<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, scene.GetInitialInstances(), scene.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);</creating_code>
-								<style></style>
-								<pos>0,0</pos>
-								<size>800,600</size>
-								<focused>1</focused>
-								<handler function="OnsceneCanvasSetFocus" entry="EVT_SET_FOCUS" />
-							</object>
-						</object>
 						<label>Scene</label>
-						<icon>res/sceneeditor.png</icon>
 					</object>
 					<object class="AuiNotebookPage">
 						<object class="wxPanel" name="ID_PANEL6" variable="eventsPanel" member="yes">
 							<bg>#FFFFFF</bg>
+							<help>Edit the events of the scene</help>
 							<style>wxNO_BORDER|wxTAB_TRAVERSAL</style>
 							<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 								<cols>1</cols>

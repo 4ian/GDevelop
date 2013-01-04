@@ -14,9 +14,12 @@
 #include <wx/combobox.h>
 //*)
 #include <wx/aui/aui.h>
+#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 class RuntimeGame;
-class SceneCanvas;
+class EditorObjets;
+class LayoutEditorPropertiesPnl;
 namespace gd { class ExternalLayout; }
+namespace gd { class LayersEditorPanel; }
 #include "GDL/Scene.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
@@ -27,23 +30,6 @@ public:
     ExternalLayoutEditor(wxWindow* parent, RuntimeGame & game_, gd::ExternalLayout & externalLayout, const gd::MainFrameWrapper & mainFrameWrapper_);
     virtual ~ExternalLayoutEditor();
 
-    //(*Declarations(ExternalLayoutEditor)
-    wxScrollBar* scrollBar1;
-    wxPanel* helpPanel;
-    wxScrollBar* scrollBar2;
-    wxStaticText* StaticText2;
-    wxStaticBitmap* StaticBitmap1;
-    wxStaticText* StaticText1;
-    SceneCanvas* sceneCanvas;
-    wxPanel* contextPanel;
-    wxPanel* corePanel;
-    wxPanel* scenePanel;
-    wxComboBox* parentSceneComboBox;
-    //*)
-
-    gd::ExternalLayout & externalLayout;
-    RuntimeGame & game;
-
     /**
      * Return the layout being used for editing the external layout
      */
@@ -53,6 +39,16 @@ public:
      * Can be called by parent so as to refresh ribbon for this editor.
      */
     void ForceRefreshRibbonAndConnect();
+
+    /**
+     * Return the external layout being edited.
+     */
+    gd::ExternalLayout & GetExternalLayout() const { return externalLayout; }
+
+    /**
+     * Return the project owning the external layout
+     */
+    gd::Project & GetProject() const { return project; }
 
 protected:
 
@@ -81,15 +77,34 @@ private:
     void OnparentSceneComboBoxSelected(wxCommandEvent& event);
     //*)
     void OnparentSceneComboBoxDropDown(wxCommandEvent& event);
-
-    DECLARE_EVENT_TABLE()
-
     void SetupForScene(Scene & scene);
 
-    Scene emptyScene;
+    //(*Declarations(ExternalLayoutEditor)
+    wxScrollBar* scrollBar1;
+    wxPanel* helpPanel;
+    wxScrollBar* scrollBar2;
+    wxStaticText* StaticText2;
+    wxStaticBitmap* StaticBitmap1;
+    wxStaticText* StaticText1;
+    wxPanel* contextPanel;
+    wxPanel* corePanel;
+    wxComboBox* parentSceneComboBox;
+    SceneEditorCanvas* layoutEditorCanvas;
+    wxPanel* layoutPanel;
+    //*)
+    boost::shared_ptr<EditorObjets> objectsEditor;
+    boost::shared_ptr<gd::LayersEditorPanel> layersEditor;
+    boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
+
+    RuntimeGame & project;
+    gd::ExternalLayout & externalLayout;
     gd::MainFrameWrapper mainFrameWrapper;
+    Scene emptyLayout;
 
     wxAuiManager m_mgr;
+
+
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

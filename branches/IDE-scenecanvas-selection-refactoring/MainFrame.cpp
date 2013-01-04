@@ -524,6 +524,18 @@ void MainFrame::SetCurrentGame(unsigned int i, bool refreshProjectManager)
 void MainFrame::UpdateNotebook()
 {
     editorsNotebook->SetWindowStyleFlag(wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS | wxNO_BORDER );
+    if ( false ) //All editors are closable currently
+    {
+        long style = editorsNotebook->GetWindowStyleFlag();
+        style &= ~wxAUI_NB_CLOSE_ON_ACTIVE_TAB;
+        editorsNotebook->SetWindowStyleFlag(style);
+    }
+    else
+    {
+        long style = editorsNotebook->GetWindowStyleFlag();
+        style |= wxAUI_NB_CLOSE_ON_ACTIVE_TAB;
+        editorsNotebook->SetWindowStyleFlag(style);
+    }
 }
 
 /**

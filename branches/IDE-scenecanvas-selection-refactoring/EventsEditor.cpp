@@ -25,13 +25,15 @@
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/IDE/EventsChangesNotifier.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
+#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
-#include "SceneCanvas.h"
+#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 #include "LogFileManager.h"
 #include "GDL/IDE/Dialogs/ProfileDlg.h"
 #include "SearchEvents.h"
@@ -110,7 +112,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
     externalEvents(NULL),
     events(events_),
     mainFrameWrapper(mainFrameWrapper_),
-    sceneCanvas(NULL),
+    layoutCanvas(NULL),
     conditionColumnWidth(350),
     isResizingColumns(false),
     leftMargin(20),
@@ -1627,6 +1629,8 @@ void EventsEditor::OnSearchBtClick(wxCommandEvent& event)
 
 void EventsEditor::OnProfilingBtClick(wxCommandEvent& event)
 {
+    SceneEditorCanvas * sceneCanvas = dynamic_cast<SceneEditorCanvas*>(layoutCanvas);
+
     if (sceneCanvas && sceneCanvas->GetProfileDialog() != boost::shared_ptr<ProfileDlg>())
     {
         if ( !profilingActivated && !sceneCanvas->GetProfileDialog()->profilingActivated)

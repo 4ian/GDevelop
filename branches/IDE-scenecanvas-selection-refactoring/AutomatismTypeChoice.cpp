@@ -33,8 +33,8 @@ BEGIN_EVENT_TABLE(AutomatismTypeChoice,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-AutomatismTypeChoice::AutomatismTypeChoice(wxWindow* parent, Game & game_) :
-game(game_)
+AutomatismTypeChoice::AutomatismTypeChoice(wxWindow* parent, gd::Project & project_) :
+project(project_)
 {
 	//(*Initialize(AutomatismTypeChoice)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -123,9 +123,9 @@ void AutomatismTypeChoice::RefreshList()
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
-	    if ( find(game.GetUsedPlatformExtensions().begin(),
-                  game.GetUsedPlatformExtensions().end(),
-                  extensions[i]->GetName()) == game.GetUsedPlatformExtensions().end() )
+	    if ( find(project.GetUsedPlatformExtensions().begin(),
+                  project.GetUsedPlatformExtensions().end(),
+                  extensions[i]->GetName()) == project.GetUsedPlatformExtensions().end() )
             continue;
 
 	    vector<string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
@@ -204,7 +204,7 @@ void AutomatismTypeChoice::OncancelBtClick(wxCommandEvent& event)
 
 void AutomatismTypeChoice::OnmoreAutomatismsBtClick(wxCommandEvent& event)
 {
-    gd::ProjectExtensionsDialog dialog(this, game);
+    gd::ProjectExtensionsDialog dialog(this, project);
     dialog.ShowModal();
 
     RefreshList();

@@ -316,7 +316,9 @@ void MainFrame::SaveAs()
         GetCurrentGame()->SetProjectFile(file);
 
         if ( !GetCurrentGame()->SaveToFile(GetCurrentGame()->GetProjectFile()) )
+        {
             wxLogError( _("The project could not be saved properly!") );
+        }
 
         SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
         SetCurrentGame(gameCurrentlyEdited, false);

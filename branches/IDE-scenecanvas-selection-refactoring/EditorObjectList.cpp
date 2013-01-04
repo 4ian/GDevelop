@@ -34,7 +34,8 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/PlatformDefinition/Platform.h"
-#include "GDL/Game.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
 #include "GDL/ExtensionsManager.h"
@@ -106,12 +107,12 @@ BEGIN_EVENT_TABLE(EditorObjectList,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorObjectList::EditorObjectList(wxWindow* parent, Game & game_, gd::ClassWithObjects & objects_, gd::MainFrameWrapper & mainFrameWrapper_, Scene * scene_) :
+EditorObjectList::EditorObjectList(wxWindow* parent, gd::Project & project_, gd::ClassWithObjects & objects_, gd::MainFrameWrapper & mainFrameWrapper_, gd::Layout * layout_) :
 objects(objects_),
-game(game_),
-scene(scene_),
+project(project_),
+layout(layout_),
 mainFrameWrapper(mainFrameWrapper_),
-globalObjects(&objects == &game)
+globalObjects(&objects == &project)
 {
 	//(*Initialize(EditorObjectList)
 	wxMenuItem* delObjMenuI;
@@ -375,8 +376,8 @@ void EditorObjectList::OnobjectsListSelectionChanged(wxTreeEvent& event)
 
     if ( item != objectsList->GetRootItem() )
     {
-        if ( scene != NULL )
-            LogFileManager::GetInstance()->WriteToLogFile(ToString("Object \""+objectsList->GetItemText(item)+"\" selected ( Layout \""+scene->GetName()+"\" )"));
+        if ( layout != NULL )
+            LogFileManager::GetInstance()->WriteToLogFile(ToString("Object \""+objectsList->GetItemText(item)+"\" selected ( Layout \""+layout->GetName()+"\" )"));
         else
             LogFileManager::GetInstance()->WriteToLogFile(ToString("Object \""+objectsList->GetItemText(item)+"\" selected"));
     }
@@ -406,7 +407,7 @@ void EditorObjectList::Refresh()
         {
             int thumbnailID = -1;
             wxBitmap thumbnail;
-            if ( objects.GetObject(i).GenerateThumbnail(game, thumbnail)  && thumbnail.IsOk() )
+            if ( objects.GetObject(i).GenerateThumbnail(project, thumbnail)  && thumbnail.IsOk() )
             {
                 objectsImagesList->Add(thumbnail);
                 thumbnailID = objectsImagesList->GetImageCount()-1;
@@ -443,8 +444,8 @@ void EditorObjectList::OnAutomatismSelected(wxCommandEvent & event)
     gd::Object & object = objects.GetObject(name);
     gd::Automatism & automatism = object.GetAutomatism(autoType);
 
-    automatism.EditAutomatism(this, game, scene, mainFrameWrapper);
-    game.GetChangesNotifier().OnAutomatismEdited(game, globalObjects ? NULL : scene, object, automatism);
+    automatism.EditAutomatism(this, project, layout, mainFrameWrapper);
+    project.GetChangesNotifier().OnAutomatismEdited(project, globalObjects ? NULL : layout, object, automatism);
 }
 
 /**
@@ -455,13 +456,13 @@ void EditorObjectList::OneditMenuISelected(wxCommandEvent& event)
     string name = ToString(objectsList->GetItemText( item ));
     if ( !objects.HasObjectNamed(name) ) return;
 
-    objects.GetObject(name).EditObject(this, game, mainFrameWrapper);
-    game.GetChangesNotifier().OnObjectEdited(game, globalObjects ? NULL : scene, objects.GetObject(name));
+    objects.GetObject(name).EditObject(this, project, mainFrameWrapper);
+    project.GetChangesNotifier().OnObjectEdited(project, globalObjects ? NULL : layout, objects.GetObject(name));
 
     //Reload thumbnail
     int thumbnailID = -1;
     wxBitmap thumbnail;
-    if ( objects.GetObject(name).GenerateThumbnail(game, thumbnail) && thumbnail.IsOk() )
+    if ( objects.GetObject(name).GenerateThumbnail(project, thumbnail) && thumbnail.IsOk() )
     {
         objectsImagesList->Add(thumbnail);
         thumbnailID = objectsImagesList->GetImageCount()-1;
@@ -503,7 +504,7 @@ void EditorObjectList::OneditNameMenuISelected(wxCommandEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
 {
-    gd::ChooseObjectTypeDialog chooseTypeDialog(this, game);
+    gd::ChooseObjectTypeDialog chooseTypeDialog(this, project);
     if ( chooseTypeDialog.ShowModal() == 0 )
         return;
 
@@ -528,14 +529,14 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     //Reload thumbnail
     int thumbnailID = -1;
     wxBitmap thumbnail;
-    if ( objects.GetObject(objects.GetObjectsCount()-1).GenerateThumbnail(game, thumbnail) )
+    if ( objects.GetObject(objects.GetObjectsCount()-1).GenerateThumbnail(project, thumbnail) )
     {
         objectsImagesList->Add(thumbnail);
         thumbnailID = objectsImagesList->GetImageCount()-1;
     }
     objectsList->SetItemImage( itemAdded, thumbnailID );
 
-    game.GetChangesNotifier().OnObjectAdded(game, globalObjects ? NULL : scene, objects.GetObject(name));
+    project.GetChangesNotifier().OnObjectAdded(project, globalObjects ? NULL : layout, objects.GetObject(name));
 
     objectsList->EditLabel(itemAdded);
 
@@ -570,23 +571,23 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
                 //Remove objects
                 objects.RemoveObject(objectName);
 
-                if ( scene )
+                if ( layout )
                 {
                     if ( answer == wxYES )
                     {
-                        gd::EventsRefactorer::RemoveObjectInEvents(game, *scene, scene->GetEvents(), objectName);
-                        for (unsigned int g = 0;g<scene->GetObjectGroups().size();++g)
+                        gd::EventsRefactorer::RemoveObjectInEvents(project, *layout, layout->GetEvents(), objectName);
+                        for (unsigned int g = 0;g<layout->GetObjectGroups().size();++g)
                         {
-                            if ( scene->GetObjectGroups()[g].Find(objectName)) scene->GetObjectGroups()[g].RemoveObject(objectName);
+                            if ( layout->GetObjectGroups()[g].Find(objectName)) layout->GetObjectGroups()[g].RemoveObject(objectName);
                         }
                     }
-                    scene->GetInitialInstances().RemoveInitialInstancesOfObject(objectName);
+                    layout->GetInitialInstances().RemoveInitialInstancesOfObject(objectName);
                 }
             }
         }
     }
 
-    game.GetChangesNotifier().OnObjectsDeleted(game, globalObjects ? NULL : scene, objectsDeleted);
+    project.GetChangesNotifier().OnObjectsDeleted(project, globalObjects ? NULL : layout, objectsDeleted);
 
     //Removing items
     void * nothing;
@@ -634,9 +635,9 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
     }
 
     //Be sure the name is valid
-    if ( !game.ValidateObjectName(newName) )
+    if ( !project.ValidateObjectName(newName) )
     {
-        wxRichToolTip tip(_("Invalid name"), game.GetBadObjectNameWarning());
+        wxRichToolTip tip(_("Invalid name"), project.GetBadObjectNameWarning());
         tip.SetIcon(wxICON_INFORMATION);
         tip.ShowFor(this);
 
@@ -648,20 +649,20 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
 
     objects.GetObject(ancienNom).SetName( newName );
 
-    if ( scene ) //Change the object name in the scene.
+    if ( layout ) //Change the object name in the layout.
     {
-        gd::EventsRefactorer::RenameObjectInEvents(game, *scene, scene->GetEvents(), ancienNom, newName);
-        scene->GetInitialInstances().RenameInstancesOfObject(ancienNom, newName);
-        for (unsigned int g = 0;g<scene->GetObjectGroups().size();++g)
+        gd::EventsRefactorer::RenameObjectInEvents(project, *layout, layout->GetEvents(), ancienNom, newName);
+        layout->GetInitialInstances().RenameInstancesOfObject(ancienNom, newName);
+        for (unsigned int g = 0;g<layout->GetObjectGroups().size();++g)
         {
-            if ( scene->GetObjectGroups()[g].Find(ancienNom))
+            if ( layout->GetObjectGroups()[g].Find(ancienNom))
             {
-                scene->GetObjectGroups()[g].RemoveObject(ancienNom);
-                scene->GetObjectGroups()[g].AddObject(newName);
+                layout->GetObjectGroups()[g].RemoveObject(ancienNom);
+                layout->GetObjectGroups()[g].AddObject(newName);
             }
         }
     }
-    game.GetChangesNotifier().OnObjectRenamed(game, globalObjects ? NULL : scene, objects.GetObject(newName), ancienNom);
+    project.GetChangesNotifier().OnObjectRenamed(project, globalObjects ? NULL : layout, objects.GetObject(newName), ancienNom);
 
     objectsList->SetItemText( event.GetItem(), event.GetLabel() );
     return;
@@ -705,7 +706,7 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
 
     std::vector<std::string> objectsDeleted;
     objectsDeleted.push_back(name);
-    game.GetChangesNotifier().OnObjectsDeleted(game, globalObjects ? NULL : scene, objectsDeleted);
+    project.GetChangesNotifier().OnObjectsDeleted(project, globalObjects ? NULL : layout, objectsDeleted);
 }
 
 /**
@@ -739,7 +740,7 @@ void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
 
     //Add it to the list
     objects.InsertObject(*object, objects.GetObjectsCount());
-    game.GetChangesNotifier().OnObjectAdded(game, globalObjects ? NULL : scene, *object);
+    project.GetChangesNotifier().OnObjectAdded(project, globalObjects ? NULL : layout, *object);
 
     //Refresh the list and select the newly added item
     searchCtrl->Clear();
@@ -830,7 +831,7 @@ void EditorObjectList::OnMoveDownSelected(wxCommandEvent& event)
 }
 
 /**
- * Begin dragging object ( to sceneCanvas )
+ * Begin dragging object ( to layoutCanvas )
  */
 void EditorObjectList::OnobjectsListBeginDrag(wxTreeEvent& event)
 {
@@ -866,7 +867,7 @@ void EditorObjectList::OneditVarMenuISelected(wxCommandEvent& event)
 
     gd::ChooseVariableDialog dialog(this, objects.GetObject(name).GetVariables(), /*editingOnly=*/true);
     if ( dialog.ShowModal() == 1 )
-        game.GetChangesNotifier().OnObjectVariablesChanged(game, globalObjects ? NULL : scene, objects.GetObject(name));
+        project.GetChangesNotifier().OnObjectVariablesChanged(project, globalObjects ? NULL : layout, objects.GetObject(name));
 }
 
 /**
@@ -881,12 +882,12 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
         return;
     }
 
-    AutomatismTypeChoice dialog(this, game);
+    AutomatismTypeChoice dialog(this, project);
     if ( dialog.ShowModal() == 1)
     {
         //Find automatism metadata
         boost::shared_ptr<gd::PlatformExtension> extension = boost::shared_ptr<gd::PlatformExtension> ();
-        std::vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
+        std::vector < boost::shared_ptr<gd::PlatformExtension> > extensions = project.GetPlatform().GetAllPlatformExtensions();
         for (unsigned int i = 0;i<extensions.size();++i)
         {
             std::vector<std::string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
@@ -902,7 +903,7 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
 
         gd::Object & object = objects.GetObject(name);
         object.AddNewAutomatism(dialog.selectedAutomatismType, autoName);
-        game.GetChangesNotifier().OnAutomatismAdded(game, globalObjects ? NULL : scene, object, object.GetAutomatism(autoName));
+        project.GetChangesNotifier().OnAutomatismAdded(project, globalObjects ? NULL : layout, object, object.GetAutomatism(autoName));
     }
 }
 
@@ -928,7 +929,7 @@ void EditorObjectList::OndeleteAutomatismItemSelected(wxCommandEvent& event)
 
     objects.GetObject(name).RemoveAutomatism(automatisms[selection]);
 
-    game.GetChangesNotifier().OnAutomatismDeleted(game, globalObjects ? NULL : scene, objects.GetObject(name), automatisms[selection]);
+    project.GetChangesNotifier().OnAutomatismDeleted(project, globalObjects ? NULL : layout, objects.GetObject(name), automatisms[selection]);
 }
 
 /**
@@ -963,7 +964,7 @@ void EditorObjectList::OnrenameAutomatismSelected(wxCommandEvent& event)
     std::string oldName = automatism.GetName();
     automatism.SetName(newName);
 
-    game.GetChangesNotifier().OnAutomatismRenamed(game, globalObjects ? NULL : scene, object, automatism, oldName);
+    project.GetChangesNotifier().OnAutomatismRenamed(project, globalObjects ? NULL : layout, object, automatism, oldName);
 }
 
 /**

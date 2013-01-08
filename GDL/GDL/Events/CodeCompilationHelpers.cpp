@@ -11,9 +11,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "llvm/ADT/OwningPtr.h"
-#include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/system_error.h"
 #include <wx/filefn.h>
 #include <wx/filename.h>
 #include <wx/datetime.h>
@@ -39,7 +36,7 @@ namespace
 {
     bool SourceFileNeedRecompilation(Game & game, SourceFile & sourceFile)
     {
-        if ( !wxFileExists(string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&sourceFile)+"LLVMIR.bc") ))
+        if ( !wxFileExists(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&sourceFile)+"ObjectFile.o") ))
             return true;
         else
         {
@@ -50,7 +47,7 @@ namespace
                 return true;
             else
             {
-                wxFileName bitcodeFileInfo(string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&sourceFile)+"LLVMIR.bc"));
+                wxFileName bitcodeFileInfo(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&sourceFile)+"ObjectFile.o"));
                 if ( bitcodeFileInfo.GetModificationTime().GetTicks() < sourceFileInfo.GetModificationTime().GetTicks() )
                     return true;
             }
@@ -65,11 +62,11 @@ namespace
         if ( analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName()).empty() )
             return false; //No need to recompile events as they cannot be compiled for any specific scene.
 
-        if ( !wxFileExists(string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&events)+"LLVMIR.bc") ))
+        if ( !wxFileExists(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&events)+"ObjectFile.o") ))
             return true;
         else
         {
-            wxFileName bitcodeFileInfo(string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&events)+"LLVMIR.bc"));
+            wxFileName bitcodeFileInfo(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&events)+"ObjectFile.o"));
             if ( bitcodeFileInfo.GetModificationTime().GetTicks() < events.GetLastChangeTimeStamp() )
                 return true;
         }
@@ -188,7 +185,7 @@ namespace
      *
      * \return true if execution engine of the scene is properly setup.
      */
-    bool LoadSceneBitCodes(Game & game, Scene & scene)
+    /*bool LoadSceneBitCodes(Game & game, Scene & scene)
     {
         std::vector < llvm::MemoryBuffer * > codeBuffers;
 
@@ -258,6 +255,62 @@ namespace
         }
 
         return true;
+    }*/
+
+    /**
+     * Automatically create and submit a task to the code compiler for linking scene events.
+     * Compiled code is then loaded into scene CodeExecutionEngine.
+     *
+     * \param game Game associated with the scene
+     * \param scene Scene with events to compile
+     */
+    void CreateSceneEventsLinkingTask(Game & game, Scene & scene)
+    {
+        std::cout << "Preparing linking task for scene " << scene.GetName() << "..." << std::endl;
+        CodeCompilerTask task;
+        task.link = true;
+        task.compilationForRuntime = false;
+        task.optimize = false;
+        task.eventsGeneratedCode = true;
+        task.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&scene)+"ObjectFile.o");
+        task.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&scene)+"Code.dll");
+        task.postWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerLinkingPostWork(&game, &scene));
+        task.scene = &scene;
+        task.userFriendlyName = "Linking code for scene "+scene.GetName();
+
+        //Also add scene dependencies to the files to be linked.
+        DependenciesAnalyzer analyzer(game);
+        analyzer.Analyze(scene.GetEvents());
+
+        for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
+        {
+            vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
+                find_if(game.externalSourceFiles.begin(), game.externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), *i));
+
+            if (sourceFile != game.externalSourceFiles.end() && *sourceFile != boost::shared_ptr<SourceFile>())
+            {
+                std::cout << "Added " << ToString((*sourceFile).get()) << "ObjectFile.o (Created from a Source file) to the linking." << std::endl;
+                task.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString((*sourceFile).get())+"ObjectFile.o"));
+            }
+        }
+        for (std::set<std::string>::const_iterator i = analyzer.GetExternalEventsDependencies().begin();i!=analyzer.GetExternalEventsDependencies().end();++i)
+        {
+            if (game.HasExternalEventsNamed(*i) && analyzer.ExternalEventsCanBeCompiledForAScene(*i) == scene.GetName())
+            {
+                ExternalEvents & externalEvents = game.GetExternalEvents(*i);
+                std::cout << "Added " << ToString(&externalEvents) << "ObjectFile.o (Created from external events) to the linking." << std::endl;
+                task.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&externalEvents)+"ObjectFile.o"));
+            }
+        }
+
+        //Construct the list of the external shared libraries files to be used
+        for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
+        {
+            if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+game.GetUsedPlatformExtensions()[i]+".a") )
+                task.extraLibFiles.push_back(game.GetUsedPlatformExtensions()[i]);
+        }
+
+        CodeCompiler::GetInstance()->AddTask(task);
     }
 
     /**
@@ -321,7 +374,7 @@ bool EventsCodeCompilerPreWork::Execute()
 
     Game gameCopy = *game;
     Scene sceneCopy = *scene;
-    if ( scene->GetCodeExecutionEngine() != boost::shared_ptr<CodeExecutionEngine>() ) scene->GetCodeExecutionEngine()->SetNotReady();
+    if ( scene->GetCodeExecutionEngine() != boost::shared_ptr<CodeExecutionEngine>() ) scene->GetCodeExecutionEngine()->Unload();
 
     //Generate the code
     cout << "Generating C++ code...\n";
@@ -331,7 +384,7 @@ bool EventsCodeCompilerPreWork::Execute()
 
     std::string eventsOutput = EventsCodeGenerator::GenerateSceneEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.GetEvents(), false /*Compilation for edittime*/);
     std::ofstream myfile;
-    myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(scene)+"events.cpp").c_str() );
+    myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(scene)+"EventsSource.cpp").c_str() );
     myfile << eventsOutput;
     myfile.close();
 
@@ -383,9 +436,9 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
 
 bool EventsCodeCompilerPostWork::Execute()
 {
-    if ( scene == NULL )
+    if ( scene == NULL || game == NULL )
     {
-        std::cout << "WARNING: Cannot execute post task: No valid associated scene." << std::endl;
+        std::cout << "WARNING: Cannot execute post task: No valid associated scene or game." << std::endl;
         return false;
     }
     if ( !compilationSucceeded )
@@ -394,14 +447,36 @@ bool EventsCodeCompilerPostWork::Execute()
         return false;
     }
 
-    if ( !LoadSceneBitCodes(*game, *scene) ) return false;
+    CreateSceneEventsLinkingTask(*game, *scene);
 
     //Make some clean up
     if ( CodeCompiler::GetInstance()->MustDeleteTemporaries() )
     {
-        wxRemoveFile(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(scene)+"LLVMIR.bc");
-        wxRemoveFile(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(scene)+"events.cpp");
+        wxRemoveFile(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(scene)+"ObjectFile.o");
+        wxRemoveFile(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(scene)+"EventsSource.cpp");
     }
+
+    //The final job will be made by EventsCodeCompilerLinkingPostWork
+
+    return true;
+}
+
+bool EventsCodeCompilerLinkingPostWork::Execute()
+{
+    if ( scene == NULL || game == NULL )
+    {
+        std::cout << "WARNING: Cannot execute post task: No valid associated scene or game." << std::endl;
+        return false;
+    }
+    if ( !compilationSucceeded )
+    {
+        std::cout << "Scene linking failed." << std::endl;
+        return false;
+    }
+
+    if ( !scene->GetCodeExecutionEngine()->LoadFromDynamicLibrary(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(scene)+"Code.dll",
+                                                                  "GDSceneEvents"+SceneNameMangler::GetMangledSceneName(scene->GetName())) )
+        return false;
 
     scene->SetCompilationNotNeeded();
     return true;
@@ -460,7 +535,7 @@ bool ExternalEventsCodeCompilerPreWork::Execute()
 
     std::string eventsOutput = EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, *externalEvents, false /*Compilation for edittime*/);
     std::ofstream myfile;
-    myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(externalEvents)+"events.cpp").c_str() );
+    myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(externalEvents)+"EventsSource.cpp").c_str() );
     myfile << eventsOutput;
     myfile.close();
 
@@ -488,9 +563,10 @@ bool ExternalEventsCodeCompilerPostWork::Execute()
     }
 
     if ( !scene.CompilationNeeded() ) //Check that a recompilation for the scene is NOT needed
-                                      //If a recompilation is needed, the scene will reload bitcodes by itself at the end.
+                                      //If a recompilation is needed, the scene will relink objects files by itself at the end.
     {
-        if ( !LoadSceneBitCodes(*game, scene) ) return false;
+        if ( scene.GetCodeExecutionEngine() != boost::shared_ptr<CodeExecutionEngine>() ) scene.GetCodeExecutionEngine()->Unload();
+        CreateSceneEventsLinkingTask(*game, scene);
     }
 
     return true;
@@ -548,8 +624,8 @@ void GD_API CodeCompilationHelpers::CreateSceneEventsCompilationTask(Game & game
     task.compilationForRuntime = false;
     task.optimize = false;
     task.eventsGeneratedCode = true;
-    task.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&scene)+"events.cpp");
-    task.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&scene)+"LLVMIR.bc");
+    task.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&scene)+"EventsSource.cpp");
+    task.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&scene)+"ObjectFile.o");
     task.scene = &scene;
     task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPreWork(&game, &scene));
     task.postWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerPostWork(&game, &scene));
@@ -568,7 +644,7 @@ void GD_API CodeCompilationHelpers::CreateExternalSourceFileCompilationTask(Game
     wxFileName inputFile(file.GetFileName());
     inputFile.MakeAbsolute(wxFileName::FileName(game.GetProjectFile()).GetPath());
     task.inputFile = ToString(inputFile.GetFullPath());
-    task.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&file)+"LLVMIR.bc");
+    task.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&file)+"ObjectFile.o");
 
     task.additionalHeaderDirectories.push_back(ToString(wxFileName::FileName(game.GetProjectFile()).GetPath()));
     task.scene = scene;
@@ -585,8 +661,8 @@ void  GD_API CodeCompilationHelpers::CreateExternalEventsCompilationTask(Game & 
     task.compilationForRuntime = false;
     task.optimize = false;
     task.eventsGeneratedCode = true;
-    task.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&events)+"events.cpp");
-    task.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+ToString(&events)+"LLVMIR.bc");
+    task.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&events)+"EventsSource.cpp");
+    task.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&events)+"ObjectFile.o");
     task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new ExternalEventsCodeCompilerPreWork(&game, &events));
     task.postWork = boost::shared_ptr<CodeCompilerExtraWork>(new ExternalEventsCodeCompilerPostWork(&game, &events));
     task.userFriendlyName = "Compilation of external events "+events.GetName();

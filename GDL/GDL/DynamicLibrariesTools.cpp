@@ -3,14 +3,14 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include <string>
-#include "GDL/DynamicLibrariesTools.h"
 #if defined(WINDOWS)
     #include <windows.h>
     #include "CommonTools.h"
 #elif defined(LINUX) || defined (MAC)
     #include <dlfcn.h>
 #endif
+#include <string>
+#include "GDL/DynamicLibrariesTools.h"
 
 namespace GDpriv
 {

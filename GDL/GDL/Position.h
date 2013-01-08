@@ -30,6 +30,8 @@ public:
     InitialPosition();
     virtual ~InitialPosition() {};
 
+    virtual InitialPosition * Clone() const { return new InitialPosition(*this);}
+
     /** \name Common properties
      * Members functions related to common properties
      */
@@ -61,6 +63,11 @@ public:
 
     virtual float GetCustomHeight() const { return height; }
     virtual void SetCustomHeight(float height_) { height = height_; }
+
+    #if defined(GD_IDE_ONLY)
+    virtual bool IsLocked() const { return locked; };
+    virtual void SetLocked(bool enable = true) { locked = enable; }
+    #endif
 
     ///@}
 
@@ -116,7 +123,8 @@ private:
     bool personalizedSize; ///< True if object has a custom size
     float width;  ///< Object custom width
     float height; ///< Object custom height
-    ListVariable initialVariables;
+    ListVariable initialVariables; ///< Instance specific variables
+    bool locked; ///< True if the instance is locked
 
     //In our implementation, more properties can be stored in floatInfos and stringInfos.
     //These properties are then managed by the Object class.

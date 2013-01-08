@@ -13,6 +13,7 @@
 #include <SFML/System.hpp>
 #include <boost/shared_ptr.hpp>
 #include <wx/event.h>
+#include <wx/process.h>
 class CodeCompilerExtraWork;
 class Scene;
 class CodeCompilerThreadStateNotifier;
@@ -25,12 +26,16 @@ class CodeCompilerThreadStateNotifier;
 class GD_API CodeCompilerTask
 {
 public:
-    CodeCompilerTask() : emptyTask(false), compilationForRuntime(false), optimize(false), eventsGeneratedCode(true), scene(NULL) {};
+    CodeCompilerTask() : emptyTask(false), link(false), compilationForRuntime(false), optimize(false), eventsGeneratedCode(true), scene(NULL) {};
     virtual ~CodeCompilerTask() {};
 
     bool emptyTask; ///< If set to true, this task will be skipped.
     std::string inputFile;
-    std::string outputFile;
+    std::string outputFile; ///< The output file ( Object file is link == false, shared library if link == true )
+
+    bool link; ///< If set to true, the task must be to link the inputFile and extraInputFiles.
+    std::vector<std::string> extraObjectFiles; ///< Additional object files to be linked ( Only relevant when link is set to true )
+    std::vector<std::string> extraLibFiles; ///< Additional libraries files to be used ( Only relevant when link is set to true )
 
     bool compilationForRuntime; ///< Automatically define GD_IDE_ONLY if set to true
     bool optimize; ///< Activate optimization flag if set to true
@@ -74,15 +79,33 @@ public:
 };
 
 /**
+ * \brief Internal class used to launch building tasks.
+ */
+class CodeCompilerProcess : public wxProcess
+{
+public:
+    CodeCompilerProcess(wxEvtHandler * parent);
+    virtual ~CodeCompilerProcess() {};
+    virtual bool HasInput();
+
+    std::vector<std::string> output;
+    std::vector<std::string> outputErrors;
+    wxEvtHandler * parent;
+    int exitCode;
+
+protected:
+    virtual void OnTerminate( int pid, int status );
+};
+
+/**
  * \brief C++ Code compiler
  * This class uses a thread to launch Clang compiler according to the task added using AddTask.
  * Specific functions are available for preventing the compiler to start a new task involving a specific scene.
  *
  * \see CodeCompilerTask
  */
-class GD_API CodeCompiler
+class GD_API CodeCompiler : public wxEvtHandler
 {
-    friend class CodeCompilerThreadStateNotifier;
 public:
 
     /**
@@ -199,13 +222,18 @@ public:
 
     static sf::Mutex openSaveDialogMutex; ///< wxWidgets Open/Save dialog seems to cause crash when writing bitcode at the same time.
     static const wxEventType refreshEventType; ///< Used to notify associated gui that they need to update.
+    static const wxEventType processEndedEventType; ///< Used by process to notify their CodeCompiler parent that they have terminated their work.
 
 private:
 
     /**
-     * Execute the current tasks until pending task list is empty. Do not call this method directly: It is only to be used by currentTaskThread.
+     * \brief Execute the next task to be done.
+     *
+     * Return without doing nothing special if no task has to be done.<br>
+     * If a task must be done, a compilation process is executed ( see CodeCompilerProgress ) and then the function returns.
+     * The process will call ProcessEndedWork when it is over.
      */
-    void ProcessTasks();
+    void StartTheNextTask();
 
     /**
      * Post an event to notifiedControls to notify them that progress has been made.
@@ -213,36 +241,22 @@ private:
     void NotifyControls();
 
     /**
-     * Set the current thread to be considered as garbage: It will be moved to the garbageThreads list
-     * and it will stop its work as soon as possible.
+     * Set the current process to be considered as garbage.
      */
-    void SendCurrentThreadToGarbage();
+    void SendCurrentProcessToGarbage();
 
     /**
-     * Must be called by threads when they end they work ( whatever their state: Being the currentTaskThread
-     * or not ( in which case they are in garbageThreads ) ).
+     * Called by processes ( CodeCompilerProgress )  when they end they work.
+     *
+     * Take care of launching the post task worker if needed, and then call StartTheNextTask() to
+     * launch the next task if any.
      */
-    void ThreadEndedWork(sf::Thread * thread);
+    void ProcessEndedWork(wxCommandEvent& event);
 
-    /**
-     * Clear garbageThreads if livingGarbageThreadsCount == 0. ( I.e. all garbage threads have finished their works
-     * and so they can be destroyed ).
-     * \warning Do not call it in ThreadEndedWork as this function is called by threads themselves.
-     */
-    void CleanGarbageThreads();
-
-    //Current tasks
-    bool threadLaunched; ///< Set to true when the thread is working, and to false when the pending task list has been exhausted.
+    //Current task
+    bool processLaunched; ///< Set to true when the thread is working, and to false when the pending task list has been exhausted.
     CodeCompilerTask currentTask; ///< When a task is being done, it is removed from pendingTasks and stored here.
-    boost::shared_ptr<sf::Thread> currentTaskThread; ///< The thread used to process tasks
-
-    //Garbage threads
-    unsigned int maxGarbageThread;
-    mutable sf::Mutex garbageThreadsMutex; ///< A mutex is used to be sure that garbageThreads is not modified by two threads ( example: A thread finishing its work and another being sent to garbage )
-    unsigned int livingGarbageThreadsCount; ///< Incremented when a thread is sent to garbage, decremented when a garbage thread ends.
-    std::vector< boost::shared_ptr<sf::Thread> > garbageThreads; ///< The threads which were doing the currentTask but which were then replaced by currentTaskThread.
-                                                                 ///< They should abort as soon as possible without doing any post work: In particular, it is not guaranteed
-                                                                 ///< that currentTask remains valid if thread has been sent to garbage.
+    CodeCompilerProcess * currentTaskProcess; ///< The process doing the current task
 
     //Pending task management
     std::vector < CodeCompilerTask > pendingTasks; ///< Compilation task waiting to be launched.

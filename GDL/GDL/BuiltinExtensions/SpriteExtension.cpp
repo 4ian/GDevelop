@@ -18,7 +18,7 @@ SpriteExtension::SpriteExtension()
     DECLARE_OBJECT("Sprite",
                    _("Sprite"),
                    _("Animated object, composed of animations and directions containing images."),
-                   "Extensions/spriteicon.png",
+                   "CppPlatform/Extensions/spriteicon.png",
                    &CreateSpriteObject,
                    &DestroySpriteObject,
                    "SpriteObject");

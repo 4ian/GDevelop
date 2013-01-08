@@ -541,7 +541,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const I
     specialAction = -1;
 
     SetCodeExecutionEngine(scene.GetCodeExecutionEngine());
-    GetCodeExecutionEngine()->llvmRuntimeContext->scene = this;
+    GetCodeExecutionEngine()->runtimeContext.scene = this;
 
     //Initialize variables
     variables = scene.GetVariables();

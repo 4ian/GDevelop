@@ -116,6 +116,7 @@ private:
     virtual void OnPasteSpecialSelected( wxCommandEvent & event );
     virtual void OnDeleteObjectSelected( wxCommandEvent & event );
     virtual void OnCreateObjectSelected( wxCommandEvent & event );
+    virtual void OnLockSelected( wxCommandEvent & event );
 
     virtual void OnInitialInstanceMoved(gd::InitialInstance & instance);
     virtual void OnInitialInstanceAdded(gd::InitialInstance & instance);
@@ -145,6 +146,7 @@ private:
     void RenderGrid();
     void AddSmallButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName );
     void DrawSelectionRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
+    void DrawHighlightRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
     sf::Vector2f ConvertToWindowCoordinates(float x, float y, const sf::View & view);
 
     static const float gapBetweenButtonsAndRectangle = 5;
@@ -204,6 +206,7 @@ private:
     static const long ID_PASTEMENU;
     static const long ID_PASTESPECIALMENU;
     static const long ID_CREATEOBJECTMENU;
+    static const long ID_LOCKMENU;
 
     wxMenu contextMenu;
     wxMenu noObjectContextMenu;

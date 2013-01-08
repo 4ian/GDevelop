@@ -336,7 +336,7 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
             DECLARE_OBJECT("ObjectName",
                            _("Object name"),
                            _("Description"),
-                           "Extensions/myicon.png",
+                           "CppPlatform/Extensions/myicon.png",
                            &CreateMyObject,
                            &DestroyMyObject,
                            "ObjectClassName");
@@ -356,7 +356,7 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
                            "defaultGDname",
                            _("Description"),
                            "",
-                           "Extensions/myicon.png",
+                           "CppPlatform/Extensions/myicon.png",
                            AutomatismClassName,
                            AutomatismSharedDataClassName);
 
@@ -431,11 +431,11 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
  * \section installExtension Use the extension with Game Develop
  *
  * To make your extension usable with %Game Develop, you have to:
- * -# <b>Copy the generated file</b> ( yourExtension.xgdw for example ) inside %Game Develop "Extensions" folder. ( Extensions/yourExtension.xgdw )<br>
+ * -# <b>Copy the generated file</b> ( yourExtension.xgdw for example ) inside %Game Develop "Extensions" folder. ( CppPlatform/Extensions/yourExtension.xgdw )<br>
  *  You can change the output directory in the Code::Blocks project to automatically create the extension file inside %Game Develop "Extensions" folder.<br><br>
- * -# Copy <b>all needed include file</b> inside a folder with the name of your extension located in GD "Extensions/include" subfolder. ( Extensions/include/yourExtension/ )<br>
- *  You can use a <b>small script</b> ( batch file on Windows ) to copy all the needed includes files to %Game Develop "Extensions/include" subfolder.<br><br>
- * -# <b>Translations catalog files</b> must be put into Extensions/locale/<language>/yourExtension.mo ( Example : Extensions/locale/en_GB/yourExtension.mo )
+ * -# Copy <b>all needed include file</b> inside a folder with the name of your extension located in GD "CppPlatform/Extensions/include" subfolder. ( Extensions/include/yourExtension/ )<br>
+ *  You can use a <b>small script</b> ( batch file on Windows ) to copy all the needed includes files to %Game Develop "CppPlatform/Extensions/include" subfolder.<br><br>
+ * -# <b>Translations catalog files</b> must be put into Extensions/locale/<language>/yourExtension.mo ( Example : CppPlatform/Extensions/locale/fr_FR/yourExtension.mo )
  */
 
 //Group definitions:

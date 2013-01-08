@@ -5,25 +5,19 @@
 
 #ifndef CODEEXECUTIONENGINE_H
 #define CODEEXECUTIONENGINE_H
-
+#include "GDL/DynamicLibrariesTools.h"
+#include "GDL/RuntimeContext.h"
 #include <vector>
 #include <string>
-#include <llvm/ADT/OwningPtr.h>
-#include <llvm/LLVMContext.h>
-namespace llvm
-{
-    class Function;
-    class Module;
-    class ExecutionEngine;
-    class MemoryBuffer;
-}
-class RuntimeContext;
 
 /**
- * \brief Manage all llvm related stuff to launch compiled events code.
+ * \brief Wrapper allowing to load a dynamic library and launch a specific function ( See the full description ).
  *
- * RuntimeScene uses this class to launch compiled events.
- * Set up this class by loading bitcode compiled by CodeCompiler.
+ * RuntimeScene uses this class to launch compiled events. In particular, the signature of the function
+ * of the dynamic library must be :
+ \code
+void functionName(RuntimeContext *);
+ \endcode
  *
  * \see CodeCompilationHelpers
  * \see CodeCompiler
@@ -33,48 +27,57 @@ class RuntimeContext;
 class GD_API CodeExecutionEngine
 {
 public:
+
+    /**
+     * Construct an empty engine.
+     */
     CodeExecutionEngine();
+
+    /**
+     * Create an engine from another: The new execution engine will load the same library as the source execution engine.
+     */
+    CodeExecutionEngine(const CodeExecutionEngine & other) : runtimeContext(other.runtimeContext) { Init(other); };
+
+    /**
+     * Create an engine from another: The new execution engine will load the same library as the source execution engine.
+     */
+    CodeExecutionEngine& operator=(const CodeExecutionEngine & other) {if( (this) != &other ) Init(other); return *this; }
+
+    /**
+     * Destructor: Unload if necessary the dynamic library.
+     */
     virtual ~CodeExecutionEngine();
 
     /**
-     * Execute compiled events.
-     * Beware, there is no protection against calling Execute on an CodeExecutionEngine that is not initialized with bitcode
-     */
-    void Execute() { ((void(*)(RuntimeContext *))compiledRawFunction)(llvmRuntimeContext); };
-
-    /**
-     * Return true if loading from bitcode has been made successfully and if Execute can be called.
-     */
-    bool const Ready() { return engineReady; };
-
-    void SetNotReady() { engineReady = false; };
-
-    /**
-     * Initialize execution engine from bitcode stored in memory.
-     * Buffers passed as parameter are internally copied.
+     * Execute the function specified during the call to LoadFromDynamicLibrary
      *
-     * \param data vector containing std::pair : The first member is the raw memory buffer, and the second member is the size of the buffer.
+     * \warning Beware, there is no protection against calling Execute on an CodeExecutionEngine that is not ( or badly ) initialized.
      */
-    bool LoadFromLLVMBitCode(std::vector< std::pair<const char * /*src*/, unsigned int /*size*/> > data, const std::string & functionToCallName);
+    void Execute() { ((void(*)(RuntimeContext *))function)(&runtimeContext); };
 
     /**
-     * Initialize execution engine from bitcode loaded in llvm::MemoryBuffer.
-     * The first bitcode buffer will be used to generate the main llvm module, and the other will be linked to the first one.
+     * Return true if an initialization from a dynamic library has been made successfully and if Execute can be called.
+     */
+    bool Ready() const { return loaded; };
+
+    /**
+     * Unload the dynamic library from memory.
      *
-     * \param bitcodeBuffers vector containing one or more pointers to memory buffers containing bitcode. These buffers won't be modified or freed by the function.
-     * \param functionToCallName The name of the function to be called.
+     * \warning Of course, Execute() can not be called after Unload() is called.
      */
-    bool LoadFromLLVMBitCode(std::vector<llvm::MemoryBuffer *> bitcodeBuffers, const std::string & functionToCallName);
-
-    void * compiledRawFunction; ///< Pointer to compiled events entry function.
-    llvm::LLVMContext llvmContext;
-    llvm::OwningPtr<llvm::ExecutionEngine> llvmExecutionEngine;
-    RuntimeContext * llvmRuntimeContext; ///<Pointer is needed here.
+    void Unload();
 
     /**
-     * To be called during program startup, or at least before launching events.
+     * Initialize the engine from a dynamic library, which is kept loaded in memory.
+     *
+     * \param filename The dynamic library to be loaded
+     * \param mainFunctionName The name of the function to be executed when Execute() is called. The function signature must be void functionName(RuntimeContext *);
+     *
+     * \return true if the CodeExecutionEngine is successfully initialized and Execute() can be called.
      */
-    static void EnsureLLVMTargetsInitialization();
+    bool LoadFromDynamicLibrary(const std::string & filename, const std::string & mainFunctionName);
+
+    RuntimeContext runtimeContext; ///< The object passed as parameter to the function of the dynamic library.
 
     /**
      * Load dynamic libraries needed by gd events generated code ( libstdc++ basically )
@@ -82,24 +85,15 @@ public:
     static void LoadDynamicLibraries();
 
 private:
-    bool engineReady;
-    std::string error;
 
-    static bool llvmTargetsInitialized;
+    bool loaded; ///< True if a dynamic library is loaded and a function is ready to be executed.
+    std::string dynamicLibraryFilename; ///< The filename of the dynamic library loaded in memory.
+    Handle dynamicLibrary; ///< The dynamic library loaded in memory.
+    std::string functionName; ///< The name of the function of the dynamic library to be executed.
+    void * function; ///< Pointer to function to be executed.
+
+    void Init(const CodeExecutionEngine & other);
 };
-
-/**
- * Blank function doing nothing used as a substitute for functions which were not found by JIT when generating machine code
- */
-void GDEmptyFunctionDoingNothing();
-
-/**
- * Called by llvm JIT when an unknown function is needed: As it should not happen, this function will warn the user about the error
- * and will return a pointer to a blank function to prevent crash.
- *
- * \see GDEmptyFunctionDoingNothing
- */
-void* UseSubstituteForUnknownFunctions(const std::string& name);
 
 
 #endif // CODEEXECUTIONENGINE_H

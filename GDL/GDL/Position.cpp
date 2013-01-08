@@ -19,7 +19,8 @@ zOrder(0),
 layer(""),
 personalizedSize(false),
 width(0),
-height(0)
+height(0),
+locked(false)
 {
     //ctor
 }

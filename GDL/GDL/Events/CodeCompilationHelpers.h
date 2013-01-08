@@ -85,6 +85,26 @@ public:
 };
 
 /**
+ * \brief Define the work to be done after events linking
+ *
+ * This code compiler extra worker loads the generated code into the execution engine of the scene.
+ *
+ * \see CodeCompiler
+ * \see CodeCompilerExtraWork
+ */
+class GD_API EventsCodeCompilerLinkingPostWork : public CodeCompilerExtraWork
+{
+public:
+    virtual bool Execute();
+
+    Game * game;
+    Scene * scene;
+
+    EventsCodeCompilerLinkingPostWork(Game * game_, Scene * scene_) : game(game_), scene(scene_) {};
+    virtual ~EventsCodeCompilerLinkingPostWork() {};
+};
+
+/**
  * \brief Define the work to be done before events compilation
  *
  * This code compiler extra worker generates code from the scene events

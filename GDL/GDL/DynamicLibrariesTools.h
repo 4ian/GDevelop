@@ -8,7 +8,10 @@
 
 #include <string>
 #if defined(WINDOWS)
-    #include <windows.h>
+    #ifndef _WINDEF_
+    class HINSTANCE__; // Forward or never
+    typedef HINSTANCE__* HINSTANCE;
+    #endif
     typedef HINSTANCE Handle;
 #elif defined(LINUX) || defined (MAC)
     typedef void* Handle;

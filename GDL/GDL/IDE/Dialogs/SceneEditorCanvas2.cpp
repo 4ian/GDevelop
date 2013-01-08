@@ -14,6 +14,7 @@
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
+#include "GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDL/IDE/Dialogs/DebuggerGUI.h"
 #include "GDL/IDE/Dialogs/ProfileDlg.h"
@@ -21,6 +22,7 @@
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/CommonTools.h"
+#include "GDCore/IDE/Clipboard.h"
 #undef GetObject //Undefining an annoying macro
 
 void SceneEditorCanvas::RenderCompilationScreen()
@@ -56,12 +58,18 @@ void SceneEditorCanvas::SetParentAuiManager(wxAuiManager * manager)
         if ( !debugger )
         {
             debugger = boost::shared_ptr<DebuggerGUI>(new DebuggerGUI(parentControl, previewScene) );
-            parentAuiManager->AddPane( debugger.get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+            if ( !parentAuiManager->GetPane("DBG").IsOk() )
+                parentAuiManager->AddPane( debugger.get(), wxAuiPaneInfo().Name( wxT( "DBG" ) ).Float().CloseButton( true ).Caption( _( "Debugger" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
+            else
+                parentAuiManager->GetPane("DBG").Window(debugger.get());
         }
         if ( !profiler )
         {
             profiler = boost::shared_ptr<ProfileDlg>(new ProfileDlg(parentControl, *this));
-            parentAuiManager->AddPane( profiler.get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Profiling" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );
+            if ( !parentAuiManager->GetPane("PROFILER").IsOk() )
+                parentAuiManager->AddPane( profiler.get(), wxAuiPaneInfo().Name( wxT( "PROFILER" ) ).Float().CloseButton( true ).Caption( _( "Profiling" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,100).Show(false) );
+            else
+                parentAuiManager->GetPane("PROFILER").Window(debugger.get());
         }
     }
 }
@@ -92,7 +100,7 @@ boost::shared_ptr<Object> SceneEditorCanvas::GetObjectLinkedToInitialInstance(gd
 {
     if ( initialInstancesAndObjectsBimap.left.find(dynamic_cast<InitialPosition*>(&instance)) == initialInstancesAndObjectsBimap.left.end() )
     {
-        std::cout << "ERROR: Object associated to initial instance \""+instance.GetObjectName()+"\" not found!";
+        //std::cout << "ERROR: Object associated to initial instance \""+instance.GetObjectName()+"\" not found!";
         return boost::shared_ptr<Object> ();
     }
 
@@ -243,6 +251,7 @@ void SceneEditorCanvas::DoConnectEvents()
     Connect(ID_PASTEMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnPasteSelected);
     Connect(ID_PASTESPECIALMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnPasteSpecialSelected);
     Connect(ID_CREATEOBJECTMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCreateObjectSelected);
+    Connect(ID_LOCKMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnLockSelected);
 }
 
 void SceneEditorCanvas::UpdateContextMenu()
@@ -371,37 +380,47 @@ void SceneEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
     game.GetChangesNotifier().OnObjectEdited(game, &scene, scene.GetObject(name));
 }
 
+void SceneEditorCanvas::OnLockSelected(wxCommandEvent & event)
+{
+    for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+        if ( it->first ) it->first->SetLocked();
+
+    ClearSelection();
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
+}
+
+
 void SceneEditorCanvas::OnCopySelected(wxCommandEvent & event)
 {
-    /*
-    vector < InitialPosition > copiedPositions;
+    vector < boost::shared_ptr<gd::InitialInstance> > copiedPositions;
 
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
-        InitialPosition * instance = dynamic_cast<InitialPosition*>(it->first);
-        if ( instance == NULL ) continue;
+        if ( it->first == NULL ) continue;
 
-        copiedPositions.push_back(*instance);
-        copiedPositions.back().SetX(copiedPositions.back().GetX() - oldMouseX);
-        copiedPositions.back().SetY(copiedPositions.back().GetY() - oldMouseY);
+        copiedPositions.push_back(boost::shared_ptr<gd::InitialInstance>(it->first->Clone()));
+        copiedPositions.back()->SetX(copiedPositions.back()->GetX() - oldMouseX);
+        copiedPositions.back()->SetY(copiedPositions.back()->GetY() - oldMouseY);
     }
 
-    Clipboard::GetInstance()->SetPositionsSelection(copiedPositions);*/
+    gd::Clipboard::GetInstance()->SetInstances(copiedPositions);
 }
 
 void SceneEditorCanvas::OnCutSelected(wxCommandEvent & event)
 {
-    /*vector < InitialPosition > copiedPositions;
+    vector < boost::shared_ptr<gd::InitialInstance> > copiedPositions;
 
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
-        InitialPosition * instance = dynamic_cast<InitialPosition*>(it->first);
-        if ( instance == NULL ) continue;
+        if ( it->first == NULL ) continue;
 
-        copiedPositions.push_back(*instance);
-        copiedPositions.back().SetX(copiedPositions.back().GetX() - oldMouseX);
-        copiedPositions.back().SetY(copiedPositions.back().GetY() - oldMouseY);
+        copiedPositions.push_back(boost::shared_ptr<gd::InitialInstance>(it->first->Clone()));
+        copiedPositions.back()->SetX(copiedPositions.back()->GetX() - oldMouseX);
+        copiedPositions.back()->SetY(copiedPositions.back()->GetY() - oldMouseY);
     }
+    gd::Clipboard::GetInstance()->SetInstances(copiedPositions);
+    ChangesMade();
 
     //Do not forget to remove the cut instances
     std::vector<gd::InitialInstance*> instancesToDelete;
@@ -409,44 +428,44 @@ void SceneEditorCanvas::OnCutSelected(wxCommandEvent & event)
         instancesToDelete.push_back(it->first);
 
     DeleteInstances(instancesToDelete);
-
-    Clipboard::GetInstance()->SetPositionsSelection(copiedPositions);
-    ChangesMade();*/
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
 }
 
 void SceneEditorCanvas::OnPasteSelected(wxCommandEvent & event)
 {
-    /*if ( !Clipboard::GetInstance()->HasPositionsSelection() ) return;
+    if ( !gd::Clipboard::GetInstance()->HasInstances() ) return;
 
-    vector < InitialPosition > pastedPositions = Clipboard::GetInstance()->GetPositionsSelection();
+    vector < boost::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::GetInstance()->GetInstances();
 
-    for (unsigned int i =0;i<pastedPositions.size();++i)
+    for (unsigned int i =0;i<pastedInstances.size();++i)
     {
-        instances.InsertInitialInstance(pastedPositions[i]);
-        gd::InitialInstance & insertedInstance = instances.GetInstance(instances.GetInstancesCount()-1);
-        insertedInstance.SetX(insertedInstance.GetX()+editionData.oldMouseX);
-        insertedInstance.SetY(insertedInstance.GetY()+editionData.oldMouseY);
+        gd::InitialInstance & instance = instances.InsertInitialInstance(*pastedInstances[i]->Clone());
+        instance.SetX(instance.GetX()+oldMouseX);
+        instance.SetY(instance.GetY()+oldMouseY);
     }
 
     ChangesMade();
-    Reload();*/
+    RefreshFromLayout();
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
 }
 
 void SceneEditorCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
 {
-    /*
-    if ( !Clipboard::GetInstance()->HasPositionsSelection() ) return;
-    vector < InitialPosition > pastedPositions = Clipboard::GetInstance()->GetPositionsSelection();
+    if ( !gd::Clipboard::GetInstance()->HasInstances() ) return;
+    vector < boost::shared_ptr<gd::InitialInstance> > pastedInstances = gd::Clipboard::GetInstance()->GetInstances();
+    if ( pastedInstances.empty() || pastedInstances[0] == boost::shared_ptr<gd::InitialInstance>() ) return;
 
-    AdvancedPasteDlg dialog(this);
-    dialog.SetStartX(editionData.oldMouseX);
-    dialog.SetStartY(editionData.oldMouseY);
+    gd::InstancesAdvancedPasteDialog dialog(this);
+    dialog.SetStartX(oldMouseX);
+    dialog.SetStartY(oldMouseY);
 
-    ObjSPtr object = GetObjectFromInitialPosition(pastedPositions.front());
-    if ( object != boost::shared_ptr<Object>() )
+    boost::shared_ptr<gd::InitialInstance> instance = boost::shared_ptr<gd::InitialInstance>(pastedInstances[0]->Clone());
+    if ( instance != boost::shared_ptr<gd::InitialInstance>() )
     {
-        dialog.SetXGap(object->GetWidth());
-        dialog.SetYGap(object->GetHeight());
+        dialog.SetXGap(GetWidthOfInitialInstance(*instance));
+        dialog.SetYGap(GetHeightOfInitialInstance(*instance));
     }
 
     if ( dialog.ShowModal() != 1 ) return;
@@ -456,19 +475,19 @@ void SceneEditorCanvas::OnPasteSpecialSelected(wxCommandEvent & event)
     {
         for (unsigned int j = 0;j<dialog.GetXCount();++j)
         {
-            instances.InsertInitialInstance(pastedPositions.front());
-            gd::InitialInstance & insertedInstance = instances.GetInstance(instances.GetInstancesCount()-1);
+            gd::InitialInstance & insertedInstance = instances.InsertInitialInstance(*instance);
             insertedInstance.SetX(dialog.GetStartX()+dialog.GetXGap()*j);
             insertedInstance.SetY(dialog.GetStartY()+dialog.GetYGap()*i);
-            insertedInstance.SetAngle(pastedPositions.front().GetAngle() + angle);
+            insertedInstance.SetAngle(instance->GetAngle() + angle);
 
             angle += dialog.GetRotationIncrementation();
         }
     }
 
-    if ( initialPositionsBrowser ) initialPositionsBrowser->Refresh();
     ChangesMade();
-    Reload();*/
+    RefreshFromLayout();
+    for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+        (*it)->InitialInstancesUpdated();
 }
 
 void SceneEditorCanvas::EnsureVisible(const gd::InitialInstance & instance)

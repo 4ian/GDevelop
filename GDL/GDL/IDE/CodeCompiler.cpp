@@ -11,65 +11,16 @@
 #include <string>
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
-
-//Long list of llvm and clang headers
-#include "clang/CodeGen/CodeGenAction.h"
-#include "clang/Driver/Compilation.h"
-#include "clang/Driver/Driver.h"
-#include "clang/Driver/Tool.h"
-#include "clang/Frontend/CompilerInvocation.h"
-#include "clang/Frontend/CompilerInstance.h"
-#include "clang/Frontend/DiagnosticOptions.h"
-#include "clang/Frontend/FrontendDiagnostic.h"
-#include "clang/Frontend/TextDiagnosticPrinter.h"
-#include "llvm/LLVMContext.h"
-#include "llvm/Module.h"
-#include "llvm/Config/config.h"
-#include "llvm/ADT/OwningPtr.h"
-#include "llvm/ADT/SmallString.h"
-#include "llvm/ExecutionEngine/ExecutionEngine.h"
-#include "llvm/ExecutionEngine/JIT.h"
-#include "llvm/Support/ManagedStatic.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Support/TypeBuilder.h"
-#include "llvm/Support/Host.h"
-#include "llvm/Support/Path.h"
-#include "llvm/GlobalVariable.h"
-#include "llvm/ADT/ArrayRef.h"
-#include "llvm/ADT/SmallVector.h"
-#include "llvm/Support/ErrorHandling.h"
-#include "llvm/Support/FileSystem.h"
-#include "llvm/Support/MemoryBuffer.h"
-#include "llvm/Support/PrettyStackTrace.h"
-#include "llvm/Support/Regex.h"
-#include "llvm/Support/Timer.h"
-#include "llvm/Support/Host.h"
-#include "llvm/Support/Path.h"
-#include "llvm/Support/Program.h"
-#include "llvm/Support/Signals.h"
-#include "llvm/Support/system_error.h"
-#include "llvm/Support/TargetSelect.h"
-#include "clang/Driver/Arg.h"
-#include "clang/Driver/ArgList.h"
-#include "clang/Driver/CC1Options.h"
-#include "clang/Driver/DriverDiagnostic.h"
-#include "clang/Driver/OptTable.h"
-#include "clang/FrontendTool/Utils.h"
-#include "llvm/ADT/Statistic.h"
-#include "llvm/Bitcode/ReaderWriter.h"
-#include "clang/Basic/FileManager.h"
-
-//wxWidgets include are put after llvm as they defines the _ macro which can cause errors in llvm headers.
 #include <wx/filename.h>
 #include <wx/filefn.h>
+#include <wx/txtstrm.h>
 
 using namespace std;
-using namespace clang;
-using namespace clang::driver;
 
 CodeCompiler *CodeCompiler::_singleton = NULL;
 sf::Mutex CodeCompiler::openSaveDialogMutex;
 const wxEventType CodeCompiler::refreshEventType = wxNewEventType();
+const wxEventType CodeCompiler::processEndedEventType = wxNewEventType();
 
 namespace {
 
@@ -85,293 +36,263 @@ CodeCompilerTask ConstructEmptyTask()
 
 }
 
-/**
- * \brief Internal tool class used to store information about a thread
- */
-class CodeCompilerThreadStateNotifier
+void CodeCompiler::StartTheNextTask()
 {
-public:
-    CodeCompilerThreadStateNotifier(CodeCompiler & owner_, sf::Thread * threadRunningTheFunction_) :
-        owner(owner_),
-        threadRunningTheFunction(threadRunningTheFunction_)
+    //Check if there is a task to be made
     {
-    }
+        sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
-    /**
-     * Default destructor. Notify CodeCompiler that the thread finished work.
-     */
-    ~CodeCompilerThreadStateNotifier()
-    {
-        owner.ThreadEndedWork(threadRunningTheFunction);
-    }
-
-    /**
-     * Return true if the thread was sent to garbage.
-     */
-    bool IsGarbage()
-    {
-        return ( owner.currentTaskThread.get() != threadRunningTheFunction );
-    }
-
-private:
-
-    CodeCompiler & owner;
-    sf::Thread * threadRunningTheFunction;
-};
-
-void CodeCompiler::ProcessTasks()
-{
-    //Get at the startup the tread used to launch this function
-    sf::Thread * ourThread = currentTaskThread.get();
-    CodeCompilerThreadStateNotifier stateNotifier(*this, ourThread);
-
-    while(true)
-    {
-        if ( stateNotifier.IsGarbage() ) //Check if we have not being asked to stop our work.
+        if ( !currentTask.emptyTask )
         {
-            std::cout << "Thread " << ourThread << " aborted as it was sent to garbage." << std::endl;
-            return;
+           //currentTask is not empty: Do it.
         }
-
-        //Check if there is a task to be made
+        else
         {
+            bool newTaskFound = false;
+            for (unsigned int i = 0;i<pendingTasks.size();++i)
+            {
+                //Be sure that the task is not disabled
+                if ( find(compilationDisallowed.begin(), compilationDisallowed.end(), pendingTasks[i].scene) == compilationDisallowed.end() )
+                {
+                    currentTask = pendingTasks[i];
+                    pendingTasks.erase(pendingTasks.begin()+i);
+
+                    newTaskFound = true;
+                    break;
+                }
+            }
+            if ( !newTaskFound ) //Bail out if no task can be made
+            {
+                if ( pendingTasks.empty() )
+                    std::cout << "No more task to be processed." << std::endl;
+                else
+                    std::cout << "No more task to be processed ( But "+ToString(pendingTasks.size())+" disabled task(s) waiting for being enabled )." << std::endl;
+
+                processLaunched = false;
+                NotifyControls();
+                return;
+            }
+
+        }
+    }
+
+    std::cout << "Processing task " << currentTask.userFriendlyName << "..." << std::endl;
+    lastTaskFailed = false;
+    NotifyControls();
+    bool skip = false; //Set to true if the preworker of the task asked to relaunch the task later.
+
+    if ( currentTask.preWork != boost::shared_ptr<CodeCompilerExtraWork>() )
+    {
+        std::cout << "Launching pre work..." << std::endl;
+        bool result = currentTask.preWork->Execute();
+
+        if ( !result )
+        {
+            std::cout << "Preworker execution failed, task skipped." << std::endl;
+            skip = true;
+        }
+        else if ( currentTask.preWork->requestRelaunchCompilationLater )
+        {
+            std::cout << "Preworker asked to launch the task later" << std::endl;
             sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
+            pendingTasks.push_back(currentTask);
+            pendingTasks.back().preWork->requestRelaunchCompilationLater = false;
 
-            if ( !currentTask.emptyTask )
-            {
-               //currentTask is not empty: Do it.
-            }
-            else
-            {
-                bool newTaskFound = false;
-                for (unsigned int i = 0;i<pendingTasks.size();++i)
-                {
-                    //Be sure that the task is not disabled
-                    if ( find(compilationDisallowed.begin(), compilationDisallowed.end(), pendingTasks[i].scene) == compilationDisallowed.end() )
-                    {
-                        currentTask = pendingTasks[i];
-                        pendingTasks.erase(pendingTasks.begin()+i);
-
-                        newTaskFound = true;
-                        break;
-                    }
-                }
-                if ( !newTaskFound ) //Bail out if no task can be made
-                {
-                    if ( pendingTasks.empty() )
-                        std::cout << "No more task to be processed." << std::endl;
-                    else
-                        std::cout << "No more task to be processed ( But "+ToString(pendingTasks.size())+" disabled task(s) waiting for being enabled )." << std::endl;
-
-                    threadLaunched = false;
-                    NotifyControls();
-                    return;
-                }
-
-            }
+            skip = true;
         }
+    }
 
-        std::cout << "Processing task " << currentTask.userFriendlyName << "... ( Thread " << ourThread << " )" << std::endl;
-        lastTaskFailed = false;
+    if ( skip ) //The preworker asked to skip the task
+    {
+        currentTask = ConstructEmptyTask();
         NotifyControls();
-        bool skip = false; //Set to true if the preworker of the task asked to relaunch the task later.
-
-        if ( currentTask.preWork != boost::shared_ptr<CodeCompilerExtraWork>() )
-        {
-            std::cout << "Launching pre work..." << std::endl;
-            bool result = currentTask.preWork->Execute();
-
-            if ( !result )
-            {
-                std::cout << "Preworker execution failed, task aborted." << std::endl;
-                skip = true;
-            }
-            else if ( currentTask.preWork->requestRelaunchCompilationLater )
-            {
-                std::cout << "Preworker asked to launch the task later" << std::endl;
-                sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
-                pendingTasks.push_back(currentTask);
-                pendingTasks.back().preWork->requestRelaunchCompilationLater = false;
-
-                skip = true;
-            }
-        }
-
-        if ( stateNotifier.IsGarbage() ) //Check if we have not being asked to stop our work.
-        {
-            std::cout << "Thread " << ourThread << " aborted as it was sent to garbage." << std::endl;
-            return;
-        }
-
-        bool compilationSucceeded = false; //Some post worker want to be informed of the compilation success/fail.
-        if (!skip)
-        {
-            lastTaskMessages.clear();
-
-            //Define compilation arguments for Clang.
-            llvm::SmallVector<const char *, 128> args;
-
-            args.push_back(currentTask.inputFile.c_str());
-
-            if ( currentTask.eventsGeneratedCode ) //Define special arguments for events generated code
-            {
-                /*#if defined(WINDOWS)
-                if ( !currentTask.optimize ) //Don't use precompiled header when optimizing, as they are built without optimizations
-                {
-                    args.push_back("-include-pch");
-                    args.push_back(!currentTask.compilationForRuntime ? "include/GDL/GDL/Events/PrecompiledHeader.h.pch" : "include/GDL/GDL/Events/PrecompiledHeaderRuntime.h.pch");
-                }
-                #endif*/
-
-                args.push_back("-fsyntax-only");
-                args.push_back("-fcxx-exceptions");
-                args.push_back("-fexceptions");
-                args.push_back("-w"); //No warnings
-                args.push_back("-working-directory=\"D:/Florian/Programmation/GameDevelop2/IDE/bin/release\""); //No warnings
-            }
-
-            //Headers
-            for (std::set<std::string>::const_iterator header = headersDirectories.begin();header != headersDirectories.end();++header)
-                args.push_back((*header).c_str());
-
-            //Additional headers
-            args.push_back("-nostdsysteminc"); //Disable standard include directories. All includes files are provided by Game Develop to ensure compatibility. Note: Arguments used with Clang prior to version 3.0:  -nobuiltininc, -nostdinc, -nostdinc++
-            args.push_back("-nostdinc++");
-            std::vector<std::string> additionalHeadersArgs;
-            for (unsigned int i = 0;i<currentTask.additionalHeaderDirectories.size();++i)
-                additionalHeadersArgs.push_back("-I"+currentTask.additionalHeaderDirectories[i]);
-            for (unsigned int i = 0;i<additionalHeadersArgs.size();++i)
-                args.push_back(additionalHeadersArgs[i].c_str());
-
-            if ( !currentTask.compilationForRuntime ) args.push_back("-DGD_IDE_ONLY"); //Already set in PCH
-            if ( currentTask.optimize ) args.push_back("-O1");
-
-            //GD library related defines.
-            #if defined(WINDOWS)
-            args.push_back("-DGD_CORE_API=__declspec(dllimport)");
-            args.push_back("-DGD_API=__declspec(dllimport)");
-            args.push_back("-DGD_EXTENSION_API=__declspec(dllimport)");
-            #elif defined(LINUX)
-            args.push_back("-DGD_CORE_API= ");
-            args.push_back("-DGD_API= ");
-            args.push_back("-DGD_EXTENSION_API= ");
-            #elif defined(MAC)
-            args.push_back("-DGD_CORE_API= ");
-            args.push_back("-DGD_API= ");
-            args.push_back("-DGD_EXTENSION_API= ");
-            #endif
-
-            //Other common defines.
-            #if defined(RELEASE)
-            args.push_back("-DRELEASE");
-            args.push_back("-DNDEBUG");
-            args.push_back("-DBOOST_DISABLE_ASSERTS");
-            #elif defined(DEV)
-            args.push_back("-DDEV");
-            args.push_back("-DNDEBUG");
-            args.push_back("-DBOOST_DISABLE_ASSERTS");
-            #elif defined(DEBUG)
-            args.push_back("-DDEBUG");
-            #endif
-
-            //The clang compiler instance
-            std::cout << "Creating compiler instance...\n";
-            CompilerInstance Clang;
-
-            // Infer the builtin include path if unspecified.
-            if (Clang.getHeaderSearchOpts().UseBuiltinIncludes && Clang.getHeaderSearchOpts().ResourceDir.empty())
-                Clang.getHeaderSearchOpts().ResourceDir = wxGetCwd();
-
-            //Diagnostic classes
-            std::string compilationErrorFileErrors;
-            llvm::raw_fd_ostream errorFile(std::string(outputDir+"compilationErrors.txt").c_str(), compilationErrorFileErrors);
-            if ( !compilationErrorFileErrors.empty() ) std::cout << "Unable to create compilation errors report file!\n";
-
-            TextDiagnosticPrinter * clangDiagClient = new TextDiagnosticPrinter(errorFile, DiagnosticOptions());
-            llvm::IntrusiveRefCntPtr<DiagnosticIDs> clangDiagID(new DiagnosticIDs());
-            DiagnosticsEngine * clangDiags = new DiagnosticsEngine(clangDiagID, clangDiagClient);
-
-            CompilerInvocation::CreateFromArgs(Clang.getInvocation(), args.begin(),  args.end(), *clangDiags);
-
-            Clang.setDiagnostics(clangDiags);
-            if (!Clang.hasDiagnostics())
-            {
-                std::cout << "Unable to create clang diagnostic engine!" << std::endl;
-                return;
-            }
-
-            std::cout << "Compiling...\n";
-            // Create and execute the frontend to generate an LLVM bitcode module.
-            llvm::OwningPtr<CodeGenAction> Act(new EmitLLVMOnlyAction());
-            if (!Clang.ExecuteAction(*Act))
-            {
-                std::cout << "Compilation failed.\n";
-                lastTaskFailed = true;
-            }
-            else
-            {
-                sf::Clock time;
-                std::cout << "Compilation succeeded. ( Thread " << ourThread << ")" << std::endl;
-
-                if ( stateNotifier.IsGarbage() ) //Check if we have not being asked to stop our work.
-                {
-                    std::cout << "Thread " << ourThread << " aborted as it was sent to garbage." << std::endl;
-                    return;
-                }
-
-                std::cout << "Writing bitcode to file " << currentTask.outputFile << "..." << std::endl;
-
-                sf::Lock lock(openSaveDialogMutex); //On windows, GD is crashing if we write bitcode while an open/save file dialog is displayed.
-                {
-                    llvm::OwningPtr<llvm::Module> module(Act->takeModule());
-
-                    std::string error;
-                    llvm::raw_fd_ostream file(currentTask.outputFile.c_str(), error, llvm::raw_fd_ostream::F_Binary);
-                    llvm::WriteBitcodeToFile(module.get(), file);
-                    std::cout << error;
-
-                    compilationSucceeded = true;
-                    std::cout << "Bitcode written in "<<time.getElapsedTime().asMilliseconds() << "ms ( Thread " << ourThread << ")." << std::endl;
-                }
-            }
-
-            //Compilation ended, loading diagnostics
-            {
-                std::ifstream t(std::string(outputDir+"compilationErrors.txt").c_str());
-                lastTaskMessages.assign(std::string((std::istreambuf_iterator<char>(t)), std::istreambuf_iterator<char>()));
-            }
-        }
-
-        //Now do post work and notify task has been done.
-        {
-            sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
-
-            if ( stateNotifier.IsGarbage() ) //Check if we have not being asked to stop our work.
-            {
-                std::cout << "Thread " << ourThread << " aborted as it was sent to garbage." << std::endl;
-                return;
-            }
-
-            if (!skip && currentTask.postWork != boost::shared_ptr<CodeCompilerExtraWork>() )
-            {
-                std::cout << "Launching post task" << std::endl;
-                currentTask.postWork->compilationSucceeded = compilationSucceeded;
-                currentTask.postWork->Execute();
-
-                if ( currentTask.postWork->requestRelaunchCompilationLater )
-                {
-                    std::cout << "Postworker asked to launch again the task later" << std::endl;
-
-                    pendingTasks.push_back(currentTask);
-                    pendingTasks.back().postWork->requestRelaunchCompilationLater = false;
-                }
-            }
-
-            std::cout << "Task ended for thread " << ourThread << "." << std::endl;
-            currentTask = ConstructEmptyTask();
-            NotifyControls();
-        }
+        StartTheNextTask(); //Calling recursively StartTheNextTask() is not a problem: The function will be called until a process is launched
+                            //or until all tasks are skipped
+        return;
     }
+
+    lastTaskMessages.clear();
+
+    //Define compilation arguments for Clang.
+    std::vector<std::string> args;
+    args.push_back("-o "+currentTask.outputFile);
+    args.push_back("-w");
+    args.push_back("-B"+baseDir+"CppPlatform/MinGW32/bin");
+    if ( currentTask.optimize ) args.push_back("-O1");
+
+    if ( !currentTask.link ) //Generate argument for compiling a file
+    {
+        args.push_back("-include D:/Florian/Programmation/GameDevelop2/IDE/scripts/events.h");
+        args.push_back("-c "+currentTask.inputFile);
+
+        //Headers directories
+        for (std::set<std::string>::const_iterator header = headersDirectories.begin();header != headersDirectories.end();++header)
+            args.push_back((*header).c_str());
+
+        //Additional headers
+        args.push_back("-nostdinc++");
+        std::vector<std::string> additionalHeadersArgs;
+        for (unsigned int i = 0;i<currentTask.additionalHeaderDirectories.size();++i)
+            additionalHeadersArgs.push_back("-I"+currentTask.additionalHeaderDirectories[i]);
+        for (unsigned int i = 0;i<additionalHeadersArgs.size();++i)
+            args.push_back(additionalHeadersArgs[i].c_str());
+
+        if ( !currentTask.compilationForRuntime ) args.push_back("-DGD_IDE_ONLY");
+
+        //GD library related defines.
+        #if defined(WINDOWS)
+        args.push_back("-DGD_CORE_API=__declspec(dllimport)");
+        args.push_back("-DGD_API=__declspec(dllimport)");
+        args.push_back("-DGD_EXTENSION_API=__declspec(dllimport)");
+        #elif defined(LINUX)
+        args.push_back("-DGD_CORE_API= ");
+        args.push_back("-DGD_API= ");
+        args.push_back("-DGD_EXTENSION_API= ");
+        #elif defined(MAC)
+        args.push_back("-DGD_CORE_API= ");
+        args.push_back("-DGD_API= ");
+        args.push_back("-DGD_EXTENSION_API= ");
+        #endif
+
+        //Other common defines.
+        #if defined(RELEASE)
+        args.push_back("-DRELEASE");
+        args.push_back("-DNDEBUG");
+        args.push_back("-DBOOST_DISABLE_ASSERTS");
+        #elif defined(DEV)
+        args.push_back("-DDEV");
+        args.push_back("-DNDEBUG");
+        args.push_back("-DBOOST_DISABLE_ASSERTS");
+        #elif defined(DEBUG)
+        args.push_back("-DDEBUG");
+        #endif
+    }
+    else //Generate argument for linking files
+    {
+        args.push_back("-shared");
+
+        args.push_back(currentTask.inputFile);
+
+        //All the files to be linked
+        for (unsigned int i = 0;i<currentTask.extraObjectFiles.size();++i)
+            args.push_back(currentTask.extraObjectFiles[i]);
+
+        //Libraries and libraries directories
+        #if defined(WINDOWS)
+        args.push_back("-L"+baseDir+"CppPlatform/MinGW32/lib/");
+        #endif
+        if ( !currentTask.compilationForRuntime )
+        {
+            args.push_back("-L"+baseDir);
+            args.push_back("-L"+baseDir+"CppPlatform/Extensions/");
+        }
+        else
+        {
+            args.push_back("-L"+baseDir+"Runtime/");
+            args.push_back("-L"+baseDir+"CppPlatform/Extensions/Runtime/");
+        }
+
+        args.push_back("-lgdl");
+        args.push_back("-lstdc++");
+        if ( !currentTask.compilationForRuntime ) args.push_back("-lGDCore");
+        #if defined(RELEASE) || defined(DEV)
+        args.push_back("-lsfml-audio");
+        args.push_back("-lsfml-network");
+        args.push_back("-lsfml-graphics");
+        args.push_back("-lsfml-window");
+        args.push_back("-lsfml-system");
+        #elif defined(DEBUG)
+        args.push_back("-lsfml-audio-d");
+        args.push_back("-lsfml-network-d");
+        args.push_back("-lsfml-graphics-d");
+        args.push_back("-lsfml-window-d");
+        args.push_back("-lsfml-system-d");
+        #endif
+        for (unsigned int i = 0;i<currentTask.extraLibFiles.size();++i)
+            args.push_back("-l"+currentTask.extraLibFiles[i]);
+    }
+
+    std::string argsStr;
+    for (unsigned int i = 0;i<args.size();++i) argsStr += args[i]+" ";
+
+    //Launching the process
+    std::cout << "Launching compiler process...\n";
+    currentTaskProcess = new CodeCompilerProcess(this);
+    wxExecute(baseDir+"CppPlatform/MinGW32/bin/g++.exe "+argsStr, wxEXEC_ASYNC, currentTaskProcess);
+
+    //When the process ends, it will call ProcessEndedWork()...
+}
+
+CodeCompilerProcess::CodeCompilerProcess(wxEvtHandler * parent_) :
+    wxProcess(0),
+    parent(parent_)
+{
+    std::cout << "CodeCompilerProcess created." << std::endl;
+}
+
+void CodeCompilerProcess::OnTerminate( int pid, int status )
+{
+    std::cout << "CodeCompilerProcess terminated with status " << status << "." << std::endl;
+    while ( HasInput() ) ;
+
+    exitCode = status;
+    wxCommandEvent processEndedEvent( CodeCompiler::processEndedEventType );
+    if ( parent != NULL) wxPostEvent(parent, processEndedEvent);
+}
+
+void CodeCompiler::ProcessEndedWork(wxCommandEvent & event)
+{
+    //...This function is called when a CodeCompilerProcess ends its job.
+    std::cout << "CodeCompiler notified that the current process ended work." << std::endl;
+
+    // Create and execute the frontend to generate an LLVM bitcode module.
+    bool compilationSucceeded = (currentTaskProcess->exitCode == 0);
+    if (!compilationSucceeded)
+    {
+        std::cout << "Compilation failed with exit code " << currentTaskProcess->exitCode << ".\n";
+        lastTaskFailed = true;
+    }
+    else
+    {
+        std::cout << "Compilation succeeded." << std::endl;
+    }
+
+    //Compilation ended, loading diagnostics
+    {
+        lastTaskMessages.clear();
+        for (unsigned int i = 0;i<currentTaskProcess->output.size();++i)
+            lastTaskMessages += currentTaskProcess->output[i]+"\n";
+
+        for (unsigned int i = 0;i<currentTaskProcess->outputErrors.size();++i)
+            lastTaskMessages += currentTaskProcess->outputErrors[i]+"\n";
+    }
+
+    //Now do post work and notify task has been done.
+    {
+        if (currentTask.postWork != boost::shared_ptr<CodeCompilerExtraWork>() )
+        {
+            std::cout << "Launching post task" << std::endl;
+            currentTask.postWork->compilationSucceeded = compilationSucceeded;
+            currentTask.postWork->Execute();
+
+            if ( currentTask.postWork->requestRelaunchCompilationLater )
+            {
+                std::cout << "Postworker asked to launch again the task later" << std::endl;
+
+                pendingTasks.push_back(currentTask);
+                pendingTasks.back().postWork->requestRelaunchCompilationLater = false;
+            }
+        }
+
+        std::cout << "Task ended." << std::endl;
+        currentTask = ConstructEmptyTask();
+        NotifyControls();
+    }
+
+    //Launch the next task ( even if there is no task to be done )
+    delete currentTaskProcess;
+    currentTaskProcess = NULL;
+    StartTheNextTask();
 }
 
 void CodeCompiler::NotifyControls()
@@ -382,7 +303,7 @@ void CodeCompiler::NotifyControls()
         if ( (*it) != NULL) wxPostEvent((*it), refreshEvent);
     }
 }
-
+/* TODO
 void CodeCompiler::SendCurrentThreadToGarbage()
 {
     sf::Lock lock(garbageThreadsMutex); //Disallow modifying garbageThreads.
@@ -392,39 +313,11 @@ void CodeCompiler::SendCurrentThreadToGarbage()
     livingGarbageThreadsCount++; //We increment livingGarbageThreadsCount as the thread sent to garbageThreads was alive ( i.e. : doing work )
 
     currentTaskThread = boost::shared_ptr<sf::Thread>();
-    threadLaunched = false;
-}
-
-void CodeCompiler::ThreadEndedWork(sf::Thread * thread)
-{
-    sf::Lock lock(garbageThreadsMutex); //Disallow modifying garbageThreads.
-
-    bool isAGarbageThread = false;
-    for (unsigned int i = 0;i<garbageThreads.size();++i)
-    {
-        if ( garbageThreads[i].get() == thread)
-            isAGarbageThread = true;
-    }
-
-    if ( isAGarbageThread )
-    {
-        livingGarbageThreadsCount--; //A thread sent to garbage is now useless.
-        //Note that we cannot destroy the thread here, as this function is called by the thread itself.
-    }
-}
-
-void CodeCompiler::CleanGarbageThreads()
-{
-    sf::Lock lock(garbageThreadsMutex); //Disallow modifying garbageThreads.
-
-    if ( livingGarbageThreadsCount == 0 )
-        garbageThreads.clear();
-}
+    processLaunched = false;
+}*/
 
 void CodeCompiler::AddTask(CodeCompilerTask task)
 {
-    CleanGarbageThreads(); //Take this opportunity to clean a bit useless garbage threads, if any.
-
     {
         sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
@@ -435,15 +328,15 @@ void CodeCompiler::AddTask(CodeCompilerTask task)
         }
 
         //If the task is equivalent to the current one, abort it.
-        if ( threadLaunched && task.IsSameTaskAs(currentTask) )
+        if ( processLaunched && task.IsSameTaskAs(currentTask) )
         {
             std::cout << "Task requested is equivalent to the current one (" << task.userFriendlyName << ")" << std::endl;
 
-            if ( livingGarbageThreadsCount < maxGarbageThread )
+            /*if ( livingGarbageThreadsCount < maxGarbageThread ) TODO
             {
-                SendCurrentThreadToGarbage();
+                SendCurrentProcessToGarbage();
             }
-            else
+            else*/
             {
                 pendingTasks.push_back(task);
                 std::cout << "Max thread count reached, new pending task added (" << task.userFriendlyName << ")" << std::endl;
@@ -456,13 +349,11 @@ void CodeCompiler::AddTask(CodeCompilerTask task)
         }
     }
 
-    if ( !threadLaunched )
+    if ( !processLaunched )
     {
-        std::cout << "Launching new compilation thread";
-        threadLaunched = true;
-        currentTaskThread = boost::shared_ptr<sf::Thread>(new sf::Thread(&CodeCompiler::ProcessTasks, this));
-        std::cout << " (" << currentTaskThread.get() << ")" << std::endl;
-        currentTaskThread->launch();
+        std::cout << "Launching new compilation run";
+        processLaunched = true;
+        StartTheNextTask();
     }
 }
 
@@ -471,7 +362,7 @@ std::vector < CodeCompilerTask > CodeCompiler::GetCurrentTasks() const
     sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
     std::vector < CodeCompilerTask > allTasks = pendingTasks;
-    if (threadLaunched) allTasks.insert(allTasks.begin(), currentTask);
+    if (processLaunched) allTasks.insert(allTasks.begin(), currentTask);
 
     return allTasks;
 }
@@ -480,7 +371,7 @@ bool CodeCompiler::HasTaskRelatedTo(Scene & scene) const
 {
     sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
-    if ( threadLaunched && currentTask.scene == &scene ) return true;
+    if ( processLaunched && currentTask.scene == &scene ) return true;
 
     for (unsigned int i = 0;i<pendingTasks.size();++i)
     {
@@ -492,7 +383,7 @@ bool CodeCompiler::HasTaskRelatedTo(Scene & scene) const
 
 void CodeCompiler::EnableTaskRelatedTo(Scene & scene)
 {
-    bool mustLaunchCompilationThread = false;
+    bool mustLaunchCompilation = false;
     {
         sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
@@ -502,16 +393,15 @@ void CodeCompiler::EnableTaskRelatedTo(Scene & scene)
         if ( it != compilationDisallowed.end())
             compilationDisallowed.erase(it);
 
-        mustLaunchCompilationThread = !pendingTasks.empty();
+        mustLaunchCompilation = !pendingTasks.empty();
     }
 
     //Launch pending tasks if needed
-    if ( !threadLaunched && mustLaunchCompilationThread )
+    if ( !processLaunched && mustLaunchCompilation )
     {
         std::cout << "Launching compilation thread...";
-        threadLaunched = true;
-        currentTaskThread = boost::shared_ptr<sf::Thread>(new sf::Thread(&CodeCompiler::ProcessTasks, this));
-        currentTaskThread->launch();
+        processLaunched = true;
+        StartTheNextTask();
     }
 }
 
@@ -544,7 +434,7 @@ bool CodeCompiler::CompilationInProcess() const
 {
     sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
-    return threadLaunched;
+    return processLaunched;
 }
 
 void CodeCompiler::SetOutputDirectory(std::string outputDir_)
@@ -575,26 +465,25 @@ void CodeCompiler::SetBaseDirectory(std::string baseDir_)
 
     std::vector<std::string> standardsIncludeDirs;
     #if defined(WINDOWS)
-    standardsIncludeDirs.push_back("include/TDM-GCC-4.5.2/include");
-    standardsIncludeDirs.push_back("include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++");
-    standardsIncludeDirs.push_back("include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
+    standardsIncludeDirs.push_back("CppPlatform/MinGW32/include");
+    standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++");
+    standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
     #elif defined(LINUX)
-    standardsIncludeDirs.push_back("include/linux/usr/include/i386-linux-gnu/");
-    standardsIncludeDirs.push_back("include/linux/usr/include");
-    standardsIncludeDirs.push_back("include/linux/usr/include/c++/4.6/");
-    standardsIncludeDirs.push_back("include/linux/usr/include/c++/4.6/i686-linux-gnu");
-    standardsIncludeDirs.push_back("include/linux/usr/include/c++/4.6/backward");
+    standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/i386-linux-gnu/");
+    standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include");
+    standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.6/");
+    standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.6/i686-linux-gnu");
+    standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.6/backward");
     #elif defined(MAC)
     #endif
 
-    standardsIncludeDirs.push_back("include/llvm/tools/clang/lib/Headers");
-    standardsIncludeDirs.push_back("include/GDL");
-    standardsIncludeDirs.push_back("include/Core");
-    standardsIncludeDirs.push_back("include/boost");
-    standardsIncludeDirs.push_back("include/SFML/include");
-    standardsIncludeDirs.push_back("include/wxwidgets/include");
-    standardsIncludeDirs.push_back("include/wxwidgets/lib/gcc_dll/msw");
-    standardsIncludeDirs.push_back("Extensions/include");
+    standardsIncludeDirs.push_back("CppPlatform/include/GDL");
+    standardsIncludeDirs.push_back("CppPlatform/include/Core");
+    standardsIncludeDirs.push_back("CppPlatform/include/boost");
+    standardsIncludeDirs.push_back("CppPlatform/include/SFML/include");
+    standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/include");
+    standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/lib/gcc_dll/msw");
+    standardsIncludeDirs.push_back("CppPlatform/Extensions/include");
 
     for (unsigned int i =0;i<standardsIncludeDirs.size();++i)
     {
@@ -605,19 +494,68 @@ void CodeCompiler::SetBaseDirectory(std::string baseDir_)
 
 void CodeCompiler::AllowMultithread(bool allow, unsigned int maxThread)
 {
-    if (!allow || maxThread == 1)
+    /*if (!allow || maxThread == 1)
         maxGarbageThread = 0;
     else
-        maxGarbageThread = maxThread-1;
+        maxGarbageThread = maxThread-1;*/
 }
 
 CodeCompiler::CodeCompiler() :
-    threadLaunched(false),
+    processLaunched(false),
     currentTask(ConstructEmptyTask()),
-    maxGarbageThread(2),
-    livingGarbageThreadsCount(0),
+    currentTaskProcess(NULL),
+    //maxGarbageThread(2),
     lastTaskFailed(false)
 {
+    Connect(wxID_ANY, processEndedEventType, (wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction) &CodeCompiler::ProcessEndedWork);
+}
+
+/**
+ * Used to get output emitted by compilers.
+ */
+bool CodeCompilerProcess::HasInput()
+{
+    wxChar c;
+
+    bool hasInput = false;
+    // The original used wxTextInputStream to read a line at a time.  Fine, except when there was no \n, whereupon the thing would hang
+    while ( IsInputAvailable() )
+    {
+        std::string line;
+        do
+        {
+            c = GetInputStream()->GetC();
+            if ( GetInputStream()->Eof() ) break; // Check we've not just overrun
+
+            line += c;
+            if ( c==wxT('\n') ) break; // If \n, break to print the line
+        }
+        while ( IsInputAvailable() ); // Unless \n, loop to get another char
+
+        output.push_back(line); // Either there's a full line in 'line', or we've run out of input. Either way, print it
+
+        hasInput = true;
+    }
+
+    while ( IsErrorAvailable() )
+    {
+        std::string line;
+        do
+        {
+            c = GetErrorStream()->GetC();
+            if ( GetErrorStream()->Eof() ) break; // Check we've not just overrun
+
+            line += c;
+            if ( c==wxT('\n') ) break; // If \n, break to print the line
+        }
+        while ( IsErrorAvailable() );                           // Unless \n, loop to get another char
+
+        outputErrors.push_back(line); // Either there's a full line in 'line', or we've run out of input. Either way, print it
+
+        hasInput = true;
+    }
+
+    return hasInput;
 }
 
 CodeCompilerExtraWork::CodeCompilerExtraWork() :

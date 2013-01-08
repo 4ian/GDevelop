@@ -298,19 +298,19 @@ void FullProjectCompiler::LaunchProjectCompilation()
         {
             if ( windowsTarget)
             {
-                if ( wxCopyFile( "Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdw", tempDir + "/" + game.GetUsedPlatformExtensions()[i]+".xgdw", true ) == false )
+                if ( wxCopyFile( "CppPlatform/Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdw", tempDir + "/" + game.GetUsedPlatformExtensions()[i]+".xgdw", true ) == false )
                     diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedPlatformExtensions()[i]+_(" for Windows in compilation directory.\n" )));
             }
 
             if ( linuxTarget )
             {
-                if ( wxCopyFile( "Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdl", tempDir + "/"+game.GetUsedPlatformExtensions()[i]+".xgdl", true ) == false )
+                if ( wxCopyFile( "CppPlatform/Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdl", tempDir + "/"+game.GetUsedPlatformExtensions()[i]+".xgdl", true ) == false )
                     diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedPlatformExtensions()[i]+_(" for Linux in compilation directory.\n" )));
             }
 
             if ( macTarget )
             {
-                if ( wxCopyFile( "Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdm", tempDir + "/"+game.GetUsedPlatformExtensions()[i]+".xgdm", true ) == false )
+                if ( wxCopyFile( "CppPlatform/Extensions/"+game.GetUsedPlatformExtensions()[i]+".xgdm", tempDir + "/"+game.GetUsedPlatformExtensions()[i]+".xgdm", true ) == false )
                     diagnosticManager.AddError(gd::ToString(_( "Unable to copy extension ")+game.GetUsedPlatformExtensions()[i]+_(" for Mac OS in compilation directory.\n" )));
             }
         }
@@ -362,31 +362,31 @@ void FullProjectCompiler::LaunchProjectCompilation()
         //Fichier pour windows
         if ( windowsTarget )
         {
-            if ( wxCopyFile( "Runtime/PlayWin.exe", tempDir + "/" + winExecutableName, true ) == false )
+            if ( wxCopyFile( "CppPlatform/Runtime/PlayWin.exe", tempDir + "/" + winExecutableName, true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable Windows"+_(" in compilation directory.\n" )));
 
-            if ( wxCopyFile( "Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )
+            if ( wxCopyFile( "CppPlatform/Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable gdl.dll"+_(" in compilation directory.\n" )));
 
         }
         //Fichiers pour linux
         if ( linuxTarget )
         {
-            if ( wxCopyFile( "Runtime/ExeLinux", tempDir + "/ExeLinux", true ) == false )
+            if ( wxCopyFile( "CppPlatform/Runtime/ExeLinux", tempDir + "/ExeLinux", true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable Linux"+_(" in compilation directory.\n" )));
 
-            if ( wxCopyFile( "Runtime/PlayLinux", tempDir + "/" + linuxExecutableName, true ) == false )
+            if ( wxCopyFile( "CppPlatform/Runtime/PlayLinux", tempDir + "/" + linuxExecutableName, true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"le script executable Linux"+_(" in compilation directory.\n" )));
 
-            if ( wxCopyFile( "Runtime/libgdl.so", tempDir + "/libgdl.so", true ) == false )
+            if ( wxCopyFile( "CppPlatform/Runtime/libgdl.so", tempDir + "/libgdl.so", true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"libgdl.so"+_(" in compilation directory.\n" )));
         }
         if ( macTarget )
         {
-            if ( wxCopyFile( "MacRuntime/MacExe", tempDir + "/MacExe", true ) == false )
+            if ( wxCopyFile( "CppPlatform/MacRuntime/MacExe", tempDir + "/MacExe", true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable Mac OS"+_(" in compilation directory.\n" )));
 
-            if ( wxCopyFile( "MacRuntime/libgdl.dylib", tempDir + "/libgdl.dylib", true ) == false )
+            if ( wxCopyFile( "CppPlatform/MacRuntime/libgdl.dylib", tempDir + "/libgdl.dylib", true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"libgdl.dylib"+_(" in compilation directory.\n" )));
         }
 
@@ -405,10 +405,10 @@ void FullProjectCompiler::LaunchProjectCompilation()
     {
         if ( windowsTarget )
         {
-            if ( wxCopyFile( "Runtime/PlayWin.exe", tempDir + "/internalstart.exe", true ) == false )
+            if ( wxCopyFile( "CppPlatform/Runtime/PlayWin.exe", tempDir + "/internalstart.exe", true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable Windows"+_(" in compilation directory.\n" )));
 
-            if ( wxCopyFile( "Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )
+            if ( wxCopyFile( "CppPlatform/Runtime/gdl.dll", tempDir + "/gdl.dll", true ) == false )
                 diagnosticManager.AddError(gd::ToString(_( "Unable to create ")+"l'executable gdl.dll"+_(" in compilation directory.\n" )));
 
             //Use 7zip to create a single archive

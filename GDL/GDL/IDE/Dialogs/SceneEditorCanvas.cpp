@@ -44,6 +44,7 @@ const long SceneEditorCanvas::ID_CUTMENU = wxNewId();
 const long SceneEditorCanvas::ID_PASTEMENU = wxNewId();
 const long SceneEditorCanvas::ID_PASTESPECIALMENU = wxNewId();
 const long SceneEditorCanvas::ID_CREATEOBJECTMENU = wxNewId();
+const long SceneEditorCanvas::ID_LOCKMENU = wxNewId();
 const long SceneEditorCanvas::idRibbonOrigine = wxNewId();
 const long SceneEditorCanvas::idRibbonOriginalZoom = wxNewId();
 const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM = wxNewId();
@@ -98,6 +99,7 @@ SceneEditorCanvas::SceneEditorCanvas(wxWindow* parent, gd::Project & project_, g
     reloadingText.setString(string(_("Compiling...").mb_str()));
     reloadingText.setCharacterSize(40);
     reloadingText.setFont(*FontManager::GetInstance()->GetFont(""));
+    setFramerateLimit(30);
 
     editionView.setCenter( (game.GetMainWindowDefaultWidth()/2),(game.GetMainWindowDefaultHeight()/2));
 
@@ -149,6 +151,11 @@ SceneEditorCanvas::SceneEditorCanvas(wxWindow* parent, gd::Project & project_, g
         contextMenu.Append(pasteItem);
         wxMenuItem * pasteSpecialItem = new wxMenuItem((&contextMenu), ID_PASTESPECIALMENU, _("Special paste"), wxEmptyString, wxITEM_NORMAL);
         contextMenu.Append(pasteSpecialItem);
+
+        contextMenu.AppendSeparator();
+        wxMenuItem * lockItem = new wxMenuItem((&contextMenu), ID_LOCKMENU, _("Lock the object(s)"), wxEmptyString, wxITEM_NORMAL);
+        lockItem->SetBitmap(wxImage( "res/lockicon.png" ) );
+        contextMenu.Append(lockItem);
     }
 
     //Generate "no object" context menu
@@ -192,6 +199,7 @@ void SceneEditorCanvas::OnPreviewBtClick( wxCommandEvent & event )
     RefreshFromLayout();
     UpdateSize();
     UpdateScrollbars();
+    setFramerateLimit(game.GetMaximumFPS());
 
     if ( debugger ) debugger->Play();
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->Refresh();
@@ -211,6 +219,7 @@ void SceneEditorCanvas::OnEditionBtClick( wxCommandEvent & event )
 
     if ( externalPreviewWindow ) externalPreviewWindow->Show(false);
     previewScene.ChangeRenderWindow(this);
+    setFramerateLimit(30);
 
     //Parse now the results of profiling
     if ( profiler ) profiler->ParseProfileEvents();
@@ -611,6 +620,8 @@ void SceneEditorCanvas::OnRightUp( wxMouseEvent &event )
 
         double mouseX = GetMouseXOnLayout();
         double mouseY = GetMouseYOnLayout();
+        oldMouseX = mouseX; //Remember the old position of the cursor for
+        oldMouseY = mouseY; //use during the next event.
 
         //Check if we must unselect all the objects
         if ( !shiftPressed && //Check that shift is not pressed
@@ -631,8 +642,6 @@ void SceneEditorCanvas::OnRightUp( wxMouseEvent &event )
         else
             PopupMenu(&noObjectContextMenu);
 
-        oldMouseX = mouseX; //Remember the old position of the cursor for
-        oldMouseY = mouseY; //use during the next event.
     }
 }
 
@@ -669,6 +678,17 @@ void SceneEditorCanvas::DrawSelectionRectangleGuiElement(std::vector < boost::sh
     target.push_back(selection);
 }
 
+void SceneEditorCanvas::DrawHighlightRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
+{
+    boost::shared_ptr<sf::Shape> highlight = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangle.width, rectangle.height)));
+    highlight->setPosition(rectangle.left, rectangle.top);
+    highlight->setFillColor(sf::Color( 230, 230, 230, 20 ));
+    highlight->setOutlineColor(sf::Color( 200, 200, 200, 70 ));
+    highlight->setOutlineThickness(1);
+
+    target.push_back(highlight);
+}
+
 void SceneEditorCanvas::AddSmallButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName )
 {
     //Declare the button as a gui element
@@ -700,7 +720,7 @@ void SceneEditorCanvas::RenderEdittime()
     glClear(GL_DEPTH_BUFFER_BIT);
     pushGLStates(); //To allow using OpenGL to draw
 
-    //On trie les objets par leurs plans
+    //Sort objects according to their Z Order
     ObjList allObjects = previewScene.objectsInstances.GetAllObjects();
     previewScene.OrderObjectsByZOrder( allObjects );
 
@@ -713,6 +733,8 @@ void SceneEditorCanvas::RenderEdittime()
     float resizeButtonsMinX = 0;
     float resizeButtonsMaxY = 0;
     float resizeButtonsMinY = 0;
+
+    gd::InitialInstance * highlightedInstance = GetInitialInstanceUnderCursor();
 
     for (unsigned int layerIndex =0;layerIndex<previewScene.GetLayersCount();++layerIndex)
     {
@@ -761,6 +783,14 @@ void SceneEditorCanvas::RenderEdittime()
                             resizeButtonsMinX = std::min(resizeButtonsMinX, rectangleOrigin.x);
                             resizeButtonsMinY = std::min(resizeButtonsMinY, rectangleOrigin.y);
                         }
+                    }
+                    else if ( highlightedInstance == associatedInitialInstance )
+                    {
+                        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX(), allObjects[id]->GetDrawableY(), editionView);
+                        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth(),
+                                                                               allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight(), editionView);
+
+                        DrawHighlightRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin ));
                     }
                 }
             }

@@ -8,7 +8,7 @@
 		<Build>
 			<Target title="Debug">
 				<Option platforms="Windows;" />
-				<Option output="../Runtime/bin/debug/gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="../Runtime/bin/debug/gdl.dll" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Debug/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -84,7 +84,7 @@
 			</Target>
 			<Target title="Debug - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="../IDE/bin/debug/gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="../IDE/bin/debug/gdl.dll" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Debug Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -201,7 +201,7 @@
 			</Target>
 			<Target title="Release">
 				<Option platforms="Windows;" />
-				<Option output="../Runtime/bin/release/gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="../Runtime/bin/release/gdl.dll" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Release/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -276,7 +276,7 @@
 			</Target>
 			<Target title="Release - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="../IDE/bin/release/gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="../IDE/bin/release/gdl.dll" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Release Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -392,7 +392,7 @@
 			</Target>
 			<Target title="Development">
 				<Option platforms="Windows;" />
-				<Option output="../Runtime/bin/dev/gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="../Runtime/bin/dev/gdl.dll" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Dev/" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -467,7 +467,7 @@
 			</Target>
 			<Target title="Development - Edittime">
 				<Option platforms="Windows;" />
-				<Option output="../IDE/bin/dev/gdl" prefix_auto="1" extension_auto="1" />
+				<Option output="../IDE/bin/dev/gdl.dll" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME)" prefix_auto="1" extension_auto="0" />
 				<Option object_output="obj/Dev Edittime/" />
 				<Option type="3" />
 				<Option compiler="gcc" />

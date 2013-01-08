@@ -26,9 +26,10 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
     std::string angleProperty;
     std::string zOrderProperty;
     std::string layerProperty;
-    bool customSizeProperty;
+    bool customSizeProperty = false;
     std::string widthProperty;
     std::string heightProperty;
+    bool lockedProperty = false;
     std::map<std::string, std::string> customProperties;
 
     for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
@@ -44,6 +45,7 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
             customSizeProperty = selectedInitialInstances[0]->HasCustomSize();
             widthProperty = ToString(selectedInitialInstances[0]->GetCustomWidth());
             heightProperty = ToString(selectedInitialInstances[0]->GetCustomHeight());
+            lockedProperty = selectedInitialInstances[0]->IsLocked();
             customProperties = selectedInitialInstances[0]->GetCustomProperties(project, layout);
         }
         else
@@ -55,6 +57,7 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
             if ( ToString(selectedInitialInstances[i]->GetZOrder()) != zOrderProperty ) zOrderProperty = _("(Multiples values)");
             if ( selectedInitialInstances[i]->GetLayer() != layerProperty ) layerProperty = _("(Multiples values)");
             if ( !selectedInitialInstances[i]->HasCustomSize() ) customSizeProperty = false;
+            if ( !selectedInitialInstances[i]->IsLocked() ) lockedProperty = false;
             if ( ToString(selectedInitialInstances[i]->GetCustomWidth()) != widthProperty ) widthProperty = _("(Multiples values)");
             if ( ToString(selectedInitialInstances[i]->GetCustomHeight()) != heightProperty ) heightProperty = _("(Multiples values)");
 
@@ -83,6 +86,7 @@ void InitialInstancesPropgridHelper::RefreshFrom(const std::vector<gd::InitialIn
     grid->Append( new wxStringProperty(_("Angle"), wxPG_LABEL, angleProperty));
     grid->Append( new wxStringProperty(_("Z Order"), wxPG_LABEL, zOrderProperty));
     grid->Append( new wxStringProperty(_("Layer"), wxPG_LABEL, layerProperty));
+    grid->Append( new wxBoolProperty(_("Locked"), wxPG_LABEL, lockedProperty));
     grid->Append( new wxPropertyCategory(_("Size")) );
     grid->Append( new wxBoolProperty(_("Custom size?"), wxPG_LABEL, customSizeProperty));
     grid->EnableProperty(grid->Append( new wxStringProperty(_("Width"), wxPG_LABEL, widthProperty)), customSizeProperty);
@@ -171,6 +175,11 @@ void InitialInstancesPropgridHelper::OnPropertyChanged(const std::vector<gd::Ini
     {
         for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
             selectedInitialInstances[i]->SetLayer(ToString(event.GetValue().GetString()));
+    }
+    else if ( event.GetPropertyName() == _("Locked") )
+    {
+        for (unsigned int i = 0;i<selectedInitialInstances.size();++i)
+            selectedInitialInstances[i]->SetLocked(event.GetValue().GetBool());
     }
     else
     {

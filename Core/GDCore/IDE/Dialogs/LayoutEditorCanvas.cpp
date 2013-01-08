@@ -331,6 +331,9 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
         return;
     }
 
+    double mouseX = GetMouseXOnLayout();
+    double mouseY = GetMouseYOnLayout();
+
     //Check if there is a click on a gui element inside the layout
     for (unsigned int i = 0;i<guiElements.size();++i)
     {
@@ -344,9 +347,6 @@ void LayoutEditorCanvas::OnLeftDown( wxMouseEvent &event )
     //Check if an instance is selected
     {
         InitialInstance * instance = GetInitialInstanceUnderCursor();
-
-        double mouseX = GetMouseXOnLayout();
-        double mouseY = GetMouseYOnLayout();
 
         //Check if we must unselect all the objects
         if ( !shiftPressed && //Check that shift is not pressed
@@ -437,6 +437,8 @@ public:
 
     virtual void operator()(gd::InitialInstance & instance)
     {
+        if ( instance.IsLocked() ) return;
+
         if ( editor.selectionRectangle.Contains(editor.GetRealXPositionOfInitialInstance(instance), editor.GetRealYPositionOfInitialInstance(instance)) &&
              editor.selectionRectangle.Contains(editor.GetRealXPositionOfInitialInstance(instance)+editor.GetWidthOfInitialInstance(instance),
                                                 editor.GetRealYPositionOfInitialInstance(instance)+editor.GetHeightOfInitialInstance(instance)) )
@@ -654,6 +656,8 @@ public:
 
     virtual void operator()(gd::InitialInstance & instance)
     {
+        if ( instance.IsLocked() ) return;
+
         wxRect2DDouble boundingBox(editor.GetRealXPositionOfInitialInstance(instance), editor.GetRealYPositionOfInitialInstance(instance),
                                    editor.GetWidthOfInitialInstance(instance), editor.GetHeightOfInitialInstance(instance));
 

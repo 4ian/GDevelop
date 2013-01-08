@@ -25,6 +25,15 @@ public:
     InitialInstance() {};
     virtual ~InitialInstance() {};
 
+    /**
+     * Must return a pointer to a copy of the object. A such method is needed to do polymorphic copies.
+     * Just redefine this method in your derived object class like this:
+     * \code
+     * return new MyInitialInstanceClass(*this);
+     * \endcode
+     */
+    virtual InitialInstance * Clone() const = 0;
+
     /** \name Common properties
      * Members functions related to common properties
      */
@@ -56,6 +65,18 @@ public:
 
     virtual float GetCustomHeight() const = 0;
     virtual void SetCustomHeight(float height) = 0;
+
+    /**
+     * Must return true if the instance is locked and cannot be selected by clicking on it.
+     */
+    virtual bool IsLocked() const = 0;
+
+    /**
+     * Must (un)lock the initial instance.
+     *
+     * An instance which is locked cannot be selected by clicking on it in a layout editor canvas.
+     */
+    virtual void SetLocked(bool enable = true) = 0;
 
     ///@}
 

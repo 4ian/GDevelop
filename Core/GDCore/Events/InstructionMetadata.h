@@ -153,8 +153,8 @@ public:
          *                 _("Change the string of a text"),
          *                 _("Do _PARAM2__PARAM1_ to the string of _PARAM0_"),
          *                 _("Text"),
-         *                 "Extensions/text24.png",
-         *                 "Extensions/text.png");
+         *                 "CppPlatform/Extensions/text24.png",
+         *                 "CppPlatform/Extensions/text.png");
          *
          *      instrInfo.AddParameter("object", _("Object"), "Text", false);
          *      instrInfo.AddParameter("string", _("String"), "", false);

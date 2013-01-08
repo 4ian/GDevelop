@@ -28,6 +28,7 @@ BEGIN_EVENT_TABLE(LayoutEditorPropertiesPnl,wxPanel)
 END_EVENT_TABLE()
 
 LayoutEditorPropertiesPnl::LayoutEditorPropertiesPnl(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, gd::LayoutEditorCanvas * layoutEditorCanvas_) :
+    grid(NULL),
     project(project_),
     layout(layout_),
     layoutEditorCanvas(layoutEditorCanvas_),
@@ -46,6 +47,8 @@ LayoutEditorPropertiesPnl::LayoutEditorPropertiesPnl(wxWindow* parent, gd::Proje
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);
 	FlexGridSizer1->SetSizeHints(this);
+
+	Connect(wxEVT_SIZE,(wxObjectEventFunction)&LayoutEditorPropertiesPnl::OnResize);
 	//*)
 	instancesHelper.SetGrid(grid);
     Connect(ID_PROPGRID, wxEVT_PG_SELECTED, (wxObjectEventFunction)&LayoutEditorPropertiesPnl::OnPropertySelected);
@@ -114,4 +117,10 @@ void LayoutEditorPropertiesPnl::OnPropertyChanged(wxPropertyGridEvent& event)
         instancesHelper.OnPropertyChanged(selectedInitialInstances, event);
         layoutEditorCanvas->RefreshFromLayout();
     }
+}
+
+void LayoutEditorPropertiesPnl::OnResize(wxSizeEvent& event)
+{
+    if ( grid ) grid->SetSplitterPosition(grid->GetSize().GetWidth()/2);
+    event.Skip();
 }

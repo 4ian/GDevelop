@@ -22,7 +22,7 @@
 #include "GDCore/CommonTools.h"
 #include "MainFrame.h"
 #include "EditObjectGroup.h"
-#include "Clipboard.h"
+#include "GDCore/IDE/Clipboard.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDCore/IDE/EventsRefactorer.h"
@@ -564,7 +564,7 @@ void EditorObjetsGroups::OnSetFocus(wxFocusEvent& event)
 
 void EditorObjetsGroups::OnCopyGroupSelected(wxCommandEvent& event)
 {
-    Clipboard * clipboard = Clipboard::GetInstance();
+    gd::Clipboard * clipboard = gd::Clipboard::GetInstance();
 
     if ( itemSelected == ObjetsGroupsList->GetRootItem() ) return;
 
@@ -578,7 +578,7 @@ void EditorObjetsGroups::OnCopyGroupSelected(wxCommandEvent& event)
 
 void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
 {
-    Clipboard * clipboard = Clipboard::GetInstance();
+    gd::Clipboard * clipboard = gd::Clipboard::GetInstance();
 
     if ( itemSelected == ObjetsGroupsList->GetRootItem() ) return;
 
@@ -596,7 +596,7 @@ void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
 
 void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
 {
-    Clipboard * clipboard = Clipboard::GetInstance();
+    gd::Clipboard * clipboard = gd::Clipboard::GetInstance();
     if ( !clipboard->HasObjectGroup() ) return;
     gd::ObjectGroup groupPasted = clipboard->GetObjectGroup();
 

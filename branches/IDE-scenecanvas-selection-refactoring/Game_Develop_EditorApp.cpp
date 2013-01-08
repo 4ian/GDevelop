@@ -31,20 +31,18 @@
 #include <unistd.h>
 #include <stdexcept>
 #include <SFML/System.hpp>
-#include "CppUnitLite/TestHarness.h"
 
 #include "GDL/CodeExecutionEngine.h"
 
 #include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
-#include "Log.h"
 #include "CheckMAJ.h"
 #include "MAJ.h"
 #include "SplashScreen.h"
 #include "ConsoleManager.h"
 #include "BugReport.h"
 #include "CompilationChecker.h"
-#include "Clipboard.h"
+#include "GDCore/IDE/Clipboard.h"
 #include "LogFileManager.h"
 #include "ExtensionBugReportDlg.h"
 #include "Dialogs/HelpViewerDlg.h"
@@ -273,8 +271,6 @@ bool Game_Develop_EditorApp::OnInit()
     //GDLogBanner();
 
     //LLVM stuff
-    cout << "* Initializing LLVM/Clang..." << endl;
-    CodeExecutionEngine::EnsureLLVMTargetsInitialization();
     cout << "* Loading required dynamic libraries..." << endl;
     CodeExecutionEngine::LoadDynamicLibraries();
 
@@ -315,7 +311,7 @@ bool Game_Develop_EditorApp::OnInit()
     #endif
 
     GDpriv::ExtensionsLoader * extensionsLoader = GDpriv::ExtensionsLoader::GetInstance();
-    extensionsLoader->SetExtensionsDir("./Extensions/");
+    extensionsLoader->SetExtensionsDir("./CppPlatform/Extensions/");
     if ( loadExtensions ) extensionsLoader->LoadAllStaticExtensionsAvailable();
 
     #if defined(RELEASE)
@@ -393,11 +389,6 @@ bool Game_Develop_EditorApp::OnInit()
         }
     }
 
-#ifndef RELEASE
-    TestResult tr;
-    TestRegistry::runAllTests( tr );
-#endif
-
     return true;
 
 }
@@ -407,7 +398,7 @@ int Game_Develop_EditorApp::OnExit()
     delete wxConfigBase::Set(( wxConfigBase* )NULL );
 
     SoundManager::GetInstance()->DestroySingleton();
-    Clipboard::GetInstance()->DestroySingleton();
+    gd::Clipboard::GetInstance()->DestroySingleton();
     FontManager::GetInstance()->DestroySingleton();
     gd::HelpFileAccess::GetInstance()->DestroySingleton();
     HelpProvider::GetInstance()->DestroySingleton();

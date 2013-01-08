@@ -41,7 +41,7 @@
 #include "ChoixTemplateEvent.h"
 #include "ChoixCondition.h"
 #include "ChoixAction.h"
-#include "Clipboard.h"
+#include "GDCore/IDE/Clipboard.h"
 #undef CreateEvent //Disable an annoying macro
 #undef DrawText //Disable an annoying macro
 
@@ -1417,7 +1417,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
                 instructionsToCopy.push_back(*itemsSelected[i].instruction);
         }
 
-        Clipboard::GetInstance()->SetConditions(instructionsToCopy);
+        gd::Clipboard::GetInstance()->SetConditions(instructionsToCopy);
     }
     else if ( selection.HasSelectedActions())
     {
@@ -1429,7 +1429,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
                 instructionsToCopy.push_back(*itemsSelected[i].instruction);
         }
 
-        Clipboard::GetInstance()->SetActions(instructionsToCopy);
+        gd::Clipboard::GetInstance()->SetActions(instructionsToCopy);
     }
     else if ( selection.HasSelectedEvents() )
     {
@@ -1441,7 +1441,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
                 eventsToCopy.push_back(itemsSelected[i].event->Clone());
         }
 
-        Clipboard::GetInstance()->SetEvents(eventsToCopy);
+        gd::Clipboard::GetInstance()->SetEvents(eventsToCopy);
         std::cout << "itemsSelected" << itemsSelected.size();
     }
 }
@@ -1463,7 +1463,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 {
     if ( selection.HasSelectedConditions() || (selection.GetHighlightedInstructionList().instructionList != NULL && selection.GetHighlightedInstructionList().isConditionList) )
     {
-        if ( !Clipboard::GetInstance()->HasCondition() ) return;
+        if ( !gd::Clipboard::GetInstance()->HasCondition() ) return;
 
         //Get information about list where conditions must be pasted
         std::vector<gd::Instruction> * instructionList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
@@ -1472,7 +1472,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if (instructionList == NULL) return;
 
         //Paste all conditions
-        const vector < gd::Instruction > & instructions = Clipboard::GetInstance()->GetInstructions();
+        const vector < gd::Instruction > & instructions = gd::Clipboard::GetInstance()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
@@ -1487,7 +1487,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
     }
     else if ( selection.HasSelectedActions()|| (selection.GetHighlightedInstructionList().instructionList != NULL && !selection.GetHighlightedInstructionList().isConditionList) )
     {
-        if ( !Clipboard::GetInstance()->HasAction() ) return;
+        if ( !gd::Clipboard::GetInstance()->HasAction() ) return;
 
         //Get information about list where actions must be pasted
         std::vector<gd::Instruction> * instructionList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
@@ -1496,7 +1496,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if (instructionList == NULL) return;
 
         //Paste all actions
-        const vector < gd::Instruction > & instructions = Clipboard::GetInstance()->GetInstructions();
+        const vector < gd::Instruction > & instructions = gd::Clipboard::GetInstance()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
@@ -1527,7 +1527,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if (eventsList == NULL) return;
 
         //Insert events
-        vector < boost::shared_ptr <gd::BaseEvent> > eventsToPaste = Clipboard::GetInstance()->GetEvents();
+        vector < boost::shared_ptr <gd::BaseEvent> > eventsToPaste = gd::Clipboard::GetInstance()->GetEvents();
         std::cout << "EventToPaste" << eventsToPaste.size();
         for (unsigned int i = 0;i<eventsToPaste.size();++i)
         {

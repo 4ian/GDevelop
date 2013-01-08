@@ -309,7 +309,7 @@ void Credits::OnDonBtClick(wxCommandEvent& event)
 
 void Credits::OnLLVMBtClick(wxCommandEvent& event)
 {
-    OpenLink(_("http://llvm.org/"));
+    OpenLink(_("http://clang.llvm.org/"));
 }
 
 void Credits::OnTinyXmlBtClick(wxCommandEvent& event)

@@ -36,6 +36,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/IDE/Clipboard.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
 #include "GDL/ExtensionsManager.h"
@@ -45,7 +46,7 @@
 #include "GDL/AutomatismsSharedDatas.h"
 #include "GDL/Automatism.h"
 #include "GDL/CommonTools.h"
-#include "Clipboard.h"
+
 #include "EditorObjetsGroups.h"
 #include "LogFileManager.h"
 #include "DndTextObjectsEditor.h"
@@ -679,7 +680,7 @@ void EditorObjectList::OnCopySelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetObject(&objects.GetObject(ToString(objectsList->GetItemText( item ))));
+    gd::Clipboard::GetInstance()->SetObject(&objects.GetObject(ToString(objectsList->GetItemText( item ))));
 }
 
 /**
@@ -699,7 +700,7 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
 
     objectsList->Delete( item );
 
-    Clipboard::GetInstance()->SetObject(&objects.GetObject(name));
+    gd::Clipboard::GetInstance()->SetObject(&objects.GetObject(name));
 
     //Remove object
     objects.RemoveObject(name);
@@ -714,7 +715,7 @@ void EditorObjectList::OnCutSelected(wxCommandEvent& event)
  */
 void EditorObjectList::OnPasteSelected(wxCommandEvent& event)
 {
-    Clipboard * clipboard = Clipboard::GetInstance();
+    gd::Clipboard * clipboard = gd::Clipboard::GetInstance();
 
     if ( !clipboard->HasObject() )
     {

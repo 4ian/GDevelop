@@ -3,8 +3,6 @@
  *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "CppUnitLite/TestHarness.h"
-
 #include "ChoixCondition.h"
 
 //(*InternalHeaders(ChoixCondition)

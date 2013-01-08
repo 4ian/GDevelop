@@ -2,6 +2,7 @@
 <wxsmith>
 	<object class="wxPanel" name="LayoutEditorPropertiesPnl">
 		<id_arg>0</id_arg>
+		<handler function="OnResize" entry="EVT_SIZE" />
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>3</cols>
 			<growablecols>0</growablecols>

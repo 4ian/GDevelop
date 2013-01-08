@@ -24,7 +24,7 @@
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
 #include "GDL/CommonTools.h"
-#include "Clipboard.h"
+#include "GDCore/IDE/Clipboard.h"
 #include <algorithm>
 #include <numeric>
 #include "EditorObjetsGroups.h"

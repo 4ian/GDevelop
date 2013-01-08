@@ -66,6 +66,7 @@ protected:
 private:
 
     //(*Handlers(LayoutEditorPropertiesPnl)
+    void OnResize(wxSizeEvent& event);
     //*)
     void OnPropertySelected(wxPropertyGridEvent& event);
     void OnPropertyChanged(wxPropertyGridEvent& event);

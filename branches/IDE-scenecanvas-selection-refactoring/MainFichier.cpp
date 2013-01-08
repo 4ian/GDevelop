@@ -26,7 +26,6 @@
 #include "Compilation.h"
 #include "PlatformManager.h"
 #include "Fusion.h"
-#include "MessagePlus.h"
 #include "ProjectManager.h"
 #include "StartHerePage.h"
 

@@ -19,7 +19,7 @@
 #include <wx/busyinfo.h>
 #include <fstream>
 #include "LogFileManager.h"
-#include "Clipboard.h"
+#include "GDCore/IDE/Clipboard.h"
 #include "MainFrame.h"
 #include "gdTreeItemProjectData.h"
 #include "GDL/ExternalEvents.h"
@@ -1071,7 +1071,7 @@ void ProjectManager::OncopySceneMenuItemSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetLayout(&game->GetLayout(data->GetSecondString()));
+    gd::Clipboard::GetInstance()->SetLayout(&game->GetLayout(data->GetSecondString()));
 }
 
 /**
@@ -1092,7 +1092,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
 
     gd::Layout & layout = game->GetLayout(layoutName);
 
-    Clipboard::GetInstance()->SetLayout(&layout);
+    gd::Clipboard::GetInstance()->SetLayout(&layout);
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -1129,7 +1129,7 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    Clipboard * clipboard = Clipboard::GetInstance();
+    gd::Clipboard * clipboard = gd::Clipboard::GetInstance();
     if (!clipboard->HasLayout()) return;
 
     gd::Layout & newLayout = *clipboard->GetLayout();
@@ -1485,7 +1485,7 @@ void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
+    gd::Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
 }
 
 void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
@@ -1501,7 +1501,7 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
+    gd::Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -1682,7 +1682,7 @@ void ProjectManager::OnCopyExternalLayoutSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
+    gd::Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
 }
 
 void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
@@ -1698,7 +1698,7 @@ void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
+    gd::Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )

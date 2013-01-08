@@ -13,6 +13,7 @@
 #include <wx/config.h>
 #include "GDL/ExternalLayout.h"
 #include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
+#include "../InitialPositionBrowserDlg.h"
 #include "LayoutEditorPropertiesPnl.h"
 #include "../EditorObjets.h"
 #include "../MainFrame.h"
@@ -54,9 +55,6 @@ mainFrameWrapper(mainFrameWrapper_)
     }
 
     InitialInstancesContainer & instanceContainer = dynamic_cast<InitialInstancesContainer&>(externalLayout.GetInitialInstances());
-
-	//Prepare pane manager
-    m_mgr.SetManagedWindow( this );
 
 	//(*Initialize(ExternalLayoutEditor)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -131,11 +129,8 @@ mainFrameWrapper(mainFrameWrapper_)
 	//*)
 	Connect(ID_COMBOBOX1,wxEVT_COMMAND_COMBOBOX_DROPDOWN,(wxObjectEventFunction)&ExternalLayoutEditor::OnparentSceneComboBoxDropDown);
 
-    //For now, just create a basic Scene canvas as no associated layout has been chosen.
-    layoutEditorCanvas->SetParentAuiManager( &m_mgr );
-    layoutEditorCanvas->SetScrollbars(scrollBar1, scrollBar2);
-    layoutEditorCanvas->RefreshFromLayout();
-
+	//Prepare pane manager
+    m_mgr.SetManagedWindow( this );
     m_mgr.AddPane( corePanel, wxAuiPaneInfo().Name( wxT( "LayoutPanel" ) ).Center().CloseButton( false ).Caption( _( "Scene's editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
 
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
@@ -231,20 +226,25 @@ void ExternalLayoutEditor::SetupForScene(Scene & layout)
             objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, project, layout, mainFrameWrapper));
             layersEditor = boost::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
             propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas) );
+            initialInstancesBrowser = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, instanceContainer, *layoutEditorCanvas) );
 
             layoutEditorCanvas->AddAssociatedEditor(objectsEditor.get());
             layoutEditorCanvas->AddAssociatedEditor(layersEditor.get());
             layoutEditorCanvas->AddAssociatedEditor(propertiesPnl.get());
+            layoutEditorCanvas->AddAssociatedEditor(initialInstancesBrowser.get());
+            layersEditor->SetAssociatedLayoutEditorCanvas(layoutEditorCanvas);
 
             //Display editors in panes
             if ( creatingEditorsForFirsttime )
             {
-                if ( !m_mgr.GetPane("ObjectsEditor").IsOk() )
-                    m_mgr.AddPane( objectsEditor.get(), wxAuiPaneInfo().Name( wxT( "ObjectsEditor" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-                if ( !m_mgr.GetPane("LayersEditor").IsOk() )
-                    m_mgr.AddPane( layersEditor.get(), wxAuiPaneInfo().Name( wxT( "LayersEditor" ) ).Right().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
-                if ( !m_mgr.GetPane("Properties").IsOk() )
-                    m_mgr.AddPane( propertiesPnl.get(), wxAuiPaneInfo().Name( wxT( "Properties" ) ).Float().CloseButton( true ).Caption( _( "Properties" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
+                if ( !m_mgr.GetPane("EO").IsOk() )
+                    m_mgr.AddPane( objectsEditor.get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+                if ( !m_mgr.GetPane("EL").IsOk() )
+                    m_mgr.AddPane( layersEditor.get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Right().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
+                if ( !m_mgr.GetPane("PROPERTIES").IsOk() )
+                    m_mgr.AddPane( propertiesPnl.get(), wxAuiPaneInfo().Name( wxT( "PROPERTIES" ) ).Float().CloseButton( true ).Caption( _( "Properties" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
+                if ( !m_mgr.GetPane("InstancesBrowser").IsOk() )
+                    m_mgr.AddPane( initialInstancesBrowser.get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Instances list" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
 
                 wxString perspective;
                 wxConfigBase::Get()->Read("/ExternalLayoutEditor/LastWorkspace", &perspective);
@@ -252,9 +252,10 @@ void ExternalLayoutEditor::SetupForScene(Scene & layout)
             }
             else
             {
-                m_mgr.GetPane("ObjectsEditor").Window(objectsEditor.get());
-                m_mgr.GetPane("LayersEditor").Window(layersEditor.get());
-                m_mgr.GetPane("Properties").Window(propertiesPnl.get());
+                m_mgr.GetPane("EO").Window(objectsEditor.get());
+                m_mgr.GetPane("EL").Window(layersEditor.get());
+                m_mgr.GetPane("PROPERTIES").Window(propertiesPnl.get());
+                m_mgr.GetPane("InstancesBrowser").Window(initialInstancesBrowser.get());
             }
 
             m_mgr.Update();

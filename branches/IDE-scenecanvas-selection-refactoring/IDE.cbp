@@ -5,7 +5,7 @@
 		<Option title="IDE" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Fichiers\;wxSFML Canvas\;LIB MyStatusBar\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;LIB CppUnitLite\;" />
+		<Option virtualFolders="Editeurs\;Editeurs\Editeur Scene\;Editeurs\Editeur Scene\Editeur objets\;Editeurs\Editeur Scene\EditorEvents\;Racine\;Racine\Demarrage\;Editeur principal\Fichier\;Editeur principal\Outils\;Editeur principal\Aide\;Editeur principal\Autres\;Editeur principal\;Log et Memoire\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\Choix\;Editeurs\Editeur Scene\EditorEvents\Templates\;Editeurs\Editeur Scene\EditorEvents\Edition evenement\;" />
 		<Build>
 			<Target title="Debug - Edittime">
 				<Option platforms="Windows;" />
@@ -485,12 +485,6 @@
 		<Unit filename="ChoixTemplateEvent.h">
 			<Option virtualFolder="Editeurs/Editeur Scene/EditorEvents/Templates/" />
 		</Unit>
-		<Unit filename="Clipboard.cpp">
-			<Option virtualFolder="Racine/" />
-		</Unit>
-		<Unit filename="Clipboard.h">
-			<Option virtualFolder="Racine/" />
-		</Unit>
 		<Unit filename="CodeEditor.cpp" />
 		<Unit filename="CodeEditor.h" />
 		<Unit filename="Compilation.cpp">
@@ -514,39 +508,6 @@
 		</Unit>
 		<Unit filename="ConsoleManager.h">
 			<Option virtualFolder="Log et Memoire/" />
-		</Unit>
-		<Unit filename="CppUnitLite/CppUnitLite/Failure.cpp">
-			<Option virtualFolder="LIB CppUnitLite/" />
-		</Unit>
-		<Unit filename="CppUnitLite/CppUnitLite/Failure.h">
-			<Option virtualFolder="LIB CppUnitLite/" />
-		</Unit>
-		<Unit filename="CppUnitLite/CppUnitLite/SimpleString.cpp">
-			<Option virtualFolder="LIB CppUnitLite/" />
-		</Unit>
-		<Unit filename="CppUnitLite/CppUnitLite/SimpleString.h">
-			<Option virtualFolder="LIB CppUnitLite/" />
-		</Unit>
-		<Unit filename="CppUnitLite/CppUnitLite/Test.cpp">
-			<Option virtualFolder="LIB CppUnitLite/" />
-		</Unit>
-		<Unit filename="CppUnitLite/CppUnitLite/Test.h">
-			<Option virtualFolder="LIB CppUnitLite/" />
-		</Unit>
-		<Unit filename="CppUnitLite/CppUnitLite/TestHarness.h">
-			<Option virtualFolder="LIB CppUnitLite/" />
-		</Unit>
-		<Unit filename="CppUnitLite/CppUnitLite/TestRegistry.cpp">
-			<Option virtualFolder="LIB CppUnitLite/" />
-		</Unit>
-		<Unit filename="CppUnitLite/CppUnitLite/TestRegistry.h">
-			<Option virtualFolder="LIB CppUnitLite/" />
-		</Unit>
-		<Unit filename="CppUnitLite/CppUnitLite/TestResult.cpp">
-			<Option virtualFolder="LIB CppUnitLite/" />
-		</Unit>
-		<Unit filename="CppUnitLite/CppUnitLite/TestResult.h">
-			<Option virtualFolder="LIB CppUnitLite/" />
 		</Unit>
 		<Unit filename="CreateTemplate.cpp">
 			<Option virtualFolder="Editeurs/Editeur Scene/EditorEvents/Templates/" />
@@ -680,21 +641,8 @@
 		<Unit filename="MainOutils.cpp">
 			<Option virtualFolder="Editeur principal/Outils/" />
 		</Unit>
-		<Unit filename="MessagePlus.cpp">
-			<Option virtualFolder="Racine/" />
-		</Unit>
-		<Unit filename="MessagePlus.h">
-			<Option virtualFolder="Racine/" />
-		</Unit>
-		<Unit filename="MyStatusBar.cpp">
-			<Option virtualFolder="LIB MyStatusBar/" />
-		</Unit>
-		<Unit filename="MyStatusBar.h">
-			<Option virtualFolder="LIB MyStatusBar/" />
-		</Unit>
 		<Unit filename="PlatformManager.cpp" />
 		<Unit filename="PlatformManager.h" />
-		<Unit filename="PlayerUnitTests.cpp" />
 		<Unit filename="Preferences.cpp">
 			<Option virtualFolder="Editeur principal/" />
 		</Unit>
@@ -709,10 +657,6 @@
 		<Unit filename="RecentList.h">
 			<Option virtualFolder="Editeur principal/Fichier/" />
 		</Unit>
-		<Unit filename="SceneCanvasEditionData.cpp" />
-		<Unit filename="SceneCanvasEditionData.h" />
-		<Unit filename="SceneCanvasPreviewData.cpp" />
-		<Unit filename="SceneCanvasPreviewData.h" />
 		<Unit filename="SearchEvents.cpp">
 			<Option virtualFolder="Editeurs/Editeur Scene/EditorEvents/" />
 		</Unit>
@@ -764,12 +708,6 @@
 			<Option target="Debug - Edittime" />
 			<Option target="Release - Edittime" />
 			<Option target="Development - Edittime" />
-		</Unit>
-		<Unit filename="wxSFMLCanvas.cpp">
-			<Option virtualFolder="wxSFML Canvas/" />
-		</Unit>
-		<Unit filename="wxSFMLCanvas.hpp">
-			<Option virtualFolder="wxSFML Canvas/" />
 		</Unit>
 		<Unit filename="wxsmith/ExternalLayoutEditor.wxs" />
 		<Unit filename="wxsmith/HelpViewerDlg.wxs" />

@@ -18,6 +18,7 @@
 class RuntimeGame;
 class EditorObjets;
 class LayoutEditorPropertiesPnl;
+class InitialPositionBrowserDlg;
 namespace gd { class ExternalLayout; }
 namespace gd { class LayersEditorPanel; }
 #include "GDL/Scene.h"
@@ -95,6 +96,7 @@ private:
     boost::shared_ptr<EditorObjets> objectsEditor;
     boost::shared_ptr<gd::LayersEditorPanel> layersEditor;
     boost::shared_ptr<LayoutEditorPropertiesPnl> propertiesPnl;
+    boost::shared_ptr<InitialPositionBrowserDlg> initialInstancesBrowser;
 
     RuntimeGame & project;
     gd::ExternalLayout & externalLayout;

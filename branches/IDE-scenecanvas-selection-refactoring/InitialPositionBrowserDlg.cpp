@@ -8,6 +8,7 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
+#include <wx/imaglist.h>
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
@@ -49,10 +50,16 @@ notUserSelection(false)
 	//*)
 
 	initialPositionsList->InsertColumn(0, _("Object"));
-	initialPositionsList->InsertColumn(1, _("X"));
-	initialPositionsList->InsertColumn(2, _("Y"));
-	initialPositionsList->InsertColumn(3, _("Angle"));
-	initialPositionsList->InsertColumn(4, _("Z order"));
+	initialPositionsList->InsertColumn(1, _("Locked?"), wxLIST_FORMAT_LEFT, 24);
+	initialPositionsList->InsertColumn(2, _("X"));
+	initialPositionsList->InsertColumn(3, _("Y"));
+	initialPositionsList->InsertColumn(4, _("Angle"));
+	initialPositionsList->InsertColumn(5, _("Z order"));
+
+	wxImageList * imageList = new wxImageList(16,16);
+	imageList->Add(wxBitmap("res/blankicon.png",wxBITMAP_TYPE_ANY));
+	imageList->Add(wxBitmap("res/lockicon.png",wxBITMAP_TYPE_ANY));
+	initialPositionsList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
 	Refresh();
 }
@@ -75,10 +82,11 @@ public:
     {
         if ( i >= editor.initialPositionsList->GetItemCount() ) editor.initialPositionsList->InsertItem(i, "");
         editor.initialPositionsList->SetItem(i, 0, instance.GetObjectName());
-        editor.initialPositionsList->SetItem(i, 1, ToString(instance.GetX()));
-        editor.initialPositionsList->SetItem(i, 2, ToString(instance.GetY()));
-        editor.initialPositionsList->SetItem(i, 3, ToString(instance.GetAngle())+"°");
-        editor.initialPositionsList->SetItem(i, 4, ToString(instance.GetZOrder()));
+        editor.initialPositionsList->SetItemColumnImage(i, 1, instance.IsLocked() ? 1 : 0 );
+        editor.initialPositionsList->SetItem(i, 2, ToString(instance.GetX()));
+        editor.initialPositionsList->SetItem(i, 3, ToString(instance.GetY()));
+        editor.initialPositionsList->SetItem(i, 4, ToString(instance.GetAngle())+"°");
+        editor.initialPositionsList->SetItem(i, 5, ToString(instance.GetZOrder()));
         editor.initialPositionsList->SetItemPtrData(i, wxPtrToUInt(&instance));
 
         if ( std::find(selectedInstance.begin(), selectedInstance.end(), &instance) != selectedInstance.end())

@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #ifndef GDCORE_LAYER_H
 #define GDCORE_LAYER_H

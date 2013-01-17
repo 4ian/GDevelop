@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "LayersEditorPanel.h"
 
@@ -74,7 +74,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	toolbar->AddTool(ID_AUITOOLBARITEM1, _("Add a layer"), wxBitmap(wxImage(_T("res/addicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Add a layer"), _("Add a new layer"), NULL);
 	toolbar->AddTool(ID_AUITOOLBARITEM4, _("Delete the selected layer"), wxBitmap(wxImage(_T("res/deleteicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Delete the selected layer"), _("Delete the selected layer"), NULL);
 	toolbar->AddSeparator();
-	toolbar->AddTool(ID_AUITOOLBARITEM5, _("Edit the properties of the layer"), wxBitmap(wxImage(_T("res/editpropicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Edit the properties of the layer"), _("Edit the properties of Edit the properties of the layerhe layer"), NULL);
+	toolbar->AddTool(ID_AUITOOLBARITEM5, _("Edit the properties of the layer"), wxBitmap(wxImage(_T("res/editpropicon.png"))), wxNullBitmap, wxITEM_NORMAL, _("Edit the properties of the layer"), _("Edit the properties of the layer"), NULL);
 	toolbar->AddTool(ID_AUITOOLBARITEM3, _("Move the layer over"), wxBitmap(wxImage(_T("res/up.png"))), wxNullBitmap, wxITEM_NORMAL, _("Move the layer over"), _("Move the layer over"), NULL);
 	toolbar->AddTool(ID_AUITOOLBARITEM2, _("Move the layer below"), wxBitmap(wxImage(_T("res/down.png"))), wxNullBitmap, wxITEM_NORMAL, _("Move the layer below"), _("Move the layer below"), NULL);
 	toolbar->AddSeparator();

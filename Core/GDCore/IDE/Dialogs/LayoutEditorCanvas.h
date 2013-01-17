@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #ifndef LAYOUTEDITORCANVAS_H
 #define LAYOUTEDITORCANVAS_H
@@ -351,7 +351,13 @@ protected:
      * Return a pointer to the smallest initial instance under the cursor.
      * Can be NULL.
      */
-    InitialInstance * GetInitialInstanceUnderCursor();
+    InitialInstance * GetInitialInstanceUnderCursor(bool pickOnlyLockedInstances = false) { return GetInitialInstanceAtPosition(GetMouseXOnLayout(), GetMouseYOnLayout(), pickOnlyLockedInstances); };
+
+    /**
+     * Return a pointer to the smallest initial instance which intersect with the specified position
+     * Can be NULL.
+     */
+    InitialInstance * GetInitialInstanceAtPosition(double xPosition, double yPosition, bool pickOnlyLockedInstances = false);
 
     /**
      * Called when a changes has been made ( Something which is lasting, e.g. when an object has been moved,

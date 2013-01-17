@@ -38,7 +38,7 @@
 									<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM5" variable="AuiToolBarItem5" member="yes">
 										<bitmap>res/editpropicon.png</bitmap>
 										<shorthelp>Edit the properties of the layer</shorthelp>
-										<longhelp>Edit the properties of Edit the properties of the layerhe layer</longhelp>
+										<longhelp>Edit the properties of the layer</longhelp>
 										<handler function="OnEditSelected1" entry="EVT_TOOL" />
 									</object>
 									<label>Edit the properties of the layer</label>

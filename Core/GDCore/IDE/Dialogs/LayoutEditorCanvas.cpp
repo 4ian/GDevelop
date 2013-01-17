@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "LayoutEditorCanvas.h"
 #include <cmath>
@@ -240,14 +240,14 @@ void LayoutEditorCanvas::CreateEditionRibbonTools()
     gd::CommonBitmapManager * bitmapManager = gd::CommonBitmapManager::GetInstance();
 
     wxRibbonButtonBar * ribbonToolbar = mainFrameWrapper.GetRibbonSceneEditorButtonBar();
-    ribbonToolbar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Objects' editor") : "", bitmapManager->objects24);
-    ribbonToolbar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Layers' editor") : "", bitmapManager->layers24);
+    ribbonToolbar->AddButton(idRibbonObjectsEditor, !hideLabels ? _("Objects") : "", bitmapManager->objects24);
+    ribbonToolbar->AddButton(idRibbonLayersEditor, !hideLabels ? _("Layers editor") : "", bitmapManager->layers24);
+    ribbonToolbar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Instances") : "", bitmapManager->objectsPositionsList24);
     ribbonToolbar->AddHybridButton(idRibbonUndo, !hideLabels ? _("Cancel") : "", bitmapManager->undo24);
     ribbonToolbar->AddButton(idRibbonRedo, !hideLabels ? _("Redo") : "", bitmapManager->redo24);
     ribbonToolbar->AddButton(idRibbonGrid, !hideLabels ? _("Grid") : "", bitmapManager->grid24);
     ribbonToolbar->AddButton(idRibbonGridSetup, !hideLabels ? _("Edit the grid") : "", bitmapManager->gridedit24);
-    ribbonToolbar->AddButton(idRibbonWindowMask, !hideLabels ? _("Window mask") : "", bitmapManager->windowMask24);
-    ribbonToolbar->AddButton(idRibbonObjectsPositionList, !hideLabels ? _("Objects list") : "", bitmapManager->objectsPositionsList24);
+    ribbonToolbar->AddButton(idRibbonWindowMask, !hideLabels ? _("Mask") : "", bitmapManager->windowMask24);
 }
 
 /** \brief Tool class picking the smallest instance under the cursor.
@@ -644,24 +644,25 @@ void LayoutEditorCanvas::ChangesMade()
 class SmallestInstanceUnderCursorPicker : public gd::InitialInstanceFunctor
 {
 public:
-    SmallestInstanceUnderCursorPicker(const LayoutEditorCanvas & editor_) :
+    SmallestInstanceUnderCursorPicker(const LayoutEditorCanvas & editor_, double xPosition_, double yPosition_) :
         editor(editor_),
         smallestInstance(NULL),
         smallestInstanceArea(0),
-        mouseX(editor.GetMouseXOnLayout()),
-        mouseY(editor.GetMouseYOnLayout())
+        xPosition(xPosition_),
+        yPosition(yPosition_),
+        pickLockedOnly(false)
     {
     };
     virtual ~SmallestInstanceUnderCursorPicker() {};
 
     virtual void operator()(gd::InitialInstance & instance)
     {
-        if ( instance.IsLocked() ) return;
+        if ( pickLockedOnly != instance.IsLocked() ) return;
 
         wxRect2DDouble boundingBox(editor.GetRealXPositionOfInitialInstance(instance), editor.GetRealYPositionOfInitialInstance(instance),
                                    editor.GetWidthOfInitialInstance(instance), editor.GetHeightOfInitialInstance(instance));
 
-        if ( boundingBox.Contains(wxPoint2DDouble(mouseX, mouseY)) )
+        if ( boundingBox.Contains(wxPoint2DDouble(xPosition, yPosition)) )
         {
             if ( smallestInstance == NULL || boundingBox.GetSize().GetWidth()*boundingBox.GetSize().GetHeight() < smallestInstanceArea )
             {
@@ -673,17 +674,21 @@ public:
 
     InitialInstance * GetSmallestInstanceUnderCursor() { return smallestInstance; };
 
+    void PickLockedInstancesAndOnlyThem() { pickLockedOnly = true; }
+
 private:
     const LayoutEditorCanvas & editor;
     InitialInstance * smallestInstance;
     double smallestInstanceArea;
-    const double mouseX;
-    const double mouseY;
+    const double xPosition;
+    const double yPosition;
+    bool pickLockedOnly;
 };
 
-InitialInstance * LayoutEditorCanvas::GetInitialInstanceUnderCursor()
+InitialInstance * LayoutEditorCanvas::GetInitialInstanceAtPosition(double xPosition, double yPosition, bool pickOnlyLockedInstances)
 {
-    SmallestInstanceUnderCursorPicker picker(*this);
+    SmallestInstanceUnderCursorPicker picker(*this, xPosition, yPosition);
+    if ( pickOnlyLockedInstances ) picker.PickLockedInstancesAndOnlyThem();
     instances.IterateOverInstances(picker);
 
     return picker.GetSmallestInstanceUnderCursor();

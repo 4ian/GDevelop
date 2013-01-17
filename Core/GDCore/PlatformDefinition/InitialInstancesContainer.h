@@ -1,11 +1,10 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef GDCORE_INITIALINSTANCESCONTAINER_H
 #define GDCORE_INITIALINSTANCESCONTAINER_H
-#include <boost/function.hpp>
 #include <string>
 namespace gd { class InitialInstance; }
 namespace gd { class InitialInstanceFunctor; }

@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef GDCORE_PLATFORM_H
@@ -58,6 +58,17 @@ public:
      * Must create an empty project
      */
     virtual boost::shared_ptr<gd::Project> CreateNewEmptyProject() const =0;
+
+    /**
+     * Called when the IDE is about to shut down: Take this opportunity for erasing
+     * for example any temporary file.
+     */
+    virtual void OnIDEClosed() {};
+
+    /**
+     * Called when the IDE is initialized and ready to be used.
+     */
+    virtual void OnIDEInitialized() {};
 
 private:
 };

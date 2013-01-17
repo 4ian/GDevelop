@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #ifndef EXTERNALLAYOUTEDITOR_H
 #define EXTERNALLAYOUTEDITOR_H
@@ -14,7 +14,7 @@
 #include <wx/combobox.h>
 //*)
 #include <wx/aui/aui.h>
-#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
+class SceneEditorCanvas;
 class RuntimeGame;
 class EditorObjets;
 class LayoutEditorPropertiesPnl;
@@ -22,6 +22,7 @@ class InitialPositionBrowserDlg;
 namespace gd { class ExternalLayout; }
 namespace gd { class LayersEditorPanel; }
 #include "GDL/Scene.h"
+#include "GDL/RuntimeGame.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
 class ExternalLayoutEditor: public wxPanel

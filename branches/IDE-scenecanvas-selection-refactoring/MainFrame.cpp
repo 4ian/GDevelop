@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <iostream>
@@ -35,6 +35,7 @@
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
@@ -335,7 +336,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     static int widths[2] = { -1, 175 };
     statusBar->SetFieldsCount(2);
     statusBar->SetStatusWidths(2, widths);
-    statusBar->SetStatusText( "2008-2012 Compil Games", 1 );
+    statusBar->SetStatusText( "2008-2013 Compil Games", 1 );
     SetStatusBar(statusBar);
 
     //Ribbon setup
@@ -371,14 +372,14 @@ MainFrame::MainFrame( wxWindow* parent ) :
             ribbonBar->AddButton(ResourcesEditor::idRibbonDeleteUnused, !hideLabels ? _("Remove useless resources") : "", wxBitmap("res/deleteunknown24.png", wxBITMAP_TYPE_ANY));
             ribbonBar->AddButton(ResourcesEditor::idRibbonUp, !hideLabels ? _("Move up") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
             ribbonBar->AddButton(ResourcesEditor::idRibbonDown, !hideLabels ? _("Move down") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Refresh the list") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Refresh") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
         }
 
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("View"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
             ribbonBar->AddButton(ResourcesEditor::idRibbonShowPreview, !hideLabels ? _("Preview") : "", wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPropertyGrid, !hideLabels ? _("Properties grid") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPropertyGrid, !hideLabels ? _("Properties") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
         }
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);

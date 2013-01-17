@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 //(*InternalHeaders(Compilation)
@@ -157,6 +157,12 @@ Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
     else
     {
         dirEdit->SetValue(wxFileName::GetHomeDir()+wxFileName::GetPathSeparator()+DeleteInvalidCharacters(gameToCompile.GetName()));
+    }
+
+    if ( gameToCompile.GetLayoutCount() == 0 )
+    {
+        CompilBt->Enable(false);
+        statusTxt->SetLabel(_("The game is empty: Add a scene using the project manager."));
     }
 }
 

@@ -41,7 +41,6 @@
 							</object>
 							<object class="Custom" name="ID_CUSTOM3" subclass="SceneEditorCanvas" variable="layoutEditorCanvas" member="yes">
 								<creating_code>$(THIS) = new $(CLASS)($(PARENT), game, scene, scene.GetInitialInstances(), scene.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);</creating_code>
-								<include_file>GDL/IDE/Dialogs/SceneEditorCanvas.h</include_file>
 								<local_include>1</local_include>
 								<style></style>
 								<pos>0,0</pos>
@@ -51,6 +50,7 @@
 							</object>
 						</object>
 						<label>Scene</label>
+						<icon>res/sceneeditor.png</icon>
 					</object>
 					<object class="AuiNotebookPage">
 						<object class="wxPanel" name="ID_PANEL6" variable="eventsPanel" member="yes">

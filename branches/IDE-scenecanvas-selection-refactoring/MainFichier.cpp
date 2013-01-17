@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <wx/progdlg.h>
@@ -14,6 +14,7 @@
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
+#include "GDL/RuntimeGame.h"
 #include "GDL/Game.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
 #include "GDL/IDE/CodeCompiler.h"
@@ -168,12 +169,16 @@ void MainFrame::Open( string file )
         if ( startPage ) startPage->Refresh();
 
         string unknownExtensions = "";
+        bool videoObjectUsed = false;
         ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
         for (unsigned int i = 0;i<newGame->GetUsedPlatformExtensions().size();++i)
         {
             if ( extensionsManager->GetExtension(newGame->GetUsedPlatformExtensions()[i]) == boost::shared_ptr<ExtensionBase> () )
             {
-                unknownExtensions += newGame->GetUsedPlatformExtensions()[i]+"\n";
+                if ( newGame->GetUsedPlatformExtensions()[i] == "VideoObject" )
+                    videoObjectUsed = true; //Display a special message for the video object extension.
+                else
+                    unknownExtensions += newGame->GetUsedPlatformExtensions()[i]+"\n";
             }
         }
 
@@ -181,8 +186,18 @@ void MainFrame::Open( string file )
         {
             wxString errorMsg = _("One or ore extensions are used by the game but are not installed :\n")
                                 + unknownExtensions
-                                + _("\nSome objects, actions, conditions or expressions can be unavailable or be unknown.");
+                                + _("\nSome objects, actions, conditions or expressions can be unavailable or not working.");
             wxLogWarning(errorMsg);
+        }
+        if (videoObjectUsed)
+        {
+            #if defined(WINDOWS)
+            wxString extensions = ".xgdwe";
+            wxLogWarning(_("The game is using the Video object. This extension has been disabled in this version of Game Develop.\nIf you want to enable it, go to the Game Develop directory, then in CppPlatform and Extensions directories, and rename VideoObject.disabled to VideoObject")+extensions);
+            #else
+            wxString extensions = ".xgdle";
+            wxLogWarning(_("The game is using the Video object. This extension has been disabled in this version of Game Develop: The videos won't be displayed");
+            #endif
         }
     }
 }

@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "EditorScene.h"
 
@@ -26,6 +26,7 @@
 #include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 #include "MainFrame.h"
 #include "EditorObjets.h"
 #include "InitialPositionBrowserDlg.h"
@@ -96,7 +97,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	eventsPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(eventsPanel);
 	FlexGridSizer3->SetSizeHints(eventsPanel);
-	notebook->AddPage(scenePanel, _("Scene"));
+	notebook->AddPage(scenePanel, _("Scene"), false, wxBitmap(wxImage(_T("res/sceneeditor.png"))));
 	notebook->AddPage(eventsPanel, _("Events"), false, wxBitmap(wxImage(_T("res/events16.png"))));
 	FlexGridSizer1->Add(notebook, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
@@ -139,7 +140,7 @@ mainFrameWrapper(mainFrameWrapper_)
     m_mgr.AddPane( notebook, wxAuiPaneInfo().Name( wxT( "ESCenter" ) ).PaneBorder(false).Center().CloseButton( false ).Caption( _( "Scene's editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(false) );
     m_mgr.AddPane( objectsEditor.get(), wxAuiPaneInfo().Name( wxT( "EO" ) ).Right().CloseButton( true ).Caption( _( "Objects' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(208, 100) );
     m_mgr.AddPane( layersEditor.get(), wxAuiPaneInfo().Name( wxT( "EL" ) ).Float().CloseButton( true ).Caption( _( "Layers' editor" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(200, 100).Show(false) );
-    m_mgr.AddPane( propertiesPnl.get(), wxAuiPaneInfo().Name( wxT( "PROPERTIES" ) ).Float().CloseButton( true ).Caption( _( "Properties" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(true) );
+    m_mgr.AddPane( propertiesPnl.get(), wxAuiPaneInfo().Name( wxT( "PROPERTIES" ) ).Float().CloseButton( true ).Caption( _( "Properties" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(false) );
     m_mgr.AddPane( initialInstancesBrowser.get(), wxAuiPaneInfo().Name( wxT( "InstancesBrowser" ) ).Float().CloseButton( true ).Caption( _( "Instances list" ) ).MaximizeButton( true ).MinimizeButton( false ).CaptionVisible(true).MinSize(50, 50).BestSize(230,200).Show(false) );
 
     //Load preferences

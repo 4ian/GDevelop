@@ -419,8 +419,6 @@
 		<ResourceCompiler>
 			<Add directory="../GDL" />
 		</ResourceCompiler>
-		<Unit filename="AdvancedPasteDlg.cpp" />
-		<Unit filename="AdvancedPasteDlg.h" />
 		<Unit filename="AutomatismTypeChoice.cpp" />
 		<Unit filename="AutomatismTypeChoice.h" />
 		<Unit filename="BugReport.cpp">
@@ -809,7 +807,6 @@
 					<wxPanel wxs="wxsmith/BuildToolsPnl.wxs" src="BuildToolsPnl.cpp" hdr="BuildToolsPnl.h" fwddecl="0" i18n="1" name="BuildToolsPnl" language="CPP" />
 					<wxDialog wxs="wxsmith/ExtensionBugReportDlg.wxs" src="ExtensionBugReportDlg.cpp" hdr="ExtensionBugReportDlg.h" fwddecl="0" i18n="1" name="ExtensionBugReportDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/EventsEditor.wxs" src="EventsEditor.cpp" hdr="EventsEditor.h" fwddecl="0" i18n="1" name="EventsEditor" language="CPP" />
-					<wxDialog wxs="wxsmith/AdvancedPasteDlg.wxs" src="AdvancedPasteDlg.cpp" hdr="AdvancedPasteDlg.h" fwddecl="0" i18n="1" name="AdvancedPasteDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/ExternalLayoutEditor.wxs" src="Dialogs\ExternalLayoutEditor.cpp" hdr="Dialogs\ExternalLayoutEditor.h" fwddecl="0" i18n="1" name="ExternalLayoutEditor" language="CPP" />
 					<wxPanel wxs="wxsmith/HtmlViewerPnl.wxs" src="Dialogs\HtmlViewerPnl.cpp" hdr="Dialogs\HtmlViewerPnl.h" fwddecl="0" i18n="1" name="HtmlViewerPnl" language="CPP" />
 					<wxPanel wxs="wxsmith/ProjectPropertiesPnl.wxs" src="Dialogs\ProjectPropertiesPnl.cpp" hdr="Dialogs\ProjectPropertiesPnl.h" fwddecl="0" i18n="1" name="ProjectPropertiesPnl" language="CPP" />

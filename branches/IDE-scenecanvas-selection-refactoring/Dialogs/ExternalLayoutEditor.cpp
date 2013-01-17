@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "ExternalLayoutEditor.h"
 
@@ -12,6 +12,7 @@
 //*)
 #include <wx/config.h>
 #include "GDL/ExternalLayout.h"
+#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 #include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
 #include "../InitialPositionBrowserDlg.h"
 #include "LayoutEditorPropertiesPnl.h"

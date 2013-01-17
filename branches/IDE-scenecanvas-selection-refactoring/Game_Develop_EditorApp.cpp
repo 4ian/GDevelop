@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 //This file was created 2008-03-01
@@ -44,6 +44,7 @@
 #include "CompilationChecker.h"
 #include "GDCore/IDE/Clipboard.h"
 #include "LogFileManager.h"
+#include "PlatformManager.h"
 #include "ExtensionBugReportDlg.h"
 #include "Dialogs/HelpViewerDlg.h"
 
@@ -367,6 +368,10 @@ bool Game_Develop_EditorApp::OnInit()
     //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();
     mainEditor->Show();
+    cout << "* Initializing platforms..." << endl;
+
+    PlatformManager::GetInstance()->NotifyPlatformIDEInitialized();
+
     cout << "* Initialization ended." << endl;
 
     //Checking for updates
@@ -395,21 +400,30 @@ bool Game_Develop_EditorApp::OnInit()
 
 int Game_Develop_EditorApp::OnExit()
 {
+    cout << "\nGame Develop shutdown started:" << endl;
+    cout << "* Closing the configuration and destroying singletons";
     delete wxConfigBase::Set(( wxConfigBase* )NULL );
-
-    SoundManager::GetInstance()->DestroySingleton();
+    cout << ".";
     gd::Clipboard::GetInstance()->DestroySingleton();
-    FontManager::GetInstance()->DestroySingleton();
+    cout << ".";
     gd::HelpFileAccess::GetInstance()->DestroySingleton();
+    cout << ".";
     HelpProvider::GetInstance()->DestroySingleton();
+    cout << "." << endl;
 
+    cout << "* Closing the platforms..." << endl;
+    PlatformManager::GetInstance()->DestroySingleton();
+
+    cout << "* Deleting single instance checker..." << endl;
     #if defined(LINUX) || defined(MAC)
     if ( singleInstanceChecker ) delete singleInstanceChecker;
     singleInstanceChecker = NULL;
     #endif
 
+    cout << "* Deleting the crash detection file..." << endl;
     wxRemoveFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log");
 
+    cout << "* Shutdown process finished." << endl;
     return 0;
 }
 

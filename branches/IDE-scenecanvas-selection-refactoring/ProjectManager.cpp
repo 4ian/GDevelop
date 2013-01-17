@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "ProjectManager.h"
@@ -620,6 +620,28 @@ void ProjectManager::OnEditSourceFileSelected(wxCommandEvent& event)
 
 void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t line)
 {
+    //Having a game associated with the editor is optional
+    Game * associatedGame = NULL;
+    if ( game )
+    {
+        vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
+            find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), filename));
+
+        if ( sourceFile != game->externalSourceFiles.end() )
+        {
+            associatedGame = game;
+            /*if ((*sourceFile)->IsGDManaged()) //We're trying to open a GD-managed source file: Let's open the editor of the associated event.
+            {
+                boost::shared_ptr<BaseEvent> event = (*sourceFile)->GetAssociatedEvent().lock();
+                if ( event != boost::shared_ptr<BaseEvent>() )
+                {
+                    event->EditEvent()
+                }
+            }*/
+        }
+    }
+
+    //As we're opening a "real" file, first check if it exists
     if ( !wxFileExists(filename) )
     {
         wxLogWarning(_("Unable to open ")+filename+_(", the file does not exists"));
@@ -639,15 +661,6 @@ void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t li
     }
     //Launch an internal code editor else
 
-    //Having a game associated with the editor is optional
-    Game * associatedGame = NULL;
-    if ( game )
-    {
-        vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
-            find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), filename));
-
-        if ( sourceFile != game->externalSourceFiles.end() ) associatedGame = game;
-    }
 
     //Verify if the editor is not already opened
     for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
@@ -1112,7 +1125,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements\ndoit être menée à terme avant de continuer...") : NULL;
+    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo(_("Please wait while the internal compilation of events is finishing...")) : NULL;
     while (CodeCompiler::GetInstance()->CompilationInProcess())
     {
         wxYield();

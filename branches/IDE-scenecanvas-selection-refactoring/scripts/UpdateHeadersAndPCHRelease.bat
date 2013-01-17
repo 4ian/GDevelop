@@ -35,6 +35,10 @@ echo.
 echo -End of copy
 if NOT errorlevel 0 echo Some errors occurred.
 echo.
+:PCH
+if "%1"=="noPCH" GOTO END
+echo -Precompiling headers
+..\bin\Release\CppPlatform\MinGW32\bin\g++.exe -DGD_API=__declspec(dllimport) -DGD_CORE_API=__declspec(dllimport) -D GD_EXTENSION_API=__declspec(dllimport) -DGD_IDE_ONLY -DDEV -DNDEBUG -DBOOST_DISABLE_ASSERTS -I..\Bin\Release\CppPlatform\include/TDM-GCC-4.5.2/include  -I..\Bin\Release\CppPlatform\include/TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include -I..\Bin\Release\CppPlatform\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++ -I..\Bin\Release\CppPlatform\include\TDM-GCC-4.5.2/lib/gcc/mingw32/4.5.2/include/c++/mingw32 -I..\Bin\Release\CppPlatform\include/llvm/tools/clang/lib/Headers -I..\Bin\Release\CppPlatform\include/llvm/include -I..\Bin\Release\CppPlatform\include/llvm/build-tdmgcc45-release/include -I..\Bin\Release\CppPlatform\include/GDL -I..\Bin\Release\CppPlatform\include/Core -I..\Bin\Release\CppPlatform\include/boost -I..\Bin\Release\CppPlatform\include\SFML/include -x c++-header ..\Bin\Release\CppPlatform\include/GDL/GDL/EventsPrecompiledHeader.h -o ..\Bin\Release\CppPlatform\include/GDL/GDL/EventsPrecompiledHeader.h.pch
 echo 
 
 :END

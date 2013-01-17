@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "EventsEditor.h"
 
@@ -33,7 +33,6 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
-#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 #include "LogFileManager.h"
 #include "GDL/IDE/Dialogs/ProfileDlg.h"
 #include "SearchEvents.h"
@@ -402,7 +401,7 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("View"), wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonFoldAll, !hideLabels ? _("Fold all") : "", wxBitmap("res/foldAll24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold all") : "", wxBitmap("res/unFoldAll24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold") : "", wxBitmap("res/unFoldAll24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);

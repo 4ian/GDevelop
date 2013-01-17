@@ -41,9 +41,11 @@ class SearchEvents: public wxDialog
 		wxCheckBox* replaceActionsCheck;
 		wxCheckBox* caseCheck;
 		wxStaticText* StaticText2;
+		wxStaticBitmap* StaticBitmap1;
 		wxPanel* Panel1;
 		wxStaticText* StaticText1;
 		wxStaticText* StaticText3;
+		wxHyperlinkCtrl* HyperlinkCtrl1;
 		wxCheckBox* replaceConditionsCheck;
 		wxTextCtrl* searchEdit;
 		wxTextCtrl* replaceEdit;
@@ -56,7 +58,6 @@ class SearchEvents: public wxDialog
 		wxPanel* Panel2;
 		wxButton* nextBt;
 		wxButton* searchBt;
-		wxButton* help2Bt;
 		//*)
 
 	protected:
@@ -82,8 +83,9 @@ class SearchEvents: public wxDialog
 		static const long ID_CHECKBOX7;
 		static const long ID_CHECKBOX9;
 		static const long ID_CHECKBOX10;
+		static const long ID_STATICBITMAP1;
+		static const long ID_HYPERLINKCTRL2;
 		static const long ID_BUTTON4;
-		static const long ID_BUTTON6;
 		static const long ID_PANEL2;
 		static const long ID_NOTEBOOK1;
 		//*)

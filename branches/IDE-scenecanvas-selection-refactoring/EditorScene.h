@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #ifndef EDITORSCENE_H
 #define EDITORSCENE_H
@@ -9,7 +9,6 @@
 #include <vector>
 //(*Headers(EditorScene)
 #include <wx/sizer.h>
-#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 #include <wx/aui/aui.h>
 #include <wx/panel.h>
 #include <wx/scrolbar.h>
@@ -20,10 +19,12 @@
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/ribbon/toolbar.h>
+#include <boost/shared_ptr.hpp>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 namespace gd {class Layout;}
 namespace gd {class Project;}
 namespace gd {class LayersEditorPanel;}
+class SceneEditorCanvas;
 class EditorObjets;
 class EventsEditor;
 class LayoutEditorPropertiesPnl;

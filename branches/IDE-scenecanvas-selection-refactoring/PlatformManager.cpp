@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "PlatformManager.h"
 #include "GDL/PlatformDefinition/Platform.h"
@@ -37,4 +37,13 @@ boost::shared_ptr<gd::Platform> PlatformManager::GetPlatform(const std::string &
     }
 
     return boost::shared_ptr<gd::Platform>();
+}
+
+void PlatformManager::NotifyPlatformIDEInitialized() const
+{
+    for (unsigned int i = 0;i<platformsLoaded.size();++i)
+    {
+        if ( platformsLoaded[i] != boost::shared_ptr<gd::Platform>() )
+            platformsLoaded[i]->OnIDEInitialized();
+    }
 }

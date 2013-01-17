@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #if defined(GD_IDE_ONLY)
 
@@ -116,13 +116,18 @@ void CodeCompiler::StartTheNextTask()
     //Define compilation arguments for Clang.
     std::vector<std::string> args;
     args.push_back("-o "+currentTask.outputFile);
-    args.push_back("-w");
+    args.push_back("-nostdinc");
+    args.push_back("-nostdinc++");
+    #if defined(WINDOWS)
     args.push_back("-B"+baseDir+"CppPlatform/MinGW32/bin");
+    #else
+    args.push_back("--sysroot="+baseDir+"CppPlatform/include/linux");
+    #endif
     if ( currentTask.optimize ) args.push_back("-O1");
 
     if ( !currentTask.link ) //Generate argument for compiling a file
     {
-        args.push_back("-include D:/Florian/Programmation/GameDevelop2/IDE/scripts/events.h");
+        if ( !currentTask.compilationForRuntime ) args.push_back("-include "+baseDir+"CppPlatform/include/GDL/GDL/EventsPrecompiledHeader.h");
         args.push_back("-c "+currentTask.inputFile);
 
         //Headers directories
@@ -188,7 +193,8 @@ void CodeCompiler::StartTheNextTask()
         }
         else
         {
-            args.push_back("-L"+baseDir+"Runtime/");
+            args.push_back("-L"+baseDir);
+            args.push_back("-L"+baseDir+"CppPlatform/Runtime/");
             args.push_back("-L"+baseDir+"CppPlatform/Extensions/Runtime/");
         }
 
@@ -215,17 +221,31 @@ void CodeCompiler::StartTheNextTask()
     std::string argsStr;
     for (unsigned int i = 0;i<args.size();++i) argsStr += args[i]+" ";
 
+    //Finding g++
+    #if defined(WINDOWS)
+    std::string gccFullPath = baseDir+"CppPlatform/MinGW32/bin/g++.exe";
+    #else
+    std::string gccFullPath = "g++";
+    #endif
+
     //Launching the process
     std::cout << "Launching compiler process...\n";
     currentTaskProcess = new CodeCompilerProcess(this);
-    wxExecute(baseDir+"CppPlatform/MinGW32/bin/g++.exe "+argsStr, wxEXEC_ASYNC, currentTaskProcess);
+    currentTaskProcess->Redirect();
+    wxExecute(gccFullPath+" "+argsStr, wxEXEC_ASYNC, currentTaskProcess);
+
+    //Also launch the thread which will read the output of the process
+    currentTaskOutputThread = new sf::Thread(&CodeCompilerProcess::WatchOutput, currentTaskProcess);
+    currentTaskOutputThread->launch();
 
     //When the process ends, it will call ProcessEndedWork()...
 }
 
 CodeCompilerProcess::CodeCompilerProcess(wxEvtHandler * parent_) :
     wxProcess(0),
-    parent(parent_)
+    parent(parent_),
+    exitCode(0),
+    stopWatchOutput(false)
 {
     std::cout << "CodeCompilerProcess created." << std::endl;
 }
@@ -233,9 +253,9 @@ CodeCompilerProcess::CodeCompilerProcess(wxEvtHandler * parent_) :
 void CodeCompilerProcess::OnTerminate( int pid, int status )
 {
     std::cout << "CodeCompilerProcess terminated with status " << status << "." << std::endl;
-    while ( HasInput() ) ;
 
     exitCode = status;
+    stopWatchOutput = true;
     wxCommandEvent processEndedEvent( CodeCompiler::processEndedEventType );
     if ( parent != NULL) wxPostEvent(parent, processEndedEvent);
 }
@@ -245,7 +265,12 @@ void CodeCompiler::ProcessEndedWork(wxCommandEvent & event)
     //...This function is called when a CodeCompilerProcess ends its job.
     std::cout << "CodeCompiler notified that the current process ended work." << std::endl;
 
-    // Create and execute the frontend to generate an LLVM bitcode module.
+    //Also terminate the thread which was reading the output
+    currentTaskOutputThread->wait();
+    delete currentTaskOutputThread;
+    currentTaskOutputThread = NULL;
+
+    // Check if compilation was successful
     bool compilationSucceeded = (currentTaskProcess->exitCode == 0);
     if (!compilationSucceeded)
     {
@@ -257,7 +282,7 @@ void CodeCompiler::ProcessEndedWork(wxCommandEvent & event)
         std::cout << "Compilation succeeded." << std::endl;
     }
 
-    //Compilation ended, loading diagnostics
+    //Compilation ended, saving diagnostics
     {
         lastTaskMessages.clear();
         for (unsigned int i = 0;i<currentTaskProcess->output.size();++i)
@@ -265,6 +290,15 @@ void CodeCompiler::ProcessEndedWork(wxCommandEvent & event)
 
         for (unsigned int i = 0;i<currentTaskProcess->outputErrors.size();++i)
             lastTaskMessages += currentTaskProcess->outputErrors[i]+"\n";
+
+        ofstream outputFile;
+        outputFile.open (std::string(outputDir+"LatestCompilationOutput.txt").c_str());
+        if (outputFile.is_open())
+        {
+            outputFile << lastTaskMessages;
+            outputFile.close();
+        }
+        else cout << "Unable to open LatestCompilationOutput for writing compiler output!";
     }
 
     //Now do post work and notify task has been done.
@@ -432,8 +466,6 @@ void CodeCompiler::DisableTaskRelatedTo(Scene & scene)
 
 bool CodeCompiler::CompilationInProcess() const
 {
-    sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
-
     return processLaunched;
 }
 
@@ -445,6 +477,19 @@ void CodeCompiler::SetOutputDirectory(std::string outputDir_)
 
     if (!wxDirExists(outputDir.c_str()))
         wxMkdir(outputDir);
+}
+
+void CodeCompiler::ClearOutputDirectory()
+{
+    wxString file = wxFindFirstFile( outputDir + "*" );
+    while ( !file.empty() )
+    {
+        wxFileName filename(file);
+        if ( !wxRemoveFile( file ) )
+            std::cout << _( "Unable to delete file" ) + file + _(" in compiler output directory.\n" );
+
+        file = wxFindNextFile();
+    }
 }
 
 void CodeCompiler::AddHeaderDirectory(const std::string & dir)
@@ -466,6 +511,7 @@ void CodeCompiler::SetBaseDirectory(std::string baseDir_)
     std::vector<std::string> standardsIncludeDirs;
     #if defined(WINDOWS)
     standardsIncludeDirs.push_back("CppPlatform/MinGW32/include");
+    standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include");
     standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++");
     standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
     #elif defined(LINUX)
@@ -504,22 +550,28 @@ CodeCompiler::CodeCompiler() :
     processLaunched(false),
     currentTask(ConstructEmptyTask()),
     currentTaskProcess(NULL),
+    currentTaskOutputThread(NULL),
     //maxGarbageThread(2),
     lastTaskFailed(false)
 {
     Connect(wxID_ANY, processEndedEventType, (wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction) &CodeCompiler::ProcessEndedWork);
 }
 
-/**
- * Used to get output emitted by compilers.
- */
-bool CodeCompilerProcess::HasInput()
+
+void CodeCompilerProcess::WatchOutput()
+{
+    while(!stopWatchOutput)
+        ReadOutput();
+
+    while(IsInputAvailable() || IsErrorAvailable())
+        ReadOutput(); //Also do not forget to read the last output emitted by the process!
+}
+
+void CodeCompilerProcess::ReadOutput()
 {
     wxChar c;
 
-    bool hasInput = false;
-    // The original used wxTextInputStream to read a line at a time.  Fine, except when there was no \n, whereupon the thing would hang
-    while ( IsInputAvailable() )
+    if(IsInputAvailable())
     {
         std::string line;
         do
@@ -533,11 +585,8 @@ bool CodeCompilerProcess::HasInput()
         while ( IsInputAvailable() ); // Unless \n, loop to get another char
 
         output.push_back(line); // Either there's a full line in 'line', or we've run out of input. Either way, print it
-
-        hasInput = true;
     }
-
-    while ( IsErrorAvailable() )
+    if(IsErrorAvailable())
     {
         std::string line;
         do
@@ -551,11 +600,7 @@ bool CodeCompilerProcess::HasInput()
         while ( IsErrorAvailable() );                           // Unless \n, loop to get another char
 
         outputErrors.push_back(line); // Either there's a full line in 'line', or we've run out of input. Either way, print it
-
-        hasInput = true;
     }
-
-    return hasInput;
 }
 
 CodeCompilerExtraWork::CodeCompilerExtraWork() :

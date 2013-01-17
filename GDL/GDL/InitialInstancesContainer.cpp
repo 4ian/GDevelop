@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #include <iostream>
 #include <map>
@@ -14,20 +14,6 @@ InitialPosition InitialInstancesContainer::badPosition;
 unsigned int InitialInstancesContainer::GetInstancesCount() const
 {
     return initialInstances.size();
-}
-
-void InitialInstancesContainer::IterateOverInstances(gd::InitialInstanceFunctor & func)
-{
-    for (std::list<InitialPosition>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
-        func(*it);
-}
-
-gd::InitialInstance & InitialInstancesContainer::InsertNewInitialInstance()
-{
-    InitialPosition newInstance;
-    initialInstances.push_back(newInstance);
-
-    return initialInstances.back();
 }
 
 void InitialInstancesContainer::LoadFromXml(const TiXmlElement * rootElem)
@@ -48,6 +34,9 @@ void InitialInstancesContainer::LoadFromXml(const TiXmlElement * rootElem)
         if ( elem->Attribute( "height" ) != NULL ) newPosition.SetCustomHeight(ToFloat(elem->Attribute("height")));
         if ( elem->Attribute( "plan" ) != NULL ) newPosition.SetZOrder(ToInt(elem->Attribute("plan")));
         if ( elem->Attribute( "layer" ) != NULL ) newPosition.SetLayer(elem->Attribute("layer"));
+        #if defined(GD_IDE_ONLY)
+        newPosition.SetLocked( elem->Attribute( "locked" ) != NULL && std::string(elem->Attribute( "locked" )) == "true" );
+        #endif
 
         const TiXmlElement * floatInfos = elem->FirstChildElement( "floatInfos" );
         if ( floatInfos ) floatInfos = floatInfos->FirstChildElement("Info");
@@ -82,6 +71,20 @@ void InitialInstancesContainer::LoadFromXml(const TiXmlElement * rootElem)
 }
 
 #if defined(GD_IDE_ONLY)
+
+void InitialInstancesContainer::IterateOverInstances(gd::InitialInstanceFunctor & func)
+{
+    for (std::list<InitialPosition>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
+        func(*it);
+}
+
+gd::InitialInstance & InitialInstancesContainer::InsertNewInitialInstance()
+{
+    InitialPosition newInstance;
+    initialInstances.push_back(newInstance);
+
+    return initialInstances.back();
+}
 
 void InitialInstancesContainer::RemoveInstance(const gd::InitialInstance & instance)
 {
@@ -185,6 +188,9 @@ void InitialInstancesContainer::SaveToXml(TiXmlElement * element) const
         objet->SetAttribute( "personalizedSize", (*it).HasCustomSize() ? "true" : "false" );
         objet->SetDoubleAttribute( "width", (*it).GetCustomWidth() );
         objet->SetDoubleAttribute( "height", (*it).GetCustomHeight() );
+        #if defined(GD_IDE_ONLY)
+        objet->SetAttribute( "locked", (*it).IsLocked() ? "true" : "false" );
+        #endif
 
         TiXmlElement * floatInfos = new TiXmlElement( "floatInfos" );
         objet->LinkEndChild( floatInfos );

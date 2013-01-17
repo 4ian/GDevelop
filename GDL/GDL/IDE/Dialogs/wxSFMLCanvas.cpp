@@ -1,3 +1,5 @@
+#if defined(GD_IDE_ONLY)
+
 #include "wxSFMLCanvas.hpp"
 #include <iostream>
 #include <wx/dcclient.h>
@@ -127,3 +129,4 @@ void wxSFMLCanvas::OnMiddleUp(wxMouseEvent &event) {}
 void wxSFMLCanvas::OnAnyMouseEvent(wxMouseEvent & event) {}
 void wxSFMLCanvas::OnMouseWheel(wxMouseEvent& event) {}
 
+#endif

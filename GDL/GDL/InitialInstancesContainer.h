@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #ifndef INITIALINSTANCESCONTAINER_H
 #define INITIALINSTANCESCONTAINER_H
@@ -29,10 +29,10 @@ public:
     #endif
 
     virtual unsigned int GetInstancesCount() const;
-    virtual gd::InitialInstance & InsertNewInitialInstance();
 
     #if defined(GD_IDE_ONLY)
     virtual void IterateOverInstances(gd::InitialInstanceFunctor & func);
+    virtual gd::InitialInstance & InsertNewInitialInstance();
     virtual gd::InitialInstance & InsertInitialInstance(const gd::InitialInstance & instance);
     virtual void RemoveInstance(const gd::InitialInstance & instance);
     virtual void RemoveAllInstancesOnLayer(const std::string & layerName);

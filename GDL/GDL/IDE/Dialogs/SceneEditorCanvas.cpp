@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #if defined(GD_IDE_ONLY)
 #include <iostream>
@@ -45,6 +45,7 @@ const long SceneEditorCanvas::ID_PASTEMENU = wxNewId();
 const long SceneEditorCanvas::ID_PASTESPECIALMENU = wxNewId();
 const long SceneEditorCanvas::ID_CREATEOBJECTMENU = wxNewId();
 const long SceneEditorCanvas::ID_LOCKMENU = wxNewId();
+const long SceneEditorCanvas::ID_UNLOCKMENU = wxNewId();
 const long SceneEditorCanvas::idRibbonOrigine = wxNewId();
 const long SceneEditorCanvas::idRibbonOriginalZoom = wxNewId();
 const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM = wxNewId();
@@ -167,6 +168,10 @@ SceneEditorCanvas::SceneEditorCanvas(wxWindow* parent, gd::Project & project_, g
         noObjectContextMenu.Append(pasteItem);
         wxMenuItem * pasteSpecialItem = new wxMenuItem((&noObjectContextMenu), ID_PASTESPECIALMENU, _("Special paste"), wxEmptyString, wxITEM_NORMAL);
         noObjectContextMenu.Append(pasteSpecialItem);
+        noObjectContextMenu.AppendSeparator();
+        wxMenuItem * unlockItem = new wxMenuItem((&noObjectContextMenu), ID_UNLOCKMENU, _("Unlock the object under the cursor"), wxEmptyString, wxITEM_NORMAL);
+        unlockItem->SetBitmap(wxImage( "res/lockicon.png" ) );
+        noObjectContextMenu.Append(unlockItem);
     }
 
     RecreateRibbonToolbar();
@@ -640,7 +645,13 @@ void SceneEditorCanvas::OnRightUp( wxMouseEvent &event )
             PopupMenu(&contextMenu);
         }
         else
+        {
+            //Check if there is locked instance under the cursor.
+            gd::InitialInstance * instance = GetInitialInstanceUnderCursor(/*pickOnlyLockedInstances=*/true);
+            noObjectContextMenu.Enable(ID_UNLOCKMENU, instance != NULL);
+
             PopupMenu(&noObjectContextMenu);
+        }
 
     }
 }
@@ -839,11 +850,30 @@ void SceneEditorCanvas::RenderEdittime()
                                                                   editionView.getCenter().y+previewScene.game->GetMainWindowDefaultHeight()/2,
                                                                   editionView);
 
-        sf::RectangleShape mask(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, rectangleEnd.y-rectangleOrigin.y));
-        mask.setPosition(rectangleOrigin.x, rectangleOrigin.y);
-        mask.setFillColor(sf::Color( 0, 0, 0, 0 ));
-        mask.setOutlineColor(sf::Color( 255, 255, 255, 128 ));
-        draw(mask);
+        {
+            sf::RectangleShape mask(sf::Vector2f(getSize().x, rectangleOrigin.y));
+            mask.setPosition(0, 0);
+            mask.setFillColor(sf::Color( 0, 0, 0, 128 ));
+            draw(mask);
+        }
+        {
+            sf::RectangleShape mask(sf::Vector2f(rectangleOrigin.x, getSize().y-rectangleOrigin.y));
+            mask.setPosition(0, rectangleOrigin.y);
+            mask.setFillColor(sf::Color( 0, 0, 0, 128 ));
+            draw(mask);
+        }
+        {
+            sf::RectangleShape mask(sf::Vector2f(getSize().x-rectangleEnd.x, getSize().y-rectangleOrigin.y));
+            mask.setPosition(rectangleEnd.x, rectangleOrigin.y);
+            mask.setFillColor(sf::Color( 0, 0, 0, 128 ));
+            draw(mask);
+        }
+        {
+            sf::RectangleShape mask(sf::Vector2f(rectangleEnd.x-rectangleOrigin.x, getSize().y-rectangleEnd.y));
+            mask.setPosition(rectangleOrigin.x, rectangleEnd.y);
+            mask.setFillColor(sf::Color( 0, 0, 0, 128 ));
+            draw(mask);
+        }
     }
 
     setView(editionView);

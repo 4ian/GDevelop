@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef DYNAMICLIBRARIESTOOLS_H
@@ -28,22 +28,22 @@ namespace GDpriv
  * On system with POSIX support, loading is made with RTLD_LAZY and RTLD_LOCAL flags.
  * If symbols of libraries need to be available globally, call SetLibraryGlobal after.
  */
-Handle OpenLibrary(const char* path);
+Handle GD_API OpenLibrary(const char* path);
 
 /**
  * Get a raw symbol from a raw C++ dynamic library
  */
-void* GetSymbol(Handle library, const char* name);
+void* GD_API GetSymbol(Handle library, const char* name);
 
 /**
  * Close a raw C++ dynamic library
  */
-void CloseLibrary(Handle library);
+void GD_API CloseLibrary(Handle library);
 
 /**
  * Get the last error occurred when loading a dynamic library
  */
-std::string DynamicLibraryLastError();
+std::string GD_API DynamicLibraryLastError();
 
 #if defined(LINUX) || defined (MAC)
 /**
@@ -51,7 +51,7 @@ std::string DynamicLibraryLastError();
  * Useless for Windows : dynamic libraries opened have their symbols available
  * globally, and when getting a symbol, the lookup is properly made.
  */
-Handle SetLibraryGlobal(const char* path);
+Handle GD_API SetLibraryGlobal(const char* path);
 #endif
 
 };

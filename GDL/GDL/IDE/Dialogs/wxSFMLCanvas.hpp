@@ -1,3 +1,5 @@
+#if defined(GD_IDE_ONLY)
+
 #ifndef WXSFMLCANVAS_HPP
 #define WXSFMLCANVAS_HPP
 
@@ -82,3 +84,4 @@ private :
 
 
 #endif // WXSFMLCANVAS_HPP
+#endif

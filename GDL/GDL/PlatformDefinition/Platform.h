@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #if defined(GD_IDE_ONLY)
@@ -11,10 +11,10 @@
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 
 /**
- * \brief Game Develop C++/OpenGL Platform
+ * \brief Game Develop C++ Platform
  *
  * Platform designed to be used to create 2D games based on SFML and OpenGL libraries for rendering,
- * events being compiled to C++ and then to native code using LLVM/Clang.
+ * events being translated to C++ and then compiled using GCC.
  */
 class GD_API Platform : public gd::Platform
 {
@@ -22,7 +22,7 @@ public:
     Platform() : gd::Platform() {};
     virtual ~Platform();
 
-    std::string GetPlatformName() { return "Game Develop C++/OpenGL platform"; }
+    std::string GetPlatformName() { return "Game Develop C++ platform"; }
 
     virtual std::vector < boost::shared_ptr<gd::PlatformExtension> > GetAllPlatformExtensions() const;
 
@@ -31,8 +31,9 @@ public:
     virtual gd::InstructionsMetadataHolder & GetInstructionsMetadataHolder() const;
 
     virtual boost::shared_ptr<gd::Project> CreateNewEmptyProject() const;
+
+    virtual void OnIDEClosed();
 };
 
 #endif // PLATFORM_H
-
 #endif

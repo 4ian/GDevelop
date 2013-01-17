@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #if defined(GD_IDE_ONLY)
@@ -14,6 +14,7 @@
 #include <boost/shared_ptr.hpp>
 #include <wx/event.h>
 #include <wx/process.h>
+#include <wx/thread.h>
 class CodeCompilerExtraWork;
 class Scene;
 class CodeCompilerThreadStateNotifier;
@@ -80,21 +81,34 @@ public:
 
 /**
  * \brief Internal class used to launch building tasks.
+ *
+ * The output of the compiler is read thanks to an OutputReadingThread object.
+ * \see OutputReadingThread
  */
 class CodeCompilerProcess : public wxProcess
 {
 public:
     CodeCompilerProcess(wxEvtHandler * parent);
     virtual ~CodeCompilerProcess() {};
-    virtual bool HasInput();
 
-    std::vector<std::string> output;
-    std::vector<std::string> outputErrors;
+    std::vector<std::string> output; ///< The output of the compiler. Must be filled thanks to a OutputReadingThread.
+    std::vector<std::string> outputErrors; ///< The error output of the compiler. Must be filled thanks to a OutputReadingThread.
     wxEvtHandler * parent;
-    int exitCode;
+    int exitCode; ///< Available when the process has terminated.
+
+    /** Must be launched by an external thread to watch the input. Keeps running until stopWatchOutput is set to false.
+     */
+    void WatchOutput();
 
 protected:
     virtual void OnTerminate( int pid, int status );
+private:
+
+    /** Read the output of the process. Called repeatedly by WatchOutput until stopWatchOutput is set to false.
+     */
+    void ReadOutput();
+
+    bool stopWatchOutput;
 };
 
 /**
@@ -208,6 +222,11 @@ public:
     const std::string & GetOutputDirectory() const { return outputDir; };
 
     /**
+     * Erase all files in the output directory ( Even if MustDeleteTemporaries() == false ).
+     */
+    void ClearOutputDirectory();
+
+    /**
      * Set if CodeCompiler is allowed to launch more than one thread.
      *
      * For example, if a task is requested twice in a short time, CodeCompiler can launch a 2nd
@@ -257,6 +276,7 @@ private:
     bool processLaunched; ///< Set to true when the thread is working, and to false when the pending task list has been exhausted.
     CodeCompilerTask currentTask; ///< When a task is being done, it is removed from pendingTasks and stored here.
     CodeCompilerProcess * currentTaskProcess; ///< The process doing the current task
+    sf::Thread * currentTaskOutputThread; ///< The wxWidgets thread used to read the output of the compiler.
 
     //Pending task management
     std::vector < CodeCompilerTask > pendingTasks; ///< Compilation task waiting to be launched.

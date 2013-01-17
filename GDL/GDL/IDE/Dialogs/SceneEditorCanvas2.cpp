@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 //The first part of the implementation is available in SceneEditorCanvas.cpp
 #if defined(GD_IDE_ONLY)
@@ -252,6 +252,7 @@ void SceneEditorCanvas::DoConnectEvents()
     Connect(ID_PASTESPECIALMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnPasteSpecialSelected);
     Connect(ID_CREATEOBJECTMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCreateObjectSelected);
     Connect(ID_LOCKMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnLockSelected);
+    Connect(ID_UNLOCKMENU,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnUnLockSelected);
 }
 
 void SceneEditorCanvas::UpdateContextMenu()
@@ -390,6 +391,19 @@ void SceneEditorCanvas::OnLockSelected(wxCommandEvent & event)
         (*it)->InitialInstancesUpdated();
 }
 
+void SceneEditorCanvas::OnUnLockSelected(wxCommandEvent & event)
+{
+    gd::InitialInstance * instance = GetInitialInstanceAtPosition(oldMouseX, oldMouseY, /*pickOnlyLockedInstances=*/true);
+    if ( instance )
+    {
+        instance->SetLocked(false);
+
+        ClearSelection();
+        SelectInstance(instance);
+        for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
+            (*it)->InitialInstancesUpdated();
+    }
+}
 
 void SceneEditorCanvas::OnCopySelected(wxCommandEvent & event)
 {

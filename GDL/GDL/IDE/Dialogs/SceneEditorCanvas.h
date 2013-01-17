@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #if defined(GD_IDE_ONLY)
 #ifndef SCENEEDITORCANVAS_H
@@ -117,6 +117,7 @@ private:
     virtual void OnDeleteObjectSelected( wxCommandEvent & event );
     virtual void OnCreateObjectSelected( wxCommandEvent & event );
     virtual void OnLockSelected( wxCommandEvent & event );
+    virtual void OnUnLockSelected( wxCommandEvent & event );
 
     virtual void OnInitialInstanceMoved(gd::InitialInstance & instance);
     virtual void OnInitialInstanceAdded(gd::InitialInstance & instance);
@@ -206,6 +207,7 @@ private:
     static const long ID_PASTEMENU;
     static const long ID_PASTESPECIALMENU;
     static const long ID_CREATEOBJECTMENU;
+    static const long ID_UNLOCKMENU;
     static const long ID_LOCKMENU;
 
     wxMenu contextMenu;

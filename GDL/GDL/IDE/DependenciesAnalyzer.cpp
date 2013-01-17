@@ -3,6 +3,7 @@
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDL/Game.h"
+#include "GDL/SourceFile.h"
 #include "GDL/LinkEvent.h"
 #include "GDL/CppCodeEvent.h"
 #include "DependenciesAnalyzer.h"

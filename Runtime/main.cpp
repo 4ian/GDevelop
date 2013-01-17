@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include <vector>
@@ -31,14 +31,13 @@
 #include "GDL/Tools/AES.h"
 #include "GDL/tinyxml/tinyxml.h"
 
-#include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 using namespace std;
 
 std::string GetCurrentWorkingDirectory();
-bool LoadSceneAndDependenciesBitCodeToExecutionEngine(Scene & scene);
+int AbortWithMessage(const std::string & message);
 
 int main( int argc, char *p_argv[] )
 {
@@ -52,13 +51,20 @@ int main( int argc, char *p_argv[] )
         fullExecutablePath += "/";
     }
     fullExecutablePath += p_argv[0];
-    string executablePath = fullExecutablePath.substr( 0, fullExecutablePath.find_last_of( "/" ) );
-    string executableFilename = fullExecutablePath.find_last_of( "/" ) < fullExecutablePath.length() ? fullExecutablePath.substr( fullExecutablePath.find_last_of( "/" ), fullExecutablePath.length() ) : "";
+    std::string executablePath = fullExecutablePath.substr( 0, fullExecutablePath.find_last_of( "/" ) );
+    std::string executableFilename = fullExecutablePath.find_last_of( "/" ) < fullExecutablePath.length() ? fullExecutablePath.substr( fullExecutablePath.find_last_of( "/" ), fullExecutablePath.length() ) : "";
+    std::string executableNameOnly = executableFilename.substr(0, executableFilename.length()-4);
 
-    // For linux, make the executable dir the current working directory
-#ifdef LINUX
-    chdir( executablePath.c_str() );
-#endif
+    #ifdef WINDOWS
+        std::string codeFileExtension = "dll";
+    #elif defined(LINUX)
+        std::string codeFileExtension = "so";
+        chdir( executablePath.c_str() ); //For linux, make the executable dir the current working directory
+    #elif defined(MAC)
+        std::string codeFileExtension = "dylib";
+    #else
+        #error Please update this part to support your target system.
+    #endif
 
     //Check GDL version
     CompilationChecker::EnsureCorrectGDLVersion();
@@ -70,11 +76,10 @@ int main( int argc, char *p_argv[] )
 
     //Load resource file
     RessourcesLoader * resLoader = RessourcesLoader::GetInstance();
-    if ( !resLoader->SetResourceFile( executablePath+"/"+executableFilename.substr(0, executableFilename.length()-4)+".egd" )
+    if ( !resLoader->SetResourceFile( executablePath+"/"+executableNameOnly+".egd" )
            && !resLoader->SetResourceFile( executablePath+"/gam.egd" ) )
     {
-        std::cout << "Failed to properly load executable." << std::endl;
-        return EXIT_FAILURE;
+        return AbortWithMessage("Unable to load resources. Aborting.");
     }
 
     RuntimeGame game;
@@ -84,7 +89,7 @@ int main( int argc, char *p_argv[] )
 
     unsigned long style = 0;
     if ( game.loadingScreen.border ) style |= sf::Style::Titlebar;
-    sf::RenderWindow loadingApp( sf::VideoMode( game.loadingScreen.width, game.loadingScreen.height, 32 ), "Chargement en cours...", style );
+    sf::RenderWindow loadingApp( sf::VideoMode( game.loadingScreen.width, game.loadingScreen.height, 32 ), "Loading...", style );
     loadingApp.setVisible(game.loadingScreen.afficher);
     loadingApp.clear( sf::Color( 100, 100, 100 ) );
 
@@ -104,6 +109,7 @@ int main( int argc, char *p_argv[] )
     }
     loadingApp.display();
 
+    //Load game data
     {
         cout << "Getting src file size..." << endl;
         int fsize = resLoader->GetBinaryFileSize( "src" );
@@ -130,8 +136,7 @@ int main( int argc, char *p_argv[] )
         TiXmlDocument doc;
         if ( !doc.Parse(uncryptedSrc.c_str()) )
         {
-            cout << "Unable to parser game data!" << endl;
-            return EXIT_FAILURE;
+            return AbortWithMessage("Unable to parse game data. Aborting.");
         }
 
         TiXmlHandle hdl(&doc);
@@ -140,21 +145,27 @@ int main( int argc, char *p_argv[] )
 
     if ( game.GetLayouts().empty() )
     {
-        std::cout << "No scene to be loaded." << std::endl;
-        return EXIT_FAILURE;
+        return AbortWithMessage("No scene to be loaded. Aborting.");
     }
 
-    //LLVM stuff
-    cout << "Initializing LLVM/Clang..." << endl;
-    CodeExecutionEngine::EnsureLLVMTargetsInitialization();
-    cout << "Loading required dynamic libraries..." << endl;
-    CodeExecutionEngine::LoadDynamicLibraries();
-
-    //Loading first scene bitcode
-    if ( !LoadSceneAndDependenciesBitCodeToExecutionEngine(*game.GetLayouts()[0]) )
+    //Loading the code
+    std::string codeLibraryName = executablePath+"/"+executableNameOnly+"."+codeFileExtension;
+    Handle codeLibrary = GDpriv::OpenLibrary(codeLibraryName.c_str());
+    if ( codeLibrary == NULL )
     {
-        std::cout << "Unable to setup execution engine for first scene." << std::endl;
-        return EXIT_FAILURE;
+        codeLibraryName = executablePath+"/Code."+codeFileExtension;
+        Handle codeLibrary = GDpriv::OpenLibrary(codeLibraryName.c_str());
+        if ( codeLibrary == NULL )
+        {
+            return AbortWithMessage("Unable to load the execution engine for game. Aborting.");
+        }
+    }
+
+    if (game.GetLayouts()[0]->GetCodeExecutionEngine() == boost::shared_ptr<CodeExecutionEngine>() ||
+        !game.GetLayouts()[0]->GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
+                                                                                "GDSceneEvents"+SceneNameMangler::GetMangledSceneName(game.GetLayouts()[0]->GetName())) )
+    {
+        return AbortWithMessage("Unable to setup execution engine for scene \"" + game.GetLayouts()[0]->GetName() + "\". Aborting.");
     }
 
     #if defined(WINDOWS)
@@ -173,99 +184,49 @@ int main( int argc, char *p_argv[] )
 
     loadingApp.close();
 
-    //Fenêtre de jeu
+    //Create main window
     sf::RenderWindow window;
     window.setFramerateLimit( game.GetMaximumFPS() );
     window.setVerticalSyncEnabled( game.IsVerticalSynchronizationEnabledByDefault() );
 
     RuntimeScene scenePlayed(&window, &game);
     if ( !scenePlayed.LoadFromScene( *game.GetLayouts()[0] ) )
-        std::cout << "Unable to load first scene." << std::endl;
+        return AbortWithMessage("Unable to load the first scene \"" + game.GetLayouts()[0]->GetName() + "\". Aborting.");
 
     window.create( sf::VideoMode( game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32 ), scenePlayed.GetWindowDefaultTitle(), sf::Style::Close );
     window.setActive(true);
     scenePlayed.ChangeRenderWindow(&window);
 
-    //Boucle de jeu
+    //Game main loop
     while ( scenePlayed.running )
     {
         int returnCode = scenePlayed.RenderAndStep();
 
-        if ( returnCode == -2 ) //Quitter le jeu
+        if ( returnCode == -2 ) //Quit the game
             scenePlayed.running = false;
-        else if ( returnCode != -1 ) //Changer de scènes
+        else if ( returnCode != -1 ) //Change the scene being played
         {
-            RuntimeScene newScenePlayed(&window, &game);
-            scenePlayed = newScenePlayed; //Clear the scene
+            RuntimeScene emptyScene(&window, &game);
+            scenePlayed = emptyScene; //Clear the scene
 
-            if ( !LoadSceneAndDependenciesBitCodeToExecutionEngine(*game.GetLayouts()[returnCode]) )
+            if (game.GetLayouts()[returnCode]->GetCodeExecutionEngine() == boost::shared_ptr<CodeExecutionEngine>() ||
+                !game.GetLayouts()[returnCode]->GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
+                                                                                                 "GDSceneEvents"+SceneNameMangler::GetMangledSceneName(game.GetLayouts()[returnCode]->GetName())) )
             {
-                std::cout << "Unable to setup execution engine for new scene.";
-                return EXIT_FAILURE;
+                return AbortWithMessage("Unable to setup execution engine for scene \"" + game.GetLayouts()[returnCode]->GetName() + "\". Aborting.");
             }
 
             if ( !scenePlayed.LoadFromScene( *game.GetLayouts()[returnCode] ) )
-                std::cout << "Scene loading failed!" << std::endl;
+                return AbortWithMessage("Unable to load scene \"" + game.GetLayouts()[returnCode]->GetName() + "\". Aborting.");
         }
     }
 
-    SoundManager * soundManager = SoundManager::GetInstance();
-    soundManager->DestroySingleton();
-    FontManager * fontManager = FontManager::GetInstance();
-    fontManager->DestroySingleton();
+    SoundManager::GetInstance()->DestroySingleton();
+    FontManager::GetInstance()->DestroySingleton();
+
+    GDpriv::CloseLibrary(codeLibrary);
 
     return EXIT_SUCCESS;
-}
-
-/**
- * Load the bitcode of a scene and its dependencies from resources and
- * setup the execution engine with them.
- */
-bool LoadSceneAndDependenciesBitCodeToExecutionEngine(Scene & scene)
-{
-    if ( scene.codeExecutionEngine->Ready() ) return true;
-
-    RessourcesLoader * resLoader = RessourcesLoader::GetInstance();
-    if ( !resLoader->HasFile("GDpriv"+SceneNameMangler::GetMangledSceneName(scene.GetName())+".ir") )
-    {
-        std::cout << "Unable to find GDpriv"+SceneNameMangler::GetMangledSceneName(scene.GetName())+".ir" << std::endl;
-        std::cout << "Scene execution engine setup failed for scene " << scene.GetName() << std::endl;
-        return false;
-    }
-
-    std::vector<char*> buffers;
-    std::vector< std::pair<const char * /*src*/, unsigned int /*size*/> > data; //Keep track of buffers and their size
-
-    unsigned int size = resLoader->GetBinaryFileSize( "GDpriv"+SceneNameMangler::GetMangledSceneName(scene.GetName())+".ir" );
-
-    buffers.push_back(new char[size]);
-    memcpy(buffers.back(), resLoader->LoadBinaryFile( "GDpriv"+SceneNameMangler::GetMangledSceneName(scene.GetName())+".ir" ), size);
-    data.push_back(std::make_pair(buffers.back(), size));
-
-    for (unsigned int i = 0;i<scene.externalSourcesDependList.size();++i)
-    {
-        if ( !resLoader->HasFile(scene.externalSourcesDependList[i]) )
-        {
-            std::cout << "Unable to find "+scene.externalSourcesDependList[i] << std::endl;
-            std::cout << "Scene execution engine setup failed for scene " << scene.GetName() << std::endl;
-            return false;
-        }
-
-        unsigned int size = resLoader->GetBinaryFileSize( scene.externalSourcesDependList[i] );
-
-        buffers.push_back(new char[size]);
-        memcpy(buffers.back(), resLoader->LoadBinaryFile(scene.externalSourcesDependList[i]), size);
-        data.push_back(std::make_pair(buffers.back(), size));
-
-    }
-
-    if (!scene.codeExecutionEngine->LoadFromLLVMBitCode(data))
-    {
-        std::cout << "Bitcode loading failed for scene " << scene.GetName() << std::endl;
-        return false;
-    }
-
-    return true;
 }
 
 /**
@@ -278,4 +239,17 @@ std::string GetCurrentWorkingDirectory()
 
     if ( path == NULL ) return "";
     return path;
+}
+
+#if defined(WINDOWS)
+#include <windows.h>
+#include <Commdlg.h>
+#endif
+int AbortWithMessage(const std::string & message)
+{
+    std::cout << message;
+    #if defined(WINDOWS)
+    MessageBox(NULL, message.c_str(), "Fatal error", MB_ICONERROR);
+    #endif
+    return EXIT_FAILURE;
 }

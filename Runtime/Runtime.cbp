@@ -7,9 +7,9 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="bin\debug\PlayWin.exe" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="bin\debug" />
-				<Option object_output="obj\Debug\" />
+				<Option output="bin/debug/PlayWin.exe" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/debug" />
+				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -24,8 +24,8 @@
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -110,14 +110,14 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add library="winmm" />
-					<Add directory="bin\debug" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
+					<Add directory="bin/debug" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="bin\release\PlayWin" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="bin\release" />
-				<Option object_output="obj\release\" />
+				<Option output="bin/release/PlayWin" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/release" />
+				<Option object_output="obj/release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -132,8 +132,8 @@
 					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -154,14 +154,14 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add library="winmm" />
-					<Add directory="bin\release" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
+					<Add directory="bin/release" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
 				</Linker>
 			</Target>
 			<Target title="Development">
-				<Option output="bin\dev\PlayWin" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="bin\dev" />
-				<Option object_output="obj\dev\" />
+				<Option output="bin/dev/PlayWin" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/dev" />
+				<Option object_output="obj/dev/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -176,8 +176,8 @@
 					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -198,14 +198,14 @@
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
 					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
 					<Add library="winmm" />
-					<Add directory="bin\dev" />
-					<Add directory="..\ExtLibs\llvm\build-tdmgcc45-release\lib" />
+					<Add directory="bin/dev" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
-				<Option output="bin\release\ExeLinux" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="bin\release" />
-				<Option object_output="obj\release\" />
+				<Option output="bin/release/ExeLinux" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/release" />
+				<Option object_output="obj/release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -221,8 +221,8 @@
 					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\build\include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -243,14 +243,14 @@
 					<Add option="-lGL" />
 					<Add option="-lpthread" />
 					<Add option="-Wl,-rpath=&apos;$$ORIGIN/.&apos;" />
-					<Add directory="bin\release" />
-					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
+					<Add directory="bin/release" />
+					<Add directory="../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
-				<Option output="bin\debug\ExeLinux" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="bin\debug" />
-				<Option object_output="obj\debug\" />
+				<Option output="bin/debug/ExeLinux" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/debug" />
+				<Option object_output="obj/debug/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -264,8 +264,8 @@
 					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\build\include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
@@ -287,14 +287,14 @@
 					<Add option="-g" />
 					<Add option="-pg" />
 					<Add option="-Wl,-rpath=&apos;$$ORIGIN/.&apos;" />
-					<Add directory="bin\debug" />
-					<Add directory="..\ExtLibs\SFML\build-linux\lib" />
+					<Add directory="bin/debug" />
+					<Add directory="../ExtLibs/SFML/build-linux/lib" />
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
-				<Option output="bin\release\MacExe" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="bin\release" />
-				<Option object_output="obj\release\" />
+				<Option output="bin/release/MacExe" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/release" />
+				<Option object_output="obj/release/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -309,8 +309,8 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\build\include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -324,8 +324,8 @@
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
-					<Add directory="bin\release" />
-					<Add directory="..\ExtLibs\SFML\build-mac\lib" />
+					<Add directory="bin/release" />
+					<Add directory="../ExtLibs/SFML/build-mac/lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../Runtime/bin/release/MacExe" />
@@ -333,9 +333,9 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Mac - Debug">
-				<Option output="bin\debug\MacExe" prefix_auto="0" extension_auto="0" />
-				<Option working_dir="bin\debug" />
-				<Option object_output="obj\debug\" />
+				<Option output="bin/debug/MacExe" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/debug" />
+				<Option object_output="obj/debug/" />
 				<Option type="0" />
 				<Option compiler="gcc" />
 				<Compiler>
@@ -348,8 +348,8 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="..\ExtLibs\llvm\include" />
-					<Add directory="..\ExtLibs\llvm\build\include" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lgdl" />
@@ -364,8 +364,8 @@
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
 					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
-					<Add directory="bin\debug" />
-					<Add directory="..\ExtLibs\SFML\build-mac\lib" />
+					<Add directory="bin/debug" />
+					<Add directory="../ExtLibs/SFML/build-mac/lib" />
 				</Linker>
 				<ExtraCommands>
 					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../Runtime/bin/debug/MacExe" />
@@ -375,13 +375,13 @@
 		</Build>
 		<Compiler>
 			<Add option="-fexceptions" />
-			<Add directory="..\GDL" />
-			<Add directory="..\ExtLibs\boost" />
-			<Add directory="..\ExtLibs\SFML\include" />
+			<Add directory="../GDL" />
+			<Add directory="../ExtLibs/boost" />
+			<Add directory="../ExtLibs/SFML/include" />
 		</Compiler>
 		<Linker>
-			<Add directory="..\ExtLibs\SFML\build-mingw-release\lib" />
-			<Add directory="..\ExtLibs\SFML\build-mingw-debug\lib" />
+			<Add directory="../ExtLibs/SFML/build-mingw-release/lib" />
+			<Add directory="../ExtLibs/SFML/build-mingw-debug/lib" />
 		</Linker>
 		<Unit filename="CompilationChecker.cpp">
 			<Option weight="60" />

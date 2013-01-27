@@ -519,7 +519,11 @@ void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
 
 void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
 {
-    if (!editing) return;
+    if (!editing)
+    {
+        evt.StopPropagation();
+        return;
+    }
 
     if ( evt.GetKeyCode() == WXK_CONTROL )
         ctrlPressed = true;
@@ -575,7 +579,11 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
 
 void LayoutEditorCanvas::OnKeyUp( wxKeyEvent& evt )
 {
-    if (!editing) return;
+    if (!editing)
+    {
+        evt.StopPropagation();
+        return;
+    }
 
     if ( evt.GetKeyCode() == WXK_CONTROL )
         ctrlPressed = false;

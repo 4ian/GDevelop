@@ -178,10 +178,9 @@ void ChooseObjectTypeDialog::RefreshList()
 
                 gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(objectsTypes[j]);
 
-                long insertedItem = objectsList->InsertItem(0,
-                                                            extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName(),
-                                                            imageList->GetImageCount()-1);
-                objectsList->SetItemPtrData(insertedItem, wxPtrToUInt(associatedData));
+                objectsList->InsertItem(0, extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName());
+                objectsList->SetItemImage(0, imageList->GetImageCount()-1);
+                objectsList->SetItemPtrData(0, wxPtrToUInt(associatedData));
 
 	        }
 	    }

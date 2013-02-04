@@ -20,10 +20,7 @@ rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*.inl --incl
 rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*.inl --include=*/ --exclude=* ../../ExtLibs/SFML/include/  ../bin/debug/CppPlatform/include/SFML/include/
 
 # Extensions headers
-rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*.inl --include=*/ --exclude=* ../../Extensions/  ../bin/debug/Extensions/include/
-
-# Extensions libs
-rsync -r -u --include=*.a --include=*/ --exclude=* ../../Extensions/  ../bin/debug/Extensions/include/
+rsync -r -u --include=*.h --include=*.hpp --include=*.inc --include=*.inl --include=*/ --exclude=* ../../Extensions/  ../bin/debug/CppPlatform/Extensions/include/
 
 echo 
 echo -End of copy

@@ -14,6 +14,10 @@
 #include "GDL/ExtensionBase.h"
 #include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
 
+#ifdef __WXMSW__
+#include <wx/msw/uxtheme.h>
+#endif
+
 //(*IdInit(AutomatismTypeChoice)
 const long AutomatismTypeChoice::ID_STATICBITMAP2 = wxNewId();
 const long AutomatismTypeChoice::ID_STATICTEXT1 = wxNewId();
@@ -99,6 +103,11 @@ project(project_)
 
     moreAutomatismsBt->SetBitmap(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
 
+    #if defined(__WXMSW__) //Offer nice look to list
+    wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
+    if(theme) theme->SetWindowTheme((HWND) automatismsList->GetHWND(), L"EXPLORER", NULL);
+    #endif
+
     RefreshList();
 }
 
@@ -135,13 +144,11 @@ void AutomatismTypeChoice::RefreshList()
 	        {
                 imageList->Add(extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetBitmapIcon());
                 gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(automatismsTypes[j]);
+                long index = automatismsList->GetItemCount();
 
-                wxListItem automatismItem;
-                automatismItem.SetText(extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName());
-                automatismItem.SetImage(imageList->GetImageCount()-1);
-                automatismItem.SetData(associatedData);
-
-                automatismsList->InsertItem(automatismItem);
+                automatismsList->InsertItem(index, extensions[i]->GetAutomatismMetadata(automatismsTypes[j]).GetFullName());
+                automatismsList->SetItemImage(index ,imageList->GetImageCount()-1);
+                automatismsList->SetItemData(index, wxPtrToUInt(associatedData));
 	        }
 	    }
 	}

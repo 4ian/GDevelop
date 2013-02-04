@@ -78,6 +78,25 @@ void MessageLoading( string message, float avancement )
     wxLogStatus( wxString(pourcent + _( " percents of loading (" ) + message + _(" ).")) );
 }
 
+class wxsfcanvas : public sf::RenderWindow, wxControl
+{
+    int coucou;
+    float bijour;
+
+};
+
+class scenecanvas : public wxPanel, wxsfcanvas
+{
+    int test;
+    wxRect rect;
+};
+extern scenecanvas test;
+
+sf::CircleShape shape;
+sf::RenderStates states;
+sf::Transformable transf;
+sf::Sprite sprite;
+
 
 /**
  * Program entry point
@@ -270,6 +289,10 @@ bool Game_Develop_EditorApp::OnInit()
     //Les log
     cout << "* Displaying Game Develop version information :" << endl;
     //GDLogBanner();
+
+    cout << "* Creating a useless SFML texture" << endl;
+    sf::RenderWindow window;
+    sf::Window window2;
 
     //LLVM stuff
     cout << "* Loading required dynamic libraries..." << endl;

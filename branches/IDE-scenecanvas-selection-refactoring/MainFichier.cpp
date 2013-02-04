@@ -196,7 +196,7 @@ void MainFrame::Open( string file )
             wxLogWarning(_("The game is using the Video object. This extension has been disabled in this version of Game Develop.\nIf you want to enable it, go to the Game Develop directory, then in CppPlatform and Extensions directories, and rename VideoObject.disabled to VideoObject")+extensions);
             #else
             wxString extensions = ".xgdle";
-            wxLogWarning(_("The game is using the Video object. This extension has been disabled in this version of Game Develop: The videos won't be displayed");
+            wxLogWarning(_("The game is using the Video object. This extension has been disabled in this version of Game Develop: The videos won't be displayed"));
             #endif
         }
     }

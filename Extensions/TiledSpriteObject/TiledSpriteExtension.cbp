@@ -7,7 +7,7 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug">
-				<Option output="..\..\Runtime\bin\debug\TiledSpriteObject.xgdw" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\TiledSpriteObject.xgdw" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -37,7 +37,7 @@
 				</Linker>
 			</Target>
 			<Target title="Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\TiledSpriteObject.xgdwe" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\CppPlatform\Extensions\TiledSpriteObject.xgdwe" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -108,7 +108,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release">
-				<Option output="..\..\Runtime\bin\release\TiledSpriteObject.xgdw" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\TiledSpriteObject.xgdw" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -138,7 +138,7 @@
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\TiledSpriteObject.xgdwe" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\CppPlatform\Extensions\TiledSpriteObject.xgdwe" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -209,7 +209,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development">
-				<Option output="..\..\Runtime\bin\dev\TiledSpriteObject.xgdw" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\dev\TiledSpriteObject.xgdw" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Dev\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -239,7 +239,7 @@
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
-				<Option output="..\..\IDE\bin\dev\Extensions\TiledSpriteObject.xgdwe" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\IDE\bin\dev\CppPlatform\Extensions\TiledSpriteObject.xgdwe" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Dev Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -310,7 +310,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release">
-				<Option output="..\..\Runtime\bin\release\TiledSpriteObject.xgdl" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\TiledSpriteObject.xgdl" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -348,7 +348,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
-				<Option output="..\..\IDE\bin\release\Extensions\TiledSpriteObject.xgdle" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\IDE\bin\release\CppPlatform\Extensions\TiledSpriteObject.xgdle" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Release Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -393,7 +393,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
-				<Option output="..\..\IDE\bin\debug\Extensions\TiledSpriteObject.xgdle" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\IDE\bin\debug\CppPlatform\Extensions\TiledSpriteObject.xgdle" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Debug Edittime\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -436,7 +436,7 @@
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug">
-				<Option output="..\..\Runtime\bin\debug\TiledSpriteObject.xgdl" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\TiledSpriteObject.xgdl" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -474,7 +474,7 @@
 				</Linker>
 			</Target>
 			<Target title="Mac - Release">
-				<Option output="..\..\Runtime\bin\release\TiledSpriteObject.xgdm" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\release\TiledSpriteObject.xgdm" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Release\" />
 				<Option type="3" />
 				<Option compiler="gcc" />
@@ -514,7 +514,7 @@
 				</ExtraCommands>
 			</Target>
 			<Target title="Mac - Debug">
-				<Option output="..\..\Runtime\bin\debug\TiledSpriteObject.xgdm" prefix_auto="1" extension_auto="0" />
+				<Option output="..\..\Runtime\bin\debug\TiledSpriteObject.xgdm" prefix_auto="1" extension_auto="0" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" />
 				<Option object_output="obj\Debug\" />
 				<Option type="3" />
 				<Option compiler="gcc" />

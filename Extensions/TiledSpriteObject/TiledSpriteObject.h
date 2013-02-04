@@ -49,11 +49,10 @@ class GD_EXTENSION_API TiledSpriteObject : public Object
 public :
 
     TiledSpriteObject(std::string name_);
-    virtual ~TiledSpriteObject();
+    virtual ~TiledSpriteObject() {};
     virtual Object * Clone() const { return new TiledSpriteObject(*this);}
 
     virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 
@@ -63,8 +62,6 @@ public :
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
     virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual wxPanel * CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position );
-    virtual void UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position);
 
     virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
     virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
@@ -75,8 +72,6 @@ public :
     #if defined(GD_IDE_ONLY)
     virtual void SaveToXml(TiXmlElement * elemScene);
     #endif
-
-    virtual void OnPositionChanged() {};
 
     virtual float GetDrawableX() const;
     virtual float GetDrawableY() const;
@@ -93,6 +88,11 @@ public :
     virtual inline void SetWidth(float newWidth) { width = newWidth; };
     virtual inline void SetHeight(float newHeight) { height = newHeight; };
 
+    void SetXOffset(float xOffset_) { xOffset = xOffset_; };
+    float GetXOffset() const { return xOffset; };
+    void SetYOffset(float yOffset_) { yOffset = yOffset_; };
+    float GetYOffset() const { return yOffset; };
+
     virtual std::vector<Polygon2d> GetHitBoxes() const;
 
     std::string textureName;
@@ -103,6 +103,8 @@ private:
     float height;
     float angle;
     bool smooth;
+    float xOffset;
+    float yOffset;
 
     boost::shared_ptr<SFMLTextureWrapper> texture;
 };

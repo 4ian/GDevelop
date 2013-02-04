@@ -25,7 +25,7 @@ freely, subject to the following restrictions:
 */
 /**
  * Contributors to the extension:
- * Florian Rival ( Minor changes and adaptations )
+ * Florian Rival ( Minor changes, added offsets )
  */
 
 #include "GDL/ExtensionBase.h"
@@ -54,7 +54,7 @@ class Extension : public ExtensionBase
             DECLARE_OBJECT("TiledSprite",
                            _("Tiled Sprite"),
                            _("Object displaying a tiled sprite."),
-                           "Extensions/TiledSpriteIcon.png",
+                           "CppPlatform/Extensions/TiledSpriteIcon.png",
                            &CreateTiledSpriteObject,
                            &DestroyTiledSpriteObject,
                            "TiledSpriteObject");
@@ -124,7 +124,7 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("expression", _("Value to test"), "", false);
                     instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
-                    instrInfo.cppCallingInformation.SetFunctionName("SetHeight").SetManipulatedType("number").SetAssociatedGetter("GetHeight").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+                    instrInfo.cppCallingInformation.SetFunctionName("GetHeight").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
 
                 DECLARE_END_OBJECT_CONDITION()
@@ -158,11 +158,75 @@ class Extension : public ExtensionBase
                     instrInfo.AddParameter("expression", _("Value to test"), "", false);
                     instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
 
-                    instrInfo.cppCallingInformation.SetFunctionName("SetAngle").SetManipulatedType("number").SetAssociatedGetter("GetAngle").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
-
+                    instrInfo.cppCallingInformation.SetFunctionName("GetAngle").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
 
                 DECLARE_END_OBJECT_CONDITION()
 
+                DECLARE_OBJECT_ACTION("XOffset",
+                               _("Image X Offset"),
+                               _("Modify the offset used on the X axis when displaying the image."),
+                               _("Do _PARAM2__PARAM1_ to the X offset of _PARAM0_"),
+                               _("Image offset"),
+                               "res/conditions/scaleWidth24.png",
+                               "res/conditions/scaleWidth.png");
+
+                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
+                    instrInfo.AddParameter("expression", _("Value"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetXOffset").SetManipulatedType("number").SetAssociatedGetter("GetXOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+
+                DECLARE_END_OBJECT_ACTION()
+
+                DECLARE_OBJECT_CONDITION("XOffset",
+                               _("Image X Offset"),
+                               _("Test the offset used on the X axis when displaying the image."),
+                               _("The X offset of _PARAM0_ is _PARAM2__PARAM1_"),
+                               _("Image offset"),
+                               "res/conditions/scaleWidth24.png",
+                               "res/conditions/scaleWidth.png");
+
+                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
+                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetXOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+                DECLARE_END_OBJECT_CONDITION()
+
+                DECLARE_OBJECT_ACTION("YOffset",
+                               _("Image Y Offset"),
+                               _("Modify the offset used on the Y axis when displaying the image."),
+                               _("Do _PARAM2__PARAM1_ to the Y offset of _PARAM0_"),
+                               _("Image offset"),
+                               "res/conditions/scaleWidth24.png",
+                               "res/conditions/scaleWidth.png");
+
+                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
+                    instrInfo.AddParameter("expression", _("Value"), "", false);
+                    instrInfo.AddParameter("operator", _("Modification's sign"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("SetYOffset").SetManipulatedType("number").SetAssociatedGetter("GetYOffset").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+
+                DECLARE_END_OBJECT_ACTION()
+
+                DECLARE_OBJECT_CONDITION("YOffset",
+                               _("Image Y Offset"),
+                               _("Test the offset used on the Y axis when displaying the image."),
+                               _("The Y offset of _PARAM0_ is _PARAM2__PARAM1_"),
+                               _("Image offset"),
+                               "res/conditions/scaleWidth24.png",
+                               "res/conditions/scaleWidth.png");
+
+                    instrInfo.AddParameter("object", _("Object"), "TiledSprite", false);
+                    instrInfo.AddParameter("expression", _("Value to test"), "", false);
+                    instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "", false);
+
+                    instrInfo.cppCallingInformation.SetFunctionName("GetYOffset").SetManipulatedType("number").SetIncludeFile("TiledSpriteObject/TiledSpriteObject.h");
+
+                DECLARE_END_OBJECT_CONDITION()
                 #endif
 
             DECLARE_END_OBJECT()

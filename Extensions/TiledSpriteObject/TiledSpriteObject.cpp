@@ -46,15 +46,13 @@ freely, subject to the following restrictions:
 #endif
 
 TiledSpriteObject::TiledSpriteObject(std::string name_) :
-Object(name_),
-textureName(""),
-width(32),
-height(32),
-angle(0)
-{
-}
-
-TiledSpriteObject::~TiledSpriteObject()
+    Object(name_),
+    textureName(""),
+    width(32),
+    height(32),
+    angle(0),
+    xOffset(0),
+    yOffset(0)
 {
 }
 
@@ -82,14 +80,6 @@ bool TiledSpriteObject::LoadResources(const RuntimeScene & scene, const ImageMan
 {
     texture =  imageMgr.GetSFMLTexture(textureName);
 
-    return true;
-}
-
-/**
- * Update from the inital position
- */
-bool TiledSpriteObject::InitializeFromInitialPosition(const InitialPosition & position)
-{
     return true;
 }
 
@@ -121,10 +111,10 @@ bool TiledSpriteObject::Draw( sf::RenderTarget& window )
     sf::Vector2f centerPosition = sf::Vector2f(GetX()+GetCenterX(),GetY()+GetCenterY());
     float angleInRad = angle*3.14159/180.0;
     texture->texture.setRepeated(true);
-    sf::Vertex vertices[] = {sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,-height/2), angleInRad), sf::Vector2f(0,0)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,-height/2), angleInRad), sf::Vector2f(width,0)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,+height/2), angleInRad), sf::Vector2f(width, height)),
-                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,+height/2), angleInRad), sf::Vector2f(0, height))};
+    sf::Vertex vertices[] = {sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,-height/2), angleInRad), sf::Vector2f(0+xOffset,0+yOffset)),
+                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,-height/2), angleInRad), sf::Vector2f(width+xOffset,0+yOffset)),
+                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(+width/2,+height/2), angleInRad), sf::Vector2f(width+xOffset, height+yOffset)),
+                             sf::Vertex( centerPosition+RotatePoint(sf::Vector2f(-width/2,+height/2), angleInRad), sf::Vector2f(0+xOffset, height+yOffset))};
 
     window.draw(vertices, 4, sf::Quads, &texture->texture);
     texture->texture.setRepeated(false);
@@ -148,7 +138,7 @@ void TiledSpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool TiledSpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
-    thumbnail = wxBitmap("Extensions/TiledSpriteIcon24.png", wxBITMAP_TYPE_ANY);
+    thumbnail = wxBitmap("CppPlatform/Extensions/TiledSpriteIcon24.png", wxBITMAP_TYPE_ANY);
 
     return true;
 }
@@ -157,22 +147,6 @@ void TiledSpriteObject::EditObject( wxWindow* parent, Game & game, gd::MainFrame
 {
     TiledSpriteObjectEditor dialog(parent, game, *this, mainFrameWrapper);
     dialog.ShowModal();
-}
-
-wxPanel * TiledSpriteObject::CreateInitialPositionPanel( wxWindow* parent, const Game & game_, const Scene & scene_, const InitialPosition & position )
-{
-    TiledSpriteInitialPositionPanel * panel = new TiledSpriteInitialPositionPanel(parent);
-    panel->angleTextCtrl->ChangeValue(ToString(position.GetAngle()));
-
-    return panel;
-}
-
-void TiledSpriteObject::UpdateInitialPositionFromPanel(wxPanel * panel, InitialPosition & position)
-{
-    TiledSpriteInitialPositionPanel * tiledSpritePanel = dynamic_cast<TiledSpriteInitialPositionPanel*>(panel);
-    if (tiledSpritePanel == NULL) return;
-
-    position.SetAngle(ToFloat(ToString(tiledSpritePanel->angleTextCtrl->GetValue())));
 }
 
 void TiledSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const

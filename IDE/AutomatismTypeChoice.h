@@ -12,61 +12,66 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-class Game;
+namespace gd { class Project; }
 
+/**
+ * \brief Dialog displaying all the automatisms types available in a project, allowing the user to choose one.
+ *
+ * \todo Move this to GDCore.
+ */
 class AutomatismTypeChoice: public wxDialog
 {
-	public:
+public:
 
-		AutomatismTypeChoice(wxWindow* parent, Game & game_);
-		virtual ~AutomatismTypeChoice();
+    AutomatismTypeChoice(wxWindow* parent, gd::Project & project);
+    virtual ~AutomatismTypeChoice();
 
-		//(*Declarations(AutomatismTypeChoice)
-		wxStaticBitmap* StaticBitmap2;
-		wxStaticBitmap* iconBmp;
-		wxTextCtrl* infoEdit;
-		wxPanel* Panel1;
-		wxStaticText* StaticText1;
-		wxButton* cancelBt;
-		wxStaticLine* StaticLine2;
-		wxListCtrl* automatismsList;
-		wxButton* moreAutomatismsBt;
-		wxStaticLine* StaticLine1;
-		wxButton* okBt;
-		//*)
+    //(*Declarations(AutomatismTypeChoice)
+    wxStaticBitmap* StaticBitmap2;
+    wxStaticBitmap* iconBmp;
+    wxTextCtrl* infoEdit;
+    wxPanel* Panel1;
+    wxStaticText* StaticText1;
+    wxButton* cancelBt;
+    wxStaticLine* StaticLine2;
+    wxListCtrl* automatismsList;
+    wxButton* moreAutomatismsBt;
+    wxStaticLine* StaticLine1;
+    wxButton* okBt;
+    //*)
 
-		std::string selectedAutomatismType;
+    std::string selectedAutomatismType;
 
-	protected:
+protected:
 
-		//(*Identifiers(AutomatismTypeChoice)
-		static const long ID_STATICBITMAP2;
-		static const long ID_STATICTEXT1;
-		static const long ID_PANEL1;
-		static const long ID_STATICLINE1;
-		static const long ID_LISTCTRL1;
-		static const long ID_STATICBITMAP1;
-		static const long ID_TEXTCTRL1;
-		static const long ID_STATICLINE2;
-		static const long ID_BUTTON3;
-		static const long ID_BUTTON1;
-		static const long ID_BUTTON2;
-		//*)
+    //(*Identifiers(AutomatismTypeChoice)
+    static const long ID_STATICBITMAP2;
+    static const long ID_STATICTEXT1;
+    static const long ID_PANEL1;
+    static const long ID_STATICLINE1;
+    static const long ID_LISTCTRL1;
+    static const long ID_STATICBITMAP1;
+    static const long ID_TEXTCTRL1;
+    static const long ID_STATICLINE2;
+    static const long ID_BUTTON3;
+    static const long ID_BUTTON1;
+    static const long ID_BUTTON2;
+    //*)
 
-	private:
+private:
 
-		//(*Handlers(AutomatismTypeChoice)
-		void OnautomatismsListItemActivated(wxListEvent& event);
-		void OnautomatismsListItemSelect(wxListEvent& event);
-		void OnokBtClick(wxCommandEvent& event);
-		void OncancelBtClick(wxCommandEvent& event);
-		void OnmoreAutomatismsBtClick(wxCommandEvent& event);
-		//*)
-		void RefreshList();
+    //(*Handlers(AutomatismTypeChoice)
+    void OnautomatismsListItemActivated(wxListEvent& event);
+    void OnautomatismsListItemSelect(wxListEvent& event);
+    void OnokBtClick(wxCommandEvent& event);
+    void OncancelBtClick(wxCommandEvent& event);
+    void OnmoreAutomatismsBtClick(wxCommandEvent& event);
+    //*)
+    void RefreshList();
 
-		Game & game;
+    gd::Project & project;
 
-		DECLARE_EVENT_TABLE()
+    DECLARE_EVENT_TABLE()
 };
 
 #endif

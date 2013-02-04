@@ -40,8 +40,9 @@ const long SearchEvents::ID_CHECKBOX8 = wxNewId();
 const long SearchEvents::ID_CHECKBOX7 = wxNewId();
 const long SearchEvents::ID_CHECKBOX9 = wxNewId();
 const long SearchEvents::ID_CHECKBOX10 = wxNewId();
+const long SearchEvents::ID_STATICBITMAP1 = wxNewId();
+const long SearchEvents::ID_HYPERLINKCTRL2 = wxNewId();
 const long SearchEvents::ID_BUTTON4 = wxNewId();
-const long SearchEvents::ID_BUTTON6 = wxNewId();
 const long SearchEvents::ID_PANEL2 = wxNewId();
 const long SearchEvents::ID_NOTEBOOK1 = wxNewId();
 //*)
@@ -61,6 +62,7 @@ events(events_)
 	wxStaticBoxSizer* StaticBoxSizer2;
 	wxFlexGridSizer* FlexGridSizer4;
 	wxFlexGridSizer* FlexGridSizer16;
+	wxFlexGridSizer* FlexGridSizer19;
 	wxStaticBoxSizer* StaticBoxSizer4;
 	wxFlexGridSizer* FlexGridSizer10;
 	wxFlexGridSizer* FlexGridSizer3;
@@ -183,7 +185,7 @@ events(events_)
 	FlexGridSizer14 = new wxFlexGridSizer(0, 1, 0, 0);
 	onlySelectedEventCheck = new wxCheckBox(Panel2, ID_CHECKBOX7, _("Only the selected event"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX7"));
 	onlySelectedEventCheck->SetValue(false);
-	FlexGridSizer14->Add(onlySelectedEventCheck, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer14->Add(onlySelectedEventCheck, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	replaceConditionsCheck = new wxCheckBox(Panel2, ID_CHECKBOX9, _("The conditions"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_CHECKBOX9"));
 	replaceConditionsCheck->SetValue(true);
@@ -197,10 +199,16 @@ events(events_)
 	FlexGridSizer10->Add(FlexGridSizer12, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer16 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer16->AddGrowableCol(1);
+	FlexGridSizer19 = new wxFlexGridSizer(0, 3, 0, 0);
+	FlexGridSizer19->AddGrowableRow(0);
+	StaticBitmap1 = new wxStaticBitmap(Panel2, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP1"));
+	FlexGridSizer19->Add(StaticBitmap1, 1, wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	HyperlinkCtrl1 = new wxHyperlinkCtrl(Panel2, ID_HYPERLINKCTRL2, _("Help"), wxEmptyString, wxDefaultPosition, wxDefaultSize, wxHL_CONTEXTMENU|wxHL_ALIGN_CENTRE|wxNO_BORDER, _T("ID_HYPERLINKCTRL2"));
+	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
+	FlexGridSizer19->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer16->Add(FlexGridSizer19, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	replaceBt = new wxButton(Panel2, ID_BUTTON4, _("Replace"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer16->Add(replaceBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
-	help2Bt = new wxButton(Panel2, ID_BUTTON6, _("Help"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON6"));
-	FlexGridSizer16->Add(help2Bt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10->Add(FlexGridSizer16, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel2->SetSizer(FlexGridSizer10);
 	FlexGridSizer10->Fit(Panel2);
@@ -217,8 +225,8 @@ events(events_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnsearchBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnnextBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnpreviousBtClick);
+	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&SearchEvents::OnhelpBtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnreplaceBtClick);
-	Connect(ID_BUTTON6,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnhelpBtClick);
 	//*)
 }
 

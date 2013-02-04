@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef EVENTSEDITOR_H
@@ -25,6 +25,7 @@
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 namespace gd { class ExternalEvents; }
+namespace gd { class LayoutEditorCanvas; }
 class SearchEvents;
 class Game;
 class Scene;
@@ -92,11 +93,11 @@ public:
     void ConnectEvents();
 
     /**
-     * Declare a SceneCanvas to be associated with this events editor.
+     * Declare a LayoutEditorCanvas to be associated with this events editor.
      * Used to check if profiling is enabled.
      */
-    void SetAssociatedSceneCanvas(SceneCanvas * sceneCanvas_) { sceneCanvas = sceneCanvas_; };
-    SceneCanvas * GetAssociatedSceneCanvas() { return sceneCanvas; };
+    void SetAssociatedLayoutCanvas(gd::LayoutEditorCanvas * layoutCanvas_) { layoutCanvas = layoutCanvas_; };
+    gd::LayoutEditorCanvas * GetAssociatedLayoutCanvas() { return layoutCanvas; };
 
     /**
      * Notify events editor that we're editing external events.
@@ -289,7 +290,7 @@ private:
 
     std::vector < gd::BaseEventSPtr > * events; ///< Events modified are not necessarily the events of the scene
     gd::MainFrameWrapper & mainFrameWrapper;
-    SceneCanvas * sceneCanvas;
+    gd::LayoutEditorCanvas * layoutCanvas;
 
     EventsEditorItemsAreas itemsAreas; ///< Areas management
     EventsEditorSelection selection; ///<Selection management and input

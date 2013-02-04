@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifndef BUILDPROGRESSPNL_H
@@ -16,7 +16,6 @@
 #include <wx/thread.h>
 #include <wx/stopwatch.h>
 class Game;
-class SceneCanvas;
 
 class BuildProgressPnl: public wxPanel
 {

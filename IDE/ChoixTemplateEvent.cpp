@@ -319,8 +319,8 @@ void ChoixTemplateEvent::RefreshTree()
 
     while (( lecture = readdir( rep ) ) )
     {
-        string lec = lecture->d_name;
-        if ( lec == "." || lec == ".." )
+        wxString lec = lecture->d_name;
+        if ( lec == "." || lec == ".." || !lec.EndsWith(".mgd") )
         {
         }
         else

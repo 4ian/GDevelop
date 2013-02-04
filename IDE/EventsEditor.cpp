@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #include "EventsEditor.h"
 
@@ -25,21 +25,22 @@
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/IDE/EventsChangesNotifier.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
+#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
-#include "SceneCanvas.h"
 #include "LogFileManager.h"
-#include "ProfileDlg.h"
+#include "GDL/IDE/Dialogs/ProfileDlg.h"
 #include "SearchEvents.h"
 #include "CreateTemplate.h"
 #include "ChoixTemplateEvent.h"
 #include "ChoixCondition.h"
 #include "ChoixAction.h"
-#include "Clipboard.h"
+#include "GDCore/IDE/Clipboard.h"
 #undef CreateEvent //Disable an annoying macro
 #undef DrawText //Disable an annoying macro
 
@@ -110,7 +111,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vecto
     externalEvents(NULL),
     events(events_),
     mainFrameWrapper(mainFrameWrapper_),
-    sceneCanvas(NULL),
+    layoutCanvas(NULL),
     conditionColumnWidth(350),
     isResizingColumns(false),
     leftMargin(20),
@@ -400,7 +401,7 @@ void EventsEditor::CreateRibbonPage(wxRibbonPage * page)
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("View"), wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
         wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
         ribbonBar->AddButton(idRibbonFoldAll, !hideLabels ? _("Fold all") : "", wxBitmap("res/foldAll24.png", wxBITMAP_TYPE_ANY));
-        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold all") : "", wxBitmap("res/unFoldAll24.png", wxBITMAP_TYPE_ANY));
+        ribbonBar->AddButton(idRibbonUnFoldAll, !hideLabels ? _("Unfold") : "", wxBitmap("res/unFoldAll24.png", wxBITMAP_TYPE_ANY));
     }
     {
         wxRibbonPanel *ribbonPanel = new wxRibbonPanel(page, wxID_ANY, _("Tools"), wxBitmap("res/profiler24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -1415,7 +1416,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
                 instructionsToCopy.push_back(*itemsSelected[i].instruction);
         }
 
-        Clipboard::GetInstance()->SetConditions(instructionsToCopy);
+        gd::Clipboard::GetInstance()->SetConditions(instructionsToCopy);
     }
     else if ( selection.HasSelectedActions())
     {
@@ -1427,7 +1428,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
                 instructionsToCopy.push_back(*itemsSelected[i].instruction);
         }
 
-        Clipboard::GetInstance()->SetActions(instructionsToCopy);
+        gd::Clipboard::GetInstance()->SetActions(instructionsToCopy);
     }
     else if ( selection.HasSelectedEvents() )
     {
@@ -1439,7 +1440,7 @@ void EventsEditor::OneventCopyMenuSelected(wxCommandEvent& event)
                 eventsToCopy.push_back(itemsSelected[i].event->Clone());
         }
 
-        Clipboard::GetInstance()->SetEvents(eventsToCopy);
+        gd::Clipboard::GetInstance()->SetEvents(eventsToCopy);
         std::cout << "itemsSelected" << itemsSelected.size();
     }
 }
@@ -1461,7 +1462,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
 {
     if ( selection.HasSelectedConditions() || (selection.GetHighlightedInstructionList().instructionList != NULL && selection.GetHighlightedInstructionList().isConditionList) )
     {
-        if ( !Clipboard::GetInstance()->HasCondition() ) return;
+        if ( !gd::Clipboard::GetInstance()->HasCondition() ) return;
 
         //Get information about list where conditions must be pasted
         std::vector<gd::Instruction> * instructionList = selection.HasSelectedConditions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
@@ -1470,7 +1471,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if (instructionList == NULL) return;
 
         //Paste all conditions
-        const vector < gd::Instruction > & instructions = Clipboard::GetInstance()->GetInstructions();
+        const vector < gd::Instruction > & instructions = gd::Clipboard::GetInstance()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
@@ -1485,7 +1486,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
     }
     else if ( selection.HasSelectedActions()|| (selection.GetHighlightedInstructionList().instructionList != NULL && !selection.GetHighlightedInstructionList().isConditionList) )
     {
-        if ( !Clipboard::GetInstance()->HasAction() ) return;
+        if ( !gd::Clipboard::GetInstance()->HasAction() ) return;
 
         //Get information about list where actions must be pasted
         std::vector<gd::Instruction> * instructionList = selection.HasSelectedActions() ? selection.GetAllSelectedInstructions().back().instructionList : selection.GetHighlightedInstructionList().instructionList;
@@ -1494,7 +1495,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if (instructionList == NULL) return;
 
         //Paste all actions
-        const vector < gd::Instruction > & instructions = Clipboard::GetInstance()->GetInstructions();
+        const vector < gd::Instruction > & instructions = gd::Clipboard::GetInstance()->GetInstructions();
         for (unsigned int i = 0;i<instructions.size();++i)
         {
             if ( positionInThisList < instructionList->size() )
@@ -1525,7 +1526,7 @@ void EventsEditor::OneventPasteMenuSelected(wxCommandEvent& event)
         if (eventsList == NULL) return;
 
         //Insert events
-        vector < boost::shared_ptr <gd::BaseEvent> > eventsToPaste = Clipboard::GetInstance()->GetEvents();
+        vector < boost::shared_ptr <gd::BaseEvent> > eventsToPaste = gd::Clipboard::GetInstance()->GetEvents();
         std::cout << "EventToPaste" << eventsToPaste.size();
         for (unsigned int i = 0;i<eventsToPaste.size();++i)
         {
@@ -1627,6 +1628,8 @@ void EventsEditor::OnSearchBtClick(wxCommandEvent& event)
 
 void EventsEditor::OnProfilingBtClick(wxCommandEvent& event)
 {
+    SceneEditorCanvas * sceneCanvas = dynamic_cast<SceneEditorCanvas*>(layoutCanvas);
+
     if (sceneCanvas && sceneCanvas->GetProfileDialog() != boost::shared_ptr<ProfileDlg>())
     {
         if ( !profilingActivated && !sceneCanvas->GetProfileDialog()->profilingActivated)

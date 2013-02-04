@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 //This file was created 2008-03-01
@@ -31,21 +31,20 @@
 #include <unistd.h>
 #include <stdexcept>
 #include <SFML/System.hpp>
-#include "CppUnitLite/TestHarness.h"
 
 #include "GDL/CodeExecutionEngine.h"
 
 #include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
-#include "Log.h"
 #include "CheckMAJ.h"
 #include "MAJ.h"
 #include "SplashScreen.h"
 #include "ConsoleManager.h"
 #include "BugReport.h"
 #include "CompilationChecker.h"
-#include "Clipboard.h"
+#include "GDCore/IDE/Clipboard.h"
 #include "LogFileManager.h"
+#include "PlatformManager.h"
 #include "ExtensionBugReportDlg.h"
 #include "Dialogs/HelpViewerDlg.h"
 
@@ -78,6 +77,25 @@ void MessageLoading( string message, float avancement )
 
     wxLogStatus( wxString(pourcent + _( " percents of loading (" ) + message + _(" ).")) );
 }
+
+class wxsfcanvas : public sf::RenderWindow, wxControl
+{
+    int coucou;
+    float bijour;
+
+};
+
+class scenecanvas : public wxPanel, wxsfcanvas
+{
+    int test;
+    wxRect rect;
+};
+extern scenecanvas test;
+
+sf::CircleShape shape;
+sf::RenderStates states;
+sf::Transformable transf;
+sf::Sprite sprite;
 
 
 /**
@@ -272,9 +290,11 @@ bool Game_Develop_EditorApp::OnInit()
     cout << "* Displaying Game Develop version information :" << endl;
     //GDLogBanner();
 
+    cout << "* Creating a useless SFML texture" << endl;
+    sf::RenderWindow window;
+    sf::Window window2;
+
     //LLVM stuff
-    cout << "* Initializing LLVM/Clang..." << endl;
-    CodeExecutionEngine::EnsureLLVMTargetsInitialization();
     cout << "* Loading required dynamic libraries..." << endl;
     CodeExecutionEngine::LoadDynamicLibraries();
 
@@ -315,7 +335,7 @@ bool Game_Develop_EditorApp::OnInit()
     #endif
 
     GDpriv::ExtensionsLoader * extensionsLoader = GDpriv::ExtensionsLoader::GetInstance();
-    extensionsLoader->SetExtensionsDir("./Extensions/");
+    extensionsLoader->SetExtensionsDir("./CppPlatform/Extensions/");
     if ( loadExtensions ) extensionsLoader->LoadAllStaticExtensionsAvailable();
 
     #if defined(RELEASE)
@@ -371,6 +391,10 @@ bool Game_Develop_EditorApp::OnInit()
     //Fin du splash screen, affichage de la fenêtre
     splash->Destroy();
     mainEditor->Show();
+    cout << "* Initializing platforms..." << endl;
+
+    PlatformManager::GetInstance()->NotifyPlatformIDEInitialized();
+
     cout << "* Initialization ended." << endl;
 
     //Checking for updates
@@ -393,32 +417,36 @@ bool Game_Develop_EditorApp::OnInit()
         }
     }
 
-#ifndef RELEASE
-    TestResult tr;
-    TestRegistry::runAllTests( tr );
-#endif
-
     return true;
 
 }
 
 int Game_Develop_EditorApp::OnExit()
 {
+    cout << "\nGame Develop shutdown started:" << endl;
+    cout << "* Closing the configuration and destroying singletons";
     delete wxConfigBase::Set(( wxConfigBase* )NULL );
-
-    SoundManager::GetInstance()->DestroySingleton();
-    Clipboard::GetInstance()->DestroySingleton();
-    FontManager::GetInstance()->DestroySingleton();
+    cout << ".";
+    gd::Clipboard::GetInstance()->DestroySingleton();
+    cout << ".";
     gd::HelpFileAccess::GetInstance()->DestroySingleton();
+    cout << ".";
     HelpProvider::GetInstance()->DestroySingleton();
+    cout << "." << endl;
 
+    cout << "* Closing the platforms..." << endl;
+    PlatformManager::GetInstance()->DestroySingleton();
+
+    cout << "* Deleting single instance checker..." << endl;
     #if defined(LINUX) || defined(MAC)
     if ( singleInstanceChecker ) delete singleInstanceChecker;
     singleInstanceChecker = NULL;
     #endif
 
+    cout << "* Deleting the crash detection file..." << endl;
     wxRemoveFile(wxFileName::GetTempDir()+"/GameDevelopRunning.log");
 
+    cout << "* Shutdown process finished." << endl;
     return 0;
 }
 

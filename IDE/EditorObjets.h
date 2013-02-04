@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #ifndef EDITOROBJETS_H
 #define EDITOROBJETS_H
@@ -10,6 +10,7 @@
 #include <wx/panel.h>
 #include "EditorObjectList.h"
 //*)
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
 #include <wx/aui/aui.h>
 #include <wx/imaglist.h>
 #include "GDL/Game.h"
@@ -23,7 +24,7 @@
 /**
  * \brief Editor composed of 4 sub editors allowing to edit objects and groups of the scene and of the game.
  */
-class EditorObjets: public wxPanel
+class EditorObjets: public wxPanel, public gd::LayoutEditorCanvasAssociatedEditor
 {
 public:
 
@@ -35,15 +36,16 @@ public:
      */
     void Refresh();
 
-    //(*Declarations(EditorObjets)
-    wxNotebook* sceneNotebook;
-    wxNotebook* Notebook1;
-    EditorObjetsGroups* ObjetsGroups;
-    EditorObjectList* sceneObjectsEditor;
-    EditorObjetsGroups* globalObjectsGroups;
-    wxNotebook* globalNotebook;
-    EditorObjectList* globalObjectsEditor;
-    //*)
+    /**
+     * Enable or disable the editor.
+     */
+    virtual bool Enable(bool enable=true) { return wxWindow::Enable(enable); };
+
+    /**
+     * Can be called by another editor ( Typically a gd::LayoutEditorCanvas, which has a list of editors
+     * of type gd::LayoutEditorCanvasAssociatedEditor ) to notify that objects have been changed.
+     */
+    virtual void ObjectsUpdated() { Refresh(); };
 
 protected:
 
@@ -68,18 +70,20 @@ private:
     void OnResize(wxSizeEvent& event);
     //*)
 
+    //(*Declarations(EditorObjets)
+    wxNotebook* sceneNotebook;
+    wxNotebook* Notebook1;
+    EditorObjetsGroups* ObjetsGroups;
+    EditorObjectList* sceneObjectsEditor;
+    EditorObjetsGroups* globalObjectsGroups;
+    wxNotebook* globalNotebook;
+    EditorObjectList* globalObjectsEditor;
+    //*)
     wxImageList* sceneNotebookImageList;
     wxImageList* globalNotebookImageList;
     wxImageList* notebookImageList;
 
-    /**
-     * Reference to game containing the datas to edit
-     */
     Game & game;
-
-    /**
-     * Reference to scene edited
-     */
     Scene & scene;
 
     gd::MainFrameWrapper & mainFrameWrapper;

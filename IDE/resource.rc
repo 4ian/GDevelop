@@ -21,7 +21,7 @@ BEGIN
             VALUE "FileDescription",  "Game Develop Integrated Development Environment"
             VALUE "FileVersion",      RC_FILEVERSION_STRING
             VALUE "InternalName",     "Game Develop IDE"
-            VALUE "LegalCopyright",   "2008-2012 Florian Rival"
+            VALUE "LegalCopyright",   "2008-2013 Florian Rival"
             VALUE "LegalTrademarks1", ""
             VALUE "LegalTrademarks2", ""
             VALUE "OriginalFilename", "GDIDE.exe"

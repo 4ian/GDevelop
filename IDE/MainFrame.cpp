@@ -1,8 +1,12 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#include <iostream>
+#include <string>
+#include <list>
+#include <sstream>
 //(*InternalHeaders(MainFrame)
 #include <wx/bitmap.h>
 #include <wx/icon.h>
@@ -27,21 +31,18 @@
 #include <wx/ribbon/toolbar.h>
 #include <wx/ribbon/buttonbar.h>
 
-#include <iostream>
-#include <string>
-#include <list>
-#include <sstream>
 #include "MainFrame.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
+#include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDL/CommonTools.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
-#include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDCore/IDE/wxTools/SkinHelper.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
-#include "MyStatusBar.h"
 #include "EditorObjets.h"
 #include "EventsEditor.h"
 #include "EditorScene.h"
@@ -335,8 +336,10 @@ MainFrame::MainFrame( wxWindow* parent ) :
     static int widths[2] = { -1, 175 };
     statusBar->SetFieldsCount(2);
     statusBar->SetStatusWidths(2, widths);
-    statusBar->SetStatusText( "2008-2012 Compil Games", 1 );
+    statusBar->SetStatusText( "2008-2013 Compil Games", 1 );
     SetStatusBar(statusBar);
+
+    std::vector<wxWindow*> controlsToBeDisabledOnPreview; //Used below:
 
     //Ribbon setup
     long ribbonStyle = wxRIBBON_BAR_DEFAULT_STYLE;
@@ -351,8 +354,8 @@ MainFrame::MainFrame( wxWindow* parent ) :
     bool hideLabels = false;
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Projects"));
-        ProjectManager::CreateRibbonPage(ribbonEditorPage);
+        wxRibbonPage * ribbonProjectPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Projects"));
+        ProjectManager::CreateRibbonPage(ribbonProjectPage);
     }
     {
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Images bank"));
@@ -363,6 +366,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
             ribbonBar->AddButton(ResourcesEditor::idRibbonAdd, !hideLabels ? _("Add an image") : "", wxBitmap("res/add24.png", wxBITMAP_TYPE_ANY));
             ribbonBar->AddButton(ResourcesEditor::idRibbonAddFromLibrary, !hideLabels ? _("Add from the library") : "", wxBitmap("res/addFromLibrary24.png", wxBITMAP_TYPE_ANY));
             ribbonBar->AddButton(ResourcesEditor::idRibbonAddDossier, !hideLabels ? _("Add a virtual folder") : "", wxBitmap("res/dossier24.png", wxBITMAP_TYPE_ANY));
+            controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("List management"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -371,24 +375,27 @@ MainFrame::MainFrame( wxWindow* parent ) :
             ribbonBar->AddButton(ResourcesEditor::idRibbonDeleteUnused, !hideLabels ? _("Remove useless resources") : "", wxBitmap("res/deleteunknown24.png", wxBITMAP_TYPE_ANY));
             ribbonBar->AddButton(ResourcesEditor::idRibbonUp, !hideLabels ? _("Move up") : "", wxBitmap("res/up24.png", wxBITMAP_TYPE_ANY));
             ribbonBar->AddButton(ResourcesEditor::idRibbonDown, !hideLabels ? _("Move down") : "", wxBitmap("res/down24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Refresh the list") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonRefresh, !hideLabels ? _("Refresh") : "", wxBitmap("res/refreshicon24.png", wxBITMAP_TYPE_ANY));
+            controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
 
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("View"), wxBitmap("res/edit24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
             ribbonBar->AddButton(ResourcesEditor::idRibbonShowPreview, !hideLabels ? _("Preview") : "", wxBitmap("res/view24.png", wxBITMAP_TYPE_ANY));
-            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPropertyGrid, !hideLabels ? _("Properties grid") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
+            ribbonBar->AddButton(ResourcesEditor::idRibbonShowPropertyGrid, !hideLabels ? _("Properties") : "", wxBitmap("res/editprop24.png", wxBITMAP_TYPE_ANY));
+            controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Help"), wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
             wxRibbonButtonBar *ribbonBar = new wxRibbonButtonBar(ribbonPanel, wxID_ANY);
             ribbonBar->AddButton(ResourcesEditor::idRibbonHelp, !hideLabels ? _("Help") : "", wxBitmap("res/helpicon24.png", wxBITMAP_TYPE_ANY));
+            controlsToBeDisabledOnPreview.push_back(ribbonBar);
         }
     }
     {
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Scene"));
-        ribbonSceneEditorButtonBar = SceneCanvas::CreateRibbonPage(ribbonEditorPage);
+        ribbonSceneEditorButtonBar = gd::LayoutEditorCanvas::CreateRibbonPage(ribbonEditorPage);
     }
     {
         wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Events"));
@@ -472,8 +479,10 @@ MainFrame::MainFrame( wxWindow* parent ) :
 
     infoBar->SetShowHideEffects(wxSHOW_EFFECT_SLIDE_TO_BOTTOM, wxSHOW_EFFECT_BLEND);
 
+    //Construct the lightweight wrapper used by editors to access to the main frame.
     mainFrameWrapper = gd::MainFrameWrapper(m_ribbon, ribbonSceneEditorButtonBar, this, &m_mgr, editorsNotebook, infoBar, &scenesLockingShortcuts, wxGetCwd());
     mainFrameWrapper.AddControlToBeDisabledOnPreview(projectManager);
+    for (unsigned int i = 0;i<controlsToBeDisabledOnPreview.size();++i) mainFrameWrapper.AddControlToBeDisabledOnPreview(controlsToBeDisabledOnPreview[i]);
 
     SetSize(900,740);
     Center();
@@ -524,6 +533,18 @@ void MainFrame::SetCurrentGame(unsigned int i, bool refreshProjectManager)
 void MainFrame::UpdateNotebook()
 {
     editorsNotebook->SetWindowStyleFlag(wxAUI_NB_TOP | wxAUI_NB_TAB_SPLIT | wxAUI_NB_TAB_MOVE | wxAUI_NB_SCROLL_BUTTONS | wxNO_BORDER );
+    if ( false ) //All editors are closable currently
+    {
+        long style = editorsNotebook->GetWindowStyleFlag();
+        style &= ~wxAUI_NB_CLOSE_ON_ACTIVE_TAB;
+        editorsNotebook->SetWindowStyleFlag(style);
+    }
+    else
+    {
+        long style = editorsNotebook->GetWindowStyleFlag();
+        style |= wxAUI_NB_CLOSE_ON_ACTIVE_TAB;
+        editorsNotebook->SetWindowStyleFlag(style);
+    }
 }
 
 /**

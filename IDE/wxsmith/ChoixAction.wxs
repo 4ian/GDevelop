@@ -31,7 +31,6 @@
 												<item2>ActionsTree</item2>
 												<item2></item2>
 											</items_text>
-											<size>300,350</size>
 											<tooltip>Choose an action to set up.</tooltip>
 											<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
 											<handler function="OnActionsTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
@@ -168,6 +167,7 @@
 							</object>
 							<object class="sizeritem">
 								<object class="wxTextCtrl" name="ID_TEXTCTRL1" subclass="wxSearchCtrl" variable="searchCtrl" member="yes">
+									<minsize>-1,24</minsize>
 									<handler function="OnsearchCtrlText" entry="EVT_TEXT" />
 								</object>
 								<flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>

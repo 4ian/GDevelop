@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "BuildProgressPnl.h"
@@ -12,8 +12,7 @@
 //*)
 #include <wx/process.h>
 #include <wx/txtstrm.h>
-#include "GDL/Game.h"
-#include "SceneCanvas.h"
+#include "GDCore/CommonTools.h"
 #include "GDL/IDE/CodeCompiler.h"
 
 //(*IdInit(BuildProgressPnl)
@@ -92,8 +91,8 @@ void BuildProgressPnl::OnMustRefresh(wxCommandEvent&)
             wxString timeStr = wxString::Format(_("( %ld seconds )"), compilationTimer.Time()/1000);
             if (!currentTasks.empty())
             {
-                statusTxt->SetLabel(_("Compilation finished")+timeStr+_(", but ")+ToString(currentTasks.size())+_(" task(s) are waiting."));
-                AppendText(_("Tasks finished ")+timeStr+_(", but ")+ToString(currentTasks.size())+_(" task(s) are waiting.")+"\n");
+                statusTxt->SetLabel(_("Compilation finished")+timeStr+_(", but ")+gd::ToString(currentTasks.size())+_(" task(s) are waiting."));
+                AppendText(_("Tasks finished ")+timeStr+_(", but ")+gd::ToString(currentTasks.size())+_(" task(s) are waiting.")+"\n");
 
             }
             else

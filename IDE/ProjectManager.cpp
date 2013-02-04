@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "ProjectManager.h"
@@ -19,7 +19,7 @@
 #include <wx/busyinfo.h>
 #include <fstream>
 #include "LogFileManager.h"
-#include "Clipboard.h"
+#include "GDCore/IDE/Clipboard.h"
 #include "MainFrame.h"
 #include "gdTreeItemProjectData.h"
 #include "GDL/ExternalEvents.h"
@@ -620,6 +620,28 @@ void ProjectManager::OnEditSourceFileSelected(wxCommandEvent& event)
 
 void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t line)
 {
+    //Having a game associated with the editor is optional
+    Game * associatedGame = NULL;
+    if ( game )
+    {
+        vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
+            find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), filename));
+
+        if ( sourceFile != game->externalSourceFiles.end() )
+        {
+            associatedGame = game;
+            /*if ((*sourceFile)->IsGDManaged()) //We're trying to open a GD-managed source file: Let's open the editor of the associated event.
+            {
+                boost::shared_ptr<BaseEvent> event = (*sourceFile)->GetAssociatedEvent().lock();
+                if ( event != boost::shared_ptr<BaseEvent>() )
+                {
+                    event->EditEvent()
+                }
+            }*/
+        }
+    }
+
+    //As we're opening a "real" file, first check if it exists
     if ( !wxFileExists(filename) )
     {
         wxLogWarning(_("Unable to open ")+filename+_(", the file does not exists"));
@@ -639,15 +661,6 @@ void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t li
     }
     //Launch an internal code editor else
 
-    //Having a game associated with the editor is optional
-    Game * associatedGame = NULL;
-    if ( game )
-    {
-        vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
-            find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), filename));
-
-        if ( sourceFile != game->externalSourceFiles.end() ) associatedGame = game;
-    }
 
     //Verify if the editor is not already opened
     for (unsigned int j =0;j<mainEditor.GetEditorsNotebook()->GetPageCount() ;j++ )
@@ -910,7 +923,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
         {
             ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-            if ( editorPtr != NULL && &editorPtr->externalLayout == &game->GetExternalLayout(newName))
+            if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(newName))
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
     }
@@ -1071,7 +1084,7 @@ void ProjectManager::OncopySceneMenuItemSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetLayout(&game->GetLayout(data->GetSecondString()));
+    gd::Clipboard::GetInstance()->SetLayout(&game->GetLayout(data->GetSecondString()));
 }
 
 /**
@@ -1092,7 +1105,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
 
     gd::Layout & layout = game->GetLayout(layoutName);
 
-    Clipboard::GetInstance()->SetLayout(&layout);
+    gd::Clipboard::GetInstance()->SetLayout(&layout);
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -1112,7 +1125,7 @@ void ProjectManager::OncutSceneMenuItemSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     //Ensure we're not destroying a scene with events being built
-    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo("Veuillez patienter, la compilation interne des évènements\ndoit être menée à terme avant de continuer...") : NULL;
+    wxBusyInfo * waitDialog = CodeCompiler::GetInstance()->CompilationInProcess() ? new wxBusyInfo(_("Please wait while the internal compilation of events is finishing...")) : NULL;
     while (CodeCompiler::GetInstance()->CompilationInProcess())
     {
         wxYield();
@@ -1129,7 +1142,7 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     gdTreeItemProjectData * data;
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
-    Clipboard * clipboard = Clipboard::GetInstance();
+    gd::Clipboard * clipboard = gd::Clipboard::GetInstance();
     if (!clipboard->HasLayout()) return;
 
     gd::Layout & newLayout = *clipboard->GetLayout();
@@ -1273,7 +1286,7 @@ void ProjectManager::CloseGame(gd::Project * project)
         }
         else if ( externalLayoutEditorPtr != NULL )
         {
-            if ( &externalLayoutEditorPtr->game == project)
+            if ( &externalLayoutEditorPtr->GetProject() == project)
             {
                 if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                     wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
@@ -1485,7 +1498,7 @@ void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
+    gd::Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
 }
 
 void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
@@ -1501,7 +1514,7 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
+    gd::Clipboard::GetInstance()->SetExternalEvents(&game->GetExternalEvents(data->GetSecondString()));
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -1608,7 +1621,7 @@ void ProjectManager::OnEditExternalLayoutSelected(wxCommandEvent& event)
     {
         ExternalLayoutEditor * externalLayoutEditorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(j));
 
-        if ( externalLayoutEditorPtr != NULL && &externalLayoutEditorPtr->externalLayout == &game->GetExternalLayout(data->GetSecondString()) )
+        if ( externalLayoutEditorPtr != NULL && &externalLayoutEditorPtr->GetExternalLayout() == &game->GetExternalLayout(data->GetSecondString()) )
         {
             //Change notebook page to scene page
             mainEditor.GetEditorsNotebook()->SetSelection(j);
@@ -1655,7 +1668,7 @@ void ProjectManager::OnDeleteExternalLayoutSelected(wxCommandEvent& event)
     {
         ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-        if ( editorPtr != NULL && &editorPtr->externalLayout == &game->GetExternalLayout(data->GetSecondString()))
+        if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(data->GetSecondString()))
         {
             if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                 wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );
@@ -1682,7 +1695,7 @@ void ProjectManager::OnCopyExternalLayoutSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
+    gd::Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
 }
 
 void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
@@ -1698,14 +1711,14 @@ void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
         return;
     }
 
-    Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
+    gd::Clipboard::GetInstance()->SetExternalLayout(&game->GetExternalLayout(data->GetSecondString()));
 
     //Updating editors
     for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
     {
         ExternalLayoutEditor * editorPtr = dynamic_cast<ExternalLayoutEditor*>(mainEditor.GetEditorsNotebook()->GetPage(k));
 
-        if ( editorPtr != NULL && &editorPtr->externalLayout == &game->GetExternalLayout(data->GetSecondString()))
+        if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(data->GetSecondString()))
         {
             if ( !mainEditor.GetEditorsNotebook()->DeletePage(k) )
                 wxMessageBox(_("Unable to delete a tab !"), _("Error"), wxICON_ERROR );

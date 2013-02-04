@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #ifndef PLATFORMMANAGER_H
 #define PLATFORMMANAGER_H
@@ -15,9 +15,22 @@ class PlatformManager
 {
 public:
 
+    /**
+     * Add a new platform to be used by the IDE
+     */
     bool AddPlatform(boost::shared_ptr<gd::Platform> newPlatform);
-    const std::vector< boost::shared_ptr<gd::Platform> > & GetAllPlatforms() const { return platformsLoaded; };
+
+    /**
+     * Get a (smart) pointer to the platform called \a platformName.
+     */
     boost::shared_ptr<gd::Platform> GetPlatform(const std::string & platformName) const;
+
+    const std::vector< boost::shared_ptr<gd::Platform> > & GetAllPlatforms() const { return platformsLoaded; };
+
+    /**
+     * Notify each platform that the IDE is ready, by calling their OnIDEInitialized member function.
+     */
+    void NotifyPlatformIDEInitialized() const;
 
     static PlatformManager *GetInstance()
     {
@@ -29,10 +42,20 @@ public:
         return ( static_cast<PlatformManager*>( _singleton ) );
     }
 
+    /**
+     * Destroy the global platform manager. This is called by the IDE before shutting down.
+     * ( Otherwise, platforms won't get notified that the IDE closed. )
+     */
     static void DestroySingleton()
     {
         if ( NULL != _singleton )
         {
+            for (unsigned int i = 0;i<_singleton->platformsLoaded.size();++i)
+            {
+                if ( _singleton->platformsLoaded[i] != boost::shared_ptr<gd::Platform>() )
+                    _singleton->platformsLoaded[i]->OnIDEClosed();
+            }
+
             delete _singleton;
             _singleton = NULL;
         }

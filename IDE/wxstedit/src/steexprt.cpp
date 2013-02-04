@@ -51,7 +51,7 @@ OR PERFORMANCE OF THIS SOFTWARE.
 #include "wx/stedit/stedit.h"    // for wxSTEEditorPrefs/Styles/Langs
 #include "wx/stedit/steexprt.h"
 #include "stedlgs_wdr.h"
-#include "wx/stc/private.h"
+#include "wx/stc/private.h" //If compilation fails here, you have to copy the file from the wxWidgets source dir to the wxWidgets installation dir.
 #include "wx/filesys.h"
 
 // ----------------------------------------------------------------------------

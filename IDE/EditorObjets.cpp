@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #ifdef __WXMSW__
@@ -24,7 +24,7 @@
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
 #include "GDL/CommonTools.h"
-#include "Clipboard.h"
+#include "GDCore/IDE/Clipboard.h"
 #include <algorithm>
 #include <numeric>
 #include "EditorObjetsGroups.h"

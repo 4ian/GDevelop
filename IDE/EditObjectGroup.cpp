@@ -1,6 +1,6 @@
 /** \file
  *  Game Develop
- *  2008-2012 Florian Rival (Florian.Rival@gmail.com)
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
 #include "EditObjectGroup.h"
@@ -52,10 +52,10 @@ BEGIN_EVENT_TABLE(EditObjectGroup,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditObjectGroup::EditObjectGroup(wxWindow* parent, Game & game_, Scene & scene_, const gd::ObjectGroup & group_) :
+EditObjectGroup::EditObjectGroup(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, const gd::ObjectGroup & group_) :
 group(group_),
-game(game_),
-scene(scene_),
+project(project_),
+layout(layout_),
 modificationCount(0)
 {
 	//(*Initialize(EditObjectGroup)
@@ -189,7 +189,7 @@ void EditObjectGroup::OnObjetsListItemRightClick(wxTreeEvent& event)
 
 void EditObjectGroup::OnAddObjetSelected(wxCommandEvent& event)
 {
-    gd::ChooseObjectDialog dialog(this, game, scene, false /*No groups*/, "" /*All objects types*/, true /*Allow multiple selection*/ );
+    gd::ChooseObjectDialog dialog(this, project, layout, false /*No groups*/, "" /*All objects types*/, true /*Allow multiple selection*/ );
     if ( dialog.ShowModal() == 1 )
     {
         for (unsigned int i = 0;i<dialog.GetChosenObjects().size();++i)

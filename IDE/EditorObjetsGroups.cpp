@@ -16,12 +16,13 @@
 #include <vector>
 #include <algorithm>
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
-#include "GDL/Object.h"
-#include "GDL/Game.h"
+#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/CommonTools.h"
 #include "MainFrame.h"
-#include "GDL/CommonTools.h"
 #include "EditObjectGroup.h"
-#include "Clipboard.h"
+#include "GDCore/IDE/Clipboard.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDCore/IDE/EventsRefactorer.h"
@@ -35,8 +36,8 @@
 #include <gtk/gtk.h>
 #endif
 
-
 using namespace std;
+using namespace gd;
 
 //(*IdInit(EditorObjetsGroups)
 const long EditorObjetsGroups::ID_PANEL4 = wxNewId();
@@ -65,9 +66,9 @@ BEGIN_EVENT_TABLE(EditorObjetsGroups,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-EditorObjetsGroups::EditorObjetsGroups( wxWindow* parent,  Game & game_, Scene & scene_, vector < gd::ObjectGroup > * objectsGroups_, gd::MainFrameWrapper & mainFrameWrapper_) :
-game(game_),
-scene(scene_),
+EditorObjetsGroups::EditorObjetsGroups( wxWindow* parent, gd::Project & project_, gd::Layout & layout_, vector < gd::ObjectGroup > * objectsGroups_, gd::MainFrameWrapper & mainFrameWrapper_) :
+project(project_),
+layout(layout_),
 objectsGroups(objectsGroups_),
 mainFrameWrapper(mainFrameWrapper_)
 {
@@ -169,7 +170,7 @@ EditorObjetsGroups::~EditorObjetsGroups()
 
 bool EditorObjetsGroups::EditingLayoutGroups()
 {
-    return (&scene.GetObjectGroups() == objectsGroups);
+    return (&layout.GetObjectGroups() == objectsGroups);
 }
 
 /**
@@ -220,7 +221,7 @@ void EditorObjetsGroups::ConnectEvents()
 void EditorObjetsGroups::Refresh()
 {
     ObjetsGroupsList->DeleteAllItems();
-    ObjetsGroupsList->AddRoot( _( "All group of objects of the scene" ) );
+    ObjetsGroupsList->AddRoot( _( "All group of objects" ) );
 
     for (unsigned int i = 0;i<objectsGroups->size();++i)
         ObjetsGroupsList->AppendItem( ObjetsGroupsList->GetRootItem(), objectsGroups->at( i ).GetName() );
@@ -230,7 +231,7 @@ void EditorObjetsGroups::Refresh()
 
 void EditorObjetsGroups::OnMoveUpSelected(wxCommandEvent& event)
 {
-    string groupName = string(ObjetsGroupsList->GetItemText( itemSelected ).mb_str());
+    std::string groupName = string(ObjetsGroupsList->GetItemText( itemSelected ).mb_str());
 
     for (unsigned int i = 0;i<objectsGroups->size();++i)
     {
@@ -337,11 +338,11 @@ void EditorObjetsGroups::OnEditGroupSelected(wxCommandEvent& event)
                                                     std::bind2nd(gd::GroupHasTheSameName(), ObjetsGroupsList->GetItemText( itemSelected )));
     if ( i != objectsGroups->end() )
     {
-        EditObjectGroup dialog(this, game, scene, *i);
+        EditObjectGroup dialog(this, project, layout, *i);
         if ( dialog.ShowModal() == 1 )
             *i = dialog.group;
 
-        game.GetChangesNotifier().OnObjectGroupEdited(game, EditingLayoutGroups() ? &scene : NULL, i->GetName());
+        project.GetChangesNotifier().OnObjectGroupEdited(project, EditingLayoutGroups() ? &layout : NULL, i->GetName());
         return;
     }
 }
@@ -355,7 +356,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     gd::ObjectGroup NewGroup;
     wxTreeItemId rootId = ObjetsGroupsList->GetRootItem();
 
-    wxString name =  _( "New_group" );
+    wxString name =  _( "NewGroup" );
     int i = 1;
 
     //Tant qu'un objet avec le même nom existe, on ajoute un chiffre
@@ -363,7 +364,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
             != objectsGroups->end() )
     {
         ++i;
-        name =  _( "New_group" )+"_"+ ToString(i);
+        name =  _( "NewGroup" )+ gd::ToString(i);
     }
     NewGroup.SetName( string(name.mb_str()) );
 
@@ -371,7 +372,7 @@ void EditorObjetsGroups::OnAddGroupSelected(wxCommandEvent& event)
     objectsGroups->push_back( NewGroup );
     ObjetsGroupsList->AppendItem( rootId, name );
 
-    game.GetChangesNotifier().OnObjectGroupAdded(game, EditingLayoutGroups() ? &scene : NULL, ToString(name));
+    project.GetChangesNotifier().OnObjectGroupAdded(project, EditingLayoutGroups() ? &layout : NULL, gd::ToString(name));
     wxLogStatus( _( "The group was correctly added." ) );
 }
 
@@ -412,10 +413,10 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
 
             if ( answer == wxYES )
             {
-                gd::EventsRefactorer::RemoveObjectInEvents(game, scene, scene.GetEvents(), groupName);
+                gd::EventsRefactorer::RemoveObjectInEvents(project, layout, layout.GetEvents(), groupName);
             }
 
-            game.GetChangesNotifier().OnObjectGroupDeleted(game, EditingLayoutGroups() ? &scene : NULL, groupName);
+            project.GetChangesNotifier().OnObjectGroupDeleted(project, EditingLayoutGroups() ? &layout : NULL, groupName);
             ObjetsGroupsList->Delete( itemSelected );
         }
     }
@@ -522,9 +523,9 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
         {
             i->SetName( newName );
 
-            gd::EventsRefactorer::RenameObjectInEvents(game, scene, scene.GetEvents(), renamedGroupOldName, newName);
+            gd::EventsRefactorer::RenameObjectInEvents(project, layout, layout.GetEvents(), renamedGroupOldName, newName);
 
-            game.GetChangesNotifier().OnObjectGroupRenamed(game, EditingLayoutGroups() ? &scene : NULL, newName, renamedGroupOldName);
+            project.GetChangesNotifier().OnObjectGroupRenamed(project, EditingLayoutGroups() ? &layout : NULL, newName, renamedGroupOldName);
             return;
         }
     }
@@ -535,7 +536,7 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
 ////////////////////////////////////////////////////////////
 void EditorObjetsGroups::OnModNameSelected(wxCommandEvent& event)
 {
-    if ( ObjetsGroupsList->GetItemText( itemSelected ) != _( "All groups of the scene" ) )
+    if ( ObjetsGroupsList->GetItemText( itemSelected ) != _( "All groups of the layout" ) )
         ObjetsGroupsList->EditLabel( itemSelected );
     else
         wxLogStatus( _( "No group selected" ) );
@@ -563,7 +564,7 @@ void EditorObjetsGroups::OnSetFocus(wxFocusEvent& event)
 
 void EditorObjetsGroups::OnCopyGroupSelected(wxCommandEvent& event)
 {
-    Clipboard * clipboard = Clipboard::GetInstance();
+    gd::Clipboard * clipboard = gd::Clipboard::GetInstance();
 
     if ( itemSelected == ObjetsGroupsList->GetRootItem() ) return;
 
@@ -577,7 +578,7 @@ void EditorObjetsGroups::OnCopyGroupSelected(wxCommandEvent& event)
 
 void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
 {
-    Clipboard * clipboard = Clipboard::GetInstance();
+    gd::Clipboard * clipboard = gd::Clipboard::GetInstance();
 
     if ( itemSelected == ObjetsGroupsList->GetRootItem() ) return;
 
@@ -589,13 +590,13 @@ void EditorObjetsGroups::OnCutGroupSelected(wxCommandEvent& event)
     clipboard->SetObjectGroup(*i);
     objectsGroups->erase( i );
 
-    game.GetChangesNotifier().OnObjectGroupDeleted(game, EditingLayoutGroups() ? &scene : NULL, ToString(ObjetsGroupsList->GetItemText( itemSelected )));
+    project.GetChangesNotifier().OnObjectGroupDeleted(project, EditingLayoutGroups() ? &layout : NULL, gd::ToString(ObjetsGroupsList->GetItemText( itemSelected )));
     ObjetsGroupsList->Delete( itemSelected );
 }
 
 void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
 {
-    Clipboard * clipboard = Clipboard::GetInstance();
+    gd::Clipboard * clipboard = gd::Clipboard::GetInstance();
     if ( !clipboard->HasObjectGroup() ) return;
     gd::ObjectGroup groupPasted = clipboard->GetObjectGroup();
 
@@ -607,13 +608,13 @@ void EditorObjetsGroups::OnPasteGroupSelected(wxCommandEvent& event)
             != objectsGroups->end() )
     {
         ++i;
-        groupPasted.SetName(ToString(_( "Copy_of_" )+groupPasted.GetName()+"_"+ToString(i)));
+        groupPasted.SetName(gd::ToString(_( "Copy_of_" )+groupPasted.GetName()+"_"+gd::ToString(i)));
     }
 
     //On l'ajoute
     objectsGroups->push_back( groupPasted );
     ObjetsGroupsList->AppendItem( rootId, groupPasted.GetName());
 
-    game.GetChangesNotifier().OnObjectGroupAdded(game, EditingLayoutGroups() ? &scene : NULL,  groupPasted.GetName());
+    project.GetChangesNotifier().OnObjectGroupAdded(project, EditingLayoutGroups() ? &layout : NULL,  groupPasted.GetName());
 }
 

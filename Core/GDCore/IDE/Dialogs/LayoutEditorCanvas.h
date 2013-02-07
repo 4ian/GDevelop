@@ -265,6 +265,7 @@ protected:
     virtual void OnHelpBtClick( wxCommandEvent & event ) {};
     virtual void OnLeftDown( wxMouseEvent &event );
     virtual void OnLeftUp( wxMouseEvent &event );
+    virtual void OnLeftDClick( wxMouseEvent &event );
     virtual void OnKey( wxKeyEvent& evt );
     virtual void OnKeyUp( wxKeyEvent& evt );
     virtual void OnMiddleDown( wxMouseEvent &event ) {};

@@ -77,6 +77,7 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
 	Connect(wxEVT_IDLE,(wxObjectEventFunction)&LayoutEditorCanvas::OnIdle);
 	Connect(wxEVT_LEFT_DOWN,(wxObjectEventFunction)&LayoutEditorCanvas::OnLeftDown);
 	Connect(wxEVT_LEFT_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnLeftUp);
+	Connect(wxEVT_LEFT_DCLICK,(wxObjectEventFunction)&LayoutEditorCanvas::OnLeftDClick);
 	Connect(wxEVT_RIGHT_UP,(wxObjectEventFunction)&LayoutEditorCanvas::OnRightUp);
 	Connect(wxEVT_MIDDLE_DOWN,(wxObjectEventFunction)&LayoutEditorCanvas::OnMiddleDown);
 	Connect(wxEVT_MOTION,(wxObjectEventFunction)&LayoutEditorCanvas::OnMotion);
@@ -515,6 +516,14 @@ void LayoutEditorCanvas::OnLeftUp( wxMouseEvent &event )
 
         isSelecting = false;
     }
+}
+
+void LayoutEditorCanvas::OnLeftDClick( wxMouseEvent &event )
+{
+    if ( !editing ) return;
+
+    parentAuiManager->GetPane("PROPERTIES").Show();
+    parentAuiManager->Update();
 }
 
 void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )

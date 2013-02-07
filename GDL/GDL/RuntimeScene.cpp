@@ -261,6 +261,9 @@ void RuntimeScene::ManageRenderTargetEvents()
     while ( renderWindow->pollEvent( event ) )
     {
         renderTargetEvents.push_back(event);
+        /*if (event.type == sf::Event::TextEntered )
+            std::cout << "TEXT";
+        std::cout << "event";*/
 
         // Close window : exit
         if ( event.type == sf::Event::Closed )

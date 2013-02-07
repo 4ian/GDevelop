@@ -91,6 +91,8 @@ private:
     virtual void OnPaint(wxPaintEvent&);
     virtual void OnEraseBackground(wxEraseEvent&) {};
     virtual void DoConnectEvents();
+    virtual void OnKey( wxKeyEvent& evt );
+    virtual void OnKeyUp( wxKeyEvent& evt );
 
     //Changing the state of the editor
     virtual void OnPreviewBtClick( wxCommandEvent & event );
@@ -101,7 +103,14 @@ private:
     virtual void OnOrigineBtClick(wxCommandEvent & event );
     virtual void OnZoomInitBtClick( wxCommandEvent & event );
     virtual void OnZoomMoreBtClick(wxRibbonButtonBarEvent& evt);
-    virtual void OnCustomZoomSelected(wxCommandEvent& event);
+    virtual void OnCustomZoom5Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom10Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom25Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom50Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom100Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom150Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom200Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom500Selected(wxCommandEvent& event);
     virtual void OnLeftUp( wxMouseEvent &event );
     virtual void OnMiddleDown( wxMouseEvent &event );
     virtual void OnMotion( wxMouseEvent &event );
@@ -124,6 +133,7 @@ private:
     virtual void OnInitialInstanceDeleted(gd::InitialInstance & instance);
     virtual void OnGuiElementPressed(const gd::LayoutEditorCanvasGuiElement & guiElement);
     virtual void OnGuiElementHovered(const gd::LayoutEditorCanvasGuiElement & guiElement);
+    virtual void OnGuiElementReleased(const gd::LayoutEditorCanvasGuiElement & guiElement);
     virtual void Undo(unsigned int times = 1) { LayoutEditorCanvas::Undo(times); RefreshFromLayout(); };
     virtual void Redo(unsigned int times = 1) { LayoutEditorCanvas::Redo(times); RefreshFromLayout(); };
 
@@ -147,6 +157,7 @@ private:
     void RenderGrid();
     void AddSmallButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName );
     void DrawSelectionRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
+    void DrawAngleButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, float angle );
     void DrawHighlightRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
     sf::Vector2f ConvertToWindowCoordinates(float x, float y, const sf::View & view);
 
@@ -172,10 +183,11 @@ private:
 
     //Editing members data
     sf::View editionView; ///< The view used for editing
-    std::string currentResizeBt;
+    std::string currentDraggableBt;
     std::map<gd::InitialInstance*, double> resizeOriginalWidths;
     std::map<gd::InitialInstance*, double> resizeOriginalHeights;
     sf::Vector2f resizeMouseStartPosition;
+    sf::Vector2f angleButtonCenter;
     bool isMovingView;
     sf::Vector2f movingViewMouseStartPosition;
     sf::Vector2f movingViewStartPosition;
@@ -187,7 +199,14 @@ private:
     //Custom ribbons buttons identifiers
     static const long idRibbonOrigine;
     static const long idRibbonOriginalZoom;
-    static const long ID_CUSTOMZOOMMENUITEM;
+    static const long ID_CUSTOMZOOMMENUITEM500;
+    static const long ID_CUSTOMZOOMMENUITEM200;
+    static const long ID_CUSTOMZOOMMENUITEM150;
+    static const long ID_CUSTOMZOOMMENUITEM100;
+    static const long ID_CUSTOMZOOMMENUITEM50;
+    static const long ID_CUSTOMZOOMMENUITEM25;
+    static const long ID_CUSTOMZOOMMENUITEM10;
+    static const long ID_CUSTOMZOOMMENUITEM5;
     static const long idRibbonRefresh;
     static const long idRibbonPlay;
     static const long idRibbonPlayWin;
@@ -223,7 +242,7 @@ private:
     /**
      * Update the mouse according to the selected button
      */
-    void UpdateMouseResizeCursor(const std::string & currentResizeBt);
+    void UpdateMouseResizeCursor(const std::string & currentDraggableBt);
 
     void UpdateContextMenu();
     void SendSelectionToLayer(const std::string & newLayerName);

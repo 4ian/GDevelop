@@ -11,6 +11,7 @@
 #include <string>
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
+#include <wx/log.h>
 #include <wx/filename.h>
 #include <wx/filefn.h>
 #include <wx/txtstrm.h>
@@ -34,6 +35,173 @@ CodeCompilerTask ConstructEmptyTask()
     return task;
 }
 
+}
+
+std::string CodeCompilerCall::GetFullCall() const
+{
+    #if defined(WINDOWS)
+    std::string compilerExecutable = "\""+CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/MinGW32/bin/g++.exe\"";
+    #else
+    std::string compilerExecutable = "g++";
+    #endif
+
+    std::string baseDir = CodeCompiler::GetInstance()->GetBaseDirectory();
+
+    std::vector<std::string> args;
+    args.push_back("-m32");
+    args.push_back("-nostdinc");
+    args.push_back("-nostdinc++");
+    #if defined(WINDOWS)
+    args.push_back("-B\""+CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/MinGW32/bin\"");
+    #else
+    args.push_back("--sysroot=\""+CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/include/linux\"");
+    #endif
+    for (unsigned int i = 0;i<extraOptions.size();++i)
+        args.push_back(extraOptions[i]);
+
+    args.push_back("-o \""+outputFile+"\"");
+    if ( optimize ) args.push_back("-O1");
+
+    if ( !link ) //Generate argument for compiling a file
+    {
+        if ( !compilationForRuntime ) args.push_back("-include \""+baseDir+"CppPlatform/include/GDL/GDL/EventsPrecompiledHeader.h\"");
+        args.push_back("-c \""+inputFile+"\"");
+
+        //Compiler default directories
+        std::vector<std::string> standardsIncludeDirs;
+        #if defined(WINDOWS)
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/include");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++");
+        standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
+        #elif defined(LINUX)
+        standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/i386-linux-gnu/");
+        standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/lib/gcc/i386-linux-gnu/4.7/include");
+        standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include");
+        standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.7/");
+        standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.7/i686-linux-gnu");
+        standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.7/backward");
+        #elif defined(MAC)
+        #endif
+
+        standardsIncludeDirs.push_back("CppPlatform/include/GDL");
+        standardsIncludeDirs.push_back("CppPlatform/include/Core");
+        standardsIncludeDirs.push_back("CppPlatform/include/boost");
+        standardsIncludeDirs.push_back("CppPlatform/include/SFML/include");
+        standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/include");
+        standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/lib/gcc_dll/msw");
+        standardsIncludeDirs.push_back("CppPlatform/Extensions/include");
+
+        for (unsigned int i =0;i<standardsIncludeDirs.size();++i)
+            args.push_back("-I\""+baseDir+standardsIncludeDirs[i]+"\"");
+
+        //CodeCompiler extra headers directories
+        const std::set<std::string> & codeCompilerHeaders = CodeCompiler::GetInstance()->GetAllHeadersDirectories();
+        for (std::set<std::string>::const_iterator header = codeCompilerHeaders.begin();header != codeCompilerHeaders.end();++header)
+            args.push_back("-I\""+*header+"\"");
+
+        //Additional headers for the task
+        for (unsigned int i = 0;i<extraHeaderDirectories.size();++i)
+            args.push_back("-I\""+extraHeaderDirectories[i]+"\"");
+
+        if ( !compilationForRuntime ) args.push_back("-DGD_IDE_ONLY");
+
+        //GD library related defines.
+        #if defined(WINDOWS)
+        args.push_back("-DGD_CORE_API=__declspec(dllimport)");
+        args.push_back("-DGD_API=__declspec(dllimport)");
+        args.push_back("-DGD_EXTENSION_API=__declspec(dllimport)");
+        #elif defined(LINUX)
+        args.push_back("-DGD_CORE_API= ");
+        args.push_back("-DGD_API= ");
+        args.push_back("-DGD_EXTENSION_API= ");
+        #elif defined(MAC)
+        args.push_back("-DGD_CORE_API= ");
+        args.push_back("-DGD_API= ");
+        args.push_back("-DGD_EXTENSION_API= ");
+        #endif
+
+        //Other common defines.
+        #if defined(RELEASE)
+        args.push_back("-DRELEASE");
+        args.push_back("-DNDEBUG");
+        args.push_back("-DBOOST_DISABLE_ASSERTS");
+        #elif defined(DEV)
+        args.push_back("-DDEV");
+        args.push_back("-DNDEBUG");
+        args.push_back("-DBOOST_DISABLE_ASSERTS");
+        #elif defined(DEBUG)
+        args.push_back("-DDEBUG");
+        #endif
+    }
+    else //Generate argument for linking files
+    {
+        args.push_back("-shared");
+        if ( !inputFile.empty() ) args.push_back("\""+inputFile+"\"");
+        for (unsigned int i = 0;i<extraObjectFiles.size();++i)
+        {
+            if (!extraObjectFiles[i].empty()) args.push_back("\""+extraObjectFiles[i]+"\"");
+        }
+
+        //Libraries and libraries directories
+        #if defined(WINDOWS)
+        args.push_back("-L\""+baseDir+"CppPlatform/MinGW32/lib/\"");
+        #endif
+        if ( !compilationForRuntime )
+        {
+            args.push_back("-L\""+baseDir+"\"");
+            args.push_back("-L\""+baseDir+"CppPlatform/Extensions/\"");
+        }
+        else
+        {
+            args.push_back("-L\""+baseDir+"\"");
+            args.push_back("-L\""+baseDir+"CppPlatform/Runtime/\"");
+            args.push_back("-L\""+baseDir+"CppPlatform/Extensions/Runtime/\"");
+        }
+
+        args.push_back("-lgdl");
+        args.push_back("-lstdc++");
+        if ( !compilationForRuntime ) args.push_back("-lGDCore");
+        #if defined(RELEASE) || defined(DEV)
+        #if defined(WINDOWS)
+        args.push_back("-lsfml-audio");
+        args.push_back("-lsfml-network");
+        args.push_back("-lsfml-graphics");
+        args.push_back("-lsfml-window");
+        args.push_back("-lsfml-system");
+        #else
+        args.push_back("\""+baseDir+"libsfml-audio.so.2\"");
+        args.push_back("\""+baseDir+"libsfml-network.so.2\"");
+        args.push_back("\""+baseDir+"libsfml-graphics.so.2\"");
+        args.push_back("\""+baseDir+"libsfml-window.so.2\"");
+        args.push_back("\""+baseDir+"libsfml-system.so.2\"");
+        #endif
+        #elif defined(DEBUG)
+        #if defined(WINDOWS)
+        args.push_back("-lsfml-audio-d");
+        args.push_back("-lsfml-network-d");
+        args.push_back("-lsfml-graphics-d");
+        args.push_back("-lsfml-window-d");
+        args.push_back("-lsfml-system-d");
+        #else
+        args.push_back("\""+baseDir+"libsfml-audio-d.so.2\"");
+        args.push_back("\""+baseDir+"libsfml-network-d.so.2\"");
+        args.push_back("\""+baseDir+"libsfml-graphics-d.so.2\"");
+        args.push_back("\""+baseDir+"libsfml-window-d.so.2\"");
+        args.push_back("\""+baseDir+"libsfml-system-d.so.2\"");
+        #endif
+        #endif
+        for (unsigned int i = 0;i<extraLibFiles.size();++i)
+        {
+            if ( !extraLibFiles[i].empty())
+                args.push_back("-l\""+extraLibFiles[i]+"\"");
+        }
+    }
+
+    std::string argsStr;
+    for (unsigned int i = 0;i<args.size();++i) argsStr += args[i]+" ";
+
+    return compilerExecutable+" "+argsStr;
 }
 
 void CodeCompiler::StartTheNextTask()
@@ -113,132 +281,25 @@ void CodeCompiler::StartTheNextTask()
 
     lastTaskMessages.clear();
 
-    //Define compilation arguments for Clang.
-    std::vector<std::string> args;
-    args.push_back("-o "+currentTask.outputFile);
-    args.push_back("-nostdinc");
-    args.push_back("-nostdinc++");
-    #if defined(WINDOWS)
-    args.push_back("-B"+baseDir+"CppPlatform/MinGW32/bin");
-    #else
-    args.push_back("--sysroot="+baseDir+"CppPlatform/include/linux");
-    #endif
-    if ( currentTask.optimize ) args.push_back("-O1");
-
-    if ( !currentTask.link ) //Generate argument for compiling a file
-    {
-        if ( !currentTask.compilationForRuntime ) args.push_back("-include "+baseDir+"CppPlatform/include/GDL/GDL/EventsPrecompiledHeader.h");
-        args.push_back("-c "+currentTask.inputFile);
-
-        //Headers directories
-        for (std::set<std::string>::const_iterator header = headersDirectories.begin();header != headersDirectories.end();++header)
-            args.push_back((*header).c_str());
-
-        //Additional headers
-        args.push_back("-nostdinc++");
-        std::vector<std::string> additionalHeadersArgs;
-        for (unsigned int i = 0;i<currentTask.additionalHeaderDirectories.size();++i)
-            additionalHeadersArgs.push_back("-I"+currentTask.additionalHeaderDirectories[i]);
-        for (unsigned int i = 0;i<additionalHeadersArgs.size();++i)
-            args.push_back(additionalHeadersArgs[i].c_str());
-
-        if ( !currentTask.compilationForRuntime ) args.push_back("-DGD_IDE_ONLY");
-
-        //GD library related defines.
-        #if defined(WINDOWS)
-        args.push_back("-DGD_CORE_API=__declspec(dllimport)");
-        args.push_back("-DGD_API=__declspec(dllimport)");
-        args.push_back("-DGD_EXTENSION_API=__declspec(dllimport)");
-        #elif defined(LINUX)
-        args.push_back("-DGD_CORE_API= ");
-        args.push_back("-DGD_API= ");
-        args.push_back("-DGD_EXTENSION_API= ");
-        #elif defined(MAC)
-        args.push_back("-DGD_CORE_API= ");
-        args.push_back("-DGD_API= ");
-        args.push_back("-DGD_EXTENSION_API= ");
-        #endif
-
-        //Other common defines.
-        #if defined(RELEASE)
-        args.push_back("-DRELEASE");
-        args.push_back("-DNDEBUG");
-        args.push_back("-DBOOST_DISABLE_ASSERTS");
-        #elif defined(DEV)
-        args.push_back("-DDEV");
-        args.push_back("-DNDEBUG");
-        args.push_back("-DBOOST_DISABLE_ASSERTS");
-        #elif defined(DEBUG)
-        args.push_back("-DDEBUG");
-        #endif
-    }
-    else //Generate argument for linking files
-    {
-        args.push_back("-shared");
-
-        args.push_back(currentTask.inputFile);
-
-        //All the files to be linked
-        for (unsigned int i = 0;i<currentTask.extraObjectFiles.size();++i)
-            args.push_back(currentTask.extraObjectFiles[i]);
-
-        //Libraries and libraries directories
-        #if defined(WINDOWS)
-        args.push_back("-L"+baseDir+"CppPlatform/MinGW32/lib/");
-        #endif
-        if ( !currentTask.compilationForRuntime )
-        {
-            args.push_back("-L"+baseDir);
-            args.push_back("-L"+baseDir+"CppPlatform/Extensions/");
-        }
-        else
-        {
-            args.push_back("-L"+baseDir);
-            args.push_back("-L"+baseDir+"CppPlatform/Runtime/");
-            args.push_back("-L"+baseDir+"CppPlatform/Extensions/Runtime/");
-        }
-
-        args.push_back("-lgdl");
-        args.push_back("-lstdc++");
-        if ( !currentTask.compilationForRuntime ) args.push_back("-lGDCore");
-        #if defined(RELEASE) || defined(DEV)
-        args.push_back("-lsfml-audio");
-        args.push_back("-lsfml-network");
-        args.push_back("-lsfml-graphics");
-        args.push_back("-lsfml-window");
-        args.push_back("-lsfml-system");
-        #elif defined(DEBUG)
-        args.push_back("-lsfml-audio-d");
-        args.push_back("-lsfml-network-d");
-        args.push_back("-lsfml-graphics-d");
-        args.push_back("-lsfml-window-d");
-        args.push_back("-lsfml-system-d");
-        #endif
-        for (unsigned int i = 0;i<currentTask.extraLibFiles.size();++i)
-            args.push_back("-l"+currentTask.extraLibFiles[i]);
-    }
-
-    std::string argsStr;
-    for (unsigned int i = 0;i<args.size();++i) argsStr += args[i]+" ";
-
-    //Finding g++
-    #if defined(WINDOWS)
-    std::string gccFullPath = baseDir+"CppPlatform/MinGW32/bin/g++.exe";
-    #else
-    std::string gccFullPath = "g++";
-    #endif
-
     //Launching the process
     std::cout << "Launching compiler process...\n";
+    //std::cout << currentTask.compilerCall.GetFullCall() << "\n";
     currentTaskProcess = new CodeCompilerProcess(this);
     currentTaskProcess->Redirect();
-    wxExecute(gccFullPath+" "+argsStr, wxEXEC_ASYNC, currentTaskProcess);
+    if ( wxExecute(currentTask.compilerCall.GetFullCall(), wxEXEC_ASYNC, currentTaskProcess) == 0 )
+    {
+        wxLogError(_("Unable to launch the internal compiler: Try to reinstall Game Develop to make sure that every file needed are present."));
+        delete currentTaskProcess;
+        currentTaskProcess = NULL;
+    }
+    else
+    {
+        //Also launch the thread which will read the output of the process
+        currentTaskOutputThread = new sf::Thread(&CodeCompilerProcess::WatchOutput, currentTaskProcess);
+        currentTaskOutputThread->launch();
 
-    //Also launch the thread which will read the output of the process
-    currentTaskOutputThread = new sf::Thread(&CodeCompilerProcess::WatchOutput, currentTaskProcess);
-    currentTaskOutputThread->launch();
-
-    //When the process ends, it will call ProcessEndedWork()...
+        //When the process ends, it will call ProcessEndedWork()...
+    }
 }
 
 CodeCompilerProcess::CodeCompilerProcess(wxEvtHandler * parent_) :
@@ -256,8 +317,13 @@ void CodeCompilerProcess::OnTerminate( int pid, int status )
 
     exitCode = status;
     stopWatchOutput = true;
+    #if defined(WINDOWS)
     wxCommandEvent processEndedEvent( CodeCompiler::processEndedEventType );
     if ( parent != NULL) wxPostEvent(parent, processEndedEvent);
+    #else
+    wxCommandEvent useless;
+    CodeCompiler::GetInstance()->ProcessEndedWork(useless);
+    #endif
 }
 
 void CodeCompiler::ProcessEndedWork(wxCommandEvent & event)
@@ -497,7 +563,7 @@ void CodeCompiler::AddHeaderDirectory(const std::string & dir)
     wxFileName filename = wxFileName::FileName(dir);
     filename.MakeAbsolute(baseDir);
 
-    headersDirectories.insert("-I"+ToString(filename.GetPath()));
+    headersDirectories.insert(ToString(filename.GetPath()));
 }
 
 void CodeCompiler::SetBaseDirectory(std::string baseDir_)
@@ -508,34 +574,7 @@ void CodeCompiler::SetBaseDirectory(std::string baseDir_)
     if ( baseDir.empty() || (baseDir[baseDir.length()-1] != '/' && baseDir[baseDir.length()-1] != '\\' ) )
         baseDir += "/"; //Normalize the path if needed
 
-    std::vector<std::string> standardsIncludeDirs;
-    #if defined(WINDOWS)
-    standardsIncludeDirs.push_back("CppPlatform/MinGW32/include");
-    standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include");
-    standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++");
-    standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
-    #elif defined(LINUX)
-    standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/i386-linux-gnu/");
-    standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include");
-    standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.6/");
-    standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.6/i686-linux-gnu");
-    standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.6/backward");
-    #elif defined(MAC)
-    #endif
-
-    standardsIncludeDirs.push_back("CppPlatform/include/GDL");
-    standardsIncludeDirs.push_back("CppPlatform/include/Core");
-    standardsIncludeDirs.push_back("CppPlatform/include/boost");
-    standardsIncludeDirs.push_back("CppPlatform/include/SFML/include");
-    standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/include");
-    standardsIncludeDirs.push_back("CppPlatform/include/wxwidgets/lib/gcc_dll/msw");
-    standardsIncludeDirs.push_back("CppPlatform/Extensions/include");
-
-    for (unsigned int i =0;i<standardsIncludeDirs.size();++i)
-    {
-        headersDirectories.erase("-I"+oldBaseDir+standardsIncludeDirs[i]); //Be sure to remove old include directories
-        headersDirectories.insert("-I"+baseDir+standardsIncludeDirs[i]);
-    }
+    std::cout << "here";
 }
 
 void CodeCompiler::AllowMultithread(bool allow, unsigned int maxThread)
@@ -554,6 +593,7 @@ CodeCompiler::CodeCompiler() :
     //maxGarbageThread(2),
     lastTaskFailed(false)
 {
+    std::cout << "Create";
     Connect(wxID_ANY, processEndedEventType, (wxObjectEventFunction) (wxEventFunction) (wxCommandEventFunction) &CodeCompiler::ProcessEndedWork);
 }
 
@@ -601,6 +641,14 @@ void CodeCompilerProcess::ReadOutput()
 
         outputErrors.push_back(line); // Either there's a full line in 'line', or we've run out of input. Either way, print it
     }
+}
+
+CodeCompilerCall::CodeCompilerCall() :
+    link(false),
+    compilationForRuntime(false),
+    optimize(false),
+    eventsGeneratedCode(true)
+{
 }
 
 CodeCompilerExtraWork::CodeCompilerExtraWork() :

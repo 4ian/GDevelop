@@ -74,15 +74,15 @@ void SceneEditorCanvas::SetParentAuiManager(wxAuiManager * manager)
     }
 }
 
-void SceneEditorCanvas::UpdateMouseResizeCursor(const std::string & currentResizeBt)
+void SceneEditorCanvas::UpdateMouseResizeCursor(const std::string & currentDraggableBt)
 {
-    if ( currentResizeBt == "resizeUp" || currentResizeBt == "resizeDown"  )
+    if ( currentDraggableBt == "resizeUp" || currentDraggableBt == "resizeDown"  )
         wxSetCursor(wxCursor(wxCURSOR_SIZENS));
-    if ( currentResizeBt == "resizeLeft" || currentResizeBt == "resizeRight"  )
+    if ( currentDraggableBt == "resizeLeft" || currentDraggableBt == "resizeRight"  )
         wxSetCursor(wxCursor(wxCURSOR_SIZEWE));
-    if ( currentResizeBt == "resizeLeftUp" || currentResizeBt == "resizeRightDown"  )
+    if ( currentDraggableBt == "resizeLeftUp" || currentDraggableBt == "resizeRightDown"  )
         wxSetCursor(wxCursor(wxCURSOR_SIZENWSE));
-    if ( currentResizeBt == "resizeRightUp" || currentResizeBt == "resizeLeftDown"  )
+    if ( currentDraggableBt == "resizeRightUp" || currentDraggableBt == "resizeLeftDown"  )
         wxSetCursor(wxCursor(wxCURSOR_SIZENESW));
 }
 
@@ -233,7 +233,14 @@ void SceneEditorCanvas::DoConnectEvents()
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonOrigine, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneEditorCanvas::OnOrigineBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneEditorCanvas::OnZoomInitBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonOriginalZoom, wxEVT_COMMAND_RIBBONBUTTON_DROPDOWN_CLICKED, (wxObjectEventFunction)&SceneEditorCanvas::OnZoomMoreBtClick, NULL, this);
-	mainFrameWrapper.GetMainEditor()->Connect(ID_CUSTOMZOOMMENUITEM,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCustomZoomSelected, NULL, this);
+	mainFrameWrapper.GetMainEditor()->Connect(ID_CUSTOMZOOMMENUITEM5,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCustomZoom5Selected, NULL, this);
+	mainFrameWrapper.GetMainEditor()->Connect(ID_CUSTOMZOOMMENUITEM10,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCustomZoom10Selected, NULL, this);
+	mainFrameWrapper.GetMainEditor()->Connect(ID_CUSTOMZOOMMENUITEM25,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCustomZoom25Selected, NULL, this);
+	mainFrameWrapper.GetMainEditor()->Connect(ID_CUSTOMZOOMMENUITEM50,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCustomZoom50Selected, NULL, this);
+	mainFrameWrapper.GetMainEditor()->Connect(ID_CUSTOMZOOMMENUITEM100,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCustomZoom100Selected, NULL, this);
+	mainFrameWrapper.GetMainEditor()->Connect(ID_CUSTOMZOOMMENUITEM150,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCustomZoom150Selected, NULL, this);
+	mainFrameWrapper.GetMainEditor()->Connect(ID_CUSTOMZOOMMENUITEM200,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCustomZoom200Selected, NULL, this);
+	mainFrameWrapper.GetMainEditor()->Connect(ID_CUSTOMZOOMMENUITEM500,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&SceneEditorCanvas::OnCustomZoom500Selected, NULL, this);
 
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonRefresh, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneEditorCanvas::OnPreviewRefreshBtClick, NULL, this);
     mainFrameWrapper.GetMainEditor()->Connect(idRibbonPlay, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, (wxObjectEventFunction)&SceneEditorCanvas::OnPreviewPlayBtClick, NULL, this);
@@ -531,9 +538,44 @@ void SceneEditorCanvas::OnMouseWheel( wxMouseEvent &event )
     UpdateViewAccordingToZoomFactor();
 }
 
-void SceneEditorCanvas::OnCustomZoomSelected(wxCommandEvent& event)
+void SceneEditorCanvas::OnCustomZoom5Selected(wxCommandEvent& event)
 {
-    std::cout << event.GetId();
+    options.zoomFactor = 0.05;
+    UpdateViewAccordingToZoomFactor();
+}
+void SceneEditorCanvas::OnCustomZoom10Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 0.10;
+    UpdateViewAccordingToZoomFactor();
+}
+void SceneEditorCanvas::OnCustomZoom25Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 0.25;
+    UpdateViewAccordingToZoomFactor();
+}
+void SceneEditorCanvas::OnCustomZoom50Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 0.5;
+    UpdateViewAccordingToZoomFactor();
+}
+void SceneEditorCanvas::OnCustomZoom100Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 1.0;
+    UpdateViewAccordingToZoomFactor();
+}
+void SceneEditorCanvas::OnCustomZoom150Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 1.5;
+    UpdateViewAccordingToZoomFactor();
+}
+void SceneEditorCanvas::OnCustomZoom200Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 2.0;
+    UpdateViewAccordingToZoomFactor();
+}
+void SceneEditorCanvas::OnCustomZoom500Selected(wxCommandEvent& event)
+{
+    options.zoomFactor = 5.0;
     UpdateViewAccordingToZoomFactor();
 }
 
@@ -627,6 +669,28 @@ void SceneEditorCanvas::UpdateViewAccordingToZoomFactor()
 void SceneEditorCanvas::OnHelpBtClick( wxCommandEvent & event )
 {
     gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_scene"));
+}
+
+void SceneEditorCanvas::OnKey( wxKeyEvent& evt )
+{
+    if (!editing)
+    {
+        evt.StopPropagation();
+        return;
+    }
+    else
+        LayoutEditorCanvas::OnKey( evt );
+}
+
+void SceneEditorCanvas::OnKeyUp( wxKeyEvent& evt )
+{
+    if (!editing)
+    {
+        evt.StopPropagation();
+        return;
+    }
+    else
+        LayoutEditorCanvas::OnKeyUp( evt );
 }
 
 #endif

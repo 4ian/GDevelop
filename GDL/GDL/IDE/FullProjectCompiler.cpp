@@ -59,24 +59,33 @@ void CreateWholeProjectRuntimeLinkingTask(Game & game, const std::string & outpu
 {
     std::cout << "Preparing linking task for project " << game.GetName() << "..." << std::endl;
     CodeCompilerTask task;
-    task.link = true;
-    task.compilationForRuntime = true;
-    task.optimize = false;
-    task.outputFile = outputFilename;
+    task.compilerCall.link = true;
+    task.compilerCall.compilationForRuntime = true;
+    task.compilerCall.optimize = false;
+    task.compilerCall.outputFile = outputFilename;
     task.userFriendlyName = "Linking code for project "+game.GetName();
 
     //Construct the list of the external shared libraries files to be used
     for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
     {
-        if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+game.GetUsedPlatformExtensions()[i]+".a") )
-            task.extraLibFiles.push_back(game.GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = ExtensionsManager::GetInstance()->GetExtension(game.GetUsedPlatformExtensions()[i]);
+        if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
+
+        if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".a") )
+            task.compilerCall.extraLibFiles.push_back(extension->GetName());
+
+        for (unsigned int j =0;j<extension->GetSupplementaryLibFiles().size();++j)
+        {
+            if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetSupplementaryLibFiles()[j]+".a") )
+                task.compilerCall.extraLibFiles.push_back(extension->GetSupplementaryLibFiles()[j]);
+        }
     }
 
     //Add all the object files of the game
     for (unsigned int l= 0;l<game.GetLayoutCount();++l)
     {
         std::cout << "Added GD" << gd::ToString(&game.GetLayout(l)) << "RuntimeObjectFile.o (Scene object file) to the linking." << std::endl;
-        task.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(l))+"RuntimeObjectFile.o"));
+        task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&game.GetLayout(l))+"RuntimeObjectFile.o"));
 
         DependenciesAnalyzer analyzer(game);
         analyzer.Analyze(game.GetLayout(l).GetEvents());
@@ -89,7 +98,7 @@ void CreateWholeProjectRuntimeLinkingTask(Game & game, const std::string & outpu
             if (sourceFile != game.externalSourceFiles.end() && *sourceFile != boost::shared_ptr<SourceFile>())
             {
                 std::cout << "Added GD" << gd::ToString((*sourceFile).get()) << "RuntimeObjectFile.o (Created from a Source file) to the linking." << std::endl;
-                task.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString((*sourceFile).get())+"RuntimeObjectFile.o"));
+                task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString((*sourceFile).get())+"RuntimeObjectFile.o"));
             }
         }
         for (std::set<std::string>::const_iterator i = analyzer.GetExternalEventsDependencies().begin();i!=analyzer.GetExternalEventsDependencies().end();++i)
@@ -98,7 +107,7 @@ void CreateWholeProjectRuntimeLinkingTask(Game & game, const std::string & outpu
             {
                 ExternalEvents & externalEvents = game.GetExternalEvents(*i);
                 std::cout << "Added GD" << gd::ToString(&externalEvents) << "RuntimeObjectFile.o (Created from external events) to the linking." << std::endl;
-                task.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&externalEvents)+"RuntimeObjectFile.o"));
+                task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&externalEvents)+"RuntimeObjectFile.o"));
             }
         }
     }
@@ -206,11 +215,12 @@ void FullProjectCompiler::LaunchProjectCompilation()
 
         diagnosticManager.OnMessage(gd::ToString(_("Compiling scene ")+game.GetLayout(i).GetName()+_(".")));
         CodeCompilerTask task;
-        task.compilationForRuntime = true;
-        task.optimize = optimize;
-        task.eventsGeneratedCode = true;
-        task.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(game.GetLayouts()[i].get())+"RuntimeEventsSource.cpp");
-        task.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(game.GetLayouts()[i].get())+"RuntimeObjectFile.o");
+        task.compilerCall.compilationForRuntime = true;
+        task.compilerCall.optimize = optimize;
+        task.compilerCall.eventsGeneratedCode = true;
+        task.compilerCall.inputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(game.GetLayouts()[i].get())+"RuntimeEventsSource.cpp");
+        task.compilerCall.outputFile = string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(game.GetLayouts()[i].get())+"RuntimeObjectFile.o");
+        task.userFriendlyName = "Compilation of events of scene "+game.GetLayout(i).GetName();
         task.preWork = boost::shared_ptr<CodeCompilerExtraWork>(new EventsCodeCompilerRuntimePreWork(&game, game.GetLayouts()[i].get(), resourcesMergingHelper));
         task.scene = game.GetLayouts()[i].get();
 
@@ -226,7 +236,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
             }
         }
 
-        if ( !wxFileExists(task.outputFile) )
+        if ( !wxFileExists(task.compilerCall.outputFile) )
         {
             diagnosticManager.AddError(gd::ToString(_("Compilation of scene ")+game.GetLayout(i).GetName()+_(" failed: Please go on our website to report this error, joining this file:\n")
                                                     +CodeCompiler::GetInstance()->GetOutputDirectory()+"compilationErrors.txt"

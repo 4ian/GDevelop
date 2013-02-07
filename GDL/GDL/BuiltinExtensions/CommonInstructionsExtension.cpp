@@ -280,6 +280,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libFLAC.so.8"));
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libfreetype.so.6"));
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libGLEW.so.1.5"));
+    supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libGLEW.so.1.8"));
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libopenal.so.0"));
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libopenal.so.1"));
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Linux", "libsfml-audio.so.2"));

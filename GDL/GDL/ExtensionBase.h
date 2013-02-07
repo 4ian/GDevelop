@@ -714,6 +714,7 @@ public :
 
     const std::vector < std::pair<std::string, std::string> > & GetSupplementaryRuntimeFiles() const { return supplementaryRuntimeFiles; };
     const std::vector < std::string > & GetSupplementaryIncludeDirectories() const { return supplementaryIncludeDirectories; };
+    const std::vector < std::string > & GetSupplementaryLibFiles() const { return supplementaryLibFiles; };
 
     /**
      * Create a custom event.
@@ -780,6 +781,7 @@ protected :
     std::string license;  ///<License name displayed to users at edittime
     std::vector < std::pair<std::string, std::string> > supplementaryRuntimeFiles; ///<Supplementary runtime files to copy on compilation
     std::vector < std::string > supplementaryIncludeDirectories; ///<Supplementary include directories to use on events compilation
+    std::vector < std::string > supplementaryLibFiles; ///<Supplementary libraries files to be used when compiling events with this extension. Files must be in CppPlatform/Extensions and CppPlatform/Extensions/Runtime directories. The filename will be completed with lib and .a.
 
     std::map<std::string, gd::InstructionMetadata > conditionsInfos;
     std::map<std::string, gd::InstructionMetadata > actionsInfos;

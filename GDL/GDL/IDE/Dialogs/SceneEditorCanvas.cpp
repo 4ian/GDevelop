@@ -48,7 +48,14 @@ const long SceneEditorCanvas::ID_LOCKMENU = wxNewId();
 const long SceneEditorCanvas::ID_UNLOCKMENU = wxNewId();
 const long SceneEditorCanvas::idRibbonOrigine = wxNewId();
 const long SceneEditorCanvas::idRibbonOriginalZoom = wxNewId();
-const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM = wxNewId();
+const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM500 = wxNewId();
+const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM200 = wxNewId();
+const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM150 = wxNewId();
+const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM100 = wxNewId();
+const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM50 = wxNewId();
+const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM25 = wxNewId();
+const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM10 = wxNewId();
+const long SceneEditorCanvas::ID_CUSTOMZOOMMENUITEM5 = wxNewId();
 const long SceneEditorCanvas::idRibbonRefresh = wxNewId();
 const long SceneEditorCanvas::idRibbonPlay = wxNewId();
 const long SceneEditorCanvas::idRibbonPlayWin = wxNewId();
@@ -88,6 +95,8 @@ SceneEditorCanvas::SceneEditorCanvas(wxWindow* parent, gd::Project & project_, g
         sf::RenderWindow::create(static_cast<sf::WindowHandle>(GetHandle()));
 
     #endif
+	Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&SceneEditorCanvas::OnKey);
+	Connect(wxEVT_KEY_UP,(wxObjectEventFunction)&SceneEditorCanvas::OnKeyUp);
 
     //Creating additional editors used specifically by our platform.
     externalPreviewWindow = boost::shared_ptr<RenderDialog>(new RenderDialog(this, this) );
@@ -105,21 +114,21 @@ SceneEditorCanvas::SceneEditorCanvas(wxWindow* parent, gd::Project & project_, g
     editionView.setCenter( (game.GetMainWindowDefaultWidth()/2),(game.GetMainWindowDefaultHeight()/2));
 
     //Generate zoom menu
-	wxMenuItem * zoom5 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("5%"), wxEmptyString, wxITEM_NORMAL);
+	wxMenuItem * zoom5 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM5, _("5%"), wxEmptyString, wxITEM_NORMAL);
 	zoomMenu.Append(zoom5);
-	wxMenuItem * zoom10 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("10%"), wxEmptyString, wxITEM_NORMAL);
+	wxMenuItem * zoom10 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM10, _("10%"), wxEmptyString, wxITEM_NORMAL);
 	zoomMenu.Append(zoom10);
-	wxMenuItem * zoom25 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("25%"), wxEmptyString, wxITEM_NORMAL);
+	wxMenuItem * zoom25 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM25, _("25%"), wxEmptyString, wxITEM_NORMAL);
 	zoomMenu.Append(zoom25);
-	wxMenuItem * zoom50 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("50%"), wxEmptyString, wxITEM_NORMAL);
+	wxMenuItem * zoom50 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM50, _("50%"), wxEmptyString, wxITEM_NORMAL);
 	zoomMenu.Append(zoom50);
-	wxMenuItem * zoom100 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("100%"), wxEmptyString, wxITEM_NORMAL);
+	wxMenuItem * zoom100 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM100, _("100%"), wxEmptyString, wxITEM_NORMAL);
 	zoomMenu.Append(zoom100);
-	wxMenuItem * zoom150 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("150%"), wxEmptyString, wxITEM_NORMAL);
+	wxMenuItem * zoom150 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM150, _("150%"), wxEmptyString, wxITEM_NORMAL);
 	zoomMenu.Append(zoom150);
-	wxMenuItem * zoom200 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("200%"), wxEmptyString, wxITEM_NORMAL);
+	wxMenuItem * zoom200 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM200, _("200%"), wxEmptyString, wxITEM_NORMAL);
 	zoomMenu.Append(zoom200);
-	wxMenuItem * zoom500 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM, _("500%"), wxEmptyString, wxITEM_NORMAL);
+	wxMenuItem * zoom500 = new wxMenuItem((&zoomMenu), ID_CUSTOMZOOMMENUITEM500, _("500%"), wxEmptyString, wxITEM_NORMAL);
 	zoomMenu.Append(zoom500);
 
     //Generate context menu
@@ -456,21 +465,31 @@ void SceneEditorCanvas::OnLeftUp( wxMouseEvent &event )
 
     if ( !editing ) return;
 
-    if ( currentResizeBt.substr(0,6) == "resize")
+    if ( !currentDraggableBt.empty() ) //First check if we were dragging a button.
     {
-        currentResizeBt.clear();
-        ChangesMade();
+        currentDraggableBt.clear();
+
+        if ( currentDraggableBt.substr(0, 6) == "resize" ) //Handle the release of resize buttons here ( as the mouse if not necessarily on the button so OnGuiButtonReleased is not called )
+        {
+
+            //Ugly hack for sprites part2 : Ensure that the selected instances "start" position is updated
+            //as the sprites objects X and Y position are updated when resized.
+            for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+            {
+                it->second.x = it->first->GetX(); it->second.y = it->first->GetY();
+            }
+        }
     }
-    else
+    else //Nothing special, let's the base editor handle the work.
         LayoutEditorCanvas::OnLeftUp(event);
 }
 
 void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
 {
     //First check if we're using a resize button
-    if ( currentResizeBt.substr(0,6) == "resize")
+    if ( currentDraggableBt.substr(0,6) == "resize")
     {
-        if ( currentResizeBt == "resizeRight" || currentResizeBt == "resizeRightUp" || currentResizeBt == "resizeRightDown" )
+        if ( currentDraggableBt == "resizeRight" || currentDraggableBt == "resizeRightUp" || currentDraggableBt == "resizeRightDown" )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
@@ -493,7 +512,7 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
                 }
             }
         }
-        if ( currentResizeBt == "resizeDown" || currentResizeBt == "resizeRightDown" || currentResizeBt == "resizeLeftDown" )
+        if ( currentDraggableBt == "resizeDown" || currentDraggableBt == "resizeRightDown" || currentDraggableBt == "resizeLeftDown" )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
@@ -516,7 +535,7 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
                 }
             }
         }
-        if ( currentResizeBt == "resizeLeft" || currentResizeBt == "resizeLeftUp" || currentResizeBt == "resizeLeftDown" )
+        if ( currentDraggableBt == "resizeLeft" || currentDraggableBt == "resizeLeftUp" || currentDraggableBt == "resizeLeftDown" )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
@@ -541,7 +560,7 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
                 }
             }
         }
-        if ( currentResizeBt == "resizeUp" || currentResizeBt == "resizeLeftUp" || currentResizeBt == "resizeRightUp" )
+        if ( currentDraggableBt == "resizeUp" || currentDraggableBt == "resizeLeftUp" || currentDraggableBt == "resizeRightUp" )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
@@ -567,7 +586,21 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
             }
         }
 
-        UpdateMouseResizeCursor(currentResizeBt);
+        UpdateMouseResizeCursor(currentDraggableBt);
+    }
+    else if (currentDraggableBt == "angle") //Check if we are dragging a angle button
+    {
+        for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
+        {
+            boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+
+            if ( associatedObject )
+            {
+                float newAngle = atan2(sf::Mouse::getPosition(*this).y-angleButtonCenter.y, sf::Mouse::getPosition(*this).x-angleButtonCenter.x)*180/3.14159;
+                it->first->SetAngle(newAngle);
+                associatedObject->SetAngle(newAngle);
+            }
+        }
     }
     else //No buttons being used
     {
@@ -663,9 +696,9 @@ void SceneEditorCanvas::OnGuiElementHovered(const gd::LayoutEditorCanvasGuiEleme
 
 void SceneEditorCanvas::OnGuiElementPressed(const gd::LayoutEditorCanvasGuiElement & guiElement)
 {
-    if ( currentResizeBt.empty() && guiElement.name.substr(0, 6) == "resize" )
+    if ( currentDraggableBt.empty() && guiElement.name.substr(0, 6) == "resize" )
     {
-        currentResizeBt = guiElement.name;
+        currentDraggableBt = guiElement.name;
 
         resizeOriginalWidths.clear();
         for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
@@ -676,17 +709,58 @@ void SceneEditorCanvas::OnGuiElementPressed(const gd::LayoutEditorCanvasGuiEleme
         }
         resizeMouseStartPosition = sf::Vector2f(GetMouseXOnLayout(), GetMouseYOnLayout());
     }
+    else if ( currentDraggableBt.empty() && guiElement.name == "angle" )
+    {
+        currentDraggableBt = "angle";
+    }
+}
+
+void SceneEditorCanvas::OnGuiElementReleased(const gd::LayoutEditorCanvasGuiElement & guiElement)
+{
 }
 
 void SceneEditorCanvas::DrawSelectionRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
 {
+    //Create the shapes
     boost::shared_ptr<sf::Shape> selection = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(rectangle.width, rectangle.height)));
     selection->setPosition(rectangle.left, rectangle.top);
     selection->setFillColor(sf::Color( 0, 0, 200, 40 ));
     selection->setOutlineColor(sf::Color( 0, 0, 255, 128 ));
     selection->setOutlineThickness(1);
 
+    //Add the shape to be drawn
     target.push_back(selection);
+}
+
+void SceneEditorCanvas::DrawAngleButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, float angle )
+{
+    //Create the shapes
+    boost::shared_ptr<sf::Shape> centerShape = boost::shared_ptr<sf::Shape>(new sf::CircleShape(3));
+    centerShape->setPosition(position);
+    centerShape->setOutlineColor(sf::Color( 0, 0, 255, 128 ));
+    centerShape->setOutlineThickness(1);
+    centerShape->setFillColor(sf::Color( 0, 0, 200, 40 ));
+
+    boost::shared_ptr<sf::Shape> angleButton = boost::shared_ptr<sf::Shape>(new sf::RectangleShape(sf::Vector2f(smallButtonSize, smallButtonSize)));
+    angleButton->setPosition(position+sf::Vector2f(10.0*cos(angle/180.0*3.14159), 10.0*sin(angle/180.0*3.14159)));
+    angleButton->setOutlineColor(sf::Color( 0, 0, 0, 255 ));
+    angleButton->setOutlineThickness(1);
+
+    //Declare the angle button as a gui element
+    gd::LayoutEditorCanvasGuiElement guiElement;
+    guiElement.name = "angle";
+    guiElement.area = wxRect(angleButton->getPosition().x, angleButton->getPosition().y, smallButtonSize, smallButtonSize);
+    guiElements.push_back(guiElement);
+    if ( !guiElement.area.Contains(wxPoint(sf::Mouse::getPosition(*this).x, sf::Mouse::getPosition(*this).y)) )
+        angleButton->setFillColor(sf::Color( 220, 220, 220, 255 ));
+    else
+        angleButton->setFillColor(sf::Color( 255, 255, 255, 255 ));
+
+    angleButtonCenter = position; //Save the position of the center to calculate the new angle when we'll be dragging the button ( See OnMoving method )
+
+    //Add the shape to be drawn
+    target.push_back(centerShape);
+    target.push_back(angleButton);
 }
 
 void SceneEditorCanvas::DrawHighlightRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle )
@@ -744,6 +818,7 @@ void SceneEditorCanvas::RenderEdittime()
     float resizeButtonsMinX = 0;
     float resizeButtonsMaxY = 0;
     float resizeButtonsMinY = 0;
+    float selectionAngle = 0;
 
     gd::InitialInstance * highlightedInstance = GetInitialInstanceUnderCursor();
 
@@ -785,6 +860,7 @@ void SceneEditorCanvas::RenderEdittime()
                             resizeButtonsMaxY = rectangleEnd.y;
                             resizeButtonsMinX = rectangleOrigin.x;
                             resizeButtonsMinY = rectangleOrigin.y;
+                            selectionAngle = associatedInitialInstance->GetAngle();
                             drawResizeButtons = true;
                         }
                         else
@@ -823,6 +899,7 @@ void SceneEditorCanvas::RenderEdittime()
         AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(0.5*(resizeButtonsMinX+resizeButtonsMaxX-smallButtonSize), resizeButtonsMaxY+gapBetweenButtonsAndRectangle), "resizeDown");
         AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMinX-gapBetweenButtonsAndRectangle-smallButtonSize, resizeButtonsMaxY+gapBetweenButtonsAndRectangle), "resizeLeftDown");
         AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMinX-gapBetweenButtonsAndRectangle-smallButtonSize, 0.5*(resizeButtonsMinY+resizeButtonsMaxY-smallButtonSize)), "resizeLeft" );
+        DrawAngleButtonGuiElement(guiElementsShapes, sf::Vector2f(0.5*(resizeButtonsMinX+resizeButtonsMaxX-smallButtonSize), 0.5*(resizeButtonsMinY+resizeButtonsMaxY-smallButtonSize)), selectionAngle);
     }
 
     if ( isSelecting )

@@ -20,6 +20,54 @@ class Scene;
 class CodeCompilerThreadStateNotifier;
 
 /**
+ * \brief Generate the call that must be executed by the CodeCompiler for a task
+ * \see CodeCompiler
+ * \see CodeCompilerTask
+ */
+class GD_API CodeCompilerCall
+{
+public:
+
+    /**
+     * Default constructor : Construct an object without options, just the default compiler set.
+     */
+    CodeCompilerCall();
+
+    /**
+     * Return the full command line that must be executed by the compiler
+     */
+    std::string GetFullCall() const;
+
+    const std::string & GetCompilerExecutable() const { return compilerExecutable; }
+    void SetCompilerExecutable(const std::string & compilerExecutableFullPath) { compilerExecutable = compilerExecutableFullPath; }
+
+    bool link; ///< If set to true, the task must be to link the inputFile and extraInputFiles.
+    std::string inputFile; ///< The input file ( i.e. Source file if link == false, Object file if link == true )
+    std::string outputFile; ///< The output file ( i.e. Object file if link == false, shared library if link == true )
+
+    std::vector<std::string> extraObjectFiles; ///< Additional object files to be linked ( Only relevant when link is set to true )
+    std::vector<std::string> extraLibFiles; ///< Additional libraries files to be used ( Only relevant when link is set to true )
+    std::vector<std::string> extraHeaderDirectories; ///< Extra directories used when searching for includes.  ( Only relevant when link is set to false )
+    std::vector<std::string> extraOptions; ///< Extra options that will be added raw as the end of the command line.
+
+    bool optimize; ///< Activate optimization flag if set to true
+    bool compilationForRuntime; ///< Automatically define GD_IDE_ONLY if set to true
+    bool eventsGeneratedCode; ///< If set to true, the compiler will be set up with common options for events compilation.
+
+    /**
+     * Method to check if the task is the same as another. ( Compare files/options but does not take in account pre/post work )
+     */
+    bool IsSameAs(CodeCompilerCall & other) const {
+        return (inputFile == other.inputFile && outputFile == other.outputFile && compilationForRuntime == other.compilationForRuntime
+                && optimize == other.optimize && eventsGeneratedCode == other.eventsGeneratedCode );
+    }
+
+private:
+
+    std::string compilerExecutable; ///< Automatically set up to the default compiler by the default constructor.
+};
+
+/**
  * \brief Define a task to be processed by the code compiler.
  * \see CodeCompiler
  * \see CodeCompiler::AddTask
@@ -27,35 +75,23 @@ class CodeCompilerThreadStateNotifier;
 class GD_API CodeCompilerTask
 {
 public:
-    CodeCompilerTask() : emptyTask(false), link(false), compilationForRuntime(false), optimize(false), eventsGeneratedCode(true), scene(NULL) {};
+    CodeCompilerTask() : emptyTask(false), scene(NULL) {};
     virtual ~CodeCompilerTask() {};
 
     bool emptyTask; ///< If set to true, this task will be skipped.
-    std::string inputFile;
-    std::string outputFile; ///< The output file ( Object file is link == false, shared library if link == true )
-
-    bool link; ///< If set to true, the task must be to link the inputFile and extraInputFiles.
-    std::vector<std::string> extraObjectFiles; ///< Additional object files to be linked ( Only relevant when link is set to true )
-    std::vector<std::string> extraLibFiles; ///< Additional libraries files to be used ( Only relevant when link is set to true )
-
-    bool compilationForRuntime; ///< Automatically define GD_IDE_ONLY if set to true
-    bool optimize; ///< Activate optimization flag if set to true
-    bool eventsGeneratedCode; ///< If set to true, the compiler will be set up with common options for events compilation.
-    Scene * scene; ///< Optional pointer to a scene to specify that the task work is related to this scene.
 
     boost::shared_ptr<CodeCompilerExtraWork> postWork; ///< Post work that will be launched when the compilation of the task is over
     boost::shared_ptr<CodeCompilerExtraWork> preWork;  ///< Pre work that will be launched before the compilation of the task is launched
-
-    std::vector<std::string> additionalHeaderDirectories; ///< Extra directories used when searching for includes.
+    CodeCompilerCall compilerCall; ///< The main work to be executed
 
     std::string userFriendlyName; ///< Task name displayed to the user
+    Scene * scene; ///< Optional pointer to a scene to specify that the task work is related to this scene.
 
     /**
      * Method to check if the task is the same as another. ( Compare files/options but does not take in account pre/post work )
      */
     bool IsSameTaskAs(CodeCompilerTask & other) const {
-        return (inputFile == other.inputFile && outputFile == other.outputFile && compilationForRuntime == other.compilationForRuntime
-                && optimize == other.optimize && eventsGeneratedCode == other.eventsGeneratedCode && scene == other.scene );
+        return (emptyTask == other.emptyTask &&compilerCall.IsSameAs(other.compilerCall) && scene == other.scene);
     }
 };
 
@@ -170,6 +206,11 @@ public:
     void AddHeaderDirectory(const std::string & dir);
 
     /**
+     * Return a read-only reference to the vector containing the common headers directories
+     */
+    const std::set<std::string> & GetAllHeadersDirectories() const { return headersDirectories; }
+
+    /**
      * Add a (wxWidgets) control to the list of objects notified when progress has been made
      */
     void AddNotifiedControl(wxEvtHandler * control) { notifiedControls.insert(control); };
@@ -264,6 +305,9 @@ private:
      */
     void SendCurrentProcessToGarbage();
 
+#if defined(LINUX)
+public:
+#endif
     /**
      * Called by processes ( CodeCompilerProgress )  when they end they work.
      *
@@ -271,6 +315,9 @@ private:
      * launch the next task if any.
      */
     void ProcessEndedWork(wxCommandEvent& event);
+#if defined(LINUX)
+private:
+#endif
 
     //Current task
     bool processLaunched; ///< Set to true when the thread is working, and to false when the pending task list has been exhausted.

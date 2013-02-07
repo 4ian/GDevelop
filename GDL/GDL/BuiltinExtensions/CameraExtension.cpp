@@ -341,7 +341,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",false);
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraWidth");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraWidth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("CameraHeight", _("Height of a camera of a layer"), _("Height of a camera of a layer"), _("Camera"), "res/actions/camera.png")
@@ -349,7 +349,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",false);
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraHeight");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraHeight").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("CameraViewportLeft", _("X position of the top left side point of a render zone"), _("X position of the top left side point of a render zone"), _("Camera"), "res/actions/camera.png")
@@ -357,7 +357,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",false);
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportLeft");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportLeft").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("CameraViewportTop", _("Y position of the top left side point of a render zone"), _("Y position of the top left side point of a render zone"), _("Camera"), "res/actions/camera.png")
@@ -365,7 +365,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",false);
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportTop");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportTop").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("CameraViewportRight", _("X position of the bottom right side point of a render zone"), _("X position of the bottom right side point of a render zone"), _("Camera"), "res/actions/camera.png")
@@ -373,7 +373,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",false);
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportRight");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportRight").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("CameraViewportBottom", _("Y position of the bottom right side point of a render zone"), _("Y position of the bottom right side point of a render zone"), _("Camera"), "res/actions/camera.png")
@@ -381,7 +381,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",false);
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",false).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportBottom");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraViewportBottom").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("CameraX", _("Camera X position"), _("Camera X position"), _("Camera"), "res/actions/camera.png")
@@ -389,7 +389,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraX");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraX").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("VueX", _("Camera X position"), _("Camera X position"), _("Camera"), "res/actions/camera.png")
@@ -397,7 +397,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraX");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraX").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
 
@@ -406,7 +406,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraY");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraY").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("VueY", _("Camera Y position"), _("Camera Y position"), _("Camera"), "res/actions/camera.png")
@@ -414,7 +414,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraY");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraY").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
 
@@ -423,7 +423,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraRotation");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraRotation").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
     DECLARE_END_EXPRESSION()
 
     DECLARE_EXPRESSION("VueRotation", _("Angle of a camera of a layer"), _("Angle of a camera of a layer"), _("Camera"), "res/actions/camera.png")
@@ -431,7 +431,7 @@ CameraExtension::CameraExtension()
         instrInfo.AddParameter("layer", _("Layer"), "",true).SetDefaultValue("\"\"");
         instrInfo.AddParameter("expression", _("Camera number ( default : 0 )"), "",true).SetDefaultValue("0");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GetCameraRotation");
+        instrInfo.cppCallingInformation.SetFunctionName("GetCameraRotation").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneCameraTools.h");
         instrInfo.SetHidden();
     DECLARE_END_EXPRESSION()
     #endif

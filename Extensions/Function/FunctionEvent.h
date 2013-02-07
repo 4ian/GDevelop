@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Function Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -30,6 +30,7 @@ freely, subject to the following restrictions:
 #define FUNCTIONEVENT_H
 #include "GDCore/Events/Event.h"
 #include "GDL/CommonTools.h"
+#include "GDL/SceneNameMangler.h"
 class RuntimeScene;
 namespace gd { class Instruction; }
 class TiXmlElement;
@@ -99,7 +100,7 @@ class GD_EXTENSION_API FunctionEvent : public gd::BaseEvent
         /**
          * Tool function to generate an unique C++ name for a function.
          */
-        static std::string MangleFunctionName(FunctionEvent & functionEvent) { return "GDFunction"+functionEvent.GetName()+ToString(&functionEvent); };
+        static std::string MangleFunctionName(FunctionEvent & functionEvent) { return "GDFunction"+SceneNameMangler::GetMangledSceneName(functionEvent.GetName())+ToString(&functionEvent); };
 
         /**
          * Tool function to search for a function event in an event list.

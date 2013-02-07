@@ -10,7 +10,6 @@
 					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
-							<size>420,54</size>
 							<bg>wxSYS_COLOUR_WINDOW</bg>
 							<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
 								<cols>3</cols>
@@ -91,7 +90,7 @@
 									<growablecols>0</growablecols>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-											<label>(Optionnal) Pass the objects of this group to the function:</label>
+											<label>(Optional) Pass the objects of this group to the function:</label>
 										</object>
 										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -123,7 +122,7 @@
 									</object>
 									<object class="sizeritem">
 										<object class="wxStaticText" name="ID_STATICTEXT5" variable="StaticText5" member="yes">
-											<label>Objects of this group which are concerned by previous&#x0A;actions/conditions will be passed to the function when it is&#x0A;called by an action, and so they will be used by actions andconditions refering to them.</label>
+											<label>Objects of this group which are concerned by previous&#x0A;actions/conditions will be passed to the function when it is&#x0A;called by an action, and so they will be used by actions and&#x0A;conditions refering to them.</label>
 										</object>
 										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 										<border>5</border>
@@ -186,10 +185,3 @@
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

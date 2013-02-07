@@ -1,0 +1,49 @@
+<!-- This XML file was generated using the htmlify tool available from http://dlib.net. -->
+<code>
+  <classes>
+    <class>
+      <name>test</name>
+      <scope></scope>
+      <declaration>class test</declaration>
+      <file>test.cpp</file>
+      <comment>WHAT THIS OBJECT REPRESENTS
+    This is a simple test class that doesn't do anything</comment>
+      <public_typedefs>
+        <typedef>typedef int type</typedef>
+      </public_typedefs>
+      <public_methods>
+        <method>
+          <name>test</name>
+          <declaration>test()</declaration>
+          <comment>ensures
+    - constructs a test object</comment>
+        </method>
+        <method>
+          <name>print</name>
+          <declaration>void
+print() const</declaration>
+          <comment>ensures
+    - prints a message to the screen</comment>
+        </method>
+      </public_methods>
+    </class>
+
+  </classes>
+
+
+  <global_functions>
+    <function>
+      <name>add_numbers</name>
+      <scope></scope>
+      <declaration>int
+add_numbers (
+    int a,
+    int b
+)</declaration>
+      <file>test.cpp</file>
+      <comment>ensures
+    - returns a + b</comment>
+    </function>
+
+  </global_functions>
+</code>

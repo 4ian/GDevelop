@@ -1,0 +1,140 @@
+#
+# This is a CMake makefile.  You can find the cmake utility and
+# information about it at http://www.cmake.org
+#
+#
+# This cmake file tries to find installed BLAS and LAPACK libraries.  
+# It looks for an installed copy of the Intel MKL library first and then
+# attempts to find some other BLAS and LAPACK libraries if you don't have 
+# the Intel MKL.
+#
+#  blas_found        - True if BLAS is available
+#  lapack_found      - True if LAPACK is available
+#  blas_libraries    - link against these to use BLAS library 
+#  lapack_libraries  - link against these to use LAPACK library 
+
+# setting this makes CMake allow normal looking if else statements
+SET(CMAKE_ALLOW_LOOSE_LOOP_CONSTRUCTS true)
+
+SET(blas_found 0)
+SET(lapack_found 0)
+
+
+if (UNIX)
+    message(STATUS "Searching for BLAS and LAPACK")
+
+    include(CheckTypeSize)
+    check_type_size( "void*" SIZE_OF_VOID_PTR)
+
+    if (SIZE_OF_VOID_PTR EQUAL 8)
+        set( mkl_search_path
+            /opt/intel/mkl/*/lib/em64t
+            )
+
+        find_library(mkl_intel mkl_intel_lp64 ${mkl_search_path})
+	else()
+        set( mkl_search_path
+            /opt/intel/mkl/*/lib/32
+            )
+
+        find_library(mkl_intel mkl_intel ${mkl_search_path})
+    endif()
+
+   include(CheckLibraryExists)
+
+   # Search for the needed libraries from the MKL
+   find_library(mkl_core mkl_core ${mkl_search_path})
+   find_library(mkl_thread mkl_intel_thread ${mkl_search_path})
+   find_library(mkl_io iomp5 ${mkl_search_path})
+
+   #MKL also needs pthreads so search for that as well
+   find_library(mkl_pthread pthread ${mkl_search_path})
+
+   mark_as_advanced( mkl_intel mkl_core mkl_thread mkl_io mkl_pthread)
+
+   
+   # if we found the MKL 
+   #if (mkl_mkl AND mkl_core AND mkl_guide AND mkl_pthread)
+   if (mkl_intel AND mkl_core AND mkl_thread AND mkl_io AND mkl_pthread)
+      set(blas_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_io} ${mkl_pthread})
+      set(lapack_libraries ${mkl_intel} ${mkl_core} ${mkl_thread} ${mkl_io} ${mkl_pthread})
+      set(blas_found 1)
+      set(lapack_found 1)
+      message(STATUS "Found Intel MKL BLAS/LAPACK library")
+   endif()
+
+
+   # try to find some other LAPACK libraries if we didn't find the MKL
+
+   if (NOT lapack_found)
+      find_library(lapack_lib NAMES lapack lapack-3)
+      if (lapack_lib)
+         set(lapack_libraries ${lapack_lib})
+         set(lapack_found 1)
+         message(STATUS "Found LAPACK library")
+      endif()
+      mark_as_advanced( lapack_lib)
+   endif()
+
+   
+   # try to find some other BLAS libraries if we didn't find the MKL
+   
+   if (NOT blas_found)
+      find_library(atlas_lib atlas)
+      find_library(cblas_lib cblas)
+      if (atlas_lib AND cblas_lib)
+         set(blas_libraries ${atlas_lib} ${cblas_lib})
+         set(blas_found 1)
+         message(STATUS "Found ATLAS BLAS library")
+      endif()
+      mark_as_advanced( atlas_lib cblas_lib)
+   endif()
+
+
+   if (NOT blas_found)
+      find_library(cblas_lib cblas)
+      if (cblas_lib)
+         set(blas_libraries ${cblas_lib})
+         set(blas_found 1)
+         message(STATUS "Found CBLAS library")
+      endif()
+      mark_as_advanced( cblas_lib)
+   endif()
+
+   
+   if (NOT blas_found)
+      find_library(generic_blas blas)
+      if (generic_blas)
+         set(blas_libraries ${generic_blas})
+         set(blas_found 1)
+         message(STATUS "Found BLAS library")
+      endif()
+      mark_as_advanced( generic_blas)
+   endif()
+
+
+
+
+   # Make sure we really found a CBLAS library.  That is, it needs to expose
+   # the proper cblas link symbols.  So here we test if one of them is present
+   # and assume everything is good if it is.
+   if (blas_found)
+      INCLUDE (CheckFunctionExists)
+      set(CMAKE_REQUIRED_LIBRARIES ${blas_libraries})
+      CHECK_FUNCTION_EXISTS(cblas_ddot HAVE_CBLAS)
+      if (NOT HAVE_CBLAS)
+         message(STATUS "BLAS library does not have cblas symbols, so dlib will not use BLAS or LAPACK")
+         set(blas_found 0)
+         set(lapack_found 0)
+      endif()
+   endif()
+
+
+   if (NOT blas_found)
+      message(STATUS "***** No BLAS library found *****")
+   endif()
+
+endif()
+
+
+

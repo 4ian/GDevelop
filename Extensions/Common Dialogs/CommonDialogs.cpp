@@ -1,7 +1,7 @@
 /**
 
 Game Develop - Common Dialogs Extension
-Copyright (c) 2008-2012 Florian Rival (Florian.Rival@gmail.com)
+Copyright (c) 2008-2013 Florian Rival (Florian.Rival@gmail.com)
 
 This software is provided 'as-is', without any express or implied
 warranty. In no event will the authors be held liable for any damages
@@ -75,7 +75,7 @@ void GD_EXTENSION_API ShowMessageBox( RuntimeScene & scene, const std::string & 
     msgBox.wait_until_closed();
     #endif
 
-    scene.NotifyPauseWasMade(timeSpent.GetElapsedTime());//Don't take the time spent in this function in account.
+    scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
 }
 
 /**
@@ -114,7 +114,7 @@ void GD_EXTENSION_API ShowOpenFile( RuntimeScene & scene, const std::string & va
     dialog->wait_until_closed();
     #endif
 
-    scene.NotifyPauseWasMade(timeSpent.GetElapsedTime());//Don't take the time spent in this function in account.
+    scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
 
     //Update the variable
     scene.GetVariables().ObtainVariable(variable) = result;
@@ -141,7 +141,7 @@ void GD_EXTENSION_API ShowYesNoMsgBox( RuntimeScene & scene, const std::string &
     dialog.wait_until_closed();
     #endif
 
-    scene.NotifyPauseWasMade(timeSpent.GetElapsedTime());//Don't take the time spent in this function in account.
+    scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
 
     //Update the variable
     scene.GetVariables().ObtainVariable(variable) = result;
@@ -457,7 +457,7 @@ bool GD_EXTENSION_API ShowTextInput( RuntimeScene & scene, const std::string & v
     dialog.wait_until_closed();
     #endif
 
-    scene.NotifyPauseWasMade(timeSpent.GetElapsedTime());//Don't take the time spent in this function in account.
+    scene.NotifyPauseWasMade(timeSpent.getElapsedTime().asMicroseconds());//Don't take the time spent in this function in account.
 
     //Update the variable
     scene.GetVariables().ObtainVariable(variable) = result;

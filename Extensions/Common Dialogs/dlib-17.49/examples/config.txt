@@ -1,0 +1,30 @@
+# This is an example config file.  Note that # is used to create a comment.
+
+# At its most basic level a config file is just a bunch of key/value pairs.
+# So for example:
+key1 = value2
+dlib = a C++ library
+
+# You can also define "sub blocks" in your config files like so
+user1 
+{ 
+    # Inside a sub block you can list more key/value pairs.  
+    id = 42
+    name = davis
+
+    # you can also nest sub-blocks as deep as you want
+    details 
+    { 
+        editor = vim
+        home_dir = /home/davis
+    }
+}
+user2 { 
+    id = 1234
+    name = joe
+    details { 
+        editor = emacs
+        home_dir = /home/joe
+    }
+}
+

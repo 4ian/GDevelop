@@ -199,6 +199,9 @@ class MainFrame: public wxFrame
         void OnCloseCurrentProjectSelected(wxCommandEvent& event);
         void OnResize(wxSizeEvent& event);
         //*)
+        void OnRibbonPageChanging(wxRibbonBarEvent& evt);
+        void OnRibbonHelpBtClick(wxRibbonBarEvent& evt);
+        void OnRibbonToggleBtClick(wxRibbonBarEvent& evt);
         void OnRibbonNewClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonOpenClicked(wxRibbonButtonBarEvent& evt);
         void OnRibbonOpenDropDownClicked(wxRibbonButtonBarEvent& evt);
@@ -212,7 +215,6 @@ class MainFrame: public wxFrame
         void OnRibbonFileBtClick(wxMouseEvent& event);
         void OnRibbonFileBtLeave(wxMouseEvent& event);
         void OnRibbonFileBtEnter(wxMouseEvent& event);
-        void OnRibbonHelpBtClick(wxMouseEvent& event);
         void OnRibbonHelpBtLeave(wxMouseEvent& event);
         void OnRibbonHelpBtEnter(wxMouseEvent& event);
         void SaveAs();
@@ -255,8 +257,10 @@ class MainFrame: public wxFrame
         static const long ID_MENUITEM25;
         static const long ID_MENUITEM24;
         static const long ID_MENUITEM21;
+        static const long ID_MENUITEM3;
         //*)
         static const long IDM_RECENTS;
+        static const long ID_RIBBON;
         static const long idRibbonNew;
         static const long idRibbonOpen;
         static const long idRibbonSave;
@@ -276,11 +280,13 @@ class MainFrame: public wxFrame
 
         //(*Declarations(MainFrame)
         wxMenuItem* MenuItem8;
+        wxMenu disabledFileMenu;
         wxMenuItem* MenuItem7;
         wxMenuItem* MenuItem5;
         wxMenuItem* MenuItem2;
         wxTimer autoSaveTimer;
         wxMenuItem* MenuItem4;
+        wxMenuItem* MenuItem11;
         wxMenuItem* MenuItem15;
         wxMenu* menuRecentFiles;
         wxMenuItem* MenuItem22;
@@ -309,7 +315,6 @@ class MainFrame: public wxFrame
         wxAuiManager m_mgr;
         wxRibbonBar * m_ribbon; ///< Pointer to the ribbon
         wxStaticBitmap * ribbonFileBt; ///< Pointer to the ribbon file custom button
-        wxStaticBitmap * ribbonHelpBt; ///< Pointer to the ribbon file custom button
         wxRibbonButtonBar * ribbonSceneEditorButtonBar; ///Pointer to the ribbon bar which can be changed by scene editors
         BuildToolsPnl * buildToolsPnl;
         std::vector<wxWindow*> scenesLockingShortcuts;

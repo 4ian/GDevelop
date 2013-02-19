@@ -115,7 +115,7 @@ public:
 
 private:
     HelpProvider() : helpDialog(NULL), parentWindow(NULL) {};
-    virtual ~HelpProvider() { if (helpDialog) delete helpDialog; };
+    virtual ~HelpProvider() { if (helpDialog) helpDialog->Destroy(); };
 
     HelpViewerDlg * helpDialog;
     wxWindow * parentWindow;

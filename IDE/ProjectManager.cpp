@@ -140,24 +140,24 @@ mainEditor(mainEditor_)
 	modVarSceneMenuI = new wxMenuItem((&sceneContextMenu), idMenuModVar, _("Modify inital variables"), wxEmptyString, wxITEM_NORMAL);
 	modVarSceneMenuI->SetBitmap(wxBitmap(wxImage(_T("res/var.png"))));
 	sceneContextMenu.Append(modVarSceneMenuI);
-	editSceneNameMenuItem = new wxMenuItem((&sceneContextMenu), idMenuModNameScene, _("Change the name"), wxEmptyString, wxITEM_NORMAL);
+	editSceneNameMenuItem = new wxMenuItem((&sceneContextMenu), idMenuModNameScene, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
 	editSceneNameMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	sceneContextMenu.Append(editSceneNameMenuItem);
 	sceneContextMenu.AppendSeparator();
 	addSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuAddScene, _("Add a scene"), wxEmptyString, wxITEM_NORMAL);
 	addSceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	sceneContextMenu.Append(addSceneMenuItem);
-	deleteSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuDelScene, _("Delete the scene"), wxEmptyString, wxITEM_NORMAL);
+	deleteSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuDelScene, _("Delete\tDEL"), wxEmptyString, wxITEM_NORMAL);
 	deleteSceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	sceneContextMenu.Append(deleteSceneMenuItem);
 	sceneContextMenu.AppendSeparator();
-	copySceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuCopyScene, _("Copy the scene"), wxEmptyString, wxITEM_NORMAL);
+	copySceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuCopyScene, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
 	copySceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	sceneContextMenu.Append(copySceneMenuItem);
-	cutSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuCutScene, _("Cut the scene"), wxEmptyString, wxITEM_NORMAL);
+	cutSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuCutScene, _("Cut\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
 	cutSceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
 	sceneContextMenu.Append(cutSceneMenuItem);
-	pasteSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuPasteScene, _("Paste the scne"), wxEmptyString, wxITEM_NORMAL);
+	pasteSceneMenuItem = new wxMenuItem((&sceneContextMenu), idMenuPasteScene, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
 	pasteSceneMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	sceneContextMenu.Append(pasteSceneMenuItem);
 	MenuItem1 = new wxMenuItem((&scenesContextMenu), ID_MENUITEM1, _("Add a scene"), wxEmptyString, wxITEM_NORMAL);
@@ -169,7 +169,7 @@ mainEditor(mainEditor_)
 	editGblVarMenuItem = new wxMenuItem((&gameContextMenu), ID_MENUITEM3, _("Modify global variables"), wxEmptyString, wxITEM_NORMAL);
 	editGblVarMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/var.png"))));
 	gameContextMenu.Append(editGblVarMenuItem);
-	editNameGameMenuItem = new wxMenuItem((&gameContextMenu), ID_MENUITEM4, _("Change the name"), wxEmptyString, wxITEM_NORMAL);
+	editNameGameMenuItem = new wxMenuItem((&gameContextMenu), ID_MENUITEM4, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
 	editNameGameMenuItem->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	gameContextMenu.Append(editNameGameMenuItem);
 	gameContextMenu.AppendSeparator();
@@ -181,24 +181,24 @@ mainEditor(mainEditor_)
 	MenuItem3 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM7, _("Edit"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/eventsedit16.png"))));
 	externalEventsContextMenu.Append(MenuItem3);
-	MenuItem9 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM13, _("Rename"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem9 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM13, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	externalEventsContextMenu.Append(MenuItem9);
 	externalEventsContextMenu.AppendSeparator();
 	MenuItem4 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM8, _("Add external events"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem4->SetBitmap(wxBitmap(wxImage(_T("res/eventsadd16.png"))));
 	externalEventsContextMenu.Append(MenuItem4);
-	MenuItem5 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM9, _("Delete"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem5 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM9, _("Delete\tDEL"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem5->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	externalEventsContextMenu.Append(MenuItem5);
 	externalEventsContextMenu.AppendSeparator();
-	MenuItem6 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM10, _("Copy"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem6 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM10, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	externalEventsContextMenu.Append(MenuItem6);
-	MenuItem7 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM11, _("Cut"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem7 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM11, _("Cut\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem7->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
 	externalEventsContextMenu.Append(MenuItem7);
-	MenuItem8 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM12, _("Paste"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem8 = new wxMenuItem((&externalEventsContextMenu), ID_MENUITEM12, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem8->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	externalEventsContextMenu.Append(MenuItem8);
 	MenuItem14 = new wxMenuItem((&sourceFilesContextMenu), ID_MENUITEM18, _("Create a new C++ file"), wxEmptyString, wxITEM_NORMAL);
@@ -210,7 +210,7 @@ mainEditor(mainEditor_)
 	MenuItem11->SetBitmap(wxBitmap(wxImage(_T("res/editicon.png"))));
 	sourceFileContextMenu.Append(MenuItem11);
 	sourceFileContextMenu.AppendSeparator();
-	MenuItem12 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM16, _("Delete"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem12 = new wxMenuItem((&sourceFileContextMenu), ID_MENUITEM16, _("Delete\tDEL"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem12->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	sourceFileContextMenu.Append(MenuItem12);
 	sourceFileContextMenu.AppendSeparator();
@@ -225,24 +225,24 @@ mainEditor(mainEditor_)
 	MenuItem17 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM21, _("Edit"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem17->SetBitmap(wxBitmap(wxImage(_T("res/eventsedit16.png"))));
 	externalLayoutContextMenu.Append(MenuItem17);
-	MenuItem18 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM22, _("Rename"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem18 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM22, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem18->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	externalLayoutContextMenu.Append(MenuItem18);
 	externalLayoutContextMenu.AppendSeparator();
 	MenuItem19 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM23, _("Add an external layout"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem19->SetBitmap(wxBitmap(wxImage(_T("res/eventsadd16.png"))));
 	externalLayoutContextMenu.Append(MenuItem19);
-	MenuItem20 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM24, _("Delete"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem20 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM24, _("Delete\tDEL"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem20->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	externalLayoutContextMenu.Append(MenuItem20);
 	externalLayoutContextMenu.AppendSeparator();
-	MenuItem21 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM25, _("Copy"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem21 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM25, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem21->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	externalLayoutContextMenu.Append(MenuItem21);
-	MenuItem22 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM26, _("Cut"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem22 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM26, _("Cut\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem22->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
 	externalLayoutContextMenu.Append(MenuItem22);
-	MenuItem23 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM27, _("Paste"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem23 = new wxMenuItem((&externalLayoutContextMenu), ID_MENUITEM27, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem23->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	externalLayoutContextMenu.Append(MenuItem23);
 	FlexGridSizer1->Fit(this);
@@ -253,6 +253,7 @@ mainEditor(mainEditor_)
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&ProjectManager::OnprojectsTreeItemActivated);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_RIGHT_CLICK,(wxObjectEventFunction)&ProjectManager::OnprojectsTreeItemRightClick);
 	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ProjectManager::OnprojectsTreeSelectionChanged);
+	Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_KEY_DOWN,(wxObjectEventFunction)&ProjectManager::OnprojectsTreeKeyDown);
 	Connect(idMenuEditScene,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OneditSceneMenuItemSelected);
 	Connect(idMenuEditPropScene,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OneditScenePropMenuItemSelected);
 	Connect(idMenuModVar,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&ProjectManager::OnmodVarSceneMenuISelected);
@@ -887,7 +888,8 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
 
         projectsTree->SetItemData(selectedItem, new gdTreeItemProjectData("ExternalEvents", newName, game));
 
-        game->GetExternalEvents(itemTextBeforeEditing).SetName(newName);
+        gd::ExternalEvents & events = game->GetExternalEvents(itemTextBeforeEditing);
+        events.SetName(newName);
 
         //Updating editors
         for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -897,6 +899,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
             if ( editorPtr != NULL && &editorPtr->events == &game->GetExternalEvents(newName))
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
+        game->GetChangesNotifier().OnExternalEventsRenamed(*game, events, data->GetSecondString());
     }
     //Renaming external layout
     else if ( data->GetString() == "ExternalLayout")
@@ -916,7 +919,8 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
 
         projectsTree->SetItemData(selectedItem, new gdTreeItemProjectData("ExternalLayout", newName, game));
 
-        game->GetExternalLayout(itemTextBeforeEditing).SetName(newName);
+        gd::ExternalLayout & layout = game->GetExternalLayout(itemTextBeforeEditing);
+        layout.SetName(newName);
 
         //Updating editors
         for (unsigned int k =0;k<static_cast<unsigned>(mainEditor.GetEditorsNotebook()->GetPageCount()) ;k++ )
@@ -926,6 +930,7 @@ void ProjectManager::OnprojectsTreeEndLabelEdit(wxTreeEvent& event)
             if ( editorPtr != NULL && &editorPtr->GetExternalLayout() == &game->GetExternalLayout(newName))
                 mainEditor.GetEditorsNotebook()->SetPageText(k, event.GetLabel());
         }
+        game->GetChangesNotifier().OnExternalLayoutRenamed(*game, layout, data->GetSecondString());
     }
 }
 
@@ -1148,11 +1153,11 @@ void ProjectManager::OnpasteSceneMenuItemSelected(wxCommandEvent& event)
     gd::Layout & newLayout = *clipboard->GetLayout();
 
     //Finding a new, unique name for the layout
-    string newLayoutName = string(_("Copy of")) + " " + newLayout.GetName();
-    int i = 2;
+    string newLayoutName = newLayout.GetName();
+    int i = 1;
     while(game->HasLayoutNamed(newLayoutName))
     {
-        newLayoutName = _("Copy of") + " " + newLayout.GetName() + " " + ToString(i);
+        newLayoutName = _("Copy of") + " " + newLayout.GetName() + " " + (i == 1 ? "" : ToString(i));
         ++i;
     }
 
@@ -1446,6 +1451,7 @@ void ProjectManager::AddExternalEventsToGame(gd::Project * project)
     }
 
     project->InsertNewExternalEvents(newName, project->GetExternalEventsCount());
+    project->GetChangesNotifier().OnExternalEventsAdded(*project, project->GetExternalEvents(newName));
 }
 
 void ProjectManager::OnRenameExternalEventsSelected(wxCommandEvent& event)
@@ -1484,6 +1490,7 @@ void ProjectManager::OnDeleteExternalEventsSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalEvents(externalEventsName);
+    game->GetChangesNotifier().OnExternalEventsDeleted(*game, externalEventsName);
 }
 
 void ProjectManager::OnCopyExternalEventsSelected(wxCommandEvent& event)
@@ -1534,6 +1541,7 @@ void ProjectManager::OnCutExternalEventsSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalEvents(externalEventsName);
+    game->GetChangesNotifier().OnExternalEventsDeleted(*game, externalEventsName);
 }
 
 void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
@@ -1545,16 +1553,17 @@ void ProjectManager::OnPasteExternalEventsSelected(wxCommandEvent& event)
     gd::ExternalEvents & newEvents = *Clipboard::GetInstance()->GetExternalEvents();
 
     //Finding a new, unique name for the events
-    string newName = string(_("Copy of")) + " " + newEvents.GetName();
-    int i = 2;
+    string newName = newEvents.GetName();
+    int i = 1;
     while(game->HasExternalEventsNamed(newName))
     {
-        newName = _("Copy of") + " " + newEvents.GetName() + " " + ToString(i);
+        newName = _("Copy of") + " " + newEvents.GetName() + " " + ( i==1 ? "" : ToString(i));
         ++i;
     }
 
     newEvents.SetName(newName);
     game->InsertExternalEvents(newEvents, game->GetExternalEventsPosition(data->GetSecondString()));
+    game->GetChangesNotifier().OnExternalEventsAdded(*game, game->GetExternalEvents(newName));
 
     //Insert in tree
     gdTreeItemProjectData * eventsItemData = new gdTreeItemProjectData("ExternalEvents", newName, game);
@@ -1579,6 +1588,7 @@ void ProjectManager::AddExternalLayoutToGame(gd::Project * project)
     }
 
     project->InsertNewExternalLayout(newName, project->GetExternalLayoutsCount());
+    project->GetChangesNotifier().OnExternalLayoutAdded(*project, project->GetExternalLayout(newName));
 }
 
 void ProjectManager::OnAddExternalLayoutSelected(wxCommandEvent& event)
@@ -1681,6 +1691,7 @@ void ProjectManager::OnDeleteExternalLayoutSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalLayout(externalLayoutName);
+    game->GetChangesNotifier().OnExternalLayoutDeleted(*game, externalLayoutName);
 }
 
 void ProjectManager::OnCopyExternalLayoutSelected(wxCommandEvent& event)
@@ -1731,6 +1742,7 @@ void ProjectManager::OnCutExternalLayoutSelected(wxCommandEvent& event)
     projectsTree->Delete(selectedItem);
 
     game->RemoveExternalLayout(externalLayoutName);
+    game->GetChangesNotifier().OnExternalLayoutDeleted(*game, externalLayoutName);
 }
 
 void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
@@ -1742,16 +1754,17 @@ void ProjectManager::OnPasteExternalLayoutSelected(wxCommandEvent& event)
     gd::ExternalLayout & newExternalLayout = *Clipboard::GetInstance()->GetExternalLayout();
 
     //Finding a new, unique name for the events
-    string newName = string(_("Copy of")) + " " + newExternalLayout.GetName();
-    int i = 2;
+    string newName = newExternalLayout.GetName();
+    int i = 1;
     while(game->HasExternalLayoutNamed(newName))
     {
-        newName = _("Copy of") + " " + newExternalLayout.GetName() + " " + ToString(i);
+        newName = _("Copy of") + " " + newExternalLayout.GetName() + " " + (i==1 ? "" : ToString(i));
         ++i;
     }
 
     newExternalLayout.SetName(newName);
     game->InsertExternalLayout(newExternalLayout, game->GetExternalLayoutPosition(data->GetSecondString()));
+    game->GetChangesNotifier().OnExternalLayoutAdded(*game, game->GetExternalLayout(newName));
 
     //Insert in tree
     gdTreeItemProjectData * eventsItemData = new gdTreeItemProjectData("ExternalLayout", newName, game);
@@ -1860,4 +1873,77 @@ void ProjectManager::OnRibbonHelpSelected(wxRibbonButtonBarEvent& event)
     gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation"));
 }
 
+void ProjectManager::OnprojectsTreeKeyDown(wxTreeEvent& event)
+{
+    wxCommandEvent useless;
+    if(event.GetKeyEvent().GetModifiers() == wxMOD_CMD)
+    {
+        gdTreeItemProjectData * data = dynamic_cast<gdTreeItemProjectData*>(projectsTree->GetItemData(selectedItem));
+        if ( data == NULL)
+            return;
 
+        switch(event.GetKeyCode()) {
+            case 'C':
+            {
+                if ( data->GetString() == "Scene")
+                    OncopySceneMenuItemSelected(useless);
+                else if ( data->GetString() == "ExternalEvents")
+                    OnCopyExternalEventsSelected(useless);
+                else if ( data->GetString() == "ExternalLayout")
+                    OnCopyExternalLayoutSelected(useless);
+                break;
+            }
+            case 'X':
+            {
+                if ( data->GetString() == "Scene")
+                    OncutSceneMenuItemSelected(useless);
+                else if ( data->GetString() == "ExternalEvents")
+                    OnCutExternalEventsSelected(useless);
+                else if ( data->GetString() == "ExternalLayout")
+                    OnCutExternalLayoutSelected(useless);
+                break;
+            }
+            case 'V':
+            {
+                if ( data->GetString() == "Scene")
+                    OnpasteSceneMenuItemSelected(useless);
+                else if ( data->GetString() == "ExternalEvents")
+                    OnPasteExternalEventsSelected(useless);
+                else if ( data->GetString() == "ExternalLayout")
+                    OnPasteExternalLayoutSelected(useless);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    else
+    {
+        switch(event.GetKeyCode()) {
+            case WXK_F2:
+            {
+                projectsTree->EditLabel( selectedItem );
+                break;
+            }
+            case WXK_DELETE:
+            {
+                gdTreeItemProjectData * data = dynamic_cast<gdTreeItemProjectData*>(projectsTree->GetItemData(selectedItem));
+                if ( data == NULL)
+                    return;
+
+                if ( data->GetString() == "Scene")
+                    OndeleteSceneMenuItemSelected(useless);
+                else if ( data->GetString() == "ExternalEvents")
+                    OnDeleteExternalEventsSelected(useless);
+                else if ( data->GetString() == "ExternalLayout")
+                    OnDeleteExternalLayoutSelected(useless);
+                else if ( data->GetString() == "SourceFile")
+                    OnDeleteSourceFileSelected(useless);
+
+                break;
+            }
+            default:
+                break;
+        }
+    }
+}

@@ -419,8 +419,6 @@
 		<ResourceCompiler>
 			<Add directory="../GDL" />
 		</ResourceCompiler>
-		<Unit filename="AutomatismTypeChoice.cpp" />
-		<Unit filename="AutomatismTypeChoice.h" />
 		<Unit filename="BugReport.cpp">
 			<Option weight="60" />
 			<Option virtualFolder="Racine/" />
@@ -580,6 +578,8 @@
 		<Unit filename="EditorScene.h">
 			<Option virtualFolder="Editeurs/Editeur Scene/" />
 		</Unit>
+		<Unit filename="EntryPoint.cpp" />
+		<Unit filename="EntryPoint.h" />
 		<Unit filename="ErrorCompilation.cpp">
 			<Option virtualFolder="Editeur principal/Fichier/" />
 		</Unit>
@@ -799,7 +799,6 @@
 					<wxPanel wxs="wxsmith/ProjectManager.wxs" src="ProjectManager.cpp" hdr="ProjectManager.h" fwddecl="0" i18n="1" name="ProjectManager" language="CPP" />
 					<wxPanel wxs="wxsmith/StartHerePage.wxs" src="StartHerePage.cpp" hdr="StartHerePage.h" fwddecl="0" i18n="1" name="StartHerePage" language="CPP" />
 					<wxPanel wxs="wxsmith/ExternalEventsEditor.wxs" src="ExternalEventsEditor.cpp" hdr="ExternalEventsEditor.h" fwddecl="0" i18n="1" name="ExternalEventsEditor" language="CPP" />
-					<wxDialog wxs="wxsmith/AutomatismTypeChoice.wxs" src="AutomatismTypeChoice.cpp" hdr="AutomatismTypeChoice.h" fwddecl="0" i18n="1" name="AutomatismTypeChoice" language="CPP" />
 					<wxPanel wxs="wxsmith/InitialPositionBrowserDlg.wxs" src="InitialPositionBrowserDlg.cpp" hdr="InitialPositionBrowserDlg.h" fwddecl="0" i18n="1" name="InitialPositionBrowserDlg" language="CPP" />
 					<wxPanel wxs="wxsmith/CodeEditor.wxs" src="CodeEditor.cpp" hdr="CodeEditor.h" fwddecl="0" i18n="1" name="CodeEditor" language="CPP" />
 					<wxPanel wxs="wxsmith/BuildMessagesPnl.wxs" src="BuildMessagesPnl.cpp" hdr="BuildMessagesPnl.h" fwddecl="0" i18n="1" name="BuildMessagesPnl" language="CPP" />

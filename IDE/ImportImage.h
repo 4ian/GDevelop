@@ -10,7 +10,6 @@
 #include <wx/statline.h>
 #include <wx/colordlg.h>
 #include <wx/panel.h>
-#include <wx/statbmp.h>
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
@@ -39,15 +38,12 @@ class ImportImage: public wxDialog
 		wxTextCtrl* origineYEdit;
 		wxTextCtrl* spaceHSSEdit;
 		wxStaticText* StaticText6;
-		wxStaticBitmap* StaticBitmap1;
 		wxStaticText* StaticText19;
 		wxStaticText* StaticText8;
 		wxStaticText* StaticText11;
 		wxStaticText* StaticText18;
 		wxTextCtrl* FileGIFEdit;
 		wxTextCtrl* fileSSEdit;
-		wxPanel* Panel1;
-		wxStaticText* StaticText1;
 		wxTextCtrl* columnsSSEdit;
 		wxButton* DecomposeRPGBt;
 		wxTextCtrl* decomposeSSEdit;
@@ -63,7 +59,6 @@ class ImportImage: public wxDialog
 		wxButton* DecomposeGIFBt;
 		wxButton* BrowseGIFBt;
 		wxButton* DecomposeSSBt;
-		wxStaticLine* StaticLine1;
 		wxStaticText* colorSSTxt;
 		wxStaticText* StaticText15;
 		wxStaticText* StaticText12;
@@ -82,10 +77,6 @@ class ImportImage: public wxDialog
 	protected:
 
 		//(*Identifiers(ImportImage)
-		static const long ID_STATICBITMAP1;
-		static const long ID_STATICTEXT1;
-		static const long ID_PANEL1;
-		static const long ID_STATICLINE1;
 		static const long ID_STATICTEXT3;
 		static const long ID_TEXTCTRL1;
 		static const long ID_BUTTON1;

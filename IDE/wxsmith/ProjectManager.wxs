@@ -24,6 +24,7 @@
 					<handler function="OnprojectsTreeItemActivated" entry="EVT_TREE_ITEM_ACTIVATED" />
 					<handler function="OnprojectsTreeItemRightClick" entry="EVT_TREE_ITEM_RIGHT_CLICK" />
 					<handler function="OnprojectsTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+					<handler function="OnprojectsTreeKeyDown" entry="EVT_TREE_KEY_DOWN" />
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 				<option>1</option>
@@ -46,7 +47,8 @@
 				<handler function="OnmodVarSceneMenuISelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuModNameScene" variable="editSceneNameMenuItem" member="no">
-				<label>Change the name</label>
+				<label>Rename</label>
+				<accel>F2</accel>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OneditSceneNameMenuItemSelected" entry="EVT_MENU" />
 			</object>
@@ -57,23 +59,27 @@
 				<handler function="OnaddSceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuDelScene" variable="deleteSceneMenuItem" member="no">
-				<label>Delete the scene</label>
+				<label>Delete</label>
+				<accel>DEL</accel>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OndeleteSceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="idMenuCopyScene" variable="copySceneMenuItem" member="yes">
-				<label>Copy the scene</label>
+				<label>Copy</label>
+				<accel>Ctrl-C</accel>
 				<bitmap>res/copyicon.png</bitmap>
 				<handler function="OncopySceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuCutScene" variable="cutSceneMenuItem" member="yes">
-				<label>Cut the scene</label>
+				<label>Cut</label>
+				<accel>Ctrl-X</accel>
 				<bitmap>res/cuticon.png</bitmap>
 				<handler function="OncutSceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="idMenuPasteScene" variable="pasteSceneMenuItem" member="yes">
-				<label>Paste the scne</label>
+				<label>Paste</label>
+				<accel>Ctrl-V</accel>
 				<bitmap>res/pasteicon.png</bitmap>
 				<handler function="OnpasteSceneMenuItemSelected" entry="EVT_MENU" />
 			</object>
@@ -97,7 +103,8 @@
 				<handler function="OneditGblVarMenuItemSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM4" variable="editNameGameMenuItem" member="yes">
-				<label>Change the name</label>
+				<label>Rename</label>
+				<accel>F2</accel>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OneditNameGameMenuItemSelected" entry="EVT_MENU" />
 			</object>
@@ -122,6 +129,7 @@
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM13" variable="MenuItem9" member="yes">
 				<label>Rename</label>
+				<accel>F2</accel>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OnRenameExternalEventsSelected" entry="EVT_MENU" />
 			</object>
@@ -133,22 +141,26 @@
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM9" variable="MenuItem5" member="yes">
 				<label>Delete</label>
+				<accel>DEL</accel>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDeleteExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM10" variable="MenuItem6" member="yes">
 				<label>Copy</label>
+				<accel>Ctrl-C</accel>
 				<bitmap>res/copyicon.png</bitmap>
 				<handler function="OnCopyExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM11" variable="MenuItem7" member="yes">
 				<label>Cut</label>
+				<accel>Ctrl-X</accel>
 				<bitmap>res/cuticon.png</bitmap>
 				<handler function="OnCutExternalEventsSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM12" variable="MenuItem8" member="yes">
 				<label>Paste</label>
+				<accel>Ctrl-V</accel>
 				<bitmap>res/pasteicon.png</bitmap>
 				<handler function="OnPasteExternalEventsSelected" entry="EVT_MENU" />
 			</object>
@@ -173,6 +185,7 @@
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM16" variable="MenuItem12" member="yes">
 				<label>Delete</label>
+				<accel>DEL</accel>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDeleteSourceFileSelected" entry="EVT_MENU" />
 			</object>
@@ -202,6 +215,7 @@
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM22" variable="MenuItem18" member="yes">
 				<label>Rename</label>
+				<accel>F2</accel>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OnRenameExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
@@ -213,22 +227,26 @@
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM24" variable="MenuItem20" member="yes">
 				<label>Delete</label>
+				<accel>DEL</accel>
 				<bitmap>res/deleteicon.png</bitmap>
 				<handler function="OnDeleteExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
 			<object class="separator" />
 			<object class="wxMenuItem" name="ID_MENUITEM25" variable="MenuItem21" member="yes">
 				<label>Copy</label>
+				<accel>Ctrl-C</accel>
 				<bitmap>res/copyicon.png</bitmap>
 				<handler function="OnCopyExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM26" variable="MenuItem22" member="yes">
 				<label>Cut</label>
+				<accel>Ctrl-X</accel>
 				<bitmap>res/cuticon.png</bitmap>
 				<handler function="OnCutExternalLayoutSelected" entry="EVT_MENU" />
 			</object>
 			<object class="wxMenuItem" name="ID_MENUITEM27" variable="MenuItem23" member="yes">
 				<label>Paste</label>
+				<accel>Ctrl-V</accel>
 				<bitmap>res/pasteicon.png</bitmap>
 				<handler function="OnPasteExternalLayoutSelected" entry="EVT_MENU" />
 			</object>

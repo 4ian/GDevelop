@@ -196,5 +196,11 @@
 				<handler function="OnAbout" entry="EVT_MENU" />
 			</object>
 		</object>
+		<object class="wxMenu" variable="disabledFileMenu" member="yes">
+			<object class="wxMenuItem" name="ID_MENUITEM3" variable="MenuItem11" member="yes">
+				<label>Please stop the preview before continuing</label>
+				<enabled>0</enabled>
+			</object>
+		</object>
 	</object>
 </wxsmith>

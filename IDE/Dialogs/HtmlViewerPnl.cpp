@@ -23,7 +23,7 @@ HtmlViewerPnl::HtmlViewerPnl(wxWindow* parent,wxWindowID id,const wxPoint& pos,c
 	FlexGridSizer1 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(0);
-	Custom1 = wxWebView::New(this,ID_CUSTOM1,"www.wiki.compilgames.net",wxDefaultPosition,wxSize(278,334), wxWEB_VIEW_BACKEND_DEFAULT, wxNO_BORDER);
+	Custom1 = wxWebView::New(this,ID_CUSTOM1,"www.wiki.compilgames.net",wxDefaultPosition,wxSize(278,334),wxWebViewBackendDefault, wxNO_BORDER);
 	FlexGridSizer1->Add(Custom1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	SetSizer(FlexGridSizer1);
 	FlexGridSizer1->Fit(this);

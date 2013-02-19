@@ -98,6 +98,7 @@ events(events_)
 	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Search"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer4->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	searchEdit = new wxTextCtrl(Panel1, ID_TEXTCTRL1, wxEmptyString, wxDefaultPosition, wxSize(178,21), 0, wxDefaultValidator, _T("ID_TEXTCTRL1"));
+	searchEdit->SetFocus();
 	FlexGridSizer4->Add(searchEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer2->Add(FlexGridSizer4, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer9 = new wxFlexGridSizer(0, 3, 0, 0);
@@ -207,7 +208,7 @@ events(events_)
 	HyperlinkCtrl1->SetToolTip(_("Display help about this window"));
 	FlexGridSizer19->Add(HyperlinkCtrl1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer16->Add(FlexGridSizer19, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	replaceBt = new wxButton(Panel2, ID_BUTTON4, _("Replace"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
+	replaceBt = new wxButton(Panel2, ID_BUTTON4, _("Replace all"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON4"));
 	FlexGridSizer16->Add(replaceBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer10->Add(FlexGridSizer16, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	Panel2->SetSizer(FlexGridSizer10);
@@ -225,8 +226,10 @@ events(events_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnsearchBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnnextBtClick);
 	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnpreviousBtClick);
+	Connect(ID_TEXTCTRL2,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&SearchEvents::OnsearchToReplaceEditText);
 	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&SearchEvents::OnhelpBtClick);
 	Connect(ID_BUTTON4,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&SearchEvents::OnreplaceBtClick);
+	Connect(wxEVT_KEY_DOWN,(wxObjectEventFunction)&SearchEvents::OnKeyDown);
 	//*)
 }
 
@@ -282,9 +285,16 @@ void SearchEvents::OnsearchBtClick(wxCommandEvent& event)
 
 void SearchEvents::OnsearchEditText(wxCommandEvent& event)
 {
+    searchToReplaceEdit->SetValue(searchEdit->GetValue());
+
     resultsCountTxt->SetLabel("");
     nextBt->Enable(false);
     previousBt->Enable(false);
+}
+
+void SearchEvents::OnsearchToReplaceEditText(wxCommandEvent& event)
+{
+    searchEdit->SetValue(searchToReplaceEdit->GetValue());
 }
 
 void SearchEvents::OnnextBtClick(wxCommandEvent&)
@@ -328,3 +338,13 @@ void SearchEvents::OnhelpBtClick(wxCommandEvent& event)
     gd::HelpFileAccess::GetInstance()->OpenURL(_("http://www.wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_event_find"));
 }
 
+void SearchEvents::OnKeyDown(wxKeyEvent& event)
+{
+    wxCommandEvent unusedEvent;
+
+    if ( event.GetKeyCode() == WXK_F3 )
+    {
+        if ( event.GetModifiers() == wxMOD_SHIFT ) OnpreviousBtClick(unusedEvent);
+        else OnnextBtClick(unusedEvent);
+    }
+}

@@ -200,6 +200,7 @@ class ProjectManager: public wxPanel
 		void OnCopyExternalLayoutSelected(wxCommandEvent& event);
 		void OnCutExternalLayoutSelected(wxCommandEvent& event);
 		void OnPasteExternalLayoutSelected(wxCommandEvent& event);
+		void OnprojectsTreeKeyDown(wxTreeEvent& event);
 		//*)
 
 		bool GetGameOfSelectedItem(RuntimeGame *& game, gdTreeItemProjectData *& data);

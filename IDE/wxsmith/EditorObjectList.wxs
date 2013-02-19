@@ -76,7 +76,8 @@
 				<label>Effects</label>
 			</object>
 			<object class="wxMenuItem" name="idMenuModName" variable="editNameMenuI" member="no">
-				<label>Change the name of the object</label>
+				<label>Rename</label>
+				<accel>F2</accel>
 				<bitmap>res/editnom.png</bitmap>
 				<handler function="OneditNameMenuISelected" entry="EVT_MENU" />
 			</object>
@@ -150,10 +151,3 @@
 		</object>
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

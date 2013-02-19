@@ -1,10 +1,7 @@
 #include "ImportImage.h"
 
 //(*InternalHeaders(ImportImage)
-#include <wx/bitmap.h>
-#include <wx/settings.h>
 #include <wx/intl.h>
-#include <wx/image.h>
 #include <wx/string.h>
 //*)
 #include <wx/filedlg.h>
@@ -18,10 +15,6 @@
 using namespace std;
 
 //(*IdInit(ImportImage)
-const long ImportImage::ID_STATICBITMAP1 = wxNewId();
-const long ImportImage::ID_STATICTEXT1 = wxNewId();
-const long ImportImage::ID_PANEL1 = wxNewId();
-const long ImportImage::ID_STATICLINE1 = wxNewId();
 const long ImportImage::ID_STATICTEXT3 = wxNewId();
 const long ImportImage::ID_TEXTCTRL1 = wxNewId();
 const long ImportImage::ID_BUTTON1 = wxNewId();
@@ -106,33 +99,21 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	wxFlexGridSizer* FlexGridSizer20;
 	wxFlexGridSizer* FlexGridSizer13;
 	wxFlexGridSizer* FlexGridSizer12;
-	wxFlexGridSizer* FlexGridSizer6;
 	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer11;
 	wxFlexGridSizer* FlexGridSizer17;
 	wxStaticBoxSizer* StaticBoxSizer5;
 
-	Create(parent, wxID_ANY, _("Import images"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
+	Create(parent, wxID_ANY, _("Import images"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER, _T("wxID_ANY"));
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
-	FlexGridSizer1->AddGrowableRow(1);
-	Panel1 = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(420,54), wxTAB_TRAVERSAL, _T("ID_PANEL1"));
-	Panel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_WINDOW));
-	FlexGridSizer6 = new wxFlexGridSizer(0, 3, 0, 0);
-	StaticBitmap1 = new wxStaticBitmap(Panel1, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/imagewizard.png"))), wxDefaultPosition, wxDefaultSize, wxSIMPLE_BORDER, _T("ID_STATICBITMAP1"));
-	FlexGridSizer6->Add(StaticBitmap1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticText1 = new wxStaticText(Panel1, ID_STATICTEXT1, _("Importing images allow to generate\nquickly your images or objects from\nanimated files or spritesheets."), wxDefaultPosition, wxSize(295,53), wxALIGN_CENTRE, _T("ID_STATICTEXT1"));
-	FlexGridSizer6->Add(StaticText1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	Panel1->SetSizer(FlexGridSizer6);
-	SetSizer(FlexGridSizer6);
-	Layout();
-	FlexGridSizer1->Add(Panel1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticLine1 = new wxStaticLine(this, ID_STATICLINE1, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE1"));
-	FlexGridSizer1->Add(StaticLine1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
+	FlexGridSizer1->AddGrowableRow(0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 1, 0, 0);
+	FlexGridSizer2->AddGrowableCol(0);
+	FlexGridSizer2->AddGrowableRow(0);
 	Notebook1 = new wxNotebook(this, ID_NOTEBOOK1, wxDefaultPosition, wxDefaultSize, 0, _T("ID_NOTEBOOK1"));
-	Panel2 = new wxPanel(Notebook1, ID_PANEL2, wxPoint(74,44), wxSize(268,103), wxTAB_TRAVERSAL, _T("ID_PANEL2"));
+	Panel2 = new wxPanel(Notebook1, ID_PANEL2, wxPoint(74,44), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL2"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
 	FlexGridSizer3->AddGrowableRow(3);
@@ -162,8 +143,8 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	DecomposeGIFBt = new wxButton(Panel2, ID_BUTTON2, _("Decompose"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON2"));
 	FlexGridSizer3->Add(DecomposeGIFBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
 	Panel2->SetSizer(FlexGridSizer3);
-	SetSizer(FlexGridSizer3);
-	Layout();
+	FlexGridSizer3->Fit(Panel2);
+	FlexGridSizer3->SetSizeHints(Panel2);
 	Panel3 = new wxPanel(Notebook1, ID_PANEL3, wxPoint(110,3), wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	FlexGridSizer9 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer9->AddGrowableCol(0);
@@ -282,15 +263,17 @@ ImportImage::ImportImage(wxWindow* parent, int pageSelected)
 	StaticBoxSizer7->Add(FlexGridSizer24, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer13->Add(StaticBoxSizer7, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer23 = new wxFlexGridSizer(0, 4, 0, 0);
+	FlexGridSizer23->AddGrowableCol(1);
+	FlexGridSizer23->AddGrowableRow(0);
 	StaticText18 = new wxStaticText(Panel4, ID_STATICTEXT20, _("Decompose in :"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT20"));
 	FlexGridSizer23->Add(StaticText18, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	decomposeSSEdit = new wxTextCtrl(Panel4, ID_TEXTCTRL14, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_TEXTCTRL14"));
-	FlexGridSizer23->Add(decomposeSSEdit, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	FlexGridSizer23->Add(decomposeSSEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	StaticText19 = new wxStaticText(Panel4, ID_STATICTEXT21, _("X.png"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT21"));
 	FlexGridSizer23->Add(StaticText19, 1, wxTOP|wxBOTTOM|wxRIGHT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	DecomposeSSBt = new wxButton(Panel4, ID_BUTTON7, _("Decompose"), wxDefaultPosition, wxDefaultSize, 0, wxDefaultValidator, _T("ID_BUTTON7"));
 	FlexGridSizer23->Add(DecomposeSSBt, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 5);
-	FlexGridSizer13->Add(FlexGridSizer23, 1, wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM, 0);
+	FlexGridSizer13->Add(FlexGridSizer23, 1, wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_BOTTOM, 0);
 	Panel4->SetSizer(FlexGridSizer13);
 	FlexGridSizer13->Fit(Panel4);
 	FlexGridSizer13->SetSizeHints(Panel4);

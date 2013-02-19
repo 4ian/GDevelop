@@ -221,13 +221,9 @@ void EditorScene::OnnotebookPageChanged(wxAuiNotebookEvent& event)
 
 void EditorScene::OnnotebookPageChanging(wxAuiNotebookEvent& event)
 {
-    if ( !layoutEditorCanvas->IsEditing() )
-    {
-        event.Veto();
-        mainFrameWrapper.GetInfoBar()->ShowMessage(_("You can not edit events while previewing the scene."));
-    }
+    if ( !layoutEditorCanvas->IsEditing() && !layoutEditorCanvas->PreviewPaused() )
+        layoutEditorCanvas->PausePreview();
 }
-
 
 void EditorScene::OnsceneCanvasSetFocus(wxFocusEvent& event)
 {

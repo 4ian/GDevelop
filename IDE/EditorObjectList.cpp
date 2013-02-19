@@ -51,7 +51,7 @@
 #include "LogFileManager.h"
 #include "DndTextObjectsEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
-#include "AutomatismTypeChoice.h"
+#include "GDCore/IDE/Dialogs/ChooseAutomatismTypeDialog.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "MainFrame.h"
 
@@ -152,7 +152,7 @@ globalObjects(&objects == &project)
 	ContextMenu.Append(ID_MENUITEM1, _("Automatisms"), automatismsMenu, wxEmptyString);
 	effectsMenuI = new wxMenuItem((&ContextMenu), idMenuEffects, _("Effects"), wxEmptyString, wxITEM_NORMAL);
 	ContextMenu.Append(effectsMenuI);
-	editNameMenuI = new wxMenuItem((&ContextMenu), idMenuModName, _("Change the name of the object"), wxEmptyString, wxITEM_NORMAL);
+	editNameMenuI = new wxMenuItem((&ContextMenu), idMenuModName, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
 	editNameMenuI->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
 	ContextMenu.Append(editNameMenuI);
 	ContextMenu.AppendSeparator();
@@ -166,27 +166,27 @@ globalObjects(&objects == &project)
 	moveUpMenuI = new wxMenuItem((&ContextMenu), idMoveUp, _("Move up\tCtrl-Up"), wxEmptyString, wxITEM_NORMAL);
 	moveUpMenuI->SetBitmap(wxBitmap(wxImage(_T("res/up.png"))));
 	ContextMenu.Append(moveUpMenuI);
-	moveDownMenuI = new wxMenuItem((&ContextMenu), idMoveDown, _("Move up\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
+	moveDownMenuI = new wxMenuItem((&ContextMenu), idMoveDown, _("Move down\tCtrl-Down"), wxEmptyString, wxITEM_NORMAL);
 	moveDownMenuI->SetBitmap(wxBitmap(wxImage(_T("res/down.png"))));
 	ContextMenu.Append(moveDownMenuI);
 	ContextMenu.AppendSeparator();
-	copyMenuI = new wxMenuItem((&ContextMenu), idMenuCopy, _("Copy\tCtrl+C"), wxEmptyString, wxITEM_NORMAL);
+	copyMenuI = new wxMenuItem((&ContextMenu), idMenuCopy, _("Copy\tCtrl-C"), wxEmptyString, wxITEM_NORMAL);
 	copyMenuI->SetBitmap(wxBitmap(wxImage(_T("res/copyicon.png"))));
 	ContextMenu.Append(copyMenuI);
-	cutMenuI = new wxMenuItem((&ContextMenu), idMenuCut, _("Cut\tCtrl+X"), wxEmptyString, wxITEM_NORMAL);
+	cutMenuI = new wxMenuItem((&ContextMenu), idMenuCut, _("Cut\tCtrl-X"), wxEmptyString, wxITEM_NORMAL);
 	cutMenuI->SetBitmap(wxBitmap(wxImage(_T("res/cuticon.png"))));
 	ContextMenu.Append(cutMenuI);
-	pasteMenuI = new wxMenuItem((&ContextMenu), idMenuPaste, _("Paste\tCtrl+V"), wxEmptyString, wxITEM_NORMAL);
+	pasteMenuI = new wxMenuItem((&ContextMenu), idMenuPaste, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
 	pasteMenuI->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	ContextMenu.Append(pasteMenuI);
 	MenuItem1 = new wxMenuItem((&rootContextMenu), ID_MENUITEM4, _("Add an object"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem1->SetBitmap(wxBitmap(wxImage(_T("res/addicon.png"))));
 	rootContextMenu.Append(MenuItem1);
 	rootContextMenu.AppendSeparator();
-	MenuItem3 = new wxMenuItem((&rootContextMenu), ID_MENUITEM6, _("Paste\tCtrl+V"), wxEmptyString, wxITEM_NORMAL);
+	MenuItem3 = new wxMenuItem((&rootContextMenu), ID_MENUITEM6, _("Paste\tCtrl-V"), wxEmptyString, wxITEM_NORMAL);
 	MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/pasteicon.png"))));
 	rootContextMenu.Append(MenuItem3);
-	MenuItem2 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Delete objects"), _("Delete all selected objects"), wxITEM_NORMAL);
+	MenuItem2 = new wxMenuItem((&multipleContextMenu), ID_MENUITEM7, _("Supprimer les objets\tDEL"), _("Delete all selected objects"), wxITEM_NORMAL);
 	MenuItem2->SetBitmap(wxBitmap(wxImage(_T("res/deleteicon.png"))));
 	multipleContextMenu.Append(MenuItem2);
 	FlexGridSizer1->Fit(this);
@@ -883,7 +883,7 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
         return;
     }
 
-    AutomatismTypeChoice dialog(this, project);
+    gd::ChooseAutomatismTypeDialog dialog(this, project);
     if ( dialog.ShowModal() == 1)
     {
         //Find automatism metadata
@@ -892,10 +892,10 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
         for (unsigned int i = 0;i<extensions.size();++i)
         {
             std::vector<std::string> automatismsTypes = extensions[i]->GetAutomatismsTypes();
-            if ( find(automatismsTypes.begin(), automatismsTypes.end(), dialog.selectedAutomatismType) != automatismsTypes.end() )
+            if ( find(automatismsTypes.begin(), automatismsTypes.end(), dialog.GetSelectedAutomatismType()) != automatismsTypes.end() )
                 extension = extensions[i];
         }
-        gd::AutomatismMetadata metadata = extension->GetAutomatismMetadata(dialog.selectedAutomatismType);
+        gd::AutomatismMetadata metadata = extension->GetAutomatismMetadata(dialog.GetSelectedAutomatismType());
 
         //Add automatism to object
         std::string autoName = metadata.GetDefaultName();
@@ -903,7 +903,7 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
             autoName = metadata.GetDefaultName()+ToString(j);
 
         gd::Object & object = objects.GetObject(name);
-        object.AddNewAutomatism(dialog.selectedAutomatismType, autoName);
+        object.AddNewAutomatism(dialog.GetSelectedAutomatismType(), autoName);
         project.GetChangesNotifier().OnAutomatismAdded(project, globalObjects ? NULL : layout, object, object.GetAutomatism(autoName));
     }
 }
@@ -977,6 +977,11 @@ void EditorObjectList::OnobjectsListKeyDown(wxTreeEvent& event)
     {
         wxCommandEvent unusedEvent;
         OndelObjMenuISelected( unusedEvent );
+    }
+    else if (event.GetKeyCode() == WXK_F2)
+    {
+        wxCommandEvent unusedEvent;
+        OneditNameMenuISelected( unusedEvent );
     }
     else if (event.GetKeyEvent().GetModifiers() == wxMOD_CMD)
     {

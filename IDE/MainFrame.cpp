@@ -58,6 +58,7 @@
 #include "ExternalEventsEditor.h"
 #include "Dialogs/HtmlViewerPnl.h"
 #include "Dialogs/ProjectPropertiesPnl.h"
+#include "Dialogs/HelpViewerDlg.h"
 
 //(*IdInit(MainFrame)
 const long MainFrame::ID_CUSTOM1 = wxNewId();
@@ -89,7 +90,9 @@ const long MainFrame::ID_MENUITEM23 = wxNewId();
 const long MainFrame::ID_MENUITEM25 = wxNewId();
 const long MainFrame::ID_MENUITEM24 = wxNewId();
 const long MainFrame::ID_MENUITEM21 = wxNewId();
+const long MainFrame::ID_MENUITEM3 = wxNewId();
 //*)
+const long MainFrame::ID_RIBBON = wxNewId();
 const long MainFrame::IDM_RECENTS = wxNewId();
 const long MainFrame::idRibbonNew = wxNewId();
 const long MainFrame::idRibbonOpen = wxNewId();
@@ -122,7 +125,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     gameCurrentlyEdited(0),
     m_ribbon(NULL),
     ribbonFileBt(NULL),
-    ribbonHelpBt(NULL),
     ribbonSceneEditorButtonBar(NULL),
     buildToolsPnl(NULL),
     mainFrameWrapper(NULL, NULL, this, NULL, NULL, NULL, &scenesLockingShortcuts, wxGetCwd()),
@@ -245,6 +247,9 @@ MainFrame::MainFrame( wxWindow* parent ) :
     MenuItem17 = new wxMenuItem((&helpMenu), ID_MENUITEM21, _("About..."), wxEmptyString, wxITEM_NORMAL);
     MenuItem17->SetBitmap(wxBitmap(wxImage(_T("res/icon16.png"))));
     helpMenu.Append(MenuItem17);
+    MenuItem11 = new wxMenuItem((&disabledFileMenu), ID_MENUITEM3, _("Please stop the preview before continuing"), wxEmptyString, wxITEM_NORMAL);
+    disabledFileMenu.Append(MenuItem11);
+    MenuItem11->Enable(false);
     SetSizer(FlexGridSizer1);
     Layout();
     Center();
@@ -293,6 +298,9 @@ MainFrame::MainFrame( wxWindow* parent ) :
     Connect( idRibbonUpdate, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuItem36Selected );
     Connect( idRibbonWebSite, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnMenuSiteSelected );
     Connect( idRibbonCredits, wxEVT_COMMAND_RIBBONBUTTON_CLICKED, ( wxObjectEventFunction )&MainFrame::OnAbout );
+    Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_PAGE_CHANGING, ( wxObjectEventFunction )&MainFrame::OnRibbonPageChanging );
+    Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_HELP_CLICKED, ( wxObjectEventFunction )&MainFrame::OnRibbonHelpBtClick );
+    Connect( ID_RIBBON, wxEVT_COMMAND_RIBBONBAR_TOGGLED, ( wxObjectEventFunction )&MainFrame::OnRibbonToggleBtClick );
 
 
     wxIconBundle icons;
@@ -349,7 +357,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     {
         ribbonStyle &= ~wxRIBBON_BAR_SHOW_PAGE_LABELS;
     }
-    m_ribbon = new wxRibbonBar(this, wxID_ANY);
+    m_ribbon = new wxRibbonBar(this, ID_RIBBON);
     m_ribbon->SetWindowStyle(ribbonStyle);
     bool hideLabels = false;
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
@@ -422,12 +430,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
     ribbonFileBt->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(MainFrame::OnRibbonFileBtEnter), NULL, this);
     ribbonFileBt->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::OnRibbonFileBtClick), NULL, this);
 
-    //Create ribbon "Help" custom button
-    ribbonHelpBt = new wxStaticBitmap(m_ribbon, idRibbonHelpBt, wxNullBitmap);
-    ribbonHelpBt->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrame::OnRibbonHelpBtLeave), NULL, this);
-    ribbonHelpBt->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(MainFrame::OnRibbonHelpBtEnter), NULL, this);
-    ribbonHelpBt->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::OnRibbonHelpBtClick), NULL, this);
-
     //Load wxAUI
     m_mgr.SetManagedWindow( this );
 
@@ -469,6 +471,9 @@ MainFrame::MainFrame( wxWindow* parent ) :
     m_mgr.GetPane(projectPropertiesPnl).Caption(_( "Project properties" ));
 
     //Change ribbon pane height.
+    bool hidePanels = false;
+    pConfig->Read( _T( "/Skin/HidePanels" ), &hidePanels );
+    m_ribbon->ShowPanels(!hidePanels);
     m_mgr.GetPane(m_ribbon).MinSize(1, m_ribbon->GetBestSize().GetHeight()+4);
 
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
@@ -492,7 +497,6 @@ MainFrame::MainFrame( wxWindow* parent ) :
 void MainFrame::OnResize(wxSizeEvent& event)
 {
     Layout();
-    if ( ribbonHelpBt != NULL ) ribbonHelpBt->SetPosition(wxPoint(m_ribbon->GetSize().GetWidth()-ribbonHelpBt->GetSize().GetWidth()-2, 2));
 }
 
 /**
@@ -505,6 +509,10 @@ MainFrame::~MainFrame()
 
     //Deinitialize the frame manager
     m_mgr.UnInit();
+
+    cout << "Destroying the help provider";
+    HelpProvider::GetInstance()->DestroySingleton();
+    cout << "." << endl;
 }
 
 /** Change current project
@@ -642,6 +650,15 @@ void MainFrame::OnNotebook1PageChanged(wxAuiNotebookEvent& event)
     }
 }
 
+void MainFrame::OnRibbonPageChanging(wxRibbonBarEvent& evt)
+{
+    if ( !scenesLockingShortcuts.empty() )
+    {
+        evt.Veto();
+        infoBar->ShowMessage(_("Please stop the preview before continuing"));
+    }
+}
+
 void MainFrame::RealizeRibbonCustomButtons()
 {
     wxRibbonArtProvider * artProvider = m_ribbon->GetArtProvider();
@@ -708,37 +725,11 @@ void MainFrame::RealizeRibbonCustomButtons()
     if ( ribbonFileHoveredBitmap.GetSize().GetHeight() > 3 )
         ribbonFileHoveredBitmap.SetHeight(ribbonFileHoveredBitmap.GetSize().GetHeight()-2);
 
-    //Render help file button
-    wxBitmap helpIcon("res/helpicon.png", wxBITMAP_TYPE_ANY);
-
-    { //(Painful) generation of help button
-        wxMemoryDC dc;
-        ribbonHelpNormalBitmap = wxBitmap(16,16,24 /*We **need** to specify 24 bit depth so as to keep the background color ( see below )*/);
-        dc.SelectObject(ribbonHelpNormalBitmap);
-        dc.SetBackground(wxBrush(backgroundColour));
-        dc.Clear();
-        //artProvider->DrawTabCtrlBackground(dc, fakeRibbon, ribbonHelpHoveredBitmap.GetSize()); //Useless, the background is destroyed by the next call to DrawBitmap ??
-                                                                                                 //That's why we use a simple background color.
-        dc.DrawBitmap(helpIcon, wxPoint(0,0), true /*Use mask, but it does not seems to work so we must use a background color ( see above )*/);
-    }
-    { //Same thing for hovered button
-        wxMemoryDC dc;
-        ribbonHelpHoveredBitmap = wxBitmap(16,16,24);
-        dc.SelectObject(ribbonHelpHoveredBitmap);
-        dc.SetBackground(wxBrush(backgroundColour));
-        dc.Clear();
-        helpIcon = wxBitmap(helpIcon.ConvertToImage().ConvertToDisabled(255));
-        dc.DrawBitmap(helpIcon, wxPoint(0,0), true);
-    }
-
     fakeRibbon->Destroy();
 
     //Finally create our bitmaps and make sure the ribbon is ready.
     ribbonFileBt->SetPosition(wxPoint(3,1));
     ribbonFileBt->SetBitmap(ribbonFileNormalBitmap);
-    ribbonHelpBt->SetPosition(wxPoint(m_ribbon->GetSize().GetWidth()-ribbonHelpBt->GetSize().GetWidth()-2, 2));
-    ribbonHelpBt->SetBitmap(ribbonHelpNormalBitmap);
-    m_ribbon->SetTabCtrlMargins(bitmapLabel.GetSize().GetWidth()+3+3, ribbonHelpBt->GetSize().GetWidth()+2+3);
 }
 
 void MainFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& event)
@@ -892,26 +883,22 @@ void MainFrame::OnRibbonFileBtEnter(wxMouseEvent& event)
 
 void MainFrame::OnRibbonFileBtClick(wxMouseEvent& event)
 {
-    PopupMenu(&fileMenu, ribbonFileBt->GetPosition().x, ribbonFileBt->GetPosition().y+ribbonFileBt->GetSize().GetHeight());
+    if ( scenesLockingShortcuts.empty() )
+        PopupMenu(&fileMenu, ribbonFileBt->GetPosition().x, ribbonFileBt->GetPosition().y+ribbonFileBt->GetSize().GetHeight());
+    else
+        PopupMenu(&disabledFileMenu, ribbonFileBt->GetPosition().x, ribbonFileBt->GetPosition().y+ribbonFileBt->GetSize().GetHeight());
 }
 
-void MainFrame::OnRibbonHelpBtLeave(wxMouseEvent& event)
+void MainFrame::OnRibbonHelpBtClick(wxRibbonBarEvent & event)
 {
-    ribbonHelpBt->SetBitmap(ribbonHelpNormalBitmap);
-    ribbonHelpBt->Refresh();
-    ribbonHelpBt->Update();
+    PopupMenu(&helpMenu, m_ribbon->GetSize().GetWidth()-16, 16);
 }
 
-void MainFrame::OnRibbonHelpBtEnter(wxMouseEvent& event)
+void MainFrame::OnRibbonToggleBtClick(wxRibbonBarEvent & event)
 {
-    ribbonHelpBt->SetBitmap(ribbonHelpHoveredBitmap);
-    ribbonHelpBt->Refresh();
-    ribbonHelpBt->Update();
-}
-
-void MainFrame::OnRibbonHelpBtClick(wxMouseEvent& event)
-{
-    PopupMenu(&helpMenu, ribbonHelpBt->GetPosition().x, ribbonHelpBt->GetPosition().y+ribbonHelpBt->GetSize().GetHeight());
+    wxConfigBase::Get()->Write(_T( "/Skin/HidePanels" ), !m_ribbon->ArePanelsShown() );
+    m_mgr.GetPane(m_ribbon).MinSize(1, m_ribbon->GetBestSize().GetHeight()+4);
+    m_mgr.Update();
 }
 
 void MainFrame::OnMenuPrefSelected( wxCommandEvent& event )

@@ -995,6 +995,8 @@ void EventsEditor::OneventsPanelMouseLeave(wxMouseEvent& event)
  */
 void EventsEditor::OneventsPanelKeyDown(wxKeyEvent& event)
 {
+    wxCommandEvent unusedEvent;
+
     if ( event.GetKeyCode() == WXK_CONTROL )
     {
         ctrlKeyDown = true;
@@ -1008,37 +1010,42 @@ void EventsEditor::OneventsPanelKeyDown(wxKeyEvent& event)
         wxCommandEvent unusedEvent;
         OnaddEventBtClick( unusedEvent );
     }
-    if ( event.GetModifiers() == wxMOD_CMD ) //Ctrl-xxx
+    if ( event.GetKeyCode() == WXK_F3 && searchDialog != NULL)
+    {
+        if ( event.GetModifiers() == wxMOD_SHIFT ) searchDialog->OnpreviousBtClick(unusedEvent);
+        else searchDialog->OnnextBtClick(unusedEvent);
+    }
+    else if ( event.GetModifiers() == wxMOD_CMD ) //Ctrl-xxx
     {
         switch ( event.GetKeyCode() )
         {
             case 67: //Ctrl C
             {
-                wxCommandEvent unusedEvent;
                 OneventCopyMenuSelected( unusedEvent );
                 break;
             }
             case 86: //Ctrl-V
             {
-                wxCommandEvent unusedEvent;
                 OneventPasteMenuSelected( unusedEvent );
                 break;
             }
             case 88: //Ctrl-X
             {
-                wxCommandEvent unusedEvent;
                 OneventCutMenuSelected( unusedEvent );
+                break;
+            }
+            case 70: //Ctrl-F
+            {
+                OnSearchBtClick( unusedEvent );
                 break;
             }
             case 89: //Ctrl-Y
             {
-                wxCommandEvent unusedEvent;
                 OnredoMenuSelected( unusedEvent );
                 break;
             }
             case 90: //Ctrl-Z
             {
-                wxCommandEvent unusedEvent;
                 OnundoMenuSelected( unusedEvent );
                 break;
             }

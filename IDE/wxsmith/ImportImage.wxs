@@ -3,55 +3,21 @@
 	<object class="wxDialog" name="ImportImage">
 		<title>Import images</title>
 		<id_arg>0</id_arg>
+		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<growablecols>0</growablecols>
-			<growablerows>1</growablerows>
-			<object class="sizeritem">
-				<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
-					<size>420,54</size>
-					<bg>wxSYS_COLOUR_WINDOW</bg>
-					<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
-						<cols>3</cols>
-						<object class="sizeritem">
-							<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="StaticBitmap1" member="yes">
-								<bitmap>res/imagewizard.png</bitmap>
-							</object>
-							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-							<border>5</border>
-							<option>1</option>
-						</object>
-						<object class="sizeritem">
-							<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-								<label>Importing images allow to generate&#x0A;quickly your images or objects from&#x0A;animated files or spritesheets.</label>
-								<size>295,53</size>
-								<style>wxALIGN_CENTRE</style>
-							</object>
-							<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-							<border>5</border>
-							<option>1</option>
-						</object>
-					</object>
-				</object>
-				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<option>1</option>
-			</object>
-			<object class="sizeritem">
-				<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
-					<size>10,-1</size>
-				</object>
-				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<option>1</option>
-			</object>
+			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 					<cols>1</cols>
+					<growablecols>0</growablecols>
+					<growablerows>0</growablerows>
 					<object class="sizeritem">
 						<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
 							<object class="notebookpage">
 								<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
 									<pos>74,44</pos>
-									<size>268,103</size>
 									<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
 										<cols>1</cols>
 										<growablecols>0</growablecols>
@@ -582,6 +548,8 @@
 										<object class="sizeritem">
 											<object class="wxFlexGridSizer" variable="FlexGridSizer23" member="no">
 												<cols>4</cols>
+												<growablecols>1</growablecols>
+												<growablerows>0</growablerows>
 												<object class="sizeritem">
 													<object class="wxStaticText" name="ID_STATICTEXT20" variable="StaticText18" member="yes">
 														<label>Decompose in :</label>
@@ -592,7 +560,7 @@
 												</object>
 												<object class="sizeritem">
 													<object class="wxTextCtrl" name="ID_TEXTCTRL14" variable="decomposeSSEdit" member="yes" />
-													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
 													<option>1</option>
 												</object>
@@ -614,7 +582,7 @@
 													<option>1</option>
 												</object>
 											</object>
-											<flag>wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM</flag>
+											<flag>wxALL|wxEXPAND|wxALIGN_RIGHT|wxALIGN_BOTTOM</flag>
 											<option>1</option>
 										</object>
 									</object>
@@ -658,10 +626,3 @@
 		<object class="wxColourDialog" variable="colorDialog" member="yes" />
 	</object>
 </wxsmith>
-
-
-
-
-
-
-

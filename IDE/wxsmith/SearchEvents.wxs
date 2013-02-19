@@ -3,6 +3,7 @@
 	<object class="wxDialog" name="SearchEvents">
 		<title>Search in events</title>
 		<id_arg>0</id_arg>
+		<handler function="OnKeyDown" entry="EVT_KEY_DOWN" />
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>3</cols>
 			<growablecols>0</growablecols>
@@ -31,6 +32,7 @@
 										<object class="sizeritem">
 											<object class="wxTextCtrl" name="ID_TEXTCTRL1" variable="searchEdit" member="yes">
 												<size>178,21</size>
+												<focused>1</focused>
 												<handler function="OnsearchEditText" entry="EVT_TEXT" />
 											</object>
 											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
@@ -224,6 +226,7 @@
 												<object class="sizeritem">
 													<object class="wxTextCtrl" name="ID_TEXTCTRL2" variable="searchToReplaceEdit" member="yes">
 														<size>178,21</size>
+														<handler function="OnsearchToReplaceEditText" entry="EVT_TEXT" />
 													</object>
 													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 													<border>5</border>
@@ -376,7 +379,7 @@
 										</object>
 										<object class="sizeritem">
 											<object class="wxButton" name="ID_BUTTON4" variable="replaceBt" member="yes">
-												<label>Replace</label>
+												<label>Replace all</label>
 												<handler function="OnreplaceBtClick" entry="EVT_BUTTON" />
 											</object>
 											<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>

@@ -1,38 +1,30 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <wxsmith>
-	<object class="wxDialog" name="ChooseObjectTypeDialog">
-		<title>Choose an object type</title>
+	<object class="wxDialog" name="ChooseAutomatismTypeDialog">
+		<title>Choose an automatism</title>
 		<id_arg>0</id_arg>
 		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
-		<handler function="OnClose" entry="EVT_CLOSE" />
 		<handler function="OnResize" entry="EVT_SIZE" />
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
 			<growablecols>0</growablecols>
 			<growablerows>1</growablerows>
 			<object class="sizeritem">
-				<object class="wxStaticText" name="ID_STATICTEXT2" variable="StaticText2" member="yes">
-					<label>Choose the kind of object to add:</label>
+				<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+					<label>Automatisms can be used to add a specific behaviour&#x0A;to an object. Choose the automatism to add:</label>
 				</object>
 				<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
 				<option>1</option>
 			</object>
 			<object class="sizeritem">
-				<object class="wxListCtrl" name="ID_LISTCTRL1" variable="objectsList" member="yes">
-					<style>wxLC_REPORT|wxLC_ALIGN_TOP|wxLC_NO_HEADER|wxLC_SINGLE_SEL</style>
-					<handler function="OnobjectsListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
-					<handler function="OnobjectsListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
+				<object class="wxListCtrl" name="ID_LISTCTRL1" variable="automatismsList" member="yes">
+					<size>277,175</size>
+					<style>wxLC_REPORT|wxLC_NO_HEADER|wxLC_SINGLE_SEL</style>
+					<handler function="OnautomatismsListItemSelect" entry="EVT_LIST_ITEM_SELECTED" />
+					<handler function="OnautomatismsListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
 				</object>
 				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
-				<border>5</border>
-				<option>1</option>
-			</object>
-			<object class="sizeritem">
-				<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
-					<label>You can also use the grayed objects:&#x0A;Their associated extension will be automatically enabled.</label>
-				</object>
-				<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 				<border>5</border>
 				<option>1</option>
 			</object>
@@ -45,8 +37,8 @@
 			</object>
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
-					<cols>4</cols>
-					<growablecols>1</growablecols>
+					<cols>3</cols>
+					<growablecols>0</growablecols>
 					<object class="sizeritem">
 						<object class="wxFlexGridSizer" variable="FlexGridSizer17" member="no">
 							<cols>3</cols>
@@ -79,7 +71,7 @@
 							<label>Ok</label>
 							<handler function="OnokBtClick" entry="EVT_BUTTON" />
 						</object>
-						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
 						<option>1</option>
 					</object>

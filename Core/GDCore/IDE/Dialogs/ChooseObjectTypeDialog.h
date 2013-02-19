@@ -9,7 +9,6 @@
 #include <wx/listctrl.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
-#include <wx/textctrl.h>
 #include <wx/statline.h>
 #include <wx/hyperlink.h>
 #include <wx/statbmp.h>
@@ -47,10 +46,8 @@ public:
 
     //(*Declarations(ChooseObjectTypeDialog)
     wxStaticBitmap* StaticBitmap2;
-    wxStaticBitmap* iconBmp;
     wxStaticText* StaticText2;
-    wxTextCtrl* infoEdit;
-    wxButton* moreObjectsBt;
+    wxStaticText* StaticText1;
     wxButton* cancelBt;
     wxStaticLine* StaticLine2;
     wxHyperlinkCtrl* helpBt;
@@ -64,10 +61,8 @@ protected:
     //(*Identifiers(ChooseObjectTypeDialog)
     static const long ID_STATICTEXT2;
     static const long ID_LISTCTRL1;
-    static const long ID_STATICBITMAP1;
-    static const long ID_TEXTCTRL1;
+    static const long ID_STATICTEXT1;
     static const long ID_STATICLINE2;
-    static const long ID_BUTTON3;
     static const long ID_STATICBITMAP5;
     static const long ID_HYPERLINKCTRL2;
     static const long ID_BUTTON1;
@@ -84,8 +79,11 @@ private:
     void OnClose(wxCloseEvent& event);
     void OnmoreObjectsBtClick(wxCommandEvent& event);
     void OnhelpBtClick(wxCommandEvent& event);
+    void OnResize(wxSizeEvent& event);
+    void OnobjectsListItemSelect1(wxListEvent& event);
     //*)
 
+    void UpdateListColumnsWidth();
     void RefreshList();
 
     gd::Project & project;

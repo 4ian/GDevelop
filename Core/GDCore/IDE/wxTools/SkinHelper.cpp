@@ -4,6 +4,7 @@
  */
 #include "SkinHelper.h"
 #include "AuiTabArt.h"
+#include "GDCore/IDE/CommonBitmapManager.h"
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/art.h>
 #include <wx/aui/aui.h>
@@ -15,6 +16,76 @@
 
 namespace gd
 {
+
+/** \brief Internal art provider providing a nice help button instead of the default one.
+ */
+class gdRibbonMSWArtProvider : public wxRibbonMSWArtProvider
+{
+public:
+    gdRibbonMSWArtProvider() : wxRibbonMSWArtProvider(), helpBitmap(gd::CommonBitmapManager::GetInstance()->help16) {};
+    virtual ~gdRibbonMSWArtProvider() {};
+    wxRibbonArtProvider* Clone() const { return new gdRibbonMSWArtProvider(*this); };
+
+    /** A mere copy of the original implementation, with a custom bitmap used instead of the default one.
+     */
+    void DrawHelpButton(wxDC& dc, wxRibbonBar* wnd, const wxRect& rect)
+    {
+        DrawPartialPageBackground(dc, wnd, rect, false);
+
+        dc.DestroyClippingRegion();
+        dc.SetClippingRegion(rect);
+
+        if ( wnd->IsHelpButtonHovered() )
+        {
+            dc.SetPen(m_ribbon_toggle_pen);
+            dc.SetBrush(m_ribbon_toggle_brush);
+            dc.DrawRoundedRectangle(rect.GetX(), rect.GetY(), 20, 20, 1.0);
+            dc.DrawBitmap(helpBitmap, rect.GetX ()+2, rect.GetY()+2, true);
+        }
+        else
+        {
+            dc.DrawBitmap(helpBitmap, rect.GetX ()+2, rect.GetY()+2, true);
+        }
+
+    }
+
+    wxBitmap helpBitmap;
+};
+
+/** \brief Internal art provider providing a nice help button instead of the default one.
+ */
+class gdRibbonAUIArtProvider : public wxRibbonAUIArtProvider
+{
+public:
+    gdRibbonAUIArtProvider() : wxRibbonAUIArtProvider(), helpBitmap(gd::CommonBitmapManager::GetInstance()->help16) {};
+    virtual ~gdRibbonAUIArtProvider() {};
+    wxRibbonArtProvider* Clone() const { return new gdRibbonAUIArtProvider(*this); };
+
+    /** A mere copy of the original implementation, with a custom bitmap used instead of the default one.
+     */
+    void DrawHelpButton(wxDC& dc, wxRibbonBar* wnd, const wxRect& rect)
+    {
+        DrawPartialPageBackground(dc, wnd, rect, false);
+
+        dc.DestroyClippingRegion();
+        dc.SetClippingRegion(rect);
+
+        if ( wnd->IsHelpButtonHovered() )
+        {
+            dc.SetPen(m_ribbon_toggle_pen);
+            dc.SetBrush(m_ribbon_toggle_brush);
+            dc.DrawRoundedRectangle(rect.GetX(), rect.GetY(), 20, 20, 1.0);
+            dc.DrawBitmap(helpBitmap, rect.GetX ()+2, rect.GetY()+2, true);
+        }
+        else
+        {
+            dc.DrawBitmap(helpBitmap, rect.GetX ()+2, rect.GetY()+2, true);
+        }
+
+    }
+
+    wxBitmap helpBitmap;
+};
 
 void SkinHelper::ApplyCurrentSkin(wxRibbonBar & bar)
 {
@@ -32,12 +103,10 @@ void SkinHelper::ApplyCurrentSkin(wxRibbonBar & bar)
         pConfig->Read( _T( "/Skin/RibbonStyle" ), &result );
 
         //Style
-        if ( result == "Office" )
-            ribbonArtProvider = new wxRibbonMSWArtProvider();
-        else if ( result == "AUI" )
-            ribbonArtProvider = new wxRibbonAUIArtProvider();
+        if ( result == "AUI" )
+            ribbonArtProvider = new gdRibbonAUIArtProvider;
         else
-            ribbonArtProvider = new wxRibbonMSWArtProvider();
+            ribbonArtProvider = new gdRibbonMSWArtProvider;
 
         bar.SetArtProvider(ribbonArtProvider);
 
@@ -57,7 +126,7 @@ void SkinHelper::ApplyCurrentSkin(wxRibbonBar & bar)
     }
     else
     {
-        bar.SetArtProvider(new wxRibbonMSWArtProvider());
+        bar.SetArtProvider(new gdRibbonMSWArtProvider());
         bar.GetArtProvider()->SetColourScheme(wxColour(244, 245, 247), wxColour(231, 241, 254), wxColour(0, 0, 0));
     }
 }

@@ -208,6 +208,27 @@ public:
     bool IsEditing() const { return editing; }
 
     /**
+     * Return true if the scene is being previewed ( i.e. : IsEditing() == false )  but the preview is paused.
+     */
+    bool PreviewPaused() const { return !editing && !playing; }
+
+    /**
+     * Must pause the preview.<br>
+     * See also the other method related to the state of the editor : PlayPreview, OnPreviewBtClick, OnEditionBtClick
+     *
+     * \note The default implementation is updating the working directory and set playing to false.
+     */
+    virtual void PausePreview();
+
+    /**
+     * Must play the layout.<br>
+     * See also the other method related to the state of the editor : PausePreview, OnPreviewBtClick, OnEditionBtClick
+     *
+     * \note The default implementation is updating the working directory and set playing to false.
+     */
+    virtual void PlayPreview();
+
+    /**
      * Must return the real X position of the object drawn by the initial instance
      * ( Some platforms are using objects which can be drawn not at their exact X position )
      *
@@ -390,9 +411,10 @@ protected:
 
     bool hasJustRightClicked;
     bool ctrlPressed;
+    bool altPressed;
     bool shiftPressed;
-    double oldMouseX;
-    double oldMouseY;
+    double oldMouseX; ///< The mouse X position which was usually stored the last time a right click happened.
+    double oldMouseY; ///< The mouse X position which was usually stored the last time a right click happened.
     bool isMovingInstance;
 
     bool isSelecting;
@@ -407,6 +429,7 @@ protected:
     std::vector<LayoutEditorCanvasGuiElement> guiElements;
 
     bool editing; ///< True if the layout is being edited, false if a preview is running.
+    bool playing; ///< True if the layout is being previewed and the preview is not paused.
 
     DECLARE_EVENT_TABLE()
     friend class InstancesInsideSelectionPicker;

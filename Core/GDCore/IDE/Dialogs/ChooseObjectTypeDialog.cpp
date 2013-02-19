@@ -3,7 +3,6 @@
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
-
 #include <string>
 #include <vector>
 //(*InternalHeaders(ChooseObjectTypeDialog)
@@ -13,6 +12,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/imaglist.h>
+#include <wx/msgdlg.h>
 #include <wx/settings.h>
 #include <boost/shared_ptr.hpp>
 #include "GDCore/PlatformDefinition/Project.h"
@@ -35,10 +35,8 @@ namespace gd
 //(*IdInit(ChooseObjectTypeDialog)
 const long ChooseObjectTypeDialog::ID_STATICTEXT2 = wxNewId();
 const long ChooseObjectTypeDialog::ID_LISTCTRL1 = wxNewId();
-const long ChooseObjectTypeDialog::ID_STATICBITMAP1 = wxNewId();
-const long ChooseObjectTypeDialog::ID_TEXTCTRL1 = wxNewId();
+const long ChooseObjectTypeDialog::ID_STATICTEXT1 = wxNewId();
 const long ChooseObjectTypeDialog::ID_STATICLINE2 = wxNewId();
-const long ChooseObjectTypeDialog::ID_BUTTON3 = wxNewId();
 const long ChooseObjectTypeDialog::ID_STATICBITMAP5 = wxNewId();
 const long ChooseObjectTypeDialog::ID_HYPERLINKCTRL2 = wxNewId();
 const long ChooseObjectTypeDialog::ID_BUTTON1 = wxNewId();
@@ -54,10 +52,7 @@ ChooseObjectTypeDialog::ChooseObjectTypeDialog(wxWindow* parent, gd::Project & p
 project(project_)
 {
 	//(*Initialize(ChooseObjectTypeDialog)
-	wxFlexGridSizer* FlexGridSizer3;
-	wxFlexGridSizer* FlexGridSizer5;
 	wxFlexGridSizer* FlexGridSizer2;
-	wxStaticBoxSizer* StaticBoxSizer1;
 	wxFlexGridSizer* FlexGridSizer1;
 	wxFlexGridSizer* FlexGridSizer17;
 
@@ -67,27 +62,14 @@ project(project_)
 	FlexGridSizer1->AddGrowableRow(1);
 	StaticText2 = new wxStaticText(this, ID_STATICTEXT2, _("Choose the kind of object to add:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT2"));
 	FlexGridSizer1->Add(StaticText2, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
-	objectsList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxDefaultSize, wxLC_ICON|wxLC_ALIGN_LEFT|wxLC_SINGLE_SEL, wxDefaultValidator, _T("ID_LISTCTRL1"));
+	objectsList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_ALIGN_TOP|wxLC_NO_HEADER|wxLC_SINGLE_SEL, wxDefaultValidator, _T("ID_LISTCTRL1"));
 	FlexGridSizer1->Add(objectsList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	StaticBoxSizer1 = new wxStaticBoxSizer(wxHORIZONTAL, this, _("Information about the object"));
-	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
-	FlexGridSizer3->AddGrowableCol(0);
-	FlexGridSizer5 = new wxFlexGridSizer(0, 2, 0, 0);
-	FlexGridSizer5->AddGrowableCol(1);
-	FlexGridSizer5->AddGrowableRow(0);
-	iconBmp = new wxStaticBitmap(this, ID_STATICBITMAP1, wxBitmap(wxImage(_T("res/unknown32.png")).Rescale(wxSize(32,32).GetWidth(),wxSize(32,32).GetHeight())), wxDefaultPosition, wxSize(32,32), wxNO_BORDER, _T("ID_STATICBITMAP1"));
-	FlexGridSizer5->Add(iconBmp, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	infoEdit = new wxTextCtrl(this, ID_TEXTCTRL1, _("No information about the object."), wxDefaultPosition, wxSize(335,37), wxTE_MULTILINE|wxTE_READONLY, wxDefaultValidator, _T("ID_TEXTCTRL1"));
-	FlexGridSizer5->Add(infoEdit, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
-	FlexGridSizer3->Add(FlexGridSizer5, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	StaticBoxSizer1->Add(FlexGridSizer3, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
-	FlexGridSizer1->Add(StaticBoxSizer1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("You can also use the grayed objects:\nTheir associated extension will be automatically enabled."), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	FlexGridSizer1->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	StaticLine2 = new wxStaticLine(this, ID_STATICLINE2, wxDefaultPosition, wxSize(10,-1), wxLI_HORIZONTAL, _T("ID_STATICLINE2"));
 	FlexGridSizer1->Add(StaticLine2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	FlexGridSizer2 = new wxFlexGridSizer(0, 4, 0, 0);
 	FlexGridSizer2->AddGrowableCol(1);
-	moreObjectsBt = new wxButton(this, ID_BUTTON3, _("More objects"), wxDefaultPosition, wxSize(113,23), 0, wxDefaultValidator, _T("ID_BUTTON3"));
-	FlexGridSizer2->Add(moreObjectsBt, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	FlexGridSizer17 = new wxFlexGridSizer(0, 3, 0, 0);
 	FlexGridSizer17->AddGrowableRow(0);
 	StaticBitmap2 = new wxStaticBitmap(this, ID_STATICBITMAP5, wxBitmap(wxImage(_T("res/helpicon.png"))), wxDefaultPosition, wxDefaultSize, wxNO_BORDER, _T("ID_STATICBITMAP5"));
@@ -107,20 +89,20 @@ project(project_)
 
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_SELECTED,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnobjectsListItemSelect);
 	Connect(ID_LISTCTRL1,wxEVT_COMMAND_LIST_ITEM_ACTIVATED,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnobjectsListItemActivated);
-	Connect(ID_BUTTON3,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnmoreObjectsBtClick);
 	Connect(ID_HYPERLINKCTRL2,wxEVT_COMMAND_HYPERLINK,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnhelpBtClick);
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnokBtClick);
 	Connect(ID_BUTTON2,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&ChooseObjectTypeDialog::OncancelBtClick);
 	Connect(wxID_ANY,wxEVT_CLOSE_WINDOW,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnClose);
+	Connect(wxEVT_SIZE,(wxObjectEventFunction)&ChooseObjectTypeDialog::OnResize);
 	//*)
-
-    moreObjectsBt->SetBitmap(wxBitmap("res/extensiononly16.png", wxBITMAP_TYPE_ANY));
 
     #if defined(__WXMSW__) //Offer nice look to list
     wxUxThemeEngine* theme =  wxUxThemeEngine::GetIfActive();
     if(theme) theme->SetWindowTheme((HWND) objectsList->GetHWND(), L"EXPLORER", NULL);
     #endif
 
+    objectsList->InsertColumn(0,_("Object"), wxLIST_FORMAT_LEFT, 320);
+    objectsList->InsertColumn(1,_("Description"), wxLIST_FORMAT_LEFT, 320);
     RefreshList();
 
     int x;
@@ -136,6 +118,8 @@ project(project_)
         SetSize(x,y,width, height);
     else
         SetSize(460,400); //Offer a convenient default size.
+
+    UpdateListColumnsWidth();
 }
 
 ChooseObjectTypeDialog::~ChooseObjectTypeDialog()
@@ -154,33 +138,37 @@ void ChooseObjectTypeDialog::RefreshList()
 
     wxImageList * imageList = new wxImageList(32,32);
     imageList->Add(wxBitmap(wxImage(_T("res/unknown32.png"))));
-    objectsList->AssignImageList(imageList, wxIMAGE_LIST_NORMAL);
+    objectsList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
     //Insert extension objects
     const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
-	    //Verify if that extension is enabled
-	    if ( find(project.GetUsedPlatformExtensions().begin(),
-                  project.GetUsedPlatformExtensions().end(),
-                  extensions[i]->GetName()) == project.GetUsedPlatformExtensions().end() )
-            continue;
+	    //Verify if this extension is enabled
+	    bool extensionEnabled = find(project.GetUsedPlatformExtensions().begin(),
+                                      project.GetUsedPlatformExtensions().end(),
+                                      extensions[i]->GetName()) != project.GetUsedPlatformExtensions().end();
 
 	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
 	    for(unsigned int j = 0;j<objectsTypes.size();++j)
 	    {
 	        if ( objectsTypes[j] != "" ) //Cannot use directly a base object
 	        {
-                if ( extensions[i]->GetObjectMetadata(objectsTypes[j]).GetBitmapIcon().IsOk() )
-                    imageList->Add(extensions[i]->GetObjectMetadata(objectsTypes[j]).GetBitmapIcon());
-                else
-                    imageList->Add(wxBitmap(wxImage(_T("res/unknown32.png"))));
+	            //Generate the icon
+	            wxBitmap objectIcon = extensions[i]->GetObjectMetadata(objectsTypes[j]).GetBitmapIcon().IsOk() ?
+                                      extensions[i]->GetObjectMetadata(objectsTypes[j]).GetBitmapIcon() :
+                                      wxBitmap(wxImage(_T("res/unknown32.png")));
 
+                imageList->Add(extensionEnabled ? objectIcon : objectIcon.ConvertToImage().ConvertToGreyscale().ConvertToDisabled(255));
+
+                //And add the object to the list
+                long index = extensionEnabled ? 0 : objectsList->GetItemCount();
                 gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(objectsTypes[j]);
-
-                objectsList->InsertItem(0, extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName());
-                objectsList->SetItemImage(0, imageList->GetImageCount()-1);
-                objectsList->SetItemPtrData(0, wxPtrToUInt(associatedData));
+                objectsList->InsertItem(index, extensions[i]->GetObjectMetadata(objectsTypes[j]).GetFullName());
+                objectsList->SetItem(index, 1, extensions[i]->GetObjectMetadata(objectsTypes[j]).GetDescription());
+                objectsList->SetItemImage(index, imageList->GetImageCount()-1);
+                objectsList->SetItemPtrData(index, wxPtrToUInt(associatedData));
+                if ( !extensionEnabled ) objectsList->SetItemTextColour(index, wxColor(128,128,128));
 
 	        }
 	    }
@@ -196,36 +184,14 @@ void ChooseObjectTypeDialog::OnobjectsListItemSelect(wxListEvent& event)
     {
         selectedObjectType = associatedData->GetString();
     }
-
-    //We need to find the extension the selected object type belongs to so as to display informations
-    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetPlatform().GetAllPlatformExtensions();
-    boost::shared_ptr<PlatformExtension> extension = boost::shared_ptr<PlatformExtension>();
-
-	for (unsigned int i = 0;i<extensions.size();++i)
-	{
-	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
-	    if ( find(objectsTypes.begin(), objectsTypes.end(), selectedObjectType) != objectsTypes.end() )
-            extension = extensions[i];
-	}
-
-    if ( extension == boost::shared_ptr<PlatformExtension>() )
-        return;
-
-    infoEdit->ChangeValue(extension->GetObjectMetadata(selectedObjectType).GetDescription());
-    iconBmp->SetBitmap(extension->GetObjectMetadata(selectedObjectType).GetBitmapIcon());
 }
 
 void ChooseObjectTypeDialog::OnobjectsListItemActivated(wxListEvent& event)
 {
-    //Get the object type associated with the item
-    wxListItem item = event.GetItem();
-    gd::TreeItemStringData * associatedData = reinterpret_cast<gd::TreeItemStringData*>(item.GetData()); //Why GetData return long ?
-    if ( associatedData != NULL )
-    {
-        selectedObjectType = associatedData->GetString();
-    }
+    OnobjectsListItemSelect(event);
 
-    EndModal(1);
+    wxCommandEvent useless;
+    OnokBtClick(useless);
 }
 
 void ChooseObjectTypeDialog::OncancelBtClick(wxCommandEvent& event)
@@ -236,7 +202,43 @@ void ChooseObjectTypeDialog::OncancelBtClick(wxCommandEvent& event)
 
 void ChooseObjectTypeDialog::OnokBtClick(wxCommandEvent& event)
 {
-    if ( selectedObjectType != "" ) EndModal(1);
+    if ( selectedObjectType.empty() ) return;
+
+    //We need to find the extension the selected object type belongs to so as to activate it if necessary
+    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetPlatform().GetAllPlatformExtensions();
+    boost::shared_ptr<PlatformExtension> extension = boost::shared_ptr<PlatformExtension>();
+
+	for (unsigned int i = 0;i<extensions.size();++i)
+	{
+	    vector<string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
+	    if ( find(objectsTypes.begin(), objectsTypes.end(), selectedObjectType) != objectsTypes.end() )
+        {
+            extension = extensions[i]; break;
+        }
+	}
+
+    if ( extension != boost::shared_ptr<PlatformExtension>() )
+    {
+	    bool extensionEnabled = find(project.GetUsedPlatformExtensions().begin(),
+                                      project.GetUsedPlatformExtensions().end(),
+                                      extension->GetName()) != project.GetUsedPlatformExtensions().end();
+
+        if ( !extensionEnabled )
+        {
+            if (wxMessageBox(_("This object is provided by the ")+
+                             extension->GetFullName()+
+                             _(" extension, but this extension is not activated for the current game.\n\nDo you want to use this extension in your game?"),
+                             _("Activate extension ")+extension->GetFullName(), wxYES_NO|wxICON_QUESTION|wxYES_DEFAULT ) == wxNO)
+            {
+                return;
+            }
+            else
+                project.GetUsedPlatformExtensions().push_back(extension->GetName());
+
+        }
+    }
+
+     EndModal(1);
 }
 
 void ChooseObjectTypeDialog::OnClose(wxCloseEvent& event)
@@ -255,6 +257,20 @@ void ChooseObjectTypeDialog::OnmoreObjectsBtClick(wxCommandEvent& event)
 void ChooseObjectTypeDialog::OnhelpBtClick(wxCommandEvent& event)
 {
     gd::HelpFileAccess::GetInstance()->OpenURL(_("http://wiki.compilgames.net/doku.php/en/game_develop/documentation/manual/edit_object"));
+}
+
+void ChooseObjectTypeDialog::UpdateListColumnsWidth()
+{
+    objectsList->SetColumnWidth(0, objectsList->GetSize().GetWidth()*2.0/5.0-5);
+    objectsList->SetColumnWidth(1, objectsList->GetSize().GetWidth()*3.0/5.0-5);
+}
+
+void ChooseObjectTypeDialog::OnResize(wxSizeEvent& event)
+{
+    UpdateListColumnsWidth();
+    objectsList->Refresh();
+    objectsList->Update();
+    event.Skip();
 }
 
 }

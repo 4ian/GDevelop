@@ -6,6 +6,7 @@
 #include <cmath>
 #include <wx/wx.h>
 #include <wx/config.h>
+#include <wx/filename.h>
 #include <wx/ribbon/bar.h>
 #include <wx/ribbon/page.h>
 #include <wx/ribbon/buttonbar.h>
@@ -16,6 +17,7 @@
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/Dialogs/GridSetupDialog.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include "GDCore/CommonTools.h"
@@ -67,7 +69,8 @@ LayoutEditorCanvas::LayoutEditorCanvas(wxWindow* parent, gd::Project & project_,
     shiftPressed(false),
     isMovingInstance(false),
     isSelecting(false),
-    editing(true)
+    editing(true),
+    playing(false)
 {
 	//(*Initialize(LayoutEditorCanvas)
 	Create(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL|wxWANTS_CHARS, _T("wxID_ANY"));
@@ -186,6 +189,23 @@ void LayoutEditorCanvas::OnEditionBtClick( wxCommandEvent & event )
     RecreateRibbonToolbar();
     hScrollbar->Show(true);
     vScrollbar->Show(true);
+}
+
+void LayoutEditorCanvas::PausePreview()
+{
+    if ( editing ) return;
+
+    playing = false;
+    wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
+}
+
+void LayoutEditorCanvas::PlayPreview()
+{
+    if ( editing ) return;
+
+    playing = true;
+    if ( wxDirExists(wxFileName::FileName(project.GetProjectFile()).GetPath()))
+        wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
 }
 
 wxRibbonButtonBar* LayoutEditorCanvas::CreateRibbonPage(wxRibbonPage * page)
@@ -538,6 +558,8 @@ void LayoutEditorCanvas::OnKey( wxKeyEvent& evt )
         ctrlPressed = true;
     if ( evt.GetKeyCode() == WXK_SHIFT )
         shiftPressed = true;
+    if ( evt.GetKeyCode() == WXK_ALT )
+        altPressed = true;
 
     if ( evt.GetKeyCode() == WXK_DELETE )
     {
@@ -598,6 +620,8 @@ void LayoutEditorCanvas::OnKeyUp( wxKeyEvent& evt )
         ctrlPressed = false;
     if ( evt.GetKeyCode() == WXK_SHIFT )
         shiftPressed = false;
+    if ( evt.GetKeyCode() == WXK_ALT )
+        altPressed = false;
 }
 
 void LayoutEditorCanvas::OnMotion( wxMouseEvent &event )

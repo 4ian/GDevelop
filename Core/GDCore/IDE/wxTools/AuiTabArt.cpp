@@ -266,6 +266,19 @@ wxAuiTabArt* AuiTabArt::Clone()
     return art;
 }
 
+void AuiTabArt::DrawBorder(wxDC& dc, wxWindow* wnd, const wxRect& rect)
+{
+    dc.SetPen(wxPen(wxColour(255,255,255)));
+    int i, border_width = GetBorderWidth(wnd);
+
+    wxRect theRect(rect);
+    for (i = 0; i < border_width; ++i)
+    {
+        dc.DrawRectangle(theRect.x, theRect.y, theRect.width, theRect.height);
+        theRect.Deflate(1);
+    }
+}
+
 void AuiTabArt::SetFlags(unsigned int flags)
 {
     m_flags = flags;

@@ -24,7 +24,6 @@ class AuiTabArt : public wxAuiTabArt
 {
 
 public:
-
     AuiTabArt();
     virtual ~AuiTabArt();
 
@@ -39,6 +38,12 @@ public:
 
     virtual void SetColour(const wxColour& colour);
     virtual void SetActiveColour(const wxColour& colour);
+
+    virtual void DrawBorder( wxDC& dc,wxWindow* wnd, const wxRect& rect);
+
+    virtual int GetBorderWidth( wxWindow* wnd) { return 1; }
+
+    virtual int GetAdditionalBorderSpace( wxWindow* wnd) { return 0; }
 
     void DrawBackground(
                  wxDC& dc,

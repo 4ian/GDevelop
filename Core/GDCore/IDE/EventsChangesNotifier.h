@@ -19,10 +19,8 @@ namespace gd
 {
 
 /**
- * \brief Class containing functions to do refactoring tasks on events.
- *
- * Class containing functions to do refactoring tasks on events
- * like changing an object name, deleting an object...
+ * \brief Tools functions that must be used by the IDE (especially the events editors) when changed occured in the events
+ * of a layout or in external events.
  */
 class GD_CORE_API EventsChangesNotifier
 {

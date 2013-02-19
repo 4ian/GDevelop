@@ -9,6 +9,7 @@
 #include <iostream>
 namespace gd { class Project; }
 namespace gd { class Layout; }
+namespace gd { class ExternalLayout; }
 namespace gd { class Object; }
 namespace gd { class Automatism; }
 namespace gd { class ExternalEvents; }
@@ -62,6 +63,64 @@ public:
      * \param layout Layout owning the variables, if applicable
      */
     virtual void OnVariablesModified(gd::Project & project, gd::Layout * layout = NULL) const {};
+
+    ///@}
+
+    /** \name External Layouts
+     * Members functions called by the IDE so as to notify changes have been made
+     */
+    ///@{
+
+    /**
+     * Called when an external layout was added to a project
+     * \param project Related project
+     * \param layout External layout
+     */
+    virtual void OnExternalLayoutAdded(gd::Project & project, gd::ExternalLayout & layout) const {};
+
+    /**
+     * Called when an external layout was renamed
+     * \param project Related project
+     * \param layout External layout
+     * \param oldName Old name of the external layout
+     */
+    virtual void OnExternalLayoutRenamed(gd::Project & project, gd::ExternalLayout & layout, const std::string & oldName) const {};
+
+    /**
+     * Called when an external layout was removed from a project
+     * \param project Related project
+     * \param deletedLayout Name of the removed external layout
+     */
+    virtual void OnExternalLayoutDeleted(gd::Project & project, const std::string deletedLayout) const {};
+
+    ///@}
+
+    /** \name External events
+     * Members functions called by the IDE so as to notify changes have been made
+     */
+    ///@{
+
+    /**
+     * Called when external events were added to a project
+     * \param project Related project
+     * \param events External events
+     */
+    virtual void OnExternalEventsAdded(gd::Project & project, gd::ExternalEvents & events) const {};
+
+    /**
+     * Called when external events were renamed
+     * \param project Related project
+     * \param events External events
+     * \param oldName Old name of the external events
+     */
+    virtual void OnExternalEventsRenamed(gd::Project & project, gd::ExternalEvents & events, const std::string & oldName) const {};
+
+    /**
+     * Called when external events were removed from a project
+     * \param project Related project
+     * \param deletedLayout Name of the removed external events
+     */
+    virtual void OnExternalEventsDeleted(gd::Project & project, const std::string deletedLayout) const {};
 
     ///@}
 

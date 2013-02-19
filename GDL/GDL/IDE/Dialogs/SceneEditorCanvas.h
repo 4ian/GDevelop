@@ -71,6 +71,9 @@ public:
      */
     virtual void SetParentAuiManager(wxAuiManager * parentAuiManager_);
 
+    virtual void PausePreview();
+    virtual void PlayPreview();
+
     virtual void UpdateSize();
     virtual void UpdateScrollbars();
     virtual void OnvScrollbarScroll(wxScrollEvent& event);

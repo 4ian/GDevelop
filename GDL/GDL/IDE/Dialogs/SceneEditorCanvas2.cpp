@@ -531,11 +531,24 @@ void SceneEditorCanvas::OnMouseWheel( wxMouseEvent &event )
 {
     if (!editing) return;
 
-    float rotation = event.GetWheelRotation()*3;
-    float newheight = editionView.getSize().y + ( rotation / 25 );
-    float newZoomFactor = static_cast<float>(getSize().y)/newheight;
-    if ( newZoomFactor > 0 ) options.zoomFactor = newZoomFactor;
-    UpdateViewAccordingToZoomFactor();
+    if ( ctrlPressed )
+    {
+        float rotation = -event.GetWheelRotation()*8;
+        float newheight = editionView.getSize().y + ( rotation / 25 );
+        float newZoomFactor = static_cast<float>(getSize().y)/newheight;
+        if ( newZoomFactor > 0 ) options.zoomFactor = newZoomFactor;
+        UpdateViewAccordingToZoomFactor();
+    }
+    else if ( altPressed )
+    {
+        editionView.move(-event.GetWheelRotation(), 0);
+        UpdateScrollbars();
+    }
+    else
+    {
+        editionView.move(0, -event.GetWheelRotation());
+        UpdateScrollbars();
+    }
 }
 
 void SceneEditorCanvas::OnCustomZoom5Selected(wxCommandEvent& event)

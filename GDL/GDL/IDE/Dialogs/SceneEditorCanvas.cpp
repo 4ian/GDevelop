@@ -209,6 +209,7 @@ void SceneEditorCanvas::OnPreviewBtClick( wxCommandEvent & event )
     LayoutEditorCanvas::OnPreviewBtClick(event);
 
     previewScene.running = false;
+    playing = false;
 
     RefreshFromLayout();
     UpdateSize();
@@ -230,6 +231,7 @@ void SceneEditorCanvas::OnEditionBtClick( wxCommandEvent & event )
 
     CodeCompiler::GetInstance()->EnableTaskRelatedTo(scene);
     previewScene.running = false;
+    playing = false;
 
     if ( externalPreviewWindow ) externalPreviewWindow->Show(false);
     previewScene.ChangeRenderWindow(this);
@@ -332,6 +334,7 @@ void SceneEditorCanvas::RefreshFromLayout()
     RuntimeScene newScene(this, &previewGame);
     previewScene = newScene;
     previewScene.running = false;
+    playing = false;
     if ( debugger ) previewScene.debugger = debugger.get();
 
     //Launch now events compilation if it has not been launched by another way. ( Events editor for example )
@@ -386,24 +389,32 @@ void SceneEditorCanvas::RefreshFromLayoutSecondPart()
 void SceneEditorCanvas::OnPreviewRefreshBtClick( wxCommandEvent & event )
 {
     previewScene.running = false;
+    playing = false;
 
     RefreshFromLayout();
 }
 
-void SceneEditorCanvas::OnPreviewPlayBtClick( wxCommandEvent & event )
+void SceneEditorCanvas::PlayPreview()
 {
+    if ( editing ) return;
+
     previewScene.running = true;
-    editing = false;
+    LayoutEditorCanvas::PlayPreview();
 
     if ( externalPreviewWindow ) externalPreviewWindow->Show(false);
     previewScene.ChangeRenderWindow(this);
 
     if ( debugger ) debugger->Play();
 }
+
+void SceneEditorCanvas::OnPreviewPlayBtClick( wxCommandEvent & event )
+{
+    PlayPreview();
+}
 void SceneEditorCanvas::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
 {
     previewScene.running = true;
-    editing = false;
+    PlayPreview();
 
     if ( externalPreviewWindow )
     {
@@ -428,11 +439,19 @@ void SceneEditorCanvas::ExternalWindowClosed()
     }
 }
 
-void SceneEditorCanvas::OnPreviewPauseBtClick( wxCommandEvent & event )
+void SceneEditorCanvas::PausePreview()
 {
+    if ( editing ) return;
+
     previewScene.running = false;
+    LayoutEditorCanvas::PausePreview();
 
     if ( debugger ) debugger->Pause();
+}
+
+void SceneEditorCanvas::OnPreviewPauseBtClick( wxCommandEvent & event )
+{
+    PausePreview();
 }
 
 void SceneEditorCanvas::OnPreviewDebugBtClick( wxCommandEvent & event )

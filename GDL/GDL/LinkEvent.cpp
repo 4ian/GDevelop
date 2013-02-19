@@ -80,6 +80,7 @@ void LinkEvent::Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEve
     if ( game.HasExternalEventsNamed(GetTarget()) )
     {
         linkedExternalEvents = &game.GetExternalEvents(GetTarget());
+        std::cout << "linkedExternalEvents: " << linkedExternalEvents->GetName();
         eventsToInclude = &game.GetExternalEvents(GetTarget()).GetEvents();
     }
     else if ( game.HasLayoutNamed(GetTarget()) ) eventsToInclude = &game.GetLayout(GetTarget()).GetEvents();
@@ -138,6 +139,9 @@ void LinkEvent::Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEve
     {
         std::cout << "Unable to get events from a link." << std::endl;
         linkWasInvalid = true;
+
+        //Delete the link event
+        eventList.erase( eventList.begin() + indexOfTheEventInThisList );
         return;
     }
 

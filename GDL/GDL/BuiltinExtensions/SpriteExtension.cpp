@@ -17,7 +17,7 @@ SpriteExtension::SpriteExtension()
     //Declaration of all objects available
     DECLARE_OBJECT("Sprite",
                    _("Sprite"),
-                   _("Animated object, composed of animations and directions containing images."),
+                   _("Animated object which can be used most element of a game"),
                    "CppPlatform/Extensions/spriteicon.png",
                    &CreateSpriteObject,
                    &DestroySpriteObject,

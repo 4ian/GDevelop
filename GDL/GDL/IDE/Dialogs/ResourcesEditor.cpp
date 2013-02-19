@@ -158,7 +158,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     FlexGridSizer1->SetSizeHints(propertiesPanel);
     AuiManager1->AddPane(propertiesPanel, wxAuiPaneInfo().Name(_T("propertiesPane")).Caption(_("Properties")).CaptionVisible().Position(1).Right());
     AuiManager1->Update();
-    MenuItem3 = new wxMenuItem((&ContextMenu), idMenuMod, _("Rename"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem3 = new wxMenuItem((&ContextMenu), idMenuMod, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
     MenuItem3->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
     ContextMenu.Append(MenuItem3);
     ContextMenu.AppendSeparator();
@@ -184,7 +184,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     MenuItem6 = new wxMenuItem((&emptyMenu), ID_MENUITEM2, _("Add a folder"), wxEmptyString, wxITEM_NORMAL);
     MenuItem6->SetBitmap(wxBitmap(wxImage(_T("res/dossier.png"))));
     emptyMenu.Append(MenuItem6);
-    MenuItem9 = new wxMenuItem((&folderMenu), ID_MENUITEM3, _("Rename"), wxEmptyString, wxITEM_NORMAL);
+    MenuItem9 = new wxMenuItem((&folderMenu), ID_MENUITEM3, _("Rename\tF2"), wxEmptyString, wxITEM_NORMAL);
     MenuItem9->SetBitmap(wxBitmap(wxImage(_T("res/editnom.png"))));
     folderMenu.Append(MenuItem9);
     MenuItem13 = new wxMenuItem((&folderMenu), ID_MENUITEM5, _("Delete\tDEL"), wxEmptyString, wxITEM_NORMAL);
@@ -213,6 +213,7 @@ resourceLibraryDialog(new gd::ResourceLibraryDialog(this))
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_END_LABEL_EDIT,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeEndLabelEdit);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_ACTIVATED,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeItemActivated);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_SEL_CHANGED,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeSelectionChanged);
+    Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_KEY_DOWN,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeKeyDown);
     Connect(ID_TREECTRL1,wxEVT_COMMAND_TREE_ITEM_MENU,(wxObjectEventFunction)&ResourcesEditor::OnresourcesTreeItemMenu);
     Connect(ID_TEXTCTRL1,wxEVT_COMMAND_TEXT_UPDATED,(wxObjectEventFunction)&ResourcesEditor::OnsearchCtrlText);
     previewPanel->Connect(wxEVT_PAINT,(wxObjectEventFunction)&ResourcesEditor::OnpreviewPanelPaint,0,this);
@@ -1108,6 +1109,7 @@ void ResourcesEditor::ShiftUpElementOfTree()
     resourcesTree->SetItemText( previous, oldText );
     resourcesTree->SetItemData( previous, oldData );
 
+    resourcesTree->UnselectItem(m_itemSelected);
     resourcesTree->SelectItem(previous);
 }
 
@@ -1162,6 +1164,7 @@ void ResourcesEditor::ShiftDownElementOfTree()
     resourcesTree->SetItemText( next, oldText );
     resourcesTree->SetItemData( next, oldData );
 
+    resourcesTree->UnselectItem(m_itemSelected);
     resourcesTree->SelectItem(next);
 }
 
@@ -1311,6 +1314,8 @@ void ResourcesEditor::OnresourcesTreeBeginDrag(wxTreeEvent& event)
 
 void ResourcesEditor::OnresourcesTreeKeyDown(wxTreeEvent& event)
 {
+    if ( event.GetItem().IsOk() ) m_itemSelected = event.GetItem();
+
     if(event.GetKeyEvent().GetModifiers() == wxMOD_CMD)
     {
         switch(event.GetKeyCode()) {
@@ -1333,6 +1338,12 @@ void ResourcesEditor::OnresourcesTreeKeyDown(wxTreeEvent& event)
     else
     {
         switch(event.GetKeyCode()) {
+            case WXK_F2:
+            {
+                wxCommandEvent useless;
+                OnModNameImageBtClick(useless);
+                break;
+            }
             case WXK_DELETE:
             {
                 wxCommandEvent useless;
@@ -1343,6 +1354,8 @@ void ResourcesEditor::OnresourcesTreeKeyDown(wxTreeEvent& event)
                 break;
         }
     }
+
+    event.Skip();
 }
 
 #endif

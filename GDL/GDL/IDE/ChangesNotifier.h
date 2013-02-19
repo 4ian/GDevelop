@@ -46,6 +46,9 @@ public:
     virtual void OnEventsModified(gd::Project & project, gd::Layout & layout, bool indirectChange = false, std::string sourceOfTheIndirectChange = "") const;
     virtual void OnEventsModified(gd::Project & project, gd::ExternalEvents & externalEvents, bool indirectChange = false, std::string sourceOfTheIndirectChange = "") const;
     virtual void OnResourceModified(gd::Project & project, const std::string & resourceName) const;
+    virtual void OnExternalEventsAdded(gd::Project & project, gd::ExternalEvents & events) const;
+    virtual void OnExternalEventsRenamed(gd::Project & project, gd::ExternalEvents & events, const std::string & oldName) const;
+    virtual void OnExternalEventsDeleted(gd::Project & project, const std::string deletedLayout) const;
 
     ///@}
 

@@ -17,6 +17,7 @@
 #include <wx/dcbuffer.h>
 #include <wx/richtooltip.h>
 #include <wx/log.h>
+#include <wx/config.h>
 #include <wx/textdlg.h>
 #include <wx/msgdlg.h>
 #include <wx/filedlg.h>
@@ -451,6 +452,9 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
 	mgr->GetPane(maskPanel).MinSize(200,150).Show(false).Float();
 	mgr->GetPane(pointsPanel).MinSize(200,150).Show(false).Float();
 	mgr->GetPane(previewPanel).MinSize(150,150).Show(false).Float();
+    wxString perspective;
+	wxConfigBase::Get()->Read("/SpriteObjectEditor/LastWorkspace", &perspective);
+	mgr->LoadPerspective(perspective);
 	mgr->Update();
 	Layout();
 	SetSize(900,600);
@@ -577,6 +581,8 @@ SpriteObjectEditor::~SpriteObjectEditor()
 	AuiManager2->UnInit();
 	AuiManager3->UnInit();
 	AuiManager4->UnInit();
+
+	wxConfigBase::Get()->Write("/SpriteObjectEditor/LastWorkspace", mgr->SavePerspective());
 	mgr->UnInit();
 }
 void SpriteObjectEditor::OnimagePanelEraseBackground(wxEraseEvent& event)

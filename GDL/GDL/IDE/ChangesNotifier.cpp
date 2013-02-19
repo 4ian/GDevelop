@@ -8,6 +8,7 @@
 #include <iostream>
 #include <wx/datetime.h>
 #include "ChangesNotifier.h"
+#include "GDCore/IDE/EventsChangesNotifier.h"
 #include "GDL/IDE/DependenciesAnalyzer.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
@@ -158,7 +159,7 @@ void ChangesNotifier::OnEventsModified(gd::Project & project, gd::Layout & layou
             }
             else
             {
-                //Changes occured in an external event which is directly included in the scene events.
+                //Changes occurred in an external event which is directly included in the scene events.
                 scene.SetCompilationNeeded();
                 CodeCompilationHelpers::CreateSceneEventsCompilationTask(game, scene);
             }
@@ -191,18 +192,18 @@ void ChangesNotifier::OnEventsModified(gd::Project & project, gd::ExternalEvents
                 DependenciesAnalyzer analyzer(game);
                 if ( analyzer.ExternalEventsCanBeCompiledForAScene(sourceOfTheIndirectChange) == associatedScene )
                 {
-                    //Do nothing: Changes occured in an external event which is compiled separately
+                    //Do nothing: Changes occurred in an external event which is compiled separately
                 }
                 else
                 {
-                    //Changes occured in an external event which is directly included in the scene events.
+                    //Changes occurred in an another external event which is directly included in our external events.
                     events.SetLastChangeTimeStamp(wxDateTime::Now().GetTicks());
                     CodeCompilationHelpers::CreateExternalEventsCompilationTask(game, events);
                 }
             }
             else
             {
-                //Changes occured directly inside the external events: We need to recompile them
+                //Changes occurred directly inside the external events: We need to recompile them
                 events.SetLastChangeTimeStamp(wxDateTime::Now().GetTicks());
                 CodeCompilationHelpers::CreateExternalEventsCompilationTask(game, events);
             }
@@ -217,12 +218,31 @@ void ChangesNotifier::OnEventsModified(gd::Project & project, gd::ExternalEvents
 
 void ChangesNotifier::OnLayoutAdded(gd::Project & project, gd::Layout & layout) const
 {
-
+    //A new layout may trigger recompilation of some events.
+    gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(project, layout);
 }
 
 void ChangesNotifier::OnLayoutRenamed(gd::Project & project, gd::Layout & layout, const std::string & oldName) const
 {
+    //A renamed layout may trigger recompilation of some events.
+    gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(project, layout);
+}
 
+void ChangesNotifier::OnExternalEventsAdded(gd::Project & project, gd::ExternalEvents & events) const
+{
+    //New external events may trigger recompilation of some events.
+    gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(project, events);
+}
+
+void ChangesNotifier::OnExternalEventsRenamed(gd::Project & project, gd::ExternalEvents & events, const std::string & oldName) const
+{
+    //A renamed external events sheet may trigger recompilation of some events.
+    gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(project, events);
+}
+
+void ChangesNotifier::OnExternalEventsDeleted(gd::Project & project, const std::string deletedLayout) const
+{
+    RequestFullRecompilation(project, NULL);
 }
 
 void ChangesNotifier::OnLayoutDeleted(gd::Project & project, const std::string deletedLayout) const

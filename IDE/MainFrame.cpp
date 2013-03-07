@@ -730,6 +730,7 @@ void MainFrame::RealizeRibbonCustomButtons()
     //Finally create our bitmaps and make sure the ribbon is ready.
     ribbonFileBt->SetPosition(wxPoint(3,1));
     ribbonFileBt->SetBitmap(ribbonFileNormalBitmap);
+    m_ribbon->SetTabCtrlMargins(bitmapLabel.GetSize().GetWidth()+3+3, 0);
 }
 
 void MainFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& event)

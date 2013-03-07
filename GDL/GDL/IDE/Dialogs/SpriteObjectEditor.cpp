@@ -455,6 +455,8 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
     wxString perspective;
 	wxConfigBase::Get()->Read("/SpriteObjectEditor/LastWorkspace", &perspective);
 	mgr->LoadPerspective(perspective);
+	mgr->GetPane(pointsPanel).Show(false);
+	mgr->GetPane(previewPanel).Show(false);
 	mgr->Update();
 	Layout();
 	SetSize(900,600);
@@ -550,8 +552,6 @@ void SpriteObjectEditor::RefreshImageAndControls()
     RefreshPoints();
     RefreshCollisionMasks();
 }
-
-#include <typeinfo>
 
 wxBitmap SpriteObjectEditor::GetwxBitmapFromImageResource(Resource & resource)
 {

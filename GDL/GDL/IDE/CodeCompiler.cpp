@@ -75,8 +75,8 @@ std::string CodeCompilerCall::GetFullCall() const
         standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++");
         standardsIncludeDirs.push_back("CppPlatform/MinGW32/lib/gcc/mingw32/4.5.2/include/c++/mingw32");
         #elif defined(LINUX)
-        standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/i386-linux-gnu/");
-        standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/lib/gcc/i386-linux-gnu/4.7/include");
+        standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/i686-linux-gnu/");
+        standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/lib/gcc/i686-linux-gnu/4.7/include");
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include");
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.7/");
         standardsIncludeDirs.push_back("CppPlatform/include/linux/usr/include/c++/4.7/i686-linux-gnu");
@@ -573,8 +573,6 @@ void CodeCompiler::SetBaseDirectory(std::string baseDir_)
 
     if ( baseDir.empty() || (baseDir[baseDir.length()-1] != '/' && baseDir[baseDir.length()-1] != '\\' ) )
         baseDir += "/"; //Normalize the path if needed
-
-    std::cout << "here";
 }
 
 void CodeCompiler::AllowMultithread(bool allow, unsigned int maxThread)

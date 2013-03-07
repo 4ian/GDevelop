@@ -217,6 +217,10 @@ void SceneEditorCanvas::OnPreviewBtClick( wxCommandEvent & event )
     setFramerateLimit(game.GetMaximumFPS());
 
     if ( debugger ) debugger->Play();
+
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlay, true);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPause, false);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlayWin, true);
     mainFrameWrapper.GetRibbonSceneEditorButtonBar()->Refresh();
 }
 
@@ -262,7 +266,7 @@ void SceneEditorCanvas::OnUpdate()
             //But be sure that no error occurred.
             if ( !editing && !scene.GetCodeExecutionEngine()->Ready() )
             {
-                wxLogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")+CodeCompiler::GetInstance()->GetOutputDirectory()+"compilationErrors.txt");
+                wxLogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")+CodeCompiler::GetInstance()->GetOutputDirectory()+"LatestCompilationOutput.txt");
                 wxCommandEvent useless;
                 OnEditionBtClick(useless);
             }
@@ -390,6 +394,9 @@ void SceneEditorCanvas::OnPreviewRefreshBtClick( wxCommandEvent & event )
 {
     previewScene.running = false;
     playing = false;
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlay, true);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPause, false);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlayWin, true);
 
     RefreshFromLayout();
 }
@@ -410,9 +417,17 @@ void SceneEditorCanvas::PlayPreview()
 void SceneEditorCanvas::OnPreviewPlayBtClick( wxCommandEvent & event )
 {
     PlayPreview();
+
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlay, false);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPause, true);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlayWin, true);
 }
 void SceneEditorCanvas::OnPreviewPlayWindowBtClick( wxCommandEvent & event )
 {
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlay, true);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPause, true);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlayWin, false);
+
     previewScene.running = true;
     PlayPreview();
 
@@ -447,6 +462,10 @@ void SceneEditorCanvas::PausePreview()
     LayoutEditorCanvas::PausePreview();
 
     if ( debugger ) debugger->Pause();
+
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlay, true);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPause, false);
+    mainFrameWrapper.GetRibbonSceneEditorButtonBar()->EnableButton(idRibbonPlayWin, true);
 }
 
 void SceneEditorCanvas::OnPreviewPauseBtClick( wxCommandEvent & event )

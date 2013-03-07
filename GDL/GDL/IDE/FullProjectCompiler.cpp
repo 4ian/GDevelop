@@ -239,7 +239,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         if ( !wxFileExists(task.compilerCall.outputFile) )
         {
             diagnosticManager.AddError(gd::ToString(_("Compilation of scene ")+game.GetLayout(i).GetName()+_(" failed: Please go on our website to report this error, joining this file:\n")
-                                                    +CodeCompiler::GetInstance()->GetOutputDirectory()+"compilationErrors.txt"
+                                                    +CodeCompiler::GetInstance()->GetOutputDirectory()+"LatestCompilationOutput.txt"
                                                     +_("\n\nIf you think the error is related to an extension, please contact its developer.")));
             diagnosticManager.OnCompilationFailed();
             return;
@@ -374,7 +374,7 @@ void FullProjectCompiler::LaunchProjectCompilation()
         if ( !wxFileExists(codeOutputFile) )
         {
             diagnosticManager.AddError(gd::ToString(_("Linking of project failed: Please go on our website to report this error, joining this file:\n")
-                                                    +CodeCompiler::GetInstance()->GetOutputDirectory()+"compilationErrors.txt"
+                                                    +CodeCompiler::GetInstance()->GetOutputDirectory()+"LatestCompilationOutput.txt"
                                                     +_("\n\nIf you think the error is related to an extension, please contact its developer.")));
             diagnosticManager.OnCompilationFailed();
             return;

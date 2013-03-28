@@ -6,9 +6,13 @@
 		<id_arg>0</id_arg>
 		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
 			<cols>1</cols>
+			<growablecols>0</growablecols>
+			<growablerows>0</growablerows>
 			<object class="sizeritem">
 				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
 					<cols>2</cols>
+					<growablecols>1</growablecols>
+					<growablerows>0</growablerows>
 					<object class="sizeritem">
 						<object class="wxRadioBox" name="ID_RADIOBOX1" variable="RadioBox1" member="yes">
 							<label>Choose the button :</label>
@@ -20,9 +24,10 @@
 								<item>Special button 2</item>
 							</content>
 							<default>-1</default>
+							<style>wxRA_HORIZONTAL</style>
 							<handler function="OnRadioBox1Select" entry="EVT_RADIOBOX" />
 						</object>
-						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
 						<option>1</option>
 					</object>
@@ -36,7 +41,7 @@
 							<handler function="OnTestPanelMiddleUp" entry="EVT_MIDDLE_UP" />
 							<handler function="OnTestPanelRightDown" entry="EVT_RIGHT_DOWN" />
 						</object>
-						<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
 						<border>5</border>
 						<option>1</option>
 					</object>

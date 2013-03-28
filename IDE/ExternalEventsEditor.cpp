@@ -111,6 +111,7 @@ void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
     //Need to recreate an events editor.
     delete eventsEditor;
     eventsEditor = new EventsEditor(this, game, *scene, &events.GetEvents(), mainFrameWrapper);
+    eventsEditor->ConnectEvents();
 
     //Make sure the new events editor is properly displayed.
     FlexGridSizer4->Detach(eventsEditor);

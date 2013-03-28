@@ -39,7 +39,11 @@ ChoixBouton::ChoixBouton( wxWindow* parent, string pBouton ) :
     Create(parent, wxID_ANY, _("Choose a mouse button"), wxDefaultPosition, wxDefaultSize, wxDEFAULT_DIALOG_STYLE, _T("wxID_ANY"));
     SetClientSize(wxSize(333,249));
     FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
+    FlexGridSizer1->AddGrowableCol(0);
+    FlexGridSizer1->AddGrowableRow(0);
     FlexGridSizer2 = new wxFlexGridSizer(0, 2, 0, 0);
+    FlexGridSizer2->AddGrowableCol(1);
+    FlexGridSizer2->AddGrowableRow(0);
     wxString __wxRadioBoxChoices_1[5] =
     {
     	_("Left button"),
@@ -48,12 +52,12 @@ ChoixBouton::ChoixBouton( wxWindow* parent, string pBouton ) :
     	_("Special button 1"),
     	_("Special button 2")
     };
-    RadioBox1 = new wxRadioBox(this, ID_RADIOBOX1, _("Choose the button :"), wxDefaultPosition, wxDefaultSize, 5, __wxRadioBoxChoices_1, 1, 0, wxDefaultValidator, _T("ID_RADIOBOX1"));
-    FlexGridSizer2->Add(RadioBox1, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    RadioBox1 = new wxRadioBox(this, ID_RADIOBOX1, _("Choose the button :"), wxDefaultPosition, wxDefaultSize, 5, __wxRadioBoxChoices_1, 1, wxRA_HORIZONTAL, wxDefaultValidator, _T("ID_RADIOBOX1"));
+    FlexGridSizer2->Add(RadioBox1, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     TestPanel = new wxPanel(this, ID_PANEL1, wxDefaultPosition, wxSize(123,117), wxRAISED_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL1"));
     TestPanel->SetBackgroundColour(wxColour(128,128,128));
     TestPanel->SetToolTip(_("Click with a button to automatically select this latter from the list"));
-    FlexGridSizer2->Add(TestPanel, 1, wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
+    FlexGridSizer2->Add(TestPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
     FlexGridSizer1->Add(FlexGridSizer2, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
     FlexGridSizer3 = new wxFlexGridSizer(0, 3, 0, 0);
     FlexGridSizer3->AddGrowableCol(0);

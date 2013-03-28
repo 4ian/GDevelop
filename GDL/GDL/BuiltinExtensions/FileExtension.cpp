@@ -20,7 +20,7 @@ FileExtension::FileExtension()
 
         instrInfo.AddParameter("file", _("Filename"), "",false);
 
-        instrInfo.cppCallingInformation.SetFunctionName("FileExists").SetIncludeFile("GDL/BuiltinExtensions/AudioTools.h");
+        instrInfo.cppCallingInformation.SetFunctionName("FileExists").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     DECLARE_END_CONDITION()
 

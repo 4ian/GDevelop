@@ -446,15 +446,23 @@ SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObj
     gd::SkinHelper::ApplyCurrentSkin(*animationToolbar);
 
 	RefreshAll();
-	mgr->GetPane(imagesPanel).MinSize(400,150);
-	mgr->GetPane(resourcesEditorPnl).MinSize(200,150);
-	mgr->GetPane(animationsPanel).MinSize(200,75);
+
+	//Load perspective
+	mgr->GetPane(imagesPanel).MinSize(400,150).Show(true);
+	mgr->GetPane(resourcesEditorPnl).MinSize(200,150).Show(true);
+	mgr->GetPane(animationsPanel).MinSize(200,75).Show(true);
 	mgr->GetPane(maskPanel).MinSize(200,150).Show(false).Float();
 	mgr->GetPane(pointsPanel).MinSize(200,150).Show(false).Float();
 	mgr->GetPane(previewPanel).MinSize(150,150).Show(false).Float();
     wxString perspective;
 	wxConfigBase::Get()->Read("/SpriteObjectEditor/LastWorkspace", &perspective);
 	mgr->LoadPerspective(perspective);
+
+	//Ensure some options remains whatever the perspective loaded
+	mgr->GetPane(imagesPanel).Dock();
+	mgr->GetPane(resourcesEditorPnl).Dock();
+	mgr->GetPane(animationsPanel).Dock();
+	mgr->GetPane(maskPanel).Show(false);
 	mgr->GetPane(pointsPanel).Show(false);
 	mgr->GetPane(previewPanel).Show(false);
 	mgr->Update();

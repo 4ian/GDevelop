@@ -15,6 +15,8 @@ void GD_API GDLogBanner()
         std::string sys = "Target system : Windows, ";
     #elif defined(MAC)
         std::string sys = "Target system : Mac OS, ";
+    #else
+        std::string sys = "Target system : Unknown, ";
     #endif
     if(sizeof(int*) == 4)
         sys += "32-bits";

@@ -26,7 +26,6 @@
 #include "GDL/Game.h"
 #include "GDL/Version.h"
 #include "GDL/ExtensionBase.h"
-#include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDL/CommonTools.h"
 
 #if defined(GD_IDE_ONLY)
@@ -34,6 +33,7 @@
 #include <wx/msgdlg.h>
 #include <wx/filename.h>
 #include "GDL/IDE/CodeCompiler.h"
+#include "GDCore/Tools/Locale/LocaleManager.h"
 #endif
 
 typedef ExtensionBase* (*createExtension)();
@@ -65,7 +65,7 @@ void ExtensionsLoader::LoadAllStaticExtensionsAvailable()
     #elif defined(MAC)
         suffix += "m";
     #else
-        #error No target system defined.
+        #warning No target system defined.
     #endif
 
     #if defined(GD_IDE_ONLY)

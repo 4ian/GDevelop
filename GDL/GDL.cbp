@@ -24,8 +24,6 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
-					<Add directory="../ExtLibs/llvm/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -77,10 +75,6 @@
 					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
 					<Add directory="../ExtLibs/wxwidgets/include" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
-					<Add directory="../ExtLibs/llvm/include" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/tools/clang/include" />
-					<Add directory="../ExtLibs/llvm/tools/clang/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-pg -lgmon" />
@@ -152,8 +146,6 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
-					<Add directory="../ExtLibs/llvm/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -203,10 +195,6 @@
 					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
 					<Add directory="../ExtLibs/wxwidgets/include" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
-					<Add directory="../ExtLibs/llvm/include" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/tools/clang/include" />
-					<Add directory="../ExtLibs/llvm/tools/clang/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -278,8 +266,6 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
-					<Add directory="../ExtLibs/llvm/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -329,10 +315,6 @@
 					<Add option="-D__STDC_CONSTANT_MACROS" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
 					<Add directory="../ExtLibs/wxwidgets/include" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
-					<Add directory="../ExtLibs/llvm/include" />
-					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/tools/clang/include" />
-					<Add directory="../ExtLibs/llvm/tools/clang/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lGDCore" />
@@ -407,8 +389,6 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="../ExtLibs/llvm/build/include" />
-					<Add directory="../ExtLibs/llvm/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -456,10 +436,6 @@
 					<Add option="-DBOOST_DISABLE_ASSERTS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="../ExtLibs/llvm/build/include" />
-					<Add directory="../ExtLibs/llvm/include" />
-					<Add directory="../ExtLibs/llvm/tools/clang/include" />
-					<Add directory="../ExtLibs/llvm/build/tools/clang/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -509,10 +485,6 @@
 					<Add option="-DSFML_DYNAMIC" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="../ExtLibs/llvm/build/include" />
-					<Add directory="../ExtLibs/llvm/include" />
-					<Add directory="../ExtLibs/llvm/tools/clang/include" />
-					<Add directory="../ExtLibs/llvm/build/tools/clang/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lGDCore" />
@@ -556,8 +528,6 @@
 					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
 					<Add option="-D__STDC_LIMIT_MACROS" />
 					<Add option="-D__STDC_CONSTANT_MACROS" />
-					<Add directory="../ExtLibs/llvm/build/include" />
-					<Add directory="../ExtLibs/llvm/include" />
 				</Compiler>
 				<Linker>
 					<Add option="-lsfml-audio" />

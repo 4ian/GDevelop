@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxDialog" name="ChoixAction">
+		<title>Edit the action</title>
+		<centered>1</centered>
+		<size>717,396</size>
+		<minsize>640,480</minsize>
+		<extra_code>wxIcon FrameIcon;&#x0A;FrameIcon.CopyFromBitmap(wxBitmap(wxImage(__T(&quot;res/actionicon.png&quot;))));&#x0A;SetIcon(FrameIcon);</extra_code>
+		<id_arg>0</id_arg>
+		<style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX</style>
+		<object class="wxBoxSizer" variable="BoxSizer6" member="no">
+			<orient>wxVERTICAL</orient>
+			<object class="sizeritem">
+				<object class="wxBoxSizer" variable="BoxSizer7" member="no">
+					<object class="sizeritem">
+						<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+							<cols>1</cols>
+							<growablecols>0</growablecols>
+							<growablerows>0</growablerows>
+							<object class="sizeritem">
+								<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
+									<size>270,500</size>
+									<object class="notebookpage">
+										<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="ActionsTree" member="yes">
+											<image_list></image_list>
+											<tree_items>
+												<item>ActionsTree</item>
+												<item></item>
+											</tree_items>
+											<items_text>
+												<item2>ActionsTree</item2>
+												<item2></item2>
+											</items_text>
+											<tooltip>Choose an action to set up.</tooltip>
+											<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
+											<handler function="OnActionsTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+										</object>
+										<label>All actions</label>
+									</object>
+									<object class="notebookpage">
+										<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+											<object class="wxBoxSizer" variable="BoxSizer9" member="no">
+												<orient>wxVERTICAL</orient>
+												<object class="sizeritem">
+													<object class="wxBoxSizer" variable="BoxSizer10" member="no">
+														<orient>wxVERTICAL</orient>
+														<object class="sizeritem">
+															<object class="wxNotebook" name="ID_NOTEBOOK2" variable="objectsListsNotebook" member="yes">
+																<object class="notebookpage">
+																	<object class="wxTreeCtrl" name="ID_TREECTRL2" variable="ObjetsList" member="yes">
+																		<image_list></image_list>
+																		<tree_items>
+																			<item>ObjetsList</item>
+																			<item></item>
+																		</tree_items>
+																		<items_text>
+																			<item2>ObjetsList</item2>
+																			<item2></item2>
+																		</items_text>
+																		<pos>-71,-11</pos>
+																		<size>179,170</size>
+																		<tooltip>Choose an object in the list</tooltip>
+																		<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
+																		<handler function="OnObjetsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+																	</object>
+																	<label>Objects</label>
+																</object>
+																<object class="notebookpage">
+																	<object class="wxTreeCtrl" name="ID_TREECTRL3" variable="GroupesList" member="yes">
+																		<image_list></image_list>
+																		<tree_items>
+																			<item>GroupesList</item>
+																			<item></item>
+																		</tree_items>
+																		<items_text>
+																			<item2>GroupesList</item2>
+																			<item2></item2>
+																		</items_text>
+																		<pos>-71,-11</pos>
+																		<size>179,170</size>
+																		<tooltip>Choose an object in the list</tooltip>
+																		<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
+																		<handler function="OnObjetsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+																	</object>
+																	<label>Objects groups</label>
+																</object>
+																<object class="notebookpage">
+																	<object class="wxTreeCtrl" name="ID_TREECTRL4" variable="globalObjectsList" member="yes">
+																		<image_list></image_list>
+																		<tree_items>
+																			<item>globalObjectsList</item>
+																			<item></item>
+																		</tree_items>
+																		<items_text>
+																			<item2>globalObjectsList</item2>
+																			<item2></item2>
+																		</items_text>
+																		<pos>-71,-11</pos>
+																		<size>179,170</size>
+																		<tooltip>Choose an object in the list</tooltip>
+																		<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
+																		<handler function="OnObjetsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+																	</object>
+																	<label>Global objects</label>
+																</object>
+																<object class="notebookpage">
+																	<object class="wxTreeCtrl" name="ID_TREECTRL5" variable="globalObjectGroups" member="yes">
+																		<image_list></image_list>
+																		<tree_items>
+																			<item>globalObjectGroups</item>
+																			<item></item>
+																		</tree_items>
+																		<items_text>
+																			<item2>globalObjectGroups</item2>
+																			<item2></item2>
+																		</items_text>
+																		<pos>-71,-11</pos>
+																		<size>281,190</size>
+																		<tooltip>Choose an object in the list</tooltip>
+																		<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
+																		<handler function="OnObjetsListSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+																	</object>
+																	<label>Global groups</label>
+																</object>
+															</object>
+															<flag>wxTOP|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<option>1</option>
+														</object>
+														<object class="sizeritem">
+															<object class="wxTextCtrl" name="ID_TEXTCTRL2" subclass="wxSearchCtrl" variable="objectsSearchCtrl" member="yes">
+																<size>10,-1</size>
+																<handler function="OnobjectsSearchCtrlText" entry="EVT_TEXT" />
+															</object>
+															<flag>wxBOTTOM|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+															<border>5</border>
+														</object>
+													</object>
+													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxTreeCtrl" name="ID_TREECTRL6" variable="objectActionsTree" member="yes">
+														<image_list></image_list>
+														<tree_items>
+															<item>objectActionsTree</item>
+															<item></item>
+														</tree_items>
+														<items_text>
+															<item2>objectActionsTree</item2>
+															<item2></item2>
+														</items_text>
+														<tooltip>Choose an action to set up.</tooltip>
+														<style>wxTR_HIDE_ROOT|wxTR_DEFAULT_STYLE|wxNO_BORDER</style>
+														<handler function="OnobjectActionsTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+													</object>
+													<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<option>1</option>
+												</object>
+											</object>
+										</object>
+										<label>By object</label>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxTextCtrl" name="ID_TEXTCTRL1" subclass="wxSearchCtrl" variable="searchCtrl" member="yes">
+									<minsize>-1,24</minsize>
+									<handler function="OnsearchCtrlText" entry="EVT_TEXT" />
+								</object>
+								<flag>wxBOTTOM|wxLEFT|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+					</object>
+					<object class="sizeritem">
+						<object class="wxBoxSizer" variable="BoxSizer8" member="no">
+							<orient>wxVERTICAL</orient>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+									<cols>2</cols>
+									<object class="sizeritem">
+										<object class="wxStaticBitmap" name="ID_STATICBITMAP1" variable="ActionImg" member="yes">
+											<bitmap>res/unknown24.png</bitmap>
+											<size>24,24</size>
+											<style>wxNO_BORDER</style>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxBoxSizer" variable="BoxSizer4" member="no">
+											<object class="sizeritem">
+												<object class="wxStaticText" name="ID_STATICTEXT1" variable="NomActionTxt" member="yes">
+													<label>No action chosen</label>
+													<font>
+														<size>16</size>
+														<style>normal</style>
+														<weight>bold</weight>
+														<underlined>0</underlined>
+														<family>swiss</family>
+													</font>
+												</object>
+												<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+												<border>5</border>
+												<option>1</option>
+											</object>
+										</object>
+										<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							</object>
+							<object class="sizeritem">
+								<object class="wxBoxSizer" variable="BoxSizer3" member="no">
+									<object class="sizeritem">
+										<object class="wxStaticText" name="ID_STATICTEXT2" variable="ActionTextTxt" member="yes">
+											<label>Choose an action in left menu</label>
+											<tooltip>See Help for more information about the condition.</tooltip>
+										</object>
+										<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							</object>
+							<object class="sizeritem">
+								<object class="wxBoxSizer" variable="BoxSizer1" member="no">
+									<object class="sizeritem">
+										<object class="wxStaticLine" name="ID_STATICLINE1" variable="StaticLine1" member="yes">
+											<size>480,-1</size>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>3</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+							</object>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="GridSizer1" member="yes">
+									<cols>3</cols>
+									<growablecols>1</growablecols>
+								</object>
+								<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxBoxSizer" variable="BoxSizer2" member="no">
+					<object class="sizeritem">
+						<object class="wxStaticLine" name="ID_STATICLINE2" variable="StaticLine2" member="yes">
+							<size>10,-1</size>
+						</object>
+						<flag>wxTOP|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+						<border>2</border>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+			</object>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+					<cols>3</cols>
+					<growablecols>0</growablecols>
+					<object class="sizeritem">
+						<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+							<cols>3</cols>
+							<object class="sizeritem">
+								<object class="wxButton" name="ID_BUTTON4" variable="moreBt" member="yes">
+									<label>More actions</label>
+									<size>119,23</size>
+									<handler function="OnmoreBtClick" entry="EVT_BUTTON" />
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxCheckBox" name="ID_CHECKBOX2" variable="objSortCheck" member="yes">
+									<label>Sort by objects</label>
+									<hidden>1</hidden>
+									<handler function="OnobjSortCheckClick" entry="EVT_CHECKBOX" />
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+									<cols>3</cols>
+									<growablerows>0</growablerows>
+									<object class="sizeritem">
+										<object class="wxStaticBitmap" name="ID_STATICBITMAP2" variable="StaticBitmap1" member="yes">
+											<bitmap>res/helpicon.png</bitmap>
+											<style>wxNO_BORDER</style>
+										</object>
+										<flag>wxTOP|wxBOTTOM|wxLEFT|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+									<object class="sizeritem">
+										<object class="wxHyperlinkCtrl" name="ID_HYPERLINKCTRL1" variable="HyperlinkCtrl1" member="yes">
+											<label>Help</label>
+											<tooltip>Display help about this window</tooltip>
+											<handler function="OnAideBtClick" entry="EVT_HYPERLINK" />
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>5</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<option>1</option>
+					</object>
+					<object class="sizeritem">
+						<object class="wxBoxSizer" variable="BoxSizer5" member="no">
+							<object class="sizeritem">
+								<object class="wxButton" name="ID_BUTTON1" variable="OkBt" member="yes">
+									<label>Ok</label>
+									<handler function="OnOkBtClick" entry="EVT_BUTTON" />
+								</object>
+								<flag>wxALL|wxFIXED_MINSIZE|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxButton" name="ID_BUTTON2" variable="CancelBt" member="yes">
+									<label>Cancel</label>
+									<handler function="OnCancelBtClick" entry="EVT_BUTTON" />
+								</object>
+								<flag>wxALL|wxFIXED_MINSIZE|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>5</border>
+								<option>1</option>
+							</object>
+						</object>
+						<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+			</object>
+		</object>
+	</object>
+</wxsmith>

@@ -1,0 +1,26 @@
+/* XPM */
+static const char *x_red_xpm[] = {
+/* columns rows colors chars-per-pixel */
+"16 16 4 1",
+"  c None",
+"a c Red",
+"b c #C0C0C0",
+"d c #808080",
+/* pixels */
+"                ",
+"                ",
+"                ",
+"   da      ad   ",
+"   aaa    aaa   ",
+"   baaa  aaab   ",
+"    baaaaaab    ",
+"     baaaab     ",
+"      aaaa      ",
+"     aaaaaa     ",
+"    aaabbaaa    ",
+"   aaab  baaa   ",
+"   dab    bad   ",
+"                ",
+"                ",
+"                "
+};

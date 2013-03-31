@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<wxsmith>
+	<object class="wxPanel" name="DebuggerGUI">
+		<id_arg>0</id_arg>
+		<handler function="OnResize" entry="EVT_SIZE" />
+		<object class="wxFlexGridSizer" variable="FlexGridSizer1" member="no">
+			<cols>1</cols>
+			<growablecols>0</growablecols>
+			<growablerows>1</growablerows>
+			<object class="sizeritem">
+				<object class="wxFlexGridSizer" variable="FlexGridSizer6" member="no">
+					<cols>3</cols>
+					<growablecols>0</growablecols>
+					<growablerows>0</growablerows>
+					<object class="sizeritem">
+						<object class="wxPanel" name="ID_PANEL3" variable="toolbarPanel" member="yes">
+							<handler function="OntoolbarPanelResize" entry="EVT_SIZE" />
+							<object class="wxAuiManager" variable="AuiManager1" member="yes">
+								<object class="AuiManagerItem">
+									<object class="wxAuiToolBar" name="ID_AUITOOLBAR1" variable="toolbar" member="yes">
+										<object class="AuiToolBarItem">
+											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM1" variable="AuiToolBarItem1" member="yes">
+												<bitmap>res/starticon.png</bitmap>
+												<shorthelp>Play the scene</shorthelp>
+												<longhelp>Play the scene</longhelp>
+												<handler function="OnPlayBtClick" entry="EVT_TOOL" />
+											</object>
+											<label>Play the scene</label>
+										</object>
+										<object class="AuiToolBarItem">
+											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM2" variable="AuiToolBarItem2" member="yes">
+												<bitmap>res/pauseicon.png</bitmap>
+												<shorthelp>Pause the scene</shorthelp>
+												<longhelp>Pause the scene being played</longhelp>
+												<handler function="OnPauseBtClick" entry="EVT_TOOL" />
+											</object>
+											<label>Pause the scene</label>
+										</object>
+										<object class="AuiToolBarItem">
+											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM3" variable="AuiToolBarItem3" member="yes">
+												<bitmap>res/stepicon.png</bitmap>
+												<shorthelp>Render only one frame of the scene</shorthelp>
+												<longhelp>Render only one frame of the scene</longhelp>
+												<handler function="OnStepBtClick" entry="EVT_TOOL" />
+											</object>
+											<label>Step</label>
+										</object>
+										<object class="AuiToolBarItem">
+											<object class="wxAuiToolBarSeparator" />
+											<label>Item label</label>
+										</object>
+										<object class="AuiToolBarItem">
+											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM5" variable="AuiToolBarItem5" member="yes">
+												<bitmap>res/addobjetdbg.png</bitmap>
+												<shorthelp>Create a new object</shorthelp>
+												<longhelp>Create a new object</longhelp>
+												<handler function="OnAddObjBtClick" entry="EVT_TOOL" />
+											</object>
+											<label>Item label</label>
+										</object>
+										<object class="AuiToolBarItem">
+											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM6" variable="AuiToolBarItem6" member="yes">
+												<bitmap>res/addvaricon.png</bitmap>
+												<shorthelp>Add a scene variable</shorthelp>
+												<longhelp>Add a scene variable</longhelp>
+												<handler function="OnAddVarSceneBtClick" entry="EVT_TOOL" />
+											</object>
+											<label>Add a scene variable</label>
+										</object>
+										<object class="AuiToolBarItem">
+											<object class="wxAuiToolBarItem" name="ID_AUITOOLBARITEM4" variable="AuiToolBarItem4" member="yes">
+												<bitmap>res/addvargicon.png</bitmap>
+												<shorthelp>Create a new global variable</shorthelp>
+												<longhelp>Create a new global variable</longhelp>
+												<handler function="OnAddVarGlobalBtClick" entry="EVT_TOOL" />
+											</object>
+											<label>Add a new global variable</label>
+										</object>
+									</object>
+									<name>PaneName</name>
+									<standardpanetype>Toolbar</standardpanetype>
+									<caption>Pane caption</caption>
+									<captionvisible>0</captionvisible>
+									<minimizebutton>0</minimizebutton>
+									<maximizebutton>0</maximizebutton>
+									<pinbutton>0</pinbutton>
+									<layer>10</layer>
+									<dockfixed>0</dockfixed>
+									<dockabledirection></dockabledirection>
+									<resizable>0</resizable>
+									<destroyonclose>0</destroyonclose>
+									<firstadd>0</firstadd>
+								</object>
+							</object>
+						</object>
+						<flag>wxBOTTOM|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL</flag>
+						<border>5</border>
+						<option>1</option>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+			<object class="sizeritem">
+				<object class="wxNotebook" name="ID_NOTEBOOK1" variable="Notebook1" member="yes">
+					<object class="notebookpage">
+						<object class="wxPanel" name="ID_PANEL1" variable="Panel1" member="yes">
+							<object class="wxFlexGridSizer" variable="FlexGridSizer3" member="no">
+								<cols>3</cols>
+								<growablecols>0</growablecols>
+								<growablerows>0</growablerows>
+								<object class="sizeritem">
+									<object class="wxListCtrl" name="ID_LISTCTRL2" variable="generalList" member="yes">
+										<size>249,203</size>
+										<style>wxLC_REPORT</style>
+										<handler function="OngeneralListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>5</border>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<label>General</label>
+					</object>
+					<object class="notebookpage">
+						<object class="wxPanel" name="ID_PANEL2" variable="Panel2" member="yes">
+							<object class="wxFlexGridSizer" variable="FlexGridSizer2" member="no">
+								<cols>3</cols>
+								<growablecols>1</growablecols>
+								<growablerows>0</growablerows>
+								<object class="sizeritem">
+									<object class="wxTreeCtrl" name="ID_TREECTRL1" variable="objectsTree" member="yes">
+										<image_list></image_list>
+										<tree_items>
+											<item>objectsTree</item>
+											<item></item>
+										</tree_items>
+										<items_text>
+											<item2>objectsTree</item2>
+											<item2></item2>
+										</items_text>
+										<size>138,203</size>
+										<handler function="OnobjectsTreeSelectionChanged" entry="EVT_TREE_SEL_CHANGED" />
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<border>2</border>
+									<option>1</option>
+								</object>
+								<object class="sizeritem">
+									<object class="wxFlexGridSizer" variable="FlexGridSizer4" member="no">
+										<cols>1</cols>
+										<growablecols>0</growablecols>
+										<growablerows>1</growablerows>
+										<object class="sizeritem">
+											<object class="wxFlexGridSizer" variable="FlexGridSizer5" member="no">
+												<cols>3</cols>
+												<growablecols>2</growablecols>
+												<growablerows>0</growablerows>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT1" variable="StaticText1" member="yes">
+														<label>Object :</label>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxStaticText" name="ID_STATICTEXT2" variable="objectName" member="yes">
+														<label></label>
+													</object>
+													<flag>wxALL|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+													<border>5</border>
+													<option>1</option>
+												</object>
+												<object class="sizeritem">
+													<object class="wxBitmapButton" name="ID_BITMAPBUTTON1" variable="deleteBt" member="yes">
+														<bitmap>res/deleteicon.png</bitmap>
+														<tooltip>Delete this object</tooltip>
+														<handler function="OndeleteBtClick" entry="EVT_BUTTON" />
+													</object>
+													<flag>wxALL|wxALIGN_RIGHT|wxALIGN_CENTER_VERTICAL</flag>
+													<border>2</border>
+													<option>1</option>
+												</object>
+											</object>
+											<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<option>1</option>
+										</object>
+										<object class="sizeritem">
+											<object class="wxListCtrl" name="ID_LISTCTRL1" variable="objectList" member="yes">
+												<size>249,203</size>
+												<style>wxLC_REPORT|wxLC_EDIT_LABELS</style>
+												<handler function="OnobjectListItemActivated" entry="EVT_LIST_ITEM_ACTIVATED" />
+											</object>
+											<flag>wxTOP|wxBOTTOM|wxRIGHT|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+											<border>2</border>
+											<option>1</option>
+										</object>
+									</object>
+									<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+									<option>1</option>
+								</object>
+							</object>
+						</object>
+						<label>Objects</label>
+					</object>
+				</object>
+				<flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+				<option>1</option>
+			</object>
+		</object>
+	</object>
+</wxsmith>

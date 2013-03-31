@@ -1,0 +1,403 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Runtime" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/debug/PlayWin.exe" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/debug" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-pg" />
+					<Add option="-g" />
+					<Add option="-m32" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DDEBUG" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
+					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-pg -lgmon" />
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
+					<Add option="-lLLVMJIT" />
+					<Add option="-lLLVMInterpreter" />
+					<Add option="-lLLVMX86CodeGen" />
+					<Add option="-lLLVMAsmParser" />
+					<Add option="-lLLVMBitReader" />
+					<Add option="-lLLVMBitWriter" />
+					<Add option="-lLLVMipo" />
+					<Add option="-lLLVMExecutionEngine" />
+					<Add option="-lLLVMAsmPrinter" />
+					<Add option="-lLLVMSelectionDAG" />
+					<Add option="-lLLVMX86AsmPrinter" />
+					<Add option="-lLLVMX86Info" />
+					<Add option="-lLLVMMCParser" />
+					<Add option="-lLLVMCodeGen" />
+					<Add option="-lLLVMX86Utils" />
+					<Add option="-lLLVMScalarOpts" />
+					<Add option="-lLLVMInstCombine" />
+					<Add option="-lLLVMTransformUtils" />
+					<Add option="-lLLVMipa" />
+					<Add option="-lLLVMAnalysis" />
+					<Add option="-lLLVMTarget" />
+					<Add option="-lLLVMCore" />
+					<Add option="-lLLVMMC" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi" />
+					<Add option="-lLLVMInstrumentation" />
+					<Add option="-lLLVMSupport -limagehlp -lpsapi -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32" />
+					<Add option="-lLLVMAlphaCodeGen" />
+					<Add option="-lLLVMARMAsmParser" />
+					<Add option="-lLLVMARMDisassembler" />
+					<Add option="-lLLVMBlackfinCodeGen" />
+					<Add option="-lLLVMCBackend" />
+					<Add option="-lLLVMCellSPUCodeGen" />
+					<Add option="-lLLVMCppBackend" />
+					<Add option="-lLLVMMipsCodeGen" />
+					<Add option="-lLLVMMBlazeAsmParser" />
+					<Add option="-lLLVMMBlazeDisassembler" />
+					<Add option="-lLLVMMSP430CodeGen" />
+					<Add option="-lLLVMPowerPCCodeGen" />
+					<Add option="-lLLVMPTXCodeGen" />
+					<Add option="-lLLVMSparcCodeGen" />
+					<Add option="-lLLVMSystemZCodeGen" />
+					<Add option="-lLLVMX86AsmParser" />
+					<Add option="-lLLVMX86Disassembler" />
+					<Add option="-lLLVMXCoreCodeGen" />
+					<Add option="-lLLVMAlphaInfo" />
+					<Add option="-lLLVMARMCodeGen" />
+					<Add option="-lLLVMBlackfinInfo" />
+					<Add option="-lLLVMCBackendInfo" />
+					<Add option="-lLLVMCellSPUInfo" />
+					<Add option="-lLLVMCppBackendInfo" />
+					<Add option="-lLLVMMipsInfo" />
+					<Add option="-lLLVMMBlazeCodeGen" />
+					<Add option="-lLLVMMSP430AsmPrinter" />
+					<Add option="-lLLVMMSP430Info" />
+					<Add option="-lLLVMPowerPCAsmPrinter" />
+					<Add option="-lLLVMPowerPCInfo" />
+					<Add option="-lLLVMPTXInfo" />
+					<Add option="-lLLVMSparcInfo" />
+					<Add option="-lLLVMSystemZInfo" />
+					<Add option="-lLLVMXCoreInfo" />
+					<Add option="-lLLVMARMAsmPrinter" />
+					<Add option="-lLLVMARMInfo" />
+					<Add option="-lLLVMMBlazeAsmPrinter" />
+					<Add option="-lLLVMMBlazeInfo" />
+					<Add library="mingw32" />
+					<Add library="opengl32" />
+					<Add library="Imm32" />
+					<Add library="Comctl32" />
+					<Add library="glu32" />
+					<Add library="Ws2_32" />
+					<Add library="gdi32" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="winmm" />
+					<Add directory="bin/debug" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/release/PlayWin" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/release" />
+				<Option object_output="obj/release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DRELEASE" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add library="mingw32" />
+					<Add library="opengl32" />
+					<Add library="Imm32" />
+					<Add library="Comctl32" />
+					<Add library="glu32" />
+					<Add library="Ws2_32" />
+					<Add library="gdi32" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="winmm" />
+					<Add directory="bin/release" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
+				</Linker>
+			</Target>
+			<Target title="Development">
+				<Option output="bin/dev/PlayWin" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="bin/dev" />
+				<Option object_output="obj/dev/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-m32" />
+					<Add option="-DGD_API=__declspec(dllimport)" />
+					<Add option="-DDEV" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add library="mingw32" />
+					<Add library="opengl32" />
+					<Add library="Imm32" />
+					<Add library="Comctl32" />
+					<Add library="glu32" />
+					<Add library="Ws2_32" />
+					<Add library="gdi32" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libfreetype.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libopenal32.a" />
+					<Add library="..\ExtLibs\SFML\extlibs\libs-mingw\libsndfile.a" />
+					<Add library="winmm" />
+					<Add directory="bin/dev" />
+					<Add directory="../ExtLibs/llvm/build-tdmgcc45-release/lib" />
+				</Linker>
+			</Target>
+			<Target title="Linux - Release">
+				<Option output="bin/release/ExeLinux" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/release" />
+				<Option object_output="obj/release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGLU" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add option="-Wl,-rpath=&apos;$$ORIGIN/.&apos;" />
+					<Add directory="bin/release" />
+					<Add directory="../ExtLibs/SFML/build-linux/lib" />
+				</Linker>
+			</Target>
+			<Target title="Linux - Debug">
+				<Option output="bin/debug/ExeLinux" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/debug" />
+				<Option object_output="obj/debug/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DLINUX" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DGD_NO_DYNAMIC_EXTENSIONS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-lsndfile" />
+					<Add option="-lopenal" />
+					<Add option="-lfreetype" />
+					<Add option="-lX11" />
+					<Add option="-lXrandr" />
+					<Add option="-lXrender" />
+					<Add option="-lFLAC" />
+					<Add option="-lGLU" />
+					<Add option="-lGL" />
+					<Add option="-lpthread" />
+					<Add option="-g" />
+					<Add option="-pg" />
+					<Add option="-Wl,-rpath=&apos;$$ORIGIN/.&apos;" />
+					<Add directory="bin/debug" />
+					<Add directory="../ExtLibs/SFML/build-linux/lib" />
+				</Linker>
+			</Target>
+			<Target title="Mac - Release">
+				<Option output="bin/release/MacExe" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/release" />
+				<Option object_output="obj/release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DRELEASE" />
+					<Add option="-DMAC" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-system" />
+					<Add option="-framework OpenGL" />
+					<Add library="..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add directory="bin/release" />
+					<Add directory="../ExtLibs/SFML/build-mac/lib" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../Runtime/bin/release/MacExe" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/release/MacExe" />
+				</ExtraCommands>
+			</Target>
+			<Target title="Mac - Debug">
+				<Option output="bin/debug/MacExe" prefix_auto="0" extension_auto="0" />
+				<Option working_dir="bin/debug" />
+				<Option object_output="obj/debug/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-fno-stack-protector" />
+					<Add option="-m32" />
+					<Add option='-DGD_API=&quot;&quot;' />
+					<Add option="-DDEBUG" />
+					<Add option="-DMAC" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
+					<Add directory="../ExtLibs/llvm/include" />
+					<Add directory="../ExtLibs/llvm/build/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-lgdl" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-system-d" />
+					<Add option="-framework OpenGL" />
+					<Add option="-g" />
+					<Add option="-pg" />
+					<Add library="..\..\libs\SFML\extlibs\libs-osx\Frameworks\sndfile.framework\sndfile" />
+					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libGLEW.a" />
+					<Add library="..\..\libs\SFML\extlibs\libs-osx\lib\libjpeg.a" />
+					<Add directory="bin/debug" />
+					<Add directory="../ExtLibs/SFML/build-mac/lib" />
+				</Linker>
+				<ExtraCommands>
+					<Add after="install_name_tool -change ../Runtime/bin/release/libgdl.dylib libgdl.dylib ../Runtime/bin/debug/MacExe" />
+					<Add after="install_name_tool -change @executable_path/../Frameworks/sndfile.framework/Versions/A/sndfile sndfile ../Runtime/bin/debug/MacExe" />
+				</ExtraCommands>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-fexceptions" />
+			<Add directory="../GDL" />
+			<Add directory="../ExtLibs/boost" />
+			<Add directory="../ExtLibs/SFML/include" />
+		</Compiler>
+		<Linker>
+			<Add directory="../ExtLibs/SFML/build-mingw-release/lib" />
+			<Add directory="../ExtLibs/SFML/build-mingw-debug/lib" />
+		</Linker>
+		<Unit filename="CompilationChecker.cpp">
+			<Option weight="60" />
+		</Unit>
+		<Unit filename="CompilationChecker.h" />
+		<Unit filename="main.cpp" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<AutoVersioning>
+				<Scheme minor_max="1" build_max="0" rev_max="0" rev_rand_max="9" build_times_to_increment_minor="100" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="1" do_auto_increment="1" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="version.h" />
+				<Changes_Log show_changes_editor="0" app_title="sortie de la version %M.%m.%b de %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
+			</AutoVersioning>
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

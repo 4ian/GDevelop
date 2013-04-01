@@ -8,6 +8,7 @@
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
+class TiXmlElement;
 class wxWindow;
 
 namespace gd
@@ -43,6 +44,16 @@ public:
      * Called when user wants to edit the automatism.
      */
     virtual void EditAutomatism( wxWindow* parent, gd::Project & project, gd::Layout * layout, gd::MainFrameWrapper & mainFrameWrapper ) {};
+
+    /**
+     * Save Automatism to XML
+     */
+    virtual void SaveToXml(TiXmlElement * eventElem) const {}
+
+    /**
+     * Load Automatism from XML
+     */
+    virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 };
 
 }

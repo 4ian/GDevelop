@@ -369,7 +369,7 @@ void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list
             automatism->SetAttribute( "Type", list[j]->GetAutomatism(allAutomatisms[i]).GetTypeName().c_str() );
             automatism->SetAttribute( "Name", list[j]->GetAutomatism(allAutomatisms[i]).GetName().c_str() );
 
-            list[j]->GetAutomatismRawPointer(allAutomatisms[i])->SaveToXml(automatism);
+            list[j]->GetAutomatism(allAutomatisms[i]).SaveToXml(automatism);
         }
 
         list[j]->SaveToXml(objet);

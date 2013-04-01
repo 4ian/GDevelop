@@ -195,7 +195,7 @@ private:
     sf::Vector2f movingViewMouseStartPosition;
     sf::Vector2f movingViewStartPosition;
 
-    typedef boost::bimap<gd::InitialInstance*, boost::shared_ptr<Object> > InstancesAndObjectsBimap;
+    typedef boost::bimap<gd::InitialInstance*, boost::shared_ptr<RuntimeObject> > InstancesAndObjectsBimap;
     typedef InstancesAndObjectsBimap::value_type InstanceAndObjectPair;
     InstancesAndObjectsBimap initialInstancesAndObjectsBimap; ///< Links between initial instances and the objects really used by previewScene to render the scene when editing.
 
@@ -240,7 +240,7 @@ private:
      * Tool function returning the object used to display during the \a instance when editing.
      * Can return a null pointer if the object is not found ( even if it should not happen normally ).
      */
-    boost::shared_ptr<Object> GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const;
+    boost::shared_ptr<RuntimeObject> GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const;
 
     /**
      * Update the mouse according to the selected button

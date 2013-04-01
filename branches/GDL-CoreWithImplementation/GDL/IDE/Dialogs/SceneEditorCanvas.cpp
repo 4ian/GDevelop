@@ -370,10 +370,10 @@ void SceneEditorCanvas::RefreshFromLayoutSecondPart()
         initialInstancesAndObjectsBimap.clear();
         gd::InitialInstancesContainer noInstances; //We need to load the scene in a two time fashion...
         previewScene.LoadFromSceneAndCustomInstances(scene, noInstances);
-        std::map< const gd::InitialInstance*, boost::shared_ptr<Object> > tempMap;
+        std::map< const gd::InitialInstance*, boost::shared_ptr<RuntimeObject> > tempMap;
         previewScene.CreateObjectsFrom(instances, 0, 0, &tempMap); //...so as to fill the tracking map.
 
-        for (std::map< const gd::InitialInstance*, boost::shared_ptr<Object> >::const_iterator it = tempMap.begin();it!=tempMap.end();++it)
+        for (std::map< const gd::InitialInstance*, boost::shared_ptr<RuntimeObject> >::const_iterator it = tempMap.begin();it!=tempMap.end();++it)
             initialInstancesAndObjectsBimap.insert(InstanceAndObjectPair(const_cast<gd::InitialInstance*>(it->first), it->second));
             //I know the const_cast is ugly, but I do not know how to bypass the issue otherwise.
 
@@ -524,6 +524,7 @@ void SceneEditorCanvas::OnLeftUp( wxMouseEvent &event )
 
 void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
 {
+    /*
     //First check if we're using a resize button
     if ( currentDraggableBt.substr(0,6) == "resize")
     {
@@ -651,7 +652,7 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
         }
 
         LayoutEditorCanvas::OnMotion(event);
-    }
+    }*/
 }
 
 void SceneEditorCanvas::OnMiddleDown( wxMouseEvent &event )
@@ -734,7 +735,7 @@ void SceneEditorCanvas::OnGuiElementHovered(const gd::LayoutEditorCanvasGuiEleme
 
 void SceneEditorCanvas::OnGuiElementPressed(const gd::LayoutEditorCanvasGuiElement & guiElement)
 {
-    if ( currentDraggableBt.empty() && guiElement.name.substr(0, 6) == "resize" )
+    /*if ( currentDraggableBt.empty() && guiElement.name.substr(0, 6) == "resize" )
     {
         currentDraggableBt = guiElement.name;
 
@@ -750,7 +751,7 @@ void SceneEditorCanvas::OnGuiElementPressed(const gd::LayoutEditorCanvasGuiEleme
     else if ( currentDraggableBt.empty() && guiElement.name == "angle" )
     {
         currentDraggableBt = "angle";
-    }
+    }*/
 }
 
 void SceneEditorCanvas::OnGuiElementReleased(const gd::LayoutEditorCanvasGuiElement & guiElement)
@@ -840,11 +841,11 @@ void SceneEditorCanvas::RenderEdittime()
     clear( sf::Color( previewScene.GetBackgroundColorRed(), previewScene.GetBackgroundColorGreen(), previewScene.GetBackgroundColorBlue() ) );
     setView(editionView);
 
-    glClear(GL_DEPTH_BUFFER_BIT);
+    /*glClear(GL_DEPTH_BUFFER_BIT);
     pushGLStates(); //To allow using OpenGL to draw
 
     //Sort objects according to their Z Order
-    ObjList allObjects = previewScene.objectsInstances.GetAllObjects();
+    RuntimeObjList allObjects = previewScene.objectsInstances.GetAllObjects();
     previewScene.OrderObjectsByZOrder( allObjects );
 
     //Reseting the gui elements
@@ -993,7 +994,7 @@ void SceneEditorCanvas::RenderEdittime()
 
     setView(editionView);
     popGLStates();
-    display();
+    display();*/
 }
 
 

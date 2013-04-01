@@ -27,6 +27,7 @@
 #include "GDL/BuiltinExtensions/NetworkExtension.h"
 #include "GDL/BuiltinExtensions/WindowExtension.h"
 #include "GDL/BuiltinExtensions/ExternalLayoutsExtension.h"
+#include "GDL/RuntimeObject.h"
 #include "GDL/Object.h"
 #include "GDL/IDE/CodeCompiler.h"
 
@@ -96,6 +97,8 @@ bool ExtensionsManager::AddExtension(boost::shared_ptr<ExtensionBase> extension)
         //Adding creations and destruction functions
         creationFunctionTable[objectsTypes[i]] = extension->GetObjectCreationFunctionPtr(objectsTypes[i]);
         destroyFunctionTable[objectsTypes[i]] = extension->GetDestroyObjectFunction(objectsTypes[i]);
+        runtimeObjCreationFunctionTable[objectsTypes[i]] = extension->GetRuntimeObjectCreationFunctionPtr(objectsTypes[i]);
+        runtimeObjDestroyFunctionTable[objectsTypes[i]] = extension->GetDestroyRuntimeObjectFunction(objectsTypes[i]);
     }
 
     #if defined(GD_IDE_ONLY)
@@ -172,6 +175,21 @@ bool ExtensionsManager::HasAutomatism(std::string automatismType) const
     return false;
 }
 #endif
+
+boost::shared_ptr<RuntimeObject> ExtensionsManager::CreateRuntimeObject(RuntimeScene & scene, Object & object)
+{
+    const std::string & type = object.GetType();
+
+    if ( runtimeObjCreationFunctionTable.find(type) == runtimeObjCreationFunctionTable.end() )
+    {
+        std::cout << "Tried to create an object with an unknown type: " << type << std::endl;
+        return boost::shared_ptr<RuntimeObject> ();
+    }
+
+    //Create a new object with the type we want.
+    RuntimeObject * newObject = runtimeObjCreationFunctionTable[type](scene, object);
+    return boost::shared_ptr<RuntimeObject> (newObject, runtimeObjDestroyFunctionTable[type]);
+}
 
 boost::shared_ptr<Object> ExtensionsManager::CreateObject(std::string type, std::string name)
 {

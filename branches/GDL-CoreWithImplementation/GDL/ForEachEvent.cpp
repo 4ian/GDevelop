@@ -64,7 +64,7 @@ std::string ForEachEvent::GenerateEventCode(Game & game, Scene & scene, EventsCo
     if ( realObjects.size() != 1) //(We write a slighty more simple ( and optimized ) output code when only one object list is used.)
     {
         outputCode += "unsigned int forEachTotalCount = 0;";
-        outputCode += "std::vector<Object*> forEachObjects;";
+        outputCode += "std::vector<RuntimeObject*> forEachObjects;";
         for (unsigned int i = 0;i<realObjects.size();++i)
         {
             outputCode += "unsigned int forEachCount"+ToString(i)+" = "+ManObjListName(realObjects[i])+".size(); forEachTotalCount += forEachCount"+ToString(i)+";";
@@ -85,14 +85,14 @@ std::string ForEachEvent::GenerateEventCode(Game & game, Scene & scene, EventsCo
     //Clear all concerned objects lists and keep only one object
     if ( realObjects.size() == 1 )
     {
-        outputCode += "std::vector<Object*> temporaryForEachList; temporaryForEachList.push_back("+ManObjListName(realObjects[0])+"[forEachIndex]);";
-        outputCode += "std::vector<Object*> "+ManObjListName(realObjects[0])+" = temporaryForEachList;\n";
+        outputCode += "std::vector<RuntimeObject*> temporaryForEachList; temporaryForEachList.push_back("+ManObjListName(realObjects[0])+"[forEachIndex]);";
+        outputCode += "std::vector<RuntimeObject*> "+ManObjListName(realObjects[0])+" = temporaryForEachList;\n";
     }
     else
     {
         //Declare all lists of concerned objects empty
         for (unsigned int j = 0;j<realObjects.size();++j)
-            outputCode += "std::vector<Object*> "+ManObjListName(realObjects[j])+";\n";
+            outputCode += "std::vector<RuntimeObject*> "+ManObjListName(realObjects[j])+";\n";
 
         for (unsigned int i = 0;i<realObjects.size();++i) //Pick then only one object
         {

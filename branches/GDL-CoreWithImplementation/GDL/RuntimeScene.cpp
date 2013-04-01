@@ -310,7 +310,7 @@ void RuntimeScene::Render()
     renderWindow->clear( sf::Color( GetBackgroundColorRed(), GetBackgroundColorGreen(), GetBackgroundColorBlue() ) );
 
     //Sort object by order to render them
-    ObjList allObjects = objectsInstances.GetAllObjects();
+    RuntimeObjList allObjects = objectsInstances.GetAllObjects();
     OrderObjectsByZOrder( allObjects );
 
     //To allow using OpenGL to draw :
@@ -401,7 +401,7 @@ bool RuntimeScene::UpdateTime()
 ////////////////////////////////////////////////////////////
 /// Met à jour un tableau contenant l'ordre d'affichage des objets
 ////////////////////////////////////////////////////////////
-bool RuntimeScene::OrderObjectsByZOrder( ObjList & objList )
+bool RuntimeScene::OrderObjectsByZOrder( RuntimeObjList & objList )
 {
     if ( StandardSortMethod() )
         std::sort( objList.begin(), objList.end(), SortByZOrder() );
@@ -431,7 +431,7 @@ bool RuntimeScene::DisplayLegacyTexts(string layer)
  */
 void RuntimeScene::ManageObjectsAfterEvents()
 {
-    ObjList allObjects = objectsInstances.GetAllObjects();
+    RuntimeObjList allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
     {
     	if ( allObjects[id]->GetName().empty() )
@@ -459,7 +459,7 @@ void RuntimeScene::ManageObjectsAfterEvents()
  */
 void RuntimeScene::ManageObjectsBeforeEvents()
 {
-    ObjList allObjects = objectsInstances.GetAllObjects();
+    RuntimeObjList allObjects = objectsInstances.GetAllObjects();
     for (unsigned int id = 0;id<allObjects.size();++id)
         allObjects[id]->DoAutomatismsPreEvents(*this);
 
@@ -476,7 +476,7 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
 class ObjectsFromInitialInstanceCreator : public gd::InitialInstanceFunctor
 {
 public:
-    ObjectsFromInitialInstanceCreator(RuntimeGame & game_, RuntimeScene & scene_, float xOffset_, float yOffset_, std::map<const gd::InitialInstance *, boost::shared_ptr<Object> > * optionalMap_) :
+    ObjectsFromInitialInstanceCreator(RuntimeGame & game_, RuntimeScene & scene_, float xOffset_, float yOffset_, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap_) :
         game(game_),
         scene(scene_),
         xOffset(xOffset_),
@@ -490,20 +490,20 @@ public:
         std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
         std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
 
-        ObjSPtr newObject = boost::shared_ptr<Object> ();
+        RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
         if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
-            newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
-        else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
-            newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
+            newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **sceneObject);
+        else if ( globalObject != scene.game->GetGlobalObjects().end() ) //Then the global object list
+            newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **globalObject);
 
-        if ( newObject != boost::shared_ptr<Object> () )
+        if ( newObject != boost::shared_ptr<RuntimeObject> () )
         {
             newObject->SetX( initialInstance.GetX() + xOffset );
             newObject->SetY( initialInstance.GetY() + yOffset );
             newObject->SetZOrder( initialInstance.GetZOrder() );
             newObject->SetLayer( initialInstance.GetLayer() );
-            newObject->InitializeFromInitialInstance(initialInstance);
+            newObject->ExtraInitializationFromInitialInstance(initialInstance);
             newObject->SetAngle( initialInstance.GetAngle() );
 
             if ( initialInstance.HasCustomSize() )
@@ -519,8 +519,6 @@ public:
                 newObject->GetVariables().ObtainVariable(instanceSpecificVariables[j].GetName()) = instanceSpecificVariables[j];
             }
 
-            newObject->LoadRuntimeResources(scene, *game.imageManager);
-
             scene.objectsInstances.AddObject(newObject);
         }
         else
@@ -534,10 +532,10 @@ private:
     RuntimeScene & scene;
     float xOffset;
     float yOffset;
-    std::map<const gd::InitialInstance *, boost::shared_ptr<Object> > * optionalMap;
+    std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap;
 };
 
-void RuntimeScene::CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const gd::InitialInstance *, boost::shared_ptr<Object> > * optionalMap)
+void RuntimeScene::CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap)
 {
     ObjectsFromInitialInstanceCreator func(*game, *this, xOffset, yOffset, optionalMap);
     const_cast<gd::InitialInstancesContainer&>(container).IterateOverInstances(func);

@@ -6,10 +6,10 @@
 #include <map>
 #include <boost/shared_ptr.hpp>
 #include <boost/unordered_map.hpp>
-class Object;
+class RuntimeObject;
 
-typedef std::vector < boost::shared_ptr<Object> > ObjList;
-typedef boost::shared_ptr<Object> ObjSPtr;
+typedef std::vector < boost::shared_ptr<RuntimeObject> > RuntimeObjList;
+typedef boost::shared_ptr<RuntimeObject> RuntimeObjSPtr;
 
 /**
  * \brief Hold lists of objects classified by the name of the objects.
@@ -26,28 +26,28 @@ public:
     /**
      * Add a new object to the lists
      */
-    void AddObject(const ObjSPtr & object);
+    void AddObject(const RuntimeObjSPtr & object);
 
     /**
      * Get all objects with a specific name
      */
-    inline const ObjList & GetObjects(const std::string & name)
+    inline const RuntimeObjList & GetObjects(const std::string & name)
     {
         return objectsInstances[name];
     }
     /**
      * Get a "raw pointers" list to objects with a specific name
      */
-    std::vector<Object*> GetObjectsRawPointers(const std::string & name);
+    std::vector<RuntimeObject*> GetObjectsRawPointers(const std::string & name);
 
     /**
      * Get a list of all objects
      */
-    inline ObjList GetAllObjects()
+    inline RuntimeObjList GetAllObjects()
     {
-        ObjList objList;
+        RuntimeObjList objList;
 
-        for (boost::unordered_map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (boost::unordered_map<std::string, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
             copy(it->second.begin(), it->second.end(), back_inserter(objList));
 
         return objList;
@@ -62,16 +62,16 @@ public:
      * scene.objectsInstances.ObjectNameHasChanged(myObject);
      * \endcode
      */
-    inline void RemoveObject(const ObjSPtr & object)
+    inline void RemoveObject(const RuntimeObjSPtr & object)
     {
-        for (boost::unordered_map<std::string, ObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
+        for (boost::unordered_map<std::string, RuntimeObjList>::iterator it = objectsInstances.begin() ; it != objectsInstances.end(); ++it )
         {
-            ObjList & associatedList = it->second;
+            RuntimeObjList & associatedList = it->second;
             associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object), associatedList.end());
         }
-        for (boost::unordered_map<std::string, std::vector<Object*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
+        for (boost::unordered_map<std::string, std::vector<RuntimeObject*> >::iterator it = objectsRawPointersInstances.begin() ; it != objectsRawPointersInstances.end(); ++it )
         {
-            std::vector<Object*> & associatedList = it->second;
+            std::vector<RuntimeObject*> & associatedList = it->second;
             associatedList.erase(std::remove(associatedList.begin(), associatedList.end(), object.get()), associatedList.end());
         }
     }
@@ -88,7 +88,7 @@ public:
     /**
      * Call this when changing name/identifier of an object.
      */
-    void ObjectNameHasChanged(Object * object);
+    void ObjectNameHasChanged(RuntimeObject * object);
 
     /**
      * Return an new ObjInstancesHolder containing the same
@@ -107,8 +107,8 @@ public:
 
 private:
 
-    boost::unordered_map<std::string, ObjList > objectsInstances;
-    boost::unordered_map<std::string, std::vector<Object*> > objectsRawPointersInstances;
+    boost::unordered_map<std::string, RuntimeObjList > objectsInstances;
+    boost::unordered_map<std::string, std::vector<RuntimeObject*> > objectsRawPointersInstances;
 };
 
 #endif // OBJINSTANCESHOLDER_H

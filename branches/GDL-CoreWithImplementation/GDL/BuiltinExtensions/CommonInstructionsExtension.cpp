@@ -95,7 +95,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                     parentContext.EmptyObjectsListNeeded(*it);
                     //We need to duplicate the object lists : The "final" ones will be filled with objects by conditions,
                     //but they will have no incidence on further conditions, as conditions use "normal" ones.
-                    declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+"final;\n";
+                    declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+"final;\n";
                 }
                 for (unsigned int i = 0;i<conditions.size();++i)
                     declarationsCode += "bool condition"+ToString(i)+"IsTrue = false;\n";

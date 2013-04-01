@@ -13,8 +13,10 @@
 #include <boost/bimap/bimap.hpp>
 #undef CreateEvent //Thanks windows.h
 class Object;
+class RuntimeObject;
 class Automatism;
 class ExtensionBase;
+class RuntimeScene;
 namespace gd { class InstructionMetadata;}
 namespace gd { class ExpressionMetadata; }
 namespace gd { class StrExpressionMetadata; }
@@ -24,6 +26,8 @@ class AutomatismsSharedDatas;
 namespace gd { class BaseEvent; }
 typedef void (*DestroyFunPtr)(Object*);
 typedef Object * (*CreateFunPtr)(std::string name);
+typedef void (*DestroyRuntimeObjectFunPtr)(RuntimeObject*);
+typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const Object & object);
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
@@ -86,6 +90,11 @@ public:
      * Return a shared_ptr to a new object.
      */
     boost::shared_ptr<Object> CreateObject(std::string type, std::string name);
+
+    /**
+     * Return a shared_ptr to a new runtime object created from \a object.
+     */
+    boost::shared_ptr<RuntimeObject> CreateRuntimeObject(RuntimeScene & scene, Object & object);
 
     /**
      * Create a new automatism of given type
@@ -272,6 +281,8 @@ private:
     std::vector < boost::shared_ptr<ExtensionBase> > extensionsLoaded;
     std::map < std::string, CreateFunPtr >           creationFunctionTable;
     std::map < std::string, DestroyFunPtr >          destroyFunctionTable;
+    std::map < std::string, CreateRuntimeObjectFunPtr > runtimeObjCreationFunctionTable;
+    std::map < std::string, DestroyRuntimeObjectFunPtr > runtimeObjDestroyFunctionTable;
 
     #if defined(GD_IDE_ONLY)
     static gd::InstructionMetadata badInstructionMetadata;

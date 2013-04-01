@@ -6,7 +6,7 @@
 #include "RuntimeSceneCameraTools.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/Camera.h"
-#include "GDL/Object.h"
+#include "GDL/RuntimeObject.h"
 
 float GD_API GetCameraX(RuntimeScene & scene, const std::string & layer, unsigned int camera)
 {
@@ -91,7 +91,7 @@ void GD_API SetCameraSize( RuntimeScene & scene, const std::string & layer, unsi
     scene.GetLayer(layer).GetCamera(cameraNb).SetSize(sf::Vector2f(width, height));
 }
 
-void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, const std::string &, Object* object, float left, float top, float right, float bottom, bool anticipateObjectMove, const std::string & layer, unsigned int camera)
+void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, const std::string &, RuntimeObject * object, float left, float top, float right, float bottom, bool anticipateObjectMove, const std::string & layer, unsigned int camera)
 {
     if ( object == NULL ) return;
 
@@ -137,7 +137,7 @@ void GD_API CenterCameraOnObjectWithLimits(RuntimeScene & scene, const std::stri
     return;
 }
 
-void GD_API CenterCameraOnObject(RuntimeScene & scene, const std::string &, Object * object,  bool anticipateObjectMove, const std::string & layer, unsigned int camera)
+void GD_API CenterCameraOnObject(RuntimeScene & scene, const std::string &, RuntimeObject * object,  bool anticipateObjectMove, const std::string & layer, unsigned int camera)
 {
     if ( object == NULL ) return;
 

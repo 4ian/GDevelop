@@ -102,11 +102,11 @@ class GD_API DebuggerGUI: public wxPanel, public BaseDebugger
         void OnExtensionListItemActivated(wxListEvent& event);
         void UpdateListCtrlColumnsWidth();
 
-        void RecreateListForObject(const ObjSPtr & object);
+        void RecreateListForObject(const RuntimeObjSPtr & object);
 
 		RuntimeScene & scene;
 
-		map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> > objectsInTree;
+		map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> > objectsInTree;
 		map < string, wxTreeItemId > initialObjects;
 		bool mustRecreateTree;
 

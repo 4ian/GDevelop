@@ -34,6 +34,7 @@ class Automatism;
 class Game;
 class Scene;
 class Object;
+class RuntimeObject;
 class ExtensionBase;
 namespace gd { class BaseEvent; }
 class AutomatismsSharedDatas;
@@ -45,6 +46,8 @@ class EventsCodeGenerator;
 //Declare typedefs for objects creations/destructions functions
 typedef void (*DestroyFunPtr)(Object*);
 typedef Object * (*CreateFunPtr)(std::string name);
+typedef void (*DestroyRuntimeObjectFunPtr)(RuntimeObject*);
+typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const Object & object);
 
 #if defined(GD_IDE_ONLY) //Condition, Action and expressions declare more things at edittime ( Description, icons... )
 
@@ -187,7 +190,7 @@ typedef Object * (*CreateFunPtr)(std::string name);
  * @param Function for creation from another object
  * @param Function for destroying the object
  */
-#define DECLARE_OBJECT(name_, fullname_, informations_, icon24x24_, createFunPtrP, destroyFunPtrP, cppClassName_) { \
+#define DECLARE_OBJECT(name_, fullname_, informations_, icon24x24_, createFunPtrP, destroyFunPtrP, createRuntimeObjectFunPtrP, destroyRuntimeObjectFunPtrP, cppClassName_) { \
             ExtensionObjectInfos objInfos; \
             std::string currentObjectDeclarationName = name_; \
             objInfos.SetFullName(std::string(fullname_.mb_str()));\
@@ -195,6 +198,8 @@ typedef Object * (*CreateFunPtr)(std::string name);
             objInfos.SetBitmapIcon(wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY)); \
             objInfos.createFunPtr = createFunPtrP;\
             objInfos.destroyFunPtr = destroyFunPtrP;\
+            objInfos.createRuntimeObjectFunPtr = createRuntimeObjectFunPtrP;\
+            objInfos.destroyRuntimeObjectFunPtr = destroyRuntimeObjectFunPtrP;\
             objInfos.cppClassName = cppClassName_;
 
 /**
@@ -445,11 +450,13 @@ typedef Object * (*CreateFunPtr)(std::string name);
 #define DECLARE_THE_EXTENSION(name_, fullname_, description_, author_, license_) name = name_; \
                                                                                 SetNameSpace(name_);
 
-#define DECLARE_OBJECT(name_, fullname, informations, icon, createFunPtrP, destroyFunPtrP, cppClassName_) { \
+#define DECLARE_OBJECT(name_, fullname, informations, icon, createFunPtrP, destroyFunPtrP, createRuntimeObjectFunPtrP, destroyRuntimeObjectFunPtrP, cppClassName_) { \
             ExtensionObjectInfos objInfos; \
             std::string currentObjectDeclarationName = name_; \
             objInfos.createFunPtr = createFunPtrP;\
-            objInfos.destroyFunPtr = destroyFunPtrP;
+            objInfos.destroyFunPtr = destroyFunPtrP; \
+            objInfos.createRuntimeObjectFunPtr = createRuntimeObjectFunPtrP;\
+            objInfos.destroyRuntimeObjectFunPtr = destroyRuntimeObjectFunPtrP;\
 
 #define DECLARE_AUTOMATISM(name_, fullname_, defaultName_, description_, group_, smallicon_, className_, sharedDatasClassName_) { \
             AutomatismInfo automatismInfo; \
@@ -564,6 +571,8 @@ public:
 
     DestroyFunPtr destroyFunPtr;
     CreateFunPtr createFunPtr;
+    DestroyRuntimeObjectFunPtr destroyRuntimeObjectFunPtr;
+    CreateRuntimeObjectFunPtr createRuntimeObjectFunPtr;
 };
 
 /**
@@ -628,12 +637,22 @@ public :
     /**
      * Return a function to create the object if the type is handled by the extension
      */
-    CreateFunPtr        GetObjectCreationFunctionPtr(std::string objectType) const;
+    CreateFunPtr GetObjectCreationFunctionPtr(std::string objectType) const;
 
     /**
      * Make sure that the object from an extension is deleted by the same extension.
      */
-    DestroyFunPtr       GetDestroyObjectFunction(std::string objectType) const;
+    DestroyFunPtr GetDestroyObjectFunction(std::string objectType) const;
+
+    /**
+     * Return a function to create the runtime object if the type is handled by the extension
+     */
+    CreateRuntimeObjectFunPtr        GetRuntimeObjectCreationFunctionPtr(std::string objectType) const;
+
+    /**
+     * Make sure that the runtime object from an extension is deleted by the same extension.
+     */
+    DestroyRuntimeObjectFunPtr       GetDestroyRuntimeObjectFunction(std::string objectType) const;
 
     /**
      * Create an automatism
@@ -674,7 +693,7 @@ public :
      *
      * \see ExtensionBase::ObjectDeletedFromScene
      */
-    virtual void ObjectDeletedFromScene(RuntimeScene & scene, Object * objectDeleted) {};
+    virtual void ObjectDeletedFromScene(RuntimeScene & scene, RuntimeObject * objectDeleted) {};
 
     /**
      * Return a vector containing all the object types provided by the extension

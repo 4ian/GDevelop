@@ -96,12 +96,12 @@ double SceneEditorCanvas::GetMouseYOnLayout() const
     return convertCoords(sf::Mouse::getPosition(*this), editionView).y;
 }
 
-boost::shared_ptr<Object> SceneEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const
+boost::shared_ptr<RuntimeObject> SceneEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const
 {
     if ( initialInstancesAndObjectsBimap.left.find(dynamic_cast<gd::InitialInstance*>(&instance)) == initialInstancesAndObjectsBimap.left.end() )
     {
         //std::cout << "ERROR: Object associated to initial instance \""+instance.GetObjectName()+"\" not found!";
-        return boost::shared_ptr<Object> ();
+        return boost::shared_ptr<RuntimeObject> ();
     }
 
     return initialInstancesAndObjectsBimap.left.find(dynamic_cast<gd::InitialInstance*>(&instance))->second;
@@ -109,56 +109,58 @@ boost::shared_ptr<Object> SceneEditorCanvas::GetObjectLinkedToInitialInstance(gd
 
 double SceneEditorCanvas::GetWidthOfInitialInstance(gd::InitialInstance & instance) const
 {
-    boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
-    if ( object ) return object->GetWidth();
+    /*boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
+    if ( object ) return object->GetWidth();*/
 
     return 0;
 }
 
 double SceneEditorCanvas::GetHeightOfInitialInstance(gd::InitialInstance & instance) const
 {
-    boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
-    if ( object ) return object->GetHeight();
+    /*boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
+    if ( object ) return object->GetHeight();*/
 
     return 0;
 }
 
 double SceneEditorCanvas::GetRealXPositionOfInitialInstance(gd::InitialInstance & instance) const
 {
-    boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
-    if ( object ) return object->GetDrawableX();
+    /*boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
+    if ( object ) return object->GetDrawableX();*/
 
     return instance.GetX();
 }
 
 double SceneEditorCanvas::GetRealYPositionOfInitialInstance(gd::InitialInstance & instance) const
 {
-    boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
-    if ( object ) return object->GetDrawableY();
+    /*boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
+    if ( object ) return object->GetDrawableY();*/
 
     return instance.GetY();
 }
 
 void SceneEditorCanvas::OnInitialInstanceMoved(gd::InitialInstance & instance)
 {
-    boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
+    /*boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
     if ( object )
     {
         object->SetX(instance.GetX());
         object->SetY(instance.GetY());
-    }
+    }*/
 }
 
 void SceneEditorCanvas::OnInitialInstanceDeleted(gd::InitialInstance & instance)
 {
+    /*
     previewScene.objectsInstances.RemoveObject(GetObjectLinkedToInitialInstance(instance));
-    initialInstancesAndObjectsBimap.left.erase(dynamic_cast<gd::InitialInstance*>(&instance));
+    initialInstancesAndObjectsBimap.left.erase(dynamic_cast<gd::InitialInstance*>(&instance));*/
 }
 
 void SceneEditorCanvas::OnInitialInstanceAdded(gd::InitialInstance & gdInstance)
 {
     try
     {
+        /*
         gd::InitialInstance & instance = dynamic_cast<gd::InitialInstance &>(gdInstance);
 
         std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
@@ -189,7 +191,7 @@ void SceneEditorCanvas::OnInitialInstanceAdded(gd::InitialInstance & gdInstance)
         initialInstancesAndObjectsBimap.insert(InstanceAndObjectPair(&instance, newObject));
 
         newObject->LoadResources(previewScene, *previewGame.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
-
+*/
     }
     catch(...)
     {
@@ -327,7 +329,7 @@ void SceneEditorCanvas::OnLayerDownSelected(wxCommandEvent & event)
 }
 
 void SceneEditorCanvas::SendSelectionToLayer(const std::string & newLayerName)
-{
+{/*
     for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
     {
         if (it->first == NULL) continue;
@@ -339,7 +341,7 @@ void SceneEditorCanvas::SendSelectionToLayer(const std::string & newLayerName)
 
     ChangesMade();
     for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
-        (*it)->InitialInstancesUpdated();
+        (*it)->InitialInstancesUpdated();*/
 }
 
 void SceneEditorCanvas::OnPropObjSelected(wxCommandEvent & event)

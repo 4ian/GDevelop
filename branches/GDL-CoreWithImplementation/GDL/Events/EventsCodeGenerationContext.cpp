@@ -41,28 +41,28 @@ std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
     {
         if ( alreadyDeclaredObjectsLists.find(*it) == alreadyDeclaredObjectsLists.end() )
         {
-            declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+" = runtimeContext->GetObjectsRawPointers(\""+EventsCodeGenerator::ConvertToCppString(*it)+"\");\n";
+            declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+" = runtimeContext->GetObjectsRawPointers(\""+EventsCodeGenerator::ConvertToCppString(*it)+"\");\n";
             alreadyDeclaredObjectsLists.insert(*it);
         }
         else
         {
             //Could normally be done in one line, but clang sometimes miscompile it.
-            declarationsCode += "std::vector<Object*> & "+ManObjListName(*it)+"T = "+ManObjListName(*it)+";\n";
-            declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+" = "+ManObjListName(*it)+"T;\n";
+            declarationsCode += "std::vector<RuntimeObject*> & "+ManObjListName(*it)+"T = "+ManObjListName(*it)+";\n";
+            declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+" = "+ManObjListName(*it)+"T;\n";
         }
     }
     for ( set<string>::iterator it = emptyObjectsListsToBeDeclared.begin() ; it != emptyObjectsListsToBeDeclared.end(); ++it )
     {
         if ( alreadyDeclaredObjectsLists.find(*it) == alreadyDeclaredObjectsLists.end() )
         {
-            declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+";\n";
+            declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+";\n";
             alreadyDeclaredObjectsLists.insert(*it);
         }
         else
         {
             //Could normally be done in one line, but clang sometimes miscompile it.
-            declarationsCode += "std::vector<Object*> & "+ManObjListName(*it)+"T = "+ManObjListName(*it)+";\n";
-            declarationsCode += "std::vector<Object*> "+ManObjListName(*it)+" = "+ManObjListName(*it)+"T;\n";
+            declarationsCode += "std::vector<RuntimeObject*> & "+ManObjListName(*it)+"T = "+ManObjListName(*it)+";\n";
+            declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+" = "+ManObjListName(*it)+"T;\n";
         }
     }
 

@@ -21,7 +21,9 @@ SpriteExtension::SpriteExtension()
                    "CppPlatform/Extensions/spriteicon.png",
                    &CreateSpriteObject,
                    &DestroySpriteObject,
-                   "SpriteObject");
+                   &CreateRuntimeSpriteObject,
+                   &DestroyRuntimeSpriteObject,
+                   "RuntimeSpriteObject");
         #if defined(GD_IDE_ONLY)
 
         objInfos.SetIncludeFile("GDL/SpriteObject.h");

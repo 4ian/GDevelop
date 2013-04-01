@@ -1,6 +1,7 @@
 #include "GDL/BuiltinExtensions/BaseObjectExtension.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/Object.h"
+#include "GDL/RuntimeObject.h"
 
 BaseObjectExtension::BaseObjectExtension()
 {
@@ -23,6 +24,8 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                    "res/objeticon24.png",
                    &CreateBaseObject,
                    &DestroyBaseObject,
+                   &CreateBaseRuntimeObject,
+                   &DestroyBaseRuntimeObject,
                    "");
 
         #if defined(GD_IDE_ONLY)

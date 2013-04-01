@@ -868,6 +868,8 @@
 		<Unit filename="GDL/RuntimeContext.h" />
 		<Unit filename="GDL/RuntimeGame.cpp" />
 		<Unit filename="GDL/RuntimeGame.h" />
+		<Unit filename="GDL/RuntimeObject.cpp" />
+		<Unit filename="GDL/RuntimeObject.h" />
 		<Unit filename="GDL/RuntimeScene.cpp" />
 		<Unit filename="GDL/RuntimeScene.h" />
 		<Unit filename="GDL/Scene.cpp" />

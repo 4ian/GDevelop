@@ -308,7 +308,7 @@ void EditCppCodeEvent::OnobjectBtClick(wxCommandEvent& event)
 
 void EditCppCodeEvent::UpdateFunctionPrototype()
 {
-    functionPrototypeTxt->SetLabel(std::string("void Function(")+ (sceneRefCheck->GetValue() ? std::string("RuntimeScene & scene") :std::string("")) + ((sceneRefCheck->GetValue()&&objectsListCheck->GetValue()) ? ", ":"")+ (objectsListCheck->GetValue() ? std::string("std::vector<Object*> objectsList") :"") + ")\n{");
+    functionPrototypeTxt->SetLabel(std::string("void Function(")+ (sceneRefCheck->GetValue() ? std::string("RuntimeScene & scene") :std::string("")) + ((sceneRefCheck->GetValue()&&objectsListCheck->GetValue()) ? ", ":"")+ (objectsListCheck->GetValue() ? std::string("std::vector<RuntimeObject*> objectsList") :"") + ")\n{");
 }
 
 void EditCppCodeEvent::OnobjectsListCheckClick(wxCommandEvent& event)

@@ -27,63 +27,64 @@
 #include "GDL/IDE/Dialogs/SpriteObjectEditor.h"
 #endif
 
-sf::Sprite SpriteObject::badSprite;
+sf::Sprite RuntimeSpriteObject::badSprite;
+Animation RuntimeSpriteObject::badAnimation;
 Animation SpriteObject::badAnimation;
-Sprite SpriteObject::badSpriteDatas;
+Sprite RuntimeSpriteObject::badSpriteDatas;
 
 SpriteObject::SpriteObject(std::string name_) :
-Object(name_),
-currentAnimation( 0 ),
-currentDirection( 0 ),
-currentAngle( 0 ),
-currentSprite( 0 ),
-animationStopped(false),
-timeElapsedOnCurrentSprite(0),
-ptrToCurrentSprite( NULL ),
-needUpdateCurrentSprite(true),
-cacheAnimationSizeNeedUpdate(true),
-opacity( 255 ),
-blendMode(0),
-isFlippedX(false),
-isFlippedY(false),
-scaleX( 1 ),
-scaleY( 1 ),
-colorR( 255 ),
-colorV( 255 ),
-colorB( 255 )
+    Object(name_)
 {
 }
 
-bool SpriteObject::LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr )
+SpriteObject::~SpriteObject()
 {
-    for ( unsigned int j = 0; j < GetAnimationCount();j++ )
-    {
-        for ( unsigned int k = 0;k < GetAnimation( j ).GetDirectionsNumber();k++ )
-        {
-            for ( unsigned int l = 0;l < GetAnimation( j ).GetDirection(k).GetSpriteCount();l++ )
-            {
-                Sprite & sprite = GetAnimation( j ).GetDirectionToModify(k).GetSprite(l);
+};
 
-                sprite.LoadImage(imageMgr.GetSFMLTexture(sprite.GetImageName()));
+RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const Object & object) :
+    RuntimeObject(scene, object),
+    currentAnimation( 0 ),
+    currentDirection( 0 ),
+    currentAngle( 0 ),
+    currentSprite( 0 ),
+    animationStopped(false),
+    timeElapsedOnCurrentSprite(0),
+    ptrToCurrentSprite( NULL ),
+    needUpdateCurrentSprite(true),
+    cacheAnimationSizeNeedUpdate(true),
+    opacity( 255 ),
+    blendMode(0),
+    isFlippedX(false),
+    isFlippedY(false),
+    scaleX( 1 ),
+    scaleY( 1 ),
+    colorR( 255 ),
+    colorV( 255 ),
+    colorB( 255 )
+{
+    const SpriteObject & spriteObject = static_cast<const SpriteObject&>(object);
+    animations = spriteObject.GetAllAnimations();
+
+    //Load resources
+    for ( unsigned int j = 0; j < animations.size();j++ )
+    {
+        Animation & anim = animations[j].GetNonConst();
+        for ( unsigned int k = 0;k < anim.GetDirectionsNumber();k++ )
+        {
+            for ( unsigned int l = 0;l < anim.GetDirection(k).GetSpriteCount();l++ )
+            {
+                Sprite & sprite = anim.GetDirectionToModify(k).GetSprite(l);
+
+                sprite.LoadImage(scene.game->imageManager->GetSFMLTexture(sprite.GetImageName()));
             }
         }
     }
-
-    /*std::vector<std::string> shaders;
-//    shaders.push_back("blur.sfx");
-    shaders.push_back("fisheye.sfx");
-    optionalShader = scene.game->shaderManager->GetSFMLShader(shaders);
-    optionalShader->SetCurrentTexture("texture");
-    optionalShader->SetParameter("offset", 0.1f);
-    optionalShader->SetParameter("mouse", 10,10);*/
-
-    return true;
 }
 
 /**
  * Update animation and direction from the inital position
  */
-bool SpriteObject::InitializeFromInitialInstance(const gd::InitialInstance & position)
+bool RuntimeSpriteObject::ExtraInitializationFromInitialInstance(const gd::InitialInstance & position)
 {
     if ( position.floatInfos.find("animation") != position.floatInfos.end() )
         SetCurrentAnimation(position.floatInfos.find("animation")->second);
@@ -94,7 +95,7 @@ bool SpriteObject::InitializeFromInitialInstance(const gd::InitialInstance & pos
 /**
  * Render object at runtime
  */
-bool SpriteObject::Draw( sf::RenderTarget & renderTarget )
+bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
 {
     //Don't draw anything if hidden
     if ( hidden ) return true;
@@ -124,7 +125,7 @@ bool SpriteObject::Draw( sf::RenderTarget & renderTarget )
  */
 bool SpriteObject::DrawEdittime( sf::RenderTarget & renderTarget )
 {
-    renderTarget.draw( GetCurrentSFMLSprite() );
+    //renderTarget.draw( GetCurrentSFMLSprite() );
 
     return true;
 }
@@ -195,7 +196,7 @@ bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance & position,
     return true;
 }
 
-void SpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
+void RuntimeSpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name, string & value) const
 {
     if      ( propertyNb == 0 ) {name = _("Animation");     value = ToString(GetCurrentAnimation());}
     else if ( propertyNb == 1 ) {name = _("Direction");     value = ToString(GetCurrentDirection());}
@@ -209,10 +210,15 @@ void SpriteObject::GetPropertyForDebugger(unsigned int propertyNb, string & name
     else if ( propertyNb == 6 ) {name = _("Y Scale");       value = ToString(GetScaleY());}
 }
 
-bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
+bool RuntimeSpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
 {
     if ( propertyNb == 0 ) { return SetCurrentAnimation(ToInt(newValue)); }
-    else if ( propertyNb == 1 ) {return GetAnimation( currentAnimation ).useMultipleDirections ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue)); }
+    else if ( propertyNb == 1 )
+    {
+        if ( currentAnimation >= GetAnimationCount() ) return false;
+
+        return animations[currentAnimation].Get().useMultipleDirections ? SetDirection(ToInt(newValue)) : SetAngle(ToFloat(newValue));
+    }
     else if ( propertyNb == 2 ) { return SetSprite(ToInt(newValue)); }
     else if ( propertyNb == 3 ) { SetOpacity(ToFloat(newValue)); }
     else if ( propertyNb == 4 ) { SetBlendMode(ToInt(newValue)); }
@@ -222,7 +228,7 @@ bool SpriteObject::ChangeProperty(unsigned int propertyNb, string newValue)
     return true;
 }
 
-unsigned int SpriteObject::GetNumberOfProperties() const
+unsigned int RuntimeSpriteObject::GetNumberOfProperties() const
 {
     return 7;
 }
@@ -231,7 +237,7 @@ unsigned int SpriteObject::GetNumberOfProperties() const
 /**
  * Get the real X position of the sprite
  */
-float SpriteObject::GetDrawableX() const
+float RuntimeSpriteObject::GetDrawableX() const
 {
     //FIXME (The not commented code is correct but not optimal)
     //Bad placement when origine of sf::Sprite is changed ( for automatic Rotation for example )
@@ -242,7 +248,7 @@ float SpriteObject::GetDrawableX() const
 /**
  * Get the real Y position of the sprite
  */
-float SpriteObject::GetDrawableY() const
+float RuntimeSpriteObject::GetDrawableY() const
 {
     //return GetCurrentSFMLSprite().GetPosition().y;
     return Y - GetCurrentSprite().GetOrigine().GetY() + (GetCurrentSFMLSprite().getLocalBounds().height)*(1-std::abs(scaleY))/2;
@@ -251,7 +257,7 @@ float SpriteObject::GetDrawableY() const
 /**
  * Get the width of the current sprite.
  */
-float SpriteObject::GetWidth() const
+float RuntimeSpriteObject::GetWidth() const
 {
     return scaleX > 0 ? GetCurrentSFMLSprite().getLocalBounds().width*scaleX : -GetCurrentSFMLSprite().getLocalBounds().width*scaleX;
 }
@@ -259,12 +265,12 @@ float SpriteObject::GetWidth() const
 /**
  * Get the height of the current sprite.
  */
-float SpriteObject::GetHeight() const
+float RuntimeSpriteObject::GetHeight() const
 {
     return scaleY > 0 ? GetCurrentSFMLSprite().getLocalBounds().height*scaleY : -GetCurrentSFMLSprite().getLocalBounds().height*scaleY;
 }
 
-void SpriteObject::SetWidth(float newWidth)
+void RuntimeSpriteObject::SetWidth(float newWidth)
 {
     if ( newWidth > 0 )
     {
@@ -274,7 +280,7 @@ void SpriteObject::SetWidth(float newWidth)
     }
 }
 
-void SpriteObject::SetHeight(float newHeight)
+void RuntimeSpriteObject::SetHeight(float newHeight)
 {
     if ( newHeight > 0 )
     {
@@ -284,7 +290,7 @@ void SpriteObject::SetHeight(float newHeight)
     }
 }
 
-void SpriteObject::SetOriginalSize()
+void RuntimeSpriteObject::SetOriginalSize()
 {
     scaleX = 1;
     scaleY = 1;
@@ -294,7 +300,7 @@ void SpriteObject::SetOriginalSize()
 /**
  * X center is computed with the current sprite
  */
-float SpriteObject::GetCenterX() const
+float RuntimeSpriteObject::GetCenterX() const
 {
     //Just need to multiply by the scale as it is the center
     return GetCurrentSprite().GetCentre().GetX()*scaleX;
@@ -303,13 +309,13 @@ float SpriteObject::GetCenterX() const
 /**
  * Y center is computed with the current sprite
  */
-float SpriteObject::GetCenterY() const
+float RuntimeSpriteObject::GetCenterY() const
 {
     //Just need to multiply by the scale as it is the center
     return GetCurrentSprite().GetCentre().GetY()*scaleY;
 }
 
-float SpriteObject::GetPointX(const std::string & point) const
+float RuntimeSpriteObject::GetPointX(const std::string & point) const
 {
     if ( !point.empty() )
     {
@@ -320,7 +326,7 @@ float SpriteObject::GetPointX(const std::string & point) const
     return GetX();
 }
 
-float SpriteObject::GetPointY(const std::string & point) const
+float RuntimeSpriteObject::GetPointY(const std::string & point) const
 {
     if ( !point.empty() )
     {
@@ -331,7 +337,7 @@ float SpriteObject::GetPointY(const std::string & point) const
     return GetY();
 }
 
-void SpriteObject::ChangeScale(double newScale, const std::string & operatorStr)
+void RuntimeSpriteObject::ChangeScale(double newScale, const std::string & operatorStr)
 {
     if ( operatorStr == "=" )
     {
@@ -362,7 +368,7 @@ void SpriteObject::ChangeScale(double newScale, const std::string & operatorStr)
     return;
 }
 
-void SpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const std::string & imageName, float xPosition, float yPosition, bool useTransparency)
+void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const std::string & imageName, float xPosition, float yPosition, bool useTransparency)
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
@@ -378,7 +384,7 @@ void SpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, const s
     dest->texture.loadFromImage(dest->image);
 }
 
-void SpriteObject::MakeColorTransparent( const std::string & colorStr )
+void RuntimeSpriteObject::MakeColorTransparent( const std::string & colorStr )
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
@@ -394,7 +400,7 @@ void SpriteObject::MakeColorTransparent( const std::string & colorStr )
     dest->texture.loadFromImage(dest->image);
 }
 
-void SpriteObject::SetColor(const std::string & colorStr)
+void RuntimeSpriteObject::SetColor(const std::string & colorStr)
 {
     vector < string > colors = SplitString<string>(colorStr, ';');
 
@@ -405,7 +411,7 @@ void SpriteObject::SetColor(const std::string & colorStr)
                ToInt(colors[2]) );
 }
 
-void SpriteObject::TurnTowardPosition(float Xposition, float Yposition)
+void RuntimeSpriteObject::TurnTowardPosition(float Xposition, float Yposition)
 {
 	//Work around for a Visual C++ internal compiler error (!)
 	double y = Yposition - (GetDrawableY()+GetCenterY());
@@ -419,9 +425,9 @@ void SpriteObject::TurnTowardPosition(float Xposition, float Yposition)
 /**
  * Prepare the current sprite
  */
-void SpriteObject::UpdateCurrentSprite() const
+void RuntimeSpriteObject::UpdateCurrentSprite() const
 {
-    if ( currentAnimation >= GetAnimationCount() )
+    if ( currentAnimation >= animations.size() )
         ptrToCurrentSprite = &badSpriteDatas;
     else
     {
@@ -466,13 +472,13 @@ void SpriteObject::UpdateCurrentSprite() const
 /**
  * Update the time elpased on the current sprite, and change this latter if needed.
  */
-void SpriteObject::UpdateTime(float elapsedTime)
+void RuntimeSpriteObject::UpdateTime(float elapsedTime)
 {
-    if ( animationStopped ) return;
+    if ( animationStopped || currentAnimation >= GetAnimationCount() ) return;
 
     timeElapsedOnCurrentSprite += elapsedTime;
 
-    const Direction & direction = GetAnimation(currentAnimation).GetDirection( currentDirection );
+    const Direction & direction = animations[currentAnimation].Get().GetDirection( currentDirection );
 
     float delay = direction.GetTimeBetweenFrames();
 
@@ -500,7 +506,7 @@ void SpriteObject::UpdateTime(float elapsedTime)
 /**
  * Get the SFML sprite
  */
-const sf::Sprite & SpriteObject::GetCurrentSFMLSprite() const
+const sf::Sprite & RuntimeSpriteObject::GetCurrentSFMLSprite() const
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
@@ -510,7 +516,7 @@ const sf::Sprite & SpriteObject::GetCurrentSFMLSprite() const
 /**
  * Get the ( Game Develop ) sprite
  */
-const Sprite & SpriteObject::GetCurrentSprite() const
+const Sprite & RuntimeSpriteObject::GetCurrentSprite() const
 {
     if ( needUpdateCurrentSprite ) UpdateCurrentSprite();
 
@@ -520,9 +526,9 @@ const Sprite & SpriteObject::GetCurrentSprite() const
 /**
  * Get object hit box(es)
  */
-std::vector<Polygon2d> SpriteObject::GetHitBoxes() const
+std::vector<Polygon2d> RuntimeSpriteObject::GetHitBoxes() const
 {
-    if ( currentAnimation >= GetAnimationCount() )
+    if ( currentAnimation >= animations.size() )
     {
         std::vector<Polygon2d> hitboxes; //Invalid animation, bail out.
         return hitboxes;
@@ -547,11 +553,11 @@ std::vector<Polygon2d> SpriteObject::GetHitBoxes() const
 /**
  * Change the number of the current sprite
  */
-bool SpriteObject::SetSprite( unsigned int nb )
+bool RuntimeSpriteObject::SetSprite( unsigned int nb )
 {
     if ( currentAnimation >= GetAnimationCount() ||
-        currentDirection >= GetAnimation( currentAnimation ).GetDirectionsNumber() ||
-        nb >= GetAnimation( currentAnimation ).GetDirection( currentDirection ).GetSpriteCount() ) return false;
+        currentDirection >= animations[currentAnimation].Get().GetDirectionsNumber() ||
+        nb >= animations[currentAnimation].Get().GetDirection( currentDirection ).GetSpriteCount() ) return false;
 
     currentSprite = nb;
     timeElapsedOnCurrentSprite = 0;
@@ -563,7 +569,7 @@ bool SpriteObject::SetSprite( unsigned int nb )
 /**
  * Change the number of the current animation
  */
-bool SpriteObject::SetCurrentAnimation( unsigned int nb )
+bool RuntimeSpriteObject::SetCurrentAnimation( unsigned int nb )
 {
     if ( nb >= GetAnimationCount() ) return false;
 
@@ -581,11 +587,11 @@ bool SpriteObject::SetCurrentAnimation( unsigned int nb )
  * Change the value of the current direction.
  * If Sprite is using a direction which use angle, the function behave as SetAngle.
  */
-bool SpriteObject::SetDirection( float nb )
+bool RuntimeSpriteObject::SetDirection( float nb )
 {
     if ( currentAnimation >= GetAnimationCount() ) return false;
 
-    if ( !GetAnimation( currentAnimation ).useMultipleDirections )
+    if ( !animations[currentAnimation].Get().useMultipleDirections )
     {
         currentAngle = nb;
 
@@ -594,8 +600,8 @@ bool SpriteObject::SetDirection( float nb )
     }
     else
     {
-        if ( nb >= GetAnimation( currentAnimation ).GetDirectionsNumber() ||
-            GetAnimation( currentAnimation ).GetDirection( nb ).HasNoSprites() ) return false;
+        if ( nb >= animations[currentAnimation].Get().GetDirectionsNumber() ||
+            animations[currentAnimation].Get().GetDirection( nb ).HasNoSprites() ) return false;
 
         if ( nb == currentDirection ) return true;
 
@@ -612,11 +618,11 @@ bool SpriteObject::SetDirection( float nb )
  * Set the angle of a sprite object, which corresponds to its direction.
  * If Sprite is using a direction which do not use angle, the direction is deduced from the angle.
  */
-bool SpriteObject::SetAngle(float newAngle)
+bool RuntimeSpriteObject::SetAngle(float newAngle)
 {
     if ( currentAnimation >= GetAnimationCount() ) return false;
 
-    if ( !GetAnimation( currentAnimation ).useMultipleDirections )
+    if ( !animations[currentAnimation].Get().useMultipleDirections )
     {
         currentAngle = newAngle;
 
@@ -636,19 +642,19 @@ bool SpriteObject::SetAngle(float newAngle)
 /**
  * Get the angle of a sprite object, which corresponds to its direction.
  */
-float SpriteObject::GetAngle() const
+float RuntimeSpriteObject::GetAngle() const
 {
-    if ( !GetAnimation( currentAnimation ).useMultipleDirections )
+    if ( !animations[currentAnimation].Get().useMultipleDirections )
         return currentAngle;
     else
         return currentDirection*45;
 }
 
-float SpriteObject::GetCurrentDirectionOrAngle() const
+float RuntimeSpriteObject::GetCurrentDirectionOrAngle() const
 {
     if ( currentAnimation >= GetAnimationCount() ) return 0;
 
-    if ( GetAnimation( currentAnimation ).useMultipleDirections )
+    if ( animations[currentAnimation].Get().useMultipleDirections )
         return GetCurrentDirection();
     else
         return GetAngle();
@@ -660,7 +666,6 @@ float SpriteObject::GetCurrentDirectionOrAngle() const
 void SpriteObject::AddAnimation(const Animation & animation)
 {
     animations.push_back(AnimationProxy(animation));
-    cacheAnimationSizeNeedUpdate = true;
 }
 
 /**
@@ -671,8 +676,6 @@ bool SpriteObject::RemoveAnimation(unsigned int nb)
     if ( nb >= GetAnimationCount() )
         return false;
 
-    cacheAnimationSizeNeedUpdate = true;
-    needUpdateCurrentSprite = true;
     animations.erase( animations.begin() + nb );
     return true;
 }
@@ -680,7 +683,7 @@ bool SpriteObject::RemoveAnimation(unsigned int nb)
 /**
  * Return the number of animations the object has.
  */
-unsigned int SpriteObject::GetAnimationCount() const
+unsigned int RuntimeSpriteObject::GetAnimationCount() const
 {
     if ( cacheAnimationSizeNeedUpdate )
     {
@@ -691,16 +694,18 @@ unsigned int SpriteObject::GetAnimationCount() const
     return cacheAnimationsSize;
 }
 
-bool SpriteObject::AnimationEnded() const
+bool RuntimeSpriteObject::AnimationEnded() const
 {
-    const Direction & direction = GetAnimation( currentAnimation ).GetDirection( currentDirection );
+    if (currentAnimation >= GetAnimationCount()) return true;
+
+    const Direction & direction = animations[currentAnimation].Get().GetDirection( currentDirection );
     return ( !direction.IsLooping() && currentSprite == direction.GetSpriteCount()-1 );
 }
 
 /**
  * Change the opacity of the object
  */
-void SpriteObject::SetOpacity( float val )
+void RuntimeSpriteObject::SetOpacity( float val )
 {
     if ( val > 255 )
         val = 255;
@@ -714,7 +719,7 @@ void SpriteObject::SetOpacity( float val )
 /**
  * Change the color filter of the sprite object
  */
-void SpriteObject::SetColor( unsigned int r, unsigned int v, unsigned int b )
+void RuntimeSpriteObject::SetColor( unsigned int r, unsigned int v, unsigned int b )
 {
     colorR = r;
     colorV = v;
@@ -722,18 +727,18 @@ void SpriteObject::SetColor( unsigned int r, unsigned int v, unsigned int b )
     needUpdateCurrentSprite = true;
 }
 
-void SpriteObject::FlipX(bool flip)
+void RuntimeSpriteObject::FlipX(bool flip)
 {
     if ( flip != isFlippedX ) scaleX *= -1;
     isFlippedX = flip;
 };
-void SpriteObject::FlipY(bool flip)
+void RuntimeSpriteObject::FlipY(bool flip)
 {
     if ( flip != isFlippedY ) scaleY *= -1;
     isFlippedY = flip;
 };
 
-bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
+bool RuntimeSpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
 {
     for (unsigned int cameraIndex = 0;cameraIndex < scene.GetLayer(layer).GetCameraCount();++cameraIndex)
     {
@@ -755,7 +760,7 @@ bool SpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
     return false;
 }
 
-void SpriteObject::TurnTowardObject( const std::string &, Object * object )
+void RuntimeSpriteObject::TurnTowardObject( const std::string &, RuntimeObject * object )
 {
     if (object == NULL) return;
 
@@ -827,25 +832,25 @@ void SpriteObject::SaveToXml(TiXmlElement * objet)
 }
 #endif
 
-SpriteObject::AnimationProxy::AnimationProxy() :
+AnimationProxy::AnimationProxy() :
     animation(new Animation)
 {
 }
-SpriteObject::AnimationProxy::~AnimationProxy()
+AnimationProxy::~AnimationProxy()
 {
     delete animation;
 }
 
-SpriteObject::AnimationProxy::AnimationProxy(const Animation & animation_) :
+AnimationProxy::AnimationProxy(const Animation & animation_) :
     animation(new Animation(animation_))
 {
 }
 
-SpriteObject::AnimationProxy::AnimationProxy(const SpriteObject::AnimationProxy & proxy) :
+AnimationProxy::AnimationProxy(const AnimationProxy & proxy) :
     animation(new Animation(proxy.Get()))
 {
 }
-SpriteObject::AnimationProxy & SpriteObject::AnimationProxy::operator=(const AnimationProxy & rhs)
+AnimationProxy & AnimationProxy::operator=(const AnimationProxy & rhs)
 {
     *animation = Animation(rhs.Get());
 
@@ -871,3 +876,13 @@ Object * CreateSpriteObject(std::string name)
     return new SpriteObject(name);
 }
 
+
+void DestroyRuntimeSpriteObject(RuntimeObject * object)
+{
+    delete object;
+}
+
+RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const Object & object)
+{
+    return new RuntimeSpriteObject(scene, object);
+}

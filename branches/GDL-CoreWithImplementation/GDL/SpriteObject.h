@@ -7,6 +7,7 @@
 #define SPRITEOBJECT_H
 
 #include "GDL/Object.h"
+#include "GDL/RuntimeObject.h"
 class Animation;
 class Sprite;
 class ImageManager;
@@ -26,6 +27,27 @@ namespace gd { class MainFrameWrapper; }
 #endif
 
 /**
+ * \brief Wrapper around a pointer to Animation. Used to reduce compile time.
+ * Animation proxy is used to avoid including Animation.h/Direction.h/Sprite.h and SFML headers
+ */
+class GD_API AnimationProxy
+{
+public:
+    AnimationProxy();
+    AnimationProxy(const Animation & animation);
+    virtual ~AnimationProxy();
+    AnimationProxy(const AnimationProxy & proxy);
+    AnimationProxy & operator=(const AnimationProxy & rhs);
+
+    Animation & Get() {return *animation; }
+    const Animation & Get() const {return *animation; }
+    Animation & GetNonConst() {return *animation; }
+
+private:
+    Animation * animation;
+};
+
+/**
  * \brief Internal built-in Sprite object.
  *
  * Sprite object is an object composed of animations, containing directions with images.
@@ -40,13 +62,8 @@ class GD_API SpriteObject : public Object
 public :
 
     SpriteObject(std::string name_);
-    virtual ~SpriteObject() {};
+    virtual ~SpriteObject();
     virtual Object * Clone() const { return new SpriteObject(*this);}
-
-    virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-    virtual bool InitializeFromInitialInstance(const gd::InitialInstance & position);
-
-    virtual bool Draw(sf::RenderTarget & renderTarget);
 
     #if defined(GD_IDE_ONLY)
     virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
@@ -58,15 +75,51 @@ public :
     virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, Game & game, Scene & scene);
 
     virtual bool SupportShaders() { return true; }
-
-    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
-    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
-    virtual unsigned int GetNumberOfProperties() const;
     #endif
 
     virtual void LoadFromXml(const TiXmlElement * elemScene);
     #if defined(GD_IDE_ONLY)
     virtual void SaveToXml(TiXmlElement * elemScene);
+    #endif
+
+    /** \name Animations
+     * Methods related to animations management
+     */
+    ///@{
+    inline const Animation & GetAnimation(unsigned int nb) const { if ( nb >= GetAnimationCount() ) return badAnimation; else return animations[nb].Get(); }
+    inline Animation & GetAnimation(unsigned int nb) { if ( nb >= GetAnimationCount() ) return badAnimation; else return animations[nb].Get(); }
+    unsigned int GetAnimationCount() const {return animations.size();};
+    void AddAnimation(const Animation & animation);
+    bool RemoveAnimation(unsigned int nb);
+    inline void RemoveAllAnimation() { animations.clear(); }
+    inline bool HasNoAnimations() { return animations.empty(); }
+    inline const std::vector < AnimationProxy > & GetAllAnimations() const { return animations; }
+    ///@}
+
+private:
+
+    mutable std::vector < AnimationProxy > animations;
+
+    //Null objects if need to return a bad object.
+    static Animation    badAnimation;
+};
+
+class GD_API RuntimeSpriteObject : public RuntimeObject
+{
+public :
+
+    RuntimeSpriteObject(RuntimeScene & scene, const Object & object);
+    virtual ~RuntimeSpriteObject() {};
+    virtual RuntimeObject * Clone() const { return new RuntimeSpriteObject(*this);}
+
+    virtual bool ExtraInitializationFromInitialInstance(const gd::InitialInstance & position);
+
+    virtual bool Draw(sf::RenderTarget & renderTarget);
+
+    #if defined(GD_IDE_ONLY)
+    virtual void GetPropertyForDebugger (unsigned int propertyNb, std::string & name, std::string & value) const;
+    virtual bool ChangeProperty(unsigned int propertyNb, std::string newValue);
+    virtual unsigned int GetNumberOfProperties() const;
     #endif
 
     virtual void UpdateTime(float timeElapsed);
@@ -100,22 +153,10 @@ public :
     void PlayAnimation() { animationStopped = false; };
     bool IsAnimationStopped() const { return animationStopped; }
     bool AnimationEnded() const;
+    unsigned int GetAnimationCount() const;
 
     inline unsigned int GetCurrentAnimation() const { return currentAnimation; }
     bool SetCurrentAnimation(unsigned int nb);
-    ///@}
-
-    /** \name Animations
-     * Methods related to animations management
-     */
-    ///@{
-    inline const Animation & GetAnimation(unsigned int nb) const { if ( nb >= GetAnimationCount() ) return badAnimation; else return animations[nb].Get(); }
-    inline Animation & GetAnimation(unsigned int nb) { if ( nb >= GetAnimationCount() ) return badAnimation; else return animations[nb].Get(); }
-    unsigned int GetAnimationCount() const;
-    void AddAnimation(const Animation & animation);
-    bool RemoveAnimation(unsigned int nb);
-    inline void RemoveAllAnimation() { animations.clear(); cacheAnimationSizeNeedUpdate = true;}
-    inline bool HasNoAnimations() { return animations.empty(); }
     ///@}
 
     bool CursorOnObject( RuntimeScene & scene, bool accurate );
@@ -158,7 +199,7 @@ public :
     bool IsFlippedY() const { return isFlippedY; };
 
     void TurnTowardPosition(float Xposition, float Yposition);
-    void TurnTowardObject( const std::string &, Object * object );
+    void TurnTowardObject( const std::string &, RuntimeObject * object );
 
     /**
      * Only used internally by GD events generated code: Prefer using (Get/Set)Scale(X/Y).
@@ -186,26 +227,6 @@ private:
     mutable Sprite * ptrToCurrentSprite; //Ptr to the current sprite
     mutable bool needUpdateCurrentSprite;
 
-    /**
-     * \brief Wrapper around a pointer to Animation. Used to reduce compile time.
-     * Animation proxy is used to avoid including Animation.h/Direction.h/Sprite.h and SFML headers
-     */
-    class AnimationProxy
-    {
-    public:
-        AnimationProxy();
-        AnimationProxy(const Animation & animation);
-        virtual ~AnimationProxy();
-        AnimationProxy(const AnimationProxy & proxy);
-        AnimationProxy & operator=(const AnimationProxy & rhs);
-
-        Animation & Get() {return *animation; }
-        const Animation & Get() const {return *animation; }
-        Animation & GetNonConst() {return *animation; }
-
-    private:
-        Animation * animation;
-    };
     mutable std::vector < AnimationProxy > animations;
     mutable unsigned int cacheAnimationsSize;
     mutable bool cacheAnimationSizeNeedUpdate;
@@ -229,8 +250,11 @@ private:
     static Animation    badAnimation;
 };
 
+
 GD_API void DestroySpriteObject(Object * object);
 GD_API Object * CreateSpriteObject(std::string name);
+GD_API void DestroyRuntimeSpriteObject(RuntimeObject * object);
+GD_API RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const Object & object);
 
 #endif // SPRITEOBJECT_H
 

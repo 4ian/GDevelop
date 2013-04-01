@@ -8,7 +8,8 @@
 #include "GDL/BuiltinExtensions/RuntimeSceneTools.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
-#include "GDL/Object.h"
+#include "GDL/RuntimeObject.h"
+#include "GDL/ExtensionsManager.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/profile.h"
@@ -66,7 +67,7 @@ bool GD_API SceneJustBegins(RuntimeScene & scene )
 
 void GD_API MoveObjects( RuntimeScene & scene )
 {
-    ObjList allObjects = scene.objectsInstances.GetAllObjects();
+    RuntimeObjList allObjects = scene.objectsInstances.GetAllObjects();
 
     for (unsigned int id = 0;id < allObjects.size();++id)
     {
@@ -79,25 +80,24 @@ void GD_API MoveObjects( RuntimeScene & scene )
     return;
 }
 
-void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int useless, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
+void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int useless, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
 {
     std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
     std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->GetGlobalObjects().begin(), scene.game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
-    ObjSPtr newObject = boost::shared_ptr<Object> ();
+    RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
     if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
-        newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
+        newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **sceneObject);
     else if ( globalObject != scene.game->GetGlobalObjects().end() ) //Then the global object list
-        newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
-    else
-        return;
+        newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **globalObject);
 
-    //Ajout à la liste d'objet et configuration de sa position
+    if ( newObject == boost::shared_ptr<RuntimeObject> () )
+        return; //Unable to create the object
+
+    //Set up the object
     newObject->SetX( positionX );
     newObject->SetY( positionY );
-    newObject->LoadRuntimeResources(scene, *scene.game->imageManager);
-
     newObject->SetLayer( layer );
 
     //Add object to scene and let it be concerned by futures actions
@@ -106,20 +106,20 @@ void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std
         pickedObjectLists[objectWanted]->push_back( newObject.get() );
 }
 
-void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, const std::string &, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
+void GD_API CreateObjectFromGroupOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, const std::string &, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
 {
     if ( pickedObjectLists[objectWanted] == NULL ) return; //Bail out if the object is not present in the specified group
 
     CreateObjectOnScene(scene, pickedObjectLists, 0, objectWanted, positionX, positionY, layer);
 }
 
-bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int, const std::string &)
+bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int, const std::string &)
 {
-    for (std::map <std::string, std::vector<Object*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
         if ( it->second != NULL )
         {
-            std::vector<Object*> objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(it->first);
+            std::vector<RuntimeObject*> objectsOnScene = scene.objectsInstances.GetObjectsRawPointers(it->first);
 
             for (unsigned int j = 0;j<objectsOnScene.size();++j)
             {
@@ -132,11 +132,11 @@ bool GD_API PickAllObjects(RuntimeScene & scene, std::map <std::string, std::vec
     return true;
 }
 
-bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<Object*> *> pickedObjectLists, int useless, const std::string & objectName)
+bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int useless, const std::string & objectName)
 {
     //Create a list with all objects
-    std::vector<Object*> allObjects;
-    for (std::map <std::string, std::vector<Object*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+    std::vector<RuntimeObject*> allObjects;
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
     {
         if ( it->second != NULL )
             std::copy(it->second->begin(), it->second->end(), std::back_inserter(allObjects));
@@ -145,9 +145,9 @@ bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::v
     if ( !allObjects.empty() )
     {
         unsigned int id = GDpriv::CommonInstructions::Random(allObjects.size()-1);
-        Object * theChosenOne = allObjects[id];
+        RuntimeObject * theChosenOne = allObjects[id];
 
-        for (std::map <std::string, std::vector<Object*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::iterator it = pickedObjectLists.begin();it!=pickedObjectLists.end();++it)
         {
             if ( it->second != NULL ) it->second->clear();
         }

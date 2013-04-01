@@ -377,10 +377,10 @@ void DebuggerGUI::UpdateGUI()
     }
 
     //Ajout des objets
-    ObjList allObjects = scene.objectsInstances.GetAllObjects();
+    RuntimeObjList allObjects = scene.objectsInstances.GetAllObjects();
     for(unsigned int i = 0;i<allObjects.size();++i)
     {
-        boost::weak_ptr<Object> weakPtrToObject = allObjects[i];
+        boost::weak_ptr<RuntimeObject> weakPtrToObject = allObjects[i];
 
         //L'objet n'est pas dans l'arbre : on l'ajoute
         if ( objectsInTree.find(weakPtrToObject) == objectsInTree.end() )
@@ -404,8 +404,8 @@ void DebuggerGUI::UpdateGUI()
     }
 
     //Suppression des élements en trop
-    map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
-    map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
+    map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::iterator objectsInTreeIter = objectsInTree.begin();
+    map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::const_iterator objectsInTreeEnd = objectsInTree.end();
 
     while(objectsInTreeIter != objectsInTreeEnd)
     {
@@ -423,9 +423,9 @@ void DebuggerGUI::UpdateGUI()
     if ( !objectsTree->GetSelection().IsOk() )
         return;
 
-    ObjSPtr object = boost::shared_ptr<Object>();
-    map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    RuntimeObjSPtr object = boost::shared_ptr<RuntimeObject>();
+    map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
         if ( i->second.second == objectsTree->GetSelection() && !i->first.expired())
         {
@@ -434,7 +434,7 @@ void DebuggerGUI::UpdateGUI()
         }
     }
 
-    if ( object == boost::shared_ptr<Object>() )
+    if ( object == boost::shared_ptr<RuntimeObject>() )
         return;
 
     objectName->SetLabel(object->GetName());
@@ -447,9 +447,9 @@ void DebuggerGUI::UpdateGUI()
     unsigned int currentLine = 1; //We start a the second line, after "General"
 
     //Properties of base object
-    for (unsigned int i = 0;i<object->Object::GetNumberOfProperties();++i)
+    for (unsigned int i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
     {
-        object->Object::GetPropertyForDebugger(i, uselessName, value);
+        object->RuntimeObject::GetPropertyForDebugger(i, uselessName, value);
         objectList->SetItem(currentLine, 1, value);
 
         currentLine++;
@@ -490,7 +490,7 @@ void DebuggerGUI::UpdateGUI()
 /**
  * Create the list of properties for an object
  */
-void DebuggerGUI::RecreateListForObject(const ObjSPtr & object)
+void DebuggerGUI::RecreateListForObject(const RuntimeObjSPtr & object)
 {
     objectList->DeleteAllItems();
     unsigned int currentLine = 0;
@@ -501,9 +501,9 @@ void DebuggerGUI::RecreateListForObject(const ObjSPtr & object)
     currentLine++;
 
     //Create base properties.
-    for (unsigned int i = 0;i<object->Object::GetNumberOfProperties();++i)
+    for (unsigned int i = 0;i<object->RuntimeObject::GetNumberOfProperties();++i)
     {
-        object->Object::GetPropertyForDebugger(i, name, uselessValue);
+        object->RuntimeObject::GetPropertyForDebugger(i, name, uselessValue);
         objectList->InsertItem(currentLine, name);
 
         currentLine++;
@@ -548,9 +548,9 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
         return;
 
     //Obtain the shared_ptr to the object
-    ObjSPtr object = boost::shared_ptr<Object>();
-    map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    RuntimeObjSPtr object = boost::shared_ptr<RuntimeObject>();
+    map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
         if ( i->second.second == objectsTree->GetSelection() && !i->first.expired())
         {
@@ -559,28 +559,28 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
         }
     }
 
-    if ( object == boost::shared_ptr<Object>() )
+    if ( object == boost::shared_ptr<RuntimeObject>() )
         return;
 
     //Check if we are trying to modify a "general" property
-    if ( event.GetIndex() < 1+object->Object::GetNumberOfProperties()) //1+ for include the "General"
+    if ( event.GetIndex() < 1+object->RuntimeObject::GetNumberOfProperties()) //1+ for include the "General"
     {
         int propNb = event.GetIndex()-1;
 
         string uselessName, oldValue;
-        object->Object::GetPropertyForDebugger(propNb, uselessName, oldValue);
+        object->RuntimeObject::GetPropertyForDebugger(propNb, uselessName, oldValue);
         string newValue = string(wxGetTextFromUser(_("Enter the new value"), _("Editing a value"), oldValue).mb_str());
 
-        if ( !object->Object::ChangeProperty(propNb, newValue) )
+        if ( !object->RuntimeObject::ChangeProperty(propNb, newValue) )
         {
             wxLogWarning(_("Unable to modify the value.\nThe value entered is either incorrect or the property is read-only."));
         }
     }
     //A specific property
-    else if ( event.GetIndex() < 1+object->Object::GetNumberOfProperties()
+    else if ( event.GetIndex() < 1+object->RuntimeObject::GetNumberOfProperties()
                                 +2+object->GetNumberOfProperties()) //+2 for include the "Specific"
     {
-        int propNb = event.GetIndex()-1-2-object->Object::GetNumberOfProperties();
+        int propNb = event.GetIndex()-1-2-object->RuntimeObject::GetNumberOfProperties();
 
         string uselessName, oldValue;
         object->GetPropertyForDebugger(propNb, uselessName, oldValue);
@@ -594,7 +594,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     else //Or a variable
     {
         const vector < gd::Variable > objectVariables = object->GetVariables().GetVariablesVector();
-        int idVariable = event.GetIndex() - ( 1+object->Object::GetNumberOfProperties()
+        int idVariable = event.GetIndex() - ( 1+object->RuntimeObject::GetNumberOfProperties()
                                               +2+object->GetNumberOfProperties()
                                               +2);
 
@@ -675,9 +675,9 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
         return;
 
     //Obtain the shared_ptr to the object
-    ObjSPtr object = boost::shared_ptr<Object>();
-    map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
-    for (map < boost::weak_ptr<Object>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
+    RuntimeObjSPtr object = boost::shared_ptr<RuntimeObject>();
+    map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::const_iterator end = objectsInTree.end();
+    for (map < boost::weak_ptr<RuntimeObject>, pair<string, wxTreeItemId> >::iterator i = objectsInTree.begin();i != end;++i)
     {
         if ( i->second.second == objectsTree->GetSelection() && !i->first.expired())
         {
@@ -686,10 +686,7 @@ void DebuggerGUI::OndeleteBtClick(wxCommandEvent& event)
         }
     }
 
-    if ( object == boost::shared_ptr<Object>() )
-        return;
-
-    object->SetName(""); //Simply set the name to nothing to let the object be deleted
+    if ( object != boost::shared_ptr<RuntimeObject>() ) object->DeleteFromScene(scene);
 }
 
 /**
@@ -739,14 +736,15 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
     std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->GetGlobalObjects().begin(), scene.game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
-    ObjSPtr newObject = boost::shared_ptr<Object> ();
+    RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
     //Creation of the object
-    if ( sceneObject != scene.GetInitialObjects().end() )
-        newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
-    else if ( globalObject != scene.game->GetGlobalObjects().end() )
-        newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
-    else
+    if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
+        newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **sceneObject);
+    else if ( globalObject != scene.game->GetGlobalObjects().end() ) //Then the global object list
+        newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **globalObject);
+
+    if ( newObject == boost::shared_ptr<RuntimeObject> () )
     {
         wxLogWarning(_("Unable to create object."));
         return;
@@ -760,8 +758,6 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     gd::ChooseLayerDialog layerDialog(this, scene, false);
     layerDialog.ShowModal();
     newObject->SetLayer( layerDialog.GetChosenLayer() );
-
-    newObject->LoadRuntimeResources(scene, *scene.game->imageManager);
 
     scene.objectsInstances.AddObject(newObject);
 

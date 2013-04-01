@@ -230,6 +230,23 @@ DestroyFunPtr ExtensionBase::GetDestroyObjectFunction(std::string objectType) co
     return NULL;
 }
 
+CreateRuntimeObjectFunPtr ExtensionBase::GetRuntimeObjectCreationFunctionPtr(std::string objectType) const
+{
+    if ( objectsInfos.find(objectType) != objectsInfos.end())
+        return objectsInfos.find(objectType)->second.createRuntimeObjectFunPtr;
+
+    return NULL;
+}
+
+DestroyRuntimeObjectFunPtr ExtensionBase::GetDestroyRuntimeObjectFunction(std::string objectType) const
+{
+    if ( objectsInfos.find(objectType) != objectsInfos.end())
+        return objectsInfos.find(objectType)->second.destroyRuntimeObjectFunPtr;
+
+    return NULL;
+}
+
+
 #if defined(GD_IDE_ONLY)
 gd::BaseEventSPtr ExtensionBase::CreateEvent(std::string eventType) const
 {

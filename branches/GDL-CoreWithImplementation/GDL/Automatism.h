@@ -5,7 +5,7 @@
 #ifndef AUTOMATISM_H
 #define AUTOMATISM_H
 #include <string>
-class Object;
+class RuntimeObject;
 class RuntimeScene;
 class Scene;
 class TiXmlElement;
@@ -50,7 +50,7 @@ public:
     /**
      * Set the object owning this automatism
      */
-    void SetOwner(Object* owner_) { object = owner_; OnOwnerChanged(); };
+    void SetOwner(RuntimeObject* owner_) { object = owner_; OnOwnerChanged(); };
 
     /**
      * Called at each frame before events. Call DoStepPreEvents.
@@ -124,7 +124,7 @@ protected:
      */
     virtual void OnOwnerChanged() {};
 
-    Object* object; ///< Object owning the automatism
+    RuntimeObject* object; ///< Object owning the automatism
     bool activated; ///< True if automatism is running
 
     std::string name; ///< Name of the automatism

@@ -13,13 +13,13 @@
 
 using namespace std;
 
-bool GD_API SpriteTurnedToward( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, float tolerance, bool conditionInverted )
+bool GD_API SpriteTurnedToward( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, float tolerance, bool conditionInverted )
 {
     const bool sameObjectLists = firstObjName == secondObjName;
     bool isTrue = false;
 
-    vector<Object*> objects1;
-    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
+    vector<RuntimeObject*> objects1;
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -29,12 +29,12 @@ bool GD_API SpriteTurnedToward( const std::string & firstObjName, const std::str
         }
     }
 
-    vector<Object*> objects2;
+    vector<RuntimeObject*> objects2;
     if (sameObjectLists)
         objects2 = objects1;
     else
     {
-        for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
         {
             if ( it->second != NULL )
             {
@@ -55,7 +55,7 @@ bool GD_API SpriteTurnedToward( const std::string & firstObjName, const std::str
             float Y = ( objects2[j]->GetDrawableY() + objects2[j]->GetCenterY() ) - ( objects1[i]->GetDrawableY() + objects1[i]->GetCenterY() );
             float angle = atan2(Y,X)*180/3.14159;
 
-            float objectAngle = static_cast<SpriteObject*>(objects1[i])->GetAngle();
+            float objectAngle = static_cast<RuntimeSpriteObject*>(objects1[i])->GetAngle();
 
             angle = fmodf(angle, 360);
             if ( angle < 0 ) angle += 360;
@@ -99,10 +99,10 @@ bool GD_API SpriteTurnedToward( const std::string & firstObjName, const std::str
 /**
  * Test a collision between two sprites objects
  */
-bool GD_API SpriteCollision( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<Object*> *> objectsLists1, std::map <std::string, std::vector<Object*> *> objectsLists2, bool conditionInverted )
+bool GD_API SpriteCollision( const std::string & firstObjName, const std::string & secondObjName, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists1, std::map <std::string, std::vector<RuntimeObject*> *> objectsLists2, bool conditionInverted )
 {
-    vector<Object*> objects1;
-    for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
+    vector<RuntimeObject*> objects1;
+    for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists1.begin();it!=objectsLists1.end();++it)
     {
         if ( it->second != NULL )
         {
@@ -117,8 +117,8 @@ bool GD_API SpriteCollision( const std::string & firstObjName, const std::string
 
     if ( !sameLists )
     {
-        vector<Object*> objects2;
-        for (std::map <std::string, std::vector<Object*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
+        vector<RuntimeObject*> objects2;
+        for (std::map <std::string, std::vector<RuntimeObject*> *>::const_iterator it = objectsLists2.begin();it!=objectsLists2.end();++it)
         {
             if ( it->second != NULL )
             {
@@ -129,18 +129,18 @@ bool GD_API SpriteCollision( const std::string & firstObjName, const std::string
         }
 
 
-        std::vector<Object*>::const_iterator obj_end = objects1.end();
-        std::vector<Object*>::const_iterator obj2_end = objects2.end();
+        std::vector<RuntimeObject*>::const_iterator obj_end = objects1.end();
+        std::vector<RuntimeObject*>::const_iterator obj2_end = objects2.end();
 
         //On teste la collision entre chaque objets
-        for ( std::vector<Object*>::const_iterator obj = objects1.begin(); obj != obj_end; ++obj )
+        for ( std::vector<RuntimeObject*>::const_iterator obj = objects1.begin(); obj != obj_end; ++obj )
         {
             bool collideWithAtLeastOneObject = false;
-            for (std::vector<Object*>::const_iterator obj2 = objects2.begin(); obj2 != obj2_end; ++obj2 )
+            for (std::vector<RuntimeObject*>::const_iterator obj2 = objects2.begin(); obj2 != obj2_end; ++obj2 )
             {
                 //On vérifie que ce n'est pas le même objet
                 if ( *obj != *obj2 &&
-                    CheckCollision( static_cast<SpriteObject*>(*obj), static_cast<SpriteObject*>(*obj2) ) )
+                    CheckCollision( static_cast<RuntimeSpriteObject*>(*obj), static_cast<RuntimeSpriteObject*>(*obj2) ) )
                 {
                     if ( !conditionInverted )
                     {
@@ -174,7 +174,7 @@ bool GD_API SpriteCollision( const std::string & firstObjName, const std::string
             for (unsigned int j = i+1;j<objects1.size();++j)
             {
                 //On vérifie que ce n'est pas le même objet
-                if ( CheckCollision( static_cast<SpriteObject*>(objects1[i]), static_cast<SpriteObject*>(objects1[j]) ) )
+                if ( CheckCollision( static_cast<RuntimeSpriteObject*>(objects1[i]), static_cast<RuntimeSpriteObject*>(objects1[j]) ) )
                 {
                     if ( !conditionInverted )
                     {

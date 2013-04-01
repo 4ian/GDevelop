@@ -114,7 +114,7 @@ public:
      * "Code only" parameters types:
      * - currentScene: Reference to the current runtime scene ( RuntimeScene& )
      * - inlineCode: supplementary information associated with the parameter is directly pasted in the C++ code without change.
-     * - mapOfObjectListsOfParameter : a std::map containing lists of objects which are specified by the object name in another parameter. (std::map <std::string, std::vector<Object*> *>) Example:
+     * - mapOfObjectListsOfParameter : a std::map containing lists of objects which are specified by the object name in another parameter. (std::map <std::string, std::vector<RuntimeObject*> *>) Example:
      * \code
     DECLARE_EXPRESSION("Count", _("Object count"), _("Count the number of picked objects"), _("Objects"), "res/conditions/nbObjet.png")
         instrInfo.AddParameter("object", _("Object"), "", false);
@@ -124,11 +124,11 @@ public:
     DECLARE_END_EXPRESSION()
      * \endcode
      * - mapOfObjectListsOfParameterWithoutPicking : Same as mapOfObjectListsOfParameter but do not pick object if they are not already concerned.
-     * - ptrToObjectOfParameter : Return a pointer to object specified by the object name in another parameter ( Object * ). Example:
+     * - ptrToObjectOfParameter : Return a pointer to object specified by the object name in another parameter ( RuntimeObject * ). Example:
      * \code
     instrInfo.AddParameter("object", _("Object"), "", false);
     instrInfo.AddParameter("object", _("Target object"), "", false);
-    instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1"); //The called function will be called with this signature : Function(std::string, std::string, Object*)
+    instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1"); //The called function will be called with this signature : Function(std::string, std::string, RuntimeObject*)
      * \endcode
      */
     std::vector<std::string> GenerateParametersCodes( const Game & game, const Scene & scene, std::vector < gd::Expression > parameters, const std::vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);

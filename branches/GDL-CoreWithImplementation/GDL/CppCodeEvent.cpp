@@ -32,7 +32,7 @@ std::string CppCodeEvent::GenerateEventCode(Game & game, Scene & scene, EventsCo
     //DependenciesAnalyzer and compiled by CodeCompilationHelpers);
 
     //Generate the code to call the associated source file
-    std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") + ((passSceneAsParameter && passObjectListAsParameter) ? ", ":"") + (passObjectListAsParameter ? "std::vector<Object*> objectsList" :"") + ");";
+    std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") + ((passSceneAsParameter && passObjectListAsParameter) ? ", ":"") + (passObjectListAsParameter ? "std::vector<RuntimeObject*> objectsList" :"") + ");";
     codeGenerator.AddGlobalDeclaration(functionPrototype+"\n");
 
     std::string outputCode;
@@ -54,7 +54,7 @@ std::string CppCodeEvent::GenerateEventCode(Game & game, Scene & scene, EventsCo
 
         if ( realObjects.empty() ) return "";
 
-        outputCode += "std::vector<Object*> functionObjects;";
+        outputCode += "std::vector<RuntimeObject*> functionObjects;";
         for (unsigned int i = 0;i<realObjects.size();++i)
         {
             parentContext.ObjectsListNeeded(realObjects[i]);
@@ -120,7 +120,7 @@ void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(Game & parentGame) const
 
 std::string CppCodeEvent::GenerateAssociatedFileCode() const
 {
-    std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") +((passSceneAsParameter && passObjectListAsParameter) ? ", ":"")+ (passObjectListAsParameter ? "std::vector<Object*> objectsList" :"") + ")";
+    std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") +((passSceneAsParameter && passObjectListAsParameter) ? ", ":"")+ (passObjectListAsParameter ? "std::vector<RuntimeObject*> objectsList" :"") + ")";
     std::string output;
     if (passSceneAsParameter ) output += "#include \"GDL/RuntimeScene.h\"\n";
     if (passObjectListAsParameter ) output += "#include \"GDL/Object.h\"\n";

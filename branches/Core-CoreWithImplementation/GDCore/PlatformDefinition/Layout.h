@@ -92,12 +92,12 @@ public:
     /**
      * Must return the container storing initial instances.
      */
-    virtual const InitialInstancesContainer & GetInitialInstances() const =0;
+    virtual const gd::InitialInstancesContainer & GetInitialInstances() const =0;
 
     /**
      * Must return the container storing initial instances.
      */
-    virtual InitialInstancesContainer & GetInitialInstances() =0;
+    virtual gd::InitialInstancesContainer & GetInitialInstances() =0;
 
     ///@}
 

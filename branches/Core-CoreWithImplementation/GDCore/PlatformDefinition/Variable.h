@@ -20,41 +20,73 @@ namespace gd
 class GD_CORE_API Variable
 {
 public:
-    Variable();
-    virtual ~Variable();
+    Variable() : name(""), value(0), isNumber(true) {};
+    Variable(std::string name_) : name(name_), value(0), isNumber(true) {};
+    virtual ~Variable() {};
 
     /**
-     * Must return the name of the variable
+     * Get name of the variable
      */
-    virtual const std::string & GetName() const =0;
+    const std::string & GetName() const { return name; }
 
     /**
-     * Must change the name of the variable
+     * Change name of the variable
      */
-    virtual void SetName(const std::string & name) =0;
+    void SetName(const std::string & newName) { name = newName; }
 
     /**
-     * Must return the content of the variable as a string.
+     * Return the content of the variable as a string.
      * \note Game Develop do not do any assumption about what is the real type of the variable: If the variable does not represent a string, then
      * the variable must convert its value to a string representation and return it.
      */
-    virtual const std::string & GetString() const =0;
+    virtual const std::string & GetString() const;
 
     /**
-     * Must change the content of the variable.
+     * Change the content of the variable.
      * \note Game Develop do not do any assumption about what is the real type of the variable: If the variable does not represent a string, then
      * the string passed as argument must be converted to the desired value.
      */
-    virtual void SetString(const std::string & value) =0;
+    virtual void SetString(const std::string & value);
+
+    /**
+     * Get value as a double
+     */
+    double GetValue() const;
+
+    /**
+     * Change value
+     */
+    void SetValue(double val);
+
+    //Operators are overloaded to allow accessing to variable using a simple int-like semantic.
+    void operator=(double val)  {SetValue(val);};
+    void operator+=(double val) {SetValue(val+GetValue());}
+    void operator-=(double val) {SetValue(GetValue()-val);}
+    void operator*=(double val) {SetValue(val*GetValue());}
+    void operator/=(double val) {SetValue(GetValue()/val);}
+
+    bool operator<=(double val) const { return GetValue() <= val;};
+    bool operator>=(double val) const { return GetValue() >= val;};
+    bool operator<(double val) const { return GetValue() < val;};
+    bool operator>(double val) const { return GetValue() > val;};
+    bool operator==(double val) const { return GetValue() == val;};
+    bool operator!=(double val) const { return GetValue() != val;};
+
+
+    //Operators are overloaded to allow accessing to variable using a simple string-like semantic.
+    void operator=(const std::string & val)  {SetString(val);};
+    void operator+=(const std::string & val) {SetString(GetString()+val);}
+
+    bool operator==(const std::string & val) const { return GetString() == val;};
+    bool operator!=(const std::string & val) const { return GetString() != val;};
+
+private:
+    std::string name;
+    mutable double value;
+    mutable std::string str;
+    mutable bool isNumber;
 };
 
 }
 
 #endif // GDCORE_VARIABLE_H
-
-
-
-
-
-
-

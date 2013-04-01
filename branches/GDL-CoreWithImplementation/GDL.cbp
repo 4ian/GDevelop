@@ -19,6 +19,7 @@
 					<Add option="-g" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllexport)" />
 					<Add option="-DDEBUG" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -140,6 +141,7 @@
 					<Add option="-Wall" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllexport)" />
 					<Add option="-DRELEASE" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -260,6 +262,7 @@
 					<Add option="-Wall" />
 					<Add option="-m32" />
 					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllexport)" />
 					<Add option="-DDEV" />
 					<Add option="-DWINDOWS" />
 					<Add option="-DSFML_DYNAMIC" />
@@ -882,8 +885,6 @@
 		<Unit filename="GDL/SourceFileCommonTools.h" />
 		<Unit filename="GDL/Sprite.cpp" />
 		<Unit filename="GDL/Sprite.h" />
-		<Unit filename="GDL/SpriteInitialPositionPanel.cpp" />
-		<Unit filename="GDL/SpriteInitialPositionPanel.h" />
 		<Unit filename="GDL/SpriteObject.cpp" />
 		<Unit filename="GDL/SpriteObject.h" />
 		<Unit filename="GDL/StandardEvent.cpp" />

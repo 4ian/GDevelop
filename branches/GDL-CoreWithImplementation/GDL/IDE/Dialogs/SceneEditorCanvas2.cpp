@@ -98,13 +98,13 @@ double SceneEditorCanvas::GetMouseYOnLayout() const
 
 boost::shared_ptr<Object> SceneEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const
 {
-    if ( initialInstancesAndObjectsBimap.left.find(dynamic_cast<InitialPosition*>(&instance)) == initialInstancesAndObjectsBimap.left.end() )
+    if ( initialInstancesAndObjectsBimap.left.find(dynamic_cast<gd::InitialInstance*>(&instance)) == initialInstancesAndObjectsBimap.left.end() )
     {
         //std::cout << "ERROR: Object associated to initial instance \""+instance.GetObjectName()+"\" not found!";
         return boost::shared_ptr<Object> ();
     }
 
-    return initialInstancesAndObjectsBimap.left.find(dynamic_cast<InitialPosition*>(&instance))->second;
+    return initialInstancesAndObjectsBimap.left.find(dynamic_cast<gd::InitialInstance*>(&instance))->second;
 }
 
 double SceneEditorCanvas::GetWidthOfInitialInstance(gd::InitialInstance & instance) const
@@ -152,14 +152,14 @@ void SceneEditorCanvas::OnInitialInstanceMoved(gd::InitialInstance & instance)
 void SceneEditorCanvas::OnInitialInstanceDeleted(gd::InitialInstance & instance)
 {
     previewScene.objectsInstances.RemoveObject(GetObjectLinkedToInitialInstance(instance));
-    initialInstancesAndObjectsBimap.left.erase(dynamic_cast<InitialPosition*>(&instance));
+    initialInstancesAndObjectsBimap.left.erase(dynamic_cast<gd::InitialInstance*>(&instance));
 }
 
 void SceneEditorCanvas::OnInitialInstanceAdded(gd::InitialInstance & gdInstance)
 {
     try
     {
-        InitialPosition & instance = dynamic_cast<InitialPosition &>(gdInstance);
+        gd::InitialInstance & instance = dynamic_cast<gd::InitialInstance &>(gdInstance);
 
         std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
         std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
@@ -182,7 +182,7 @@ void SceneEditorCanvas::OnInitialInstanceAdded(gd::InitialInstance & gdInstance)
         newObject->SetY( instance.GetY() );
         newObject->SetZOrder( instance.GetZOrder() );
         newObject->SetLayer( instance.GetLayer() );
-        newObject->InitializeFromInitialPosition(instance);
+        newObject->InitializeFromInitialInstance(instance);
         newObject->LoadRuntimeResources( previewScene, *previewGame.imageManager );
 
         previewScene.objectsInstances.AddObject(newObject);

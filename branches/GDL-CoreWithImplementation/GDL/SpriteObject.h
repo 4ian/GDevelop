@@ -13,7 +13,7 @@ class ImageManager;
 class RuntimeScene;
 class Object;
 class ImageManager;
-class InitialPosition;
+namespace gd { class InitialInstance; }
 namespace sf
 {
     class Sprite;
@@ -44,7 +44,7 @@ public :
     virtual Object * Clone() const { return new SpriteObject(*this);}
 
     virtual bool LoadResources(const RuntimeScene & scene, const ImageManager & imageMgr );
-    virtual bool InitializeFromInitialPosition(const InitialPosition & position);
+    virtual bool InitializeFromInitialInstance(const gd::InitialInstance & position);
 
     virtual bool Draw(sf::RenderTarget & renderTarget);
 
@@ -54,8 +54,8 @@ public :
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
     virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const InitialPosition & position, Game & game, Scene & scene);
-    virtual bool UpdateInitialInstanceProperty(InitialPosition & position, const std::string & name, const std::string & value, Game & game, Scene & scene);
+    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & position, Game & game, Scene & scene);
+    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, Game & game, Scene & scene);
 
     virtual bool SupportShaders() { return true; }
 

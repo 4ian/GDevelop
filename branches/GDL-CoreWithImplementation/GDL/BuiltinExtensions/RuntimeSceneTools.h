@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 class RuntimeScene;
-class Variable;
+namespace gd { class Variable; }
 class Object;
 
 /**
@@ -81,25 +81,25 @@ void GD_API ChangeSceneBackground( RuntimeScene & scene, std::string newColor );
  * Only used internally by GD events generated code.
  * \return Variable with specified name
  */
-Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string & variableName);
+gd::Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string & variableName);
 
 /**
  * Only used internally by GD events generated code.
  * \return Global variable with specified name
  */
-Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName);
+gd::Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName);
 
 /**
  * Only used internally by GD events generated code.
  * \return Variable with specified name
  */
-Variable & GD_API IndexGetSceneVariable(RuntimeScene & scene, unsigned int variableIndex);
+gd::Variable & GD_API IndexGetSceneVariable(RuntimeScene & scene, unsigned int variableIndex);
 
 /**
  * Only used internally by GD events generated code.
  * \return Global variable with specified name
  */
-Variable & GD_API IndexGetGlobalVariable(RuntimeScene & scene, unsigned int variableIndex);
+gd::Variable & GD_API IndexGetGlobalVariable(RuntimeScene & scene, unsigned int variableIndex);
 
 /**
  * Only used internally by GD events generated code.

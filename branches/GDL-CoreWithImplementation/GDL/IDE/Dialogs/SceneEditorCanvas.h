@@ -170,7 +170,7 @@ private:
     //References to objects being edited
     RuntimeGame & game; ///< The game being edited. Initialized at the editor construction from the gd::Project parameter.
     Scene & scene; ///< The scene being edited. Initialized at the editor construction from the gd::Layout parameter.
-    InitialInstancesContainer & instances; ///< The instances being edited.  Initialized at the editor construction from the gd::InitialInstancesContainer parameter.
+    gd::InitialInstancesContainer & instances; ///< The instances being edited.  Initialized at the editor construction from the gd::InitialInstancesContainer parameter.
 
     //Members used during preview or compilation
     RuntimeGame previewGame; ///< Runtime game used during preview.
@@ -195,7 +195,7 @@ private:
     sf::Vector2f movingViewMouseStartPosition;
     sf::Vector2f movingViewStartPosition;
 
-    typedef boost::bimap<InitialPosition*, boost::shared_ptr<Object> > InstancesAndObjectsBimap;
+    typedef boost::bimap<gd::InitialInstance*, boost::shared_ptr<Object> > InstancesAndObjectsBimap;
     typedef InstancesAndObjectsBimap::value_type InstanceAndObjectPair;
     InstancesAndObjectsBimap initialInstancesAndObjectsBimap; ///< Links between initial instances and the objects really used by previewScene to render the scene when editing.
 

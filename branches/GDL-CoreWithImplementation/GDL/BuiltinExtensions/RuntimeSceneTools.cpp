@@ -13,6 +13,7 @@
 #include "GDL/RuntimeGame.h"
 #include "GDL/profile.h"
 #include "GDL/CommonTools.h"
+#include "GDL/Variable.h"
 #include "GDL/Text.h"
 
 bool GD_API LayerVisible( RuntimeScene & scene, const std::string & layer )
@@ -157,22 +158,22 @@ bool GD_API PickRandomObject(RuntimeScene & scene, std::map <std::string, std::v
     return true;
 }
 
-Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string & variableName)
+gd::Variable & GD_API GetSceneVariable(RuntimeScene & scene, const std::string & variableName)
 {
     return scene.GetVariables().ObtainVariable(variableName);
 }
 
-Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName)
+gd::Variable & GD_API GetGlobalVariable(RuntimeScene & scene, const std::string & variableName)
 {
     return scene.game->GetVariables().ObtainVariable(variableName);
 }
 
-Variable & GD_API IndexGetSceneVariable(RuntimeScene & scene, unsigned int index)
+gd::Variable & GD_API IndexGetSceneVariable(RuntimeScene & scene, unsigned int index)
 {
     return scene.GetVariables().GetVariable(index);
 }
 
-Variable & GD_API IndexGetGlobalVariable(RuntimeScene & scene, unsigned int index)
+gd::Variable & GD_API IndexGetGlobalVariable(RuntimeScene & scene, unsigned int index)
 {
     return scene.game->GetVariables().GetVariable(index);
 }

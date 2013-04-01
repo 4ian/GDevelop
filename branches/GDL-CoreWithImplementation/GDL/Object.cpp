@@ -211,7 +211,7 @@ const std::string & Object::GetVariableString( const std::string & variable )
 }
 
 #if defined(GD_IDE_ONLY)
-std::map<std::string, std::string> Object::GetInitialInstanceProperties(const InitialPosition & position, Game & game, Scene & scene)
+std::map<std::string, std::string> Object::GetInitialInstanceProperties(const gd::InitialInstance & position, Game & game, Scene & scene)
 {
     std::map<std::string, std::string> nothing;
     return nothing;

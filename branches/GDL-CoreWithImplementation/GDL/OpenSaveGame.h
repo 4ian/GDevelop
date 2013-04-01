@@ -12,7 +12,7 @@
 #include "GDL/CommonTools.h"
 namespace gd { class Instruction; }
 namespace gd { class InstructionMetadata;}
-class InitialPosition;
+namespace gd { class InitialInstance; }
 class Layer;
 namespace gd { class BaseEvent; }
 namespace gd {typedef boost::shared_ptr<gd::BaseEvent> BaseEventSPtr;}

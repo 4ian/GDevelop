@@ -199,7 +199,7 @@
  * Then, it is common to add files like <ExtensionName>Tools.cpp and <ExtensionName>Tools.h which implements and defines the functions provided by the extensions.<br>
  * If objects are provided by the extension, it is common to implement and define them in <ObjectName>Object.cpp and <ObjectName>Object.h.<br>
 
- * Finally, if objects need to have an editor ( when double clicking on them in Objects editor ) and/or a Initial position panel ( displayed your right click on an object on the scene editor and choose Properties ), it is common to use files like <ObjectName>Editor.cpp and/or <ObjectName>InitialPositionPanel.cpp, with their associated .h.<br>
+ * Finally, if objects need to have an editor ( when double clicking on them in Objects editor ) and/or a Initial position panel ( displayed your right click on an object on the scene editor and choose Properties ), it is common to use files like <ObjectName>Editor.cpp and/or <ObjectName>gd::InitialInstancePanel.cpp, with their associated .h.<br>
  * \image html images/extensiondir.png
  * The directory wxsmith is used by Code::Blocks to save the files used so as to create the user interfaces, like the editor of an object.
  */

@@ -9,6 +9,7 @@
 #include <string>
 #include <boost/shared_ptr.hpp>
 #include "GDL/InitialInstancesContainer.h"
+#include "GDL/VariableList.h"
 #include "GDL/Layer.h"
 class Object;
 class Game;
@@ -138,12 +139,12 @@ public:
     /**
      * Return the container storing initial instances.
      */
-    virtual const InitialInstancesContainer & GetInitialInstances() const { return initialInstances; }
+    virtual const gd::InitialInstancesContainer & GetInitialInstances() const { return initialInstances; }
 
     /**
      * Return the container storing initial instances.
      */
-    virtual InitialInstancesContainer & GetInitialInstances() { return initialInstances; }
+    virtual gd::InitialInstancesContainer & GetInitialInstances() { return initialInstances; }
 
     virtual void LoadFromXml(const TiXmlElement * element);
 
@@ -363,7 +364,7 @@ private:
     std::string                                 title; ///< Title displayed in the window
     std::vector < boost::shared_ptr<Object> >   initialObjects; ///< Objects available.
     ListVariable                                variables; ///< Variables list
-    InitialInstancesContainer                   initialInstances; ///< Initial instances
+    gd::InitialInstancesContainer                   initialInstances; ///< Initial instances
     std::vector < Layer >                       layers; ///< Initial layers
     bool                                        stopSoundsOnStartup; ///< True to make the scene stop all sounds at startup.
     bool                                        standardSortMethod; ///< True to sort objects using standard sort.

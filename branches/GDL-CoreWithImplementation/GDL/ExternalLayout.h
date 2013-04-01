@@ -42,12 +42,12 @@ public:
     /**
      * Return the container storing initial instances.
      */
-    virtual const InitialInstancesContainer & GetInitialInstances() const { return instances; }
+    virtual const gd::InitialInstancesContainer & GetInitialInstances() const { return instances; }
 
     /**
      * Return the container storing initial instances.
      */
-    virtual InitialInstancesContainer & GetInitialInstances() { return instances; }
+    virtual gd::InitialInstancesContainer & GetInitialInstances() { return instances; }
 
     #if defined(GD_IDE_ONLY)
     virtual const gd::LayoutEditorCanvasOptions & GetAssociatedSettings() const {return editionSettings;}
@@ -66,7 +66,7 @@ public:
 private:
 
     std::string name;
-    InitialInstancesContainer instances;
+    gd::InitialInstancesContainer instances;
     #if defined(GD_IDE_ONLY)
     gd::LayoutEditorCanvasOptions editionSettings;
     #endif

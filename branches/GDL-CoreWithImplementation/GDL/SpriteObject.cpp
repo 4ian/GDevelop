@@ -25,7 +25,6 @@
 #include "GDL/CommonTools.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDL/IDE/Dialogs/SpriteObjectEditor.h"
-#include "GDL/SpriteInitialPositionPanel.h"
 #endif
 
 sf::Sprite SpriteObject::badSprite;
@@ -84,7 +83,7 @@ bool SpriteObject::LoadResources(const RuntimeScene & scene, const ImageManager 
 /**
  * Update animation and direction from the inital position
  */
-bool SpriteObject::InitializeFromInitialPosition(const InitialPosition & position)
+bool SpriteObject::InitializeFromInitialInstance(const gd::InitialInstance & position)
 {
     if ( position.floatInfos.find("animation") != position.floatInfos.end() )
         SetCurrentAnimation(position.floatInfos.find("animation")->second);
@@ -179,7 +178,7 @@ void SpriteObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapp
 }
 
 
-std::map<std::string, std::string> SpriteObject::GetInitialInstanceProperties(const InitialPosition & position, Game & game, Scene & scene)
+std::map<std::string, std::string> SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance & position, Game & game, Scene & scene)
 {
     std::map<std::string, std::string> properties;
     properties[ToString(_("Animation"))] = position.floatInfos.find("animation") != position.floatInfos.end() ?
@@ -189,7 +188,7 @@ std::map<std::string, std::string> SpriteObject::GetInitialInstanceProperties(co
     return properties;
 }
 
-bool SpriteObject::UpdateInitialInstanceProperty(InitialPosition & position, const std::string & name, const std::string & value, Game & game, Scene & scene)
+bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, Game & game, Scene & scene)
 {
     if ( name == _("Animation") ) position.floatInfos["animation"] = ToInt(value);
 

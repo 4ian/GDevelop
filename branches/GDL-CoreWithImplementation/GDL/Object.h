@@ -13,11 +13,11 @@
 #include "GDL/VariableList.h"
 namespace sf {class RenderTarget;}
 namespace sf {class Shader;}
+namespace gd { class InitialInstance; }
 class Polygon2d;
 class RuntimeScene;
 class Object;
 class ImageManager;
-class InitialPosition;
 class TiXmlElement;
 class Automatism;
 #if defined(GD_IDE_ONLY)
@@ -39,9 +39,9 @@ namespace gd {class ArbitraryResourceWorker;}
  * - Objects must be able to return their size, by redefining Object::GetWidth and Object::GetHeight
  * - Objects must be able to return the position where they have precisely drawn ( for example, Sprite can draw image not exactly at the position of the object, if the origine point was moved ). They must also be able to return the position of their center. See Object::GetDrawableX, Object::GetDrawableY and Object::GetCenterX, Object::GetCenterY.
  * - If objects need to load ressources ( for example textures at the loading ), redefine and implement Object::LoadResources and/or Object::LoadRuntimeResources ( See the Box3D Object extension sources so as to view an example ).
- * - When objects are placed at the start of the scene, scenes call Object::InitializeFromInitialPosition, passing a InitialPosition object in parameter ( containing information like the position where place the object ). Note that common information were already changed ( Position, angle, layer... ). You just need to setup the object with the information related to your object.
+ * - When objects are placed at the start of the scene, scenes call Object::InitializeFromInitialInstance, passing a gd::InitialInstance object in parameter ( containing information like the position where place the object ). Note that common information were already changed ( Position, angle, layer... ). You just need to setup the object with the information related to your object.
  * - Objects are loaded and saved ( to xml ) with Object::LoadFromXml and Object::SaveToXml, using TinyXml library ( See the source of the Text Object or the Box 3D Object so as to view how to implement these functions ) :
- * - Objects can have also functions related to the edition: Object::GenerateThumbnail, Object::EditObject, Object::CreateInitialPositionPanel and Object::UpdateInitialPositionFromPanel
+ * - Objects can have also functions related to the edition: Object::GenerateThumbnail, Object::EditObject, Object::Creategd::InitialInstancePanel and Object::Updategd::InitialInstanceFromPanel
  * - Finally, objects can expose debugging features: Object::GetPropertyForDebugger, Object::ChangeProperty and Object::GetNumberOfProperties
  *
  * \ingroup GameEngine
@@ -103,7 +103,7 @@ public:
     /**
      * Called by RuntimeScene when placing an real object from a position
      */
-    virtual bool InitializeFromInitialPosition(const InitialPosition & position) {return true;}
+    virtual bool InitializeFromInitialInstance(const gd::InitialInstance & position) {return true;}
 
     /**
      * Draw the object.
@@ -413,17 +413,17 @@ public:
      * Called when the IDE wants to know about the custom properties of an initial instance of this object.
      *
      * \return a std::map with properties names as key and values.
-     * \see InitialPosition
+     * \see gd::InitialInstance
      */
-    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const InitialPosition & position, Game & game, Scene & scene);
+    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & position, Game & game, Scene & scene);
 
     /**
      * Called when the IDE wants to update a custom property of an initial instance of this object.
      *
      * \return false if the new value cannot be set
-     * \see InitialPosition
+     * \see gd::InitialInstance
      */
-    virtual bool UpdateInitialInstanceProperty(InitialPosition & position, const std::string & name, const std::string & value, Game & game, Scene & scene) {return false;};
+    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, Game & game, Scene & scene) {return false;};
 
     /**
      * Called by the debugger so as to get a property value and name

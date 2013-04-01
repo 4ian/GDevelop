@@ -470,20 +470,31 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
     specialAction = scene;
 }
 
-void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const InitialPosition *, boost::shared_ptr<Object> > * optionalMap)
+/**
+ * \brief Internal Tool class used by RuntimeScene::CreateObjectsFrom
+ */
+class ObjectsFromInitialInstanceCreator : public gd::InitialInstanceFunctor
 {
-    for (std::list<InitialPosition>::const_iterator it = container.initialInstances.begin(), end = container.initialInstances.end(); it != end; ++it)
-    {
-        const InitialPosition & initialInstance = *it;
+public:
+    ObjectsFromInitialInstanceCreator(RuntimeGame & game_, RuntimeScene & scene_, float xOffset_, float yOffset_, std::map<const gd::InitialInstance *, boost::shared_ptr<Object> > * optionalMap_) :
+        game(game_),
+        scene(scene_),
+        xOffset(xOffset_),
+        yOffset(yOffset_),
+        optionalMap(optionalMap_)
+    {};
+    virtual ~ObjectsFromInitialInstanceCreator() {};
 
-        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(GetInitialObjects().begin(), GetInitialObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
-        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game->GetGlobalObjects().begin(), game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
+    virtual void operator()(gd::InitialInstance & initialInstance)
+    {
+        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
+        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
 
         ObjSPtr newObject = boost::shared_ptr<Object> ();
 
-        if ( sceneObject != GetInitialObjects().end() ) //We check first scene's objects' list.
+        if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
             newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
-        else if ( globalObject != game->GetGlobalObjects().end() ) //Then the global object list
+        else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
             newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
 
         if ( newObject != boost::shared_ptr<Object> () )
@@ -492,7 +503,7 @@ void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container
             newObject->SetY( initialInstance.GetY() + yOffset );
             newObject->SetZOrder( initialInstance.GetZOrder() );
             newObject->SetLayer( initialInstance.GetLayer() );
-            newObject->InitializeFromInitialPosition(initialInstance);
+            newObject->InitializeFromInitialInstance(initialInstance);
             newObject->SetAngle( initialInstance.GetAngle() );
 
             if ( initialInstance.HasCustomSize() )
@@ -502,21 +513,34 @@ void RuntimeScene::CreateObjectsFrom(const InitialInstancesContainer & container
             }
 
             //Substitute initial variables specific to that object instance.
-            const std::vector<Variable> & instanceSpecificVariables = initialInstance.GetVariables().GetVariablesVector();
+            const std::vector<gd::Variable> & instanceSpecificVariables = initialInstance.GetVariables().GetVariablesVector();
             for (unsigned int j = 0;j<instanceSpecificVariables.size();++j)
             {
                 newObject->GetVariables().ObtainVariable(instanceSpecificVariables[j].GetName()) = instanceSpecificVariables[j];
             }
 
-            newObject->LoadRuntimeResources(*this, *game->imageManager);
+            newObject->LoadRuntimeResources(scene, *game.imageManager);
 
-            objectsInstances.AddObject(newObject);
+            scene.objectsInstances.AddObject(newObject);
         }
         else
             std::cout << "Could not find and put object " << initialInstance.GetObjectName() << std::endl;
 
         if ( optionalMap ) (*optionalMap)[&initialInstance] = newObject;
     }
+
+private:
+    RuntimeGame & game;
+    RuntimeScene & scene;
+    float xOffset;
+    float yOffset;
+    std::map<const gd::InitialInstance *, boost::shared_ptr<Object> > * optionalMap;
+};
+
+void RuntimeScene::CreateObjectsFrom(const gd::InitialInstancesContainer & container, float xOffset, float yOffset, std::map<const gd::InitialInstance *, boost::shared_ptr<Object> > * optionalMap)
+{
+    ObjectsFromInitialInstanceCreator func(*game, *this, xOffset, yOffset, optionalMap);
+    const_cast<gd::InitialInstancesContainer&>(container).IterateOverInstances(func);
 }
 
 bool RuntimeScene::LoadFromScene( const Scene & scene )
@@ -524,7 +548,7 @@ bool RuntimeScene::LoadFromScene( const Scene & scene )
     return LoadFromSceneAndCustomInstances(scene, scene.GetInitialInstances());
 }
 
-bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const InitialInstancesContainer & instances )
+bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const gd::InitialInstancesContainer & instances )
 {
     MessageLoading( "Loading scene", 10 );
 

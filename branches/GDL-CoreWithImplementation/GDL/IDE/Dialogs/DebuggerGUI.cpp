@@ -287,8 +287,8 @@ void DebuggerGUI::UpdateGUI()
     generalList->SetItem(5, 1, ToString(sf::Mouse::getPosition(*scene.renderWindow).x)+";"+ToString(sf::Mouse::getPosition(*scene.renderWindow).y));
     generalList->SetItem(6, 1, ToString(static_cast<double>(scene.GetTimeFromStart())/1000000.0)+"s");
 
-    const vector < Variable > sceneVariables = scene.GetVariables().GetVariablesVector();
-    const vector < Variable > gameVariables = scene.game->GetVariables().GetVariablesVector();
+    const vector < gd::Variable > sceneVariables = scene.GetVariables().GetVariablesVector();
+    const vector < gd::Variable > gameVariables = scene.game->GetVariables().GetVariablesVector();
 
     //Suppression des lignes en trop pour les variables
     while(static_cast<unsigned int>(generalList->GetItemCount()) > generalBaseItemCount + sceneVariables.size() + gameVariables.size()+2)
@@ -468,7 +468,7 @@ void DebuggerGUI::UpdateGUI()
 
     currentLine += 2; //We have two lines to jump for "Variables"
 
-    const vector < Variable > objectVariables = object->GetVariables().GetVariablesVector();
+    const vector < gd::Variable > objectVariables = object->GetVariables().GetVariablesVector();
     //Suppression des lignes en trop pour les variables
     while(objectList->GetItemCount() > baseItemCount+objectVariables.size())
         objectList->DeleteItem(baseItemCount+objectVariables.size());
@@ -593,7 +593,7 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
     }
     else //Or a variable
     {
-        const vector < Variable > objectVariables = object->GetVariables().GetVariablesVector();
+        const vector < gd::Variable > objectVariables = object->GetVariables().GetVariablesVector();
         int idVariable = event.GetIndex() - ( 1+object->Object::GetNumberOfProperties()
                                               +2+object->GetNumberOfProperties()
                                               +2);
@@ -613,8 +613,8 @@ void DebuggerGUI::OnobjectListItemActivated(wxListEvent& event)
  */
 void DebuggerGUI::OngeneralListItemActivated(wxListEvent& event)
 {
-    const vector < Variable > sceneVariables = scene.GetVariables().GetVariablesVector();
-    const vector < Variable > gameVariables = scene.game->GetVariables().GetVariablesVector();
+    const vector < gd::Variable > sceneVariables = scene.GetVariables().GetVariablesVector();
+    const vector < gd::Variable > gameVariables = scene.game->GetVariables().GetVariablesVector();
 
     if ( event.GetIndex() < (generalBaseItemCount + sceneVariables.size()))
     {

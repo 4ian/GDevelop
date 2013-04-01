@@ -68,7 +68,7 @@ SceneEditorCanvas::SceneEditorCanvas(wxWindow* parent, gd::Project & project_, g
     LayoutEditorCanvas(parent, project_, layout_, instances_, settings_, mainFrameWrapper_),
     game(dynamic_cast<RuntimeGame &>(project_)),
     scene(dynamic_cast<Scene &>(layout_)),
-    instances(dynamic_cast<InitialInstancesContainer &>(instances_)),
+    instances(dynamic_cast<gd::InitialInstancesContainer &>(instances_)),
     previewScene(this, &game),
     isMovingView(false),
     isReloading(false)
@@ -368,13 +368,13 @@ void SceneEditorCanvas::RefreshFromLayoutSecondPart()
     {
         //Create the map linking initial instances to real objects used by the scene for rendering.
         initialInstancesAndObjectsBimap.clear();
-        InitialInstancesContainer noInstances; //We need to load the scene in a two time fashion...
+        gd::InitialInstancesContainer noInstances; //We need to load the scene in a two time fashion...
         previewScene.LoadFromSceneAndCustomInstances(scene, noInstances);
-        std::map< const InitialPosition*, boost::shared_ptr<Object> > tempMap;
+        std::map< const gd::InitialInstance*, boost::shared_ptr<Object> > tempMap;
         previewScene.CreateObjectsFrom(instances, 0, 0, &tempMap); //...so as to fill the tracking map.
 
-        for (std::map< const InitialPosition*, boost::shared_ptr<Object> >::const_iterator it = tempMap.begin();it!=tempMap.end();++it)
-            initialInstancesAndObjectsBimap.insert(InstanceAndObjectPair(const_cast<InitialPosition*>(it->first), it->second));
+        for (std::map< const gd::InitialInstance*, boost::shared_ptr<Object> >::const_iterator it = tempMap.begin();it!=tempMap.end();++it)
+            initialInstancesAndObjectsBimap.insert(InstanceAndObjectPair(const_cast<gd::InitialInstance*>(it->first), it->second));
             //I know the const_cast is ugly, but I do not know how to bypass the issue otherwise.
 
     }
@@ -883,7 +883,7 @@ void SceneEditorCanvas::RenderEdittime()
                     allObjects[id]->DrawEdittime(*previewScene.renderWindow);
 
                     //Selection rectangle
-                    InitialPosition * associatedInitialInstance = initialInstancesAndObjectsBimap.right.find(allObjects[id])->second;
+                    gd::InitialInstance * associatedInitialInstance = initialInstancesAndObjectsBimap.right.find(allObjects[id])->second;
                     if ( selectedInstances.find(associatedInitialInstance) != selectedInstances.end() )
                     {
                         sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX(), allObjects[id]->GetDrawableY(), editionView);

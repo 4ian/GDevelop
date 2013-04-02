@@ -8,10 +8,11 @@
 #define LINKCOMMENT_H
 #include "GDCore/Events/LinkEvent.h"
 #include <vector>
+namespace gd { class MainFrameWrapper; }
+namespace gd { class Project; }
 class Game;
 class RuntimeScene;
 class Scene;
-namespace gd { class MainFrameWrapper; }
 class wxWindow;
 
 /**
@@ -25,7 +26,7 @@ public:
     virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new LinkEvent(*this));}
 
     virtual void SaveToXml(TiXmlElement * eventElem) const;
-    virtual void LoadFromXml(const TiXmlElement * eventElem);
+    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
 
     virtual bool IsExecutable() const { return true; };
     virtual void Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);

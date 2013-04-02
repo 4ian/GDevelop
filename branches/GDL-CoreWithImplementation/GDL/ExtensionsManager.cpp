@@ -176,7 +176,7 @@ bool ExtensionsManager::HasAutomatism(std::string automatismType) const
 }
 #endif
 
-boost::shared_ptr<RuntimeObject> ExtensionsManager::CreateRuntimeObject(RuntimeScene & scene, Object & object)
+boost::shared_ptr<RuntimeObject> ExtensionsManager::CreateRuntimeObject(RuntimeScene & scene, gd::Object & object)
 {
     const std::string & type = object.GetType();
 
@@ -191,7 +191,7 @@ boost::shared_ptr<RuntimeObject> ExtensionsManager::CreateRuntimeObject(RuntimeS
     return boost::shared_ptr<RuntimeObject> (newObject, runtimeObjDestroyFunctionTable[type]);
 }
 
-boost::shared_ptr<Object> ExtensionsManager::CreateObject(std::string type, std::string name)
+boost::shared_ptr<gd::Object> ExtensionsManager::CreateObject(std::string type, std::string name)
 {
     if ( creationFunctionTable.find(type) == creationFunctionTable.end() )
     {
@@ -200,10 +200,10 @@ boost::shared_ptr<Object> ExtensionsManager::CreateObject(std::string type, std:
     }
 
     //Create a new object with the type we want.
-    Object * object = creationFunctionTable[type](name);
+    gd::Object * object = creationFunctionTable[type](name);
     object->SetType(type);
 
-    return boost::shared_ptr<Object> (object, destroyFunctionTable[type]);
+    return boost::shared_ptr<gd::Object> (object, destroyFunctionTable[type]);
 }
 
 Automatism* ExtensionsManager::CreateAutomatism(std::string automatismType) const

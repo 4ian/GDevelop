@@ -974,7 +974,7 @@ string EventsCodeGenerator::GenerateSceneEventsCompleteCode(Game & game, Scene &
     return output;
 }
 
-std::string EventsCodeGenerator::GenerateExternalEventsCompleteCode(Game & game, ExternalEvents & events, bool compilationForRuntime)
+std::string EventsCodeGenerator::GenerateExternalEventsCompleteCode(Game & game, gd::ExternalEvents & events, bool compilationForRuntime)
 {
     DependenciesAnalyzer analyzer(game);
     std::string associatedSceneName = analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName());

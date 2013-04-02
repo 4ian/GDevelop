@@ -16,7 +16,7 @@
 class Text;
 class ManualTimer;
 class RuntimeGame;
-class Object;
+namespace gd { class Object; }
 class AutomatismsRuntimeSharedDatas;
 class ExtensionBase;
 #undef GetObject //Disable an annoying macro
@@ -54,14 +54,14 @@ public:
     bool                                    running; ///< True if the scene is being played
 
     /**
-     * Provide access to the ListVariable member containing the variables
+     * Provide access to the gd::VariablesContainer member containing the variables
      */
-    inline const ListVariable & GetVariables() const { return variables; }
+    inline const gd::VariablesContainer & GetVariables() const { return variables; }
 
     /**
-     * Provide access to the ListVariable member containing the variables
+     * Provide access to the gd::VariablesContainer member containing the variables
      */
-    inline ListVariable & GetVariables() { return variables; }
+    inline gd::VariablesContainer & GetVariables() { return variables; }
 
     /**
      * Add a text to be displayed on the scene
@@ -211,7 +211,7 @@ protected:
     signed long long                        timeFromStart; ///< Time in microseconds elapsed from start.
     signed long long                        pauseTime; ///< Time to be subtracted to realElapsedTime for the current frame.
     int                                     specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
-    ListVariable                            variables; ///<List of the scene variables
+    gd::VariablesContainer                            variables; ///<List of the scene variables
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;
     bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.

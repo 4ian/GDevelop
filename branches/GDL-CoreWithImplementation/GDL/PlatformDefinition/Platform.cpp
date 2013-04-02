@@ -12,6 +12,7 @@
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/SoundManager.h"
+#include "GDL/Automatism.h"
 #include "GDL/FontManager.h"
 #include "GDL/IDE/CodeCompiler.h"
 
@@ -39,6 +40,16 @@ boost::shared_ptr<gd::PlatformExtension> Platform::GetExtension(const std::strin
 gd::InstructionsMetadataHolder & Platform::GetInstructionsMetadataHolder() const
 {
     return *ExtensionsManager::GetInstance();
+}
+
+gd::Automatism* Platform::CreateAutomatism(const std::string & type) const
+{
+    return ExtensionsManager::GetInstance()->CreateAutomatism(type);
+}
+
+boost::shared_ptr<gd::BaseEvent> Platform::CreateEvent(const std::string & type) const
+{
+    return ExtensionsManager::GetInstance()->CreateEvent(type);
 }
 
 boost::shared_ptr<gd::Project> Platform::CreateNewEmptyProject() const

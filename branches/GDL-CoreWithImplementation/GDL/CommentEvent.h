@@ -12,6 +12,7 @@ class TiXmlElement;
 class Scene;
 class Game;
 namespace gd { class MainFrameWrapper; }
+namespace gd { class Project; }
 class wxWindow;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
@@ -27,7 +28,7 @@ class GD_API CommentEvent : public gd::BaseEvent
         virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new CommentEvent(*this));}
 
         void SaveToXml(TiXmlElement * eventElem) const;
-        void LoadFromXml(const TiXmlElement * eventElem);
+        void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
 
         int r; ///< Background color Red component
         int v; ///< Background color Green component

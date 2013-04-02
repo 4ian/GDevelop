@@ -109,7 +109,7 @@ boost::shared_ptr<RuntimeObject> SceneEditorCanvas::GetObjectLinkedToInitialInst
 
 double SceneEditorCanvas::GetWidthOfInitialInstance(gd::InitialInstance & instance) const
 {
-    /*boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
+    /*boost::shared_ptr<gd::Object> object = GetObjectLinkedToInitialInstance(instance);
     if ( object ) return object->GetWidth();*/
 
     return 0;
@@ -117,7 +117,7 @@ double SceneEditorCanvas::GetWidthOfInitialInstance(gd::InitialInstance & instan
 
 double SceneEditorCanvas::GetHeightOfInitialInstance(gd::InitialInstance & instance) const
 {
-    /*boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
+    /*boost::shared_ptr<gd::Object> object = GetObjectLinkedToInitialInstance(instance);
     if ( object ) return object->GetHeight();*/
 
     return 0;
@@ -125,7 +125,7 @@ double SceneEditorCanvas::GetHeightOfInitialInstance(gd::InitialInstance & insta
 
 double SceneEditorCanvas::GetRealXPositionOfInitialInstance(gd::InitialInstance & instance) const
 {
-    /*boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
+    /*boost::shared_ptr<gd::Object> object = GetObjectLinkedToInitialInstance(instance);
     if ( object ) return object->GetDrawableX();*/
 
     return instance.GetX();
@@ -133,7 +133,7 @@ double SceneEditorCanvas::GetRealXPositionOfInitialInstance(gd::InitialInstance 
 
 double SceneEditorCanvas::GetRealYPositionOfInitialInstance(gd::InitialInstance & instance) const
 {
-    /*boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
+    /*boost::shared_ptr<gd::Object> object = GetObjectLinkedToInitialInstance(instance);
     if ( object ) return object->GetDrawableY();*/
 
     return instance.GetY();
@@ -141,7 +141,7 @@ double SceneEditorCanvas::GetRealYPositionOfInitialInstance(gd::InitialInstance 
 
 void SceneEditorCanvas::OnInitialInstanceMoved(gd::InitialInstance & instance)
 {
-    /*boost::shared_ptr<Object> object = GetObjectLinkedToInitialInstance(instance);
+    /*boost::shared_ptr<gd::Object> object = GetObjectLinkedToInitialInstance(instance);
     if ( object )
     {
         object->SetX(instance.GetX());
@@ -166,14 +166,14 @@ void SceneEditorCanvas::OnInitialInstanceAdded(gd::InitialInstance & gdInstance)
         std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
         std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
 
-        ObjSPtr newObject = boost::shared_ptr<Object> ();
+        ObjSPtr newObject = boost::shared_ptr<gd::Object> ();
 
         if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
-            newObject = boost::shared_ptr<Object>((*sceneObject)->Clone());
+            newObject = boost::shared_ptr<gd::Object>((*sceneObject)->Clone());
         else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
-            newObject = boost::shared_ptr<Object>((*globalObject)->Clone());
+            newObject = boost::shared_ptr<gd::Object>((*globalObject)->Clone());
 
-        if ( newObject == boost::shared_ptr<Object> () )
+        if ( newObject == boost::shared_ptr<gd::Object> () )
         {
             wxLogError(_("The object to add does not exist ( anymore ) in the object list.\nDrag and drop objects on the scene from the objects list."));
             return;
@@ -335,7 +335,7 @@ void SceneEditorCanvas::SendSelectionToLayer(const std::string & newLayerName)
         if (it->first == NULL) continue;
 
         it->first->SetLayer(newLayerName);
-        boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*it->first);
+        boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*it->first);
         if ( associatedObject ) associatedObject->SetLayer(newLayerName);
     }
 

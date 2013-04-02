@@ -105,7 +105,7 @@ void CreateWholeProjectRuntimeLinkingTask(Game & game, const std::string & outpu
         {
             if (game.HasExternalEventsNamed(*i) && analyzer.ExternalEventsCanBeCompiledForAScene(*i) == game.GetLayout(l).GetName())
             {
-                ExternalEvents & externalEvents = game.GetExternalEvents(*i);
+                gd::ExternalEvents & externalEvents = game.GetExternalEvents(*i);
                 std::cout << "Added GD" << gd::ToString(&externalEvents) << "RuntimeObjectFile.o (Created from external events) to the linking." << std::endl;
                 task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+gd::ToString(&externalEvents)+"RuntimeObjectFile.o"));
             }

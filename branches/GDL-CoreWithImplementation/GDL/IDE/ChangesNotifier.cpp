@@ -176,7 +176,7 @@ void ChangesNotifier::OnEventsModified(gd::Project & project, gd::ExternalEvents
     try
     {
         Game & game = dynamic_cast<Game &>(project);
-        ExternalEvents & events = dynamic_cast<ExternalEvents &>(externalEvents);
+        gd::ExternalEvents & events = dynamic_cast<gd::ExternalEvents &>(externalEvents);
 
         DependenciesAnalyzer analyzer(game);
         std::string associatedScene = analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName());

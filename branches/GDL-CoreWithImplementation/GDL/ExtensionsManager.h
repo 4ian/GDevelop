@@ -12,9 +12,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/bimap/bimap.hpp>
 #undef CreateEvent //Thanks windows.h
-class Object;
+namespace gd { class Object; }
 class RuntimeObject;
-class Automatism;
+namespace gd { class Automatism; }; typedef gd::Automatism Automatism;
 class ExtensionBase;
 class RuntimeScene;
 namespace gd { class InstructionMetadata;}
@@ -24,10 +24,10 @@ class ExtensionObjectInfos;
 class AutomatismInfo;
 class AutomatismsSharedDatas;
 namespace gd { class BaseEvent; }
-typedef void (*DestroyFunPtr)(Object*);
-typedef Object * (*CreateFunPtr)(std::string name);
+typedef void (*DestroyFunPtr)(gd::Object*);
+typedef gd::Object * (*CreateFunPtr)(std::string name);
 typedef void (*DestroyRuntimeObjectFunPtr)(RuntimeObject*);
-typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const Object & object);
+typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const gd::Object & object);
 
 #if defined(GD_IDE_ONLY)
 #include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
@@ -89,12 +89,12 @@ public:
     /**
      * Return a shared_ptr to a new object.
      */
-    boost::shared_ptr<Object> CreateObject(std::string type, std::string name);
+    boost::shared_ptr<gd::Object> CreateObject(std::string type, std::string name);
 
     /**
      * Return a shared_ptr to a new runtime object created from \a object.
      */
-    boost::shared_ptr<RuntimeObject> CreateRuntimeObject(RuntimeScene & scene, Object & object);
+    boost::shared_ptr<RuntimeObject> CreateRuntimeObject(RuntimeScene & scene, gd::Object & object);
 
     /**
      * Create a new automatism of given type

@@ -16,6 +16,7 @@
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
+#include "GDCore/Events/Serialization.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/Events/EventsCodeGenerationContext.h"
 #include "GDL/ExtensionsManager.h"
@@ -110,12 +111,12 @@ void WhileEvent::SaveToXml(TiXmlElement * eventElem) const
         subeventsElem = new TiXmlElement( "Events" );
         eventElem->LinkEndChild( subeventsElem );
 
-        OpenSaveGame::SaveEvents(events, subeventsElem);
+        gd::EventsListSerialization::SaveEventsToXml(events, subeventsElem);
     }
 }
 
 
-void WhileEvent::LoadFromXml(const TiXmlElement * eventElem)
+void WhileEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventElem)
 {
     if ( eventElem == NULL ) return;
 
@@ -141,7 +142,7 @@ void WhileEvent::LoadFromXml(const TiXmlElement * eventElem)
 
     //Subevents
     if ( eventElem->FirstChildElement( "Events" ) != NULL )
-        OpenSaveGame::OpenEvents(events, eventElem->FirstChildElement( "Events" ));
+        gd::EventsListSerialization::LoadEventsFromXml(project, events, eventElem->FirstChildElement( "Events" ));
 }
 
 /**

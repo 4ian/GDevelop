@@ -7,10 +7,10 @@
 
 #ifndef WHILEEVENT_H
 #define WHILEEVENT_H
-
 #include "GDCore/Events/Event.h"
-class RuntimeScene;
 namespace gd { class Instruction; }
+namespace gd { class Project; }
+class RuntimeScene;
 class TiXmlElement;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
@@ -52,7 +52,7 @@ class WhileEvent : public gd::BaseEvent
         virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();
 
         virtual void SaveToXml(TiXmlElement * eventElem) const;
-        virtual void LoadFromXml(const TiXmlElement * eventElem);
+        virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
 
         /**
          * Called by event editor to draw the event.

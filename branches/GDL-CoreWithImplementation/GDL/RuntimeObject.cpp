@@ -12,7 +12,7 @@
 
 using namespace std;
 
-RuntimeObject::RuntimeObject(RuntimeScene & scene, const Object & object) :
+RuntimeObject::RuntimeObject(RuntimeScene & scene, const gd::Object & object) :
     name(object.GetName()),
     type(object.GetType()),
     X(0),
@@ -583,7 +583,7 @@ void DestroyBaseRuntimeObject(RuntimeObject * object)
     delete object;
 }
 
-RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const Object & object)
+RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object & object)
 {
     return new RuntimeObject(scene, object);
 }

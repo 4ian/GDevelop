@@ -7,7 +7,5 @@
 #define LISTVARIABLE_H
 
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
-typedef gd::VariablesContainer ListVariable;
 
 #endif // LISTVARIABLE_H
-

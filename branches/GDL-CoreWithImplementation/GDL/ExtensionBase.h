@@ -30,10 +30,10 @@ namespace gd { class MainFrameWrapper; }
 #endif
 class RuntimeScene;
 namespace gd { class Instruction; }
-class Automatism;
+namespace gd { class Automatism; }; typedef gd::Automatism Automatism;
 class Game;
 class Scene;
-class Object;
+namespace gd { class Object; }
 class RuntimeObject;
 class ExtensionBase;
 namespace gd { class BaseEvent; }
@@ -44,10 +44,10 @@ class EventsCodeGenerator;
 #undef CreateEvent
 
 //Declare typedefs for objects creations/destructions functions
-typedef void (*DestroyFunPtr)(Object*);
-typedef Object * (*CreateFunPtr)(std::string name);
+typedef void (*DestroyFunPtr)(gd::Object*);
+typedef gd::Object * (*CreateFunPtr)(std::string name);
 typedef void (*DestroyRuntimeObjectFunPtr)(RuntimeObject*);
-typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const Object & object);
+typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const gd::Object & object);
 
 #if defined(GD_IDE_ONLY) //Condition, Action and expressions declare more things at edittime ( Description, icons... )
 

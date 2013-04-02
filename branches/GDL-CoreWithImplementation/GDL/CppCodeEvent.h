@@ -10,11 +10,12 @@
 #include "GDCore/Events/Event.h"
 class RuntimeScene;
 namespace gd { class Instruction; }
+namespace gd { class MainFrameWrapper; }
+namespace gd { class Project; }
 class TiXmlElement;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
 class Scene;
-namespace gd { class MainFrameWrapper; }
 class wxWindow;
 
 /**
@@ -71,7 +72,7 @@ public:
     void SetDisplayedName(const std::string & displayedName_) { displayedName = displayedName_; };
 
     virtual void SaveToXml(TiXmlElement * eventElem) const;
-    virtual void LoadFromXml(const TiXmlElement * eventElem);
+    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
 
     /**
      * Called by event editor to draw the event.

@@ -741,8 +741,6 @@
 		<Unit filename="GDL/DocMainPage.h" />
 		<Unit filename="GDL/DynamicLibrariesTools.cpp" />
 		<Unit filename="GDL/DynamicLibrariesTools.h" />
-		<Unit filename="GDL/EmptyEvent.cpp" />
-		<Unit filename="GDL/EmptyEvent.h" />
 		<Unit filename="GDL/Events/CodeCompilationHelpers.cpp" />
 		<Unit filename="GDL/Events/CodeCompilationHelpers.h" />
 		<Unit filename="GDL/Events/EventsCodeGenerationContext.cpp" />

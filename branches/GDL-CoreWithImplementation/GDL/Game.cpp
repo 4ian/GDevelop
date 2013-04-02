@@ -171,7 +171,7 @@ void Game::LoadFromXml(const TiXmlElement * rootElement)
     //Global objects
     elem = rootElement->FirstChildElement( "Objects" );
     if ( elem )
-        OpenSaveGame::OpenObjects(GetGlobalObjects(), elem);
+        OpenSaveGame::OpenObjects(*this, GetGlobalObjects(), elem);
 
     #if defined(GD_IDE_ONLY)
     //Global object groups
@@ -193,7 +193,7 @@ void Game::LoadFromXml(const TiXmlElement * rootElement)
         //Add a new layout
         GetLayouts().push_back(boost::shared_ptr<Scene>(new Scene));
         GetLayouts().back()->SetName(layoutName);
-        GetLayouts().back()->LoadFromXml(elem);
+        GetLayouts().back()->LoadFromXml(*this, elem);
 
         elem = elem->NextSiblingElement();
     }
@@ -202,7 +202,17 @@ void Game::LoadFromXml(const TiXmlElement * rootElement)
     //External events
     elem = rootElement->FirstChildElement( "ExternalEvents" );
     if ( elem )
-        OpenSaveGame::OpenExternalEvents(GetExternalEvents(), elem);
+    {
+        const TiXmlElement * externalEventsElem = elem->FirstChildElement();
+
+        while ( externalEventsElem )
+        {
+            gd::ExternalEvents & externalEvents = InsertNewExternalEvents(externalEventsElem->Attribute("Name") ? externalEventsElem->Attribute("Name") : "", GetExternalEventsCount() );
+            externalEvents.LoadFromXml(*this, externalEventsElem);
+
+            externalEventsElem = externalEventsElem->NextSiblingElement();
+        }
+    }
 
     elem = rootElement->FirstChildElement( "ExternalSourceFiles" );
     if ( elem )
@@ -377,11 +387,9 @@ void Game::SaveToXml(TiXmlElement * root) const
     //Scenes
     TiXmlElement * scenes = new TiXmlElement( "Scenes" );
     root->LinkEndChild( scenes );
-    TiXmlElement * scene;
-
     for ( unsigned int i = 0;i < GetLayoutCount();i++ )
     {
-        scene = new TiXmlElement( "Scene" );
+        TiXmlElement * scene = new TiXmlElement( "Scene" );
         scenes->LinkEndChild( scene );
         GetLayout(i).SaveToXml(scene);
     }
@@ -389,7 +397,12 @@ void Game::SaveToXml(TiXmlElement * root) const
     //External events
     TiXmlElement * externalEvents = new TiXmlElement( "ExternalEvents" );
     root->LinkEndChild( externalEvents );
-    OpenSaveGame::SaveExternalEvents(GetExternalEvents(), externalEvents);
+    for ( unsigned int j = 0;j < GetExternalEventsCount();j++ )
+    {
+        TiXmlElement * externalEventsElem = new TiXmlElement( "ExternalEvents" );
+        externalEvents->LinkEndChild( externalEventsElem );
+        GetExternalEvents(j).SaveToXml(externalEventsElem);
+    }
 
     //External layouts
     TiXmlElement * externalLayouts = new TiXmlElement( "ExternalLayouts" );
@@ -606,7 +619,7 @@ unsigned int Game::GetLayoutCount() const
     return scenes.size();
 }
 
-void Game::InsertNewLayout(const std::string & name, unsigned int position)
+gd::Layout & Game::InsertNewLayout(const std::string & name, unsigned int position)
 {
     boost::shared_ptr<Scene> newScene = boost::shared_ptr<Scene>(new Scene);
     if (position<scenes.size())
@@ -616,6 +629,7 @@ void Game::InsertNewLayout(const std::string & name, unsigned int position)
 
     newScene->SetName(name);
     newScene->UpdateAutomatismsSharedData(*this);
+    return *newScene;
 }
 
 void Game::InsertLayout(const gd::Layout & layout, unsigned int position)
@@ -644,21 +658,21 @@ void Game::RemoveLayout(const std::string & name)
 
 bool Game::HasExternalEventsNamed(const std::string & name) const
 {
-    return ( find_if(externalEvents.begin(), externalEvents.end(), bind2nd(ExternalEventsHasName(), name)) != externalEvents.end() );
+    return ( find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name)) != externalEvents.end() );
 }
-ExternalEvents & Game::GetExternalEvents(const std::string & name)
+gd::ExternalEvents & Game::GetExternalEvents(const std::string & name)
 {
-    return *(*find_if(externalEvents.begin(), externalEvents.end(), bind2nd(ExternalEventsHasName(), name)));
+    return *(*find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name)));
 }
-const ExternalEvents & Game::GetExternalEvents(const std::string & name) const
+const gd::ExternalEvents & Game::GetExternalEvents(const std::string & name) const
 {
-    return *(*find_if(externalEvents.begin(), externalEvents.end(), bind2nd(ExternalEventsHasName(), name)));
+    return *(*find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name)));
 }
-ExternalEvents & Game::GetExternalEvents(unsigned int index)
+gd::ExternalEvents & Game::GetExternalEvents(unsigned int index)
 {
     return *externalEvents[index];
 }
-const ExternalEvents & Game::GetExternalEvents (unsigned int index) const
+const gd::ExternalEvents & Game::GetExternalEvents (unsigned int index) const
 {
     return *externalEvents[index];
 }
@@ -675,34 +689,29 @@ unsigned int Game::GetExternalEventsCount() const
     return externalEvents.size();
 }
 
-void Game::InsertNewExternalEvents(std::string & name, unsigned int position)
+gd::ExternalEvents & Game::InsertNewExternalEvents(const std::string & name, unsigned int position)
 {
-    boost::shared_ptr<ExternalEvents> newExternalEvents = boost::shared_ptr<ExternalEvents>(new ExternalEvents);
+    boost::shared_ptr<gd::ExternalEvents> newExternalEvents(new gd::ExternalEvents);
     if (position<externalEvents.size())
         externalEvents.insert(externalEvents.begin()+position, newExternalEvents);
     else
         externalEvents.push_back(newExternalEvents);
 
     newExternalEvents->SetName(name);
+    return *newExternalEvents;
 }
 
 void Game::InsertExternalEvents(const gd::ExternalEvents & events, unsigned int position)
 {
-    try
-    {
-        const ExternalEvents & castedEvents = dynamic_cast<const ExternalEvents&>(events);
-        boost::shared_ptr<ExternalEvents> newExternalEvents = boost::shared_ptr<ExternalEvents>(new ExternalEvents(castedEvents));
-        if (position<externalEvents.size())
-            externalEvents.insert(externalEvents.begin()+position, newExternalEvents);
-        else
-            externalEvents.push_back(newExternalEvents);
-    }
-    catch(...) { std::cout << "WARNING: Tried to add external events which are not GD C++ Platform ExternalEvents to a GD C++ Platform project"; }
+    if (position<externalEvents.size())
+        externalEvents.insert(externalEvents.begin()+position, boost::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
+    else
+        externalEvents.push_back(boost::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(events)));
 }
 
 void Game::RemoveExternalEvents(const std::string & name)
 {
-    std::vector< boost::shared_ptr<ExternalEvents> >::iterator events = find_if(externalEvents.begin(), externalEvents.end(), bind2nd(ExternalEventsHasName(), name));
+    std::vector< boost::shared_ptr<gd::ExternalEvents> >::iterator events = find_if(externalEvents.begin(), externalEvents.end(), bind2nd(gd::ExternalEventsHasName(), name));
     if ( events == externalEvents.end() ) return;
 
     externalEvents.erase(events);
@@ -741,7 +750,7 @@ unsigned int Game::GetExternalLayoutsCount() const
     return externalLayouts.size();
 }
 
-void Game::InsertNewExternalLayout(std::string & name, unsigned int position)
+gd::ExternalLayout & Game::InsertNewExternalLayout(const std::string & name, unsigned int position)
 {
     boost::shared_ptr<ExternalLayout> newExternalLayout = boost::shared_ptr<ExternalLayout>(new ExternalLayout);
     if (position<externalLayouts.size())
@@ -750,6 +759,7 @@ void Game::InsertNewExternalLayout(std::string & name, unsigned int position)
         externalLayouts.push_back(newExternalLayout);
 
     newExternalLayout->SetName(name);
+    return *newExternalLayout;
 }
 
 void Game::InsertExternalLayout(const gd::ExternalLayout & events, unsigned int position)
@@ -810,7 +820,7 @@ unsigned int Game::GetObjectsCount() const
 
 void Game::InsertNewObject(const std::string & objectType, const std::string & name, unsigned int position)
 {
-    boost::shared_ptr<Object> newObject = ExtensionsManager::GetInstance()->CreateObject(objectType, name);
+    boost::shared_ptr<gd::Object> newObject = ExtensionsManager::GetInstance()->CreateObject(objectType, name);
     if (position<GetGlobalObjects().size())
         GetGlobalObjects().insert(GetGlobalObjects().begin()+position, newObject);
     else
@@ -821,8 +831,8 @@ void Game::InsertObject(const gd::Object & object, unsigned int position)
 {
     try
     {
-        const Object & castedObject = dynamic_cast<const Object&>(object);
-        boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(castedObject.Clone());
+        const gd::Object & castedObject = dynamic_cast<const gd::Object&>(object);
+        boost::shared_ptr<gd::Object> newObject = boost::shared_ptr<gd::Object>(castedObject.Clone());
         if (position<GetGlobalObjects().size())
             GetGlobalObjects().insert(GetGlobalObjects().begin()+position, newObject);
         else
@@ -833,7 +843,7 @@ void Game::InsertObject(const gd::Object & object, unsigned int position)
 
 void Game::RemoveObject(const std::string & name)
 {
-    std::vector< boost::shared_ptr<Object> >::iterator events = find_if(GetGlobalObjects().begin(), GetGlobalObjects().end(), bind2nd(ObjectHasName(), name));
+    std::vector< boost::shared_ptr<gd::Object> >::iterator events = find_if(GetGlobalObjects().begin(), GetGlobalObjects().end(), bind2nd(ObjectHasName(), name));
     if ( events == GetGlobalObjects().end() ) return;
 
     GetGlobalObjects().erase(events);
@@ -844,7 +854,7 @@ void Game::SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectI
     if ( firstObjectIndex >= GetGlobalObjects().size() || secondObjectIndex >= GetGlobalObjects().size() )
         return;
 
-    boost::shared_ptr<Object> temp = GetGlobalObjects()[firstObjectIndex];
+    boost::shared_ptr<gd::Object> temp = GetGlobalObjects()[firstObjectIndex];
     GetGlobalObjects()[firstObjectIndex] = GetGlobalObjects()[secondObjectIndex];
     GetGlobalObjects()[secondObjectIndex] = temp;
 }
@@ -873,7 +883,7 @@ void Game::Init(const Game & game)
 
     GetGlobalObjects().clear();
     for (unsigned int i =0;i<game.GetGlobalObjects().size();++i)
-    	GetGlobalObjects().push_back( boost::shared_ptr<Object>(game.GetGlobalObjects()[i]->Clone()) );
+    	GetGlobalObjects().push_back( boost::shared_ptr<gd::Object>(game.GetGlobalObjects()[i]->Clone()) );
 
     scenes.clear();
     for (unsigned int i =0;i<game.scenes.size();++i)
@@ -882,7 +892,7 @@ void Game::Init(const Game & game)
     #if defined(GD_IDE_ONLY)
     externalEvents.clear();
     for (unsigned int i =0;i<game.externalEvents.size();++i)
-    	externalEvents.push_back( boost::shared_ptr<ExternalEvents>(new ExternalEvents(*game.externalEvents[i])) );
+    	externalEvents.push_back( boost::shared_ptr<gd::ExternalEvents>(new gd::ExternalEvents(*game.externalEvents[i])) );
     #endif
 
     externalLayouts.clear();

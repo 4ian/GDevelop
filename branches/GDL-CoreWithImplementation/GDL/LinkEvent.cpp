@@ -46,7 +46,7 @@ void LinkEvent::SaveToXml(TiXmlElement * eventElem) const
     com1->SetAttribute( "value", GetTarget().c_str() );
 }
 
-void LinkEvent::LoadFromXml(const TiXmlElement * eventElem)
+void LinkEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventElem)
 {
     if ( eventElem->FirstChildElement( "Limites" ) )
     {
@@ -76,7 +76,7 @@ void LinkEvent::Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEve
 
     //Finding what to link to.
     const vector< gd::BaseEventSPtr > * eventsToInclude = NULL;
-    ExternalEvents * linkedExternalEvents = NULL;
+    gd::ExternalEvents * linkedExternalEvents = NULL;
     if ( game.HasExternalEventsNamed(GetTarget()) )
     {
         linkedExternalEvents = &game.GetExternalEvents(GetTarget());
@@ -122,7 +122,7 @@ void LinkEvent::Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEve
         //Insert an empty event to replace the link event ( we'll delete the link event at the end )
         //( If we just erase the link event without adding a blank event to replace it,
         //the first event inserted by the link will not be preprocessed ( and it can be annoying if it require preprocessing, such as another link event ). )
-        eventList.insert(eventList.begin() + indexOfTheEventInThisList, boost::shared_ptr<gd::BaseEvent>(new EmptyEvent));
+        eventList.insert(eventList.begin() + indexOfTheEventInThisList, boost::shared_ptr<gd::BaseEvent>(new gd::EmptyEvent));
 
         //Insert linked events
         for ( unsigned int insertion = 0;insertion <= static_cast<unsigned>(lastEvent-firstEvent);insertion++ )

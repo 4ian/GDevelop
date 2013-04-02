@@ -20,6 +20,7 @@
 #include "GDCore/Events/Event.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/Events/Serialization.h"
 #endif
 #undef GetObject //Disable an annoying macro
 
@@ -179,7 +180,7 @@ unsigned int Scene::GetObjectsCount() const
 
 void Scene::InsertNewObject(const std::string & objectType, const std::string & name, unsigned int position)
 {
-    boost::shared_ptr<Object> newObject = ExtensionsManager::GetInstance()->CreateObject(objectType, name);
+    boost::shared_ptr<gd::Object> newObject = ExtensionsManager::GetInstance()->CreateObject(objectType, name);
     if (position<GetInitialObjects().size())
         GetInitialObjects().insert(GetInitialObjects().begin()+position, newObject);
     else
@@ -190,8 +191,8 @@ void Scene::InsertObject(const gd::Object & object, unsigned int position)
 {
     try
     {
-        const Object & castedObject = dynamic_cast<const Object&>(object);
-        boost::shared_ptr<Object> newObject = boost::shared_ptr<Object>(castedObject.Clone());
+        const gd::Object & castedObject = dynamic_cast<const gd::Object&>(object);
+        boost::shared_ptr<gd::Object> newObject = boost::shared_ptr<gd::Object>(castedObject.Clone());
         if (position<GetInitialObjects().size())
             GetInitialObjects().insert(GetInitialObjects().begin()+position, newObject);
         else
@@ -205,14 +206,14 @@ void Scene::SwapObjects(unsigned int firstObjectIndex, unsigned int secondObject
     if ( firstObjectIndex >= GetInitialObjects().size() || secondObjectIndex >= GetInitialObjects().size() )
         return;
 
-    boost::shared_ptr<Object> temp = GetInitialObjects()[firstObjectIndex];
+    boost::shared_ptr<gd::Object> temp = GetInitialObjects()[firstObjectIndex];
     GetInitialObjects()[firstObjectIndex] = GetInitialObjects()[secondObjectIndex];
     GetInitialObjects()[secondObjectIndex] = temp;
 }
 
 void Scene::RemoveObject(const std::string & name)
 {
-    std::vector< boost::shared_ptr<Object> >::iterator object = find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name));
+    std::vector< boost::shared_ptr<gd::Object> >::iterator object = find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name));
     if ( object == GetInitialObjects().end() ) return;
 
     GetInitialObjects().erase(object);
@@ -336,11 +337,11 @@ void Scene::SaveToXml(TiXmlElement * scene) const
 
     TiXmlElement * eventsElem = new TiXmlElement( "Events" );
     scene->LinkEndChild( eventsElem );
-    OpenSaveGame::SaveEvents(GetEvents(), eventsElem);
+    gd::EventsListSerialization::SaveEventsToXml(GetEvents(), eventsElem);
 }
 #endif
 
-void Scene::LoadFromXml(const TiXmlElement * elem)
+void Scene::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
 {
     if ( elem->Attribute( "r" ) != NULL && elem->Attribute( "v" ) != NULL && elem->Attribute( "b" ) != NULL)
         SetBackgroundColor(ToInt(elem->Attribute( "r" )), ToInt(elem->Attribute( "v" )), ToInt(elem->Attribute( "b" )));
@@ -361,7 +362,7 @@ void Scene::LoadFromXml(const TiXmlElement * elem)
     #endif
 
     if ( elem->FirstChildElement( "Objets" ) != NULL )
-        OpenSaveGame::OpenObjects(initialObjects, elem->FirstChildElement( "Objets" ));
+        OpenSaveGame::OpenObjects(project, initialObjects, elem->FirstChildElement( "Objets" ));
 
     if ( elem->FirstChildElement( "Positions" ) != NULL )
         initialInstances.LoadFromXml(elem->FirstChildElement( "Positions" ));
@@ -371,7 +372,7 @@ void Scene::LoadFromXml(const TiXmlElement * elem)
 
     #if defined(GD_IDE_ONLY)
     if ( elem->FirstChildElement( "Events" ) != NULL )
-        OpenSaveGame::OpenEvents(GetEvents(), elem->FirstChildElement( "Events" ));
+        gd::EventsListSerialization::LoadEventsFromXml(project, GetEvents(), elem->FirstChildElement( "Events" ));
     #endif
 
     if ( elem->FirstChildElement( "Variables" ) != NULL )
@@ -430,7 +431,7 @@ void Scene::Init(const Scene & scene)
 
     GetInitialObjects().clear();
     for (unsigned int i =0;i<scene.GetInitialObjects().size();++i)
-    	GetInitialObjects().push_back( boost::shared_ptr<Object>(scene.GetInitialObjects()[i]->Clone()) );
+    	GetInitialObjects().push_back( boost::shared_ptr<gd::Object>(scene.GetInitialObjects()[i]->Clone()) );
 
     initialInstances = scene.initialInstances;
     layers = scene.layers;

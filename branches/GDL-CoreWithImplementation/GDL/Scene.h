@@ -11,7 +11,7 @@
 #include "GDL/InitialInstancesContainer.h"
 #include "GDL/VariableList.h"
 #include "GDL/Layer.h"
-class Object;
+namespace gd { class Object; }
 class Game;
 class CodeExecutionEngine;
 class AutomatismsSharedDatas;
@@ -94,12 +94,12 @@ public:
     /**
      * Return a reference to the vector containing the (smart) pointers to the objects.
      */
-    inline const std::vector < boost::shared_ptr<Object> > & GetInitialObjects() const { return initialObjects; }
+    inline const std::vector < boost::shared_ptr<gd::Object> > & GetInitialObjects() const { return initialObjects; }
 
     /**
      * Return a reference to the vector containing the (smart) pointers to the objects.
      */
-    inline std::vector < boost::shared_ptr<Object> > & GetInitialObjects() { return initialObjects; }
+    inline std::vector < boost::shared_ptr<gd::Object> > & GetInitialObjects() { return initialObjects; }
 
     /**
      * Return a reference to the specified layer
@@ -127,14 +127,14 @@ public:
     virtual unsigned int GetLayersCount() const;
 
     /**
-     * Provide access to the ListVariable member containing the layout variables
+     * Provide access to the gd::VariablesContainer member containing the layout variables
      */
-    inline const ListVariable & GetVariables() const { return variables; }
+    inline const gd::VariablesContainer & GetVariables() const { return variables; }
 
     /**
-     * Provide access to the ListVariable member containing the layout variables
+     * Provide access to the gd::VariablesContainer member containing the layout variables
      */
-    inline ListVariable & GetVariables() { return variables; }
+    inline gd::VariablesContainer & GetVariables() { return variables; }
 
     /**
      * Return the container storing initial instances.
@@ -146,7 +146,7 @@ public:
      */
     virtual gd::InitialInstancesContainer & GetInitialInstances() { return initialInstances; }
 
-    virtual void LoadFromXml(const TiXmlElement * element);
+    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * element);
 
     #if defined(GD_IDE_ONLY)
     /** \name Specialization of gd::Layout members
@@ -362,8 +362,8 @@ private:
     unsigned int                                backgroundColorG; ///< Background color Green component
     unsigned int                                backgroundColorB; ///< Background color Blue component
     std::string                                 title; ///< Title displayed in the window
-    std::vector < boost::shared_ptr<Object> >   initialObjects; ///< Objects available.
-    ListVariable                                variables; ///< Variables list
+    std::vector < boost::shared_ptr<gd::Object> >   initialObjects; ///< Objects available.
+    gd::VariablesContainer                                variables; ///< Variables list
     gd::InitialInstancesContainer                   initialInstances; ///< Initial instances
     std::vector < Layer >                       layers; ///< Initial layers
     bool                                        stopSoundsOnStartup; ///< True to make the scene stop all sounds at startup.

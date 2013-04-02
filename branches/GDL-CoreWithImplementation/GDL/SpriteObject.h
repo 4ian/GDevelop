@@ -8,13 +8,15 @@
 
 #include "GDL/Object.h"
 #include "GDL/RuntimeObject.h"
+namespace gd { class InitialInstance; }
+namespace gd { class Object; }
 class Animation;
 class Sprite;
 class ImageManager;
 class RuntimeScene;
-class Object;
+class Game;
+class Scene;
 class ImageManager;
-namespace gd { class InitialInstance; }
 namespace sf
 {
     class Sprite;
@@ -57,27 +59,27 @@ private:
  * \see Sprite
  * \ingroup SpriteObjectExtension
  */
-class GD_API SpriteObject : public Object
+class GD_API SpriteObject : public gd::Object
 {
 public :
 
     SpriteObject(std::string name_);
     virtual ~SpriteObject();
-    virtual Object * Clone() const { return new SpriteObject(*this);}
+    virtual gd::Object * Clone() const { return new SpriteObject(*this);}
 
     #if defined(GD_IDE_ONLY)
     virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
-    virtual void EditObject( wxWindow* parent, Game & game_, gd::MainFrameWrapper & mainFrameWrapper_ );
+    virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & position, Game & game, Scene & scene);
     virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, Game & game, Scene & scene);
 
     virtual bool SupportShaders() { return true; }
     #endif
 
-    virtual void LoadFromXml(const TiXmlElement * elemScene);
+    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
     #if defined(GD_IDE_ONLY)
     virtual void SaveToXml(TiXmlElement * elemScene);
     #endif
@@ -108,7 +110,7 @@ class GD_API RuntimeSpriteObject : public RuntimeObject
 {
 public :
 
-    RuntimeSpriteObject(RuntimeScene & scene, const Object & object);
+    RuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object);
     virtual ~RuntimeSpriteObject() {};
     virtual RuntimeObject * Clone() const { return new RuntimeSpriteObject(*this);}
 
@@ -251,10 +253,10 @@ private:
 };
 
 
-GD_API void DestroySpriteObject(Object * object);
-GD_API Object * CreateSpriteObject(std::string name);
+GD_API void DestroySpriteObject(gd::Object * object);
+GD_API gd::Object * CreateSpriteObject(std::string name);
 GD_API void DestroyRuntimeSpriteObject(RuntimeObject * object);
-GD_API RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const Object & object);
+GD_API RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // SPRITEOBJECT_H
 

@@ -18,7 +18,7 @@
 namespace gd {class ArbitraryResourceWorker;}
 class CodeExecutionEngine;
 class Scene;
-class ExternalEvents;
+namespace gd { class ExternalEvents; }
 class Game;
 namespace GDpriv
 {
@@ -61,7 +61,7 @@ public:
      * \param game Game owning the source file. ( Used to add the game directory to headers directories list )
      * \param events External events to compile.
      */
-    static void CreateExternalEventsCompilationTask(Game & game, ExternalEvents & events);
+    static void CreateExternalEventsCompilationTask(Game & game, gd::ExternalEvents & events);
 };
 
 /**
@@ -160,9 +160,9 @@ public:
     virtual bool Execute();
 
     Game * game;
-    ExternalEvents * externalEvents;
+    gd::ExternalEvents * externalEvents;
 
-    ExternalEventsCodeCompilerPreWork(Game * game_, ExternalEvents * events_) : game(game_), externalEvents(events_) {};
+    ExternalEventsCodeCompilerPreWork(Game * game_, gd::ExternalEvents * events_) : game(game_), externalEvents(events_) {};
     virtual ~ExternalEventsCodeCompilerPreWork() {};
 };
 
@@ -181,9 +181,9 @@ public:
     virtual bool Execute();
 
     Game * game;
-    ExternalEvents * externalEvents;
+    gd::ExternalEvents * externalEvents;
 
-    ExternalEventsCodeCompilerPostWork(Game * game_, ExternalEvents * events_) : game(game_), externalEvents(events_) {};
+    ExternalEventsCodeCompilerPostWork(Game * game_, gd::ExternalEvents * events_) : game(game_), externalEvents(events_) {};
     virtual ~ExternalEventsCodeCompilerPostWork() {};
 };
 
@@ -201,10 +201,10 @@ public:
     virtual bool Execute();
 
     Game * game;
-    ExternalEvents * externalEvents;
+    gd::ExternalEvents * externalEvents;
     gd::ArbitraryResourceWorker & resourceWorker;
 
-    ExternalEventsCodeCompilerRuntimePreWork(Game * game_, ExternalEvents * events_, gd::ArbitraryResourceWorker & resourceWorker_) : game(game_), externalEvents(events_), resourceWorker(resourceWorker_) {};
+    ExternalEventsCodeCompilerRuntimePreWork(Game * game_, gd::ExternalEvents * events_, gd::ArbitraryResourceWorker & resourceWorker_) : game(game_), externalEvents(events_), resourceWorker(resourceWorker_) {};
     virtual ~ExternalEventsCodeCompilerRuntimePreWork() {};
 };
 

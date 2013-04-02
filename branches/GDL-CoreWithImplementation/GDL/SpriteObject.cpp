@@ -41,7 +41,7 @@ SpriteObject::~SpriteObject()
 {
 };
 
-RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const Object & object) :
+RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object) :
     RuntimeObject(scene, object),
     currentAnimation( 0 ),
     currentDirection( 0 ),
@@ -172,10 +172,14 @@ void SpriteObject::ExposeResources(gd::ArbitraryResourceWorker & worker)
     }
 }
 
-void SpriteObject::EditObject( wxWindow* parent, Game & game, gd::MainFrameWrapper & mainFrameWrapper )
+void SpriteObject::EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper )
 {
-    SpriteObjectEditor dialog( parent, game, *this, mainFrameWrapper );
-    dialog.ShowModal();
+    try
+    {
+        SpriteObjectEditor dialog( parent, dynamic_cast<Game&>(project), *this, mainFrameWrapper );
+        dialog.ShowModal();
+    }
+    catch (...) { std::cout << "WARNING: The IDE probably passed a project which is not a GD C++ Platform Game."; }
 }
 
 
@@ -775,8 +779,10 @@ void RuntimeSpriteObject::TurnTowardObject( const std::string &, RuntimeObject *
 }
 
 
-void SpriteObject::LoadFromXml(const TiXmlElement * elemScene)
+void SpriteObject::LoadFromXml(gd::Project & project, const TiXmlElement * elemScene)
 {
+    gd::Object::LoadFromXml(project, elemScene);
+
     if ( elemScene->FirstChildElement( "Animations" ) == NULL ) return;
 
     const TiXmlElement * elemObjetScene = elemScene->FirstChildElement( "Animations" )->FirstChildElement();
@@ -805,11 +811,13 @@ void SpriteObject::LoadFromXml(const TiXmlElement * elemScene)
 }
 
 #if defined(GD_IDE_ONLY)
-void SpriteObject::SaveToXml(TiXmlElement * objet)
+void SpriteObject::SaveToXml(TiXmlElement * elem)
 {
+    gd::Object::SaveToXml(elem);
+
     //Animations
     TiXmlElement * animations = new TiXmlElement( "Animations" );
-    objet->LinkEndChild( animations );
+    elem->LinkEndChild( animations );
     TiXmlElement * animation;
 
     for ( unsigned int k = 0;k < GetAnimationCount();k++ )
@@ -862,7 +870,7 @@ AnimationProxy & AnimationProxy::operator=(const AnimationProxy & rhs)
  * Game Develop does not delete directly extension object
  * to avoid overloaded new/delete conflicts.
  */
-void DestroySpriteObject(Object * object)
+void DestroySpriteObject(gd::Object * object)
 {
     delete object;
 }
@@ -871,7 +879,7 @@ void DestroySpriteObject(Object * object)
  * Function creating an extension Object.
  * Game Develop can not directly create an extension object
  */
-Object * CreateSpriteObject(std::string name)
+gd::Object * CreateSpriteObject(std::string name)
 {
     return new SpriteObject(name);
 }
@@ -882,7 +890,7 @@ void DestroyRuntimeSpriteObject(RuntimeObject * object)
     delete object;
 }
 
-RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const Object & object)
+RuntimeObject * CreateRuntimeSpriteObject(RuntimeScene & scene, const gd::Object & object)
 {
     return new RuntimeSpriteObject(scene, object);
 }

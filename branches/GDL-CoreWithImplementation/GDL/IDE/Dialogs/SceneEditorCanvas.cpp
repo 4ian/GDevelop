@@ -532,7 +532,7 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
-                boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+                boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
 
                 if ( associatedObject )
                 {
@@ -555,7 +555,7 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
-                boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+                boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
 
                 if ( associatedObject )
                 {
@@ -578,7 +578,7 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
-                boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+                boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
 
                 if ( associatedObject )
                 {
@@ -603,7 +603,7 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
-                boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+                boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
 
                 if ( associatedObject )
                 {
@@ -631,7 +631,7 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
     {
         for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
         {
-            boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+            boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
 
             if ( associatedObject )
             {
@@ -742,7 +742,7 @@ void SceneEditorCanvas::OnGuiElementPressed(const gd::LayoutEditorCanvasGuiEleme
         resizeOriginalWidths.clear();
         for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
         {
-            boost::shared_ptr<Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+            boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
             if ( associatedObject) resizeOriginalWidths[it->first] = associatedObject->GetWidth();
             if ( associatedObject) resizeOriginalHeights[it->first] = associatedObject->GetHeight();
         }

@@ -11,10 +11,10 @@ namespace sf {class Shader;}
 namespace gd { class InitialInstance; }
 class Polygon2d;
 class RuntimeScene;
-class Object;
+namespace gd { class Object; }
 class ImageManager;
 class TiXmlElement;
-class Automatism;
+namespace gd { class Automatism; }; typedef gd::Automatism Automatism;
 
 /**
  * \brief A RuntimeObject is something displayed on the scene.
@@ -42,14 +42,14 @@ public:
      * The default implementation already takes care of setting common properties
      * ( name, type, automatisms... ). Be sure to call the original constructor if you redefine it:
      * \code
-     * MyRuntimeObject(RuntimeScene & scene, const Object & object) :
+     * MyRuntimeObject(RuntimeScene & scene, const gd::Object & object) :
      *     RuntimeObject(scene, object)
      * {
      *     //...
      * }
      * \endcode
      */
-    RuntimeObject(RuntimeScene & scene, const Object & object);
+    RuntimeObject(RuntimeScene & scene, const gd::Object & object);
 
     /**
      * Copy constructor. Calls Init().
@@ -93,14 +93,14 @@ public:
     ///@{
 
     /**
-     * Provide access to the ListVariable member containing the layout variables
+     * Provide access to the gd::VariablesContainer member containing the layout variables
      */
-    inline const ListVariable & GetVariables() const { return objectVariables; }
+    inline const gd::VariablesContainer & GetVariables() const { return objectVariables; }
 
     /**
-     * Provide access to the ListVariable member containing the layout variables
+     * Provide access to the gd::VariablesContainer member containing the layout variables
      */
-    inline ListVariable & GetVariables() { return objectVariables; }
+    inline gd::VariablesContainer & GetVariables() { return objectVariables; }
 
     ///@}
 
@@ -390,7 +390,7 @@ protected:
     bool                                                    hidden; ///<True to prevent the object from being rendered.
     std::string                                             layer; ///<Name of the layer on which the object is.
     std::map<std::string, Automatism* >                     automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
-    ListVariable                                            objectVariables; ///<List of the variables of the object
+    gd::VariablesContainer                                            objectVariables; ///<List of the variables of the object
 
     /**
      * Initialize object using another object. Used by copy-ctor and assign-op.
@@ -407,6 +407,6 @@ void DestroyBaseRuntimeObject(RuntimeObject * object);
 /**
  * As extensions, a function used to create an object. ( Simply a "return new RuntimeObject(name);" )
  */
-RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const Object & object);
+RuntimeObject * CreateBaseRuntimeObject(RuntimeScene & scene, const gd::Object & object);
 
 #endif // RUNTIMEOBJECT_H

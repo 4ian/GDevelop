@@ -46,7 +46,6 @@
 #include "GDL/Layer.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/EmptyEvent.h"
 #include "GDL/ForEachEvent.h"
 #include "GDL/WhileEvent.h"
 #include "GDL/ExternalEvents.h"
@@ -58,7 +57,7 @@
 
 using namespace std;
 
-void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, const TiXmlElement * elem)
+void OpenSaveGame::OpenObjects(gd::Project & project, vector < boost::shared_ptr<gd::Object> > & objects, const TiXmlElement * elem)
 {
     const TiXmlElement * elemScene = elem->FirstChildElement("Objet");
 
@@ -76,38 +75,15 @@ void OpenSaveGame::OpenObjects(vector < boost::shared_ptr<Object> > & objects, c
         if ( elemScene->Attribute( "type" ) != NULL ) { type = elemScene->Attribute( "type" ); }
 
         //Objet vide
-        boost::shared_ptr<Object> newObject = extensionsManager->CreateObject(type, name);
+        boost::shared_ptr<gd::Object> newObject = extensionsManager->CreateObject(type, name);
 
-        if ( newObject != boost::shared_ptr<Object>() )
+        if ( newObject != boost::shared_ptr<gd::Object>() )
         {
-            if ( elemScene->FirstChildElement( "Variables" ) != NULL ) { newObject->GetVariables().LoadFromXml(elemScene->FirstChildElement( "Variables" )); }
-
-            //Spécifique à l'objet
-            newObject->LoadFromXml(elemScene);
-
-            if ( elemScene->FirstChildElement( "Automatism" ) != NULL )
-            {
-                const TiXmlElement * elemAutomatism = elemScene->FirstChildElement( "Automatism" );
-                while ( elemAutomatism )
-                {
-                    Automatism* newAutomatism = extensionsManager->CreateAutomatism(elemAutomatism->Attribute("Type") != NULL ? elemAutomatism->Attribute("Type") : "");
-                    if ( newAutomatism != NULL )
-                    {
-                        newAutomatism->SetName(elemAutomatism->Attribute("Name") != NULL ? elemAutomatism->Attribute("Name") : "");
-                        newAutomatism->LoadFromXml(elemAutomatism);
-
-                        newObject->AddAutomatism(newAutomatism);
-                    }
-                    else
-                        cout << "Unknown automatism" << elemAutomatism->Attribute("Type") << endl;
-
-                    elemAutomatism = elemAutomatism->NextSiblingElement("Automatism");
-                }
-            }
-
-            //Ajout de l'objet
+            newObject->LoadFromXml(project, elemScene);
             objects.push_back( newObject );
         }
+        else
+            std::cout << "Unknown object " << type << std::endl;
 
         elemScene = elemScene->NextSiblingElement();
     }
@@ -145,39 +121,6 @@ void OpenSaveGame::OpenGroupesObjets(vector < gd::ObjectGroup > & list, const Ti
 #endif
 
 #if defined(GD_IDE_ONLY)
-void OpenSaveGame::OpenEvents(vector < gd::BaseEventSPtr > & list, const TiXmlElement * elem)
-{
-    const TiXmlElement * elemScene = elem->FirstChildElement();
-    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
-
-    //Passage en revue des évènements
-    while ( elemScene )
-    {
-        string type;
-
-        if ( elemScene->FirstChildElement( "Type" ) != NULL && elemScene->FirstChildElement( "Type" )->Attribute( "value" ) != NULL ) { type = elemScene->FirstChildElement( "Type" )->Attribute( "value" );}
-        else { MSG( "Les informations concernant le type d'un évènement manquent." ); }
-
-        gd::BaseEventSPtr event = extensionsManager->CreateEvent(type);
-        if ( event != boost::shared_ptr<gd::BaseEvent>())
-        {
-            event->LoadFromXml(elemScene);
-        }
-        else
-        {
-            cout << "Unknown event of type " << type << endl;
-            event = boost::shared_ptr<gd::BaseEvent>(new EmptyEvent);
-        }
-
-        if ( elemScene->Attribute( "disabled" ) != NULL ) { if ( string(elemScene->Attribute( "disabled" )) == "true" ) event->SetDisabled(); }
-        if ( elemScene->Attribute( "folded" ) != NULL ) { event->folded = ( string(elemScene->Attribute( "folded" )) == "true" ); }
-
-        list.push_back( event );
-
-        elemScene = elemScene->NextSiblingElement();
-    }
-
-}
 
 std::string AddBackSlashBeforeQuotes(std::string text)
 {
@@ -325,28 +268,8 @@ void OpenSaveGame::OpenLayers(vector < Layer > & list, const TiXmlElement * elem
     }
 }
 
-
 #if defined(GD_IDE_ONLY)
-void OpenSaveGame::OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, const TiXmlElement * elem )
-{
-    list.clear();
-    const TiXmlElement * elemScene = elem->FirstChildElement();
-
-    while ( elemScene )
-    {
-        boost::shared_ptr<ExternalEvents> externalEvents = boost::shared_ptr<ExternalEvents>(new ExternalEvents);
-
-        externalEvents->LoadFromXml(elemScene);
-
-        list.push_back(externalEvents);
-        elemScene = elemScene->NextSiblingElement();
-    }
-}
-#endif
-
-
-#if defined(GD_IDE_ONLY)
-void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects )
+void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<gd::Object> > & list, TiXmlElement * objects )
 {
     //Objets
     for ( unsigned int j = 0;j < list.size();j++ )
@@ -356,21 +279,6 @@ void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<Object> > & list
 
         objet->SetAttribute( "nom", list.at( j )->GetName().c_str() );
         objet->SetAttribute( "type", list.at( j )->GetType().c_str() );
-
-        TiXmlElement * variables = new TiXmlElement( "Variables" );
-        objet->LinkEndChild( variables );
-        list[j]->GetVariables().SaveToXml(variables);
-
-        vector < std::string > allAutomatisms = list[j]->GetAllAutomatismNames();
-        for (unsigned int i = 0;i<allAutomatisms.size();++i)
-        {
-            TiXmlElement * automatism = new TiXmlElement( "Automatism" );
-            objet->LinkEndChild( automatism );
-            automatism->SetAttribute( "Type", list[j]->GetAutomatism(allAutomatisms[i]).GetTypeName().c_str() );
-            automatism->SetAttribute( "Name", list[j]->GetAutomatism(allAutomatisms[i]).GetName().c_str() );
-
-            list[j]->GetAutomatism(allAutomatisms[i]).SaveToXml(automatism);
-        }
 
         list[j]->SaveToXml(objet);
     }
@@ -395,23 +303,6 @@ void OpenSaveGame::SaveGroupesObjets(const vector < gd::ObjectGroup > & list, Ti
             grp->LinkEndChild( objet );
             objet->SetAttribute( "nom", allObjects.at(k).c_str() );
         }
-    }
-}
-
-void OpenSaveGame::SaveEvents(const vector < gd::BaseEventSPtr > & list, TiXmlElement * events)
-{
-    for ( unsigned int j = 0;j < list.size();j++ )
-    {
-        TiXmlElement * event = new TiXmlElement( "Event" );
-        event->SetAttribute( "disabled", list[j]->IsDisabled() ? "true" : "false" );
-        event->SetAttribute( "folded", list[j]->folded ? "true" : "false" );
-        events->LinkEndChild( event );
-
-        TiXmlElement * type = new TiXmlElement( "Type" );
-        event->LinkEndChild( type );
-        type->SetAttribute( "value", list[j]->GetType().c_str() );
-
-        list[j]->SaveToXml(event);
     }
 }
 
@@ -520,18 +411,6 @@ void OpenSaveGame::SaveLayers(const vector < Layer > & list, TiXmlElement * laye
         }
     }
 }
-
-void OpenSaveGame::SaveExternalEvents(const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * elem)
-{
-    for ( unsigned int j = 0;j < list.size();j++ )
-    {
-        TiXmlElement * externalEvents = new TiXmlElement( "ExternalEvents" );
-        elem->LinkEndChild( externalEvents );
-
-        list[j]->SaveToXml(externalEvents);
-    }
-}
-
 
 void OpenSaveGame::OpenImagesFromGD2010498(Game & game, const TiXmlElement * imagesElem, const TiXmlElement * dossierElem)
 {

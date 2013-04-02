@@ -14,7 +14,7 @@
 #include <set>
 #include <utility>
 class Scene;
-class ExternalEvents;
+namespace gd { class ExternalEvents; }
 namespace gd { class ParameterMetadata; }
 class EventsCodeGenerationContext;
 namespace gd { class InstructionMetadata;}
@@ -48,7 +48,7 @@ public:
      * \param compilationForRuntime Set this to true if the code is generated for runtime.
      * \return C++ code
      */
-    static std::string GenerateExternalEventsCompleteCode(Game & game, ExternalEvents & events, bool compilationForRuntime = false);
+    static std::string GenerateExternalEventsCompleteCode(Game & game, gd::ExternalEvents & events, bool compilationForRuntime = false);
 
     static void DeleteUselessEvents(std::vector < gd::BaseEventSPtr > & events);
     static void PreprocessEventList( Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & listEvent );

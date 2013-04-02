@@ -38,7 +38,7 @@ void CommentEvent::SaveToXml(TiXmlElement * eventElem) const
     com2Elem->SetAttribute( "value", com2.c_str() );
 }
 
-void CommentEvent::LoadFromXml(const TiXmlElement * eventElem)
+void CommentEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventElem)
 {
     if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "r" ) != NULL ) { int value;eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "r", &value ); r = value;}
     else { cout << "Les informations concernant la couleur d'un commentaire manquent."; }

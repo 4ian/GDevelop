@@ -579,16 +579,6 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const g
             GetLayer(i).GetCamera(j).InitializeSFMLView(defaultView);
     }
 
-    //Load resources of initial objects
-    MessageLoading( "Loading objects resources", 30 );
-    for (unsigned int i = 0; i < GetInitialObjects().size();++i)
-        GetInitialObjects()[i]->LoadResources(*this, *game->imageManager);
-
-    //Load resources of global objects
-    //TODO : Make this only one time during game
-    for (unsigned int i = 0; i < game->GetGlobalObjects().size();++i)
-        game->GetGlobalObjects()[i]->LoadResources(*this, *game->imageManager);
-
     //Create object instances which are originally positioned on scene
     MessageLoading( "Adding objects to their initial position", 66 );
     CreateObjectsFrom(instances);

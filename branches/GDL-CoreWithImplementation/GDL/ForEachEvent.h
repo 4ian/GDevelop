@@ -10,11 +10,12 @@
 #include "GDCore/Events/Event.h"
 class RuntimeScene;
 namespace gd { class Instruction; }
+namespace gd { class Project; }
+namespace gd { class MainFrameWrapper; }
 class TiXmlElement;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
 class Scene;
-namespace gd { class MainFrameWrapper; }
 class wxWindow;
 
 /**
@@ -55,7 +56,7 @@ class ForEachEvent : public gd::BaseEvent
         virtual std::vector < gd::Expression* > GetAllExpressions();
 
         virtual void SaveToXml(TiXmlElement * eventElem) const;
-        virtual void LoadFromXml(const TiXmlElement * eventElem);
+        virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
 
         /**
          * Called by event editor to draw the event.

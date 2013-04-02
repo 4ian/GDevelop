@@ -58,7 +58,7 @@ namespace
         return false;
     }
 
-    bool ExternalEventsNeedRecompilation(Game & game, ExternalEvents & events)
+    bool ExternalEventsNeedRecompilation(Game & game, gd::ExternalEvents & events)
     {
         DependenciesAnalyzer analyzer(game);
         if ( analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName()).empty() )
@@ -107,7 +107,7 @@ namespace
         {
             if (game.HasExternalEventsNamed(*i))
             {
-                boost::shared_ptr<ExternalEvents> externalEvents = game.GetExternalEvents()[game.GetExternalEventsPosition(*i)];
+                boost::shared_ptr<gd::ExternalEvents> externalEvents = game.GetExternalEvents()[game.GetExternalEventsPosition(*i)];
                 if (ExternalEventsNeedRecompilation(game, *externalEvents))
                 {
                     CodeCompilationHelpers::CreateExternalEventsCompilationTask(game, *externalEvents);
@@ -154,7 +154,7 @@ namespace
         {
             if (game.HasExternalEventsNamed(*i))
             {
-                boost::shared_ptr<ExternalEvents> events = game.GetExternalEvents()[game.GetExternalEventsPosition(*i)];
+                boost::shared_ptr<gd::ExternalEvents> events = game.GetExternalEvents()[game.GetExternalEventsPosition(*i)];
 
                 DependenciesAnalyzer analyzer(game);
                 if ( !analyzer.ExternalEventsCanBeCompiledForAScene(events->GetName()).empty() )
@@ -217,7 +217,7 @@ namespace
         {
             if (game.HasExternalEventsNamed(*i) && analyzer.ExternalEventsCanBeCompiledForAScene(*i) == scene.GetName())
             {
-                ExternalEvents & externalEvents = game.GetExternalEvents(*i);
+                gd::ExternalEvents & externalEvents = game.GetExternalEvents(*i);
                 std::cout << "Added GD" << ToString(&externalEvents) << "ObjectFile.o (Created from external events) to the linking." << std::endl;
                 task.compilerCall.extraObjectFiles.push_back(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&externalEvents)+"ObjectFile.o"));
             }
@@ -547,7 +547,7 @@ void GD_API CodeCompilationHelpers::CreateExternalSourceFileCompilationTask(Game
     CodeCompiler::GetInstance()->AddTask(task);
 }
 
-void  GD_API CodeCompilationHelpers::CreateExternalEventsCompilationTask(Game & game, ExternalEvents & events)
+void  GD_API CodeCompilationHelpers::CreateExternalEventsCompilationTask(Game & game, gd::ExternalEvents & events)
 {
     CodeCompilerTask task;
     task.compilerCall.compilationForRuntime = false;

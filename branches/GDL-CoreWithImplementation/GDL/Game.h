@@ -12,9 +12,9 @@
 #include "GDL/VariableList.h"
 #include "GDL/LoadingScreen.h"
 #include "GDL/ResourcesManager.h"
-class Object;
+namespace gd { class Object; }
 class Scene;
-class ExternalEvents;
+namespace gd { class ExternalEvents; }
 class ExternalLayout;
 #if defined(GD_IDE_ONLY)
 class wxPropertyGrid;
@@ -136,12 +136,12 @@ public:
     /**
      * Return a reference to the vector containing the (smart) pointers to the layouts.
      */
-    inline const std::vector < boost::shared_ptr<Object> > & GetGlobalObjects() const { return globalObjects; }
+    inline const std::vector < boost::shared_ptr<gd::Object> > & GetGlobalObjects() const { return globalObjects; }
 
     /**
      * Return a reference to the vector containing the (smart) pointers to the layouts.
      */
-    inline std::vector < boost::shared_ptr<Object> > & GetGlobalObjects() { return globalObjects; }
+    inline std::vector < boost::shared_ptr<gd::Object> > & GetGlobalObjects() { return globalObjects; }
 
     /**
      * Return a reference to the vector containing the (smart) pointers to the layouts.
@@ -164,14 +164,14 @@ public:
     inline std::vector < boost::shared_ptr<ExternalLayout> > & GetExternalLayouts() { return externalLayouts; }
 
     /**
-     * Provide access to the ListVariable member containing the global variables
+     * Provide access to the gd::VariablesContainer member containing the global variables
      */
-    inline const ListVariable & GetVariables() const { return variables; }
+    inline const gd::VariablesContainer & GetVariables() const { return variables; }
 
     /**
-     * Provide access to the ListVariable member containing the global variables
+     * Provide access to the gd::VariablesContainer member containing the global variables
      */
-    inline ListVariable & GetVariables() { return variables; }
+    inline gd::VariablesContainer & GetVariables() { return variables; }
 
     /**
      * Provide access to the ResourceManager member containing the list of the resources.
@@ -187,12 +187,12 @@ public:
     /**
      * Return a reference to the vector containing the (smart) pointers to the external events.
      */
-    inline const std::vector < boost::shared_ptr<ExternalEvents> > & GetExternalEvents() const { return externalEvents; }
+    inline const std::vector < boost::shared_ptr<gd::ExternalEvents> > & GetExternalEvents() const { return externalEvents; }
 
     /**
      * Return a reference to the vector containing the (smart) pointers to the external events.
      */
-    inline std::vector < boost::shared_ptr<ExternalEvents> > & GetExternalEvents() { return externalEvents; }
+    inline std::vector < boost::shared_ptr<gd::ExternalEvents> > & GetExternalEvents() { return externalEvents; }
     #endif
 
     LoadingScreen loadingScreen; ///< Data concerning the loading screen
@@ -237,18 +237,18 @@ public:
     virtual const gd::Layout & GetLayout (unsigned int index) const;
     virtual unsigned int GetLayoutPosition(const std::string & name) const;
     virtual unsigned int GetLayoutCount() const;
-    virtual void InsertNewLayout(const std::string & name, unsigned int position);
+    virtual gd::Layout & InsertNewLayout(const std::string & name, unsigned int position);
     virtual void InsertLayout(const gd::Layout & layout, unsigned int position);
     virtual void RemoveLayout(const std::string & name);
 
     virtual bool HasExternalEventsNamed(const std::string & name) const;
-    virtual ExternalEvents & GetExternalEvents(const std::string & name);
-    virtual const ExternalEvents & GetExternalEvents(const std::string & name) const;
-    virtual ExternalEvents & GetExternalEvents(unsigned int index);
-    virtual const ExternalEvents & GetExternalEvents (unsigned int index) const;
+    virtual gd::ExternalEvents & GetExternalEvents(const std::string & name);
+    virtual const gd::ExternalEvents & GetExternalEvents(const std::string & name) const;
+    virtual gd::ExternalEvents & GetExternalEvents(unsigned int index);
+    virtual const gd::ExternalEvents & GetExternalEvents (unsigned int index) const;
     virtual unsigned int GetExternalEventsPosition(const std::string & name) const;
     virtual unsigned int GetExternalEventsCount() const;
-    virtual void InsertNewExternalEvents(std::string & name, unsigned int position);
+    virtual gd::ExternalEvents & InsertNewExternalEvents(const std::string & name, unsigned int position);
     virtual void RemoveExternalEvents(const std::string & name);
     virtual void InsertExternalEvents(const gd::ExternalEvents & externalEvents, unsigned int position);
 
@@ -271,7 +271,7 @@ public:
     virtual const gd::ExternalLayout & GetExternalLayout (unsigned int index) const;
     virtual unsigned int GetExternalLayoutPosition(const std::string & name) const;
     virtual unsigned int GetExternalLayoutsCount() const;
-    virtual void InsertNewExternalLayout(std::string & name, unsigned int position);
+    virtual gd::ExternalLayout & InsertNewExternalLayout(const std::string & name, unsigned int position);
     virtual void InsertExternalLayout(const gd::ExternalLayout & externalEvents, unsigned int position);
     virtual void RemoveExternalLayout(const std::string & name);
 
@@ -303,8 +303,8 @@ private:
     unsigned int                                        minFPS; ///< Minimum Frame Per Seconds ( slow down game if FPS are below this number )
     bool                                                verticalSync; ///< If true, must activate vertical synchronization.
     std::vector < boost::shared_ptr<Scene> >            scenes; ///< List of all scenes
-    std::vector < boost::shared_ptr<Object> >           globalObjects; ///< Global objects
-    ListVariable                                        variables; ///< Initial global variables
+    std::vector < boost::shared_ptr<gd::Object> >           globalObjects; ///< Global objects
+    gd::VariablesContainer                              variables; ///< Initial global variables
     std::vector < boost::shared_ptr<ExternalLayout> >   externalLayouts; ///< List of all externals layouts
     ResourcesManager                                    resourcesManager; ///< Contains all resources used by the project
     #if defined(GD_IDE_ONLY)
@@ -313,7 +313,7 @@ private:
     std::string                                         latestCompilationDirectory; ///< File of the game
     vector < std::string >                              extensionsUsed; ///< List of extensions used
     gd::Platform *                                      platform; ///< Pointer to the platform owning the project
-    std::vector < boost::shared_ptr<ExternalEvents> >   externalEvents; ///< List of all externals events
+    std::vector < boost::shared_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
     static ChangesNotifier                              changesNotifier; ///< IDE related object
     #endif
 

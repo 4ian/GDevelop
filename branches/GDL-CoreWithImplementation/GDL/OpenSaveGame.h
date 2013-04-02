@@ -11,6 +11,7 @@
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/CommonTools.h"
 namespace gd { class Instruction; }
+namespace gd { class Project; }
 namespace gd { class InstructionMetadata;}
 namespace gd { class InitialInstance; }
 class Layer;
@@ -32,23 +33,18 @@ public:
     static void OpenConditions(vector < gd::Instruction > & list, const TiXmlElement * elem);
     static void OpenActions(vector < gd::Instruction > & list, const TiXmlElement * elem);
 
-    static void SaveEvents( const vector < gd::BaseEventSPtr > & list, TiXmlElement * events );
     static void SaveConditions(const vector < gd::Instruction > & list, TiXmlElement * elem);
     static void SaveActions(const vector < gd::Instruction > & list, TiXmlElement * elem);
 
     static void OpenGroupesObjets( vector < gd::ObjectGroup > & list, const TiXmlElement * elem );
     static void SaveGroupesObjets( const vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets );
 
-    static void SaveObjects( const vector < boost::shared_ptr<Object> > & list, TiXmlElement * objects );
+    static void SaveObjects( const vector < boost::shared_ptr<gd::Object> > & list, TiXmlElement * objects );
     static void SaveLayers( const vector < Layer > & list, TiXmlElement * layers );
-
-    static void OpenExternalEvents( vector < boost::shared_ptr<ExternalEvents> > & list, const TiXmlElement * elem );
     static void OpenImagesFromGD2010498(Game & game, const TiXmlElement * elem, const TiXmlElement * dossierElem );
-
-    static void SaveExternalEvents( const vector < boost::shared_ptr<ExternalEvents> > & list, TiXmlElement * layers );
     #endif
 
-    static void OpenObjects(vector < boost::shared_ptr<Object> > & objects, const TiXmlElement * elem);
+    static void OpenObjects(gd::Project & project, vector < boost::shared_ptr<gd::Object> > & objects, const TiXmlElement * elem);
     static void OpenLayers( vector < Layer > & list, const TiXmlElement * elem );
 };
 

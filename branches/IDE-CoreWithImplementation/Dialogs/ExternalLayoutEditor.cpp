@@ -48,14 +48,14 @@ mainFrameWrapper(mainFrameWrapper_)
     //TODO
     try
     {
-        InitialInstancesContainer & instanceContainer = dynamic_cast<InitialInstancesContainer&>(externalLayout.GetInitialInstances());
+        gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
     }
     catch(...)
     {
         std::cout << "ERROR: ExternalLayoutEditor is not ready for arbitrary Platform. GD will crash";
     }
 
-    InitialInstancesContainer & instanceContainer = dynamic_cast<InitialInstancesContainer&>(externalLayout.GetInitialInstances());
+    gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
 
 	//(*Initialize(ExternalLayoutEditor)
 	wxFlexGridSizer* FlexGridSizer4;
@@ -210,7 +210,7 @@ void ExternalLayoutEditor::SetupForScene(Scene & layout)
 
         try
         {
-            InitialInstancesContainer & instanceContainer = dynamic_cast<InitialInstancesContainer&>(externalLayout.GetInitialInstances());
+            gd::InitialInstancesContainer & instanceContainer = dynamic_cast<gd::InitialInstancesContainer&>(externalLayout.GetInitialInstances());
 
             //Check if external editors already have been created
             bool creatingEditorsForFirsttime = (objectsEditor == boost::shared_ptr<EditorObjets>() ||

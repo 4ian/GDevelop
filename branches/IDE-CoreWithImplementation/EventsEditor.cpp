@@ -1612,7 +1612,7 @@ void EventsEditor::OnTemplateBtClick( wxCommandEvent& event )
         return;
     }
 
-    ChoixTemplateEvent dialog( this );
+    ChoixTemplateEvent dialog( this, game );
     if ( dialog.ShowModal() != 1 ) return;
 
     //Insert new events

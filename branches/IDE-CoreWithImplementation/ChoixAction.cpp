@@ -884,7 +884,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
             std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
             std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
-            ObjSPtr object = boost::shared_ptr<Object> ();
+            ObjSPtr object = boost::shared_ptr<gd::Object> ();
 
             if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
                 object = *sceneObject;

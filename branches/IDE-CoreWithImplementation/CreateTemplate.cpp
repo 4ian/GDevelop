@@ -18,6 +18,7 @@
 #include "GDL/Game.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/CommonTools.h"
+#include "GDCore/Events/Serialization.h"
 
 using namespace std;
 
@@ -254,7 +255,7 @@ void CreateTemplate::OnCreateBtClick( wxCommandEvent& event )
     TiXmlElement * elemEvents = new TiXmlElement( "Events" );
     root->LinkEndChild( elemEvents );
 
-    OpenSaveGame::SaveEvents(events, elemEvents);
+    gd::EventsListSerialization::SaveEventsToXml(events, elemEvents);
 
     wxFileDialog dialog( this, _( "Choose where save the template" ), "Templates", "", "Template (*.mgd)|*.mgd", wxFD_SAVE );
     ;

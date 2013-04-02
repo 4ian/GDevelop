@@ -185,7 +185,7 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
     {
         for(unsigned int i = 0;i<secondGame.GetGlobalObjects().size();i++)
         {
-            vector< boost::shared_ptr<Object> >::iterator object =
+            vector< boost::shared_ptr<gd::Object> >::iterator object =
                 find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), bind2nd(ObjectHasName(), secondGame.GetGlobalObjects()[i]->GetName()));
 
             if ( object != game.GetGlobalObjects().end())
@@ -195,11 +195,11 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
                 if (wxMessageBox(depart+secondGame.GetGlobalObjects()[i]->GetName()+fin, "Un objet global de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
-                    *object = boost::shared_ptr<Object>(secondGame.GetGlobalObjects()[i]->Clone());
+                    *object = boost::shared_ptr<gd::Object>(secondGame.GetGlobalObjects()[i]->Clone());
                 }
             }
             else
-                game.GetGlobalObjects().push_back(boost::shared_ptr<Object>(secondGame.GetGlobalObjects()[i]->Clone()));
+                game.GetGlobalObjects().push_back(boost::shared_ptr<gd::Object>(secondGame.GetGlobalObjects()[i]->Clone()));
         }
     }
     if ( groupsCheck->GetValue() )

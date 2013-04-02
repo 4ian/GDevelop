@@ -19,6 +19,7 @@
 #include "GDL/OpenSaveGame.h"
 #include "TemplateEvents.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/Events/Serialization.h"
 
 #define MSG(x) wxLogWarning(_(x));
 
@@ -57,7 +58,8 @@ BEGIN_EVENT_TABLE( ChoixTemplateEvent, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-ChoixTemplateEvent::ChoixTemplateEvent( wxWindow* parent )
+ChoixTemplateEvent::ChoixTemplateEvent( wxWindow* parent, gd::Project & project_ ) :
+    project(project_)
 {
     //(*Initialize(ChoixTemplateEvent)
     wxFlexGridSizer* FlexGridSizer4;
@@ -294,7 +296,7 @@ void ChoixTemplateEvent::Refresh()
         }
 
         if ( elem->FirstChildElement( "Events" ) != NULL )
-            OpenSaveGame::OpenEvents(newTemplate.events, elem->FirstChildElement( "Events" ));
+            gd::EventsListSerialization::LoadEventsFromXml(project, newTemplate.events, elem->FirstChildElement( "Events" ));
         else
             wxLogWarning( _( "The events of the template are missing." ) );
 

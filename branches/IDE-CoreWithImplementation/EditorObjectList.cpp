@@ -903,7 +903,7 @@ void EditorObjectList::OnaddAutomatismItemSelected(wxCommandEvent& event)
             autoName = metadata.GetDefaultName()+ToString(j);
 
         gd::Object & object = objects.GetObject(name);
-        object.AddNewAutomatism(dialog.GetSelectedAutomatismType(), autoName);
+        object.AddNewAutomatism(project, dialog.GetSelectedAutomatismType(), autoName);
         project.GetChangesNotifier().OnAutomatismAdded(project, globalObjects ? NULL : layout, object, object.GetAutomatism(autoName));
     }
 }

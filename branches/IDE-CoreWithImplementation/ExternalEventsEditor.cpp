@@ -70,7 +70,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	Connect(ID_COMBOBOX1,wxEVT_COMMAND_COMBOBOX_DROPDOWN,(wxObjectEventFunction)&ExternalEventsEditor::OnparentSceneComboBoxDropDown);
 
 	eventsEditor->SetExternalEvents(&events);
-	if ( !events.GetAssociatedScene().empty() ) parentSceneComboBox->SetValue(events.GetAssociatedScene());
+	if ( !events.GetAssociatedLayout().empty() ) parentSceneComboBox->SetValue(events.GetAssociatedLayout());
 }
 
 ExternalEventsEditor::~ExternalEventsEditor()
@@ -106,7 +106,7 @@ void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
     }
 
     //Save the scene chosen
-    events.SetAssociatedScene(scene->GetName());
+    events.SetAssociatedLayout(scene->GetName());
 
     //Need to recreate an events editor.
     delete eventsEditor;

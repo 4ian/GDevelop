@@ -41,7 +41,7 @@ std::map<std::string, std::string> gd::InitialInstance::GetCustomProperties(gd::
         std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
         std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
 
-        ObjSPtr object = boost::shared_ptr<Object> ();
+        ObjSPtr object = boost::shared_ptr<gd::Object> ();
 
         if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
             return (*sceneObject)->GetInitialInstanceProperties(*this, game, scene);
@@ -67,7 +67,7 @@ bool gd::InitialInstance::UpdateCustomProperty(const std::string & name, const s
         std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
         std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
 
-        ObjSPtr object = boost::shared_ptr<Object> ();
+        ObjSPtr object = boost::shared_ptr<gd::Object> ();
 
         if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
             return (*sceneObject)->UpdateInitialInstanceProperty(*this, name, value, game, scene);

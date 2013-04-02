@@ -47,7 +47,7 @@ public:
     /**
      * Must return a reference to the object called "name".
      */
-    virtual const Object & GetObject(const std::string & name) const =0;
+    virtual const gd::Object & GetObject(const std::string & name) const =0;
 
     /**
      * Must return a reference to the object at position "index" in the objects list
@@ -57,7 +57,7 @@ public:
     /**
      * Must return a reference to the object at position "index" in the objects list
      */
-    virtual const Object & GetObject (unsigned int index) const =0;
+    virtual const gd::Object & GetObject (unsigned int index) const =0;
 
     /**
      * Must return the position of the object called "name" in the objects list
@@ -80,7 +80,7 @@ public:
      * \param object The object that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the object must be inserted at the end of the objects list.
      */
-    virtual void InsertObject(const Object & object, unsigned int position) =0;
+    virtual void InsertObject(const gd::Object & object, unsigned int position) =0;
 
     /**
      * Must delete the object named "name".

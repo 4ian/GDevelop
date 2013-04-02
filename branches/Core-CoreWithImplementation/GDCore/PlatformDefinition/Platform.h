@@ -10,6 +10,8 @@
 #include <string>
 namespace gd { class InstructionsMetadataHolder; }
 namespace gd { class Project; }
+namespace gd { class Automatism; }
+namespace gd { class BaseEvent; }
 
 namespace gd
 {
@@ -54,10 +56,27 @@ public:
      */
     virtual gd::InstructionsMetadataHolder & GetInstructionsMetadataHolder() const =0;
 
+    /** \name Factory method
+     * Member functions used to create the platforms objects
+     */
+    ///@{
+
     /**
      * Must create an empty project
      */
     virtual boost::shared_ptr<gd::Project> CreateNewEmptyProject() const =0;
+
+    /**
+     * Must create an automatism
+     */
+    virtual gd::Automatism* CreateAutomatism(const std::string & type) const =0;
+
+    /**
+     * Must create an event of given type
+     */
+    virtual boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type) const =0;
+
+    ///@}
 
     /**
      * Called when the IDE is about to shut down: Take this opportunity for erasing

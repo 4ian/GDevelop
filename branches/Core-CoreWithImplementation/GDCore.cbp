@@ -233,6 +233,8 @@
 		<Unit filename="GDCore/Events/LinkEvent.h" />
 		<Unit filename="GDCore/Events/ObjectMetadata.cpp" />
 		<Unit filename="GDCore/Events/ObjectMetadata.h" />
+		<Unit filename="GDCore/Events/Serialization.cpp" />
+		<Unit filename="GDCore/Events/Serialization.h" />
 		<Unit filename="GDCore/IDE/ActionSentenceFormatter.cpp" />
 		<Unit filename="GDCore/IDE/ActionSentenceFormatter.h" />
 		<Unit filename="GDCore/IDE/ArbitraryResourceWorker.cpp" />

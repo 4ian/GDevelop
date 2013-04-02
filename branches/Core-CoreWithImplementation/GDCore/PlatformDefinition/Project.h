@@ -252,7 +252,7 @@ public:
     /**
      * Must add a new empty layout called "name" at the specified position in the layout list.
      */
-    virtual void InsertNewLayout(const std::string & name, unsigned int position) =0;
+    virtual gd::Layout & InsertNewLayout(const std::string & name, unsigned int position) =0;
 
     /**
      * Must add a new layout constructed from the layout passed as parameter.
@@ -340,7 +340,7 @@ public:
     /**
      * Must add a new empty external events sheet called "name" at the specified position in the layout list.
      */
-    virtual void InsertNewExternalEvents(std::string & name, unsigned int position) =0;
+    virtual ExternalEvents & InsertNewExternalEvents(const std::string & name, unsigned int position) =0;
 
     /**
      * Must add a new external events sheet constructed from the layout passed as parameter.
@@ -400,7 +400,7 @@ public:
     /**
      * Must add a new empty external layout called "name" at the specified position in the layout list.
      */
-    virtual void InsertNewExternalLayout(std::string & name, unsigned int position) =0;
+    virtual ExternalLayout & InsertNewExternalLayout(const std::string & name, unsigned int position) =0;
 
     /**
      * Must add a new external layout constructed from the layout passed as parameter.

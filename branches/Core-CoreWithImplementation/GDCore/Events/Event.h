@@ -14,6 +14,7 @@
 #include "GDCore/Events/Instruction.h"
 class Game;
 namespace gd { class MainFrameWrapper; }
+namespace gd { class Project; }
 class wxWindow;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
@@ -158,7 +159,7 @@ public:
     /**
      * Load event from XML
      */
-    virtual void LoadFromXml(const TiXmlElement * eventElem) {}
+    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem) {}
 
     ///@}
 
@@ -270,6 +271,17 @@ BaseEventSPtr GD_CORE_API CloneRememberingOriginalEvent(gd::BaseEventSPtr event)
  * \ingroup Events
  */
 std::vector < gd::BaseEventSPtr > GD_CORE_API CloneVectorOfEvents(const std::vector < gd::BaseEventSPtr > & events);
+
+/**
+ * \brief Empty event doing nothing.
+ * \see gd::BaseEvent
+ */
+class EmptyEvent : public BaseEvent
+{
+    public:
+        EmptyEvent() : BaseEvent() {};
+        virtual ~EmptyEvent() {};
+};
 
 }
 

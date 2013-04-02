@@ -90,14 +90,14 @@ public:
 
     /**
      * Return a reference to the variable at the @ index position in the list.
-     * \warning No bound check is made. Please use other overload of ListVariable::GetVariable when you do not have any efficiency request.
+     * \warning No bound check is made. Please use other overload of gd::VariablesContainer::GetVariable when you do not have any efficiency request.
      * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
      */
     inline Variable & GetVariable(unsigned int index) { return variables[index]; }
 
     /**
      * Return a reference to the variable at the @ index position in the list.
-     * \warning No bound check is made. Please use other overload of ListVariable::GetVariable when you do not have any efficiency request.
+     * \warning No bound check is made. Please use other overload of gd::VariablesContainer::GetVariable when you do not have any efficiency request.
      * \note This specific overload can used by code generated from events when a variable index is known at the time of the code generation.
      */
     inline const Variable & GetVariable(unsigned int index) const { return variables[index]; }

@@ -15,7 +15,7 @@
 namespace gd { class Object; }
 class Scene;
 namespace gd { class ExternalEvents; }
-class ExternalLayout;
+namespace gd { class ExternalLayout; }
 #if defined(GD_IDE_ONLY)
 class wxPropertyGrid;
 class wxPropertyGridEvent;
@@ -156,12 +156,12 @@ public:
     /**
      * Return a reference to the vector containing the (smart) pointers to the external layouts.
      */
-    inline const std::vector < boost::shared_ptr<ExternalLayout> > & GetExternalLayouts() const { return externalLayouts; }
+    inline const std::vector < boost::shared_ptr<gd::ExternalLayout> > & GetExternalLayouts() const { return externalLayouts; }
 
     /**
      * Return a reference to the vector containing the (smart) pointers to the external layouts.
      */
-    inline std::vector < boost::shared_ptr<ExternalLayout> > & GetExternalLayouts() { return externalLayouts; }
+    inline std::vector < boost::shared_ptr<gd::ExternalLayout> > & GetExternalLayouts() { return externalLayouts; }
 
     /**
      * Provide access to the gd::VariablesContainer member containing the global variables
@@ -305,7 +305,7 @@ private:
     std::vector < boost::shared_ptr<Scene> >            scenes; ///< List of all scenes
     std::vector < boost::shared_ptr<gd::Object> >           globalObjects; ///< Global objects
     gd::VariablesContainer                              variables; ///< Initial global variables
-    std::vector < boost::shared_ptr<ExternalLayout> >   externalLayouts; ///< List of all externals layouts
+    std::vector < boost::shared_ptr<gd::ExternalLayout> >   externalLayouts; ///< List of all externals layouts
     ResourcesManager                                    resourcesManager; ///< Contains all resources used by the project
     #if defined(GD_IDE_ONLY)
     std::string                                         author; ///< Game author name

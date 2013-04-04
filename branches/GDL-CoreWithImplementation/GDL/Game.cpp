@@ -235,7 +235,7 @@ void Game::LoadFromXml(const TiXmlElement * rootElement)
         const TiXmlElement * externalLayoutElem = elem->FirstChildElement( "ExternalLayout" );
         while (externalLayoutElem)
         {
-            boost::shared_ptr<ExternalLayout> newExternalLayout(new ExternalLayout);
+            boost::shared_ptr<gd::ExternalLayout> newExternalLayout(new gd::ExternalLayout);
             newExternalLayout->LoadFromXml(externalLayoutElem);
             GetExternalLayouts().push_back(newExternalLayout);
 
@@ -719,15 +719,15 @@ void Game::RemoveExternalEvents(const std::string & name)
 
 bool Game::HasExternalLayoutNamed(const std::string & name) const
 {
-    return ( find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(ExternalLayoutHasName(), name)) != externalLayouts.end() );
+    return ( find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name)) != externalLayouts.end() );
 }
 gd::ExternalLayout & Game::GetExternalLayout(const std::string & name)
 {
-    return *(*find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(ExternalLayoutHasName(), name)));
+    return *(*find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name)));
 }
 const gd::ExternalLayout & Game::GetExternalLayout(const std::string & name) const
 {
-    return *(*find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(ExternalLayoutHasName(), name)));
+    return *(*find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name)));
 }
 gd::ExternalLayout & Game::GetExternalLayout(unsigned int index)
 {
@@ -752,7 +752,7 @@ unsigned int Game::GetExternalLayoutsCount() const
 
 gd::ExternalLayout & Game::InsertNewExternalLayout(const std::string & name, unsigned int position)
 {
-    boost::shared_ptr<ExternalLayout> newExternalLayout = boost::shared_ptr<ExternalLayout>(new ExternalLayout);
+    boost::shared_ptr<gd::ExternalLayout> newExternalLayout = boost::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout);
     if (position<externalLayouts.size())
         externalLayouts.insert(externalLayouts.begin()+position, newExternalLayout);
     else
@@ -762,23 +762,19 @@ gd::ExternalLayout & Game::InsertNewExternalLayout(const std::string & name, uns
     return *newExternalLayout;
 }
 
-void Game::InsertExternalLayout(const gd::ExternalLayout & events, unsigned int position)
+void Game::InsertExternalLayout(const gd::ExternalLayout & layout, unsigned int position)
 {
-    try
-    {
-        const ExternalLayout & castedEvents = dynamic_cast<const ExternalLayout&>(events);
-        boost::shared_ptr<ExternalLayout> newExternalLayout = boost::shared_ptr<ExternalLayout>(new ExternalLayout(castedEvents));
-        if (position<externalLayouts.size())
-            externalLayouts.insert(externalLayouts.begin()+position, newExternalLayout);
-        else
-            externalLayouts.push_back(newExternalLayout);
-    }
-    catch(...) { std::cout << "WARNING: Tried to add external layout which are not GD C++ Platform ExternalLayout to a GD C++ Platform project"; }
+    boost::shared_ptr<gd::ExternalLayout> newLayout(new gd::ExternalLayout(layout));
+
+    if (position<externalLayouts.size())
+        externalLayouts.insert(externalLayouts.begin()+position, newLayout);
+    else
+        externalLayouts.push_back(newLayout);
 }
 
 void Game::RemoveExternalLayout(const std::string & name)
 {
-    std::vector< boost::shared_ptr<ExternalLayout> >::iterator externalLayout = find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(ExternalLayoutHasName(), name));
+    std::vector< boost::shared_ptr<gd::ExternalLayout> >::iterator externalLayout = find_if(externalLayouts.begin(), externalLayouts.end(), bind2nd(gd::ExternalLayoutHasName(), name));
     if ( externalLayout == externalLayouts.end() ) return;
 
     externalLayouts.erase(externalLayout);
@@ -897,7 +893,7 @@ void Game::Init(const Game & game)
 
     externalLayouts.clear();
     for (unsigned int i =0;i<game.externalLayouts.size();++i)
-    	externalLayouts.push_back( boost::shared_ptr<ExternalLayout>(new ExternalLayout(*game.externalLayouts[i])) );
+    	externalLayouts.push_back( boost::shared_ptr<gd::ExternalLayout>(new gd::ExternalLayout(*game.externalLayouts[i])) );
 
     useExternalSourceFiles = game.useExternalSourceFiles;
 

@@ -61,8 +61,11 @@ void Object::RemoveAutomatism(const std::string & name)
 gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const std::string & type, const std::string & name)
 {
     Automatism * automatism = project.GetPlatform().CreateAutomatism(type);
-    automatism->SetName(name);
-    automatisms[automatism->GetName()] = automatism;
+
+    if ( automatism != NULL ) {
+        automatism->SetName(name);
+        automatisms[automatism->GetName()] = automatism;
+    }
 
     return automatism;
 }

@@ -400,7 +400,7 @@ public:
     /**
      * Must add a new empty external layout called "name" at the specified position in the layout list.
      */
-    virtual ExternalLayout & InsertNewExternalLayout(const std::string & name, unsigned int position) =0;
+    virtual gd::ExternalLayout & InsertNewExternalLayout(const std::string & name, unsigned int position) =0;
 
     /**
      * Must add a new external layout constructed from the layout passed as parameter.

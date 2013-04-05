@@ -104,22 +104,22 @@ public:
     /**
      * Return a reference to the specified layer
      */
-    virtual Layer & GetLayer(const std::string & name);
+    virtual gd::Layer & GetLayer(const std::string & name);
 
     /**
      * Return a reference to the specified layer
      */
-    virtual const Layer & GetLayer(const std::string & name) const;
+    virtual const gd::Layer & GetLayer(const std::string & name) const;
 
     /**
      * Return a reference to the specified layer
      */
-    virtual Layer & GetLayer(unsigned int index);
+    virtual gd::Layer & GetLayer(unsigned int index);
 
     /**
      * Return a reference to the specified layer
      */
-    virtual const Layer & GetLayer (unsigned int index) const;
+    virtual const gd::Layer & GetLayer (unsigned int index) const;
 
     /**
      * Return the number of layers
@@ -363,9 +363,9 @@ private:
     unsigned int                                backgroundColorB; ///< Background color Blue component
     std::string                                 title; ///< Title displayed in the window
     std::vector < boost::shared_ptr<gd::Object> >   initialObjects; ///< Objects available.
-    gd::VariablesContainer                                variables; ///< Variables list
-    gd::InitialInstancesContainer                   initialInstances; ///< Initial instances
-    std::vector < Layer >                       layers; ///< Initial layers
+    gd::VariablesContainer                      variables; ///< Variables list
+    gd::InitialInstancesContainer               initialInstances; ///< Initial instances
+    std::vector < gd::Layer >                   initialLayers; ///< Initial layers
     bool                                        stopSoundsOnStartup; ///< True to make the scene stop all sounds at startup.
     bool                                        standardSortMethod; ///< True to sort objects using standard sort.
     float                                       oglFOV; ///< OpenGL Field Of View value
@@ -390,7 +390,7 @@ private:
      */
     void Init(const Scene & scene);
 
-    static Layer badLayer;
+    static gd::Layer badLayer;
 };
 
 //"Tool" Functions

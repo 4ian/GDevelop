@@ -10,6 +10,7 @@
 #include "GDL/SpriteObject.h"
 #include "GDL/Animation.h"
 #include "GDL/RuntimeGame.h"
+#include "GDL/RuntimeLayer.h"
 #include "GDL/Object.h"
 #include "GDL/ImageManager.h"
 #include "GDL/tinyxml/tinyxml.h"
@@ -744,10 +745,10 @@ void RuntimeSpriteObject::FlipY(bool flip)
 
 bool RuntimeSpriteObject::CursorOnObject( RuntimeScene & scene, bool accurate )
 {
-    for (unsigned int cameraIndex = 0;cameraIndex < scene.GetLayer(layer).GetCameraCount();++cameraIndex)
+    for (unsigned int cameraIndex = 0;cameraIndex < scene.GetRuntimeLayer(layer).GetCameraCount();++cameraIndex)
     {
-        int mouseXInTheLayer = scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).x;
-        int mouseYInTheLayer = scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), scene.GetLayer(layer).GetCamera(cameraIndex).GetSFMLView()).y;
+        int mouseXInTheLayer = scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), scene.GetRuntimeLayer(layer).GetCamera(cameraIndex).GetSFMLView()).x;
+        int mouseYInTheLayer = scene.renderWindow->convertCoords(sf::Mouse::getPosition(*scene.renderWindow), scene.GetRuntimeLayer(layer).GetCamera(cameraIndex).GetSFMLView()).y;
 
         if  ( GetDrawableX() < mouseXInTheLayer &&
             ( GetDrawableX() + GetWidth() ) > mouseXInTheLayer &&

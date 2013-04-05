@@ -3,8 +3,9 @@
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "GDL/BuiltinExtensions/KeyboardTools.h"
 #include <string>
+#include "GDL/BuiltinExtensions/KeyboardTools.h"
+#include <SFML/Graphics.hpp>
 #include "GDL/RuntimeScene.h"
 
 using namespace std;

@@ -209,64 +209,6 @@ void OpenSaveGame::OpenActions(vector < gd::Instruction > & actions, const TiXml
 }
 #endif
 
-void OpenSaveGame::OpenLayers(vector < Layer > & list, const TiXmlElement * elem)
-{
-    list.clear();
-    const TiXmlElement * elemScene = elem->FirstChildElement();
-
-    //Passage en revue des évènements
-    while ( elemScene )
-    {
-        Layer layer;
-
-        layer.SetName("unnamed");
-        if ( elemScene->Attribute( "Name" ) != NULL ) { layer.SetName(elemScene->Attribute( "Name" ));}
-        else { MSG( "Les informations concernant le nom d'un calque manquent." ); }
-
-        if ( elemScene->Attribute( "Visibility" ) != NULL )
-        {
-            string visibility = elemScene->Attribute( "Visibility" );
-            if ( visibility == "false" )
-                layer.SetVisibility( false );
-
-        }
-        else { MSG( "Les informations concernant la visibilité manquent." ); }
-
-        const TiXmlElement * elemCamera = elemScene->FirstChildElement("Camera");
-
-        //Compatibility with Game Develop 1.2.8699 and inferior
-        if ( !elemCamera ) layer.SetCameraCount(1);
-
-        while (elemCamera)
-        {
-            layer.SetCameraCount(layer.GetCameraCount()+1);
-
-            if ( elemCamera->Attribute("DefaultSize") && elemCamera->Attribute("Width") && elemCamera->Attribute("Height") )
-            {
-                string defaultSize = elemCamera->Attribute("DefaultSize");
-                layer.GetCamera(layer.GetCameraCount()-1).SetUseDefaultSize(!(defaultSize == "false"));
-                layer.GetCamera(layer.GetCameraCount()-1).SetSize(sf::Vector2f(ToFloat(elemCamera->Attribute("Width")), ToFloat(elemCamera->Attribute("Height"))));
-            }
-
-            if ( elemCamera->Attribute("DefaultViewport") && elemCamera->Attribute("ViewportLeft") && elemCamera->Attribute("ViewportTop") &&
-                 elemCamera->Attribute("ViewportRight") && elemCamera->Attribute("ViewportBottom") )
-            {
-                string defaultViewport = elemCamera->Attribute("DefaultViewport");
-                layer.GetCamera(layer.GetCameraCount()-1).SetUseDefaultViewport(!(defaultViewport == "false"));
-                layer.GetCamera(layer.GetCameraCount()-1).SetViewport(sf::FloatRect(ToFloat(elemCamera->Attribute("ViewportLeft")),
-                                                                                    ToFloat(elemCamera->Attribute("ViewportTop")),
-                                                                                    ToFloat(elemCamera->Attribute("ViewportRight"))-ToFloat(elemCamera->Attribute("ViewportLeft")),
-                                                                                    ToFloat(elemCamera->Attribute("ViewportBottom"))-ToFloat(elemCamera->Attribute("ViewportTop"))
-                                                                                    )); // (sf::Rect used Right and Bottom instead of Width and Height before. )
-            }
-
-            elemCamera = elemCamera->NextSiblingElement();
-        }
-
-        list.push_back( layer );
-        elemScene = elemScene->NextSiblingElement();
-    }
-}
 
 #if defined(GD_IDE_ONLY)
 void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<gd::Object> > & list, TiXmlElement * objects )
@@ -372,42 +314,6 @@ void OpenSaveGame::SaveConditions(const vector < gd::Instruction > & list, TiXml
             TiXmlElement * subConditions = new TiXmlElement( "SubConditions" );
             condition->LinkEndChild(subConditions);
             SaveConditions(list[k].GetSubInstructions(), subConditions);
-        }
-    }
-}
-
-void OpenSaveGame::SaveLayers(const vector < Layer > & list, TiXmlElement * layers)
-{
-    for ( unsigned int j = 0;j < list.size();j++ )
-    {
-        //Pour chaque calque
-        TiXmlElement * layer;
-
-        layer = new TiXmlElement( "Layer" );
-        layers->LinkEndChild( layer );
-
-        layer->SetAttribute("Name", list.at(j).GetName().c_str());
-        if ( list.at(j).GetVisibility() )
-            layer->SetAttribute("Visibility", "true");
-        else
-            layer->SetAttribute("Visibility", "false");
-
-        for (unsigned int c = 0;c<list.at(j).GetCameraCount();++c)
-        {
-            TiXmlElement * camera = new TiXmlElement( "Camera" );
-            layer->LinkEndChild( camera );
-
-            camera->SetAttribute("DefaultSize", list.at(j).GetCamera(c).UseDefaultSize() ? "true" : "false");
-
-            camera->SetDoubleAttribute("Width", list.at(j).GetCamera(c).GetSize().x);
-            camera->SetDoubleAttribute("Height", list.at(j).GetCamera(c).GetSize().y);
-
-            camera->SetAttribute("DefaultViewport", list.at(j).GetCamera(c).UseDefaultViewport() ? "true" : "false");
-
-            camera->SetDoubleAttribute("ViewportLeft", list.at(j).GetCamera(c).GetViewport().left);
-            camera->SetDoubleAttribute("ViewportTop", list.at(j).GetCamera(c).GetViewport().top);
-            camera->SetDoubleAttribute("ViewportRight", list.at(j).GetCamera(c).GetViewport().left+list.at(j).GetCamera(c).GetViewport().width);
-            camera->SetDoubleAttribute("ViewportBottom", list.at(j).GetCamera(c).GetViewport().top+list.at(j).GetCamera(c).GetViewport().height);
         }
     }
 }

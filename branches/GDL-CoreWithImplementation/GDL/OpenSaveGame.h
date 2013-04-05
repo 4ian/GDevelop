@@ -14,7 +14,7 @@ namespace gd { class Instruction; }
 namespace gd { class Project; }
 namespace gd { class InstructionMetadata;}
 namespace gd { class InitialInstance; }
-class Layer;
+namespace gd { class Layer; }
 namespace gd { class BaseEvent; }
 namespace gd {typedef boost::shared_ptr<gd::BaseEvent> BaseEventSPtr;}
 
@@ -40,12 +40,10 @@ public:
     static void SaveGroupesObjets( const vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets );
 
     static void SaveObjects( const vector < boost::shared_ptr<gd::Object> > & list, TiXmlElement * objects );
-    static void SaveLayers( const vector < Layer > & list, TiXmlElement * layers );
     static void OpenImagesFromGD2010498(Game & game, const TiXmlElement * elem, const TiXmlElement * dossierElem );
     #endif
 
     static void OpenObjects(gd::Project & project, vector < boost::shared_ptr<gd::Object> > & objects, const TiXmlElement * elem);
-    static void OpenLayers( vector < Layer > & list, const TiXmlElement * elem );
 };
 
 #endif // OPENSAVEGAME_H

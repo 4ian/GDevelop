@@ -13,9 +13,12 @@
 #include <SFML/System.hpp>
 #include <boost/shared_ptr.hpp>
 #include "GDL/ObjInstancesHolder.h"
+namespace sf { class RenderWindow; }
+namespace sf { class Event; }
 class Text;
 class ManualTimer;
 class RuntimeGame;
+class RuntimeLayer;
 namespace gd { class Object; }
 class AutomatismsRuntimeSharedDatas;
 class ExtensionBase;
@@ -62,6 +65,11 @@ public:
      * Provide access to the gd::VariablesContainer member containing the variables
      */
     inline gd::VariablesContainer & GetVariables() { return variables; }
+
+    /**
+     * Get the layer with specified name.
+     */
+    RuntimeLayer & GetRuntimeLayer(const std::string & name);
 
     /**
      * Add a text to be displayed on the scene
@@ -211,16 +219,19 @@ protected:
     signed long long                        timeFromStart; ///< Time in microseconds elapsed from start.
     signed long long                        pauseTime; ///< Time to be subtracted to realElapsedTime for the current frame.
     int                                     specialAction; ///< -1 for doing nothing, -2 to quit the game, another number to change the scene
-    gd::VariablesContainer                            variables; ///<List of the scene variables
+    gd::VariablesContainer                  variables; ///<List of the scene variables
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;
     bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.
     std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
+    std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
 
     std::vector < Text >                    textes; ///<Deprecated way of displaying a text
     bool DisplayLegacyTexts(std::string layer = "");
 
     void Init(const RuntimeScene & scene);
+
+    static RuntimeLayer badRuntimeLayer; ///< Null object return by GetLayer when no appropriate layer could be found.
 };
 
 #endif // RUNTIMESCENE_H

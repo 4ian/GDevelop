@@ -15,6 +15,7 @@
 #include "GDL/CodeExecutionEngine.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/OpenSaveGame.h"
+#include "GDL/Layer.h"
 #include "GDL/XmlMacros.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Event.h"
@@ -24,7 +25,7 @@
 #endif
 #undef GetObject //Disable an annoying macro
 
-Layer Scene::badLayer;
+gd::Layer Scene::badLayer;
 
 Scene::Scene() :
 backgroundColorR(209),
@@ -44,9 +45,9 @@ compilationNeeded(true)
 #endif
 {
     //ctor
-    Layer layer;
+    gd::Layer layer;
     layer.SetCameraCount(1);
-    layers.push_back(layer);
+    initialLayers.push_back(layer);
 }
 
 Scene::~Scene()
@@ -58,35 +59,35 @@ Scene::~Scene()
     #endif
 }
 
-Layer & Scene::GetLayer(const std::string & name)
+gd::Layer & Scene::GetLayer(const std::string & name)
 {
-    std::vector<Layer>::iterator layer = find_if(layers.begin(), layers.end(), bind2nd(LayerHasName(), name));
+    std::vector<gd::Layer>::iterator layer = find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name));
 
-    if ( layer != layers.end())
+    if ( layer != initialLayers.end())
         return *layer;
 
     return badLayer;
 }
-const Layer & Scene::GetLayer(const std::string & name) const
+const gd::Layer & Scene::GetLayer(const std::string & name) const
 {
-    std::vector<Layer>::const_iterator layer = find_if(layers.begin(), layers.end(), bind2nd(LayerHasName(), name));
+    std::vector<gd::Layer>::const_iterator layer = find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name));
 
-    if ( layer != layers.end())
+    if ( layer != initialLayers.end())
         return *layer;
 
     return badLayer;
 }
-Layer & Scene::GetLayer(unsigned int index)
+gd::Layer & Scene::GetLayer(unsigned int index)
 {
-    return layers[index];
+    return initialLayers[index];
 }
-const Layer & Scene::GetLayer (unsigned int index) const
+const gd::Layer & Scene::GetLayer (unsigned int index) const
 {
-    return layers[index];
+    return initialLayers[index];
 }
 unsigned int Scene::GetLayersCount() const
 {
-    return layers.size();
+    return initialLayers.size();
 }
 
 #if defined(GD_IDE_ONLY)
@@ -220,56 +221,51 @@ void Scene::RemoveObject(const std::string & name)
 }
 bool Scene::HasLayerNamed(const std::string & name) const
 {
-    return ( find_if(layers.begin(), layers.end(), bind2nd(LayerHasName(), name)) != layers.end() );
+    return ( find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name)) != initialLayers.end() );
 }
 unsigned int Scene::GetLayerPosition(const std::string & name) const
 {
-    for (unsigned int i = 0;i<layers.size();++i)
+    for (unsigned int i = 0;i<initialLayers.size();++i)
     {
-        if ( layers[i].GetName() == name ) return i;
+        if ( initialLayers[i].GetName() == name ) return i;
     }
     return std::string::npos;
 }
 
 void Scene::InsertNewLayer(const std::string & name, unsigned int position)
 {
-    Layer newLayer;
+    gd::Layer newLayer;
     newLayer.SetName(name);
-    if (position<layers.size())
-        layers.insert(layers.begin()+position, newLayer);
+    if (position<initialLayers.size())
+        initialLayers.insert(initialLayers.begin()+position, newLayer);
     else
-        layers.push_back(newLayer);
+        initialLayers.push_back(newLayer);
 }
 
 void Scene::InsertLayer(const gd::Layer & layer, unsigned int position)
 {
-    try
-    {
-        const Layer & castedLayer = dynamic_cast<const Layer&>(layer);
-        if (position<layers.size())
-            layers.insert(layers.begin()+position, castedLayer);
-        else
-            layers.push_back(castedLayer);
-    }
-    catch(...) { std::cout << "WARNING: Tried to add an layer which is not a GD C++ Platform Layer to a GD C++ Platform project"; }
+    if (position<initialLayers.size())
+        initialLayers.insert(initialLayers.begin()+position, layer);
+    else
+        initialLayers.push_back(layer);
 }
 
 void Scene::RemoveLayer(const std::string & name)
 {
-    std::vector< Layer >::iterator layer = find_if(layers.begin(), layers.end(), bind2nd(LayerHasName(), name));
-    if ( layer == layers.end() ) return;
+    std::vector< gd::Layer >::iterator layer = find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name));
+    if ( layer == initialLayers.end() ) return;
 
-    layers.erase(layer);
+    initialLayers.erase(layer);
 }
 
 void Scene::SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex)
 {
-    if ( firstLayerIndex >= layers.size() || secondLayerIndex >= layers.size() )
+    if ( firstLayerIndex >= initialLayers.size() || secondLayerIndex >= initialLayers.size() )
         return;
 
-    Layer temp = layers[firstLayerIndex];
-    layers[firstLayerIndex] = layers[secondLayerIndex];
-    layers[secondLayerIndex] = temp;
+    gd::Layer temp = initialLayers[firstLayerIndex];
+    initialLayers[firstLayerIndex] = initialLayers[secondLayerIndex];
+    initialLayers[secondLayerIndex] = temp;
 }
 
 void Scene::SaveToXml(TiXmlElement * scene) const
@@ -300,9 +296,14 @@ void Scene::SaveToXml(TiXmlElement * scene) const
     scene->LinkEndChild( objets );
     OpenSaveGame::SaveObjects(GetInitialObjects(), objets);
 
-    TiXmlElement * layersElem = new TiXmlElement( "Layers" );
-    scene->LinkEndChild( layersElem );
-    OpenSaveGame::SaveLayers(layers, layersElem);
+    TiXmlElement * initialLayersElem = new TiXmlElement( "Layers" );
+    scene->LinkEndChild( initialLayersElem );
+    for ( unsigned int j = 0;j < GetLayersCount();++j )
+    {
+        TiXmlElement * layer = new TiXmlElement( "Layer" );
+        initialLayersElem->LinkEndChild( layer );
+        GetLayer(j).SaveToXml(layer);
+    }
 
     TiXmlElement * variables = new TiXmlElement( "Variables" );
     scene->LinkEndChild( variables );
@@ -368,7 +369,19 @@ void Scene::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
         initialInstances.LoadFromXml(elem->FirstChildElement( "Positions" ));
 
     if ( elem->FirstChildElement( "Layers" ) != NULL )
-        OpenSaveGame::OpenLayers(layers, elem->FirstChildElement( "Layers" ));
+    {
+        initialLayers.clear();
+        const TiXmlElement * elemLayer = elem->FirstChildElement( "Layers" )->FirstChildElement("Layer");
+        while ( elemLayer )
+        {
+            gd::Layer layer;
+            layer.LoadFromXml(elemLayer);
+
+            initialLayers.push_back(layer);
+            elemLayer = elemLayer->NextSiblingElement();
+        }
+
+    }
 
     #if defined(GD_IDE_ONLY)
     if ( elem->FirstChildElement( "Events" ) != NULL )
@@ -434,7 +447,7 @@ void Scene::Init(const Scene & scene)
     	GetInitialObjects().push_back( boost::shared_ptr<gd::Object>(scene.GetInitialObjects()[i]->Clone()) );
 
     initialInstances = scene.initialInstances;
-    layers = scene.layers;
+    initialLayers = scene.initialLayers;
     variables = scene.GetVariables();
 
     automatismsInitialSharedDatas.clear();

@@ -6,6 +6,7 @@
 #include "JoystickTools.h"
 #include "GDL/RuntimeScene.h"
 #include <SFML/System.hpp>
+#include <SFML/Graphics.hpp>
 
 bool GD_API JoystickButtonDown( RuntimeScene & scene, unsigned int joystick, unsigned int button )
 {

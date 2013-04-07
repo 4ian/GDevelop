@@ -520,7 +520,7 @@ void EditorObjectList::OnaddObjMenuISelected(wxCommandEvent& event)
     }
 
     //Add a new object of selected type to objects list
-    objects.InsertNewObject(chooseTypeDialog.GetSelectedObjectType(), ToString(name), objects.GetObjectsCount());
+    objects.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), ToString(name), objects.GetObjectsCount());
 
     //And to the TreeCtrl
     wxTreeItemId rootId = objectsList->GetRootItem();

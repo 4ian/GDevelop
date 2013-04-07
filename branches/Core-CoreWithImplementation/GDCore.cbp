@@ -327,6 +327,8 @@
 		<Unit filename="GDCore/IDE/wxTools/TreeItemStringData.h" />
 		<Unit filename="GDCore/PlatformDefinition/Automatism.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/Automatism.h" />
+		<Unit filename="GDCore/PlatformDefinition/AutomatismsSharedData.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/AutomatismsSharedData.h" />
 		<Unit filename="GDCore/PlatformDefinition/ChangesNotifier.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/ChangesNotifier.h" />
 		<Unit filename="GDCore/PlatformDefinition/ClassWithObjects.cpp" />

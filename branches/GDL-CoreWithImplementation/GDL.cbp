@@ -722,8 +722,6 @@
 		<Unit filename="GDL/BuiltinExtensions/VariablesExtension.h" />
 		<Unit filename="GDL/BuiltinExtensions/WindowExtension.cpp" />
 		<Unit filename="GDL/BuiltinExtensions/WindowExtension.h" />
-		<Unit filename="GDL/Camera.cpp" />
-		<Unit filename="GDL/Camera.h" />
 		<Unit filename="GDL/CodeExecutionEngine.cpp" />
 		<Unit filename="GDL/CodeExecutionEngine.h" />
 		<Unit filename="GDL/Collisions.cpp" />
@@ -789,8 +787,6 @@
 		<Unit filename="GDL/IDE/Dialogs/EditCppCodeEvent.h" />
 		<Unit filename="GDL/IDE/Dialogs/EditForEachEvent.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/EditForEachEvent.h" />
-		<Unit filename="GDL/IDE/Dialogs/EditLayerDialog.cpp" />
-		<Unit filename="GDL/IDE/Dialogs/EditLayerDialog.h" />
 		<Unit filename="GDL/IDE/Dialogs/EditLink.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/EditLink.h" />
 		<Unit filename="GDL/IDE/Dialogs/EditRepeatEvent.cpp" />
@@ -844,6 +840,7 @@
 		<Unit filename="GDL/OpenSaveGame.h" />
 		<Unit filename="GDL/OpenSaveLoadingScreen.cpp" />
 		<Unit filename="GDL/OpenSaveLoadingScreen.h" />
+		<Unit filename="GDL/PlatformDefinition/ClassWithObjects.cpp" />
 		<Unit filename="GDL/PlatformDefinition/Platform.cpp" />
 		<Unit filename="GDL/PlatformDefinition/Platform.h" />
 		<Unit filename="GDL/Point.cpp" />
@@ -866,6 +863,8 @@
 		<Unit filename="GDL/RuntimeContext.h" />
 		<Unit filename="GDL/RuntimeGame.cpp" />
 		<Unit filename="GDL/RuntimeGame.h" />
+		<Unit filename="GDL/RuntimeLayer.cpp" />
+		<Unit filename="GDL/RuntimeLayer.h" />
 		<Unit filename="GDL/RuntimeObject.cpp" />
 		<Unit filename="GDL/RuntimeObject.h" />
 		<Unit filename="GDL/RuntimeScene.cpp" />

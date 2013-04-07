@@ -146,79 +146,6 @@ void Scene::UpdateAutomatismsSharedData(Game & game)
     }
 }
 
-bool Scene::HasObjectNamed(const std::string & name) const
-{
-    return ( find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name)) != GetInitialObjects().end() );
-}
-gd::Object & Scene::GetObject(const std::string & name)
-{
-    return *(*find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name)));
-}
-const gd::Object & Scene::GetObject(const std::string & name) const
-{
-    return *(*find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name)));
-}
-gd::Object & Scene::GetObject(unsigned int index)
-{
-    return *GetInitialObjects()[index];
-}
-const gd::Object & Scene::GetObject (unsigned int index) const
-{
-    return *GetInitialObjects()[index];
-}
-unsigned int Scene::GetObjectPosition(const std::string & name) const
-{
-    for (unsigned int i = 0;i<GetInitialObjects().size();++i)
-    {
-        if ( GetInitialObjects()[i]->GetName() == name ) return i;
-    }
-    return std::string::npos;
-}
-unsigned int Scene::GetObjectsCount() const
-{
-    return GetInitialObjects().size();
-}
-
-void Scene::InsertNewObject(const std::string & objectType, const std::string & name, unsigned int position)
-{
-    boost::shared_ptr<gd::Object> newObject = ExtensionsManager::GetInstance()->CreateObject(objectType, name);
-    if (position<GetInitialObjects().size())
-        GetInitialObjects().insert(GetInitialObjects().begin()+position, newObject);
-    else
-        GetInitialObjects().push_back(newObject);
-}
-
-void Scene::InsertObject(const gd::Object & object, unsigned int position)
-{
-    try
-    {
-        const gd::Object & castedObject = dynamic_cast<const gd::Object&>(object);
-        boost::shared_ptr<gd::Object> newObject = boost::shared_ptr<gd::Object>(castedObject.Clone());
-        if (position<GetInitialObjects().size())
-            GetInitialObjects().insert(GetInitialObjects().begin()+position, newObject);
-        else
-            GetInitialObjects().push_back(newObject);
-    }
-    catch(...) { std::cout << "WARNING: Tried to add an object which is not a GD C++ Platform Object to a GD C++ Platform project"; }
-}
-
-void Scene::SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex)
-{
-    if ( firstObjectIndex >= GetInitialObjects().size() || secondObjectIndex >= GetInitialObjects().size() )
-        return;
-
-    boost::shared_ptr<gd::Object> temp = GetInitialObjects()[firstObjectIndex];
-    GetInitialObjects()[firstObjectIndex] = GetInitialObjects()[secondObjectIndex];
-    GetInitialObjects()[secondObjectIndex] = temp;
-}
-
-void Scene::RemoveObject(const std::string & name)
-{
-    std::vector< boost::shared_ptr<gd::Object> >::iterator object = find_if(GetInitialObjects().begin(), GetInitialObjects().end(), bind2nd(ObjectHasName(), name));
-    if ( object == GetInitialObjects().end() ) return;
-
-    GetInitialObjects().erase(object);
-}
 bool Scene::HasLayerNamed(const std::string & name) const
 {
     return ( find_if(initialLayers.begin(), initialLayers.end(), bind2nd(gd::LayerHasName(), name)) != initialLayers.end() );
@@ -294,7 +221,7 @@ void Scene::SaveToXml(TiXmlElement * scene) const
 
     TiXmlElement * objets = new TiXmlElement( "Objets" );
     scene->LinkEndChild( objets );
-    OpenSaveGame::SaveObjects(GetInitialObjects(), objets);
+    SaveObjectsToXml(objets);
 
     TiXmlElement * initialLayersElem = new TiXmlElement( "Layers" );
     scene->LinkEndChild( initialLayersElem );
@@ -363,7 +290,7 @@ void Scene::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
     #endif
 
     if ( elem->FirstChildElement( "Objets" ) != NULL )
-        OpenSaveGame::OpenObjects(project, initialObjects, elem->FirstChildElement( "Objets" ));
+        LoadObjectsFromXml(project, elem->FirstChildElement( "Objets" ));
 
     if ( elem->FirstChildElement( "Positions" ) != NULL )
         initialInstances.LoadFromXml(elem->FirstChildElement( "Positions" ));

@@ -42,8 +42,6 @@ public:
     static void SaveObjects( const vector < boost::shared_ptr<gd::Object> > & list, TiXmlElement * objects );
     static void OpenImagesFromGD2010498(Game & game, const TiXmlElement * elem, const TiXmlElement * dossierElem );
     #endif
-
-    static void OpenObjects(gd::Project & project, vector < boost::shared_ptr<gd::Object> > & objects, const TiXmlElement * elem);
 };
 
 #endif // OPENSAVEGAME_H

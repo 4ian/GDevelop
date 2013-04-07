@@ -136,12 +136,12 @@ public:
     /**
      * Return a reference to the vector containing the (smart) pointers to the layouts.
      */
-    inline const std::vector < boost::shared_ptr<gd::Object> > & GetGlobalObjects() const { return globalObjects; }
+    inline const std::vector < boost::shared_ptr<gd::Object> > & GetGlobalObjects() const { return initialObjects; }
 
     /**
      * Return a reference to the vector containing the (smart) pointers to the layouts.
      */
-    inline std::vector < boost::shared_ptr<gd::Object> > & GetGlobalObjects() { return globalObjects; }
+    inline std::vector < boost::shared_ptr<gd::Object> > & GetGlobalObjects() { return initialObjects; }
 
     /**
      * Return a reference to the vector containing the (smart) pointers to the layouts.
@@ -252,18 +252,6 @@ public:
     virtual void RemoveExternalEvents(const std::string & name);
     virtual void InsertExternalEvents(const gd::ExternalEvents & externalEvents, unsigned int position);
 
-    virtual bool HasObjectNamed(const std::string & name) const;
-    virtual gd::Object & GetObject(const std::string & name);
-    virtual const gd::Object & GetObject(const std::string & name) const;
-    virtual gd::Object & GetObject(unsigned int index);
-    virtual const gd::Object & GetObject (unsigned int index) const;
-    virtual unsigned int GetObjectPosition(const std::string & name) const;
-    virtual unsigned int GetObjectsCount() const;
-    virtual void InsertNewObject(const std::string & objectType, const std::string & name, unsigned int position);
-    virtual void InsertObject(const gd::Object & theObject, unsigned int position);
-    virtual void RemoveObject(const std::string & name);
-    virtual void SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex);
-
     virtual bool HasExternalLayoutNamed(const std::string & name) const;
     virtual gd::ExternalLayout & GetExternalLayout(const std::string & name);
     virtual const gd::ExternalLayout & GetExternalLayout(const std::string & name) const;
@@ -303,7 +291,6 @@ private:
     unsigned int                                        minFPS; ///< Minimum Frame Per Seconds ( slow down game if FPS are below this number )
     bool                                                verticalSync; ///< If true, must activate vertical synchronization.
     std::vector < boost::shared_ptr<Scene> >            scenes; ///< List of all scenes
-    std::vector < boost::shared_ptr<gd::Object> >           globalObjects; ///< Global objects
     gd::VariablesContainer                              variables; ///< Initial global variables
     std::vector < boost::shared_ptr<gd::ExternalLayout> >   externalLayouts; ///< List of all externals layouts
     ResourcesManager                                    resourcesManager; ///< Contains all resources used by the project

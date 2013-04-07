@@ -10,6 +10,7 @@
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 namespace gd { class Automatism; }
+namespace gd { class Object; }
 
 /**
  * \brief Game Develop C++ Platform
@@ -36,6 +37,8 @@ public:
     virtual gd::Automatism* CreateAutomatism(const std::string & type) const;
 
     virtual boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type) const;
+
+    virtual boost::shared_ptr<gd::Object> CreateObject(const std::string & type, const std::string & name) const;
 
     virtual void OnIDEClosed();
 };

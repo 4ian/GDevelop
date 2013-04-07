@@ -156,18 +156,6 @@ public:
     virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const { return events; }
     virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() { return events; }
 
-    virtual bool HasObjectNamed(const std::string & name) const;
-    virtual gd::Object & GetObject(const std::string & name);
-    virtual const gd::Object & GetObject(const std::string & name) const;
-    virtual gd::Object & GetObject(unsigned int index);
-    virtual const gd::Object & GetObject (unsigned int index) const;
-    virtual unsigned int GetObjectPosition(const std::string & name) const;
-    virtual unsigned int GetObjectsCount() const;
-    virtual void InsertNewObject(const std::string & objectType, const std::string & name, unsigned int position);
-    virtual void InsertObject(const gd::Object & theObject, unsigned int position);
-    virtual void RemoveObject(const std::string & name);
-    virtual void SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex);
-
     virtual bool HasLayerNamed(const std::string & name) const;
     virtual unsigned int GetLayerPosition(const std::string & name) const;
     virtual void InsertNewLayer(const std::string & name, unsigned int position);
@@ -362,7 +350,6 @@ private:
     unsigned int                                backgroundColorG; ///< Background color Green component
     unsigned int                                backgroundColorB; ///< Background color Blue component
     std::string                                 title; ///< Title displayed in the window
-    std::vector < boost::shared_ptr<gd::Object> >   initialObjects; ///< Objects available.
     gd::VariablesContainer                      variables; ///< Variables list
     gd::InitialInstancesContainer               initialInstances; ///< Initial instances
     std::vector < gd::Layer >                   initialLayers; ///< Initial layers

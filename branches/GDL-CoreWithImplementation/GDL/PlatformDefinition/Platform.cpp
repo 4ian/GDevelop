@@ -42,6 +42,11 @@ gd::InstructionsMetadataHolder & Platform::GetInstructionsMetadataHolder() const
     return *ExtensionsManager::GetInstance();
 }
 
+boost::shared_ptr<gd::Object> Platform::CreateObject(const std::string & type, const std::string & name) const
+{
+    return ExtensionsManager::GetInstance()->CreateObject(type, name);
+}
+
 gd::Automatism* Platform::CreateAutomatism(const std::string & type) const
 {
     return ExtensionsManager::GetInstance()->CreateAutomatism(type);

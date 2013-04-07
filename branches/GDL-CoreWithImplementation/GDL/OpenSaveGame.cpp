@@ -57,38 +57,6 @@
 
 using namespace std;
 
-void OpenSaveGame::OpenObjects(gd::Project & project, vector < boost::shared_ptr<gd::Object> > & objects, const TiXmlElement * elem)
-{
-    const TiXmlElement * elemScene = elem->FirstChildElement("Objet");
-
-    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
-
-    //Passage en revue des objets
-    while ( elemScene )
-    {
-        //Nom
-        string name;
-        if ( elemScene->Attribute( "nom" ) != NULL ) { name = elemScene->Attribute( "nom" ); }
-        else { MSG( "Les informations concernant le nom de de l'objet manquent." ); }
-
-        string type = "Sprite"; //Compatibility with Game Develop 1.2 and inferior
-        if ( elemScene->Attribute( "type" ) != NULL ) { type = elemScene->Attribute( "type" ); }
-
-        //Objet vide
-        boost::shared_ptr<gd::Object> newObject = extensionsManager->CreateObject(type, name);
-
-        if ( newObject != boost::shared_ptr<gd::Object>() )
-        {
-            newObject->LoadFromXml(project, elemScene);
-            objects.push_back( newObject );
-        }
-        else
-            std::cout << "Unknown object " << type << std::endl;
-
-        elemScene = elemScene->NextSiblingElement();
-    }
-}
-
 #if defined(GD_IDE_ONLY)
 void OpenSaveGame::OpenGroupesObjets(vector < gd::ObjectGroup > & list, const TiXmlElement * elem)
 {
@@ -211,21 +179,6 @@ void OpenSaveGame::OpenActions(vector < gd::Instruction > & actions, const TiXml
 
 
 #if defined(GD_IDE_ONLY)
-void OpenSaveGame::SaveObjects(const vector < boost::shared_ptr<gd::Object> > & list, TiXmlElement * objects )
-{
-    //Objets
-    for ( unsigned int j = 0;j < list.size();j++ )
-    {
-        TiXmlElement * objet = new TiXmlElement( "Objet" );
-        objects->LinkEndChild( objet );
-
-        objet->SetAttribute( "nom", list.at( j )->GetName().c_str() );
-        objet->SetAttribute( "type", list.at( j )->GetType().c_str() );
-
-        list[j]->SaveToXml(objet);
-    }
-}
-
 void OpenSaveGame::SaveGroupesObjets(const vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets)
 {
     for ( unsigned int j = 0;j < list.size();j++ )

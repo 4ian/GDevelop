@@ -377,7 +377,7 @@ void SceneEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
     }
 
     //Add a new object of selected type to objects list
-    scene.InsertNewObject(chooseTypeDialog.GetSelectedObjectType(), name, scene.GetObjectsCount());
+    scene.InsertNewObject(project, chooseTypeDialog.GetSelectedObjectType(), name, scene.GetObjectsCount());
 
     for (std::set<gd::LayoutEditorCanvasAssociatedEditor*>::iterator it = associatedEditors.begin();it !=associatedEditors.end();++it)
         (*it)->ObjectsUpdated();

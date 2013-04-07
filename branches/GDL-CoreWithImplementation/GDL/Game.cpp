@@ -171,7 +171,7 @@ void Game::LoadFromXml(const TiXmlElement * rootElement)
     //Global objects
     elem = rootElement->FirstChildElement( "Objects" );
     if ( elem )
-        OpenSaveGame::OpenObjects(*this, GetGlobalObjects(), elem);
+        LoadObjectsFromXml(*this, elem);
 
     #if defined(GD_IDE_ONLY)
     //Global object groups
@@ -372,7 +372,7 @@ void Game::SaveToXml(TiXmlElement * root) const
     //Global objects
     TiXmlElement * objects = new TiXmlElement( "Objects" );
     root->LinkEndChild( objects );
-    OpenSaveGame::SaveObjects(GetGlobalObjects(), objects);
+    SaveObjectsToXml(objects);
 
     //Global object groups
     TiXmlElement * globalObjectGroups = new TiXmlElement( "ObjectGroups" );
@@ -778,81 +778,6 @@ void Game::RemoveExternalLayout(const std::string & name)
     if ( externalLayout == externalLayouts.end() ) return;
 
     externalLayouts.erase(externalLayout);
-}
-
-
-bool Game::HasObjectNamed(const std::string & name) const
-{
-    return ( find_if(GetGlobalObjects().begin(), GetGlobalObjects().end(), bind2nd(ObjectHasName(), name)) != GetGlobalObjects().end() );
-}
-gd::Object & Game::GetObject(const std::string & name)
-{
-    return *(*find_if(GetGlobalObjects().begin(), GetGlobalObjects().end(), bind2nd(ObjectHasName(), name)));
-}
-const gd::Object & Game::GetObject(const std::string & name) const
-{
-    return *(*find_if(GetGlobalObjects().begin(), GetGlobalObjects().end(), bind2nd(ObjectHasName(), name)));
-}
-gd::Object & Game::GetObject(unsigned int index)
-{
-    return *GetGlobalObjects()[index];
-}
-const gd::Object & Game::GetObject (unsigned int index) const
-{
-    return *GetGlobalObjects()[index];
-}
-unsigned int Game::GetObjectPosition(const std::string & name) const
-{
-    for (unsigned int i = 0;i<GetGlobalObjects().size();++i)
-    {
-        if ( GetGlobalObjects()[i]->GetName() == name ) return i;
-    }
-    return std::string::npos;
-}
-unsigned int Game::GetObjectsCount() const
-{
-    return GetGlobalObjects().size();
-}
-
-void Game::InsertNewObject(const std::string & objectType, const std::string & name, unsigned int position)
-{
-    boost::shared_ptr<gd::Object> newObject = ExtensionsManager::GetInstance()->CreateObject(objectType, name);
-    if (position<GetGlobalObjects().size())
-        GetGlobalObjects().insert(GetGlobalObjects().begin()+position, newObject);
-    else
-        GetGlobalObjects().push_back(newObject);
-}
-
-void Game::InsertObject(const gd::Object & object, unsigned int position)
-{
-    try
-    {
-        const gd::Object & castedObject = dynamic_cast<const gd::Object&>(object);
-        boost::shared_ptr<gd::Object> newObject = boost::shared_ptr<gd::Object>(castedObject.Clone());
-        if (position<GetGlobalObjects().size())
-            GetGlobalObjects().insert(GetGlobalObjects().begin()+position, newObject);
-        else
-            GetGlobalObjects().push_back(newObject);
-    }
-    catch(...) { std::cout << "WARNING: Tried to add an object which is not a GD C++ Platform Object to a GD C++ Platform project"; }
-}
-
-void Game::RemoveObject(const std::string & name)
-{
-    std::vector< boost::shared_ptr<gd::Object> >::iterator events = find_if(GetGlobalObjects().begin(), GetGlobalObjects().end(), bind2nd(ObjectHasName(), name));
-    if ( events == GetGlobalObjects().end() ) return;
-
-    GetGlobalObjects().erase(events);
-}
-
-void Game::SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex)
-{
-    if ( firstObjectIndex >= GetGlobalObjects().size() || secondObjectIndex >= GetGlobalObjects().size() )
-        return;
-
-    boost::shared_ptr<gd::Object> temp = GetGlobalObjects()[firstObjectIndex];
-    GetGlobalObjects()[firstObjectIndex] = GetGlobalObjects()[secondObjectIndex];
-    GetGlobalObjects()[secondObjectIndex] = temp;
 }
 #endif
 

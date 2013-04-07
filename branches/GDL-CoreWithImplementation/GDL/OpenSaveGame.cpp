@@ -39,7 +39,7 @@
 #include "GDL/Animation.h"
 #include "GDL/Position.h"
 #include "GDL/Automatism.h"
-#include "GDL/AutomatismsSharedDatas.h"
+#include "GDL/AutomatismsSharedData.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/VersionWrapper.h"
 #include "GDL/ExtensionsLoader.h"

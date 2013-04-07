@@ -14,7 +14,7 @@
 namespace gd { class Object; }
 class Game;
 class CodeExecutionEngine;
-class AutomatismsSharedDatas;
+namespace gd { class AutomatismsSharedData; }
 class BaseProfiler;
 class TiXmlElement;
 #if defined(GD_IDE_ONLY)
@@ -316,20 +316,12 @@ public:
     float GetOpenGLZFar() const { return oglZFar; }
     ///@}
 
-    std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
+    std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
 
     /** \name Code execution engine
      * Functions members giving access to the code execution engine.
      */
     ///@{
-
-    /**
-     * Get the list containing the list of bitcodes files which must be loaded at the same time of the scene's bitcode.
-     * This list is populated at the compilation ( see CodeCompiler and EventsCodeCompilerRuntimePreWork classes ) and is only used at runtime ( i.e: Not in the IDE ).
-     * The IDE takes care of loading itself the necessary bitcodes ( See EventsCodeCompilerPostWork class ).
-     */
-    std::vector<std::string> & GetExternalBitCodeDependList() const { return externalBitCodeDependList; };
-
     /**
      * Give access to the execution engine of the scene.
      * Each scene has its own unique execution engine.
@@ -360,7 +352,6 @@ private:
     float                                       oglZFar; ///< OpenGL Far Z position
     bool                                        disableInputWhenNotFocused; /// If set to true, the input must be disabled when the window do not have the focus.
 
-    mutable std::vector<std::string>            externalBitCodeDependList; ///< List of bitcode files the scene depends on. Used only for runtime and not in the IDE.
     mutable boost::shared_ptr<CodeExecutionEngine> codeExecutionEngine;
 
     #if defined(GD_IDE_ONLY)

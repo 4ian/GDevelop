@@ -8,7 +8,7 @@
 #include <iostream>
 #include "GDL/ExtensionBase.h"
 #include "GDL/Automatism.h"
-#include "GDL/AutomatismsSharedDatas.h"
+#include "GDL/AutomatismsSharedData.h"
 #include "GDL/CommonTools.h"
 #if defined(GD_IDE_ONLY)
 #include "GDCore/Events/Event.h"
@@ -266,12 +266,12 @@ Automatism* ExtensionBase::CreateAutomatism(std::string type) const
 }
 
 
-boost::shared_ptr<AutomatismsSharedDatas> ExtensionBase::CreateAutomatismSharedDatas(std::string type) const
+boost::shared_ptr<gd::AutomatismsSharedData> ExtensionBase::CreateAutomatismSharedDatas(std::string type) const
 {
     if ( automatismsInfo.find(type) != automatismsInfo.end())
         return automatismsInfo.find(type)->second.sharedDatasInstance->Clone();
 
-    return boost::shared_ptr<AutomatismsSharedDatas>();
+    return boost::shared_ptr<gd::AutomatismsSharedData>();
 }
 
 void ExtensionBase::SceneLoaded(RuntimeScene & scene)

@@ -20,7 +20,7 @@ class ManualTimer;
 class RuntimeGame;
 class RuntimeLayer;
 namespace gd { class Object; }
-class AutomatismsRuntimeSharedDatas;
+class AutomatismsRuntimeSharedData;
 class ExtensionBase;
 #undef GetObject //Disable an annoying macro
 
@@ -81,7 +81,7 @@ public:
      * Get the AutomatismsRuntimeSharedData associated with automatism.
      * Be careful, no check is made to ensure that the shared data exist.
      */
-    const boost::shared_ptr<AutomatismsRuntimeSharedDatas> & GetAutomatismSharedDatas(const std::string & automatismName) const { return automatismsSharedDatas.find(automatismName)->second; }
+    const boost::shared_ptr<AutomatismsRuntimeSharedData> & GetAutomatismSharedDatas(const std::string & automatismName) const { return automatismsSharedDatas.find(automatismName)->second; }
 
     /**
      * Set up the RuntimeScene using a Scene.
@@ -223,7 +223,7 @@ protected:
     std::vector < ExtensionBase * >         extensionsToBeNotifiedOnObjectDeletion; ///< List, built during LoadFromScene, containing a list of extensions which must be notified when an object is deleted.
     sf::Clock                               clock;
     bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.
-    std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
+    std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedData> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
 
     std::vector < Text >                    textes; ///<Deprecated way of displaying a text

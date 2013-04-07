@@ -218,16 +218,16 @@ Automatism* ExtensionsManager::CreateAutomatism(std::string automatismType) cons
     return NULL;
 }
 
-boost::shared_ptr<AutomatismsSharedDatas> ExtensionsManager::CreateAutomatismSharedDatas(std::string automatismType) const
+boost::shared_ptr<gd::AutomatismsSharedData> ExtensionsManager::CreateAutomatismSharedDatas(std::string automatismType) const
 {
     for (unsigned int i =0;i<extensionsLoaded.size();++i)
     {
-        boost::shared_ptr<AutomatismsSharedDatas> automatism = extensionsLoaded[i]->CreateAutomatismSharedDatas(automatismType);
-        if ( automatism != boost::shared_ptr<AutomatismsSharedDatas>() )
+        boost::shared_ptr<gd::AutomatismsSharedData> automatism = extensionsLoaded[i]->CreateAutomatismSharedDatas(automatismType);
+        if ( automatism != boost::shared_ptr<gd::AutomatismsSharedData>() )
             return automatism;
     }
 
-    return boost::shared_ptr<AutomatismsSharedDatas>();
+    return boost::shared_ptr<gd::AutomatismsSharedData>();
 }
 
 #if defined(GD_IDE_ONLY)

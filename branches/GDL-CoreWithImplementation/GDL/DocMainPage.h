@@ -167,10 +167,10 @@
 
  * Each automatism is an instance of a class that derive from the base class Automatism.  Automatisms are linked to an object ( Thus, automatisms can access to their object by using their member object* ) and they are also managed by this object.<br>
 
- * \subsection automatismSharedData The base AutomatismsSharedDatas and AutomatismsRuntimeSharedDatas classes
+ * \subsection automatismSharedData The base AutomatismsSharedData and AutomatismsRuntimeSharedData classes
 
  * Automatisms with the same name can share datas.
- * Each automatisms have to provide a class derived from AutomatismsSharedDatas, which contains the datas to be shared at edittime. This class is almost empty, but have to redefine the member function CreateRuntimeSharedDatas. This function must return a shared pointer to the runtime equivalent of this class, in other word, a class which contains datas to be shared at runtime. This class must derive from AutomatismsRuntimeSharedDatas.
+ * Each automatisms have to provide a class derived from AutomatismsSharedData, which contains the datas to be shared at edittime. This class is almost empty, but have to redefine the member function CreateRuntimeSharedDatas. This function must return a shared pointer to the runtime equivalent of this class, in other word, a class which contains datas to be shared at runtime. This class must derive from AutomatismsRuntimeSharedData.
 
  * \section aboutBoostShared_ptr About Boost shared pointers
 

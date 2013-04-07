@@ -37,7 +37,7 @@ namespace gd { class Object; }
 class RuntimeObject;
 class ExtensionBase;
 namespace gd { class BaseEvent; }
-class AutomatismsSharedDatas;
+namespace gd { class AutomatismsSharedData; }
 namespace gd {class ArbitraryResourceWorker;}
 class EventsCodeGenerationContext;
 class EventsCodeGenerator;
@@ -366,7 +366,7 @@ typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const
                 automatismInfo.SetBitmapIcon(wxBitmap(icon24x24_, wxBITMAP_TYPE_ANY)); \
             } else { automatismInfo.SetBitmapIcon(wxBitmap(24,24));} \
             automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName));\
-            automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
+            automatismInfo.sharedDatasInstance = boost::shared_ptr<gd::AutomatismsSharedData>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
 
 /**
  * Need to be added after DECLARE_CONDITION and DECLARE_PARAMTERs.
@@ -462,7 +462,7 @@ typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const
             AutomatismInfo automatismInfo; \
             std::string currentAutomatismDeclarationName = name_;\
             automatismInfo.instance = boost::shared_ptr<Automatism>(new className_(GetNameSpace()+currentAutomatismDeclarationName)); \
-            automatismInfo.sharedDatasInstance = boost::shared_ptr<AutomatismsSharedDatas>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
+            automatismInfo.sharedDatasInstance = boost::shared_ptr<gd::AutomatismsSharedData>(new sharedDatasClassName_(GetNameSpace()+currentAutomatismDeclarationName));
 
 //Emulating wxWidgets internationalization macro
 #ifndef _
@@ -538,7 +538,7 @@ public:
 #endif
 
     boost::shared_ptr<Automatism> instance;
-    boost::shared_ptr<AutomatismsSharedDatas> sharedDatasInstance;
+    boost::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance;
 };
 
 /**
@@ -664,7 +664,7 @@ public :
      * Create shared datas of an automatism
      * Return NULL if automatismType is not provided by the extension.
      */
-    boost::shared_ptr<AutomatismsSharedDatas> CreateAutomatismSharedDatas(std::string automatismType) const;
+    boost::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(std::string automatismType) const;
 
     /**
      * Get the namespace

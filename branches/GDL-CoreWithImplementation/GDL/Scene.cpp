@@ -11,7 +11,7 @@
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/Automatism.h"
-#include "GDL/AutomatismsSharedDatas.h"
+#include "GDL/AutomatismsSharedData.h"
 #include "GDL/CodeExecutionEngine.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/OpenSaveGame.h"
@@ -123,7 +123,7 @@ void Scene::UpdateAutomatismsSharedData(Game & game)
     {
         if ( automatismsInitialSharedDatas.find(allAutomatismsNames[i]) == automatismsInitialSharedDatas.end() )
         {
-            boost::shared_ptr<AutomatismsSharedDatas> automatismsSharedDatas = ExtensionsManager::GetInstance()->CreateAutomatismSharedDatas(allAutomatismsTypes[i]);
+            boost::shared_ptr<gd::AutomatismsSharedData> automatismsSharedDatas = ExtensionsManager::GetInstance()->CreateAutomatismSharedDatas(allAutomatismsTypes[i]);
             automatismsSharedDatas->SetName(allAutomatismsNames[i]);
             automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
         }
@@ -132,7 +132,7 @@ void Scene::UpdateAutomatismsSharedData(Game & game)
     //Remove useless shared data:
     //First construct the list of existing shared data.
     std::vector < std::string > allSharedData;
-    for (std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = automatismsInitialSharedDatas.begin();
+    for (std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = automatismsInitialSharedDatas.begin();
          it != automatismsInitialSharedDatas.end();++it)
     {
         allSharedData.push_back(it->first);
@@ -236,9 +236,9 @@ void Scene::SaveToXml(TiXmlElement * scene) const
     scene->LinkEndChild( variables );
     GetVariables().SaveToXml(variables);
 
-    TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedDatas" );
+    TiXmlElement * autosSharedDatas = new TiXmlElement( "AutomatismsSharedData" );
     scene->LinkEndChild( autosSharedDatas );
-    for (std::map<std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = automatismsInitialSharedDatas.begin();
+    for (std::map<std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = automatismsInitialSharedDatas.begin();
          it != automatismsInitialSharedDatas.end();++it)
     {
         TiXmlElement * autoSharedDatas = new TiXmlElement( "AutomatismSharedDatas" );
@@ -247,16 +247,6 @@ void Scene::SaveToXml(TiXmlElement * scene) const
         autoSharedDatas->SetAttribute("Type", it->second->GetTypeName().c_str());
         autoSharedDatas->SetAttribute("Name", it->second->GetName().c_str());
         it->second->SaveToXml(autoSharedDatas);
-    }
-
-    TiXmlElement * dependenciesElem = new TiXmlElement( "Dependencies" );
-    scene->LinkEndChild( dependenciesElem );
-    for ( unsigned int j = 0;j < externalBitCodeDependList.size();++j)
-    {
-        TiXmlElement * dependencyElem = new TiXmlElement( "Dependency" );
-        dependenciesElem->LinkEndChild( dependencyElem );
-
-        dependencyElem->SetAttribute("bitcodeFile", externalBitCodeDependList[j].c_str());
     }
 
     TiXmlElement * positions = new TiXmlElement( "Positions" );
@@ -318,15 +308,15 @@ void Scene::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
     if ( elem->FirstChildElement( "Variables" ) != NULL )
         variables.LoadFromXml(elem->FirstChildElement( "Variables" ));
 
-    if ( elem->FirstChildElement( "AutomatismsSharedDatas" ) != NULL )
+    if ( elem->FirstChildElement( "AutomatismsSharedData" ) != NULL )
     {
-        const TiXmlElement * elemSharedDatas = elem->FirstChildElement( "AutomatismsSharedDatas" )->FirstChildElement( "AutomatismSharedDatas" );
+        const TiXmlElement * elemSharedDatas = elem->FirstChildElement( "AutomatismsSharedData" )->FirstChildElement( "AutomatismSharedDatas" );
         while ( elemSharedDatas != NULL )
         {
             std::string type = elemSharedDatas->Attribute("Type") ? elemSharedDatas->Attribute("Type") : "";
-            boost::shared_ptr<AutomatismsSharedDatas> sharedDatas = ExtensionsManager::GetInstance()->CreateAutomatismSharedDatas(type);
+            boost::shared_ptr<gd::AutomatismsSharedData> sharedDatas = ExtensionsManager::GetInstance()->CreateAutomatismSharedDatas(type);
 
-            if ( sharedDatas != boost::shared_ptr<AutomatismsSharedDatas>() )
+            if ( sharedDatas != boost::shared_ptr<gd::AutomatismsSharedData>() )
             {
                 sharedDatas->SetName( elemSharedDatas->Attribute("Name") ? elemSharedDatas->Attribute("Name") : "" );
                 sharedDatas->LoadFromXml(elemSharedDatas);
@@ -336,20 +326,6 @@ void Scene::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
             elemSharedDatas = elemSharedDatas->NextSiblingElement("AutomatismSharedDatas");
         }
     }
-
-    externalBitCodeDependList.clear();
-    const TiXmlElement * dependenciesElem = elem->FirstChildElement( "Dependencies" );
-    if ( dependenciesElem != NULL)
-    {
-        const TiXmlElement * dependencyElem = dependenciesElem->FirstChildElement();
-        while(dependencyElem)
-        {
-            externalBitCodeDependList.push_back(dependencyElem->Attribute("bitcodeFile") != NULL ? dependencyElem->Attribute("bitcodeFile") : "");
-
-            dependencyElem = dependencyElem->NextSiblingElement();
-        }
-    }
-
 }
 
 void Scene::Init(const Scene & scene)
@@ -366,7 +342,6 @@ void Scene::Init(const Scene & scene)
     stopSoundsOnStartup = scene.stopSoundsOnStartup;
     disableInputWhenNotFocused = scene.disableInputWhenNotFocused;
 
-    externalBitCodeDependList = scene.GetExternalBitCodeDependList();
     codeExecutionEngine = boost::shared_ptr<CodeExecutionEngine>(new CodeExecutionEngine);
 
     GetInitialObjects().clear();
@@ -378,7 +353,7 @@ void Scene::Init(const Scene & scene)
     variables = scene.GetVariables();
 
     automatismsInitialSharedDatas.clear();
-    for (std::map< std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
+    for (std::map< std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
          it != scene.automatismsInitialSharedDatas.end();++it)
     {
     	automatismsInitialSharedDatas[it->first] = it->second->Clone();

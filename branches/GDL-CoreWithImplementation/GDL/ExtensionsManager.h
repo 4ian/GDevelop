@@ -22,7 +22,7 @@ namespace gd { class ExpressionMetadata; }
 namespace gd { class StrExpressionMetadata; }
 class ExtensionObjectInfos;
 class AutomatismInfo;
-class AutomatismsSharedDatas;
+namespace gd { class AutomatismsSharedData; }
 namespace gd { class BaseEvent; }
 typedef void (*DestroyFunPtr)(gd::Object*);
 typedef gd::Object * (*CreateFunPtr)(std::string name);
@@ -104,7 +104,7 @@ public:
     /**
      * Create shared datas of the automatism of given type
      */
-    boost::shared_ptr<AutomatismsSharedDatas> CreateAutomatismSharedDatas(std::string automatismType) const;
+    boost::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(std::string automatismType) const;
 
     #if defined(GD_IDE_ONLY)
     /**

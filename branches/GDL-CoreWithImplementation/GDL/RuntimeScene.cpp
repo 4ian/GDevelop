@@ -25,7 +25,8 @@
 #include "GDL/profile.h"
 #include "GDL/Position.h"
 #include "GDL/FontManager.h"
-#include "GDL/AutomatismsSharedDatas.h"
+#include "GDL/AutomatismsSharedData.h"
+#include "GDL/AutomatismsRuntimeSharedData.h"
 #include "GDL/RuntimeContext.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/RuntimeGame.h"
@@ -108,7 +109,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     windowHasFocus = scene.windowHasFocus;
 
     automatismsSharedDatas.clear();
-    for (std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedDatas> >::const_iterator it = scene.automatismsSharedDatas.begin();
+    for (std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedData> >::const_iterator it = scene.automatismsSharedDatas.begin();
          it != scene.automatismsSharedDatas.end();++it)
     {
     	automatismsSharedDatas[it->first] = it->second->Clone();
@@ -596,7 +597,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const g
 
     //Automatisms data
     automatismsSharedDatas.clear();
-    for(std::map < std::string, boost::shared_ptr<AutomatismsSharedDatas> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
+    for(std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
         it != scene.automatismsInitialSharedDatas.end();
         ++it)
     {

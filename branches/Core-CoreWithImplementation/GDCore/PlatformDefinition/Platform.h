@@ -10,6 +10,7 @@
 #include <string>
 namespace gd { class InstructionsMetadataHolder; }
 namespace gd { class Project; }
+namespace gd { class Object; }
 namespace gd { class Automatism; }
 namespace gd { class BaseEvent; }
 
@@ -65,6 +66,11 @@ public:
      * Must create an empty project
      */
     virtual boost::shared_ptr<gd::Project> CreateNewEmptyProject() const =0;
+
+    /**
+     * Must create an object of given type with the specified name.
+     */
+    virtual boost::shared_ptr<gd::Object> CreateObject(const std::string & type, const std::string & name) const =0;
 
     /**
      * Must create an automatism

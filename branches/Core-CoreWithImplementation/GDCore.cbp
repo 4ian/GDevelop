@@ -261,6 +261,8 @@
 		<Unit filename="GDCore/IDE/Dialogs/ChooseVariableDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/EditExpressionDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/EditExpressionDialog.h" />
+		<Unit filename="GDCore/IDE/Dialogs/EditLayerDialog.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/EditLayerDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/EditStrExpressionDialog.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/EditStrExpressionDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/GridSetupDialog.cpp" />
@@ -377,6 +379,7 @@
 		<Unit filename="wxsmith/ChooseObjectTypeDialog.wxs" />
 		<Unit filename="wxsmith/ChooseVariableDialog.wxs" />
 		<Unit filename="wxsmith/EditExpressionDialog.wxs" />
+		<Unit filename="wxsmith/EditLayerDialog.wxs" />
 		<Unit filename="wxsmith/EditStrExpressionDialog.wxs" />
 		<Unit filename="wxsmith/GridSetupDialog.wxs" />
 		<Unit filename="wxsmith/InstancesAdvancedPasteDialog.wxs" />
@@ -415,6 +418,7 @@
 					<wxPanel wxs="wxsmith/LayersEditorPanel.wxs" src="GDCore\IDE\Dialogs\LayersEditorPanel.cpp" hdr="GDCore\IDE\Dialogs\LayersEditorPanel.h" fwddecl="0" i18n="1" name="LayersEditorPanel" language="CPP" />
 					<wxDialog wxs="wxsmith/InstancesAdvancedPasteDialog.wxs" src="GDCore\IDE\Dialogs\InstancesAdvancedPasteDialog.cpp" hdr="GDCore\IDE\Dialogs\InstancesAdvancedPasteDialog.h" fwddecl="0" i18n="1" name="InstancesAdvancedPasteDialog" language="CPP" />
 					<wxDialog wxs="wxsmith/ChooseAutomatismTypeDialog.wxs" src="GDCore\IDE\Dialogs\ChooseAutomatismTypeDialog.cpp" hdr="GDCore\IDE\Dialogs\ChooseAutomatismTypeDialog.h" fwddecl="0" i18n="1" name="ChooseAutomatismTypeDialog" language="CPP" />
+					<wxDialog wxs="wxsmith/EditLayerDialog.wxs" src="GDCore\IDE\Dialogs\EditLayerDialog.cpp" hdr="GDCore\IDE\Dialogs\EditLayerDialog.h" fwddecl="0" i18n="1" name="EditLayerDialog" language="CPP" />
 				</resources>
 			</wxsmith>
 		</Extensions>

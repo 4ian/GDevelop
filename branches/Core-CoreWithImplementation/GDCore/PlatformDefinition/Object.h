@@ -4,6 +4,7 @@
  */
 #ifndef GDCORE_OBJECT_H
 #define GDCORE_OBJECT_H
+#include <boost/shared_ptr.hpp>
 #include <string>
 #include <vector>
 #include <map>
@@ -226,6 +227,15 @@ protected:
      * Don't forget to update me if members were changed !
      */
     void Init(const gd::Object & object);
+};
+
+/**
+ * \brief Functor testing object name
+ *
+ * \see gd::Object
+ */
+struct ObjectHasName : public std::binary_function<boost::shared_ptr<gd::Object>, std::string, bool> {
+    bool operator()(const boost::shared_ptr<gd::Object> & object, const std::string & name) const { return object->GetName() == name; }
 };
 
 }

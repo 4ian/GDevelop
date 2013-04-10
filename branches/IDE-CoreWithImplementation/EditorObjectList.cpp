@@ -43,7 +43,7 @@
 #include "GDL/ExtensionBase.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
-#include "GDL/AutomatismsSharedDatas.h"
+#include "GDL/AutomatismsSharedData.h"
 #include "GDL/Automatism.h"
 #include "GDL/CommonTools.h"
 

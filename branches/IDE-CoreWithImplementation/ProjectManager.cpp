@@ -780,7 +780,7 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
     }
 
     vector< boost::shared_ptr<Scene> >::const_iterator scene =
-        find_if(game->GetLayouts().begin(), game->GetLayouts().end(), bind2nd(SceneHasName(), data->GetSecondString()));
+        find_if(game->GetLayouts().begin(), game->GetLayouts().end(), bind2nd(gd::LayoutHasName(), data->GetSecondString()));
 
     if ( scene == game->GetLayouts().end() )
     {

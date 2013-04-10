@@ -91,7 +91,7 @@ void ExternalEventsEditor::ForceRefreshRibbonAndConnect()
 void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
 {
     vector< boost::shared_ptr<Scene> >::iterator sceneFound =
-        find_if(game.GetLayouts().begin(), game.GetLayouts().end(), bind2nd(SceneHasName(), string(parentSceneComboBox->GetValue().mb_str())));
+        find_if(game.GetLayouts().begin(), game.GetLayouts().end(), bind2nd(gd::LayoutHasName(), string(parentSceneComboBox->GetValue().mb_str())));
 
     Scene * scene = NULL;
 

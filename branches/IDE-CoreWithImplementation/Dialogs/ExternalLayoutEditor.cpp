@@ -137,7 +137,7 @@ mainFrameWrapper(mainFrameWrapper_)
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
 
     vector< boost::shared_ptr<Scene> >::iterator layoutFound =
-        find_if(project.GetLayouts().begin(), project.GetLayouts().end(), bind2nd(SceneHasName(), externalLayout.GetAssociatedSettings().associatedLayout));
+        find_if(project.GetLayouts().begin(), project.GetLayouts().end(), bind2nd(gd::LayoutHasName(), externalLayout.GetAssociatedSettings().associatedLayout));
 
     if ( layoutFound != project.GetLayouts().end() )
         SetupForScene(*(*layoutFound));
@@ -277,7 +277,7 @@ void ExternalLayoutEditor::SetupForScene(Scene & layout)
 void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
 {
     vector< boost::shared_ptr<Scene> >::iterator layoutFound =
-        find_if(project.GetLayouts().begin(), project.GetLayouts().end(), bind2nd(SceneHasName(), ToString(parentSceneComboBox->GetValue())));
+        find_if(project.GetLayouts().begin(), project.GetLayouts().end(), bind2nd(gd::LayoutHasName(), ToString(parentSceneComboBox->GetValue())));
 
     Scene * layout = NULL;
 

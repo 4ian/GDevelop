@@ -884,12 +884,12 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
             if ( ParaEdit.empty() ) return;
 
             string objectWanted = string(ParaEdit[0]->GetValue().mb_str());
-            std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+            std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
             std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
             ObjSPtr object = boost::shared_ptr<gd::Object> ();
 
-            if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
+            if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
                 object = *sceneObject;
             else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
                 object = *globalObject;

@@ -52,6 +52,12 @@ gd::Automatism* Platform::CreateAutomatism(const std::string & type) const
     return ExtensionsManager::GetInstance()->CreateAutomatism(type);
 }
 
+boost::shared_ptr<gd::AutomatismsSharedData> Platform::CreateAutomatismSharedDatas(const std::string & type) const
+{
+    std::cout << "created" << type;
+    return ExtensionsManager::GetInstance()->CreateAutomatismSharedDatas(type);
+}
+
 boost::shared_ptr<gd::BaseEvent> Platform::CreateEvent(const std::string & type) const
 {
     return ExtensionsManager::GetInstance()->CreateEvent(type);

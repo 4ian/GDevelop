@@ -36,10 +36,6 @@ public:
     static void SaveConditions(const vector < gd::Instruction > & list, TiXmlElement * elem);
     static void SaveActions(const vector < gd::Instruction > & list, TiXmlElement * elem);
 
-    static void OpenGroupesObjets( vector < gd::ObjectGroup > & list, const TiXmlElement * elem );
-    static void SaveGroupesObjets( const vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets );
-
-    static void SaveObjects( const vector < boost::shared_ptr<gd::Object> > & list, TiXmlElement * objects );
     static void OpenImagesFromGD2010498(Game & game, const TiXmlElement * elem, const TiXmlElement * dossierElem );
     #endif
 };

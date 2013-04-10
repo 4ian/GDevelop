@@ -58,50 +58,6 @@
 using namespace std;
 
 #if defined(GD_IDE_ONLY)
-void OpenSaveGame::OpenGroupesObjets(vector < gd::ObjectGroup > & list, const TiXmlElement * elem)
-{
-    const TiXmlElement * elemScene = elem->FirstChildElement("Groupe");
-
-    //Passage en revue des positions initiales
-    while ( elemScene )
-    {
-        gd::ObjectGroup objectGroup;
-
-        if ( elemScene->Attribute( "nom" ) != NULL ) { objectGroup.SetName(elemScene->Attribute( "nom" ));}
-        else { MSG( "Les informations concernant le nom d'un groupe d'objet manquent." ); }
-
-        const TiXmlElement * objet = elemScene->FirstChildElement( "Objet" );
-        while ( objet )
-        {
-            string objetName;
-            if ( objet->Attribute( "nom" ) != NULL ) { objetName = objet->Attribute( "nom");}
-            else { MSG( "Les informations concernant le nom d'un objet d'un groupe d'objet manquent." ); }
-
-            objectGroup.AddObject(objetName);
-            objet = objet->NextSiblingElement();
-        }
-
-        list.push_back( objectGroup );
-
-        elemScene = elemScene->NextSiblingElement();
-    }
-}
-#endif
-
-#if defined(GD_IDE_ONLY)
-
-std::string AddBackSlashBeforeQuotes(std::string text)
-{
-    size_t foundPos=text.find("\"");
-    while(foundPos != string::npos)
-    {
-        if(foundPos != string::npos) text.replace(foundPos,1,"\\\"");
-        foundPos=text.find("\"", foundPos+2);
-    }
-
-    return text;
-}
-
 void OpenSaveGame::OpenConditions(vector < gd::Instruction > & conditions, const TiXmlElement * elem)
 {
     if (elem == NULL) return;
@@ -179,28 +135,6 @@ void OpenSaveGame::OpenActions(vector < gd::Instruction > & actions, const TiXml
 
 
 #if defined(GD_IDE_ONLY)
-void OpenSaveGame::SaveGroupesObjets(const vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets)
-{
-    for ( unsigned int j = 0;j < list.size();j++ )
-    {
-        TiXmlElement * grp;
-
-        grp = new TiXmlElement( "Groupe" );
-        grpsobjets->LinkEndChild( grp );
-        grp->SetAttribute( "nom", list.at( j ).GetName().c_str() );
-
-        vector < string > allObjects = list.at(j).GetAllObjectsNames();
-        for ( unsigned int k = 0;k < allObjects.size();k++ )
-        {
-            TiXmlElement * objet;
-
-            objet = new TiXmlElement( "Objet" );
-            grp->LinkEndChild( objet );
-            objet->SetAttribute( "nom", allObjects.at(k).c_str() );
-        }
-    }
-}
-
 void OpenSaveGame::SaveActions(const vector < gd::Instruction > & list, TiXmlElement * actions)
 {
     for ( unsigned int k = 0;k < list.size();k++ )

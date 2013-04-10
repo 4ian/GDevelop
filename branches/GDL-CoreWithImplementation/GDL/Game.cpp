@@ -28,6 +28,7 @@
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/IDE/ChangesNotifier.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/CommonTools.h"
 #elif !defined(_)
@@ -177,7 +178,7 @@ void Game::LoadFromXml(const TiXmlElement * rootElement)
     //Global object groups
     elem = rootElement->FirstChildElement( "ObjectGroups" );
     if ( elem )
-        OpenSaveGame::OpenGroupesObjets(GetObjectGroups(), elem);
+        gd::ObjectGroup::LoadFromXml(GetObjectGroups(), elem);
     #endif
 
     //Global variables
@@ -377,7 +378,7 @@ void Game::SaveToXml(TiXmlElement * root) const
     //Global object groups
     TiXmlElement * globalObjectGroups = new TiXmlElement( "ObjectGroups" );
     root->LinkEndChild( globalObjectGroups );
-    OpenSaveGame::SaveGroupesObjets(GetObjectGroups(), globalObjectGroups);
+    gd::ObjectGroup::SaveToXml(GetObjectGroups(), globalObjectGroups);
 
     //Global variables
     TiXmlElement * variables = new TiXmlElement( "Variables" );
@@ -588,15 +589,15 @@ void Game::ExposeResources(gd::ArbitraryResourceWorker & worker)
 
 bool Game::HasLayoutNamed(const std::string & name) const
 {
-    return ( find_if(scenes.begin(), scenes.end(), bind2nd(SceneHasName(), name)) != scenes.end() );
+    return ( find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name)) != scenes.end() );
 }
 gd::Layout & Game::GetLayout(const std::string & name)
 {
-    return *(*find_if(scenes.begin(), scenes.end(), bind2nd(SceneHasName(), name)));
+    return *(*find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name)));
 }
 const gd::Layout & Game::GetLayout(const std::string & name) const
 {
-    return *(*find_if(scenes.begin(), scenes.end(), bind2nd(SceneHasName(), name)));
+    return *(*find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name)));
 }
 gd::Layout & Game::GetLayout(unsigned int index)
 {
@@ -650,7 +651,7 @@ void Game::InsertLayout(const gd::Layout & layout, unsigned int position)
 
 void Game::RemoveLayout(const std::string & name)
 {
-    std::vector< boost::shared_ptr<Scene> >::iterator scene = find_if(scenes.begin(), scenes.end(), bind2nd(SceneHasName(), name));
+    std::vector< boost::shared_ptr<Scene> >::iterator scene = find_if(scenes.begin(), scenes.end(), bind2nd(gd::LayoutHasName(), name));
     if ( scene == scenes.end() ) return;
 
     scenes.erase(scene);

@@ -499,12 +499,12 @@ public:
 
     virtual void operator()(gd::InitialInstance & initialInstance)
     {
-        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
+        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
         std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
 
         RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
-        if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
+        if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
             newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **sceneObject);
         else if ( globalObject != scene.game->GetGlobalObjects().end() ) //Then the global object list
             newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **globalObject);
@@ -588,7 +588,6 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const g
     sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight() ) );
     for (unsigned int i = 0;i<GetLayersCount();++i) {
         layers.push_back(RuntimeLayer(GetLayer(i), defaultView));
-        std::cout << "Created layout from " << GetLayer(i).GetName() << std::endl;
     }
 
     //Create object instances which are originally positioned on scene
@@ -601,7 +600,12 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const g
         it != scene.automatismsInitialSharedDatas.end();
         ++it)
     {
-        automatismsSharedDatas[it->first] = it->second->CreateRuntimeSharedDatas();
+        boost::shared_ptr<AutomatismsRuntimeSharedData> data = it->second->CreateRuntimeSharedDatas();
+
+        if ( data )
+            automatismsSharedDatas[it->first] = data;
+        else
+            std::cout << "ERROR: Unable to create shared data for automatism \"" << it->second->GetName() <<"\".";
     }
 
     //Extensions specific initialization

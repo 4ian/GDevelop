@@ -163,12 +163,12 @@ void SceneEditorCanvas::OnInitialInstanceAdded(gd::InitialInstance & gdInstance)
         /*
         gd::InitialInstance & instance = dynamic_cast<gd::InitialInstance &>(gdInstance);
 
-        std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
+        std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
         std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
 
         ObjSPtr newObject = boost::shared_ptr<gd::Object> ();
 
-        if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
+        if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
             newObject = boost::shared_ptr<gd::Object>((*sceneObject)->Clone());
         else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
             newObject = boost::shared_ptr<gd::Object>((*globalObject)->Clone());

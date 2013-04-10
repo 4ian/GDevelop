@@ -361,10 +361,10 @@ void DebuggerGUI::UpdateGUI()
         mustRecreateTree = false;
 
         //Scene's objects
-        for(unsigned int i = 0;i<scene.GetInitialObjects().size();++i)
+        for(unsigned int i = 0;i<scene.GetObjects().size();++i)
         {
-            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.GetInitialObjects()[i]->GetName());
-            initialObjects[scene.GetInitialObjects()[i]->GetName()] = objectItem;
+            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.GetObjects()[i]->GetName());
+            initialObjects[scene.GetObjects()[i]->GetName()] = objectItem;
         }
         //Globals objects
         for(unsigned int i = 0;i<scene.game->GetGlobalObjects().size();++i)
@@ -733,13 +733,13 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
     if ( dialog.ShowModal() != 1 ) return;
 
     string objectWanted = dialog.GetChosenObject();
-    std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+    std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
     std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->GetGlobalObjects().begin(), scene.game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
     RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
     //Creation of the object
-    if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
+    if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
         newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **sceneObject);
     else if ( globalObject != scene.game->GetGlobalObjects().end() ) //Then the global object list
         newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **globalObject);

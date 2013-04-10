@@ -194,8 +194,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
     //Add scenes resources
     for ( unsigned int i = 0;i < game.GetLayoutCount();i++ )
     {
-        for (unsigned int j = 0;j<game.GetLayouts()[i]->GetInitialObjects().size();++j) //Add objects resources
-        	game.GetLayouts()[i]->GetInitialObjects()[j]->ExposeResources(resourcesMergingHelper);
+        for (unsigned int j = 0;j<game.GetLayouts()[i]->GetObjects().size();++j) //Add objects resources
+        	game.GetLayouts()[i]->GetObjects()[j]->ExposeResources(resourcesMergingHelper);
 
         LaunchResourceWorkerOnEvents(game, game.GetLayout(i).GetEvents(), resourcesMergingHelper);
     }

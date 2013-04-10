@@ -36,6 +36,8 @@ public:
 
     virtual gd::Automatism* CreateAutomatism(const std::string & type) const;
 
+    virtual boost::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type) const;
+
     virtual boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type) const;
 
     virtual boost::shared_ptr<gd::Object> CreateObject(const std::string & type, const std::string & name) const;

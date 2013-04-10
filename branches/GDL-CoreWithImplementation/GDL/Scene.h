@@ -8,21 +8,13 @@
 #include <map>
 #include <string>
 #include <boost/shared_ptr.hpp>
-#include "GDL/InitialInstancesContainer.h"
-#include "GDL/VariableList.h"
-#include "GDL/Layer.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 namespace gd { class Object; }
+namespace gd { class AutomatismsSharedData; }
 class Game;
 class CodeExecutionEngine;
-namespace gd { class AutomatismsSharedData; }
 class BaseProfiler;
 class TiXmlElement;
-#if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.h"
-#include "GDCore/PlatformDefinition/Layout.h"
-namespace gd { class BaseEvent; }
-namespace gd { typedef boost::shared_ptr<BaseEvent> BaseEventSPtr; }
-#endif
 
 #undef GetObject //Disable an annoying macro
 
@@ -51,119 +43,7 @@ public:
      */
     virtual Scene * Clone() const { return new Scene(*this); };
 
-    /**
-     * Get scene name
-     */
-    virtual const std::string & GetName() const {return name;};
-
-    /**
-     * Change scene name
-     */
-    virtual void SetName(const std::string & name_) {name = name_;};
-
-    /**
-     * Set the background color
-     */
-    virtual void SetBackgroundColor(unsigned int r, unsigned int g, unsigned int b) { backgroundColorR = r; backgroundColorG = g; backgroundColorB = b; }
-
-    /**
-     * Get the background color red component
-     */
-    virtual unsigned int GetBackgroundColorRed() const { return backgroundColorR; }
-
-    /**
-     * Get the background color green component
-     */
-    virtual unsigned int GetBackgroundColorGreen() const { return backgroundColorG; }
-
-    /**
-     * Get the background color blue component
-     */
-    virtual unsigned int GetBackgroundColorBlue() const { return backgroundColorB; }
-
-    /**
-     * Get scene window default title
-     */
-    virtual const std::string & GetWindowDefaultTitle() const {return title;};
-
-    /**
-     * Set scene window default title
-     */
-    virtual void SetWindowDefaultTitle(const std::string & title_) {title = title_;};
-
-    /**
-     * Return a reference to the vector containing the (smart) pointers to the objects.
-     */
-    inline const std::vector < boost::shared_ptr<gd::Object> > & GetInitialObjects() const { return initialObjects; }
-
-    /**
-     * Return a reference to the vector containing the (smart) pointers to the objects.
-     */
-    inline std::vector < boost::shared_ptr<gd::Object> > & GetInitialObjects() { return initialObjects; }
-
-    /**
-     * Return a reference to the specified layer
-     */
-    virtual gd::Layer & GetLayer(const std::string & name);
-
-    /**
-     * Return a reference to the specified layer
-     */
-    virtual const gd::Layer & GetLayer(const std::string & name) const;
-
-    /**
-     * Return a reference to the specified layer
-     */
-    virtual gd::Layer & GetLayer(unsigned int index);
-
-    /**
-     * Return a reference to the specified layer
-     */
-    virtual const gd::Layer & GetLayer (unsigned int index) const;
-
-    /**
-     * Return the number of layers
-     */
-    virtual unsigned int GetLayersCount() const;
-
-    /**
-     * Provide access to the gd::VariablesContainer member containing the layout variables
-     */
-    inline const gd::VariablesContainer & GetVariables() const { return variables; }
-
-    /**
-     * Provide access to the gd::VariablesContainer member containing the layout variables
-     */
-    inline gd::VariablesContainer & GetVariables() { return variables; }
-
-    /**
-     * Return the container storing initial instances.
-     */
-    virtual const gd::InitialInstancesContainer & GetInitialInstances() const { return initialInstances; }
-
-    /**
-     * Return the container storing initial instances.
-     */
-    virtual gd::InitialInstancesContainer & GetInitialInstances() { return initialInstances; }
-
-    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * element);
-
     #if defined(GD_IDE_ONLY)
-    /** \name Specialization of gd::Layout members
-     * See gd::Layout documentation for more information about what these members functions should do.
-     */
-    ///@{
-    virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const { return events; }
-    virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() { return events; }
-
-    virtual bool HasLayerNamed(const std::string & name) const;
-    virtual unsigned int GetLayerPosition(const std::string & name) const;
-    virtual void InsertNewLayer(const std::string & name, unsigned int position);
-    virtual void InsertLayer(const gd::Layer & theLayer, unsigned int position);
-    virtual void RemoveLayer(const std::string & name);
-    virtual void SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex);
-    ///@}
-
     /** \name Events compilation and bitcode management
      * Members functions related to managing the compilation of events and the resulting bitcodes.
      *
@@ -220,26 +100,6 @@ public:
     ///@}
 
     /**
-     * Make sure that the scene had an instance of shared data for
-     * every automatism of every object that can be used on the scene
-     * ( i.e. the objects of the scene and the global objects )
-     *
-     * Must be called when an automatism have been added/deleted
-     * or when a scene have been added to a game.
-     */
-    void UpdateAutomatismsSharedData(Game & game);
-
-    /**
-     * Return the settings associated to the scene.
-     */
-    const gd::LayoutEditorCanvasOptions & GetAssociatedLayoutEditorCanvasOptions() const { return associatedSettings; }
-
-    /**
-     * Return the settings associated to the scene.
-     */
-    gd::LayoutEditorCanvasOptions & GetAssociatedLayoutEditorCanvasOptions() { return associatedSettings; }
-
-    /**
      * Get the profiler associated with the scene. Can be NULL.
      */
     BaseProfiler * GetProfiler() { return profiler; };
@@ -248,75 +108,8 @@ public:
      * Set the profiler associated with the scene. Can be NULL.
      */
     void SetProfiler(BaseProfiler * profiler_) { profiler = profiler_; };
-
-    virtual void SaveToXml(TiXmlElement * element) const;
     #endif
 
-    /** \name Other properties
-     */
-    ///@{
-    /**
-     * Set if the input must be disabled when window lost focus.
-     */
-    void DisableInputWhenFocusIsLost(bool disable = true) { disableInputWhenNotFocused = disable; }
-
-    /**
-     * Return true if the input must be disabled when window lost focus.
-     */
-    bool IsInputDisabledWhenFocusIsLost() { return disableInputWhenNotFocused; }
-
-    /**
-     * Set if the objects z-order are sorted using the standard method
-     */
-    void SetStandardSortMethod(bool enable = true) { standardSortMethod = enable; }
-
-    /**
-     * Return true if the objects z-order are sorted using the standard method
-     */
-    bool StandardSortMethod() const { return standardSortMethod; }
-
-    /**
-     * Set if the scene must stop all the sounds being played when it is launched.
-     */
-    void SetStopSoundsOnStartup(bool enable = true) { stopSoundsOnStartup = enable; }
-
-    /**
-     * Return true if the scene must stop all the sounds being played when it is launched
-     */
-    bool StopSoundsOnStartup() const { return stopSoundsOnStartup; }
-
-    /**
-     * Set OpenGL default field of view
-     */
-    void SetOpenGLFOV(float oglFOV_) { oglFOV = oglFOV_; }
-
-    /**
-     * Get OpenGL default field of view
-     */
-    float GetOpenGLFOV() const { return oglFOV; }
-
-    /**
-     * Set OpenGL near clipping plan
-     */
-    void SetOpenGLZNear(float oglZNear_) { oglZNear = oglZNear_; }
-
-    /**
-     * Get OpenGL near clipping plan
-     */
-    float GetOpenGLZNear() const { return oglZNear; }
-
-    /**
-     * Set OpenGL far clipping plan
-     */
-    void SetOpenGLZFar(float oglZFar_) { oglZFar = oglZFar_; }
-
-    /**
-     * Get OpenGL far clipping plan
-     */
-    float GetOpenGLZFar() const { return oglZFar; }
-    ///@}
-
-    std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> > automatismsInitialSharedDatas; ///< Initial shared datas of automatisms
 
     /** \name Code execution engine
      * Functions members giving access to the code execution engine.
@@ -337,29 +130,11 @@ public:
 
 private:
 
-    std::string                                 name; ///< Scene name
-    unsigned int                                backgroundColorR; ///< Background color Red component
-    unsigned int                                backgroundColorG; ///< Background color Green component
-    unsigned int                                backgroundColorB; ///< Background color Blue component
-    std::string                                 title; ///< Title displayed in the window
-    gd::VariablesContainer                      variables; ///< Variables list
-    gd::InitialInstancesContainer               initialInstances; ///< Initial instances
-    std::vector < gd::Layer >                   initialLayers; ///< Initial layers
-    bool                                        stopSoundsOnStartup; ///< True to make the scene stop all sounds at startup.
-    bool                                        standardSortMethod; ///< True to sort objects using standard sort.
-    float                                       oglFOV; ///< OpenGL Field Of View value
-    float                                       oglZNear; ///< OpenGL Near Z position
-    float                                       oglZFar; ///< OpenGL Far Z position
-    bool                                        disableInputWhenNotFocused; /// If set to true, the input must be disabled when the window do not have the focus.
-
     mutable boost::shared_ptr<CodeExecutionEngine> codeExecutionEngine;
-
     #if defined(GD_IDE_ONLY)
-    std::vector < gd::BaseEventSPtr >           events; ///< Scene events
-    BaseProfiler *                              profiler; ///< Pointer to the profiler. Can be NULL.
-    bool                                        refreshNeeded; ///< If set to true, the IDE will reload the scene( thanks to SceneEditorCanvas notably which check this flag when the scene is being edited )
-    bool                                        compilationNeeded; ///< If set to true, the IDE will recompile the events ( thanks to SceneEditorCanvas notably which check this flag when the scene is being edited )
-    gd::LayoutEditorCanvasOptions               associatedSettings;
+    BaseProfiler * profiler; ///< Pointer to the profiler. Can be NULL.
+    bool refreshNeeded; ///< If set to true, the IDE will reload the scene( thanks to SceneEditorCanvas notably which check this flag when the scene is being edited )
+    bool compilationNeeded; ///< If set to true, the IDE will recompile the events ( thanks to SceneEditorCanvas notably which check this flag when the scene is being edited )
     #endif
 
     /**
@@ -367,19 +142,6 @@ private:
      * Don't forget to update me if members were changed !
      */
     void Init(const Scene & scene);
-
-    static gd::Layer badLayer;
-};
-
-//"Tool" Functions
-
-/**
- * \brief Functor testing scene name
- * \see Scene
- */
-struct SceneHasName : public std::binary_function<boost::shared_ptr<Scene>, std::string, bool> {
-    bool operator()(const boost::shared_ptr<Scene> & scene, std::string name) const { return scene->GetName() == name; }
 };
 
 #endif // SCENE_H
-

@@ -523,8 +523,8 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
                 ImagesUsedInventorizer inventorizer;
                 for ( unsigned int i = 0;i < project.GetLayoutCount();i++ )
                 {
-                    for (unsigned int j = 0;j<project.GetLayouts()[i]->GetInitialObjects().size();++j)
-                        project.GetLayouts()[i]->GetInitialObjects()[j]->ExposeResources(inventorizer);
+                    for (unsigned int j = 0;j<project.GetLayouts()[i]->GetObjects().size();++j)
+                        project.GetLayouts()[i]->GetObjects()[j]->ExposeResources(inventorizer);
 
                     LaunchResourceWorkerOnEvents(project, project.GetLayout(i).GetEvents(), inventorizer);
                 }

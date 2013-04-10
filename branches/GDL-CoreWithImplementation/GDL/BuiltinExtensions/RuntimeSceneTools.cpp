@@ -82,14 +82,14 @@ void GD_API MoveObjects( RuntimeScene & scene )
 
 void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std::vector<RuntimeObject*> *> pickedObjectLists, int useless, const std::string & objectWanted, float positionX, float positionY, const std::string & layer)
 {
-    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
-    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->GetGlobalObjects().begin(), scene.game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+    std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+    std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
     RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
-    if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
+    if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
         newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **sceneObject);
-    else if ( globalObject != scene.game->GetGlobalObjects().end() ) //Then the global object list
+    else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
         newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **globalObject);
 
     if ( newObject == boost::shared_ptr<RuntimeObject> () )

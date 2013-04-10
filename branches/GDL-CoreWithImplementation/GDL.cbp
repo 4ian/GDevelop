@@ -647,10 +647,10 @@
 		<Unit filename="GDL/Arial.hpp" />
 		<Unit filename="GDL/Automatism.cpp" />
 		<Unit filename="GDL/Automatism.h" />
-		<Unit filename="GDL/AutomatismsRuntimeSharedDatas.cpp" />
-		<Unit filename="GDL/AutomatismsRuntimeSharedDatas.h" />
-		<Unit filename="GDL/AutomatismsSharedDatas.cpp" />
-		<Unit filename="GDL/AutomatismsSharedDatas.h" />
+		<Unit filename="GDL/AutomatismsRuntimeSharedData.cpp" />
+		<Unit filename="GDL/AutomatismsRuntimeSharedData.h" />
+		<Unit filename="GDL/AutomatismsSharedData.cpp" />
+		<Unit filename="GDL/AutomatismsSharedData.h" />
 		<Unit filename="GDL/BuiltinExtensions/AdvancedExtension.cpp" />
 		<Unit filename="GDL/BuiltinExtensions/AdvancedExtension.h" />
 		<Unit filename="GDL/BuiltinExtensions/AudioExtension.cpp" />

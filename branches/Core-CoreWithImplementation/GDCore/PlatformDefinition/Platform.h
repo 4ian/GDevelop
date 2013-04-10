@@ -13,6 +13,7 @@ namespace gd { class Project; }
 namespace gd { class Object; }
 namespace gd { class Automatism; }
 namespace gd { class BaseEvent; }
+namespace gd { class AutomatismsSharedData; }
 
 namespace gd
 {
@@ -76,6 +77,11 @@ public:
      * Must create an automatism
      */
     virtual gd::Automatism* CreateAutomatism(const std::string & type) const =0;
+
+    /**
+     * Must create an automatism shared data object.
+     */
+    virtual boost::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type) const =0;
 
     /**
      * Must create an event of given type

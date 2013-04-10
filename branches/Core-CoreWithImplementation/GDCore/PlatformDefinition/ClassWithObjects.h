@@ -95,6 +95,16 @@ public:
      * Must swap the position of the specified objects.
      */
     virtual void SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex);
+
+    /**
+     * Provide access to the vector containing the objects
+     */
+    virtual std::vector < boost::shared_ptr<gd::Object> > & GetObjects() { return initialObjects; }
+
+    /**
+     * Provide access to the vector containing the objects
+     */
+    virtual const std::vector < boost::shared_ptr<gd::Object> > & GetObjects() const  { return initialObjects; }
     ///@}
 
     /** \name Saving and loading

@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <utility>
+class TiXmlElement;
 
 namespace gd
 {
@@ -59,6 +60,9 @@ public:
     {
         return memberObjects;
     }
+
+    static void LoadFromXml(std::vector < gd::ObjectGroup > & list, const TiXmlElement * elem);
+    static void SaveToXml(const std::vector < gd::ObjectGroup > & list, TiXmlElement * grpsobjets);
 
 private:
     std::vector < std::string > memberObjects;

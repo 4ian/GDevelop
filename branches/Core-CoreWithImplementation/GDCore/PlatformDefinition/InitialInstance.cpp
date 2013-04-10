@@ -38,12 +38,12 @@ std::map<std::string, std::string> gd::InitialInstance::GetCustomProperties(gd::
         Game & game = dynamic_cast<Game&>(project);
 
         //Find an object
-        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
+        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
         std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
 
         ObjSPtr object = boost::shared_ptr<gd::Object> ();
 
-        if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
+        if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
             return (*sceneObject)->GetInitialInstanceProperties(*this, game, scene);
         else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
             return (*globalObject)->GetInitialInstanceProperties(*this, game, scene);
@@ -64,12 +64,12 @@ bool gd::InitialInstance::UpdateCustomProperty(const std::string & name, const s
         Game & game = dynamic_cast<Game&>(project);
 
         //Find an object
-        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetInitialObjects().begin(), scene.GetInitialObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
+        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
         std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
 
         ObjSPtr object = boost::shared_ptr<gd::Object> ();
 
-        if ( sceneObject != scene.GetInitialObjects().end() ) //We check first scene's objects' list.
+        if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
             return (*sceneObject)->UpdateInitialInstanceProperty(*this, name, value, game, scene);
         else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
             return (*globalObject)->UpdateInitialInstanceProperty(*this, name, value, game, scene);

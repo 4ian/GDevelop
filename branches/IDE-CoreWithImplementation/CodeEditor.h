@@ -14,7 +14,7 @@
 #include <vector>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 class Game;
-class Scene;
+namespace gd { class Layout; }
 
 class CodeEditor: public wxPanel
 {

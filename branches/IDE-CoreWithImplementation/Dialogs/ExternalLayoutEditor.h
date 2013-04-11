@@ -79,7 +79,7 @@ private:
     void OnparentSceneComboBoxSelected(wxCommandEvent& event);
     //*)
     void OnparentSceneComboBoxDropDown(wxCommandEvent& event);
-    void SetupForScene(Scene & scene);
+    void SetupForScene(gd::Layout & scene);
 
     //(*Declarations(ExternalLayoutEditor)
     wxScrollBar* scrollBar1;

@@ -17,7 +17,7 @@
 #include <wx/dialog.h>
 //*)
 class Game;
-class Scene;
+namespace gd { class Layout; }
 #include "GDL/Scene.h"
 #include <string>
 #include <vector>
@@ -31,7 +31,7 @@ class ChoiceFile: public wxDialog
 {
 	public:
 
-		ChoiceFile(wxWindow* parent, string file_, Game & game_, Scene & scene_);
+		ChoiceFile(wxWindow* parent, string file_, Game & game_, gd::Layout & scene_);
 		virtual ~ChoiceFile();
 
 		//(*Declarations(ChoiceFile)
@@ -77,7 +77,7 @@ class ChoiceFile: public wxDialog
 
         //Données pour éditer une expression textuelle
 		Game & game;
-		Scene & scene;
+		gd::Layout & scene;
 		bool canSelectGroup;
 
 		DECLARE_EVENT_TABLE()

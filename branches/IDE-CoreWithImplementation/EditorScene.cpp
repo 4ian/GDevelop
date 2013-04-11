@@ -60,12 +60,12 @@ mainFrameWrapper(mainFrameWrapper_)
     //TODO: GD C++ Platform specific code
     try
     {
-        Scene & scene = dynamic_cast<Scene&>(layout);
+        gd::Layout & scene = dynamic_cast<Scene&>(layout);
         Game & game = dynamic_cast<Game&>(project);
     }
     catch (...) { std::cout << "Scene editor is not adapted to arbitrary gd::Layout, GD will crash."; std::cout << char(7); /*Not a GD C++ Platform scene*/ }
 
-    Scene & scene = dynamic_cast<Scene&>(layout);
+    gd::Layout & scene = dynamic_cast<Scene&>(layout);
     RuntimeGame & game = dynamic_cast<RuntimeGame&>(project);
 
 	//(*Initialize(EditorScene)

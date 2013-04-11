@@ -105,7 +105,7 @@ BEGIN_EVENT_TABLE(EventsEditor,wxPanel)
 END_EVENT_TABLE()
 
 
-EventsEditor::EventsEditor(wxWindow* parent, Game & game_, Scene & scene_, vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
+EventsEditor::EventsEditor(wxWindow* parent, Game & game_, gd::Layout & scene_, vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
     game(game_),
     scene(scene_),
     externalEvents(NULL),

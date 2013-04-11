@@ -28,7 +28,7 @@ class EditorObjets: public wxPanel, public gd::LayoutEditorCanvasAssociatedEdito
 {
 public:
 
-    EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+    EditorObjets(wxWindow* parent, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
     virtual ~EditorObjets();
 
     /**
@@ -84,7 +84,7 @@ private:
     wxImageList* notebookImageList;
 
     Game & game;
-    Scene & scene;
+    gd::Layout & scene;
 
     gd::MainFrameWrapper & mainFrameWrapper;
 

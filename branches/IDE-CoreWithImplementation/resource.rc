@@ -1,6 +1,6 @@
 aaaa ICON "icon.ico"
 
-#include "GDL/Version.h"
+#include "GDCore/Tools/Version.h"
 #include "wx/msw/wx.rc"
 
 #ifndef DEBUG

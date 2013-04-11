@@ -23,7 +23,7 @@
 #include <wx/srchctrl.h>
 #include <wx/bmpbuttn.h>
 #include "GDCore/Events/Expression.h"
-class Scene;
+namespace gd { class Layout; }
 class Game;
 
 #include <string>
@@ -35,14 +35,14 @@ class ChoixCondition: public wxDialog
 {
 	public:
 
-		ChoixCondition(wxWindow* parent, Game & game_, Scene & scene_);
+		ChoixCondition(wxWindow* parent, Game & game_, gd::Layout & scene_);
 		virtual ~ChoixCondition();
         void RefreshList();
         void RefreshFromCondition();
 
         //Les données de la condition à modifier
         Game & game;
-        Scene & scene;
+        gd::Layout & scene;
         string Type;
         bool conditionInverted;
         vector < gd::Expression > Param;

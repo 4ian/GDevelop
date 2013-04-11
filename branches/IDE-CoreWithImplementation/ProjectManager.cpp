@@ -25,7 +25,7 @@
 #include "GDL/ExternalEvents.h"
 #include "GDL/StandardEvent.h"
 #include "GDL/CommentEvent.h"
-#include "GDL/SourceFile.h"
+#include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
@@ -49,7 +49,6 @@
 #endif
 
 using namespace gd;
-using namespace GDpriv;
 
 //(*IdInit(ProjectManager)
 const long ProjectManager::ID_TREECTRL1 = wxNewId();
@@ -626,7 +625,7 @@ void ProjectManager::EditSourceFile(Game * game, std::string filename, size_t li
     if ( game )
     {
         vector< boost::shared_ptr<SourceFile> >::const_iterator sourceFile =
-            find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), filename));
+            find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), filename));
 
         if ( sourceFile != game->externalSourceFiles.end() )
         {
@@ -779,19 +778,17 @@ void ProjectManager::OnmodVarSceneMenuISelected(wxCommandEvent& event)
         return;
     }
 
-    vector< boost::shared_ptr<Scene> >::const_iterator scene =
-        find_if(game->GetLayouts().begin(), game->GetLayouts().end(), bind2nd(gd::LayoutHasName(), data->GetSecondString()));
-
-    if ( scene == game->GetLayouts().end() )
+    if ( !game->HasLayoutNamed(data->GetSecondString()) )
     {
         wxLogWarning(_("Scene not found."));
         return;
     }
+    gd::Layout & layout = game->GetLayout(data->GetSecondString());
 
-    gd::ChooseVariableDialog dialog(this, (*scene)->GetVariables(), /*editingOnly=*/true);
-    dialog.SetAssociatedLayout(game, (*scene).get());
+    gd::ChooseVariableDialog dialog(this, layout.GetVariables(), /*editingOnly=*/true);
+    dialog.SetAssociatedLayout(game, &layout);
     if ( dialog.ShowModal() == 1 )
-        game->GetChangesNotifier().OnVariablesModified(*game, (*scene).get());
+        game->GetChangesNotifier().OnVariablesModified(*game, &layout);
 }
 
 /**
@@ -1806,7 +1803,7 @@ void ProjectManager::OnDeleteSourceFileSelected(wxCommandEvent& event)
     if ( !GetGameOfSelectedItem(game, data) ) return;
 
     vector< boost::shared_ptr<SourceFile> >::iterator sourceFile =
-        find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), data->GetSecondString()));
+        find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), data->GetSecondString()));
 
     if ( sourceFile == game->externalSourceFiles.end() )
     {
@@ -1858,7 +1855,7 @@ void ProjectManager::OnCreateNewCppFileSelected(wxCommandEvent& event)
     sourceFile->SetFileName(ToString(filename.GetFullPath()));
 
     vector< boost::shared_ptr<SourceFile> >::iterator alreadyExistingSourceFile =
-        find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(ExternalSourceFileHasName(), ToString(filename.GetFullPath())));
+        find_if(game->externalSourceFiles.begin(), game->externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), ToString(filename.GetFullPath())));
 
     if ( alreadyExistingSourceFile == game->externalSourceFiles.end() )
         game->externalSourceFiles.push_back(sourceFile);

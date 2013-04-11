@@ -12,6 +12,7 @@
 #include <wx/log.h>
 #include <wx/ribbon/bar.h>
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/CommonTools.h"
 #include "GDL/Game.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "EventsEditor.h"
@@ -90,16 +91,13 @@ void ExternalEventsEditor::ForceRefreshRibbonAndConnect()
  */
 void ExternalEventsEditor::OnparentSceneComboBoxSelect(wxCommandEvent& event)
 {
-    vector< boost::shared_ptr<Scene> >::iterator sceneFound =
-        find_if(game.GetLayouts().begin(), game.GetLayouts().end(), bind2nd(gd::LayoutHasName(), string(parentSceneComboBox->GetValue().mb_str())));
+    std::string name = gd::ToString(parentSceneComboBox->GetValue()) ;
 
-    Scene * scene = NULL;
+    gd::Layout * scene = game.HasLayoutNamed(name) ? &game.GetLayout(name) : NULL;
 
-    if ( sceneFound != game.GetLayouts().end() )
-        scene = (*sceneFound).get();
-    else if ( parentSceneComboBox->GetSelection() == 0 ) //0 i.e. "No scene"
+    if ( parentSceneComboBox->GetSelection() == 0 ) //0 i.e. "No scene"
         scene = &emptyScene;
-    else
+    else if ( scene == NULL)
     {
         wxLogWarning(_("Scene not found."));
         return;

@@ -36,7 +36,7 @@ BEGIN_EVENT_TABLE(ChoiceJoyAxis,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoiceJoyAxis::ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, Scene & scene_) :
+ChoiceJoyAxis::ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, gd::Layout & scene_) :
 joyaxis(joyaxis_),
 game(game_),
 scene(scene_)

@@ -54,7 +54,7 @@ BEGIN_EVENT_TABLE( EditorObjets, wxPanel )
     //*)
 END_EVENT_TABLE()
 
-EditorObjets::EditorObjets(wxWindow* parent, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_) :
+EditorObjets::EditorObjets(wxWindow* parent, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_) :
 game(game_),
 scene(scene_),
 mainFrameWrapper(mainFrameWrapper_)

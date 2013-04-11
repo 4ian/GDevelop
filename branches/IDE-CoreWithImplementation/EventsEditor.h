@@ -28,7 +28,7 @@ namespace gd { class ExternalEvents; }
 namespace gd { class LayoutEditorCanvas; }
 class SearchEvents;
 class Game;
-class Scene;
+namespace gd { class Layout; }
 class SceneCanvas;
 namespace gd { class BaseEvent; }
 class EventsEditor;
@@ -63,7 +63,7 @@ public:
      * \param events The events to be edited
      * \param gd::MainFrameWrapper gd::MainFrameWrapper object to be used so as to communicate with the editor.
      */
-    EventsEditor(wxWindow* parent, Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ );
+    EventsEditor(wxWindow* parent, Game & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual ~EventsEditor();
 
     /**
@@ -285,7 +285,7 @@ private:
 
     Game & game;
 
-    Scene & scene; ///< Scene is required, even if it is a empty useless scene.
+    gd::Layout & scene; ///< Scene is required, even if it is a empty useless scene.
     gd::ExternalEvents * externalEvents; ///< Events editor can be used to edit external events
 
     std::vector < gd::BaseEventSPtr > * events; ///< Events modified are not necessarily the events of the scene

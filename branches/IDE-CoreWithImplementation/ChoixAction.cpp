@@ -89,7 +89,7 @@ BEGIN_EVENT_TABLE(ChoixAction,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoixAction::ChoixAction(wxWindow* parent, Game & game_, Scene & scene_) :
+ChoixAction::ChoixAction(wxWindow* parent, Game & game_, gd::Layout & scene_) :
 game(game_),
 scene(scene_)
 {

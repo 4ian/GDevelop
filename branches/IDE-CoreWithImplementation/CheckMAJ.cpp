@@ -17,7 +17,7 @@
 #include <fstream>
 #include "SFML/Network.hpp"
 #include "GDL/tinyxml/tinyxml.h"
-#include "GDL/VersionWrapper.h"
+#include "GDCore/Tools/VersionWrapper.h"
 
 using namespace std;
 

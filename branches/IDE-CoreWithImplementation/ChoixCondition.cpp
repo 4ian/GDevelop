@@ -95,7 +95,7 @@ BEGIN_EVENT_TABLE( ChoixCondition, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-ChoixCondition::ChoixCondition( wxWindow* parent, Game & game_, Scene & scene_) :
+ChoixCondition::ChoixCondition( wxWindow* parent, Game & game_, gd::Layout & scene_) :
 game(game_),
 scene(scene_),
 conditionInverted(false)

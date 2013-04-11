@@ -16,7 +16,7 @@
 //*)
 #include <wx/textfile.h>
 #include "GDCore/CommonTools.h"
-#include "GDL/VersionWrapper.h"
+#include "GDCore/Tools/VersionWrapper.h"
 #include <string>
 #include <vector>
 #include <iostream>

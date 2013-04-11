@@ -19,7 +19,7 @@
 #include <string>
 #include <vector>
 class Game;
-class Scene;
+namespace gd { class Layout; }
 
 using namespace std;
 
@@ -30,7 +30,7 @@ class ChoiceJoyAxis: public wxDialog
 {
 	public:
 
-		ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, Scene & scene_);
+		ChoiceJoyAxis(wxWindow* parent, string joyaxis_, Game & game_, gd::Layout & scene_);
 		virtual ~ChoiceJoyAxis();
 
 		//(*Declarations(ChoiceJoyAxis)
@@ -62,7 +62,7 @@ class ChoiceJoyAxis: public wxDialog
 	private:
 
 		Game & game;
-		Scene & scene;
+		gd::Layout & scene;
 		bool canSelectGroup;
 
 		//(*Handlers(ChoiceJoyAxis)

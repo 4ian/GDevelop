@@ -57,7 +57,7 @@
 #include "GDCore/IDE/ActionSentenceFormatter.h"
 #include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionsLoader.h"
-#include "GDL/VersionWrapper.h"
+#include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
 #include "GDL/IDE/CodeCompiler.h"
 

@@ -25,7 +25,7 @@
 #include <wx/imaglist.h>
 #include <wx/bmpbuttn.h>
 #include "GDCore/Events/Expression.h"
-class Scene;
+namespace gd { class Layout; }
 class Game;
 
 #include <string>
@@ -37,7 +37,7 @@ class ChoixAction: public wxDialog
 {
 	public:
 
-		ChoixAction(wxWindow* parent, Game & game_, Scene & scene_);
+		ChoixAction(wxWindow* parent, Game & game_, gd::Layout & scene_);
 		virtual ~ChoixAction();
 		void RefreshList();
 		void RefreshFromAction();
@@ -45,7 +45,7 @@ class ChoixAction: public wxDialog
         //Les données de l'action à modifier
         string Type;
         Game & game;
-        Scene & scene;
+        gd::Layout & scene;
         vector < gd::Expression > Param;
 
 		//(*Declarations(ChoixAction)

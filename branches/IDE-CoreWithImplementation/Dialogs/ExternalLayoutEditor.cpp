@@ -136,11 +136,11 @@ mainFrameWrapper(mainFrameWrapper_)
 
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
 
-    vector< boost::shared_ptr<Scene> >::iterator layoutFound =
-        find_if(project.GetLayouts().begin(), project.GetLayouts().end(), bind2nd(gd::LayoutHasName(), externalLayout.GetAssociatedSettings().associatedLayout));
+    std::string name = externalLayout.GetAssociatedSettings().associatedLayout;
+    gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
 
-    if ( layoutFound != project.GetLayouts().end() )
-        SetupForScene(*(*layoutFound));
+    if ( scene != NULL )
+        SetupForScene(*scene);
     else
         SetupForScene(emptyLayout);
 }
@@ -196,7 +196,7 @@ void ExternalLayoutEditor::OnsceneCanvasSetFocus(wxFocusEvent& event)
     layoutEditorCanvas->ConnectEvents();
 }
 
-void ExternalLayoutEditor::SetupForScene(Scene & layout)
+void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 {
     if ( &layout == &emptyLayout )
     {
@@ -276,22 +276,18 @@ void ExternalLayoutEditor::SetupForScene(Scene & layout)
 
 void ExternalLayoutEditor::OnparentSceneComboBoxSelected(wxCommandEvent& event)
 {
-    vector< boost::shared_ptr<Scene> >::iterator layoutFound =
-        find_if(project.GetLayouts().begin(), project.GetLayouts().end(), bind2nd(gd::LayoutHasName(), ToString(parentSceneComboBox->GetValue())));
+    std::string name = ToString(parentSceneComboBox->GetValue()) ;
+    gd::Layout * scene = project.HasLayoutNamed(name) ? &project.GetLayout(name) : NULL;
 
-    Scene * layout = NULL;
-
-    if ( layoutFound != project.GetLayouts().end() )
-        layout = (*layoutFound).get();
-    else if ( parentSceneComboBox->GetSelection() == 0 ) //0 i.e. "No layout"
-        layout = &emptyLayout;
-    else
+    if ( parentSceneComboBox->GetSelection() == 0 ) //0 i.e. "No scene"
+        scene = &emptyLayout;
+    else if ( scene == NULL)
     {
         wxLogWarning(_("Scene not found."));
         return;
     }
 
-    SetupForScene(*layout);
+    SetupForScene(*scene);
 }
 
 /**

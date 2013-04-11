@@ -163,7 +163,7 @@ EditPropScene::EditPropScene(wxWindow* parent, gd::Layout & layout_) :
     //TODO: GD C++ Platform specific code
     try
     {
-        Scene & scene = dynamic_cast<Scene&>(layout);
+        gd::Layout & scene = dynamic_cast<Scene&>(layout);
 
         if ( scene.StandardSortMethod() ) stableSortCheck->SetValue(true);
         fovEdit->SetValue(ToString(scene.GetOpenGLFOV()));
@@ -193,7 +193,7 @@ void EditPropScene::OnOkBtClick(wxCommandEvent& event)
     //TODO: GD C++ Platform specific code
     try
     {
-        Scene & scene = dynamic_cast<Scene&>(layout);
+        gd::Layout & scene = dynamic_cast<Scene&>(layout);
 
         scene.SetOpenGLFOV(ToFloat(ToString(fovEdit->GetValue())));
         scene.SetOpenGLZNear(ToFloat(ToString(zNearEdit->GetValue())));

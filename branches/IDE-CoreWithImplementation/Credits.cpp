@@ -13,7 +13,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/mimetype.h> // mimetype support
-#include "GDL/VersionWrapper.h"
+#include "GDCore/Tools/VersionWrapper.h"
 #include <string>
 #include <vector>
 #include <iostream>

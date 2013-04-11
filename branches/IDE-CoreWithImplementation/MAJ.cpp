@@ -16,7 +16,7 @@
 #include <wx/progdlg.h>
 #include <wx/wfstream.h>
 #include "GDL/CommonTools.h"
-#include "GDL/VersionWrapper.h"
+#include "GDCore/Tools/VersionWrapper.h"
 #include "CheckMAJ.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"

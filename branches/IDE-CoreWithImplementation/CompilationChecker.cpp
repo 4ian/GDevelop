@@ -1,6 +1,6 @@
 #include "CompilationChecker.h"
-#include "GDL/Version.h"
-#include "GDL/VersionWrapper.h"
+#include "GDCore/Tools/Version.h"
+#include "GDCore/Tools/VersionWrapper.h"
 #include "GDL/CommonTools.h"
 #include <iostream>
 

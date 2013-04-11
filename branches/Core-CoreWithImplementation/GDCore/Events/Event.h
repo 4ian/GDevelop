@@ -15,10 +15,10 @@
 class Game;
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Project; }
+namespace gd { class Layout; }
 class wxWindow;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
-class Scene;
 namespace gd { class Instruction; }
 class TiXmlElement;
 class Game;
@@ -138,12 +138,12 @@ public:
         return outputCode;
      * \endcode
      */
-    virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context) {return "";};
+    virtual std::string GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context) {return "";};
 
     /**
      * Called before events are compiled
      */
-    virtual void Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
+    virtual void Preprocess(Game & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
 
     ///@}
 
@@ -234,7 +234,7 @@ public:
     /**
      * Called when the user want to edit the event.
      */
-    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_) { return ChangesMade; };
+    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_) { return ChangesMade; };
 
     ///@}
 

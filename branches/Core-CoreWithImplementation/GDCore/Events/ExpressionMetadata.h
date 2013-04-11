@@ -8,7 +8,7 @@
 #include <wx/bitmap.h>
 class wxString;
 class Game;
-class Scene;
+namespace gd { class Layout; }
 
 namespace gd
 {
@@ -76,7 +76,7 @@ class GD_CORE_API ExpressionMetadata
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const Game & game, const gd::Layout & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context) {return "";};
         };
 
         CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
@@ -160,7 +160,7 @@ class GD_CORE_API StrExpressionMetadata
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_ ,EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const Game & game, const gd::Layout & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_ ,EventsCodeGenerationContext & context) {return "";};
         };
 
         CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)

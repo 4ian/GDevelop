@@ -359,6 +359,8 @@
 		<Unit filename="GDCore/PlatformDefinition/Project.h" />
 		<Unit filename="GDCore/PlatformDefinition/ResourcesManager.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/ResourcesManager.h" />
+		<Unit filename="GDCore/PlatformDefinition/SourceFile.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/SourceFile.h" />
 		<Unit filename="GDCore/PlatformDefinition/Variable.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/Variable.h" />
 		<Unit filename="GDCore/PlatformDefinition/VariablesContainer.cpp" />
@@ -373,6 +375,9 @@
 		<Unit filename="GDCore/Tools/HelpFileAccess.h" />
 		<Unit filename="GDCore/Tools/Locale/LocaleManager.cpp" />
 		<Unit filename="GDCore/Tools/Locale/LocaleManager.h" />
+		<Unit filename="GDCore/Tools/Version.h" />
+		<Unit filename="GDCore/Tools/VersionWrapper.cpp" />
+		<Unit filename="GDCore/Tools/VersionWrapper.h" />
 		<Unit filename="wxsmith/AdvancedEntryDialog.wxs" />
 		<Unit filename="wxsmith/ChooseAutomatismDialog.wxs" />
 		<Unit filename="wxsmith/ChooseAutomatismTypeDialog.wxs" />

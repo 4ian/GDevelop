@@ -55,7 +55,7 @@ public:
      * catch(...) { std::cout << "WARNING: Tried to create a MyContainer object from an object which is not a MyContainer"; }
      * \endcode
      */
-    virtual void Create(const gd::VariablesContainer & source);
+    virtual void Create(const VariablesContainer & source);
     #endif
 
     /** \name Variables management

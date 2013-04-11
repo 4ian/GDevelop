@@ -13,6 +13,8 @@ class TiXmlElement;
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/PlatformDefinition/ClassWithObjects.h"
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
+#include "GDCore/PlatformDefinition/VariablesContainer.h"
+#include "GDCore/PlatformDefinition/ResourcesManager.h"
 namespace gd { class Platform; }
 namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
@@ -21,6 +23,7 @@ namespace gd { class ExternalLayout; }
 namespace gd { class Object; }
 namespace gd { class VariablesContainer; }
 namespace gd { class ArbitraryResourceWorker; }
+namespace gd { class SourceFile; }
 #undef GetObject //Disable an annoying macro
 
 namespace gd
@@ -53,116 +56,117 @@ public:
     ///@{
 
     /**
+     * Change project name
+     */
+    virtual void SetName(const std::string & name_) { name = name_; };
+
+    /**
+     * Get project name
+     */
+    virtual const std::string & GetName() const {return name;}
+
+    /**
      * Must change the name of the project with the name passed as parameter.
      */
-    virtual void SetName(const std::string & name) =0;
+    virtual void SetAuthor(const std::string & author_) { author = author_; };
 
     /**
      * Must return the name of the project.
      */
-    virtual const std::string & GetName() const =0;
-
-    /**
-     * Must change the name of the project with the name passed as parameter.
-     */
-    virtual void SetAuthor(const std::string & name) =0;
-
-    /**
-     * Must return the name of the project.
-     */
-    virtual const std::string & GetAuthor() const =0;
+    virtual const std::string & GetAuthor() const {return author;}
 
     /**
      * Called when project file has changed.
      */
-    virtual void SetProjectFile(const std::string & name) =0;
+    virtual void SetProjectFile(const std::string & file) { gameFile = file; }
 
     /**
      * Must return project file
      * \see gd::Project::SetProjectFile
      */
-    virtual const std::string & GetProjectFile() const =0;
+    virtual const std::string & GetProjectFile() const { return gameFile; }
 
     /**
      * Called when project file has changed.
      */
-    virtual void SetLastCompilationDirectory(const std::string & dir) =0;
+    virtual void SetLastCompilationDirectory(const std::string & dir){ latestCompilationDirectory = dir; }
 
     /**
      * Must return the latest directory used to compile the game
      * \see gd::Project::SetLastCompilationDirectory
      */
-    virtual const std::string & GetLastCompilationDirectory() const =0;
+    virtual const std::string & GetLastCompilationDirectory() const {return latestCompilationDirectory;}
 
     /**
-     * Must change the default width of the project main window
+     * Change game's main window default width.
+     *
+     * \note This is only the default width used when creating the main window for the first time. To change the width at runtime, use the functions related to RuntimeScene.renderWindow
      */
-    virtual void SetMainWindowDefaultWidth(unsigned int width) =0;
+    virtual void SetMainWindowDefaultWidth(unsigned int width) { windowWidth = width; }
 
     /**
-     * Must return the default width of the project main window
+     * Get the default width of the project main window
      */
-    virtual unsigned int GetMainWindowDefaultWidth() const  =0;
+    virtual unsigned int GetMainWindowDefaultWidth() const { return windowWidth; }
 
     /**
-     * Must change the default width of the project main window
+     * Change the default height of the project main window
      */
-    virtual void SetMainWindowDefaultHeight(unsigned int width) =0;
+    virtual void SetMainWindowDefaultHeight(unsigned int height) { windowHeight = height; }
 
     /**
-     * Must return the default width of the project main window
+     * Return the default height of the project main window
      */
-    virtual unsigned int GetMainWindowDefaultHeight() const  =0;
+    virtual unsigned int GetMainWindowDefaultHeight() const { return windowHeight; }
 
     /**
-     * Must change the maximum number of frames allowed to be rendered per seconds
+     * Change the default maximum number of frames allowed to be rendered per seconds
      */
-    virtual void SetMaximumFPS(int maxFPS) =0;
+    virtual void SetMaximumFPS(int maxFPS_) { maxFPS = maxFPS_; }
 
     /**
-     * Must return the maximum number of frames allowed to be rendered per seconds
+     * Get the default number of maximum frame par seconds
      */
-    virtual int GetMaximumFPS() const  =0;
+    virtual int GetMaximumFPS() const { return maxFPS; }
 
     /**
-     * Must change the minimum number of frames allowed to be rendered per seconds
+     * Change the default minimum number of frames allowed to be rendered per seconds
      */
-    virtual void SetMinimumFPS(unsigned int minFPS) =0;
+    virtual void SetMinimumFPS(unsigned int minFPS_) { minFPS = minFPS_; }
 
     /**
-     * Must return the minimum number of frames allowed to be rendered per seconds
+     * Get the default number of minimum frame par seconds
      */
-    virtual unsigned int GetMinimumFPS() const =0;
+    virtual unsigned int GetMinimumFPS() const { return minFPS; }
 
     /**
-     * Must return true if vertical synchronization is activated by default when starting the game
+     * Return true if vertical synchronization is enabled by default.
      */
-    virtual bool IsVerticalSynchronizationEnabledByDefault() const =0;
+    virtual bool IsVerticalSynchronizationEnabledByDefault() const { return verticalSync; }
 
     /**
-     * Must change the value of the vertical synchronization activation
+     * Set if vertical synchronization is enabled by default.
      */
-    virtual void SetVerticalSyncActivatedByDefault(bool enable) =0;
-
+    virtual void SetVerticalSyncActivatedByDefault(bool enable) { verticalSync = enable; }
 
     /**
      * Must return a reference to the vector containing the names of extensions used by the project.
      *
      * \note Default implementation: Return a reference to an empty vector
      */
-    virtual const std::vector < std::string > & GetUsedPlatformExtensions() const { return noPlatformExtensionsUsed; };
+    virtual const std::vector < std::string > & GetUsedPlatformExtensions() const { return extensionsUsed; };
 
     /**
      * Must return a reference to the vector containing the names of extensions used by the project.
      *
      * \note Default implementation: Return a reference to an empty vector
      */
-    virtual std::vector < std::string > & GetUsedPlatformExtensions() { return noPlatformExtensionsUsed; };
+    virtual std::vector < std::string > & GetUsedPlatformExtensions() { return extensionsUsed; };
 
     /**
      * Must return a reference to the platform the project is based on.
      */
-    virtual Platform & GetPlatform() const =0;
+    virtual Platform & GetPlatform() const { return *platform; }
 
     ///@}
 
@@ -217,42 +221,42 @@ public:
     /**
      * Must return true if layout called "name" exists.
      */
-    virtual bool HasLayoutNamed(const std::string & name) const =0;
+    virtual bool HasLayoutNamed(const std::string & name) const;
 
     /**
      * Must return a reference to the layout called "name".
      */
-    virtual Layout & GetLayout(const std::string & name) =0;
+    virtual Layout & GetLayout(const std::string & name);
 
     /**
      * Must return a reference to the layout called "name".
      */
-    virtual const Layout & GetLayout(const std::string & name) const =0;
+    virtual const Layout & GetLayout(const std::string & name) const;
 
     /**
      * Must return a reference to the layout at position "index" in the layout list
      */
-    virtual Layout & GetLayout(unsigned int index) =0;
+    virtual Layout & GetLayout(unsigned int index);
 
     /**
      * Must return a reference to the layout at position "index" in the layout list
      */
-    virtual const Layout & GetLayout (unsigned int index) const =0;
+    virtual const Layout & GetLayout (unsigned int index) const;
 
     /**
      * Must return the position of the layout called "name" in the layout list
      */
-    virtual unsigned int GetLayoutPosition(const std::string & name) const =0;
+    virtual unsigned int GetLayoutPosition(const std::string & name) const;
 
     /**
      * Must return the number of layouts.
      */
-    virtual unsigned int GetLayoutCount() const =0;
+    virtual unsigned int GetLayoutCount() const;
 
     /**
      * Must add a new empty layout called "name" at the specified position in the layout list.
      */
-    virtual gd::Layout & InsertNewLayout(const std::string & name, unsigned int position) =0;
+    virtual gd::Layout & InsertNewLayout(const std::string & name, unsigned int position);
 
     /**
      * Must add a new layout constructed from the layout passed as parameter.
@@ -260,12 +264,12 @@ public:
      * \param layout The layout that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the layout must be inserted at the end of the layout list.
      */
-    virtual void InsertLayout(const Layout & layout, unsigned int position) =0;
+    virtual void InsertLayout(const Layout & layout, unsigned int position);
 
     /**
      * Must delete layout named "name".
      */
-    virtual void RemoveLayout(const std::string & name) =0;
+    virtual void RemoveLayout(const std::string & name);
 
     ///@}
 
@@ -289,12 +293,12 @@ public:
     /**
      * Called to save the layout to a TiXmlElement.
      */
-    virtual void SaveToXml(TiXmlElement * element) const {};
+    virtual void SaveToXml(TiXmlElement * element) const;
 
     /**
      * Called to load the layout from a TiXmlElement.
      */
-    virtual void LoadFromXml(const TiXmlElement * element) {};
+    virtual void LoadFromXml(const TiXmlElement * element);
     ///@}
 
     /** \name External events management
@@ -305,42 +309,42 @@ public:
     /**
      * Must return true if external events called "name" exists.
      */
-    virtual bool HasExternalEventsNamed(const std::string & name) const =0;
+    virtual bool HasExternalEventsNamed(const std::string & name) const;
 
     /**
      * Must return a reference to the external events called "name".
      */
-    virtual ExternalEvents & GetExternalEvents(const std::string & name) =0;
+    virtual ExternalEvents & GetExternalEvents(const std::string & name);
 
     /**
      * Must return a reference to the external events called "name".
      */
-    virtual const ExternalEvents & GetExternalEvents(const std::string & name) const =0;
+    virtual const ExternalEvents & GetExternalEvents(const std::string & name) const;
 
     /**
      * Must return a reference to the external events at position "index" in the external events list
      */
-    virtual ExternalEvents & GetExternalEvents(unsigned int index) =0;
+    virtual ExternalEvents & GetExternalEvents(unsigned int index);
 
     /**
      * Must return a reference to the external events at position "index" in the external events list
      */
-    virtual const ExternalEvents & GetExternalEvents (unsigned int index) const =0;
+    virtual const ExternalEvents & GetExternalEvents (unsigned int index) const;
 
     /**
      * Must return the position of the external events called "name" in the external events list
      */
-    virtual unsigned int GetExternalEventsPosition(const std::string & name) const =0;
+    virtual unsigned int GetExternalEventsPosition(const std::string & name) const;
 
     /**
      * Must return the number of external events.
      */
-    virtual unsigned int GetExternalEventsCount() const =0;
+    virtual unsigned int GetExternalEventsCount() const;
 
     /**
      * Must add a new empty external events sheet called "name" at the specified position in the layout list.
      */
-    virtual ExternalEvents & InsertNewExternalEvents(const std::string & name, unsigned int position) =0;
+    virtual ExternalEvents & InsertNewExternalEvents(const std::string & name, unsigned int position);
 
     /**
      * Must add a new external events sheet constructed from the layout passed as parameter.
@@ -348,12 +352,12 @@ public:
      * \param externalEvents The external events that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the external events must be inserted at the end of the external events list.
      */
-    virtual void InsertExternalEvents(const ExternalEvents & externalEvents, unsigned int position) =0;
+    virtual void InsertExternalEvents(const ExternalEvents & externalEvents, unsigned int position);
 
     /**
      * Must delete external events named "name".
      */
-    virtual void RemoveExternalEvents(const std::string & name) =0;
+    virtual void RemoveExternalEvents(const std::string & name);
 
     ///@}
 
@@ -365,42 +369,42 @@ public:
     /**
      * Must return true if external layout called "name" exists.
      */
-    virtual bool HasExternalLayoutNamed(const std::string & name) const =0;
+    virtual bool HasExternalLayoutNamed(const std::string & name) const;
 
     /**
      * Must return a reference to the external layout called "name".
      */
-    virtual ExternalLayout & GetExternalLayout(const std::string & name) =0;
+    virtual ExternalLayout & GetExternalLayout(const std::string & name);
 
     /**
      * Must return a reference to the external layout called "name".
      */
-    virtual const ExternalLayout & GetExternalLayout(const std::string & name) const =0;
+    virtual const ExternalLayout & GetExternalLayout(const std::string & name) const;
 
     /**
      * Must return a reference to the external layout at position "index" in the external layout list
      */
-    virtual ExternalLayout & GetExternalLayout(unsigned int index) =0;
+    virtual ExternalLayout & GetExternalLayout(unsigned int index);
 
     /**
      * Must return a reference to the external layout at position "index" in the external layout list
      */
-    virtual const ExternalLayout & GetExternalLayout (unsigned int index) const =0;
+    virtual const ExternalLayout & GetExternalLayout (unsigned int index) const;
 
     /**
      * Must return the position of the external layout called "name" in the external layout list
      */
-    virtual unsigned int GetExternalLayoutPosition(const std::string & name) const =0;
+    virtual unsigned int GetExternalLayoutPosition(const std::string & name) const;
 
     /**
      * Must return the number of external layout.
      */
-    virtual unsigned int GetExternalLayoutsCount() const =0;
+    virtual unsigned int GetExternalLayoutsCount() const;
 
     /**
      * Must add a new empty external layout called "name" at the specified position in the layout list.
      */
-    virtual gd::ExternalLayout & InsertNewExternalLayout(const std::string & name, unsigned int position) =0;
+    virtual gd::ExternalLayout & InsertNewExternalLayout(const std::string & name, unsigned int position);
 
     /**
      * Must add a new external layout constructed from the layout passed as parameter.
@@ -408,12 +412,12 @@ public:
      * \param externalLayout The external layout that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the external layout must be inserted at the end of the external layout list.
      */
-    virtual void InsertExternalLayout(const ExternalLayout & externalLayout, unsigned int position) =0;
+    virtual void InsertExternalLayout(const ExternalLayout & externalLayout, unsigned int position);
 
     /**
      * Must delete external layout named "name".
      */
-    virtual void RemoveExternalLayout(const std::string & name) =0;
+    virtual void RemoveExternalLayout(const std::string & name);
 
     ///@}
 
@@ -439,14 +443,14 @@ public:
      */
     ///@{
     /**
-     * Provide access to the ResourcesManager member containing the list of the resources.
+     * Provide access to the ResourceManager member containing the list of the resources.
      */
-    virtual const gd::ResourcesManager & GetResourcesManager() const =0;
+    inline const ResourcesManager & GetResourcesManager() const { return resourcesManager; }
 
     /**
-     * Provide access to the ResourcesManager member containing the list of the resources.
+     * Provide access to the ResourceManager member containing the list of the resources.
      */
-    virtual gd::ResourcesManager & GetResourcesManager() =0;
+    inline ResourcesManager & GetResourcesManager() { return resourcesManager; }
 
     /**
      * Called ( e.g. during compilation ) so as to inventory internal resources and sometimes update their filename.
@@ -473,16 +477,15 @@ public:
     ///@{
 
     /**
-     * Must return a reference to the container storing the global variables
-     * \see gd::VariablesContainer
+     * Provide access to the gd::VariablesContainer member containing the global variables
      */
-    virtual const gd::VariablesContainer & GetVariables() const =0;
+    inline const gd::VariablesContainer & GetVariables() const { return variables; }
 
     /**
-     * Must return a reference to the container storing the global variables
-     * \see gd::VariablesContainer
+     * Provide access to the gd::VariablesContainer member containing the global variables
      */
-    virtual gd::VariablesContainer & GetVariables() =0;
+    inline gd::VariablesContainer & GetVariables() { return variables; }
+
     ///@}
 
     /** \name Notification of changes
@@ -520,10 +523,51 @@ public:
 
     ///@}
 
-private:
+    //TODO: Put this in private part
+    bool useExternalSourceFiles; ///< True if game used external source files.
 
+    #if defined(GD_IDE_ONLY)
+    std::vector < std::string > imagesChanged; ///< Images that have been changed and which have to be reloaded
+    std::string winExecutableFilename; ///< Windows executable name
+    std::string winExecutableIconFile; ///< Icon for Windows executable
+    std::string linuxExecutableFilename;  ///< Linux executable name
+    std::string macExecutableFilename;  ///< Mac executable name
+    std::vector < boost::shared_ptr<gd::SourceFile> > externalSourceFiles; ///< List of C++ source files used.
+    #endif
+
+protected:
+
+    /**
+     * Initialize from another game. Used by copy-ctor and assign-op.
+     * Don't forget to update me if members were changed !
+     */
+    void Init(const gd::Project & project);
+
+    /**
+     * Helper method for LoadFromXml method.
+     */
+    void LoadProjectInformationFromXml(const TiXmlElement * elem);
+
+    std::string                                         name; ///< Game name
+    unsigned int                                        windowWidth; ///< Window default width
+    unsigned int                                        windowHeight; ///< Window default height
+    int                                                 maxFPS; ///< Maximum Frame Per Seconds, -1 for unlimited
+    unsigned int                                        minFPS; ///< Minimum Frame Per Seconds ( slow down game if FPS are below this number )
+    bool                                                verticalSync; ///< If true, must activate vertical synchronization.
+    std::vector < boost::shared_ptr<gd::Layout> >       scenes; ///< List of all scenes
+    gd::VariablesContainer                              variables; ///< Initial global variables
+    std::vector < boost::shared_ptr<gd::ExternalLayout> >   externalLayouts; ///< List of all externals layouts
+    gd::ResourcesManager                                resourcesManager; ///< Contains all resources used by the project
     std::vector<ObjectGroup> objectGroups; ///< Global objects groups
-    static std::vector < std::string > noPlatformExtensionsUsed;
+    #if defined(GD_IDE_ONLY)
+    std::string                                         author; ///< Game author name
+    std::string                                         gameFile; ///< File of the game
+    std::string                                         latestCompilationDirectory; ///< File of the game
+    std::vector < std::string >                         extensionsUsed; ///< List of extensions used
+    gd::Platform *                                      platform; ///< Pointer to the platform owning the project
+    std::vector < boost::shared_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
+    #endif
+
     static ChangesNotifier defaultEmptyChangesNotifier;
 };
 

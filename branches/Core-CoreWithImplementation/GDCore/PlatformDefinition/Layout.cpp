@@ -52,6 +52,11 @@ Layout::Layout() :
     oglZNear(1.0f),
     oglZFar(500.0f),
     disableInputWhenNotFocused(true)
+    #if defined(GD_IDE_ONLY)
+    ,profiler(NULL),
+    refreshNeeded(false),
+    compilationNeeded(true)
+    #endif
 {
     gd::Layer layer;
     layer.SetCameraCount(1);
@@ -358,6 +363,11 @@ void Layout::Init(const Layout & other)
 
     #if defined(GD_IDE_ONLY)
     events = CloneVectorOfEvents(other.events);
+
+    compiledEventsFile = other.compiledEventsFile;
+    profiler = other.profiler;
+    SetCompilationNeeded(); //Force recompilation/refreshing
+    SetRefreshNeeded();
     #endif
 }
 

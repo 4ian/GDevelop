@@ -34,7 +34,7 @@ std::map<std::string, std::string> gd::InitialInstance::GetCustomProperties(gd::
     /*
     try
     {
-        Scene & scene = dynamic_cast<Scene&>(layout);
+        gd::Layout & scene = dynamic_cast<Scene&>(layout);
         Game & game = dynamic_cast<Game&>(project);
 
         //Find an object
@@ -60,7 +60,7 @@ bool gd::InitialInstance::UpdateCustomProperty(const std::string & name, const s
     /*
     try
     {
-        Scene & scene = dynamic_cast<Scene&>(layout);
+        gd::Layout & scene = dynamic_cast<Scene&>(layout);
         Game & game = dynamic_cast<Game&>(project);
 
         //Find an object

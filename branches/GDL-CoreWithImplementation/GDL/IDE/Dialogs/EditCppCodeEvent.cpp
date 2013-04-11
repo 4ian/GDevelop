@@ -13,7 +13,7 @@
 #include <wx/filename.h>
 #include <fstream>
 #include "GDL/Game.h"
-#include "GDL/SourceFile.h"
+#include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDL/Scene.h"
 #include "GDL/CppCodeEvent.h"
 #include "GDL/CommonTools.h"
@@ -53,7 +53,7 @@ enum
     MARGIN_FOLD
 };
 
-EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game & game_, Scene & scene_) :
+EditCppCodeEvent::EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game & game_, gd::Layout & scene_) :
     editedEvent(event_),
     game(game_),
     scene(scene_)

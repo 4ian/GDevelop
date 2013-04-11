@@ -45,7 +45,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const gd::Layout & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
                 //Conditions code
                 std::string conditionsCode;
@@ -130,7 +130,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const gd::Layout & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
                 string outputCode;
 
@@ -162,7 +162,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const Game & game, const gd::Layout & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
             {
                 std::vector<gd::Instruction> & conditions = instruction.GetSubInstructions();
                 string outputCode;

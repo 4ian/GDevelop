@@ -7,8 +7,11 @@
 #include "GDL/RessourcesLoader.h"
 #include "GDL/Game.h"
 #include "GDL/InvalidImage.h"
+#include "GDCore/PlatformDefinition/ResourcesManager.h"
 
 #undef LoadImage //thx windows.h
+
+using namespace gd;
 
 void MessageLoading( string message, float avancement )
 {

@@ -5,7 +5,7 @@
 
 #include <string>
 #include <iostream>
-#include "GDL/VersionWrapper.h"
+#include "GDCore/Tools/VersionWrapper.h"
 
 void GD_API GDLogBanner()
 {

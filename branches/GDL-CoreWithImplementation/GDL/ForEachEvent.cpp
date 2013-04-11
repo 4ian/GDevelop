@@ -28,7 +28,7 @@ objectsToPickSelected(false)
 {
 }
 
-std::string ForEachEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+std::string ForEachEvent::GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
     std::string outputCode;
 
@@ -259,7 +259,7 @@ unsigned int ForEachEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-gd::BaseEvent::EditEventReturnType ForEachEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType ForEachEvent::EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditForEachEvent dialog(parent_, *this, game_, scene_);
     if ( dialog.ShowModal() == 0 ) return Cancelled;

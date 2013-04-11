@@ -15,7 +15,7 @@ class Sprite;
 class ImageManager;
 class RuntimeScene;
 class Game;
-class Scene;
+namespace gd { class Layout; }
 class ImageManager;
 namespace sf
 {
@@ -73,8 +73,8 @@ public :
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
     virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & position, Game & game, Scene & scene);
-    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, Game & game, Scene & scene);
+    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & position, Game & game, gd::Layout & scene);
+    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, Game & game, gd::Layout & scene);
 
     virtual bool SupportShaders() { return true; }
     #endif

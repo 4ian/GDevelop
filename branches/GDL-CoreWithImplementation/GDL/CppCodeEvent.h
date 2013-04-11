@@ -15,7 +15,7 @@ namespace gd { class Project; }
 class TiXmlElement;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
-class Scene;
+namespace gd { class Layout; }
 class wxWindow;
 
 /**
@@ -34,7 +34,7 @@ public:
     virtual bool IsExecutable() const {return true;}
     virtual bool CanHaveSubEvents() const {return false;}
 
-    virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
+    virtual std::string GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
     void EnsureAssociatedSourceFileIsUpToDate(Game & parentGame) const;
 
     const std::vector<std::string> & GetIncludeFiles() const { return includeFiles; };
@@ -87,7 +87,7 @@ public:
     /**
      * Called when the user want to edit the event
      */
-    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
 private:
     void Init(const CppCodeEvent & event);

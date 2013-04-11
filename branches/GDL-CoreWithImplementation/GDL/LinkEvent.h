@@ -12,7 +12,7 @@ namespace gd { class MainFrameWrapper; }
 namespace gd { class Project; }
 class Game;
 class RuntimeScene;
-class Scene;
+namespace gd { class Layout; }
 class wxWindow;
 
 /**
@@ -29,8 +29,8 @@ public:
     virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
 
     virtual bool IsExecutable() const { return true; };
-    virtual void Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
-    virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext);
+    virtual void Preprocess(Game & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
+    virtual std::string GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext);
 
     /**
      * Called by event editor to draw the event.
@@ -42,7 +42,7 @@ public:
      */
     virtual unsigned int GetRenderedHeight(unsigned int width) const;
 
-    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
     bool linkWasInvalid; ///< Set to true by Preprocess if the links was invalid the last time is was processed. Used to display a warning in the events editor.
 };

@@ -32,7 +32,7 @@ class RuntimeScene;
 namespace gd { class Instruction; }
 namespace gd { class Automatism; }; typedef gd::Automatism Automatism;
 class Game;
-class Scene;
+namespace gd { class Layout; }
 namespace gd { class Object; }
 class RuntimeObject;
 class ExtensionBase;

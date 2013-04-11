@@ -22,7 +22,7 @@ BaseEvent()
 {
 }
 
-std::string StandardEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+std::string StandardEvent::GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
 {
     std::string outputCode;
 

@@ -13,7 +13,7 @@
 #include <vector>
 #include <set>
 #include <utility>
-class Scene;
+namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
 namespace gd { class ParameterMetadata; }
 class EventsCodeGenerationContext;
@@ -37,7 +37,7 @@ public:
      * \param compilationForRuntime Set this to true if the code is generated for runtime.
      * \return C++ code
      */
-    static std::string GenerateSceneEventsCompleteCode(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events, bool compilationForRuntime = false);
+    static std::string GenerateSceneEventsCompleteCode(Game & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & events, bool compilationForRuntime = false);
 
     /**
      * Generate complete C++ file for compiling external events.
@@ -51,7 +51,7 @@ public:
     static std::string GenerateExternalEventsCompleteCode(Game & game, gd::ExternalEvents & events, bool compilationForRuntime = false);
 
     static void DeleteUselessEvents(std::vector < gd::BaseEventSPtr > & events);
-    static void PreprocessEventList( Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & listEvent );
+    static void PreprocessEventList( Game & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & listEvent );
 
     EventsCodeGenerator() : errorOccurred(false), compilationForRuntime(false) {};
     virtual ~EventsCodeGenerator() {};
@@ -65,7 +65,7 @@ public:
      * \param context Context used for generation
      * \return C++ code
      */
-    std::string GenerateEventsListCode(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
+    std::string GenerateEventsListCode(Game & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
 
     /**
      * Generate code for executing a condition list
@@ -76,7 +76,7 @@ public:
      * \param context Context used for generation
      * \return C++ code. Boolean containing conditions result are name conditionXIsTrue, with X = the number of the condition, starting from 0.
      */
-    std::string GenerateConditionsListCode(const Game & game, const Scene & scene, std::vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context);
+    std::string GenerateConditionsListCode(const Game & game, const gd::Layout & scene, std::vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context);
 
     /**
      * Generate code for executing an action list
@@ -87,7 +87,7 @@ public:
      * \param context Context used for generation
      * \return C++ code
      */
-    std::string GenerateActionsListCode(const Game & game, const Scene & scene, std::vector < gd::Instruction > & actions, EventsCodeGenerationContext & context);
+    std::string GenerateActionsListCode(const Game & game, const gd::Layout & scene, std::vector < gd::Instruction > & actions, EventsCodeGenerationContext & context);
 
     /**
      * Generate the code for a parameter of an action/condition/expression.
@@ -131,7 +131,7 @@ public:
     instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1"); //The called function will be called with this signature : Function(std::string, std::string, RuntimeObject*)
      * \endcode
      */
-    std::vector<std::string> GenerateParametersCodes( const Game & game, const Scene & scene, std::vector < gd::Expression > parameters, const std::vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
+    std::vector<std::string> GenerateParametersCodes( const Game & game, const gd::Layout & scene, std::vector < gd::Expression > parameters, const std::vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
 
     /**
      * Generate code for a single condition
@@ -143,7 +143,7 @@ public:
      * \param context Context used for generation
      * \return C++ code
      */
-    std::string GenerateConditionCode(const Game & game, const Scene & scene, gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context);
+    std::string GenerateConditionCode(const Game & game, const gd::Layout & scene, gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context);
 
     /**
      * Generate code for a single action
@@ -154,7 +154,7 @@ public:
      * \param context Context used for generation
      * \return C++ code
      */
-    std::string GenerateActionCode(const Game & game, const Scene & scene, gd::Instruction & action, EventsCodeGenerationContext & context);
+    std::string GenerateActionCode(const Game & game, const gd::Layout & scene, gd::Instruction & action, EventsCodeGenerationContext & context);
 
     /**
      * Convert a plain string ( with line feed, quotes ) to a C++ string ( adding backslash ).

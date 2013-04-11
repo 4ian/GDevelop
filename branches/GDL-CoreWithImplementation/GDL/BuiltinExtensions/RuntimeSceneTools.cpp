@@ -48,9 +48,9 @@ void GD_API StopGame( RuntimeScene & scene )
 
 void GD_API ChangeScene( RuntimeScene & scene, std::string newSceneName )
 {
-    for ( unsigned int i = 0;i < scene.game->GetLayouts().size() ; ++i )
+    for ( unsigned int i = 0;i < scene.game->GetLayoutCount(); ++i )
     {
-        if ( scene.game->GetLayouts()[i]->GetName() == newSceneName )
+        if ( scene.game->GetLayout(i).GetName() == newSceneName )
         {
             scene.GotoSceneWhenEventsAreFinished(i);
             return;

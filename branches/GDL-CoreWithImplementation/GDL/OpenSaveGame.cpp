@@ -41,7 +41,7 @@
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedData.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/VersionWrapper.h"
+#include "GDCore/Tools/VersionWrapper.h"
 #include "GDL/ExtensionsLoader.h"
 #include "GDL/Layer.h"
 #include "GDL/OpenSaveLoadingScreen.h"
@@ -53,7 +53,7 @@
 #include "GDL/StandardEvent.h"
 #include "GDL/RepeatEvent.h"
 #include "GDL/XmlMacros.h"
-#include "GDL/SourceFile.h"
+#include "GDCore/PlatformDefinition/SourceFile.h"
 
 using namespace std;
 
@@ -205,54 +205,5 @@ void OpenSaveGame::SaveConditions(const vector < gd::Instruction > & list, TiXml
     }
 }
 
-void OpenSaveGame::OpenImagesFromGD2010498(Game & game, const TiXmlElement * imagesElem, const TiXmlElement * dossierElem)
-{
-    //Images
-    while ( imagesElem )
-    {
-        ImageResource image;
-
-        if ( imagesElem->Attribute( "nom" ) != NULL ) { image.SetName(imagesElem->Attribute( "nom" )); }
-        else { MSG( "Les informations concernant le nom de l'image manquent." ); }
-        if ( imagesElem->Attribute( "fichier" ) != NULL ) {image.GetFile() = imagesElem->Attribute( "fichier" ); }
-        else { MSG( "Les informations concernant le fichier de l'image manquent." ); }
-
-        image.smooth = true;
-        if ( imagesElem->Attribute( "lissage" ) != NULL && string(imagesElem->Attribute( "lissage" )) == "false")
-                image.smooth = false;
-
-        image.alwaysLoaded = false;
-        if ( imagesElem->Attribute( "alwaysLoaded" ) != NULL && string(imagesElem->Attribute( "alwaysLoaded" )) == "true")
-                image.alwaysLoaded = true;
-
-        game.GetResourcesManager().AddResource(image);
-        imagesElem = imagesElem->NextSiblingElement();
-    }
-
-    //Dossiers d'images
-    while ( dossierElem )
-    {
-        if ( dossierElem->Attribute( "nom" ) != NULL )
-        {
-            game.GetResourcesManager().CreateFolder( dossierElem->Attribute( "nom" ) );
-            ResourceFolder & folder = game.GetResourcesManager().GetFolder(dossierElem->Attribute( "nom" ));
-
-            const TiXmlElement *elemDossier = dossierElem;
-            if ( elemDossier->FirstChildElement( "Contenu" ) != NULL )
-            {
-                elemDossier = elemDossier->FirstChildElement( "Contenu" )->FirstChildElement();
-                while ( elemDossier )
-                {
-                    if ( elemDossier->Attribute( "nom" ) != NULL ) { folder.AddResource(elemDossier->Attribute( "nom" ), game.GetResourcesManager()); }
-                    else { MSG( "Les informations concernant le nom d'une image d'un dossier manquent." ); }
-
-                    elemDossier = elemDossier->NextSiblingElement();
-                }
-            }
-        }
-
-        dossierElem = dossierElem->NextSiblingElement();
-    }
-}
 
 #endif

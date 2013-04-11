@@ -23,10 +23,10 @@
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDL/IDE/CodeCompiler.h"
-#include "GDL/SourceFile.h"
+#include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDL/XmlMacros.h"
 
-std::string CppCodeEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+std::string CppCodeEvent::GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
     //Note: The associated source file is compiled separately ( it is recognized as a Source File dependency by
     //DependenciesAnalyzer and compiled by CodeCompilationHelpers);
@@ -73,24 +73,24 @@ void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(Game & parentGame) const
 {
     std::string outputFile(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(this)+"SourceFile.cpp");
 
-    vector< boost::shared_ptr<GDpriv::SourceFile> >::const_iterator sourceFileIter =
-        find_if(parentGame.externalSourceFiles.begin(), parentGame.externalSourceFiles.end(), bind2nd(GDpriv::ExternalSourceFileHasName(), associatedGDManagedSourceFile));
+    vector< boost::shared_ptr<gd::SourceFile> >::const_iterator sourceFileIter =
+        find_if(parentGame.externalSourceFiles.begin(), parentGame.externalSourceFiles.end(), bind2nd(gd::ExternalSourceFileHasName(), associatedGDManagedSourceFile));
 
-    boost::shared_ptr<GDpriv::SourceFile> sourceFile;
+    boost::shared_ptr<gd::SourceFile> sourceFile;
     if ( sourceFileIter != parentGame.externalSourceFiles.end() ) sourceFile = *sourceFileIter;
 
     //First check if the associated source file exists in the GD project.
-    if ( sourceFile == boost::shared_ptr<GDpriv::SourceFile>() )
+    if ( sourceFile == boost::shared_ptr<gd::SourceFile>() )
     {
         //If there is no associated source file existing, then create a new one
-        boost::shared_ptr<GDpriv::SourceFile> associatedSourceFile(new GDpriv::SourceFile);
+        boost::shared_ptr<gd::SourceFile> associatedSourceFile(new gd::SourceFile);
         associatedSourceFile->SetGDManaged(true);
 
         parentGame.externalSourceFiles.push_back(associatedSourceFile);
         sourceFile = parentGame.externalSourceFiles.back();
     }
 
-    if (sourceFile == boost::shared_ptr<GDpriv::SourceFile>() )
+    if (sourceFile == boost::shared_ptr<gd::SourceFile>() )
     {
         wxLogError(_("Unable to create a virtual source file for a C++ Code event.\nPlease report this error to Game Develop developer."));
         return;
@@ -182,7 +182,7 @@ unsigned int CppCodeEvent::GetRenderedHeight(unsigned int width) const
     return renderedHeight;
 }
 
-gd::BaseEvent::EditEventReturnType CppCodeEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType CppCodeEvent::EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditCppCodeEvent dialog(parent_, *this, game_, scene_);
     int returned = dialog.ShowModal();

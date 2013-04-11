@@ -24,7 +24,7 @@ ProfileEvent::~ProfileEvent()
 {
 }
 
-std::string ProfileEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+std::string ProfileEvent::GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
     codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/ProfileTools.h");
 

@@ -24,7 +24,7 @@
 
 #include "GDL/Object.h"
 #include "GDL/Game.h"
-#include "GDL/Version.h"
+#include "GDCore/Tools/Version.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/CommonTools.h"
 

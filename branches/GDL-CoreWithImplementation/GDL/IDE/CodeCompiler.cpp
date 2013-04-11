@@ -467,7 +467,7 @@ std::vector < CodeCompilerTask > CodeCompiler::GetCurrentTasks() const
     return allTasks;
 }
 
-bool CodeCompiler::HasTaskRelatedTo(Scene & scene) const
+bool CodeCompiler::HasTaskRelatedTo(gd::Layout & scene) const
 {
     sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
@@ -481,7 +481,7 @@ bool CodeCompiler::HasTaskRelatedTo(Scene & scene) const
     return false;
 }
 
-void CodeCompiler::EnableTaskRelatedTo(Scene & scene)
+void CodeCompiler::EnableTaskRelatedTo(gd::Layout & scene)
 {
     bool mustLaunchCompilation = false;
     {
@@ -505,7 +505,7 @@ void CodeCompiler::EnableTaskRelatedTo(Scene & scene)
     }
 }
 
-void CodeCompiler::RemovePendingTasksRelatedTo(Scene & scene)
+void CodeCompiler::RemovePendingTasksRelatedTo(gd::Layout & scene)
 {
     sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 
@@ -519,7 +519,7 @@ void CodeCompiler::RemovePendingTasksRelatedTo(Scene & scene)
 
 }
 
-void CodeCompiler::DisableTaskRelatedTo(Scene & scene)
+void CodeCompiler::DisableTaskRelatedTo(gd::Layout & scene)
 {
     sf::Lock lock(pendingTasksMutex); //Disallow modifying pending tasks.
 

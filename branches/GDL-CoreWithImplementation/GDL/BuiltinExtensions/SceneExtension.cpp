@@ -114,7 +114,7 @@ SceneExtension::SceneExtension()
 
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const Scene & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const Game & game, const gd::Layout & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
             {
                 std::string value1Code;
                 {

@@ -19,7 +19,7 @@
 
 using namespace std;
 
-CallbacksForGeneratingExpressionCode::CallbacksForGeneratingExpressionCode(string & plainExpression_, const Game & game_, const Scene & scene_, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context_) :
+CallbacksForGeneratingExpressionCode::CallbacksForGeneratingExpressionCode(string & plainExpression_, const Game & game_, const gd::Layout & scene_, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context_) :
     plainExpression(plainExpression_),
     game(game_),
     scene(scene_),

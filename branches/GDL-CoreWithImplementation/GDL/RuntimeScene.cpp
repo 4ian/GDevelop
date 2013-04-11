@@ -62,7 +62,8 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_
     timeFromStart(0),
     pauseTime(0),
     specialAction(-1),
-    windowHasFocus(true)
+    windowHasFocus(true),
+    codeExecutionEngine(new CodeExecutionEngine)
 {
     ChangeRenderWindow(renderWindow);
 }
@@ -96,7 +97,7 @@ void RuntimeScene::Init(const RuntimeScene & scene)
     timers = scene.timers;
     pauseTime = scene.pauseTime;
 
-    GetCodeExecutionEngine() = scene.GetCodeExecutionEngine();
+    SetCodeExecutionEngine(scene.GetCodeExecutionEngine());
 
     firstLoop = scene.firstLoop;
     isFullScreen = scene.isFullScreen;
@@ -553,12 +554,12 @@ void RuntimeScene::CreateObjectsFrom(const gd::InitialInstancesContainer & conta
     const_cast<gd::InitialInstancesContainer&>(container).IterateOverInstances(func);
 }
 
-bool RuntimeScene::LoadFromScene( const Scene & scene )
+bool RuntimeScene::LoadFromScene( const gd::Layout & scene )
 {
     return LoadFromSceneAndCustomInstances(scene, scene.GetInitialInstances());
 }
 
-bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const gd::InitialInstancesContainer & instances )
+bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, const gd::InitialInstancesContainer & instances )
 {
     MessageLoading( "Loading scene", 10 );
 
@@ -577,7 +578,6 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const Scene & scene, const g
     timeFromStart = 0;
     specialAction = -1;
 
-    SetCodeExecutionEngine(scene.GetCodeExecutionEngine());
     GetCodeExecutionEngine()->runtimeContext.scene = this;
 
     //Initialize variables

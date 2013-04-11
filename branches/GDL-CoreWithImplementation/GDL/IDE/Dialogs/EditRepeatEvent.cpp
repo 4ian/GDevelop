@@ -35,7 +35,7 @@ BEGIN_EVENT_TABLE(EditRepeatEvent,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditRepeatEvent::EditRepeatEvent(wxWindow* parent, RepeatEvent & event_, Game & game_, Scene & scene_) :
+EditRepeatEvent::EditRepeatEvent(wxWindow* parent, RepeatEvent & event_, Game & game_, gd::Layout & scene_) :
 event(event_),
 game(game_),
 scene(scene_)

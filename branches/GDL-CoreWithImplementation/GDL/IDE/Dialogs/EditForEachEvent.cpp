@@ -35,7 +35,7 @@ BEGIN_EVENT_TABLE(EditForEachEvent,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditForEachEvent::EditForEachEvent(wxWindow* parent, ForEachEvent & event_, Game & game_, Scene & scene_) :
+EditForEachEvent::EditForEachEvent(wxWindow* parent, ForEachEvent & event_, Game & game_, gd::Layout & scene_) :
 eventEdited(event_),
 game(game_),
 scene(scene_)

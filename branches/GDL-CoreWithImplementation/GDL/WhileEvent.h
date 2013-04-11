@@ -29,7 +29,7 @@ class WhileEvent : public gd::BaseEvent
         virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new WhileEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
+        virtual std::string GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -67,7 +67,7 @@ class WhileEvent : public gd::BaseEvent
         /**
          * Called when the user want to edit the event
          */
-        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
     private:
         void Init(const WhileEvent & event);

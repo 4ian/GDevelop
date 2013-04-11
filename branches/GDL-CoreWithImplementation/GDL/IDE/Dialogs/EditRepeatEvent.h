@@ -19,7 +19,7 @@
 #include <wx/dialog.h>
 //*)
 class Game;
-class Scene;
+namespace gd { class Layout; }
 class RepeatEvent;
 
 /**
@@ -29,7 +29,7 @@ class EditRepeatEvent: public wxDialog
 {
 	public:
 
-		EditRepeatEvent(wxWindow* parent, RepeatEvent & event_, Game & game_, Scene & scene_);
+		EditRepeatEvent(wxWindow* parent, RepeatEvent & event_, Game & game_, gd::Layout & scene_);
 		virtual ~EditRepeatEvent();
 
 		//(*Declarations(EditRepeatEvent)
@@ -67,7 +67,7 @@ class EditRepeatEvent: public wxDialog
 
 		RepeatEvent & event;
 		Game & game;
-		Scene & scene;
+		gd::Layout & scene;
 
 		DECLARE_EVENT_TABLE()
 };

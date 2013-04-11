@@ -19,14 +19,14 @@ void ChangesNotifier::OnObjectEdited(gd::Project & project, gd::Layout * layout,
     try
     {
         Game & game = dynamic_cast<Game &>(project);
-        Scene * scene = dynamic_cast<Scene *>(layout);
+        gd::Layout * scene = dynamic_cast<Scene *>(layout);
 
         if ( scene )
             scene->SetRefreshNeeded();
         else //Scene pointer is not NULL: Update shared data of all scenes
         {
-            for (unsigned int i = 0;i<game.GetLayouts().size();++i)
-                game.GetLayouts()[i]->SetRefreshNeeded();
+            for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+                game.GetLayout(i).SetRefreshNeeded();
         }
     }
     catch(...)
@@ -75,14 +75,14 @@ void ChangesNotifier::OnAutomatismEdited(gd::Project & project, gd::Layout * lay
     try
     {
         Game & game = dynamic_cast<Game &>(project);
-        Scene * scene = dynamic_cast<Scene *>(layout);
+        gd::Layout * scene = dynamic_cast<Scene *>(layout);
 
         if ( scene )
             scene->SetRefreshNeeded();
         else //Scene pointer is not NULL: Update shared data of all scenes
         {
-            for (unsigned int i = 0;i<game.GetLayouts().size();++i)
-                game.GetLayouts()[i]->SetRefreshNeeded();
+            for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+                game.GetLayout(i).SetRefreshNeeded();
         }
     }
     catch(...)
@@ -114,20 +114,20 @@ void ChangesNotifier::OnObjectVariablesChanged(gd::Project & project, gd::Layout
     try
     {
         Game & game = dynamic_cast<Game &>(project);
-        Scene * scene = dynamic_cast<Scene *>(layout);
+        gd::Layout * scene = dynamic_cast<Scene *>(layout);
 
         if ( scene )
             scene->SetRefreshNeeded();
         else //Scene pointer is NULL: Update shared data of all scenes
         {
-            for (unsigned int i = 0;i<game.GetLayouts().size();++i)
+            for (unsigned int i = 0;i<game.GetLayoutCount();++i)
             {
-                game.GetLayouts()[i]->SetRefreshNeeded();
-                game.GetLayouts()[i]->SetCompilationNeeded();
+                game.GetLayout(i).SetRefreshNeeded();
+                game.GetLayout(i).SetCompilationNeeded();
             }
             for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
             {
-                game.GetExternalEvents()[i]->SetLastChangeTimeStamp(wxDateTime::Now().GetTicks()); //Do no forget external events as they can have been compiled separately from scenes.
+                game.GetExternalEvents(i).SetLastChangeTimeStamp(wxDateTime::Now().GetTicks()); //Do no forget external events as they can have been compiled separately from scenes.
             }
         }
     }
@@ -142,7 +142,7 @@ void ChangesNotifier::OnEventsModified(gd::Project & project, gd::Layout & layou
     try
     {
         Game & game = dynamic_cast<Game &>(project);
-        Scene & scene = dynamic_cast<Scene &>(layout);
+        gd::Layout & scene = dynamic_cast<gd::Layout &>(layout);
 
         scene.SetRefreshNeeded();
         if ( !indirectChange ) //Changes occured directly in the scene: Recompile it.
@@ -259,7 +259,7 @@ void ChangesNotifier::RequestFullRecompilation(gd::Project & project, gd::Layout
     try
     {
         Game & game = dynamic_cast<Game &>(project);
-        Scene * scene = dynamic_cast<Scene *>(layout);
+        gd::Layout * scene = dynamic_cast<Scene *>(layout);
 
         if ( scene )
         {
@@ -281,14 +281,14 @@ void ChangesNotifier::RequestFullRecompilation(gd::Project & project, gd::Layout
         }
         else //Scene pointer is NULL: Mark all scenes as modified
         {
-            for (unsigned int i = 0;i<game.GetLayouts().size();++i)
+            for (unsigned int i = 0;i<game.GetLayoutCount();++i)
             {
-                game.GetLayouts()[i]->SetRefreshNeeded();
-                game.GetLayouts()[i]->SetCompilationNeeded();
+                game.GetLayout(i).SetRefreshNeeded();
+                game.GetLayout(i).SetCompilationNeeded();
             }
             for (unsigned int i = 0;i<game.GetExternalEventsCount();++i)
             {
-                game.GetExternalEvents()[i]->SetLastChangeTimeStamp(wxDateTime::Now().GetTicks()); //Do no forget external events as they can have been compiled separately from scenes.
+                game.GetExternalEvents(i).SetLastChangeTimeStamp(wxDateTime::Now().GetTicks()); //Do no forget external events as they can have been compiled separately from scenes.
             }
         }
     }
@@ -303,14 +303,14 @@ void ChangesNotifier::RequestAutomatismsSharedDataUpdate(gd::Project & project, 
     try
     {
         Game & game = dynamic_cast<Game &>(project);
-        Scene * scene = dynamic_cast<Scene *>(layout);
+        gd::Layout * scene = dynamic_cast<Scene *>(layout);
 
         if ( scene )
             scene->UpdateAutomatismsSharedData(game);
         else //Scene pointer is NULL: Update shared data of all scenes
         {
-            for (unsigned int i = 0;i<game.GetLayouts().size();++i)
-                game.GetLayouts()[i]->UpdateAutomatismsSharedData(game);
+            for (unsigned int i = 0;i<game.GetLayoutCount();++i)
+                game.GetLayout(i).UpdateAutomatismsSharedData(game);
         }
     }
     catch(...)

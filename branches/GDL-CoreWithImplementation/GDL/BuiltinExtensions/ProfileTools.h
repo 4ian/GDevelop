@@ -10,7 +10,7 @@
 #include <vector>
 #include <map>
 class ProfileEvent;
-class Scene;
+namespace gd { class Layout; }
 class RuntimeScene;
 
 void GD_API StartProfileTimer(RuntimeScene & scene, unsigned int id);

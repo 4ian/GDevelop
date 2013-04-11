@@ -38,7 +38,7 @@ public:
     /**
      * \brief Return a reference to the scene being edited inside the editor.
      */
-    Scene & GetEditedScene() { return scene; }
+    gd::Layout & GetEditedScene() { return scene; }
 
     /**
      * \brief Return a reference to the scene used for preview inside the editor.
@@ -169,7 +169,7 @@ private:
 
     //References to objects being edited
     RuntimeGame & game; ///< The game being edited. Initialized at the editor construction from the gd::Project parameter.
-    Scene & scene; ///< The scene being edited. Initialized at the editor construction from the gd::Layout parameter.
+    gd::Layout & scene; ///< The scene being edited. Initialized at the editor construction from the gd::Layout parameter.
     gd::InitialInstancesContainer & instances; ///< The instances being edited.  Initialized at the editor construction from the gd::InitialInstancesContainer parameter.
 
     //Members used during preview or compilation

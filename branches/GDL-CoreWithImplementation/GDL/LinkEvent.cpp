@@ -70,7 +70,7 @@ void LinkEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventEle
     else { cout <<"Les informations concernant le nom de la scène liée."; }
 }
 
-void LinkEvent::Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
+void LinkEvent::Preprocess(Game & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
 {
     if ( IsDisabled() ) return;
 
@@ -148,7 +148,7 @@ void LinkEvent::Preprocess(Game & game, Scene & scene, std::vector < gd::BaseEve
     linkWasInvalid = false;
 }
 
-std::string LinkEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+std::string LinkEvent::GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
 {
     //This function is called only when the link refers to external events compiled separately. ( See LinkEvent::Preprocess )
     //We must generate code to call these external events.
@@ -162,7 +162,7 @@ std::string LinkEvent::GenerateEventCode(Game & game, Scene & scene, EventsCodeG
     return outputCode;
 }
 
-gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game & game, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game & game, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditLink dialog(parent_, *this, game);
     if ( dialog.ShowModal() == 0 ) return Cancelled;

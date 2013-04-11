@@ -29,7 +29,7 @@ class GD_API ProfileEvent : public gd::BaseEvent
         void SetPreviousProfileEvent( boost::shared_ptr<ProfileEvent> previousProfileEvent_ ) { previousProfileEvent = previousProfileEvent_; }
 
         virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
+        virtual std::string GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         unsigned int index;
 

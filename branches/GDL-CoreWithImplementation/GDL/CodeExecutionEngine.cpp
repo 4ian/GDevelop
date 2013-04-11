@@ -31,6 +31,7 @@ CodeExecutionEngine::~CodeExecutionEngine()
 
 void CodeExecutionEngine::Unload()
 {
+    std::cout << "Unloaded compiled code" << dynamicLibrary << std::endl;
     loaded = false;
 
     if ( dynamicLibrary != NULL ) GDpriv::CloseLibrary(dynamicLibrary);
@@ -67,6 +68,7 @@ bool CodeExecutionEngine::LoadFromDynamicLibrary(const std::string & filename, c
         return false;
     }
 
+    std::cout << "Loaded compiled code" << dynamicLibrary << std::endl;
     loaded = true;
     return true;
 }

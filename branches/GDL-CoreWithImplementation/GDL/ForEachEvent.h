@@ -15,7 +15,7 @@ namespace gd { class MainFrameWrapper; }
 class TiXmlElement;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
-class Scene;
+namespace gd { class Layout; }
 class wxWindow;
 
 /**
@@ -32,7 +32,7 @@ class ForEachEvent : public gd::BaseEvent
         virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new ForEachEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(Game & game, Scene & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
+        virtual std::string GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -71,7 +71,7 @@ class ForEachEvent : public gd::BaseEvent
         /**
          * Called when the user want to edit the event
          */
-        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
     private:
         void Init(const ForEachEvent & event);

@@ -9,7 +9,7 @@
 
 #include "GDCore/Events/Event.h"
 class TiXmlElement;
-class Scene;
+namespace gd { class Layout; }
 class Game;
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Project; }
@@ -51,7 +51,7 @@ class GD_API CommentEvent : public gd::BaseEvent
          */
         virtual unsigned int GetRenderedHeight(unsigned int width) const;
 
-        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+        virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 };
 
 #endif // COMMENTEVENT_H

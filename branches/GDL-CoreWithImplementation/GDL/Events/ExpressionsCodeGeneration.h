@@ -17,7 +17,7 @@ namespace gd { class Expression; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
 class Game;
-class Scene;
+namespace gd { class Layout; }
 class EventsCodeGenerationContext;
 class EventsCodeGenerator;
 
@@ -39,7 +39,7 @@ class EventsCodeGenerator;
 class GD_API CallbacksForGeneratingExpressionCode : public gd::ParserCallbacks
 {
 public:
-    CallbacksForGeneratingExpressionCode(std::string & output, const Game & game_, const Scene & scene_, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context_);
+    CallbacksForGeneratingExpressionCode(std::string & output, const Game & game_, const gd::Layout & scene_, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context_);
     virtual ~CallbacksForGeneratingExpressionCode() {};
 
     void OnConstantToken(std::string text);
@@ -57,7 +57,7 @@ public:
 private :
     std::string & plainExpression;
     const Game & game;
-    const Scene & scene;
+    const gd::Layout & scene;
     EventsCodeGenerator & codeGenerator;
     EventsCodeGenerationContext & context;
 };

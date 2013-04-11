@@ -879,8 +879,6 @@
 		<Unit filename="GDL/Sound.h" />
 		<Unit filename="GDL/SoundManager.cpp" />
 		<Unit filename="GDL/SoundManager.h" />
-		<Unit filename="GDL/SourceFile.cpp" />
-		<Unit filename="GDL/SourceFile.h" />
 		<Unit filename="GDL/SourceFileCommonTools.h" />
 		<Unit filename="GDL/Sprite.cpp" />
 		<Unit filename="GDL/Sprite.h" />

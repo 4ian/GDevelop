@@ -24,7 +24,7 @@
 namespace gd { class MainFrameWrapper; }
 class ResourcesEditor;
 class SpriteObject;
-class Resource;
+namespace gd { class Resource; }
 class Game;
 class Sprite;
 
@@ -220,7 +220,7 @@ private:
     void RefreshPoints();
     void RefreshCollisionMasks();
     void ResetPreview();
-    wxBitmap GetwxBitmapFromImageResource(Resource & resource);
+    wxBitmap GetwxBitmapFromImageResource(gd::Resource & resource);
 
     /**
      * Return a vector containing the sprites which must be modified when editing a point

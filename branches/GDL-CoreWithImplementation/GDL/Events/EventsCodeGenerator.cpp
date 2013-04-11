@@ -184,7 +184,7 @@ string EventsCodeGenerator::GenerateCompoundOperatorCall(const gd::InstructionMe
 }
 
 
-std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const Scene & scene, gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context)
+std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const gd::Layout & scene, gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context)
 {
     ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
 
@@ -426,7 +426,7 @@ std::string EventsCodeGenerator::GenerateConditionCode(const Game & game, const 
  * Generate code for a list of conditions.
  * Bools containing conditions results are named conditionXIsTrue.
  */
-string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const Scene & scene, vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const gd::Layout & scene, vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context)
 {
     string outputCode;
 
@@ -458,7 +458,7 @@ string EventsCodeGenerator::GenerateConditionsListCode(const Game & game, const 
 /**
  * Generate code for an action.
  */
-std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Scene & scene, gd::Instruction & action, EventsCodeGenerationContext & context)
+std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const gd::Layout & scene, gd::Instruction & action, EventsCodeGenerationContext & context)
 {
     ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
 
@@ -667,7 +667,7 @@ std::string EventsCodeGenerator::GenerateActionCode(const Game & game, const Sce
 /**
  * Generate actions code.
  */
-string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Scene & scene, vector < gd::Instruction > & actions, EventsCodeGenerationContext & context)
+string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const gd::Layout & scene, vector < gd::Instruction > & actions, EventsCodeGenerationContext & context)
 {
     string outputCode;
     for (unsigned int aId =0;aId < actions.size();++aId)
@@ -686,7 +686,7 @@ string EventsCodeGenerator::GenerateActionsListCode(const Game & game, const Sce
 
 /**
  */
-vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, const Scene & scene, vector < gd::Expression > parameters, const vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
+vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, const gd::Layout & scene, vector < gd::Expression > parameters, const vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes)
 {
     vector<string> arguments;
 
@@ -920,7 +920,7 @@ vector<string> EventsCodeGenerator::GenerateParametersCodes(const Game & game, c
 /**
  * Generate events list code.
  */
-string EventsCodeGenerator::GenerateEventsListCode(Game & game, Scene & scene, vector < gd::BaseEventSPtr > & events, const EventsCodeGenerationContext & parentContext)
+string EventsCodeGenerator::GenerateEventsListCode(Game & game, gd::Layout & scene, vector < gd::BaseEventSPtr > & events, const EventsCodeGenerationContext & parentContext)
 {
     string output;
 
@@ -939,7 +939,7 @@ string EventsCodeGenerator::GenerateEventsListCode(Game & game, Scene & scene, v
     return output;
 }
 
-string EventsCodeGenerator::GenerateSceneEventsCompleteCode(Game & game, Scene & scene, vector < gd::BaseEventSPtr > & events, bool compilationForRuntime)
+string EventsCodeGenerator::GenerateSceneEventsCompleteCode(Game & game, gd::Layout & scene, vector < gd::BaseEventSPtr > & events, bool compilationForRuntime)
 {
     string output;
 
@@ -983,7 +983,7 @@ std::string EventsCodeGenerator::GenerateExternalEventsCompleteCode(Game & game,
         std::cout << "ERROR: Cannot generate code for an external event: No unique associated scene." << std::endl;
         return "";
     }
-    Scene & associatedScene = *game.GetLayouts()[game.GetLayoutPosition(associatedSceneName)];
+    gd::Layout & associatedScene = game.GetLayout(game.GetLayoutPosition(associatedSceneName));
 
     string output;
 
@@ -1071,7 +1071,7 @@ void EventsCodeGenerator::DeleteUselessEvents(vector < gd::BaseEventSPtr > & eve
 /**
  * Call preprocession method of each event
  */
-void EventsCodeGenerator::PreprocessEventList( Game & game, Scene & scene, vector < gd::BaseEventSPtr > & listEvent )
+void EventsCodeGenerator::PreprocessEventList( Game & game, gd::Layout & scene, vector < gd::BaseEventSPtr > & listEvent )
 {
     boost::shared_ptr<ProfileEvent> previousProfileEvent;
 

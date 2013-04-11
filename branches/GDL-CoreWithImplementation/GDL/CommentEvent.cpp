@@ -56,7 +56,7 @@ void CommentEvent::LoadFromXml(gd::Project & project, const TiXmlElement * event
     if ( eventElem->FirstChildElement( "Couleur" )->Attribute( "textB" ) != NULL ) { eventElem->FirstChildElement( "Couleur" )->QueryIntAttribute( "textB", &textB );}
 }
 
-gd::BaseEvent::EditEventReturnType CommentEvent::EditEvent(wxWindow* parent_, Game & game_, Scene & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType CommentEvent::EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditComment dialog(parent_, *this);
     if ( dialog.ShowModal() == 0) return Cancelled;

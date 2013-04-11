@@ -16,6 +16,7 @@
 namespace sf { class RenderWindow; }
 namespace sf { class Event; }
 class Text;
+class CodeExecutionEngine;
 class ManualTimer;
 class RuntimeGame;
 class RuntimeLayer;
@@ -90,14 +91,14 @@ public:
      * \note Similar to calling LoadFromSceneAndCustomInstances(scene, scene.GetInitialInstances());
      * \see LoadFromSceneAndCustomInstances
      */
-    bool LoadFromScene( const Scene & scene );
+    bool LoadFromScene( const gd::Layout & scene );
 
     /**
      * Set up the Runtime Scene using the \a instances and the \a scene.
      * \param scene Scene used as context.
      * \param instances Initial instances to be put on the scene
      */
-    bool LoadFromSceneAndCustomInstances( const Scene & scene, const gd::InitialInstancesContainer & instances );
+    bool LoadFromSceneAndCustomInstances( const gd::Layout & scene, const gd::InitialInstancesContainer & instances );
 
     /**
      * Create the objects from an gd::InitialInstancesContainer object.
@@ -180,6 +181,11 @@ public:
     void ManageRenderTargetEvents();
 
     /**
+     * Order an object list according to object's Z coordinate.
+     */
+    bool OrderObjectsByZOrder( RuntimeObjList & objList );
+
+    /**
      * Get a read-only list of SFML events managed by the render target.
      */
     const std::vector<sf::Event> & GetRenderTargetEvents() const { return renderTargetEvents; }
@@ -195,10 +201,23 @@ public:
     std::vector<sf::Event> & GetRenderTargetEvents() { return renderTargetEvents; }
     #endif
 
-    /**
-     * Order an object list according to object's Z coordinate.
+    /** \name Code execution engine
+     * Functions members giving access to the code execution engine.
      */
-    bool OrderObjectsByZOrder( RuntimeObjList & objList );
+    ///@{
+    /**
+     * Give access to the execution engine of the scene.
+     * Each scene has its own unique execution engine.
+     */
+    boost::shared_ptr<CodeExecutionEngine> GetCodeExecutionEngine() const { return codeExecutionEngine; }
+
+    /**
+     * Give access to the execution engine of the scene.
+     * Each scene has its own unique execution engine.
+     */
+    void SetCodeExecutionEngine(boost::shared_ptr<CodeExecutionEngine> codeExecutionEngine_) { codeExecutionEngine = codeExecutionEngine_; }
+    ///@}
+
 
 protected:
 
@@ -225,6 +244,7 @@ protected:
     bool                                    windowHasFocus; ///< True if the render target used by the scene has the focus.
     std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedData> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
+    boost::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
 
     std::vector < Text >                    textes; ///<Deprecated way of displaying a text
     bool DisplayLegacyTexts(std::string layer = "");

@@ -16,7 +16,7 @@
 #include <wx/process.h>
 #include <wx/thread.h>
 class CodeCompilerExtraWork;
-class Scene;
+namespace gd { class Layout; }
 class CodeCompilerThreadStateNotifier;
 
 /**
@@ -85,7 +85,7 @@ public:
     CodeCompilerCall compilerCall; ///< The main work to be executed
 
     std::string userFriendlyName; ///< Task name displayed to the user
-    Scene * scene; ///< Optional pointer to a scene to specify that the task work is related to this scene.
+    gd::Layout * scene; ///< Optional pointer to a scene to specify that the task work is related to this scene.
 
     /**
      * Method to check if the task is the same as another. ( Compare files/options but does not take in account pre/post work )
@@ -168,25 +168,25 @@ public:
     /**
      * Return true if a task involving scene is being processed or will be processed.
      */
-    bool HasTaskRelatedTo(Scene & scene) const;
+    bool HasTaskRelatedTo(gd::Layout & scene) const;
 
     /**
      * Tell the compiler task related to scene can be launched
      * ( Compiler can launch at this moment a pending task )
      */
-    void EnableTaskRelatedTo(Scene & scene);
+    void EnableTaskRelatedTo(gd::Layout & scene);
 
     /**
      * Tell the compiler to not attempt to compile anything related to scene.
      * However, if a compilation is currently run, it will not stop:
      * That is why the scene has to wait until HasTaskRelatedTo(scene) return false.
      */
-    void DisableTaskRelatedTo(Scene & scene);
+    void DisableTaskRelatedTo(gd::Layout & scene);
 
     /**
      * Remove pending tasks related to scene. The current task is not aborted.
      */
-    void RemovePendingTasksRelatedTo(Scene & scene);
+    void RemovePendingTasksRelatedTo(gd::Layout & scene);
 
     /**
      * Return true if a task is being processed.
@@ -328,7 +328,7 @@ private:
     //Pending task management
     std::vector < CodeCompilerTask > pendingTasks; ///< Compilation task waiting to be launched.
     mutable sf::Mutex pendingTasksMutex; ///< A mutex is used to be sure that pending tasks are not modified by the thread and another method at the same time.
-    std::vector < Scene* > compilationDisallowed; ///< List of scenes which disallow their events to be compiled. (However, if a compilation is being made, it will not be stopped)
+    std::vector < gd::Layout* > compilationDisallowed; ///< List of scenes which disallow their events to be compiled. (However, if a compilation is being made, it will not be stopped)
 
     //Global compiler configuration
     std::string baseDir; ///< The directory used as the base directory for searching for includes files.

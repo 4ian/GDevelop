@@ -39,6 +39,8 @@
 #endif
 namespace gd { class MainFrameWrapper; }
 
+using namespace gd;
+
 namespace { //Some private tools functions
 
 wxBitmap Rescale(wxBitmap bmp, int max_width, int max_height) {
@@ -561,7 +563,7 @@ void SpriteObjectEditor::RefreshImageAndControls()
     RefreshCollisionMasks();
 }
 
-wxBitmap SpriteObjectEditor::GetwxBitmapFromImageResource(Resource & resource)
+wxBitmap SpriteObjectEditor::GetwxBitmapFromImageResource(gd::Resource & resource)
 {
     try
     {

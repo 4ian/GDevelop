@@ -20,13 +20,13 @@
 //*)
 #include "GDL/ForEachEvent.h"
 class Game;
-class Scene;
+namespace gd { class Layout; }
 
 class EditForEachEvent: public wxDialog
 {
 	public:
 
-		EditForEachEvent(wxWindow* parent, ForEachEvent & event_, Game & game_, Scene & scene_);
+		EditForEachEvent(wxWindow* parent, ForEachEvent & event_, Game & game_, gd::Layout & scene_);
 		virtual ~EditForEachEvent();
 
 		//(*Declarations(EditForEachEvent)
@@ -65,7 +65,7 @@ class EditForEachEvent: public wxDialog
 		//*)
 
 		Game & game;
-		Scene & scene;
+		gd::Layout & scene;
 
 		DECLARE_EVENT_TABLE()
 };

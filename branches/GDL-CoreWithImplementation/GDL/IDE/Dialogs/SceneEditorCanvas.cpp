@@ -14,6 +14,7 @@
 #include "GDL/RuntimeGame.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/CodeExecutionEngine.h"
+#include "GDL/SceneNameMangler.h"
 #include "GDL/SoundManager.h"
 #include "GDL/FontManager.h"
 #include "GDL/Object.h"
@@ -67,7 +68,7 @@ const long SceneEditorCanvas::idRibbonProfiler = wxNewId();
 SceneEditorCanvas::SceneEditorCanvas(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, gd::InitialInstancesContainer & instances_, gd::LayoutEditorCanvasOptions & settings_, gd::MainFrameWrapper & mainFrameWrapper_) :
     LayoutEditorCanvas(parent, project_, layout_, instances_, settings_, mainFrameWrapper_),
     game(dynamic_cast<RuntimeGame &>(project_)),
-    scene(dynamic_cast<Scene &>(layout_)),
+    scene(dynamic_cast<gd::Layout &>(layout_)),
     instances(dynamic_cast<gd::InitialInstancesContainer &>(instances_)),
     previewScene(this, &game),
     isMovingView(false),
@@ -261,17 +262,9 @@ void SceneEditorCanvas::OnUpdate()
             RenderCompilationScreen(); //Display a message when compiling
             return;
         }
-        else //Everything is finished, reloading is complete!
+        else //Everything is finished, reloading is almost complete!
         {
-            //But be sure that no error occurred.
-            if ( !editing && !scene.GetCodeExecutionEngine()->Ready() )
-            {
-                wxLogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")+CodeCompiler::GetInstance()->GetOutputDirectory()+"LatestCompilationOutput.txt");
-                wxCommandEvent useless;
-                OnEditionBtClick(useless);
-            }
-            else
-                RefreshFromLayoutSecondPart();
+            RefreshFromLayoutSecondPart();
         }
     }
     else //We're displaying the scene
@@ -308,8 +301,8 @@ void SceneEditorCanvas::OnUpdate()
                 mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the game will quit." ));
             else if ( retourEvent != -1 )
             {
-                if (retourEvent > 0 && static_cast<unsigned>(retourEvent) < game.GetLayouts().size())
-                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + "\"" + game.GetLayouts()[retourEvent]->GetName() + "\"");
+                if (retourEvent > 0 && static_cast<unsigned>(retourEvent) < game.GetLayoutCount())
+                    mainFrameWrapper.GetInfoBar()->ShowMessage(_( "In the compiled game, the scene will change for " ) + "\"" + game.GetLayout(retourEvent).GetName() + "\"");
             }
         }
         else if ( !previewScene.running && !editing ) //Runtime paused
@@ -379,7 +372,19 @@ void SceneEditorCanvas::RefreshFromLayoutSecondPart()
 
     }
     else
+    {
+        std::cout << "Initializing RuntimeScene from layout..." << std::endl;
         previewScene.LoadFromSceneAndCustomInstances( scene, instances );
+
+        std::cout << "Loading compiled code..." << std::endl;
+        if ( !previewScene.GetCodeExecutionEngine()->LoadFromDynamicLibrary(scene.GetCompiledEventsFile(),
+                                                                            "GDSceneEvents"+SceneNameMangler::GetMangledSceneName(scene.GetName())) )
+        {
+            wxLogError(_("Compilation of events failed, and scene cannot be previewed. Please report this problem to Game Develop's developer, joining this file:\n")+CodeCompiler::GetInstance()->GetOutputDirectory()+"LatestCompilationOutput.txt");
+            wxCommandEvent useless;
+            OnEditionBtClick(useless);
+        }
+    }
     scene.SetRefreshNotNeeded();
 
     //If a preview is not going to be made, switch back to the IDE working directory

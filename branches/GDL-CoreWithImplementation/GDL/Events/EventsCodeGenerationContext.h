@@ -11,7 +11,7 @@
 #include <set>
 #include <boost/shared_ptr.hpp>
 class Game;
-class Scene;
+namespace gd { class Layout; }
 
 /**
  * Used to manage the context ( objects concerned, objects being modified by an action... )

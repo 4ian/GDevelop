@@ -3,6 +3,7 @@
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 #include <iostream>
+#include <algorithm>
 #include <map>
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include "GDCore/PlatformDefinition/InitialInstance.h"
@@ -72,7 +73,6 @@ void InitialInstancesContainer::LoadFromXml(const TiXmlElement * rootElem)
         newPosition.GetVariables().LoadFromXml(elem->FirstChildElement( "InitialVariables" ));
 
         initialInstances.push_back( newPosition );
-
         elem = elem->NextSiblingElement();
     }
 }
@@ -83,6 +83,34 @@ void InitialInstancesContainer::IterateOverInstances(gd::InitialInstanceFunctor 
 {
     for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
         func(*it);
+}
+
+namespace
+{
+
+struct InstancesZOrderSort
+{
+   bool operator ()(gd::InitialInstance * a, gd::InitialInstance * b) const
+   {
+      return a->GetZOrder() < b->GetZOrder();
+   }
+};
+
+}
+
+void InitialInstancesContainer::IterateOverInstancesWithZOrdering(gd::InitialInstanceFunctor & func, const std::string & layerName)
+{
+    std::vector<gd::InitialInstance*> sortedInstances;
+    sortedInstances.reserve(initialInstances.size());
+    for (std::list<gd::InitialInstance>::iterator it = initialInstances.begin(), end = initialInstances.end(); it != end; ++it)
+    {
+        if (it->GetLayer() == layerName )
+            sortedInstances.push_back(&(*it));
+    }
+
+    std::sort(sortedInstances.begin(), sortedInstances.end(), gd::InstancesZOrderSort());
+    for (unsigned int i = 0;i<sortedInstances.size();++i)
+        func(*sortedInstances[i]);
 }
 
 gd::InitialInstance & InitialInstancesContainer::InsertNewInitialInstance()
@@ -195,9 +223,7 @@ void InitialInstancesContainer::SaveToXml(TiXmlElement * element) const
         objet->SetAttribute( "personalizedSize", (*it).HasCustomSize() ? "true" : "false" );
         objet->SetDoubleAttribute( "width", (*it).GetCustomWidth() );
         objet->SetDoubleAttribute( "height", (*it).GetCustomHeight() );
-        #if defined(GD_IDE_ONLY)
         objet->SetAttribute( "locked", (*it).IsLocked() ? "true" : "false" );
-        #endif
 
         TiXmlElement * floatInfos = new TiXmlElement( "floatInfos" );
         objet->LinkEndChild( floatInfos );

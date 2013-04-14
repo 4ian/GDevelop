@@ -24,6 +24,7 @@ namespace gd { class Object; }
 namespace gd { class VariablesContainer; }
 namespace gd { class ArbitraryResourceWorker; }
 namespace gd { class SourceFile; }
+namespace gd { class ImageManager; }
 #undef GetObject //Disable an annoying macro
 
 namespace gd
@@ -299,6 +300,16 @@ public:
      * Called to load the layout from a TiXmlElement.
      */
     virtual void LoadFromXml(const TiXmlElement * element);
+
+    /**
+     * Get the major version of Game Develop used to save the project.
+     */
+    unsigned int GetLastSaveGDMajorVersion() { return GDMajorVersion; };
+
+    /**
+     * Get the minor version of Game Develop used to save the project.
+     */
+    unsigned int GetLastSaveGDMinorVersion() { return GDMinorVersion; };
     ///@}
 
     /** \name External events management
@@ -453,6 +464,24 @@ public:
     inline ResourcesManager & GetResourcesManager() { return resourcesManager; }
 
     /**
+     * Provide access to the ImageManager allowing to load SFML or OpenGL textures for the
+     * IDE ( or at runtime for the GD C++ Platform ).
+     */
+    inline const boost::shared_ptr<gd::ImageManager> & GetImageManager() const { return imageManager; }
+
+    /**
+     * Provide access to the ImageManager allowing to load SFML or OpenGL textures for the
+     * IDE ( or at runtime for the GD C++ Platform ).
+     */
+    inline boost::shared_ptr<gd::ImageManager> & GetImageManager() { return imageManager; }
+
+    /**
+     * Provide access to the ImageManager allowing to load SFML or OpenGL textures for the
+     * IDE ( or at runtime for the GD C++ Platform ).
+     */
+    inline void SetImageManager(boost::shared_ptr<gd::ImageManager> imageManager_) { imageManager = imageManager_; }
+
+    /**
      * Called ( e.g. during compilation ) so as to inventory internal resources and sometimes update their filename.
      *
      * \note The default implementation takes care of exposing all resources of global objects, layouts, events.
@@ -558,7 +587,8 @@ protected:
     gd::VariablesContainer                              variables; ///< Initial global variables
     std::vector < boost::shared_ptr<gd::ExternalLayout> >   externalLayouts; ///< List of all externals layouts
     gd::ResourcesManager                                resourcesManager; ///< Contains all resources used by the project
-    std::vector<ObjectGroup> objectGroups; ///< Global objects groups
+    std::vector<ObjectGroup> objectGroups;              ///< Global objects groups
+    boost::shared_ptr<gd::ImageManager>                 imageManager;///< Image manager is accessed thanks to a (smart) ptr as it can be shared with GD C++ Platform RuntimeGame.
     #if defined(GD_IDE_ONLY)
     std::string                                         author; ///< Game author name
     std::string                                         gameFile; ///< File of the game
@@ -566,7 +596,10 @@ protected:
     std::vector < std::string >                         extensionsUsed; ///< List of extensions used
     gd::Platform *                                      platform; ///< Pointer to the platform owning the project
     std::vector < boost::shared_ptr<gd::ExternalEvents> >   externalEvents; ///< List of all externals events
+    mutable unsigned int                                GDMajorVersion; ///< The GD major version used the last time the project was saved.
+    mutable unsigned int                                GDMinorVersion; ///< The GD minor version used the last time the project was saved.
     #endif
+
 
     static ChangesNotifier defaultEmptyChangesNotifier;
 };

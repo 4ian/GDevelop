@@ -15,6 +15,7 @@
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/ExternalLayout.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
+#include "GDCore/PlatformDefinition/ImageManager.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/ResourcesManager.h"
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
@@ -32,6 +33,7 @@
 #include <wx/propgrid/propgrid.h>
 #include <wx/propgrid/advprops.h>
 #include <wx/settings.h>
+#include <wx/filename.h>
 #endif
 
 using namespace std;
@@ -48,11 +50,15 @@ Project::Project() :
     windowHeight(600),
     maxFPS(60),
     minFPS(10),
-    verticalSync(false)
+    verticalSync(false),
+    imageManager(boost::shared_ptr<gd::ImageManager>(new ImageManager))
     #if defined(GD_IDE_ONLY)
-    ,platform(NULL)
+    ,platform(NULL),
+    GDMajorVersion(GDLVersionWrapper::Major()),
+    GDMinorVersion(GDLVersionWrapper::Minor())
     #endif
 {
+    imageManager->SetGame(this);
     #if defined(GD_IDE_ONLY)
     //Game use builtin extensions by default
     extensionsUsed.push_back("BuiltinObject");
@@ -320,6 +326,50 @@ void OpenImagesFromGD2010498(gd::Project & game, const TiXmlElement * imagesElem
 }
 //End of compatibility code
 
+
+//Compatibility with GD2.x
+class SpriteObjectsPositionUpdater : public gd::InitialInstanceFunctor
+{
+public:
+    SpriteObjectsPositionUpdater(gd::Project & project_, gd::Layout & layout_) :
+        project(project_),
+        layout(layout_)
+    {};
+    virtual ~SpriteObjectsPositionUpdater() {};
+
+    virtual void operator()(gd::InitialInstance & instance)
+    {
+        std::cout << "a " << instance.GetX();
+        gd::Object * object = NULL;
+        if ( layout.HasObjectNamed(instance.GetObjectName()))
+            object = &layout.GetObject(instance.GetObjectName());
+        else if ( project.HasObjectNamed(instance.GetObjectName()))
+            object = &project.GetObject(instance.GetObjectName());
+        else return;
+        std::cout << "b " << instance.GetX();
+
+        if ( object->GetType() != "Sprite") return;
+        std::cout << "c " << instance.GetX();
+        if ( !instance.HasCustomSize() ) return;
+
+        wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
+        object->LoadResources(project, layout);
+
+        float defaultWidth = object->GetInitialInstanceDefaultWidth(instance, project, layout);
+        float defaultHeight = object->GetInitialInstanceDefaultHeight(instance, project, layout);
+
+        std::cout << "Updated from " << instance.GetX();
+        instance.SetX(instance.GetX() + defaultWidth/2 - instance.GetCustomWidth()/2 );
+        instance.SetY(instance.GetY() + defaultHeight/2 - instance.GetCustomHeight()/2 );
+        std::cout << " to " << instance.GetX() << std::endl;
+    }
+
+private:
+    gd::Project & project;
+    gd::Layout & layout;
+};
+//End of compatibility code
+
 void Project::LoadFromXml(const TiXmlElement * rootElement)
 {
     if ( rootElement == NULL ) return;
@@ -327,17 +377,21 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
     const TiXmlElement * elem = rootElement->FirstChildElement();
 
     //Comparaison de versions
-    int major = 0;
-    int minor = 0;
+    GDMajorVersion = 0;
+    GDMinorVersion = 0;
     int build = 0;
     int revision = 0;
     if ( elem != NULL )
     {
+        int major = 0;
+        int minor = 0;
         elem->QueryIntAttribute( "Major", &major );
         elem->QueryIntAttribute( "Minor", &minor );
         elem->QueryIntAttribute( "Build", &build );
         elem->QueryIntAttribute( "Revision", &revision );
-        if ( major > GDLVersionWrapper::Major() )
+        GDMajorVersion = major;
+        GDMinorVersion = minor;
+        if ( GDMajorVersion > GDLVersionWrapper::Major() )
         {
             #if defined(GD_IDE_ONLY)
             wxLogWarning( _( "The version of the editor used to create this game seems to be a new version.\nThe game can not open, or datas may be missing.\nYou should check if a new version of Game Develop is available." ) );
@@ -345,7 +399,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
         }
         else
         {
-            if ( major == GDLVersionWrapper::Major() && (build > GDLVersionWrapper::Build() || minor > GDLVersionWrapper::Minor() || revision > GDLVersionWrapper::Revision()) )
+            if ( GDMajorVersion == GDLVersionWrapper::Major() && (build > GDLVersionWrapper::Build() || GDMinorVersion > GDLVersionWrapper::Minor() || revision > GDLVersionWrapper::Revision()) )
             {
                 #if defined(GD_IDE_ONLY)
                 wxLogWarning( _( "The version of the editor used to create this game seems to be greater.\nThe game can not open, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
@@ -355,7 +409,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
 
         //Compatibility code
         #if defined(GD_IDE_ONLY)
-        if ( major <= 1 )
+        if ( GDMajorVersion <= 1 )
         {
             wxLogError(_("The game was saved with version of Game Develop which is too old. Please open and save the game with one of the first version of Game Develop 2. You will then be able to open your game with this Game Develop version."));
             return;
@@ -369,7 +423,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
 
     //Compatibility code
     #if defined(GD_IDE_ONLY)
-    if ( major < 2 || (major == 2 && minor == 0 && build <= 10498) )
+    if ( GDMajorVersion < 2 || (GDMajorVersion == 2 && GDMinorVersion == 0 && build <= 10498) )
     {
         OpenImagesFromGD2010498(*this,
                                 rootElement->FirstChildElement( "Images" )->FirstChildElement(),
@@ -380,7 +434,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
 
     //Compatibility code
     #if defined(GD_IDE_ONLY)
-    if ( major < 2 || (major == 2 && minor <= 0) )
+    if ( GDMajorVersion < 2 || (GDMajorVersion == 2 && GDMinorVersion <= 0) )
     {
         //TODO
         /*
@@ -395,7 +449,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
 
     //Compatibility code
     #if defined(GD_IDE_ONLY)
-    if ( major < 2 || (major == 2 && minor <= 1 && build <= 10822) )
+    if ( GDMajorVersion < 2 || (GDMajorVersion == 2 && GDMinorVersion <= 1 && build <= 10822) )
     {
         GetUsedPlatformExtensions().push_back("BuiltinExternalLayouts");
     }
@@ -432,6 +486,16 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
             scenes.push_back(layout);
             scenes.back()->SetName(layoutName);
             scenes.back()->LoadFromXml(*this, elem);
+
+            //Compatibility code with GD 2.x
+            if ( GDMajorVersion <= 2 )
+            {
+                SpriteObjectsPositionUpdater updater(*this, *scenes.back());
+                gd::InitialInstancesContainer & instances = scenes.back()->GetInitialInstances();
+                instances.IterateOverInstances(updater);
+
+            }
+            //End of compatibility code
         }
         else
             std::cout << "ERROR : Unable to create a layout when loading a project!" << std::endl;
@@ -544,6 +608,8 @@ void Project::SaveToXml(TiXmlElement * root) const
     version->SetAttribute( "Minor", ToString( GDLVersionWrapper::Minor() ).c_str() );
     version->SetAttribute( "Build", ToString( GDLVersionWrapper::Build() ).c_str() );
     version->SetAttribute( "Revision", ToString( GDLVersionWrapper::Revision() ).c_str() );
+    GDMajorVersion = GDLVersionWrapper::Major();
+    GDMinorVersion = GDLVersionWrapper::Minor();
 
     TiXmlElement * infos = new TiXmlElement( "Info" );
     root->LinkEndChild( infos );
@@ -895,6 +961,8 @@ void Project::Init(const gd::Project & game)
 
     //Resources
     resourcesManager = game.resourcesManager;
+    imageManager = boost::shared_ptr<ImageManager>(new ImageManager(*game.imageManager));
+    imageManager->SetGame(this);
 
     GetObjects().clear();
     for (unsigned int i =0;i<game.GetObjects().size();++i)

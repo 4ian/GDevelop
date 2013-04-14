@@ -15,6 +15,7 @@ namespace gd { class Layout; }
 namespace gd { class MainFrameWrapper; }
 namespace gd { class ArbitraryResourceWorker; }
 namespace gd { class InitialInstance; }
+namespace sf { class RenderTarget; }
 class wxWindow;
 class wxBitmap;
 
@@ -66,80 +67,20 @@ public:
 
     /** Must change the name of the object with the name passed as parameter.
      */
-    virtual void SetName(const std::string & name_) { name = name_; };
+    void SetName(const std::string & name_) { name = name_; };
 
     /** Must return the name of the object.
      */
-    virtual const std::string & GetName() const { return name; };
+    const std::string & GetName() const { return name; };
 
     /** Must change the type of the object.
      */
-    virtual void SetType(const std::string & type_) { type = type_; }
+    void SetType(const std::string & type_) { type = type_; }
 
     /** Must return the type of the object.
      */
-    virtual const std::string & GetType() const { return type; }
+    const std::string & GetType() const { return type; }
     ///@}
-
-    /** \name Automatisms management
-     * Members functions related to automatisms management.
-     */
-    ///@{
-
-    #if defined(GD_IDE_ONLY)
-    /**
-     * Must return a vector containing the names of all the automatisms used by the object
-     */
-    virtual std::vector < std::string > GetAllAutomatismNames() const;
-
-    /**
-     * Must return a reference to the automatism called "name".
-     */
-    virtual Automatism & GetAutomatism(const std::string & name);
-
-    /**
-     * Must return a reference to the automatism called "name".
-     */
-    virtual const Automatism & GetAutomatism(const std::string & name) const;
-
-    /**
-     * Must return true if object has an automatism called "name".
-     */
-    virtual bool HasAutomatismNamed(const std::string & name) const;
-
-    /**
-     * Must remove automatism called "name"
-     */
-    virtual void RemoveAutomatism(const std::string & name);
-
-    /**
-     * Must add the automatism of the specified \a type with the specified \a name.
-     * \return A pointer to the newly added automatism. NULL if the creation failed.
-     */
-    virtual gd::Automatism * AddNewAutomatism(gd::Project & project, const std::string & type, const std::string & name);
-    #endif
-
-    /**
-     * Get a read-only access to the map containing the automatisms.
-     */
-    virtual const std::map<std::string, gd::Automatism* > & GetAllAutomatisms() const {return automatisms;};
-    ///@}
-
-    /** \name Variable management
-     * Members functions related to object variables management.
-     */
-    ///@{
-    /**
-     * Provide access to the gd::VariablesContainer member containing the object variables
-     */
-    inline const gd::VariablesContainer & GetVariables() const { return objectVariables; }
-
-    /**
-     * Provide access to the gd::VariablesContainer member containing the object variables
-     */
-    inline gd::VariablesContainer & GetVariables() { return objectVariables; }
-    ///@}
-
 
     #if defined(GD_IDE_ONLY)
     /** \name Resources management
@@ -164,6 +105,53 @@ public:
     virtual bool SupportShaders() { return false; }
     ///@}
 
+    /** \name Drawing and editing initial instances
+     * Members functions related to drawing and editing initial instances of this object
+     */
+    ///@{
+    /**
+     * Called when the IDE wants to know about the custom properties of an initial instance of this object.
+     *
+     * \return a std::map with properties names as key and values.
+     * \see gd::InitialInstance
+     */
+    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout);
+
+    /**
+     * Called when the IDE wants to update a custom property of an initial instance of this object.
+     *
+     * \return false if the new value cannot be set
+     * \see gd::InitialInstance
+     */
+    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & instance, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & layout) {return false;};
+
+    /**
+     * Called when the IDE wants to draw an initial instance of the object on the layout editor.
+     *
+     * LoadResources method was called before so as to let the object load resources if necessary.
+     * \see gd::InitialInstance
+     */
+    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
+
+    /**
+     * Called by the IDE when a layout is going to be rendered.
+     * \see gd::InitialInstance
+     */
+    virtual void LoadResources(gd::Project & project, gd::Layout & layout);
+
+    /**
+     * Called when the IDE wants to know the width of an initial instance which has a default width.
+     * \see gd::InitialInstance
+     */
+    virtual float GetInitialInstanceDefaultWidth(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const { return 32; }
+
+    /**
+     * Called when the IDE wants to know the height of an initial instance which has a default height.
+     * \see gd::InitialInstance
+     */
+    virtual float GetInitialInstanceDefaultHeight(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const { return 32; }
+    ///@}
+
     /** \name  Others IDE related functions
      * Members functions related to generating thumbnails and other wxWidgets related tasks
      */
@@ -180,23 +168,68 @@ public:
      */
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) {return false;};
 
-    /**
-     * Called when the IDE wants to know about the custom properties of an initial instance of this object.
-     *
-     * \return a std::map with properties names as key and values.
-     * \see gd::InitialInstance
-     */
-    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & layout);
-
-    /**
-     * Called when the IDE wants to update a custom property of an initial instance of this object.
-     *
-     * \return false if the new value cannot be set
-     * \see gd::InitialInstance
-     */
-    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & layout) {return false;};
     ///@}
     #endif
+
+
+    /** \name Automatisms management
+     * Members functions related to automatisms management.
+     */
+    ///@{
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Must return a vector containing the names of all the automatisms used by the object
+     */
+    std::vector < std::string > GetAllAutomatismNames() const;
+
+    /**
+     * Must return a reference to the automatism called "name".
+     */
+    Automatism & GetAutomatism(const std::string & name);
+
+    /**
+     * Must return a reference to the automatism called "name".
+     */
+    const Automatism & GetAutomatism(const std::string & name) const;
+
+    /**
+     * Must return true if object has an automatism called "name".
+     */
+    bool HasAutomatismNamed(const std::string & name) const;
+
+    /**
+     * Must remove automatism called "name"
+     */
+    void RemoveAutomatism(const std::string & name);
+
+    /**
+     * Must add the automatism of the specified \a type with the specified \a name.
+     * \return A pointer to the newly added automatism. NULL if the creation failed.
+     */
+    gd::Automatism * AddNewAutomatism(gd::Project & project, const std::string & type, const std::string & name);
+    #endif
+
+    /**
+     * Get a read-only access to the map containing the automatisms.
+     */
+    const std::map<std::string, gd::Automatism* > & GetAllAutomatisms() const {return automatisms;};
+    ///@}
+
+    /** \name Variable management
+     * Members functions related to object variables management.
+     */
+    ///@{
+    /**
+     * Provide access to the gd::VariablesContainer member containing the object variables
+     */
+    const gd::VariablesContainer & GetVariables() const { return objectVariables; }
+
+    /**
+     * Provide access to the gd::VariablesContainer member containing the object variables
+     */
+    gd::VariablesContainer & GetVariables() { return objectVariables; }
+    ///@}
 
     /** \name Serialization
      * Members functions related to saving and loading the object

@@ -9,10 +9,8 @@
 #include <list>
 #include "GDCore/PlatformDefinition/InitialInstance.h"
 namespace gd { class InitialInstanceFunctor; }
+namespace gd { class Project; }
 class TiXmlElement;
-#if !defined(GD_IDE_ONLY)
-class RuntimeScene; //TODO: C++ Platform specific code.
-#endif
 
 namespace gd
 {
@@ -74,12 +72,19 @@ public:
      */
     virtual unsigned int GetInstancesCount() const;
 
-    #if defined(GD_IDE_ONLY)
     /**
-     * Must apply \a func to each instance of the container.
+     * Apply \a func to each instance of the container.
      */
     virtual void IterateOverInstances(InitialInstanceFunctor & func);
 
+    /**
+     * Sort the instances regarding their Z order and then all \a func on them.
+     * \param func The functor to be applied.
+     * \param layer The layer
+     */
+    virtual void IterateOverInstancesWithZOrdering(InitialInstanceFunctor & func, const std::string & layer);
+
+    #if defined(GD_IDE_ONLY)
     /**
      * Must insert the specified \a instance into the list and return a
      * a reference to the newly added instance.
@@ -143,7 +148,7 @@ public:
     ///@}
 
 private:
-    std::list<gd::InitialInstance> initialInstances; //TODO : Send this in private.
+    std::list<gd::InitialInstance> initialInstances;
 
     static gd::InitialInstance badPosition;
 };

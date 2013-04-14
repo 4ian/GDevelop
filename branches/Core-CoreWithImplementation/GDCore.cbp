@@ -53,8 +53,14 @@
 					<Add option="-lwxjpegd" />
 					<Add option="-lwxzlibd" />
 					<Add option="-lwxtiffd" />
+					<Add option="-lsfml-audio-d" />
+					<Add option="-lsfml-graphics-d" />
+					<Add option="-lsfml-window-d" />
+					<Add option="-lsfml-network-d" />
+					<Add option="-lsfml-system-d" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
+					<Add directory="../ExtLibs/SFML/build-mingw-debug/lib" />
 				</Linker>
 			</Target>
 			<Target title="Development - Edittime">
@@ -104,8 +110,14 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
+					<Add directory="../ExtLibs/SFML/build-mingw-release/lib" />
 				</Linker>
 			</Target>
 			<Target title="Release - Edittime">
@@ -155,8 +167,14 @@
 					<Add option="-lwxjpeg" />
 					<Add option="-lwxzlib" />
 					<Add option="-lwxtiff" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
 					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
+					<Add directory="../ExtLibs/SFML/build-mingw-release/lib" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Release - Edittime">
@@ -181,6 +199,11 @@
 				<Linker>
 					<Add option="-s" />
 					<Add option="`wx-config --libs all`" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 				</Linker>
 			</Target>
 			<Target title="Linux - Debug - Edittime">
@@ -203,6 +226,11 @@
 				</Compiler>
 				<Linker>
 					<Add option="`wx-config --libs all`" />
+					<Add option="-lsfml-audio" />
+					<Add option="-lsfml-graphics" />
+					<Add option="-lsfml-window" />
+					<Add option="-lsfml-network" />
+					<Add option="-lsfml-system" />
 				</Linker>
 			</Target>
 		</Build>
@@ -212,7 +240,11 @@
 			<Add option="-DGD_IDE_ONLY" />
 			<Add directory="../Core" />
 			<Add directory="../ExtLibs/boost" />
+			<Add directory="../ExtLibs/SFML/include" />
 		</Compiler>
+		<ResourceCompiler>
+			<Add directory="../Core" />
+		</ResourceCompiler>
 		<Unit filename="GDCore/CommonTools.cpp" />
 		<Unit filename="GDCore/CommonTools.h" />
 		<Unit filename="GDCore/DocMainPage.h" />
@@ -337,6 +369,8 @@
 		<Unit filename="GDCore/PlatformDefinition/ExternalEvents.h" />
 		<Unit filename="GDCore/PlatformDefinition/ExternalLayout.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/ExternalLayout.h" />
+		<Unit filename="GDCore/PlatformDefinition/ImageManager.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/ImageManager.h" />
 		<Unit filename="GDCore/PlatformDefinition/InitialInstance.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/InitialInstance.h" />
 		<Unit filename="GDCore/PlatformDefinition/InitialInstancesContainer.cpp" />
@@ -359,6 +393,8 @@
 		<Unit filename="GDCore/PlatformDefinition/Project.h" />
 		<Unit filename="GDCore/PlatformDefinition/ResourcesManager.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/ResourcesManager.h" />
+		<Unit filename="GDCore/PlatformDefinition/RessourcesLoader.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/RessourcesLoader.h" />
 		<Unit filename="GDCore/PlatformDefinition/SourceFile.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/SourceFile.h" />
 		<Unit filename="GDCore/PlatformDefinition/Variable.cpp" />

@@ -3,11 +3,10 @@
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "InitialInstance.h"
-#if !defined(GD_IDE_ONLY) //TODO : C++ Platform Specific Code
-#include "GDL/Scene.h"
-#include "GDL/Game.h"
-#endif
+#include "GDCore/PlatformDefinition/InitialInstance.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Object.h"
 
 namespace gd
 {
@@ -27,56 +26,27 @@ InitialInstance::InitialInstance() :
 }
 
 
-#if defined(GD_IDE_ONLY) //TODO : C++ Platform Specific Code
+#if defined(GD_IDE_ONLY)
 std::map<std::string, std::string> gd::InitialInstance::GetCustomProperties(gd::Project & project, gd::Layout & layout)
 {
-    //TODO
-    /*
-    try
-    {
-        gd::Layout & scene = dynamic_cast<Scene&>(layout);
-        Game & game = dynamic_cast<Game&>(project);
-
-        //Find an object
-        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
-        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
-
-        ObjSPtr object = boost::shared_ptr<gd::Object> ();
-
-        if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
-            return (*sceneObject)->GetInitialInstanceProperties(*this, game, scene);
-        else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
-            return (*globalObject)->GetInitialInstanceProperties(*this, game, scene);
-    }
-    catch (...) { std::cout << "Warning: IDE probably sent a wrong project or layout to a GD C++ InitialInstance."; std::cout << char(7); }
+    //Find an object
+    if ( layout.HasObjectNamed(GetObjectName()) )
+        return layout.GetObject(GetObjectName()).GetInitialInstanceProperties(*this, project, layout);
+    else if ( project.HasObjectNamed(GetObjectName()) )
+        return project.GetObject(GetObjectName()).GetInitialInstanceProperties(*this, project, layout);
 
     std::map<std::string, std::string> nothing;
-    return nothing;*/
+    return nothing;
 }
 
 bool gd::InitialInstance::UpdateCustomProperty(const std::string & name, const std::string & value, gd::Project & project, gd::Layout & layout)
 {
-    //TODO
-    /*
-    try
-    {
-        gd::Layout & scene = dynamic_cast<Scene&>(layout);
-        Game & game = dynamic_cast<Game&>(project);
+    if ( layout.HasObjectNamed(GetObjectName()) )
+        return layout.GetObject(GetObjectName()).UpdateInitialInstanceProperty(*this, name, value, project, layout);
+    else if ( project.HasObjectNamed(GetObjectName()) )
+        return project.GetObject(GetObjectName()).UpdateInitialInstanceProperty(*this, name, value, project, layout);
 
-        //Find an object
-        std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
-        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), GetObjectName()));
-
-        ObjSPtr object = boost::shared_ptr<gd::Object> ();
-
-        if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
-            return (*sceneObject)->UpdateInitialInstanceProperty(*this, name, value, game, scene);
-        else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
-            return (*globalObject)->UpdateInitialInstanceProperty(*this, name, value, game, scene);
-    }
-    catch (...) { std::cout << "Warning: IDE probably sent a wrong project or layout to a GD C++ InitialInstance ."; std::cout << char(7); }
-
-    return false;*/
+    return false;
 }
 
 #endif

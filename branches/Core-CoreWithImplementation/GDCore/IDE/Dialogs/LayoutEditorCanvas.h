@@ -228,24 +228,6 @@ public:
      */
     virtual void PlayPreview();
 
-    /**
-     * Must return the real X position of the object drawn by the initial instance
-     * ( Some platforms are using objects which can be drawn not at their exact X position )
-     *
-     * The bounding box of an initial instance is assumed to be at position (GetRealXPositionOfInitialInstance;GetRealYPositionOfInitialInstance)
-     * and its size is (GetWidthOfInitialInstance;GetHeightOfInitialInstance)
-     *
-     * \note Default implementation returns instance.GetX() and it should be ok for most usages.
-     *
-     * \see GetRealYPositionOfInitialInstance
-     * \see GetWidthOfInitialInstance
-     * \see GetHeightOfInitialInstance
-     */
-    virtual double GetRealXPositionOfInitialInstance(InitialInstance & instance) const;
-
-    /** \see GetRealXPositionOfInitialInstance */
-    virtual double GetRealYPositionOfInitialInstance(InitialInstance & instance) const;
-
     /** To be redefined by the child classes so as to provide the width of an initial instance */
     virtual double GetWidthOfInitialInstance(InitialInstance & instance) const { return 16; };
 

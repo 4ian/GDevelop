@@ -8,6 +8,7 @@
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/TinyXml/tinyxml.h"
+#include <SFML/Graphics.hpp>
 
 namespace gd
 {
@@ -70,7 +71,7 @@ gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const std::stri
     return automatism;
 }
 
-std::map<std::string, std::string> Object::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & layout)
+std::map<std::string, std::string> Object::GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout)
 {
     std::map<std::string, std::string> nothing;
     return nothing;
@@ -90,7 +91,23 @@ bool Object::HasAutomatismNamed(const std::string & name) const
 {
     return automatisms.find(name) != automatisms.end();
 }
+
+void Object::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
+{
+    sf::RectangleShape mask(sf::Vector2f(instance.HasCustomSize() ? instance.GetCustomWidth() : GetInitialInstanceDefaultWidth(instance, project, layout),
+                                         instance.HasCustomSize() ? instance.GetCustomHeight() : GetInitialInstanceDefaultHeight(instance, project, layout)));
+    mask.setPosition(instance.GetX(), instance.GetY());
+    mask.setRotation(instance.GetAngle());
+    mask.setFillColor(sf::Color( 147,151,255 ));
+    mask.setOutlineThickness(1);
+    mask.setOutlineColor(sf::Color( 255, 48, 69));
+    renderTarget.draw(mask);
+}
 #endif
+
+void Object::LoadResources(gd::Project & project, gd::Layout & layout)
+{
+}
 
 void Object::LoadFromXml(gd::Project & project, const TiXmlElement * elemScene)
 {

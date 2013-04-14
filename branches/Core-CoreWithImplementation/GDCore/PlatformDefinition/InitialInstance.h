@@ -133,7 +133,6 @@ public:
     //TODO : Refactor this:
     std::map < std::string, float > floatInfos; ///< More data which can be used by the object
     std::map < std::string, std::string > stringInfos; ///< More data which can be used by the object
-
 private:
 
     std::string objectName; ///< Object name

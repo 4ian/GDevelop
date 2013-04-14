@@ -460,9 +460,9 @@ public:
     {
         if ( instance.IsLocked() ) return;
 
-        if ( editor.selectionRectangle.Contains(editor.GetRealXPositionOfInitialInstance(instance), editor.GetRealYPositionOfInitialInstance(instance)) &&
-             editor.selectionRectangle.Contains(editor.GetRealXPositionOfInitialInstance(instance)+editor.GetWidthOfInitialInstance(instance),
-                                                editor.GetRealYPositionOfInitialInstance(instance)+editor.GetHeightOfInitialInstance(instance)) )
+        if ( editor.selectionRectangle.Contains(instance.GetX(), instance.GetY()) &&
+             editor.selectionRectangle.Contains(instance.GetX()+editor.GetWidthOfInitialInstance(instance),
+                                                instance.GetY()+editor.GetHeightOfInitialInstance(instance)) )
         {
             selectedList.push_back(&instance);
         }
@@ -700,7 +700,7 @@ public:
     {
         if ( pickLockedOnly != instance.IsLocked() ) return;
 
-        wxRect2DDouble boundingBox(editor.GetRealXPositionOfInitialInstance(instance), editor.GetRealYPositionOfInitialInstance(instance),
+        wxRect2DDouble boundingBox(instance.GetX(), instance.GetY(),
                                    editor.GetWidthOfInitialInstance(instance), editor.GetHeightOfInitialInstance(instance));
 
         if ( boundingBox.Contains(wxPoint2DDouble(xPosition, yPosition)) )
@@ -742,16 +742,6 @@ std::vector<gd::InitialInstance*> LayoutEditorCanvas::GetSelection()
         selection.push_back(it->first);
 
     return selection;
-}
-
-double LayoutEditorCanvas::GetRealXPositionOfInitialInstance(InitialInstance & instance) const
-{
-    return instance.GetX();
-}
-
-double LayoutEditorCanvas::GetRealYPositionOfInitialInstance(InitialInstance & instance) const
-{
-    return instance.GetY();
 }
 
 void LayoutEditorCanvas::OnLayersEditor( wxCommandEvent & event )

@@ -96,108 +96,34 @@ double SceneEditorCanvas::GetMouseYOnLayout() const
     return convertCoords(sf::Mouse::getPosition(*this), editionView).y;
 }
 
-boost::shared_ptr<RuntimeObject> SceneEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const
+gd::Object * SceneEditorCanvas::GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const
 {
-    if ( initialInstancesAndObjectsBimap.left.find(dynamic_cast<gd::InitialInstance*>(&instance)) == initialInstancesAndObjectsBimap.left.end() )
-    {
-        //std::cout << "ERROR: Object associated to initial instance \""+instance.GetObjectName()+"\" not found!";
-        return boost::shared_ptr<RuntimeObject> ();
-    }
+    if ( scene.HasObjectNamed(instance.GetObjectName()) )
+        return &scene.GetObject(instance.GetObjectName());
+    else if ( game.HasObjectNamed(instance.GetObjectName()) )
+        return &game.GetObject(instance.GetObjectName());
 
-    return initialInstancesAndObjectsBimap.left.find(dynamic_cast<gd::InitialInstance*>(&instance))->second;
+    return NULL;
 }
 
 double SceneEditorCanvas::GetWidthOfInitialInstance(gd::InitialInstance & instance) const
 {
-    /*boost::shared_ptr<gd::Object> object = GetObjectLinkedToInitialInstance(instance);
-    if ( object ) return object->GetWidth();*/
+    if (instance.HasCustomSize()) return instance.GetCustomWidth();
+
+    gd::Object * object = GetObjectLinkedToInitialInstance(instance);
+    if ( object ) return object->GetInitialInstanceDefaultWidth(instance, project, layout);
 
     return 0;
 }
 
 double SceneEditorCanvas::GetHeightOfInitialInstance(gd::InitialInstance & instance) const
 {
-    /*boost::shared_ptr<gd::Object> object = GetObjectLinkedToInitialInstance(instance);
-    if ( object ) return object->GetHeight();*/
+    if (instance.HasCustomSize()) return instance.GetCustomHeight();
+
+    gd::Object * object = GetObjectLinkedToInitialInstance(instance);
+    if ( object ) return object->GetInitialInstanceDefaultHeight(instance, project, layout);
 
     return 0;
-}
-
-double SceneEditorCanvas::GetRealXPositionOfInitialInstance(gd::InitialInstance & instance) const
-{
-    /*boost::shared_ptr<gd::Object> object = GetObjectLinkedToInitialInstance(instance);
-    if ( object ) return object->GetDrawableX();*/
-
-    return instance.GetX();
-}
-
-double SceneEditorCanvas::GetRealYPositionOfInitialInstance(gd::InitialInstance & instance) const
-{
-    /*boost::shared_ptr<gd::Object> object = GetObjectLinkedToInitialInstance(instance);
-    if ( object ) return object->GetDrawableY();*/
-
-    return instance.GetY();
-}
-
-void SceneEditorCanvas::OnInitialInstanceMoved(gd::InitialInstance & instance)
-{
-    /*boost::shared_ptr<gd::Object> object = GetObjectLinkedToInitialInstance(instance);
-    if ( object )
-    {
-        object->SetX(instance.GetX());
-        object->SetY(instance.GetY());
-    }*/
-}
-
-void SceneEditorCanvas::OnInitialInstanceDeleted(gd::InitialInstance & instance)
-{
-    /*
-    previewScene.objectsInstances.RemoveObject(GetObjectLinkedToInitialInstance(instance));
-    initialInstancesAndObjectsBimap.left.erase(dynamic_cast<gd::InitialInstance*>(&instance));*/
-}
-
-void SceneEditorCanvas::OnInitialInstanceAdded(gd::InitialInstance & gdInstance)
-{
-    try
-    {
-        /*
-        gd::InitialInstance & instance = dynamic_cast<gd::InitialInstance &>(gdInstance);
-
-        std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
-        std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), instance.GetObjectName()));
-
-        ObjSPtr newObject = boost::shared_ptr<gd::Object> ();
-
-        if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
-            newObject = boost::shared_ptr<gd::Object>((*sceneObject)->Clone());
-        else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
-            newObject = boost::shared_ptr<gd::Object>((*globalObject)->Clone());
-
-        if ( newObject == boost::shared_ptr<gd::Object> () )
-        {
-            wxLogError(_("The object to add does not exist ( anymore ) in the object list.\nDrag and drop objects on the scene from the objects list."));
-            return;
-        }
-
-        //Create the object to be displayed during edition
-        newObject->SetX( instance.GetX() );
-        newObject->SetY( instance.GetY() );
-        newObject->SetZOrder( instance.GetZOrder() );
-        newObject->SetLayer( instance.GetLayer() );
-        newObject->InitializeFromInitialInstance(instance);
-        newObject->LoadRuntimeResources( previewScene, *previewGame.imageManager );
-
-        previewScene.objectsInstances.AddObject(newObject);
-        initialInstancesAndObjectsBimap.insert(InstanceAndObjectPair(&instance, newObject));
-
-        newObject->LoadResources(previewScene, *previewGame.imageManager); //Global objects images are curiously not displayed if we don't reload resources..
-*/
-    }
-    catch(...)
-    {
-        std::cout << "ERROR: IDE probably sent an object which is not a GD C++ Platform object to OnInitialInstanceAdded" << std::endl;
-    }
-
 }
 
 void SceneEditorCanvas::CreatePreviewRibbonTools()

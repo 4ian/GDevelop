@@ -10,20 +10,13 @@
 #include "GDL/RuntimeObject.h"
 namespace gd { class InitialInstance; }
 namespace gd { class Object; }
+namespace gd { class Layout; }
+namespace sf { class Sprite; }
 class Animation;
 class Sprite;
-class ImageManager;
 class RuntimeScene;
-class Game;
-namespace gd { class Layout; }
-class ImageManager;
-namespace sf
-{
-    class Sprite;
-}
 #if defined(GD_IDE_ONLY)
 class wxBitmap;
-class Game;
 class wxWindow;
 namespace gd { class MainFrameWrapper; }
 #endif
@@ -68,13 +61,16 @@ public :
     virtual gd::Object * Clone() const { return new SpriteObject(*this);}
 
     #if defined(GD_IDE_ONLY)
-    virtual bool DrawEdittime(sf::RenderTarget & renderTarget);
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail);
     virtual void ExposeResources(gd::ArbitraryResourceWorker & worker);
 
     virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ );
-    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & position, Game & game, gd::Layout & scene);
-    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, Game & game, gd::Layout & scene);
+    virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene);
+    virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & scene);
+    virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
+    virtual float GetInitialInstanceDefaultWidth(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
+    virtual float GetInitialInstanceDefaultHeight(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
+    virtual void LoadResources(gd::Project & project, gd::Layout & layout);
 
     virtual bool SupportShaders() { return true; }
     #endif
@@ -94,12 +90,13 @@ public :
     void AddAnimation(const Animation & animation);
     bool RemoveAnimation(unsigned int nb);
     inline void RemoveAllAnimation() { animations.clear(); }
-    inline bool HasNoAnimations() { return animations.empty(); }
+    inline bool HasNoAnimations() const { return animations.empty(); }
     inline const std::vector < AnimationProxy > & GetAllAnimations() const { return animations; }
     ///@}
 
 private:
 
+    const Sprite * GetInitialInstanceSprite(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const;
     mutable std::vector < AnimationProxy > animations;
 
     //Null objects if need to return a bad object.

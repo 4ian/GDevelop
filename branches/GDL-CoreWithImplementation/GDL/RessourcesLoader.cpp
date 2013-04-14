@@ -1,3 +1,5 @@
+#if !defined(GD_IDE_ONLY)
+
 #include "GDL/RessourcesLoader.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
@@ -9,6 +11,9 @@
 #undef LoadImage //Undef a macro from windows.h
 
 using namespace std;
+
+namespace gd
+{
 
 RessourcesLoader * RessourcesLoader::_singleton = NULL;
 
@@ -130,8 +135,20 @@ char* RessourcesLoader::LoadBinaryFile( const string & filename )
         return buffer;
     }
     else
-        cout << "Binary file can't be loaded from external file for " << filename << endl;
+    {
+        ifstream file (filename.c_str(), ios::in|ios::binary|ios::ate);
+        if (file.is_open()) {
+            ifstream::pos_type size = file.tellg();
+            char * memblock = new char [size];
+            file.seekg (0, ios::beg);
+            file.read (memblock, size);
+            file.close();
 
+            return memblock;
+        }
+    }
+
+    cout << "Binary file " << filename << " can't be loaded into memory " << endl;
     return NULL;
 }
 
@@ -139,8 +156,15 @@ long int RessourcesLoader::GetBinaryFileSize( const string & filename)
 {
     if ( resFile.ContainsFile(filename))
         return resFile.GetFileSize(filename);
+    else
+    {
+        ifstream file (filename.c_str(), ios::in|ios::binary|ios::ate);
+        if (file.is_open()) {
+            return file.tellg();
+        }
+    }
 
-    cout << "Internal file " << filename << " not found for GetFileSize.";
+    std::cout << "Binary file " << filename << " cannot be read. " << std::endl;
     return 0;
 }
 
@@ -149,20 +173,5 @@ bool RessourcesLoader::HasFile(const std::string & filename)
     return resFile.ContainsFile(filename);
 }
 
-Music * RessourcesLoader::LoadMusic( const string & filename )
-{
-    Music * music = new Music;
-
-    if ( resFile.ContainsFile(filename)) //Priorité aux fichiers contenu dans l'egd
-    {
-        music->SetBuffer(resFile.GetFile(filename), resFile.GetFileSize(filename));
-
-        if (!music->OpenFromMemory(resFile.GetFileSize(filename)))
-            cout << "Failed to load a music from resource file: " << filename << endl;
-    }
-    else if (!music->OpenFromFile(filename)) //Chargement depuis un fichier externe
-        cout << "Failed to load a music: " << filename << endl;
-
-    return music;
 }
-
+#endif

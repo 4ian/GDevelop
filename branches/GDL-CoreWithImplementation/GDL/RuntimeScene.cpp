@@ -561,7 +561,7 @@ bool RuntimeScene::LoadFromScene( const gd::Layout & scene )
 
 bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, const gd::InitialInstancesContainer & instances )
 {
-    MessageLoading( "Loading scene", 10 );
+    std::cout << "Loading RuntimeScene from a scene.";
 
     //Copy inherited scene
     Scene::operator=(scene);
@@ -578,12 +578,14 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     timeFromStart = 0;
     specialAction = -1;
 
+    std::cout << ".";
     GetCodeExecutionEngine()->runtimeContext.scene = this;
 
     //Initialize variables
     variables = scene.GetVariables();
 
     //Initialize layers
+    std::cout << ".";
     layers.clear();
     sf::View defaultView( sf::FloatRect( 0.0f, 0.0f, game->GetMainWindowDefaultWidth(), game->GetMainWindowDefaultHeight() ) );
     for (unsigned int i = 0;i<GetLayersCount();++i) {
@@ -591,10 +593,11 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
     }
 
     //Create object instances which are originally positioned on scene
-    MessageLoading( "Adding objects to their initial position", 66 );
+    std::cout << ".";
     CreateObjectsFrom(instances);
 
     //Automatisms data
+    std::cout << ".";
     automatismsSharedDatas.clear();
     for(std::map < std::string, boost::shared_ptr<gd::AutomatismsSharedData> >::const_iterator it = scene.automatismsInitialSharedDatas.begin();
         it != scene.automatismsInitialSharedDatas.end();
@@ -608,6 +611,7 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
             std::cout << "ERROR: Unable to create shared data for automatism \"" << it->second->GetName() <<"\".";
     }
 
+    std::cout << ".";
     //Extensions specific initialization
     const vector < boost::shared_ptr<ExtensionBase> > extensions = ExtensionsManager::GetInstance()->GetExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
@@ -619,10 +623,11 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
         }
     }
 
+    std::cout << ".";
     if ( StopSoundsOnStartup() ) {SoundManager::GetInstance()->ClearAllSoundsAndMusics(); }
     if ( renderWindow ) renderWindow->setTitle(GetWindowDefaultTitle());
 
-    MessageLoading( "Loading finished", 100 );
+    std::cout << " Done." << std::endl;
 
     return true;
 }

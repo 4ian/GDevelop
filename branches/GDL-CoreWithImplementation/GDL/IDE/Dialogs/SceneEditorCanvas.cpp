@@ -30,6 +30,7 @@
     #include <gtk/gtk.h>
     #include <wx/gtk/private/win_gtk.h> //If this file is unable during compilation, then you must manually locate the "gtk/private" folder it in the wxWidgets folder and copy it into the folder where wx is installed.
 #endif
+#undef GetObject
 
 sf::Texture SceneEditorCanvas::reloadingIconImage;
 sf::Sprite SceneEditorCanvas::reloadingIconSprite;
@@ -240,7 +241,7 @@ void SceneEditorCanvas::OnEditionBtClick( wxCommandEvent & event )
 
     if ( externalPreviewWindow ) externalPreviewWindow->Show(false);
     previewScene.ChangeRenderWindow(this);
-    setFramerateLimit(30);
+    //setFramerateLimit(30);
 
     //Parse now the results of profiling
     if ( profiler ) profiler->ParseProfileEvents();
@@ -279,9 +280,9 @@ void SceneEditorCanvas::OnUpdate()
                     wxSetWorkingDirectory(wxFileName::FileName(game.GetProjectFile()).GetPath()); //Resources loading stuff incoming: Switch current work dir.
 
                 for (unsigned int i = 0;i<game.imagesChanged.size();++i)
-                    previewGame.imageManager->ReloadImage(game.imagesChanged[i]);
+                    previewGame.GetImageManager()->ReloadImage(game.imagesChanged[i]);
 
-                game.imageManager->LoadPermanentImages();
+                game.GetImageManager()->LoadPermanentImages();
                 game.imagesChanged.clear();
                 scene.SetRefreshNeeded();
 
@@ -321,11 +322,11 @@ void SceneEditorCanvas::RefreshFromLayout()
     isReloading = true;
 
     SoundManager::GetInstance()->ClearAllSoundsAndMusics();
-    if ( game.imageManager ) game.imageManager->PreventImagesUnloading(); //Images are normally unloaded and loaded again when reloading the scene. We can prevent this to happen as it is time wasting.
+    if ( game.GetImageManager() ) game.GetImageManager()->PreventImagesUnloading(); //Images are normally unloaded and loaded again when reloading the scene. We can prevent this to happen as it is time wasting.
 
     //Reset game
     previewGame = game;
-    previewGame.imageManager = game.imageManager; //Use same image manager.
+    previewGame.SetImageManager(game.GetImageManager()); //Use same image manager.
 
     //Reset scene
     RuntimeScene newScene(this, &previewGame);
@@ -359,17 +360,10 @@ void SceneEditorCanvas::RefreshFromLayoutSecondPart()
     //Load the scene ( compilation is done )
     if ( editing )
     {
-        //Create the map linking initial instances to real objects used by the scene for rendering.
-        initialInstancesAndObjectsBimap.clear();
-        gd::InitialInstancesContainer noInstances; //We need to load the scene in a two time fashion...
-        previewScene.LoadFromSceneAndCustomInstances(scene, noInstances);
-        std::map< const gd::InitialInstance*, boost::shared_ptr<RuntimeObject> > tempMap;
-        previewScene.CreateObjectsFrom(instances, 0, 0, &tempMap); //...so as to fill the tracking map.
-
-        for (std::map< const gd::InitialInstance*, boost::shared_ptr<RuntimeObject> >::const_iterator it = tempMap.begin();it!=tempMap.end();++it)
-            initialInstancesAndObjectsBimap.insert(InstanceAndObjectPair(const_cast<gd::InitialInstance*>(it->first), it->second));
-            //I know the const_cast is ugly, but I do not know how to bypass the issue otherwise.
-
+        for (unsigned int i = 0;i<layout.GetObjectsCount();++i)
+            layout.GetObject(i).LoadResources(project, layout);
+        for (unsigned int i = 0;i<project.GetObjectsCount();++i)
+            project.GetObject(i).LoadResources(project, layout);
     }
     else
     {
@@ -390,7 +384,7 @@ void SceneEditorCanvas::RefreshFromLayoutSecondPart()
     //If a preview is not going to be made, switch back to the IDE working directory
     if ( editing ) wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
 
-    if ( game.imageManager ) game.imageManager->EnableImagesUnloading(); //We were preventing images unloading so as to be sure not to waste time unloading and reloading just after scenes images.
+    if ( game.GetImageManager() ) game.GetImageManager()->EnableImagesUnloading(); //We were preventing images unloading so as to be sure not to waste time unloading and reloading just after scenes images.
 
     isReloading = false;
 }
@@ -514,9 +508,6 @@ void SceneEditorCanvas::OnLeftUp( wxMouseEvent &event )
 
         if ( currentDraggableBt.substr(0, 6) == "resize" ) //Handle the release of resize buttons here ( as the mouse if not necessarily on the button so OnGuiButtonReleased is not called )
         {
-
-            //Ugly hack for sprites part2 : Ensure that the selected instances "start" position is updated
-            //as the sprites objects X and Y position are updated when resized.
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
                 it->second.x = it->first->GetX(); it->second.y = it->first->GetY();
@@ -529,7 +520,6 @@ void SceneEditorCanvas::OnLeftUp( wxMouseEvent &event )
 
 void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
 {
-    /*
     //First check if we're using a resize button
     if ( currentDraggableBt.substr(0,6) == "resize")
     {
@@ -537,96 +527,54 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
-                boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+                if (resizeOriginalWidths[it->first]+GetMouseXOnLayout()-resizeMouseStartPosition.x < 0) continue;
 
-                if ( associatedObject )
-                {
-                    if (resizeOriginalWidths[it->first]+GetMouseXOnLayout()-resizeMouseStartPosition.x < 0) continue;
-
-                    associatedObject->SetWidth(resizeOriginalWidths[it->first]+GetMouseXOnLayout()-resizeMouseStartPosition.x);
+                if ( !it->first->HasCustomSize() ) {
                     it->first->SetHasCustomSize(true);
-                    it->first->SetCustomWidth(associatedObject->GetWidth());
-
-                    //Ugly hack to let the Sprite behave as others objects
-                    if ( boost::shared_ptr<SpriteObject> spriteObject = boost::dynamic_pointer_cast<SpriteObject>(associatedObject) )
-                    {
-                        spriteObject->SetX(it->second.x+0.5*(GetMouseXOnLayout()-resizeMouseStartPosition.x));
-                        it->first->SetX(spriteObject->GetX());
-                    }
+                    it->first->SetCustomHeight(resizeOriginalHeights[it->first]);
                 }
+                it->first->SetCustomWidth(resizeOriginalWidths[it->first]+GetMouseXOnLayout()-resizeMouseStartPosition.x);
             }
         }
         if ( currentDraggableBt == "resizeDown" || currentDraggableBt == "resizeRightDown" || currentDraggableBt == "resizeLeftDown" )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
-                boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+                if ( resizeOriginalHeights[it->first]+GetMouseYOnLayout()-resizeMouseStartPosition.y < 0 ) continue;
 
-                if ( associatedObject )
-                {
-                    if ( resizeOriginalHeights[it->first]+GetMouseYOnLayout()-resizeMouseStartPosition.y < 0 ) continue;
-
-                    associatedObject->SetHeight(resizeOriginalHeights[it->first]+GetMouseYOnLayout()-resizeMouseStartPosition.y);
+                if ( !it->first->HasCustomSize() ) {
                     it->first->SetHasCustomSize(true);
-                    it->first->SetCustomHeight(associatedObject->GetHeight());
-
-                    //Ugly hack to let the Sprite behave as others objects
-                    if ( boost::shared_ptr<SpriteObject> spriteObject = boost::dynamic_pointer_cast<SpriteObject>(associatedObject) )
-                    {
-                        spriteObject->SetY(it->second.y+0.5*(GetMouseYOnLayout()-resizeMouseStartPosition.y));
-                        it->first->SetY(spriteObject->GetY());
-                    }
+                    it->first->SetCustomWidth(resizeOriginalWidths[it->first]);
                 }
+                it->first->SetCustomHeight(resizeOriginalHeights[it->first]+GetMouseYOnLayout()-resizeMouseStartPosition.y);
             }
         }
         if ( currentDraggableBt == "resizeLeft" || currentDraggableBt == "resizeLeftUp" || currentDraggableBt == "resizeLeftDown" )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
-                boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+                if (resizeOriginalWidths[it->first]-GetMouseXOnLayout()+resizeMouseStartPosition.x < 0) continue;
 
-                if ( associatedObject )
-                {
-                    if (resizeOriginalWidths[it->first]-GetMouseXOnLayout()+resizeMouseStartPosition.x < 0) continue;
-
-                    associatedObject->SetWidth(resizeOriginalWidths[it->first]-GetMouseXOnLayout()+resizeMouseStartPosition.x);
-                    associatedObject->SetX(it->second.x+GetMouseXOnLayout()-resizeMouseStartPosition.x);
+                if ( !it->first->HasCustomSize() ) {
                     it->first->SetHasCustomSize(true);
-                    it->first->SetCustomWidth(associatedObject->GetWidth());
-                    it->first->SetX(associatedObject->GetX());
-
-                    //Ugly hack to let the Sprite behave as others objects
-                    if ( boost::shared_ptr<SpriteObject> spriteObject = boost::dynamic_pointer_cast<SpriteObject>(associatedObject) )
-                    {
-                        spriteObject->SetX(it->second.x+0.5*(GetMouseXOnLayout()-resizeMouseStartPosition.x));
-                        it->first->SetX(spriteObject->GetX());
-                    }
+                    it->first->SetCustomHeight(resizeOriginalHeights[it->first]);
                 }
+                it->first->SetCustomWidth(resizeOriginalWidths[it->first]-GetMouseXOnLayout()+resizeMouseStartPosition.x);
+                it->first->SetX(it->second.x+GetMouseXOnLayout()-resizeMouseStartPosition.x);
             }
         }
         if ( currentDraggableBt == "resizeUp" || currentDraggableBt == "resizeLeftUp" || currentDraggableBt == "resizeRightUp" )
         {
             for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
             {
-                boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+                if ( resizeOriginalHeights[it->first]-GetMouseYOnLayout()+resizeMouseStartPosition.y < 0 ) continue;
 
-                if ( associatedObject )
-                {
-                    if ( resizeOriginalHeights[it->first]-GetMouseYOnLayout()+resizeMouseStartPosition.y < 0 ) continue;
-
-                    associatedObject->SetHeight(resizeOriginalHeights[it->first]-GetMouseYOnLayout()+resizeMouseStartPosition.y);
-                    associatedObject->SetY(it->second.y+GetMouseYOnLayout()-resizeMouseStartPosition.y);
+                if ( !it->first->HasCustomSize() ) {
                     it->first->SetHasCustomSize(true);
-                    it->first->SetCustomHeight(associatedObject->GetHeight());
-                    it->first->SetY(associatedObject->GetY());
-
-                    //Ugly hack to let the Sprite behave as others objects
-                    if ( boost::shared_ptr<SpriteObject> spriteObject = boost::dynamic_pointer_cast<SpriteObject>(associatedObject) )
-                    {
-                        spriteObject->SetY(it->second.y+0.5*(GetMouseYOnLayout()-resizeMouseStartPosition.y));
-                        it->first->SetY(spriteObject->GetY());
-                    }
+                    it->first->SetCustomWidth(resizeOriginalWidths[it->first]);
                 }
+                it->first->SetCustomHeight(resizeOriginalHeights[it->first]-GetMouseYOnLayout()+resizeMouseStartPosition.y);
+                it->first->SetY(it->second.y+GetMouseYOnLayout()-resizeMouseStartPosition.y);
             }
         }
 
@@ -636,14 +584,8 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
     {
         for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
         {
-            boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
-
-            if ( associatedObject )
-            {
-                float newAngle = atan2(sf::Mouse::getPosition(*this).y-angleButtonCenter.y, sf::Mouse::getPosition(*this).x-angleButtonCenter.x)*180/3.14159;
-                it->first->SetAngle(newAngle);
-                associatedObject->SetAngle(newAngle);
-            }
+            float newAngle = atan2(sf::Mouse::getPosition(*this).y-angleButtonCenter.y, sf::Mouse::getPosition(*this).x-angleButtonCenter.x)*180/3.14159;
+            it->first->SetAngle(newAngle);
         }
     }
     else //No buttons being used
@@ -657,7 +599,7 @@ void SceneEditorCanvas::OnMotion( wxMouseEvent &event )
         }
 
         LayoutEditorCanvas::OnMotion(event);
-    }*/
+    }
 }
 
 void SceneEditorCanvas::OnMiddleDown( wxMouseEvent &event )
@@ -740,23 +682,32 @@ void SceneEditorCanvas::OnGuiElementHovered(const gd::LayoutEditorCanvasGuiEleme
 
 void SceneEditorCanvas::OnGuiElementPressed(const gd::LayoutEditorCanvasGuiElement & guiElement)
 {
-    /*if ( currentDraggableBt.empty() && guiElement.name.substr(0, 6) == "resize" )
+    if ( currentDraggableBt.empty() && guiElement.name.substr(0, 6) == "resize" )
     {
         currentDraggableBt = guiElement.name;
 
         resizeOriginalWidths.clear();
+        resizeOriginalHeights.clear();
         for ( std::map <gd::InitialInstance*, wxRealPoint >::iterator it = selectedInstances.begin();it!=selectedInstances.end();++it)
         {
-            boost::shared_ptr<gd::Object> associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
-            if ( associatedObject) resizeOriginalWidths[it->first] = associatedObject->GetWidth();
-            if ( associatedObject) resizeOriginalHeights[it->first] = associatedObject->GetHeight();
+            it->second.x = it->first->GetX(); it->second.y = it->first->GetY();
+
+            if ( it->first->HasCustomSize() ) {
+                resizeOriginalWidths[it->first] = it->first->GetCustomWidth();
+                resizeOriginalHeights[it->first] = it->first->GetCustomHeight();
+            }
+            else {
+                gd::Object * associatedObject = GetObjectLinkedToInitialInstance(*(it->first));
+                if ( associatedObject ) resizeOriginalWidths[it->first] = associatedObject->GetInitialInstanceDefaultWidth(*(it->first), project, layout);
+                if ( associatedObject ) resizeOriginalHeights[it->first] = associatedObject->GetInitialInstanceDefaultHeight(*(it->first), project, layout);
+            }
         }
         resizeMouseStartPosition = sf::Vector2f(GetMouseXOnLayout(), GetMouseYOnLayout());
     }
     else if ( currentDraggableBt.empty() && guiElement.name == "angle" )
     {
         currentDraggableBt = "angle";
-    }*/
+    }
 }
 
 void SceneEditorCanvas::OnGuiElementReleased(const gd::LayoutEditorCanvasGuiElement & guiElement)
@@ -839,38 +790,98 @@ void SceneEditorCanvas::AddSmallButtonGuiElement(std::vector < boost::shared_ptr
     target.push_back(button);
 }
 
+/**
+ * \brief Internal Tool class used to display instances at edittime
+ */
+class InstancesRenderer : public gd::InitialInstanceFunctor
+{
+public:
+    InstancesRenderer(SceneEditorCanvas & editor_, gd::InitialInstance * highlightedInstance_, std::vector < boost::shared_ptr<sf::Shape> > & guiElementsShapes_) :
+        drawResizeButtons(false),
+        resizeButtonsMaxX(0),
+        resizeButtonsMinX(0),
+        resizeButtonsMaxY(0),
+        resizeButtonsMinY(0),
+        selectionAngle(0),
+        editor(editor_),
+        highlightedInstance(highlightedInstance_),
+        guiElementsShapes(guiElementsShapes_)
+    {};
+    virtual ~InstancesRenderer() {};
+
+    virtual void operator()(gd::InitialInstance & instance)
+    {
+        gd::Object * associatedObject = editor.GetObjectLinkedToInitialInstance(instance);
+        if ( !associatedObject ) return;
+
+        associatedObject->DrawInitialInstance(instance, editor, editor.project, editor.layout);
+        float width = instance.HasCustomSize() ? instance.GetCustomWidth() : associatedObject->GetInitialInstanceDefaultWidth(instance, editor.project, editor.layout);
+        float height = instance.HasCustomSize() ? instance.GetCustomHeight() : associatedObject->GetInitialInstanceDefaultHeight(instance, editor.project, editor.layout);
+
+        //Selection rectangle
+        if ( editor.selectedInstances.find(&instance) != editor.selectedInstances.end() )
+        {
+            sf::Vector2f rectangleOrigin = editor.ConvertToWindowCoordinates(instance.GetX(), instance.GetY(), editor.editionView);
+            sf::Vector2f rectangleEnd = editor.ConvertToWindowCoordinates(instance.GetX()+width, instance.GetY()+height, editor.editionView); //TODO
+
+            editor.DrawSelectionRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin ));
+
+            if ( !drawResizeButtons )
+            {
+                resizeButtonsMaxX = rectangleEnd.x;
+                resizeButtonsMaxY = rectangleEnd.y;
+                resizeButtonsMinX = rectangleOrigin.x;
+                resizeButtonsMinY = rectangleOrigin.y;
+                selectionAngle = instance.GetAngle();
+                drawResizeButtons = true;
+            }
+            else
+            {
+                resizeButtonsMaxX = std::max(resizeButtonsMaxX, rectangleEnd.x);
+                resizeButtonsMaxY = std::max(resizeButtonsMaxY, rectangleEnd.y);
+                resizeButtonsMinX = std::min(resizeButtonsMinX, rectangleOrigin.x);
+                resizeButtonsMinY = std::min(resizeButtonsMinY, rectangleOrigin.y);
+            }
+        }
+        else if ( highlightedInstance == &instance )
+        {
+            sf::Vector2f rectangleOrigin = editor.ConvertToWindowCoordinates(instance.GetX(), instance.GetY(), editor.editionView);
+            sf::Vector2f rectangleEnd = editor.ConvertToWindowCoordinates(instance.GetX()+width, instance.GetY()+height, editor.editionView); //TODO
+
+            editor.DrawHighlightRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin ));
+        }
+    }
+
+    bool drawResizeButtons;
+    float resizeButtonsMaxX;
+    float resizeButtonsMinX;
+    float resizeButtonsMaxY;
+    float resizeButtonsMinY;
+    float selectionAngle;
+
+private:
+    SceneEditorCanvas & editor;
+    gd::InitialInstance * highlightedInstance;
+    std::vector < boost::shared_ptr<sf::Shape> > & guiElementsShapes;
+};
+
 void SceneEditorCanvas::RenderEdittime()
 {
-    previewScene.ManageRenderTargetEvents();
-
-    clear( sf::Color( previewScene.GetBackgroundColorRed(), previewScene.GetBackgroundColorGreen(), previewScene.GetBackgroundColorBlue() ) );
+    clear( sf::Color( scene.GetBackgroundColorRed(), scene.GetBackgroundColorGreen(), scene.GetBackgroundColorBlue() ) );
     setView(editionView);
 
-    /*glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
     pushGLStates(); //To allow using OpenGL to draw
 
-    //Sort objects according to their Z Order
-    RuntimeObjList allObjects = previewScene.objectsInstances.GetAllObjects();
-    previewScene.OrderObjectsByZOrder( allObjects );
-
-    //Reseting the gui elements
+    //Prepare GUI elements and the renderer
     std::vector < boost::shared_ptr<sf::Shape> > guiElementsShapes;
     guiElements.clear();
+    InstancesRenderer renderer(*this, GetInitialInstanceUnderCursor(), guiElementsShapes);
 
-    bool drawResizeButtons = false;
-    float resizeButtonsMaxX = 0;
-    float resizeButtonsMinX = 0;
-    float resizeButtonsMaxY = 0;
-    float resizeButtonsMinY = 0;
-    float selectionAngle = 0;
-
-    gd::InitialInstance * highlightedInstance = GetInitialInstanceUnderCursor();
-
-    for (unsigned int layerIndex =0;layerIndex<previewScene.GetLayersCount();++layerIndex)
+    for (unsigned int layerIndex =0;layerIndex<scene.GetLayersCount();++layerIndex)
     {
-        if ( previewScene.GetLayer(layerIndex).GetVisibility() )
+        if ( scene.GetLayer(layerIndex).GetVisibility() )
         {
-            //Prepare OpenGL rendering
             popGLStates();
 
             glMatrixMode(GL_PROJECTION);
@@ -881,60 +892,23 @@ void SceneEditorCanvas::RenderEdittime()
 
             pushGLStates();
 
-            //Render all objects
-            for (unsigned int id = 0;id < allObjects.size();++id)
-            {
-                if ( allObjects[id]->GetLayer() == previewScene.GetLayer(layerIndex).GetName())
-                {
-                    allObjects[id]->DrawEdittime(*previewScene.renderWindow);
-
-                    //Selection rectangle
-                    gd::InitialInstance * associatedInitialInstance = initialInstancesAndObjectsBimap.right.find(allObjects[id])->second;
-                    if ( selectedInstances.find(associatedInitialInstance) != selectedInstances.end() )
-                    {
-                        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX(), allObjects[id]->GetDrawableY(), editionView);
-                        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth(),
-                                                                               allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight(), editionView);
-
-                        DrawSelectionRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin ));
-
-                        if ( !drawResizeButtons )
-                        {
-                            resizeButtonsMaxX = rectangleEnd.x;
-                            resizeButtonsMaxY = rectangleEnd.y;
-                            resizeButtonsMinX = rectangleOrigin.x;
-                            resizeButtonsMinY = rectangleOrigin.y;
-                            selectionAngle = associatedInitialInstance->GetAngle();
-                            drawResizeButtons = true;
-                        }
-                        else
-                        {
-                            resizeButtonsMaxX = std::max(resizeButtonsMaxX, rectangleEnd.x);
-                            resizeButtonsMaxY = std::max(resizeButtonsMaxY, rectangleEnd.y);
-                            resizeButtonsMinX = std::min(resizeButtonsMinX, rectangleOrigin.x);
-                            resizeButtonsMinY = std::min(resizeButtonsMinY, rectangleOrigin.y);
-                        }
-                    }
-                    else if ( highlightedInstance == associatedInitialInstance )
-                    {
-                        sf::Vector2f rectangleOrigin = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX(), allObjects[id]->GetDrawableY(), editionView);
-                        sf::Vector2f rectangleEnd = ConvertToWindowCoordinates(allObjects[id]->GetDrawableX()+allObjects[id]->GetWidth(),
-                                                                               allObjects[id]->GetDrawableY()+allObjects[id]->GetHeight(), editionView);
-
-                        DrawHighlightRectangleGuiElement(guiElementsShapes, sf::FloatRect(rectangleOrigin, rectangleEnd-rectangleOrigin ));
-                    }
-                }
-            }
+            scene.GetInitialInstances().IterateOverInstancesWithZOrdering(renderer, scene.GetLayer(layerIndex).GetName());
         }
     }
+
 
     //Go back to "window" view before drawing GUI elements
     setView(sf::View(sf::Vector2f(getSize().x/2,getSize().y/2), sf::Vector2f(getSize().x,getSize().y)));
 
     if ( options.grid ) RenderGrid();
 
-    if ( drawResizeButtons )
+    if ( renderer.drawResizeButtons )
     {
+        float resizeButtonsMaxX = renderer.resizeButtonsMaxX;
+        float resizeButtonsMinX = renderer.resizeButtonsMinX;
+        float resizeButtonsMaxY = renderer.resizeButtonsMaxY;
+        float resizeButtonsMinY = renderer.resizeButtonsMinY;
+
         AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMinX-gapBetweenButtonsAndRectangle-smallButtonSize, resizeButtonsMinY-gapBetweenButtonsAndRectangle-smallButtonSize), "resizeLeftUp");
         AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(0.5*(resizeButtonsMinX+resizeButtonsMaxX-smallButtonSize), resizeButtonsMinY-gapBetweenButtonsAndRectangle-smallButtonSize), "resizeUp");
         AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMaxX+gapBetweenButtonsAndRectangle, resizeButtonsMinY-gapBetweenButtonsAndRectangle-smallButtonSize), "resizeRightUp");
@@ -943,7 +917,7 @@ void SceneEditorCanvas::RenderEdittime()
         AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(0.5*(resizeButtonsMinX+resizeButtonsMaxX-smallButtonSize), resizeButtonsMaxY+gapBetweenButtonsAndRectangle), "resizeDown");
         AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMinX-gapBetweenButtonsAndRectangle-smallButtonSize, resizeButtonsMaxY+gapBetweenButtonsAndRectangle), "resizeLeftDown");
         AddSmallButtonGuiElement(guiElementsShapes, sf::Vector2f(resizeButtonsMinX-gapBetweenButtonsAndRectangle-smallButtonSize, 0.5*(resizeButtonsMinY+resizeButtonsMaxY-smallButtonSize)), "resizeLeft" );
-        DrawAngleButtonGuiElement(guiElementsShapes, sf::Vector2f(0.5*(resizeButtonsMinX+resizeButtonsMaxX-smallButtonSize), 0.5*(resizeButtonsMinY+resizeButtonsMaxY-smallButtonSize)), selectionAngle);
+        DrawAngleButtonGuiElement(guiElementsShapes, sf::Vector2f(0.5*(resizeButtonsMinX+resizeButtonsMaxX-smallButtonSize), 0.5*(resizeButtonsMinY+resizeButtonsMaxY-smallButtonSize)), renderer.selectionAngle);
     }
 
     if ( isSelecting )
@@ -999,7 +973,7 @@ void SceneEditorCanvas::RenderEdittime()
 
     setView(editionView);
     popGLStates();
-    display();*/
+    display();
 }
 
 

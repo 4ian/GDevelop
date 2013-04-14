@@ -128,9 +128,20 @@ void GD_API RePlaySoundOnChannel( RuntimeScene & scene, unsigned int channel )
 void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repeat, float volume, float pitch )
 {
     SoundManager * soundManager = SoundManager::GetInstance();
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
+    gd::RessourcesLoader * ressourcesLoader = gd::RessourcesLoader::GetInstance();
 
-    boost::shared_ptr<Music> music = boost::shared_ptr<Music>(ressourcesLoader->LoadMusic(file)); //Chargement
+    boost::shared_ptr<Music> music(new Music);
+    #if !defined(GD_IDE_ONLY)
+    if(RessourcesLoader::GetInstance()->HasFile(file))
+    {
+        music->OpenFromMemory(gd::RessourcesLoader::GetInstance()->LoadBinaryFile(file),
+                                  gd::RessourcesLoader::GetInstance()->GetBinaryFileSize(file));
+    }
+    else
+    #endif
+    {
+        music->OpenFromFile(file);
+    }
 
     soundManager->musics.push_back(music); //Ajout aux soundManager qui prend en charge la musique
     soundManager->musics.back()->Play();
@@ -143,9 +154,20 @@ void GD_API PlayMusic( RuntimeScene & scene, const std::string & file, bool repe
 void GD_API PlayMusicOnChannel( RuntimeScene & scene, const std::string & file, unsigned int channel , bool repeat, float volume, float pitch )
 {
     SoundManager * soundManager = SoundManager::GetInstance();
-    RessourcesLoader * ressourcesLoader = RessourcesLoader::GetInstance();
+    gd::RessourcesLoader * ressourcesLoader = gd::RessourcesLoader::GetInstance();
 
-    boost::shared_ptr<Music> music = boost::shared_ptr<Music>(ressourcesLoader->LoadMusic(file)); //Chargement
+    boost::shared_ptr<Music> music(new Music);
+    #if !defined(GD_IDE_ONLY)
+    if(RessourcesLoader::GetInstance()->HasFile(file))
+    {
+        music->OpenFromMemory(gd::RessourcesLoader::GetInstance()->LoadBinaryFile(file),
+                                  gd::RessourcesLoader::GetInstance()->GetBinaryFileSize(file));
+    }
+    else
+    #endif
+    {
+        music->OpenFromFile(file);
+    }
     music->Play();
 
     soundManager->SetMusicOnChannel(channel, music); //Ajout au soundManager qui prend en charge la music

@@ -478,10 +478,15 @@ const std::string & RuntimeObject::GetVariableString( const std::string & variab
     return objectVariables.GetVariableString(variable);
 }
 
-
 std::vector<Polygon2d> RuntimeObject::GetHitBoxes() const
 {
-    return std::vector<Polygon2d>();
+    std::vector<Polygon2d> mask;
+    Polygon2d rectangle = Polygon2d::CreateRectangle(GetWidth(), GetHeight());
+    rectangle.Rotate(GetAngle()/180*3.14159);
+    rectangle.Move(GetX()+GetCenterX(), GetY()+GetCenterY());
+
+    mask.push_back(rectangle);
+    return mask;
 }
 
 Automatism* RuntimeObject::GetAutomatismRawPointer(const std::string & name)

@@ -76,7 +76,7 @@ RuntimeSpriteObject::RuntimeSpriteObject(RuntimeScene & scene, const gd::Object 
             {
                 Sprite & sprite = anim.GetDirectionToModify(k).GetSprite(l);
 
-                sprite.LoadImage(scene.game->imageManager->GetSFMLTexture(sprite.GetImageName()));
+                sprite.LoadImage(scene.game->GetImageManager()->GetSFMLTexture(sprite.GetImageName()));
             }
         }
     }
@@ -105,57 +105,106 @@ bool RuntimeSpriteObject::Draw( sf::RenderTarget & renderTarget )
                                                                (blendMode == 1 ? sf::BlendAdd :
                                                                (blendMode == 2 ? sf::BlendMultiply :
                                                                 sf::BlendNone))));
-    /*std::vector<Polygon2d> polygons = GetHitBoxes();
-    for (unsigned int i = 0;i<polygons.size();++i)
-    {
-        sf::Shape shape;
-        shape.EnableFill(true);
-        for (unsigned int j = 0;j<polygons[i].vertices.size();++j)
-        {
-            shape.AddPoint(polygons[i].vertices[j], sf::Color(255,120,120), sf::Color(0,120,0));
-        }
-        renderTarget.draw(shape);
-    }*/
 
     return true;
 }
 
 #if defined(GD_IDE_ONLY)
-/**
- * Render object at edittime
- */
-bool SpriteObject::DrawEdittime( sf::RenderTarget & renderTarget )
+void SpriteObject::LoadResources(gd::Project & project, gd::Layout & layout)
 {
-    //renderTarget.draw( GetCurrentSFMLSprite() );
+    for ( unsigned int j = 0; j < animations.size();j++ )
+    {
+        Animation & anim = animations[j].GetNonConst();
+        for ( unsigned int k = 0;k < anim.GetDirectionsNumber();k++ )
+        {
+            for ( unsigned int l = 0;l < anim.GetDirection(k).GetSpriteCount();l++ )
+            {
+                Sprite & sprite = anim.GetDirectionToModify(k).GetSprite(l);
 
-    return true;
+                sprite.LoadImage(project.GetImageManager()->GetSFMLTexture(sprite.GetImageName()));
+            }
+        }
+    }
+}
+
+const Sprite * SpriteObject::GetInitialInstanceSprite(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+{
+    if ( HasNoAnimations() ) return NULL;
+
+    //Search the first sprite of the current animation/direction.
+    unsigned int animationId = instance.floatInfos.find("animation") != instance.floatInfos.end() ? instance.floatInfos.find("animation")->second : 0;
+    if ( animationId >= GetAnimationCount() ) animationId = 0;
+
+    const Animation & animation = GetAnimation(animationId);
+    if ( animation.HasNoDirections() ) return NULL;
+
+    unsigned int directionId = 0;
+    if ( animation.useMultipleDirections ) {
+
+        float normalizedAngle = static_cast<int>(instance.GetAngle())%360;
+        if ( normalizedAngle < 0 ) normalizedAngle += 360;
+
+        directionId = static_cast<int>(floor(normalizedAngle/45.f))%8;
+    }
+
+    if ( directionId >= animation.GetDirectionsNumber() ) directionId = 0;
+
+    const Direction & direction = animation.GetDirection(directionId);
+
+    return direction.HasNoSprites() ? NULL : &direction.GetSprite(0);
+}
+
+void SpriteObject::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout)
+{
+    const Sprite * associatedSprite = GetInitialInstanceSprite(instance, project, layout);
+    if ( associatedSprite == NULL || !associatedSprite->GetSFMLTexture() ) return;
+
+    sf::Sprite sprite(associatedSprite->GetSFMLTexture()->texture);
+
+    float scaleX = instance.HasCustomSize() ? instance.GetCustomWidth()/sprite.getLocalBounds().width : 1;
+    float scaleY = instance.HasCustomSize() ? instance.GetCustomHeight()/sprite.getLocalBounds().height : 1;
+
+    sprite.setPosition(instance.GetX()+sprite.getLocalBounds().width/2*scaleX,
+                       instance.GetY()+sprite.getLocalBounds().height/2*scaleY);
+    sprite.setOrigin(sprite.getLocalBounds().width/2, sprite.getLocalBounds().height/2);
+    sprite.setRotation(instance.GetAngle());
+    sprite.setScale(scaleX, scaleY);
+
+    renderTarget.draw(sprite);
+}
+
+float SpriteObject::GetInitialInstanceDefaultWidth(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+{
+    const Sprite * associatedSprite = GetInitialInstanceSprite(instance, project, layout);
+    if ( associatedSprite == NULL || !associatedSprite->GetSFMLTexture() ) return 0;
+
+    return associatedSprite->GetSFMLTexture()->texture.getSize().x;
+}
+
+float SpriteObject::GetInitialInstanceDefaultHeight(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const
+{
+    const Sprite * associatedSprite = GetInitialInstanceSprite(instance, project, layout);
+    if ( associatedSprite == NULL || !associatedSprite->GetSFMLTexture() ) return 0;
+
+    return associatedSprite->GetSFMLTexture()->texture.getSize().y;
 }
 
 bool SpriteObject::GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail)
 {
-    try
+    //Generate a thumbnail from the first animation
+    if ( !HasNoAnimations() && !GetAnimation(0).HasNoDirections() && !GetAnimation(0).GetDirection(0).HasNoSprites() )
     {
-        const Game & game = dynamic_cast<const Game &>(project);
+        std::string imageName = GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName();
 
-        //Generate a thumbnail from the first animation
-        if ( !HasNoAnimations() && !GetAnimation(0).HasNoDirections() && !GetAnimation(0).GetDirection(0).HasNoSprites() )
+        if ( project.GetResourcesManager().HasResource(imageName) && wxFileExists(project.GetResourcesManager().GetResource(imageName).GetAbsoluteFile(project)) )
         {
-            std::string imageName = GetAnimation(0).GetDirection(0).GetSprite(0).GetImageName();
+            thumbnail = wxBitmap( project.GetResourcesManager().GetResource(imageName).GetAbsoluteFile(project), wxBITMAP_TYPE_ANY);
 
-            if ( game.GetResourcesManager().HasResource(imageName) && wxFileExists(game.GetResourcesManager().GetResource(imageName).GetAbsoluteFile(game)) )
-            {
-                thumbnail = wxBitmap( game.GetResourcesManager().GetResource(imageName).GetAbsoluteFile(game), wxBITMAP_TYPE_ANY);
+            wxImage thumbImage = thumbnail.ConvertToImage();
+            thumbnail = wxBitmap(thumbImage.Scale(24, 24));
 
-                wxImage thumbImage = thumbnail.ConvertToImage();
-                thumbnail = wxBitmap(thumbImage.Scale(24, 24));
-
-                return true;
-            }
+            return true;
         }
-    }
-    catch(...)
-    {
-        std::cout << "Error during thumbnail generation: Probably the project passed in argument is not a GD C++ Platform project" << std::endl;
     }
 
     return false;
@@ -184,7 +233,7 @@ void SpriteObject::EditObject( wxWindow* parent, gd::Project & project, gd::Main
 }
 
 
-std::map<std::string, std::string> SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance & position, Game & game, gd::Layout & scene)
+std::map<std::string, std::string> SpriteObject::GetInitialInstanceProperties(const gd::InitialInstance & position, gd::Project & project, gd::Layout & scene)
 {
     std::map<std::string, std::string> properties;
     properties[ToString(_("Animation"))] = position.floatInfos.find("animation") != position.floatInfos.end() ?
@@ -194,7 +243,7 @@ std::map<std::string, std::string> SpriteObject::GetInitialInstanceProperties(co
     return properties;
 }
 
-bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, Game & game, gd::Layout & scene)
+bool SpriteObject::UpdateInitialInstanceProperty(gd::InitialInstance & position, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & scene)
 {
     if ( name == _("Animation") ) position.floatInfos["animation"] = ToInt(value);
 
@@ -244,10 +293,7 @@ unsigned int RuntimeSpriteObject::GetNumberOfProperties() const
  */
 float RuntimeSpriteObject::GetDrawableX() const
 {
-    //FIXME (The not commented code is correct but not optimal)
-    //Bad placement when origine of sf::Sprite is changed ( for automatic Rotation for example )
-    //return GetCurrentSFMLSprite().GetPosition().x;
-    return X - GetCurrentSprite().GetOrigine().GetX() + (GetCurrentSFMLSprite().getLocalBounds().width)*(1-std::abs(scaleX))/2;
+    return X - GetCurrentSprite().GetOrigine().GetX()*scaleX;
 }
 
 /**
@@ -255,8 +301,7 @@ float RuntimeSpriteObject::GetDrawableX() const
  */
 float RuntimeSpriteObject::GetDrawableY() const
 {
-    //return GetCurrentSFMLSprite().GetPosition().y;
-    return Y - GetCurrentSprite().GetOrigine().GetY() + (GetCurrentSFMLSprite().getLocalBounds().height)*(1-std::abs(scaleY))/2;
+    return Y - GetCurrentSprite().GetOrigine().GetY()*scaleY;
 }
 
 /**
@@ -385,7 +430,7 @@ void RuntimeSpriteObject::CopyImageOnImageOfCurrentSprite(RuntimeScene & scene, 
     if ( yPosition < 0 || static_cast<unsigned>(yPosition) >= dest->texture.getSize().y) return;
 
     //Update texture and pixel perfect collision mask
-    dest->image.copy(scene.game->imageManager->GetSFMLTexture(imageName)->image, xPosition, yPosition, sf::IntRect(0, 0, 0, 0), useTransparency);
+    dest->image.copy(scene.game->GetImageManager()->GetSFMLTexture(imageName)->image, xPosition, yPosition, sf::IntRect(0, 0, 0, 0), useTransparency);
     dest->texture.loadFromImage(dest->image);
 }
 
@@ -432,41 +477,31 @@ void RuntimeSpriteObject::TurnTowardPosition(float Xposition, float Yposition)
  */
 void RuntimeSpriteObject::UpdateCurrentSprite() const
 {
+    bool multipleDirections = false;
     if ( currentAnimation >= animations.size() )
         ptrToCurrentSprite = &badSpriteDatas;
     else
     {
-        Animation & currentAnim = animations[currentAnimation].GetNonConst();
+        Animation & animation = animations[currentAnimation].GetNonConst();
+        multipleDirections = animation.useMultipleDirections;
 
-        if ( currentAnim.useMultipleDirections )
-        {
-            //Update sprite pointer
-            if ( currentDirection >= currentAnim.GetDirectionsNumber() || currentSprite >= currentAnim.GetDirection(currentDirection).GetSpriteCount() )
-                ptrToCurrentSprite = &badSpriteDatas;
-            else
-                ptrToCurrentSprite = &currentAnim.GetDirectionToModify( currentDirection ).GetSprite( currentSprite );
-
-            ptrToCurrentSprite->GetSFMLSprite().setPosition( X - ptrToCurrentSprite->GetOrigine().GetX() + (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().width)*(1-scaleX)/2,
-                                                             Y - ptrToCurrentSprite->GetOrigine().GetY() + (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().height)*(1-scaleY)/2 );
-        }
+        unsigned int directionIndex = multipleDirections ? currentDirection : 0;
+        if ( directionIndex >= animation.GetDirectionsNumber() )
+            ptrToCurrentSprite = &badSpriteDatas;
         else
         {
-            //Update sprite pointer
-            if ( currentAnim.HasNoDirections() || currentSprite >= currentAnim.GetDirection(0).GetSpriteCount() )
+            Direction & direction = animation.GetDirectionToModify(directionIndex);
+            if ( currentSprite >= direction.GetSpriteCount())
                 ptrToCurrentSprite = &badSpriteDatas;
             else
-                ptrToCurrentSprite = &currentAnim.GetDirectionToModify(0).GetSprite( currentSprite );
-
-            ptrToCurrentSprite->GetSFMLSprite().setPosition( X + ptrToCurrentSprite->GetCentre().GetX()*scaleX - ptrToCurrentSprite->GetOrigine().GetX()
-                                                               + (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().width)*(1-scaleX)/2,
-                                                             Y + ptrToCurrentSprite->GetCentre().GetY()*scaleY - ptrToCurrentSprite->GetOrigine().GetY()
-                                                               + (ptrToCurrentSprite->GetSFMLSprite().getLocalBounds().height)*(1-scaleY)/2);
-
-            ptrToCurrentSprite->GetSFMLSprite().setOrigin( ptrToCurrentSprite->GetCentre().GetX(), ptrToCurrentSprite->GetCentre().GetY() );
-            ptrToCurrentSprite->GetSFMLSprite().setRotation( currentAngle );
+                ptrToCurrentSprite = &direction.GetSprite(currentSprite);
         }
     }
 
+    ptrToCurrentSprite->GetSFMLSprite().setOrigin( ptrToCurrentSprite->GetCentre().GetX(), ptrToCurrentSprite->GetCentre().GetY() ); ;
+    ptrToCurrentSprite->GetSFMLSprite().setRotation( multipleDirections ? 0 : currentAngle );
+    ptrToCurrentSprite->GetSFMLSprite().setPosition( X + (ptrToCurrentSprite->GetCentre().GetX() - ptrToCurrentSprite->GetOrigine().GetX())*scaleX,
+                                                     Y + (ptrToCurrentSprite->GetCentre().GetY() - ptrToCurrentSprite->GetOrigine().GetY())*scaleY );
     ptrToCurrentSprite->GetSFMLSprite().setScale( scaleX, scaleY );
     ptrToCurrentSprite->GetSFMLSprite().setColor( sf::Color( colorR, colorV, colorB, opacity ) );
 

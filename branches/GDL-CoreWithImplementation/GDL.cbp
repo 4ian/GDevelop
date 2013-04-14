@@ -818,7 +818,6 @@
 		<Unit filename="GDL/ImageManager.h" />
 		<Unit filename="GDL/InitialInstancesContainer.cpp" />
 		<Unit filename="GDL/InitialInstancesContainer.h" />
-		<Unit filename="GDL/InvalidImage.h" />
 		<Unit filename="GDL/Layer.cpp" />
 		<Unit filename="GDL/Layer.h" />
 		<Unit filename="GDL/LinkEvent.cpp" />
@@ -896,9 +895,6 @@
 		<Unit filename="GDL/Variable.h" />
 		<Unit filename="GDL/VariableList.cpp" />
 		<Unit filename="GDL/VariableList.h" />
-		<Unit filename="GDL/Version.h" />
-		<Unit filename="GDL/VersionWrapper.cpp" />
-		<Unit filename="GDL/VersionWrapper.h" />
 		<Unit filename="GDL/WhileEvent.cpp" />
 		<Unit filename="GDL/WhileEvent.h" />
 		<Unit filename="GDL/XmlFilesHelper.cpp" />

@@ -3,6 +3,12 @@
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
+#if defined(GD_IDE_ONLY)
+#include "GDCore/PlatformDefinition/RessourcesLoader.h"
+
+#else
+//Use a custom implementation at Runtime.
+
 #ifndef RESSOURCESLOADER_H
 #define RESSOURCESLOADER_H
 
@@ -12,6 +18,9 @@ class Music;
 #include <SFML/Audio.hpp>
 #include <string>
 #undef LoadImage //Undef macro from windows.h
+
+namespace gd
+{
 
 /**
  * \brief Class that is used by games to load resources from an Game Develop Executable ( DatFile ) or from an external file.
@@ -25,40 +34,34 @@ public:
     /**
      * Load a SFML image
      */
-    sf::Texture * LoadSFMLTexture( const string & filename );
+    sf::Texture * LoadSFMLTexture( const std::string & filename );
 
     /**
      * Load a SFML Font
      */
-    sf::Font * LoadFont( const string & filename );
-
-    /**
-     * Load a GD Music
-     * The caller have to manage the pointer.
-     */
-    Music * LoadMusic( const string & filename );
+    sf::Font * LoadFont( const std::string & filename );
 
     /**
      * Load a SFML Sound Buffer
      */
-    sf::SoundBuffer LoadSoundBuffer( const string & filename );
+    sf::SoundBuffer LoadSoundBuffer( const std::string & filename );
 
     /**
      * Load a plain text file
      */
-    std::string LoadPlainText( const string & filename );
+    std::string LoadPlainText( const std::string & filename );
 
     /**
      * Get a buffer for file.
      * Be careful, the buffer will be invalided by any subsequent call to Load[Something]. Make
      * a copy of the buffer if you want it to stay alive longer.
      */
-    char* LoadBinaryFile( const string & filename );
+    char* LoadBinaryFile( const std::string & filename );
 
     /**
      * Get the size of a file
      */
-    long int GetBinaryFileSize( const string & filename);
+    long int GetBinaryFileSize( const std::string & filename);
 
     /**
      * Check if a file is present inside resource file.
@@ -99,5 +102,8 @@ private:
     static RessourcesLoader *_singleton;
 };
 
+}
+
 #endif // RESSOURCESLOADER_H
 
+#endif

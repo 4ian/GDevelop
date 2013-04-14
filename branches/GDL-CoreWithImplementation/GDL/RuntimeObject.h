@@ -1,31 +1,32 @@
+/** \file
+ *  Game Develop
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ */
 #ifndef RUNTIMEOBJECT_H
 #define RUNTIMEOBJECT_H
 
-#include "GDL/Force.h" //This include file must be placed first. Could be removed if Force is removed one day.
 #include <string>
 #include <vector>
 #include <map>
-#include "GDL/VariableList.h"
-namespace sf {class RenderTarget;}
-namespace sf {class Shader;}
+#include "GDCore/PlatformDefinition/VariablesContainer.h"
+#include "GDL/Force.h"
+namespace gd { class Automatism; }
 namespace gd { class InitialInstance; }
+namespace gd { class Object; }
+namespace sf { class RenderTarget; }
 class Polygon2d;
 class RuntimeScene;
-namespace gd { class Object; }
-class ImageManager;
-class TiXmlElement;
-namespace gd { class Automatism; }; typedef gd::Automatism Automatism;
 
 /**
  * \brief A RuntimeObject is something displayed on the scene.
  *
  * Games don't directly use this class: Extensions can provide object by deriving from this class, and redefining functions:
- * - An important function is Object::Draw. It is called to render the object on the scene. This function take in parameter a reference to the target where render the object.
- * - Objects must be able to return their size, by redefining Object::GetWidth and Object::GetHeight
- * - Objects must be able to return the position where they have precisely drawn ( for example, Sprite can draw image not exactly at the position of the object, if the origine point was moved ). They must also be able to return the position of their center. See Object::GetDrawableX, Object::GetDrawableY and Object::GetCenterX, Object::GetCenterY.
- * - If objects need to load ressources ( for example textures at the loading ), it must be done inside the constructor creating the object from a gd::Object.
- * - When objects are placed at the start of the scene, scenes call Object::ExtraInitializationFromInitialInstance, passing a gd::InitialInstance object in parameter ( containing information like the position where place the object ). Note that common information were already changed ( Position, angle, layer... ). You just need to setup the object with the information related to your object.
- * - Finally, objects can expose debugging features: Object::GetPropertyForDebugger, Object::ChangeProperty and Object::GetNumberOfProperties
+ * - An important function is RuntimeObject::Draw. It is called to render the object on the scene. This function take in parameter a reference to the target where render the object.
+ * - RuntimeObjects must be able to return their size, by redefining RuntimeObject::GetWidth and RuntimeObject::GetHeight
+ * - RuntimeObjects must be able to return the position where they have precisely drawn ( for example, Sprite can draw image not exactly at the position of the object, if the origin point was moved ). They must also be able to return the position of their center. See RuntimeObject::GetDrawableX, RuntimeObject::GetDrawableY and RuntimeObject::GetCenterX, RuntimeObject::GetCenterY.
+ * - If objects need to load ressources ( for example textures at the loading ), it must be done inside the constructor creating the object from a gd::RuntimeObject.
+ * - When objects are placed at the start of the scene, scenes call RuntimeObject::ExtraInitializationFromInitialInstance, passing a gd::InitialInstance object in parameter ( containing information like the position where place the object ). Note that common information were already changed ( Position, angle, layer... ). You just need to setup the object with the information related to your object.
+ * - Finally, objects can expose debugging features: RuntimeObject::GetPropertyForDebugger, RuntimeObject::ChangeProperty and RuntimeObject::GetNumberOfProperties
  *
  * See also gd::Object which is used to store the initial objects before they are instancied on the scene.
  *
@@ -122,12 +123,12 @@ public:
     /**
      * Only used by GD events generated code
      */
-    Automatism* GetAutomatismRawPointer(const std::string & name);
+    gd::Automatism* GetAutomatismRawPointer(const std::string & name);
 
     /**
      * Only used by GD events generated code
      */
-    Automatism* GetAutomatismRawPointer(const std::string & name) const;
+    gd::Automatism* GetAutomatismRawPointer(const std::string & name) const;
 
     /**
      * Return true if the object has the automatism with the specified name.
@@ -186,7 +187,9 @@ public:
     inline bool IsOnLayer(const std::string & layer_) const { return layer == layer_; }
 
     /**
-     * Get object hit box(es)
+     * Get object hitbox(es)
+     *
+     * \note Default implementation returns a basic bounding box, according to the object width/height and angle.
      */
     virtual std::vector<Polygon2d> GetHitBoxes() const;
 
@@ -260,25 +263,25 @@ public:
      * Get the real X position where is renderer the object.
      * Used by the IDE to draw selection box for instance.
      */
-    virtual float GetDrawableX() const {return 0;};
+    virtual float GetDrawableX() const {return GetX();};
 
     /**
      * Get the real Y position where is renderer the object.
      * Used by the IDE to draw selection box for instance.
      */
-    virtual float GetDrawableY() const {return 0;};
+    virtual float GetDrawableY() const {return GetY();};
 
     /**
      * Get the X position of the center.
      * Used by actions that move object for instance.
      */
-    virtual float GetCenterX() const {return 0;};
+    virtual float GetCenterX() const {return GetWidth()/2;};
 
     /**
      * Get the Y position of the center.
      * Used by actions that move object for instance.
      */
-    virtual float GetCenterY() const {return 0;};
+    virtual float GetCenterY() const {return GetHeight()/2;};
 
     ///@}
 
@@ -389,8 +392,8 @@ protected:
     int                                                     zOrder; ///<Z order on the scene, to choose if an object is displayed before another object.
     bool                                                    hidden; ///<True to prevent the object from being rendered.
     std::string                                             layer; ///<Name of the layer on which the object is.
-    std::map<std::string, Automatism* >                     automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
-    gd::VariablesContainer                                            objectVariables; ///<List of the variables of the object
+    std::map<std::string, gd::Automatism* >                 automatisms; ///<Contains all automatisms of the object. Automatisms are the ownership of the object
+    gd::VariablesContainer                                  objectVariables; ///<List of the variables of the object
 
     /**
      * Initialize object using another object. Used by copy-ctor and assign-op.

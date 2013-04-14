@@ -231,7 +231,7 @@ const std::string & GD_API IndexGetGlobalVariableString( const RuntimeScene & sc
 void GD_API SetWindowIcon(RuntimeScene & scene, const std::string & imageName)
 {
     //Retrieve the image
-    boost::shared_ptr<SFMLTextureWrapper> image = scene.game->imageManager->GetSFMLTexture(imageName);
+    boost::shared_ptr<SFMLTextureWrapper> image = scene.game->GetImageManager()->GetSFMLTexture(imageName);
     if ( image == boost::shared_ptr<SFMLTextureWrapper>() )
         return;
 

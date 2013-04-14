@@ -20,12 +20,14 @@ namespace gd { class LayoutEditorCanvasOptions; }
 class DebuggerGUI;
 class ProfileDlg;
 class RenderDialog;
+class InstancesRenderer;
 
 /**
  * \brief The new scene editor canvas
  */
 class GD_API SceneEditorCanvas : public gd::LayoutEditorCanvas, public sf::RenderWindow
 {
+    friend class InstancesRenderer;
 public:
     SceneEditorCanvas(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, gd::InitialInstancesContainer & instances_, gd::LayoutEditorCanvasOptions & settings_, gd::MainFrameWrapper & mainFrameWrapper_);
     virtual ~SceneEditorCanvas() {};
@@ -82,8 +84,6 @@ public:
 
     virtual double GetWidthOfInitialInstance(gd::InitialInstance & instance) const;
     virtual double GetHeightOfInitialInstance(gd::InitialInstance & instance) const;
-    virtual double GetRealXPositionOfInitialInstance(gd::InitialInstance & instance) const;
-    virtual double GetRealYPositionOfInitialInstance(gd::InitialInstance & instance) const;
 
     void UpdateViewAccordingToZoomFactor();
 
@@ -131,9 +131,6 @@ private:
     virtual void OnLockSelected( wxCommandEvent & event );
     virtual void OnUnLockSelected( wxCommandEvent & event );
 
-    virtual void OnInitialInstanceMoved(gd::InitialInstance & instance);
-    virtual void OnInitialInstanceAdded(gd::InitialInstance & instance);
-    virtual void OnInitialInstanceDeleted(gd::InitialInstance & instance);
     virtual void OnGuiElementPressed(const gd::LayoutEditorCanvasGuiElement & guiElement);
     virtual void OnGuiElementHovered(const gd::LayoutEditorCanvasGuiElement & guiElement);
     virtual void OnGuiElementReleased(const gd::LayoutEditorCanvasGuiElement & guiElement);
@@ -240,7 +237,7 @@ private:
      * Tool function returning the object used to display during the \a instance when editing.
      * Can return a null pointer if the object is not found ( even if it should not happen normally ).
      */
-    boost::shared_ptr<RuntimeObject> GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const;
+    gd::Object * GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const;
 
     /**
      * Update the mouse according to the selected button

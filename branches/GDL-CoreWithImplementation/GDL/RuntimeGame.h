@@ -23,21 +23,20 @@ class ShaderManager;
  */
 class GD_API RuntimeGame : public Game
 {
-    public:
-        /**
-         * Create a new RuntimeGame, using a new Image manager.
-         */
-        RuntimeGame();
-        RuntimeGame(const RuntimeGame&);
-        RuntimeGame& operator=(const RuntimeGame & rhs);
-        virtual ~RuntimeGame() {};
+public:
+    /**
+     * Create a new RuntimeGame, using a new Image manager.
+     */
+    RuntimeGame();
+    RuntimeGame(const RuntimeGame&);
+    RuntimeGame& operator=(const RuntimeGame & rhs);
+    virtual ~RuntimeGame() {};
 
-        boost::shared_ptr<ImageManager> imageManager; ///< Image manager is accessed thanks to a (smart) ptr as it can be shared across (Runtime) games
-        boost::shared_ptr<ShaderManager> shaderManager; ///< Shader manager is accessed thanks to a (smart) ptr as it can be shared across (Runtime) games
+    boost::shared_ptr<ShaderManager> shaderManager; ///< Shader manager is accessed thanks to a (smart) ptr as it can be shared across (Runtime) games
 
-    private:
+private:
 
-        void Init(const RuntimeGame & runtimeGame);
+    void Init(const RuntimeGame & runtimeGame);
 };
 
 #endif // RUNTIMEGAME_H

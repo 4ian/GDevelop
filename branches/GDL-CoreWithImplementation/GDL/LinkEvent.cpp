@@ -13,9 +13,9 @@
 #include "GDL/CommonTools.h"
 #include "GDL/EmptyEvent.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/EventsCodeNameMangler.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
 #include "GDL/IDE/DependenciesAnalyzer.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/RuntimeScene.h"
@@ -70,23 +70,23 @@ void LinkEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventEle
     else { cout <<"Les informations concernant le nom de la scène liée."; }
 }
 
-void LinkEvent::Preprocess(Game & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
+void LinkEvent::Preprocess(gd::Project & project, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList)
 {
     if ( IsDisabled() ) return;
 
     //Finding what to link to.
     const vector< gd::BaseEventSPtr > * eventsToInclude = NULL;
     gd::ExternalEvents * linkedExternalEvents = NULL;
-    if ( game.HasExternalEventsNamed(GetTarget()) )
+    if ( project.HasExternalEventsNamed(GetTarget()) )
     {
-        linkedExternalEvents = &game.GetExternalEvents(GetTarget());
+        linkedExternalEvents = &project.GetExternalEvents(GetTarget());
         std::cout << "linkedExternalEvents: " << linkedExternalEvents->GetName();
-        eventsToInclude = &game.GetExternalEvents(GetTarget()).GetEvents();
+        eventsToInclude = &project.GetExternalEvents(GetTarget()).GetEvents();
     }
-    else if ( game.HasLayoutNamed(GetTarget()) ) eventsToInclude = &game.GetLayout(GetTarget()).GetEvents();
+    else if ( project.HasLayoutNamed(GetTarget()) ) eventsToInclude = &project.GetLayout(GetTarget()).GetEvents();
 
     //Check if the link refers to external events compiled separately
-    DependenciesAnalyzer analyzer(game);
+    DependenciesAnalyzer analyzer(project);
     if (linkedExternalEvents != NULL &&
         analyzer.ExternalEventsCanBeCompiledForAScene(linkedExternalEvents->GetName()) == scene.GetName()) //Check if the link refers to events
     {                                                                                                      //compiled separately.
@@ -148,7 +148,7 @@ void LinkEvent::Preprocess(Game & game, gd::Layout & scene, std::vector < gd::Ba
     linkWasInvalid = false;
 }
 
-std::string LinkEvent::GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+std::string LinkEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
 {
     //This function is called only when the link refers to external events compiled separately. ( See LinkEvent::Preprocess )
     //We must generate code to call these external events.
@@ -162,9 +162,9 @@ std::string LinkEvent::GenerateEventCode(Game & game, gd::Layout & scene, Events
     return outputCode;
 }
 
-gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game & game, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game & project, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
-    EditLink dialog(parent_, *this, game);
+    EditLink dialog(parent_, *this, project);
     if ( dialog.ShowModal() == 0 ) return Cancelled;
 
     return ChangesMade;
@@ -173,11 +173,11 @@ gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game 
 /**
  * Render the event in the bitmap
  */
-void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
 {
     dc.SetBrush( wxBrush( wxColour( 255, 255, 255 ) ) );
     dc.SetPen( wxPen( wxColour( 0, 0, 0 ), 1) );
-    wxRect rect(x+1, y, width, GetRenderedHeight(width)-2);
+    wxRect rect(x+1, y, width, GetRenderedHeight(width, platform)-2);
     dc.DrawRectangle(rect);
 
     dc.DrawBitmap( wxBitmap( "res/link48.png", wxBITMAP_TYPE_ANY ), x+4, y + 4, true);
@@ -198,7 +198,7 @@ void LinkEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditor
 /**
  * Precompute height for the link
  */
-unsigned int LinkEvent::GetRenderedHeight(unsigned int width) const
+unsigned int LinkEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
     if ( eventHeightNeedUpdate )
     {

@@ -18,10 +18,10 @@
 #include "GDL/CppCodeEvent.h"
 #include "GDL/LinkEvent.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/Events/EventsCodeNameMangler.h"
-#include "GDL/Events/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
+#include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDL/ExtensionBase.h"
 
 using namespace std;
@@ -45,7 +45,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const gd::Layout & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
                 //Conditions code
                 std::string conditionsCode;
@@ -57,10 +57,10 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 {
                     //Each condition inherits the context from the "Or" condition:
                     //For example, two sub conditions using an object called "MyObject" will both have to declare a "MyObject" object list.
-                    EventsCodeGenerationContext context;
+                    gd::EventsCodeGenerationContext context;
                     context.InheritsFrom(parentContext);
 
-                    string conditionCode = codeGenerator.GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
+                    string conditionCode = codeGenerator.GenerateConditionCode(scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", context);
 
                     conditionsCode += "{\n";
 
@@ -130,11 +130,11 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const gd::Layout & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
                 string outputCode;
 
-                outputCode += codeGenerator.GenerateConditionsListCode(game, scene, instruction.GetSubInstructions(), parentContext);
+                outputCode += codeGenerator.GenerateConditionsListCode(scene, instruction.GetSubInstructions(), parentContext);
 
                 std::string ifPredicat = "true";
                 for (unsigned int i = 0;i<instruction.GetSubInstructions().size();++i)
@@ -162,7 +162,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const gd::Layout & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
             {
                 std::vector<gd::Instruction> & conditions = instruction.GetSubInstructions();
                 string outputCode;
@@ -172,7 +172,7 @@ CommonInstructionsExtension::CommonInstructionsExtension()
 
                 for (unsigned int cId =0;cId < conditions.size();++cId)
                 {
-                    string conditionCode = codeGenerator.GenerateConditionCode(game, scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", parentContext);
+                    string conditionCode = codeGenerator.GenerateConditionCode(scene, conditions[cId], "condition"+ToString(cId)+"IsTrue", parentContext);
 
                     if ( !conditions[cId].GetType().empty() )
                     {

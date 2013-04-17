@@ -14,10 +14,10 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml/tinyxml.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/ExpressionsCodeGeneration.h"
-#include "GDL/Events/EventsCodeNameMangler.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDL/IDE/Dialogs/EditCppCodeEvent.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
@@ -26,7 +26,7 @@
 #include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDL/XmlMacros.h"
 
-std::string CppCodeEvent::GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+std::string CppCodeEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
 {
     //Note: The associated source file is compiled separately ( it is recognized as a Source File dependency by
     //DependenciesAnalyzer and compiled by CodeCompilationHelpers);
@@ -41,11 +41,12 @@ std::string CppCodeEvent::GenerateEventCode(Game & game, gd::Layout & scene, Eve
     //Prepare objects list if needed
     if ( passObjectListAsParameter )
     {
-        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPassAsParameter));
+        const gd::Project & project = codeGenerator.GetProject();
+        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(project.GetObjectGroups().begin(), project.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPassAsParameter));
         vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPassAsParameter));
 
         std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
-        if ( globalGroup != game.GetObjectGroups().end() )
+        if ( globalGroup != project.GetObjectGroups().end() )
             realObjects = (*globalGroup).GetAllObjectsNames();
         else if ( sceneGroup != scene.GetObjectGroups().end() )
             realObjects = (*sceneGroup).GetAllObjectsNames();
@@ -69,7 +70,7 @@ std::string CppCodeEvent::GenerateEventCode(Game & game, gd::Layout & scene, Eve
     return outputCode;
 }
 
-void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(Game & parentGame) const
+void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(gd::Project & parentGame) const
 {
     std::string outputFile(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(this)+"SourceFile.cpp");
 
@@ -137,13 +138,13 @@ std::string CppCodeEvent::GenerateAssociatedFileCode() const
 /**
  * Render the event in the bitmap
  */
-void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
 {
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     const int titleTextHeight = 20;
 
     //Draw header rectangle
-    wxRect headerRect(x, y, width, GetRenderedHeight(width));
+    wxRect headerRect(x, y, width, GetRenderedHeight(width, platform));
     renderingHelper->DrawNiceRectangle(dc, headerRect);
 
     //Header
@@ -157,12 +158,12 @@ void CppCodeEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
         dc.SetBrush(renderingHelper->GetActionsRectangleFillBrush());
         dc.SetPen(renderingHelper->GetActionsRectangleOutlinePen());
 
-        dc.DrawRectangle(wxRect(x + 4, y + 3 + titleTextHeight + 2, width-8, GetRenderedHeight(width)-(3 + titleTextHeight + 5)));
-        dc.DrawLabel( inlineCode, wxNullBitmap, wxRect(x + 4, y + 3 + titleTextHeight + 4, width-2, GetRenderedHeight(width)));
+        dc.DrawRectangle(wxRect(x + 4, y + 3 + titleTextHeight + 2, width-8, GetRenderedHeight(width, platform)-(3 + titleTextHeight + 5)));
+        dc.DrawLabel( inlineCode, wxNullBitmap, wxRect(x + 4, y + 3 + titleTextHeight + 4, width-2, GetRenderedHeight(width, platform)));
     }
 }
 
-unsigned int CppCodeEvent::GetRenderedHeight(unsigned int width) const
+unsigned int CppCodeEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
     if ( eventHeightNeedUpdate )
     {

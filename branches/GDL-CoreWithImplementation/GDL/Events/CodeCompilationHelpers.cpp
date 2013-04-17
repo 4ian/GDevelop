@@ -20,6 +20,7 @@
 #include "GDL/ExternalEvents.h"
 #include "GDCore/Events/Event.h"
 #include "GDCore/IDE/ArbitraryResourceWorker.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDL/Events/EventsCodeGenerator.h"
 #include "GDL/CodeExecutionEngine.h"
 #include "GDL/IDE/DependenciesAnalyzer.h"
@@ -273,10 +274,10 @@ bool EventsCodeCompilerPreWork::Execute()
     //Generate the code
     cout << "Generating C++ code...\n";
     if ( sceneCopy.GetProfiler() != NULL ) sceneCopy.GetProfiler()->profileEventsInformation.clear();
-    EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
-    EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
+    ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
+    gd::EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
 
-    std::string eventsOutput = EventsCodeGenerator::GenerateSceneEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.GetEvents(), false /*Compilation for edittime*/);
+    std::string eventsOutput = ::EventsCodeGenerator::GenerateSceneEventsCompleteCode(game->GetPlatform(), gameCopy, sceneCopy, sceneCopy.GetEvents(), false /*Compilation for edittime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(scene)+"EventsSource.cpp").c_str() );
     myfile << eventsOutput;
@@ -314,10 +315,10 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
 
     //Generate the code
     cout << "Generating C++ code...\n";
-    EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
-    EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
+    ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
+    gd::EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
 
-    std::string eventsOutput = EventsCodeGenerator::GenerateSceneEventsCompleteCode(gameCopy, sceneCopy, sceneCopy.GetEvents(), true /*Compilation for runtime*/);
+    std::string eventsOutput = ::EventsCodeGenerator::GenerateSceneEventsCompleteCode(game->GetPlatform(), gameCopy, sceneCopy, sceneCopy.GetEvents(), true /*Compilation for runtime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(scene)+"RuntimeEventsSource.cpp").c_str() );
     myfile << eventsOutput;
@@ -416,10 +417,10 @@ bool ExternalEventsCodeCompilerPreWork::Execute()
     //Generate the code
     cout << "Generating C++ code...\n";
     if ( sceneCopy.GetProfiler() != NULL ) sceneCopy.GetProfiler()->profileEventsInformation.clear();
-    EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
-    EventsCodeGenerator::DeleteUselessEvents(externalEvents->GetEvents());
+    ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
+    gd::EventsCodeGenerator::DeleteUselessEvents(externalEvents->GetEvents());
 
-    std::string eventsOutput = EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, *externalEvents, false /*Compilation for edittime*/);
+    std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(game->GetPlatform(), gameCopy, *externalEvents, false /*Compilation for edittime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(externalEvents)+"EventsSource.cpp").c_str() );
     myfile << eventsOutput;
@@ -492,10 +493,10 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
     //Generate the code
     cout << "Generating C++ code...\n";
     if ( sceneCopy.GetProfiler() != NULL ) sceneCopy.GetProfiler()->profileEventsInformation.clear();
-    EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
-    EventsCodeGenerator::DeleteUselessEvents(externalEvents->GetEvents());
+    ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
+    gd::EventsCodeGenerator::DeleteUselessEvents(externalEvents->GetEvents());
 
-    std::string eventsOutput = EventsCodeGenerator::GenerateExternalEventsCompleteCode(gameCopy, *externalEvents, true /*Compilation for runtime*/);
+    std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(game->GetPlatform(), gameCopy, *externalEvents, true /*Compilation for runtime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(externalEvents)+"RuntimeEventsSource.cpp").c_str() );
     myfile << eventsOutput;

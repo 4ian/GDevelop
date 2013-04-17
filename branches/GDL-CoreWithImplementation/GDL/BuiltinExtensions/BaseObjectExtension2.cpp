@@ -1,8 +1,8 @@
 #include "GDL/BuiltinExtensions/BaseObjectExtension.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/Events/EventsCodeNameMangler.h"
-#include "GDL/Events/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
+#include "GDCore/Events/ExpressionsCodeGeneration.h"
 
 void BaseObjectExtension::DeclareExtensionSecondPart()
 {

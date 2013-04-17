@@ -15,10 +15,10 @@
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/ExpressionsCodeGeneration.h"
-#include "GDL/Events/EventsCodeNameMangler.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDL/IDE/Dialogs/EditForEachEvent.h"
 
 ForEachEvent::ForEachEvent() :
@@ -28,9 +28,11 @@ objectsToPickSelected(false)
 {
 }
 
-std::string ForEachEvent::GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+std::string ForEachEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
 {
     std::string outputCode;
+
+    const gd::Project & game = codeGenerator.GetProject();
 
     vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(game.GetObjectGroups().begin(), game.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectsToPick.GetPlainString()));
     vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectsToPick.GetPlainString()));
@@ -49,16 +51,16 @@ std::string ForEachEvent::GenerateEventCode(Game & game, gd::Layout & scene, Eve
         parentContext.ObjectsListNeeded(realObjects[i]);
 
     //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
-    EventsCodeGenerationContext context;
+    gd::EventsCodeGenerationContext context;
     context.InheritsFrom(parentContext);
 
     //Prepare conditions/actions codes
-    std::string conditionsCode = codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
-    std::string actionsCode = codeGenerator.GenerateActionsListCode(game, scene, actions, context);
+    std::string conditionsCode = codeGenerator.GenerateConditionsListCode(scene, conditions, context);
+    std::string actionsCode = codeGenerator.GenerateActionsListCode(scene, actions, context);
     std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
     //Prepare object declaration and sub events
-    std::string subevents = codeGenerator.GenerateEventsListCode(game, scene, events, context);
+    std::string subevents = codeGenerator.GenerateEventsListCode(scene, events, context);
 
     std::string objectDeclaration = context.GenerateObjectsDeclarationCode()+"\n";
 
@@ -210,7 +212,7 @@ void ForEachEvent::LoadFromXml(gd::Project & project, const TiXmlElement * event
 /**
  * Render the event in the bitmap
  */
-void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
 {
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
@@ -226,21 +228,21 @@ void ForEachEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
     dc.DrawText( _("For each object") + " " + objectsToPick.GetPlainString() + _(", repeat :"), x + 4, y + 3 );
 
     //Draw conditions rectangle
-    wxRect rect(x, y+forEachTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-forEachTextHeight);
+    wxRect rect(x, y+forEachTextHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width, platform)-forEachTextHeight);
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     //Draw actions and conditions
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+forEachTextHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, *ExtensionsManager::GetInstance());
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, platform);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+forEachTextHeight+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, platform);
 }
 
-unsigned int ForEachEvent::GetRenderedHeight(unsigned int width) const
+unsigned int ForEachEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
     if ( eventHeightNeedUpdate )
     {
@@ -249,8 +251,8 @@ unsigned int ForEachEvent::GetRenderedHeight(unsigned int width) const
         const int forEachTextHeight = 20;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, *ExtensionsManager::GetInstance());
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, platform);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, platform);
 
         renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + forEachTextHeight)+border*2;
         eventHeightNeedUpdate = false;

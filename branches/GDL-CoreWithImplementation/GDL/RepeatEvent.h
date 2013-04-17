@@ -29,7 +29,7 @@ class RepeatEvent : public gd::BaseEvent
         virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new RepeatEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
+        virtual std::string GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -58,12 +58,12 @@ class RepeatEvent : public gd::BaseEvent
         /**
          * Called by event editor to draw the event.
          */
-        virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+        virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform);
 
         /**
          * Must return the height of the event when rendered
          */
-        virtual unsigned int GetRenderedHeight(unsigned int width) const;
+        virtual unsigned int GetRenderedHeight(unsigned int width, const gd::Platform & platform) const;
 
         /**
          * Called when the user want to edit the event

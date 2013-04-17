@@ -522,21 +522,6 @@ public:
     AutomatismInfo();
     virtual ~AutomatismInfo();
 
-#if defined(GD_IDE_ONLY)
-    /**
-     * Set that the automatism is located in a specific include file
-     */
-    AutomatismInfo & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
-
-    std::map<std::string, gd::InstructionMetadata > conditionsInfos;
-    std::map<std::string, gd::InstructionMetadata > actionsInfos;
-    std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
-    std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
-
-    std::string optionalIncludeFile;
-    std::string cppClassName;
-#endif
-
     boost::shared_ptr<Automatism> instance;
     boost::shared_ptr<gd::AutomatismsSharedData> sharedDatasInstance;
 };
@@ -554,20 +539,6 @@ public:
     ExtensionObjectInfos();
     virtual ~ExtensionObjectInfos() {};
 
-#if defined(GD_IDE_ONLY)
-    /**
-     * Set that the object is located in a specific include file
-     */
-    ExtensionObjectInfos & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
-
-    std::map<std::string, gd::InstructionMetadata > conditionsInfos;
-    std::map<std::string, gd::InstructionMetadata > actionsInfos;
-    std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
-    std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
-
-    std::string optionalIncludeFile;
-    std::string cppClassName;
-#endif
 
     DestroyFunPtr destroyFunPtr;
     CreateFunPtr createFunPtr;

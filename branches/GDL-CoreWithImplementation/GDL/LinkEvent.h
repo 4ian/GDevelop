@@ -29,18 +29,18 @@ public:
     virtual void LoadFromXml(gd::Project & project, const TiXmlElement * eventElem);
 
     virtual bool IsExecutable() const { return true; };
-    virtual void Preprocess(Game & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
-    virtual std::string GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext);
+    virtual void Preprocess(gd::Project & project, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
+    virtual std::string GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext);
 
     /**
      * Called by event editor to draw the event.
      */
-    virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+    virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform);
 
     /**
      * Must return the height of the event when rendered
      */
-    virtual unsigned int GetRenderedHeight(unsigned int width) const;
+    virtual unsigned int GetRenderedHeight(unsigned int width, const gd::Platform & platform) const;
 
     virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 

@@ -7,9 +7,6 @@
 
 #ifndef PROFILEEVENT_H
 #define PROFILEEVENT_H
-#include <wx/bitmap.h>
-#include <wx/dcbuffer.h>
-#include <wx/html/htmprint.h>
 #include "GDCore/Events/Event.h"
 #include "GDL/profile.h"
 
@@ -29,7 +26,7 @@ class GD_API ProfileEvent : public gd::BaseEvent
         void SetPreviousProfileEvent( boost::shared_ptr<ProfileEvent> previousProfileEvent_ ) { previousProfileEvent = previousProfileEvent_; }
 
         virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context);
+        virtual std::string GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
         unsigned int index;
 

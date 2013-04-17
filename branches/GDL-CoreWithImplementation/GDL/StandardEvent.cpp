@@ -14,19 +14,19 @@
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
 
 StandardEvent::StandardEvent() :
 BaseEvent()
 {
 }
 
-std::string StandardEvent::GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+std::string StandardEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
 {
     std::string outputCode;
 
-    outputCode += codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
+    outputCode += codeGenerator.GenerateConditionsListCode(scene, conditions, context);
 
     std::string ifPredicat;
     for (unsigned int i = 0;i<conditions.size();++i)
@@ -37,11 +37,11 @@ std::string StandardEvent::GenerateEventCode(Game & game, gd::Layout & scene, Ev
 
     if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
     outputCode += "{\n";
-    outputCode += codeGenerator.GenerateActionsListCode(game, scene, actions, context);
+    outputCode += codeGenerator.GenerateActionsListCode(scene, actions, context);
     if ( !events.empty() ) //Sub events
     {
         outputCode += "\n{\n";
-        outputCode += codeGenerator.GenerateEventsListCode(game, scene, events, context);
+        outputCode += codeGenerator.GenerateEventsListCode(scene, events, context);
         outputCode += "}\n";
     }
 
@@ -113,28 +113,28 @@ void StandardEvent::LoadFromXml(gd::Project & project, const TiXmlElement * even
 /**
  * Render the event in the bitmap
  */
-void StandardEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+void StandardEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
 {
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
 
     //Draw event rectangle
-    wxRect rect(x, y, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width));
+    wxRect rect(x, y, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width, platform));
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, *ExtensionsManager::GetInstance());
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, platform);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, platform);
 
     //Make sure that Render is rendering an event with the same height as GetRenderedHeight : Use same values for border and similar calls to compute heights
 }
 
-unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
+unsigned int StandardEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
     if ( eventHeightNeedUpdate )
     {
@@ -142,8 +142,8 @@ unsigned int StandardEvent::GetRenderedHeight(unsigned int width) const
         int border = renderingHelper->instructionsListBorder;
 
         //Get maximum height needed
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border*2, platform);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, platform);
 
         renderedHeight = (conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight)+border*2;
         eventHeightNeedUpdate = false;

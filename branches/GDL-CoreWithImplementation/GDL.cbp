@@ -741,14 +741,10 @@
 		<Unit filename="GDL/DynamicLibrariesTools.h" />
 		<Unit filename="GDL/Events/CodeCompilationHelpers.cpp" />
 		<Unit filename="GDL/Events/CodeCompilationHelpers.h" />
-		<Unit filename="GDL/Events/EventsCodeGenerationContext.cpp" />
-		<Unit filename="GDL/Events/EventsCodeGenerationContext.h" />
 		<Unit filename="GDL/Events/EventsCodeGenerator.cpp" />
 		<Unit filename="GDL/Events/EventsCodeGenerator.h" />
 		<Unit filename="GDL/Events/EventsCodeNameMangler.cpp" />
 		<Unit filename="GDL/Events/EventsCodeNameMangler.h" />
-		<Unit filename="GDL/Events/ExpressionsCodeGeneration.cpp" />
-		<Unit filename="GDL/Events/ExpressionsCodeGeneration.h" />
 		<Unit filename="GDL/ExtensionBase.cpp" />
 		<Unit filename="GDL/ExtensionBase.h" />
 		<Unit filename="GDL/ExtensionsLoader.cpp" />

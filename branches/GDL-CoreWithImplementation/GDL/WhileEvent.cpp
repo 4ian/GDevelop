@@ -11,30 +11,30 @@
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/OpenSaveGame.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/Events/Serialization.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDL/ExtensionsManager.h"
 
-std::string WhileEvent::GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+std::string WhileEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
 {
     std::string outputCode;
 
     //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
-    EventsCodeGenerationContext context;
+    gd::EventsCodeGenerationContext context;
     context.InheritsFrom(parentContext);
     if ( infiniteLoopWarning && !codeGenerator.GenerateCodeForRuntime() ) codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     //Prepare codes
-    std::string whileConditionsStr = codeGenerator.GenerateConditionsListCode(game, scene, whileConditions, context);
+    std::string whileConditionsStr = codeGenerator.GenerateConditionsListCode(scene, whileConditions, context);
     std::string whileIfPredicat = "true"; for (unsigned int i = 0;i<whileConditions.size();++i) whileIfPredicat += " && condition"+ToString(i)+"IsTrue";
-    std::string conditionsCode = codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
-    std::string actionsCode = codeGenerator.GenerateActionsListCode(game, scene, actions, context);
+    std::string conditionsCode = codeGenerator.GenerateConditionsListCode(scene, conditions, context);
+    std::string actionsCode = codeGenerator.GenerateActionsListCode(scene, actions, context);
     std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
 
     //Write final code
@@ -56,7 +56,7 @@ std::string WhileEvent::GenerateEventCode(Game & game, gd::Layout & scene, Event
     outputCode += "{\n";
     outputCode += actionsCode;
     outputCode += "\n{ //Subevents: \n";
-    outputCode += codeGenerator.GenerateEventsListCode(game, scene, events, context);
+    outputCode += codeGenerator.GenerateEventsListCode(scene, events, context);
     outputCode += "} //Subevents end.\n";
     outputCode += "}\n";
     outputCode += "} else stopDoWhile = true; \n";
@@ -148,14 +148,14 @@ void WhileEvent::LoadFromXml(gd::Project & project, const TiXmlElement * eventEl
 /**
  * Render the event in the bitmap
  */
-void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
 {
     gd::EventsRenderingHelper * renderingHelper = gd::EventsRenderingHelper::GetInstance();
     int border = renderingHelper->instructionsListBorder;
     const int repeatHeight = 20;
 
     //Draw header rectangle
-    int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, *ExtensionsManager::GetInstance())+border*2;
+    int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, platform)+border*2;
     if (!infiniteLoopWarning && whileConditionsHeight < 32 ) whileConditionsHeight = 32;
     wxRect headerRect(x, y, width, whileConditionsHeight+repeatHeight);
     renderingHelper->DrawNiceRectangle(dc, headerRect);
@@ -173,7 +173,7 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     }
 
     //Draw "while conditions"
-    renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
+    renderingHelper->DrawConditionsList(whileConditions, dc, x+80+border, y+border, width-80-border*2, this, areas, selection, platform);
 
     dc.SetFont( renderingHelper->GetNiceFont().Bold()  );
     dc.SetTextForeground(wxColour(0,0,0));
@@ -181,20 +181,20 @@ void WhileEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdito
     whileConditionsHeight += repeatHeight;
 
     //Draw conditions rectangle
-    wxRect rect(x, y+whileConditionsHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width)-whileConditionsHeight);
+    wxRect rect(x, y+whileConditionsHeight, renderingHelper->GetConditionsColumnWidth()+border, GetRenderedHeight(width, platform)-whileConditionsHeight);
     renderingHelper->DrawNiceRectangle(dc, rect);
 
     renderingHelper->DrawConditionsList(conditions, dc,
                                         x+border,
                                         y+whileConditionsHeight+border,
-                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, *ExtensionsManager::GetInstance());
+                                        renderingHelper->GetConditionsColumnWidth()-border, this, areas, selection, platform);
     renderingHelper->DrawActionsList(actions, dc,
                                      x+renderingHelper->GetConditionsColumnWidth()+border,
                                      y+whileConditionsHeight+border,
-                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, *ExtensionsManager::GetInstance());
+                                     width-renderingHelper->GetConditionsColumnWidth()-border*2, this, areas, selection, platform);
 }
 
-unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
+unsigned int WhileEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
     if ( eventHeightNeedUpdate )
     {
@@ -203,10 +203,10 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width) const
         const int repeatHeight = 20;
 
         //Get maximum height needed
-        int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, *ExtensionsManager::GetInstance());
+        int whileConditionsHeight = renderingHelper->GetRenderedConditionsListHeight(whileConditions, width-80-border*2, platform);
         if (!infiniteLoopWarning && whileConditionsHeight < 32 ) whileConditionsHeight = 32;
-        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, *ExtensionsManager::GetInstance());
-        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, *ExtensionsManager::GetInstance());
+        int conditionsHeight = renderingHelper->GetRenderedConditionsListHeight(conditions, renderingHelper->GetConditionsColumnWidth()-border, platform);
+        int actionsHeight = renderingHelper->GetRenderedActionsListHeight(actions, width-renderingHelper->GetConditionsColumnWidth()-border*2, platform);
 
         renderedHeight = (( conditionsHeight > actionsHeight ? conditionsHeight : actionsHeight ) + whileConditionsHeight + repeatHeight)+border*2+border*2;
         eventHeightNeedUpdate = false;

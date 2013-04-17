@@ -67,7 +67,7 @@ gd::BaseEvent::EditEventReturnType CommentEvent::EditEvent(wxWindow* parent_, Ga
 /**
  * Render the event
  */
-void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection)
+void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform)
 {
     x += 1; //Small border
 
@@ -114,7 +114,7 @@ void CommentEvent::Render(wxDC & dc, int x, int y, unsigned int width, EventsEdi
     }
 }
 
-unsigned int CommentEvent::GetRenderedHeight(unsigned int width) const
+unsigned int CommentEvent::GetRenderedHeight(unsigned int width, const gd::Platform & platform) const
 {
     if ( eventHeightNeedUpdate )
     {

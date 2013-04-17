@@ -9,8 +9,8 @@
 #include "GDL/BuiltinExtensions/ProfileTools.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDL/IDE/BaseProfiler.h"
 #include <iostream>
 
@@ -24,7 +24,7 @@ ProfileEvent::~ProfileEvent()
 {
 }
 
-std::string ProfileEvent::GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & parentContext)
+std::string ProfileEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
 {
     codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/ProfileTools.h");
 

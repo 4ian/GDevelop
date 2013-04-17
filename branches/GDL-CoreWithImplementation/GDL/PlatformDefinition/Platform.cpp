@@ -37,11 +37,6 @@ boost::shared_ptr<gd::PlatformExtension> Platform::GetExtension(const std::strin
     return ExtensionsManager::GetInstance()->GetExtension(name);
 }
 
-gd::InstructionsMetadataHolder & Platform::GetInstructionsMetadataHolder() const
-{
-    return *ExtensionsManager::GetInstance();
-}
-
 boost::shared_ptr<gd::Object> Platform::CreateObject(const std::string & type, const std::string & name) const
 {
     return ExtensionsManager::GetInstance()->CreateObject(type, name);

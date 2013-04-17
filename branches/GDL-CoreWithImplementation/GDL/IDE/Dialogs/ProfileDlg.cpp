@@ -13,6 +13,7 @@
 #undef CreateDialog //Thanks windows.h
 #include <iostream>
 #include <wx/textdlg.h>
+#include <wx/dcbuffer.h>
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/ProfileEvent.h"
 #include "GDL/IDE/Dialogs/SceneEditorCanvas.h"

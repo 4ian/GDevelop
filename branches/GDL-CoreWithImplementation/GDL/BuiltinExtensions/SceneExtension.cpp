@@ -5,10 +5,10 @@
 
 #include "GDL/BuiltinExtensions/SceneExtension.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/Events/EventsCodeGenerator.h"
-#include "GDL/Events/EventsCodeGenerationContext.h"
-#include "GDL/Events/EventsCodeNameMangler.h"
-#include "GDL/Events/ExpressionsCodeGeneration.h"
+#include "GDCore/Events/EventsCodeGenerator.h"
+#include "GDCore/Events/EventsCodeGenerationContext.h"
+#include "GDCore/Events/EventsCodeNameMangler.h"
+#include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDL/Scene.h"
 #include "GDL/Game.h"
 
@@ -114,20 +114,20 @@ SceneExtension::SceneExtension()
 
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const Game & game, const gd::Layout & scene, gd::Instruction & instruction, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
                 std::string value1Code;
                 {
-                    CallbacksForGeneratingExpressionCode callbacks(value1Code, game, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(value1Code, project, scene, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[0].GetPlainString());
-                    if (!parser.ParseMathExpression(game, scene, callbacks) || value1Code.empty()) value1Code = "0";
+                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || value1Code.empty()) value1Code = "0";
                 }
 
                 std::string value2Code;
                 {
-                    CallbacksForGeneratingExpressionCode callbacks(value2Code, game, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(value2Code, project, scene, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[1].GetPlainString());
-                    if (!parser.ParseMathExpression(game, scene, callbacks) || value2Code.empty()) value2Code = "0";
+                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || value2Code.empty()) value2Code = "0";
                 }
 
                 if ( instruction.GetParameters()[2].GetPlainString() == "=" || instruction.GetParameters()[2].GetPlainString().empty() )

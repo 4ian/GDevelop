@@ -515,7 +515,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
 
         gd::EventsRenderingHelper::GetInstance()->SetConditionsColumnWidth(conditionColumnWidth-x);
         unsigned int width = eventsPanel->GetSize().x-x > 0 ? eventsPanel->GetSize().x-x : 1;
-        unsigned int height = events[i]->GetRenderedHeight(width);
+        unsigned int height = events[i]->GetRenderedHeight(width, game.GetPlatform());
 
         if( !(y+static_cast<int>(height) < 0 || y > eventsPanel->GetSize().y) ) //Render only if needed
         {
@@ -572,7 +572,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
 
 
             //Event rendering
-            events[i]->Render(dc, x, y, width, itemsAreas, selection);
+            events[i]->Render(dc, x, y, width, itemsAreas, selection, game.GetPlatform());
 
             if ( drawDragTarget )
             {

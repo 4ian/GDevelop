@@ -593,7 +593,7 @@ void ChoixAction::RefreshFromAction()
 {
     if ( Type.empty() ) return;
 
-    const gd::InstructionMetadata & instructionMetadata = ExtensionsManager::GetInstance()->GetActionMetadata(Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetActionMetadata(game.GetPlatform(), Type);
 
     //Display action main properties
     NomActionTxt->SetLabel( instructionMetadata.GetFullName() );
@@ -715,8 +715,7 @@ void ChoixAction::OnABtClick(wxCommandEvent& event)
     string num = ( string ) wxWindow::FindFocus()->GetName();
     unsigned int i = ToInt(num);
 
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetActionMetadata(Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetActionMetadata(game.GetPlatform(), Type);
 
     if ( i < ParaEdit.size() && i < instructionMetadata.parameters.size())
     {
@@ -946,8 +945,7 @@ void ChoixAction::OnFacClicked(wxCommandEvent& event)
 
 void ChoixAction::OnOkBtClick(wxCommandEvent& event)
 {
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const gd::InstructionMetadata & instructionMetadata = extensionManager->GetActionMetadata(Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetActionMetadata(game.GetPlatform(), Type);
 
     if ( Type == "" )
         return;
@@ -972,12 +970,12 @@ void ChoixAction::OnOkBtClick(wxCommandEvent& event)
             gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
             gd::ExpressionParser expressionParser(string(ParaEdit.at(i)->GetValue().mb_str())) ;
 
-            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game, scene, callbacks)))
+            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game.GetPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game.GetPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseStringExpression(game.GetPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseStringExpression(game.GetPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game.GetPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game.GetPlatform(), game, scene, callbacks)))
             {
                 message = expressionParser.firstErrorStr;
 

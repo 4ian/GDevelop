@@ -576,7 +576,7 @@ void EditorObjectList::OndelObjMenuISelected(wxCommandEvent& event)
                 {
                     if ( answer == wxYES )
                     {
-                        gd::EventsRefactorer::RemoveObjectInEvents(project, *layout, layout->GetEvents(), objectName);
+                        gd::EventsRefactorer::RemoveObjectInEvents(project.GetPlatform(), project, *layout, layout->GetEvents(), objectName);
                         for (unsigned int g = 0;g<layout->GetObjectGroups().size();++g)
                         {
                             if ( layout->GetObjectGroups()[g].Find(objectName)) layout->GetObjectGroups()[g].RemoveObject(objectName);
@@ -652,7 +652,7 @@ void EditorObjectList::OnobjectsListEndLabelEdit(wxTreeEvent& event)
 
     if ( layout ) //Change the object name in the layout.
     {
-        gd::EventsRefactorer::RenameObjectInEvents(project, *layout, layout->GetEvents(), ancienNom, newName);
+        gd::EventsRefactorer::RenameObjectInEvents(project.GetPlatform(), project, *layout, layout->GetEvents(), ancienNom, newName);
         layout->GetInitialInstances().RenameInstancesOfObject(ancienNom, newName);
         for (unsigned int g = 0;g<layout->GetObjectGroups().size();++g)
         {

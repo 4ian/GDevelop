@@ -413,7 +413,7 @@ void EditorObjetsGroups::OnDelGroupSelected(wxCommandEvent& event)
 
             if ( answer == wxYES )
             {
-                gd::EventsRefactorer::RemoveObjectInEvents(project, layout, layout.GetEvents(), groupName);
+                gd::EventsRefactorer::RemoveObjectInEvents(project.GetPlatform(), project, layout, layout.GetEvents(), groupName);
             }
 
             project.GetChangesNotifier().OnObjectGroupDeleted(project, EditingLayoutGroups() ? &layout : NULL, groupName);
@@ -523,7 +523,7 @@ void EditorObjetsGroups::OnObjetsGroupsListEndLabelEdit(wxTreeEvent& event)
         {
             i->SetName( newName );
 
-            gd::EventsRefactorer::RenameObjectInEvents(project, layout, layout.GetEvents(), renamedGroupOldName, newName);
+            gd::EventsRefactorer::RenameObjectInEvents(project.GetPlatform(), project, layout, layout.GetEvents(), renamedGroupOldName, newName);
 
             project.GetChangesNotifier().OnObjectGroupRenamed(project, EditingLayoutGroups() ? &layout : NULL, newName, renamedGroupOldName);
             return;

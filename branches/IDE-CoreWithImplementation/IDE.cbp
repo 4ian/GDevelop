@@ -418,6 +418,7 @@
 		</Compiler>
 		<ResourceCompiler>
 			<Add directory="../GDL" />
+			<Add directory="../Core" />
 		</ResourceCompiler>
 		<Unit filename="BugReport.cpp">
 			<Option weight="60" />

@@ -159,6 +159,9 @@ void MainFrame::Open( string file )
     boost::shared_ptr<RuntimeGame> newGame(new RuntimeGame); //TODO: Abstract
     if ( newGame->LoadFromFile(file) )
     {
+        //Ensure working directory is set to the IDE one.
+        wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
+
         games.push_back(newGame);
 
         //Sauvegarde fichiers récents
@@ -200,6 +203,8 @@ void MainFrame::Open( string file )
             #endif
         }
     }
+    //Ensure working directory is set to the IDE one.
+    wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
 }
 
 void MainFrame::OnMenuSaveSelected( wxCommandEvent& event )

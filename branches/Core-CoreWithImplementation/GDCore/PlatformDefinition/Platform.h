@@ -12,6 +12,8 @@ namespace gd { class InstructionsMetadataHolder; }
 namespace gd { class Project; }
 namespace gd { class Object; }
 namespace gd { class Automatism; }
+namespace gd { class AutomatismMetadata; }
+namespace gd { class ObjectMetadata; }
 namespace gd { class BaseEvent; }
 namespace gd { class AutomatismsSharedData; }
 
@@ -52,12 +54,6 @@ public:
      */
     virtual boost::shared_ptr<PlatformExtension> GetExtension(const std::string & name) const =0;
 
-    /**
-     * Must return a reference to the InstructionsMetadataHolder of the platform
-     * \see gd::InstructionsMetadataHolder
-     */
-    virtual gd::InstructionsMetadataHolder & GetInstructionsMetadataHolder() const =0;
-
     /** \name Factory method
      * Member functions used to create the platforms objects
      */
@@ -88,6 +84,7 @@ public:
      */
     virtual boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type) const =0;
 
+
     ///@}
 
     /**
@@ -100,7 +97,6 @@ public:
      * Called when the IDE is initialized and ready to be used.
      */
     virtual void OnIDEInitialized() {};
-
 private:
 };
 

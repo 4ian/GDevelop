@@ -5,6 +5,9 @@
 #ifndef AUTOMATISMMETADATA_H
 #define AUTOMATISMMETADATA_H
 #include <string>
+#include <map>
+#include "GDCore/Events/InstructionMetadata.h"
+#include "GDCore/Events/ExpressionMetadata.h"
 #include <wx/bitmap.h>
 
 namespace gd
@@ -29,6 +32,9 @@ public:
     AutomatismMetadata & SetDescription(const std::string & description_) { description = description_; return *this; }
     AutomatismMetadata & SetGroup(const std::string & group_) { group = group_; return *this; }
     AutomatismMetadata & SetBitmapIcon(const wxBitmap & bitmap_) { icon = bitmap_; return *this; }
+#if defined(GD_IDE_ONLY)
+    AutomatismMetadata & SetIncludeFile(const std::string & includeFile) { optionalIncludeFile = includeFile; return *this; }
+#endif
 
     const std::string & GetFullName() const { return fullname; }
     const std::string & GetDefaultName() const { return defaultName; }
@@ -36,6 +42,15 @@ public:
     const std::string & GetGroup() const  { return group; }
     const wxBitmap & GetBitmapIcon() const { return icon; }
 
+#if defined(GD_IDE_ONLY)
+    std::map<std::string, gd::InstructionMetadata > conditionsInfos;
+    std::map<std::string, gd::InstructionMetadata > actionsInfos;
+    std::map<std::string, gd::ExpressionMetadata > expressionsInfos;
+    std::map<std::string, gd::StrExpressionMetadata > strExpressionsInfos;
+
+    std::string optionalIncludeFile;
+    std::string cppClassName;
+#endif
 private:
     std::string fullname;
     std::string defaultName;

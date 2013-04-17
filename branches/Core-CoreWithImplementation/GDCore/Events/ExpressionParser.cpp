@@ -8,7 +8,7 @@
 #include "GDCore/Events/ExpressionParser.h"
 #include "GDCore/Events/InstructionMetadata.h"
 #include "GDCore/Events/ExpressionMetadata.h"
-#include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
+#include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/CommonTools.h"
 #include <iostream>
@@ -321,9 +321,8 @@ bool ExpressionParser::ValidSyntax(const std::string & str)
     return true;
 }
 
-bool ExpressionParser::ParseMathExpression(const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks)
+bool ExpressionParser::ParseMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks)
 {
-    InstructionsMetadataHolder & metadataHolder = project.GetPlatform().GetInstructionsMetadataHolder();
     string expression = expressionPlainString;
 
     size_t parsePosition = 0;
@@ -374,16 +373,16 @@ bool ExpressionParser::ParseMathExpression(const gd::Project & project, const gd
             bool automatismFunctionFound = false;
 
             //First try to bind to a static expression
-            if ( nameIsFunction && metadataHolder.HasExpression(functionName) )
+            if ( nameIsFunction && MetadataProvider::HasExpression(platform, functionName) )
             {
                 functionFound = true; staticFunctionFound = true;
-                instructionInfos = metadataHolder.GetExpressionMetadata(functionName);
+                instructionInfos = MetadataProvider::GetExpressionMetadata(platform, functionName);
             }
             //Then search in object expression
-            else if ( !nameIsFunction && metadataHolder.HasObjectExpression(gd::GetTypeOfObject(project, layout, objectName), functionName) )
+            else if ( !nameIsFunction && MetadataProvider::HasObjectExpression(platform, gd::GetTypeOfObject(project, layout, objectName), functionName) )
             {
                 functionFound = true; objectFunctionFound = true;
-                instructionInfos = metadataHolder.GetObjectExpressionMetadata(gd::GetTypeOfObject(project, layout, objectName), functionName);
+                instructionInfos = MetadataProvider::GetObjectExpressionMetadata(platform, gd::GetTypeOfObject(project, layout, objectName), functionName);
             }
             //And in automatisms expressions
             else if ( !nameIsFunction )
@@ -397,12 +396,13 @@ bool ExpressionParser::ParseMathExpression(const gd::Project & project, const gd
                     else
                         functionName = "";
 
-                    if ( metadataHolder.HasAutomatismExpression(gd::GetTypeOfAutomatism(project, layout, autoName), functionName) )
+                    if ( MetadataProvider::HasAutomatismExpression(platform, gd::GetTypeOfAutomatism(project, layout, autoName), functionName) )
                     {
                         parameters.push_back(gd::Expression(autoName));
                         functionFound = true; automatismFunctionFound = true;
 
-                        instructionInfos = metadataHolder.GetAutomatismExpressionMetadata(gd::GetTypeOfAutomatism(project, layout, autoName), functionName);
+                        instructionInfos = MetadataProvider::GetAutomatismExpressionMetadata(platform,
+                                                                                             gd::GetTypeOfAutomatism(project, layout, autoName), functionName);
 
                         //Verify that object has automatism.
                         vector < std::string > automatisms = gd::GetAutomatismsOfObject(project, layout, objectName);
@@ -477,7 +477,7 @@ bool ExpressionParser::ParseMathExpression(const gd::Project & project, const gd
                     parameters = CompleteParameters(instructionInfos.parameters, parameters);
                     for (unsigned int i = 0;i<instructionInfos.parameters.size();++i)
                     {
-                        if ( !PrepareParameter(project, layout, callbacks, parameters[i], instructionInfos.parameters[i], functionNameEnd) )
+                        if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], instructionInfos.parameters[i], functionNameEnd) )
                             return false; //TODO : Boarf, paramètres optionels sont rajoutés et évalués : Problème avec les calques par exemple ( Au minimum, il faut "" )
                     }
                 }
@@ -533,9 +533,8 @@ bool ExpressionParser::ParseMathExpression(const gd::Project & project, const gd
     return ValidSyntax(expressionWithoutFunctions);
 }
 
-bool ExpressionParser::ParseStringExpression(const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks)
+bool ExpressionParser::ParseStringExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks)
 {
-    InstructionsMetadataHolder & metadataHolder = project.GetPlatform().GetInstructionsMetadataHolder();
     string expression = expressionPlainString;
 
     size_t parsePosition = 0;
@@ -663,10 +662,10 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
             bool functionFound = false;
 
             //First try to bind to a static str expression
-            if ( nameIsFunction && metadataHolder.HasStrExpression(functionName) )
+            if ( nameIsFunction && MetadataProvider::HasStrExpression(platform, functionName) )
             {
                 functionFound = true;
-                const gd::StrExpressionMetadata & expressionInfo = metadataHolder.GetStrExpressionMetadata(functionName);
+                const gd::StrExpressionMetadata & expressionInfo = MetadataProvider::GetStrExpressionMetadata(platform, functionName);
 
                 //Testing the number of parameters
                 if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
@@ -681,17 +680,17 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
                 parameters = CompleteParameters(expressionInfo.parameters, parameters);
                 for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                 {
-                    if ( !PrepareParameter(project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
+                    if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
                         return false;
                 }
 
                 callbacks.OnStaticFunction(functionName, parameters, expressionInfo);
             }
             //Then an object member expression
-            else if ( !nameIsFunction && metadataHolder.HasObjectStrExpression(gd::GetTypeOfObject(project, layout, objectName), functionName) )
+            else if ( !nameIsFunction && MetadataProvider::HasObjectStrExpression(platform, gd::GetTypeOfObject(project, layout, objectName), functionName) )
             {
                 functionFound = true;
-                const gd::StrExpressionMetadata & expressionInfo = metadataHolder.GetObjectStrExpressionMetadata(gd::GetTypeOfObject(project, layout, nameBefore), functionName);
+                const gd::StrExpressionMetadata & expressionInfo = MetadataProvider::GetObjectStrExpressionMetadata(platform, gd::GetTypeOfObject(project, layout, nameBefore), functionName);
 
                 //Testing the number of parameters
                 if ( parameters.size() > GetMaximalParametersNumber(expressionInfo.parameters) || parameters.size() < GetMinimalParametersNumber(expressionInfo.parameters))
@@ -709,7 +708,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
                 parameters = CompleteParameters(expressionInfo.parameters, parameters);
                 for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                 {
-                    if ( !PrepareParameter(project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
+                    if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
                         return false;
                 }
 
@@ -727,12 +726,13 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
                     else
                         functionName = "";
 
-                    if ( metadataHolder.HasAutomatismStrExpression(gd::GetTypeOfAutomatism(project, layout, autoName), functionName) )
+                    if ( MetadataProvider::HasAutomatismStrExpression(platform, gd::GetTypeOfAutomatism(project, layout, autoName), functionName) )
                     {
                         parameters.push_back(gd::Expression(autoName));
                         functionFound = true;
 
-                        const gd::StrExpressionMetadata & expressionInfo = metadataHolder.GetAutomatismStrExpressionMetadata(gd::GetTypeOfAutomatism(project, layout, autoName), functionName);
+                        const gd::StrExpressionMetadata & expressionInfo = MetadataProvider::GetAutomatismStrExpressionMetadata(platform,
+                                                                                                                                gd::GetTypeOfAutomatism(project, layout, autoName), functionName);
 
                         //Verify that object has automatism.
                         vector < std::string > automatisms = gd::GetAutomatismsOfObject(project, layout, objectName);
@@ -756,7 +756,7 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
                             parameters = CompleteParameters(expressionInfo.parameters, parameters);
                             for (unsigned int i = 0;i<parameters.size() && i<expressionInfo.parameters.size();++i)
                             {
-                                if ( !PrepareParameter(project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
+                                if ( !PrepareParameter(platform, project, layout, callbacks, parameters[i], expressionInfo.parameters[i], functionNameEnd) )
                                     return false;
                             }
 
@@ -820,14 +820,14 @@ bool ExpressionParser::ParseStringExpression(const gd::Project & project, const 
     return true;
 }
 
-bool ExpressionParser::PrepareParameter(const gd::Project & project, const gd::Layout & layout, ParserCallbacks & callbacks, gd::Expression & parameter, const gd::ParameterMetadata & parametersInfo, const size_t positionInExpression)
+bool ExpressionParser::PrepareParameter(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, ParserCallbacks & callbacks, gd::Expression & parameter, const gd::ParameterMetadata & parametersInfo, const size_t positionInExpression)
 {
     if ( parametersInfo.type == "expression" || parametersInfo.type == "camera" )
     {
         if (parametersInfo.optional && parameter.GetPlainString().empty())
             parameter = parametersInfo.defaultValue.empty() ? gd::Expression("0") : gd::Expression(parametersInfo.defaultValue);
 
-        if ( !callbacks.OnSubMathExpression(project, layout, parameter) )
+        if ( !callbacks.OnSubMathExpression(platform, project, layout, parameter) )
         {
             firstErrorStr = callbacks.firstErrorStr;
             firstErrorPos = callbacks.firstErrorPos+positionInExpression;
@@ -840,7 +840,7 @@ bool ExpressionParser::PrepareParameter(const gd::Project & project, const gd::L
         if (parametersInfo.optional && parameter.GetPlainString().empty())
             parameter = parametersInfo.defaultValue.empty() ? gd::Expression("\"\"") : gd::Expression(parametersInfo.defaultValue);
 
-        if ( !callbacks.OnSubTextExpression(project, layout, parameter) )
+        if ( !callbacks.OnSubTextExpression(platform, project, layout, parameter) )
         {
             firstErrorStr = callbacks.firstErrorStr;
             firstErrorPos = callbacks.firstErrorPos+positionInExpression;

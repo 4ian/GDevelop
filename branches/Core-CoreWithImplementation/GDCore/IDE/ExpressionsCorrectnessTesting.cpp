@@ -19,12 +19,12 @@ CallbacksForExpressionCorrectnessTesting::CallbacksForExpressionCorrectnessTesti
 {
 }
 
-bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
+bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
 {
     CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
 
     gd::ExpressionParser parser(expression.GetPlainString());
-    if ( !parser.ParseMathExpression(project, layout, callbacks) )
+    if ( !parser.ParseMathExpression(platform, project, layout, callbacks) )
     {
         #if defined(GD_IDE_ONLY)
         firstErrorStr = callbacks.firstErrorStr;
@@ -36,12 +36,12 @@ bool CallbacksForExpressionCorrectnessTesting::OnSubMathExpression(const gd::Pro
     return true;
 }
 
-bool CallbacksForExpressionCorrectnessTesting::OnSubTextExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
+bool CallbacksForExpressionCorrectnessTesting::OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression)
 {
     CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
 
     gd::ExpressionParser parser(expression.GetPlainString());
-    if ( !parser.ParseStringExpression(project, layout, callbacks) )
+    if ( !parser.ParseStringExpression(platform, project, layout, callbacks) )
     {
         #if defined(GD_IDE_ONLY)
         firstErrorStr = callbacks.firstErrorStr;

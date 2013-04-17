@@ -48,12 +48,12 @@ public:
      * Replace all occurences of an object name by another name
      * ( include : objects in parameters and in math/text expressions of all events ).
      */
-    static void RenameObjectInEvents(gd::Project & project, gd::Layout & layout, std::vector < gd::BaseEventSPtr > & events, std::string oldName, std::string newName);
+    static void RenameObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, std::vector < gd::BaseEventSPtr > & events, std::string oldName, std::string newName);
 
     /**
      * Remove all actions or conditions using an object
      */
-    static void RemoveObjectInEvents(gd::Project & project, gd::Layout & layout, std::vector < gd::BaseEventSPtr > & events, std::string name);
+    static void RemoveObjectInEvents(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, std::vector < gd::BaseEventSPtr > & events, std::string name);
 
     /**
      * Search for a string in events
@@ -83,7 +83,7 @@ private:
      *
      * \return true if something was modified.
      */
-    static bool RenameObjectInActions(gd::Project & project, gd::Layout & layout, std::vector < gd::Instruction > & instructions, std::string oldName, std::string newName);
+    static bool RenameObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, std::vector < gd::Instruction > & instructions, std::string oldName, std::string newName);
 
     /**
      * Replace all occurences of an object name by another name in a condition
@@ -91,21 +91,21 @@ private:
      *
      * \return true if something was modified.
      */
-    static bool RenameObjectInConditions(gd::Project & project, gd::Layout & layout, std::vector < gd::Instruction > & instructions, std::string oldName, std::string newName);
+    static bool RenameObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, std::vector < gd::Instruction > & instructions, std::string oldName, std::string newName);
 
     /**
      * Remove all conditions of the list using an object
      *
      * \return true if something was modified.
      */
-    static bool RemoveObjectInConditions(gd::Project & project, gd::Layout & layout, std::vector < gd::Instruction > & conditions, std::string name);
+    static bool RemoveObjectInConditions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, std::vector < gd::Instruction > & conditions, std::string name);
 
     /**
      * Remove all actions of the list using an object
      *
      * \return true if something was modified.
      */
-    static bool RemoveObjectInActions(gd::Project & project, gd::Layout & layout, std::vector < gd::Instruction > & conditions, std::string name);
+    static bool RemoveObjectInActions(const gd::Platform & platform, gd::Project & project, gd::Layout & layout, std::vector < gd::Instruction > & conditions, std::string name);
 
     /**
      * Replace all occurences of a string in conditions

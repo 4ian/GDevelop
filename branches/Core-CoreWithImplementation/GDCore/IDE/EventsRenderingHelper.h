@@ -11,6 +11,7 @@
 
 namespace gd { class BaseEvent; }
 namespace gd { class Instruction; }
+namespace gd { class Platform; }
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
 namespace gd { class InstructionMetadata;}
@@ -49,30 +50,32 @@ class GD_CORE_API EventsRenderingHelper
          * \param event Event owning the condition list
          * \param areas EventsEditorItemsAreas object when drawn areas will be registered
          * \param selection EventsEditorSelection object providing information about selection
-         * \param metadataHolder gd::InstructionsMetadataHolder object providing metadata about the conditions
+         * \param platform The platform currently used
          * \return Height used for the drawing
          */
-        int DrawConditionsList(std::vector < gd::Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
+        int DrawConditionsList(std::vector < gd::Instruction > & conditions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
+                               EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform);
 
         /**
          * \brief Draw the specified action list
          * \see gd::EventsRenderingHelper::DrawConditionsList
          */
-        int DrawActionsList(std::vector < gd::Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, gd::InstructionsMetadataHolder & metadataHolder);
+        int DrawActionsList(std::vector < gd::Instruction > & actions, wxDC & dc, int x, int y, int width, gd::BaseEvent * event,
+                            EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform);
 
         /**
          * \brief Get the height taken by drawing a condition list
          * \param conditions Conditions to be rendered
          * \param width Width available for the drawing
-         * \param metadataHolder gd::InstructionsMetadataHolder object providing metadata about the conditions
+         * \param platform The platform currently used
          * \return Height used for the drawing
          */
-        unsigned int GetRenderedConditionsListHeight(const std::vector < gd::Instruction > & conditions, int width, gd::InstructionsMetadataHolder & metadataHolder);
+        unsigned int GetRenderedConditionsListHeight(const std::vector < gd::Instruction > & conditions, int width, const gd::Platform & platform);
         /**
          * \brief Get the height taken by drawing a condition list
          * \see gd::EventsRenderingHelper::GetRenderedConditionsListHeight
          */
-        unsigned int GetRenderedActionsListHeight(const std::vector < gd::Instruction > & actions, int width, gd::InstructionsMetadataHolder & metadataHolder);
+        unsigned int GetRenderedActionsListHeight(const std::vector < gd::Instruction > & actions, int width, const gd::Platform & platform);
 
         inline unsigned int GetConditionsColumnWidth() const {return conditionsColumnWidth;};
         inline void SetConditionsColumnWidth(unsigned int conditionsColumnWidth_) { conditionsColumnWidth = conditionsColumnWidth_; };
@@ -101,7 +104,10 @@ class GD_CORE_API EventsRenderingHelper
          * \param selection EventsEditorSelection object providing information about selection
          * \return Height used for the drawing
          */
-        int DrawInstruction(gd::Instruction & instruction, const gd::InstructionMetadata & instructionMetadata, bool isCondition, wxDC & dc, wxPoint point, int freeWidth, gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
+        int DrawInstruction(gd::Instruction & instruction,
+                            const gd::InstructionMetadata & instructionMetadata,
+                            bool isCondition, wxDC & dc, wxPoint point, int freeWidth,
+                            gd::BaseEvent * event, EventsEditorItemsAreas & areas, EventsEditorSelection & selection);
 
         /**
          * Change font. Only use a fixed width font.

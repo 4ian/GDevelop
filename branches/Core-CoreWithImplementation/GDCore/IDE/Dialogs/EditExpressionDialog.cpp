@@ -474,7 +474,7 @@ void EditExpressionDialog::TextModified(wxStyledTextEvent& event)
 
     gd::CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
     gd::ExpressionParser expressionParser(expression);
-    if ( !expressionParser.ParseMathExpression(project, layout, callbacks) )
+    if ( !expressionParser.ParseMathExpression(project.GetPlatform(), project, layout, callbacks) )
     {
         errorTxt->SetLabel(expressionParser.firstErrorStr);
         lastErrorPos = expressionParser.firstErrorPos;
@@ -493,7 +493,7 @@ void EditExpressionDialog::OnOkBtClick(wxCommandEvent& event)
     gd::CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
     gd::ExpressionParser expressionParser(expression);
 
-    if ( !expressionParser.ParseMathExpression(project, layout, callbacks) )
+    if ( !expressionParser.ParseMathExpression(project.GetPlatform(), project, layout, callbacks) )
     {
         if ( wxMessageBox(_("The expression is malformed. Are you sur you want to validate this expression \?"), _("The expression contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;

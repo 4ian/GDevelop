@@ -16,14 +16,15 @@ class Game;
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
+namespace gd { class EventsCodeGenerator; }
+namespace gd { class EventsCodeGenerationContext; }
+namespace gd { class Platform; }
 class wxWindow;
 class EventsEditorItemsAreas;
 class EventsEditorSelection;
 namespace gd { class Instruction; }
 class TiXmlElement;
 class Game;
-class EventsCodeGenerator;
-class EventsCodeGenerationContext;
 class wxDC;
 
 namespace gd
@@ -129,7 +130,7 @@ public:
         if ( !events.empty() ) //Sub events
         {
             outputCode += "\n{\n";
-            outputCode += codeGenerator.GenerateEventsListCode(game, scene, events, context);
+            outputCode += codeGenerator.GenerateEventsListCode(scene, events, context);
             outputCode += "}\n";
         }
 
@@ -138,12 +139,12 @@ public:
         return outputCode;
      * \endcode
      */
-    virtual std::string GenerateEventCode(Game & game, gd::Layout & scene, EventsCodeGenerator & codeGenerator, EventsCodeGenerationContext & context) {return "";};
+    virtual std::string GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {return "";};
 
     /**
      * Called before events are compiled
      */
-    virtual void Preprocess(Game & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
+    virtual void Preprocess(gd::Project & project, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList) {};
 
     ///@}
 
@@ -211,14 +212,14 @@ public:
      * \see EventsEditorSelection
      * \see EventsEditorItemsAreas
      */
-    virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection) {return;}
+    virtual void Render(wxDC & dc, int x, int y, unsigned int width, EventsEditorItemsAreas & areas, EventsEditorSelection & selection, const gd::Platform & platform) {return;}
 
     /**
      * Must return the height of the event when rendered.
      *
      * \note The height of the drawing must be the same as the height of the drawing made by BaseEvent::Render
      */
-    virtual unsigned int GetRenderedHeight(unsigned int width) const {return 0;};
+    virtual unsigned int GetRenderedHeight(unsigned int width, const gd::Platform & platform) const {return 0;};
 
     /**
      * Used by EditEvent to describe what sort of changes have been made to the event.

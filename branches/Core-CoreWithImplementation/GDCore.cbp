@@ -252,11 +252,19 @@
 		<Unit filename="GDCore/Events/AutomatismMetadata.h" />
 		<Unit filename="GDCore/Events/Event.cpp" />
 		<Unit filename="GDCore/Events/Event.h" />
+		<Unit filename="GDCore/Events/EventsCodeGenerationContext.cpp" />
+		<Unit filename="GDCore/Events/EventsCodeGenerationContext.h" />
+		<Unit filename="GDCore/Events/EventsCodeGenerator.cpp" />
+		<Unit filename="GDCore/Events/EventsCodeGenerator.h" />
+		<Unit filename="GDCore/Events/EventsCodeNameMangler.cpp" />
+		<Unit filename="GDCore/Events/EventsCodeNameMangler.h" />
 		<Unit filename="GDCore/Events/Expression.h" />
 		<Unit filename="GDCore/Events/ExpressionMetadata.cpp" />
 		<Unit filename="GDCore/Events/ExpressionMetadata.h" />
 		<Unit filename="GDCore/Events/ExpressionParser.cpp" />
 		<Unit filename="GDCore/Events/ExpressionParser.h" />
+		<Unit filename="GDCore/Events/ExpressionsCodeGeneration.cpp" />
+		<Unit filename="GDCore/Events/ExpressionsCodeGeneration.h" />
 		<Unit filename="GDCore/Events/Instruction.cpp" />
 		<Unit filename="GDCore/Events/Instruction.h" />
 		<Unit filename="GDCore/Events/InstructionMetadata.cpp" />
@@ -464,6 +472,12 @@
 					<wxDialog wxs="wxsmith/EditLayerDialog.wxs" src="GDCore\IDE\Dialogs\EditLayerDialog.cpp" hdr="GDCore\IDE\Dialogs\EditLayerDialog.h" fwddecl="0" i18n="1" name="EditLayerDialog" language="CPP" />
 				</resources>
 			</wxsmith>
+			<AutoVersioning>
+				<Scheme minor_max="10" build_max="0" rev_max="0" rev_rand_max="10" build_times_to_increment_minor="100" />
+				<Settings autoincrement="0" date_declarations="1" update_manifest="0" do_auto_increment="0" ask_to_increment="0" language="C++" svn="0" svn_directory="" header_path="GDCore\Tools\Version.h" />
+				<Changes_Log show_changes_editor="0" app_title="released version %M.%m.%b of %p" changeslog_path="ChangesLog.txt" />
+				<Code header_guard="VERSION_H" namespace="AutoVersion" prefix="" />
+			</AutoVersioning>
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

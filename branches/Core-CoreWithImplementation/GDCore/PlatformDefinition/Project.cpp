@@ -20,7 +20,7 @@
 #include "GDCore/PlatformDefinition/ResourcesManager.h"
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
 #include "GDCore/Events/ExpressionMetadata.h"
-#include "GDCore/PlatformDefinition/InstructionsMetadataHolder.h"
+#include "GDCore/IDE/MetadataProvider.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/VersionWrapper.h"
@@ -907,34 +907,8 @@ bool Project::ValidateObjectName(const std::string & name)
 {
     const std::vector < boost::shared_ptr<PlatformExtension> > extensions = GetPlatform().GetAllPlatformExtensions();
 
-    //Check if name is not an expression
-    bool nameUsedByExpression = (GetPlatform().GetInstructionsMetadataHolder().HasExpression(name) ||
-                                 GetPlatform().GetInstructionsMetadataHolder().HasStrExpression(name));
-
-    //Check if name is not an object expression
-    for (unsigned int i = 0;i<extensions.size();++i)
-    {
-        if ( find(GetUsedPlatformExtensions().begin(),
-                  GetUsedPlatformExtensions().end(),
-                  extensions[i]->GetName()) == GetUsedPlatformExtensions().end() )
-            continue; //Do not take care of unused extensions
-
-        std::vector<std::string> objectsTypes = extensions[i]->GetExtensionObjectsTypes();
-
-        for(unsigned int j = 0;j<objectsTypes.size();++j)
-        {
-            std::map<std::string, gd::ExpressionMetadata > allObjExpr = extensions[i]->GetAllExpressionsForObject(objectsTypes[j]);
-            for(std::map<std::string, gd::ExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
-            {
-                if ( name == it->first )
-                    nameUsedByExpression = true;
-            }
-        }
-    }
-
-    //Finally check if the name has only allowed characters
     std::string allowedCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
-    return !(name.find_first_not_of(allowedCharacter) != std::string::npos || nameUsedByExpression);
+    return !(name.find_first_not_of(allowedCharacter) != std::string::npos);
 }
 
 std::string Project::GetBadObjectNameWarning()

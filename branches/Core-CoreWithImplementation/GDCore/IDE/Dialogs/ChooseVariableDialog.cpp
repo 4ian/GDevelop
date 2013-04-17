@@ -19,6 +19,7 @@
 #include <wx/choicdlg.h>
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/IDE/EventsVariablesFinder.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/VariablesContainer.h"
 #include "GDCore/PlatformDefinition/Variable.h"
 #include "GDCore/Tools/HelpFileAccess.h"
@@ -363,8 +364,8 @@ void ChooseVariableDialog::OnvariablesListKeyDown(wxListEvent& event)
 void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
 {
     std::set<std::string> allVariables;
-    if ( associatedProject != NULL && associatedLayout == NULL ) allVariables = EventsVariablesFinder::FindAllGlobalVariables(*associatedProject);
-    else if ( associatedProject != NULL && associatedLayout != NULL ) allVariables = EventsVariablesFinder::FindAllLayoutVariables(*associatedProject, *associatedLayout);
+    if ( associatedProject != NULL && associatedLayout == NULL ) allVariables = EventsVariablesFinder::FindAllGlobalVariables(associatedProject->GetPlatform(), *associatedProject);
+    else if ( associatedProject != NULL && associatedLayout != NULL ) allVariables = EventsVariablesFinder::FindAllLayoutVariables(associatedProject->GetPlatform(), *associatedProject, *associatedLayout);
     else return;
 
     //Construct a wxArrayString with not declared variables

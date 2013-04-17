@@ -11,6 +11,7 @@ namespace gd { class Expression; }
 namespace gd { class ParserCallbacks; }
 namespace gd { class Layout; }
 namespace gd { class Project; }
+namespace gd { class Platform; }
 namespace gd { class ParameterMetadata; }
 namespace gd { class ExpressionMetadata; }
 namespace gd { class StrExpressionMetadata; }
@@ -33,13 +34,13 @@ public:
      * Parse the expression, calling each functor when necessary
      * \return True if expression was correctly parsed.
      */
-    bool ParseMathExpression(const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks);
+    bool ParseMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks);
 
     /**
      * Parse the expression, calling each functor when necessary
      * \return True if expression was correctly parsed.
      */
-    bool ParseStringExpression(const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks);
+    bool ParseStringExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::ParserCallbacks & callbacks);
 
     std::string firstErrorStr;
     size_t firstErrorPos;
@@ -54,7 +55,7 @@ private:
     /**
      * Tool function to prepare a parameter
      */
-    bool PrepareParameter(const gd::Project & project, const gd::Layout & layout, ParserCallbacks &, gd::Expression & parameter, const gd::ParameterMetadata & parametersInfo, const size_t positionInExpression);
+    bool PrepareParameter(const gd::Platform & platform,const gd::Project & project, const gd::Layout & layout, ParserCallbacks &, gd::Expression & parameter, const gd::ParameterMetadata & parametersInfo, const size_t positionInExpression);
 
     /**
      * Return the minimal number of parameters which can be used when calling an expression ( i.e. ParametersCount-OptionalParameters-CodeOnlyParameters )
@@ -97,8 +98,8 @@ class GD_CORE_API ParserCallbacks
     virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::ExpressionMetadata & expressionInfo) = 0;
     virtual void OnObjectAutomatismFunction(std::string functionName, const std::vector<gd::Expression> & parameters, const gd::StrExpressionMetadata & expressionInfo) = 0;
 
-    virtual bool OnSubMathExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression) = 0;
-    virtual bool OnSubTextExpression(const gd::Project & project, const gd::Layout & layout, gd::Expression & expression) = 0;
+    virtual bool OnSubMathExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression) = 0;
+    virtual bool OnSubTextExpression(const gd::Platform & platform, const gd::Project & project, const gd::Layout & layout, gd::Expression & expression) = 0;
 
     std::string firstErrorStr;
     size_t firstErrorPos;

@@ -10,9 +10,10 @@
 #include <boost/shared_ptr.hpp>
 #include <wx/bitmap.h>
 class Game;
+namespace gd { class Project; }
 namespace gd { class Layout; }
-class EventsCodeGenerator;
-class EventsCodeGenerationContext;
+namespace gd { class EventsCodeGenerator; }
+namespace gd { class EventsCodeGenerationContext; }
 
 namespace gd
 {
@@ -195,7 +196,7 @@ public:
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const Game & game, const gd::Layout & scene, Instruction & instruction, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, Instruction & instruction, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
         };
 
         CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)

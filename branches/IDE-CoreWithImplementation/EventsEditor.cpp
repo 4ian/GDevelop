@@ -26,12 +26,13 @@
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/IDE/EventsChangesNotifier.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 #include "GDL/Game.h"
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
 #include "LogFileManager.h"
 #include "GDL/IDE/Dialogs/ProfileDlg.h"
@@ -286,8 +287,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, gd::Layout & scene_, 
         gd::EventsRenderingHelper::GetInstance()->SetFont(eventsEditorFont);
 
     //Adding events types
-    ExtensionsManager * extensionManager = ExtensionsManager::GetInstance();
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = extensionManager->GetExtensions();
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
 
     //Insert extension specific events types
 	for (unsigned int i = 0;i<extensions.size();++i)
@@ -299,8 +299,8 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, gd::Layout & scene_, 
             continue;
 
         //Add each event type provided
-	    std::map<std::string, EventInfos > allEventsProvidedByExtension = extensions[i]->GetAllEvents();
-        for(std::map<string, EventInfos>::const_iterator it = allEventsProvidedByExtension.begin(); it != allEventsProvidedByExtension.end(); ++it)
+	    std::map<std::string, gd::EventMetadata > allEventsProvidedByExtension = extensions[i]->GetAllEvents();
+        for(std::map<string, gd::EventMetadata>::const_iterator it = allEventsProvidedByExtension.begin(); it != allEventsProvidedByExtension.end(); ++it)
         {
             //Find an identifier for the menu item
             long id = wxID_ANY;
@@ -318,7 +318,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, gd::Layout & scene_, 
             }
 
             wxMenuItem * menuItem = new wxMenuItem(&eventTypesMenu, id, it->second.fullname, it->second.description);
-            menuItem->SetBitmap(it->second.smallicon);
+            menuItem->SetBitmap(it->second.GetBitmapIcon());
             eventTypesMenu.Append(menuItem);
             Connect(id,wxEVT_COMMAND_MENU_SELECTED,(wxObjectEventFunction)&EventsEditor::OnAddCustomEventFromMenuSelected);
             mainFrameWrapper.GetMainEditor()->Connect(id, wxEVT_COMMAND_MENU_SELECTED, (wxObjectEventFunction)&EventsEditor::OnAddCustomEventFromMenuSelected, NULL, this);

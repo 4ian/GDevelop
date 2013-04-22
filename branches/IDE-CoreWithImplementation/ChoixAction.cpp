@@ -43,7 +43,6 @@
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/ExtensionsManager.h"
-#include "GDL/ExtensionBase.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "ChoixClavier.h"
 #include "SigneModification.h"
@@ -332,9 +331,9 @@ void ChoixAction::RefreshList()
 
                 //Add action item
                 int IDimage = 0;
-                if ( it->second.smallicon.IsOk() )
+                if ( it->second.GetBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.smallicon);
+                    imageList->Add(it->second.GetBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 
@@ -373,9 +372,9 @@ void ChoixAction::RefreshList()
 
                 //Add action item
                 int IDimage = 0;
-                if ( it->second.smallicon.IsOk() )
+                if ( it->second.GetBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.smallicon);
+                    imageList->Add(it->second.GetBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 
@@ -407,9 +406,9 @@ void ChoixAction::RefreshList()
 
             //Add action item
             int IDimage = 0;
-            if ( it->second.smallicon.IsOk() )
+            if ( it->second.GetBitmapIcon().IsOk() )
             {
-                imageList->Add(it->second.smallicon);
+                imageList->Add(it->second.GetBitmapIcon());
                 IDimage = imageList->GetImageCount()-1;
             }
 
@@ -488,9 +487,9 @@ void ChoixAction::RefreshObjectActionsList()
 
             //Add action item, if it is not hidden
             int IDimage = 0;
-            if ( it->second.smallicon.IsOk() )
+            if ( it->second.GetBitmapIcon().IsOk() )
             {
-                imageList->Add(it->second.smallicon);
+                imageList->Add(it->second.GetBitmapIcon());
                 IDimage = imageList->GetImageCount()-1;
             }
 
@@ -536,9 +535,9 @@ void ChoixAction::RefreshObjectActionsList()
 
                 //Add action item
                 int IDimage = 0;
-                if ( it->second.smallicon.IsOk() )
+                if ( it->second.GetBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.smallicon);
+                    imageList->Add(it->second.GetBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 
@@ -598,9 +597,9 @@ void ChoixAction::RefreshFromAction()
     //Display action main properties
     NomActionTxt->SetLabel( instructionMetadata.GetFullName() );
     NomActionTxt->Wrap( 450 );
-    ActionTextTxt->SetLabel( instructionMetadata.description );
+    ActionTextTxt->SetLabel( instructionMetadata.GetDescription() );
     ActionTextTxt->Wrap( 450 );
-    if ( instructionMetadata.icon.IsOk() ) ActionImg->SetBitmap( instructionMetadata.icon );
+    if ( instructionMetadata.GetBitmapIcon().IsOk() ) ActionImg->SetBitmap( instructionMetadata.GetBitmapIcon() );
     else ActionImg->SetBitmap(gd::CommonBitmapManager::GetInstance()->unknown24);
 
     //Update controls count

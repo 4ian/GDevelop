@@ -40,7 +40,7 @@
 #include "GDL/Position.h"
 #include "GDL/Automatism.h"
 #include "GDL/AutomatismsSharedData.h"
-#include "GDL/ExtensionBase.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDL/ExtensionsLoader.h"
 #include "GDL/Layer.h"

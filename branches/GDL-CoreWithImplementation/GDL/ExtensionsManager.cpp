@@ -184,6 +184,10 @@ boost::shared_ptr<gd::Object> ExtensionsManager::CreateObject(std::string type, 
     {
         std::cout << "Tried to create an object with an unknown type: " << type << std::endl;
         type = "";
+        if ( creationFunctionTable.find("") == creationFunctionTable.end() ) {
+            std::cout << "Unable to create a Base object!" << std::endl;
+            return boost::shared_ptr<gd::Object>();
+        }
     }
 
     //Create a new object with the type we want.

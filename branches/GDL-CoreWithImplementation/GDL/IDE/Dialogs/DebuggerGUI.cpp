@@ -27,7 +27,8 @@
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
-
+#undef _
+#define _(s) wxGetTranslation((s))
 
 //(*IdInit(DebuggerGUI)
 const long DebuggerGUI::ID_AUITOOLBARITEM1 = wxNewId();

@@ -28,7 +28,6 @@
 #include "GDL/AutomatismsSharedData.h"
 #include "GDL/AutomatismsRuntimeSharedData.h"
 #include "GDL/RuntimeContext.h"
-#include "GDL/ExtensionBase.h"
 #include "GDL/RuntimeGame.h"
 #include "GDL/Text.h"
 #include "GDL/ManualTimer.h"
@@ -40,7 +39,10 @@
 #include "GDL/IDE/BaseDebugger.h"
 #include "GDL/BuiltinExtensions/ProfileTools.h"
 #endif
+#include "GDL/ExtensionBase.h"
 #undef GetObject //Disable an annoying macro
+#undef _
+#define _(s) wxGetTranslation((s))
 
 RuntimeLayer RuntimeScene::badRuntimeLayer;
 

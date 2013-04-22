@@ -14,104 +14,74 @@
 
 SceneExtension::SceneExtension()
 {
-    DECLARE_THE_EXTENSION("BuiltinScene",
+    SetExtensionInformation("BuiltinScene",
                           _("Scene management features"),
                           _("Builtin extension allowing to manipulate scenes"),
                           "Compil Games",
-                          "Freeware")
+                          "Freeware");
     #if defined(GD_IDE_ONLY)
 
-    DECLARE_EXPRESSION("Random", _("Random value"), _("Random value"), _("Random"), "res/actions/position.png")
-        instrInfo.AddParameter("expression", _("Maximum value"), "", false);
+    AddExpression("Random", _("Random value"), _("Random value"), _("Random"), "res/actions/position.png")
+        .AddParameter("expression", _("Maximum value"))
+        .cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::Random").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
-        instrInfo.cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::Random").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
-    DECLARE_END_EXPRESSION()
 
-    DECLARE_CONDITION("DepartScene",
+    AddCondition("DepartScene",
                    _("At the beginning of the scene"),
                    _("Is true only when scene just begins."),
                    _("At the beginning of the scene"),
                    _("Scene"),
                    "res/conditions/depart24.png",
-                   "res/conditions/depart.png");
+                   "res/conditions/depart.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .cppCallingInformation.SetFunctionName("SceneJustBegins").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
-        instrInfo.AddCodeOnlyParameter("currentScene", "");
 
-        instrInfo.cppCallingInformation.SetFunctionName("SceneJustBegins").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
-    DECLARE_END_CONDITION()
-
-    DECLARE_ACTION("Scene",
+    AddAction("Scene",
                    _("Go to a scene"),
                    _("Change and start the specified scene."),
                    _("Go to scene _PARAM1_"),
                    _("Scene"),
                    "res/actions/goscene24.png",
-                   "res/actions/goscene.png");
+                   "res/actions/goscene.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("string", _("Name of the scene"), "",false)
+        .cppCallingInformation.SetFunctionName("ChangeScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
-        instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("string", _("Name of the scene"), "",false);
-
-        instrInfo.cppCallingInformation.SetFunctionName("ChangeScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
-    DECLARE_END_ACTION()
-
-    DECLARE_ACTION("Quit",
+    AddAction("Quit",
                    _("Quit the game"),
                    _("Quit the game"),
                    _("Quit the game"),
                    _("Scene"),
                    "res/actions/quit24.png",
-                   "res/actions/quit.png");
+                   "res/actions/quit.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .cppCallingInformation.SetFunctionName("StopGame").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
-        instrInfo.AddCodeOnlyParameter("currentScene", "");
-
-        instrInfo.cppCallingInformation.SetFunctionName("StopGame").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
-    DECLARE_END_ACTION()
-
-    DECLARE_ACTION("SceneBackground",
+    AddAction("SceneBackground",
                    _("Change background color"),
                    _("Change the background color of the scene."),
                    _("Set background color to _PARAM1_"),
                    _("Scene"),
                    "res/actions/background24.png",
-                   "res/actions/background.png");
+                   "res/actions/background.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("color", _("Color"), "",false)
+        .cppCallingInformation.SetFunctionName("ChangeSceneBackground").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
-        instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("color", _("Color"), "",false);
-
-        instrInfo.cppCallingInformation.SetFunctionName("ChangeSceneBackground").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
-    DECLARE_END_ACTION()
-
-    DECLARE_ACTION("DisableInputWhenFocusIsLost",
+    AddAction("DisableInputWhenFocusIsLost",
                    _("Disable input when focus is lost"),
                    _("Set if the keyboard and mouse buttons must be taken into account even\nif the window is not active."),
                    _("Disable input when focus is lost: _PARAM1_"),
                    _("Scene"),
                    "res/actions/window24.png",
-                   "res/actions/window.png");
+                   "res/actions/window.png")
+        .AddCodeOnlyParameter("currentScene", "")
+        .AddParameter("yesorno", _("Deactivate input when focus is lost"))
+        .cppCallingInformation.SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
-        instrInfo.AddCodeOnlyParameter("currentScene", "");
-        instrInfo.AddParameter("yesorno", _("Deactivate input when focus is lost"), "", false);
-
-        instrInfo.cppCallingInformation.SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
-    DECLARE_END_ACTION()
-
-    DECLARE_CONDITION("Egal",
-                   _("Compare two expressions"),
-                   _("Test the two expression"),
-                   _("_PARAM0_ _PARAM2_ _PARAM1_"),
-                   _("Other"),
-                   "res/conditions/egal24.png",
-                   "res/conditions/egal.png");
-
-        instrInfo.AddParameter("expression", _("Expression 1"), "",false);
-        instrInfo.AddParameter("expression", _("Expression 2"), "",false);
-        instrInfo.AddParameter("relationalOperator", _("Sign of the test"), "",false);
-
+    {
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
@@ -146,11 +116,21 @@ SceneExtension::SceneExtension()
                 return "";
             };
         };
-
         gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
 
-    DECLARE_END_CONDITION()
+        AddCondition("Egal",
+                   _("Compare two expressions"),
+                   _("Test the two expression"),
+                   _("_PARAM0_ _PARAM2_ _PARAM1_"),
+                   _("Other"),
+                   "res/conditions/egal24.png",
+                   "res/conditions/egal.png")
+        .AddParameter("expression", _("Expression 1"), "",false)
+        .AddParameter("expression", _("Expression 2"), "",false)
+        .AddParameter("relationalOperator", _("Sign of the test"), "",false)
+        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+    }
+
     #endif
 }
 

@@ -204,6 +204,7 @@
  * The directory wxsmith is used by Code::Blocks to save the files used so as to create the user interfaces, like the editor of an object.
  */
 
+//TODO : Update this:
 /**
  * \page AboutExtensionCpp About Extension.cpp
  *
@@ -216,11 +217,11 @@ The declarations are made with macros so as to make these declarations easier. T
  * \code
     Extension()
     {
-            DECLARE_THE_EXTENSION("TextObject",
+            SetExtensionInformation("TextObject",
                                   _("Text object"),
                                   _("Extension allowing to use an object displaying a text."),
                                   "Compil Games",
-                                  "zlib/libpng License ( Open Source )")
+                                  "zlib/libpng License ( Open Source )");
  * \endcode
 
 The first parameter is the name of the extension. Choose carefully the name of the extension, as games are directly refering to it.
@@ -230,21 +231,17 @@ The first parameter is the name of the extension. Choose carefully the name of t
 Actions are declared like this :
 
  * \code
-            DECLARE_ACTION("Name",
+            AddAction("Name",
                            _("Name displayed to users"),
                            _("Description"),
                            _("Sentence displayed in event editor"),
                            _("Category"),
                            "path-to-an-24-by-24-icon-file.png",
-                           "path-to-an-16-by-16-icon-file.png");
+                           "path-to-an-16-by-16-icon-file.png")
+                .AddParameter("theTypeOfTheParameter", _("Parameter1"))
+                .AddParameter("theTypeOfTheParameter", _("Parameter2"))
+                .cppCallingInformation.SetFunctionName("MyFunctionName").SetIncludeFile("MyExtension/MyIncludeFile.h");
 
-                instrInfo.AddParameter("theTypeOfTheParameter", _("Parameter1"), "", false);
-                instrInfo.AddParameter("theTypeOfTheParameter", _("Parameter2"), "", false);
-
-                instrInfo.cppCallingInformation.SetFunctionName("MyFunctionName").SetIncludeFile("MyExtension/MyIncludeFile.h");
-
-
-            DECLARE_END_ACTION()
  * \endcode
  * Declare conditions and expressions in a similar way.<br>
  * Parameters are added using gd::InstructionMetadata::AddParameter. See the function documentation for more information.<br>
@@ -257,7 +254,8 @@ Objects are declared like this :
 
 
  * \code
-            DECLARE_OBJECT("Name",
+            {
+    ObjectMetadata & obj = AddObject("Name",
                            _("Name displayed to users"),
                            _("Description"),
                            "path-to-an-32-by-32-icon.png",
@@ -269,7 +267,7 @@ Objects are declared like this :
 
 "FunctionForCreatingTheObject" and "FunctionForDestroyingTheObject" are two functions that must be provided with the object, the first one to create a new instance of the object and the second to delete an object instance. See implementation example in TextObject extension.
 
-You can then declare the actions, conditions, and expressions related to the objects, like normal actions/conditions/expressions, but with "_OBJECT_" added in the name of the macro ( DECLARE_OBJECT_ACTION instead of DECLARE_ACTION ).
+You can then declare the actions, conditions, and expressions related to the objects, like normal actions/conditions/expressions, but with "_OBJECT_" added in the name of the macro ( DECLARE_OBJECTACTION instead of AddAction ).
 You will also want to specify where the object is located using ExtensionObjectInfos::SetIncludeFile. For example :
 * \code
 objInfos.SetIncludeFile("TextObject/TextObject.h");
@@ -284,14 +282,12 @@ Events are declared like this :
 
 
  * \code
-    DECLARE_EVENT("Name",
+    AddEvent("Name",
                   _("Name displayed to users"),
                   "Description",
                   "Group",
                   "path-to-a-16-by-16-icon.png",
                   EventClassName)
-
-    DECLARE_END_EVENT()
  * \endcode
 
 * \section automatismsDeclaration Declaring the automatisms
@@ -300,7 +296,8 @@ Automatisms are declared like this :
 
 
  * \code
-                DECLARE_AUTOMATISM("Name",
+                {
+    gd::AutomatismMetadata & aut = AddAutomatism("Name",
                           _("Name displayed to users"),
                           _("DefaultNameUsedInEditor"),
                           _("Description."),
@@ -310,9 +307,9 @@ Automatisms are declared like this :
                           AutomatismSharedDatasClassName)
  * \endcode
 
-You can then declare the actions, conditions, and expressions related to the automatism, like normal actions/conditions/expressions, but with "_AUTOMATISM_" added in the name of the macro ( i.e. DECLARE_AUTOMATISM_ACTION instead of DECLARE_ACTION ).
+You can then declare the actions, conditions, and expressions related to the automatism, like normal actions/conditions/expressions, but with "_AUTOMATISM_" added in the name of the macro ( i.e. aut.AddAction(,  instead of AddAction ).
 
-Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
+Finally, finish the declaration by adding }.
 
  * \section excludingNonRuntimeDeclaration Excluding elements declaration from runtime
  * When your extension is compiled for runtime used ( as opposed to edittime use ), %Game Develop does not known anything about action/condition or even events classes.
@@ -321,19 +318,20 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
  * \code
         Extension()
         {
-            DECLARE_THE_EXTENSION("MyExtension",
+            SetExtensionInformation("MyExtension",
                                   _("Extension name"),
                                   _("Extension declaration"),
                                   "Me",
-                                  "license")
+                                  "license");
 
             #if defined(GD_IDE_ONLY)
-            DECLARE_ACTION[...]
-            DECLARE_CONDITION[...]
-            DECLARE_EXPRESSION[...]
+            AddAction[...]
+            AddCondition[...]
+            AddExpression[...]
             #endif
 
-            DECLARE_OBJECT("ObjectName",
+            {
+                ObjectMetadata & obj = AddObject("ObjectName",
                            _("Object name"),
                            _("Description"),
                            "CppPlatform/Extensions/myicon.png",
@@ -344,14 +342,15 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
                 #if defined(GD_IDE_ONLY)
                 objInfos.SetIncludeFile("MyExtension/MyIncludeFile.h");
 
-                DECLARE_OBJECT_ACTION[...]
-                DECLARE_OBJECT_CONDITION[...]
-                DECLARE_OBJECT_EXPRESSION[...]
+                DECLARE_OBJECTACTION[...]
+                DECLARE_OBJECTCONDITION[...]
+                DECLARE_OBJECTEXPRESSION[...]
                 #endif
 
-            DECLARE_END_OBJECT()
+            }
 
-            DECLARE_AUTOMATISM("AutomatismName",
+            {
+                gd::AutomatismMetadata & aut = AddAutomatism("AutomatismName",
                            _("Automatism name"),
                            "defaultGDname",
                            _("Description"),
@@ -363,12 +362,12 @@ Finally, finish the declaration by adding DECLARE_END_AUTOMATISM().
                 #if defined(GD_IDE_ONLY)
                 automatismInfo.SetIncludeFile("MyExtension/MyIncludeFile.h");
 
-                DECLARE_AUTOMATISM_ACTION[...]
-                DECLARE_AUTOMATISM_CONDITION[...]
-                DECLARE_AUTOMATISM_EXPRESSION[...]
+                aut.AddAction(, [...]
+                aut.AddCondition(, [...]
+                aut.AddExpression([...]
                 #endif
 
-            DECLARE_END_AUTOMATISM()
+            }
 
             CompleteCompilationInformation();
         };

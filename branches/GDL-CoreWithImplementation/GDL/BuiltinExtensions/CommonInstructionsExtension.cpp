@@ -28,21 +28,14 @@ using namespace std;
 
 CommonInstructionsExtension::CommonInstructionsExtension()
 {
-    DECLARE_THE_EXTENSION("BuiltinCommonInstructions",
+    SetExtensionInformation("BuiltinCommonInstructions",
                           _("Standard events"),
                           _("Builtin extension providing standard events."),
                           "Compil Games",
-                          "Freeware")
+                          "Freeware");
 
     #if defined(GD_IDE_ONLY)
-    DECLARE_CONDITION("Or",
-                   _("Or"),
-                   _("Return true if one of the sub conditions is true"),
-                   _("If one of these conditions is true :"),
-                   _("Advanced"),
-                   "res/conditions/or24.png",
-                   "res/conditions/or.png");
-
+    {
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
@@ -115,19 +108,19 @@ CommonInstructionsExtension::CommonInstructionsExtension()
             };
         };
         gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
-        instrInfo.SetCanHaveSubInstructions();
 
-    DECLARE_END_CONDITION()
-
-    DECLARE_CONDITION("And",
-                   _("And"),
-                   _("Return true if all sub conditions are true"),
-                   _("If all of these conditions are true :"),
+        AddCondition("Or",
+                   _("Or"),
+                   _("Return true if one of the sub conditions is true"),
+                   _("If one of these conditions is true :"),
                    _("Advanced"),
-                   "res/conditions/and24.png",
-                   "res/conditions/and.png");
+                   "res/conditions/or24.png",
+                   "res/conditions/or.png")
+            .SetCanHaveSubInstructions()
+            .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+    }
 
+    {
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
@@ -145,21 +138,20 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 return outputCode;
             };
         };
-
         gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
-        instrInfo.SetCanHaveSubInstructions();
 
-    DECLARE_END_CONDITION()
-
-    DECLARE_CONDITION("Not",
-                   _("No"),
-                   _("Return the contrary of the result of the sub conditions"),
-                   _("Invert the logical result of these conditions :"),
+        AddCondition("And",
+                   _("And"),
+                   _("Return true if all sub conditions are true"),
+                   _("If all of these conditions are true :"),
                    _("Advanced"),
-                   "res/conditions/not24.png",
-                   "res/conditions/not.png");
+                   "res/conditions/and24.png",
+                   "res/conditions/and.png")
+            .SetCanHaveSubInstructions()
+            .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+    }
 
+    {
         class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
         {
             virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
@@ -196,75 +188,69 @@ CommonInstructionsExtension::CommonInstructionsExtension()
                 return outputCode;
             };
         };
-
         gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
-        instrInfo.cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
-        instrInfo.SetCanHaveSubInstructions();
 
-    DECLARE_END_CONDITION()
+        AddCondition("Not",
+                   _("No"),
+                   _("Return the contrary of the result of the sub conditions"),
+                   _("Invert the logical result of these conditions :"),
+                   _("Advanced"),
+                   "res/conditions/not24.png",
+                   "res/conditions/not.png")
+            .SetCanHaveSubInstructions()
+            .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+    }
 
-    DECLARE_EVENT("Standard",
-                  _("Standard event"),
-                  "Évènement standard : Actions qui sont lancées si des conditions sont vérifiées",
-                  "",
-                  "res/eventaddicon.png",
-                  StandardEvent)
 
-    DECLARE_END_EVENT()
 
-    DECLARE_EVENT("Link",
-                  _("Link"),
-                  "Lien vers des évènements d'une autre scène",
-                  "",
-                  "res/lienaddicon.png",
-                  LinkEvent)
+    AddEvent("Standard",
+              _("Standard event"),
+              _("Standard event: Actions are run if conditions are fulfilled."),
+              "",
+              "res/eventaddicon.png",
+              boost::shared_ptr<gd::BaseEvent>(new StandardEvent));
 
-    DECLARE_END_EVENT()
+    AddEvent("Link",
+              _("Link"),
+              _("Link to some external events"),
+              "",
+              "res/lienaddicon.png",
+              boost::shared_ptr<gd::BaseEvent>(new LinkEvent));
 
-    DECLARE_EVENT("Comment",
-                  _("Comment"),
-                  "Un évènement permettant d'ajouter un commentaire dans la liste des évènements",
-                  "",
-                  "res/comment.png",
-                  CommentEvent)
+    AddEvent("Comment",
+              _("Comment"),
+              _("Event displaying a text in the events editor"),
+              "",
+              "res/comment.png",
+              boost::shared_ptr<gd::BaseEvent>(new CommentEvent));
 
-    DECLARE_END_EVENT()
+    AddEvent("While",
+              _("While"),
+              _("The event is repeated while the conditions are true"),
+              "",
+              "res/while.png",
+              boost::shared_ptr<gd::BaseEvent>(new WhileEvent));
 
-    DECLARE_EVENT("While",
-                  _("While"),
-                  "Répète des conditions et actions tant que certaines conditions ne sont pas vérifiées",
-                  "",
-                  "res/while.png",
-                  WhileEvent)
+    AddEvent("Repeat",
+              _("Repeat"),
+              _("Event repeated a number of times"),
+              "",
+              "res/repeat.png",
+              boost::shared_ptr<gd::BaseEvent>(new RepeatEvent));
 
-    DECLARE_END_EVENT()
+    AddEvent("ForEach",
+              _("For each object"),
+              _("Repeat the event for each specified object."),
+              "",
+              "res/foreach.png",
+              boost::shared_ptr<gd::BaseEvent>(new ForEachEvent));
 
-    DECLARE_EVENT("Repeat",
-                  _("Repeat"),
-                  "Répète un certain nombre de fois des conditions et actions",
-                  "",
-                  "res/repeat.png",
-                  RepeatEvent)
-
-    DECLARE_END_EVENT()
-
-    DECLARE_EVENT("ForEach",
-                  _("For each object"),
-                  "Répète des conditions et actions en prenant à chaque fois un objet ayant le nom indiqué",
-                  "",
-                  "res/foreach.png",
-                  ForEachEvent)
-
-    DECLARE_END_EVENT()
-
-    DECLARE_EVENT("CppCode",
-                  _("C++ code ( Experimental )"),
-                  "Execute du code C++",
-                  "",
-                  "res/source_cpp16.png",
-                  CppCodeEvent)
-
-    DECLARE_END_EVENT()
+    AddEvent("CppCode",
+              _("C++ code ( Experimental )"),
+              _("Execute C++ code"),
+              "",
+              "res/source_cpp16.png",
+              boost::shared_ptr<gd::BaseEvent>(new CppCodeEvent));
 
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-audio-2.dll"));
     supplementaryRuntimeFiles.push_back(std::pair<std::string, std::string>("Windows", "sfml-graphics-2.dll"));

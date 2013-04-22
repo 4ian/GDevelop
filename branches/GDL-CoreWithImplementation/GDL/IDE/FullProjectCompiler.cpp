@@ -42,6 +42,8 @@
 #include "GDL/IDE/BaseProfiler.h"
 #include "GDL/PlatformDefinition/Platform.h"
 #include "GDL/IDE/DependenciesAnalyzer.h"
+#undef _
+#define _(s) wxGetTranslation((s))
 
 using namespace std;
 using namespace gd;

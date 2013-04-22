@@ -743,8 +743,6 @@
 		<Unit filename="GDL/Events/CodeCompilationHelpers.h" />
 		<Unit filename="GDL/Events/EventsCodeGenerator.cpp" />
 		<Unit filename="GDL/Events/EventsCodeGenerator.h" />
-		<Unit filename="GDL/Events/EventsCodeNameMangler.cpp" />
-		<Unit filename="GDL/Events/EventsCodeNameMangler.h" />
 		<Unit filename="GDL/ExtensionBase.cpp" />
 		<Unit filename="GDL/ExtensionBase.h" />
 		<Unit filename="GDL/ExtensionsLoader.cpp" />
@@ -938,7 +936,7 @@
 			</wxsmith>
 			<DoxyBlocks>
 				<comment_style block="0" line="2" />
-				<doxyfile_project project_number="2.2.11125" output_directory="doc" use_auto_version="1" />
+				<doxyfile_project output_directory="doc" />
 				<doxyfile_build />
 				<doxyfile_warnings />
 				<doxyfile_output html_help="1" />

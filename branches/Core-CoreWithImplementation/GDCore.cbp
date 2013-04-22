@@ -347,6 +347,8 @@
 		<Unit filename="GDCore/IDE/ExpressionsCorrectnessTesting.h" />
 		<Unit filename="GDCore/IDE/ImagesUsedInventorizer.cpp" />
 		<Unit filename="GDCore/IDE/ImagesUsedInventorizer.h" />
+		<Unit filename="GDCore/IDE/MetadataProvider.cpp" />
+		<Unit filename="GDCore/IDE/MetadataProvider.h" />
 		<Unit filename="GDCore/IDE/ProjectResourcesCopier.cpp" />
 		<Unit filename="GDCore/IDE/ProjectResourcesCopier.h" />
 		<Unit filename="GDCore/IDE/ResourcesAbsolutePathChecker.cpp" />
@@ -383,8 +385,6 @@
 		<Unit filename="GDCore/PlatformDefinition/InitialInstance.h" />
 		<Unit filename="GDCore/PlatformDefinition/InitialInstancesContainer.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/InitialInstancesContainer.h" />
-		<Unit filename="GDCore/PlatformDefinition/InstructionsMetadataHolder.cpp" />
-		<Unit filename="GDCore/PlatformDefinition/InstructionsMetadataHolder.h" />
 		<Unit filename="GDCore/PlatformDefinition/Layer.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/Layer.h" />
 		<Unit filename="GDCore/PlatformDefinition/Layout.cpp" />

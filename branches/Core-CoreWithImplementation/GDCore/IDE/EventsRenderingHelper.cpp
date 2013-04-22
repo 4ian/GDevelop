@@ -219,15 +219,15 @@ int EventsRenderingHelper::DrawConditionsList(vector < gd::Instruction > & condi
         if ( conditions[j].IsInverted() )
         {
             dc.DrawBitmap( gd::CommonBitmapManager::GetInstance()->invertedCondition, x + 1, y, true );
-            if ( InstructionMetadata.smallicon.IsOk() ) dc.DrawBitmap( InstructionMetadata.smallicon, x + iconWidth + 1, y, true );
+            if ( InstructionMetadata.GetSmallBitmapIcon().IsOk() ) dc.DrawBitmap( InstructionMetadata.GetSmallBitmapIcon(), x + iconWidth + 1, y, true );
         }
-        else if ( InstructionMetadata.smallicon.IsOk() ) dc.DrawBitmap( InstructionMetadata.smallicon, x + 1, y, true );
+        else if ( InstructionMetadata.GetSmallBitmapIcon().IsOk() ) dc.DrawBitmap( InstructionMetadata.GetSmallBitmapIcon(), x + 1, y, true );
 
         areas.AddInstructionArea(wxRect(x,y, width, height), accessor);
         y+=height;
 
         //Draw sub conditions
-        if ( InstructionMetadata.canHaveSubInstructions )
+        if ( InstructionMetadata.CanHaveSubInstructions() )
             y += DrawConditionsList(conditions[j].GetSubInstructions(), dc, x + 18, y, width-18, event, areas, selection, platform);
     }
 
@@ -312,13 +312,13 @@ int EventsRenderingHelper::DrawActionsList(vector < gd::Instruction > & actions,
             height = DrawInstruction(actions[j], instructionMetadata, /*isCondition=*/false, dc, wxPoint(x + iconWidth, y), freeWidth, event, areas, selection);
 
         //Draw needed icons
-        if ( instructionMetadata.smallicon.IsOk() ) dc.DrawBitmap( instructionMetadata.smallicon, x + 1, y, true );
+        if ( instructionMetadata.GetSmallBitmapIcon().IsOk() ) dc.DrawBitmap( instructionMetadata.GetSmallBitmapIcon(), x + 1, y, true );
 
         areas.AddInstructionArea(wxRect(x,y, width, height), accessor);
         y+=height;
 
         //Draw sub actions
-        if ( instructionMetadata.canHaveSubInstructions )
+        if ( instructionMetadata.CanHaveSubInstructions() )
             y += DrawActionsList(actions[j].GetSubInstructions(), dc, x + 18, y, width-18, event, areas, selection, platform);
     }
 
@@ -349,7 +349,7 @@ unsigned int EventsRenderingHelper::GetRenderedConditionsListHeight(const vector
         y += height;
 
         //Sub conditions
-        if ( instructionMetadata.canHaveSubInstructions )
+        if ( instructionMetadata.CanHaveSubInstructions() )
             y += GetRenderedConditionsListHeight(conditions[j].GetSubInstructions(), width-18, platform);
     }
 
@@ -381,7 +381,7 @@ unsigned int EventsRenderingHelper::GetRenderedActionsListHeight(const vector < 
         y+=height;
 
         //Draw sub actions
-        if ( instructionMetadata.canHaveSubInstructions )
+        if ( instructionMetadata.CanHaveSubInstructions() )
             y += GetRenderedActionsListHeight(actions[j].GetSubInstructions(), width-18, platform);
     }
 

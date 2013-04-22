@@ -20,9 +20,14 @@ namespace gd
  */
 class GD_CORE_API ExpressionMetadata
 {
-    public:
+public:
 
-    ExpressionMetadata(std::string extensionNamespace);
+    ExpressionMetadata(const std::string & extensionNamespace,
+                        const std::string & name,
+                        const std::string & fullname,
+                        const std::string & description,
+                        const std::string & group,
+                        const std::string & smallicon);
     virtual ~ExpressionMetadata() {};
 
     /**
@@ -30,22 +35,28 @@ class GD_CORE_API ExpressionMetadata
      */
     ExpressionMetadata & SetHidden();
 
-    std::string fullname;
-    std::string description;
-    std::string group;
-    bool shown;
-    wxBitmap smallicon;
     std::vector < gd::ParameterMetadata > parameters;
 
     /**
      * \see gd::InstructionMetadata::AddParameter
      */
-    gd::ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    gd::ExpressionMetadata & AddParameter(const std::string & type, const std::string & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
 
     /**
      * \see gd::InstructionMetadata::AddCodeOnlyParameter
      */
-    gd::ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    gd::ExpressionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+
+    /**
+     * Set the default value used in editor ( or if an optional parameter is empty during code generation ) for the latest added parameter.
+     *
+     * \see AddParameter
+     */
+    ExpressionMetadata & SetDefaultValue(std::string defaultValue_)
+    {
+        if ( !parameters.empty() ) parameters.back().defaultValue = defaultValue_;
+        return *this;
+    };
 
     /**
      * \brief Defines information about how generate C++ code for an instruction
@@ -95,8 +106,19 @@ class GD_CORE_API ExpressionMetadata
      */
     ExpressionMetadata() {};
 
-    private:
-        std::string extensionNamespace;
+    bool IsShown() const { return shown; }
+    const std::string & GetFullName() const { return fullname; }
+    const std::string & GetDescription() const { return description; }
+    const std::string & GetGroup() const { return group; }
+    const wxBitmap & GetBitmapIcon() const { return smallicon; }
+
+private:
+    std::string fullname;
+    std::string description;
+    std::string group;
+    bool shown;
+    wxBitmap smallicon;
+    std::string extensionNamespace;
 };
 
 /**
@@ -104,9 +126,14 @@ class GD_CORE_API ExpressionMetadata
  */
 class GD_CORE_API StrExpressionMetadata
 {
-    public:
+public:
 
-    StrExpressionMetadata(std::string extensionNamespace);
+    StrExpressionMetadata(const std::string & extensionNamespace,
+                        const std::string & name,
+                        const std::string & fullname,
+                        const std::string & description,
+                        const std::string & group,
+                        const std::string & smallicon);
     virtual ~StrExpressionMetadata() {};
 
     /**
@@ -114,22 +141,28 @@ class GD_CORE_API StrExpressionMetadata
      */
     StrExpressionMetadata & SetHidden();
 
-    std::string fullname;
-    std::string description;
-    std::string group;
-    bool shown;
-    wxBitmap smallicon;
     std::vector < gd::ParameterMetadata > parameters;
 
     /**
      * \see gd::InstructionMetadata::AddParameter
      */
-    gd::ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    gd::StrExpressionMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
 
     /**
      * \see gd::InstructionMetadata::AddCodeOnlyParameter
      */
-    gd::ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    gd::StrExpressionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+
+    /**
+     * Set the default value used in editor ( or if an optional parameter is empty during code generation ) for the latest added parameter.
+     *
+     * \see AddParameter
+     */
+    StrExpressionMetadata & SetDefaultValue(std::string defaultValue_)
+    {
+        if ( !parameters.empty() ) parameters.back().defaultValue = defaultValue_;
+        return *this;
+    };
 
     /**
      * \brief Defines information about how generate C++ code for an instruction
@@ -179,8 +212,19 @@ class GD_CORE_API StrExpressionMetadata
      */
     StrExpressionMetadata() {};
 
-    private:
-        std::string extensionNamespace;
+    bool IsShown() const { return shown; }
+    const std::string & GetFullName() const { return fullname; }
+    const std::string & GetDescription() const { return description; }
+    const std::string & GetGroup() const { return group; }
+    const wxBitmap & GetBitmapIcon() const { return smallicon; }
+
+private:
+    std::string fullname;
+    std::string description;
+    std::string group;
+    bool shown;
+    wxBitmap smallicon;
+    std::string extensionNamespace;
 };
 
 }

@@ -34,7 +34,7 @@ ActionSentenceFormatter *ActionSentenceFormatter::_singleton = NULL;
 ////////////////////////////////////////////////////////////
 string ActionSentenceFormatter::Translate(const gd::Instruction & action, const gd::InstructionMetadata & infos)
 {
-    std::string trad = infos.sentence;
+    std::string trad = infos.GetSentence();
 
     //Remplacement des _PARAMx_ par la valeur des paramètres
     for (unsigned int i =0;i<infos.parameters.size();++i)
@@ -61,7 +61,7 @@ std::vector< std::pair<std::string, gd::TextFormatting> > ActionSentenceFormatte
 {
     std::vector< std::pair<std::string, gd::TextFormatting> > formattedStr;
 
-    std::string sentence = infos.sentence;
+    std::string sentence = infos.GetSentence();
     std::replace( sentence.begin(), sentence.end(), '\n', ' ');
     bool parse = true;
 

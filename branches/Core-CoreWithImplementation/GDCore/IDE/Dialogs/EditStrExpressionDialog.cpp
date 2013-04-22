@@ -185,27 +185,27 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
             std::map<string, gd::StrExpressionMetadata > allObjExpr = extensions[i]->GetAllStrExpressionsForObject(objectsTypes[j]);
             for(std::map<string, gd::StrExpressionMetadata>::const_iterator it = allObjExpr.begin(); it != allObjExpr.end(); ++it)
             {
-                if ( it->second.shown )
+                if ( it->second.IsShown() )
                 {
                     //Search and/or add group item
                     wxTreeItemIdValue cookie;
                     wxTreeItemId groupItem = ObjList->GetFirstChild(objectTypeItem, cookie);
-                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != it->second.group )
+                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != it->second.GetGroup() )
                     {
                         groupItem = ObjList->GetNextSibling(groupItem);
                     }
-                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(objectTypeItem, it->second.group, 0);
+                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(objectTypeItem, it->second.GetGroup(), 0);
 
                     //Add expression item
                     int IDimage = 0;
-                    if ( it->second.smallicon.IsOk() )
+                    if ( it->second.GetBitmapIcon().IsOk() )
                     {
-                        imageListObj->Add(it->second.smallicon);
+                        imageListObj->Add(it->second.GetBitmapIcon());
                         IDimage = imageListObj->GetImageCount()-1;
                     }
 
                     TreeItemStrExpressionInfoData * associatedData = new TreeItemStrExpressionInfoData(it->first, it->second);
-                    ObjList->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+                    ObjList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
                 }
             }
 	    }
@@ -220,27 +220,27 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
             std::map<string, gd::StrExpressionMetadata > allAutoExpr = extensions[i]->GetAllStrExpressionsForAutomatism(automatismsTypes[j]);
             for(std::map<string, gd::StrExpressionMetadata>::const_iterator it = allAutoExpr.begin(); it != allAutoExpr.end(); ++it)
             {
-                if ( it->second.shown )
+                if ( it->second.IsShown() )
                 {
                     //Search and/or add group item
                     wxTreeItemIdValue cookie;
                     wxTreeItemId groupItem = ObjList->GetFirstChild(automatismTypeItem, cookie);
-                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != it->second.group )
+                    while ( groupItem.IsOk() && ObjList->GetItemText(groupItem) != it->second.GetGroup() )
                     {
                         groupItem = ObjList->GetNextSibling(groupItem);
                     }
-                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(automatismTypeItem, it->second.group, 0);
+                    if ( !groupItem.IsOk() ) groupItem = ObjList->AppendItem(automatismTypeItem, it->second.GetGroup(), 0);
 
                     //Add expression item
                     int IDimage = 0;
-                    if ( it->second.smallicon.IsOk() )
+                    if ( it->second.GetBitmapIcon().IsOk() )
                     {
-                        imageListObj->Add(it->second.smallicon);
+                        imageListObj->Add(it->second.GetBitmapIcon());
                         IDimage = imageListObj->GetImageCount()-1;
                     }
 
                     TreeItemStrExpressionInfoData * associatedData = new TreeItemStrExpressionInfoData(it->first, it->second);
-                    ObjList->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+                    ObjList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
                 }
             }
 	    }
@@ -251,27 +251,27 @@ EditStrExpressionDialog::EditStrExpressionDialog(wxWindow* parent, std::string e
         std::map<string, gd::StrExpressionMetadata > allExpr = extensions[i]->GetAllStrExpressions();
         for(std::map<string, gd::StrExpressionMetadata>::const_iterator it = allExpr.begin(); it != allExpr.end(); ++it)
         {
-            if ( it->second.shown )
+            if ( it->second.IsShown() )
             {
                 //Search and/or add group item
                 wxTreeItemIdValue cookie;
                 wxTreeItemId groupItem = ValList->GetFirstChild(extensionItem, cookie);
-                while ( groupItem.IsOk() && ValList->GetItemText(groupItem) != it->second.group )
+                while ( groupItem.IsOk() && ValList->GetItemText(groupItem) != it->second.GetGroup() )
                 {
                     groupItem = ValList->GetNextSibling(groupItem);
                 }
-                if ( !groupItem.IsOk() ) groupItem = ValList->AppendItem(extensionItem, it->second.group, 0);
+                if ( !groupItem.IsOk() ) groupItem = ValList->AppendItem(extensionItem, it->second.GetGroup(), 0);
 
                 //Add expression item
                 int IDimage = 0;
-                if ( it->second.smallicon.IsOk() )
+                if ( it->second.GetBitmapIcon().IsOk() )
                 {
-                    imageListVal->Add(it->second.smallicon);
+                    imageListVal->Add(it->second.GetBitmapIcon());
                     IDimage = imageListVal->GetImageCount()-1;
                 }
 
                 TreeItemStrExpressionInfoData * associatedData = new TreeItemStrExpressionInfoData(it->first, it->second);
-                ValList->AppendItem(groupItem, it->second.fullname, IDimage, -1, associatedData);
+                ValList->AppendItem(groupItem, it->second.GetFullName(), IDimage, -1, associatedData);
             }
         }
 	}

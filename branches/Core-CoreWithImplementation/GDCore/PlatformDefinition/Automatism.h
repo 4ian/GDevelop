@@ -24,7 +24,7 @@ namespace gd
 class GD_CORE_API Automatism
 {
 public:
-    Automatism(const std::string & automatismTypeName);
+    Automatism() : activated(true) {};
     virtual ~Automatism();
     virtual Automatism* Clone() const { return new Automatism(*this);}
 
@@ -42,6 +42,11 @@ public:
      * Return the name identifying the type of the automatism
      */
     virtual const std::string & GetTypeName() const { return type; }
+
+    /**
+     * Change name identifying the type of the automatism.
+     */
+    virtual void SetTypeName(const std::string & type_) { type = type_; };
 
 
     #if defined(GD_IDE_ONLY)

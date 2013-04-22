@@ -37,13 +37,6 @@ public:
     std::string description; ///< Description shown in editor
     bool codeOnly; ///< True if parameter is relative to code generation only, i.e. must not be shown in editor
     std::string defaultValue; ///< Used as a default value in editor or if an optional parameter is empty.
-
-    /**
-     * Set the default value used in editor or if an optional parameter is empty during code generation.
-     */
-    ParameterMetadata & SetDefaultValue(std::string defaultValue_) {
-        defaultValue = defaultValue_;
-        return *this; };
 };
 
 /**
@@ -55,7 +48,14 @@ class GD_CORE_API InstructionMetadata
 {
 public:
 
-    InstructionMetadata(std::string extensionNamespace);
+    InstructionMetadata(const std::string & extensionNamespace,
+                        const std::string & name,
+                        const std::string & fullname,
+                        const std::string & description,
+                        const std::string & sentence,
+                        const std::string & group,
+                        const std::string & icon,
+                        const std::string & smallicon);
     virtual ~InstructionMetadata() {};
 
     const std::string & GetFullName() const { return fullname; }
@@ -64,15 +64,7 @@ public:
     const std::string & GetGroup() const { return group; }
     const wxBitmap & GetBitmapIcon() const { return icon; }
     const wxBitmap & GetSmallBitmapIcon() const { return smallicon; }
-
-    std::string fullname;
-    std::string description;
-    std::string sentence;
-    std::string group;
-    wxBitmap icon;
-    wxBitmap smallicon;
-    bool canHaveSubInstructions;
-    std::vector < ParameterMetadata > parameters;
+    bool CanHaveSubInstructions() const { return canHaveSubInstructions; }
 
     /**
      * Notify that the instruction can have sub instructions.
@@ -106,15 +98,25 @@ public:
      * \param optionalObjectType If type is "object", this parameter will describe which objects are allowed. If it is empty, all objects are allowed.
      * \param parameterIsOptional true if the parameter must be optional, false otherwise.
      */
-    ParameterMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType, bool parameterIsOptional);
+    InstructionMetadata & AddParameter(const std::string & type, const wxString & description, const std::string & optionalObjectType = "", bool parameterIsOptional = false);
 
     /**
      * Add a parameter not displayed in editor.
      * \param type One of the type handled by Game Develop. This will also determine the type of the argument used when calling the function in C++ code. \see EventsCodeGenerator::GenerateParametersCodes
      * \param supplementaryInformation Can be used if needed. For example, when type == "inlineCode", the content of supplementaryInformation is inserted in the generated C++ code.
      */
-    ParameterMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
+    InstructionMetadata & AddCodeOnlyParameter(const std::string & type, const std::string & supplementaryInformation);
 
+    /**
+     * Set the default value used in editor ( or if an optional parameter is empty during code generation ) for the latest added parameter.
+     *
+     * \see AddParameter
+     */
+    InstructionMetadata & SetDefaultValue(std::string defaultValue_)
+    {
+        if ( !parameters.empty() ) parameters.back().defaultValue = defaultValue_;
+        return *this;
+    };
 
     /**
      * \brief Defines information about how generate C++ code for an instruction
@@ -149,7 +151,7 @@ public:
          *
          * Usage example:
          * \code
-         *  DECLARE_OBJECT_ACTION("String",
+         *  obj.AddAction("String",
          *                 _("Change the string"),
          *                 _("Change the string of a text"),
          *                 _("Do _PARAM2__PARAM1_ to the string of _PARAM0_"),
@@ -157,11 +159,11 @@ public:
          *                 "CppPlatform/Extensions/text24.png",
          *                 "CppPlatform/Extensions/text.png");
          *
-         *      instrInfo.AddParameter("object", _("Object"), "Text", false);
-         *      instrInfo.AddParameter("string", _("String"), "", false);
-         *      instrInfo.AddParameter("operator", _("Modification operator"), "", false);
+         *      .AddParameter("object", _("Object"), "Text", false);
+         *      .AddParameter("string", _("String"))
+         *      .AddParameter("operator", _("Modification operator"))
          *
-         *      instrInfo.cppCallingInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
+         *      .cppCallingInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
          *
          *  DECLARE_END_OBJECT_ACTION()
          * \endcode
@@ -219,7 +221,16 @@ public:
      */
     InstructionMetadata() {};
 
+    std::vector < ParameterMetadata > parameters;
 private:
+
+    std::string fullname;
+    std::string description;
+    std::string sentence;
+    std::string group;
+    wxBitmap icon;
+    wxBitmap smallicon;
+    bool canHaveSubInstructions;
     std::string extensionNamespace;
     bool hidden;
 };

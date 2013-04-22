@@ -8,9 +8,8 @@
 namespace gd
 {
 
-AutomatismsSharedData::AutomatismsSharedData(std::string typeName) :
-    type(typeName)
+AutomatismsSharedData::~AutomatismsSharedData()
 {
-}
+};
 
 }

@@ -333,8 +333,10 @@ std::string EventsCodeGenerator::GenerateConditionCode(const gd::Layout & scene,
 
     //Generate automatism condition if available
     string automatismType = gd::GetTypeOfAutomatism(project, scene, condition.GetParameters().size() < 2 ? "" : condition.GetParameter(1).GetPlainString());
+    std::cout << "Searching for " << condition.GetType() << " for auto " << automatismType << std::endl;
     if (MetadataProvider::HasAutomatismCondition(platform, automatismType, condition.GetType()) && instrInfos.parameters.size() >= 2)
     {
+        std::cout << "FOUND" << std::endl;
         vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(project.GetObjectGroups().begin(), project.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectName));
         vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectName));
 

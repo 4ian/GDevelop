@@ -90,19 +90,18 @@ public:
      * - inlineCode: supplementary information associated with the parameter is directly pasted in the C++ code without change.
      * - mapOfObjectListsOfParameter : a std::map containing lists of objects which are specified by the object name in another parameter. (std::map <std::string, std::vector<RuntimeObject*> *>) Example:
      * \code
-    DECLARE_EXPRESSION("Count", _("Object count"), _("Count the number of picked objects"), _("Objects"), "res/conditions/nbObjet.png")
-        instrInfo.AddParameter("object", _("Object"), "", false);
-        instrInfo.AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0");
+    AddExpression("Count", _("Object count"), _("Count the number of picked objects"), _("Objects"), "res/conditions/nbObjet.png")
+        .AddParameter("object", _("Object"))
+        .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
+        .cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
-        instrInfo.cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
-    DECLARE_END_EXPRESSION()
      * \endcode
      * - mapOfObjectListsOfParameterWithoutPicking : Same as mapOfObjectListsOfParameter but do not pick object if they are not already concerned.
      * - ptrToObjectOfParameter : Return a pointer to object specified by the object name in another parameter ( RuntimeObject * ). Example:
      * \code
-    instrInfo.AddParameter("object", _("Object"), "", false);
-    instrInfo.AddParameter("object", _("Target object"), "", false);
-    instrInfo.AddCodeOnlyParameter("ptrToObjectOfParameter", "1"); //The called function will be called with this signature : Function(std::string, std::string, RuntimeObject*)
+    .AddParameter("object", _("Object"))
+    .AddParameter("object", _("Target object"))
+    .AddCodeOnlyParameter("ptrToObjectOfParameter", "1") //The called function will be called with this signature : Function(std::string, std::string, RuntimeObject*)
      * \endcode
      */
     std::vector<std::string> GenerateParametersCodes( const gd::Layout & scene, std::vector < gd::Expression > parameters, const std::vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);

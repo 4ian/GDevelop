@@ -25,8 +25,8 @@ namespace gd
 class GD_CORE_API AutomatismsSharedData
 {
 public:
-    AutomatismsSharedData(std::string typeName);
-    virtual ~AutomatismsSharedData() {};
+    AutomatismsSharedData() {};
+    virtual ~AutomatismsSharedData();
     virtual boost::shared_ptr<gd::AutomatismsSharedData> Clone() const { return boost::shared_ptr<gd::AutomatismsSharedData>(new AutomatismsSharedData(*this));}
 
     /**
@@ -43,6 +43,11 @@ public:
      * Return the name identifying the type of the automatism
      */
     std::string GetTypeName() { return type; }
+
+    /**
+     * Change name identifying the type of the automatism.
+     */
+    virtual void SetTypeName(const std::string & type_) { type = type_; };
 
     //TODO : GD C++ Platform specific code :
     /**

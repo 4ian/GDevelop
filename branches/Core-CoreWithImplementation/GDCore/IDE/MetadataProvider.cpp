@@ -14,8 +14,9 @@ using namespace std;
 
 namespace gd
 {
-AutomatismMetadata MetadataProvider::badAutomatismInfo;
-ObjectMetadata MetadataProvider::badObjectInfo;
+
+gd::AutomatismMetadata MetadataProvider::badAutomatismInfo;
+gd::ObjectMetadata MetadataProvider::badObjectInfo;
 gd::InstructionMetadata MetadataProvider::badInstructionMetadata;
 gd::ExpressionMetadata MetadataProvider::badExpressionMetadata;
 gd::StrExpressionMetadata MetadataProvider::badStrExpressionMetadata;

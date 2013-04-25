@@ -28,12 +28,11 @@
 #include <iostream>
 #include <fstream>
 
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/DatFile.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDCore/IDE/ResourcesMergingHelper.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/ExternalEvents.h"
 #include "Compilation.h"
@@ -63,7 +62,7 @@ BEGIN_EVENT_TABLE( Compilation, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-Compilation::Compilation( wxWindow* parent, Game & gameToCompile_ ) :
+Compilation::Compilation( wxWindow* parent, gd::Project & gameToCompile_ ) :
     gameToCompile(gameToCompile_)
 {
     //(*Initialize(Compilation)

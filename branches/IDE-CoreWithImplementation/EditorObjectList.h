@@ -23,7 +23,7 @@
 #include <wx/srchctrl.h>
 namespace gd {class ClassWithObjects;}
 #include "GDL/Object.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 

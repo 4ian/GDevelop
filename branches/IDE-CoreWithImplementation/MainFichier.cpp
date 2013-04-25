@@ -10,12 +10,12 @@
 #include <SFML/System.hpp>
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/IDE/ProjectResourcesCopier.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
 #include "GDCore/CommonTools.h"
-#include "GDL/ExtensionsManager.h"
-#include "GDL/RuntimeGame.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
+#include "GDL/Project.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
 #include "GDL/IDE/CodeCompiler.h"
 #include "GDL/CommonTools.h"
@@ -25,7 +25,7 @@
 #include "BuildToolsPnl.h"
 #include "BuildProgressPnl.h"
 #include "Compilation.h"
-#include "PlatformManager.h"
+#include "GDCore/IDE/PlatformManager.h"
 #include "Fusion.h"
 #include "ProjectManager.h"
 #include "StartHerePage.h"
@@ -49,35 +49,33 @@ void MainFrame::CreateNewProject()
     NewProjectDialog dialog(this);
     if ( dialog.ShowModal() == 1 )
     {
-        boost::shared_ptr<gd::Platform> associatedPlatform = PlatformManager::GetInstance()->GetPlatform(dialog.GetChosenTemplatePlatform());
+        boost::shared_ptr<gd::Platform> associatedPlatform = gd::PlatformManager::GetInstance()->GetPlatform(dialog.GetChosenTemplatePlatform());
         if ( associatedPlatform != boost::shared_ptr<gd::Platform>() )
         {
-            boost::shared_ptr<gd::Project> newProject = boost::shared_ptr<gd::Project> (associatedPlatform->CreateNewEmptyProject());
-            if ( newProject != boost::shared_ptr<gd::Project> () )
+            boost::shared_ptr<gd::Project> newProject(new gd::Project);
+            newProject->AddPlatform(associatedPlatform);
+
+            //Be sure that the directory of the target exists
+            wxString targetDirectory = wxFileName::FileName(dialog.GetChosenFilename()).GetPath();
+            if ( !wxDirExists(targetDirectory) ) gd::RecursiveMkDir::MkDir(targetDirectory);
+
+            if ( !dialog.GetChosenTemplateFile().empty() )
             {
-                //Be sure that the directory of the target exists
-                wxString targetDirectory = wxFileName::FileName(dialog.GetChosenFilename()).GetPath();
-                if ( !wxDirExists(targetDirectory) ) gd::RecursiveMkDir::MkDir(targetDirectory);
-
-                if ( !dialog.GetChosenTemplateFile().empty() )
-                {
-                    newProject->SetProjectFile(dialog.GetChosenTemplateFile());
-                    newProject->LoadFromFile(newProject->GetProjectFile());
-                    gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, ToString(targetDirectory), false);
-                }
-                else
-                    newProject->InsertNewLayout(gd::ToString(_("New scene")), 0);
-
-                newProject->SetProjectFile(dialog.GetChosenFilename());
-                newProject->SaveToFile(newProject->GetProjectFile());
-
-                games.push_back(newProject);
-                SetCurrentGame(games.size()-1);
-                if ( startPage ) startPage->Refresh();
-
-                if ( newProject->GetLayoutCount() > 0 ) projectManager->EditLayout(*newProject, newProject->GetLayout(0));
+                newProject->SetProjectFile(dialog.GetChosenTemplateFile());
+                newProject->LoadFromFile(newProject->GetProjectFile());
+                gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, ToString(targetDirectory), false);
             }
-            else wxLogError(_("Unable to create the project associated with the platform.\n\nPlease report this error to Game Develop developer."));
+            else
+                newProject->InsertNewLayout(gd::ToString(_("New scene")), 0);
+
+            newProject->SetProjectFile(dialog.GetChosenFilename());
+            newProject->SaveToFile(newProject->GetProjectFile());
+
+            games.push_back(newProject);
+            SetCurrentGame(games.size()-1);
+            if ( startPage ) startPage->Refresh();
+
+            if ( newProject->GetLayoutCount() > 0 ) projectManager->EditLayout(*newProject, newProject->GetLayout(0));
         }
         else wxLogError(_("Unable to find the platform associated with the template.\n\nPlease report this error to Game Develop developer."));
     }
@@ -156,13 +154,13 @@ void MainFrame::Open( string file )
 {
     sf::Lock lock(CodeCompiler::openSaveDialogMutex);
 
-    boost::shared_ptr<RuntimeGame> newGame(new RuntimeGame); //TODO: Abstract
-    if ( newGame->LoadFromFile(file) )
+    boost::shared_ptr<gd::Project> newProject(new gd::Project);
+    if ( newProject->LoadFromFile(file) )
     {
         //Ensure working directory is set to the IDE one.
         wxSetWorkingDirectory(mainFrameWrapper.GetIDEWorkingDirectory());
 
-        games.push_back(newGame);
+        games.push_back(newProject);
 
         //Sauvegarde fichiers récents
         SetLastUsedFile( file );
@@ -172,35 +170,35 @@ void MainFrame::Open( string file )
         if ( startPage ) startPage->Refresh();
 
         string unknownExtensions = "";
-        bool videoObjectUsed = false;
-        ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
-        for (unsigned int i = 0;i<newGame->GetUsedPlatformExtensions().size();++i)
+        for (unsigned int i = 0;i<newProject->GetUsedPlatformExtensions().size();++i)
         {
-            if ( extensionsManager->GetExtension(newGame->GetUsedPlatformExtensions()[i]) == boost::shared_ptr<ExtensionBase> () )
+            bool extensionFound = false;
+
+            for(unsigned int p = 0;p<newProject->GetUsedPlatforms().size();++p)
             {
-                if ( newGame->GetUsedPlatformExtensions()[i] == "VideoObject" )
-                    videoObjectUsed = true; //Display a special message for the video object extension.
-                else
-                    unknownExtensions += newGame->GetUsedPlatformExtensions()[i]+"\n";
+                gd::Platform & platform = *newProject->GetUsedPlatforms()[p];
+                std::vector < boost::shared_ptr<gd::PlatformExtension> > allExtensions = platform.GetAllPlatformExtensions();
+                for (unsigned int e = 0;e<allExtensions.size();++e)
+                {
+                    if ( allExtensions[e]->GetName() == newProject->GetUsedPlatformExtensions()[i])
+                    {
+                        extensionFound = true;
+                        break;
+                    }
+                }
+                if ( extensionFound ) break;
             }
+
+            if ( !extensionFound )
+                unknownExtensions += newProject->GetUsedPlatformExtensions()[i]+"\n";
         }
 
         if (unknownExtensions != "")
         {
-            wxString errorMsg = _("One or ore extensions are used by the game but are not installed :\n")
+            wxString errorMsg = _("One or ore extensions are used by the project but are not installed for the platform used by the project :\n")
                                 + unknownExtensions
                                 + _("\nSome objects, actions, conditions or expressions can be unavailable or not working.");
             wxLogWarning(errorMsg);
-        }
-        if (videoObjectUsed)
-        {
-            #if defined(WINDOWS)
-            wxString extensions = ".xgdwe";
-            wxLogWarning(_("The game is using the Video object. This extension has been disabled in this version of Game Develop.\nIf you want to enable it, go to the Game Develop directory, then in CppPlatform and Extensions directories, and rename VideoObject.disabled to VideoObject")+extensions);
-            #else
-            wxString extensions = ".xgdle";
-            wxLogWarning(_("The game is using the Video object. This extension has been disabled in this version of Game Develop: The videos won't be displayed"));
-            #endif
         }
     }
     //Ensure working directory is set to the IDE one.
@@ -340,7 +338,7 @@ void MainFrame::SaveAs()
         }
 
         SetLastUsedFile( GetCurrentGame()->GetProjectFile() );
-        SetCurrentGame(gameCurrentlyEdited, false);
+        SetCurrentGame(projectCurrentlyEdited, false);
 
         return;
     }
@@ -402,17 +400,8 @@ void MainFrame::OnMenuFusionSelected(wxCommandEvent& event)
 {
     if ( !CurrentGameIsValid() ) return;
 
-    try //TODO
-    {
-        Game & game = dynamic_cast<Game &>(*GetCurrentGame());
-        Fusion dialog(this, game);
-        dialog.ShowModal();
-    }
-    catch(...)
-    {
-        std::cout << "WARNING: The merge dialog is not yet adapted for non GD C++ Platform project";
-    }
-
+    Fusion dialog(this, *GetCurrentGame());
+    dialog.ShowModal();
 
     projectManager->Refresh();
     if ( startPage ) startPage->Refresh();

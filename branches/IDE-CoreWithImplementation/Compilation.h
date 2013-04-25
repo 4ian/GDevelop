@@ -16,7 +16,7 @@
 #include <wx/dialog.h>
 #include <wx/gauge.h>
 //*)
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include <string>
 #include <vector>
 #include <wx/process.h>
@@ -30,7 +30,7 @@ class Compilation: public wxDialog
 {
 	public:
 
-		Compilation(wxWindow* parent, Game & gameToCompile_);
+		Compilation(wxWindow* parent, gd::Project & gameToCompile_);
 		virtual ~Compilation();
 
 		//(*Declarations(Compilation)
@@ -82,7 +82,7 @@ class Compilation: public wxDialog
 		//*)
 		wxString DeleteInvalidCharacters(const wxString & directoryName) const;
 
-		Game & gameToCompile;
+		gd::Project & gameToCompile;
 
 		DECLARE_EVENT_TABLE()
 };

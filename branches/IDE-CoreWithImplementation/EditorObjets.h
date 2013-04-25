@@ -13,7 +13,7 @@
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
 #include <wx/aui/aui.h>
 #include <wx/imaglist.h>
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #ifdef __WXMSW__
@@ -28,7 +28,7 @@ class EditorObjets: public wxPanel, public gd::LayoutEditorCanvasAssociatedEdito
 {
 public:
 
-    EditorObjets(wxWindow* parent, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+    EditorObjets(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
     virtual ~EditorObjets();
 
     /**
@@ -83,7 +83,7 @@ private:
     wxImageList* globalNotebookImageList;
     wxImageList* notebookImageList;
 
-    Game & game;
+    gd::Project & game;
     gd::Layout & scene;
 
     gd::MainFrameWrapper & mainFrameWrapper;

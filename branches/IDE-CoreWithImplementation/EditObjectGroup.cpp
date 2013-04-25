@@ -15,7 +15,7 @@
 #include <wx/log.h>
 #include <wx/help.h>
 #include <wx/msgdlg.h>
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"

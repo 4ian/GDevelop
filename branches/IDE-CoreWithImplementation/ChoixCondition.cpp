@@ -24,10 +24,9 @@
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Scene.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/ConditionSentenceFormatter.h"
@@ -42,6 +41,7 @@
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
+#include "GDCore/IDE/MetadataProvider.h"
 #include "TrueOrFalse.h"
 #include "ChoiceJoyAxis.h"
 #include "ChoiceFile.h"
@@ -94,7 +94,7 @@ BEGIN_EVENT_TABLE( ChoixCondition, wxDialog )
     //*)
 END_EVENT_TABLE()
 
-ChoixCondition::ChoixCondition( wxWindow* parent, Game & game_, gd::Layout & scene_) :
+ChoixCondition::ChoixCondition( wxWindow* parent, gd::Project & game_, gd::Layout & scene_) :
 game(game_),
 scene(scene_),
 conditionInverted(false)
@@ -296,7 +296,7 @@ void ChoixCondition::RefreshList()
     bool searching = search.empty() ? false : true;
 
     //Insert extension objects conditions
-    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -457,7 +457,7 @@ void ChoixCondition::RefreshObjectConditionsList()
     std::string selectedObjectType = gd::GetTypeOfObject(game, scene, selectedObject);
 
     //Insert extension objects conditions
-    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -609,7 +609,7 @@ void ChoixCondition::RefreshFromCondition()
     if ( Type.empty() ) return;
 
     //Display action main properties
-    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetConditionMetadata(game.GetPlatform(), Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), Type);
 
     NomConditionTxt->SetLabel( instructionMetadata.GetFullName() );
     NomConditionTxt->Wrap( 450 );
@@ -757,7 +757,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
     string num = ( string ) wxWindow::FindFocus()->GetName();
     unsigned int i = atoi( num.c_str() );
 
-    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetConditionMetadata(game.GetPlatform(), Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), Type);
 
     if ( i < MaxPara && i < instructionMetadata.parameters.size())
     {
@@ -883,13 +883,13 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
 
             string objectWanted = string(ParaEdit[0]->GetValue().mb_str());
             std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
-            std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+            std::vector<ObjSPtr>::iterator globalObject = std::find_if(game.GetObjects().begin(), game.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
             ObjSPtr object = boost::shared_ptr<gd::Object> ();
 
             if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
                 object = *sceneObject;
-            else if ( globalObject != game.GetGlobalObjects().end() ) //Then the global object list
+            else if ( globalObject != game.GetObjects().end() ) //Then the global object list
                 object = *globalObject;
             else
                 return;
@@ -923,7 +923,7 @@ void ChoixCondition::OnABtClick( wxCommandEvent& event )
 
 void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
 {
-    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetConditionMetadata(game.GetPlatform(), Type);
+    const gd::InstructionMetadata & instructionMetadata = gd::MetadataProvider::GetConditionMetadata(game.GetCurrentPlatform(), Type);
 
     if ( Type == "" )
         return;
@@ -948,12 +948,12 @@ void ChoixCondition::OnOkBtClick( wxCommandEvent& event )
             gd::CallbacksForExpressionCorrectnessTesting callbacks(game, scene);
             gd::ExpressionParser expressionParser(ToString(ParaEdit[i]->GetValue()));
 
-            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game.GetPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game.GetPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseStringExpression(game.GetPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseStringExpression(game.GetPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game.GetPlatform(), game, scene, callbacks))
-                ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game.GetPlatform(), game, scene, callbacks)))
+            if (  (instructionMetadata.parameters[i].type == "string" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "file" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "color" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "joyaxis" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "layer" && !expressionParser.ParseStringExpression(game.GetCurrentPlatform(), game, scene, callbacks))
+                ||(instructionMetadata.parameters[i].type == "expression" && !expressionParser.ParseMathExpression(game.GetCurrentPlatform(), game, scene, callbacks)))
             {
                 message = expressionParser.firstErrorStr;
 

@@ -39,7 +39,7 @@ BEGIN_EVENT_TABLE(ExternalLayoutEditor,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-ExternalLayoutEditor::ExternalLayoutEditor(wxWindow* parent, RuntimeGame & project_, gd::ExternalLayout & externalLayout_, const gd::MainFrameWrapper & mainFrameWrapper_) :
+ExternalLayoutEditor::ExternalLayoutEditor(wxWindow* parent, gd::Project & project_, gd::ExternalLayout & externalLayout_, const gd::MainFrameWrapper & mainFrameWrapper_) :
 layoutEditorCanvas(NULL),
 externalLayout(externalLayout_),
 project(project_),

@@ -20,7 +20,7 @@
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/CommonTools.h"
-#include "../PlatformManager.h"
+#include "GDCore/IDE/PlatformManager.h"
 
 //(*IdInit(NewProjectDialog)
 const long NewProjectDialog::ID_STATICTEXT1 = wxNewId();
@@ -154,14 +154,14 @@ void NewProjectDialog::RefreshPlatformList()
     imageList->Add(wxBitmap("res/icon32.png", wxBITMAP_TYPE_ANY));
     platformList->AssignImageList(imageList, wxIMAGE_LIST_SMALL);
 
-    const std::vector< boost::shared_ptr<gd::Platform> > & platforms = PlatformManager::GetInstance()->GetAllPlatforms();
+    const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::GetInstance()->GetAllPlatforms();
     for (unsigned int i = 0;i<platforms.size();++i)
     {
-        platformList->InsertItem(0, platforms[i]->GetPlatformName(), 0);
-        gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(platforms[i]->GetPlatformName());
+        platformList->InsertItem(0, platforms[i]->GetName(), 0);
+        gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(platforms[i]->GetName());
         platformList->SetItemPtrData(0, wxPtrToUInt(associatedData));
 
-        if (i == 0) chosenTemplatePlatform = platforms[i]->GetPlatformName();
+        if (i == 0) chosenTemplatePlatform = platforms[i]->GetName();
     }
 }
 

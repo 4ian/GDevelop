@@ -44,18 +44,18 @@
 #include "CompilationChecker.h"
 #include "GDCore/IDE/Clipboard.h"
 #include "LogFileManager.h"
-#include "PlatformManager.h"
 #include "ExtensionBugReportDlg.h"
 #include "Dialogs/HelpViewerDlg.h"
 
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Log.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/SoundManager.h"
 #include "GDL/FontManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/ActionSentenceFormatter.h"
-#include "GDL/ExtensionsManager.h"
+#include "GDCore/IDE/PlatformManager.h"
+#include "GDCore/IDE/PlatformLoader.h"
 #include "GDL/ExtensionsLoader.h"
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Locale/LocaleManager.h"
@@ -131,7 +131,7 @@ bool Game_Develop_EditorApp::OnInit()
         ;
     else if ( parser.Found( wxT("version") ) )
     {
-        cout << GDLVersionWrapper::FullString() << endl;
+        cout << gd::VersionWrapper::FullString() << endl;
         return false;
     }
     else if ( parser.Found( wxT("help") ) )
@@ -226,13 +226,6 @@ bool Game_Develop_EditorApp::OnInit()
     #endif
 
     cout << "* Single instance checked" << endl;
-    //Safety check for gdl.dll
-    bool sameGDLdllAsDuringCompilation = CompilationChecker::EnsureCorrectGDLVersion();
-    if ( !sameGDLdllAsDuringCompilation )
-    {
-        wxLogError(_("The version of GDL.dll ( or GDL.so ) seems to be incorrect. Try to reinstall Game Develop.\nIf the problem is still present, check for new version of Game Develop : http://www.compilgames.net\nIf there isn't any new version available, contact the author."));
-    }
-    cout << "* GDL checked" << endl;
 
     //Test si le programme n'aurait pas planté la dernière fois
     //En vérifiant si un fichier existe toujours
@@ -292,8 +285,8 @@ bool Game_Develop_EditorApp::OnInit()
     else
         CodeCompiler::GetInstance()->AllowMultithread(false);
 
-    //Load extensions
-    cout << "* Loading extensions:" << endl;
+    //Load platforms and extensions
+    cout << "* Loading platforms and extensions:" << endl;
     bool loadExtensions = true;
 
     #if defined(RELEASE)
@@ -314,15 +307,13 @@ bool Game_Develop_EditorApp::OnInit()
     }
     #endif
 
-    GDpriv::ExtensionsLoader * extensionsLoader = GDpriv::ExtensionsLoader::GetInstance();
-    extensionsLoader->SetExtensionsDir("./CppPlatform/Extensions/");
-    if ( loadExtensions ) extensionsLoader->LoadAllStaticExtensionsAvailable();
+    if ( loadExtensions ) gd::PlatformLoader::LoadAllPlatformsInManager(".");
 
     #if defined(RELEASE)
     wxSetAssertHandler(NULL); //Don't want to have annoying assert dialogs in release
     #endif
 
-    cout << "* Extensions loading ended." << endl;
+    cout << "* Platform and extensions loading ended." << endl;
     wxFileSystem::AddHandler( new wxZipFSHandler );
 
     //Creating main window
@@ -373,7 +364,7 @@ bool Game_Develop_EditorApp::OnInit()
     mainEditor->Show();
     cout << "* Initializing platforms..." << endl;
 
-    PlatformManager::GetInstance()->NotifyPlatformIDEInitialized();
+    gd::PlatformManager::GetInstance()->NotifyPlatformIDEInitialized();
 
     cout << "* Initialization ended." << endl;
 
@@ -413,7 +404,7 @@ int Game_Develop_EditorApp::OnExit()
     cout << "." << endl;
 
     cout << "* Closing the platforms..." << endl;
-    PlatformManager::GetInstance()->DestroySingleton();
+    gd::PlatformManager::DestroySingleton();
 
     cout << "* Deleting single instance checker..." << endl;
     #if defined(LINUX) || defined(MAC)

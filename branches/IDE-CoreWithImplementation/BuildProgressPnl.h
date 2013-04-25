@@ -15,7 +15,7 @@
 //*)
 #include <wx/thread.h>
 #include <wx/stopwatch.h>
-class Game;
+namespace gd { class Project; }
 
 class BuildProgressPnl: public wxPanel
 {

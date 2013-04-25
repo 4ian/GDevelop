@@ -33,8 +33,8 @@
 #include "EventsEditor.h"
 #include "Dialogs/LayoutEditorPropertiesPnl.h"
 
-#include "GDL/Game.h"
-#include "GDL/RuntimeGame.h"
+#include "GDL/Project.h"
+#include "GDL/Project.h"
 
 //(*IdInit(EditorScene)
 const long EditorScene::ID_SCROLLBAR3 = wxNewId();
@@ -57,17 +57,6 @@ project(project_),
 layout(layout_),
 mainFrameWrapper(mainFrameWrapper_)
 {
-    //TODO: GD C++ Platform specific code
-    try
-    {
-        gd::Layout & scene = dynamic_cast<Scene&>(layout);
-        Game & game = dynamic_cast<Game&>(project);
-    }
-    catch (...) { std::cout << "Scene editor is not adapted to arbitrary gd::Layout, GD will crash."; std::cout << char(7); /*Not a GD C++ Platform scene*/ }
-
-    gd::Layout & scene = dynamic_cast<Scene&>(layout);
-    RuntimeGame & game = dynamic_cast<RuntimeGame&>(project);
-
 	//(*Initialize(EditorScene)
 	wxFlexGridSizer* FlexGridSizer3;
 	wxFlexGridSizer* FlexGridSizer1;
@@ -85,14 +74,14 @@ mainFrameWrapper(mainFrameWrapper_)
 	vScrollbar->SetScrollbar(2500, 10, 5000, 10);
 	hScrollbar = new wxScrollBar(scenePanel, ID_SCROLLBAR4, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR4"));
 	hScrollbar->SetScrollbar(2500, 10, 5000, 10);
-	layoutEditorCanvas = new SceneEditorCanvas(scenePanel, game, scene, scene.GetInitialInstances(), scene.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);
+	layoutEditorCanvas = new SceneEditorCanvas(scenePanel, project, layout, layout.GetInitialInstances(), layout.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);
 	eventsPanel = new wxPanel(notebook, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
 	eventsPanel->SetBackgroundColour(wxColour(255,255,255));
 	eventsPanel->SetHelpText(_("Edit the events of the scene"));
 	FlexGridSizer3 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer3->AddGrowableCol(0);
 	FlexGridSizer3->AddGrowableRow(0);
-	eventsEditor = new EventsEditor(eventsPanel, game, scene, &scene.GetEvents(), mainFrameWrapper);
+	eventsEditor = new EventsEditor(eventsPanel, project, layout, &layout.GetEvents(), mainFrameWrapper);
 	FlexGridSizer3->Add(eventsEditor, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	eventsPanel->SetSizer(FlexGridSizer3);
 	FlexGridSizer3->Fit(eventsPanel);
@@ -123,9 +112,9 @@ mainFrameWrapper(mainFrameWrapper_)
     layoutEditorCanvas->SetScrollbars(hScrollbar, vScrollbar);
 
     //Create all editors linked to scene canvas.
-    objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, game, scene, mainFrameWrapper) );
-    layersEditor =  boost::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, game, scene, mainFrameWrapper) );
-    initialInstancesBrowser = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, scene.GetInitialInstances(), *layoutEditorCanvas) );
+    objectsEditor = boost::shared_ptr<EditorObjets>(new EditorObjets(this, project, layout, mainFrameWrapper) );
+    layersEditor =  boost::shared_ptr<gd::LayersEditorPanel>(new gd::LayersEditorPanel(this, project, layout, mainFrameWrapper) );
+    initialInstancesBrowser = boost::shared_ptr<InitialPositionBrowserDlg>(new InitialPositionBrowserDlg(this, layout.GetInitialInstances(), *layoutEditorCanvas) );
     propertiesPnl = boost::shared_ptr<LayoutEditorPropertiesPnl>(new LayoutEditorPropertiesPnl(this, project, layout, layoutEditorCanvas));
 
     //Link some editors together

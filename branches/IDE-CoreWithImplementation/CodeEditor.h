@@ -13,14 +13,14 @@
 #include <string>
 #include <vector>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
-class Game;
+namespace gd { class Project; }
 namespace gd { class Layout; }
 
 class CodeEditor: public wxPanel
 {
 	public:
 
-		CodeEditor(wxWindow* parent, std::string filename, Game * game_, const gd::MainFrameWrapper & mainFrameWrapper_);
+		CodeEditor(wxWindow* parent, std::string filename, gd::Project * game_, const gd::MainFrameWrapper & mainFrameWrapper_);
 		virtual ~CodeEditor();
 
 		//(*Declarations(CodeEditor)
@@ -34,7 +34,7 @@ class CodeEditor: public wxPanel
 		//*)
 
 		std::string filename; ///< File being edited.
-		Game * game; ///< Game associated with the file. Can be NULL.
+		gd::Project * game; ///< Game associated with the file. Can be NULL.
 
         /**
          * Change selected line

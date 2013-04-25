@@ -15,7 +15,7 @@
 #include <string>
 #include <vector>
 
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/OpenSaveGame.h"
 #include "GDL/CommonTools.h"
 #include "GDCore/Events/Serialization.h"

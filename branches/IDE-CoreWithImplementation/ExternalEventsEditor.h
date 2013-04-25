@@ -12,7 +12,7 @@
 #include <wx/combobox.h>
 //*)
 namespace gd { class ExternalEvents; };
-class Game;
+namespace gd { class Project; }
 class EventsEditor;
 #include "GDL/Scene.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
@@ -21,7 +21,7 @@ class ExternalEventsEditor: public wxPanel
 {
 public:
 
-    ExternalEventsEditor(wxWindow* parent, Game & game_, gd::ExternalEvents & events_, const gd::MainFrameWrapper & mainFrameWrapper_);
+    ExternalEventsEditor(wxWindow* parent, gd::Project & game_, gd::ExternalEvents & events_, const gd::MainFrameWrapper & mainFrameWrapper_);
     virtual ~ExternalEventsEditor();
 
     //(*Declarations(ExternalEventsEditor)
@@ -33,7 +33,7 @@ public:
     //*)
 
     gd::ExternalEvents & events;
-    Game & game;
+    gd::Project & game;
 
     /**
      * Can be called by parent so as to refresh ribbon for this editor.

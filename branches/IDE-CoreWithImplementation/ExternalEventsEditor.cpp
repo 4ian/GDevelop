@@ -13,7 +13,7 @@
 #include <wx/ribbon/bar.h>
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/CommonTools.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "EventsEditor.h"
 
@@ -28,7 +28,7 @@ BEGIN_EVENT_TABLE(ExternalEventsEditor,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-ExternalEventsEditor::ExternalEventsEditor(wxWindow* parent, Game & game_, gd::ExternalEvents & events_, const gd::MainFrameWrapper & mainFrameWrapper_) :
+ExternalEventsEditor::ExternalEventsEditor(wxWindow* parent, gd::Project & game_, gd::ExternalEvents & events_, const gd::MainFrameWrapper & mainFrameWrapper_) :
 events(events_),
 game(game_),
 mainFrameWrapper(mainFrameWrapper_)

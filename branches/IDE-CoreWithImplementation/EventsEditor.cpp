@@ -29,10 +29,9 @@
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/ExternalEvents.h"
 #include "LogFileManager.h"
 #include "GDL/IDE/Dialogs/ProfileDlg.h"
@@ -106,7 +105,7 @@ BEGIN_EVENT_TABLE(EventsEditor,wxPanel)
 END_EVENT_TABLE()
 
 
-EventsEditor::EventsEditor(wxWindow* parent, Game & game_, gd::Layout & scene_, vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
+EventsEditor::EventsEditor(wxWindow* parent, gd::Project & game_, gd::Layout & scene_, vector < gd::BaseEventSPtr > * events_, gd::MainFrameWrapper & mainFrameWrapper_ ) :
     game(game_),
     scene(scene_),
     externalEvents(NULL),
@@ -287,7 +286,7 @@ EventsEditor::EventsEditor(wxWindow* parent, Game & game_, gd::Layout & scene_, 
         gd::EventsRenderingHelper::GetInstance()->SetFont(eventsEditorFont);
 
     //Adding events types
-    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<gd::PlatformExtension> > extensions = game.GetCurrentPlatform().GetAllPlatformExtensions();
 
     //Insert extension specific events types
 	for (unsigned int i = 0;i<extensions.size();++i)
@@ -515,7 +514,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
 
         gd::EventsRenderingHelper::GetInstance()->SetConditionsColumnWidth(conditionColumnWidth-x);
         unsigned int width = eventsPanel->GetSize().x-x > 0 ? eventsPanel->GetSize().x-x : 1;
-        unsigned int height = events[i]->GetRenderedHeight(width, game.GetPlatform());
+        unsigned int height = events[i]->GetRenderedHeight(width, game.GetCurrentPlatform());
 
         if( !(y+static_cast<int>(height) < 0 || y > eventsPanel->GetSize().y) ) //Render only if needed
         {
@@ -572,7 +571,7 @@ unsigned int EventsEditor::DrawEvents(wxDC & dc, std::vector < boost::shared_ptr
 
 
             //Event rendering
-            events[i]->Render(dc, x, y, width, itemsAreas, selection, game.GetPlatform());
+            events[i]->Render(dc, x, y, width, itemsAreas, selection, game.GetCurrentPlatform());
 
             if ( drawDragTarget )
             {
@@ -1096,9 +1095,9 @@ void EventsEditor::ChangesMadeOnEvents(bool updateHistory, bool noNeedForSceneRe
     if ( !noNeedForSceneRecompilation )
     {
         if ( externalEvents != NULL )
-            gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(game, *externalEvents);
+            gd::EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(game.GetCurrentPlatform(), game, *externalEvents);
         else
-            gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(game, scene);
+            gd::EventsChangesNotifier::NotifyChangesInEventsOfScene(game.GetCurrentPlatform(), game, scene);
     }
 }
 
@@ -1208,7 +1207,7 @@ void EventsEditor::OnaddInstrBtClick(wxCommandEvent& event)
  */
 void EventsEditor::AddEvent(EventItem & previousEventItem)
 {
-    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Standard");
+    gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent("BuiltinCommonInstructions::Standard");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
         //Edit the event
@@ -1261,7 +1260,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
     EventItem previousEventItem;
     if ( !eventsSelected.empty() && eventsSelected[0].event != boost::shared_ptr<gd::BaseEvent>() ) previousEventItem = eventsSelected[0];
 
-    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Comment");
+    gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent("BuiltinCommonInstructions::Comment");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
         if ( eventToAdd->EditEvent(this, game, scene, mainFrameWrapper) == gd::BaseEvent::Cancelled ) return;
@@ -1289,7 +1288,7 @@ void EventsEditor::OnRibbonAddCommentBtClick(wxRibbonButtonBarEvent& evt)
  */
 void EventsEditor::AddSubEvent(EventItem & parentEventItem)
 {
-    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent("BuiltinCommonInstructions::Standard");
+    gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent("BuiltinCommonInstructions::Standard");
     if ( eventToAdd != boost::shared_ptr<gd::BaseEvent>() )
     {
         eventToAdd->EditEvent(this, game, scene, mainFrameWrapper);
@@ -1333,8 +1332,8 @@ void EventsEditor::AddCustomEventFromMenu(unsigned int menuID, EventItem & previ
     }
 
     //Create event
-    if ( !ExtensionsManager::GetInstance()->HasEventType(eventType) ) return;
-    gd::BaseEventSPtr eventToAdd = ExtensionsManager::GetInstance()->CreateEvent(eventType);
+    gd::BaseEventSPtr eventToAdd = game.GetCurrentPlatform().CreateEvent(eventType);
+    if ( !eventToAdd ) return;
     if ( eventToAdd->EditEvent(this, game, scene, mainFrameWrapper) == gd::BaseEvent::Cancelled ) return;
 
     //Adding event

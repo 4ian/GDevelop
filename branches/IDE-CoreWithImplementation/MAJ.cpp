@@ -123,7 +123,7 @@ parent(parent_)
 	Connect(ID_BUTTON1,wxEVT_COMMAND_BUTTON_CLICKED,(wxObjectEventFunction)&MAJ::OnFermerBtClick);
 	//*)
 
-	versionTxt->SetLabel( GDLVersionWrapper::FullString() );
+	versionTxt->SetLabel( gd::VersionWrapper::FullString() );
 
 	if ( wasAutomaticallyOpened )
     {

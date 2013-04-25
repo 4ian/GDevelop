@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include "GDCore/Events/Event.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/EventsRefactorer.h"

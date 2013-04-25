@@ -14,7 +14,7 @@
 #include <wx/mimetype.h>
 #include <wx/config.h>
 #include "GDL/Scene.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include <wx/fontdlg.h>
 
@@ -45,7 +45,7 @@ BEGIN_EVENT_TABLE(CodeEditor,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-CodeEditor::CodeEditor(wxWindow* parent, std::string filename_, Game * game_, const gd::MainFrameWrapper & mainFrameWrapper_) :
+CodeEditor::CodeEditor(wxWindow* parent, std::string filename_, gd::Project * game_, const gd::MainFrameWrapper & mainFrameWrapper_) :
 filename(filename_),
 game(game_),
 mainFrameWrapper(mainFrameWrapper_)

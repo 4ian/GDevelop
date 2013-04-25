@@ -36,11 +36,11 @@
 #include <wx/msw/winundef.h>
 #endif
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/CommonTools.h"
 #include "EditorScene.h"
 #include "RecentList.h"
-class RuntimeGame;
+namespace gd { class Project; }
 class ProjectManager;
 class StartHerePage;
 class BuildToolsPnl;
@@ -64,16 +64,16 @@ class MainFrame: public wxFrame
         virtual ~MainFrame();
 
         vector < boost::shared_ptr<gd::Project> > games; ///< All games opened
-        unsigned int gameCurrentlyEdited; ///< Index of the current game ( "Current" means chosen in the project manager )
+        unsigned int projectCurrentlyEdited; ///< Index of the current game ( "Current" means chosen in the project manager )
 
         /**
          * Get a shared pointer to the current game ( "Current" means choosen in the project manager )
          */
         inline boost::shared_ptr<gd::Project> GetCurrentGame()
         {
-            if ( gameCurrentlyEdited >= games.size()) return boost::shared_ptr<gd::Project> ();
+            if ( projectCurrentlyEdited >= games.size()) return boost::shared_ptr<gd::Project> ();
 
-            return games[gameCurrentlyEdited];
+            return games[projectCurrentlyEdited];
         }
 
         /**
@@ -81,7 +81,7 @@ class MainFrame: public wxFrame
          */
         inline bool CurrentGameIsValid()
         {
-            if ( gameCurrentlyEdited >= games.size()) return false;
+            if ( projectCurrentlyEdited >= games.size()) return false;
 
             return true;
         }

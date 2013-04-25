@@ -11,7 +11,7 @@
 #include <wx/sizer.h>
 #include <wx/panel.h>
 //*)
-class Game;
+namespace gd { class Project; }
 class ProjectManager;
 #include <vector>
 #include "GDL/IDE/CompilerMessagesParser.h"
@@ -26,7 +26,7 @@ class BuildMessagesPnl: public wxPanel
 		void OpenFileContainingFirstError();
 
         ProjectManager * projectManager; ///< Used to open files.
-		Game * gameAssociatedWithErrors; ///< Game for which errors have been emitted.
+		gd::Project * gameAssociatedWithErrors; ///< Game for which errors have been emitted.
 
 		//(*Declarations(BuildMessagesPnl)
 		wxListCtrl* messagesList;
@@ -50,7 +50,7 @@ class BuildMessagesPnl: public wxPanel
          * \param game Game from which the messages have been emitted
          * \param messages Messages to be displayed
          */
-		void RefreshWith(Game * game, std::vector < GDpriv::CompilerMessage > messages);
+		void RefreshWith(gd::Project * game, std::vector < GDpriv::CompilerMessage > messages);
 
 		/**
 		 * Called thanks to an event of type CodeCompiler::refreshEventType sent ( typically ) by CodeCompiler.

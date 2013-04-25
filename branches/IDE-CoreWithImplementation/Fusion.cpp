@@ -19,7 +19,7 @@
 #include <wx/msgdlg.h>
 
 #include "GDL/CommonTools.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/Scene.h"
@@ -50,7 +50,7 @@ BEGIN_EVENT_TABLE(Fusion,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-Fusion::Fusion(wxWindow* parent, Game & game_) :
+Fusion::Fusion(wxWindow* parent, gd::Project & game_) :
 game(game_)
 {
 	//(*Initialize(Fusion)
@@ -137,7 +137,7 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
     if ( dialog.GetPath() == "" )
         return;
 
-    Game secondGame;
+    gd::Project secondGame;
     secondGame.LoadFromFile(static_cast<string>( dialog.GetPath() ));
 
     if ( ImageCheck->GetValue() )
@@ -183,23 +183,23 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
     }
     if ( objectsCheck->GetValue() )
     {
-        for(unsigned int i = 0;i<secondGame.GetGlobalObjects().size();i++)
+        for(unsigned int i = 0;i<secondGame.GetObjects().size();i++)
         {
             vector< boost::shared_ptr<gd::Object> >::iterator object =
-                find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), bind2nd(ObjectHasName(), secondGame.GetGlobalObjects()[i]->GetName()));
+                find_if(game.GetObjects().begin(), game.GetObjects().end(), bind2nd(ObjectHasName(), secondGame.GetObjects()[i]->GetName()));
 
-            if ( object != game.GetGlobalObjects().end())
+            if ( object != game.GetObjects().end())
             {
                 wxString depart = _("A global object named \"");
                 wxString fin = _("\" already exists in the game. Do you want to replace it \?");
-                if (wxMessageBox(depart+secondGame.GetGlobalObjects()[i]->GetName()+fin, "Un objet global de ce nom existe déjà",wxYES_NO ) == wxYES)
+                if (wxMessageBox(depart+secondGame.GetObjects()[i]->GetName()+fin, "Un objet global de ce nom existe déjà",wxYES_NO ) == wxYES)
                 {
                     //Remplacement
-                    *object = boost::shared_ptr<gd::Object>(secondGame.GetGlobalObjects()[i]->Clone());
+                    *object = boost::shared_ptr<gd::Object>(secondGame.GetObjects()[i]->Clone());
                 }
             }
             else
-                game.GetGlobalObjects().push_back(boost::shared_ptr<gd::Object>(secondGame.GetGlobalObjects()[i]->Clone()));
+                game.GetObjects().push_back(boost::shared_ptr<gd::Object>(secondGame.GetObjects()[i]->Clone()));
         }
     }
     if ( groupsCheck->GetValue() )

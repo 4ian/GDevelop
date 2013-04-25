@@ -15,7 +15,7 @@
 #include <wx/filename.h>
 #include "GDL/CommonTools.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 namespace gd { class Layout; }
 
@@ -37,7 +37,7 @@ BEGIN_EVENT_TABLE(ChoiceFile,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-ChoiceFile::ChoiceFile(wxWindow* parent, string file_, Game & game_, gd::Layout & scene_) :
+ChoiceFile::ChoiceFile(wxWindow* parent, string file_, gd::Project & game_, gd::Layout & scene_) :
 file(file_),
 game(game_),
 scene(scene_)

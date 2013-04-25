@@ -122,7 +122,7 @@ END_EVENT_TABLE()
  * Constructor of the main frame.
  */
 MainFrame::MainFrame( wxWindow* parent ) :
-    gameCurrentlyEdited(0),
+    projectCurrentlyEdited(0),
     m_ribbon(NULL),
     ribbonFileBt(NULL),
     ribbonSceneEditorButtonBar(NULL),
@@ -519,7 +519,7 @@ MainFrame::~MainFrame()
   */
 void MainFrame::SetCurrentGame(unsigned int i, bool refreshProjectManager)
 {
-    gameCurrentlyEdited = i;
+    projectCurrentlyEdited = i;
     if ( i >= games.size())
     {
         wxString GD = "Game Develop";

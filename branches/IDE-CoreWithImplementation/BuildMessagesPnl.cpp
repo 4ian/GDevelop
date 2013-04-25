@@ -9,13 +9,14 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/CommonTools.h"
 #include "GDL/IDE/CodeCompiler.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
 #include "ProjectManager.h"
 
 using namespace GDpriv;
+using namespace std;
 
 //(*IdInit(BuildMessagesPnl)
 const long BuildMessagesPnl::ID_LISTCTRL1 = wxNewId();
@@ -68,7 +69,7 @@ void BuildMessagesPnl::OnMustRefresh(wxCommandEvent&)
     RefreshWith(NULL, parser.parsedMessages);
 }
 
-void BuildMessagesPnl::RefreshWith(Game * game, std::vector < CompilerMessage > messages)
+void BuildMessagesPnl::RefreshWith(gd::Project * game, std::vector < CompilerMessage > messages)
 {
     gameAssociatedWithErrors = game;
 

@@ -364,8 +364,8 @@ void ChooseVariableDialog::OnvariablesListKeyDown(wxListEvent& event)
 void ChooseVariableDialog::OnFindUndeclaredSelected(wxCommandEvent& event)
 {
     std::set<std::string> allVariables;
-    if ( associatedProject != NULL && associatedLayout == NULL ) allVariables = EventsVariablesFinder::FindAllGlobalVariables(associatedProject->GetPlatform(), *associatedProject);
-    else if ( associatedProject != NULL && associatedLayout != NULL ) allVariables = EventsVariablesFinder::FindAllLayoutVariables(associatedProject->GetPlatform(), *associatedProject, *associatedLayout);
+    if ( associatedProject != NULL && associatedLayout == NULL ) allVariables = EventsVariablesFinder::FindAllGlobalVariables(associatedProject->GetCurrentPlatform(), *associatedProject);
+    else if ( associatedProject != NULL && associatedLayout != NULL ) allVariables = EventsVariablesFinder::FindAllLayoutVariables(associatedProject->GetCurrentPlatform(), *associatedProject, *associatedLayout);
     else return;
 
     //Construct a wxArrayString with not declared variables

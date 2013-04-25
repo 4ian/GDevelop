@@ -7,7 +7,6 @@
 #include <boost/shared_ptr.hpp>
 #include <wx/bitmap.h>
 class wxString;
-class Game;
 namespace gd { class Layout; }
 
 namespace gd

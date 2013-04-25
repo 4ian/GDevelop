@@ -176,7 +176,7 @@ void Layout::UpdateAutomatismsSharedData(gd::Project & project)
     {
         if ( automatismsInitialSharedDatas.find(allAutomatismsNames[i]) == automatismsInitialSharedDatas.end() )
         {
-            boost::shared_ptr<gd::AutomatismsSharedData> automatismsSharedDatas = project.GetPlatform().CreateAutomatismSharedDatas(allAutomatismsTypes[i]);
+            boost::shared_ptr<gd::AutomatismsSharedData> automatismsSharedDatas = project.CreateAutomatismSharedDatas(allAutomatismsTypes[i]);
             automatismsSharedDatas->SetName(allAutomatismsNames[i]);
             automatismsInitialSharedDatas[automatismsSharedDatas->GetName()] = automatismsSharedDatas;
         }
@@ -318,8 +318,7 @@ void Layout::LoadFromXml(gd::Project & project, const TiXmlElement * elem)
         while ( elemSharedDatas != NULL )
         {
             std::string type = elemSharedDatas->Attribute("Type") ? elemSharedDatas->Attribute("Type") : "";
-            std::cout << "AutoatmismSharedData" << type << std::endl;
-            boost::shared_ptr<gd::AutomatismsSharedData> sharedDatas = project.GetPlatform().CreateAutomatismSharedDatas(type);
+            boost::shared_ptr<gd::AutomatismsSharedData> sharedDatas = project.CreateAutomatismSharedDatas(type);
 
             if ( sharedDatas != boost::shared_ptr<gd::AutomatismsSharedData>() )
             {

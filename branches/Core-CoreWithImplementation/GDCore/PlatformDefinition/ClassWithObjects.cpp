@@ -45,7 +45,7 @@ void ClassWithObjects::LoadObjectsFromXml(gd::Project & project, const TiXmlElem
         if ( elemScene->Attribute( "type" ) != NULL ) { type = elemScene->Attribute( "type" ); }
 
         //Objet vide
-        boost::shared_ptr<gd::Object> newObject = project.GetPlatform().CreateObject(type, name);
+        boost::shared_ptr<gd::Object> newObject = project.CreateObject(type, name);
 
         if ( newObject != boost::shared_ptr<gd::Object>() )
         {
@@ -94,7 +94,7 @@ unsigned int ClassWithObjects::GetObjectsCount() const
 
 void ClassWithObjects::InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position)
 {
-    boost::shared_ptr<gd::Object> newObject = project.GetPlatform().CreateObject(objectType, name);
+    boost::shared_ptr<gd::Object> newObject = project.GetCurrentPlatform().CreateObject(objectType, name);
     if (position<initialObjects.size())
         initialObjects.insert(initialObjects.begin()+position, newObject);
     else

@@ -6,43 +6,46 @@
 #include "GDCore/Tools/VersionWrapper.h"
 #include "GDCore/Tools/Version.h"
 
-int GDLVersionWrapper::Major()
+namespace gd
 {
-    return AutoVersion::MAJOR;
-}
-int GDLVersionWrapper::Minor()
+
+int VersionWrapper::Major()
 {
-     return AutoVersion::MINOR;
+    return AutoVersion::GDCore_MAJOR;
 }
-int GDLVersionWrapper::Build()
+int VersionWrapper::Minor()
 {
-     return AutoVersion::BUILD;
+     return AutoVersion::GDCore_MINOR;
 }
-int GDLVersionWrapper::Revision()
+int VersionWrapper::Build()
 {
-     return AutoVersion::REVISION;
+     return AutoVersion::GDCore_BUILD;
 }
-std::string GDLVersionWrapper::FullString()
+int VersionWrapper::Revision()
 {
-    return AutoVersion::FULLVERSION_STRING;
+     return AutoVersion::GDCore_REVISION;
 }
-std::string GDLVersionWrapper::Date()
+std::string VersionWrapper::FullString()
 {
-    return AutoVersion::DATE;
+    return AutoVersion::GDCore_FULLVERSION_STRING;
 }
-std::string GDLVersionWrapper::Month()
+std::string VersionWrapper::Date()
 {
-    return AutoVersion::MONTH;
+    return AutoVersion::GDCore_DATE;
 }
-std::string GDLVersionWrapper::Year()
+std::string VersionWrapper::Month()
 {
-    return AutoVersion::YEAR;
+    return AutoVersion::GDCore_MONTH;
 }
-std::string GDLVersionWrapper::Status()
+std::string VersionWrapper::Year()
 {
-    return AutoVersion::STATUS;
+    return AutoVersion::GDCore_YEAR;
 }
-bool GDLVersionWrapper::CompiledForEdittime()
+std::string VersionWrapper::Status()
+{
+    return AutoVersion::GDCore_STATUS;
+}
+bool VersionWrapper::CompiledForEdittime()
 {
 #if defined(GD_IDE_ONLY)
     return true;
@@ -51,3 +54,5 @@ bool GDLVersionWrapper::CompiledForEdittime()
 #endif
 }
 
+
+}

@@ -28,6 +28,42 @@ namespace gd
 {
 
 /**
+ * \brief Class used by gd::PlatformExtension to ensure that an extension is compiled against the right versions of libraries.
+ */
+class GD_CORE_API CompilationInfo
+{
+    public :
+    CompilationInfo() : informationCompleted(false) {};
+    virtual ~CompilationInfo() {};
+
+    bool informationCompleted;
+
+    bool runtimeOnly; ///< True if the extension was compiled for a runtime use only
+
+    #if defined(__GNUC__)
+    int gccMajorVersion;
+    int gccMinorVersion;
+    int gccPatchLevel;
+    #endif
+
+    int boostVersion;
+
+    int sfmlMajorVersion;
+    int sfmlMinorVersion;
+
+    #if defined(GD_IDE_ONLY)
+    int wxWidgetsMajorVersion;
+    int wxWidgetsMinorVersion;
+    int wxWidgetsReleaseNumber;
+    int wxWidgetsSubReleaseNumber;
+    #endif
+
+    std::string gdCoreVersion;
+    int sizeOfpInt;
+};
+
+
+/**
  * \brief Base class for implementing platform's extensions.
  *
  * \ingroup PlatformDefinition
@@ -35,6 +71,8 @@ namespace gd
 class GD_CORE_API PlatformExtension
 {
 public:
+    CompilationInfo compilationInfo;
+
     PlatformExtension();
     virtual ~PlatformExtension();
 
@@ -143,17 +181,17 @@ public:
     /**
      * Get the namespace
      */
-    inline std::string GetNameSpace() { return nameSpace; };
+    std::string GetNameSpace() { return nameSpace; };
 
     /**
      * Must return a vector containing all the object types provided by the extension
      */
-    virtual std::vector < std::string > GetExtensionObjectsTypes() const;
+    std::vector < std::string > GetExtensionObjectsTypes() const;
 
     /**
      * Must return a vector containing all the automatism types provided by the extension
      */
-    virtual std::vector < std::string > GetAutomatismsTypes() const;
+    std::vector < std::string > GetAutomatismsTypes() const;
 
 
     /**
@@ -275,14 +313,12 @@ public:
      */
     virtual void ExposeActionsResources(Instruction & action, gd::ArbitraryResourceWorker & worker) {};
 
-protected:
+private:
 
     /**
      * Set the namespace ( the string each actions/conditions/expressions start with )
      */
     void SetNameSpace(std::string nameSpace_);
-
-private:
 
     std::string name; ///<Name identifying the extension
     std::string nameSpace; ///<Automatically set from the name of the extension, and added to every actions/conditions/expressions/objects/automatism/event.

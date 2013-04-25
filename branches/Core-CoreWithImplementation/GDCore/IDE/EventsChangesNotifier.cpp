@@ -8,6 +8,7 @@
 #include "GDCore/Events/LinkEvent.h"
 #include "GDCore/Events/ExpressionParser.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/EventsChangesNotifier.h"
@@ -15,9 +16,9 @@
 namespace gd
 {
 
-void EventsChangesNotifier::NotifyChangesInEventsOfScene(gd::Project & project, gd::Layout & layout)
+void EventsChangesNotifier::NotifyChangesInEventsOfScene(const gd::Platform & platform, gd::Project & project, gd::Layout & layout)
 {
-    project.GetChangesNotifier().OnEventsModified(project, layout);
+    platform.GetChangesNotifier().OnEventsModified(project, layout);
 
     //Notify others scenes, which include the changed scene ( even indirectly ), that their events has changed
     for (unsigned int i = 0;i<project.GetLayoutCount();++i)
@@ -32,7 +33,7 @@ void EventsChangesNotifier::NotifyChangesInEventsOfScene(gd::Project & project, 
         for (unsigned int j = 0;j<linkedScenes.size();++j)
         {
             if ( linkedScenes[j]->GetName() == layout.GetName() )
-                project.GetChangesNotifier().OnEventsModified(project, project.GetLayout(i), /*indirectChange=*/true, layout.GetName());
+                platform.GetChangesNotifier().OnEventsModified(project, project.GetLayout(i), /*indirectChange=*/true, layout.GetName());
         }
     }
     //Also notify external events
@@ -46,14 +47,14 @@ void EventsChangesNotifier::NotifyChangesInEventsOfScene(gd::Project & project, 
         for (unsigned int j = 0;j<linkedScenes.size();++j)
         {
             if ( linkedScenes[j]->GetName() == layout.GetName() )
-                project.GetChangesNotifier().OnEventsModified(project, project.GetExternalEvents(i), /*indirectChange=*/true, layout.GetName());
+                platform.GetChangesNotifier().OnEventsModified(project, project.GetExternalEvents(i), /*indirectChange=*/true, layout.GetName());
         }
     }
 }
 
-void EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(gd::Project & project, gd::ExternalEvents & externalEvents)
+void EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(const gd::Platform & platform, gd::Project & project, gd::ExternalEvents & externalEvents)
 {
-    project.GetChangesNotifier().OnEventsModified(project, externalEvents);
+    platform.GetChangesNotifier().OnEventsModified(project, externalEvents);
 
     //Notify scenes, which include the external events ( even indirectly ), that their events has changed
     for (unsigned int i = 0;i<project.GetLayoutCount();++i)
@@ -66,7 +67,7 @@ void EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(gd::Project & 
         for (unsigned int j = 0;j<linkedExternalEvents.size();++j)
         {
             if ( linkedExternalEvents[j]->GetName() == externalEvents.GetName() )
-                project.GetChangesNotifier().OnEventsModified(project, project.GetLayout(i), /*indirectChange=*/true, externalEvents.GetName());
+                platform.GetChangesNotifier().OnEventsModified(project, project.GetLayout(i), /*indirectChange=*/true, externalEvents.GetName());
         }
     }
     //Also notify external events
@@ -80,7 +81,7 @@ void EventsChangesNotifier::NotifyChangesInEventsOfExternalEvents(gd::Project & 
         for (unsigned int j = 0;j<linkedScenes.size();++j)
         {
             if ( linkedScenes[j]->GetName() == externalEvents.GetName() )
-                project.GetChangesNotifier().OnEventsModified(project, project.GetExternalEvents(i), /*indirectChange=*/true, externalEvents.GetName());
+                platform.GetChangesNotifier().OnEventsModified(project, project.GetExternalEvents(i), /*indirectChange=*/true, externalEvents.GetName());
         }
     }
 }

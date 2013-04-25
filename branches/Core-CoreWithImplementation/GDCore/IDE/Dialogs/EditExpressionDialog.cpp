@@ -372,7 +372,7 @@ lastErrorPos(std::string::npos)
 
     //Prepare keyword highlighting
     std::string keywords;
-    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
 	for (unsigned int i = 0;i<extensions.size();++i)
 	{
 	    //Verify if that extension is enabled
@@ -474,7 +474,7 @@ void EditExpressionDialog::TextModified(wxStyledTextEvent& event)
 
     gd::CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
     gd::ExpressionParser expressionParser(expression);
-    if ( !expressionParser.ParseMathExpression(project.GetPlatform(), project, layout, callbacks) )
+    if ( !expressionParser.ParseMathExpression(project.GetCurrentPlatform(), project, layout, callbacks) )
     {
         errorTxt->SetLabel(expressionParser.firstErrorStr);
         lastErrorPos = expressionParser.firstErrorPos;
@@ -493,7 +493,7 @@ void EditExpressionDialog::OnOkBtClick(wxCommandEvent& event)
     gd::CallbacksForExpressionCorrectnessTesting callbacks(project, layout);
     gd::ExpressionParser expressionParser(expression);
 
-    if ( !expressionParser.ParseMathExpression(project.GetPlatform(), project, layout, callbacks) )
+    if ( !expressionParser.ParseMathExpression(project.GetCurrentPlatform(), project, layout, callbacks) )
     {
         if ( wxMessageBox(_("The expression is malformed. Are you sur you want to validate this expression \?"), _("The expression contains one or more errors."), wxYES_NO | wxICON_EXCLAMATION, this) == wxNO )
             return;
@@ -510,7 +510,7 @@ void EditExpressionDialog::RefreshLists()
     ValList->DeleteAllItems();
     ValList->AddRoot( _( "All special values" ), 0 );
 
-    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetPlatform().GetAllPlatformExtensions();
+    const vector < boost::shared_ptr<PlatformExtension> > extensions = project.GetCurrentPlatform().GetAllPlatformExtensions();
 
     //Insert extension objects expressions
 	for (unsigned int i = 0;i<extensions.size();++i)

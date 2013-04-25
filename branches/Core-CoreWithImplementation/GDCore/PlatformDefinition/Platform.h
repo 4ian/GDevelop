@@ -8,6 +8,8 @@
 #include <boost/shared_ptr.hpp>
 #include <vector>
 #include <string>
+#include <map>
+#include "GDCore/PlatformDefinition/ChangesNotifier.h"
 namespace gd { class InstructionsMetadataHolder; }
 namespace gd { class Project; }
 namespace gd { class Object; }
@@ -16,15 +18,16 @@ namespace gd { class AutomatismMetadata; }
 namespace gd { class ObjectMetadata; }
 namespace gd { class BaseEvent; }
 namespace gd { class AutomatismsSharedData; }
+namespace gd { class PlatformExtension; }
+
+typedef void (*DestroyFunPtr)(gd::Object*);
+typedef gd::Object * (*CreateFunPtr)(std::string name);
 
 namespace gd
 {
-class PlatformExtension;
 
 /**
  * \brief Base class for implementing a platform
- *
- * \todo Current implementation status: Used in some part of the IDE: Currently, the IDE automatically create the Platform class of the GD C++ Platform when it is need.
  *
  * \ingroup PlatformDefinition
  */
@@ -37,22 +40,41 @@ public:
     /**
      * Must return the platform name
      */
-    virtual std::string GetPlatformName() { return "Unnamed platform"; }
+    virtual std::string GetName() const { return "Unnamed platform"; }
 
-    /**
-     * Must return all the PlatformExtension available for the platform.
-     * \see PlatformExtension
+
+    /** \name Extensions management
+     * Member functions used to manage the extensions
      */
-    virtual std::vector < boost::shared_ptr<PlatformExtension> > GetAllPlatformExtensions() const =0;
+    ///@{
 
     /**
-     * Must return a (smart) pointer to the extension named name.
-     * \param name Extension name
-     * \return (smart) pointer to the extension named name.
+     * Add an extension to the manager.
      *
-     * \see PlatformExtension
+     * \note This method is virtual and can be redefined by platforms if they want to do special work when an extension is loaded.
+     *
+     * \see gd::ExtensionsLoader
      */
-    virtual boost::shared_ptr<PlatformExtension> GetExtension(const std::string & name) const =0;
+    virtual bool AddExtension(boost::shared_ptr<PlatformExtension> extension);
+
+    /**
+     * Return true if an extension with the same name is loaded
+     */
+    bool IsExtensionLoaded(const std::string & name) const;
+
+    /**
+     * Get an extension
+     * @return Shared pointer to the extension
+     */
+    boost::shared_ptr<PlatformExtension> GetExtension(const std::string & name) const;
+
+    /**
+     * Get all extensions
+     * @return Vector of Shared pointer containing all extensions
+     */
+    const std::vector < boost::shared_ptr<gd::PlatformExtension> > & GetAllPlatformExtensions() const { return extensionsLoaded; };
+
+    ///@}
 
     /** \name Factory method
      * Member functions used to create the platforms objects
@@ -60,31 +82,43 @@ public:
     ///@{
 
     /**
-     * Must create an empty project
+     * Create an object of given type with the specified name.
      */
-    virtual boost::shared_ptr<gd::Project> CreateNewEmptyProject() const =0;
+    boost::shared_ptr<gd::Object> CreateObject(std::string type, const std::string & name) const;
 
     /**
-     * Must create an object of given type with the specified name.
+     * Create an automatism
      */
-    virtual boost::shared_ptr<gd::Object> CreateObject(const std::string & type, const std::string & name) const =0;
+    gd::Automatism* CreateAutomatism(const std::string & type) const;
 
     /**
-     * Must create an automatism
+     * Create an automatism shared data object.
      */
-    virtual gd::Automatism* CreateAutomatism(const std::string & type) const =0;
+    boost::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type) const;
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * Create an event of given type
+     */
+    boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type) const;
+    #endif
+
+    ///@}
+
+    #if defined(GD_IDE_ONLY)
+
+    /** \name Notification of changes
+     * The platform can do extra work when a change occurs by providing a special gd::ChangesNotifier
+     */
+    ///@{
 
     /**
-     * Must create an automatism shared data object.
+     * Must provide a ChangesNotifier object that will be called by the IDE if needed.
+     * The IDE is not supposed to store the returned object.
+     *
+     * The default implementation simply return a ChangesNotifier object doing nothing.
      */
-    virtual boost::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type) const =0;
-
-    /**
-     * Must create an event of given type
-     */
-    virtual boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type) const =0;
-
-
+    virtual ChangesNotifier & GetChangesNotifier() const { return defaultEmptyChangesNotifier; };
     ///@}
 
     /**
@@ -97,7 +131,18 @@ public:
      * Called when the IDE is initialized and ready to be used.
      */
     virtual void OnIDEInitialized() {};
+
+    #endif
+
 private:
+
+    std::vector < boost::shared_ptr<PlatformExtension> >    extensionsLoaded; ///< Extensions of the platform
+    std::map < std::string, CreateFunPtr >                  creationFunctionTable; ///< Creation functions for objects
+    std::map < std::string, DestroyFunPtr >                 destroyFunctionTable; ///< Destroy functions for objects
+
+    #if defined(GD_IDE_ONLY)
+    static ChangesNotifier defaultEmptyChangesNotifier;
+    #endif
 };
 
 }

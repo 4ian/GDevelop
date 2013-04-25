@@ -9,7 +9,6 @@
 #include "GDCore/Events/Instruction.h"
 #include <boost/shared_ptr.hpp>
 #include <wx/bitmap.h>
-class Game;
 namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class EventsCodeGenerator; }

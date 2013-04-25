@@ -44,10 +44,10 @@ public:
     /**
      * Assignment operator. Calls Init().
      */
-    Object& operator=(const gd::Object & object) {if( (this) != &object ) Init(object); return *this; }
+    Object& operator=(const gd::Object & object) { if( (this) != &object ) Init(object); return *this; }
 
     /**
-     * Destructor. Does nothing particular.
+     * Destructor.
      */
     virtual ~Object();
 
@@ -58,7 +58,7 @@ public:
      * return new MyObject(*this);
      * \endcode
      */
-    virtual gd::Object * Clone() const { return new gd::Object(*this);}
+    virtual gd::Object * Clone() const { return new gd::Object(*this); }
 
     /** \name Common properties
      * Members functions related to common properties
@@ -137,7 +137,7 @@ public:
      * Called by the IDE when a layout is going to be rendered.
      * \see gd::InitialInstance
      */
-    virtual void LoadResources(gd::Project & project, gd::Layout & layout);
+    virtual void LoadResources(gd::Project & project, gd::Layout & layout) {};
 
     /**
      * Called when the IDE wants to know the width of an initial instance which has a default width.
@@ -204,7 +204,10 @@ public:
     void RemoveAutomatism(const std::string & name);
 
     /**
-     * Must add the automatism of the specified \a type with the specified \a name.
+     * \brief Add the automatism of the specified \a type with the specified \a name.
+     *
+     * The project's current platform is used to create the automatism.
+     *
      * \return A pointer to the newly added automatism. NULL if the creation failed.
      */
     gd::Automatism * AddNewAutomatism(gd::Project & project, const std::string & type, const std::string & name);

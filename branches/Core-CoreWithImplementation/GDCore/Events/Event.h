@@ -12,7 +12,6 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/weak_ptr.hpp>
 #include "GDCore/Events/Instruction.h"
-class Game;
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
@@ -24,7 +23,6 @@ class EventsEditorItemsAreas;
 class EventsEditorSelection;
 namespace gd { class Instruction; }
 class TiXmlElement;
-class Game;
 class wxDC;
 
 namespace gd
@@ -235,7 +233,7 @@ public:
     /**
      * Called when the user want to edit the event.
      */
-    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_) { return ChangesMade; };
+    virtual EditEventReturnType EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_) { return ChangesMade; };
 
     ///@}
 

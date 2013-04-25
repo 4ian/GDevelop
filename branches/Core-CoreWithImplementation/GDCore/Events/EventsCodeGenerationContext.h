@@ -8,7 +8,6 @@
 #include <string>
 #include <set>
 #include <boost/shared_ptr.hpp>
-class Game;
 namespace gd { class Layout; }
 
 namespace gd

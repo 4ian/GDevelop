@@ -252,6 +252,8 @@
 		<Unit filename="GDCore/Events/AutomatismMetadata.h" />
 		<Unit filename="GDCore/Events/Event.cpp" />
 		<Unit filename="GDCore/Events/Event.h" />
+		<Unit filename="GDCore/Events/EventMetadata.cpp" />
+		<Unit filename="GDCore/Events/EventMetadata.h" />
 		<Unit filename="GDCore/Events/EventsCodeGenerationContext.cpp" />
 		<Unit filename="GDCore/Events/EventsCodeGenerationContext.h" />
 		<Unit filename="GDCore/Events/EventsCodeGenerator.cpp" />
@@ -345,10 +347,16 @@
 		<Unit filename="GDCore/IDE/EventsVariablesFinder.h" />
 		<Unit filename="GDCore/IDE/ExpressionsCorrectnessTesting.cpp" />
 		<Unit filename="GDCore/IDE/ExpressionsCorrectnessTesting.h" />
+		<Unit filename="GDCore/IDE/ExtensionsLoader.cpp" />
+		<Unit filename="GDCore/IDE/ExtensionsLoader.h" />
 		<Unit filename="GDCore/IDE/ImagesUsedInventorizer.cpp" />
 		<Unit filename="GDCore/IDE/ImagesUsedInventorizer.h" />
 		<Unit filename="GDCore/IDE/MetadataProvider.cpp" />
 		<Unit filename="GDCore/IDE/MetadataProvider.h" />
+		<Unit filename="GDCore/IDE/PlatformLoader.cpp" />
+		<Unit filename="GDCore/IDE/PlatformLoader.h" />
+		<Unit filename="GDCore/IDE/PlatformManager.cpp" />
+		<Unit filename="GDCore/IDE/PlatformManager.h" />
 		<Unit filename="GDCore/IDE/ProjectResourcesCopier.cpp" />
 		<Unit filename="GDCore/IDE/ProjectResourcesCopier.h" />
 		<Unit filename="GDCore/IDE/ResourcesAbsolutePathChecker.cpp" />
@@ -415,6 +423,8 @@
 		<Unit filename="GDCore/TinyXml/tinyxml.h" />
 		<Unit filename="GDCore/TinyXml/tinyxmlerror.cpp" />
 		<Unit filename="GDCore/TinyXml/tinyxmlparser.cpp" />
+		<Unit filename="GDCore/Tools/DynamicLibrariesTools.cpp" />
+		<Unit filename="GDCore/Tools/DynamicLibrariesTools.h" />
 		<Unit filename="GDCore/Tools/HelpFileAccess.cpp" />
 		<Unit filename="GDCore/Tools/HelpFileAccess.h" />
 		<Unit filename="GDCore/Tools/Locale/LocaleManager.cpp" />

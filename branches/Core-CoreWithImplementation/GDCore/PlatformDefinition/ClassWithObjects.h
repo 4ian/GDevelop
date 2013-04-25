@@ -39,72 +39,74 @@ public:
     ///@{
 
     /**
-     * Must return true if object called "name" exists.
+     * Return true if object called "name" exists.
      */
-    virtual bool HasObjectNamed(const std::string & name) const;
+    bool HasObjectNamed(const std::string & name) const;
 
     /**
-     * Must return a reference to the object called "name".
+     * Return a reference to the object called "name".
      */
-    virtual Object & GetObject(const std::string & name);
+    Object & GetObject(const std::string & name);
 
     /**
-     * Must return a reference to the object called "name".
+     * Return a reference to the object called "name".
      */
-    virtual const gd::Object & GetObject(const std::string & name) const;
+    const gd::Object & GetObject(const std::string & name) const;
 
     /**
-     * Must return a reference to the object at position "index" in the objects list
+     * Return a reference to the object at position "index" in the objects list
      */
-    virtual Object & GetObject(unsigned int index);
+    Object & GetObject(unsigned int index);
 
     /**
-     * Must return a reference to the object at position "index" in the objects list
+     * Return a reference to the object at position "index" in the objects list
      */
-    virtual const gd::Object & GetObject (unsigned int index) const;
+    const gd::Object & GetObject (unsigned int index) const;
 
     /**
-     * Must return the position of the object called "name" in the objects list
+     * Return the position of the object called "name" in the objects list
      */
-    virtual unsigned int GetObjectPosition(const std::string & name) const;
+    unsigned int GetObjectPosition(const std::string & name) const;
 
     /**
-     * Must return the number of object.
+     * Return the number of object.
      */
-    virtual unsigned int GetObjectsCount() const;
+    unsigned int GetObjectsCount() const;
 
     /**
-     * Must add a new empty object of type \a objectType called \a name at the specified position in the layout list.
+     * Add a new empty object of type \a objectType called \a name at the specified position in the layout list.<br>
+     * The object is created from the project's current platform.
      */
-    virtual void InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position);
+    void InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position);
 
     /**
      * Must add a new object constructed from the layout passed as parameter.
      * \note No pointer or reference must be kept on the object passed as parameter.
      * \param object The object that must be copied and inserted into the project
-     * \param position Insertion position. Even if the position is invalid, the object must be inserted at the end of the objects list.
+     * \param position Insertion position. If the position is invalid, the object is inserted at the end of the objects list.
      */
-    virtual void InsertObject(const gd::Object & object, unsigned int position);
+    void InsertObject(const gd::Object & object, unsigned int position);
 
     /**
-     * Must delete the object named "name".
+     * Delete an object.
+     * \param name The name of the object to be deleted.
      */
-    virtual void RemoveObject(const std::string & name);
+    void RemoveObject(const std::string & name);
 
     /**
-     * Must swap the position of the specified objects.
+     * Swap the position of the specified objects.
      */
-    virtual void SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex);
-
-    /**
-     * Provide access to the vector containing the objects
-     */
-    virtual std::vector < boost::shared_ptr<gd::Object> > & GetObjects() { return initialObjects; }
+    void SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex);
 
     /**
      * Provide access to the vector containing the objects
      */
-    virtual const std::vector < boost::shared_ptr<gd::Object> > & GetObjects() const  { return initialObjects; }
+    std::vector < boost::shared_ptr<gd::Object> > & GetObjects() { return initialObjects; }
+
+    /**
+     * Provide access to the vector containing the objects
+     */
+    const std::vector < boost::shared_ptr<gd::Object> > & GetObjects() const  { return initialObjects; }
     ///@}
 
     /** \name Saving and loading
@@ -114,12 +116,12 @@ public:
     /**
      * Called to save the layout to a TiXmlElement.
      */
-    virtual void SaveObjectsToXml(TiXmlElement * element) const;
+    void SaveObjectsToXml(TiXmlElement * element) const;
 
     /**
      * Called to load the layout from a TiXmlElement.
      */
-    virtual void LoadObjectsFromXml(gd::Project & project, const TiXmlElement * element);
+    void LoadObjectsFromXml(gd::Project & project, const TiXmlElement * element);
     ///@}
 
 protected:

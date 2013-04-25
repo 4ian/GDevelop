@@ -61,7 +61,7 @@ void Object::RemoveAutomatism(const std::string & name)
 
 gd::Automatism * Object::AddNewAutomatism(gd::Project & project, const std::string & type, const std::string & name)
 {
-    Automatism * automatism = project.GetPlatform().CreateAutomatism(type);
+    Automatism * automatism = project.GetCurrentPlatform().CreateAutomatism(type);
 
     if ( automatism != NULL ) {
         automatism->SetName(name);
@@ -105,10 +105,6 @@ void Object::DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarge
 }
 #endif
 
-void Object::LoadResources(gd::Project & project, gd::Layout & layout)
-{
-}
-
 void Object::LoadFromXml(gd::Project & project, const TiXmlElement * elemScene)
 {
     //Name and type are already loaded.
@@ -123,11 +119,15 @@ void Object::LoadFromXml(gd::Project & project, const TiXmlElement * elemScene)
             std::string autoType = elemAutomatism->Attribute("Type") != NULL ? elemAutomatism->Attribute("Type") : "";
             std::string autoName = elemAutomatism->Attribute("Name") != NULL ? elemAutomatism->Attribute("Name") : "";
 
-            Automatism* newAutomatism = AddNewAutomatism(project, autoType, autoName);
-            if ( newAutomatism != NULL )
-                newAutomatism->LoadFromXml(elemAutomatism);
+            Automatism* automatism = project.CreateAutomatism(autoType);
+            if ( automatism != NULL )
+            {
+                automatism->SetName(autoName);
+                automatism->LoadFromXml(elemAutomatism);
+                automatisms[automatism->GetName()] = automatism;
+            }
             else
-                std::cout << "Unknown automatism" << elemAutomatism->Attribute("Type") << std::endl;
+                std::cout << "Unknown automatism " << elemAutomatism->Attribute("Type") << std::endl;
 
             elemAutomatism = elemAutomatism->NextSiblingElement("Automatism");
         }

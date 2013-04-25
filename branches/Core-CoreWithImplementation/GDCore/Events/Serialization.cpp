@@ -24,7 +24,7 @@ void EventsListSerialization::LoadEventsFromXml(gd::Project & project, std::vect
 
         if ( elemScene->FirstChildElement( "Type" ) != NULL && elemScene->FirstChildElement( "Type" )->Attribute( "value" ) != NULL ) { type = elemScene->FirstChildElement( "Type" )->Attribute( "value" );}
 
-        gd::BaseEventSPtr event = project.GetPlatform().CreateEvent(type);
+        gd::BaseEventSPtr event = project.CreateEvent(type);
         if ( event != boost::shared_ptr<gd::BaseEvent>())
         {
             event->LoadFromXml(project, elemScene);

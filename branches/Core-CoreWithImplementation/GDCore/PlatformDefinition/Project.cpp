@@ -21,6 +21,7 @@
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
 #include "GDCore/Events/ExpressionMetadata.h"
 #include "GDCore/IDE/MetadataProvider.h"
+#include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/Tools/VersionWrapper.h"
@@ -41,8 +42,6 @@ using namespace std;
 namespace gd
 {
 
-ChangesNotifier Project::defaultEmptyChangesNotifier;
-
 Project::Project() :
     useExternalSourceFiles(false),
     name(_("Project")),
@@ -53,9 +52,8 @@ Project::Project() :
     verticalSync(false),
     imageManager(boost::shared_ptr<gd::ImageManager>(new ImageManager))
     #if defined(GD_IDE_ONLY)
-    ,platform(NULL),
-    GDMajorVersion(GDLVersionWrapper::Major()),
-    GDMinorVersion(GDLVersionWrapper::Minor())
+    ,GDMajorVersion(gd::VersionWrapper::Major()),
+    GDMinorVersion(gd::VersionWrapper::Minor())
     #endif
 {
     imageManager->SetGame(this);
@@ -86,6 +84,99 @@ Project::Project() :
 Project::~Project()
 {
     //dtor
+}
+
+boost::shared_ptr<gd::Object> Project::CreateObject(const std::string & type, const std::string & name, const std::string & platformName)
+{
+    for (unsigned int i = 0;i<platforms.size();++i)
+    {
+        if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
+
+        boost::shared_ptr<gd::Object> object = platforms[i]->CreateObject(type, name);
+        if ( object ) return object;
+    }
+
+    return boost::shared_ptr<gd::Object>();
+}
+
+gd::Automatism* Project::CreateAutomatism(const std::string & type, const std::string & platformName)
+{
+    for (unsigned int i = 0;i<platforms.size();++i)
+    {
+        if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
+
+        gd::Automatism* automatism = platforms[i]->CreateAutomatism(type);
+        if ( automatism ) return automatism;
+    }
+
+    return NULL;
+}
+
+boost::shared_ptr<gd::AutomatismsSharedData> Project::CreateAutomatismSharedDatas(const std::string & type, const std::string & platformName)
+{
+    for (unsigned int i = 0;i<platforms.size();++i)
+    {
+        if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
+
+        boost::shared_ptr<gd::AutomatismsSharedData> automatism = platforms[i]->CreateAutomatismSharedDatas(type);
+        if ( automatism ) return automatism;
+    }
+
+    return boost::shared_ptr<gd::AutomatismsSharedData>();
+}
+
+boost::shared_ptr<gd::BaseEvent> Project::CreateEvent(const std::string & type, const std::string & platformName)
+{
+    for (unsigned int i = 0;i<platforms.size();++i)
+    {
+        if ( !platformName.empty() && platforms[i]->GetName() != platformName ) continue;
+
+        boost::shared_ptr<gd::BaseEvent> event = platforms[i]->CreateEvent(type);
+        if ( event ) return event;
+    }
+
+    return boost::shared_ptr<gd::BaseEvent>();
+}
+
+Platform & Project::GetCurrentPlatform() const
+{
+    if ( currentPlatform == boost::shared_ptr<gd::Platform>() )
+        std::cout << "FATAL ERROR: Project has no assigned current platform. GD will crash." << std::endl;
+
+    return *currentPlatform;
+}
+
+void Project::AddPlatform(boost::shared_ptr<Platform> platform)
+{
+    for (unsigned int i = 0;i<platforms.size();++i)
+    {
+        if (platforms[i] == platform)
+            return;
+    }
+
+    //Add the platform and make it the current one if the game has no other platform.
+    platforms.push_back(platform);
+    if ( currentPlatform == boost::shared_ptr<gd::Platform>() ) currentPlatform = platform;
+}
+
+bool Project::RemovePlatform(const std::string & platformName)
+{
+    if ( platforms.size() <= 1 ) return false;
+
+    for (unsigned int i = 0;i<platforms.size();++i)
+    {
+        if (platforms[i]->GetName() == platformName)
+        {
+            //Remove the platform, ensuring that currentPlatform remains correct.
+            if ( currentPlatform == platforms[i] ) currentPlatform = platforms.back();
+            if ( currentPlatform == platforms[i] ) currentPlatform = platforms[0];
+            platforms.erase(platforms.begin()+i);
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool Project::HasLayoutNamed(const std::string & name) const
@@ -339,17 +430,14 @@ public:
 
     virtual void operator()(gd::InitialInstance & instance)
     {
-        std::cout << "a " << instance.GetX();
         gd::Object * object = NULL;
         if ( layout.HasObjectNamed(instance.GetObjectName()))
             object = &layout.GetObject(instance.GetObjectName());
         else if ( project.HasObjectNamed(instance.GetObjectName()))
             object = &project.GetObject(instance.GetObjectName());
         else return;
-        std::cout << "b " << instance.GetX();
 
         if ( object->GetType() != "Sprite") return;
-        std::cout << "c " << instance.GetX();
         if ( !instance.HasCustomSize() ) return;
 
         wxSetWorkingDirectory(wxFileName::FileName(project.GetProjectFile()).GetPath());
@@ -358,10 +446,8 @@ public:
         float defaultWidth = object->GetInitialInstanceDefaultWidth(instance, project, layout);
         float defaultHeight = object->GetInitialInstanceDefaultHeight(instance, project, layout);
 
-        std::cout << "Updated from " << instance.GetX();
         instance.SetX(instance.GetX() + defaultWidth/2 - instance.GetCustomWidth()/2 );
         instance.SetY(instance.GetY() + defaultHeight/2 - instance.GetCustomHeight()/2 );
-        std::cout << " to " << instance.GetX() << std::endl;
     }
 
 private:
@@ -391,7 +477,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
         elem->QueryIntAttribute( "Revision", &revision );
         GDMajorVersion = major;
         GDMinorVersion = minor;
-        if ( GDMajorVersion > GDLVersionWrapper::Major() )
+        if ( GDMajorVersion > gd::VersionWrapper::Major() )
         {
             #if defined(GD_IDE_ONLY)
             wxLogWarning( _( "The version of the editor used to create this game seems to be a new version.\nThe game can not open, or datas may be missing.\nYou should check if a new version of Game Develop is available." ) );
@@ -399,7 +485,7 @@ void Project::LoadFromXml(const TiXmlElement * rootElement)
         }
         else
         {
-            if ( GDMajorVersion == GDLVersionWrapper::Major() && (build > GDLVersionWrapper::Build() || GDMinorVersion > GDLVersionWrapper::Minor() || revision > GDLVersionWrapper::Revision()) )
+            if ( GDMajorVersion == gd::VersionWrapper::Major() && (build > gd::VersionWrapper::Build() || GDMinorVersion > gd::VersionWrapper::Minor() || revision > gd::VersionWrapper::Revision()) )
             {
                 #if defined(GD_IDE_ONLY)
                 wxLogWarning( _( "The version of the editor used to create this game seems to be greater.\nThe game can not open, or data may be missing.\nYou should check if a new version of Game Develop is available." ) );
@@ -572,6 +658,31 @@ void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
     if ( elem->FirstChildElement( "LatestCompilationDirectory" ) != NULL && elem->FirstChildElement( "LatestCompilationDirectory" )->Attribute( "value" ) != NULL )
         SetLastCompilationDirectory( elem->FirstChildElement( "LatestCompilationDirectory" )->Attribute( "value" ) );
 
+    if ( elem->FirstChildElement( "Platforms" ) )
+    {
+        std::string current = elem->Attribute("current") ? elem->Attribute("current") : "";
+
+        for (const TiXmlElement * platformElem = elem->FirstChildElement( "Platform" ); platformElem; platformElem = platformElem->NextSiblingElement())
+        {
+            std::string name = elem->Attribute("name") ? elem->Attribute("name") : "";
+            boost::shared_ptr<gd::Platform> platform = gd::PlatformManager::GetInstance()->GetPlatform(name);
+
+            if ( platform ) {
+                AddPlatform(platform);
+                if ( platform->GetName() == current ) currentPlatform = platform;
+            }
+            else {
+                std::cout << "Platform \"" << name << "\" is unknown." << std::endl;
+            }
+        }
+    }
+    else
+    {
+        //Compatibility with GD2.x
+        platforms.push_back(gd::PlatformManager::GetInstance()->GetPlatform("Game Develop C++ platform"));
+        currentPlatform = platforms.back();
+    }
+
     if ( elem->FirstChildElement( "Extensions" ) != NULL )
     {
         const TiXmlElement * extensionsElem = elem->FirstChildElement( "Extensions" )->FirstChildElement();
@@ -604,12 +715,12 @@ void Project::SaveToXml(TiXmlElement * root) const
 {
     TiXmlElement * version = new TiXmlElement( "GDVersion" );
     root->LinkEndChild( version );
-    version->SetAttribute( "Major", ToString( GDLVersionWrapper::Major() ).c_str() );
-    version->SetAttribute( "Minor", ToString( GDLVersionWrapper::Minor() ).c_str() );
-    version->SetAttribute( "Build", ToString( GDLVersionWrapper::Build() ).c_str() );
-    version->SetAttribute( "Revision", ToString( GDLVersionWrapper::Revision() ).c_str() );
-    GDMajorVersion = GDLVersionWrapper::Major();
-    GDMinorVersion = GDLVersionWrapper::Minor();
+    version->SetAttribute( "Major", ToString( gd::VersionWrapper::Major() ).c_str() );
+    version->SetAttribute( "Minor", ToString( gd::VersionWrapper::Minor() ).c_str() );
+    version->SetAttribute( "Build", ToString( gd::VersionWrapper::Build() ).c_str() );
+    version->SetAttribute( "Revision", ToString( gd::VersionWrapper::Revision() ).c_str() );
+    GDMajorVersion = gd::VersionWrapper::Major();
+    GDMinorVersion = gd::VersionWrapper::Minor();
 
     TiXmlElement * infos = new TiXmlElement( "Info" );
     root->LinkEndChild( infos );
@@ -623,6 +734,26 @@ void Project::SaveToXml(TiXmlElement * root) const
         info = new TiXmlElement( "Auteur" );
         infos->LinkEndChild( info );
         info->SetAttribute( "value", GetAuthor().c_str() );
+
+        TiXmlElement * extensions = new TiXmlElement( "Extensions" );
+        infos->LinkEndChild( extensions );
+        for (unsigned int i =0;i<GetUsedPlatformExtensions().size();++i)
+        {
+            TiXmlElement * extension = new TiXmlElement( "Extension" );
+            extensions->LinkEndChild( extension );
+            extension->SetAttribute("name", GetUsedPlatformExtensions().at(i).c_str());
+        }
+
+        TiXmlElement * platformsElem = new TiXmlElement( "Platforms" );
+        if ( currentPlatform ) platformsElem->SetAttribute("current", currentPlatform->GetName().c_str());
+        infos->LinkEndChild( platformsElem );
+        for (unsigned int i =0;i<platforms.size();++i)
+        {
+            TiXmlElement * platform = new TiXmlElement( "Platform" );
+            platformsElem->LinkEndChild( platform );
+            platform->SetAttribute("name", platforms[i]->GetName().c_str() );
+        }
+
         info = new TiXmlElement( "WindowW" );
         infos->LinkEndChild( info );
         info->SetAttribute( "value", GetMainWindowDefaultWidth() );
@@ -644,14 +775,6 @@ void Project::SaveToXml(TiXmlElement * root) const
         elem->SetAttribute("useExternalSourceFiles", useExternalSourceFiles ? "true" : "false");
     }
 
-    TiXmlElement * extensions = new TiXmlElement( "Extensions" );
-    infos->LinkEndChild( extensions );
-    for (unsigned int i =0;i<GetUsedPlatformExtensions().size();++i)
-    {
-        TiXmlElement * extension = new TiXmlElement( "Extension" );
-        extensions->LinkEndChild( extension );
-        extension->SetAttribute("name", GetUsedPlatformExtensions().at(i).c_str());
-    }
 
     info = new TiXmlElement( "FPSmax" );
     infos->LinkEndChild( info );
@@ -905,8 +1028,6 @@ bool Project::LoadFromFile(const std::string & filename)
 
 bool Project::ValidateObjectName(const std::string & name)
 {
-    const std::vector < boost::shared_ptr<PlatformExtension> > extensions = GetPlatform().GetAllPlatformExtensions();
-
     std::string allowedCharacter = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_";
     return !(name.find_first_not_of(allowedCharacter) != std::string::npos);
 }

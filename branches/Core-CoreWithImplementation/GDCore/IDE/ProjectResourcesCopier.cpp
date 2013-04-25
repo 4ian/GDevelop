@@ -42,7 +42,7 @@ bool ProjectResourcesCopier::CopyAllResourcesTo(gd::Project & originalProject, s
     }
     else
     {
-        boost::shared_ptr<gd::Project> project = boost::shared_ptr<gd::Project>(originalProject.Clone());
+        boost::shared_ptr<gd::Project> project(new gd::Project(originalProject));
         project->ExposeResources(resourcesMergingHelper);
     }
 

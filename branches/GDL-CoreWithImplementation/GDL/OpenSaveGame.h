@@ -6,7 +6,7 @@
 #ifndef OPENSAVEGAME_H
 #define OPENSAVEGAME_H
 
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include <string>
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/CommonTools.h"
@@ -36,7 +36,7 @@ public:
     static void SaveConditions(const vector < gd::Instruction > & list, TiXmlElement * elem);
     static void SaveActions(const vector < gd::Instruction > & list, TiXmlElement * elem);
 
-    static void OpenImagesFromGD2010498(Game & game, const TiXmlElement * elem, const TiXmlElement * dossierElem );
+    static void OpenImagesFromGD2010498(gd::Project & game, const TiXmlElement * elem, const TiXmlElement * dossierElem );
     #endif
 };
 

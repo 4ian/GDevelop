@@ -19,14 +19,14 @@
 #include <wx/dialog.h>
 //*)
 #include "GDL/ForEachEvent.h"
-class Game;
+namespace gd { class Project; }
 namespace gd { class Layout; }
 
 class EditForEachEvent: public wxDialog
 {
 	public:
 
-		EditForEachEvent(wxWindow* parent, ForEachEvent & event_, Game & game_, gd::Layout & scene_);
+		EditForEachEvent(wxWindow* parent, ForEachEvent & event_, gd::Project & game_, gd::Layout & scene_);
 		virtual ~EditForEachEvent();
 
 		//(*Declarations(EditForEachEvent)
@@ -64,7 +64,7 @@ class EditForEachEvent: public wxDialog
 		void OnhelpBtClick(wxCommandEvent& event);
 		//*)
 
-		Game & game;
+		gd::Project & game;
 		gd::Layout & scene;
 
 		DECLARE_EVENT_TABLE()

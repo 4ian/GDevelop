@@ -15,12 +15,11 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/RuntimeLayer.h"
 #include "GDL/Scene.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
 #include "GDL/ImageManager.h"
 #include "GDL/SoundManager.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/Layer.h"
 #include "GDL/profile.h"
 #include "GDL/Position.h"
@@ -28,9 +27,10 @@
 #include "GDL/AutomatismsSharedData.h"
 #include "GDL/AutomatismsRuntimeSharedData.h"
 #include "GDL/RuntimeContext.h"
-#include "GDL/RuntimeGame.h"
+#include "GDL/Project.h"
 #include "GDL/Text.h"
 #include "GDL/ManualTimer.h"
+#include "GDL/CppPlatform.h"
 
 #include "GDL/CodeExecutionEngine.h"
 #if defined(GD_IDE_ONLY)
@@ -49,7 +49,7 @@ RuntimeLayer RuntimeScene::badRuntimeLayer;
 void MessageLoading( string message, float avancement ); //Prototype de la fonction pour renvoyer un message
 //La fonction est implémenté différemment en fonction du runtime ou de l'éditeur
 
-RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_) :
+RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, gd::Project * game_) :
     renderWindow(renderWindow_),
     game(game_),
     #if defined(GD_IDE_ONLY)
@@ -72,11 +72,12 @@ RuntimeScene::RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_
 
 RuntimeScene::~RuntimeScene()
 {
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = ExtensionsManager::GetInstance()->GetExtensions();
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (unsigned int i = 0;i<game->GetUsedPlatformExtensions().size();++i)
     {
-        if ( extensions[i] != boost::shared_ptr<ExtensionBase>() )
-            extensions[i]->SceneUnloaded(*this);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        if ( extension != boost::shared_ptr<ExtensionBase>() )
+            extension->SceneUnloaded(*this);
     }
 
     objectsInstances.Clear(); //Force destroy objects NOW as they can have pointers to some
@@ -491,7 +492,7 @@ void RuntimeScene::GotoSceneWhenEventsAreFinished(int scene)
 class ObjectsFromInitialInstanceCreator : public gd::InitialInstanceFunctor
 {
 public:
-    ObjectsFromInitialInstanceCreator(RuntimeGame & game_, RuntimeScene & scene_, float xOffset_, float yOffset_, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap_) :
+    ObjectsFromInitialInstanceCreator(gd::Project & game_, RuntimeScene & scene_, float xOffset_, float yOffset_, std::map<const gd::InitialInstance *, boost::shared_ptr<RuntimeObject> > * optionalMap_) :
         game(game_),
         scene(scene_),
         xOffset(xOffset_),
@@ -503,14 +504,14 @@ public:
     virtual void operator()(gd::InitialInstance & initialInstance)
     {
         std::vector<ObjSPtr>::const_iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
-        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetGlobalObjects().begin(), game.GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
+        std::vector<ObjSPtr>::const_iterator globalObject = std::find_if(game.GetObjects().begin(), game.GetObjects().end(), std::bind2nd(ObjectHasName(), initialInstance.GetObjectName()));
 
         RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
         if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
-            newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **sceneObject);
-        else if ( globalObject != scene.game->GetGlobalObjects().end() ) //Then the global object list
-            newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **globalObject);
+            newObject = CppPlatform::Get().CreateRuntimeObject(scene, **sceneObject);
+        else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
+            newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
         if ( newObject != boost::shared_ptr<RuntimeObject> () )
         {
@@ -543,7 +544,7 @@ public:
     }
 
 private:
-    RuntimeGame & game;
+    gd::Project & game;
     RuntimeScene & scene;
     float xOffset;
     float yOffset;
@@ -564,6 +565,11 @@ bool RuntimeScene::LoadFromScene( const gd::Layout & scene )
 bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, const gd::InitialInstancesContainer & instances )
 {
     std::cout << "Loading RuntimeScene from a scene.";
+    if (!game)
+    {
+        std::cout << "..No valid gd::Project associated to the RuntimeScene. Aborting loading." << std::endl;
+        return false;
+    }
 
     //Copy inherited scene
     Scene::operator=(scene);
@@ -615,13 +621,14 @@ bool RuntimeScene::LoadFromSceneAndCustomInstances( const gd::Layout & scene, co
 
     std::cout << ".";
     //Extensions specific initialization
-    const vector < boost::shared_ptr<ExtensionBase> > extensions = ExtensionsManager::GetInstance()->GetExtensions();
-	for (unsigned int i = 0;i<extensions.size();++i)
+	for (unsigned int i = 0;i<game->GetUsedPlatformExtensions().size();++i)
     {
-        if ( extensions[i] != boost::shared_ptr<ExtensionBase>() )
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+        if ( extension != boost::shared_ptr<ExtensionBase>() )
         {
-            extensions[i]->SceneLoaded(*this);
-            if ( extensions[i]->ToBeNotifiedOnObjectDeletion() ) extensionsToBeNotifiedOnObjectDeletion.push_back(extensions[i].get());
+            extension->SceneLoaded(*this);
+            if ( extension->ToBeNotifiedOnObjectDeletion() ) extensionsToBeNotifiedOnObjectDeletion.push_back(extension.get());
         }
     }
 

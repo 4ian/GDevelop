@@ -14,7 +14,6 @@
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/Events/Serialization.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/EventsCodeNameMangler.h"
@@ -261,7 +260,7 @@ unsigned int ForEachEvent::GetRenderedHeight(unsigned int width, const gd::Platf
     return renderedHeight;
 }
 
-gd::BaseEvent::EditEventReturnType ForEachEvent::EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType ForEachEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditForEachEvent dialog(parent_, *this, game_, scene_);
     if ( dialog.ShowModal() == 0 ) return Cancelled;

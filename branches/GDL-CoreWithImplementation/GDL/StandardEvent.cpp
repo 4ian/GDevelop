@@ -6,7 +6,6 @@
 #if defined(GD_IDE_ONLY)
 
 #include "StandardEvent.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDCore/IDE/EventsRenderingHelper.h"
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"

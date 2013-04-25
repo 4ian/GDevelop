@@ -747,8 +747,6 @@
 		<Unit filename="GDL/ExtensionBase.h" />
 		<Unit filename="GDL/ExtensionsLoader.cpp" />
 		<Unit filename="GDL/ExtensionsLoader.h" />
-		<Unit filename="GDL/ExtensionsManager.cpp" />
-		<Unit filename="GDL/ExtensionsManager.h" />
 		<Unit filename="GDL/ExternalEvents.cpp" />
 		<Unit filename="GDL/ExternalEvents.h" />
 		<Unit filename="GDL/ExternalLayout.cpp" />
@@ -759,8 +757,6 @@
 		<Unit filename="GDL/ForEachEvent.h" />
 		<Unit filename="GDL/Force.cpp" />
 		<Unit filename="GDL/Force.h" />
-		<Unit filename="GDL/Game.cpp" />
-		<Unit filename="GDL/Game.h" />
 		<Unit filename="GDL/IDE/BaseDebugger.cpp" />
 		<Unit filename="GDL/IDE/BaseDebugger.h" />
 		<Unit filename="GDL/IDE/BaseProfiler.cpp" />
@@ -834,8 +830,8 @@
 		<Unit filename="GDL/OpenSaveLoadingScreen.cpp" />
 		<Unit filename="GDL/OpenSaveLoadingScreen.h" />
 		<Unit filename="GDL/PlatformDefinition/ClassWithObjects.cpp" />
-		<Unit filename="GDL/PlatformDefinition/Platform.cpp" />
-		<Unit filename="GDL/PlatformDefinition/Platform.h" />
+		<Unit filename="GDL/PlatformDefinition/CppPlatform.cpp" />
+		<Unit filename="GDL/PlatformDefinition/CppPlatform.h" />
 		<Unit filename="GDL/Point.cpp" />
 		<Unit filename="GDL/Point.h" />
 		<Unit filename="GDL/Polygon.cpp" />
@@ -846,6 +842,8 @@
 		<Unit filename="GDL/Position.h" />
 		<Unit filename="GDL/ProfileEvent.cpp" />
 		<Unit filename="GDL/ProfileEvent.h" />
+		<Unit filename="GDL/Project.cpp" />
+		<Unit filename="GDL/Project.h" />
 		<Unit filename="GDL/RepeatEvent.cpp" />
 		<Unit filename="GDL/RepeatEvent.h" />
 		<Unit filename="GDL/ResourcesManager.cpp" />
@@ -854,8 +852,6 @@
 		<Unit filename="GDL/RessourcesLoader.h" />
 		<Unit filename="GDL/RuntimeContext.cpp" />
 		<Unit filename="GDL/RuntimeContext.h" />
-		<Unit filename="GDL/RuntimeGame.cpp" />
-		<Unit filename="GDL/RuntimeGame.h" />
 		<Unit filename="GDL/RuntimeLayer.cpp" />
 		<Unit filename="GDL/RuntimeLayer.h" />
 		<Unit filename="GDL/RuntimeObject.cpp" />

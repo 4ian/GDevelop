@@ -22,7 +22,7 @@ namespace gd { class BaseEvent; }
 namespace gd { class AutomatismsSharedData; }
 namespace gd {class ArbitraryResourceWorker;}
 class RuntimeScene;
-class Game;
+namespace gd { class Project; }
 class RuntimeObject;
 class ExtensionBase;
 class EventsCodeGenerationContext;
@@ -49,41 +49,6 @@ typedef RuntimeObject * (*CreateRuntimeObjectFunPtr)(RuntimeScene & scene, const
 #endif
 
 /**
- * \brief Class used in extension to be sure that extension is compatible.
- */
-class GD_API CompilationInfos
-{
-    public :
-    CompilationInfos() : informationCompleted(false) {};
-    virtual ~CompilationInfos() {};
-
-    bool informationCompleted;
-
-    bool runtimeOnly; ///< True if the extension was compiled for a runtime use only
-
-    #if defined(__GNUC__)
-    int gccMajorVersion;
-    int gccMinorVersion;
-    int gccPatchLevel;
-    #endif
-
-    int boostVersion;
-
-    int sfmlMajorVersion;
-    int sfmlMinorVersion;
-
-    #if defined(GD_IDE_ONLY)
-    int wxWidgetsMajorVersion;
-    int wxWidgetsMinorVersion;
-    int wxWidgetsReleaseNumber;
-    int wxWidgetsSubReleaseNumber;
-    #endif
-
-    std::string gdlVersion;
-    int sizeOfpInt;
-};
-
-/**
  * \brief Base class for C++ extensions.
  * Extensions can provide :
  *
@@ -103,7 +68,6 @@ public :
 
     ExtensionBase() {};
     virtual ~ExtensionBase();
-    CompilationInfos compilationInfo;
 
     /**
      * To be called so as to declare the creation and destruction function of a RuntimeObject associated to a gd::Object.

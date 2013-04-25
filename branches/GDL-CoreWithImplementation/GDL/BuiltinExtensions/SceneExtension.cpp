@@ -10,7 +10,7 @@
 #include "GDCore/Events/EventsCodeNameMangler.h"
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDL/Scene.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 
 SceneExtension::SceneExtension()
 {

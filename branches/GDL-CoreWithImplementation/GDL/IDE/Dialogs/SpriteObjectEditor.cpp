@@ -24,12 +24,13 @@
 #include <vector>
 #include "GDCore/IDE/CommonBitmapManager.h"
 #include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
 #include "GDL/CommonTools.h"
 #include "GDL/SpriteObject.h"
 #include "GDL/Animation.h"
 #include "GDL/Direction.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/ResourcesManager.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
@@ -134,7 +135,7 @@ BEGIN_EVENT_TABLE(SpriteObjectEditor,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, Game & game_, SpriteObject & object_, gd::MainFrameWrapper & mainFrameWrapper_) :
+SpriteObjectEditor::SpriteObjectEditor(wxWindow* parent, gd::Project & game_, SpriteObject & object_, gd::MainFrameWrapper & mainFrameWrapper_) :
     game(game_),
     object(object_),
     selectedAnimation(0),
@@ -1751,7 +1752,7 @@ void SpriteObjectEditor::OnAddImageFromFileSelected(wxCommandEvent& event)
                     image.SetUserAdded(false);
 
                     game.GetResourcesManager().AddResource(image);
-                    game.GetChangesNotifier().OnResourceModified(game, name);
+                    game.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(game, name);
                 }
 
                 Sprite sprite;

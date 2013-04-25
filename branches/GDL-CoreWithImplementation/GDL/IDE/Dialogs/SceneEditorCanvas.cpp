@@ -11,7 +11,8 @@
 #include <wx/scrolbar.h>
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/CommonBitmapManager.h"
-#include "GDL/RuntimeGame.h"
+#include "GDCore/PlatformDefinition/ImageManager.h"
+#include "GDL/Project.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/CodeExecutionEngine.h"
 #include "GDL/SceneNameMangler.h"
@@ -68,7 +69,7 @@ const long SceneEditorCanvas::idRibbonProfiler = wxNewId();
 
 SceneEditorCanvas::SceneEditorCanvas(wxWindow* parent, gd::Project & project_, gd::Layout & layout_, gd::InitialInstancesContainer & instances_, gd::LayoutEditorCanvasOptions & settings_, gd::MainFrameWrapper & mainFrameWrapper_) :
     LayoutEditorCanvas(parent, project_, layout_, instances_, settings_, mainFrameWrapper_),
-    game(dynamic_cast<RuntimeGame &>(project_)),
+    game(dynamic_cast<gd::Project &>(project_)),
     scene(dynamic_cast<gd::Layout &>(layout_)),
     instances(dynamic_cast<gd::InitialInstancesContainer &>(instances_)),
     previewScene(this, &game),

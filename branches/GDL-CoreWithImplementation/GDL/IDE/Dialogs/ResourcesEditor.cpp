@@ -37,6 +37,7 @@
 #include <wx/ribbon/gallery.h>
 #include <wx/ribbon/toolbar.h>
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/PlatformDefinition/Project.h"
@@ -424,7 +425,7 @@ void ResourcesEditor::AddResources(const std::vector<std::string> & filenames)
         //Add to all images
         if ( project.GetResourcesManager().AddResource(name, gd::ToString(file.GetFullPath())) )
         {
-            project.GetChangesNotifier().OnResourceModified(project, name);
+            project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, name);
 
             resourcesTree->AppendItem( allImagesItem, name, -1, -1, new gd::TreeItemStringData("Image", name));
         }
@@ -529,8 +530,8 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
                     LaunchResourceWorkerOnEvents(project, project.GetLayout(i).GetEvents(), inventorizer);
                 }
                 //Search in global objects resources
-                for (unsigned int j = 0;j<project.GetGlobalObjects().size();++j)
-                    project.GetGlobalObjects()[j]->ExposeResources(inventorizer);
+                for (unsigned int j = 0;j<project.GetObjects().size();++j)
+                    project.GetObjects()[j]->ExposeResources(inventorizer);
                 //Search in external events
                 for ( unsigned int i = 0;i < project.GetExternalEventsCount();i++ )
                     LaunchResourceWorkerOnEvents(project, project.GetExternalEvents(i).GetEvents(), inventorizer);
@@ -544,7 +545,7 @@ void ResourcesEditor::OnDelImageBtClick( wxCommandEvent& event )
             }*/
 
             project.GetResourcesManager().RemoveResource(imageName),
-            project.GetChangesNotifier().OnResourceModified(project, imageName);
+            project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, imageName);
             RemoveImageFromTree( resourcesTree->GetRootItem(), imageName );
         }
         else if ( data && data->GetString() == "Folder" )
@@ -780,15 +781,15 @@ void ResourcesEditor::OnPropertyChanged(wxPropertyGridEvent& event)
             {
                 project.GetResourcesManager().RenameResource(renamedItemOldName, propertyNewValue);
 
-                project.GetChangesNotifier().OnResourceModified(project, renamedItemOldName);
-                project.GetChangesNotifier().OnResourceModified(project, propertyNewValue);
+                project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, renamedItemOldName);
+                project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, propertyNewValue);
 
                 RenameInTree(resourcesTree->GetRootItem(), renamedItemOldName, propertyNewValue, "Image");
             }
             else
                 project.GetResourcesManager().GetResource(data->GetSecondString()).ChangeProperty(project, propertyName, propertyNewValue);
 
-            project.GetChangesNotifier().OnResourceModified(project, data->GetSecondString());
+            project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, data->GetSecondString());
         }
         else if ( data && data->GetString() == "Folder")
         {
@@ -899,8 +900,8 @@ void ResourcesEditor::OnresourcesTreeEndLabelEdit( wxTreeEvent& event )
 
             project.GetResourcesManager().RenameResource(renamedItemOldName, newName);
 
-            project.GetChangesNotifier().OnResourceModified(project, renamedItemOldName);
-            project.GetChangesNotifier().OnResourceModified(project, newName);
+            project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, renamedItemOldName);
+            project.GetCurrentPlatform().GetChangesNotifier().OnResourceModified(project, newName);
 
             RenameInTree(resourcesTree->GetRootItem(), renamedItemOldName, newName, "Image");
 

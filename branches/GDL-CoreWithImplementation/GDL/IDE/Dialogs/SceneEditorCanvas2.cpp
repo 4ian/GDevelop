@@ -16,6 +16,7 @@
 #include "GDCore/IDE/Dialogs/ChooseObjectTypeDialog.h"
 #include "GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDL/IDE/Dialogs/DebuggerGUI.h"
 #include "GDL/IDE/Dialogs/ProfileDlg.h"
 #include "GDL/Position.h"
@@ -24,6 +25,8 @@
 #include "GDL/CommonTools.h"
 #include "GDCore/IDE/Clipboard.h"
 #undef GetObject //Undefining an annoying macro
+
+using namespace std;
 
 void SceneEditorCanvas::RenderCompilationScreen()
 {
@@ -313,7 +316,7 @@ void SceneEditorCanvas::OnCreateObjectSelected(wxCommandEvent & event)
 
     //Edit now the object
     scene.GetObject(name).EditObject(this, game, mainFrameWrapper);
-    game.GetChangesNotifier().OnObjectEdited(game, &scene, scene.GetObject(name));
+    game.GetCurrentPlatform().GetChangesNotifier().OnObjectEdited(game, &scene, scene.GetObject(name));
 }
 
 void SceneEditorCanvas::OnLockSelected(wxCommandEvent & event)

@@ -8,7 +8,6 @@
     #define MSG(x) wxLogWarning(x);          // Utiliser WxWidgets pour
     #define MSGERR(x) wxLogError(x.c_str()); // afficher les messages dans l'éditeur
     #include "GDL/IDE/Dialogs/ProjectUpdateDlg.h"
-    #include "GDL/PlatformDefinition/Platform.h"
     #include "GDCore/PlatformDefinition/ObjectGroup.h"
     #include "GDCore/IDE/ResourcesUnmergingHelper.h"
     #include "GDCore/Events/Event.h"
@@ -33,7 +32,7 @@
 #include "GDL/OpenSaveGame.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
 #include "GDL/Animation.h"
@@ -45,7 +44,6 @@
 #include "GDL/ExtensionsLoader.h"
 #include "GDL/Layer.h"
 #include "GDL/OpenSaveLoadingScreen.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/ForEachEvent.h"
 #include "GDL/WhileEvent.h"
 #include "GDL/ExternalEvents.h"

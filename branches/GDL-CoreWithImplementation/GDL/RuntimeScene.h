@@ -15,14 +15,15 @@
 #include "GDL/ObjInstancesHolder.h"
 namespace sf { class RenderWindow; }
 namespace sf { class Event; }
+namespace gd { class Project; }
+namespace gd { class Object; }
+class CppPlatform;
+class RuntimeLayer;
+class AutomatismsRuntimeSharedData;
+class ExtensionBase;
 class Text;
 class CodeExecutionEngine;
 class ManualTimer;
-class RuntimeGame;
-class RuntimeLayer;
-namespace gd { class Object; }
-class AutomatismsRuntimeSharedData;
-class ExtensionBase;
 #undef GetObject //Disable an annoying macro
 
 #if defined(GD_IDE_ONLY)
@@ -42,14 +43,14 @@ class BaseProfiler;
 class GD_API RuntimeScene : public Scene
 {
 public:
-    RuntimeScene(sf::RenderWindow * renderWindow_, RuntimeGame * game_);
+    RuntimeScene(sf::RenderWindow * renderWindow_, gd::Project * game_);
     virtual ~RuntimeScene();
 
     RuntimeScene& operator=(const RuntimeScene & scene);
     RuntimeScene(const RuntimeScene & scene);
 
     sf::RenderWindow *                      renderWindow; ///< Pointer to the render window used for display
-    RuntimeGame *                           game; ///< Pointer to the game the scene is linked to
+    gd::Project *                           game; ///< Pointer to the game the scene is linked to
     #if defined(GD_IDE_ONLY)
     BaseDebugger *                          debugger; ///< Pointer to the debugger. Can be NULL.
     #endif
@@ -245,6 +246,7 @@ protected:
     std::map < std::string, boost::shared_ptr<AutomatismsRuntimeSharedData> > automatismsSharedDatas; ///<Contains all automatisms shared datas.
     std::vector < RuntimeLayer >            layers; ///< The layers used at runtime to display the scene.
     boost::shared_ptr<CodeExecutionEngine>  codeExecutionEngine;
+    CppPlatform *                           platform;
 
     std::vector < Text >                    textes; ///<Deprecated way of displaying a text
     bool DisplayLegacyTexts(std::string layer = "");

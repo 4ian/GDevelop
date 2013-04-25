@@ -16,7 +16,7 @@
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 
 //(*IdInit(EditForEachEvent)
@@ -35,7 +35,7 @@ BEGIN_EVENT_TABLE(EditForEachEvent,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditForEachEvent::EditForEachEvent(wxWindow* parent, ForEachEvent & event_, Game & game_, gd::Layout & scene_) :
+EditForEachEvent::EditForEachEvent(wxWindow* parent, ForEachEvent & event_, gd::Project & game_, gd::Layout & scene_) :
 eventEdited(event_),
 game(game_),
 scene(scene_)

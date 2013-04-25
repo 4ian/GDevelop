@@ -8,7 +8,7 @@
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 
 VariablesExtension::VariablesExtension()

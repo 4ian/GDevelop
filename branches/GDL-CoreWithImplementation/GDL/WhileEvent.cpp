@@ -17,9 +17,7 @@
 #include "GDCore/IDE/EventsEditorItemsAreas.h"
 #include "GDCore/IDE/EventsEditorSelection.h"
 #include "GDCore/Events/Serialization.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDCore/Events/EventsCodeGenerationContext.h"
-#include "GDL/ExtensionsManager.h"
 
 std::string WhileEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
 {
@@ -215,7 +213,7 @@ unsigned int WhileEvent::GetRenderedHeight(unsigned int width, const gd::Platfor
     return renderedHeight;
 }
 
-gd::BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType WhileEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     if ( !justCreatedByTheUser )
     {

@@ -15,7 +15,6 @@
 #include "GDCore/Events/EventsCodeGenerator.h"
 #include "GDCore/Events/ExpressionsCodeGeneration.h"
 #include "GDCore/Events/EventsCodeGenerationContext.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/IDE/Dialogs/EditRepeatEvent.h"
 
 RepeatEvent::RepeatEvent() :
@@ -195,7 +194,7 @@ unsigned int RepeatEvent::GetRenderedHeight(unsigned int width, const gd::Platfo
     return renderedHeight;
 }
 
-gd::BaseEvent::EditEventReturnType RepeatEvent::EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType RepeatEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditRepeatEvent dialog(parent_, *this, game_, scene_);
     if ( dialog.ShowModal() == 0 ) return Cancelled;

@@ -15,7 +15,7 @@
 #include "GDCore/IDE/Dialogs/EditExpressionDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDL/RepeatEvent.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 #include "GDL/CommonTools.h"
 
@@ -35,7 +35,7 @@ BEGIN_EVENT_TABLE(EditRepeatEvent,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditRepeatEvent::EditRepeatEvent(wxWindow* parent, RepeatEvent & event_, Game & game_, gd::Layout & scene_) :
+EditRepeatEvent::EditRepeatEvent(wxWindow* parent, RepeatEvent & event_, gd::Project & game_, gd::Layout & scene_) :
 event(event_),
 game(game_),
 scene(scene_)

@@ -25,14 +25,14 @@ namespace gd { class MainFrameWrapper; }
 class ResourcesEditor;
 class SpriteObject;
 namespace gd { class Resource; }
-class Game;
+namespace gd { class Project; }
 class Sprite;
 
 class SpriteObjectEditor: public wxDialog
 {
 public:
 
-    SpriteObjectEditor(wxWindow* parent, Game & game, SpriteObject & object, gd::MainFrameWrapper & mainFrameWrapper_ );
+    SpriteObjectEditor(wxWindow* parent, gd::Project & game, SpriteObject & object, gd::MainFrameWrapper & mainFrameWrapper_ );
     virtual ~SpriteObjectEditor();
 
     /**
@@ -233,7 +233,7 @@ private:
 
     DECLARE_EVENT_TABLE()
 
-    Game & game;
+    gd::Project & game;
     SpriteObject & object;
     unsigned int selectedAnimation;
     unsigned int selectedDirection;

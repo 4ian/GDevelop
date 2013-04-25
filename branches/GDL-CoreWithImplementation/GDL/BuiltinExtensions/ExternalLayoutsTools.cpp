@@ -1,6 +1,6 @@
 #include "ExternalLayoutsTools.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/RuntimeGame.h"
+#include "GDL/Project.h"
 #include "GDL/ExternalLayout.h"
 
 namespace ExternalLayoutsTools

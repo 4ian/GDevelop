@@ -4,5 +4,5 @@
  */
 
 #if !defined(GD_IDE_ONLY)
-#include "GDCore/IDE/ExtensionsLoader.cpp"
+#include "GDCore/PlatformDefinition/Project.cpp"
 #endif

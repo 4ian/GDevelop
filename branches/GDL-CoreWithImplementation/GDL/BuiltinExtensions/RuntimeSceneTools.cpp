@@ -9,9 +9,10 @@
 #include "GDL/RuntimeScene.h"
 #include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDL/RuntimeObject.h"
-#include "GDL/ExtensionsManager.h"
+#include "GDL/ImageManager.h"
+#include "GDL/CppPlatform.h"
 #include "GDL/ObjectHelpers.h"
-#include "GDL/RuntimeGame.h"
+#include "GDL/Project.h"
 #include "GDL/profile.h"
 #include "GDL/CommonTools.h"
 #include "GDL/Variable.h"
@@ -88,9 +89,9 @@ void GD_API CreateObjectOnScene(RuntimeScene & scene, std::map <std::string, std
     RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
     if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
-        newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **sceneObject);
+        newObject = CppPlatform::Get().CreateRuntimeObject(scene, **sceneObject);
     else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
-        newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **globalObject);
+        newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
     if ( newObject == boost::shared_ptr<RuntimeObject> () )
         return; //Unable to create the object

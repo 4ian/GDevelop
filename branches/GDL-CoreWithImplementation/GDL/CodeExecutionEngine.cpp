@@ -34,7 +34,7 @@ void CodeExecutionEngine::Unload()
     std::cout << "Unloaded compiled code" << dynamicLibrary << std::endl;
     loaded = false;
 
-    if ( dynamicLibrary != NULL ) GDpriv::CloseLibrary(dynamicLibrary);
+    if ( dynamicLibrary != NULL ) gd::CloseLibrary(dynamicLibrary);
     dynamicLibrary = NULL;
     function = NULL;
     dynamicLibraryFilename.clear();
@@ -48,22 +48,22 @@ bool CodeExecutionEngine::LoadFromDynamicLibrary(const std::string & filename, c
     dynamicLibraryFilename = filename;
     functionName = mainFunctionName;
 
-    dynamicLibrary = GDpriv::OpenLibrary(dynamicLibraryFilename.c_str());
+    dynamicLibrary = gd::OpenLibrary(dynamicLibraryFilename.c_str());
     if ( dynamicLibrary == NULL )
     {
         std::cout << "ERROR: Unable to load " << dynamicLibraryFilename << std::endl;
-        std::cout << "Full error message: " << GDpriv::DynamicLibraryLastError() << std::endl;
+        std::cout << "Full error message: " << gd::DynamicLibraryLastError() << std::endl;
         return false;
     }
 
-    function = GDpriv::GetSymbol(dynamicLibrary, functionName.c_str());
+    function = gd::GetSymbol(dynamicLibrary, functionName.c_str());
     if ( function == NULL )
     {
         std::cout << "ERROR: Unable to find " << functionName << " in " << dynamicLibraryFilename << std::endl;
         std::cout << "(Dynamic library unloaded)" << std::endl;
-        std::cout << "Full error message: " << GDpriv::DynamicLibraryLastError() << std::endl;
+        std::cout << "Full error message: " << gd::DynamicLibraryLastError() << std::endl;
 
-        GDpriv::CloseLibrary(dynamicLibrary);
+        gd::CloseLibrary(dynamicLibrary);
         dynamicLibrary = NULL;
         return false;
     }

@@ -9,7 +9,7 @@
 #include <boost/bimap.hpp>
 #include <SFML/Graphics.hpp>
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
-#include "GDL/RuntimeGame.h"
+#include "GDL/Project.h"
 #include "GDL/RuntimeScene.h"
 namespace gd { class MainFrameWrapper; }
 namespace gd { class InitialInstancesContainer; }
@@ -35,7 +35,7 @@ public:
     /**
      * \brief Return a reference to the game owning the scene being edited inside the editor.
      */
-    RuntimeGame & GetEditedGame() { return game; }
+    gd::Project & GetEditedGame() { return game; }
 
     /**
      * \brief Return a reference to the scene being edited inside the editor.
@@ -165,12 +165,12 @@ private:
     static const float smallButtonSize = 5;
 
     //References to objects being edited
-    RuntimeGame & game; ///< The game being edited. Initialized at the editor construction from the gd::Project parameter.
+    gd::Project & game; ///< The game being edited. Initialized at the editor construction from the gd::Project parameter.
     gd::Layout & scene; ///< The scene being edited. Initialized at the editor construction from the gd::Layout parameter.
     gd::InitialInstancesContainer & instances; ///< The instances being edited.  Initialized at the editor construction from the gd::InitialInstancesContainer parameter.
 
     //Members used during preview or compilation
-    RuntimeGame previewGame; ///< Runtime game used during preview.
+    gd::Project previewGame; ///< Runtime game used during preview.
     RuntimeScene previewScene; ///< Runtime scene used to render or preview the scene.
     static sf::Texture reloadingIconImage;
     static sf::Sprite reloadingIconSprite;

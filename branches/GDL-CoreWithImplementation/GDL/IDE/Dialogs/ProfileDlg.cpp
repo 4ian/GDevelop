@@ -18,6 +18,7 @@
 #include "GDL/ProfileEvent.h"
 #include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 #include "GDL/CommonTools.h"
+#include "GDL/CppPlatform.h"
 
 using namespace std;
 
@@ -307,7 +308,7 @@ void ProfileDlg::OnactivateCheckClick(wxCommandEvent& event)
     profilingActivated = activateCheck->GetValue();
 
     gd::Project & project = sceneCanvas.GetEditedGame();
-    project.GetChangesNotifier().OnEventsModified(project, sceneCanvas.GetEditedScene());
+    CppPlatform::Get().GetChangesNotifier().OnEventsModified(project, sceneCanvas.GetEditedScene());
     sceneCanvas.RefreshFromLayout();
 
 }

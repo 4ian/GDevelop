@@ -13,7 +13,7 @@
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/CommonTools.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 #include <wx/help.h>
 
@@ -43,7 +43,7 @@ BEGIN_EVENT_TABLE(EditLink,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-EditLink::EditLink(wxWindow* parent, LinkEvent & event, const Game & game_) :
+EditLink::EditLink(wxWindow* parent, LinkEvent & event, const gd::Project & game_) :
 editedEvent(event),
 game(game_)
 {

@@ -148,7 +148,7 @@
  *
  * \subsection game The Game class
  * A game is represented by a Game class. This class contains the scenes of the game, as well as the images, the global objects and some information.<br>
- * When a game is played, a RuntimeGame is used instead of a Game. A RuntimeGame contains some members need by a game who is played ( like the image manager ).<br>
+ * When a game is played, a gd::Project is used instead of a Game. A gd::Project contains some members need by a game who is played ( like the image manager ).<br>
  * Scenes are owned by the Game, thanks to a vector of shared pointer to scenes.<br>
  *
  * \subsection scene The Scene and RuntimeScene classes

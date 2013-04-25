@@ -23,8 +23,8 @@ void GD_API GDLogBanner()
     else if(sizeof(int*) == 8)
         sys += "64-bits";
 
-    std::cout << "Game Develop - " << GDLVersionWrapper::FullString() << " " << GDLVersionWrapper::Status() << std::endl;
-    std::cout << "Built " << GDLVersionWrapper::Date() << "/" << GDLVersionWrapper::Month() << "/" << GDLVersionWrapper::Year() << std::endl;
+    std::cout << "Game Develop - " << gd::VersionWrapper::FullString() << " " << gd::VersionWrapper::Status() << std::endl;
+    std::cout << "Built " << gd::VersionWrapper::Date() << "/" << gd::VersionWrapper::Month() << "/" << gd::VersionWrapper::Year() << std::endl;
     std::cout << sys << std::endl;
     std::cout << std::endl;
 }

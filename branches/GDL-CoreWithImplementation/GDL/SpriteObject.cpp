@@ -9,7 +9,7 @@
 #include <SFML/Graphics.hpp>
 #include "GDL/SpriteObject.h"
 #include "GDL/Animation.h"
-#include "GDL/RuntimeGame.h"
+#include "GDL/Project.h"
 #include "GDL/RuntimeLayer.h"
 #include "GDL/Object.h"
 #include "GDL/ImageManager.h"

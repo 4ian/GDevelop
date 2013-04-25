@@ -19,16 +19,19 @@
 #include <string>
 #include <set>
 #include "GDL/CommonTools.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/RuntimeGame.h"
+#include "GDL/Project.h"
 #include "GDL/Object.h"
 #include "GDL/ObjectHelpers.h"
+#include "GDL/CppPlatform.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
+#include <SFML/Graphics.hpp>
 #undef _
 #define _(s) wxGetTranslation((s))
+
+using namespace std;
 
 //(*IdInit(DebuggerGUI)
 const long DebuggerGUI::ID_AUITOOLBARITEM1 = wxNewId();
@@ -191,7 +194,8 @@ objectChanged(true)
     std::set<std::string> alreadyCreatedPanels; //Just to be sure not to create a panel twice ( extensionsUsed can contains the same extension name twice )
     for (unsigned int i = 0;i<scene.game->GetUsedPlatformExtensions().size();++i)
     {
-        boost::shared_ptr<ExtensionBase> extension = ExtensionsManager::GetInstance()->GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && alreadyCreatedPanels.find(extension->GetName()) == alreadyCreatedPanels.end())
         {
@@ -329,7 +333,8 @@ void DebuggerGUI::UpdateGUI()
     unsigned int extListCtrlId = 0;
     for (unsigned int i = 0;i<scene.game->GetUsedPlatformExtensions().size();++i)
     {
-        boost::shared_ptr<ExtensionBase> extension = ExtensionsManager::GetInstance()->GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(scene.game->GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() && extension->HasDebuggingProperties() && extListCtrlId < extensionsListCtrls.size() )
         {
@@ -368,10 +373,10 @@ void DebuggerGUI::UpdateGUI()
             initialObjects[scene.GetObjects()[i]->GetName()] = objectItem;
         }
         //Globals objects
-        for(unsigned int i = 0;i<scene.game->GetGlobalObjects().size();++i)
+        for(unsigned int i = 0;i<scene.game->GetObjects().size();++i)
         {
-            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.game->GetGlobalObjects()[i]->GetName());
-            initialObjects[scene.game->GetGlobalObjects()[i]->GetName()] = objectItem;
+            wxTreeItemId objectItem = objectsTree->AppendItem(objectsTree->GetRootItem(), scene.game->GetObjects()[i]->GetName());
+            initialObjects[scene.game->GetObjects()[i]->GetName()] = objectItem;
         }
 
         objectsTree->ExpandAll();
@@ -649,7 +654,9 @@ void DebuggerGUI::OnExtensionListItemActivated(wxListEvent& event)
         return;
     }
 
-    boost::shared_ptr<ExtensionBase> extension = ExtensionsManager::GetInstance()->GetExtension(string(list->GetName().mb_str()));
+    boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(string(list->GetName().mb_str()));
+    boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
+
     if ( extension == boost::shared_ptr<ExtensionBase>() )
     {
         cout << "Unknown extension in debugger ( " << list->GetName() << " )" << endl;
@@ -735,15 +742,15 @@ void DebuggerGUI::OnAddObjBtClick( wxCommandEvent & event )
 
     string objectWanted = dialog.GetChosenObject();
     std::vector<ObjSPtr>::iterator sceneObject = std::find_if(scene.GetObjects().begin(), scene.GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
-    std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->GetGlobalObjects().begin(), scene.game->GetGlobalObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
+    std::vector<ObjSPtr>::iterator globalObject = std::find_if(scene.game->GetObjects().begin(), scene.game->GetObjects().end(), std::bind2nd(ObjectHasName(), objectWanted));
 
     RuntimeObjSPtr newObject = boost::shared_ptr<RuntimeObject> ();
 
     //Creation of the object
     if ( sceneObject != scene.GetObjects().end() ) //We check first scene's objects' list.
-        newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **sceneObject);
-    else if ( globalObject != scene.game->GetGlobalObjects().end() ) //Then the global object list
-        newObject = ExtensionsManager::GetInstance()->CreateRuntimeObject(scene, **globalObject);
+        newObject = CppPlatform::Get().CreateRuntimeObject(scene, **sceneObject);
+    else if ( globalObject != scene.game->GetObjects().end() ) //Then the global object list
+        newObject = CppPlatform::Get().CreateRuntimeObject(scene, **globalObject);
 
     if ( newObject == boost::shared_ptr<RuntimeObject> () )
     {

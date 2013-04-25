@@ -183,7 +183,7 @@ unsigned int CppCodeEvent::GetRenderedHeight(unsigned int width, const gd::Platf
     return renderedHeight;
 }
 
-gd::BaseEvent::EditEventReturnType CppCodeEvent::EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType CppCodeEvent::EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditCppCodeEvent dialog(parent_, *this, game_, scene_);
     int returned = dialog.ShowModal();

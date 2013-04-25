@@ -16,13 +16,13 @@
 #include <wx/combobox.h>
 //*)
 #include "GDL/LinkEvent.h"
-class Game;
+namespace gd { class Project; }
 
 class EditLink: public wxDialog
 {
 	public:
 
-		EditLink(wxWindow* parent, LinkEvent & event, const Game & game);
+		EditLink(wxWindow* parent, LinkEvent & event, const gd::Project & game);
 		virtual ~EditLink();
 
 		//(*Declarations(EditLink)
@@ -80,7 +80,7 @@ class EditLink: public wxDialog
 		//*)
 
 		LinkEvent & editedEvent;
-		const Game & game;
+		const gd::Project & game;
 
 		DECLARE_EVENT_TABLE()
 };

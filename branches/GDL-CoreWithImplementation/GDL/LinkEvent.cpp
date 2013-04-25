@@ -19,7 +19,7 @@
 #include "GDL/IDE/DependenciesAnalyzer.h"
 #include "GDL/tinyxml/tinyxml.h"
 #include "GDL/RuntimeScene.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/IDE/Dialogs/EditLink.h"
 #include <iostream>
 #include <fstream>
@@ -162,7 +162,7 @@ std::string LinkEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGener
     return outputCode;
 }
 
-gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, Game & project, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
+gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, gd::Project & project, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditLink dialog(parent_, *this, project);
     if ( dialog.ShowModal() == 0 ) return Cancelled;

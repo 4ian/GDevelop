@@ -18,7 +18,7 @@
 #include <wx/button.h>
 #include <wx/dialog.h>
 //*)
-class Game;
+namespace gd { class Project; }
 namespace gd { class Layout; }
 class RepeatEvent;
 
@@ -29,7 +29,7 @@ class EditRepeatEvent: public wxDialog
 {
 	public:
 
-		EditRepeatEvent(wxWindow* parent, RepeatEvent & event_, Game & game_, gd::Layout & scene_);
+		EditRepeatEvent(wxWindow* parent, RepeatEvent & event_, gd::Project & game_, gd::Layout & scene_);
 		virtual ~EditRepeatEvent();
 
 		//(*Declarations(EditRepeatEvent)
@@ -66,7 +66,7 @@ class EditRepeatEvent: public wxDialog
 		//*)
 
 		RepeatEvent & event;
-		Game & game;
+		gd::Project & game;
 		gd::Layout & scene;
 
 		DECLARE_EVENT_TABLE()

@@ -4,7 +4,6 @@
  */
 
 #include "GDL/ObjInstancesHolder.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/RuntimeObject.h"
 #include "GDL/profile.h"
 

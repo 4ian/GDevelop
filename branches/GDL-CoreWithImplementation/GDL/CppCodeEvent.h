@@ -87,7 +87,7 @@ public:
     /**
      * Called when the user want to edit the event
      */
-    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+    virtual EditEventReturnType EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
 private:
     void Init(const CppCodeEvent & event);

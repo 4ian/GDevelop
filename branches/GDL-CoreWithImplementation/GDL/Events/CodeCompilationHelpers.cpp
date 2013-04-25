@@ -15,7 +15,7 @@
 #include <wx/filename.h>
 #include <wx/datetime.h>
 
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 #include "GDL/ExternalEvents.h"
 #include "GDCore/Events/Event.h"
@@ -26,9 +26,9 @@
 #include "GDL/IDE/DependenciesAnalyzer.h"
 #include "GDL/IDE/BaseProfiler.h"
 #include "GDL/ExtensionBase.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/CommonTools.h"
 #include "GDL/SceneNameMangler.h"
+#include "GDL/CppPlatform.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
 
 using namespace std;
@@ -37,7 +37,7 @@ using namespace gd;
 //Tool functions
 namespace
 {
-    bool SourceFileNeedRecompilation(Game & game, SourceFile & sourceFile)
+    bool SourceFileNeedRecompilation(gd::Project & game, SourceFile & sourceFile)
     {
         if ( !wxFileExists(string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(&sourceFile)+"ObjectFile.o") ))
             return true;
@@ -59,7 +59,7 @@ namespace
         return false;
     }
 
-    bool ExternalEventsNeedRecompilation(Game & game, gd::ExternalEvents & events)
+    bool ExternalEventsNeedRecompilation(gd::Project & game, gd::ExternalEvents & events)
     {
         DependenciesAnalyzer analyzer(game);
         if ( analyzer.ExternalEventsCanBeCompiledForAScene(events.GetName()).empty() )
@@ -83,7 +83,7 @@ namespace
      *
      * \return true if each dependency is already compiled.
      */
-    bool EnsureDependenciesAreOrWillBeCompiled(Game & game, const DependenciesAnalyzer & analyzer, gd::Layout * optionalScene = NULL)
+    bool EnsureDependenciesAreOrWillBeCompiled(gd::Project & game, const DependenciesAnalyzer & analyzer, gd::Layout * optionalScene = NULL)
     {
         bool aDependencyIsNotCompiled = false;
         for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
@@ -119,7 +119,7 @@ namespace
         return !aDependencyIsNotCompiled;
     }
 
-    bool EnsureDependenciesAreOrWillBeCompiledForRuntime(Game & game, const DependenciesAnalyzer & analyzer, gd::Layout * optionalScene, gd::ArbitraryResourceWorker & resourceWorker)
+    bool EnsureDependenciesAreOrWillBeCompiledForRuntime(gd::Project & game, const DependenciesAnalyzer & analyzer, gd::Layout * optionalScene, gd::ArbitraryResourceWorker & resourceWorker)
     {
         bool aDependencyIsNotCompiled = false;
         for (std::set<std::string>::const_iterator i = analyzer.GetSourceFilesDependencies().begin();i!=analyzer.GetSourceFilesDependencies().end();++i)
@@ -184,7 +184,7 @@ namespace
      * \param game Game associated with the scene
      * \param scene Scene with events to compile
      */
-    void CreateSceneEventsLinkingTask(Game & game, gd::Layout & scene)
+    void CreateSceneEventsLinkingTask(gd::Project & game, gd::Layout & scene)
     {
         std::cout << "Preparing linking task for scene " << scene.GetName() << "..." << std::endl;
         CodeCompilerTask task;
@@ -226,7 +226,8 @@ namespace
         //Construct the list of the external shared libraries files to be used
         for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
         {
-            boost::shared_ptr<ExtensionBase> extension = ExtensionsManager::GetInstance()->GetExtension(game.GetUsedPlatformExtensions()[i]);
+            boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedPlatformExtensions()[i]);
+            boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
             if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
 
             if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/"+"lib"+extension->GetName()+".a") )
@@ -277,7 +278,7 @@ bool EventsCodeCompilerPreWork::Execute()
     ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
     gd::EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
 
-    std::string eventsOutput = ::EventsCodeGenerator::GenerateSceneEventsCompleteCode(game->GetPlatform(), gameCopy, sceneCopy, sceneCopy.GetEvents(), false /*Compilation for edittime*/);
+    std::string eventsOutput = ::EventsCodeGenerator::GenerateSceneEventsCompleteCode(CppPlatform::Get(), gameCopy, sceneCopy, sceneCopy.GetEvents(), false /*Compilation for edittime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(scene)+"EventsSource.cpp").c_str() );
     myfile << eventsOutput;
@@ -318,7 +319,7 @@ bool EventsCodeCompilerRuntimePreWork::Execute()
     ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
     gd::EventsCodeGenerator::DeleteUselessEvents(sceneCopy.GetEvents());
 
-    std::string eventsOutput = ::EventsCodeGenerator::GenerateSceneEventsCompleteCode(game->GetPlatform(), gameCopy, sceneCopy, sceneCopy.GetEvents(), true /*Compilation for runtime*/);
+    std::string eventsOutput = ::EventsCodeGenerator::GenerateSceneEventsCompleteCode(CppPlatform::Get(), gameCopy, sceneCopy, sceneCopy.GetEvents(), true /*Compilation for runtime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(scene)+"RuntimeEventsSource.cpp").c_str() );
     myfile << eventsOutput;
@@ -420,7 +421,7 @@ bool ExternalEventsCodeCompilerPreWork::Execute()
     ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
     gd::EventsCodeGenerator::DeleteUselessEvents(externalEvents->GetEvents());
 
-    std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(game->GetPlatform(), gameCopy, *externalEvents, false /*Compilation for edittime*/);
+    std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(CppPlatform::Get(), gameCopy, *externalEvents, false /*Compilation for edittime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(externalEvents)+"EventsSource.cpp").c_str() );
     myfile << eventsOutput;
@@ -496,7 +497,7 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
     ::EventsCodeGenerator::PreprocessEventList(gameCopy, sceneCopy, sceneCopy.GetEvents());
     gd::EventsCodeGenerator::DeleteUselessEvents(externalEvents->GetEvents());
 
-    std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(game->GetPlatform(), gameCopy, *externalEvents, true /*Compilation for runtime*/);
+    std::string eventsOutput = ::EventsCodeGenerator::GenerateExternalEventsCompleteCode(CppPlatform::Get(), gameCopy, *externalEvents, true /*Compilation for runtime*/);
     std::ofstream myfile;
     myfile.open ( string(CodeCompiler::GetInstance()->GetOutputDirectory()+"GD"+ToString(externalEvents)+"RuntimeEventsSource.cpp").c_str() );
     myfile << eventsOutput;
@@ -505,7 +506,7 @@ bool ExternalEventsCodeCompilerRuntimePreWork::Execute()
     return true;
 }
 
-void GD_API CodeCompilationHelpers::CreateSceneEventsCompilationTask(Game & game, gd::Layout & scene)
+void GD_API CodeCompilationHelpers::CreateSceneEventsCompilationTask(gd::Project & game, gd::Layout & scene)
 {
     CodeCompilerTask task;
     task.compilerCall.compilationForRuntime = false;
@@ -521,7 +522,7 @@ void GD_API CodeCompilationHelpers::CreateSceneEventsCompilationTask(Game & game
     CodeCompiler::GetInstance()->AddTask(task);
 }
 
-void GD_API CodeCompilationHelpers::CreateExternalSourceFileCompilationTask(Game & game, SourceFile & file, gd::Layout * scene)
+void GD_API CodeCompilationHelpers::CreateExternalSourceFileCompilationTask(gd::Project & game, SourceFile & file, gd::Layout * scene)
 {
     CodeCompilerTask task;
 
@@ -542,7 +543,7 @@ void GD_API CodeCompilationHelpers::CreateExternalSourceFileCompilationTask(Game
     CodeCompiler::GetInstance()->AddTask(task);
 }
 
-void  GD_API CodeCompilationHelpers::CreateExternalEventsCompilationTask(Game & game, gd::ExternalEvents & events)
+void  GD_API CodeCompilationHelpers::CreateExternalEventsCompilationTask(gd::Project & game, gd::ExternalEvents & events)
 {
     CodeCompilerTask task;
     task.compilerCall.compilationForRuntime = false;

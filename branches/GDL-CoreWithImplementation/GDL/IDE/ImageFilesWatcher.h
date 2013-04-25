@@ -12,7 +12,7 @@
 #include <wx/msw/winundef.h>
 #endif
 #include <wx/fswatcher.h>
-class Game;
+namespace gd { class Project; }
 
 /**
  * Watch images files and notify the game if they are modified, so as to reload them when.
@@ -20,13 +20,13 @@ class Game;
 class GD_API ImageFilesWatcher : public wxFileSystemWatcher
 {
 public:
-    ImageFilesWatcher(const Game & game_);
+    ImageFilesWatcher(const gd::Project & game_);
 
 protected:
     void OnChange(wxFileSystemWatcherEvent& event);
 
 private:
-    const Game & game;
+    const gd::Project & game;
 };
 
 #endif // IMAGEFILESWATCHER_H

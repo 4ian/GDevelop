@@ -18,14 +18,14 @@
 #include <wx/stc/stc.h>
 //*)
 class CppCodeEvent;
-class Game;
+namespace gd { class Project; }
 namespace gd { class Layout; }
 
 class EditCppCodeEvent: public wxDialog
 {
 	public:
 
-		EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, Game & game_, gd::Layout & scene_);
+		EditCppCodeEvent(wxWindow* parent, CppCodeEvent & event_, gd::Project & game_, gd::Layout & scene_);
 		virtual ~EditCppCodeEvent();
 
 		//(*Declarations(EditCppCodeEvent)
@@ -89,7 +89,7 @@ class EditCppCodeEvent: public wxDialog
         void UpdateFunctionPrototype();
 
 		CppCodeEvent & editedEvent;
-		Game & game;
+		gd::Project & game;
 		gd::Layout & scene;
 
 		DECLARE_EVENT_TABLE()

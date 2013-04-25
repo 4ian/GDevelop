@@ -10,7 +10,7 @@
 #include <vector>
 namespace gd { class MainFrameWrapper; }
 namespace gd { class Project; }
-class Game;
+namespace gd { class Project; }
 class RuntimeScene;
 namespace gd { class Layout; }
 class wxWindow;
@@ -42,7 +42,7 @@ public:
      */
     virtual unsigned int GetRenderedHeight(unsigned int width, const gd::Platform & platform) const;
 
-    virtual EditEventReturnType EditEvent(wxWindow* parent_, Game & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
+    virtual EditEventReturnType EditEvent(wxWindow* parent_, gd::Project & game_, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_);
 
     bool linkWasInvalid; ///< Set to true by Preprocess if the links was invalid the last time is was processed. Used to display a warning in the events editor.
 };

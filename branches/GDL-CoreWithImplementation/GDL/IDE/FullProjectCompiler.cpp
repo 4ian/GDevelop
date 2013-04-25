@@ -24,7 +24,7 @@
 #include "GDL/IDE/CodeCompiler.h"
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/DatFile.h"
-#include "GDL/Game.h"
+#include "GDL/Project.h"
 #include "GDL/Scene.h"
 #include "GDL/Object.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
@@ -32,7 +32,6 @@
 #include "GDL/SceneNameMangler.h"
 #include "GDL/Tools/AES.h"
 #include "GDL/CommonTools.h"
-#include "GDL/ExtensionsManager.h"
 #include "GDL/ExtensionBase.h"
 #include "GDL/ExternalEvents.h"
 #include "GDL/OpenSaveGame.h"
@@ -40,8 +39,9 @@
 #include "GDCore/CommonTools.h"
 #include "GDL/IDE/ExecutableIconChanger.h"
 #include "GDL/IDE/BaseProfiler.h"
-#include "GDL/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/Platform.h"
 #include "GDL/IDE/DependenciesAnalyzer.h"
+#include "GDL/CppPlatform.h"
 #undef _
 #define _(s) wxGetTranslation((s))
 
@@ -58,7 +58,7 @@ namespace GDpriv
  * \param game Game associated with the scene
  * \param scene Scene with events to compile
  */
-void CreateWholeProjectRuntimeLinkingTask(Game & game, const std::string & outputFilename)
+void CreateWholeProjectRuntimeLinkingTask(gd::Project & game, const std::string & outputFilename)
 {
     std::cout << "Preparing linking task for project " << game.GetName() << "..." << std::endl;
     CodeCompilerTask task;
@@ -71,7 +71,8 @@ void CreateWholeProjectRuntimeLinkingTask(Game & game, const std::string & outpu
     //Construct the list of the external shared libraries files to be used
     for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
     {
-        boost::shared_ptr<ExtensionBase> extension = ExtensionsManager::GetInstance()->GetExtension(game.GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
         if ( extension == boost::shared_ptr<ExtensionBase>() ) continue;
 
         if ( wxFileExists(CodeCompiler::GetInstance()->GetBaseDirectory()+"CppPlatform/Extensions/Runtime/"+"lib"+extension->GetName()+".a") )
@@ -204,8 +205,8 @@ void FullProjectCompiler::LaunchProjectCompilation()
         LaunchResourceWorkerOnEvents(game, game.GetExternalEvents(i).GetEvents(), resourcesMergingHelper);
     }
     //Add global objects resources
-    for (unsigned int j = 0;j<game.GetGlobalObjects().size();++j) //Add global objects resources
-        game.GetGlobalObjects()[j]->ExposeResources(resourcesMergingHelper);
+    for (unsigned int j = 0;j<game.GetObjects().size();++j) //Add global objects resources
+        game.GetObjects()[j]->ExposeResources(resourcesMergingHelper);
 
     //Compile all scene events to object files
     for (unsigned int i = 0;i<game.GetLayoutCount();++i)
@@ -385,11 +386,11 @@ void FullProjectCompiler::LaunchProjectCompilation()
     wxSafeYield();
 
     //Copy extensions
-    ExtensionsManager * extensionsManager = ExtensionsManager::GetInstance();
     for (unsigned int i = 0;i<game.GetUsedPlatformExtensions().size();++i)
     {
         //Builtin extensions does not have a namespace.
-        boost::shared_ptr<ExtensionBase> extension = extensionsManager->GetExtension(game.GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<gd::PlatformExtension> gdExtension = CppPlatform::Get().GetExtension(game.GetUsedPlatformExtensions()[i]);
+        boost::shared_ptr<ExtensionBase> extension = boost::dynamic_pointer_cast<ExtensionBase>(gdExtension);
 
         if ( extension != boost::shared_ptr<ExtensionBase>() &&
             ( extension->GetNameSpace() != "" || extension->GetName() == "CommonDialogs" )

@@ -660,11 +660,13 @@ void Project::LoadProjectInformationFromXml(const TiXmlElement * elem)
 
     if ( elem->FirstChildElement( "Platforms" ) )
     {
-        std::string current = elem->Attribute("current") ? elem->Attribute("current") : "";
+        std::string current = elem->FirstChildElement( "Platforms" )->Attribute("current") ? elem->FirstChildElement( "Platforms" )->Attribute("current") : "";
 
-        for (const TiXmlElement * platformElem = elem->FirstChildElement( "Platform" ); platformElem; platformElem = platformElem->NextSiblingElement())
+        for (const TiXmlElement * platformElem = elem->FirstChildElement( "Platforms" )->FirstChildElement( "Platform" );
+             platformElem;
+             platformElem = platformElem->NextSiblingElement())
         {
-            std::string name = elem->Attribute("name") ? elem->Attribute("name") : "";
+            std::string name = platformElem->Attribute("name") ? platformElem->Attribute("name") : "";
             boost::shared_ptr<gd::Platform> platform = gd::PlatformManager::GetInstance()->GetPlatform(name);
 
             if ( platform ) {

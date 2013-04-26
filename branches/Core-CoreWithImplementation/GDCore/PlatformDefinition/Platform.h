@@ -42,6 +42,16 @@ public:
      */
     virtual std::string GetName() const { return "Unnamed platform"; }
 
+    /**
+     * Must return the platform full name, displayed to users.
+     */
+    virtual std::string GetFullName() const { return "Unnamed platform"; }
+
+    /**
+     * Must return a text describing the platform, displayed to users.
+     */
+    virtual std::string GetDescription() const { return ""; }
+
 
     /** \name Extensions management
      * Member functions used to manage the extensions

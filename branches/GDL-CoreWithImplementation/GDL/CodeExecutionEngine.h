@@ -79,11 +79,6 @@ public:
 
     RuntimeContext runtimeContext; ///< The object passed as parameter to the function of the dynamic library.
 
-    /**
-     * Load dynamic libraries needed by gd events generated code ( libstdc++ basically )
-     */
-    static void LoadDynamicLibraries();
-
 private:
 
     bool loaded; ///< True if a dynamic library is loaded and a function is ready to be executed.

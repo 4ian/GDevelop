@@ -37,12 +37,35 @@
 #include "GDL/BuiltinExtensions/ExternalLayoutsExtension.h"
 #include "GDL/RuntimeObject.h"
 #include "GDL/Object.h"
+#include "GDL/CommonTools.h"
+#include <wx/intl.h>
+#include <wx/config.h>
+#include <wx/filename.h>
 
 CppPlatform *CppPlatform::singleton = NULL;
 
 CppPlatform::CppPlatform() :
     gd::Platform()
 {
+    //Events compiler setup
+    cout << "* Setting up events compiler..." << endl;
+    CodeCompiler::GetInstance()->SetBaseDirectory(ToString(wxGetCwd()));
+    wxString eventsCompilerTempDir;
+    if ( wxConfigBase::Get()->Read("/Dossier/EventsCompilerTempDir", &eventsCompilerTempDir) && !eventsCompilerTempDir.empty() )
+        CodeCompiler::GetInstance()->SetOutputDirectory(ToString(eventsCompilerTempDir));
+    else
+        CodeCompiler::GetInstance()->SetOutputDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
+    int eventsCompilerMaxThread = 0;
+    if ( wxConfigBase::Get()->Read("/CodeCompiler/MaxThread", &eventsCompilerMaxThread, 0) && eventsCompilerMaxThread >= 0 )
+        CodeCompiler::GetInstance()->AllowMultithread(eventsCompilerMaxThread > 1, eventsCompilerMaxThread);
+    else
+        CodeCompiler::GetInstance()->AllowMultithread(false);
+
+    cout << "* Loading events code compiler configuration" << endl;
+    bool deleteTemporaries;
+    if ( wxConfigBase::Get()->Read( _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true) )
+        CodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporaries);
+
     AddExtension(boost::shared_ptr<ExtensionBase>(new BaseObjectExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new SpriteExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new CommonInstructionsExtension()));
@@ -62,6 +85,13 @@ CppPlatform::CppPlatform() :
     AddExtension(boost::shared_ptr<ExtensionBase>(new StringInstructionsExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new AdvancedExtension()));
     AddExtension(boost::shared_ptr<ExtensionBase>(new ExternalLayoutsExtension()));
+
+
+}
+
+std::string CppPlatform::GetDescription() const
+{
+    return ToString(_("Allows to create 2D games which can be compiled and play on Windows or Linux."));
 }
 
 bool CppPlatform::AddExtension(boost::shared_ptr<gd::PlatformExtension> platformExtension)

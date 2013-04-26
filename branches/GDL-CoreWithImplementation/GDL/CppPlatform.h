@@ -28,7 +28,9 @@ class GD_API CppPlatform : public gd::Platform
 {
 public:
 
-    std::string GetName() const { return "Game Develop C++ platform"; }
+    virtual std::string GetName() const { return "Game Develop C++ platform"; }
+    virtual std::string GetFullName() const { return "C++ Platform"; }
+    virtual std::string GetDescription() const;
 
     /**
      * Create a RuntimeObject from a gd::Object for a scene.

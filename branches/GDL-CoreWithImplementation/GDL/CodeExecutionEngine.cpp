@@ -12,10 +12,6 @@
 #include <wx/log.h>
 #endif
 
-void CodeExecutionEngine::LoadDynamicLibraries()
-{
-}
-
 CodeExecutionEngine::CodeExecutionEngine() :
     runtimeContext(NULL),
     loaded(false),

@@ -16,16 +16,6 @@
 /**
  * An object list is a vector containing (smart) pointers to objects.
  */
-typedef std::vector < boost::shared_ptr<gd::Object> > ObjList;
-
-/**
- * Objects are usually managed thanks to (smart) pointers.
- */
-typedef boost::shared_ptr<gd::Object> ObjSPtr;
-
-/**
- * An object list is a vector containing (smart) pointers to objects.
- */
 typedef std::vector < boost::shared_ptr<RuntimeObject> > RuntimeObjList;
 
 /**

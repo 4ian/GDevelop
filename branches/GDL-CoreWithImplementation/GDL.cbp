@@ -732,6 +732,8 @@
 		<Unit filename="GDL/CommonTools.h" />
 		<Unit filename="GDL/CppCodeEvent.cpp" />
 		<Unit filename="GDL/CppCodeEvent.h" />
+		<Unit filename="GDL/CppPlatform.cpp" />
+		<Unit filename="GDL/CppPlatform.h" />
 		<Unit filename="GDL/DatFile.cpp" />
 		<Unit filename="GDL/DatFile.h" />
 		<Unit filename="GDL/Direction.cpp" />
@@ -830,8 +832,6 @@
 		<Unit filename="GDL/OpenSaveLoadingScreen.cpp" />
 		<Unit filename="GDL/OpenSaveLoadingScreen.h" />
 		<Unit filename="GDL/PlatformDefinition/ClassWithObjects.cpp" />
-		<Unit filename="GDL/PlatformDefinition/CppPlatform.cpp" />
-		<Unit filename="GDL/PlatformDefinition/CppPlatform.h" />
 		<Unit filename="GDL/Point.cpp" />
 		<Unit filename="GDL/Point.h" />
 		<Unit filename="GDL/Polygon.cpp" />

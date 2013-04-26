@@ -56,11 +56,10 @@ NewProjectDialog::NewProjectDialog(wxWindow* parent,wxWindowID id,const wxPoint&
 	FlexGridSizer1 = new wxFlexGridSizer(0, 1, 0, 0);
 	FlexGridSizer1->AddGrowableCol(0);
 	FlexGridSizer1->AddGrowableRow(1);
-	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Choose a template:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
+	StaticText1 = new wxStaticText(this, ID_STATICTEXT1, _("Choose a platform and a template:"), wxDefaultPosition, wxDefaultSize, 0, _T("ID_STATICTEXT1"));
 	FlexGridSizer1->Add(StaticText1, 1, wxALL|wxALIGN_LEFT|wxALIGN_CENTER_VERTICAL, 5);
 	BoxSizer1 = new wxBoxSizer(wxHORIZONTAL);
 	platformList = new wxListCtrl(this, ID_LISTCTRL1, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_NO_HEADER, wxDefaultValidator, _T("ID_LISTCTRL1"));
-	platformList->Hide();
 	BoxSizer1->Add(platformList, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
 	templateList = new wxListCtrl(this, ID_LISTCTRL2, wxDefaultPosition, wxDefaultSize, wxLC_REPORT|wxLC_NO_HEADER, wxDefaultValidator, _T("ID_LISTCTRL2"));
 	BoxSizer1->Add(templateList, 3, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 5);
@@ -157,7 +156,7 @@ void NewProjectDialog::RefreshPlatformList()
     const std::vector< boost::shared_ptr<gd::Platform> > & platforms = gd::PlatformManager::GetInstance()->GetAllPlatforms();
     for (unsigned int i = 0;i<platforms.size();++i)
     {
-        platformList->InsertItem(0, platforms[i]->GetName(), 0);
+        platformList->InsertItem(0, platforms[i]->GetFullName(), 0);
         gd::TreeItemStringData * associatedData = new gd::TreeItemStringData(platforms[i]->GetName());
         platformList->SetItemPtrData(0, wxPtrToUInt(associatedData));
 
@@ -167,6 +166,8 @@ void NewProjectDialog::RefreshPlatformList()
 
 void NewProjectDialog::RefreshTemplateList()
 {
+    templateList->DeleteAllItems();
+
     wxImageList * templateImageList = new wxImageList(32,32);
     templateImageList->Add(wxBitmap("res/gdFile32.png", wxBITMAP_TYPE_ANY));
     templateList->AssignImageList(templateImageList, wxIMAGE_LIST_SMALL);
@@ -292,6 +293,7 @@ void NewProjectDialog::OnplatformListItemSelect(wxListEvent& event)
     {
         chosenTemplatePlatform = associatedData->GetString();
     }
+    RefreshTemplateList();
 }
 
 void NewProjectDialog::OnbrowseBtClick(wxCommandEvent& event)

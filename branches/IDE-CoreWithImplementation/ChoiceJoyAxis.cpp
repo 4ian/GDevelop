@@ -13,8 +13,8 @@
 //*)
 #include <string>
 #include <vector>
-#include "GDL/Project.h"
-#include "GDL/Scene.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 

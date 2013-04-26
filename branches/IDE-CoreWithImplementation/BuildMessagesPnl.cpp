@@ -9,13 +9,14 @@
 #include <wx/intl.h>
 #include <wx/string.h>
 //*)
-#include "GDL/Project.h"
-#include "GDL/CommonTools.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/CommonTools.h"
 #include "GDL/IDE/CodeCompiler.h"
 #include "GDL/IDE/CompilerMessagesParser.h"
 #include "ProjectManager.h"
 
 using namespace GDpriv;
+using namespace gd;
 using namespace std;
 
 //(*IdInit(BuildMessagesPnl)

@@ -38,11 +38,10 @@
 #include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseAutomatismDialog.h"
 #include "GDCore/IDE/Dialogs/ChooseLayerDialog.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Scene.h"
-#include "GDL/Project.h"
-#include "GDL/Object.h"
-#include "GDL/ObjectHelpers.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "ChoixClavier.h"
 #include "SigneModification.h"
@@ -53,6 +52,8 @@
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>
 #endif
+
+using namespace gd;
 
 //(*IdInit(ChoixAction)
 const long ChoixAction::ID_TREECTRL1 = wxNewId();

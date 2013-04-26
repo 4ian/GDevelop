@@ -5,10 +5,6 @@
 
 //This file was created 2008-03-01
 
-#ifdef __WXMSW__
-#include <wx/msw/winundef.h>
-#endif
-
 //(*AppHeaders
 #include <wx/image.h>
 //*)
@@ -30,10 +26,18 @@
 #include <string>
 #include <unistd.h>
 #include <stdexcept>
+#include <fstream>
+#include <boost/shared_ptr.hpp>
 #include <SFML/System.hpp>
-
-#include "GDL/CodeExecutionEngine.h"
-
+#include <SFML/Graphics.hpp>
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/IDE/ActionSentenceFormatter.h"
+#include "GDCore/IDE/PlatformManager.h"
+#include "GDCore/IDE/PlatformLoader.h"
+#include "GDCore/Tools/VersionWrapper.h"
+#include "GDCore/Tools/Locale/LocaleManager.h"
+#include "GDCore/CommonTools.h"
 #include "MainFrame.h"
 #include "Game_Develop_EditorApp.h"
 #include "CheckMAJ.h"
@@ -47,22 +51,7 @@
 #include "ExtensionBugReportDlg.h"
 #include "Dialogs/HelpViewerDlg.h"
 
-#include "GDL/Project.h"
-#include "GDL/Log.h"
-#include "GDL/OpenSaveGame.h"
-#include "GDL/SoundManager.h"
-#include "GDL/FontManager.h"
-#include "GDCore/Tools/HelpFileAccess.h"
-#include "GDCore/IDE/ActionSentenceFormatter.h"
-#include "GDCore/IDE/PlatformManager.h"
-#include "GDCore/IDE/PlatformLoader.h"
-#include "GDL/ExtensionsLoader.h"
-#include "GDCore/Tools/VersionWrapper.h"
-#include "GDCore/Tools/Locale/LocaleManager.h"
-#include "GDL/IDE/CodeCompiler.h"
-
-#include <fstream>
-#include <boost/shared_ptr.hpp>
+using namespace gd;
 
 IMPLEMENT_APP(Game_Develop_EditorApp)
 
@@ -261,29 +250,12 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Les log
     cout << "* Displaying Game Develop version information :" << endl;
-    //GDLogBanner();
+    cout << "Game Develop " << gd::VersionWrapper::FullString() << ", built "
+         << gd::VersionWrapper::Date() << "/" << gd::VersionWrapper::Month() << "/" << gd::VersionWrapper::Year() << endl;
 
     cout << "* Creating a useless SFML texture" << endl;
     sf::RenderWindow window;
     sf::Window window2;
-
-    //Code engine stuff
-    cout << "* Loading required dynamic libraries..." << endl;
-    CodeExecutionEngine::LoadDynamicLibraries();
-
-    //Events compiler setup
-    cout << "* Setting up events compiler..." << endl;
-    CodeCompiler::GetInstance()->SetBaseDirectory(ToString(wxGetCwd()));
-    wxString eventsCompilerTempDir;
-    if ( Config->Read("/Dossier/EventsCompilerTempDir", &eventsCompilerTempDir) && !eventsCompilerTempDir.empty() )
-        CodeCompiler::GetInstance()->SetOutputDirectory(ToString(eventsCompilerTempDir));
-    else
-        CodeCompiler::GetInstance()->SetOutputDirectory(ToString(wxFileName::GetTempDir()+"/GDTemporaries"));
-    int eventsCompilerMaxThread = 0;
-    if ( Config->Read("/CodeCompiler/MaxThread", &eventsCompilerMaxThread, 0) && eventsCompilerMaxThread >= 0 )
-        CodeCompiler::GetInstance()->AllowMultithread(eventsCompilerMaxThread > 1, eventsCompilerMaxThread);
-    else
-        CodeCompiler::GetInstance()->AllowMultithread(false);
 
     //Load platforms and extensions
     cout << "* Loading platforms and extensions:" << endl;
@@ -341,18 +313,13 @@ bool Game_Develop_EditorApp::OnInit()
 
     //Set help provider
     {
-        gd::HelpFileAccess::GetInstance()->SetHelpProvider(HelpProvider::GetInstance());
-        HelpProvider::GetInstance()->SetParentWindow(mainEditor);
+        gd::HelpFileAccess::GetInstance()->SetHelpProvider(::HelpProvider::GetInstance());
+        ::HelpProvider::GetInstance()->SetParentWindow(mainEditor);
     }
     cout << "* Help provider set" << endl;
 
     cout << "* Loading events editor configuration" << endl;
     gd::ActionSentenceFormatter::GetInstance()->LoadTypesFormattingFromConfig();
-
-    cout << "* Loading events code compiler configuration" << endl;
-    bool deleteTemporaries;
-    if ( Config->Read( _T( "/Dossier/EventsCompilerDeleteTemp" ), &deleteTemporaries, true) )
-        CodeCompiler::GetInstance()->SetMustDeleteTemporaries(deleteTemporaries);
 
     //Save the event to log file
     cout << "* Creating log file (if activated)" << endl;

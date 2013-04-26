@@ -33,8 +33,8 @@
 #include "EventsEditor.h"
 #include "Dialogs/LayoutEditorPropertiesPnl.h"
 
-#include "GDL/Project.h"
-#include "GDL/Project.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Project.h"
 
 //(*IdInit(EditorScene)
 const long EditorScene::ID_SCROLLBAR3 = wxNewId();

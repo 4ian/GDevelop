@@ -20,10 +20,10 @@
 #include <wx/aui/aui.h>
 #include <wx/config.h>
 
-#include "GDL/Project.h"
-#include "GDL/Scene.h"
-#include "GDL/Object.h"
-#include "GDL/CommonTools.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Clipboard.h"
 #include <algorithm>
 #include <numeric>

@@ -13,22 +13,20 @@
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/IDE/ProjectResourcesCopier.h"
 #include "GDCore/IDE/wxTools/RecursiveMkDir.h"
+#include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/CommonTools.h"
-#include "GDL/Project.h"
-#include "GDL/Project.h"
-#include "GDL/IDE/CompilerMessagesParser.h"
-#include "GDL/IDE/CodeCompiler.h"
-#include "GDL/CommonTools.h"
 #include "Dialogs/NewProjectDialog.h"
 #include "BuildMessagesPnl.h"
 #include "MainFrame.h"
 #include "BuildToolsPnl.h"
 #include "BuildProgressPnl.h"
 #include "Compilation.h"
-#include "GDCore/IDE/PlatformManager.h"
 #include "Fusion.h"
 #include "ProjectManager.h"
 #include "StartHerePage.h"
+#include "GDL/IDE/CodeCompiler.h"
+
+using namespace gd;
 
 /**
  * Request close
@@ -63,7 +61,7 @@ void MainFrame::CreateNewProject()
             {
                 newProject->SetProjectFile(dialog.GetChosenTemplateFile());
                 newProject->LoadFromFile(newProject->GetProjectFile());
-                gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, ToString(targetDirectory), false);
+                gd::ProjectResourcesCopier::CopyAllResourcesTo(*newProject, gd::ToString(targetDirectory), false);
             }
             else
                 newProject->InsertNewLayout(gd::ToString(_("New scene")), 0);
@@ -105,7 +103,7 @@ void MainFrame::OnMenuOpenSelected( wxCommandEvent& event )
     wxFileDialog openFileDialog( this, _( "Choose the project to open" ), "", "", "\"Game Develop\" Project(*.gdg)|*.gdg|\"Game Develop\" Project Autosave (*.gdg.autosave)|*.gdg.autosave" );
 
     if (openFileDialog.ShowModal() != wxID_CANCEL && !openFileDialog.GetPath().empty() )
-        Open( ToString(openFileDialog.GetPath()) );
+        Open( gd::ToString(openFileDialog.GetPath()) );
 }
 
 /**
@@ -250,7 +248,7 @@ void MainFrame::OnRibbonSaveAllClicked(wxRibbonButtonBarEvent& evt)
             wxFileDialog FileDialog( this, _( "Choose where to save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
             FileDialog.ShowModal();
 
-            std::string path = ToString(FileDialog.GetPath());
+            std::string path = gd::ToString(FileDialog.GetPath());
 
             #if defined(LINUX) //Extension seems not be added with wxGTK?
             if ( FileDialog.GetFilterIndex() == 0 && !path.empty() )
@@ -299,7 +297,7 @@ void MainFrame::SaveAs()
     wxFileDialog fileDialog( this, _( "Choose where save the project" ), "", "", "\"Game Develop\" Project (*.gdg)|*.gdg", wxFD_SAVE );
     fileDialog.ShowModal();
 
-    std::string file = ToString(fileDialog.GetPath());
+    std::string file = gd::ToString(fileDialog.GetPath());
     #if defined(LINUX) //Extension seems not be added with wxGTK?
     if ( fileDialog.GetFilterIndex() == 0 && !file.empty() )
         file += ".gdg";
@@ -323,7 +321,7 @@ void MainFrame::SaveAs()
             if ( dlg.ShowModal() == wxID_YES )
             {
                 wxProgressDialog progressDialog(_("Save progress"), _("Exporting resources..."));
-                gd::ProjectResourcesCopier::CopyAllResourcesTo(*GetCurrentGame(), ToString(newPath), true, &progressDialog);
+                gd::ProjectResourcesCopier::CopyAllResourcesTo(*GetCurrentGame(), gd::ToString(newPath), true, &progressDialog);
             }
 
             if ( dlg.IsCheckBoxChecked() )
@@ -348,7 +346,7 @@ void MainFrame::OnMenuCompilationSelected( wxCommandEvent& event )
 {
     if ( !CurrentGameIsValid() ) return;
 
-    Compilation Dialog( this, * dynamic_cast<Game*>(GetCurrentGame().get()) ); //TODO : Abstract
+    Compilation Dialog( this, *GetCurrentGame() ); //TODO : Abstract
     Dialog.ShowModal();
 }
 
@@ -390,7 +388,7 @@ void MainFrame::OnRecentClicked( wxCommandEvent& event )
         break;
     }
 
-    Open( ToString(last) );
+    Open( gd::ToString(last) );
 }
 
 /**

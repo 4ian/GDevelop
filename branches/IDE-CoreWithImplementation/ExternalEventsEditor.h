@@ -14,7 +14,7 @@
 namespace gd { class ExternalEvents; };
 namespace gd { class Project; }
 class EventsEditor;
-#include "GDL/Scene.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 
 class ExternalEventsEditor: public wxPanel

@@ -10,17 +10,16 @@
 //*)
 #include <wx/log.h>
 #include <wx/filedlg.h>
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/Events/Serialization.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDL/tinyxml/tinyxml.h"
+#include "GDCore/TinyXml/tinyxml.h"
 #include <string>
 #include <vector>
 
-#include "GDL/Project.h"
-#include "GDL/OpenSaveGame.h"
-#include "GDL/CommonTools.h"
-#include "GDCore/Events/Serialization.h"
-
 using namespace std;
+using namespace gd;
 
 //(*IdInit(CreateTemplate)
 const long CreateTemplate::ID_STATICBITMAP3 = wxNewId();

@@ -28,18 +28,19 @@
 #include <iostream>
 #include <fstream>
 
-#include "GDL/Project.h"
-#include "GDL/DatFile.h"
-#include "GDL/OpenSaveLoadingScreen.h"
-#include "GDL/OpenSaveGame.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/IDE/ResourcesMergingHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDL/ExternalEvents.h"
+#include "GDCore/CommonTools.h"
+#include "GDL/IDE/FullProjectCompiler.h"
+#include "GDL/DatFile.h"
 #include "Compilation.h"
 #include "ErrorCompilation.h"
-#include "GDL/IDE/FullProjectCompiler.h"
 
 using namespace std;
+using namespace gd;
 
 //(*IdInit(Compilation)
 const long Compilation::ID_GAUGE1 = wxNewId();

@@ -9,7 +9,7 @@
 #include <wx/app.h>
 #include <wx/log.h>
 #include <wx/snglinst.h>
-#include "GDL/Project.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "MainFrame.h"
 
 /**

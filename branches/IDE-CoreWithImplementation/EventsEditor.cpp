@@ -28,11 +28,11 @@
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
-#include "GDL/Project.h"
-#include "GDL/Scene.h"
-#include "GDL/CommonTools.h"
-#include "GDL/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/CommonTools.h"
 #include "LogFileManager.h"
 #include "GDL/IDE/Dialogs/ProfileDlg.h"
 #include "SearchEvents.h"
@@ -47,6 +47,7 @@
 #include <SFML/System.hpp>
 
 using namespace std;
+using namespace gd;
 
 //(*IdInit(EventsEditor)
 const long EventsEditor::ID_TEXTCTRL1 = wxNewId();

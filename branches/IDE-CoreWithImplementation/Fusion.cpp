@@ -18,13 +18,10 @@
 #include <wx/log.h>
 #include <wx/msgdlg.h>
 
-#include "GDL/CommonTools.h"
-#include "GDL/Project.h"
-#include "GDL/Object.h"
-#include "GDL/ObjectHelpers.h"
-#include "GDL/Scene.h"
-#include "GDL/OpenSaveGame.h"
-#include "GDL/ExternalEvents.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 
 
 using namespace std;
@@ -186,7 +183,7 @@ void Fusion::OnFusionBtClick(wxCommandEvent& event)
         for(unsigned int i = 0;i<secondGame.GetObjects().size();i++)
         {
             vector< boost::shared_ptr<gd::Object> >::iterator object =
-                find_if(game.GetObjects().begin(), game.GetObjects().end(), bind2nd(ObjectHasName(), secondGame.GetObjects()[i]->GetName()));
+                find_if(game.GetObjects().begin(), game.GetObjects().end(), bind2nd(gd::ObjectHasName(), secondGame.GetObjects()[i]->GetName()));
 
             if ( object != game.GetObjects().end())
             {

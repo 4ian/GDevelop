@@ -37,14 +37,11 @@
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Object.h"
+#include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
+#include "GDCore/PlatformDefinition/Automatism.h"
 #include "GDCore/IDE/Clipboard.h"
-#include "GDL/Scene.h"
-#include "GDL/Object.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Events/CodeCompilationHelpers.h"
-#include "GDL/AutomatismsSharedData.h"
-#include "GDL/Automatism.h"
-#include "GDL/CommonTools.h"
+#include "GDCore/CommonTools.h"
 
 #include "EditorObjetsGroups.h"
 #include "LogFileManager.h"
@@ -62,6 +59,8 @@
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
 #endif
+
+using namespace gd;
 
 //(*IdInit(EditorObjectList)
 const long EditorObjectList::ID_TREECTRL1 = wxNewId();

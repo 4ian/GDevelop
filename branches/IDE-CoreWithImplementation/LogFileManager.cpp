@@ -3,7 +3,7 @@
 #include <wx/log.h>
 #include <wx/datetime.h>
 #include "LogFileManager.h"
-#include "GDL/CommonTools.h"
+#include "GDCore/CommonTools.h"
 
 LogFileManager *LogFileManager::_singleton = NULL;
 
@@ -23,7 +23,7 @@ void LogFileManager::WriteToLogFile(const std::string & log)
             if ( !file.Create() ) return; //Failed to create log file
         }
         wxDateTime time = wxDateTime::Now();
-        file.AddLine("["+ToString(time.GetMonth()+1)+"/"+ToString(time.GetDay())+"/"+ToString(time.GetYear())+", "+ToString(time.GetHour())+":"+ToString(time.GetMinute())+":"+ToString(time.GetSecond())+"] "+log);
+        file.AddLine("["+gd::ToString(time.GetMonth()+1)+"/"+gd::ToString(time.GetDay())+"/"+gd::ToString(time.GetYear())+", "+gd::ToString(time.GetHour())+":"+gd::ToString(time.GetMinute())+":"+gd::ToString(time.GetSecond())+"] "+log);
         file.Write();
     }
 }
@@ -34,7 +34,7 @@ void LogFileManager::InitalizeFromConfig()
     wxConfig::Get()->Read("/Log/Activated", &logActivated, false);
     wxString wxLogFile;
     wxConfig::Get()->Read("/Log/File", &wxLogFile, "");
-    logFile = ToString(wxLogFile);
+    logFile = gd::ToString(wxLogFile);
 
     //Clear log
     if ( logActivated && !logFile.empty() )

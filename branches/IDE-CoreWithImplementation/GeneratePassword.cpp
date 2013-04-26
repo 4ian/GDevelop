@@ -6,7 +6,6 @@
 #include <wx/image.h>
 #include <wx/string.h>
 //*)
-#include "GDL/BuiltinExtensions/CommonInstructionsTools.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include <string>
 #include <SFML/System.hpp>
@@ -94,6 +93,29 @@ GeneratePassword::~GeneratePassword()
 	//*)
 }
 
+/**
+ * Original code by Laurent Gomila.
+ */
+namespace
+{
+    // Initialize the generator's seed with the current system time
+    // in milliseconds, so that it is always different
+    unsigned int InitializeSeed()
+    {
+        unsigned int seed = static_cast<unsigned int>(std::time(NULL));
+        std::srand(seed);
+        return seed;
+    }
+
+    double Random(int end)
+    {
+        int begin = 0;
+        return std::rand() % (end - begin + 1) + begin;
+    }
+
+    // Global variable storing the current seed
+    unsigned int globalSeed = InitializeSeed();
+}
 
 void GeneratePassword::OnCreerBtClick(wxCommandEvent& event)
 {
@@ -106,7 +128,7 @@ void GeneratePassword::OnCreerBtClick(wxCommandEvent& event)
     mdpEdit->ChangeValue("");
     for (unsigned int i = 0;i<static_cast<unsigned>(number);i++)
     {
-        int nb = GDpriv::CommonInstructions::Random(41);
+        int nb = ::Random(41);
         mdpEdit->ChangeValue(mdpEdit->GetValue()+carac.substr(nb,1));
     }
 }

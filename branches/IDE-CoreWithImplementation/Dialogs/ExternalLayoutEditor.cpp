@@ -11,7 +11,7 @@
 #include <wx/string.h>
 //*)
 #include <wx/config.h>
-#include "GDL/ExternalLayout.h"
+#include "GDCore/PlatformDefinition/ExternalLayout.h"
 #include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
 #include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
 #include "../InitialPositionBrowserDlg.h"
@@ -19,6 +19,9 @@
 #include "../EditorObjets.h"
 #include "../MainFrame.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
+#include "GDCore/CommonTools.h"
+
+using namespace gd;
 
 //(*IdInit(ExternalLayoutEditor)
 const long ExternalLayoutEditor::ID_STATICTEXT1 = wxNewId();

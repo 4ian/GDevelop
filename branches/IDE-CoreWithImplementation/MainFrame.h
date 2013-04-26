@@ -36,8 +36,6 @@
 #include <wx/msw/winundef.h>
 #endif
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
-#include "GDL/Project.h"
-#include "GDL/CommonTools.h"
 #include "EditorScene.h"
 #include "RecentList.h"
 namespace gd { class Project; }

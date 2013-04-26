@@ -18,32 +18,26 @@
 #include <wx/imaglist.h>
 #include <wx/busyinfo.h>
 #include <fstream>
-#include "LogFileManager.h"
-#include "GDCore/IDE/Clipboard.h"
-#include "MainFrame.h"
-#include "gdTreeItemProjectData.h"
-#include "GDL/ExternalEvents.h"
-#include "GDL/StandardEvent.h"
-#include "GDL/CommentEvent.h"
+#include "GDCore/Tools/HelpFileAccess.h"
+#include "GDCore/PlatformDefinition/ExternalEvents.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/SourceFile.h"
-#include "GDL/Events/CodeCompilationHelpers.h"
-#ifdef __WXMSW__
-#include <wx/msw/winundef.h>
-#endif
-#include "CodeEditor.h"
-#include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
-#include "ExternalEventsEditor.h"
-#include "Dialogs/ExternalLayoutEditor.h"
-#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
-#include "EditPropScene.h"
-#include "Dialogs/ProjectPropertiesPnl.h"
-#include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/ExternalLayout.h"
-
-#include <fstream>
+#include "GDCore/IDE/Dialogs/ProjectExtensionsDialog.h"
+#include "GDCore/IDE/Dialogs/ChooseVariableDialog.h"
+#include "GDCore/IDE/Clipboard.h"
+#include "GDCore/CommonTools.h"
+#include "Dialogs/ExternalLayoutEditor.h"
+#include "Dialogs/ProjectPropertiesPnl.h"
+#include "gdTreeItemProjectData.h"
+#include "LogFileManager.h"
+#include "MainFrame.h"
+#include "CodeEditor.h"
+#include "ExternalEventsEditor.h"
+#include "EditPropScene.h"
+#include "GDL/IDE/CodeCompiler.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/uxtheme.h>

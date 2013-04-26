@@ -18,7 +18,7 @@
 //*)
 namespace gd { class Project; }
 namespace gd { class Layout; }
-#include "GDL/Scene.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include <string>
 #include <vector>
 

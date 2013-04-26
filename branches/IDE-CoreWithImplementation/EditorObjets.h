@@ -13,8 +13,8 @@
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
 #include <wx/aui/aui.h>
 #include <wx/imaglist.h>
-#include "GDL/Project.h"
-#include "GDL/Scene.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>

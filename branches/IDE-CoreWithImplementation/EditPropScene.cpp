@@ -19,9 +19,11 @@
 #include <wx/config.h>
 
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDL/CommonTools.h"
 #include "GDCore/PlatformDefinition/Layout.h"
-#include "GDL/Scene.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/CommonTools.h"
+
+using namespace gd;
 
 //(*IdInit(EditPropScene)
 const long EditPropScene::ID_STATICTEXT4 = wxNewId();

@@ -37,8 +37,7 @@
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
-#include "GDL/CommonTools.h"
-#include "GDL/OpenSaveGame.h"
+#include "GDCore/CommonTools.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>

@@ -22,11 +22,10 @@
 #include <wx/log.h>
 #include <wx/msgdlg.h>
 #include "GDCore/PlatformDefinition/Layout.h"
-#include "GDL/CommonTools.h"
-#include "GDL/Scene.h"
-#include "GDL/Project.h"
-#include "GDL/Object.h"
-#include "GDL/ObjectHelpers.h"
+#include "GDCore/CommonTools.h"
+#include "GDCore/PlatformDefinition/Layout.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Object.h"
 #include "GDCore/IDE/wxTools/TreeItemStringData.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/IDE/ConditionSentenceFormatter.h"
@@ -58,6 +57,7 @@
 #endif
 
 using namespace std;
+using namespace gd;
 
 //(*IdInit(ChoixCondition)
 const long ChoixCondition::ID_TREECTRL1 = wxNewId();

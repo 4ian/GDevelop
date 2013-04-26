@@ -13,9 +13,9 @@
 //*)
 #include <wx/filedlg.h>
 #include <wx/filename.h>
-#include "GDL/CommonTools.h"
+#include "GDCore/CommonTools.h"
 #include "GDCore/IDE/Dialogs/EditStrExpressionDialog.h"
-#include "GDL/Project.h"
+#include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 namespace gd { class Layout; }
 
@@ -121,7 +121,7 @@ void ChoiceFile::OnadvancedBtClick(wxCommandEvent& event)
 
 void ChoiceFile::OnokBtClick(wxCommandEvent& event)
 {
-    file = ToString(fileEdit->GetValue());
+    file = gd::ToString(fileEdit->GetValue());
     EndModal(1);
 }
 

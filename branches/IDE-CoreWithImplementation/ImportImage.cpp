@@ -10,9 +10,10 @@
 #include <wx/animate.h>
 #include <wx/filename.h>
 
-#include "GDL/CommonTools.h"
+#include "GDCore/CommonTools.h"
 
 using namespace std;
+using namespace gd;
 
 //(*IdInit(ImportImage)
 const long ImportImage::ID_STATICTEXT3 = wxNewId();
@@ -345,7 +346,7 @@ void ImportImage::OnFileGIFEditText(wxCommandEvent& event)
 {
     wxAnimation animation;
     if ( animation.LoadFile(FileGIFEdit->GetValue()) )
-        nbImageGIFBt->SetLabel(_("Number of images : ")+ToString(animation.GetFrameCount()));
+        nbImageGIFBt->SetLabel(_("Number of images : ")+gd::ToString(animation.GetFrameCount()));
     else
         nbImageGIFBt->SetLabel(_("Number of images : \?"));
 }
@@ -368,7 +369,7 @@ void ImportImage::OnDecomposeGIFBtClick(wxCommandEvent& event)
     for (unsigned int i = 0;i<animation.GetFrameCount();++i)
     {
     	wxImage img = animation.GetFrame(i);
-    	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+ToString(i)+".png", wxBITMAP_TYPE_PNG);
+    	img.SaveFile(path+"/"+DecomposeGIFEdit->GetValue()+gd::ToString(i)+".png", wxBITMAP_TYPE_PNG);
     }
 
     wxLogMessage(_("Decomposition of the GIF completed!"));
@@ -405,7 +406,7 @@ void ImportImage::OnfileRPGEditText(wxCommandEvent& event)
 {
     wxImage image;
     if ( image.LoadFile(fileRPGEdit->GetValue()) )
-        tailleImageRPGEdit->SetLabel(_("Size of an image : ")+ToString(image.GetWidth()/4)+"x"+ToString(image.GetHeight()/4));
+        tailleImageRPGEdit->SetLabel(_("Size of an image : ")+gd::ToString(image.GetWidth()/4)+"x"+gd::ToString(image.GetHeight()/4));
     else
         tailleImageRPGEdit->SetLabel(_("Size of an image : \?x\?"));
 }
@@ -441,7 +442,7 @@ void ImportImage::OnDecomposeRPGEditClick(wxCommandEvent& event)
             if ( j == 1 ) direc = "L";
             if ( j == 2 ) direc = "R";
             if ( j == 3 ) direc = "U";
-            subImage.SaveFile(path+"/"+decomposeRPGEdit->GetValue()+direc+ToString(i)+".png", wxBITMAP_TYPE_PNG);
+            subImage.SaveFile(path+"/"+decomposeRPGEdit->GetValue()+direc+gd::ToString(i)+".png", wxBITMAP_TYPE_PNG);
         }
     }
 
@@ -520,7 +521,7 @@ void ImportImage::OnDecomposeSSBtClick(wxCommandEvent& event)
             imageRect.SetWidth(width);
             imageRect.SetHeight(height);
 
-            image.GetSubImage(imageRect).SaveFile(path+"/"+decomposeSSEdit->GetValue()+"l"+ToString(line)+"c"+ToString(column)+".png", wxBITMAP_TYPE_PNG);
+            image.GetSubImage(imageRect).SaveFile(path+"/"+decomposeSSEdit->GetValue()+"l"+gd::ToString(line)+"c"+gd::ToString(column)+".png", wxBITMAP_TYPE_PNG);
 
             X += width + spaceH;
         }

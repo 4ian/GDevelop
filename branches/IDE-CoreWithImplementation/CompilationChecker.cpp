@@ -1,15 +1,16 @@
 #include "CompilationChecker.h"
 #include "GDCore/Tools/Version.h"
 #include "GDCore/Tools/VersionWrapper.h"
-#include "GDL/CommonTools.h"
+#include "GDCore/CommonTools.h"
 #include <iostream>
 
 using namespace std;
+using namespace gd;
 
 bool CompilationChecker::EnsureCorrectGDLVersion()
 {
-    string versionString =  ToString(gd::VersionWrapper::Major()) + ", " + ToString(gd::VersionWrapper::Minor()) + ", " +
-                            ToString(gd::VersionWrapper::Build()) + ", " + ToString(gd::VersionWrapper::Revision());
+    string versionString =  ToString(VersionWrapper::Major()) + ", " + ToString(VersionWrapper::Minor()) + ", " +
+                            ToString(VersionWrapper::Build()) + ", " + ToString(VersionWrapper::Revision());
 
     if (versionString != GDCore_RC_FILEVERSION_STRING)
     {
@@ -24,7 +25,7 @@ bool CompilationChecker::EnsureCorrectGDLVersion()
         return false;
     }
 
-    if ( !gd::VersionWrapper::CompiledForEdittime() )
+    if ( !VersionWrapper::CompiledForEdittime() )
     {
         char beep = 7;
         std::cout << std::endl;

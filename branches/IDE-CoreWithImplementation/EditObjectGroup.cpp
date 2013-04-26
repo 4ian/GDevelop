@@ -15,13 +15,13 @@
 #include <wx/log.h>
 #include <wx/help.h>
 #include <wx/msgdlg.h>
-#include "GDL/Project.h"
-#include "GDL/Scene.h"
+#include "GDCore/PlatformDefinition/Project.h"
+#include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/Tools/HelpFileAccess.h"
 #include "GDCore/PlatformDefinition/ObjectGroup.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
-#include "GDL/CommonTools.h"
+#include "GDCore/CommonTools.h"
 #ifdef __WXMSW__
 #include <wx/msw/winundef.h>
 #endif
@@ -33,6 +33,7 @@
 #endif
 
 using namespace std;
+using namespace gd;
 
 //(*IdInit(EditObjectGroup)
 const long EditObjectGroup::ID_AUITOOLBAR1 = wxNewId();

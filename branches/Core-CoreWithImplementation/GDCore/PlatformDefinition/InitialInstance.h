@@ -17,11 +17,14 @@ namespace gd
 {
 
 /**
- * \brief Describe an instance of an object to be created on a layout start up
+ * \brief Represents an instance of an object to be created on a layout start up.
  */
 class GD_CORE_API InitialInstance
 {
 public:
+    /**
+     * \brief Create an initial instance pointing to no object, at position (0,0).
+     */
     InitialInstance();
     virtual ~InitialInstance() {};
 
@@ -32,52 +35,106 @@ public:
      * return new MyInitialInstanceClass(*this);
      * \endcode
      */
-    virtual InitialInstance * Clone() const { return new InitialInstance(*this); }
+    InitialInstance * Clone() const { return new InitialInstance(*this); }
 
     /** \name Common properties
      * Members functions related to common properties
      */
     ///@{
 
-    virtual const std::string & GetObjectName() const { return objectName; }
-    virtual void SetObjectName(const std::string & name) { objectName = name; }
+    /**
+     * \brief Get the name of object instantiated on the layout.
+     */
+    const std::string & GetObjectName() const { return objectName; }
 
-    virtual float GetX() const {return x;}
-    virtual void SetX(float x_) { x = x_; }
+    /**
+     * \brief Set the name of object instantiated on the layout.
+     */
+    void SetObjectName(const std::string & name) { objectName = name; }
 
-    virtual float GetY() const {return y;}
-    virtual void SetY(float y_) { y = y_; }
+    /**
+     * \brief Get the X position of the instance
+     */
+    float GetX() const {return x;}
 
-    virtual float GetAngle() const {return angle;}
-    virtual void SetAngle(float angle_) {angle = angle_;}
+    /**
+     * \brief Set the X position of the instance
+     */
+    void SetX(float x_) { x = x_; }
 
-    virtual int GetZOrder() const  {return zOrder;}
-    virtual void SetZOrder(int zOrder_) {zOrder = zOrder_;}
+    /**
+     * \brief Get the Y position of the instance
+     */
+    float GetY() const {return y;}
 
-    virtual const std::string & GetLayer() const {return layer;}
-    virtual void SetLayer(const std::string & layer_) {layer = layer_;}
+    /**
+     * \brief Set the Y position of the instance
+     */
+    void SetY(float y_) { y = y_; }
 
-    virtual bool HasCustomSize() const { return personalizedSize; }
-    virtual void SetHasCustomSize(bool hasCustomSize_ ) { personalizedSize = hasCustomSize_; }
+    /**
+     * \brief Get the rotation of the instance, in radians.
+     */
+    float GetAngle() const {return angle;}
 
-    virtual float GetCustomWidth() const { return width; }
-    virtual void SetCustomWidth(float width_) { width = width_; }
+    /**
+     * \brief Set the rotation of the instance, in radians.
+     */
+    void SetAngle(float angle_) {angle = angle_;}
 
-    virtual float GetCustomHeight() const { return height; }
-    virtual void SetCustomHeight(float height_) { height = height_; }
+    /**
+     * \brief Get the Z order of the instance.
+     */
+    int GetZOrder() const  {return zOrder;}
+
+    /**
+     * \brief Set the Z order of the instance.
+     */
+    void SetZOrder(int zOrder_) {zOrder = zOrder_;}
+
+    /**
+     * \brief Get the layer the instance belongs to.
+     */
+    const std::string & GetLayer() const {return layer;}
+
+    /**
+     * \brief Set the layer the instance belongs to.
+     */
+    void SetLayer(const std::string & layer_) {layer = layer_;}
+
+    /**
+     * \brief Return true if the instance has a size which is different from its object default size.
+     *
+     * \see gd::Object
+     */
+    bool HasCustomSize() const { return personalizedSize; }
+
+    /**
+     * \brief Set whether the instance has a size which is different from its object default size or not.
+     *
+     * \param hasCustomSize true if the size is different from the object's default size.
+     * \see gd::Object
+     */
+    void SetHasCustomSize(bool hasCustomSize_ ) { personalizedSize = hasCustomSize_; }
+
+    float GetCustomWidth() const { return width; }
+    void SetCustomWidth(float width_) { width = width_; }
+
+    float GetCustomHeight() const { return height; }
+    void SetCustomHeight(float height_) { height = height_; }
 
     #if defined(GD_IDE_ONLY)
     /**
-     * Must return true if the instance is locked and cannot be selected by clicking on it.
+     * \brief Return true if the instance is locked and cannot be selected by clicking on it in the IDE.
      */
-    virtual bool IsLocked() const { return locked; };
+    bool IsLocked() const { return locked; };
 
     /**
-     * Must (un)lock the initial instance.
+     * \brief (Un)lock the initial instance.
      *
      * An instance which is locked cannot be selected by clicking on it in a layout editor canvas.
      */
-    virtual void SetLocked(bool enable = true) { locked = enable; }
+    void SetLocked(bool enable = true) { locked = enable; }
     #endif
 
     ///@}
@@ -91,46 +148,48 @@ public:
      * Must return a reference to the container storing the instance variables
      * \see gd::VariablesContainer
      */
-    virtual const gd::VariablesContainer & GetVariables() const { return initialVariables; }
+    const gd::VariablesContainer & GetVariables() const { return initialVariables; }
 
     /**
      * Must return a reference to the container storing the instance variables
      * \see gd::VariablesContainer
      */
-    virtual gd::VariablesContainer & GetVariables() { return initialVariables; }
+    gd::VariablesContainer & GetVariables() { return initialVariables; }
     ///@}
 
     #if defined(GD_IDE_ONLY)
     /** \name Others properties management
      * Members functions related to exposing others properties of the instance.
      *
-     * \note Extensions writers: Even if we can define new types of object by inheriting from Object class,
+     * \note Extensions writers: Even if we can define new types of object by inheriting from gd::Object class,
      * we cannot define new gd::InitialInstance classes. However, objects can store custom
      * properties for their associated initial instances : These properties can be stored
-     * into floatInfos and stringInfos. When the IDE want to get the custom properties, it
-     * will call GetProperties and UpdateProperty methods ( see GDCore documentation ). These
-     * methods are here overloaded to forward the call to the Object associated to the gd::InitialInstance.
+     * into floatInfos and stringInfos members. When the IDE want to get the custom properties, it
+     * will call GetProperties and UpdateProperty methods. These
+     * methods are here defined to forward the call to the gd::Object associated to the gd::InitialInstance.
      * ( By looking at the value returned by GetObjectName() ).
      *
-     * \see Object
+     * \see gd::Object
      */
     ///@{
     /**
-     * Must return a map containing the properties names (as keys) and their values.
-     * \note Common properties do not need to be inserted in this map
+     * \brief Return a map containing the properties names (as keys) and their values.
+     * \note Common properties ( name, position... ) do not need to be inserted in this map
      */
-    virtual std::map<std::string, std::string> GetCustomProperties(gd::Project & project, gd::Layout & layout);
+    std::map<std::string, std::string> GetCustomProperties(gd::Project & project, gd::Layout & layout);
 
     /**
-     * Must update the property called \a name with the new \a value.
+     * \brief Update the property called \a name with the new \a value.
      *
      * \return false if the property could not be updated.
      */
-    virtual bool UpdateCustomProperty(const std::string & name, const std::string & value, gd::Project & project, gd::Layout & layout);
+    bool UpdateCustomProperty(const std::string & name, const std::string & value, gd::Project & project, gd::Layout & layout);
     ///@}
     #endif
 
     //TODO : Refactor this:
+    //In our implementation, more properties can be stored in floatInfos and stringInfos.
+    //These properties are then managed by the Object class.
     std::map < std::string, float > floatInfos; ///< More data which can be used by the object
     std::map < std::string, std::string > stringInfos; ///< More data which can be used by the object
 private:
@@ -146,9 +205,6 @@ private:
     float height; ///< Object custom height
     gd::VariablesContainer initialVariables; ///< Instance specific variables
     bool locked; ///< True if the instance is locked
-
-    //In our implementation, more properties can be stored in floatInfos and stringInfos.
-    //These properties are then managed by the Object class.
 };
 
 }

@@ -10,6 +10,7 @@
 #include <string>
 #include <map>
 #include "GDCore/PlatformDefinition/ChangesNotifier.h"
+#include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
 namespace gd { class InstructionsMetadataHolder; }
 namespace gd { class Project; }
 namespace gd { class Object; }
@@ -19,6 +20,7 @@ namespace gd { class ObjectMetadata; }
 namespace gd { class BaseEvent; }
 namespace gd { class AutomatismsSharedData; }
 namespace gd { class PlatformExtension; }
+namespace gd { class LayoutEditorCanvas; }
 
 typedef void (*DestroyFunPtr)(gd::Object*);
 typedef gd::Object * (*CreateFunPtr)(std::string name);
@@ -38,17 +40,17 @@ public:
     virtual ~Platform();
 
     /**
-     * Must return the platform name
+     * \brief Must return the platform name
      */
     virtual std::string GetName() const { return "Unnamed platform"; }
 
     /**
-     * Must return the platform full name, displayed to users.
+     * \brief Must return the platform full name, displayed to users.
      */
     virtual std::string GetFullName() const { return "Unnamed platform"; }
 
     /**
-     * Must return a text describing the platform, displayed to users.
+     * \brief Must return a text describing the platform, displayed to users.
      */
     virtual std::string GetDescription() const { return ""; }
 
@@ -59,27 +61,25 @@ public:
     ///@{
 
     /**
-     * Add an extension to the manager.
-     *
+     * \brief Add an extension to the manager.
      * \note This method is virtual and can be redefined by platforms if they want to do special work when an extension is loaded.
-     *
      * \see gd::ExtensionsLoader
      */
     virtual bool AddExtension(boost::shared_ptr<PlatformExtension> extension);
 
     /**
-     * Return true if an extension with the same name is loaded
+     * \brief Return true if an extension with the specified name is loaded
      */
     bool IsExtensionLoaded(const std::string & name) const;
 
     /**
-     * Get an extension
+     * \brief Get an extension of the platform
      * @return Shared pointer to the extension
      */
     boost::shared_ptr<PlatformExtension> GetExtension(const std::string & name) const;
 
     /**
-     * Get all extensions
+     * \brief Get all extensions loaded for the platform.
      * @return Vector of Shared pointer containing all extensions
      */
     const std::vector < boost::shared_ptr<gd::PlatformExtension> > & GetAllPlatformExtensions() const { return extensionsLoaded; };
@@ -92,23 +92,23 @@ public:
     ///@{
 
     /**
-     * Create an object of given type with the specified name.
+     * \brief Create an object of given type with the specified name.
      */
     boost::shared_ptr<gd::Object> CreateObject(std::string type, const std::string & name) const;
 
     /**
-     * Create an automatism
+     * \brief Create an automatism
      */
     gd::Automatism* CreateAutomatism(const std::string & type) const;
 
     /**
-     * Create an automatism shared data object.
+     * \brief Create an automatism shared data object.
      */
     boost::shared_ptr<gd::AutomatismsSharedData> CreateAutomatismSharedDatas(const std::string & type) const;
 
     #if defined(GD_IDE_ONLY)
     /**
-     * Create an event of given type
+     * \brief Create an event of given type
      */
     boost::shared_ptr<gd::BaseEvent> CreateEvent(const std::string & type) const;
     #endif
@@ -123,7 +123,7 @@ public:
     ///@{
 
     /**
-     * Must provide a ChangesNotifier object that will be called by the IDE if needed.
+     * \brief Must provide a ChangesNotifier object that will be called by the IDE if needed.
      * The IDE is not supposed to store the returned object.
      *
      * The default implementation simply return a ChangesNotifier object doing nothing.
@@ -131,14 +131,29 @@ public:
     virtual ChangesNotifier & GetChangesNotifier() const { return defaultEmptyChangesNotifier; };
     ///@}
 
+    /** \name Preview and compilation
+     * The platform should provides specialized classes used for previewing layouts or
+     * exporting the project.
+     */
+    ///@{
+
     /**
-     * Called when the IDE is about to shut down: Take this opportunity for erasing
+     * \brief Must provide a gd::LayoutEditorPreviewer object that will be stored and used
+     * by LayoutEditorCanvas to display/run a preview of the layout of a project.
+     *
+     * The default implementation simply return a gd::LayoutEditorPreviewer object doing nothing.
+     */
+    virtual boost::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
+    ///@}
+
+    /**
+     * \brief Called when the IDE is about to shut down: Take this opportunity for erasing
      * for example any temporary file.
      */
     virtual void OnIDEClosed() {};
 
     /**
-     * Called when the IDE is initialized and ready to be used.
+     * \brief Called when the IDE is initialized and ready to be used.
      */
     virtual void OnIDEInitialized() {};
 

@@ -130,20 +130,6 @@ boost::shared_ptr<OpenGLTextureWrapper> ImageManager::GetOpenGLTexture(const std
     return texture;
 }
 
-bool ImageManager::HasImage(const std::string & name) const
-{
-    if ( !game )
-    {
-        cout << "Image manager has no game associated with.";
-        return false;
-    }
-
-    if ( alreadyLoadedImages.find(name) != alreadyLoadedImages.end() && !alreadyLoadedImages.find(name)->second.expired() )
-        return true;
-
-    return game->GetResourcesManager().HasResource(name);
-}
-
 void ImageManager::LoadPermanentImages()
 {
     if ( !game )

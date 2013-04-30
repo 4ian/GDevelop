@@ -125,5 +125,9 @@ boost::shared_ptr<gd::BaseEvent> Platform::CreateEvent(const std::string & event
     return boost::shared_ptr<gd::BaseEvent>();
 }
 
+boost::shared_ptr<gd::LayoutEditorPreviewer> Platform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
+{
+    return boost::shared_ptr<gd::LayoutEditorPreviewer>(new gd::LayoutEditorPreviewer);
+}
 
 }

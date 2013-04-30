@@ -1,4 +1,10 @@
+/** \file
+ *  Game Develop
+ *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
+ */
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
+#include "GDCore/PlatformDefinition/Platform.h"
+#include "GDCore/IDE/PlatformManager.h"
 #include "GDCore/PlatformDefinition/Automatism.h"
 #include "GDCore/PlatformDefinition/AutomatismsSharedData.h"
 #include "GDCore/Events/InstructionMetadata.h"
@@ -98,10 +104,11 @@ gd::EventMetadata & PlatformExtension::AddEvent(const std::string & name_,
                                                  const std::string & description_,
                                                  const std::string & group_,
                                                  const std::string & smallicon_,
-                                                 boost::shared_ptr<gd::BaseEvent> instance_)
+                                                 boost::shared_ptr<gd::BaseEvent> instance_,
+                                                 boost::shared_ptr<gd::EventMetadata::CodeGenerator> codeGen_)
 {
     std::string nameWithNamespace = GetNameSpace().empty() ? name_ : GetNameSpace()+name_;
-    eventsInfos[nameWithNamespace] = gd::EventMetadata(nameWithNamespace, fullname_, description_, group_, smallicon_, instance_);
+    eventsInfos[nameWithNamespace] = gd::EventMetadata(nameWithNamespace, fullname_, description_, group_, smallicon_, instance_, codeGen_);
     return eventsInfos[nameWithNamespace];
 }
 
@@ -142,36 +149,36 @@ std::vector < std::string > PlatformExtension::GetAutomatismsTypes() const
     return automatisms;
 }
 
-const std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllActions() const
+std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllActions()
 {
     return actionsInfos;
 }
 
-const std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllConditions() const
+std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllConditions()
 {
     return conditionsInfos;
 }
 
-const std::map<std::string, gd::ExpressionMetadata > & PlatformExtension::GetAllExpressions() const
+std::map<std::string, gd::ExpressionMetadata > & PlatformExtension::GetAllExpressions()
 {
     return expressionsInfos;
 }
 
-const std::map<std::string, gd::StrExpressionMetadata > & PlatformExtension::GetAllStrExpressions() const
+std::map<std::string, gd::StrExpressionMetadata > & PlatformExtension::GetAllStrExpressions()
 {
     return strExpressionsInfos;
 }
 
-const std::map<std::string, gd::EventMetadata > & PlatformExtension::GetAllEvents() const
+std::map<std::string, gd::EventMetadata > & PlatformExtension::GetAllEvents()
 {
     return eventsInfos;
 }
 
-const std::map<std::string, gd::AutomatismMetadata > & PlatformExtension::GetAllAutomatisms() const
+std::map<std::string, gd::AutomatismMetadata > & PlatformExtension::GetAllAutomatisms()
 {
     return automatismsInfo;
 }
-const std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllActionsForObject(std::string objectType) const
+std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllActionsForObject(std::string objectType)
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second.actionsInfos;
@@ -179,7 +186,7 @@ const std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAl
     return badActionsMetadata;
 }
 
-const std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllConditionsForObject(std::string objectType) const
+std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllConditionsForObject(std::string objectType)
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second.conditionsInfos;
@@ -187,7 +194,7 @@ const std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAl
     return badConditionsMetadata;
 }
 
-const std::map<std::string, gd::ExpressionMetadata > & PlatformExtension::GetAllExpressionsForObject(std::string objectType) const
+std::map<std::string, gd::ExpressionMetadata > & PlatformExtension::GetAllExpressionsForObject(std::string objectType)
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second.expressionsInfos;
@@ -195,7 +202,7 @@ const std::map<std::string, gd::ExpressionMetadata > & PlatformExtension::GetAll
     return badExpressionsMetadata;
 }
 
-const std::map<std::string, gd::StrExpressionMetadata > & PlatformExtension::GetAllStrExpressionsForObject(std::string objectType) const
+std::map<std::string, gd::StrExpressionMetadata > & PlatformExtension::GetAllStrExpressionsForObject(std::string objectType)
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second.strExpressionsInfos;
@@ -203,7 +210,7 @@ const std::map<std::string, gd::StrExpressionMetadata > & PlatformExtension::Get
     return badStrExpressionsMetadata;
 }
 
-const std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllActionsForAutomatism(std::string autoType) const
+std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllActionsForAutomatism(std::string autoType)
 {
     if ( automatismsInfo.find(autoType) != automatismsInfo.end())
         return automatismsInfo.find(autoType)->second.actionsInfos;
@@ -211,7 +218,7 @@ const std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAl
     return badActionsMetadata;
 }
 
-const std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllConditionsForAutomatism(std::string autoType) const
+std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAllConditionsForAutomatism(std::string autoType)
 {
     if ( automatismsInfo.find(autoType) != automatismsInfo.end())
         return automatismsInfo.find(autoType)->second.conditionsInfos;
@@ -219,7 +226,7 @@ const std::map<std::string, gd::InstructionMetadata > & PlatformExtension::GetAl
     return badConditionsMetadata;
 }
 
-const std::map<std::string, gd::ExpressionMetadata > & PlatformExtension::GetAllExpressionsForAutomatism(std::string autoType) const
+std::map<std::string, gd::ExpressionMetadata > & PlatformExtension::GetAllExpressionsForAutomatism(std::string autoType)
 {
     if ( automatismsInfo.find(autoType) != automatismsInfo.end())
         return automatismsInfo.find(autoType)->second.expressionsInfos;
@@ -227,7 +234,7 @@ const std::map<std::string, gd::ExpressionMetadata > & PlatformExtension::GetAll
     return badExpressionsMetadata;
 }
 
-const std::map<std::string, gd::StrExpressionMetadata > & PlatformExtension::GetAllStrExpressionsForAutomatism(std::string autoType) const
+std::map<std::string, gd::StrExpressionMetadata > & PlatformExtension::GetAllStrExpressionsForAutomatism(std::string autoType)
 {
     if ( automatismsInfo.find(autoType) != automatismsInfo.end())
         return automatismsInfo.find(autoType)->second.strExpressionsInfos;
@@ -235,7 +242,7 @@ const std::map<std::string, gd::StrExpressionMetadata > & PlatformExtension::Get
     return badStrExpressionsMetadata;
 }
 
-const gd::ObjectMetadata & PlatformExtension::GetObjectMetadata(const std::string & objectType) const
+gd::ObjectMetadata & PlatformExtension::GetObjectMetadata(const std::string & objectType)
 {
     if ( objectsInfos.find(objectType) != objectsInfos.end())
         return objectsInfos.find(objectType)->second;
@@ -243,7 +250,7 @@ const gd::ObjectMetadata & PlatformExtension::GetObjectMetadata(const std::strin
     return badObjectMetadata;
 }
 
-const gd::AutomatismMetadata & PlatformExtension::GetAutomatismMetadata(const std::string & automatismType) const
+gd::AutomatismMetadata & PlatformExtension::GetAutomatismMetadata(const std::string & automatismType)
 {
     if ( automatismsInfo.find(automatismType) != automatismsInfo.end())
         return automatismsInfo.find(automatismType)->second;
@@ -324,6 +331,23 @@ void PlatformExtension::SetNameSpace(std::string nameSpace_)
 
 
     nameSpace = nameSpace_+"::";
+}
+
+void PlatformExtension::CloneExtension(const std::string & platformName, const std::string & extensionName)
+{
+    boost::shared_ptr<gd::Platform> platform = gd::PlatformManager::GetInstance()->GetPlatform(platformName);
+    if ( !platform ) {
+        std::cout << "Unable to clone extension \""<< extensionName << "\" from " << platformName << ": This platform doesn't exist.";
+        return;
+    }
+
+    boost::shared_ptr<gd::PlatformExtension> extension = platform->GetExtension(extensionName);
+    if ( !extension ) {
+        std::cout << "Unable to clone extension \""<< extensionName << "\" from " << platformName << ": This extension doesn't exist.";
+        return;
+    }
+
+    *this = *extension;
 }
 
 PlatformExtension::PlatformExtension()

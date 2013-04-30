@@ -17,7 +17,7 @@ namespace gd
 {
 
 /**
- * \brief Base class used to represent an automatism that can be applied to an object
+ * \brief Base class used to represents an automatism that can be applied to an object
  *
  * \ingroup PlatformDefinition
  */
@@ -29,42 +29,43 @@ public:
     virtual Automatism* Clone() const { return new Automatism(*this);}
 
     /**
-     * Change the name identifying the automatism.
+     * \brief Change the name identifying the automatism.
      */
     virtual void SetName(const std::string & name_) { name = name_; };
 
     /**
-     * Return the name identifying the automatism
+     * \brief Return the name identifying the automatism
      */
     virtual const std::string & GetName() const { return name; }
 
     /**
-     * Return the name identifying the type of the automatism
+     * \brief Return the name identifying the type of the automatism
      */
     virtual const std::string & GetTypeName() const { return type; }
 
     /**
-     * Change name identifying the type of the automatism.
+     * \brief Change name identifying the type of the automatism.
+     *
+     * You should not need to use this method: The type is set by the IDE when the automatism is created
+     * or when the automatism is loaded from xml.
      */
     virtual void SetTypeName(const std::string & type_) { type = type_; };
 
 
     #if defined(GD_IDE_ONLY)
     /**
-     * Called when user wants to edit the automatism.
-     *
-     * \warning Extensions writers: Redefine the other EditAutomatism method (taking Game and Scene in parameters) instead of this one.
+     * \brief Called when user wants to edit the automatism.
      */
     void EditAutomatism( wxWindow* parent, gd::Project & project, gd::Layout * optionalLayout, gd::MainFrameWrapper & mainFrameWrapper_ ) {};
 
     /**
-     * Save Automatism to XML
+     * \brief Save the object to XML
      */
     virtual void SaveToXml(TiXmlElement * eventElem) const {}
     #endif
 
     /**
-     * Load Automatism from XML
+     * \brief Load the object from XML
      */
     virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 

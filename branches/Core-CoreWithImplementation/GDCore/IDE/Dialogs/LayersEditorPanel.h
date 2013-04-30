@@ -13,7 +13,7 @@
 #include <wx/panel.h>
 #include <wx/imaglist.h>
 //*)
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 namespace gd { class LayoutEditorCanvas; }
 namespace gd { class Project; }
 namespace gd { class Layout; }

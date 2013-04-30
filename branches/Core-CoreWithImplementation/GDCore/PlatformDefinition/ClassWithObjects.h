@@ -18,7 +18,7 @@ namespace gd
 /**
  * \brief Used as a base class for classes that will own objects (see gd::Object).
  *
- * For example, gd::Project inherits from this class as it have global objects.
+ * For example, gd::Project inherits from this class as it have global objects.<br>
  * gd::Layout also inherits from this class as each layout has specific objects.
  *
  * \see gd::Project
@@ -30,6 +30,9 @@ namespace gd
 class GD_CORE_API ClassWithObjects
 {
 public:
+    /**
+     * \brief Default constructor creating a container without any objects.
+     */
     ClassWithObjects();
     virtual ~ClassWithObjects() {};
 
@@ -39,48 +42,52 @@ public:
     ///@{
 
     /**
-     * Return true if object called "name" exists.
+     * \brief Return true if object called \a name exists.
      */
     bool HasObjectNamed(const std::string & name) const;
 
     /**
-     * Return a reference to the object called "name".
+     * \brief Return a reference to the object called \a name.
      */
     Object & GetObject(const std::string & name);
 
     /**
-     * Return a reference to the object called "name".
+     * \brief Return a reference to the object called \a name.
      */
     const gd::Object & GetObject(const std::string & name) const;
 
     /**
-     * Return a reference to the object at position "index" in the objects list
+     * \brief Return a reference to the object at position \a index in the objects list
      */
     Object & GetObject(unsigned int index);
 
     /**
-     * Return a reference to the object at position "index" in the objects list
+     * \brief Return a reference to the object at position \a index in the objects list.
      */
     const gd::Object & GetObject (unsigned int index) const;
 
     /**
-     * Return the position of the object called "name" in the objects list
+     * \brief Return the position of the object called \a name in the objects list.
+     *
+     * \warning This has nothing to do with an object position on a layout. Objects put on layouts
+     * are represented thanks to the gd::InitialInstance class.
      */
     unsigned int GetObjectPosition(const std::string & name) const;
 
     /**
-     * Return the number of object.
+     * \brief Return the number of object.
      */
     unsigned int GetObjectsCount() const;
 
     /**
-     * Add a new empty object of type \a objectType called \a name at the specified position in the layout list.<br>
-     * The object is created from the project's current platform.
+     * \brief Add a new empty object of type \a objectType called \a name at the specified position in the layout list.<br>
+     *
+     * \note The object is created using the project's current platform.
      */
     void InsertNewObject(gd::Project & project, const std::string & objectType, const std::string & name, unsigned int position);
 
     /**
-     * Must add a new object constructed from the layout passed as parameter.
+     * \brief Must add a new object constructed from the layout passed as parameter.
      * \note No pointer or reference must be kept on the object passed as parameter.
      * \param object The object that must be copied and inserted into the project
      * \param position Insertion position. If the position is invalid, the object is inserted at the end of the objects list.
@@ -88,23 +95,23 @@ public:
     void InsertObject(const gd::Object & object, unsigned int position);
 
     /**
-     * Delete an object.
+     * \brief Delete an object.
      * \param name The name of the object to be deleted.
      */
     void RemoveObject(const std::string & name);
 
     /**
-     * Swap the position of the specified objects.
+     * \brief Swap the position of the specified objects.
      */
     void SwapObjects(unsigned int firstObjectIndex, unsigned int secondObjectIndex);
 
     /**
-     * Provide access to the vector containing the objects
+     * Provide a raw access to the vector containing the objects
      */
     std::vector < boost::shared_ptr<gd::Object> > & GetObjects() { return initialObjects; }
 
     /**
-     * Provide access to the vector containing the objects
+     * Provide a raw access to the vector containing the objects
      */
     const std::vector < boost::shared_ptr<gd::Object> > & GetObjects() const  { return initialObjects; }
     ///@}
@@ -114,12 +121,12 @@ public:
      */
     ///@{
     /**
-     * Called to save the layout to a TiXmlElement.
+     * \brief Save the objects to xml
      */
     void SaveObjectsToXml(TiXmlElement * element) const;
 
     /**
-     * Called to load the layout from a TiXmlElement.
+     * \brief Load the objects from xml
      */
     void LoadObjectsFromXml(gd::Project & project, const TiXmlElement * element);
     ///@}

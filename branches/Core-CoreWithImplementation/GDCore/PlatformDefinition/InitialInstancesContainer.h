@@ -18,11 +18,11 @@ namespace gd
 /**
  * \brief Defines a container of gd::InitialInstances.
  *
- * The container must notably be able to ensure that pointers
+ * The container is notably able to ensure that pointers
  * to the elements of the container are not invalidated when
  * a change occurs ( through InsertNewInitialInstance or RemoveInstance
  * for example ). <br>
- * Thus, most implementations should use a std::list
+ * Thus, the implementations uses a std::list
  * for holding the instances. In this way, the container is not required
  * to provide a direct access to element based on an index. Instead,
  * the method IterateOverInstances is used to perform operations.
@@ -34,7 +34,7 @@ public:
     virtual ~InitialInstancesContainer();
 
     /**
-     * Must return a pointer to a copy of the container.
+     * \brief Return a pointer to a copy of the container.
      * A such method is needed as the IDE may want to store copies of some containers and so need a way to do polymorphic copies.
      *
      * Typical implementation example:
@@ -42,7 +42,7 @@ public:
      * return new MyContainer(*this);
      * \endcode
      */
-    virtual InitialInstancesContainer * Clone() const { return new InitialInstancesContainer(*this); };
+    InitialInstancesContainer * Clone() const { return new InitialInstancesContainer(*this); };
 
     #if defined(GD_IDE_ONLY)
     /**
@@ -59,7 +59,7 @@ public:
      * catch(...) { std::cout << "WARNING: Tried to create a MyContainer object from an object which is not a MyContainer"; }
      * \endcode
      */
-    virtual void Create(const InitialInstancesContainer & source);
+    void Create(const InitialInstancesContainer & source);
     #endif
 
     /** \name Instances management
@@ -68,64 +68,68 @@ public:
     ///@{
 
     /**
-     * Must return the number of instances
+     * \brief Return the number of instances
      */
-    virtual unsigned int GetInstancesCount() const;
+    unsigned int GetInstancesCount() const;
 
     /**
-     * Apply \a func to each instance of the container.
+     * \brief Apply \a func to each instance of the container.
+     * \see InitialInstanceFunctor
      */
-    virtual void IterateOverInstances(InitialInstanceFunctor & func);
+    void IterateOverInstances(InitialInstanceFunctor & func);
 
     /**
-     * Sort the instances regarding their Z order and then all \a func on them.
+     * Get the instances on the specified layer,
+     * sort them regarding their Z order and then apply \a func on them.
      * \param func The functor to be applied.
      * \param layer The layer
+     *
+     * \see InitialInstanceFunctor
      */
-    virtual void IterateOverInstancesWithZOrdering(InitialInstanceFunctor & func, const std::string & layer);
+    void IterateOverInstancesWithZOrdering(InitialInstanceFunctor & func, const std::string & layer);
 
     #if defined(GD_IDE_ONLY)
     /**
-     * Must insert the specified \a instance into the list and return a
+     * \brief Insert the specified \a instance into the list and return a
      * a reference to the newly added instance.
      */
-    virtual InitialInstance & InsertInitialInstance(const InitialInstance & instance);
+    InitialInstance & InsertInitialInstance(const InitialInstance & instance);
 
     /**
-     * Must insert a new blank instance at the end of the list and return a
+     * \brief Insert a new blank instance at the end of the list and return a
      * a reference to the newly added instance.
      */
-    virtual InitialInstance & InsertNewInitialInstance();
+    InitialInstance & InsertNewInitialInstance();
 
     /**
-     * Must remove the specified \a instance
+     * \brief Remove the specified \a instance
      */
-    virtual void RemoveInstance(const gd::InitialInstance & instance);
+    void RemoveInstance(const gd::InitialInstance & instance);
 
     /**
-     * Must remove all instances from layer \a layerName.
+     * \brief Remove all instances from layer \a layerName.
      */
-    virtual void RemoveAllInstancesOnLayer(const std::string & layerName);
+    void RemoveAllInstancesOnLayer(const std::string & layerName);
 
     /**
-     * Must move instances on layer \a fromLayer to layer \a toLayer.
+     * \brief Move the instances on layer \a fromLayer to layer \a toLayer.
      */
-    virtual void MoveInstancesToLayer(const std::string & fromLayer, const std::string & toLayer);
+    void MoveInstancesToLayer(const std::string & fromLayer, const std::string & toLayer);
 
     /**
-     * Must remove instances of object named \a objectName
+     * \brief Remove instances of object named \a objectName
      */
-    virtual void RemoveInitialInstancesOfObject(const std::string & objectName);
+    void RemoveInitialInstancesOfObject(const std::string & objectName);
 
     /**
-     * Must change instances with object's name \a oldName to \a newName
+     * \brief Change instances with object's name \a oldName to \a newName
      */
-    virtual void RenameInstancesOfObject(const std::string & oldName, const std::string & newName);
+    void RenameInstancesOfObject(const std::string & oldName, const std::string & newName);
 
     /**
-     * Must return true if there is at least one instance on the layer named \a layerName.
+     * \brief Return true if there is at least one instance on the layer named \a layerName.
      */
-    virtual bool SomeInstancesAreOnLayer(const std::string & layerName);
+    bool SomeInstancesAreOnLayer(const std::string & layerName);
     #endif
     ///@}
 
@@ -136,15 +140,15 @@ public:
 
     #if defined(GD_IDE_ONLY)
     /**
-     * Called to save the layout to a TiXmlElement.
+     * \brief Save the instances to a TiXmlElement.
      */
-    virtual void SaveToXml(TiXmlElement * element) const;
+    void SaveToXml(TiXmlElement * element) const;
     #endif
 
     /**
-     * Called to load the layout from a TiXmlElement.
+     * \brief Load the instances from a TiXmlElement.
      */
-    virtual void LoadFromXml(const TiXmlElement * element);
+    void LoadFromXml(const TiXmlElement * element);
     ///@}
 
 private:
@@ -154,7 +158,9 @@ private:
 };
 
 /**
- * \brief Tool class to be used with InitialInstancesContainer::IterateOverInstances
+ * \brief Tool class to be used with gd::InitialInstancesContainer::IterateOverInstances.
+ *
+ * \see gd::InitialInstancesContainer
  */
 class GD_CORE_API InitialInstanceFunctor
 {

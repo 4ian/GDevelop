@@ -65,19 +65,19 @@ public:
      */
     ///@{
 
-    /** Must change the name of the object with the name passed as parameter.
+    /** \brief Change the name of the object with the name passed as parameter.
      */
     void SetName(const std::string & name_) { name = name_; };
 
-    /** Must return the name of the object.
+    /** \brief Return the name of the object.
      */
     const std::string & GetName() const { return name; };
 
-    /** Must change the type of the object.
+    /** \brief Change the type of the object.
      */
     void SetType(const std::string & type_) { type = type_; }
 
-    /** Must return the type of the object.
+    /** \brief Return the type of the object.
      */
     const std::string & GetType() const { return type; }
     ///@}
@@ -88,7 +88,7 @@ public:
      */
     ///@{
     /**
-     * Called ( e.g. during compilation ) so as to inventory internal resources and sometimes update their filename.
+     * \brief Called ( e.g. during compilation ) so as to inventory internal resources and sometimes update their filename.
      * Implementation example:
      * \code
      * worker.ExposeImage(myImage);
@@ -110,7 +110,7 @@ public:
      */
     ///@{
     /**
-     * Called when the IDE wants to know about the custom properties of an initial instance of this object.
+     * \brief Called when the IDE wants to know about the custom properties of an initial instance of this object.
      *
      * \return a std::map with properties names as key and values.
      * \see gd::InitialInstance
@@ -118,7 +118,7 @@ public:
     virtual std::map<std::string, std::string> GetInitialInstanceProperties(const gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout);
 
     /**
-     * Called when the IDE wants to update a custom property of an initial instance of this object.
+     * \brief Called when the IDE wants to update a custom property of an initial instance of this object.
      *
      * \return false if the new value cannot be set
      * \see gd::InitialInstance
@@ -126,7 +126,7 @@ public:
     virtual bool UpdateInitialInstanceProperty(gd::InitialInstance & instance, const std::string & name, const std::string & value, gd::Project & project, gd::Layout & layout) {return false;};
 
     /**
-     * Called when the IDE wants to draw an initial instance of the object on the layout editor.
+     * \brief Called when the IDE wants to draw an initial instance of the object on the layout editor.
      *
      * LoadResources method was called before so as to let the object load resources if necessary.
      * \see gd::InitialInstance
@@ -134,19 +134,19 @@ public:
     virtual void DrawInitialInstance(gd::InitialInstance & instance, sf::RenderTarget & renderTarget, gd::Project & project, gd::Layout & layout);
 
     /**
-     * Called by the IDE when a layout is going to be rendered.
+     * \brief Called by the IDE when a layout is going to be rendered.
      * \see gd::InitialInstance
      */
     virtual void LoadResources(gd::Project & project, gd::Layout & layout) {};
 
     /**
-     * Called when the IDE wants to know the width of an initial instance which has a default width.
+     * \brief Called when the IDE wants to know the width of an initial instance which has a default width.
      * \see gd::InitialInstance
      */
     virtual float GetInitialInstanceDefaultWidth(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const { return 32; }
 
     /**
-     * Called when the IDE wants to know the height of an initial instance which has a default height.
+     * \brief Called when the IDE wants to know the height of an initial instance which has a default height.
      * \see gd::InitialInstance
      */
     virtual float GetInitialInstanceDefaultHeight(gd::InitialInstance & instance, gd::Project & project, gd::Layout & layout) const { return 32; }
@@ -157,20 +157,17 @@ public:
      */
     ///@{
     /**
-     * Called when user wants to edit the object.
+     * \brief Called when user wants to edit the object.
      */
     virtual void EditObject( wxWindow* parent, gd::Project & project, gd::MainFrameWrapper & mainFrameWrapper_ ) {};
 
     /**
-     * Must update \a thumbnail bitmap with a 24*24 bitmap.
-     *
+     * \brief Must update \a thumbnail bitmap with a 24*24 bitmap.
      * \return true if thumbnail was successfully updated.
      */
     virtual bool GenerateThumbnail(const gd::Project & project, wxBitmap & thumbnail) {return false;};
-
     ///@}
     #endif
-
 
     /** \name Automatisms management
      * Members functions related to automatisms management.
@@ -179,27 +176,27 @@ public:
 
     #if defined(GD_IDE_ONLY)
     /**
-     * Must return a vector containing the names of all the automatisms used by the object
+     * \brief Return a vector containing the names of all the automatisms used by the object
      */
     std::vector < std::string > GetAllAutomatismNames() const;
 
     /**
-     * Must return a reference to the automatism called "name".
+     * \brief Return a reference to the automatism called \a name.
      */
     Automatism & GetAutomatism(const std::string & name);
 
     /**
-     * Must return a reference to the automatism called "name".
+     * \brief Return a reference to the automatism called \a name.
      */
     const Automatism & GetAutomatism(const std::string & name) const;
 
     /**
-     * Must return true if object has an automatism called "name".
+     * \brief Return true if object has an automatism called \a name.
      */
     bool HasAutomatismNamed(const std::string & name) const;
 
     /**
-     * Must remove automatism called "name"
+     * \brief Remove automatism called \a name
      */
     void RemoveAutomatism(const std::string & name);
 
@@ -214,7 +211,7 @@ public:
     #endif
 
     /**
-     * Get a read-only access to the map containing the automatisms.
+     * \brief Get a read-only access to the map containing the automatisms.
      */
     const std::map<std::string, gd::Automatism* > & GetAllAutomatisms() const {return automatisms;};
     ///@}
@@ -224,12 +221,12 @@ public:
      */
     ///@{
     /**
-     * Provide access to the gd::VariablesContainer member containing the object variables
+     * \brief Provide access to the gd::VariablesContainer member containing the object variables
      */
     const gd::VariablesContainer & GetVariables() const { return objectVariables; }
 
     /**
-     * Provide access to the gd::VariablesContainer member containing the object variables
+     * \brief Provide access to the gd::VariablesContainer member containing the object variables
      */
     gd::VariablesContainer & GetVariables() { return objectVariables; }
     ///@}
@@ -240,13 +237,13 @@ public:
     ///@{
 
     /**
-     * Load object from an xml element.
+     * \brief Load object from an xml element.
      */
     virtual void LoadFromXml(gd::Project & project, const TiXmlElement * elemScene);
 
     #if defined(GD_IDE_ONLY)
     /**
-     * Save object to an xml element.
+     * \brief Save object to an xml element.
      */
     virtual void SaveToXml(TiXmlElement * elemScene);
     #endif

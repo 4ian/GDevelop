@@ -60,22 +60,22 @@ public:
     /**
      * \brief Defines information about how generate C++ code for an instruction
      */
-    class CppCallingInformation
+    class ExtraInformation
     {
     public:
         /**
          * Set the C++ function name which will be used when generating the C++ code.
          */
-        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
+        ExtraInformation & SetFunctionName(const std::string & cppCallingName_)
         {
-            cppCallingName = cppCallingName_;
+            functionCallName = cppCallingName_;
             return *this;
         }
 
         /**
          * Set that the function is located in a specific include file
          */
-        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+        ExtraInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
         {
             optionalIncludeFile = optionalIncludeFile_;
             return *this;
@@ -86,20 +86,20 @@ public:
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
         };
 
-        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+        ExtraInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
         {
             optionalCustomCodeGenerator = codeGenerator;
             return *this;
         }
 
-        std::string cppCallingName;
+        std::string functionCallName;
         std::string optionalIncludeFile;
         boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
-    CppCallingInformation cppCallingInformation;
+    ExtraInformation codeExtraInformation;
 
     /** Don't use this constructor. Only here to fullfil std::map requirements
      */
@@ -166,22 +166,22 @@ public:
     /**
      * \brief Defines information about how generate C++ code for an instruction
      */
-    class CppCallingInformation
+    class ExtraInformation
     {
     public:
         /**
          * Set the C++ function name which will be used when generating the C++ code.
          */
-        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
+        ExtraInformation & SetFunctionName(const std::string & cppCallingName_)
         {
-            cppCallingName = cppCallingName_;
+            functionCallName = cppCallingName_;
             return *this;
         }
 
         /**
          * Set that the function is located in a specific include file
          */
-        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+        ExtraInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
         {
             optionalIncludeFile = optionalIncludeFile_;
             return *this;
@@ -192,20 +192,20 @@ public:
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_ ,EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, EventsCodeGenerator & codeGenerator_ ,EventsCodeGenerationContext & context) {return "";};
         };
 
-        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+        ExtraInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
         {
             optionalCustomCodeGenerator = codeGenerator;
             return *this;
         }
 
-        std::string cppCallingName;
+        std::string functionCallName;
         std::string optionalIncludeFile;
         boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
-    CppCallingInformation cppCallingInformation;
+    ExtraInformation codeExtraInformation;
 
     /** Don't use this constructor. Only here to fulfill std::map requirements
      */

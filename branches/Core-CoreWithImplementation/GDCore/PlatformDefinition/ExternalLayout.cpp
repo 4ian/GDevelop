@@ -6,7 +6,7 @@
 #include "GDCore/TinyXml/tinyxml.h"
 #include "GDCore/PlatformDefinition/ExternalLayout.h"
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 
 namespace gd
 {

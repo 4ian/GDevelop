@@ -11,16 +11,19 @@
 #include <map>
 #include <vector>
 #include <boost/shared_ptr.hpp>
+#include <SFML/Graphics.hpp>
 #include <wx/menu.h>
 #include <wx/ribbon/buttonbar.h>
 #include <wx/gdicmn.h>
 #include <wx/panel.h>
+#include "GDCore/PlatformDefinition/LayoutEditorPreviewer.h"
 namespace gd { class MainFrameWrapper; }
 namespace gd { class InitialInstancesContainer; }
 namespace gd { class InitialInstance; }
 namespace gd { class LayoutEditorCanvasAssociatedEditor; }
 namespace gd { class Project; }
 namespace gd { class Layout; }
+namespace gd { class Object; }
 namespace gd { class LayoutEditorCanvasOptions; }
 class wxWindow;
 class wxRibbonButtonBar;
@@ -59,8 +62,9 @@ public:
  * \ingroup IDE
  * \ingroup IDE dialogs
  */
-class GD_CORE_API LayoutEditorCanvas: public wxPanel
+class GD_CORE_API LayoutEditorCanvas: public wxPanel, public sf::RenderWindow
 {
+    friend class InstancesRenderer;
 public:
 
     LayoutEditorCanvas(wxWindow* parent,
@@ -70,6 +74,26 @@ public:
                        LayoutEditorCanvasOptions & options,
                        gd::MainFrameWrapper & mainFrameWrapper);
     virtual ~LayoutEditorCanvas();
+
+    /**
+     * Get the parent window of the editor.s
+     */
+    wxWindow * GetParentControl() { return parentControl; }
+
+    /**
+     * \brief Return a reference to the game owning the scene being edited inside the editor.
+     */
+    gd::Project & GetProject() { return project; }
+
+    /**
+     * \brief Return a reference to the scene being edited inside the editor.
+     */
+    gd::Layout & GetLayout() { return layout; }
+
+    /**
+     * \brief Provide an access to the main frame wrapper that can be needed by some previewers.
+     */
+    gd::MainFrameWrapper & GetMainFrameWrapper() { return mainFrameWrapper; }
 
     /**
      * \brief Declares an editor to be associated with the LayoutEditorCanvas.
@@ -88,7 +112,7 @@ public:
      * Can be called by the IDE to notify the editor that it is displayed thanks to a wxAuiManager
      * and that it can uses it to display it own sub editors.
      */
-    virtual void SetParentAuiManager(wxAuiManager * parentAuiManager_) { parentAuiManager = parentAuiManager_; };
+    void SetParentAuiManager(wxAuiManager * parentAuiManager_);
 
     /**
      * Get the wxAuiManager managing the editor. Can be NULL.
@@ -113,16 +137,8 @@ public:
 
     /**
      * Called by the IDE when the editor is active to connect ribbon buttons to the editor methods
-     *
-     * \note Do not redefine this function ( it is not virtual ), but gd::LayoutEditorCanvas::DoConnectEvents instead.
      */
     void ConnectEvents();
-
-    /**
-     * Called when the an editor made changes to the layout ( New layout added for example ) and so the editor must
-     * be refreshed if needed.
-     */
-    virtual void RefreshFromLayout() {};
 
     /**
      * Static method for creating the ribbon's page used by all layout editors.
@@ -144,13 +160,13 @@ public:
      * The editors' parent panel can forward the event of the scrollbars to these methods.
      * \see OnhScrollbarScroll
      */
-    virtual void OnvScrollbarScroll(wxScrollEvent& event) {};
+    virtual void OnvScrollbarScroll(wxScrollEvent& event);
 
     /**
      * The editors' parent panel can forward the event of the scrollbars to these methods.
      * \see OnvScrollbarScroll
      */
-    virtual void OnhScrollbarScroll(wxScrollEvent& event) {};
+    virtual void OnhScrollbarScroll(wxScrollEvent& event);
 
     /**
      * Return a list of the currently selected instances.
@@ -190,7 +206,7 @@ public:
     /**
      * Can be called so that the editor make the initial instance passed in parameters visible.
      */
-    virtual void EnsureVisible(const gd::InitialInstance & instance) {};
+    virtual void EnsureVisible(const gd::InitialInstance & instance);
 
     /**
      * Set the layer where the new instance must be added
@@ -210,29 +226,22 @@ public:
     /**
      * Return true if the scene is being previewed ( i.e. : IsEditing() == false )  but the preview is paused.
      */
-    bool PreviewPaused() const { return !editing && !playing; }
+    bool PreviewPaused() const;
 
     /**
-     * Must pause the preview.<br>
-     * See also the other method related to the state of the editor : PlayPreview, OnPreviewBtClick, OnEditionBtClick
+     * \brief Tell the current previewer to pause the preview.
      *
-     * \note The default implementation is updating the working directory and set playing to false.
+     * Has no effects in editing state.
      */
     virtual void PausePreview();
 
     /**
-     * Must play the layout.<br>
-     * See also the other method related to the state of the editor : PausePreview, OnPreviewBtClick, OnEditionBtClick
-     *
-     * \note The default implementation is updating the working directory and set playing to false.
+     * Load resources for objects.
      */
-    virtual void PlayPreview();
+    void ReloadResources();
 
-    /** To be redefined by the child classes so as to provide the width of an initial instance */
-    virtual double GetWidthOfInitialInstance(InitialInstance & instance) const { return 16; };
-
-    /** To be redefined by the child classes so as to provide the height of an initial instance */
-    virtual double GetHeightOfInitialInstance(InitialInstance & instance) const { return 16; };
+    virtual double GetWidthOfInitialInstance(gd::InitialInstance & instance) const;
+    virtual double GetHeightOfInitialInstance(gd::InitialInstance & instance) const;
 
     //(*Declarations(LayoutEditorCanvas)
     //*)
@@ -240,11 +249,11 @@ public:
 protected:
     //(*Identifiers(LayoutEditorCanvas)
     //*)
-    //Common identifiers of ribbon buttons shared by layout editors of any platform.
+
+    //All ribbons identifiers
     static const long idRibbonEditMode;
     static const long idRibbonPreviewMode;
     static const long idRibbonHelp;
-    //Edition mode identifiers
     static const long idRibbonObjectsEditor;
     static const long idRibbonLayersEditor;
     static const long idRibbonGrid;
@@ -257,23 +266,54 @@ protected:
     static const long idRibbonRedo;
     static const long idRibbonObjectsPositionList;
     static const long idRibbonFullScreen;
+    static const long idRibbonOrigine;
+    static const long idRibbonOriginalZoom;
+    static const long ID_CUSTOMZOOMMENUITEM500;
+    static const long ID_CUSTOMZOOMMENUITEM200;
+    static const long ID_CUSTOMZOOMMENUITEM150;
+    static const long ID_CUSTOMZOOMMENUITEM100;
+    static const long ID_CUSTOMZOOMMENUITEM50;
+    static const long ID_CUSTOMZOOMMENUITEM25;
+    static const long ID_CUSTOMZOOMMENUITEM10;
+    static const long ID_CUSTOMZOOMMENUITEM5;
+
+    //Context menu identifiers
+    static const long ID_ADDOBJMENU;
+    static const long ID_DELOBJMENU;
+    static const long ID_PROPMENU;
+    static const long ID_LAYERUPMENU;
+    static const long ID_LAYERDOWNMENU;
+    static const long ID_COPYMENU;
+    static const long ID_CUTMENU;
+    static const long ID_PASTEMENU;
+    static const long ID_PASTESPECIALMENU;
+    static const long ID_CREATEOBJECTMENU;
+    static const long ID_UNLOCKMENU;
+    static const long ID_LOCKMENU;
+    std::map<long, std::string> idForPlatformsMenu;
 
     //(*Handlers(LayoutEditorCanvas)
     //*)
 
-    //Events
+    //Methods allowing to run SFML within the wxWidgets control
+    virtual void OnUpdate();
     virtual void OnPaint(wxPaintEvent& event);
-    virtual void OnEraseBackground(wxEraseEvent& event) {};
-    virtual void OnIdle(wxIdleEvent&) {};
-    virtual void OnHelpBtClick( wxCommandEvent & event ) {};
+    virtual void OnEraseBackground(wxEraseEvent& event);
+    virtual void OnIdle(wxIdleEvent&);
+    //Changing the state of the editor
+    virtual void OnPreviewBtClick( wxCommandEvent & event );
+    virtual void OnPreviewDropDownBtClick( wxRibbonButtonBarEvent & event );
+    virtual void OnEditionBtClick( wxCommandEvent & event );
+    //Others events
+    virtual void OnHelpBtClick( wxCommandEvent & event );
     virtual void OnLeftDown( wxMouseEvent &event );
     virtual void OnLeftUp( wxMouseEvent &event );
     virtual void OnLeftDClick( wxMouseEvent &event );
     virtual void OnKey( wxKeyEvent& evt );
     virtual void OnKeyUp( wxKeyEvent& evt );
-    virtual void OnMiddleDown( wxMouseEvent &event ) {};
-    virtual void OnMouseWheel( wxMouseEvent &event ) {};
-    virtual void OnRightUp( wxMouseEvent &event ) {};
+    virtual void OnMiddleDown( wxMouseEvent &event );
+    virtual void OnMouseWheel( wxMouseEvent &event );
+    virtual void OnRightUp( wxMouseEvent &event );
     virtual void OnMotion( wxMouseEvent &event );
     virtual void OnGridBtClick( wxCommandEvent & event );
     virtual void OnGridSetupBtClick( wxCommandEvent & event );
@@ -288,18 +328,44 @@ protected:
     virtual void OnRedoBtClick( wxCommandEvent & event );
     virtual void OnWindowMaskBtClick( wxCommandEvent & event );
     virtual void OnFullScreenBtClick(wxCommandEvent& event);
-    virtual void OnGuiElementHovered(const LayoutEditorCanvasGuiElement & guiElement) {};
-    virtual void OnGuiElementPressed(const LayoutEditorCanvasGuiElement & guiElement) {};
-    virtual void OnGuiElementReleased(const LayoutEditorCanvasGuiElement & guiElement) {};
-    virtual void OnInitialInstanceMoved(gd::InitialInstance & instance) {};
-    virtual void OnInitialInstanceAdded(gd::InitialInstance & instance) {};
-    virtual void OnInitialInstanceDeleted(gd::InitialInstance & instance) {};
+    virtual void OnGuiElementHovered(const LayoutEditorCanvasGuiElement & guiElement);
+    virtual void OnGuiElementPressed(const LayoutEditorCanvasGuiElement & guiElement);
+    virtual void OnGuiElementReleased(const LayoutEditorCanvasGuiElement & guiElement);
+    virtual void OnOrigineBtClick(wxCommandEvent & event );
+    virtual void OnZoomInitBtClick( wxCommandEvent & event );
+    virtual void OnZoomMoreBtClick(wxRibbonButtonBarEvent& evt);
+    virtual void OnCustomZoom5Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom10Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom25Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom50Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom100Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom150Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom200Selected(wxCommandEvent& event);
+    virtual void OnCustomZoom500Selected(wxCommandEvent& event);
+    virtual void OnPropObjSelected( wxCommandEvent & event );
+    virtual void OnLayerUpSelected( wxCommandEvent & event );
+    virtual void OnLayerDownSelected( wxCommandEvent & event );
+    virtual void OnCopySelected( wxCommandEvent & event );
+    virtual void OnCutSelected( wxCommandEvent & event );
+    virtual void OnPasteSelected( wxCommandEvent & event );
+    virtual void OnPasteSpecialSelected( wxCommandEvent & event );
+    virtual void OnDeleteObjectSelected( wxCommandEvent & event );
+    virtual void OnCreateObjectSelected( wxCommandEvent & event );
+    virtual void OnLockSelected( wxCommandEvent & event );
+    virtual void OnUnLockSelected( wxCommandEvent & event );
+    virtual void OnPreviewForPlatformSelected( wxCommandEvent & event );
 
-    /** To be redefined by the child classes so as to provide the position of the mouse */
-    virtual double GetMouseXOnLayout() const { return 0; };
+    virtual double GetMouseXOnLayout() const;
+    virtual double GetMouseYOnLayout() const;
 
-    /** To be redefined by the child classes so as to provide the position of the mouse */
-    virtual double GetMouseYOnLayout() const { return 0; };
+    //Rendering methods. The rendering during preview is done by previewScene.
+    void RenderEdittime();
+    void RenderGrid();
+    void AddSmallButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, const std::string & buttonName );
+    void DrawSelectionRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
+    void DrawAngleButtonGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::Vector2f & position, float angle );
+    void DrawHighlightRectangleGuiElement(std::vector < boost::shared_ptr<sf::Shape> > & target, const sf::FloatRect & rectangle );
+    sf::Vector2f ConvertToWindowCoordinates(float x, float y, const sf::View & view);
 
     /**
      * Can be called ( most of the time when the layout is rendered when editing ) to declare that
@@ -317,39 +383,10 @@ protected:
     void ClearAllGuiElements() { guiElements.clear(); };
 
     /**
-     * Called when the preview button is clicked.
-     * The default implementation of this method do some useful work ( disable useless editors, call methods to change the ribbon tools...) :
-     * If you redefine this function, you can call LayoutEditorCanvas::OnPreviewBtClick(event);
-     * so as not to have to redo this work.
-     */
-    virtual void OnPreviewBtClick( wxCommandEvent & event );
-
-    /**
-     * Called when the preview button is clicked.
-     * See OnPreviewBtClick method for more infomation about the default implementation.
-     */
-    virtual void OnEditionBtClick( wxCommandEvent & event );
-
-    /**
-     * Called when the ribbon buttons of preview mode must be created inside ribbonToolbar.
-     * Default implementation adds common buttons: if you redefine this function,
-     * you can call LayoutEditorCanvas::CreatePreviewRibbonTools();
-     * so as not to have to redo this work.
-     */
-    virtual void CreatePreviewRibbonTools();
-
-    /**
      * Called when the ribbon buttons of edition mode must be created inside ribbonToolbar.
      * \see CreatePreviewRibbonTools
      */
     virtual void CreateEditionRibbonTools();
-
-    /**
-     * Redefine this function to connect the ribbon buttons to the editors methods.
-     * Ribbons buttons are created thanks to CreatePreviewRibbonTools and CreateEditionRibbonTools.
-     * \see CreatePreviewRibbonTools
-     */
-    virtual void DoConnectEvents() {};
 
     /**
      * Return a pointer to the smallest initial instance under the cursor.
@@ -370,6 +407,11 @@ protected:
     void ChangesMade();
 
     /**
+     * Tool function returning the object used to display during the \a instance when editing.
+     */
+    gd::Object * GetObjectLinkedToInitialInstance(gd::InitialInstance & instance) const;
+
+    /**
      * Undo last changes.
      */
     virtual void Undo(unsigned int times = 1);
@@ -379,18 +421,39 @@ protected:
      */
     virtual void Redo(unsigned int times = 1);
 
+    /**
+     * Update the mouse according to the selected button
+     */
+    void UpdateMouseResizeCursor(const std::string & currentDraggableBt);
+
+    void UpdateContextMenu();
+    void UpdateScrollbars();
+    void UpdateViewAccordingToZoomFactor();
+
+    void SendSelectionToLayer(const std::string & newLayerName);
+
     gd::Project & project; ///< The project owning the layout
     gd::Layout & layout; ///< The layout being edited or used to edit the instances
     gd::InitialInstancesContainer & instances; ///< The initial instances of objects being edited
     LayoutEditorCanvasOptions & options;
     gd::MainFrameWrapper & mainFrameWrapper;
     std::set<LayoutEditorCanvasAssociatedEditor*> associatedEditors;
+    std::map<std::string, boost::shared_ptr<gd::LayoutEditorPreviewer> > previewers;
     wxWindow * parentControl; ///< The wxWidgets control owning the editor ( probably a wxPanel )
     wxAuiManager * parentAuiManager; ///< Pointer to the wxAuiManager displayed the editor. Can be NULL.
     wxScrollBar * hScrollbar;
     wxScrollBar * vScrollbar;
     wxMenu undoMenu;
 
+    sf::View editionView; ///< The view used for editing
+    std::string currentDraggableBt;
+    std::map<gd::InitialInstance*, double> resizeOriginalWidths;
+    std::map<gd::InitialInstance*, double> resizeOriginalHeights;
+    sf::Vector2f resizeMouseStartPosition;
+    sf::Vector2f angleButtonCenter;
+    bool isMovingView;
+    sf::Vector2f movingViewMouseStartPosition;
+    sf::Vector2f movingViewStartPosition;
     bool hasJustRightClicked;
     bool ctrlPressed;
     bool altPressed;
@@ -398,6 +461,8 @@ protected:
     double oldMouseX; ///< The mouse X position which was usually stored the last time a right click happened.
     double oldMouseY; ///< The mouse X position which was usually stored the last time a right click happened.
     bool isMovingInstance;
+    static const float gapBetweenButtonsAndRectangle = 5;
+    static const float smallButtonSize = 5;
 
     bool isSelecting;
     wxRect selectionRectangle;
@@ -410,8 +475,14 @@ protected:
 
     std::vector<LayoutEditorCanvasGuiElement> guiElements;
 
+    //State
     bool editing; ///< True if the layout is being edited, false if a preview is running.
-    bool playing; ///< True if the layout is being previewed and the preview is not paused.
+    boost::shared_ptr<gd::LayoutEditorPreviewer> currentPreviewer; ///< The previewer being used to preview the layout.
+
+    wxMenu contextMenu;
+    wxMenu noObjectContextMenu;
+    wxMenu zoomMenu;
+    wxMenu platformsMenu;
 
     DECLARE_EVENT_TABLE()
     friend class InstancesInsideSelectionPicker;

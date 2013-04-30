@@ -14,9 +14,9 @@ namespace gd
 {
 
 /**
- * \brief Class defining a container for variables
- * \see gd::Variable
+ * \brief Class defining a container for gd::Variable.
  *
+ * \see gd::Variable
  * \see gd::Project
  * \see gd::Layout
  * \see gd::Object

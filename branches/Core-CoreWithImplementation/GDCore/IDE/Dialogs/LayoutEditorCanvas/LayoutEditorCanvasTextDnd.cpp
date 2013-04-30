@@ -3,7 +3,7 @@
  *  2008-2013 Florian Rival (Florian.Rival@gmail.com)
  */
 
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/CommonTools.h"
 #include "LayoutEditorCanvasTextDnd.h"
 

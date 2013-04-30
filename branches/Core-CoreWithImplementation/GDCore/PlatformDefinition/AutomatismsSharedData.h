@@ -15,10 +15,11 @@ namespace gd
 {
 
 /**
- * \brief Base class for defining automatisms shared datas.
+ * \brief Base class for defining data shared by automatisms having the same type and name.
  *
- * Automatisms can use shared datas, as if they were extending the Scene members.
- * Inherit from this class, and redefine Clone and CreateRuntimeSharedDatas.
+ * Automatisms can use shared data, as if they were extending the gd::Layout class.
+ *
+ * \note GD C++ Platform extensions writers : Inherit from this class, and redefine Clone and CreateRuntimeSharedDatas.
  *
  * \ingroup GameEngine
  */
@@ -30,24 +31,36 @@ public:
     virtual boost::shared_ptr<gd::AutomatismsSharedData> Clone() const { return boost::shared_ptr<gd::AutomatismsSharedData>(new AutomatismsSharedData(*this));}
 
     /**
-     * Change the name identifying the automatism. Change also AutomatismId.
+     * \brief Change the name identifying the automatism.
      */
     void SetName(std::string name_) { name = name_; };
 
     /**
-     * Return the name identifying the automatism
+     * \brief Return the name identifying the automatism
      */
     std::string GetName() { return name; }
 
     /**
-     * Return the name identifying the type of the automatism
+     * \brief Return the name identifying the type of the automatism
      */
     std::string GetTypeName() { return type; }
 
     /**
-     * Change name identifying the type of the automatism.
+     * \brief Change name identifying the type of the automatism.
      */
     virtual void SetTypeName(const std::string & type_) { type = type_; };
+
+    #if defined(GD_IDE_ONLY)
+    /**
+     * \brief Save the object to XML
+     */
+    virtual void SaveToXml(TiXmlElement * eventElem) const {}
+    #endif
+
+    /**
+     * \brief Load the object from XML
+     */
+    virtual void LoadFromXml(const TiXmlElement * eventElem) {}
 
     //TODO : GD C++ Platform specific code :
     /**
@@ -60,20 +73,8 @@ public:
         return boost::shared_ptr<AutomatismsRuntimeSharedData>();
     }
 
-    #if defined(GD_IDE_ONLY)
-    /**
-     * Save AutomatismsSharedData to XML
-     */
-    virtual void SaveToXml(TiXmlElement * eventElem) const {}
-    #endif
-
-    /**
-     * Load AutomatismsSharedData from XML
-     */
-    virtual void LoadFromXml(const TiXmlElement * eventElem) {}
-
 private:
-    std::string name;
+    std::string name; ///< A layout can have some automatisms with the same type, but with different names.
     std::string type; ///< The type indicate of which type is the automatism.
 };
 

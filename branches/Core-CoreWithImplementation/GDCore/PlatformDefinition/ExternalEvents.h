@@ -41,53 +41,59 @@ public:
     virtual ExternalEvents * Clone() const { return new ExternalEvents(*this); };
 
     /**
-     * Get external events name
+     * \brief Get external events name
      */
     virtual const std::string & GetName() const {return name;};
 
     /**
-     * Change external events name
+     * \brief Change external events name
      */
     virtual void SetName(const std::string & name_) {name = name_;};
 
     /**
-     * Get the layout associated with external events.
+     * \brief Get the layout associated with external events.
+     *
+     * This is used in the IDE to remember the layout used to edit the external events.
      */
     virtual const std::string & GetAssociatedLayout() const {return associatedScene;};
 
     /**
-     * Set the layout associated with external events.
+     * \brief Set the layout associated with external events.
      */
     virtual void SetAssociatedLayout(const std::string & name_) {associatedScene = name_;};
 
     /**
      * Get the latest time of the build.
      * Used when the IDE found that the external events can be compiled separately from scene's events.
+     *
+     * \todo This is specific to GD C++ Platform
      */
     time_t GetLastChangeTimeStamp() const { return lastChangeTimeStamp; };
 
     /**
      * Change the latest time of the build of the external events.
+     *
+     * \todo This is specific to GD C++ Platform
      */
     void SetLastChangeTimeStamp(time_t newTimeStamp) { lastChangeTimeStamp = newTimeStamp; };
 
     /**
-     * Return a reference to the list of events associated to the ExternalEvents class.
+     * \brief Get the events.
      */
     virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const { return events; }
 
     /**
-     * Return a reference to the list of events associated to the ExternalEvents class.
+     * \brief Get the events.
      */
     virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() { return events; }
 
     /**
-     * Load from xml
+     * \brief Load the object from xml
      */
     virtual void LoadFromXml(gd::Project & project, const TiXmlElement * element);
 
     /**
-     * Save to xml
+     * \brief Save the object to xml
      */
     virtual void SaveToXml(TiXmlElement * element) const;
 

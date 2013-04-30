@@ -9,12 +9,15 @@
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include <boost/shared_ptr.hpp>
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 #endif
 
 namespace gd
 {
 
+/**
+ * \brief An external layout allows to create layouts of objects that can be then inserted on a layout.
+ */
 class GD_CORE_API ExternalLayout
 {
 public:
@@ -22,41 +25,56 @@ public:
     virtual ~ExternalLayout() {};
 
     /**
-     * Return a pointer to a new ExternalLayout constructed from this one.
+     * \brief Return a pointer to a new ExternalLayout constructed from this one.
      */
-    virtual ExternalLayout * Clone() const { return new ExternalLayout(*this); };
+    ExternalLayout * Clone() const { return new ExternalLayout(*this); };
 
     /**
-     * Must return the name of the external layout.
+     * \brief Return the name of the external layout.
      */
-    virtual const std::string & GetName() const {return name;}
+    const std::string & GetName() const {return name;}
 
     /**
-     * Must change the name of the external layout.
+     * \brief Change the name of the external layout.
      */
-    virtual void SetName(const std::string & name_) {name = name_;}
+    void SetName(const std::string & name_) {name = name_;}
 
     /**
-     * Return the container storing initial instances.
+     * \brief Return the container storing initial instances.
      */
-    virtual const gd::InitialInstancesContainer & GetInitialInstances() const { return instances; }
+    const gd::InitialInstancesContainer & GetInitialInstances() const { return instances; }
 
     /**
-     * Return the container storing initial instances.
+     * \brief Return the container storing initial instances.
      */
-    virtual gd::InitialInstancesContainer & GetInitialInstances() { return instances; }
+    gd::InitialInstancesContainer & GetInitialInstances() { return instances; }
 
     #if defined(GD_IDE_ONLY)
-    virtual const gd::LayoutEditorCanvasOptions & GetAssociatedSettings() const {return editionSettings;}
-    virtual gd::LayoutEditorCanvasOptions & GetAssociatedSettings() {return editionSettings;}
+    /**
+     * \brief Get the user settings for the IDE.
+     */
+    const gd::LayoutEditorCanvasOptions & GetAssociatedSettings() const {return editionSettings;}
+
+    /**
+     * \brief Get the user settings for the IDE.
+     */
+    gd::LayoutEditorCanvasOptions & GetAssociatedSettings() {return editionSettings;}
     #endif
 
     /** \name Serialization
      */
     ///@{
-    virtual void LoadFromXml(const TiXmlElement * element);
+
+    /**
+     * \brief Load the object from XML
+     */
+    void LoadFromXml(const TiXmlElement * element);
+
     #if defined(GD_IDE_ONLY)
-    virtual void SaveToXml(TiXmlElement * element) const;
+    /**
+     * \brief Save the object to XML
+     */
+    void SaveToXml(TiXmlElement * element) const;
     #endif
     ///@}
 

@@ -34,41 +34,6 @@ void EventsCodeGenerationContext::EmptyObjectsListNeeded(const std::string & obj
         emptyObjectsListsToBeDeclared.insert(objectName);
 }
 
-std::string EventsCodeGenerationContext::GenerateObjectsDeclarationCode()
-{
-    std::string declarationsCode;
-    for ( set<string>::iterator it = objectsListsToBeDeclared.begin() ; it != objectsListsToBeDeclared.end(); ++it )
-    {
-        if ( alreadyDeclaredObjectsLists.find(*it) == alreadyDeclaredObjectsLists.end() )
-        {
-            declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+" = runtimeContext->GetObjectsRawPointers(\""+EventsCodeGenerator::ConvertToCppString(*it)+"\");\n";
-            alreadyDeclaredObjectsLists.insert(*it);
-        }
-        else
-        {
-            //Could normally be done in one line, but clang sometimes miscompile it.
-            declarationsCode += "std::vector<RuntimeObject*> & "+ManObjListName(*it)+"T = "+ManObjListName(*it)+";\n";
-            declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+" = "+ManObjListName(*it)+"T;\n";
-        }
-    }
-    for ( set<string>::iterator it = emptyObjectsListsToBeDeclared.begin() ; it != emptyObjectsListsToBeDeclared.end(); ++it )
-    {
-        if ( alreadyDeclaredObjectsLists.find(*it) == alreadyDeclaredObjectsLists.end() )
-        {
-            declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+";\n";
-            alreadyDeclaredObjectsLists.insert(*it);
-        }
-        else
-        {
-            //Could normally be done in one line, but clang sometimes miscompile it.
-            declarationsCode += "std::vector<RuntimeObject*> & "+ManObjListName(*it)+"T = "+ManObjListName(*it)+";\n";
-            declarationsCode += "std::vector<RuntimeObject*> "+ManObjListName(*it)+" = "+ManObjListName(*it)+"T;\n";
-        }
-    }
-
-    return declarationsCode ;
-}
-
 std::set<std::string> EventsCodeGenerationContext::GetObjectsToBeDeclared()
 {
     std::set <std::string> allObjectListsToBeDeclared(objectsListsToBeDeclared.begin(), objectsListsToBeDeclared.end());

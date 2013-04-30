@@ -19,6 +19,7 @@ namespace gd
  */
 class GD_CORE_API EventsCodeGenerationContext
 {
+    friend class EventsCodeGenerator;
 public:
     /**
      * Default constructor. You may want to call InheritsFrom just after.

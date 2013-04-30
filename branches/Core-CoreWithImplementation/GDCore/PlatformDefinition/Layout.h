@@ -16,7 +16,7 @@
 #include "GDCore/PlatformDefinition/InitialInstancesContainer.h"
 #include "GDCore/PlatformDefinition/Layer.h"
 #if defined(GD_IDE_ONLY)
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h"
 namespace gd { class BaseEvent; }
 namespace gd { typedef boost::shared_ptr<BaseEvent> BaseEventSPtr; }
 #endif
@@ -32,7 +32,7 @@ namespace gd
 {
 
 /**
- * \brief Base class used to represent a layout ( also called a scene ) of a Platform.
+ * \brief Represent a layout ( also called a scene ) of a project.
  *
  * \ingroup PlatformDefinition
  */
@@ -53,7 +53,7 @@ public:
      * return new MyLayout(*this);
      * \endcode
      */
-    virtual Layout * Clone() const { return new Layout(*this); };
+    Layout * Clone() const { return new Layout(*this); };
 
     /** \name Common properties
      * Members functions related to common properties of layouts
@@ -63,42 +63,42 @@ public:
     /**
      * Change the name of the layout with the name passed as parameter.
      */
-    virtual void SetName(const std::string & name_) {name = name_;};
+    void SetName(const std::string & name_) {name = name_;};
 
     /**
      * Return the name of the layout.
      */
-    virtual const std::string & GetName() const {return name;};
+    const std::string & GetName() const {return name;};
 
     /**
      * Set the background color
      */
-    virtual void SetBackgroundColor(unsigned int r, unsigned int g, unsigned int b) { backgroundColorR = r; backgroundColorG = g; backgroundColorB = b; }
+    void SetBackgroundColor(unsigned int r, unsigned int g, unsigned int b) { backgroundColorR = r; backgroundColorG = g; backgroundColorB = b; }
 
     /**
      * Get the background color red component
      */
-    virtual unsigned int GetBackgroundColorRed() const { return backgroundColorR; }
+    unsigned int GetBackgroundColorRed() const { return backgroundColorR; }
 
     /**
      * Get the background color green component
      */
-    virtual unsigned int GetBackgroundColorGreen() const { return backgroundColorG; }
+    unsigned int GetBackgroundColorGreen() const { return backgroundColorG; }
 
     /**
      * Get the background color blue component
      */
-    virtual unsigned int GetBackgroundColorBlue() const { return backgroundColorB; }
+    unsigned int GetBackgroundColorBlue() const { return backgroundColorB; }
 
     /**
      * Get scene window default title
      */
-    virtual const std::string & GetWindowDefaultTitle() const {return title;};
+    const std::string & GetWindowDefaultTitle() const {return title;};
 
     /**
      * Set scene window default title
      */
-    virtual void SetWindowDefaultTitle(const std::string & title_) {title = title_;};
+    void SetWindowDefaultTitle(const std::string & title_) {title = title_;};
 
     ///@}
 
@@ -109,12 +109,12 @@ public:
     /**
      * Return the container storing initial instances.
      */
-    virtual const gd::InitialInstancesContainer & GetInitialInstances() const { return initialInstances; }
+    const gd::InitialInstancesContainer & GetInitialInstances() const { return initialInstances; }
 
     /**
      * Return the container storing initial instances.
      */
-    virtual gd::InitialInstancesContainer & GetInitialInstances() { return initialInstances; }
+    gd::InitialInstancesContainer & GetInitialInstances() { return initialInstances; }
     ///@}
 
     /** \name Layout's events
@@ -125,17 +125,17 @@ public:
     /**
      * Get the events of the layout
      */
-    virtual const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const { return events; }
+    const std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() const { return events; }
 
     /**
      * Get the events of the layout
      */
-    virtual std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() { return events; }
+    std::vector<boost::shared_ptr<gd::BaseEvent> > & GetEvents() { return events; }
 
     /**
      * Called by the IDE when events have been changed.
      */
-    virtual void OnEventsModified() {};
+    void OnEventsModified() {};
     ///@}
 
     /** \name Layout objects groups management
@@ -182,42 +182,42 @@ public:
     /**
      * Must return true if the layer called "name" exists.
      */
-    virtual bool HasLayerNamed(const std::string & name) const;
+    bool HasLayerNamed(const std::string & name) const;
 
     /**
      * Must return a reference to the layer called "name".
      */
-    virtual Layer & GetLayer(const std::string & name);
+    Layer & GetLayer(const std::string & name);
 
     /**
      * Must return a reference to the layer called "name".
      */
-    virtual const Layer & GetLayer(const std::string & name) const;
+    const Layer & GetLayer(const std::string & name) const;
 
     /**
      * Must return a reference to the layer at position "index" in the layers list
      */
-    virtual Layer & GetLayer(unsigned int index);
+    Layer & GetLayer(unsigned int index);
 
     /**
      * Must return a reference to the layer at position "index" in the layers list
      */
-    virtual const Layer & GetLayer (unsigned int index) const;
+    const Layer & GetLayer (unsigned int index) const;
 
     /**
      * Must return the position of the layer called "name" in the layers list
      */
-    virtual unsigned int GetLayerPosition(const std::string & name) const;
+    unsigned int GetLayerPosition(const std::string & name) const;
 
     /**
      * Must return the number of layers.
      */
-    virtual unsigned int GetLayersCount() const;
+    unsigned int GetLayersCount() const;
 
     /**
      * Must add a new empty the layer sheet called "name" at the specified position in the layout list.
      */
-    virtual void InsertNewLayer(const std::string & name, unsigned int position);
+    void InsertNewLayer(const std::string & name, unsigned int position);
 
     /**
      * Must add a new the layer constructed from the layout passed as parameter.
@@ -225,17 +225,17 @@ public:
      * \param theLayer The the layer that must be copied and inserted into the project
      * \param position Insertion position. Even if the position is invalid, the layer must be inserted at the end of the layers list.
      */
-    virtual void InsertLayer(const Layer & theLayer, unsigned int position);
+    void InsertLayer(const Layer & theLayer, unsigned int position);
 
     /**
      * Must delete the layer named "name".
      */
-    virtual void RemoveLayer(const std::string & name);
+    void RemoveLayer(const std::string & name);
 
     /**
      * Must swap the position of the specified layers.
      */
-    virtual void SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex);
+    void SwapLayers(unsigned int firstLayerIndex, unsigned int secondLayerIndex);
     ///@}
 
     /**
@@ -333,12 +333,12 @@ public:
     /**
      * Called to save the layout to a TiXmlElement.
      */
-    virtual void SaveToXml(TiXmlElement * element) const;
+    void SaveToXml(TiXmlElement * element) const;
 
     /**
      * Called to load the layout from a TiXmlElement.
      */
-    virtual void LoadFromXml(gd::Project & project, const TiXmlElement * element);
+    void LoadFromXml(gd::Project & project, const TiXmlElement * element);
     ///@}
 
     //TODO: Send this to private part.
@@ -361,19 +361,19 @@ public:
      * \see ChangesNotifier
      * \see CodeCompilationHelpers
      */
-    virtual void SetCompilationNeeded() { compilationNeeded = true; };
+    void SetCompilationNeeded() { compilationNeeded = true; };
 
     /**
      * Must be called when compilation of events is over and so events are not considered "modified" anymore.
      */
-    virtual void SetCompilationNotNeeded() { compilationNeeded = false; };
+    void SetCompilationNotNeeded() { compilationNeeded = false; };
 
     /**
      * Return true if a compilation is needed.
      * This method is usually called by SceneEditorCanvas when (re)loading a scene
      * so as to know if it should launch compilation.
      */
-    virtual bool CompilationNeeded() { return compilationNeeded; };
+    bool CompilationNeeded() { return compilationNeeded; };
 
     const std::string & GetCompiledEventsFile() const { return compiledEventsFile; }
     void SetCompiledEventsFile(const std::string & file) { compiledEventsFile = file; }
@@ -407,7 +407,7 @@ public:
     /**
      * Get the profiler associated with the scene. Can be NULL.
      */
-    BaseProfiler * GetProfiler() { return profiler; };
+    BaseProfiler * GetProfiler() const { return profiler; };
 
     /**
      * Set the profiler associated with the scene. Can be NULL.

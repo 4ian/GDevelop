@@ -315,14 +315,15 @@
 		<Unit filename="GDCore/IDE/Dialogs/InstancesAdvancedPasteDialog.h" />
 		<Unit filename="GDCore/IDE/Dialogs/LayersEditorPanel.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/LayersEditorPanel.h" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas.cpp" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas.h" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.cpp" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.cpp" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasOptions.h" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasTextDnd.cpp" />
-		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvasTextDnd.h" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas2.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasOptions.h" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasTextDnd.cpp" />
+		<Unit filename="GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasTextDnd.h" />
 		<Unit filename="GDCore/IDE/Dialogs/MainFrameWrapper.cpp" />
 		<Unit filename="GDCore/IDE/Dialogs/MainFrameWrapper.h" />
 		<Unit filename="GDCore/IDE/Dialogs/ObjectListDialogsHelper.cpp" />
@@ -397,6 +398,8 @@
 		<Unit filename="GDCore/PlatformDefinition/Layer.h" />
 		<Unit filename="GDCore/PlatformDefinition/Layout.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/Layout.h" />
+		<Unit filename="GDCore/PlatformDefinition/LayoutEditorPreviewer.cpp" />
+		<Unit filename="GDCore/PlatformDefinition/LayoutEditorPreviewer.h" />
 		<Unit filename="GDCore/PlatformDefinition/Object.cpp" />
 		<Unit filename="GDCore/PlatformDefinition/Object.h" />
 		<Unit filename="GDCore/PlatformDefinition/ObjectGroup.cpp" />
@@ -458,8 +461,8 @@
 				<doxyfile_project output_directory="doc" />
 				<doxyfile_build />
 				<doxyfile_warnings />
-				<doxyfile_output html_help="1" />
-				<doxyfile_dot class_diagrams="1" />
+				<doxyfile_output />
+				<doxyfile_dot have_dot="1" />
 				<general />
 			</DoxyBlocks>
 			<wxsmith version="1">

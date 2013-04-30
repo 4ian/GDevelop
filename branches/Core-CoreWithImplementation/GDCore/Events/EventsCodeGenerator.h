@@ -1,5 +1,5 @@
-#ifndef EVENTSCODEGENERATOR_H
-#define EVENTSCODEGENERATOR_H
+#ifndef GDCORE_EVENTSCODEGENERATOR_H
+#define GDCORE_EVENTSCODEGENERATOR_H
 
 #include "GDCore/Events/Event.h"
 #include <string>
@@ -10,6 +10,9 @@ namespace gd { class Project; }
 namespace gd { class Layout; }
 namespace gd { class ExternalEvents; }
 namespace gd { class ParameterMetadata; }
+namespace gd { class ObjectMetadata; }
+namespace gd { class AutomatismMetadata; }
+namespace gd { class InstructionMetadata; }
 namespace gd { class EventsCodeGenerationContext; }
 namespace gd { class InstructionMetadata;}
 namespace gd { class Platform;}
@@ -18,29 +21,32 @@ namespace gd
 {
 
 /**
- * \brief Internal class used to prepare events for runtime.
+ * \brief Internal class used to generate code from events
+ * \todo For now, this class generates only C++ code for GD C++ Platform.
  *
  * \see CallbacksForGeneratingExpressionCode
  */
 class GD_CORE_API EventsCodeGenerator
 {
+    friend class CallbacksForGeneratingExpressionCode;
 public:
     static void DeleteUselessEvents(std::vector < gd::BaseEventSPtr > & events);
     static void PreprocessEventList( gd::Project & game, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & listEvent );
 
-    EventsCodeGenerator(const gd::Project & project_, const gd::Platform & platform_) : project(project_), platform(platform_), errorOccurred(false), compilationForRuntime(false) {};
+    /**
+     * \brief Construct a code generator for the specified platform/project/layout.
+     */
+    EventsCodeGenerator(const gd::Project & project_, const gd::Layout & layout, const gd::Platform & platform_) : project(project_), scene(layout), platform(platform_), errorOccurred(false), compilationForRuntime(false) {};
     virtual ~EventsCodeGenerator() {};
 
     /**
      * Generate code for executing an event list
      *
-     * \param game Game used
-     * \param scene Scene used
      * \param events std::vector of events
      * \param context Context used for generation
      * \return C++ code
      */
-    std::string GenerateEventsListCode(gd::Layout & scene, std::vector < gd::BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
+    std::string GenerateEventsListCode(std::vector < gd::BaseEventSPtr > & events, const EventsCodeGenerationContext & context);
 
     /**
      * Generate code for executing a condition list
@@ -51,7 +57,7 @@ public:
      * \param context Context used for generation
      * \return C++ code. Boolean containing conditions result are name conditionXIsTrue, with X = the number of the condition, starting from 0.
      */
-    std::string GenerateConditionsListCode(const gd::Layout & scene, std::vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context);
+    std::string GenerateConditionsListCode(std::vector < gd::Instruction > & conditions, EventsCodeGenerationContext & context);
 
     /**
      * Generate code for executing an action list
@@ -62,7 +68,7 @@ public:
      * \param context Context used for generation
      * \return C++ code
      */
-    std::string GenerateActionsListCode(const gd::Layout & scene, std::vector < gd::Instruction > & actions, EventsCodeGenerationContext & context);
+    std::string GenerateActionsListCode(std::vector < gd::Instruction > & actions, EventsCodeGenerationContext & context);
 
     /**
      * Generate the code for a parameter of an action/condition/expression.
@@ -90,13 +96,13 @@ public:
      * - inlineCode: supplementary information associated with the parameter is directly pasted in the C++ code without change.
      * - mapOfObjectListsOfParameter : a std::map containing lists of objects which are specified by the object name in another parameter. (std::map <std::string, std::vector<RuntimeObject*> *>) Example:
      * \code
-    AddExpression("Count", _("Object count"), _("Count the number of picked objects"), _("Objects"), "res/conditions/nbObjet.png")
+        AddExpression("Count", _("Object count"), _("Count the number of picked objects"), _("Objects"), "res/conditions/nbObjet.png")
         .AddParameter("object", _("Object"))
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+        .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
      * \endcode
-     * - mapOfObjectListsOfParameterWithoutPicking : Same as mapOfObjectListsOfParameter but do not pick object if they are not already concerned.
+     * - mapOfObjectListsOfParameterWithoutPicking : Same as mapOfObjectListsOfParameter but do not pick object if they are not already picked.
      * - ptrToObjectOfParameter : Return a pointer to object specified by the object name in another parameter ( RuntimeObject * ). Example:
      * \code
     .AddParameter("object", _("Object"))
@@ -104,7 +110,7 @@ public:
     .AddCodeOnlyParameter("ptrToObjectOfParameter", "1") //The called function will be called with this signature : Function(std::string, std::string, RuntimeObject*)
      * \endcode
      */
-    std::vector<std::string> GenerateParametersCodes( const gd::Layout & scene, std::vector < gd::Expression > parameters, const std::vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
+    virtual std::vector<std::string> GenerateParametersCodes(std::vector < gd::Expression > parameters, const std::vector < gd::ParameterMetadata > & parametersInfo, EventsCodeGenerationContext & context, std::vector < std::pair<std::string, std::string> > * supplementaryParametersTypes = 0);
 
     /**
      * Generate code for a single condition
@@ -115,7 +121,7 @@ public:
      * \param context Context used for generation
      * \return C++ code
      */
-    std::string GenerateConditionCode(const gd::Layout & scene, gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context);
+    std::string GenerateConditionCode(gd::Instruction & condition, std::string returnBoolean, EventsCodeGenerationContext & context);
 
     /**
      * Generate code for a single action
@@ -125,7 +131,14 @@ public:
      * \param context Context used for generation
      * \return C++ code
      */
-    std::string GenerateActionCode(const gd::Layout & scene, gd::Instruction & action, EventsCodeGenerationContext & context);
+    std::string GenerateActionCode(gd::Instruction & action, EventsCodeGenerationContext & context);
+
+    /**
+     * Generate code for declaring objects lists.
+     *
+     * \param context The context to be used.
+     */
+    std::string GenerateObjectsDeclarationCode(EventsCodeGenerationContext & context);
 
     /**
      * Convert a plain string ( with line feed, quotes ) to a C++ string ( adding backslash ).
@@ -138,7 +151,7 @@ public:
      * \param plainString The string to convert
      * \return plainString which can be included in a C++ code.
      */
-    static std::string ConvertToCppString(std::string plainString);
+    std::string ConvertToCppString(std::string plainString);
 
     /**
      * Declare an include file to be added
@@ -196,17 +209,95 @@ public:
      */
     bool ErrorOccurred() const { return errorOccurred; };
 
+    /**
+     * Get the project the code is being generated for
+     */
     const gd::Project & GetProject() const { return project; }
 
+    /**
+     * Get the layout the code is being generated for
+     */
+    const gd::Layout & GetLayout() const { return scene; }
+
+    /**
+     * Get the platform the code is being generated for
+     */
     const gd::Platform & GetPlatform() const { return platform; }
 
-private:
+    /**
+     * Get a list the "real" objects name when the events refers to \a objectName :<br>
+     * If \a objectName if really an object, the list will only contains \a objectName unchanged.<br>
+     * If \a objectName is a group, the list will contains all the objects of the group.<br>
+     * If \a objectName is the "current" object in the context ( i.e: The object being used for launching an action... ),
+     * none of the two rules below apply, and the list will only contains the context "current" object name.
+     */
+    std::vector<std::string> ExpandObjectsName(const std::string & objectName, const EventsCodeGenerationContext & context) const;
 
-    std::string GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, std::vector<std::string> & arguments, const std::string & callStartString, unsigned int startFromArgument = 0);
-    std::string GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, std::vector<std::string> & arguments, const std::string & callStartString, const std::string & getterStartString, unsigned int startFromArgument = 0);
-    std::string GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, std::vector<std::string> & arguments, const std::string & callStartString, unsigned int startFromArgument = 0);
+protected:
+
+    virtual std::string GenerateCurrentObjectFunctionCall(std::string objectListName,
+                                                          const ObjectMetadata & objMetadata,
+                                                          std::string functionCallName,
+                                                          std::string parametersStr);
+
+    virtual std::string GenerateNotPickedObjectFunctionCall(std::string objectListName,
+                                                            const ObjectMetadata & objMetadata,
+                                                            std::string functionCallName,
+                                                            std::string parametersStr,
+                                                            std::string defaultOutput);
+
+    virtual std::string GenerateCurrentObjectAutomatismFunctionCall(std::string objectListName,
+                                                                      std::string automatismName,
+                                                                      const gd::AutomatismMetadata & autoInfo,
+                                                                      std::string functionCallName,
+                                                                      std::string parametersStr);
+
+    virtual std::string GenerateNotPickedObjectAutomatismFunctionCall(std::string objectListName,
+                                                                      std::string automatismName,
+                                                                      const gd::AutomatismMetadata & autoInfo,
+                                                                      std::string functionCallName,
+                                                                      std::string parametersStr,
+                                                                      std::string defaultOutput);
+
+    virtual std::string GenerateScopeBegin() const { return "{\n"; };
+    virtual std::string GenerateScopeEnd() const { return "}\n"; };
+    virtual std::string GenerateNegatedPredicat(const std::string & predicat) const { return "!("+predicat+")"; };
+    virtual std::string GenerateReferenceToBoolean(const std::string & referenceName, const std::string & referencedBoolean) { return "bool & "+referenceName+" = "+referencedBoolean+";\n";}
+    virtual std::string GenerateBooleanInitializationToFalse(const std::string & boolName) { return "bool "+boolName+" = false;\n";}
+
+    virtual std::string GenerateObjectListObjectCondition(const std::string & objectName,
+                                                            const gd::ObjectMetadata & objInfo,
+                                                            const std::vector<std::string> & arguments,
+                                                            const gd::InstructionMetadata & instrInfos,
+                                                            const std::string & returnBoolean,
+                                                            bool conditionInverted);
+
+    virtual std::string GenerateObjectListAutomatismCondition(const std::string & objectName,
+                                                                const std::string & automatismName,
+                                                                const gd::AutomatismMetadata & autoInfo,
+                                                                const std::vector<std::string> & arguments,
+                                                                const gd::InstructionMetadata & instrInfos,
+                                                                const std::string & returnBoolean,
+                                                                bool conditionInverted);
+
+    virtual std::string GenerateObjectListObjectAction(const std::string & objectName,
+                                                        const gd::ObjectMetadata & objInfo,
+                                                        const std::vector<std::string> & arguments,
+                                                        const gd::InstructionMetadata & instrInfos);
+
+    virtual std::string GenerateObjectListAutomatismAction(const std::string & objectName,
+                                                            const std::string & automatismName,
+                                                            const gd::AutomatismMetadata & autoInfo,
+                                                            const std::vector<std::string> & arguments,
+                                                            const gd::InstructionMetadata & instrInfos);
+
+
+    std::string GenerateRelationalOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<std::string> & arguments, const std::string & callStartString, unsigned int startFromArgument = 0);
+    std::string GenerateOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<std::string> & arguments, const std::string & callStartString, const std::string & getterStartString, unsigned int startFromArgument = 0);
+    std::string GenerateCompoundOperatorCall(const gd::InstructionMetadata & instrInfos, const std::vector<std::string> & arguments, const std::string & callStartString, unsigned int startFromArgument = 0);
 
     const gd::Project & project;
+    const gd::Layout & scene;
     const gd::Platform & platform;
 
     bool errorOccurred;
@@ -220,4 +311,4 @@ private:
 
 }
 
-#endif // EVENTSCODEGENERATOR_H
+#endif // GDCORE_EVENTSCODEGENERATOR_H

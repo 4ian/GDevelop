@@ -17,6 +17,7 @@ namespace gd
 /**
  * \brief Class that is used by games to load resources from an Game Develop Executable ( DatFile ) or from an external file.
  *
+ * \todo Rename and refactor this class.
  * \ingroup ResourcesManagement
  */
 class GD_CORE_API RessourcesLoader

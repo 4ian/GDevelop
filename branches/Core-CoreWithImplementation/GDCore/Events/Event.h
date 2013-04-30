@@ -42,7 +42,7 @@ class GD_CORE_API BaseEvent
 {
 public:
     BaseEvent();
-    virtual ~BaseEvent();
+    virtual ~BaseEvent() {};
 
     /**
      * Must return a pointer to a copy of the event.
@@ -81,6 +81,12 @@ public:
     virtual std::vector < gd::BaseEventSPtr > & GetSubEvents() {return badSubEvents;};
 
     /**
+     * \brief Return true if the events has sub events.
+     * \warning This is only applicable when CanHaveSubEvents() return true.
+     */
+    bool HasSubEvents() const { return !GetSubEvents().empty(); }
+
+    /**
      * Event must be able to return all conditions std::vector they have.
      * Used to preprocess the conditions.
      */
@@ -108,36 +114,12 @@ public:
     ///@{
 
     /**
-     * Generate event's code.
-     * Implementation example :
-     * \code
-        std::string outputCode;
-
-        outputCode += codeGenerator.GenerateConditionsListCode(game, scene, conditions, context);
-
-        std::string ifPredicat;
-        for (unsigned int i = 0;i<conditions.size();++i)
-        {
-            if (i!=0) ifPredicat += " && ";
-            ifPredicat += "condition"+ToString(i)+"IsTrue";
-        }
-
-        if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
-        outputCode += "{\n";
-        outputCode += codeGenerator.GenerateActionsListCode(game, scene, actions, context);
-        if ( !events.empty() ) //Sub events
-        {
-            outputCode += "\n{\n";
-            outputCode += codeGenerator.GenerateEventsListCode(scene, events, context);
-            outputCode += "}\n";
-        }
-
-        outputCode += "}\n";
-
-        return outputCode;
-     * \endcode
+     * Generate the code event : the platform provided by \a codeGenerator is asked for the EventMetadata associated to the event,
+     * which is then used to generate the code event ( gd::EventMetadata::codeGeneration member )
+     *
+     * \see gd::EventMetadata
      */
-    virtual std::string GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context) {return "";};
+    std::string GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
     /**
      * Called before events are compiled

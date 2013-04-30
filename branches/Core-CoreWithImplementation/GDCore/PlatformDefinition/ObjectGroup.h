@@ -17,10 +17,8 @@ namespace gd
  * \brief Represents an object group.
  *
  * Objects groups do not really contains objects : They are just used in events, so as to create events which can be applied to several objects.
- * \note This class is fully implemented in GDCore: There is no needed to make a custom class inheriting from it.
  *
  * \see gd::GroupHasTheSameName
- *
  * \ingroup PlatformDefinition
  */
 class GD_CORE_API ObjectGroup
@@ -31,30 +29,30 @@ public:
     virtual ~ObjectGroup() {};
 
     /**
-     * Return true if an object is found inside the ObjectGroup.
+     * \brief Return true if an object is found inside the ObjectGroup.
      */
     bool Find(const std::string & name) const;
 
     /**
-     * Add an object name to the group.
+     * \brief Add an object name to the group.
      */
     void AddObject(const std::string & name);
 
     /**
-     * Remove an object name from the group
+     * \brief Remove an object name from the group
      */
     void RemoveObject(const std::string & name);
 
-    /** Get group name
+    /** \brief Get group name
      */
     inline const std::string & GetName() const { return name; };
 
-    /** Change group name
+    /** \brief Change group name
      */
     inline void SetName(const std::string & name_) {name = name_;};
 
     /**
-     * Get a vector with objects names.
+     * \brief Get a vector with objects names.
      */
     inline const std::vector < std::string > & GetAllObjectsNames() const
     {

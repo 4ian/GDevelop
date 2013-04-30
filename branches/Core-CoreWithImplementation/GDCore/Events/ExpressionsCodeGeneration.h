@@ -27,7 +27,7 @@ namespace gd
  * \code
  *   std::string expressionOutputCppCode;
  *
- *   CallbacksForGeneratingExpressionCode callbacks(expressionOutputCppCode, project, scene, codeGenerator, context);
+ *   CallbacksForGeneratingExpressionCode callbacks(expressionOutputCppCode, codeGenerator, context);
  *   gd::ExpressionParser parser(theOriginalGameDevelopExpression);
  *   parser.ParseStringExpression(platform, project, scene, callbacks);
  *
@@ -38,7 +38,7 @@ namespace gd
 class GD_CORE_API CallbacksForGeneratingExpressionCode : public gd::ParserCallbacks
 {
 public:
-    CallbacksForGeneratingExpressionCode(std::string & output, const gd::Project & game_, const gd::Layout & scene_, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context_);
+    CallbacksForGeneratingExpressionCode(std::string & output, EventsCodeGenerator & codeGenerator_, EventsCodeGenerationContext & context_);
     virtual ~CallbacksForGeneratingExpressionCode() {};
 
     void OnConstantToken(std::string text);
@@ -55,8 +55,6 @@ public:
 
 private :
     std::string & plainExpression;
-    const gd::Project & project;
-    const gd::Layout & scene;
     EventsCodeGenerator & codeGenerator;
     EventsCodeGenerationContext & context;
 };

@@ -13,7 +13,7 @@ namespace gd
 {
 
 /**
- * \brief Base class used to represent a layer of a layout.
+ * \brief Represents a layer of a layout.
  *
  * \see gd::Layout
  * \ingroup PlatformDefinition
@@ -25,71 +25,71 @@ public:
     virtual ~Layer() {};
 
     /**
-     * Change layer name
+     * \brief Change layer name
      */
-    virtual void SetName(const std::string & name_) { name = name_; }
+    void SetName(const std::string & name_) { name = name_; }
 
     /**
-     * Get layer name
+     * \brief Get layer name
      */
-    virtual const std::string & GetName() const { return name; }
+    const std::string & GetName() const { return name; }
 
     /**
-     * Change if layer is displayed or not
+     * \brief Change if layer is displayed or not
      */
-    virtual void SetVisibility(bool isVisible_) { isVisible = isVisible_; }
+    void SetVisibility(bool isVisible_) { isVisible = isVisible_; }
 
     /**
-     * True if layer will be displayed.
+     * \brief Return true if layer will be displayed at the layout startup.
      */
-    virtual bool GetVisibility() const { return isVisible; }
+    bool GetVisibility() const { return isVisible; }
 
     /**
-     * Change the number of cameras inside the layer.
+     * \brief Change the number of cameras inside the layer.
      */
     void SetCameraCount(unsigned int n);
 
     /**
-     * Get cameras count.
+     * \brief Get cameras count.
      */
     inline unsigned int GetCameraCount() const { return cameras.size(); };
 
     /**
-     * Return a reference to a camera
+     * \brief Return a reference to a camera
      */
     inline const Camera & GetCamera(unsigned int n) const { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
 
     /**
-     * Return a reference to a camera
+     * \brief Return a reference to a camera
      */
     inline Camera & GetCamera(unsigned int n) { if ( n >= GetCameraCount() ) return badCamera; return cameras[n]; }
 
     /**
-     * Delete a specific camera.
+     * \brief Delete a specific camera.
      */
     inline void DeleteCamera(unsigned int n) { if ( n >= GetCameraCount() ) return; cameras.erase(cameras.begin()+n); }
 
     /**
-     * Add an already existing camera.
+     * \brief Add an already existing camera.
      */
     inline void AddCamera(const Camera & camera) { cameras.push_back(camera); };
 
     #if defined(GD_IDE_ONLY)
     /**
-     * Display a window to edit the layer
+     * \brief Display a window to edit the layer
      */
-    virtual void EditLayer();
+    void EditLayer();
 
     /**
-     * Save to xml
+     * \brief Save to xml
      */
-    virtual void SaveToXml(TiXmlElement * element) const;
+    void SaveToXml(TiXmlElement * element) const;
     #endif
 
     /**
-     * Load from xml
+     * \brief Load from xml
      */
-    virtual void LoadFromXml(const TiXmlElement * element);
+    void LoadFromXml(const TiXmlElement * element);
 
 private:
 
@@ -111,7 +111,7 @@ struct LayerHasName : public std::binary_function<gd::Layer, std::string, bool> 
 
 
 /**
- * \brief A camera is used to render a specific area of a scene.
+ * \brief A camera is used to render a specific area of a layout.
  *
  * \see gd::Layout
  * \ingroup PlatformDefinition
@@ -120,7 +120,7 @@ class GD_CORE_API Camera
 {
 public:
     Camera();
-    virtual ~Camera() {};
+    ~Camera() {};
 
     /**
      * Change the viewport, i.e the area of the window where the camera will be displayed

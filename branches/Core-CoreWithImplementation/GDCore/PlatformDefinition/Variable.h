@@ -11,7 +11,7 @@ namespace gd
 {
 
 /**
- * \brief Defines a variable which can be used by an object, a layout or a project for example.
+ * \brief Defines a variable which can be used by an object, a layout or a project.
  *
  * \see gd::VariablesContainer
  *
@@ -49,12 +49,12 @@ public:
     virtual void SetString(const std::string & value);
 
     /**
-     * Get value as a double
+     * \brief Get value as a double
      */
     double GetValue() const;
 
     /**
-     * Change value
+     * \brief Change value
      */
     void SetValue(double val);
 

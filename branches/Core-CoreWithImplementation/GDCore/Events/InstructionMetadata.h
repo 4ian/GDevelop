@@ -120,32 +120,32 @@ public:
     /**
      * \brief Defines information about how generate C++ code for an instruction
      */
-    class CppCallingInformation
+    class ExtraInformation
     {
     public:
         enum AccessType {Reference, MutatorAndOrAccessor};
-        CppCallingInformation() : accessType(Reference), doNotEncloseInstructionCodeWithinBrackets(false) {};
+        ExtraInformation() : accessType(Reference), doNotEncloseInstructionCodeWithinBrackets(false) {};
 
         /**
          * Set the C++ function name which will be used when generating the C++ code.
          */
-        CppCallingInformation & SetFunctionName(const std::string & cppCallingName_)
+        ExtraInformation & SetFunctionName(const std::string & cppCallingName_)
         {
-            cppCallingName = cppCallingName_;
+            functionCallName = cppCallingName_;
             return *this;
         }
 
         /**
          * Declare if the instruction ( condition or action ) being declared is manipulating something in a standard way.
          */
-        CppCallingInformation & SetManipulatedType(const std::string & type_)
+        ExtraInformation & SetManipulatedType(const std::string & type_)
         {
             type = type_;
             return *this;
         }
 
         /**
-         * If InstructionMetadata::CppCallingInformation::SetManipulatedType was called with "number" or "string", this function will tell the code generator
+         * If InstructionMetadata::ExtraInformation::SetManipulatedType was called with "number" or "string", this function will tell the code generator
          * the name of the getter function used to retrieve the data value.
          *
          * Usage example:
@@ -162,12 +162,12 @@ public:
          *      .AddParameter("string", _("String"))
          *      .AddParameter("operator", _("Modification operator"))
          *
-         *      .cppCallingInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
+         *      .codeExtraInformation.SetFunctionName("SetString").SetManipulatedType("string").SetAssociatedGetter("GetString").SetIncludeFile("MyExtension/TextObject.h");
          *
          *  DECLARE_END_OBJECT_ACTION()
          * \endcode
          */
-        CppCallingInformation & SetAssociatedGetter(const std::string & getter)
+        ExtraInformation & SetAssociatedGetter(const std::string & getter)
         {
             optionalAssociatedInstruction = getter;
             accessType = MutatorAndOrAccessor;
@@ -177,7 +177,7 @@ public:
         /**
          * Set that the function is located in a specific include file
          */
-        CppCallingInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
+        ExtraInformation & SetIncludeFile(const std::string & optionalIncludeFile_)
         {
             optionalIncludeFile = optionalIncludeFile_;
             return *this;
@@ -186,7 +186,7 @@ public:
         /**
          * Set that the instruction should not be enclose within brackets ( { } )
          */
-        CppCallingInformation & DoNotEncloseInstructionCodeWithinBrackets(bool disableBrackets = true)
+        ExtraInformation & DoNotEncloseInstructionCodeWithinBrackets(bool disableBrackets = true)
         {
             doNotEncloseInstructionCodeWithinBrackets = disableBrackets;
             return *this;
@@ -197,16 +197,16 @@ public:
         class CustomCodeGenerator
         {
         public:
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, Instruction & instruction, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
+            virtual std::string GenerateCode(Instruction & instruction, gd::EventsCodeGenerator & codeGenerator_, gd::EventsCodeGenerationContext & context) {return "";};
         };
 
-        CppCallingInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
+        ExtraInformation & SetCustomCodeGenerator(boost::shared_ptr<CustomCodeGenerator> codeGenerator)
         {
             optionalCustomCodeGenerator = codeGenerator;
             return *this;
         }
 
-        std::string cppCallingName;
+        std::string functionCallName;
         std::string type;
         AccessType accessType;
         std::string optionalAssociatedInstruction;
@@ -214,7 +214,7 @@ public:
         std::string optionalIncludeFile;
         boost::shared_ptr<CustomCodeGenerator> optionalCustomCodeGenerator;
     };
-    CppCallingInformation cppCallingInformation; ///< Information about how generate C++ code for the instruction
+    ExtraInformation codeExtraInformation; ///< Information about how generate code for the instruction
 
     /** Don't use this constructor. Only here to fulfill std::map requirements
      */

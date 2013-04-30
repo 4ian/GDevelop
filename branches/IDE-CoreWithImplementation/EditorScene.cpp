@@ -26,7 +26,7 @@
 #include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/Tools/HelpFileAccess.h"
-#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "MainFrame.h"
 #include "EditorObjets.h"
 #include "InitialPositionBrowserDlg.h"
@@ -74,7 +74,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	vScrollbar->SetScrollbar(2500, 10, 5000, 10);
 	hScrollbar = new wxScrollBar(scenePanel, ID_SCROLLBAR4, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR4"));
 	hScrollbar->SetScrollbar(2500, 10, 5000, 10);
-	layoutEditorCanvas = new SceneEditorCanvas(scenePanel, project, layout, layout.GetInitialInstances(), layout.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);
+	layoutEditorCanvas = new gd::LayoutEditorCanvas(scenePanel, project, layout, layout.GetInitialInstances(), layout.GetAssociatedLayoutEditorCanvasOptions(), mainFrameWrapper);
 	eventsPanel = new wxPanel(notebook, ID_PANEL6, wxDefaultPosition, wxDefaultSize, wxNO_BORDER|wxTAB_TRAVERSAL, _T("ID_PANEL6"));
 	eventsPanel->SetBackgroundColour(wxColour(255,255,255));
 	eventsPanel->SetHelpText(_("Edit the events of the scene"));
@@ -156,7 +156,6 @@ mainFrameWrapper(mainFrameWrapper_)
 	m_mgr.LoadPerspective(perspective);
 
     m_mgr.Update();
-    layoutEditorCanvas->RefreshFromLayout();
 }
 
 void EditorScene::OnscenePanelResize(wxSizeEvent& event)

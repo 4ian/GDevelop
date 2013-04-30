@@ -117,12 +117,12 @@ class MainFrame: public wxFrame
         /**
          * Get a pointer to the ribbon
          */
-        inline const wxRibbonBar * GetRibbon() const { return m_ribbon; };
+        inline const wxRibbonBar * GetRibbon() const { return ribbon; };
 
         /**
          * Get a pointer to the ribbon
          */
-        inline wxRibbonBar * GetRibbon() { return m_ribbon; };
+        inline wxRibbonBar * GetRibbon() { return ribbon; };
 
         /**
          * Get a pointer to ribbon bar which can be changed by scene editors
@@ -311,7 +311,7 @@ class MainFrame: public wxFrame
         wxMenu fileMenu;
         //*)
         wxAuiManager m_mgr;
-        wxRibbonBar * m_ribbon; ///< Pointer to the ribbon
+        wxRibbonBar * ribbon; ///< Pointer to the ribbon
         wxStaticBitmap * ribbonFileBt; ///< Pointer to the ribbon file custom button
         wxRibbonButtonBar * ribbonSceneEditorButtonBar; ///Pointer to the ribbon bar which can be changed by scene editors
         BuildToolsPnl * buildToolsPnl;

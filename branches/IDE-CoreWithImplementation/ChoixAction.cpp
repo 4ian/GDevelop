@@ -332,9 +332,9 @@ void ChoixAction::RefreshList()
 
                 //Add action item
                 int IDimage = 0;
-                if ( it->second.GetBitmapIcon().IsOk() )
+                if ( it->second.GetSmallBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.GetBitmapIcon());
+                    imageList->Add(it->second.GetSmallBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 
@@ -373,9 +373,9 @@ void ChoixAction::RefreshList()
 
                 //Add action item
                 int IDimage = 0;
-                if ( it->second.GetBitmapIcon().IsOk() )
+                if ( it->second.GetSmallBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.GetBitmapIcon());
+                    imageList->Add(it->second.GetSmallBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 
@@ -407,9 +407,9 @@ void ChoixAction::RefreshList()
 
             //Add action item
             int IDimage = 0;
-            if ( it->second.GetBitmapIcon().IsOk() )
+            if ( it->second.GetSmallBitmapIcon().IsOk() )
             {
-                imageList->Add(it->second.GetBitmapIcon());
+                imageList->Add(it->second.GetSmallBitmapIcon());
                 IDimage = imageList->GetImageCount()-1;
             }
 
@@ -488,9 +488,9 @@ void ChoixAction::RefreshObjectActionsList()
 
             //Add action item, if it is not hidden
             int IDimage = 0;
-            if ( it->second.GetBitmapIcon().IsOk() )
+            if ( it->second.GetSmallBitmapIcon().IsOk() )
             {
-                imageList->Add(it->second.GetBitmapIcon());
+                imageList->Add(it->second.GetSmallBitmapIcon());
                 IDimage = imageList->GetImageCount()-1;
             }
 
@@ -536,9 +536,9 @@ void ChoixAction::RefreshObjectActionsList()
 
                 //Add action item
                 int IDimage = 0;
-                if ( it->second.GetBitmapIcon().IsOk() )
+                if ( it->second.GetSmallBitmapIcon().IsOk() )
                 {
-                    imageList->Add(it->second.GetBitmapIcon());
+                    imageList->Add(it->second.GetSmallBitmapIcon());
                     IDimage = imageList->GetImageCount()-1;
                 }
 

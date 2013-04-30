@@ -23,8 +23,9 @@
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 namespace gd {class Layout;}
 namespace gd {class Project;}
+namespace gd {class LayoutEditorCanvas;}
 namespace gd {class LayersEditorPanel;}
-class SceneEditorCanvas;
+class CppLayoutPreviewer;
 class EditorObjets;
 class EventsEditor;
 class LayoutEditorPropertiesPnl;
@@ -93,7 +94,7 @@ private:
     wxPanel* scenePanel;
     wxPanel* eventsPanel;
     wxScrollBar* hScrollbar;
-    SceneEditorCanvas* layoutEditorCanvas;
+    gd::LayoutEditorCanvas* layoutEditorCanvas;
     wxAuiNotebook* notebook;
     wxScrollBar* vScrollbar;
     //*)

@@ -11,7 +11,7 @@
 #include <wx/panel.h>
 //*)
 #include <vector>
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 namespace gd { class InitialInstancesContainer; }
 namespace gd { class LayoutEditorCanvas; }
 

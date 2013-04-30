@@ -10,7 +10,7 @@
 #include <wx/panel.h>
 #include "EditorObjectList.h"
 //*)
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include <wx/aui/aui.h>
 #include <wx/imaglist.h>
 #include "GDCore/PlatformDefinition/Project.h"

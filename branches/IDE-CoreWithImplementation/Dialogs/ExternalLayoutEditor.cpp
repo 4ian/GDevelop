@@ -12,7 +12,7 @@
 //*)
 #include <wx/config.h>
 #include "GDCore/PlatformDefinition/ExternalLayout.h"
-#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/Dialogs/LayersEditorPanel.h"
 #include "../InitialPositionBrowserDlg.h"
 #include "LayoutEditorPropertiesPnl.h"
@@ -101,7 +101,7 @@ mainFrameWrapper(mainFrameWrapper_)
 	scrollBar2->SetScrollbar(2500, 10, 5000, 10);
 	scrollBar1 = new wxScrollBar(layoutPanel, ID_SCROLLBAR1, wxDefaultPosition, wxDefaultSize, wxSB_HORIZONTAL, wxDefaultValidator, _T("ID_SCROLLBAR1"));
 	scrollBar1->SetScrollbar(2500, 10, 5000, 10);
-	layoutEditorCanvas = new SceneEditorCanvas(layoutPanel, project, emptyLayout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
+	layoutEditorCanvas = new gd::LayoutEditorCanvas(layoutPanel, project, emptyLayout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
 	FlexGridSizer3->Add(layoutPanel, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL, 0);
 	helpPanel = new wxPanel(corePanel, ID_PANEL3, wxDefaultPosition, wxDefaultSize, wxTAB_TRAVERSAL, _T("ID_PANEL3"));
 	helpPanel->SetBackgroundColour(wxColour(255,255,255));
@@ -154,7 +154,7 @@ ExternalLayoutEditor::~ExternalLayoutEditor()
 	//*)
 
     //Save the configuration
-    if ( &layoutEditorCanvas->GetEditedScene() != &emptyLayout ) wxConfigBase::Get()->Write("/ExternalLayoutEditor/LastWorkspace", m_mgr.SavePerspective());
+    if ( &layoutEditorCanvas->GetLayout() != &emptyLayout ) wxConfigBase::Get()->Write("/ExternalLayoutEditor/LastWorkspace", m_mgr.SavePerspective());
 	m_mgr.UnInit();
 }
 
@@ -222,7 +222,7 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
 
             //(Re)create layout canvas
             if ( layoutEditorCanvas ) delete layoutEditorCanvas;
-            layoutEditorCanvas = new SceneEditorCanvas(layoutPanel, project, layout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
+            layoutEditorCanvas = new gd::LayoutEditorCanvas(layoutPanel, project, layout, instanceContainer, externalLayout.GetAssociatedSettings(), mainFrameWrapper);
             layoutEditorCanvas->SetParentAuiManager( &m_mgr );
             layoutEditorCanvas->SetScrollbars(scrollBar1, scrollBar2);
 
@@ -263,7 +263,6 @@ void ExternalLayoutEditor::SetupForScene(gd::Layout & layout)
             }
 
             m_mgr.Update();
-            layoutEditorCanvas->RefreshFromLayout();
             ForceRefreshRibbonAndConnect();
         }
         catch(...)
@@ -307,6 +306,6 @@ void ExternalLayoutEditor::OnparentSceneComboBoxDropDown(wxCommandEvent& event)
 
 gd::Layout & ExternalLayoutEditor::GetAssociatedLayout()
 {
-    return layoutEditorCanvas->GetEditedScene();
+    return layoutEditorCanvas->GetLayout();
 }
 

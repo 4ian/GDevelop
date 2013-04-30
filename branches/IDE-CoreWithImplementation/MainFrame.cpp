@@ -33,9 +33,9 @@
 
 #include "MainFrame.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/ChooseObjectDialog.h"
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/IDE/wxTools/SkinHelper.h"
 #include "GDCore/CommonTools.h"
 #include "GDL/IDE/Dialogs/ResourcesEditor.h"
@@ -122,7 +122,7 @@ END_EVENT_TABLE()
  */
 MainFrame::MainFrame( wxWindow* parent ) :
     projectCurrentlyEdited(0),
-    m_ribbon(NULL),
+    ribbon(NULL),
     ribbonFileBt(NULL),
     ribbonSceneEditorButtonBar(NULL),
     buildToolsPnl(NULL),
@@ -356,16 +356,16 @@ MainFrame::MainFrame( wxWindow* parent ) :
     {
         ribbonStyle &= ~wxRIBBON_BAR_SHOW_PAGE_LABELS;
     }
-    m_ribbon = new wxRibbonBar(this, ID_RIBBON);
-    m_ribbon->SetWindowStyle(ribbonStyle);
+    ribbon = new wxRibbonBar(this, ID_RIBBON);
+    ribbon->SetWindowStyle(ribbonStyle);
     bool hideLabels = false;
     pConfig->Read( _T( "/Skin/HideLabels" ), &hideLabels );
     {
-        wxRibbonPage * ribbonProjectPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Projects"));
+        wxRibbonPage * ribbonProjectPage = new wxRibbonPage(ribbon, wxID_ANY, _("Projects"));
         ProjectManager::CreateRibbonPage(ribbonProjectPage);
     }
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Images bank"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(ribbon, wxID_ANY, _("Images bank"));
         //
         {
             wxRibbonPanel *ribbonPanel = new wxRibbonPanel(ribbonEditorPage, wxID_ANY, _("Adding resources"), wxBitmap("res/list24.png", wxBITMAP_TYPE_ANY), wxDefaultPosition, wxDefaultSize, wxRIBBON_PANEL_DEFAULT_STYLE);
@@ -401,30 +401,30 @@ MainFrame::MainFrame( wxWindow* parent ) :
         }
     }
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Scene"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(ribbon, wxID_ANY, _("Scene"));
         ribbonSceneEditorButtonBar = gd::LayoutEditorCanvas::CreateRibbonPage(ribbonEditorPage);
     }
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Events"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(ribbon, wxID_ANY, _("Events"));
         EventsEditor::CreateRibbonPage(ribbonEditorPage);
     }
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Objects"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(ribbon, wxID_ANY, _("Objects"));
         EditorObjectList::CreateRibbonPage(ribbonEditorPage);
     }
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Groups"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(ribbon, wxID_ANY, _("Groups"));
         EditorObjetsGroups::CreateRibbonPage(ribbonEditorPage);
     }
     {
-        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(m_ribbon, wxID_ANY, _("Code"));
+        wxRibbonPage * ribbonEditorPage = new wxRibbonPage(ribbon, wxID_ANY, _("Code"));
         CodeEditor::CreateRibbonPage(ribbonEditorPage);
     }
-    m_ribbon->Realize();
-    ribbonSizer->Add(m_ribbon, 0, wxEXPAND);
+    ribbon->Realize();
+    ribbonSizer->Add(ribbon, 0, wxEXPAND);
 
     //Create ribbon "File" custom button
-    ribbonFileBt = new wxStaticBitmap(m_ribbon, idRibbonFileBt, wxNullBitmap);
+    ribbonFileBt = new wxStaticBitmap(ribbon, idRibbonFileBt, wxNullBitmap);
     ribbonFileBt->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrame::OnRibbonFileBtLeave), NULL, this);
     ribbonFileBt->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(MainFrame::OnRibbonFileBtEnter), NULL, this);
     ribbonFileBt->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::OnRibbonFileBtClick), NULL, this);
@@ -434,7 +434,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
 
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
     gd::SkinHelper::ApplyCurrentSkin(*editorsNotebook);
-    gd::SkinHelper::ApplyCurrentSkin(*m_ribbon);
+    gd::SkinHelper::ApplyCurrentSkin(*ribbon);
 
     RealizeRibbonCustomButtons();
 
@@ -455,7 +455,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     //Setup panes and load user configuration
     m_mgr.AddPane( projectManager, wxAuiPaneInfo().Name( wxT( "PM" ) ).Caption( _( "Project manager" ) ).Left().MaximizeButton( true ).MinimizeButton( false ).MinSize(170,100) );
     m_mgr.AddPane( Panel1, wxAuiPaneInfo().Name( wxT( "EP" ) ).Caption( _( "Main editor" ) ).Center().CaptionVisible(false).CloseButton( false ).MaximizeButton( true ).MinimizeButton( false ) );
-    m_mgr.AddPane( m_ribbon, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ribbon" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).Resizable(false) );
+    m_mgr.AddPane( ribbon, wxAuiPaneInfo().Name( wxT( "RP" ) ).Caption( _( "Ribbon" ) ).Top().PaneBorder(false).CaptionVisible(false).Movable(false).Floatable(false).CloseButton( false ).MaximizeButton( false ).MinimizeButton( false ).Resizable(false) );
     m_mgr.AddPane( buildToolsPnl, wxAuiPaneInfo().Name( wxT( "CT" ) ).Caption( _( "Compilation tools" ) ).Bottom().MaximizeButton( true ).MinimizeButton( false ).Show(false).MinSize(120,130));
     m_mgr.AddPane( projectPropertiesPnl, wxAuiPaneInfo().Name( wxT( "PP" ) ).Caption( _( "Project properties" ) ).Float().Show(false) );
 
@@ -472,8 +472,8 @@ MainFrame::MainFrame( wxWindow* parent ) :
     //Change ribbon pane height.
     bool hidePanels = false;
     pConfig->Read( _T( "/Skin/HidePanels" ), &hidePanels );
-    m_ribbon->ShowPanels(!hidePanels);
-    m_mgr.GetPane(m_ribbon).MinSize(1, m_ribbon->GetBestSize().GetHeight()+4);
+    ribbon->ShowPanels(!hidePanels);
+    m_mgr.GetPane(ribbon).MinSize(1, ribbon->GetBestSize().GetHeight()+4);
 
     m_mgr.SetFlags( wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_ALLOW_ACTIVE_PANE | wxAUI_MGR_TRANSPARENT_HINT
                     | wxAUI_MGR_TRANSPARENT_DRAG | wxAUI_MGR_HINT_FADE | wxAUI_MGR_NO_VENETIAN_BLINDS_FADE );
@@ -484,7 +484,7 @@ MainFrame::MainFrame( wxWindow* parent ) :
     infoBar->SetShowHideEffects(wxSHOW_EFFECT_SLIDE_TO_BOTTOM, wxSHOW_EFFECT_BLEND);
 
     //Construct the lightweight wrapper used by editors to access to the main frame.
-    mainFrameWrapper = gd::MainFrameWrapper(m_ribbon, ribbonSceneEditorButtonBar, this, &m_mgr, editorsNotebook, infoBar, &scenesLockingShortcuts, wxGetCwd());
+    mainFrameWrapper = gd::MainFrameWrapper(ribbon, ribbonSceneEditorButtonBar, this, &m_mgr, editorsNotebook, infoBar, &scenesLockingShortcuts, wxGetCwd());
     mainFrameWrapper.AddControlToBeDisabledOnPreview(projectManager);
     for (unsigned int i = 0;i<controlsToBeDisabledOnPreview.size();++i) mainFrameWrapper.AddControlToBeDisabledOnPreview(controlsToBeDisabledOnPreview[i]);
 
@@ -660,7 +660,7 @@ void MainFrame::OnRibbonPageChanging(wxRibbonBarEvent& evt)
 
 void MainFrame::RealizeRibbonCustomButtons()
 {
-    wxRibbonArtProvider * artProvider = m_ribbon->GetArtProvider();
+    wxRibbonArtProvider * artProvider = ribbon->GetArtProvider();
     if ( artProvider == NULL ) return;
 
     wxColor buttonColor;
@@ -695,7 +695,7 @@ void MainFrame::RealizeRibbonCustomButtons()
     pages.Add(tabInfo); //Add page twice to ensure that tab have a correct height
 
     //Compute height of the bitmap button and create bitmap
-    int height = artProvider->GetTabCtrlHeight(dc, m_ribbon, pages);
+    int height = artProvider->GetTabCtrlHeight(dc, ribbon, pages);
     wxBitmap bitmapLabel(width+2, height);
     dc.SelectObject(bitmapLabel);
 
@@ -729,7 +729,7 @@ void MainFrame::RealizeRibbonCustomButtons()
     //Finally create our bitmaps and make sure the ribbon is ready.
     ribbonFileBt->SetPosition(wxPoint(3,1));
     ribbonFileBt->SetBitmap(ribbonFileNormalBitmap);
-    m_ribbon->SetTabCtrlMargins(bitmapLabel.GetSize().GetWidth()+3+3, 0);
+    ribbon->SetTabCtrlMargins(bitmapLabel.GetSize().GetWidth()+3+3, 0);
 }
 
 void MainFrame::OneditorsNotebookPageClose(wxAuiNotebookEvent& event)
@@ -891,13 +891,13 @@ void MainFrame::OnRibbonFileBtClick(wxMouseEvent& event)
 
 void MainFrame::OnRibbonHelpBtClick(wxRibbonBarEvent & event)
 {
-    PopupMenu(&helpMenu, m_ribbon->GetSize().GetWidth()-16, 16);
+    PopupMenu(&helpMenu, ribbon->GetSize().GetWidth()-16, 16);
 }
 
 void MainFrame::OnRibbonToggleBtClick(wxRibbonBarEvent & event)
 {
-    wxConfigBase::Get()->Write(_T( "/Skin/HidePanels" ), !m_ribbon->ArePanelsShown() );
-    m_mgr.GetPane(m_ribbon).MinSize(1, m_ribbon->GetBestSize().GetHeight()+4);
+    wxConfigBase::Get()->Write(_T( "/Skin/HidePanels" ), !ribbon->ArePanelsShown() );
+    m_mgr.GetPane(ribbon).MinSize(1, ribbon->GetBestSize().GetHeight()+4);
     m_mgr.Update();
 }
 
@@ -909,13 +909,13 @@ void MainFrame::OnMenuPrefSelected( wxCommandEvent& event )
     //Reload skins and update controls
     gd::SkinHelper::ApplyCurrentSkin(m_mgr);
     gd::SkinHelper::ApplyCurrentSkin(*editorsNotebook);
-    gd::SkinHelper::ApplyCurrentSkin(*m_ribbon);
+    gd::SkinHelper::ApplyCurrentSkin(*ribbon);
 
     PrepareAutosave();
 
     UpdateNotebook();
     RealizeRibbonCustomButtons();
-    m_ribbon->Realize();
+    ribbon->Realize();
     m_mgr.Update();
 }
 

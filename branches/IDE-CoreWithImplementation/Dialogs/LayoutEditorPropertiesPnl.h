@@ -10,7 +10,7 @@
 #include <wx/propgrid/propgrid.h>
 #include <wx/panel.h>
 //*)
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvasAssociatedEditor.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvasAssociatedEditor.h"
 #include "GDCore/IDE/Dialogs/InitialInstancesPropgridHelper.h"
 namespace gd { class LayoutEditorCanvas; }
 namespace gd { class InitialInstance; }

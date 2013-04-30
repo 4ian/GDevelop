@@ -25,11 +25,11 @@
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
 #include "GDCore/IDE/EventsRefactorer.h"
 #include "GDCore/IDE/EventsChangesNotifier.h"
-#include "GDCore/IDE/Dialogs/LayoutEditorCanvas.h"
+#include "GDCore/IDE/Dialogs/LayoutEditorCanvas/LayoutEditorCanvas.h"
 #include "GDCore/PlatformDefinition/PlatformExtension.h"
 #include "GDCore/PlatformDefinition/Platform.h"
 #include "GDCore/PlatformDefinition/ExternalEvents.h"
-#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
+#include "GDL/IDE/Dialogs/CppLayoutPreviewer.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/CommonTools.h"
@@ -1635,7 +1635,7 @@ void EventsEditor::OnSearchBtClick(wxCommandEvent& event)
 
 void EventsEditor::OnProfilingBtClick(wxCommandEvent& event)
 {
-    SceneEditorCanvas * sceneCanvas = dynamic_cast<SceneEditorCanvas*>(layoutCanvas);
+    CppLayoutPreviewer * sceneCanvas = dynamic_cast<CppLayoutPreviewer*>(layoutCanvas);
 
     if (sceneCanvas && sceneCanvas->GetProfileDialog() != boost::shared_ptr<ProfileDlg>())
     {

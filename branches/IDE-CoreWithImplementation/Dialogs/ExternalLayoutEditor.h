@@ -14,16 +14,16 @@
 #include <wx/combobox.h>
 //*)
 #include <wx/aui/aui.h>
-class SceneEditorCanvas;
-namespace gd { class Project; }
-class EditorObjets;
-class LayoutEditorPropertiesPnl;
-class InitialPositionBrowserDlg;
-namespace gd { class ExternalLayout; }
-namespace gd { class LayersEditorPanel; }
 #include "GDCore/PlatformDefinition/Layout.h"
 #include "GDCore/PlatformDefinition/Project.h"
 #include "GDCore/IDE/Dialogs/MainFrameWrapper.h"
+namespace gd { class Project; }
+namespace gd { class ExternalLayout; }
+namespace gd { class LayersEditorPanel; }
+namespace gd { class LayoutEditorCanvas; }
+class EditorObjets;
+class LayoutEditorPropertiesPnl;
+class InitialPositionBrowserDlg;
 
 class ExternalLayoutEditor: public wxPanel
 {
@@ -91,7 +91,7 @@ private:
     wxPanel* contextPanel;
     wxPanel* corePanel;
     wxComboBox* parentSceneComboBox;
-    SceneEditorCanvas* layoutEditorCanvas;
+    gd::LayoutEditorCanvas* layoutEditorCanvas;
     wxPanel* layoutPanel;
     //*)
     boost::shared_ptr<EditorObjets> objectsEditor;

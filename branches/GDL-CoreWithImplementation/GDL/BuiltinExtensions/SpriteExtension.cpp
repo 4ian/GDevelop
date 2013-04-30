@@ -40,7 +40,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
-            .cppCallingInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("SetOpacity").SetAssociatedGetter("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeAnimation",
@@ -54,7 +54,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
-            .cppCallingInformation.SetFunctionName("SetCurrentAnimation").SetAssociatedGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("SetCurrentAnimation").SetAssociatedGetter("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeDirection",
@@ -68,7 +68,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
-            .cppCallingInformation.SetFunctionName("SetDirection").SetAssociatedGetter("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("SetDirection").SetAssociatedGetter("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeSprite",
@@ -82,7 +82,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
-            .cppCallingInformation.SetFunctionName("SetSprite").SetAssociatedGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("SetSprite").SetAssociatedGetter("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("PauseAnimation",
@@ -94,7 +94,7 @@ SpriteExtension::SpriteExtension()
                        "res/actions/animation.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .cppCallingInformation.SetFunctionName("StopAnimation").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("StopAnimation").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("PlayAnimation",
@@ -106,7 +106,7 @@ SpriteExtension::SpriteExtension()
                        "res/actions/animation.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .cppCallingInformation.SetFunctionName("PlayAnimation").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("PlayAnimation").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("TourneVersPos",
@@ -120,7 +120,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object to be rotated"), "Sprite", false)
             .AddParameter("expression", _("X position"), "",false)
             .AddParameter("expression", _("Y position"), "",false)
-            .cppCallingInformation.SetFunctionName("TurnTowardPosition").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("TurnTowardPosition").SetIncludeFile("GDL/SpriteObject.h");
 
 
 
@@ -135,7 +135,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
-            .cppCallingInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("ChangeScale").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeScaleWidth",
@@ -149,7 +149,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
-            .cppCallingInformation.SetFunctionName("SetScaleX").SetAssociatedGetter("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("SetScaleX").SetAssociatedGetter("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeScaleHeight",
@@ -163,7 +163,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Value"), "",false)
             .AddParameter("operator", _("Modification's sign"), "",false)
-            .cppCallingInformation.SetFunctionName("SetScaleY").SetAssociatedGetter("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("SetScaleY").SetAssociatedGetter("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddCondition("Animation",
@@ -177,7 +177,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Number to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .cppCallingInformation.SetFunctionName("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("Direction",
                        _("Current direction"),
@@ -190,7 +190,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Direction to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .cppCallingInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("Sprite",
                        _("Current frame"),
@@ -203,7 +203,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Animation frame to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .cppCallingInformation.SetFunctionName("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetSpriteNb").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("AnimStopped",
                        _("Animation is paused"),
@@ -214,7 +214,7 @@ SpriteExtension::SpriteExtension()
                        "res/conditions/animation.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .cppCallingInformation.SetFunctionName("IsAnimationStopped").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("IsAnimationStopped").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("AnimationEnded",
                        _("Animation finished"),
@@ -225,7 +225,7 @@ SpriteExtension::SpriteExtension()
                        "res/conditions/animation.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
-            .cppCallingInformation.SetFunctionName("AnimationEnded").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("AnimationEnded").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("ScaleWidth",
                        _("Scale of the width of an object"),
@@ -238,7 +238,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Value to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .cppCallingInformation.SetFunctionName("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetScaleX").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("ScaleHeight",
                        _("Scale of the height of an object"),
@@ -251,7 +251,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Value to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .cppCallingInformation.SetFunctionName("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetScaleY").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("Opacity",
                        _("Opacity"),
@@ -264,7 +264,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Value to test"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .cppCallingInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetOpacity").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddCondition("BlendMode",
                        _("Blend mode"),
@@ -277,7 +277,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Value to test  ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
             .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-            .cppCallingInformation.SetFunctionName("GetBlendMode").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetBlendMode").SetManipulatedType("number").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddAction("CopyImageOnImageOfSprite",
                        _("Copy an image on the current one of an object"),
@@ -293,7 +293,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("expression", _("X position"), "",false)
             .AddParameter("expression", _("Y position"), "",false)
             .AddParameter("yesorno", _("Should the copy take in account the source transparency\?"), "",false)
-            .cppCallingInformation.SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("CopyImageOnImageOfCurrentSprite").SetIncludeFile("GDL/SpriteObject.h");
 
 
 
@@ -307,7 +307,7 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("color", _("Color to make transparent"), "",false)
-            .cppCallingInformation.SetFunctionName("MakeColorTransparent").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("MakeColorTransparent").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeColor",
@@ -320,7 +320,7 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("color", _("Color"), "",false)
-            .cppCallingInformation.SetFunctionName("SetColor").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("SetColor").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("ChangeBlendMode",
@@ -333,7 +333,7 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("expression", _("Mode ( 0 : Alpha, 1 : Add, 2 : Multiply, 3 : None )"), "",false)
-            .cppCallingInformation.SetFunctionName("SetBlendMode").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("SetBlendMode").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("FlipX",
@@ -346,7 +346,7 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("yesorno", _("Activate flipping"), "",false)
-            .cppCallingInformation.SetFunctionName("FlipX").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("FlipX").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("FlipY",
@@ -359,7 +359,7 @@ SpriteExtension::SpriteExtension()
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("yesorno", _("Activate flipping"), "",false)
-            .cppCallingInformation.SetFunctionName("FlipY").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("FlipY").SetIncludeFile("GDL/SpriteObject.h");
 
 
         obj.AddAction("TourneVers",
@@ -373,7 +373,7 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object to be rotated"), "Sprite", false)
             .AddParameter("object", _("Rotate toward this object"))
             .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
-            .cppCallingInformation.SetFunctionName("TurnTowardObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
+            .codeExtraInformation.SetFunctionName("TurnTowardObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
 
         obj.AddCondition("SourisSurObjet",
@@ -387,61 +387,61 @@ SpriteExtension::SpriteExtension()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddCodeOnlyParameter("currentScene", "")
             .AddParameter("yesorno", _("Precise test ( yes by default )"), "", true).SetDefaultValue("yes")
-            .cppCallingInformation.SetFunctionName("CursorOnObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
+            .codeExtraInformation.SetFunctionName("CursorOnObject").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
         obj.AddExpression("X", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
             .SetHidden()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("", _("Name of the point"), "", true)
-            .cppCallingInformation.SetFunctionName("GetPointX").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetPointX").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddExpression("Y", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
             .SetHidden()
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("", _("Name of the point"), "", true)
-            .cppCallingInformation.SetFunctionName("GetPointY").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetPointY").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddExpression("PointX", _("X position of a point"), _("X position of a point"), _("Position"), "res/actions/position.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("", _("Name of the point"), "",false)
-            .cppCallingInformation.SetFunctionName("GetPointX").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetPointX").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddExpression("PointY", _("Y position of a point"), _("Y position of a point"), _("Position"), "res/actions/position.png")
 
             .AddParameter("object", _("Object"), "Sprite", false)
             .AddParameter("", _("Name of the point"), "",false)
-            .cppCallingInformation.SetFunctionName("GetPointY").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetPointY").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddExpression("Direc", _("Direction"), _("Direction of the object"), _("Direction"), "res/actions/direction.png")
             .SetHidden()
             .AddParameter("object", _("Object"), "Sprite", false)
-            .cppCallingInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddExpression("Direction", _("Direction"), _("Direction of the object"), _("Direction"), "res/actions/direction.png")
             .AddParameter("object", _("Object"), "Sprite", false)
-            .cppCallingInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetCurrentDirectionOrAngle").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddExpression("Anim", _("Animation"), _("Animation of the object"), _("Animations and images"), "res/actions/animation.png")
             .SetHidden()
             .AddParameter("object", _("Object"), "Sprite", false)
-            .cppCallingInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddExpression("Animation", _("Animation"), _("Animation of the object"), _("Animations and images"), "res/actions/animation.png")
             .AddParameter("object", _("Object"), "Sprite", false)
-            .cppCallingInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetCurrentAnimation").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddExpression("Sprite", _("Image"), _("Animation frame of the object"), _("Animations and images"), "res/actions/sprite.png")
             .AddParameter("object", _("Object"), "Sprite", false)
-            .cppCallingInformation.SetFunctionName("GetSpriteNb").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetSpriteNb").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddExpression("ScaleX", _("Scale of the width of an object"), _("Scale of the width of an object"), _("Size"), "res/actions/scaleWidth.png")
             .AddParameter("object", _("Object"), "Sprite", false)
-            .cppCallingInformation.SetFunctionName("GetScaleX").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetScaleX").SetIncludeFile("GDL/SpriteObject.h");
 
         obj.AddExpression("ScaleY", _("Scale of the height of an object"), _("Scale of the height of an object"), _("Size"), "res/actions/scaleHeight.png")
             .AddParameter("object", _("Object"), "Sprite", false)
-            .cppCallingInformation.SetFunctionName("GetScaleY").SetIncludeFile("GDL/SpriteObject.h");
+            .codeExtraInformation.SetFunctionName("GetScaleY").SetIncludeFile("GDL/SpriteObject.h");
         #endif
 
     }
@@ -461,7 +461,7 @@ SpriteExtension::SpriteExtension()
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
         .AddParameter("expression", _("Angle of tolerance (0: minimum tolerance)"), "",false)
         .AddCodeOnlyParameter("conditionInverted", "")
-        .cppCallingInformation.SetFunctionName("SpriteTurnedToward").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
+        .codeExtraInformation.SetFunctionName("SpriteTurnedToward").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
 
     AddCondition("Collision",
                       _("Collision ( Pixel perfect )"),
@@ -475,7 +475,7 @@ SpriteExtension::SpriteExtension()
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
         .AddCodeOnlyParameter("conditionInverted", "")
-        .cppCallingInformation.SetFunctionName("SpriteCollision").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
+        .codeExtraInformation.SetFunctionName("SpriteCollision").SetIncludeFile("GDL/BuiltinExtensions/SpriteTools.h");
     #endif
 }
 

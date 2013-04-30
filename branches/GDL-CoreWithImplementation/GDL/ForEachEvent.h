@@ -32,7 +32,6 @@ class ForEachEvent : public gd::BaseEvent
         virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new ForEachEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};

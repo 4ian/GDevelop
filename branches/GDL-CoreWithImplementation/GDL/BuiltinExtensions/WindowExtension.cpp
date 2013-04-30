@@ -33,7 +33,7 @@ WindowExtension::WindowExtension()
         .AddParameter("expression", _("Size"), "",false)
         .AddParameter("police", _("Font"), "",true)
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "",true).SetDefaultValue("\"\"")
-        .cppCallingInformation.SetFunctionName("DisplayLegacyTextOnScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("DisplayLegacyTextOnScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("SetFullScreen",
                    _("De/activate fullscreen"),
@@ -44,7 +44,7 @@ WindowExtension::WindowExtension()
                    "res/actions/fullscreen.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("yesorno", _("Activate fullscreen"), "",false)
-        .cppCallingInformation.SetFunctionName("SetFullScreen").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("SetFullScreen").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("SetWindowSize",
                    _("Change the size of the screen"),
@@ -57,7 +57,7 @@ WindowExtension::WindowExtension()
         .AddParameter("expression", _("Width"), "",false)
         .AddParameter("expression", _("Height"), "",false)
         .AddParameter("yesorno", _("Use this size as default size for new scene cameras \?"), "",false)
-        .cppCallingInformation.SetFunctionName("SetWindowSize").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("SetWindowSize").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
     AddAction("SetWindowIcon",
                    _("Change window's icon"),
                    _("This action change the icon of the game's window."),
@@ -67,7 +67,7 @@ WindowExtension::WindowExtension()
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Name of the image to be used as the icon"), "",false)
-        .cppCallingInformation.SetFunctionName("SetWindowIcon").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("SetWindowIcon").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("SetWindowTitle",
                    _("Change window's title"),
@@ -78,29 +78,29 @@ WindowExtension::WindowExtension()
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("New title"), "",false)
-        .cppCallingInformation.SetFunctionName("SetWindowTitle").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("SetWindowTitle").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddExpression("SceneWindowWidth", _("Width of the scene's window"), _("Width of the scene's window"), _("Screen"), "res/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .cppCallingInformation.SetFunctionName("GetSceneWindowWidth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("GetSceneWindowWidth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddExpression("SceneWindowHeight", _("Height of the scene's window"), _("Height of the scene's window"), _("Screen"), "res/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .cppCallingInformation.SetFunctionName("GetSceneWindowHeight").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("GetSceneWindowHeight").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
 
     AddExpression("ScreenWidth", _("Width of the current resolution"), _("Width of the current resolution"), _("Screen"), "res/display16.png")
-        .cppCallingInformation.SetFunctionName("GetScreenWidth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("GetScreenWidth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddExpression("ScreenHeight", _("Height of the current resolution"), _("Height of the current resolution"), _("Screen"), "res/display16.png")
-        .cppCallingInformation.SetFunctionName("GetScreenHeight").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("GetScreenHeight").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddExpression("ColorDepth", _("Color depth"), _("Color depth"), _("Screen"), "res/display16.png")
-        .cppCallingInformation.SetFunctionName("GetColorDepth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("GetColorDepth").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddStrExpression("WindowTitle", _("Window's title"), _("Window's title"), _("Screen"), "res/window.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .cppCallingInformation.SetFunctionName("GetWindowTitle").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("GetWindowTitle").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     #endif
 }

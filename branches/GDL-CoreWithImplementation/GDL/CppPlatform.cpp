@@ -14,6 +14,7 @@
 #include "GDL/FontManager.h"
 #include "GDL/IDE/CodeCompiler.h"
 #include "GDL/IDE/ChangesNotifier.h"
+#include "GDL/IDE/Dialogs/CppLayoutPreviewer.h"
 
 //Builtin extensions
 #include "GDL/BuiltinExtensions/BaseObjectExtension.h"
@@ -137,6 +138,10 @@ boost::shared_ptr<RuntimeObject> CppPlatform::CreateRuntimeObject(RuntimeScene &
     return boost::shared_ptr<RuntimeObject> (newObject, runtimeObjDestroyFunctionTable[type]);
 }
 
+boost::shared_ptr<gd::LayoutEditorPreviewer> CppPlatform::GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const
+{
+    return boost::shared_ptr<gd::LayoutEditorPreviewer>(new CppLayoutPreviewer(editor));
+}
 
 void CppPlatform::OnIDEClosed()
 {

@@ -16,7 +16,7 @@
 #include <wx/dcbuffer.h>
 #include "GDL/Events/CodeCompilationHelpers.h"
 #include "GDL/ProfileEvent.h"
-#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
+#include "GDL/IDE/Dialogs/CppLayoutPreviewer.h"
 #include "GDL/CommonTools.h"
 #include "GDL/CppPlatform.h"
 
@@ -43,10 +43,10 @@ BEGIN_EVENT_TABLE(ProfileDlg,wxPanel)
 	//*)
 END_EVENT_TABLE()
 
-ProfileDlg::ProfileDlg(wxWindow* parent, SceneEditorCanvas & associatedSceneEditorCanvas) :
+ProfileDlg::ProfileDlg(wxWindow* parent, CppLayoutPreviewer & associatedCppLayoutPreviewer) :
 BaseProfiler(),
 maxData(300),
-sceneCanvas(associatedSceneEditorCanvas)
+sceneCanvas(associatedCppLayoutPreviewer)
 {
 	//(*Initialize(ProfileDlg)
 	wxFlexGridSizer* FlexGridSizer3;
@@ -135,7 +135,7 @@ sceneCanvas(associatedSceneEditorCanvas)
 	eventsTimeCheck->Check();
 	objectsCountCheck->Check();
 
-	sceneCanvas.GetEditedScene().SetProfiler(this);
+	sceneCanvas.GetRuntimeScene().SetProfiler(this);
 	UpdateGUI();
 }
 
@@ -269,12 +269,14 @@ void ProfileDlg::OnratioGraphicsPaint(wxPaintEvent& event)
 
 void ProfileDlg::ParseProfileEvents()
 {
-    for (unsigned int i = 0;i<sceneCanvas.GetEditedScene().GetProfiler()->profileEventsInformation.size();++i)
+    if (!sceneCanvas.GetRuntimeScene().GetProfiler()) return;
+
+    for (unsigned int i = 0;i<sceneCanvas.GetRuntimeScene().GetProfiler()->profileEventsInformation.size();++i)
     {
-        boost::shared_ptr<gd::BaseEvent> event = sceneCanvas.GetEditedScene().GetProfiler()->profileEventsInformation[i].originalEvent.lock();
+        boost::shared_ptr<gd::BaseEvent> event = sceneCanvas.GetRuntimeScene().GetProfiler()->profileEventsInformation[i].originalEvent.lock();
         if ( event != boost::shared_ptr<gd::BaseEvent>())
         {
-            event->totalTimeDuringLastSession = sceneCanvas.GetEditedScene().GetProfiler()->profileEventsInformation[i].GetTime();
+            event->totalTimeDuringLastSession = sceneCanvas.GetRuntimeScene().GetProfiler()->profileEventsInformation[i].GetTime();
             event->percentDuringLastSession = static_cast<double>(event->totalTimeDuringLastSession)/static_cast<double>(totalEventsTime)*100.0;
         }
     }
@@ -307,9 +309,8 @@ void ProfileDlg::OnactivateCheckClick(wxCommandEvent& event)
 {
     profilingActivated = activateCheck->GetValue();
 
-    gd::Project & project = sceneCanvas.GetEditedGame();
-    CppPlatform::Get().GetChangesNotifier().OnEventsModified(project, sceneCanvas.GetEditedScene());
-    sceneCanvas.RefreshFromLayout();
+    gd::Project & project = sceneCanvas.GetProject();
+    CppPlatform::Get().GetChangesNotifier().OnEventsModified(project, sceneCanvas.GetLayout());
 
 }
 

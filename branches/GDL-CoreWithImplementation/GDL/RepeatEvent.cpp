@@ -24,50 +24,6 @@ repeatNumberExpressionSelected(false)
 {
 }
 
-std::string RepeatEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
-{
-    std::string outputCode;
-
-    //Prepare expression containing how many times event must be repeated
-    std::string repeatCountCode;
-    gd::CallbacksForGeneratingExpressionCode callbacks(repeatCountCode, codeGenerator.GetProject(), scene, codeGenerator, parentContext);
-    gd::ExpressionParser parser(repeatNumberExpression.GetPlainString());
-    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), scene, callbacks) || repeatCountCode.empty()) repeatCountCode = "0";
-
-    //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
-    gd::EventsCodeGenerationContext context;
-    context.InheritsFrom(parentContext);
-
-    //Prepare conditions/actions codes
-    std::string conditionsCode = codeGenerator.GenerateConditionsListCode(scene, conditions, context);
-    std::string actionsCode = codeGenerator.GenerateActionsListCode(scene, actions, context);
-    std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
-
-    //Prepare object declaration and sub events
-    std::string subevents = codeGenerator.GenerateEventsListCode(scene, events, context);
-    std::string objectDeclaration = context.GenerateObjectsDeclarationCode()+"\n";
-
-    //Write final code
-    outputCode += "int repeatCount = "+repeatCountCode+";\n";
-    outputCode += "for(unsigned int repeatIndex = 0;repeatIndex < repeatCount;++repeatIndex)\n";
-    outputCode += "{\n";
-    outputCode += objectDeclaration;
-    outputCode += conditionsCode;
-    outputCode += "if (" +ifPredicat+ ")\n";
-    outputCode += "{\n";
-    outputCode += actionsCode;
-    if (!events.empty())
-    {
-        outputCode += "\n{ //Subevents: \n";
-        outputCode += subevents;
-        outputCode += "} //Subevents end.\n";
-    }
-    outputCode += "}\n";
-
-    outputCode += "}\n";
-
-    return outputCode;
-}
 
 vector < vector<gd::Instruction>* > RepeatEvent::GetAllConditionsVectors()
 {

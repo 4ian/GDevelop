@@ -18,7 +18,7 @@ FileExtension::FileExtension()
                    "res/conditions/fichier24.png",
                    "res/conditions/fichier.png")
         .AddParameter("file", _("Filename"), "",false)
-        .cppCallingInformation.SetFunctionName("FileExists").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("FileExists").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
 
 
@@ -31,7 +31,7 @@ FileExtension::FileExtension()
                    "res/conditions/fichier.png")
         .AddParameter("file", _("Filename"), "",false)
         .AddParameter("string", _("Group"), "",false)
-        .cppCallingInformation.SetFunctionName("GroupExists").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("GroupExists").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
 
 
@@ -43,7 +43,7 @@ FileExtension::FileExtension()
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png")
         .AddParameter("file", _("File"), "",false)
-        .cppCallingInformation.SetFunctionName("LoadFileInMemory").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("LoadFileInMemory").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     AddAction("UnloadFile",
                    _("Close a XML file loaded in memory"),
@@ -53,7 +53,7 @@ FileExtension::FileExtension()
                    "res/actions/fichier24.png",
                    "res/actions/fichier.png")
         .AddParameter("file", _("File"), "",false)
-        .cppCallingInformation.SetFunctionName("UnloadFileFromMemory").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("UnloadFileFromMemory").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     AddAction("EcrireFichierExp",
                    _("Write a value"),
@@ -65,7 +65,7 @@ FileExtension::FileExtension()
         .AddParameter("file", _("File"), "",false)
         .AddParameter("string", _("Group"), "",false)
         .AddParameter("expression", _("Expression"), "",false)
-        .cppCallingInformation.SetFunctionName("WriteValueInFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("WriteValueInFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     AddAction("EcrireFichierTxt",
                    _("Write a text"),
@@ -77,7 +77,7 @@ FileExtension::FileExtension()
         .AddParameter("file", _("File"), "",false)
         .AddParameter("string", _("Group"), "",false)
         .AddParameter("string", _("Text"), "",false)
-        .cppCallingInformation.SetFunctionName("WriteStringInFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("WriteStringInFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     AddAction("LireFichierExp",
                    _("Read a value"),
@@ -90,7 +90,7 @@ FileExtension::FileExtension()
         .AddParameter("string", _("Group"), "",false)
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("scenevar", _("Scene variables"), "",false)
-        .cppCallingInformation.SetFunctionName("ReadValueFromFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("ReadValueFromFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     AddAction("LireFichierTxt",
                    _("Read a text"),
@@ -103,7 +103,7 @@ FileExtension::FileExtension()
         .AddParameter("string", _("Group"), "",false)
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("scenevar", _("Scene variables"), "",false)
-        .cppCallingInformation.SetFunctionName("ReadStringFromFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("ReadStringFromFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     AddAction("DeleteFichier",
                    _("Delete a file"),
@@ -113,7 +113,7 @@ FileExtension::FileExtension()
                    "res/actions/delete24.png",
                    "res/actions/delete.png")
         .AddParameter("file", _("Filename"), "",false)
-        .cppCallingInformation.SetFunctionName("GDDeleteFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("GDDeleteFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     AddAction("DeleteGroupFichier",
                    _("Delete a group"),
@@ -124,7 +124,7 @@ FileExtension::FileExtension()
                    "res/actions/delete.png")
         .AddParameter("file", _("Filename"), "",false)
         .AddParameter("string", _("Group"), "",false)
-        .cppCallingInformation.SetFunctionName("DeleteGroupFromFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("DeleteGroupFromFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     AddAction("LaunchFile",
                    _("Launch a file"),
@@ -134,7 +134,7 @@ FileExtension::FileExtension()
                    "res/actions/launchFile24.png",
                    "res/actions/launchFile.png")
         .AddParameter("file", _("Filename"), "",false)
-        .cppCallingInformation.SetFunctionName("LaunchFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("LaunchFile").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
 
     AddAction("ExecuteCmd",
                    _("Execute a command"),
@@ -144,7 +144,7 @@ FileExtension::FileExtension()
                    "res/actions/launchFile24.png",
                    "res/actions/launchFile.png")
         .AddParameter("string", _("Command"), "",false)
-        .cppCallingInformation.SetFunctionName("ExecuteCmd").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
+        .codeExtraInformation.SetFunctionName("ExecuteCmd").SetIncludeFile("GDL/BuiltinExtensions/FileTools.h");
     #endif
 }
 

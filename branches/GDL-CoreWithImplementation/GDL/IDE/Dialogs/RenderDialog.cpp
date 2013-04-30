@@ -4,7 +4,7 @@
  */
 #if defined(GD_IDE_ONLY)
 #include "GDL/IDE/Dialogs/RenderDialog.h"
-#include "GDL/IDE/Dialogs/SceneEditorCanvas.h"
+#include "GDL/IDE/Dialogs/CppLayoutPreviewer.h"
 
 //(*InternalHeaders(RenderDialog)
 #include <wx/intl.h>
@@ -20,7 +20,7 @@ BEGIN_EVENT_TABLE(RenderDialog,wxDialog)
 	//*)
 END_EVENT_TABLE()
 
-RenderDialog::RenderDialog(wxWindow* parent, SceneEditorCanvas * sceneCanvasNotifiedOnClose_) :
+RenderDialog::RenderDialog(wxWindow* parent, CppLayoutPreviewer * sceneCanvasNotifiedOnClose_) :
     toBeNotifiedOnClose(sceneCanvasNotifiedOnClose_)
 {
 	//(*Initialize(RenderDialog)

@@ -30,7 +30,6 @@ public:
 
     virtual bool IsExecutable() const { return true; };
     virtual void Preprocess(gd::Project & project, gd::Layout & scene, std::vector < gd::BaseEventSPtr > & eventList, unsigned int indexOfTheEventInThisList);
-    virtual std::string GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext);
 
     /**
      * Called by event editor to draw the event.

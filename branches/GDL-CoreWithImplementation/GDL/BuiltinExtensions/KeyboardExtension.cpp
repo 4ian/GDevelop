@@ -24,7 +24,7 @@ KeyboardExtension::KeyboardExtension()
                    "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("key", _("Key to test"), "",false)
-        .cppCallingInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDL/BuiltinExtensions/KeyboardTools.h");
+        .codeExtraInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDL/BuiltinExtensions/KeyboardTools.h");
 
 
 
@@ -37,7 +37,7 @@ KeyboardExtension::KeyboardExtension()
                    "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Expression generating the key to test"), "",false)
-        .cppCallingInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDL/BuiltinExtensions/KeyboardTools.h");
+        .codeExtraInformation.SetFunctionName("IsKeyPressed").SetIncludeFile("GDL/BuiltinExtensions/KeyboardTools.h");
 
 
 
@@ -49,7 +49,7 @@ KeyboardExtension::KeyboardExtension()
                    "res/conditions/keyboard24.png",
                    "res/conditions/keyboard.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .cppCallingInformation.SetFunctionName("AnyKeyIsPressed").SetIncludeFile("GDL/BuiltinExtensions/KeyboardTools.h");
+        .codeExtraInformation.SetFunctionName("AnyKeyIsPressed").SetIncludeFile("GDL/BuiltinExtensions/KeyboardTools.h");
 
 
     #endif

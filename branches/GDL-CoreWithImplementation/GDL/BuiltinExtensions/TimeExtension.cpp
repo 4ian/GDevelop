@@ -28,7 +28,7 @@ TimeExtension::TimeExtension()
         .AddParameter("expression", _("Time in seconds"))
         .AddParameter("string", _("Timer's name"))
 
-        .cppCallingInformation.SetFunctionName("TimerElapsedTime").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("TimerElapsedTime").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
 
 
@@ -43,7 +43,7 @@ TimeExtension::TimeExtension()
         .AddParameter("expression", _("Value to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
 
-        .cppCallingInformation.SetFunctionName("GetTimeScale").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("GetTimeScale").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
 
 
@@ -57,7 +57,7 @@ TimeExtension::TimeExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Timer's name"))
 
-        .cppCallingInformation.SetFunctionName("TimerPaused").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("TimerPaused").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
 
 
@@ -71,7 +71,7 @@ TimeExtension::TimeExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Timer's name"))
 
-        .cppCallingInformation.SetFunctionName("ResetTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("ResetTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     AddAction("PauseTimer",
                    _("Pause a timer"),
@@ -83,7 +83,7 @@ TimeExtension::TimeExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Timer's name"))
 
-        .cppCallingInformation.SetFunctionName("PauseTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("PauseTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     AddAction("UnPauseTimer",
                    _("Unpause a timer"),
@@ -95,7 +95,7 @@ TimeExtension::TimeExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Timer's name"))
 
-        .cppCallingInformation.SetFunctionName("UnPauseTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("UnPauseTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     AddAction("RemoveTimer",
                    _("Delete a timer"),
@@ -106,7 +106,7 @@ TimeExtension::TimeExtension()
                    "res/actions/timer.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Timer's name"))
-        .cppCallingInformation.SetFunctionName("RemoveTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("RemoveTimer").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     AddAction("ChangeTimeScale",
                    _("Change time scale"),
@@ -118,58 +118,58 @@ TimeExtension::TimeExtension()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("expression", _("Scale ( 1 : Default, 2 : Faster, 0.5 : Slower... )"))
 
-        .cppCallingInformation.SetFunctionName("SetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("SetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     AddExpression("TimeDelta", _("Time elapsed since the last image"), _("Time elapsed since the last image"), _("Time"), "res/actions/time.png")
         .AddCodeOnlyParameter("currentScene", "")
 
-        .cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     AddExpression("TempsFrame", _("Time elapsed since the last image"), _("Time elapsed since the last image"), _("Time"), "res/actions/time.png")
         .SetHidden()
         .AddCodeOnlyParameter("currentScene", "")
-        .cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     AddExpression("ElapsedTime", _("Time elapsed since the last image"), _("Time elapsed since the last image"), _("Time"), "res/actions/time.png")
         .SetHidden()
         .AddCodeOnlyParameter("currentScene", "")
-        .cppCallingInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("GetElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
 
     AddExpression("TimerElapsedTime", _("Timer value"), _("Value of a timer"), _("Time"), "res/actions/time.png")
         .SetHidden()
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Timer's name"))
-        .cppCallingInformation.SetFunctionName("GetTimerElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("GetTimerElapsedTimeInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
 
     AddExpression("TimeFromStart", _("Time elapsed since the beginning of the scene"), _("Time elapsed since the beginning of the scene"), _("Time"), "res/actions/time.png")
         .AddCodeOnlyParameter("currentScene", "")
 
-        .cppCallingInformation.SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     AddExpression("TempsDebut", _("Time elapsed since the beginning of the scene"), _("Time elapsed since the beginning of the scene"), _("Time"), "res/actions/time.png")
         .SetHidden()
         .AddCodeOnlyParameter("currentScene", "")
 
-        .cppCallingInformation.SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("GetTimeFromStartInSeconds").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
 
     AddExpression("TimeScale", _("Time scale"), _("Time scale"), _("Time"), "res/actions/time.png")
         .AddCodeOnlyParameter("currentScene", "")
 
-        .cppCallingInformation.SetFunctionName("GetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("GetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     AddExpression("TimeScale", _("Time scale"), _("Time scale"), _("Time"), "res/actions/time.png")
         .SetHidden()
         .AddCodeOnlyParameter("currentScene", "")
-        .cppCallingInformation.SetFunctionName("GetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("GetTimeScale").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
 
     AddExpression("Time", _("Current time"), _("Current time"), _("Time"), "res/actions/time.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("", _("Hour : hour\nMinutes : min\nSeconds : sec\nDay in the month : mday\nMonths since January : mon\nYear since 1900 : year\nDays since sunday :wday\nDays since January 1st : yday"), "",false)
-        .cppCallingInformation.SetFunctionName("GetTime").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
+        .codeExtraInformation.SetFunctionName("GetTime").SetIncludeFile("GDL/BuiltinExtensions/TimeTools.h");
 
     #endif
 }

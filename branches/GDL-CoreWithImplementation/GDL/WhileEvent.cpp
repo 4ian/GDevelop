@@ -19,51 +19,6 @@
 #include "GDCore/Events/Serialization.h"
 #include "GDCore/Events/EventsCodeGenerationContext.h"
 
-std::string WhileEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
-{
-    std::string outputCode;
-
-    //Context is "reset" each time the event is repeated ( i.e. objects are picked again )
-    gd::EventsCodeGenerationContext context;
-    context.InheritsFrom(parentContext);
-    if ( infiniteLoopWarning && !codeGenerator.GenerateCodeForRuntime() ) codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-
-    //Prepare codes
-    std::string whileConditionsStr = codeGenerator.GenerateConditionsListCode(scene, whileConditions, context);
-    std::string whileIfPredicat = "true"; for (unsigned int i = 0;i<whileConditions.size();++i) whileIfPredicat += " && condition"+ToString(i)+"IsTrue";
-    std::string conditionsCode = codeGenerator.GenerateConditionsListCode(scene, conditions, context);
-    std::string actionsCode = codeGenerator.GenerateActionsListCode(scene, actions, context);
-    std::string ifPredicat = "true"; for (unsigned int i = 0;i<conditions.size();++i) ifPredicat += " && condition"+ToString(i)+"IsTrue";
-
-    //Write final code
-    outputCode += "bool stopDoWhile = false;";
-    if ( infiniteLoopWarning && !codeGenerator.GenerateCodeForRuntime() ) outputCode += "unsigned int loopCount = 0;";
-    outputCode += "do";
-    outputCode += "{\n";
-    outputCode += context.GenerateObjectsDeclarationCode();
-    outputCode +=  whileConditionsStr;
-    outputCode += "if ("+whileIfPredicat+")\n";
-    outputCode += "{\n";
-    if ( infiniteLoopWarning && !codeGenerator.GenerateCodeForRuntime() )
-    {
-        outputCode += "if (loopCount == 100000) { if ( WarnAboutInfiniteLoop(*runtimeContext->scene) ) break; }\n";
-        outputCode += "loopCount++;\n\n";
-    }
-    outputCode += conditionsCode;
-    outputCode += "if (" +ifPredicat+ ")\n";
-    outputCode += "{\n";
-    outputCode += actionsCode;
-    outputCode += "\n{ //Subevents: \n";
-    outputCode += codeGenerator.GenerateEventsListCode(scene, events, context);
-    outputCode += "} //Subevents end.\n";
-    outputCode += "}\n";
-    outputCode += "} else stopDoWhile = true; \n";
-
-    outputCode += "} while ( !stopDoWhile );\n";
-
-    return outputCode;
-}
-
 vector < vector<gd::Instruction>* > WhileEvent::GetAllConditionsVectors()
 {
     vector < vector<gd::Instruction>* > allConditions;

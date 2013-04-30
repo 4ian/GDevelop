@@ -10,7 +10,7 @@
 #include "wxSFMLCanvas.hpp"
 #include <wx/dialog.h>
 //*)
-class SceneEditorCanvas;
+class CppLayoutPreviewer;
 
 /**
  * \brief Window used to mimic a sf::RenderWindow inside an IDE.
@@ -19,7 +19,7 @@ class GD_API RenderDialog: public wxDialog
 {
 public:
 
-    RenderDialog(wxWindow* parent, SceneEditorCanvas * sceneCanvasNotifiedOnClose = NULL);
+    RenderDialog(wxWindow* parent, CppLayoutPreviewer * sceneCanvasNotifiedOnClose = NULL);
     virtual ~RenderDialog();
 
     void SetSizeOfRenderingZone(unsigned int width, unsigned int height);
@@ -40,7 +40,7 @@ private:
     void OnClose(wxCloseEvent& event);
     //*)
 
-    SceneEditorCanvas * toBeNotifiedOnClose; ///< Optional scene canvas that can be notified when the window is closed.
+    CppLayoutPreviewer * toBeNotifiedOnClose; ///< Optional scene canvas that can be notified when the window is closed.
 
     DECLARE_EVENT_TABLE()
 };

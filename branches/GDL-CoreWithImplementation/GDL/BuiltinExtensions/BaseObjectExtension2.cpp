@@ -21,7 +21,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddParameter("expression", _("X position"))
         .AddParameter("expression", _("Y position"))
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
-        .cppCallingInformation.SetFunctionName("CreateObjectOnScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("CreateObjectOnScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("CreateByName",
                    _("Create an object from its name"),
@@ -37,7 +37,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddParameter("expression", _("X position"))
         .AddParameter("expression", _("Y position"))
         .AddParameter("layer", _("Layer ( Base layer if empty )"), "", true).SetDefaultValue("\"\"")
-        .cppCallingInformation.SetFunctionName("CreateObjectFromGroupOnScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("CreateObjectFromGroupOnScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("AjoutObjConcern",
                    _("Consider objects"),
@@ -50,7 +50,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
         .AddCodeOnlyParameter("inlineCode", "0")
         .AddParameter("object", _("Object"))
-        .cppCallingInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("AjoutHasard",
                    _("Take a random object"),
@@ -63,7 +63,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
         .AddCodeOnlyParameter("inlineCode", "0")
         .AddParameter("object", _("Object"))
-        .cppCallingInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("MoveObjects",
                    _("Make objects moving"),
@@ -73,7 +73,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
                    "res/actions/doMove24.png",
                    "res/actions/doMove.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .cppCallingInformation.SetFunctionName("MoveObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("MoveObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddCondition("SeDirige",
                    _("An object is moving to another"),
@@ -88,7 +88,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
         .AddParameter("expression", _("Angle of tolerance"))
         .AddCodeOnlyParameter("conditionInverted", "")
-        .cppCallingInformation.SetFunctionName("MovesToward").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+        .codeExtraInformation.SetFunctionName("MovesToward").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
 
@@ -106,7 +106,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddParameter("expression", _("Distance"))
         .AddParameter("relationalOperator", _("Sign of the test"))
         .AddCodeOnlyParameter("conditionInverted", "")
-        .cppCallingInformation.SetFunctionName("DistanceBetweenObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+        .codeExtraInformation.SetFunctionName("DistanceBetweenObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
 
@@ -121,7 +121,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
         .AddCodeOnlyParameter("inlineCode", "0")
         .AddParameter("object", _("Object"))
-        .cppCallingInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("PickAllObjects").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
 
 
@@ -136,7 +136,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "3")
         .AddCodeOnlyParameter("inlineCode", "0")
         .AddParameter("object", _("Object"))
-        .cppCallingInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("PickRandomObject").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
 
 
@@ -151,7 +151,7 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
         .AddParameter("expression", _("Value to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .cppCallingInformation.SetFunctionName("PickedObjectsCount").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+        .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetManipulatedType("number").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
 
@@ -167,14 +167,14 @@ void BaseObjectExtension::DeclareExtensionSecondPart()
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
         .AddCodeOnlyParameter("conditionInverted", "")
-        .cppCallingInformation.SetFunctionName("HitBoxesCollision").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+        .codeExtraInformation.SetFunctionName("HitBoxesCollision").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
 
     AddExpression("Count", _("Number of objects"), _("Count the number of specified objects currently concerned"), _("Objects"), "res/conditions/nbObjet.png")
         .AddParameter("object", _("Object"))
         .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-        .cppCallingInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+        .codeExtraInformation.SetFunctionName("PickedObjectsCount").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
     #endif
 }

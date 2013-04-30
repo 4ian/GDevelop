@@ -23,7 +23,7 @@ AdvancedExtension::AdvancedExtension()
                  "res/conditions/toujours24.png",
                  "res/conditions/toujours.png")
     .AddCodeOnlyParameter("conditionInverted", "")
-    .cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::LogicalNegation").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+    .codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::LogicalNegation").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
     #endif
 }
 

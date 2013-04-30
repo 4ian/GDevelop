@@ -148,20 +148,6 @@ void LinkEvent::Preprocess(gd::Project & project, gd::Layout & scene, std::vecto
     linkWasInvalid = false;
 }
 
-std::string LinkEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
-{
-    //This function is called only when the link refers to external events compiled separately. ( See LinkEvent::Preprocess )
-    //We must generate code to call these external events.
-    std::string outputCode;
-
-    std::string functionCall = EventsCodeNameMangler::GetInstance()->GetExternalEventsFunctionMangledName(GetTarget())+"(runtimeContext);";
-    std::string functionDeclaration = "void "+EventsCodeNameMangler::GetInstance()->GetExternalEventsFunctionMangledName(GetTarget())+"(RuntimeContext * context);";
-    outputCode += functionCall+"\n";
-    codeGenerator.AddGlobalDeclaration(functionDeclaration);
-
-    return outputCode;
-}
-
 gd::BaseEvent::EditEventReturnType LinkEvent::EditEvent(wxWindow* parent_, gd::Project & project, gd::Layout & scene_, gd::MainFrameWrapper & mainFrameWrapper_)
 {
     EditLink dialog(parent_, *this, project);

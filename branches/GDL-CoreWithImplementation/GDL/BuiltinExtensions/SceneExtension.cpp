@@ -23,7 +23,7 @@ SceneExtension::SceneExtension()
 
     AddExpression("Random", _("Random value"), _("Random value"), _("Random"), "res/actions/position.png")
         .AddParameter("expression", _("Maximum value"))
-        .cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::Random").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::Random").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
 
     AddCondition("DepartScene",
@@ -34,7 +34,7 @@ SceneExtension::SceneExtension()
                    "res/conditions/depart24.png",
                    "res/conditions/depart.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .cppCallingInformation.SetFunctionName("SceneJustBegins").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("SceneJustBegins").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
 
 
@@ -47,7 +47,7 @@ SceneExtension::SceneExtension()
                    "res/actions/goscene.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("string", _("Name of the scene"), "",false)
-        .cppCallingInformation.SetFunctionName("ChangeScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("ChangeScene").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("Quit",
                    _("Quit the game"),
@@ -57,7 +57,7 @@ SceneExtension::SceneExtension()
                    "res/actions/quit24.png",
                    "res/actions/quit.png")
         .AddCodeOnlyParameter("currentScene", "")
-        .cppCallingInformation.SetFunctionName("StopGame").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("StopGame").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("SceneBackground",
                    _("Change background color"),
@@ -68,7 +68,7 @@ SceneExtension::SceneExtension()
                    "res/actions/background.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("color", _("Color"), "",false)
-        .cppCallingInformation.SetFunctionName("ChangeSceneBackground").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("ChangeSceneBackground").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     AddAction("DisableInputWhenFocusIsLost",
                    _("Disable input when focus is lost"),
@@ -79,25 +79,25 @@ SceneExtension::SceneExtension()
                    "res/actions/window.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("yesorno", _("Deactivate input when focus is lost"))
-        .cppCallingInformation.SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("DisableInputWhenFocusIsLost").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
     {
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
                 std::string value1Code;
                 {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(value1Code, project, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(value1Code, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[0].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || value1Code.empty()) value1Code = "0";
+                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value1Code.empty()) value1Code = "0";
                 }
 
                 std::string value2Code;
                 {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(value2Code, project, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(value2Code, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[1].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || value2Code.empty()) value2Code = "0";
+                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || value2Code.empty()) value2Code = "0";
                 }
 
                 if ( instruction.GetParameters()[2].GetPlainString() == "=" || instruction.GetParameters()[2].GetPlainString().empty() )
@@ -116,7 +116,7 @@ SceneExtension::SceneExtension()
                 return "";
             };
         };
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddCondition("Egal",
                    _("Compare two expressions"),
@@ -128,7 +128,7 @@ SceneExtension::SceneExtension()
         .AddParameter("expression", _("Expression 1"), "",false)
         .AddParameter("expression", _("Expression 2"), "",false)
         .AddParameter("relationalOperator", _("Sign of the test"), "",false)
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     #endif

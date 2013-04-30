@@ -26,48 +26,8 @@
 #include "GDCore/PlatformDefinition/SourceFile.h"
 #include "GDL/XmlMacros.h"
 
-std::string CppCodeEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
+std::string CppCodeEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
 {
-    //Note: The associated source file is compiled separately ( it is recognized as a Source File dependency by
-    //DependenciesAnalyzer and compiled by CodeCompilationHelpers);
-
-    //Generate the code to call the associated source file
-    std::string functionPrototype = "void "+functionToCall+"("+ (passSceneAsParameter ? "RuntimeScene & scene" :"") + ((passSceneAsParameter && passObjectListAsParameter) ? ", ":"") + (passObjectListAsParameter ? "std::vector<RuntimeObject*> objectsList" :"") + ");";
-    codeGenerator.AddGlobalDeclaration(functionPrototype+"\n");
-
-    std::string outputCode;
-    outputCode += "{";
-
-    //Prepare objects list if needed
-    if ( passObjectListAsParameter )
-    {
-        const gd::Project & project = codeGenerator.GetProject();
-        vector< gd::ObjectGroup >::const_iterator globalGroup = find_if(project.GetObjectGroups().begin(), project.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPassAsParameter));
-        vector< gd::ObjectGroup >::const_iterator sceneGroup = find_if(scene.GetObjectGroups().begin(), scene.GetObjectGroups().end(), bind2nd(gd::GroupHasTheSameName(), objectToPassAsParameter));
-
-        std::vector<std::string> realObjects; //With groups, we may have to generate condition for more than one object list.
-        if ( globalGroup != project.GetObjectGroups().end() )
-            realObjects = (*globalGroup).GetAllObjectsNames();
-        else if ( sceneGroup != scene.GetObjectGroups().end() )
-            realObjects = (*sceneGroup).GetAllObjectsNames();
-        else
-            realObjects.push_back(objectToPassAsParameter);
-
-        if ( realObjects.empty() ) return "";
-
-        outputCode += "std::vector<RuntimeObject*> functionObjects;";
-        for (unsigned int i = 0;i<realObjects.size();++i)
-        {
-            parentContext.ObjectsListNeeded(realObjects[i]);
-            outputCode += "functionObjects.insert("+ string(i == 0 ? "functionObjects.begin()" : "functionObjects.end()") +", "+ManObjListName(realObjects[i])+".begin(), "+ManObjListName(realObjects[i])+".end());";
-        }
-    }
-
-    std::string functionCall = functionToCall+"("+ (passSceneAsParameter ? "*runtimeContext->scene" :"") +((passSceneAsParameter && passObjectListAsParameter) ? ", ":"")+(passObjectListAsParameter ? "functionObjects" :"") + ");";
-    outputCode += ""+functionCall+"\n";
-
-    outputCode += "}";
-    return outputCode;
 }
 
 void CppCodeEvent::EnsureAssociatedSourceFileIsUpToDate(gd::Project & parentGame) const

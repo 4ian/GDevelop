@@ -52,6 +52,11 @@ public:
     virtual ChangesNotifier & GetChangesNotifier() { return changesNotifier; };
 
     /**
+     * Preview can be done directly inside the editor thanks to CppLayoutPreviewer
+     */
+    virtual boost::shared_ptr<gd::LayoutEditorPreviewer> GetLayoutPreviewer(gd::LayoutEditorCanvas & editor) const;
+
+    /**
      * When destroyed, our platform need to do ensure the destruction of some singletons.
      */
     virtual void OnIDEClosed();

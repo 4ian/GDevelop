@@ -240,12 +240,12 @@ Actions are declared like this :
                            "path-to-an-16-by-16-icon-file.png")
                 .AddParameter("theTypeOfTheParameter", _("Parameter1"))
                 .AddParameter("theTypeOfTheParameter", _("Parameter2"))
-                .cppCallingInformation.SetFunctionName("MyFunctionName").SetIncludeFile("MyExtension/MyIncludeFile.h");
+                .codeExtraInformation.SetFunctionName("MyFunctionName").SetIncludeFile("MyExtension/MyIncludeFile.h");
 
  * \endcode
  * Declare conditions and expressions in a similar way.<br>
  * Parameters are added using gd::InstructionMetadata::AddParameter. See the function documentation for more information.<br>
- * See also gd::InstructionMetadata::CppCallingInformation class documentation for more information about SetFunctionName and similar functions.<br>
+ * See also gd::InstructionMetadata::ExtraInformation class documentation for more information about SetFunctionName and similar functions.<br>
  *
 
  * \section objectsDeclaration Declaring objects

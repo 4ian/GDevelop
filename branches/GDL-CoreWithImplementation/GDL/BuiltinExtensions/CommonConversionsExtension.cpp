@@ -16,7 +16,7 @@ CommonConversionsExtension::CommonConversionsExtension()
                        "res/conditions/toujours24.png")
 
         .AddParameter("string", _("Text to convert in a number"), "",false)
-        .cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::ToDouble").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::ToDouble").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
 
 
@@ -27,7 +27,7 @@ CommonConversionsExtension::CommonConversionsExtension()
                        "res/conditions/toujours24.png")
 
         .AddParameter("expression", _("Expression to be converted to a text"), "",false)
-        .cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::ToString").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::ToString").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
     AddStrExpression("LargeNumberToString",
                        _("Number > Text ( without scientific notation )"),
@@ -36,7 +36,7 @@ CommonConversionsExtension::CommonConversionsExtension()
                        "res/conditions/toujours24.png")
 
         .AddParameter("expression", _("Expression to be converted to a text"), "",false)
-        .cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::LargeNumberToString").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::LargeNumberToString").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
     AddExpression("ToRad",
                        _("Degrees > Radians"),
@@ -45,7 +45,7 @@ CommonConversionsExtension::CommonConversionsExtension()
                        "res/conditions/toujours24.png")
 
         .AddParameter("expression", _("Angle, in degrees"), "",false)
-        .cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::ToRad").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::ToRad").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
 
 
@@ -56,7 +56,7 @@ CommonConversionsExtension::CommonConversionsExtension()
                        "res/conditions/toujours24.png")
 
         .AddParameter("expression", _("Angle, in radians"), "",false)
-        .cppCallingInformation.SetFunctionName("GDpriv::CommonInstructions::ToDeg").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
+        .codeExtraInformation.SetFunctionName("GDpriv::CommonInstructions::ToDeg").SetIncludeFile("GDL/BuiltinExtensions/CommonInstructionsTools.h");
 
 
     #endif

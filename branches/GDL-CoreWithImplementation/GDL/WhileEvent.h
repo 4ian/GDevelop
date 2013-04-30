@@ -29,7 +29,6 @@ class WhileEvent : public gd::BaseEvent
         virtual gd::BaseEventSPtr Clone() const { return boost::shared_ptr<gd::BaseEvent>(new WhileEvent(*this));}
 
         virtual bool IsExecutable() const {return true;}
-        virtual std::string GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context);
 
         virtual bool CanHaveSubEvents() const {return true;}
         virtual const std::vector < gd::BaseEventSPtr > & GetSubEvents() const {return events;};
@@ -47,6 +46,8 @@ class WhileEvent : public gd::BaseEvent
         const std::vector < gd::Instruction > & GetWhileConditions() const { return whileConditions; };
         std::vector < gd::Instruction > & GetWhileConditions() { return whileConditions; };
         void SetWhileConditions(std::vector < gd::Instruction > & whileConditions_) { whileConditions = whileConditions_; };
+
+        bool HasInfiniteLoopWarning() const { return infiniteLoopWarning; }
 
         virtual std::vector < std::vector<gd::Instruction>* > GetAllConditionsVectors();
         virtual std::vector < std::vector<gd::Instruction>* > GetAllActionsVectors();

@@ -771,6 +771,8 @@
 		<Unit filename="GDL/IDE/CompilerMessagesParser.h" />
 		<Unit filename="GDL/IDE/DependenciesAnalyzer.cpp" />
 		<Unit filename="GDL/IDE/DependenciesAnalyzer.h" />
+		<Unit filename="GDL/IDE/Dialogs/CppLayoutPreviewer.cpp" />
+		<Unit filename="GDL/IDE/Dialogs/CppLayoutPreviewer.h" />
 		<Unit filename="GDL/IDE/Dialogs/DebuggerGUI.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/DebuggerGUI.h" />
 		<Unit filename="GDL/IDE/Dialogs/EditComment.cpp" />
@@ -791,9 +793,6 @@
 		<Unit filename="GDL/IDE/Dialogs/RenderDialog.h" />
 		<Unit filename="GDL/IDE/Dialogs/ResourcesEditor.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/ResourcesEditor.h" />
-		<Unit filename="GDL/IDE/Dialogs/SceneEditorCanvas.cpp" />
-		<Unit filename="GDL/IDE/Dialogs/SceneEditorCanvas.h" />
-		<Unit filename="GDL/IDE/Dialogs/SceneEditorCanvas2.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/SpriteObjectEditor.cpp" />
 		<Unit filename="GDL/IDE/Dialogs/SpriteObjectEditor.h" />
 		<Unit filename="GDL/IDE/Dialogs/wxSFMLCanvas.cpp" />

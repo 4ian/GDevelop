@@ -21,33 +21,9 @@ BaseEvent()
 {
 }
 
-std::string StandardEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+StandardEvent::~StandardEvent()
 {
-    std::string outputCode;
-
-    outputCode += codeGenerator.GenerateConditionsListCode(scene, conditions, context);
-
-    std::string ifPredicat;
-    for (unsigned int i = 0;i<conditions.size();++i)
-    {
-        if (i!=0) ifPredicat += " && ";
-        ifPredicat += "condition"+ToString(i)+"IsTrue";
-    }
-
-    if ( !ifPredicat.empty() ) outputCode += "if (" +ifPredicat+ ")\n";
-    outputCode += "{\n";
-    outputCode += codeGenerator.GenerateActionsListCode(scene, actions, context);
-    if ( !events.empty() ) //Sub events
-    {
-        outputCode += "\n{\n";
-        outputCode += codeGenerator.GenerateEventsListCode(scene, events, context);
-        outputCode += "}\n";
-    }
-
-    outputCode += "}\n";
-
-    return outputCode;
-}
+};
 
 vector < vector<gd::Instruction>* > StandardEvent::GetAllConditionsVectors()
 {

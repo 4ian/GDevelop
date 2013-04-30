@@ -24,8 +24,9 @@ ProfileEvent::~ProfileEvent()
 {
 }
 
-std::string ProfileEvent::GenerateEventCode(gd::Layout & scene, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
+std::string ProfileEvent::GenerateEventCode(gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & parentContext)
 {
+    const gd::Layout & scene = codeGenerator.GetLayout();
     codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/ProfileTools.h");
 
     ProfileLink profileLink;

@@ -21,21 +21,22 @@ VariablesExtension::VariablesExtension()
     #if defined(GD_IDE_ONLY)
     {
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Layout & scene = codeGenerator.GetLayout();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, project, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || expressionCode.empty()) expressionCode = "0";
+                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
                 //Generate variable getter call.
-                std::string variableGetCode = "GetSceneVariableValue(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
+                std::string variableGetCode = "GetSceneVariableValue(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -62,7 +63,7 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddCondition("VarScene",
                    _("Scene variables"),
@@ -75,26 +76,27 @@ VariablesExtension::VariablesExtension()
         .AddParameter("scenevar", _("Name of the variable"))
         .AddParameter("expression", _("Value to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     {
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Layout & scene = codeGenerator.GetLayout();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, project, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
+                    if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
                 //Generate variable getter call.
-                std::string variableGetCode = "GetSceneVariableString(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
+                std::string variableGetCode = "GetSceneVariableString(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -112,7 +114,7 @@ VariablesExtension::VariablesExtension()
                 return "";
             };
         };
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddCondition("VarSceneTxt",
                    _("Text of a scene variable"),
@@ -125,7 +127,7 @@ VariablesExtension::VariablesExtension()
         .AddParameter("scenevar", _("Name of the variable"))
         .AddParameter("string", _("Text to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
 
@@ -138,26 +140,27 @@ VariablesExtension::VariablesExtension()
                    "res/conditions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("scenevar", _("Name of the variable"))
-        .cppCallingInformation.SetFunctionName("SceneVariableDefined").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("SceneVariableDefined").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
 
     {
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Project & project = codeGenerator.GetProject();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, project, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || expressionCode.empty()) expressionCode = "0";
+                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
                 //Generate variable getter call.
-                std::string variableGetCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
+                std::string variableGetCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<project.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( project.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -183,7 +186,7 @@ VariablesExtension::VariablesExtension()
                 return "";
             };
         };
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddCondition("VarGlobal",
                    _("Global variable"),
@@ -196,27 +199,28 @@ VariablesExtension::VariablesExtension()
         .AddParameter("globalvar", _("Name of the variable"))
         .AddParameter("expression", _("Value to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
 
     {
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Project & project = codeGenerator.GetProject();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, project, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
+                    if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
                 //Generate variable getter call.
-                std::string variableGetCode = "GetGlobalVariableString(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
+                std::string variableGetCode = "GetGlobalVariableString(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<project.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( project.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -234,7 +238,7 @@ VariablesExtension::VariablesExtension()
                 return "";
             };
         };
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddCondition("VarGlobalTxt",
                    _("Text of a global variable"),
@@ -247,7 +251,7 @@ VariablesExtension::VariablesExtension()
         .AddParameter("globalvar", _("Name of the variable"))
         .AddParameter("string", _("Text to test"))
         .AddParameter("relationalOperator", _("Sign of the test"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
 
     }
 
@@ -262,27 +266,28 @@ VariablesExtension::VariablesExtension()
                    "res/conditions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("globalvar", _("Name of the variable"))
-        .cppCallingInformation.SetFunctionName("GlobalVariableDefined").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
+        .codeExtraInformation.SetFunctionName("GlobalVariableDefined").SetIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
 
 
 
     {
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Layout & scene = codeGenerator.GetLayout();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, project, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || expressionCode.empty()) expressionCode = "0";
+                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
                 //Generate variable getter call.
-                std::string variableObtainCode = "GetSceneVariable(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
+                std::string variableObtainCode = "GetSceneVariable(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -307,7 +312,7 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddAction("ModVarScene",
                    _("Scene variables"),
@@ -320,27 +325,28 @@ VariablesExtension::VariablesExtension()
         .AddParameter("scenevar", _("Name of the variable"))
         .AddParameter("expression", _("Value"))
         .AddParameter("operator", _("Modification's sign"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
 
     }
 
     {
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Layout & scene = codeGenerator.GetLayout();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, project, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
+                    if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
                 //Generate variable getter call.
-                std::string variableObtainCode = "GetSceneVariable(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
+                std::string variableObtainCode = "GetSceneVariable(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -358,7 +364,7 @@ VariablesExtension::VariablesExtension()
                 return "";
             };
         };
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddAction("ModVarSceneTxt",
                    _("Text of a scene variable"),
@@ -371,27 +377,28 @@ VariablesExtension::VariablesExtension()
         .AddParameter("scenevar", _("Name of the variable"))
         .AddParameter("string", _("Text"))
         .AddParameter("operator", _("Modification's sign"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
 
     }
 
     {
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Project & project = codeGenerator.GetProject();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, project, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || expressionCode.empty()) expressionCode = "0";
+                    if (!parser.ParseMathExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "0";
                 }
 
                 //Generate variable getter call.
-                std::string variableObtainCode = "GetGlobalVariable(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
+                std::string variableObtainCode = "GetGlobalVariable(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<project.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( project.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -415,7 +422,7 @@ VariablesExtension::VariablesExtension()
                 return "";
             };
         };
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddAction("ModVarGlobal",
                    _("Global variable"),
@@ -428,27 +435,28 @@ VariablesExtension::VariablesExtension()
         .AddParameter("globalvar", _("Name of the variable"))
         .AddParameter("expression", _("Value"))
         .AddParameter("operator", _("Modification's sign"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
 
     }
 
     {
         //Optimized implementation to speed up access to variables which are declared in scene initial variables:
-        class CodeGenerator : public gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(gd::Instruction & instruction, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Project & project = codeGenerator.GetProject();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
                 //Generate the code for the expression as usual
                 std::string expressionCode;
                 {
-                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, project, scene, codeGenerator, context);
+                    gd::CallbacksForGeneratingExpressionCode callbacks(expressionCode, codeGenerator, context);
                     gd::ExpressionParser parser(instruction.GetParameters()[2].GetPlainString());
-                    if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), project, scene, callbacks) || expressionCode.empty()) expressionCode = "\"\"";
+                    if (!parser.ParseStringExpression(codeGenerator.GetPlatform(), codeGenerator.GetProject(), codeGenerator.GetLayout(), callbacks) || expressionCode.empty()) expressionCode = "\"\"";
                 }
 
                 //Generate variable getter call.
-                std::string variableObtainCode = "GetGlobalVariable(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
+                std::string variableObtainCode = "GetGlobalVariable(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(instruction.GetParameters()[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<project.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( project.GetVariables().GetVariablesVector()[i].GetName() == instruction.GetParameters()[1].GetPlainString() )
@@ -466,7 +474,7 @@ VariablesExtension::VariablesExtension()
                 return "";
             };
         };
-        gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddAction("ModVarGlobalTxt",
                    _("Text of a global variable"),
@@ -479,17 +487,18 @@ VariablesExtension::VariablesExtension()
         .AddParameter("globalvar", _("Name of the variable"))
         .AddParameter("string", _("Text"))
         .AddParameter("operator", _("Modification's sign"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::InstructionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     {
         //Implementation optimized for declared scene variables:
-        class CodeGenerator : public gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::ExpressionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Layout & scene = codeGenerator.GetLayout();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-                std::string variableObtainCode = "GetSceneVariableValue(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(parameters[1].GetPlainString())+"\")";
+                std::string variableObtainCode = "GetSceneVariableValue(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(parameters[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
@@ -503,23 +512,24 @@ VariablesExtension::VariablesExtension()
             };
         };
 
-        gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::ExpressionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddExpression("Variable", _("Scene variables"), _("Scene variables"), _("Variables"), "res/actions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("scenevar", _("Name of the variable"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
 
     }
 
     {
         //Implementation optimized for declared scene variables:
-        class CodeGenerator : public gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Layout & scene = codeGenerator.GetLayout();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-                std::string variableObtainCode = "GetSceneVariableString(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(parameters[1].GetPlainString())+"\")";
+                std::string variableObtainCode = "GetSceneVariableString(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(parameters[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<scene.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( scene.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
@@ -532,22 +542,23 @@ VariablesExtension::VariablesExtension()
                 return variableObtainCode;
             };
         };
-        gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddStrExpression("VariableString", _("Scene variables"), _("Text of a scene variable"), _("Variables"), "res/actions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("scenevar", _("Name of the variable"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     {
         //Implementation optimized for declared scene variables:
-        class CodeGenerator : public gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::ExpressionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Project & project = codeGenerator.GetProject();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-                std::string variableObtainCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(parameters[1].GetPlainString())+"\")";
+                std::string variableObtainCode = "GetGlobalVariableValue(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(parameters[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<project.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( project.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
@@ -560,22 +571,23 @@ VariablesExtension::VariablesExtension()
                 return variableObtainCode;
             };
         };
-        gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::ExpressionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddExpression("GlobalVariable", _("Global variable"), _("Global variable"), _("Variables"), "res/actions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("globalvar", _("Name of the global variable"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::ExpressionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
 
     {
         //Implementation optimized for declared scene variables:
-        class CodeGenerator : public gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator
+        class CodeGenerator : public gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator
         {
-            virtual std::string GenerateCode(const gd::Project & project, const gd::Layout & scene, const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
+            virtual std::string GenerateCode(const std::vector<gd::Expression> & parameters, gd::EventsCodeGenerator & codeGenerator, gd::EventsCodeGenerationContext & context)
             {
+                const gd::Project & project = codeGenerator.GetProject();
                 codeGenerator.AddIncludeFile("GDL/BuiltinExtensions/RuntimeSceneTools.h");
-                std::string variableObtainCode = "GetGlobalVariableString(*runtimeContext->scene, \""+gd::EventsCodeGenerator::ConvertToCppString(parameters[1].GetPlainString())+"\")";
+                std::string variableObtainCode = "GetGlobalVariableString(*runtimeContext->scene, \""+codeGenerator.ConvertToCppString(parameters[1].GetPlainString())+"\")";
                 for (unsigned int i = 0;i<project.GetVariables().GetVariablesVector().size();++i)
                 {
                     if ( project.GetVariables().GetVariablesVector()[i].GetName() == parameters[1].GetPlainString() )
@@ -588,12 +600,12 @@ VariablesExtension::VariablesExtension()
                 return variableObtainCode;
             };
         };
-        gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
+        gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator * codeGenerator = new CodeGenerator; //Need for code to compile
 
         AddStrExpression("GlobalVariableString", _("Global variable"), _("Text of a global variable"), _("Variables"), "res/actions/var.png")
         .AddCodeOnlyParameter("currentScene", "")
         .AddParameter("globalvar", _("Name of the variable"))
-        .cppCallingInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::StrExpressionMetadata::CppCallingInformation::CustomCodeGenerator>(codeGenerator));
+        .codeExtraInformation.SetCustomCodeGenerator(boost::shared_ptr<gd::StrExpressionMetadata::ExtraInformation::CustomCodeGenerator>(codeGenerator));
     }
     #endif
 }

@@ -41,7 +41,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("X position"))
             .AddParameter("relationalOperator", _("Sign of the test"))
-            .cppCallingInformation.SetFunctionName("GetX").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("GetX").SetManipulatedType("number");
 
         obj.AddAction("MettreX",
                        _("X position of an object"),
@@ -54,7 +54,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("Value"))
             .AddParameter("operator", _("Modification's sign"))
-            .cppCallingInformation.SetFunctionName("SetX").SetManipulatedType("number").SetAssociatedGetter("GetX");
+            .codeExtraInformation.SetFunctionName("SetX").SetManipulatedType("number").SetAssociatedGetter("GetX");
 
 
         obj.AddCondition("PosY",
@@ -68,7 +68,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("Y position"))
             .AddParameter("relationalOperator", _("Sign of the test"))
-            .cppCallingInformation.SetFunctionName("GetY").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("GetY").SetManipulatedType("number");
 
         obj.AddAction("MettreY",
                        _("Y position of an object"),
@@ -81,7 +81,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("Value"))
             .AddParameter("operator", _("Modification's sign"))
-            .cppCallingInformation.SetFunctionName("SetY").SetManipulatedType("number").SetAssociatedGetter("GetY");
+            .codeExtraInformation.SetFunctionName("SetY").SetManipulatedType("number").SetAssociatedGetter("GetY");
 
 
         obj.AddAction("MettreXY",
@@ -97,7 +97,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("operator", _("Modification's sign"))
             .AddParameter("expression", _("Y position"))
             .AddParameter("operator", _("Modification's sign"))
-            .cppCallingInformation.SetFunctionName("SetXY");
+            .codeExtraInformation.SetFunctionName("SetXY");
 
 
         obj.AddAction("MettreAutourPos",
@@ -113,7 +113,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("expression", _("Y position"))
             .AddParameter("expression", _("Distance"))
             .AddParameter("expression", _("Angle, in degrees"))
-            .cppCallingInformation.SetFunctionName("PutAroundAPosition");
+            .codeExtraInformation.SetFunctionName("PutAroundAPosition");
 
 
         obj.AddAction("AddForceXY",
@@ -128,7 +128,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("expression", _("X coordinate of moving"))
             .AddParameter("expression", _("Y coordinate of moving"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .cppCallingInformation.SetFunctionName("AddForce");
+            .codeExtraInformation.SetFunctionName("AddForce");
 
         obj.AddAction("AddForceAL",
                        _("Add a force ( angle )"),
@@ -142,7 +142,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("expression", _("Angle"))
             .AddParameter("expression", _("Length ( in pixels )"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .cppCallingInformation.SetFunctionName("AddForceUsingPolarCoordinates");
+            .codeExtraInformation.SetFunctionName("AddForceUsingPolarCoordinates");
 
 
         obj.AddAction("AddForceVersPos",
@@ -158,7 +158,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("expression", _("Y position"))
             .AddParameter("expression", _("Length ( in pixels )"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .cppCallingInformation.SetFunctionName("AddForceTowardPosition");
+            .codeExtraInformation.SetFunctionName("AddForceTowardPosition");
 
 
         obj.AddAction("AddForceTournePos",
@@ -175,7 +175,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("expression", _("Speed ( in Degrees per seconds )"))
             .AddParameter("expression", _("Distance ( in pixels )"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
-            .cppCallingInformation.SetFunctionName("AddForceToMoveAround");
+            .codeExtraInformation.SetFunctionName("AddForceToMoveAround");
 
 
         obj.AddAction("Arreter",
@@ -187,7 +187,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/arreter.png")
 
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("ClearForce");
+            .codeExtraInformation.SetFunctionName("ClearForce");
 
 
         obj.AddAction("Delete",
@@ -200,7 +200,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             .AddParameter("object", _("Object"))
             .AddCodeOnlyParameter("currentScene","")
-            .cppCallingInformation.SetFunctionName("DeleteFromScene");
+            .codeExtraInformation.SetFunctionName("DeleteFromScene");
 
 
         obj.AddAction("Duplicate",
@@ -214,7 +214,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddCodeOnlyParameter("currentScene", "")
             .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "0")
-            .cppCallingInformation.SetFunctionName("Duplicate");
+            .codeExtraInformation.SetFunctionName("Duplicate");
 
 
         obj.AddAction("ChangePlan",
@@ -228,7 +228,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("Value"))
             .AddParameter("operator", _("Modification's sign"))
-            .cppCallingInformation.SetFunctionName("SetZOrder").SetAssociatedGetter("GetZOrder").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("SetZOrder").SetAssociatedGetter("GetZOrder").SetManipulatedType("number");
 
 
         obj.AddAction("ChangeLayer",
@@ -241,7 +241,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             .AddParameter("object", _("Object"))
             .AddParameter("layer", _("Put on the layer ( base layer if empty )")).SetDefaultValue("\"\"")
-            .cppCallingInformation.SetFunctionName("SetLayer");
+            .codeExtraInformation.SetFunctionName("SetLayer");
 
 
         obj.AddAction("ModVarObjet",
@@ -256,7 +256,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("expression", _("Value"))
             .AddParameter("operator", _("Modification's sign"))
-            .cppCallingInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
 
 
         obj.AddAction("ModVarObjetTxt",
@@ -271,7 +271,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("string", _("Text"))
             .AddParameter("operator", _("Modification's sign"))
-            .cppCallingInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
+            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
 
 
 
@@ -284,7 +284,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/actions/visibilite.png")
 
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("SetHidden");
+            .codeExtraInformation.SetFunctionName("SetHidden");
 
 
         obj.AddAction("Montre",
@@ -297,7 +297,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             .AddParameter("object", _("Object"))
             .AddCodeOnlyParameter("inlineCode", "false")
-            .cppCallingInformation.SetFunctionName("SetHidden");
+            .codeExtraInformation.SetFunctionName("SetHidden");
 
 
         obj.AddCondition("Plan",
@@ -311,7 +311,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("Z order"))
             .AddParameter("relationalOperator", _("Sign of the test"))
-            .cppCallingInformation.SetFunctionName("GetZOrder").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("GetZOrder").SetManipulatedType("number");
 
         obj.AddCondition("Layer",
                        _("Test the layer of an object"),
@@ -324,7 +324,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("layer", _("Layer"))
             .AddParameter("relationalOperator", _("Layer"))
-            .cppCallingInformation.SetFunctionName("IsOnLayer");
+            .codeExtraInformation.SetFunctionName("IsOnLayer");
 
         obj.AddCondition("Visible",
                        _("Visibility of an object"),
@@ -335,7 +335,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/visibilite.png")
 
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("IsVisible");
+            .codeExtraInformation.SetFunctionName("IsVisible");
 
         obj.AddCondition("Invisible",
                        _("Invisibility of an object"),
@@ -346,7 +346,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/visibilite.png")
 
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("IsHidden");
+            .codeExtraInformation.SetFunctionName("IsHidden");
 
         obj.AddCondition("Arret",
                        _("An object is stopped"),
@@ -357,7 +357,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
                        "res/conditions/arret.png")
 
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("IsStopped");
+            .codeExtraInformation.SetFunctionName("IsStopped");
 
         obj.AddCondition("Vitesse",
                        _("Speed of the object"),
@@ -370,7 +370,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("Speed"))
             .AddParameter("relationalOperator", _("Sign of the test"))
-            .cppCallingInformation.SetFunctionName("TotalForceLength").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("TotalForceLength").SetManipulatedType("number");
 
         obj.AddCondition("AngleOfDisplacement",
                        _("Angle of moving"),
@@ -383,7 +383,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("expression", _("Angle, in degrees"))
             .AddParameter("expression", _("Tolerance"))
-            .cppCallingInformation.SetFunctionName("TestAngleOfDisplacement");
+            .codeExtraInformation.SetFunctionName("TestAngleOfDisplacement");
 
         obj.AddCondition("VarObjet",
                        _("Object's variable"),
@@ -397,7 +397,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("expression", _("Value to test"))
             .AddParameter("relationalOperator", _("Sign of the test"))
-            .cppCallingInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
+            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("number");
 
         obj.AddCondition("VarObjetTxt",
                        _("Text of variable of an object"),
@@ -411,7 +411,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("objectvar", _("Name of the variable"))
             .AddParameter("string", _("Text to test"))
             .AddParameter("relationalOperator", _("Sign of the test"))
-            .cppCallingInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
+            .codeExtraInformation.SetFunctionName("GetVariables().ObtainVariable").SetManipulatedType("string");
 
         obj.AddCondition("VarObjetDef",
                        _("Variable defined"),
@@ -423,7 +423,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             .AddParameter("object", _("Object"))
             .AddParameter("objectvar", _("Name of the variable"))
-            .cppCallingInformation.SetFunctionName("GetVariables().HasVariableNamed");
+            .codeExtraInformation.SetFunctionName("GetVariables().HasVariableNamed");
 
         obj.AddCondition("AutomatismActivated",
                        _("Automatism activated"),
@@ -435,7 +435,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
 
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"))
-            .cppCallingInformation.SetFunctionName("AutomatismActivated");
+            .codeExtraInformation.SetFunctionName("AutomatismActivated");
 
         obj.AddAction("ActivateAutomatism",
                        _("De/activate an automatism"),
@@ -448,7 +448,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("automatism", _("Automatism"))
             .AddParameter("yesorno", _("Activate \?"))
-            .cppCallingInformation.SetFunctionName("ActivateAutomatism");
+            .codeExtraInformation.SetFunctionName("ActivateAutomatism");
 
 
         obj.AddAction("AddForceVers",
@@ -464,7 +464,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("expression", _("Length in pixel"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
             .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
-            .cppCallingInformation.SetFunctionName("AddForceTowardObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+            .codeExtraInformation.SetFunctionName("AddForceTowardObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
         obj.AddAction("AddForceTourne",
@@ -481,7 +481,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("expression", _("Distance ( in pixel )"))
             .AddParameter("expression", _("Damping ( Default : 0 )"))
             .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
-            .cppCallingInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+            .codeExtraInformation.SetFunctionName("AddForceToMoveAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
         obj.AddAction("MettreAutour",
@@ -497,7 +497,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("expression", _("Distance"))
             .AddParameter("expression", _("Angle, in degrees"))
             .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
-            .cppCallingInformation.SetFunctionName("PutAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+            .codeExtraInformation.SetFunctionName("PutAroundObject").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
         //Deprecated action
@@ -513,7 +513,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("object", _("Object 2 ( won't move )"))
             .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
-            .cppCallingInformation.SetFunctionName("SeparateObjectsWithForces").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+            .codeExtraInformation.SetFunctionName("SeparateObjectsWithForces").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
         //Deprecated action
@@ -529,7 +529,7 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("object", _("Object 2 ( won't move )"))
             .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
-            .cppCallingInformation.SetFunctionName("SeparateObjectsWithoutForces").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+            .codeExtraInformation.SetFunctionName("SeparateObjectsWithoutForces").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
         obj.AddAction("SeparateFromObjects",
@@ -543,97 +543,97 @@ void BaseObjectExtension::DeclareExtensionFirstPart()
             .AddParameter("object", _("Object"))
             .AddParameter("object", _("Objects"))
             .AddCodeOnlyParameter("mapOfObjectListsOfParameter", "1")
-            .cppCallingInformation.SetFunctionName("SeparateFromObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
+            .codeExtraInformation.SetFunctionName("SeparateFromObjects").SetIncludeFile("GDL/BuiltinExtensions/ObjectTools.h");
 
 
         obj.AddExpression("X", _("X position"), _("X position of the object"), _("Position"), "res/actions/position.png")
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("GetX");
+            .codeExtraInformation.SetFunctionName("GetX");
 
         obj.AddExpression("Y", _("Y position"), _("Y position of the object"), _("Position"), "res/actions/position.png")
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("GetY");
+            .codeExtraInformation.SetFunctionName("GetY");
 
         obj.AddExpression("ForceX", _("Average X coordinates of forces"), _("Average X coordinates of forces"), _("Displacement"), "res/actions/force.png")
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("TotalForceX");
+            .codeExtraInformation.SetFunctionName("TotalForceX");
 
         obj.AddExpression("ForceY", _("Average Y coordinates of forces"), _("Average Y coordinates of forces"), _("Displacement"), "res/actions/force.png")
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("TotalForceY");
+            .codeExtraInformation.SetFunctionName("TotalForceY");
 
         obj.AddExpression("ForceAngle", _("Average angle of the forces"), _("Average angle of the forces"), _("Displacement"), "res/actions/force.png")
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("TotalForceAngle");
+            .codeExtraInformation.SetFunctionName("TotalForceAngle");
 
         obj.AddExpression("Angle", _("Average angle of the forces"), _("Average angle of the forces"), _("Displacement"), "res/actions/force.png")
             .AddParameter("object", _("Object"))
 
             .SetHidden()
-            .cppCallingInformation.SetFunctionName("TotalForceAngle");
+            .codeExtraInformation.SetFunctionName("TotalForceAngle");
 
         obj.AddExpression("ForceLength", _("Average length of the forces"), _("Average length of the forces"), _("Displacement"), "res/actions/force.png")
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("TotalForceLength");
+            .codeExtraInformation.SetFunctionName("TotalForceLength");
 
         obj.AddExpression("Longueur", _("Average length of the forces"), _("Average length of the forces"), _("Displacement"), "res/actions/force.png")
             .AddParameter("object", _("Object"))
 
             .SetHidden()
-            .cppCallingInformation.SetFunctionName("TotalForceLength");
+            .codeExtraInformation.SetFunctionName("TotalForceLength");
 
 
         obj.AddExpression("Width", _("Object's width"), _("Object's width"), _("Size"), "res/actions/scaleWidth.png")
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("GetWidth");
+            .codeExtraInformation.SetFunctionName("GetWidth");
 
         obj.AddExpression("Largeur", _("Object's width"), _("Object's width"), _("Size"), "res/actions/scaleWidth.png")
             .AddParameter("object", _("Object"))
 
             .SetHidden()
-            .cppCallingInformation.SetFunctionName("GetWidth");
+            .codeExtraInformation.SetFunctionName("GetWidth");
 
         obj.AddExpression("Height", _("Object's height"), _("Object's height"), _("Size"), "res/actions/scaleHeight.png")
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("GetHeight");
+            .codeExtraInformation.SetFunctionName("GetHeight");
 
         obj.AddExpression("Hauteur", _("Object's height"), _("Object's height"), _("Size"), "res/actions/scaleHeight.png")
             .AddParameter("object", _("Object"))
 
             .SetHidden()
-            .cppCallingInformation.SetFunctionName("GetHeight");
+            .codeExtraInformation.SetFunctionName("GetHeight");
 
         obj.AddExpression("ZOrder", _("Z order of an object"), _("Z order of an object"), _("Visibility"), "res/actions/planicon.png")
             .AddParameter("object", _("Object"))
-            .cppCallingInformation.SetFunctionName("GetZOrder");
+            .codeExtraInformation.SetFunctionName("GetZOrder");
 
         obj.AddExpression("Plan", _("Z order of an object"), _("Z order of an object"), _("Visibility"), "res/actions/planicon.png")
             .AddParameter("object", _("Object"))
 
             .SetHidden()
-            .cppCallingInformation.SetFunctionName("GetZOrder");
+            .codeExtraInformation.SetFunctionName("GetZOrder");
 
         obj.AddExpression("Distance", _("Distance between two objects"), _("Distance between two objects"), _("Position"), "res/conditions/distance.png")
             .AddParameter("object", _("Object"))
             .AddParameter("object", _("Object"))
             .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
-            .cppCallingInformation.SetFunctionName("GetDistanceWithObject");
+            .codeExtraInformation.SetFunctionName("GetDistanceWithObject");
 
         obj.AddExpression("SqDistance", _("Square distance between two objects"), _("Square distance between two objects"), _("Position"), "res/conditions/distance.png")
             .AddParameter("object", _("Object"))
             .AddParameter("object", _("Object"))
             .AddCodeOnlyParameter("ptrToObjectOfParameter", "1")
-            .cppCallingInformation.SetFunctionName("GetSqDistanceWithObject");
+            .codeExtraInformation.SetFunctionName("GetSqDistanceWithObject");
 
         obj.AddExpression("Variable", _("Object's variable"), _("Object's variable"), _("Variables"), "res/actions/var.png")
             .AddParameter("object", _("Object"))
             .AddParameter("objectvar", _("Name of the variable"))
-            .cppCallingInformation.SetFunctionName("GetVariables().GetVariableValue");
+            .codeExtraInformation.SetFunctionName("GetVariables().GetVariableValue");
 
         obj.AddStrExpression("VariableString", _("Object's variable"), _("Text of variable of an object"), _("Variables"), "res/actions/var.png")
             .AddParameter("object", _("Object"))
             .AddParameter("objectvar", _("Name of the variable"))
-            .cppCallingInformation.SetFunctionName("GetVariables().GetVariableString");
+            .codeExtraInformation.SetFunctionName("GetVariables().GetVariableString");
         #endif
 
     }

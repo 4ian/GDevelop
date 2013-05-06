@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Game Develop JS Platform" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug - Edittime">
+				<Option output="../IDE/bin/debug/JsPlatform/GDJS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-g" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-D__WXDEBUG__" />
+					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
+					<Add option="-DDEBUG" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=1" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
+					<Add directory="../ExtLibs/wxwidgets/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-lGDCore" />
+					<Add option="-lwxmsw29ud_xrc" />
+					<Add option="-lwxmsw29ud_stc" />
+					<Add option="-lwxmsw29ud_richtext" />
+					<Add option="-lwxmsw29ud_propgrid" />
+					<Add option="-lwxmsw29ud_ribbon" />
+					<Add option="-lwxmsw29ud_aui" />
+					<Add option="-lwxmsw29ud_adv" />
+					<Add option="-lwxmsw29ud_html" />
+					<Add option="-lwxmsw29ud_core" />
+					<Add option="-lwxbase29ud_xml" />
+					<Add option="-lwxbase29ud_net" />
+					<Add option="-lwxexpatd" />
+					<Add option="-lwxbase29ud" />
+					<Add option="-lwxpngd" />
+					<Add option="-lwxjpegd" />
+					<Add option="-lwxzlibd" />
+					<Add option="-lwxtiffd" />
+					<Add library="user32" />
+					<Add directory="../IDE/bin/debug" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswud" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
+				</Linker>
+			</Target>
+			<Target title="Release - Edittime">
+				<Option output="../IDE/bin/release/JsPlatform/GDJS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
+					<Add option="-DRELEASE" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=1" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../ExtLibs/wxwidgets/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lGDCore" />
+					<Add option="-lwxmsw29u_xrc" />
+					<Add option="-lwxmsw29u_stc" />
+					<Add option="-lwxmsw29u_richtext" />
+					<Add option="-lwxmsw29u_propgrid" />
+					<Add option="-lwxmsw29u_ribbon" />
+					<Add option="-lwxmsw29u_aui" />
+					<Add option="-lwxmsw29u_adv" />
+					<Add option="-lwxmsw29u_html" />
+					<Add option="-lwxmsw29u_core" />
+					<Add option="-lwxbase29u_xml" />
+					<Add option="-lwxbase29u_net" />
+					<Add option="-lwxexpat" />
+					<Add option="-lwxbase29u" />
+					<Add option="-lwxpng" />
+					<Add option="-lwxjpeg" />
+					<Add option="-lwxzlib" />
+					<Add option="-lwxtiff" />
+					<Add library="user32" />
+					<Add directory="../IDE/bin/release" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
+				</Linker>
+			</Target>
+			<Target title="Development - Edittime">
+				<Option output="../IDE/bin/dev/JsPlatform/GDJS" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-Wall" />
+					<Add option="-D__GNUWIN32__" />
+					<Add option="-D__WXMSW__" />
+					<Add option="-DGD_IDE_ONLY" />
+					<Add option="-DGD_API=__declspec(dllexport)" />
+					<Add option="-DGD_CORE_API=__declspec(dllimport)" />
+					<Add option="-DDEV" />
+					<Add option="-DWINDOWS" />
+					<Add option="-DSFML_DYNAMIC" />
+					<Add option="-DwxUSE_UNICODE=1" />
+					<Add option="-DWXUSINGDLL" />
+					<Add option="-DBOOST_DISABLE_ASSERTS" />
+					<Add option="-D__STDC_LIMIT_MACROS" />
+					<Add option="-D__STDC_CONSTANT_MACROS" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../ExtLibs/wxwidgets/include" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="-lGDCore" />
+					<Add option="-lwxmsw29u_xrc" />
+					<Add option="-lwxmsw29u_stc" />
+					<Add option="-lwxmsw29u_richtext" />
+					<Add option="-lwxmsw29u_propgrid" />
+					<Add option="-lwxmsw29u_ribbon" />
+					<Add option="-lwxmsw29u_aui" />
+					<Add option="-lwxmsw29u_adv" />
+					<Add option="-lwxmsw29u_html" />
+					<Add option="-lwxmsw29u_core" />
+					<Add option="-lwxbase29u_xml" />
+					<Add option="-lwxbase29u_net" />
+					<Add option="-lwxexpat" />
+					<Add option="-lwxbase29u" />
+					<Add option="-lwxpng" />
+					<Add option="-lwxjpeg" />
+					<Add option="-lwxzlib" />
+					<Add option="-lwxtiff" />
+					<Add library="user32" />
+					<Add directory="../IDE/bin/dev" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll/mswu" />
+					<Add directory="../ExtLibs/wxwidgets/lib/gcc_dll" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add directory="../GDJS" />
+			<Add directory="../Core" />
+			<Add directory="../ExtLibs/boost" />
+			<Add directory="../ExtLibs/SFML/include" />
+		</Compiler>
+		<Unit filename="GDJS/BuiltinExtensions/CommonInstructionsExtension.cpp" />
+		<Unit filename="GDJS/BuiltinExtensions/CommonInstructionsExtension.h" />
+		<Unit filename="GDJS/BuiltinExtensions/SpriteExtension.cpp" />
+		<Unit filename="GDJS/BuiltinExtensions/SpriteExtension.h" />
+		<Unit filename="GDJS/EventsCodeGenerator.cpp" />
+		<Unit filename="GDJS/EventsCodeGenerator.h" />
+		<Unit filename="GDJS/Exporter.cpp" />
+		<Unit filename="GDJS/Exporter.h" />
+		<Unit filename="GDJS/JsPlatform.cpp" />
+		<Unit filename="GDJS/JsPlatform.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

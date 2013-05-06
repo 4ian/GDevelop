@@ -1,0 +1,66 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>pixi.js example 1</title>
+	<style>
+		body {
+			margin: 0;
+			padding: 0;
+			background-color: #000000;
+		}
+	</style>
+	<script src="pixi.js"></script>
+	<script src="jquery.js"></script>
+	<script src="jshashtable.js"></script>
+	<script src="gd.js"></script>
+	<script src="runtimescene.js"></script>
+	<script src="runtimeobject.js"></script>
+	<script src="spriteruntimeobject.js"></script>
+	<script src="code.js"></script>
+
+</head>
+<body>
+	<script>
+    
+    $( document ).ready( function() {
+        $.ajax({type:"GET", url:"data.xml", dataType:"xml", success: launch});
+    });
+    
+    
+	
+    var launch = function(project) {
+    
+        var winWidth = $(project).find("Project").find("Info").find("WindowW").attr("value");
+        var winHeight = $(project).find("Project").find("Info").find("WindowH").attr("value");
+    
+        // create a renderer instance
+        var renderer = PIXI.autoDetectRenderer(winWidth, winHeight);
+        document.body.appendChild(renderer.view); // add the renderer view element to the DOM
+    
+        // create an new instance of a pixi stage
+        var currentScene = gdjs.runtimeScene(renderer);
+        currentScene.loadFromScene($(project).find("Project").find("Scenes").find("Scene"));
+        
+        var obj = gdjs.spriteRuntimeObject(currentScene, null)
+        obj.setPosition(50,150);
+        
+        var obj2 = gdjs.spriteRuntimeObject(currentScene, null)
+        obj2.setPosition(150,350);
+        
+        currentScene.addObject(obj);
+        currentScene.addObject(obj2);
+        
+        requestAnimFrame( GameLoop );
+        
+        function GameLoop() {
+            requestAnimFrame( GameLoop );
+        
+            currentScene.renderAndStep();
+            gdjs.Nouvelle_32sc__4524neCode(currentScene);
+        }
+    }
+        
+	</script>
+
+	</body>
+</html>

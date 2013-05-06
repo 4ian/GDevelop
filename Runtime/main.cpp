@@ -14,17 +14,16 @@
 #endif
 
 #include "GDL/CommonTools.h"
-#include "GDL/OpenSaveGame.h"
 #include "GDL/RuntimeScene.h"
 #include "GDL/RessourcesLoader.h"
 #include "GDL/FontManager.h"
 #include "GDL/SoundManager.h"
 #include "GDL/OpenSaveLoadingScreen.h"
 #include "GDL/SceneNameMangler.h"
-#include "GDL/Game.h"
-#include "GDL/RuntimeGame.h"
+#include "GDL/Project.h"
+#include "GDL/Project.h"
 #include "GDL/CodeExecutionEngine.h"
-#include "GDL/ExtensionsManager.h"
+#include "GDL/CppPlatform.h"
 #include "GDL/ExtensionsLoader.h"
 #include "CompilationChecker.h"
 #include "GDL/Log.h"
@@ -72,42 +71,17 @@ int main( int argc, char *p_argv[] )
     //Load extensions
     GDpriv::ExtensionsLoader * extensionsLoader = GDpriv::ExtensionsLoader::GetInstance();
     extensionsLoader->SetExtensionsDir("./");
-    extensionsLoader->LoadAllStaticExtensionsAvailable();
+    extensionsLoader->LoadAllExtensionsAvailable();
 
     //Load resource file
-    RessourcesLoader * resLoader = RessourcesLoader::GetInstance();
+    gd::RessourcesLoader * resLoader = gd::RessourcesLoader::GetInstance();
     if ( !resLoader->SetResourceFile( executablePath+"/"+executableNameOnly+".egd" )
            && !resLoader->SetResourceFile( executablePath+"/gam.egd" ) )
     {
         return AbortWithMessage("Unable to load resources. Aborting.");
     }
 
-    RuntimeGame game;
-
-    //Display optional loading screen
-    OpenSaveLoadingScreen::OpenFromString(game.loadingScreen, resLoader->LoadPlainText( "loadingscreen" ));
-
-    unsigned long style = 0;
-    if ( game.loadingScreen.border ) style |= sf::Style::Titlebar;
-    sf::RenderWindow loadingApp( sf::VideoMode( game.loadingScreen.width, game.loadingScreen.height, 32 ), "Loading...", style );
-    loadingApp.setVisible(game.loadingScreen.afficher);
-    loadingApp.clear( sf::Color( 100, 100, 100 ) );
-
-    boost::shared_ptr<sf::Texture> image = boost::shared_ptr<sf::Texture>(resLoader->LoadSFMLTexture( game.loadingScreen.imageFichier ));
-    if ( !game.loadingScreen.smooth ) image->setSmooth(false);
-
-    sf::Sprite sprite( *image );
-    if ( game.loadingScreen.image )
-    {
-        loadingApp.draw( sprite );
-    }
-    if ( game.loadingScreen.texte )
-    {
-        sf::Text loadingText( game.loadingScreen.texteChargement, *FontManager::GetInstance()->GetFont("") );
-        loadingText.setPosition( game.loadingScreen.texteXPos, game.loadingScreen.texteYPos );
-        loadingApp.draw( loadingText );
-    }
-    loadingApp.display();
+    gd::Project game;
 
     //Load game data
     {
@@ -143,29 +117,29 @@ int main( int argc, char *p_argv[] )
         game.LoadFromXml(hdl.FirstChildElement().Element());
 	}
 
-    if ( game.GetLayouts().empty() )
+    if ( game.GetLayoutCount() == 0 )
     {
         return AbortWithMessage("No scene to be loaded. Aborting.");
     }
 
     //Loading the code
     std::string codeLibraryName = executablePath+"/"+executableNameOnly+"."+codeFileExtension;
-    Handle codeLibrary = GDpriv::OpenLibrary(codeLibraryName.c_str());
+    Handle codeLibrary = gd::OpenLibrary(codeLibraryName.c_str());
     if ( codeLibrary == NULL )
     {
         codeLibraryName = executablePath+"/Code."+codeFileExtension;
-        Handle codeLibrary = GDpriv::OpenLibrary(codeLibraryName.c_str());
+        Handle codeLibrary = gd::OpenLibrary(codeLibraryName.c_str());
         if ( codeLibrary == NULL )
         {
             return AbortWithMessage("Unable to load the execution engine for game. Aborting.");
         }
     }
 
-    if (game.GetLayouts()[0]->GetCodeExecutionEngine() == boost::shared_ptr<CodeExecutionEngine>() ||
-        !game.GetLayouts()[0]->GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
-                                                                                "GDSceneEvents"+SceneNameMangler::GetMangledSceneName(game.GetLayouts()[0]->GetName())) )
+    if (game.GetLayout(0).GetCodeExecutionEngine() == boost::shared_ptr<CodeExecutionEngine>() ||
+        !game.GetLayout(0).GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
+                                                                                "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(game.GetLayout(0).GetName())) )
     {
-        return AbortWithMessage("Unable to setup execution engine for scene \"" + game.GetLayouts()[0]->GetName() + "\". Aborting.");
+        return AbortWithMessage("Unable to setup execution engine for scene \"" + game.GetLayout(0).GetName() + "\". Aborting.");
     }
 
     #if defined(WINDOWS)
@@ -179,7 +153,6 @@ int main( int argc, char *p_argv[] )
     #endif
 
     //Initialize image manager and load always loaded images
-    game.imageManager->SetGame( &game );
     game.imageManager->LoadPermanentImages();
 
     loadingApp.close();
@@ -190,8 +163,8 @@ int main( int argc, char *p_argv[] )
     window.setVerticalSyncEnabled( game.IsVerticalSynchronizationEnabledByDefault() );
 
     RuntimeScene scenePlayed(&window, &game);
-    if ( !scenePlayed.LoadFromScene( *game.GetLayouts()[0] ) )
-        return AbortWithMessage("Unable to load the first scene \"" + game.GetLayouts()[0]->GetName() + "\". Aborting.");
+    if ( !scenePlayed.LoadFromScene( game.GetLayout(0) ) )
+        return AbortWithMessage("Unable to load the first scene \"" + game.GetLayout(0).GetName() + "\". Aborting.");
 
     window.create( sf::VideoMode( game.GetMainWindowDefaultWidth(), game.GetMainWindowDefaultHeight(), 32 ), scenePlayed.GetWindowDefaultTitle(), sf::Style::Close );
     window.setActive(true);
@@ -204,20 +177,20 @@ int main( int argc, char *p_argv[] )
 
         if ( returnCode == -2 ) //Quit the game
             scenePlayed.running = false;
-        else if ( returnCode != -1 ) //Change the scene being played
+        else if ( returnCode != -1 && returnCode < game.GetLayoutCount()) //Change the scene being played
         {
             RuntimeScene emptyScene(&window, &game);
             scenePlayed = emptyScene; //Clear the scene
 
-            if (game.GetLayouts()[returnCode]->GetCodeExecutionEngine() == boost::shared_ptr<CodeExecutionEngine>() ||
-                !game.GetLayouts()[returnCode]->GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
-                                                                                                 "GDSceneEvents"+SceneNameMangler::GetMangledSceneName(game.GetLayouts()[returnCode]->GetName())) )
+            if ( !scenePlayed.LoadFromScene( game.GetLayout(returnCode) ) )
+                return AbortWithMessage("Unable to load scene \"" + game.GetLayout(returnCode).GetName() + "\". Aborting.");
+
+            if (!scenePlayed.GetCodeExecutionEngine()->LoadFromDynamicLibrary(codeLibraryName,
+                                                                              "GDSceneEvents"+gd::SceneNameMangler::GetMangledSceneName(scenePlayed.GetName())) )
             {
-                return AbortWithMessage("Unable to setup execution engine for scene \"" + game.GetLayouts()[returnCode]->GetName() + "\". Aborting.");
+                return AbortWithMessage("Unable to setup execution engine for scene \"" + scenePlayed.GetName()) + "\". Aborting.");
             }
 
-            if ( !scenePlayed.LoadFromScene( *game.GetLayouts()[returnCode] ) )
-                return AbortWithMessage("Unable to load scene \"" + game.GetLayouts()[returnCode]->GetName() + "\". Aborting.");
         }
     }
 

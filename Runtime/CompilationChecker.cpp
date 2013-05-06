@@ -1,6 +1,6 @@
 #include "CompilationChecker.h"
-#include "GDL/Version.h"
-#include "GDL/VersionWrapper.h"
+#include "GDCore/Tools/Version.h"
+#include "GDCore/Tools/VersionWrapper.h"
 #include "GDL/CommonTools.h"
 #include <iostream>
 
@@ -8,23 +8,23 @@ using namespace std;
 
 bool CompilationChecker::EnsureCorrectGDLVersion()
 {
-    std::string versionString =  ToString(GDLVersionWrapper::Major()) + ", " + ToString(GDLVersionWrapper::Minor()) + ", " +
-                            ToString(GDLVersionWrapper::Build()) + ", " + ToString(GDLVersionWrapper::Revision());
+    std::string versionString =  ToString(gd::VersionWrapper::Major()) + ", " + ToString(gd::VersionWrapper::Minor()) + ", " +
+                            ToString(gd::VersionWrapper::Build()) + ", " + ToString(gd::VersionWrapper::Revision());
 
-    if (versionString != RC_FILEVERSION_STRING)
+    if (versionString != GDCore_RC_FILEVERSION_STRING)
     {
         char beep = 7;
         std::cout << std::endl;
         std::cout << "-- WARNING ! --" << beep << std::endl;
         std::cout << "Compiled with a different version of GDL." << std::endl;
         std::cout << "GDL DLL Version :" << versionString << std::endl;
-        std::cout << "Compiled with version :" << RC_FILEVERSION_STRING << std::endl;
+        std::cout << "Compiled with version :" << GDCore_RC_FILEVERSION_STRING << std::endl;
         std::cout << "---------------" << std::endl;
 
         return false;
     }
 
-    if ( GDLVersionWrapper::CompiledForEdittime() )
+    if ( gd::VersionWrapper::CompiledForEdittime() )
     {
         char beep = 7;
         std::cout << std::endl;
